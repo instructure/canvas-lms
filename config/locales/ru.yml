@@ -6,7 +6,7 @@ ru:
   1_item_scores_examplescores_9736236: "1- Оценки элементов: %{exampleScores}"
   1_user_found_76399771: "Найден 1 пользователь."
   1st_reviewer_3c1d0119: "1ый рецензент"
-  25th_75th_ile_406a67bf: "25-е–75-е %iили"
+  25th_75th_ile_406a67bf: "25-е-75-е процентили"
   25th_75th_percentile_aa4c11f2: "25-е-75-е процентили"
   2_final_score_7b0fd15e: "2- Итоговая оценка"
   2_final_score_exampleresult_922edf9c: "2- Итоговая оценка: %{exampleResult}"
@@ -328,6 +328,7 @@ ru:
     turnitin_pledge: "Это отправленное задание — моя собственная работа"
   account_97b34646: Аккаунт
   account_account_b6b3746b: "Учетная запись: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Администраторы учетной записи всегда могут создавать курсы"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Шкалы выходного уровня усвоения на уровне учетных записей и курсов"
   account_and_course_level_outcome_proficiencies_1cfa260: "Выходные уровни квалификации на уровне учетных записей и курсов"
   account_and_subaccount_40c6430: "Учетная и субучетная запись"
@@ -440,6 +441,7 @@ ru:
       login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
       unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
   account_course_and_user_search_22bf297a: "Поиск аккаунта, курса и пользователей"
+  account_creation_still_in_progress_ac0e0a18: "Создание учетной записи еще не завершено"
   account_domain_78f43049: "Домен учетной записи"
   account_domain_lookups_f9d1147e: "Поиск домена учетной записи"
   account_groups_2f301732: "Группы учетных записей"
@@ -1000,10 +1002,10 @@ ru:
       custom_reports: 
         end: 
           parameters: 
-            header: "Состояние регистрации"
+            header: "Завершено:"
         start: 
           parameters: 
-            header: "Состояние регистрации"
+            header: "Начато:"
     default_account_quotas_not_updated: "Квоты учетной записи по умолчанию не были обновлены"
     default_account_quotas_updated: "Квоты учетной записи по умолчанию обновлены"
     devry: 
@@ -1366,7 +1368,7 @@ ru:
         media_quota: "Квота мультимедиа"
         site_admin_quotas: "Квоты администратора сайта"
         student_quota: "Квота студента"
-        update: "Обновить событие"
+        update: Обновить
       account_roles: "Роли учетной записи:"
       account_settings_title: "Настройки учетной записи"
       add_a_custom_help_link: "Добавить пользовательскую ссылку помощи "
@@ -1549,7 +1551,7 @@ ru:
       open_registration_delegated_warning_tooltip: "Провайдер внешней идентификации включен"
       open_report_description: "Открыть описание отчета"
       page_header_title: "Настройки учетной записи"
-      page_title: "Общедоступный контент"
+      page_title: "Настройки учетной записи"
       quiz_ip_filters_delete: "Удалить IP-фильтр тестов"
       quiz_ip_filters_help_message: |-
           IP-фильтры Quiz используются для ограничения доступа к упражнениям на компьютерах в указанном диапазоне IP-адресов.
@@ -2364,6 +2366,7 @@ ru:
       Позволяет сортировать ответы в обсуждении в соответствии с временными метками создания
       . По умолчанию для ответов на корневом уровне используется порядок от самых новых к самым старым.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Позволяет отмечать ссылки для вызова справки как выбранные или новые и постоянно отображать ссылку для вызова выбранной функции справки в меню справки"
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Позволяет преподавателям массово применять баллы к неоцененным работам."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Позволяет выбирать результаты обучения во время миграции содержимого курса"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Позволяет изменять настройки уведомлений для любого курса со страницы настроек уведомлений на уровне учетной записи."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Позволяет настраивать шкалы усвоения и методы расчетов на уровне учетных записей и курсов для замены методов оценивания и расчета критериев по результату"
@@ -3211,9 +3214,9 @@ ru:
   and_more_not_shown_here_7842765e: "... и еще другие, не показанные здесь"
   ange_name: "Конвертер Angel"
   angel: 
-    file_copy_fail: "Не удалось скопировать папку «%{base_path}\""
-    file_copy_fail_message: "Не удалось переименовать каталог в путь «%{path}\""
-    file_import_fail: "Не удалось импортировать файл «%{file_path}\""
+    file_copy_fail: "Не удалось скопировать папку «%{base_path}»"
+    file_copy_fail_message: "Не удалось переименовать каталог в путь «%{path}»"
+    file_import_fail: "Не удалось импортировать файл «%{file_path}»"
   angel_display: "Обучение ANGEL"
   angel_file_description: "Экспорт Angel в .zip формат"
   annotated_document_submission_d9ff236a: "Аннотированная отправка документов"
@@ -3321,6 +3324,7 @@ ru:
   anonymous_submission_assignment_title_896654de: "Анонимная отправка: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Комментарий при анонимной отправке: Учащийся (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Комментарий при анонимной отправке: Учащийся (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "В этой теме необходимо включить флаг функции «Перекомпоновка обсуждений / объявлений»"
   anonymous_turned_off_8118a0b: "Анонимность выключена"
   anonymous_turned_on_fe56f997: "Анонимность включена"
   anonymous_user: "Анонимный пользователь"
@@ -3420,6 +3424,7 @@ ru:
   apply_date_range_selection_cc4351ed: "Применить выбор диапазона дат"
   apply_filter_7e4f6113: "Применить фильтр"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Примените фильтры. Примечание: нажатие этой кнопки приведет к перезагрузке страницы."
+  apply_score_to_ungraded_afd025d0: "Применить балл к неоцененным"
   apply_settings_10409ad9: "Применить настройки"
   apply_theme_7af08387: "Применить тему"
   applying_new_styles_to_subaccounts_e8aeeef2: "Применение новых стилей к субаккаунтам."
@@ -6702,7 +6707,7 @@ ru:
       options: Опции
     course_list_error: "Не удалось извлечь курсы. Вы подключены к Интернету?"
     d2_l_export: 
-      content: Содержимое
+      content: Контент
       options: Опции
     external_tool_content: 
       content: Содержимое
@@ -6781,7 +6786,7 @@ ru:
         default_select_folder: "Выбрать папку"
         upload_to: "Загрузить файл"
       import_quizzes_next_view: 
-        import_new_quizzes: "Импорт содержания тестирования в качестве Новых тестирований"
+        import_new_quizzes: "Импорт содержания тестирования в качестве *Новых тестирований*"
         import_new_quizzes_help_text: "Новые тестирования — это движок новых тестирований для Canvas.%{p_p}Чтобы узнать больше, обращайтесь к администратору своей системы или посетите"
         import_quizzesNext_help_label: "Импорт содержания в качестве иконки справки Новые тестирования"
         import_quizzesNext_help_text: "Quizzes.Next – это новый компонент оценки для Canvas.%{p_p}Для получения дополнительной информации обратитесь к своему системному администратору или посетите"
@@ -7981,6 +7986,7 @@ ru:
       file_meta: "Ошибка экспорта метаданных файла"
       files: "Ошибка экспорта некоторых файлов"
       grading_standards: "Ошибка экспорта стандартов оценок"
+      late_policy: "Не удалось экспортировать политику в отношении опозданий"
       learning_outcomes: "Ошибка экспорта результатов обучения"
       lti_links: "Ошибка экспорта некоторых веб-ссылок"
       media_file: "Ошибка экспорта медиафайла"
@@ -8872,6 +8878,7 @@ ru:
   create_an_ba36d171: Создать
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Создайте онлайновые контрольные работы и опросы как с оценкой, так и без оценки и осуществляйте их администрирование"
   create_announcements_above_1c36202b: "Создать объявления выше"
+  create_anonymous_discussion_topics_d573e88e: "Создать темы анонимных обсуждений"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Создавайте столько тем для обсуждений, сколько необходимо, в качестве заданий
                 для выставления оценок или форума для обмена идеями и информацией.
@@ -10153,6 +10160,7 @@ ru:
             обсуждения способствуют углубленным или длительным дискуссиям
              с сохранением их структуры, тогда как фокусные дискуссии лучше подходят для быстрого обмена мнениями.
   discussions_announcements_redesign_901c5528: "Перекомпоновка дискуссий/обсуждений"
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "Перекомпоновка обсуждений / объявлений — Анонимность"
   discussions_create_94dff604: "Обсуждения - создать"
   discussions_index_menu_42591bc9: "Меню указателя обсуждений"
   discussions_menu_f18eb4a2: "Меню обсуждений"
@@ -10580,7 +10588,7 @@ ru:
       formatting: "Форматирование, нажмите стрелку вниз, чтобы выбрать"
       rte_help: "Область форматированного текста. Нажмите ALT + F8 для справки"
   editor_button_6647db9c: "Кнопка редактора"
-  either_course_or_student_c42bb055: "Либо «курс», либо «студент»'"
+  either_course_or_student_c42bb055: "Либо «курс», либо «студент»"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Необходимо изменить значения groupId или outcomeId"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Должен быть установлен либо URL-адрес, либо домен."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Вы либо новый пользователь, либо *условия использования* изменились после того, как вы в последний раз приняли их. Примите *условия использования*, прежде чем продолжить."
@@ -11297,7 +11305,7 @@ ru:
   example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "пример: \"https://schoolofrock.catalog.instructure.com\""
   example_https_schoolofrock_edu_d4326f03: "пример: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Пример оценок за элемент"
-  example_school_of_rock_41f32c31: "пример: «Школа рока\""
+  example_school_of_rock_41f32c31: "пример: «Школа рока»"
   exceeds_expectations_5910fc3a: "Превышает ожидания"
   exceeds_mastery_1f995dce: "Превышает проходной балл"
   excelsior_student_activity_tracking_7a1ba44d: "Отслеживание активности студентов Excelsior"
@@ -11553,6 +11561,7 @@ ru:
   failed_to_load_apps_db37e651: "Не удалось загрузить приложения."
   failed_to_load_apps_for_name_fc6ce1c: "Не удалось загрузить приложения для %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Не удалось загрузить задания в важные даты."
+  failed_to_load_conversation_messages_9b4546fc: "Не удалось загрузить сообщения беседы."
   failed_to_load_course_navigation_for_name_aded3650: "Не удалось загрузить навигацию по курсу для %{name}."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Не удалось загрузить курсы. Обновите страницу, чтобы повторить попытку."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Не удалось загрузить информацию CSP, попробуйте обновить страницу."
@@ -11635,6 +11644,7 @@ ru:
   feature_options_enable_disable_7e748054: "Параметры функции - включить / отключить"
   feature_options_view_a170e80c: "Опции функции – показать"
   feature_preview_5e1216a0: "Предварительный просмотр функции"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Предварительный просмотр функции — выбор включает в себя постоянные обновления вне регулярного графика релизов"
   feature_previews_2700a397: "Предварительный просмотр функций"
   feature_previews_account_settings_274440bc: "Предварительный просмотр функций (настройки учетной записи)"
   feature_previews_enable_disable_707af910: "Предварительный просмотр функций - включить / отключить"
@@ -12005,6 +12015,7 @@ ru:
   full_name_23fdfb6d: "Полное имя"
   full_name_83cf5453: "Полное имя"
   full_name_is_required_8efbdc84: "Необходимо указать полное имя"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Полностью: имена учащихся и фотографии профиля будут скрыты"
   future_5416ea92: Будущее
   future_terms_7fba2ae6: "Будущие семестры"
   galician_7e4508b5: Галисийский
@@ -13555,6 +13566,7 @@ ru:
   handlebars_helpers: 
     time: 
       event: "%{date} в %{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "автоматически выбран на основании того, где находится экземпляр Canvas этой учетной записи. В некоторых случаях это может быть другой регион."
   has_similarity_score_d5f332b4: "Имеет коэффициент сходства"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Имеется оценка Turnitin"
@@ -13971,6 +13983,7 @@ ru:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Если отключен, у пользователя все равно будет доступ к настройкам курса. Пользователь не может управлять отдельным содержимым курса без соответствующего разрешения для этого элемента содержимого. Если видимость курса ограничена пользователями, зачисленными на курс, это разрешение позволяет пользователю просматривать контент курса без зачисления на курс."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Если отключен, у пользователя все равно будет доступ к настройкам курса."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "После включения будет активирован доступ к LTI 1.3 и LTI Advantage."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Если эта функция включена, она позволяет устанавливать глубинные ссылки из индекса модулей посредством модала."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Если эта функция включена, она позволяет устанавливать глубинные ссылки из индекса модулей."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "В случае активации позволяет выставлять в рубрике оценку выше максимально возможной."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Если включено, позволяет поддерживать множественные глубинные ссылки для заданий и модулей."
@@ -14331,7 +14344,7 @@ ru:
   include_scores_when_alerting_about_grades_89728ae1: "Включить оценки при уведомлении об оценках."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Включает баллы, когда оповещает об оценках.
-                Если ваш электронный адрес не является электронным адресом организации, это означает, что требующее особого обращения содержимое будет отправляться за пределы организации.
+      Если ваш электронный адрес не является электронным адресом организации, это означает, что требующее особого обращения содержимое будет отправляться за пределы организации.
   include_speedgrader_in_assignment_header_menu_69cd8656: "Включить SpeedGrader в меню заголовка заданий"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Включить агент Datadog RUM JS в ЗАГОЛОВОК документа."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Включить эти оценки за задания при размещении в школьной Системе информации о студенте"
@@ -14556,7 +14569,7 @@ ru:
   international_sms_9edb9868: "Международные SMS"
   international_sms_send_from_recipient_s_country_43881ea4: "Международные SMS - Отправить из страны получателя"
   international_text_messaging_rates_may_apply_d4b4a97a: "Могут применяться расценки на международные текстовые сообщения."
-  internet2_254c6ca6: Интернет2
+  internet2_254c6ca6: Internet2
   invalid_address_book_strategy_904a7ada: "Недопустимая стратегия адресной книги."
   invalid_authenticity_token_b753558c: "Неверный маркер проверки подлинности"
   invalid_aws_configuration_e8a6ae0f: "Недействительная конфигурация AWS"
@@ -14607,6 +14620,8 @@ ru:
                                     Свяжитесь с нами через #canvas-sre в Slack.
   invalid_restrictions_316cd740: "Недействительные ограничения"
   invalid_score_3d247da7: "Недействительная оценка"
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Неверное имя пользователя sftp. Нам не удалось определить имя пользователя из-за отсутствия домена, заканчивающегося на .instructure.\n\
+      \x20                             Обратитесь в #canvas-sre в Slack.   "
   invalid_sis_sync_status_b68db497: "Недействительный статус синхр. SIS"
   invalid_state_parameter_7a5aa108: "Неверный параметр состояния"
   invalid_submission_file_type_cda6742a: "Неверный тип файла отправки"
@@ -15205,6 +15220,7 @@ ru:
   loading_comment_library_3131e5c6: "Загрузка библиотеки комментариев"
   loading_comments_32366acf: "Загрузка комментариев"
   loading_compose_modal_f6da0e8b: "Загрузка модальности составления"
+  loading_conversation_messages_71e9050e: "Выполняется загрузка сообщений беседы"
   loading_courses_409a3641: "Загрузка курсов"
   loading_courses_bd1bffe: "Загрузка курсов..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -15217,6 +15233,7 @@ ru:
   loading_discussions_8ed5fcd7: "Загрузка дискуссий"
   loading_external_tool_d839042c: "Загрузка внешнего инструмента"
   loading_f99d93d4: "... загрузка"
+  loading_feature_options_82e07ee4: "Выполняется загрузка параметров функции"
   loading_features_d26820f6: "Загрузка функций"
   loading_folders_d8b5869e: "Загрузка папок"
   loading_graders_f6a76142: "Загрузка оценщиков"
@@ -16580,7 +16597,6 @@ ru:
             
             %{course}, ваш курс в Canvas Network начался пару дней назад, но мы заметили, что вы еще не входили в систему. Мы просто хотели отправить вам напоминание, если вы забыли.
             
-            
             Чтобы войти в систему, перейдите на %{site} и введите свое имя пользователя и пароль. Если вы еще не установили пароль, вы можете задать его здесь: %{password_url}
             
             Если вы просто не можете пройти этот конкретный курс, обязательно просмотрите наш каталог курсов на %{site}, чтобы найти что-то другое, что вас вдохновит. Постоянно добавляются новые курсы!
@@ -16627,7 +16643,6 @@ ru:
             Что вы можете сделать, чтобы подготовиться?
             
             Если вы еще не создали свой профиль Canvas Network, вы можете войти и настроить его на Canvas.net. Ваш профиль поможет другим участникам курса узнать, кто вы. Там же вы можете настроить параметры уведомлений.
-            
             
             Наконец, здесь вы можете ознакомиться с необходимыми материалами и всеми инструкциями для вашего курса: %{url}
             
@@ -17665,6 +17680,7 @@ ru:
   mfa_required_ca66e177: "Требуется MFA"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Экспорт оценки MGP"
+  miami_utilization_report_9c927880: "Отчет об использовании Miami"
   mic_a7f3d311: Микрофон
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 позволяет увеличить количество участников в команде максимум до %{max}."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 допускает максимум %{max} владельцев в команде."
@@ -17957,6 +17973,8 @@ ru:
   modules_group_menu_4aae0d5f: "Меню групп модулей"
   modules_home_page_568c6bb9: "Домашняя страница модулей"
   modules_index_menu_c8748e7c: "Меню указателя модулей"
+  modules_index_menu_modal_79123a19: "Меню указателя модулей (модал)"
+  modules_index_menu_tray_3f9975d9: "Меню указателя модулей (лоток )"
   modules_item_controller: 
     max_score_complete: "оценка не более *score*"
     max_score_incomplete: "оценка должна быть не более *score*"
@@ -18328,8 +18346,8 @@ ru:
       продуктах партнеров, должны активировать эту функцию для расширения рабочих
       процессов валидации данных по заданиям. После активации эта функция отображает новые настройки
       интеграции SIS для SIS Sync (передача информации об оценках на уровне заданий по каналам обратной связи) в
-      настройках учетных записей. функция «Публикация в SIS» была включена в эту новую настройку
-      и активирована по умолчанию.
+      настройках учетных записей. Опциональная функция «Публикация в SIS» была включена в эту новую
+      настройку и активирована по умолчанию.
   new_slack_api_key_453d04d: "Новый ключ Slack API"
   new_topic_for_course_3d98222a: "Новая тема для %{course}"
   new_typography_4eaeca26: "Новая топография"
@@ -18610,7 +18628,7 @@ ru:
     blueprint_description: |-
         *Только инструктор и администратор:*
         
-              Содержимое было синхронизировано из шаблонного курса применительно к связанным курсам
+        Содержимое было синхронизировано из шаблонного курса применительно к связанным курсам
     blueprint_display: "Синхронизация шаблона"
     calendar_description: "Новые или измененные элементы в вашем календаре курса"
     calendar_display: Календарь
@@ -18643,7 +18661,7 @@ ru:
       student_appointment_signups: "Регистрация встреч студента"
       submission_comment: "Комментарий отправки"
     content_link_error_description: "*Только преподаватель и администратор:*\n\n\
-        \x20       Расположение и содержание неисправной ссылки, которую использовал учащийся "
+        Расположение и содержание неисправной ссылки, которую использовал учащийся "
     content_link_error_display: "Ошибка ссылки на содержимое"
     conversation_created_description: "Вы создали беседу"
     conversation_created_display: "Беседы, созданные мной"
@@ -18652,9 +18670,9 @@ ru:
     course_content_description: |-
         Изменение содержания курса: 
         
-              * Содержание страницы
-              * Содержание тестирования
-              * Содержание задания
+        * Содержание страницы
+        * Содержание тестирования
+        * Содержание задания
     course_content_display: "Содержание курса"
     discussion_description: "Новая тема для обсуждения в вашем курсе"
     discussion_display: "Новая тема"
@@ -18667,8 +18685,8 @@ ru:
     grading_description: |-
         Включает: 
         
-              * Введенная/измененная оценка задания/отправки
-              * Измененный вес оценки
+        * Введенная/измененная оценка задания/отправки
+        * Измененный вес оценки
     grading_display: Аттестация
     grading_notify_include_grade: "Включить оценки при уведомлении об изменении оценок."
     grading_policies_description: "Изменение политики оценки курса"
@@ -18676,21 +18694,21 @@ ru:
     invitation_description: |-
         Приглашение: 
         
-              * на веб-конференцию
-              * в группу
-              * к совместной деятельности
-              * к рецензированию и напоминанию
+        * на веб-конференцию
+        * в группу
+        * к совместной деятельности
+        * к рецензированию и напоминанию
     invitation_display: Приглашение
     late_grading_description: |-
         *Только инструктор и администратор:*
         
-              Поздняя отправка задания
+        Поздняя отправка задания
     late_grading_display: "Поздняя оценка"
     membership_update_description: |-
         *Только администратор: активировано ожидание регистрации*
         
-              * Регистрация группы
-              * принято/отклонено
+        * Регистрация группы
+        * принято/отклонено
     membership_update_display: "Обновление членства"
     missing_description_description: "Для уведомлений %{category}"
     missing_display_display: "Для уведомлений %{category}"
@@ -18775,19 +18793,19 @@ ru:
     other_description: |-
         *Только инструктор и администратор:*
         
-              * Регистрация на курсе
-              * Создан отчет
-              * Экспорт содержимого
-              * Отчет о перемещении
-              * Новая учетная запись пользователя
-              * Новая группа студентов
+        * Регистрация на курсе
+        * Создан отчет
+        * Экспорт содержимого
+        * Отчет о перемещении
+        * Новая учетная запись пользователя
+        * Новая группа студентов
     other_display: "Административные предупреждения"
     recording_ready_display: "Запись готова"
     reminder_display: Напоминание
     student_appointment_description: |-
         *Только инструктор и администратор:*
         
-              Регистрация встречи студента
+        Регистрация встречи студента
     student_appointment_display: "Регистрация встреч студента"
     submission_comment_description: "Комментарий к отправке задания"
     submission_comment_display: "Комментарий отправки"
@@ -18989,6 +19007,7 @@ ru:
   of_students_5d1af0d2: "# студентов"
   off_5385ef3f: Выкл
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Откл - Политика не применяется к этой субучетной записи"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Выкл.: имена учащихся и фотографии профиля будут видны другим участникам данного курса"
   offensive_abusive_c41dcb08: "Оскорбительный, нецензурный"
   offline_score_8d7b4779: "Оценка в автономном режиме:"
   offline_web_export_dca67174: "Экспорт веб-страниц для просмотра без выхода в Интернет"
@@ -19100,6 +19119,7 @@ ru:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Открыть этот диалог комбинаций клавиш"
   open_title_in_a_new_window_b29fed77: "Открыть %{title} в новом окне"
   open_to_comments_23d5585e: "Открыть для комментариев"
+  open_to_do_items_in_a_new_tab_120ea5f4: "Открыть пункты текущих дел в новой вкладке"
   openid_connect_initiation_url_2be36b48: "URL-адрес инициации OpenID Connect"
   openid_connect_initiation_url_d9037d30: "* URL инициации подключения OpenID"
   opens_in_new_window_b4b99243: "открывается в новом окне"
@@ -19672,6 +19692,7 @@ ru:
   please_provide_a_pairing_code_530d1e9d: "Укажите код сопряжения."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Укажите действительный домен клиента. Проверьте настройки Azure Active Directory, чтобы найти его."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Свяжитесь с нами в Slack по адресу #canvas-sre, если это продолжается."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Свяжитесь в Slack в #canvas-sre. Регион, в котором находится экземпляр Canvas этого клиента, не поддерживает SFTP."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Свяжитесь с нами в Slack по адресу #canvas-sre, чтобы создать SFTP для этой учетной записи."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Выберите набор групп для данного задания"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Выберите причину для сообщения этого ответа"
@@ -22162,7 +22183,7 @@ ru:
           time_elapsed: "Прошло времени"
           time_running: "Время идет"
         links: 
-          hide_time_running: Скрыть
+          hide_time_running: "Скрыть время"
           keep_editing_quiz: "Продолжить редактирование этой контрольной работы"
           keep_editing_survey: "Продолжить редактирование этого опроса"
     retrieving_filters: "Получение фильтров..."
@@ -22233,7 +22254,7 @@ ru:
       errors: 
         connection_lost: "Подключение к %{host} было потеряно.  Перед продолжением убедитесь, что вы подключены к Интернету."
         only_numerical_values: "принимаются только числовые значения"
-      hide_time_link: Скрыть
+      hide_time_link: "Скрыть время"
       hours_count: 
         few: "%{count} часа(ов)"
         many: "%{count} часа(ов)"
@@ -22272,7 +22293,7 @@ ru:
         many: "%{count} секунд(ы)"
         one: "1 секунда"
         other: "%{count} секунд(ы)"
-      show_time_link: Показать
+      show_time_link: "Показать время"
       titles: 
         come_back_later: "Вы отметили этот вопрос, чтобы вернуться к нему позднее"
         times_up: "Время истекло!"
@@ -23966,6 +23987,7 @@ ru:
                                     четырех часов до начала работы этого ключа.
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "Недопустимый ключ SFTP. Убедитесь, что он правильно отформатирован."
   sftp_key_removed_from_user_42318725: "SFTP-ключ удален для пользователя."
+  sftp_region_invalid_216caa40: "Недопустимый регион SFTP"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       Пользователь SFTP уже существует или отключен.
                                     Свяжитесь с нами через #canvas-sre в Slack.
@@ -26562,6 +26584,7 @@ ru:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Это ePortfolio было идентифицировано как « спам». В настоящее время оно доступно для просмотра только для администраторов и автора. Если вы уверены, в том, что данный контент не является спамом, вы можете пометить его как «безопасное»."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Эта функция влияет на существующие данные для всех курсов в учетной записи."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Эта функция влияет на существующие данные для всей учетной записи."
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Эта функция позволяет преподавателям создавать анонимные обсуждения и включить настройку на уровне курса, чтобы учащиеся могли создавать анонимные обсуждения."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Эта функция позволяет преподавателям без проблем копировать одиночные элементы из одного курса в другой и делиться одиночным элементом содержания с другими пользователями таким образом, чтобы они также могли импортировать эти элементы в свои курсы."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Данную функцию нельзя отключить, так как существует как минимум одна субучетная запись или курс с включенной функцией."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Эта функция не может быть активирована, пока активировано автораспознавание или разделители полей"
@@ -26760,7 +26783,6 @@ ru:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Этот отчет отражает всю активность пользователей, зачисленных на все курсы
         в данном семестре. Полученный файл csv будет содержать по одной строке активности
-        
         каждого студента и будет иметь следующие заголовки: идентификатор раздела, идентификатор sis раздела,
         название раздела, идентификатор курса, идентификатор sis курса, название курса, идентификатор семестра, идентификатор sis семестра,
         название семестра, идентификатор пользователя, идентификатор sis пользователя, имя пользователя, тип контента, контент, время просмотра,
@@ -26803,6 +26825,7 @@ ru:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Этот пользователь на данный момент не может получить доступ к курсу"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Этот пользователь на данный момент не может получить доступ к курсу\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Этот пользователь совершил действия, когда анонимность была отключена"
+  this_user_will_be_created_in_3b2a2b52: "Этот пользователь будет создан в:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Эта версия журнала оценок будет заменена на обновленную 18.01.2020 или раньше."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       Это уже происходило в отношении рассматриваемых изображений, но не в отношении ответов,
@@ -28839,6 +28862,7 @@ ru:
   view_description_b6d8e52b: "Просмотреть описание"
   view_due_items_due_today_for_course_coursename_129e433: "Показать %{due} пунктов со сроком сдачи сегодня для курса %{courseName}"
   view_faculty_journals_ad0e8c8f: "Просмотреть журнал преподавателей"
+  view_feature_options_at_an_account_level_a84cedbe: "Просмотр параметры функции на уровне учетной записи"
   view_feature_settings_at_an_account_level_ec7f5e10: "Просмотр настроек функций на уровне учетной записи"
   view_feedback_b88c99c: "Просмотреть отзыв"
   view_feedback_f2feabca: "Просмотреть отзыв"
@@ -29049,6 +29073,7 @@ ru:
       Если этот флажок установлен, в календаре учащегося Canvas
       отображается кнопка "Присоединиться"
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Если этот флаг включен, то в личном кабинете отображается переключатель выбора студента для наблюдателей."
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "При включении этого параметра пункты текущих дел преподавателя автоматически открываются в новой вкладке."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Если этот параметр активен, он включает функцию «@mention» в обсуждениях курса."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "При сокрытии оценок для назначения анонимных заданий оценки будут скрыты для всех студентов на курсе. Анонимность будет применена повторно."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Эту страницу видят люди, посещающие курс. Вы можете настроить на ней отображение ленты активности, списка модулей курса, программы обучения или установить пользовательскую страницу, созданную вами. По умолчанию на ней отображается лента активности курса."

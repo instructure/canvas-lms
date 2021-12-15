@@ -146,10 +146,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   include ::Filters::QuizSubmissions
 
   before_action :require_user, :require_context, :require_quiz
-  before_action :require_overridden_quiz, :except => [:index]
-  before_action :require_quiz_submission, :except => [:index, :submission, :create]
-  before_action :prepare_service, :only => [:create, :update, :complete]
-  before_action :validate_ldb_status!, :only => [:create, :complete]
+  before_action :require_overridden_quiz, except: [:index]
+  before_action :require_quiz_submission, except: %i[index submission create]
+  before_action :prepare_service, only: %i[create update complete]
+  before_action :validate_ldb_status!, only: [:create, :complete]
 
   # @API Get all quiz submissions.
   #
@@ -173,12 +173,12 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
                          # teachers have access to all student submissions
                          visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user).pluck(:user_id)
-                         Api.paginate @quiz.quiz_submissions.where(:user_id => visible_student_ids),
+                         Api.paginate @quiz.quiz_submissions.where(user_id: visible_student_ids),
                                       self,
                                       api_v1_course_quiz_submissions_url(@context, @quiz)
                        elsif @quiz.grants_right?(@current_user, session, :submit)
                          # students have access only to their own submissions, both in progress, or completed`
-                         submission = @quiz.quiz_submissions.where(:user_id => @current_user).first
+                         submission = @quiz.quiz_submissions.where(user_id: @current_user).first
                          if submission
                            if submission.workflow_state == "untaken"
                              [submission]
@@ -237,7 +237,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      if params.has_key?(:attempt)
+      if params.key?(:attempt)
         retrieve_quiz_submission_attempt!(params[:attempt])
       end
 
@@ -280,7 +280,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
                         @service.create(@quiz)
                       end
 
-    log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
+    log_asset_access(@quiz, "quizzes", "quizzes", "participate")
 
     serialize_and_render quiz_submission
   end
@@ -343,7 +343,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     resource_params = params[:quiz_submissions]
 
     unless resource_params.is_a?(Array)
-      reject! 'missing required key :quiz_submissions'
+      reject! "missing required key :quiz_submissions"
     end
 
     if (resource_params = resource_params[0])
@@ -412,10 +412,9 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def time
     if authorized_action(@quiz_submission, @current_user, :record_events)
-      render :json =>
-      {
-        :end_at => @quiz_submission && @quiz_submission.end_at,
-        :time_left => @quiz_submission && @quiz_submission.time_left
+      render json: {
+        end_at: @quiz_submission && @quiz_submission.end_at,
+        time_left: @quiz_submission && @quiz_submission.time_left
       }
     end
   end
@@ -423,7 +422,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   private
 
   def module_locked?
-    @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+    @quiz.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
   end
 
   def previewing?
@@ -433,7 +432,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def serialize_and_render(quiz_submissions)
     quiz_submissions = [quiz_submissions] unless quiz_submissions.is_a? Array
 
-    render :json => quiz_submissions_json(
+    render json: quiz_submissions_json(
       quiz_submissions,
       @quiz,
       @current_user,
@@ -445,10 +444,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   def validate_ldb_status!(quiz = @quiz)
-    if quiz.require_lockdown_browser?
-      unless ldb_plugin.authorized?(self)
-        reject! 'this quiz requires the lockdown browser', :forbidden
-      end
+    if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
+      reject! "this quiz requires the lockdown browser", :forbidden
     end
   end
 

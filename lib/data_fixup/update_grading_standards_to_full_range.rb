@@ -24,10 +24,10 @@ module DataFixup::UpdateGradingStandardsToFullRange
         next if grading_standard.valid?
 
         # Let's not update any records that already have a 0% bucket
-        next unless grading_standard.errors[:data].include?('grading schemes must have 0% for the lowest grade')
+        next unless grading_standard.errors[:data].include?("grading schemes must have 0% for the lowest grade")
         # or any records that have a negative bucket value because technically 0 will fit either in the highest bucket
         # or in the first negative bucket following a positive bucket
-        next if grading_standard.errors[:data].include?('grading scheme values cannot be negative')
+        next if grading_standard.errors[:data].include?("grading scheme values cannot be negative")
 
         buckets = grading_standard.data.sort_by { |bucket| -bucket[1] }
         buckets.last[1] = 0.0

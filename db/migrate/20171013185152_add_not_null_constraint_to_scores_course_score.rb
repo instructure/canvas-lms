@@ -23,18 +23,18 @@ class AddNotNullConstraintToScoresCourseScore < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def up
-    self.connection.execute(<<SQL)
+    connection.execute(<<SQL.squish)
       ALTER TABLE #{Score.quoted_table_name}
        ADD CONSTRAINT course_score_not_null CHECK (course_score IS NOT NULL) NOT VALID;
 SQL
 
-    self.connection.execute(<<SQL)
+    connection.execute(<<SQL.squish)
       ALTER TABLE #{Score.quoted_table_name} VALIDATE CONSTRAINT course_score_not_null;
 SQL
   end
 
   def down
-    self.connection.execute(<<SQL)
+    connection.execute(<<SQL.squish)
       ALTER TABLE #{Score.quoted_table_name} DROP CONSTRAINT course_score_not_null;
 SQL
   end

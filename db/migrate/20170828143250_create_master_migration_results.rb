@@ -36,8 +36,8 @@ class CreateMasterMigrationResults < ActiveRecord::Migration[5.0]
     add_foreign_key :master_courses_migration_results, :content_migrations
 
     add_index :master_courses_migration_results, [:master_migration_id, :state],
-              :name => "index_mc_migration_results_on_master_mig_id_and_state"
+              name: "index_mc_migration_results_on_master_mig_id_and_state"
     add_index :master_courses_migration_results, [:master_migration_id, :content_migration_id],
-              :unique => true, :name => "index_mc_migration_results_on_master_and_content_migration_ids"
+              unique: true, name: "index_mc_migration_results_on_master_and_content_migration_ids"
   end
 end

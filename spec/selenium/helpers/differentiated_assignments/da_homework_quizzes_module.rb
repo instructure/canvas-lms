@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'da_quiz'
+require_relative "da_quiz"
 
 module DifferentiatedAssignments
   module Homework
@@ -50,20 +50,20 @@ module DifferentiatedAssignments
 
         def all
           [
-            self.quiz_for_everyone,
-            self.quiz_for_section_a,
-            self.quiz_for_section_b,
-            self.quiz_for_section_c,
-            self.quiz_for_sections_a_and_b,
-            self.quiz_for_first_student,
-            self.quiz_for_second_and_third_students
+            quiz_for_everyone,
+            quiz_for_section_a,
+            quiz_for_section_b,
+            quiz_for_section_c,
+            quiz_for_sections_a_and_b,
+            quiz_for_first_student,
+            quiz_for_second_and_third_students
           ]
         end
 
         def short_list
           [
-            self.quiz_for_sections_a_and_b,
-            self.quiz_for_second_and_third_students
+            quiz_for_sections_a_and_b,
+            quiz_for_second_and_third_students
           ]
         end
 
@@ -75,22 +75,22 @@ module DifferentiatedAssignments
 
         def assign_quiz_overrides(short = flase)
           if short
-            self.short_list.each(&:assign_overrides)
+            short_list.each(&:assign_overrides)
           else
-            self.all.each(&:assign_overrides)
+            all.each(&:assign_overrides)
           end
         end
 
         def submit_quizzes
           users = DifferentiatedAssignments::Users
-          self.quiz_for_everyone.submit_as(users.first_student)
-          self.quiz_for_section_a.submit_as(users.first_student)
-          self.quiz_for_section_b.submit_as(users.second_student)
-          self.quiz_for_section_c.submit_as(users.fourth_student)
-          self.quiz_for_sections_a_and_b.submit_as(users.third_student)
-          self.quiz_for_first_student.submit_as(users.first_student)
-          self.quiz_for_second_and_third_students.submit_as(users.second_student)
-          self.quiz_for_second_and_third_students.submit_as(users.third_student)
+          quiz_for_everyone.submit_as(users.first_student)
+          quiz_for_section_a.submit_as(users.first_student)
+          quiz_for_section_b.submit_as(users.second_student)
+          quiz_for_section_c.submit_as(users.fourth_student)
+          quiz_for_sections_a_and_b.submit_as(users.third_student)
+          quiz_for_first_student.submit_as(users.first_student)
+          quiz_for_second_and_third_students.submit_as(users.second_student)
+          quiz_for_second_and_third_students.submit_as(users.third_student)
         end
       end
     end

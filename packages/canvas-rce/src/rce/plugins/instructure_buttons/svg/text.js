@@ -175,6 +175,8 @@ function getYMiddleTextForShape(getYTextSizeCallback, shape, size) {
     case 'square':
     case 'circle':
     case 'triangle':
+    case 'diamond':
+    case 'pentagon':
     case 'hexagon':
     case 'octagon':
     case 'star':

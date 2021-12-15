@@ -25,9 +25,9 @@ class FixupObserverAlert < ActiveRecord::Migration[5.1]
     remove_column :observer_alerts, :html_url # rubocop:disable Migration/RemoveColumn
 
     change_table :observer_alerts do |t|
-      t.remove_belongs_to :user_observation_link, foreign_key: { to_table: 'user_observers' } # rubocop:disable Migration/RemoveColumn
-      t.references :user, null: false, foreign_key: { to_table: 'users' }
-      t.references :observer, null: false, foreign_key: { to_table: 'users' }
+      t.remove_belongs_to :user_observation_link, foreign_key: { to_table: "user_observers" } # rubocop:disable Migration/RemoveColumn
+      t.references :user, null: false, foreign_key: { to_table: "users" }
+      t.references :observer, null: false, foreign_key: { to_table: "users" }
     end
   end
 end

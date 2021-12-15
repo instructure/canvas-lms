@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 def view_context(context = @course, current_user = @user, real_current_user = nil)
   assign(:context, context)
@@ -32,7 +32,7 @@ def view_portfolio(portfolio = @portfolio, current_user = @user)
   assign(:current_user, current_user)
 end
 
-RSpec.shared_context 'lti_layout_spec_helper' do
+RSpec.shared_context "lti_layout_spec_helper" do
   before do
     allow(ActionController).to receive(:flash).with(any_args).and_return(true)
     allow(User).to receive(:default_avatar_fallback).and_return("http://localhost/avatar.png")
@@ -48,7 +48,7 @@ RSpec.shared_context 'lti_layout_spec_helper' do
 
     allow(tag).to receive(:new_tab).and_return(true)
     allow(tag).to receive(:quiz_lti).and_return true
-    allow(tool).to receive(:login_or_launch_url).with(any_args).and_return('https://example.com')
+    allow(tool).to receive(:login_or_launch_url).with(any_args).and_return("https://example.com")
     allow(tool).to receive(:use_1_3?).and_return(true)
     allow(ContextExternalTool).to receive(:find_external_tool).with(any_args).and_return(tool)
   end
@@ -69,17 +69,17 @@ end
 
 module LtiLayoutSpecHelper
   def self.create_tag(tool)
-    ContentTag.create!(title: 'Test',
+    ContentTag.create!(title: "Test",
                        content_id: tool.id,
-                       content_type: 'ContextExternalTool',
-                       tag_type: 'context_module',
-                       context_type: 'Account',
+                       content_type: "ContextExternalTool",
+                       tag_type: "context_module",
+                       context_type: "Account",
                        context_id: Account.default.id,
                        root_account_id: Account.default,
-                       url: 'https://example.com')
+                       url: "https://example.com")
   end
 
-  def self.create_tool(tool_id = 'A brand new tool')
+  def self.create_tool(tool_id = "A brand new tool")
     dev_key = DeveloperKey.create
     course = Course.create
     ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
@@ -88,9 +88,9 @@ module LtiLayoutSpecHelper
   def self.create_request
     ActionDispatch::Request.new({
                                   "rack.input" => StringIO.new(""),
-                                  "HTTP_HOST" => 'example.com',
-                                  "HTTP_ACCEPT" => 'text/html',
-                                  "REQUEST_METHOD" => 'GET',
+                                  "HTTP_HOST" => "example.com",
+                                  "HTTP_ACCEPT" => "text/html",
+                                  "REQUEST_METHOD" => "GET",
                                   "action_dispatch.request.parameters" => {
                                     "display" => "full_width"
                                   }

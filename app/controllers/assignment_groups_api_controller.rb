@@ -21,7 +21,7 @@
 # @API Assignment Groups
 class AssignmentGroupsApiController < ApplicationController
   before_action :require_context
-  before_action :get_assignment_group, :except => [:create]
+  before_action :get_assignment_group, except: [:create]
 
   include Api::V1::AssignmentGroup
 
@@ -51,16 +51,16 @@ class AssignmentGroupsApiController < ApplicationController
       if params[:grading_period_id].present?
         assignments = GradingPeriod.for(@context).find_by(id: params[:grading_period_id]).assignments(@context, assignments)
       end
-      if assignments.any? && includes.include?('submission')
-        submissions = submissions_hash(['submission'], assignments)
+      if assignments.any? && includes.include?("submission")
+        submissions = submissions_hash(["submission"], assignments)
       end
-      includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-      render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
-                                              stringify_json_ids: stringify_json_ids?,
-                                              override_dates: override_dates,
-                                              assignments: assignments,
-                                              submissions: submissions
-                                            })
+      includes.delete("assignment_visibility") unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      render json: assignment_group_json(@assignment_group, @current_user, session, includes, {
+                                           stringify_json_ids: stringify_json_ids?,
+                                           override_dates: override_dates,
+                                           assignments: assignments,
+                                           submissions: submissions
+                                         })
     end
   end
 
@@ -92,7 +92,7 @@ class AssignmentGroupsApiController < ApplicationController
     @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
       unless valid_integration_data?(params)
-        return render :json => 'Invalid integration data', :status => :bad_request
+        return render json: "Invalid integration data", status: :bad_request
       end
 
       updated = update_assignment_group(@assignment_group, params)
@@ -109,7 +109,7 @@ class AssignmentGroupsApiController < ApplicationController
   def update
     if authorized_action(@assignment_group, @current_user, :update)
       unless valid_integration_data?(params)
-        return render :json => 'Invalid integration data', :status => :bad_request
+        return render json: "Invalid integration data", status: :bad_request
       end
 
       updated = update_assignment_group(@assignment_group, params)
@@ -137,9 +137,9 @@ class AssignmentGroupsApiController < ApplicationController
 
       if @assignment_group.assignments.active.exists?
         if @assignment_group.has_frozen_assignment_group_id_assignment?(@current_user)
-          err_msg = t('errors.frozen_assignments_error', "You cannot delete a group with a locked assignment.")
-          @assignment_group.errors.add('workflow_state', err_msg, :att_name => 'workflow_state')
-          render :json => @assignment_group.errors, :status => :bad_request
+          err_msg = t("errors.frozen_assignments_error", "You cannot delete a group with a locked assignment.")
+          @assignment_group.errors.add("workflow_state", err_msg, att_name: "workflow_state")
+          render json: @assignment_group.errors, status: :bad_request
           return
         end
 
@@ -150,7 +150,7 @@ class AssignmentGroupsApiController < ApplicationController
       end
 
       @assignment_group.destroy
-      render :json => assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
+      render json: assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
     end
   end
 
@@ -160,9 +160,9 @@ class AssignmentGroupsApiController < ApplicationController
 
   def process_assignment_group(updated)
     if updated && @assignment_group.save
-      render :json => assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
+      render json: assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
     else
-      render :json => @assignment_group.errors, :status => :bad_request
+      render json: @assignment_group.errors, status: :bad_request
     end
   end
 
@@ -176,7 +176,7 @@ class AssignmentGroupsApiController < ApplicationController
   private
 
   def valid_integration_data?(params)
-    integration_data = params['integration_data']
+    integration_data = params["integration_data"]
     integration_data.is_a?(ActionController::Parameters) || integration_data.nil?
   end
 

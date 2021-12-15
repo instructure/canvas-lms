@@ -31,11 +31,11 @@ module Api::V1::PlannerItem
   include Api::V1::AssessmentRequest
   include PlannerApiHelper
 
-  API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
-                          :read_state, :created_at, :updated_at].freeze
-  CALENDAR_PLANNABLE_FIELDS = [:all_day, :location_address, :description, :start_at, :end_at,
-                               :online_meeting_url].freeze
-  GRADABLE_FIELDS = [:assignment_id, :points_possible, :due_at].freeze
+  API_PLANNABLE_FIELDS = %i[id title course_id location_name todo_date details url unread_count
+                            read_state created_at updated_at].freeze
+  CALENDAR_PLANNABLE_FIELDS = %i[all_day location_address description start_at end_at
+                                 online_meeting_url].freeze
+  GRADABLE_FIELDS = %i[assignment_id points_possible due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze
   ASSESSMENT_REQUEST_FIELDS = [:workflow_state].freeze
 
@@ -43,10 +43,10 @@ module Api::V1::PlannerItem
     planner_override = item.planner_override_for(user)
     planner_override.plannable = item if planner_override
     context_data(item, use_effective_code: true).merge({
-                                                         :plannable_id => item.id,
-                                                         :planner_override => planner_override_json(planner_override, user, session, item.class_name),
-                                                         :plannable_type => PlannerHelper::PLANNABLE_TYPES.key(item.class_name),
-                                                         :new_activity => new_activity(item, user, opts)
+                                                         plannable_id: item.id,
+                                                         planner_override: planner_override_json(planner_override, user, session, item.class_name),
+                                                         plannable_type: PlannerHelper::PLANNABLE_TYPES.key(item.class_name),
+                                                         new_activity: new_activity(item, user, opts)
                                                        }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
       if item.is_a?(::CalendarEvent)
         hash[:plannable_date] = item.start_at || item.created_at
@@ -74,7 +74,7 @@ module Api::V1::PlannerItem
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
         ann_hash = item.attributes
-        ann_hash.delete('todo_date')
+        ann_hash.delete("todo_date")
         unread_count, read_state = topics_status_for(user, item.id, opts[:topics_status])[item.id]
         hash[:plannable_date] = item.posted_at || item.created_at
         hash[:plannable] = plannable_json({ unread_count: unread_count, read_state: read_state }.merge(ann_hash))
@@ -233,7 +233,7 @@ module Api::V1::PlannerItem
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
       unread_count, read_state = opts.dig(:topics_status, topic.id)
-      return (read_state == 'unread' || unread_count > 0) if unread_count && read_state
+      return (read_state == "unread" || unread_count > 0) if unread_count && read_state
       return (topic.unread?(user) || topic.unread_count(user) > 0) if topic
     end
     false
@@ -258,7 +258,7 @@ module Api::V1::PlannerItem
   end
 
   def online_meeting_url(event_description, event_location)
-    config = Canvas::DynamicSettings.find('canvas', tree: 'config', service: 'canvas')
+    config = Canvas::DynamicSettings.find("canvas", tree: "config", service: "canvas")
     default_regex = <<~'REGEX'
       https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
       https:\/\/[\w-]+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
@@ -270,7 +270,7 @@ module Api::V1::PlannerItem
       https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
     REGEX
     url_regex_str = config["online-meeting-url-regex"] || default_regex
-    url_regex_str = url_regex_str.split("\n").join('|')
+    url_regex_str = url_regex_str.split("\n").join("|")
     url_regex = Regexp.new "(#{url_regex_str})"
 
     if event_description

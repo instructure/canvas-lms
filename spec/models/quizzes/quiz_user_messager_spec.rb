@@ -38,17 +38,17 @@ describe Quizzes::QuizUserMessager do
 
   describe "#send" do
     it "sends to all students" do
-      expect { send_message }.to change { recipient_messages('all') }.by 2
+      expect { send_message }.to change { recipient_messages("all") }.by 2
     end
 
     it "can send to either submitted or unsubmitted students" do
-      expect {
-        send_message('submitted')
-      }.to change { recipient_messages('submitted') }.by 1
+      expect do
+        send_message("submitted")
+      end.to change { recipient_messages("submitted") }.by 1
 
-      expect {
-        send_message('unsubmitted')
-      }.to change { recipient_messages('unsubmitted') }.by 1
+      expect do
+        send_message("unsubmitted")
+      end.to change { recipient_messages("unsubmitted") }.by 1
     end
   end
 end

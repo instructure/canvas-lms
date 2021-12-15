@@ -5,6 +5,6 @@ class AddHomeroomCourseIndex < ActiveRecord::Migration[6.0]
   tag :predeploy
 
   def change
-    add_index :courses, :homeroom_course_id, algorithm: :concurrently, if_not_exists: true, where: 'homeroom_course_id IS NOT NULL'
+    add_index :courses, :homeroom_course_id, algorithm: :concurrently, if_not_exists: true, where: "homeroom_course_id IS NOT NULL"
   end
 end

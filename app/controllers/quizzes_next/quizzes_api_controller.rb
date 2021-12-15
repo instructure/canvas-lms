@@ -37,9 +37,9 @@ class QuizzesNext::QuizzesApiController < ApplicationController
   # @returns [Quiz]
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
-      log_api_asset_access(["quizzes.next", @context], "quizzes", 'other')
+      log_api_asset_access(["quizzes.next", @context], "quizzes", "other")
       cache_key = [
-        'quizzes.next', @context.id, all_quizzes.count,
+        "quizzes.next", @context.id, all_quizzes.count,
         @current_user, latest_updated_at, accepts_jsonapi?,
         params[:search_term], params[:page], params[:per_page]
       ].cache_key
@@ -78,8 +78,8 @@ class QuizzesNext::QuizzesApiController < ApplicationController
   def latest_updated_at
     return @_latest_updated_at if defined?(@_latest_updated_at)
 
-    quiz_updated = @context.quizzes.active.reorder('updated_at DESC').limit(1).pluck(:updated_at).first
-    assignment_updated = @context.assignments.active.reorder('updated_at DESC').limit(1).pluck(:updated_at).first
+    quiz_updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
+    assignment_updated = @context.assignments.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
     @_latest_updated_at = [quiz_updated, assignment_updated].compact.max
   end
 end

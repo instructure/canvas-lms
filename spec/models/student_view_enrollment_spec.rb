@@ -20,10 +20,10 @@
 
 describe StudentViewEnrollment do
   before do
-    @student = User.create(:name => "some student")
-    @course = Course.create(:name => "some course")
+    @student = User.create(name: "some student")
+    @course = Course.create(name: "some course")
     @se = @course.enroll_student(@student)
-    @assignment = @course.assignments.create!(:title => 'some assignment')
+    @assignment = @course.assignments.create!(title: "some assignment")
     @submission = @assignment.submit_homework(@student)
     @assignment.reload
     @course.save!

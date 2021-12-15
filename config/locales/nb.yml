@@ -6,7 +6,7 @@ nb:
   1_item_scores_examplescores_9736236: "1- Element-scores: %{exampleScores}"
   1_user_found_76399771: "1 bruker funnet."
   1st_reviewer_3c1d0119: "1st Anmelder"
-  25th_75th_ile_406a67bf: "25. til 75. %ile"
+  25th_75th_ile_406a67bf: "25. til 75. persentil"
   25th_75th_percentile_aa4c11f2: "25. til 75. persentil"
   2_final_score_7b0fd15e: "2- Sluttresultat"
   2_final_score_exampleresult_922edf9c: "2- Endelig score: %{exampleResult}"
@@ -315,6 +315,7 @@ nb:
     turnitin_pledge: "Denne oppgaveinnleveringen er mitt eget, originale arbeid"
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Kontoadministratorer kan alltid lage emner"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Ekspertiseskalaer for læringsmål på konto- og emnenivå"
   account_and_course_level_outcome_proficiencies_1cfa260: "Resultatferdigheter på konto- og emnenivå"
   account_and_subaccount_40c6430: "Konto og underkonto"
@@ -427,6 +428,7 @@ nb:
       login_handle_name_description: "Etiketten som brukes for unike innloggingsidentifikatorer. Eksempler: Innlogging, Brukernavn, Elev ID, osv."
       unknown_user_url_description: "URL-adressen å omdirigere til når en autentisert bruker ikke er funnet i Canvas."
   account_course_and_user_search_22bf297a: "Konto emne- og brukersøk"
+  account_creation_still_in_progress_ac0e0a18: "Oppretting av konto pågår fremdeles"
   account_domain_78f43049: Konto-domene
   account_domain_lookups_f9d1147e: "Konto domene-oppslag"
   account_groups_2f301732: Kontogrupper
@@ -981,10 +983,10 @@ nb:
       custom_reports: 
         end: 
           parameters: 
-            header: Registreringsstatus
+            header: "Slutt:"
         start: 
           parameters: 
-            header: Registreringsstatus
+            header: "Start:"
     default_account_quotas_not_updated: "Standard kontokvoter ble ikke oppdatert"
     default_account_quotas_updated: "Kontokvotene ble oppdatert"
     devry: 
@@ -1347,7 +1349,7 @@ nb:
         media_quota: Mediekvote
         site_admin_quotas: Site-administratorkvoter
         student_quota: Studentkvote
-        update: "Oppdater hendelse"
+        update: Oppdater
       account_roles: "Kontoroller:"
       account_settings_title: Kontoinnstillinger
       add_a_custom_help_link: "Legg til en tilpasset lenke"
@@ -1530,7 +1532,7 @@ nb:
       open_registration_delegated_warning_tooltip: "En ekstern identitetsleverandør er slått på"
       open_report_description: "Åpne Rapport Beskrivelse"
       page_header_title: Kontoinnstillinger
-      page_title: "Delt innhold"
+      page_title: Kontoinnstillinger
       quiz_ip_filters_delete: "Fjern Test-IP-filter"
       quiz_ip_filters_help_message: |-
           IP-filtere for tester er en måte å begrense tilgang til tester på datamaskiner i et visst IP-område.
@@ -2337,6 +2339,7 @@ nb:
       Tillater diskusjonssvar å bli sortert etter tiddstempler for
       opprettelse. Standardrekkefølgen er nyeste til eldste for svar på rotnivå.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillater Hjelp-lenker å bli festet som Viste eller Nye og viser fremtredende Viste Hjelp-lenker i menyen «Hjelp»."
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Lar instruktører vurdere innleveringer gruppevis."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Lar læringsresultatet være valgbart under migrering av kursinnhold"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillater endring av varslingsinnstillinger for ethvert emne fra siden for varslingsinnstillinger på kontonivå."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillater å sette ekspertiseskalaer og beregningsmetoder for konto- og emnenivå, som erstatter kriterievurderinger og beregningsmetoder per læringsmål."
@@ -3169,9 +3172,9 @@ nb:
   and_more_not_shown_here_7842765e: "… og flere som ikke vises her"
   ange_name: Angel-konvertør
   angel: 
-    file_copy_fail: "Kunne ikke kopiere mappen «%{base_path}»\""
-    file_copy_fail_message: "Kunne ikke endre navn på mappen til stien «%{path}»\""
-    file_import_fail: "Kunne ikke importere filen «%{file_path}»\""
+    file_copy_fail: "Kunne ikke kopiere mappen «%{base_path}»"
+    file_copy_fail_message: "Kunne ikke endre navn på mappen til stien «%{path}»"
+    file_import_fail: "Kunne ikke importere filen «%{file_path}»"
   angel_display: "ANGEL Learning"
   angel_file_description: "Angel export .zip format"
   annotated_document_submission_d9ff236a: "Annoterte dokumentinnleveringer"
@@ -3275,6 +3278,7 @@ nb:
   anonymous_submission_assignment_title_896654de: "Anonym innlevering: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Anonym innleveringskommentar: Student (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Anonym innleveringskommentar: Student (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "Dette emnet krever av flagget for Redesign av diskusjoner/kunngjøringer er slått på."
   anonymous_turned_off_8118a0b: "Anonym avslått"
   anonymous_turned_on_fe56f997: "Anonym slått på"
   anonymous_user: "Anonym bruker"
@@ -3374,6 +3378,7 @@ nb:
   apply_date_range_selection_cc4351ed: "Bruk valg av datointervall"
   apply_filter_7e4f6113: "Bruk filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Bruk filtre. Merk: Ved å klikke på denne tasten vil siden bli lastet opp på nytt."
+  apply_score_to_ungraded_afd025d0: "Sett poengsum til ikke vurdert"
   apply_settings_10409ad9: "Bruk innstillinger"
   apply_theme_7af08387: "Bruk tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stiler til underkontoer"
@@ -6692,7 +6697,7 @@ nb:
         default_select_folder: "Velg mappe"
         upload_to: "Last opp til"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importer innhold fra vurderinger som Ny Quizzes"
+        import_new_quizzes: "Importer innhold fra vurderinger som *Ny Quizzes*"
         import_new_quizzes_help_text: "Nye tester er den nye vurderingsmotoren for Canvas.%{p_p}For å lær mer, ta kontkat med systemadminstratoren din eller se"
         import_quizzesNext_help_label: "Importer vurdering som Ny Quizzes hjelpeikon"
         import_quizzesNext_help_text: "Quizzes.Next er vurderingsmaskinen til Canvas.%{p_p}For å lære mer kontakt din systemadministrator eller gå til"
@@ -7769,6 +7774,7 @@ nb:
       file_meta: "Kunne ikke eksportere filens metadata"
       files: "Kunne ikke eksportere enkelte filer"
       grading_standards: "Kunne ikke eksportere karakterstandard"
+      late_policy: "Kunne ikke eksportere forsinkelse-regel"
       learning_outcomes: "Kunne ikke eksportere læringsresultat"
       lti_links: "Eksportering av enkelte konfigurasjoner for eksterne verktøy mislyktes"
       media_file: "Feil ved eksport av en mediafil"
@@ -8654,6 +8660,7 @@ nb:
   create_an_ba36d171: "Opprette en"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Opprett og administrer tester og undersøkelser på nett, både med og uten karakter."
   create_announcements_above_1c36202b: "Opprett kunngjøringer ovenfor"
+  create_anonymous_discussion_topics_d573e88e: "Opprett anonyme diskusjonstemaer"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Opprett så mange diskusjonsemner du trenger – som oppgaver
                 for karaktersetting, eller som forum for delte ideer og informasjon.
@@ -9884,6 +9891,7 @@ nb:
             tråder er perfekt for å holde dype og langvarige diskusjoner
             organisert, mens Fokuserte diskusjoner passer best for korte utvekslinger.
   discussions_announcements_redesign_901c5528: "Redesign av diskusjoner/kunngjøringer"
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "Redesign av diskusjoner/kunngjøringer - Anonymitet"
   discussions_create_94dff604: "'Diskusjoner - opprette'"
   discussions_index_menu_42591bc9: "Diskusjonenes indeksmeny"
   discussions_menu_f18eb4a2: "Lær mer"
@@ -10307,7 +10315,7 @@ nb:
       formatting: "Formatering, trykk nedover for å velge"
       rte_help: "Riktekstområde. Trykk ALT+F8 for hjelp"
   editor_button_6647db9c: Editor-knapp
-  either_course_or_student_c42bb055: "Enten ‘emne’ eller ‘student’'"
+  either_course_or_student_c42bb055: "Enten ‘emne’ eller ‘student’"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Enten gruppe-ID eller læringsmål-ID kreves"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Enten URL-en eller domenet må angis."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Enten du er ny bruker eller *bruksvilkårene* er endret siden sist du godkjente dem. Du må godta *bruksvilkårene* før du fortsetter."
@@ -11009,8 +11017,8 @@ nb:
   example_final_score_a92b30b9: "Eksempel sluttresultat]]"
   example_https_example_com_config_xml_be5f36ac: "Eksempel: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Eksempel: https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "eksempel: «https://schoolofrock.catalog.instructure.com»\""
-  example_https_schoolofrock_edu_d4326f03: "eksempel: «https://schoolofrock.edu»\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "eksempel: «https://schoolofrock.catalog.instructure.com»"
+  example_https_schoolofrock_edu_d4326f03: "eksempel: «https://schoolofrock.edu»"
   example_item_scores_6726c689: "Eksempel element resultat"
   example_school_of_rock_41f32c31: "eksempel: «School of Rock»\""
   exceeds_expectations_5910fc3a: "Overgår forventningene"
@@ -11268,6 +11276,7 @@ nb:
   failed_to_load_apps_db37e651: "Mislykket innlasting av apper."
   failed_to_load_apps_for_name_fc6ce1c: "Kunne ikke laste inn apper for %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Kunne ikke laste oppgaver på viktige datoer."
+  failed_to_load_conversation_messages_9b4546fc: "Kunne ikke laste inn samtalemeldinger."
   failed_to_load_course_navigation_for_name_aded3650: "Kunne ikke laste inn emnenavigasjon for %{name}."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Kunne ikke laste inn emner. Oppdater siden og prøv igjen."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Mislyktes å laste CSP-informasjon, prøv å oppdatere siden."
@@ -11354,6 +11363,7 @@ nb:
   feature_options_enable_disable_7e748054: "Funksjonsvalg - aktiver / deaktiver"
   feature_options_view_a170e80c: "Funksjonsvalg - vis"
   feature_preview_5e1216a0: "Forhåndsvisning funksjon"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Forhåndsvisning funksjon — påmelding inkluderer løpende oppdateringer utenfor den vanlige utgivelsesplanen"
   feature_previews_2700a397: "Forhåndsvisninger funksjon"
   feature_previews_account_settings_274440bc: "Funksjonsforhåndsvisninger (kontoinnstillinger)"
   feature_previews_enable_disable_707af910: "Funksjonsforhåndsvisninger - aktiver/deaktiver"
@@ -11718,6 +11728,7 @@ nb:
   full_name_23fdfb6d: "Fullt navn"
   full_name_83cf5453: "Fullt navn"
   full_name_is_required_8efbdc84: "Fullt navn er påkrevd"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Full: studentnavn og profilbilder skjules"
   future_5416ea92: Fremtidige
   future_terms_7fba2ae6: "Fremtidige semestre"
   galician_7e4508b5: Galisisk
@@ -13245,6 +13256,7 @@ nb:
   handlebars_helpers: 
     time: 
       event: "%{date} på %{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "har blitt valgt automatisk basert på posisjonen til denne Canvas-økten. I noen tilfeller kan det være en annen region."
   has_similarity_score_d5f332b4: "Har likhetsresultat"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
@@ -13650,6 +13662,7 @@ nb:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis deaktivert vil brukeren fortsatt ha tilgang til emneinnstillinger. Brukeren kan ikke administrere spesifikt emneinnhold uten tilsvarende tillatelser for den innholdsartikkelen. Hvis emnesynlighet er begrenset til brukere som er registrert i emnet vil denne tillatelsen la brukeren vise emneinnhold uten å være registrert i emnet."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Hvis deaktivert vil brukeren fortsatt ha tilgang til emneinnstillinger."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Om de er aktivert, vil tilgang til LTI 1,3 og LTI Fordel bli aktivert."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Hvis aktivert, tillater den dype lenker fra modulindeksen via en modal."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Hvis aktivert, tillater dyp kobling fra modulindeksen."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Når aktivert, tillater mer enn maksimalt mulig poeng på et resultat i en rubrikk."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Hvis den er aktivert, tillates flere dyplenker for tester og moduler."
@@ -14008,7 +14021,7 @@ nb:
   include_scores_when_alerting_about_grades_89728ae1: "Inkluder resultater når det varsles om karakterer."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultat ved karaktervarsling.
-                Hvis e-posten din ikke er e-post tilhørende institusjonen betyr det at sensitivt innhold vil sendes på utsiden av institusjonen.
+      Hvis e-posten din ikke er e-post tilhørende institusjonen betyr det at sensitivt innhold vil sendes på utsiden av institusjonen.
   include_speedgrader_in_assignment_header_menu_69cd8656: "Inkluderer SpeedGrader i menyen oppgaveoverskrift ( Assignment Header Menu)"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Inkluderer Datadog RUM JS Agent i dokumentet HEAD."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne oppgavens karakterer når du poster til skolens Student Information System"
@@ -14268,6 +14281,8 @@ nb:
                                     Ta kontakt via #canvas-sre i Slack.
   invalid_restrictions_316cd740: "Ugyldige restriksjoner"
   invalid_score_3d247da7: "Ugyldig resultat"
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Ugyldig sftp-brukernavn. Vi kunne ikke bestemme brukernavnet som skulle brukes på grunn av at det ikke var noe domene som sluttet med .instructure.\n\
+      \x20                             Ta kontakt via #canvas-sre i Slack.   "
   invalid_sis_sync_status_b68db497: "Ugyldig SIS synkroniseringsstatus"
   invalid_state_parameter_7a5aa108: "Ugyldig tilstandsparameter"
   invalid_submission_file_type_cda6742a: "Ugyldig filtype for innsending"
@@ -14857,6 +14872,7 @@ nb:
   loading_comment_library_3131e5c6: "Laster inn kommentarbibliotek"
   loading_comments_32366acf: "Laster inn kommentarer"
   loading_compose_modal_f6da0e8b: "Laster inn skrivemodus"
+  loading_conversation_messages_71e9050e: "Laster inn samtalebeskjeder"
   loading_courses_409a3641: "Laster inn emner"
   loading_courses_bd1bffe: "Laster emner ..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -14867,6 +14883,7 @@ nb:
   loading_discussions_8ed5fcd7: "Laster diskusjoner"
   loading_external_tool_d839042c: "Laster inn eksternt verktøy"
   loading_f99d93d4: "...Laster"
+  loading_feature_options_82e07ee4: "Laster inn funksjonsvalg"
   loading_features_d26820f6: "Laster funksjoner"
   loading_folders_d8b5869e: "Laster mapper"
   loading_graders_f6a76142: "Laster inn karaktersettere"
@@ -16207,7 +16224,6 @@ nb:
             
             %{course}, emnet ditt på Canvas Network startet for et par dager siden, og vi har lagt merke til at du ikke har loggen inn ennå. Vi ville bare sende deg en siste påminnelse i tilfelle du har glemt det.
             
-            
             For å logge inn, gå til %{site} og skriv inn ditt brukernavn og passord. Hvis du ikke har angitt et passord ennå, kan du angi et her: %{password_url}
             
             Hvis du rett og slett ikke kan lage akkurat dette emnet, kan du gjerne bla deg gjennom emnekatalogen på %{site} for å finne noe annet som inspirerer deg. Nye emner blir lagt til hele tiden!
@@ -16254,7 +16270,6 @@ nb:
             Hva kan du gjøre for å bli klar?
             
             Hvis du ikke allerede har opprettet din Canvas Network-profil, kan du logge på og sette den opp på Canvas.net. Profilen din vil hjelpe andre i emnet å vite hvem du er. Det kan du også sette opp varslingspreferansene dine.
-            
             
             Til slutt kan du se gjennom nødvendige materialer og eventuelle instruksjoner for emnet ditt her: %{url}
             
@@ -17286,6 +17301,7 @@ nb:
   mfa_required_ca66e177: "MFA kreves"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP karaktereksport"
+  miami_utilization_report_9c927880: "Miami bruksrapport"
   mic_a7f3d311: Mikrofon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 tillater maksimalt %{max} medlemmer i et team."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 tillater maksimalt %{max} eiere i et team."
@@ -17570,6 +17586,8 @@ nb:
   modules_group_menu_4aae0d5f: "Modulenes gruppemeny"
   modules_home_page_568c6bb9: "Hjemmeside for moduler"
   modules_index_menu_c8748e7c: "Modulenes indeksmeny"
+  modules_index_menu_modal_79123a19: "Modulindeksmeny (modal)"
+  modules_index_menu_tray_3f9975d9: "Modulindeksmeny (undermeny)"
   modules_item_controller: 
     max_score_complete: "scoret ikke mer enn en *poengsum*"
     max_score_incomplete: "må score ikke mer enn en *poengsum*"
@@ -17934,7 +17952,7 @@ nb:
       partnerprodukter, må aktivere denne funksjonen for økt oppgavedata
       validering av arbeidsflyten. Når det er aktivert viser denne funksjonen de nye SIS
       -innstillinger for integrering for SIS-synkronisering (Oppgavenivå for å sende karakter tilbake) i konto
-      innstillinger. Posten til forhåndsvisning av SIS-funksjon er innlemmet i disse nye
+      innstillinger. Posten til funksjonsvalget SIS er innlemmet i disse nye
       innstillingene og vil som standard aktiveres.
   new_slack_api_key_453d04d: "Ny Slack API-nøkkel"
   new_topic_for_course_3d98222a: "Nytt emne for %{course}"
@@ -18216,7 +18234,7 @@ nb:
     blueprint_description: |-
         *Kun for instruktør og admin:*
         
-              Innhold ble synkronisert fra en emnemal til tilknyttede emner
+        Innhold ble synkronisert fra en emnemal til tilknyttede emner
     blueprint_display: Emnemalsynkronisering
     calendar_description: "Nye og endrede elementer i emnekalenderen din"
     calendar_display: Kalender
@@ -18251,7 +18269,7 @@ nb:
     content_link_error_description: |-
         *Kun instruktør og admin:*
         
-                Plassering og innhold på en ødelagt lenke som en student har samhandlet med
+        Plassering og innhold på en ødelagt lenke som en student har samhandlet med
     content_link_error_display: "Avvik på innholdslenke"
     conversation_created_description: "Du opprettet en samtale"
     conversation_created_display: "Samtaler opprettet av meg"
@@ -18260,9 +18278,9 @@ nb:
     course_content_description: |-
         Endring i emneinnhold: 
         
-              * Sideinnhold
-              * Testinnhold
-              * Oppgaveinnhold
+        * Sideinnhold
+        * Testinnhold
+        * Oppgaveinnhold
     course_content_display: Emneinnhold
     discussion_description: "Nytt diskusjonstema i emnet ditt"
     discussion_display: "Nytt tema"
@@ -18275,8 +18293,8 @@ nb:
     grading_description: |-
         Inkluderer: 
         
-              * Oppgave/innleverings karakter skrevet inn/endret
-              * Karaktervekting endret
+        * Oppgave/innleverings karakter skrevet inn/endret
+        * Karaktervekting endret
     grading_display: Karaktersetting
     grading_notify_include_grade: "Inkluder resultat når det varsles om karakterendringer."
     grading_policies_description: "Retningslinjer for karaktersetting i emnet er endret"
@@ -18284,21 +18302,21 @@ nb:
     invitation_description: |-
         Invitasjon for: 
         
-              * Nettkonferanse
-              * Gruppe
-              * Samarbeid
-              * Hverandrevurdering og påminnelse
+        * Nettkonferanse
+        * Gruppe
+        * Samarbeid
+        * Hverandrevurdering og påminnelse
     invitation_display: Invitasjon
     late_grading_description: |-
         *Kun instruktør og admin:*
         
-              Sen innlevering av oppgave
+        Sen innlevering av oppgave
     late_grading_display: "Forsinket karaktersetting"
     membership_update_description: |-
         *Kun admin: avventer påmelding aktivert*
         
-              * Gruppepåmelding
-              * Akesptert/avslått
+        * Gruppepåmelding
+        * Akesptert/avslått
     membership_update_display: "Oppdatering av medlemskap"
     missing_description_description: "For %{category}-varslinger"
     missing_display_display: "For %{category}-varslinger"
@@ -18383,19 +18401,19 @@ nb:
     other_description: |-
         *Kun Instruktør og Administrator:*
         
-              * Emnepåmelding
-              * Rapport generert
-              * Innhold eksport
-              * Flytte rapport
-              * Ny kontobruker
-              * Ny studentgruppe
+        * Emnepåmelding
+        * Rapport generert
+        * Innhold eksport
+        * Flytte rapport
+        * Ny kontobruker
+        * Ny studentgruppe
     other_display: "Administrative varslinger"
     recording_ready_display: "Opptak klart"
     reminder_display: Påminnelse
     student_appointment_description: |-
         *Kun Instruktør og Admin:*
         
-              Påmelding for studentavtale
+        Påmelding for studentavtale
     student_appointment_display: "Påmeldinger til studentavtaler"
     submission_comment_description: "Kommentar – oppgaveinnlevering"
     submission_comment_display: Innleveringskommentar
@@ -18589,6 +18607,7 @@ nb:
   of_students_5d1af0d2: "# Av studenter"
   off_5385ef3f: Av
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Av - regel vil ikke gjelde for denne underkontoen"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Av: studentnavn og profilbilder vil være synlige for andre medlemmer i dette emnet"
   offensive_abusive_c41dcb08: "Støtende, krenkende"
   offline_score_8d7b4779: "Poengsum frakoblet modus:"
   offline_web_export_dca67174: "Offline netteksport"
@@ -18698,6 +18717,7 @@ nb:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Åpne denne tastatursnarveidialogen"
   open_title_in_a_new_window_b29fed77: "Åpne %{title} i et nytt vindu."
   open_to_comments_23d5585e: "Åpne for kommentarer"
+  open_to_do_items_in_a_new_tab_120ea5f4: "Åpne gjøremål i en ny fane"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect igangsettings-Url"
   opens_in_new_window_b4b99243: "åpner i et nytt vindu"
   option_1_dea39f90: "Valg 1"
@@ -19263,6 +19283,7 @@ nb:
   please_provide_a_pairing_code_530d1e9d: "Oppgi en paringskode."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Oppgi et gyldig brukerdomene. Sjekk dine Azure Active Directory-innstillinger for å finne det."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Kontakt oss via Slack på #canvas-sre hvis dette fortsetter å skje."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Ta kontakt i Slack på #canvas-sre. Regionen som denne kundens Canvas-forekomst befinner seg i, støtter ikke SFTP."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Kontakt oss via Slack på #canvas-sre for å opprette en SFTP for denne kontoen."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Velg et gruppesett for denne oppgaven"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Velg en årsak til å rapportere dette svaret"
@@ -21693,7 +21714,7 @@ nb:
           time_elapsed: "Tid som har gått"
           time_running: "Tiden går"
         links: 
-          hide_time_running: Skjul
+          hide_time_running: "Skjul tid"
           keep_editing_quiz: "Fortsett å redigere denne testen"
           keep_editing_survey: "Fortsett å redigere denne undersøkelsen"
     retrieving_filters: "Henter filtre…"
@@ -21752,7 +21773,7 @@ nb:
       errors: 
         connection_lost: "Tilkoblingen til %{host} forsvant. Sjekk at du har internettilkobling før du fortsetter."
         only_numerical_values: "kun numeriske verdier godtas"
-      hide_time_link: Skjul
+      hide_time_link: "Skjul tid"
       hours_count: 
         one: "1 time"
         other: "%{count} timer"
@@ -21783,7 +21804,7 @@ nb:
       seconds_count: 
         one: "1 sekund"
         other: "%{count} sekunder"
-      show_time_link: Vis
+      show_time_link: "Vis tid"
       titles: 
         come_back_later: "Du indikerte at du ville komme tilbake til dette spørsmålet"
         times_up: "Tiden er ute!"
@@ -23429,6 +23450,7 @@ nb:
                                     fire timer før denne nøkkelen begynner å fungere.
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "SFTP-nøkkelen er ugyldig. Sørg for at denne er riktig formatert."
   sftp_key_removed_from_user_42318725: "SFTP-nøkkel fjernet fra bruker."
+  sftp_region_invalid_216caa40: "SFTP-område ugyldig"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       SFTP-bruker eksisterer allerede eller er deaktivert.
                                     Ta kontakt i #canvas-sre i Slack.
@@ -25973,6 +25995,7 @@ nb:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolioen er identifisert som spam. Den er for øyeblikket kun synlig for administratorer og forfatteren. Hvis du er sikker på at innholdet ikke er spam kan du merke den som sikker."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Denne funksjonen påvirker eksisterende data for alle emner i kontoen."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Denne funksjonen påvirker eksisterende data for en hel konto."
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Denne funksjonen lar lærere opprette anonyme diskusjoner og lar lærere aktivere innstillinger på emnenivå slik at studenter kan opprette anonyme diskusjoner"
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Denne funksjonen lar lærere enkelt kopiere enkelte saker fra et emne til et annet, og å dele en enkelt sak med andre brukere, sånn at de også kan importere de sakene til deres emne."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funksjonen kan ikke deaktiveres fordi det er minst én underkonto eller ett emne med denne funksjonen aktivert."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denne funksjonen kan ikke aktiveres mens automatisk oppdagelse av feltseparatorer er aktivert"
@@ -26169,7 +26192,6 @@ nb:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Denne rapporten viser all aktivitet fra brukere som er påmeldt alle emner
         innenfor en spesifikk tidsramme. Den resulterende csv-filen vil ha en rad per
-        
         studentaktivitet og følgende overskrifter: seksjons-id, seksjon sis-id,
         seksjonsnavn, kurs-id, kurs sis-id, kursnavn, semester-id, semester sis-id,
         semesternavn, bruker-id, bruker sis-id, brukernavn, innholdstype, innhold, antall visninger,
@@ -26212,6 +26234,7 @@ nb:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Denne brukeren har for tiden ikke tilgang til emnet"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Denne brukeren har for tiden ikke tilgang til emnet\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Denne brukeren utførte handlinger mens anonym var avslått"
+  this_user_will_be_created_in_3b2a2b52: "Denne brukeren vil bli opprettet i:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Denne versjonen av karakteroversikten er erstattet av en oppdatert karakteroversikt på eller før 18. januar 2020."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       Dette pågikk allerede for det aktuelle bildet, men ingen svar
@@ -27682,7 +27705,7 @@ nb:
   user_id_bcace870: Bruker-ID
   user_id_ddfbd586: "bruker id"
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Bruker-ID, eller SIS-ID (SIS-ID bør stå foran med sis_user_id:)"
-  user_id_user_id_69a9e865: "Bruker-ID %{user_id}"
+  user_id_user_id_69a9e865: "Bruker-ID: %{user_id}"
   user_inactivity_report_70cae434: "Inaktivitetsrapport for bruker"
   user_information_6353d7e1: Brukerinformasjon
   user_is_from_unacceptable_domain_domain_b4b6fd1b: "Bruker er fra ikke akseptert domene %{domain}."
@@ -28155,7 +28178,7 @@ nb:
   users_manage_login_details_9462b30f: "Brukere - administrer innloggingsdetaljer"
   users_manage_observers_126f03a3: "Brukere - administrer observatører"
   users_manage_students_in_courses_d6168815: "Brukere - administrer studenter i emner"
-  users_matching_search_term_c604db9e: "Brukere som matcher «%{search_term}»\""
+  users_matching_search_term_c604db9e: "Brukere som matcher «%{search_term}»"
   users_moderate_content_36d6eed7: "Brukere - moderer innhold"
   users_observers_e0e66c52: "Brukere - Observatører"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukere av skjermlesere trenger kanskje å slå av den virtuelle markøren for å kunne bruke disse tastatursnarveiene"
@@ -28220,6 +28243,7 @@ nb:
   view_description_b6d8e52b: "Vise beskrivelsen"
   view_due_items_due_today_for_course_coursename_129e433: "Vis %{due} elementer som forfaller i dag i %{courseName}"
   view_faculty_journals_ad0e8c8f: "Vis lærerprotokollene"
+  view_feature_options_at_an_account_level_a84cedbe: "Vis funksjonsvalg på kontonivå"
   view_feature_settings_at_an_account_level_ec7f5e10: "Vis funksjonsinnstillinger på et kontonivå"
   view_feedback_b88c99c: "Vis tilbakemelding"
   view_feedback_f2feabca: "Vis tilbakemelding"
@@ -28426,6 +28450,7 @@ nb:
       Når den er aktivert, viser dette flagget en «Bli med»-knapp i Canvas-kalenderoppførigen
       i studentplanleggeren
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Når aktivert, viser dette flagget en studentvelger for observatører på dashbordet."
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Når den er aktivert, åpner denne innstillingen automatisk opp lærerens gjøremål i en ny fane."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Når den er aktivert, slår @mention-funksjonen i emnediskusjoner seg på."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når karakterer for anonyme oppgaver skjules, vil karakterene være skjult for alle i emnet. Anonymitet vil bli gjeninnført."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når personer besøker emnet, er dette siden de får se. Du kan sette den til å vise en aktivitetsstrøm, listen over emnemoduler, en emneoversikt, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsstrøm for emne."

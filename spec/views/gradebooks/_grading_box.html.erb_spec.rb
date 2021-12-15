@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/gradebooks/_grading_box" do
   it "renders" do
     course_with_student
     view_context
-    a = @course.assignments.create!(:title => "some assignment")
-    render :partial => "gradebooks/grading_box", :object => a
+    a = @course.assignments.create!(title: "some assignment")
+    render partial: "gradebooks/grading_box", object: a
     expect(response).not_to be_nil
   end
 end

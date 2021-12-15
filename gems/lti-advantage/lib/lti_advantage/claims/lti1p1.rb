@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_model'
+require "active_model"
 
 module LtiAdvantage::Claims
   # Class represeting an LTI 1.3 message "lti1p1" claim which allows a platform
@@ -27,7 +27,7 @@ module LtiAdvantage::Claims
   class Lti1p1
     include ActiveModel::Model
 
-    attr_accessor :user_id
+    attr_accessor :user_id, :resource_link_id
 
     validates_presence_of :user_id
   end

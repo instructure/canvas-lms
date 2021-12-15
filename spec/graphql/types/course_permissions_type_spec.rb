@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::CoursePermissionsType do
-  let_once(:course) { course_with_student(active_all: true); @course }
+  let_once(:course) do
+    course_with_student(active_all: true)
+    @course
+  end
   let(:course_type) { GraphQLTypeTester.new(course) }
 
   it "works" do

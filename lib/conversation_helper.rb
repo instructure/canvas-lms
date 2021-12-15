@@ -20,22 +20,22 @@
 
 module ConversationHelper
   def set_root_account_ids
-    write_attribute(:root_account_ids, conversation&.root_account_ids&.sort&.join(','))
+    write_attribute(:root_account_ids, conversation&.root_account_ids&.sort&.join(","))
   end
 
-  # Note: all ids are relative to the birth shard, if you are going to consume these you should do
+  # NOTE: all ids are relative to the birth shard, if you are going to consume these you should do
   # `Shard.birth.activate do`
   def root_account_ids
-    (read_attribute(:root_account_ids) || '').split(',').map(&:to_i).sort
+    (read_attribute(:root_account_ids) || "").split(",").map(&:to_i).sort
   end
 
   def root_account_ids=(ids)
     # handle case when ids is a comma separated list
     if ids.is_a? String
-      ids = ids.split(',').map(&:to_i)
+      ids = ids.split(",").map(&:to_i)
     end
     # ids must be sorted for the scope to work
-    write_attribute(:root_account_ids, ids.sort.join(','))
+    write_attribute(:root_account_ids, ids.sort.join(","))
   end
 
   def global_root_account_ids

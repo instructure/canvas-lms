@@ -67,7 +67,7 @@ module Lti
     include ::Lti::IMS::Concerns::AdvantageServices
     include Api::V1::Account
 
-    MIME_TYPE = 'application/vnd.canvas.accountlookup+json'
+    MIME_TYPE = "application/vnd.canvas.accountlookup+json"
 
     # @API Get account
     # Retrieve information on an individual account, given by local or global ID.

@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module CourseWizardPageComponent
   #------------------------- Selectors --------------------------
   def course_wizard_selector
-    '.ic-wizard-box'
+    ".ic-wizard-box"
   end
 
   def close_btn_selector
-    '.ic-Expand-link__trigger'
+    ".ic-Expand-link__trigger"
   end
 
   def checklist_item_selector(item)

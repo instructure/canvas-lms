@@ -28,7 +28,7 @@ module Filters::QuizSubmissions
   def require_quiz_submission(active: false)
     query = {}
     scope = @quiz ? @quiz.quiz_submissions : Quizzes::QuizSubmission
-    id = if params.has_key?(:quiz_submission_id)
+    id = if params.key?(:quiz_submission_id)
            params[:quiz_submission_id]
          else
            params[:id]
@@ -38,14 +38,14 @@ module Filters::QuizSubmissions
       scope = scope.not_settings_only
     end
 
-    if id.to_s == 'self'
+    if id.to_s == "self"
       query[:user_id] = @current_user
     else
       query[:id] = id.to_i
     end
 
     unless (@quiz_submission = scope.where(query).first)
-      raise ActiveRecord::RecordNotFound.new('Quiz Submission not found')
+      raise ActiveRecord::RecordNotFound, "Quiz Submission not found"
     end
 
     @quiz_submission.ensure_question_reference_integrity!
@@ -58,7 +58,7 @@ module Filters::QuizSubmissions
 
   def retrieve_quiz_submission_attempt!(attempt)
     unless (@quiz_submission = @quiz_submission.model_for_attempt(attempt.to_i))
-      raise ActiveRecord::RecordNotFound.new('Unable to find a submission with that attempt')
+      raise ActiveRecord::RecordNotFound, "Unable to find a submission with that attempt"
     end
   end
 

@@ -19,9 +19,9 @@
 #
 
 RSpec.shared_examples "outcome import context examples" do
-  describe 'relationships' do
+  describe "relationships" do
     it { is_expected.to have_many(:outcome_imports).dependent(:destroy).inverse_of(:context) }
-    it { is_expected.to belong_to(:latest_outcome_import).class_name('OutcomeImport') }
+    it { is_expected.to belong_to(:latest_outcome_import).class_name("OutcomeImport") }
   end
 
   it "does not raise error when setting latest outcome import" do

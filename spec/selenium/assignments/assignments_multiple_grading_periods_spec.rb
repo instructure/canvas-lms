@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/assignments_common'
+require_relative "../common"
+require_relative "../helpers/assignments_common"
 
 describe "assignments index grading period filter" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    course_with_teacher(:active_all => true, :account => @account, :mgp_flag_enabled => true,
-                        :grading_periods => [:old, :current, :future])
+    course_with_teacher(active_all: true, account: @account, mgp_flag_enabled: true,
+                        grading_periods: %i[old current future])
     @assignments = []
     GradingPeriod.for(@course).sort_by(&:start_date).each do |grading_period|
-      @assignments << @course.assignments.create!(:name => grading_period.title, :due_at => grading_period.start_date + 1.second)
+      @assignments << @course.assignments.create!(name: grading_period.title, due_at: grading_period.start_date + 1.second)
     end
-    @undated_assignment = @course.assignments.create!(:name => "Undated")
+    @undated_assignment = @course.assignments.create!(name: "Undated")
   end
 
   def select_grading_period(index)
@@ -72,9 +72,9 @@ describe "assignments index grading period filter" do
 
   context "VDD" do
     before(:once) do
-      @vdd_assignment = @course.assignments.create! :name => "VDD", :due_at => 3.months.ago
+      @vdd_assignment = @course.assignments.create! name: "VDD", due_at: 3.months.ago
 
-      @other_section = @course.course_sections.create! :name => "other section"
+      @other_section = @course.course_sections.create! name: "other section"
       override = @vdd_assignment.assignment_overrides.build
       override.set = @other_section
       override.due_at_overridden = true
@@ -95,7 +95,7 @@ describe "assignments index grading period filter" do
     end
 
     it "uses the applicable due date for students" do
-      student_in_course :course => @course, :section => @other_section, :active_all => true
+      student_in_course course: @course, section: @other_section, active_all: true
       user_session(@student)
       get "/courses/#{@course.id}/assignments"
       assignment_element = f("#assignment_#{@vdd_assignment.id}")

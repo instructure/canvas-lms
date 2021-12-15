@@ -20,25 +20,25 @@
 RSpec.describe Lti::IMS::LineItemsSerializer do
   let(:resource_link) { resource_link_model(overrides: { resource_link_uuid: assignment.lti_context_id }) }
   let_once(:course) { course_model }
-  let(:tool) {
+  let(:tool) do
     ContextExternalTool.create!(
       context: course,
-      consumer_key: 'key',
-      shared_secret: 'secret',
-      name: 'wrong tool',
-      url: 'http://www.wrong_tool.com/launch',
+      consumer_key: "key",
+      shared_secret: "secret",
+      name: "wrong tool",
+      url: "http://www.wrong_tool.com/launch",
       developer_key: DeveloperKey.create!,
       settings: { use_1_3: true },
-      workflow_state: 'public'
+      workflow_state: "public"
     )
-  }
+  end
   let(:assignment) do
     opts = {
       course: course,
-      submission_types: 'external_tool',
+      submission_types: "external_tool",
       external_tool_tag_attributes: {
         url: tool.url,
-        content_type: 'context_external_tool',
+        content_type: "context_external_tool",
         content_id: tool.id
       }
     }
@@ -54,15 +54,15 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
     line_item_model(
       assignment: assignment,
       resource_link: resource_link,
-      label: 'label',
-      tag: 'tag',
+      label: "label",
+      tag: "tag",
       score_maximum: 60,
-      resource_id: 'resource_id'
+      resource_id: "resource_id"
     )
   end
 
-  describe '#as_json' do
-    it 'properly formats the line item hash' do
+  describe "#as_json" do
+    it "properly formats the line item hash" do
       expect(described_class.new(line_item, line_item_id).as_json).to eq(
         {
           id: line_item_id,
@@ -75,7 +75,7 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
       )
     end
 
-    it 'does not incude values that are nil' do
+    it "does not incude values that are nil" do
       line_item.update!(resource_link: nil, tag: nil)
       expect(described_class.new(line_item, line_item_id).as_json).to eq(
         {

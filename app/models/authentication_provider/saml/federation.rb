@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'saml2'
+require "saml2"
 
 class AuthenticationProvider::SAML::Federation < AuthenticationProvider::SAML::MetadataRefresher
   class << self
@@ -96,5 +96,5 @@ end
 
 # make sure to force these to eager load, otherwise we may try to iterate
 # all federations, but there won't be any
-require_dependency 'authentication_provider/saml/in_common'
-require_dependency 'authentication_provider/saml/uk_federation'
+require_dependency "authentication_provider/saml/in_common"
+require_dependency "authentication_provider/saml/uk_federation"

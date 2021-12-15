@@ -37,7 +37,15 @@ import tz from '@canvas/timezone'
 export const getBaseDueAt = ({all_dates}) =>
   (all_dates.filter(d => d.base)[0] || all_dates[0])?.due_at
 
-const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, timeZone}) => {
+const Todo = ({
+  assignment,
+  context_name,
+  html_url,
+  ignore,
+  needs_grading_count,
+  timeZone,
+  openInNewTab
+}) => {
   const [ignored, setIgnored] = useState(false)
 
   // Only assignments are supported (ungraded_quizzes are not)
@@ -87,7 +95,7 @@ const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, 
       <Flex as="div" direction="column" margin="0 small 0 0" width="27rem">
         <Link
           href={html_url}
-          target="_blank"
+          target={openInNewTab ? '_blank' : undefined}
           isWithinText={false}
           theme={{
             fontWeight: '700'
@@ -146,7 +154,8 @@ Todo.propTypes = {
   html_url: PropTypes.string.isRequired,
   ignore: PropTypes.string.isRequired,
   needs_grading_count: PropTypes.number,
-  timeZone: PropTypes.string.isRequired
+  timeZone: PropTypes.string.isRequired,
+  openInNewTab: PropTypes.bool.isRequired
 }
 
 export default Todo

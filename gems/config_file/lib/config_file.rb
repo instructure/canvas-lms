@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rails'
+require "rails"
 
 module ConfigFile
   class << self
@@ -43,9 +43,9 @@ module ConfigFile
         return @yaml_cache[config_name]&.[](with_rails_env)
       end
 
-      path = Rails.root.join('config', "#{config_name}.yml")
-      if File.exist?(path)
-        config_string = ERB.new(File.read(path))
+      path = Rails.root.join("config/#{config_name}.yml")
+      if path.file?
+        config_string = ERB.new(path.read)
         config = YAML.safe_load(config_string.result, aliases: true)
         config = config.with_indifferent_access if config.respond_to?(:with_indifferent_access)
       end

@@ -19,7 +19,7 @@
 
 require_relative "../common"
 require_relative "../helpers/quizzes_common"
-require_relative 'pages/rce_next_page'
+require_relative "pages/rce_next_page"
 
 describe "equation editor" do
   include_context "in-process server selenium tests"
@@ -33,15 +33,15 @@ describe "equation editor" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
 
     wait_for_tiny(f("#quiz_description"))
-    type_in_tiny 'textarea', 'foo'
+    type_in_tiny "textarea", "foo"
     select_math_equation_from_toolbar
     equation_editor = fj(".mathquill-editor:visible")
     expect(equation_editor).not_to be_nil
 
-    fj('.ui-dialog-titlebar-close:visible').click
-    type_in_tiny 'textarea#quiz_description', 'bar'
-    f('.save_quiz_button').click
+    fj(".ui-dialog-titlebar-close:visible").click
+    type_in_tiny "textarea#quiz_description", "bar"
+    f(".save_quiz_button").click
 
-    expect(f('.description')).to include_text 'foobar'
+    expect(f(".description")).to include_text "foobar"
   end
 end

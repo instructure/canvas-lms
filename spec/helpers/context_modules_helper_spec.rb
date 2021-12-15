@@ -30,47 +30,47 @@ describe ContextModulesHelper do
     end
 
     it "returns true for an itemless item like a subheader" do
-      item = t_module.add_item(type: 'context_module_sub_header')
+      item = t_module.add_item(type: "context_module_sub_header")
       expect(module_item_unpublishable?(item)).to be_truthy
     end
 
     it "returns true for an item that doesn't respond to can_unpublish?" do
       tag = t_module.content_tags.build
-      tag.tag_type = 'context_module'
+      tag.tag_type = "context_module"
       tag.content = Thumbnail.new
       expect(module_item_unpublishable?(tag)).to be_truthy
     end
 
     it "returns the content's can_unpublish?" do
       topic = t_course.discussion_topics.create
-      topic.workflow_state = 'active'
+      topic.workflow_state = "active"
       topic.save!
-      student_in_course(:course => t_course)
-      item = t_module.add_item(type: 'discussion_topic', id: topic.id)
+      student_in_course(course: t_course)
+      item = t_module.add_item(type: "discussion_topic", id: topic.id)
       expect(module_item_unpublishable?(item)).to be_truthy
       item.reload
-      topic.discussion_entries.create!(:user => @student)
+      topic.discussion_entries.create!(user: @student)
       expect(module_item_unpublishable?(item)).to be_falsey
     end
   end
 
   describe "module_item_publishable?" do
     it "returns true for an itemless item like a subheader" do
-      item = t_module.add_item(type: 'context_module_sub_header')
+      item = t_module.add_item(type: "context_module_sub_header")
       expect(module_item_publishable?(item)).to be_truthy
     end
 
     it "returns true for an item that doesn't respond to can_publish?" do
       tag = t_module.content_tags.build
-      tag.tag_type = 'context_module'
+      tag.tag_type = "context_module"
       tag.content = Thumbnail.new
       expect(module_item_publishable?(tag)).to be_truthy
     end
 
     it "returns the content's can_publish?" do
-      assignment = t_course.assignments.create(workflow_state: 'unpublished')
-      student_in_course(:course => t_course)
-      item = t_module.add_item(type: 'assignment', id: assignment.id)
+      assignment = t_course.assignments.create(workflow_state: "unpublished")
+      student_in_course(course: t_course)
+      item = t_module.add_item(type: "assignment", id: assignment.id)
       expect(assignment.can_publish?).to be_truthy
       expect(module_item_publishable?(item)).to be_truthy
       assignment.publish!
@@ -78,7 +78,7 @@ describe ContextModulesHelper do
       item.reload
       expect(assignment.can_publish?).to be_truthy
       expect(module_item_publishable?(item)).to be_truthy
-      assignment.workflow_state = 'duplicating'
+      assignment.workflow_state = "duplicating"
       assignment.save!
       item.content.reload
       item.reload
@@ -89,60 +89,60 @@ describe ContextModulesHelper do
 
   describe "module_item_translated_content_type" do
     it 'returns "" for nil item' do
-      expect(module_item_translated_content_type(nil)).to eq ''
+      expect(module_item_translated_content_type(nil)).to eq ""
     end
 
-    it 'returns New Quiz for lti-quiz type' do
+    it "returns New Quiz for lti-quiz type" do
       tool = t_course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
       )
       assignment = t_course.assignments.create(
-        submission_types: 'external_tool',
+        submission_types: "external_tool",
         external_tool_tag_attributes: {
           content: tool
         }
       )
-      item = t_module.add_item(type: 'assignment', id: assignment.id)
-      expect(module_item_translated_content_type(item)).to eq 'New Quiz'
+      item = t_module.add_item(type: "assignment", id: assignment.id)
+      expect(module_item_translated_content_type(item)).to eq "New Quiz"
     end
 
-    it 'returns Quiz for lti-quiz type if is_student' do
+    it "returns Quiz for lti-quiz type if is_student" do
       tool = t_course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
       )
       assignment = t_course.assignments.create(
-        submission_types: 'external_tool',
+        submission_types: "external_tool",
         external_tool_tag_attributes: {
           content: tool
         }
       )
-      item = t_module.add_item(type: 'assignment', id: assignment.id)
-      expect(module_item_translated_content_type(item, true)).to eq 'Quiz'
+      item = t_module.add_item(type: "assignment", id: assignment.id)
+      expect(module_item_translated_content_type(item, true)).to eq "Quiz"
     end
 
-    it 'returns a string for a recognized content type' do
-      item = t_module.add_item(type: 'context_module_sub_header')
-      expect(module_item_translated_content_type(item)).to eq 'Context Module Sub Header'
+    it "returns a string for a recognized content type" do
+      item = t_module.add_item(type: "context_module_sub_header")
+      expect(module_item_translated_content_type(item)).to eq "Context Module Sub Header"
     end
 
-    it 'returns unknown if the content_type is not recognized' do
-      item = t_module.add_item(type: 'context_module_sub_header')
-      ContentTag.where(id: item).update_all(content_type: 'Blah')
-      expect(module_item_translated_content_type(item.reload)).to eq 'Unknown Content Type'
+    it "returns unknown if the content_type is not recognized" do
+      item = t_module.add_item(type: "context_module_sub_header")
+      ContentTag.where(id: item).update_all(content_type: "Blah")
+      expect(module_item_translated_content_type(item.reload)).to eq "Unknown Content Type"
     end
   end
 
   describe "process_module_data" do
     let_once(:assg) { t_course.assignments.create }
-    let_once(:item) { t_module.add_item(type: 'assignment', id: assg.id) }
+    let_once(:item) { t_module.add_item(type: "assignment", id: assg.id) }
 
     before do
       @context = t_course
@@ -178,7 +178,7 @@ describe ContextModulesHelper do
       it "returns the correct choose_url for a cyoe trigger assignment module item" do
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
-        expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
+        expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + "/modules/items/" + item.id.to_s + "/choose"
       end
 
       it "is true if no set has been selected and the rule is locked" do
@@ -254,43 +254,43 @@ describe ContextModulesHelper do
     it "does not affect cache keys unless mastery paths enabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       student_in_course(course: t_course, active_all: true)
-      cache = add_mastery_paths_to_cache_key('foo', t_course, @student)
-      expect(cache).to eq 'foo'
+      cache = add_mastery_paths_to_cache_key("foo", t_course, @student)
+      expect(cache).to eq "foo"
     end
 
     it "creates the same key for the same mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, s1.user)
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, s2.user)
-      expect(cache1).not_to eq 'foo'
+      cache1 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
+      cache2 = add_mastery_paths_to_cache_key("foo", t_course, s2.user)
+      expect(cache1).not_to eq "foo"
       expect(cache1).to eq cache2
     end
 
     it "creates different keys for different mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, s1.user)
+      cache1 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([3, 2, 1])
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, s2.user)
+      cache2 = add_mastery_paths_to_cache_key("foo", t_course, s2.user)
       expect(cache1).not_to eq cache2
     end
 
     it "creates the same key for the same mastery paths rules for a teacher" do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t1.user)
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t2.user)
-      expect(cache1).not_to eq 'foo'
+      cache1 = add_mastery_paths_to_cache_key("foo", t_course, t1.user)
+      cache2 = add_mastery_paths_to_cache_key("foo", t_course, t2.user)
+      expect(cache1).not_to eq "foo"
       expect(cache1).to eq cache2
     end
 
     it "creates different keys for different mastery paths rules for a teacher" do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t1.user)
+      cache1 = add_mastery_paths_to_cache_key("foo", t_course, t1.user)
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([3, 2, 1])
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t2.user)
+      cache2 = add_mastery_paths_to_cache_key("foo", t_course, t2.user)
       expect(cache1).not_to eq cache2
     end
   end
@@ -302,60 +302,60 @@ describe ContextModulesHelper do
 
     it "returns true for a graded assignment module item" do
       ag = @course.assignment_groups.create!
-      assg = ag.assignments.create! context: @course, submission_types: 'online_text_entry'
-      item = @mod.add_item type: 'assignment', id: assg.id
+      assg = ag.assignments.create! context: @course, submission_types: "online_text_entry"
+      item = @mod.add_item type: "assignment", id: assg.id
 
       expect(cyoe_able?(item)).to eq true
     end
 
     it "returns false for a ungraded assignment module item" do
       ag = @course.assignment_groups.create!
-      assg = ag.assignments.create! context: @course, submission_types: 'not_graded'
-      item = @mod.add_item type: 'assignment', id: assg.id
+      assg = ag.assignments.create! context: @course, submission_types: "not_graded"
+      item = @mod.add_item type: "assignment", id: assg.id
 
       expect(cyoe_able?(item)).to eq false
     end
 
     it "returns true for a assignment quiz module item" do
-      quiz = @course.quizzes.create! quiz_type: 'assignment'
-      item = @mod.add_item type: 'quiz', id: quiz.id
+      quiz = @course.quizzes.create! quiz_type: "assignment"
+      item = @mod.add_item type: "quiz", id: quiz.id
 
       expect(cyoe_able?(item)).to eq true
     end
 
     it "returns false for a non-assignment quiz module item" do
-      quiz = @course.quizzes.create! quiz_type: 'survey'
-      item = @mod.add_item type: 'quiz', id: quiz.id
+      quiz = @course.quizzes.create! quiz_type: "survey"
+      item = @mod.add_item type: "quiz", id: quiz.id
 
       expect(cyoe_able?(item)).to eq false
     end
 
     it "returns true for a graded discussion module item" do
       ag = @course.assignment_groups.create!
-      assg = ag.assignments.create! context: @course, submission_types: 'discussion_topic'
+      assg = ag.assignments.create! context: @course, submission_types: "discussion_topic"
       topic = @course.discussion_topics.create! assignment: assg
-      item = @mod.add_item type: 'discussion_topic', id: topic.id
+      item = @mod.add_item type: "discussion_topic", id: topic.id
 
       expect(cyoe_able?(item)).to eq true
     end
 
     it "returns false for a non-graded discussion module item" do
       topic = @course.discussion_topics.create!
-      item = @mod.add_item type: 'discussion_topic', id: topic.id
+      item = @mod.add_item type: "discussion_topic", id: topic.id
 
       expect(cyoe_able?(item)).to eq false
     end
   end
 
-  describe 'module_item_new_quizzes_build_button_enabled?' do
-    it 'returns true when the feature flag is on' do
+  describe "module_item_new_quizzes_build_button_enabled?" do
+    it "returns true when the feature flag is on" do
       allow(Account.site_admin).to receive(:feature_enabled?)
         .with(:new_quizzes_skip_to_build_module_button)
         .and_return(true)
       expect(module_item_new_quizzes_build_button_enabled?).to eq true
     end
 
-    it 'returns false when the feature flag is off' do
+    it "returns false when the feature flag is off" do
       allow(Account.site_admin).to receive(:feature_enabled?)
         .with(:new_quizzes_skip_to_build_module_button)
         .and_return(false)

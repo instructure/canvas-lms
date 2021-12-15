@@ -24,7 +24,7 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   plugin_settings :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
-    'linkedin'
+    "linkedin"
   end
 
   def self.recognized_params
@@ -32,21 +32,21 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   end
 
   def self.login_attributes
-    ['id', 'emailAddress'].freeze
+    ["id", "emailAddress"].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    [
-      'emailAddress',
-      'firstName',
-      'id',
-      'lastName',
+    %w[
+      emailAddress
+      firstName
+      id
+      lastName
     ].freeze
   end
 
   def login_attribute
-    super || 'id'
+    super || "id"
   end
 
   def unique_id(token)
@@ -69,15 +69,15 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
     token.options[:me] ||= begin
       data = token.get("/v2/me").parsed
       {
-        'id' => data['id'],
-        'firstName' => get_localized_field(data['firstName']),
-        'lastName' => get_localized_field(data['lastName'])
+        "id" => data["id"],
+        "firstName" => get_localized_field(data["firstName"]),
+        "lastName" => get_localized_field(data["lastName"])
       }
     end
   end
 
   def get_localized_field(localized_field)
-    localized_field['localized'].first.last
+    localized_field["localized"].first.last
   end
 
   def email(token)
@@ -85,15 +85,15 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   end
 
   def email_required?
-    login_attribute == 'emailAddress' ||
-      federated_attributes.any? { |(_k, v)| v['attribute'] == 'emailAddress' }
+    login_attribute == "emailAddress" ||
+      federated_attributes.any? { |(_k, v)| v["attribute"] == "emailAddress" }
   end
 
   def client_options
     {
-      site: 'https://api.linkedin.com',
-      authorize_url: 'https://www.linkedin.com/uas/oauth2/authorization',
-      token_url: 'https://www.linkedin.com/uas/oauth2/accessToken'
+      site: "https://api.linkedin.com",
+      authorize_url: "https://www.linkedin.com/uas/oauth2/authorization",
+      token_url: "https://www.linkedin.com/uas/oauth2/accessToken"
     }
   end
 
@@ -103,9 +103,9 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
 
   def scope
     if email_required?
-      'r_liteprofile r_emailaddress'
+      "r_liteprofile r_emailaddress"
     else
-      'r_liteprofile'
+      "r_liteprofile"
     end
   end
 end

@@ -83,7 +83,7 @@ const NotificationPreferences = props => {
 
   const renderNotificationInfoAlert = () => (
     <Flex.Item>
-      <Alert variant="info" transition="none">
+      <Alert transition="none" variant="info" renderCloseButtonLabel={I18n.t('Close')}>
         {props.contextType === 'course'
           ? I18n.t(
               'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.'
@@ -94,6 +94,30 @@ const NotificationPreferences = props => {
       </Alert>
     </Flex.Item>
   )
+
+  const renderNotificationTimesInfoAlert = () => {
+    const globalTimeText = I18n.t(
+      'Daily notifications will be delivered around %{day_time}. Weekly notifications will be delivered %{weekday} between %{start_time} and %{end_time}.',
+      {
+        day_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.daily_notification_time,
+        weekday: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.weekday,
+        start_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.start_time,
+        end_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.end_time
+      }
+    )
+    return (
+      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.daily_notification_time &&
+      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.weekday &&
+      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.start_time &&
+      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.end_time && (
+        <Flex.Item data-testid="notification_times">
+          <Alert transition="none" variant="info" renderCloseButtonLabel={I18n.t('Close')}>
+            {globalTimeText}
+          </Alert>
+        </Flex.Item>
+      )
+    )
+  }
 
   const renderAccountPrivacyInfoAlert = () =>
     props.contextType === 'account' &&
@@ -163,6 +187,7 @@ const NotificationPreferences = props => {
         </Heading>
       </Flex.Item>
       {renderNotificationInfoAlert()}
+      {renderNotificationTimesInfoAlert()}
       {renderAccountPrivacyInfoAlert()}
       {contextSelectable && renderContextSelect()}
       {renderMuteToggle()}

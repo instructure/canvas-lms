@@ -40,7 +40,7 @@ module EpubExports
       @_courses_not_including_epub_exports ||= Course.joins(:enrollments)
                                                      .where(Enrollment::QueryBuilder.new(:current_and_concluded).conditions)
                                                      .where(
-                                                       'enrollments.type IN (?) AND enrollments.user_id = ?',
+                                                       "enrollments.type IN (?) AND enrollments.user_id = ?",
                                                        [StudentEnrollment, TeacherEnrollment, TaEnrollment],
                                                        current_user
                                                      ).to_a

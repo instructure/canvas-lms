@@ -38,7 +38,7 @@ class HostUrl
     end
 
     def domain_config
-      if !@@domain_config
+      unless @@domain_config
         @@domain_config = ConfigFile.load("domain")
         @@domain_config ||= {}
       end
@@ -47,14 +47,14 @@ class HostUrl
 
     # returns "http" or "https" depending on whether this instance of canvas runs over ssl
     def protocol
-      if !@@protocol
-        if domain_config.key?('ssl')
-          is_secure = domain_config['ssl']
-        elsif Attachment.file_store_config.key?('secure')
-          is_secure = Attachment.file_store_config['secure']
-        else
-          is_secure = Rails.env.production?
-        end
+      unless @@protocol
+        is_secure = if domain_config.key?("ssl")
+                      domain_config["ssl"]
+                    elsif Attachment.file_store_config.key?("secure")
+                      Attachment.file_store_config["secure"]
+                    else
+                      Rails.env.production?
+                    end
 
         @@protocol = is_secure ? "https" : "http"
       end
@@ -71,11 +71,11 @@ class HostUrl
     end
 
     def default_host
-      if !@@default_host
-        @@default_host = domain_config[:domain] if domain_config.has_key?(:domain)
+      if !@@default_host && domain_config.key?(:domain)
+        @@default_host = domain_config[:domain]
       end
       res = @@default_host
-      res ||= ENV['RAILS_HOST_WITH_PORT']
+      res ||= ENV["RAILS_HOST_WITH_PORT"]
       res
     end
 
@@ -83,7 +83,7 @@ class HostUrl
       return [@@file_host, Shard.default] if @@file_host
 
       res = nil
-      res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)
+      res = @@file_host = domain_config[:files_domain] if domain_config.key?(:files_domain)
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
       [res, Shard.default]
@@ -96,7 +96,7 @@ class HostUrl
     def cdn_host
       # by default only set it for development. useful so that gravatar can
       # proxy our fallback urls
-      host = ENV['CANVAS_CDN_HOST']
+      host = ENV["CANVAS_CDN_HOST"]
       host ||= "canvas.instructure.com" if Rails.env.development?
       host
     end

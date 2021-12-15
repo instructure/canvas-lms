@@ -22,6 +22,6 @@ class AddLookupIdToLtiResourceHandler < ActiveRecord::Migration[4.2]
   def change
     add_column :lti_resource_handlers, :lookup_id, :text
     add_index :lti_resource_handlers, [:lookup_id]
-    add_index :lti_resource_handlers, [:tool_proxy_id, :lookup_id], name: 'index_lti_resource_handlers_on_tool_proxy_and_lookup_id', unique: true
+    add_index :lti_resource_handlers, [:tool_proxy_id, :lookup_id], name: "index_lti_resource_handlers_on_tool_proxy_and_lookup_id", unique: true
   end
 end

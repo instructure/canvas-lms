@@ -52,11 +52,11 @@ module AccountReports
     end
 
     def self.sis_export_csv(account_report)
-      SisExporter.new(account_report, { :sis_format => true }).csv
+      SisExporter.new(account_report, { sis_format: true }).csv
     end
 
     def self.provisioning_csv(account_report)
-      SisExporter.new(account_report, { :sis_format => false }).csv
+      SisExporter.new(account_report, { sis_format: false }).csv
     end
 
     def self.unpublished_courses_csv(account_report)

@@ -23,8 +23,8 @@ module CC::Exporter::Epub::Converters
 
     def convert_quizzes
       quizzes = []
-      @manifest.css('resource[type$=assessment]').each do |quiz|
-        xml_path = @package_root.item_path quiz.at_css('file[href$="xml"]')['href']
+      @manifest.css("resource[type$=assessment]").each do |quiz|
+        xml_path = @package_root.item_path quiz.at_css('file[href$="xml"]')["href"]
 
         meta_node = open_file_xml(xml_path)
         ident = get_node_att(meta_node, "assessment", "ident")
@@ -34,8 +34,8 @@ module CC::Exporter::Epub::Converters
         quiz_meta_data = open_file_xml(quiz_meta_link)
 
         quiz = convert_quiz(quiz_meta_data)
-        next unless get_bool_val(quiz_meta_data, 'available') &&
-                    !get_bool_val(quiz_meta_data, 'module_locked')
+        next unless get_bool_val(quiz_meta_data, "available") &&
+                    !get_bool_val(quiz_meta_data, "module_locked")
 
         quizzes << quiz
       end
@@ -52,10 +52,10 @@ module CC::Exporter::Epub::Converters
       quiz[:unlock_at] = get_node_val(quiz_meta_data, "unlock_at")
       quiz[:allowed_attempts] = get_node_val(quiz_meta_data, "allowed_attempts")
       quiz[:points_possible] = get_node_val(quiz_meta_data, "points_possible")
-      quiz[:position] = get_node_val(quiz_meta_data, 'position')
-      quiz[:identifier] = get_node_att(quiz_meta_data, 'quiz', 'identifier')
+      quiz[:position] = get_node_val(quiz_meta_data, "position")
+      quiz[:identifier] = get_node_att(quiz_meta_data, "quiz", "identifier")
       quiz[:href] = "quizzes.xhtml##{quiz[:identifier]}"
-      update_syllabus(quiz) if get_node_val(quiz_meta_data, 'assignment').present?
+      update_syllabus(quiz) if get_node_val(quiz_meta_data, "assignment").present?
       quiz
     end
   end

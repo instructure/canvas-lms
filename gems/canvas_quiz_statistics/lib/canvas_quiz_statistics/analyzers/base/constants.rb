@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasQuizStatistics::Analyzers::Base::Constants
-  UnknownAnswerKey = 'other'
-  UnknownAnswerText = 'Other'
-  MissingAnswerKey = 'none'
-  MissingAnswerText = 'No Answer'
-  FalseLike = ['nil', 'null', 'false', '']
+  UnknownAnswerKey = "other"
+  UnknownAnswerText = "Other"
+  MissingAnswerKey = "none"
+  MissingAnswerText = "No Answer"
+  FalseLike = ["nil", "null", "false", ""].freeze
 end

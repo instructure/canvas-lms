@@ -41,25 +41,25 @@ describe GoogleDocsCollaboration do
     end
   end
 
-  describe 'collaborators' do
+  describe "collaborators" do
     before :once do
-      PluginSetting.create!(:name => "google_drive", :settings => {})
-      @other_user = user_with_pseudonym(:active_all => true)
-      @student = user_with_pseudonym(:active_all => true)
-      course_factory(:active_all => true)
+      PluginSetting.create!(name: "google_drive", settings: {})
+      @other_user = user_with_pseudonym(active_all: true)
+      @student = user_with_pseudonym(active_all: true)
+      course_factory(active_all: true)
       @course.enroll_student(@student)
 
-      @teacher.user_services.create! service: 'google_drive', service_domain: 'drive.google.com',
-                                     service_user_id: 'teh_teacher@gmail.com', token: 'blah', secret: 'bleh'
-      @student.user_services.create! service: 'google_drive', service_domain: 'drive.google.com',
-                                     service_user_id: 'teh_student@gmail.com', token: 'bleh', secret: 'blah'
-      @other_user.user_services.create! service: 'google_drive', service_domain: 'drive.google.com',
-                                        service_user_id: 'distractor@gmail.com', token: 'bleh', secret: 'bleh'
+      @teacher.user_services.create! service: "google_drive", service_domain: "drive.google.com",
+                                     service_user_id: "teh_teacher@gmail.com", token: "blah", secret: "bleh"
+      @student.user_services.create! service: "google_drive", service_domain: "drive.google.com",
+                                     service_user_id: "teh_student@gmail.com", token: "bleh", secret: "blah"
+      @other_user.user_services.create! service: "google_drive", service_domain: "drive.google.com",
+                                        service_user_id: "distractor@gmail.com", token: "bleh", secret: "bleh"
     end
 
     before do
       stub_service
-      @collaboration = GoogleDocsCollaboration.new(:title => 'title', :user => @teacher)
+      @collaboration = GoogleDocsCollaboration.new(title: "title", user: @teacher)
       @collaboration.context = @course
       @collaboration.save!
     end
@@ -69,7 +69,7 @@ describe GoogleDocsCollaboration do
       @collaboration.update_members([@teacher, @student])
       collaborators = @collaboration.reload.collaborators.to_a
       expect(collaborators.map(&:user_id)).to match_array([@student.id, @teacher.id])
-      expect(collaborators.map(&:authorized_service_user_id)).to match_array(['teh_teacher@gmail.com', 'teh_student@gmail.com'])
+      expect(collaborators.map(&:authorized_service_user_id)).to match_array(["teh_teacher@gmail.com", "teh_student@gmail.com"])
     end
 
     it "doesn't add users outside the course" do

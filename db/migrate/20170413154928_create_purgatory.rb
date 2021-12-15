@@ -25,7 +25,7 @@ class CreatePurgatory < ActiveRecord::Migration[4.2]
       t.integer :attachment_id, limit: 8, null: false
       t.integer :deleted_by_user_id, limit: 8
       t.timestamps null: false
-      t.string :workflow_state, null: false, default: 'active'
+      t.string :workflow_state, null: false, default: "active"
       t.string :old_filename, null: false
     end
     add_foreign_key :purgatories, :users, column: :deleted_by_user_id

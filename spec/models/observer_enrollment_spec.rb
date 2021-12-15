@@ -24,30 +24,30 @@ describe ObserverEnrollment do
     @student = user_factory
     @observer = user_factory
     @student_enrollment = @course1.enroll_student(@student)
-    @observer_enrollment = @course1.enroll_user(@observer, 'ObserverEnrollment')
+    @observer_enrollment = @course1.enroll_user(@observer, "ObserverEnrollment")
     @observer_enrollment.update_attribute(:associated_user_id, @student.id)
 
     @course2 = course_factory(active_all: true)
     @student_enrollment2 = @course2.enroll_student(@student)
-    @observer_enrollment2 = @course2.enroll_user(@observer, 'ObserverEnrollment')
+    @observer_enrollment2 = @course2.enroll_user(@observer, "ObserverEnrollment")
     @observer_enrollment2.update_attribute(:associated_user_id, @student.id)
   end
 
-  describe 'observed_enrollments_for_courses' do
+  describe "observed_enrollments_for_courses" do
     it "retrieve observed enrollments for courses passed in" do
       expect(ObserverEnrollment.observed_enrollments_for_courses([@course1, @course2], @observer).sort)
         .to eq([@student_enrollment, @student_enrollment2].sort)
     end
   end
 
-  describe 'observed_students' do
+  describe "observed_students" do
     it "does not fail if the observed has been deleted" do
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({ @student => [@student_enrollment] })
       @student_enrollment.destroy
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({})
     end
 
-    describe 'date restricted future sections' do
+    describe "date restricted future sections" do
       let(:unrestricted_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2, include_restricted_access: false) }
       let(:all_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2) }
 
@@ -62,18 +62,18 @@ describe ObserverEnrollment do
         @section.save!
 
         add_linked_observer(@student2, @observer2)
-        @student_enrollment = @section.enroll_user(@student2, 'StudentEnrollment')
+        @student_enrollment = @section.enroll_user(@student2, "StudentEnrollment")
       end
 
-      it 'does not include students in future sections with restricted access when called with current_only' do
+      it "does not include students in future sections with restricted access when called with current_only" do
         expect(unrestricted_observed_students).not_to have_key(@student2)
       end
 
-      it 'includes all students when called without current_only' do
+      it "includes all students when called without current_only" do
         expect(all_observed_students).to include(@student2 => [@student_enrollment])
       end
 
-      it 'includes all students in future sections without restricted access when called with current_only' do
+      it "includes all students in future sections without restricted access when called with current_only" do
         @section.restrict_enrollments_to_section_dates = false
         @section.save!
 
@@ -81,10 +81,11 @@ describe ObserverEnrollment do
       end
     end
   end
-  describe 'observed_student_ids_by_observer_id' do
+
+  describe "observed_student_ids_by_observer_id" do
     it "returns a properly formatted hash" do
       @observer_two = user_factory
-      @observer_enrollment_two = @course1.enroll_user(@observer_two, 'ObserverEnrollment')
+      @observer_enrollment_two = @course1.enroll_user(@observer_two, "ObserverEnrollment")
       expect(ObserverEnrollment
                .observed_student_ids_by_observer_id(@course1,
                                                     [@observer.id, @observer_two.id]))
@@ -94,16 +95,16 @@ describe ObserverEnrollment do
 
   context "notifications" do
     it "doesn't send enrollment notifications if already registered" do
-      Notification.create!(:name => "Enrollment Notification")
-      user_with_pseudonym(:active_all => true)
-      e = @course1.enroll_user(@user, 'ObserverEnrollment')
+      Notification.create!(name: "Enrollment Notification")
+      user_with_pseudonym(active_all: true)
+      e = @course1.enroll_user(@user, "ObserverEnrollment")
       expect(e.messages_sent).to be_empty
     end
 
     it "does send enrollment notifications if not already registered" do
-      Notification.create!(:name => "Enrollment Registration")
+      Notification.create!(name: "Enrollment Registration")
       user_with_pseudonym
-      e = @course1.enroll_user(@user, 'ObserverEnrollment')
+      e = @course1.enroll_user(@user, "ObserverEnrollment")
       expect(e.messages_sent).to_not be_empty
     end
   end

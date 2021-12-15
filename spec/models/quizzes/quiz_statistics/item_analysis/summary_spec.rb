@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'common'
+require_relative "common"
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
   let(:quiz) do
-    simple_quiz_with_submissions %w{T T A}, %w{T T A}, %w{T T B}, %w{T F B}, %w{T F B}
+    simple_quiz_with_submissions %w[T T A], %w[T T A], %w[T T B], %w[T F B], %w[T F B]
   end
 
   let(:summary_options) { {} }
@@ -32,7 +32,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
   describe "#aggregate_data" do
     it "groups items by question" do
-      simple_quiz_with_shuffled_answers %w{T T A}, %w{T T A}
+      simple_quiz_with_shuffled_answers %w[T T A], %w[T T A]
       expect(summary.size).to eq 3
     end
   end
@@ -40,15 +40,15 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
   describe "#buckets" do
     context "with distributed submissions" do
       let(:quiz) do
-        simple_quiz_with_submissions %w{T T A},
-                                     %w{T T A}, %w{T T A}, %w{T T B}, # top
-                                     %w{T F B}, %w{T F B}, %w{F T C}, %w{F T D}, %w{F T B}, # middle
-                                     %w{F F B}, %w{F F C}, %w{F F D} # bottom
+        simple_quiz_with_submissions %w[T T A],
+                                     %w[T T A], %w[T T A], %w[T T B], # top
+                                     %w[T F B], %w[T F B], %w[F T C], %w[F T D], %w[F T B], # middle
+                                     %w[F F B], %w[F F C], %w[F F D] # bottom
       end
 
       it "distributes the students accordingly" do
         buckets = summary.buckets
-        total = buckets.values.map(&:size).sum
+        total = buckets.values.sum(&:size)
         top, middle, bottom = buckets[:top].size / total.to_f, buckets[:middle].size / total.to_f, buckets[:bottom].size / total.to_f
 
         # because of the small sample size, this is slightly off, but close enough for gvt work
@@ -60,8 +60,8 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
     context "with tied submissions" do
       let(:quiz) do
-        simple_quiz_with_submissions %w{T T A},
-                                     %w{T T A}, %w{T T A}, %w{F F B}, %w{F F B}
+        simple_quiz_with_submissions %w[T T A],
+                                     %w[T T A], %w[T T A], %w[F F B], %w[F F B]
       end
 
       let(:summary_options) do
@@ -85,8 +85,8 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
     context "with perfect submissions" do
       let(:quiz) do
-        simple_quiz_with_submissions %w{T T A},
-                                     %w{T T A}, %w{T T A}
+        simple_quiz_with_submissions %w[T T A],
+                                     %w[T T A], %w[T T A]
       end
 
       it "does not choke" do
@@ -100,7 +100,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
   describe "#add_response" do
     it "does not add unsupported response types" do
-      summary.add_response({ :question_type => "foo", :answers => [] }, 0, 0)
+      summary.add_response({ question_type: "foo", answers: [] }, 0, 0)
       expect(summary.size).to eq 3
     end
   end
@@ -133,7 +133,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
     context "with less than 2 items" do
       let(:quiz) do
-        simple_quiz_with_submissions %w{T}, %w{F}, %w{T}, %w{T}, %w{T}
+        simple_quiz_with_submissions %w[T], %w[F], %w[T], %w[T], %w[T]
       end
 
       it "is nil" do
@@ -144,7 +144,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
     context "with a #variance of 0" do
       let(:quiz) do
-        simple_quiz_with_submissions %w{T T F}, %w{T T T}, %w{T T T}, %w{T T T}, %w{T T T}
+        simple_quiz_with_submissions %w[T T F], %w[T T T], %w[T T T], %w[T T T], %w[T T T]
       end
 
       it "is nil" do

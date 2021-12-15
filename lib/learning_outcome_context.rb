@@ -20,10 +20,10 @@
 module LearningOutcomeContext
   def self.included(klass)
     if klass < ActiveRecord::Base
-      klass.has_many :learning_outcome_links, -> { where("content_tags.tag_type='learning_outcome_association' AND content_tags.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'ContentTag'
-      klass.has_many :linked_learning_outcomes, -> { distinct.where(content_tags: { content_type: 'LearningOutcome' }) }, through: :learning_outcome_links, source: :learning_outcome_content
-      klass.has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context, :inverse_of => :context
-      klass.has_many :learning_outcome_groups, :as => :context, :inverse_of => :context
+      klass.has_many :learning_outcome_links, -> { where("content_tags.tag_type='learning_outcome_association' AND content_tags.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "ContentTag"
+      klass.has_many :linked_learning_outcomes, -> { distinct.where(content_tags: { content_type: "LearningOutcome" }) }, through: :learning_outcome_links, source: :learning_outcome_content
+      klass.has_many :created_learning_outcomes, class_name: "LearningOutcome", as: :context, inverse_of: :context
+      klass.has_many :learning_outcome_groups, as: :context, inverse_of: :context
       klass.send :include, InstanceMethods
 
       klass.after_save :update_root_outcome_group_name, if: -> { saved_change_to_name? }
@@ -53,7 +53,7 @@ module LearningOutcomeContext
 
       unless opts[:recurse] == false
         (associated_accounts.uniq - [self]).each do |context|
-          outcome = context.available_outcome(outcome_id, :recurse => false)
+          outcome = context.available_outcome(outcome_id, recurse: false)
           return outcome if outcome
         end
       end
@@ -68,7 +68,7 @@ module LearningOutcomeContext
     end
 
     def has_outcomes?
-      Rails.cache.fetch(['has_outcomes', self].cache_key) do
+      Rails.cache.fetch(["has_outcomes", self].cache_key) do
         linked_learning_outcomes.exists?
       end
     end
@@ -82,7 +82,7 @@ module LearningOutcomeContext
       return unless root
 
       self.class.connection.after_transaction_commit do
-        root.update! title: self.name
+        root.update! title: name
       end
     end
   end

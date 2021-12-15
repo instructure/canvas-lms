@@ -26,15 +26,15 @@
 module ContextModuleItem
   # set up the association for the AR class that included this module
   def self.included(klass)
-    klass.has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'").preload(:context_module) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
+    klass.has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'").preload(:context_module) }, as: :content, inverse_of: :content, class_name: "ContentTag"
   end
 
   # Check if this item is locked for the given user.
   # If we are locked, this will return the module item (ContentTag) that is
   # locking the item for the given user
   def locked_by_module_item?(user, opts = {})
-    if self.context_module_tags.present? && self.context_module_tags.all? { |tag| tag.locked_for?(user, opts) }
-      item = self.context_module_tags.first
+    if context_module_tags.present? && context_module_tags.all? { |tag| tag.locked_for?(user, opts) }
+      item = context_module_tags.first
     end
     item || false
   end
@@ -50,7 +50,7 @@ module ContextModuleItem
     objs_to_search.each do |obj|
       next unless obj.present?
 
-      tag = obj.context_module_tags.where(:id => preferred_id).first
+      tag = obj.context_module_tags.where(id: preferred_id).first
       return tag if tag
     end
     objs_to_search.each do |obj|
@@ -62,6 +62,6 @@ module ContextModuleItem
       tag = tags.first
       return tag if tag
     end
-    return nil
+    nil
   end
 end

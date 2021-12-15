@@ -25,6 +25,8 @@ module Services
   describe ScreencapService do
     include WebMock::API
 
+    subject { described_class.new(config) }
+
     before do
       WebMock.disable_net_connect!
     end
@@ -35,32 +37,30 @@ module Services
 
     let :config do
       {
-        url: 'https://screencap.example.net/capture',
-        token: 'AN_API_TOKEN'
+        url: "https://screencap.example.net/capture",
+        token: "AN_API_TOKEN"
       }
     end
 
-    subject { described_class.new(config) }
-
     context ".snapshot_url_to_file" do
-      it 'calls the provided url' do
+      it "calls the provided url" do
         @stub = stub_request(:get, config[:url])
-                .with(query: { url: 'https://www.example.com' })
+                .with(query: { url: "https://www.example.com" })
                 .to_return(status: 200, body: "IMAGE_GOES_HERE")
 
-        Tempfile.create('example.png') do |f|
+        Tempfile.create("example.png") do |f|
           result = subject.snapshot_url_to_file("https://www.example.com", f)
           expect(result).to be_truthy
         end
         expect(@stub).to have_been_requested.times(1)
       end
 
-      it 'returns false if it gets a non-200' do
+      it "returns false if it gets a non-200" do
         @stub = stub_request(:get, config[:url])
-                .with(query: { url: 'https://www.example.com' })
+                .with(query: { url: "https://www.example.com" })
                 .to_return(status: 500, body: "IMAGE_GOES_HERE")
 
-        Tempfile.create('example.png') do |f|
+        Tempfile.create("example.png") do |f|
           result = subject.snapshot_url_to_file("https://www.example.com", f)
           expect(result).to be_falsey
         end

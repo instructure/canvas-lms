@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "accounts/settings.html.erb" do
   before do
@@ -49,7 +49,7 @@ describe "accounts/settings.html.erb" do
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false })
+      admin = account_admin_user_with_role_changes(role_changes: { "manage_sis" => false })
       view_context(@account, admin)
       assign(:current_user, admin)
       render
@@ -77,7 +77,7 @@ describe "accounts/settings.html.erb" do
     end
 
     it "shows warning dialog when a delegated auth config is around" do
-      @account.authentication_providers.create!(:auth_type => 'cas')
+      @account.authentication_providers.create!(auth_type: "cas")
       @account.authentication_providers.first.move_to_bottom
       render
       expect(response).to have_tag("input#account_settings_open_registration")
@@ -221,7 +221,7 @@ describe "accounts/settings.html.erb" do
     end
 
     def do_render(user, account = nil)
-      account = @account unless account
+      account ||= @account
       view_context(account, user)
       render
     end
@@ -263,7 +263,7 @@ describe "accounts/settings.html.erb" do
 
       before do
         @account = Account.default
-        @subaccount = @account.sub_accounts.create!(:name => 'sub-account')
+        @subaccount = @account.sub_accounts.create!(name: "sub-account")
 
         assign(:account, @account)
         assign(:root_account, @account)
@@ -399,15 +399,15 @@ describe "accounts/settings.html.erb" do
       it "shows quota options" do
         render
         expect(@controller.js_env).to include :ACCOUNT
-        expect(@controller.js_env[:ACCOUNT]).to include 'default_storage_quota_mb'
-        expect(response).to have_tag '#tab-quotas-link'
-        expect(response).to have_tag '#tab-quotas'
+        expect(@controller.js_env[:ACCOUNT]).to include "default_storage_quota_mb"
+        expect(response).to have_tag "#tab-quotas-link"
+        expect(response).to have_tag "#tab-quotas"
       end
     end
 
     context "without :manage_storage_quotas" do
       before do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'manage_storage_quotas' => false })
+        admin = account_admin_user_with_role_changes(account: @account, role_changes: { "manage_storage_quotas" => false })
         view_context(@account, admin)
         assign(:current_user, admin)
       end
@@ -415,9 +415,9 @@ describe "accounts/settings.html.erb" do
       it "does not show quota options" do
         render
         expect(@controller.js_env).to include :ACCOUNT
-        expect(@controller.js_env[:ACCOUNT]).not_to include 'default_storage_quota_mb'
-        expect(response).not_to have_tag '#tab-quotas-link'
-        expect(response).not_to have_tag '#tab-quotas'
+        expect(@controller.js_env[:ACCOUNT]).not_to include "default_storage_quota_mb"
+        expect(response).not_to have_tag "#tab-quotas-link"
+        expect(response).not_to have_tag "#tab-quotas"
       end
     end
   end
@@ -438,34 +438,34 @@ describe "accounts/settings.html.erb" do
         view_context(@account, admin)
         assign(:current_user, admin)
         render
-        expect(response).to have_tag '#tab-reports-link'
+        expect(response).to have_tag "#tab-reports-link"
       end
     end
 
     context "without :read_reports" do
       it "does not show reports tab link" do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'read_reports' => false })
+        admin = account_admin_user_with_role_changes(account: @account, role_changes: { "read_reports" => false })
         view_context(@account, admin)
         assign(:current_user, admin)
         render
-        expect(response).not_to have_tag '#tab-reports-link'
+        expect(response).not_to have_tag "#tab-reports-link"
       end
     end
   end
 
   context "admins" do
     it "does not show add admin button if don't have permission to any roles" do
-      role = custom_account_role('CustomAdmin', :account => Account.site_admin)
+      role = custom_account_role("CustomAdmin", account: Account.site_admin)
       account_admin_user_with_role_changes(
-        :account => Account.site_admin,
-        :role => role,
-        :role_changes => { manage_account_memberships: true }
+        account: Account.site_admin,
+        role: role,
+        role_changes: { manage_account_memberships: true }
       )
       view_context(Account.default, @user)
       assign(:account, Account.default)
       assign(:announcements, AccountNotification.none.paginate)
       render
-      expect(response).not_to have_tag '#enroll_users_form'
+      expect(response).not_to have_tag "#enroll_users_form"
     end
   end
 
@@ -506,7 +506,7 @@ describe "accounts/settings.html.erb" do
 
     def expect_threshold_to_be(value)
       expect(response).to have_tag(
-        "select#account_settings_smart_alerts_threshold" +
+        "select#account_settings_smart_alerts_threshold" \
         "  option[value=\"#{value}\"][selected]"
       )
     end
@@ -516,8 +516,8 @@ describe "accounts/settings.html.erb" do
 
       render
 
-      expect(response).to include('Smart Assignment Alerts')
-      expect(response).to include('Hours (from due date) before students are alerted')
+      expect(response).to include("Smart Assignment Alerts")
+      expect(response).to include("Hours (from due date) before students are alerted")
     end
 
     it "does not show if the feature flag is turned off" do
@@ -525,7 +525,7 @@ describe "accounts/settings.html.erb" do
 
       render
 
-      expect(response).not_to include('Smart Assignment Alerts')
+      expect(response).not_to include("Smart Assignment Alerts")
     end
 
     it "defaults to a 36 hour threshold" do
@@ -547,12 +547,12 @@ describe "accounts/settings.html.erb" do
     end
   end
 
-  context 'privacy' do
+  context "privacy" do
     let(:account) { account_model }
     let(:account_admin) { account_admin_user(account: account) }
     let(:dom) { Nokogiri::HTML5(response) }
-    let(:enable_fullstory) { dom.at_css('#account_settings_enable_fullstory') }
-    let(:enable_google_analytics) { dom.at_css('#account_settings_enable_google_analytics') }
+    let(:enable_fullstory) { dom.at_css("#account_settings_enable_fullstory") }
+    let(:enable_google_analytics) { dom.at_css("#account_settings_enable_google_analytics") }
     let(:site_admin) { site_admin_user }
     let(:sub_account) { account_model(root_account: account) }
 
@@ -570,31 +570,31 @@ describe "accounts/settings.html.erb" do
       yield if block_given?
     end
 
-    it 'is not available to account admins' do
+    it "is not available to account admins" do
       render_for(account, account_admin) do
-        expect(response).not_to have_tag('#tab-privacy')
+        expect(response).not_to have_tag("#tab-privacy")
       end
     end
 
-    it 'is not available for the site_admin account' do
+    it "is not available for the site_admin account" do
       render_for(Account.site_admin, site_admin) do
-        expect(response).not_to have_tag('#tab-privacy')
+        expect(response).not_to have_tag("#tab-privacy")
       end
     end
 
-    it 'is not available for sub accounts' do
+    it "is not available for sub accounts" do
       render_for(sub_account, site_admin) do
-        expect(response).not_to have_tag('#tab-privacy')
+        expect(response).not_to have_tag("#tab-privacy")
       end
     end
 
-    it 'opts in to Google Analytics by default' do
+    it "opts in to Google Analytics by default" do
       render_for(account, site_admin) do
         expect(enable_google_analytics).to be_checked
       end
     end
 
-    it 'allows opting out of Google Analytics' do
+    it "allows opting out of Google Analytics" do
       account.settings[:enable_google_analytics] = false
       account.save!
 
@@ -603,13 +603,13 @@ describe "accounts/settings.html.erb" do
       end
     end
 
-    it 'opts in to FullStory by default' do
+    it "opts in to FullStory by default" do
       render_for(account, site_admin) do
         expect(enable_fullstory).to be_checked
       end
     end
 
-    it 'allows opting out of FullStory' do
+    it "allows opting out of FullStory" do
       account.settings[:enable_fullstory] = false
       account.save!
 
@@ -619,7 +619,7 @@ describe "accounts/settings.html.erb" do
     end
   end
 
-  context 'course templates' do
+  context "course templates" do
     let_once(:account) { Account.default }
     let_once(:admin) { account_admin_user(account: account) }
 
@@ -638,8 +638,8 @@ describe "accounts/settings.html.erb" do
     it "shows no template only for root account" do
       render
       doc = Nokogiri::HTML5(response.body)
-      select = doc.at_css('#account_course_template_id')
-      expect(select.css('option').map { |o| o['value'] }).to eq [""]
+      select = doc.at_css("#account_course_template_id")
+      expect(select.css("option").map { |o| o["value"] }).to eq [""]
     end
 
     it "shows no template and inherit for sub accounts" do
@@ -650,8 +650,8 @@ describe "accounts/settings.html.erb" do
 
       render
       doc = Nokogiri::HTML5(response.body)
-      select = doc.at_css('#account_course_template_id')
-      expect(select.css('option').map { |o| o['value'] }).to eq ["", "0"]
+      select = doc.at_css("#account_course_template_id")
+      expect(select.css("option").map { |o| o["value"] }).to eq ["", "0"]
     end
 
     it "disables if you don't have permission" do
@@ -660,9 +660,9 @@ describe "accounts/settings.html.erb" do
 
       render
       doc = Nokogiri::HTML5(response.body)
-      select = doc.at_css('#account_course_template_id')
-      expect(select.css('option').map { |o| o['value'] }).to eq ["", c.id.to_s]
-      expect(select.css('option').map { |o| o['disabled'] }).to eq [nil, "disabled"]
+      select = doc.at_css("#account_course_template_id")
+      expect(select.css("option").map { |o| o["value"] }).to eq ["", c.id.to_s]
+      expect(select.css("option").map { |o| o["disabled"] }).to eq [nil, "disabled"]
     end
 
     it "disables if you don't have permission in a sub-account" do
@@ -677,9 +677,9 @@ describe "accounts/settings.html.erb" do
 
       render
       doc = Nokogiri::HTML5(response.body)
-      select = doc.at_css('#account_course_template_id')
-      expect(select.css('option').map { |o| o['value'] }).to eq ["", "0", c.id.to_s]
-      expect(select.css('option').map { |o| o['disabled'] }).to eq ["disabled", "disabled", "disabled"]
+      select = doc.at_css("#account_course_template_id")
+      expect(select.css("option").map { |o| o["value"] }).to eq ["", "0", c.id.to_s]
+      expect(select.css("option").map { |o| o["disabled"] }).to eq %w[disabled disabled disabled]
     end
   end
 end

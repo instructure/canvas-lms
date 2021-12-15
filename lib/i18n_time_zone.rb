@@ -35,7 +35,7 @@ class I18nTimeZone < ActiveSupport::TimeZone
     other_period = tzinfo.period_for_utc(period.end_transition.at)
     # always sort the DST offset second
     periods = [period, other_period].sort_by { |p| p.dst? ? 1 : 0 }
-    periods.map { |p| self.class.seconds_to_utc_offset(p.utc_offset + p.std_offset, colon) }.join('/')
+    periods.map { |p| self.class.seconds_to_utc_offset(p.utc_offset + p.std_offset, colon) }.join("/")
   end
 
   def to_s
@@ -44,7 +44,7 @@ class I18nTimeZone < ActiveSupport::TimeZone
   end
 
   def keyify
-    "time_zones.#{name.gsub(/(\W|\s|-)/, '').underscore}"
+    "time_zones.#{name.gsub(/(\W|\s|-)/, "").underscore}"
   end
 
   def self.us_zones

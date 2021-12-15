@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/moderate" do
   let(:num_students) { 5 }
 
   before do
     course_with_teacher
-    @students = num_students.times.map do |i|
-      name = "#{(i + 'a'.ord).chr}_student"
+    @students = Array.new(num_students) do |i|
+      name = "#{(i + "a".ord).chr}_student"
       course_with_student(name: name, course: @course)
       @student
     end
@@ -44,6 +44,6 @@ describe "/quizzes/quizzes/moderate" do
 
   it "has filter options" do
     render "quizzes/quizzes/moderate"
-    expect(response.inspect).to include 'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.'
+    expect(response.inspect).to include "Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input."
   end
 end

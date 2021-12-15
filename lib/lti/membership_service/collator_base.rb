@@ -36,17 +36,17 @@ module Lti::MembershipService
     end
 
     def memberships
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     protected
 
     def scope
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     def membership_type
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     def bookmarked_collection

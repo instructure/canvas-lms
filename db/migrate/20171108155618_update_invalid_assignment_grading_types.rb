@@ -21,8 +21,8 @@ class UpdateInvalidAssignmentGradingTypes < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def change
-    Assignment.where(grading_type: '').find_ids_in_batches do |ids|
-      Assignment.where(id: ids).update_all(grading_type: 'points')
+    Assignment.where(grading_type: "").find_ids_in_batches do |ids|
+      Assignment.where(id: ids).update_all(grading_type: "points")
     end
   end
 end

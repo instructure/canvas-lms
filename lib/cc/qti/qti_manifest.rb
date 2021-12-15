@@ -24,8 +24,8 @@ module CC
 
       attr_accessor :exporter
 
-      delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :for_course_copy, :qti_export?, :course, :user, :create_key, :to => :exporter
-      delegate :referenced_files, :to => :@html_exporter
+      delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :for_course_copy, :qti_export?, :course, :user, :create_key, to: :exporter
+      delegate :referenced_files, to: :@html_exporter
 
       def initialize(exporter)
         @exporter = exporter
@@ -33,9 +33,9 @@ module CC
         @document = nil
         @html_exporter = CCHelper::HtmlContentExporter.new(@exporter.course,
                                                            @exporter.user,
-                                                           :key_generator => @exporter,
-                                                           :track_referenced_files => true,
-                                                           :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
+                                                           key_generator: @exporter,
+                                                           track_referenced_files: true,
+                                                           media_object_flavor: Setting.get("exporter_media_object_flavor", nil).presence)
       end
 
       def export_dir
@@ -47,14 +47,14 @@ module CC
       end
 
       def close
-        @file.close if @file
+        @file&.close
         @document = nil
         @file
       end
 
       def create_document
-        @file = File.new(File.join(export_dir, MANIFEST), 'w')
-        @document = Builder::XmlMarkup.new(:target => @file, :indent => 2)
+        @file = File.new(File.join(export_dir, MANIFEST), "w")
+        @document = Builder::XmlMarkup.new(target: @file, indent: 2)
         @document.instruct!
         # noinspection RubyArgCount
         @document.manifest("identifier" => create_key(course, "qti_export_"),
@@ -75,38 +75,38 @@ module CC
               g = Qti::QtiGenerator.new(self, resources, @html_exporter)
               g.generate_qti_only
             rescue
-              add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)
+              add_error(I18n.t("course_exports.errors.quizzes", "Some quizzes failed to export"), $!)
             end
             set_progress(60)
 
-            zipper = ContentZipper.new(:check_user => false)
-            @html_exporter.referenced_files.keys.each do |file_id|
-              att = course.attachments.find_by_id(file_id)
+            zipper = ContentZipper.new(check_user: false)
+            @html_exporter.referenced_files.each_key do |file_id|
+              att = course.attachments.find_by(id: file_id)
               next unless att
 
-              path = att.full_display_path.sub("course files/", '')
+              path = att.full_display_path.sub("course files/", "")
               zipper.add_attachment_to_zip(att, @exporter.zip_file, path)
 
               resources.resource(
-                :identifier => create_key(att),
-                :type => WEBCONTENT,
-                :href => path
+                identifier: create_key(att),
+                type: WEBCONTENT,
+                href: path
               ) do |res|
-                res.file(:href => path)
+                res.file(href: path)
               end
             end
 
             begin
               Resource.new(self, manifest_node, resources).add_media_objects(@html_exporter)
             rescue
-              add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
+              add_error(I18n.t("course_exports.errors.resources", "Failed to link some resources."), $!)
             end
           end
         end # manifest
 
         # write any errors to the manifest file
-        if @exporter.errors.length > 0
-          @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
+        unless @exporter.errors.empty?
+          @document.comment! I18n.t("course_exports.errors_list_message", "Export errors for export %{export_id}:", export_id: @exporter.export_id)
           @exporter.errors.each do |error|
             @document.comment! error.first
           end
@@ -119,7 +119,7 @@ module CC
         md.imsmd :lom do |lom|
           lom.imsmd :general do |general|
             general.imsmd :title do |title|
-              title.imsmd :string, %{QTI Quiz Export for course "#{course.name}"}
+              title.imsmd :string, %(QTI Quiz Export for course "#{course.name}")
             end
           end
           lom.imsmd :lifeCycle do |general|

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
+require_relative "../../api_spec_helper"
 
 describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
   describe "GET /courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions [index]" do
@@ -29,7 +29,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
                   format: "json",
                   course_id: @course.id,
                   quiz_id: @quiz.id }
-      headers = { 'Accept' => 'application/vnd.api+json' }
+      headers = { "Accept" => "application/vnd.api+json" }
       if options[:raw]
         raw_api_call(:get, url, params, data, headers)
       else
@@ -41,29 +41,29 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     before :once do
       course_factory
       @student = student_in_course.user
-      @quiz = @course.quizzes.create!(:title => "Outstanding")
+      @quiz = @course.quizzes.create!(title: "Outstanding")
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, false)
       @submission.submission_data = {}
       @submission.end_at = 20.minutes.ago
       @submission.save!
     end
 
-    it 'denies unprivileged access' do
+    it "denies unprivileged access" do
       api_index(raw: true)
       assert_status(401)
     end
 
-    context 'with privileged access' do
+    context "with privileged access" do
       before :once do
-        teacher_in_course(:active_all => true)
+        teacher_in_course(active_all: true)
       end
 
-      it 'returns all outstanding QS' do
+      it "returns all outstanding QS" do
         json = api_index
         expect(json["quiz_submissions"].first["id"]).to eq @submission.id
       end
 
-      it 'also returns user info' do
+      it "also returns user info" do
         json = api_index
         expect(json["users"].first["id"]).to eq @student.id
       end
@@ -78,7 +78,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
                  format: "json",
                  course_id: @course.id,
                  quiz_id: @quiz.id }
-      headers = { 'Accept' => 'application/vnd.api+json' }
+      headers = { "Accept" => "application/vnd.api+json" }
       if options[:raw]
         raw_api_call(:post, url, params, data, headers)
       else
@@ -88,7 +88,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     before :once do
       course_factory
-      @quiz = @course.quizzes.create!(:title => "Outstanding")
+      @quiz = @course.quizzes.create!(title: "Outstanding")
       @quiz.save
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)
       @submission.submission_data = {}
@@ -96,7 +96,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
       @submission.save!
     end
 
-    it 'denies unprivileged access' do
+    it "denies unprivileged access" do
       student_in_course
       api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
       assert_status 401
@@ -109,7 +109,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
         @submission2.submission_data = {}
         @submission2.end_at = 20.minutes.ago
         @submission2.save!
-        teacher_in_course(:active_all => true)
+        teacher_in_course(active_all: true)
       end
 
       it "grades all outstanding quiz submissions" do
@@ -117,7 +117,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
         assert_status 204
       end
 
-      it 'continues w/o error when given already graded ids' do
+      it "continues w/o error when given already graded ids" do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
         expect(@submission.needs_grading?).to eq false
         api_grade({ raw: true }, { quiz_submission_ids: [@submission.id, @submission2.id] })

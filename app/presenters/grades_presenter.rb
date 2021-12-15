@@ -23,15 +23,15 @@ class GradesPresenter
   end
 
   def student_enrollments
-    @student_enrollments ||= current_enrollments.select { |e| e.student? }.index_by { |e| e.course }
+    @student_enrollments ||= current_enrollments.select(&:student?).index_by(&:course)
   end
 
   def observed_enrollments
-    @observed_enrollments ||= observer_enrollments.map { |e|
+    @observed_enrollments ||= observer_enrollments.map do |e|
       e.shard.activate do
         StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
       end
-    }.uniq.compact
+    end.uniq.compact
   end
 
   def course_grade_summaries
@@ -54,7 +54,7 @@ class GradesPresenter
   end
 
   def teacher_enrollments
-    @teacher_enrollments ||= current_enrollments.select { |e| e.instructor? }.index_by { |e| e.course }.values
+    @teacher_enrollments ||= current_enrollments.select(&:instructor?).index_by(&:course).values
   end
 
   def prior_enrollments

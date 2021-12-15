@@ -20,15 +20,15 @@
 
 module Types
   class AssessmentType < BaseEnum
-    graphql_name 'AssessmentType'
-    description 'The type of assessment'
-    value 'grading'
-    value 'peer_review'
-    value 'provisional_grade'
+    graphql_name "AssessmentType"
+    description "The type of assessment"
+    value "grading"
+    value "peer_review"
+    value "provisional_grade"
   end
 
   class RubricAssessmentType < ApplicationObjectType
-    description 'An assessment for a rubric'
+    description "An assessment for a rubric"
 
     implements Interfaces::LegacyIDInterface
 
@@ -53,9 +53,9 @@ module Types
       load_association(:assessor)
     end
 
-    field :assessment_ratings, [RubricAssessmentRatingType], <<~DESC, null: false
+    field :assessment_ratings, [RubricAssessmentRatingType], <<~MD, null: false
       The assessments for the individual criteria in this rubric
-    DESC
+    MD
     def assessment_ratings
       # Need to gimmy the rubric_id in here, so that the RubricAssessmentRating
       # criterions can associate back to the criterions on the rubric. It's all

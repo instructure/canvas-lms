@@ -33,24 +33,24 @@ module MicrosoftSync
     class Http
       attr_reader :tenant
 
-      BASE_URL = 'https://graph.microsoft.com/v1.0/'
-      STATSD_PREFIX = 'microsoft_sync.graph_service'
+      BASE_URL = "https://graph.microsoft.com/v1.0/"
+      STATSD_PREFIX = "microsoft_sync.graph_service"
 
-      PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
-      PAGINATED_VALUE_KEY = 'value'
+      PAGINATED_NEXT_LINK_KEY = "@odata.nextLink"
+      PAGINATED_VALUE_KEY = "value"
 
       DEFAULT_N_INTERMITTENT_RETRIES = 1
 
       class ApplicationNotAuthorizedForTenant < MicrosoftSync::Errors::GracefulCancelError
         def self.public_message
-          I18n.t 'Application not authorized for tenant. ' \
-                 'Please make sure your admin has granted access for us to access your Microsoft tenant.'
+          I18n.t "Application not authorized for tenant. " \
+                 "Please make sure your admin has granted access for us to access your Microsoft tenant."
         end
       end
 
       class BatchRequestFailed < MicrosoftSync::Errors::PublicError
         def self.public_message
-          I18n.t 'Got error from Microsoft API while making a batch request.'
+          I18n.t "Got error from Microsoft API while making a batch request."
         end
       end
 
@@ -60,14 +60,14 @@ module MicrosoftSync
         def initialize(msg, responses)
           super(msg)
 
-          @retry_after_seconds = responses.map do |resp|
-            headers = resp['headers']&.transform_keys(&:downcase) || {}
-            headers['retry-after'].presence&.to_f
-          end.compact.max
+          @retry_after_seconds = responses.filter_map do |resp|
+            headers = resp["headers"]&.transform_keys(&:downcase) || {}
+            headers["retry-after"].presence&.to_f
+          end.max
         end
 
         def self.public_message
-          I18n.t 'Received throttled response from Microsoft API while making a batch request.'
+          I18n.t "Received throttled response from Microsoft API while making a batch request."
         end
       end
 
@@ -112,7 +112,11 @@ module MicrosoftSync
           end
         end
 
-        if (special_case_value = SpecialCase.match(special_cases, response.code, response.body))
+        special_case_value = SpecialCase.match(
+          special_cases,
+          status_code: response.code, body: response.body
+        )
+        if special_case_value
           log_and_increment(method, path, statsd_tags, :expected, response.code)
           if special_case_value.is_a?(StandardError)
             raise ExpectedErrorWrapper, special_case_value
@@ -128,25 +132,25 @@ module MicrosoftSync
         result
       rescue ExpectedErrorWrapper => e
         raise e.wrapped_exception
-      rescue => error
-        response_code = response&.code&.to_s || error.class.name.tr(':', '_')
+      rescue => e
+        response_code = response&.code&.to_s || e.class.name.tr(":", "_")
 
-        if intermittent_non_throttled?(error) && retries > 0
+        if intermittent_non_throttled?(e) && retries > 0
           retries -= 1
           log_and_increment(method, path, statsd_tags, :retried, response_code)
           retry
         end
 
-        log_and_increment(method, path, statsd_tags, statsd_name_for_error(error), response_code)
+        log_and_increment(method, path, statsd_tags, statsd_name_for_error(e), response_code)
         raise
       end
 
       # Builds a query string (hash) from options used by get or list endpoints
       def expand_options(filter: {}, select: [], top: nil)
         {}.tap do |query|
-          query['$filter'] = filter_clause(filter) unless filter.empty?
-          query['$select'] = select.join(',') unless select.empty?
-          query['$top'] = top if top
+          query["$filter"] = filter_clause(filter) unless filter.empty?
+          query["$select"] = select.join(",") unless select.empty?
+          query["$top"] = top if top
         end
       end
 
@@ -196,7 +200,7 @@ module MicrosoftSync
 
         response =
           begin
-            request(:post, '$batch', body: { requests: requests })
+            request(:post, "$batch", body: { requests: requests })
           rescue Errors::HTTPFailedDependency => e
             # The main request may return a 424 if any subrequests fail (esp. if throttled).
             # Regardless, we handle subrequests failures below.
@@ -206,14 +210,14 @@ module MicrosoftSync
             raise
           end
 
-        grouped, special_vals = group_batch_subresponses_by_type(response['responses'], special_cases)
+        grouped, special_vals = group_batch_subresponses_by_type(response["responses"], special_cases)
 
         increment_batch_statsd_counters(endpoint_name, grouped)
 
         failed = (grouped[:error] || []) + (grouped[:throttled] || [])
         if failed.present?
-          codes = failed.map { |resp| resp['status'] }
-          bodies = failed.map { |resp| resp['body'].to_s.truncate(500) }
+          codes = failed.map { |resp| resp["status"] }
+          bodies = failed.map { |resp| resp["body"].to_s.truncate(500) }
           msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
 
           raise BatchRequestThrottled.new(msg, grouped[:throttled]) if grouped[:throttled]
@@ -240,13 +244,13 @@ module MicrosoftSync
         options = options.dup
         options[:headers] = options[:headers]&.dup || {}
 
-        options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
+        options[:headers]["Authorization"] = "Bearer " + LoginService.token(tenant)
         if options[:body]
-          options[:headers]['Content-type'] = 'application/json'
+          options[:headers]["Content-type"] = "application/json"
           options[:body] = options[:body].to_json
         end
 
-        url = path.start_with?('https:') ? path : BASE_URL + path
+        url = path.start_with?("https:") ? path : BASE_URL + path
 
         HTTParty.send(method, url, options)
       end
@@ -260,7 +264,7 @@ module MicrosoftSync
           raise ApplicationNotAuthorizedForTenant
         elsif !(200..299).cover?(response.code)
           raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
-            service: 'graph', tenant: tenant, response: response
+            service: "graph", tenant: tenant, response: response
           )
         end
       end
@@ -276,8 +280,8 @@ module MicrosoftSync
       def increment_statsd_quota_points(quota, request_options, tags)
         read, write = quota
         if read && read > 0
-          query = request_options['query'] || request_options[:query]
-          read -= 1 if read > 1 && query&.dig('$select')
+          query = request_options["query"] || request_options[:query]
+          read -= 1 if read > 1 && query&.dig("$select")
           InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_read", read, tags: tags)
         end
         if write && write > 0
@@ -287,29 +291,29 @@ module MicrosoftSync
 
       def statsd_tags_for_request(method, path_or_url)
         # Strip https, hostname, "v1.0"
-        path = path_or_url.gsub(%r{^https?://[^/]*/[^/]*/}, '')
+        path = path_or_url.gsub(%r{^https?://[^/]*/[^/]*/}, "")
 
         extra_statsd_tags.merge(
-          msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
+          msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split("/").first}")
         )
       end
 
       def application_not_authorized_response?(response)
         (
           response.code == 401 &&
-          response.body.include?('The identity of the calling application could not be established.')
+          response.body.include?("The identity of the calling application could not be established.")
         ) || (
           response.code == 403 &&
-          response.body.include?('Required roles claim values are not provided')
+          response.body.include?("Required roles claim values are not provided")
         )
       end
 
       def statsd_name_for_error(error)
         case error
-        when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
-        when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
-        when *MicrosoftSync::Errors::INTERMITTENT then 'intermittent'
-        else 'error'
+        when MicrosoftSync::Errors::HTTPNotFound then "notfound"
+        when MicrosoftSync::Errors::HTTPTooManyRequests then "throttled"
+        when *MicrosoftSync::Errors::INTERMITTENT then "intermittent"
+        else "error"
         end
       end
 
@@ -328,11 +332,11 @@ module MicrosoftSync
         filter.map do |filter_key, filter_value|
           if filter_value.is_a?(Array)
             quoted_values = filter_value.map { |v| quote_value(v) }
-            "#{filter_key} in (#{quoted_values.join(', ')})"
+            "#{filter_key} in (#{quoted_values.join(", ")})"
           else
             "#{filter_key} eq #{quote_value(filter_value)}"
           end
-        end.join(' and ')
+        end.join(" and ")
       end
 
       # -- Helpers for run_batch()
@@ -345,15 +349,17 @@ module MicrosoftSync
         special_cases_values = {}
         grouped = responses.group_by do |subresponse|
           special_case_value = SpecialCase.match(
-            special_cases, subresponse['status'], subresponse['body'].to_json
+            special_cases,
+            status_code: subresponse["status"], body: subresponse["body"].to_json,
+            batch_request_id: subresponse["id"]
           )
 
           if special_case_value
-            special_cases_values[subresponse['id']] = special_case_value
+            special_cases_values[subresponse["id"]] = special_case_value
             :ignored
-          elsif subresponse['status'] == 429
+          elsif subresponse["status"] == 429
             :throttled
-          elsif (200..299).cover?(subresponse['status'])
+          elsif (200..299).cover?(subresponse["status"])
             :success
           else
             :error
@@ -365,7 +371,7 @@ module MicrosoftSync
 
       def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
         responses_grouped_by_type.each do |type, responses|
-          responses.group_by { |c| c['status'] }.transform_values(&:count).each do |code, count|
+          responses.group_by { |c| c["status"] }.transform_values(&:count).each do |code, count|
             tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: code)
             InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
           end
@@ -373,7 +379,7 @@ module MicrosoftSync
       end
 
       def increment_batch_statsd_counters_unknown_error(endpoint_name, count)
-        tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: 'unknown')
+        tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: "unknown")
         InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.error", count, tags: tags)
       end
     end

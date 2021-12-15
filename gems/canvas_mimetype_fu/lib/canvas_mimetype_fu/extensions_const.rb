@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'yaml'
+require "yaml"
 
 module MimetypeFu
-  EXTENSIONS = YAML.load_file(File.dirname(__FILE__) + '/mime_types.yml')
+  EXTENSIONS = YAML.load_file(File.dirname(__FILE__) + "/mime_types.yml")
 end

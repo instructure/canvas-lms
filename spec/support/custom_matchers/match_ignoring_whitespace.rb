@@ -19,7 +19,7 @@
 #
 RSpec::Matchers.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
-    str.gsub(/\s+/, '')
+    str.gsub(/\s+/, "")
   end
 
   match do |actual|

@@ -52,7 +52,7 @@ class Quizzes::QuizSubmissionService
   #   The (re)generated QS.
   def create(quiz)
     unless quiz.grants_right?(participant.user, :submit)
-      reject! 'you are not allowed to participate in this quiz', 403
+      reject! "you are not allowed to participate in this quiz", 403
     end
 
     assert_takeability! quiz
@@ -79,7 +79,7 @@ class Quizzes::QuizSubmissionService
   #   The newly created preview QS.
   def create_preview(quiz, session)
     unless quiz.grants_right?(participant.user, session, :update)
-      reject! 'you are not allowed to preview this quiz', 403
+      reject! "you are not allowed to preview this quiz", 403
     end
 
     quiz.generate_submission(participant.user_code, true)
@@ -111,7 +111,7 @@ class Quizzes::QuizSubmissionService
   def complete(quiz_submission, attempt)
     quiz = quiz_submission.quiz
     unless quiz.grants_right?(participant.user, :submit)
-      reject! 'you are not allowed to complete this quiz submission', 403
+      reject! "you are not allowed to complete this quiz submission", 403
     end
 
     # Participant must be able to take the quiz...
@@ -122,7 +122,7 @@ class Quizzes::QuizSubmissionService
 
     # The QS must be completable:
     unless quiz_submission.untaken?
-      reject! 'quiz submission is already complete', 400
+      reject! "quiz submission is already complete", 400
     end
 
     # And we need a valid attempt index to work with.
@@ -162,19 +162,19 @@ class Quizzes::QuizSubmissionService
   # @throw RequestError(400) if a question score is funny
   def update_scores(quiz_submission, attempt, scoring_data)
     unless quiz_submission.grants_right?(participant.user, :update_scores)
-      reject! 'you are not allowed to update scores for this quiz submission', 403
+      reject! "you are not allowed to update scores for this quiz submission", 403
     end
 
-    if !attempt
-      reject! 'invalid attempt', 400
+    unless attempt
+      reject! "invalid attempt", 400
     end
 
     version = quiz_submission.versions.get(attempt.to_i)
 
     if version.nil?
-      reject! 'invalid attempt', 400
+      reject! "invalid attempt", 400
     elsif !version.model.completed?
-      reject! 'quiz submission attempt must be complete', 400
+      reject! "quiz submission attempt must be complete", 400
     end
 
     # map the scoring data to the legacy format of QuizSubmission#update_scores
@@ -194,7 +194,7 @@ class Quizzes::QuizSubmissionService
           legacy_params["question_score_#{question_id}".to_sym] = begin
             score.to_f
           rescue
-            reject! 'question score must be an unsigned decimal', 400
+            reject! "question score must be an unsigned decimal", 400
           end
         end
 
@@ -237,13 +237,13 @@ class Quizzes::QuizSubmissionService
   # @return [Hash] the recently-adjusted submission_data set
   def update_question(question_record, quiz_submission, attempt, snapshot = true)
     unless quiz_submission.grants_right?(participant.user, :update)
-      reject! 'you are not allowed to update questions for this quiz submission', 403
+      reject! "you are not allowed to update questions for this quiz submission", 403
     end
 
     if quiz_submission.completed?
-      reject! 'quiz submission is already complete', 400
+      reject! "quiz submission is already complete", 400
     elsif quiz_submission.overdue?
-      reject! 'quiz submission is overdue', 400
+      reject! "quiz submission is overdue", 400
     end
 
     assert_takeability! quiz_submission.quiz
@@ -293,7 +293,7 @@ class Quizzes::QuizSubmissionService
   def assert_takeability!(quiz, participant = self.participant)
     # [Transient:CNVS-10224] - support for CGB-OQAAT quizzes
     if quiz.cant_go_back
-      reject! 'that type of quizzes is not supported yet', 501
+      reject! "that type of quizzes is not supported yet", 501
     end
 
     can_take = Quizzes::QuizEligibility.new(course: quiz.context,
@@ -304,12 +304,13 @@ class Quizzes::QuizSubmissionService
 
     unless can_take.eligible?
       reason = can_take.declined_reason_renders
-      if reason == :access_code
-        reject! 'invalid access code', 403
-      elsif reason == :invalid_ip
-        reject! 'IP address denied', 403
+      case reason
+      when :access_code
+        reject! "invalid access code", 403
+      when :invalid_ip
+        reject! "IP address denied", 403
       end
-      reject! 'quiz is locked', 400
+      reject! "quiz is locked", 400
     end
   end
 
@@ -320,13 +321,13 @@ class Quizzes::QuizSubmissionService
   # See QuizSubmission#retriable?
   def assert_retriability!(quiz_submission)
     if quiz_submission.present? && !quiz_submission.retriable?
-      reject! 'a quiz submission already exists', 409
+      reject! "a quiz submission already exists", 409
     end
   end
 
   def validate_token!(quiz_submission, validation_token)
     unless quiz_submission.valid_token?(validation_token)
-      reject! 'invalid token', 403
+      reject! "invalid token", 403
     end
   end
 
@@ -349,7 +350,7 @@ class Quizzes::QuizSubmissionService
     attempt = Integer(attempt) rescue nil
 
     if !attempt
-      reject! 'invalid attempt', 400
+      reject! "invalid attempt", 400
     elsif !quiz_submission.preview? && quiz_submission.attempt != attempt
       reject! "attempt #{attempt} can not be modified", 400
     end

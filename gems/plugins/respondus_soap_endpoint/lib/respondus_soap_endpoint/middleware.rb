@@ -21,11 +21,11 @@ module RespondusSoapEndpoint
   class Middleware
     class_attribute :servant
 
-    Endpoint = %r{\A/api/respondus/soap}
+    Endpoint = %r{\A/api/respondus/soap}.freeze
 
     def self.plugin_enabled?
       plugin = Canvas::Plugin.find(:respondus_soap_endpoint)
-      plugin.settings[:enabled] == 'true'
+      plugin.settings[:enabled] == "true"
     end
 
     # The first time a call to this API is made, and the plugin is enabled, we
@@ -42,25 +42,25 @@ module RespondusSoapEndpoint
       # code ensures that our gem is on the front of the load order, before the
       # system ruby load path.
       # see http://code.google.com/p/phusion-passenger/issues/detail?id=133
-      soap_gem_path_idx = $LOAD_PATH.index { |p| p.to_s =~ /\/soap4r-[\d.]+\/lib/ }
+      soap_gem_path_idx = $LOAD_PATH.index { |p| p.to_s =~ %r{/soap4r-[\d.]+/lib} }
       if soap_gem_path_idx
         soap_gem_path = $LOAD_PATH.delete_at(soap_gem_path_idx)
         $LOAD_PATH.unshift(soap_gem_path)
       end
 
       remove_method :call # we'll just use soap4r-middleware's
-      Bundler.require 'respondus_soap_endpoint'
+      Bundler.require "respondus_soap_endpoint"
       include Soap4r::Middleware
-      require 'respondus_soap_endpoint'
+      require "respondus_soap_endpoint"
       setup do
         self.endpoint = Endpoint
         self.servant = RespondusAPIPort.new
         RespondusAPIPort::Methods.each do |definitions|
           opt = definitions.last
           if opt[:request_style] == :document
-            @router.add_document_operation(self.servant, *definitions)
+            @router.add_document_operation(servant, *definitions)
           else
-            @router.add_rpc_operation(self.servant, *definitions)
+            @router.add_rpc_operation(servant, *definitions)
           end
         end
         self.mapping_registry = UrnRespondusAPIMappingRegistry::EncodedRegistry
@@ -73,7 +73,7 @@ module RespondusSoapEndpoint
     end
 
     def call(env)
-      if env['PATH_INFO'].match(Endpoint) && self.class.plugin_enabled?
+      if env["PATH_INFO"].match(Endpoint) && self.class.plugin_enabled?
         self.class.do_setup
         super
       else
@@ -82,7 +82,7 @@ module RespondusSoapEndpoint
     end
 
     def handle(env)
-      self.servant.rack_env = env
+      servant.rack_env = env
       super(env)
     end
   end

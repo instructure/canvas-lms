@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'timeout'
+require "timeout"
 
 module IncomingMailProcessor
   # Internal: A helper mixin for Mailbox implementation to properly implement
@@ -100,10 +100,8 @@ module IncomingMailProcessor
     # Returns the return value of the block.
     # Raises Timeout::Error if the block takes longer than the default timeout
     #   duration.
-    def default_timeout_method()
-      Timeout.timeout(default_timeout_duration) do
-        yield
-      end
+    def default_timeout_method(&block)
+      Timeout.timeout(default_timeout_duration, &block)
     end
 
     # Internal: The default timeout duration for default_timeout_method. The

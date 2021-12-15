@@ -22,13 +22,13 @@ class AddReplicaIdentityForDiscussionEntryParticipants < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'DiscussionEntryParticipant', :root_account_id, 0
-    remove_index :discussion_entry_participants, name: 'index_discussion_entry_participants_on_root_account_id', if_exists: true
+    add_replica_identity "DiscussionEntryParticipant", :root_account_id, 0
+    remove_index :discussion_entry_participants, name: "index_discussion_entry_participants_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :discussion_entry_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'DiscussionEntryParticipant'
+    remove_replica_identity "DiscussionEntryParticipant"
     change_column_null :discussion_entry_participants, :root_account_id, true
   end
 end

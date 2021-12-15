@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe "Importers::LinkReplacer" do
   describe "#rewrite_item_version!" do

@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe 'site-wide', :type => :request do
+describe "site-wide", type: :request do
   context "web app manifest" do
     before(:once) do
       student_in_course
-      user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
+      user_with_pseudonym(user: @student, username: "student@example.com", password: "password")
     end
 
     it "doesn't add link tag if setting is explicitly unset" do
@@ -31,7 +31,7 @@ describe 'site-wide', :type => :request do
     end
 
     it "adds the app manifest link tag so it prompts android users to install mobile app" do
-      Setting.set('web_app_manifest_url', '/web-app-manifest/manifest.json')
+      Setting.set("web_app_manifest_url", "/web-app-manifest/manifest.json")
       user_session(@student, @pseudonym)
       get "/"
       expect(response.body).to include('link rel="manifest" href="/web-app-manifest/manifest.json"')

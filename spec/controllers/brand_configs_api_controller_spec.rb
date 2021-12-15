@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe BrandConfigsApiController do
-  describe '#show' do
+  describe "#show" do
     it "redirects to the default when nothing is set" do
       get :show
-      expect(response).to redirect_to("#{Canvas::Cdn.config.host}/#{BrandableCSS.public_default_path('json')}")
+      expect(response).to redirect_to("#{Canvas::Cdn.config.host}/#{BrandableCSS.public_default_path("json")}")
     end
 
     it "redirects to the one for @domain_root_account's brand config if set" do

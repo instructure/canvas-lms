@@ -36,24 +36,24 @@ module Canvas::Security
     def self.execute(encryption_key)
       {
         Account => {
-          :encrypted_column => :turnitin_crypted_secret,
-          :salt_column => :turnitin_salt,
-          :key => 'instructure_turnitin_secret_shared'
+          encrypted_column: :turnitin_crypted_secret,
+          salt_column: :turnitin_salt,
+          key: "instructure_turnitin_secret_shared"
         },
         AuthenticationProvider => {
-          :encrypted_column => :auth_crypted_password,
-          :salt_column => :auth_password_salt,
-          :key => 'instructure_auth'
+          encrypted_column: :auth_crypted_password,
+          salt_column: :auth_password_salt,
+          key: "instructure_auth"
         },
         UserService => {
-          :encrypted_column => :crypted_password,
-          :salt_column => :password_salt,
-          :key => 'instructure_user_service'
+          encrypted_column: :crypted_password,
+          salt_column: :password_salt,
+          key: "instructure_user_service"
         },
         User => {
-          :encrypted_column => :otp_secret_key_enc,
-          :salt_column => :otp_secret_key_salt,
-          :key => 'otp_secret_key'
+          encrypted_column: :otp_secret_key_enc,
+          salt_column: :otp_secret_key_salt,
+          key: "otp_secret_key"
         }
       }.each do |(model, definition)|
         model.where("#{definition[:encrypted_column]} IS NOT NULL")
@@ -64,7 +64,7 @@ module Canvas::Security
                                                         definition[:key],
                                                         encryption_key)
           new_crypted_data, new_salt = Canvas::Security.encrypt_password(cleartext, definition[:key])
-          model.where(:id => instance)
+          model.where(id: instance)
                .update_all(definition[:encrypted_column] => new_crypted_data,
                            definition[:salt_column] => new_salt)
         end
@@ -78,9 +78,9 @@ module Canvas::Security
         Array(settings.plugin.encrypted_settings).each do |setting|
           cleartext = Canvas::Security.decrypt_password(settings.settings["#{setting}_enc".to_sym],
                                                         settings.settings["#{setting}_salt".to_sym],
-                                                        'instructure_plugin_setting',
+                                                        "instructure_plugin_setting",
                                                         encryption_key)
-          new_crypted_data, new_salt = Canvas::Security.encrypt_password(cleartext, 'instructure_plugin_setting')
+          new_crypted_data, new_salt = Canvas::Security.encrypt_password(cleartext, "instructure_plugin_setting")
           settings.settings["#{setting}_enc".to_sym] = new_crypted_data
           settings.settings["#{setting}_salt".to_sym] = new_salt
           settings.settings_will_change!

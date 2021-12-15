@@ -25,44 +25,44 @@ require_dependency "lti/capabilities_helper"
 
 module Lti
   describe CapabilitiesHelper do
-    let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
+    let(:root_account) { Account.new(lti_guid: "test-lti-guid") }
     let(:account) { Account.new(root_account: root_account) }
     let(:course) { Course.new(account: account, sis_source_id: 12) }
-    let(:group_category) { course.group_categories.new(name: 'Category') }
-    let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
+    let(:group_category) { course.group_categories.new(name: "Category") }
+    let(:group) { course.groups.new(name: "Group", group_category: group_category) }
     let(:user) { User.new }
     let(:assignment) { Assignment.new }
     let(:collaboration) do
       ExternalToolCollaboration.new(
         title: "my collab",
         user: user,
-        url: 'http://www.example.com'
+        url: "http://www.example.com"
       )
     end
     let(:substitution_helper) { double.as_null_object }
     let(:right_now) { DateTime.now }
     let(:tool) do
-      m = double('tool')
+      m = double("tool")
       allow(m).to receive(:id).and_return(1)
       allow(m).to receive(:context).and_return(root_account)
-      shard_mock = double('shard')
-      allow(shard_mock).to receive(:settings).and_return({ encription_key: 'abc' })
+      shard_mock = double("shard")
+      allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
       allow(m).to receive(:shard).and_return(shard_mock)
       allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
       m
     end
     let(:controller) do
-      request_mock = double('request')
-      allow(request_mock).to receive(:url).and_return('https://localhost')
-      allow(request_mock).to receive(:host).and_return('/my/url')
-      allow(request_mock).to receive(:scheme).and_return('https')
-      m = double('controller')
-      allow(m).to receive(:css_url_for).with(:common).and_return('/path/to/common.scss')
+      request_mock = double("request")
+      allow(request_mock).to receive(:url).and_return("https://localhost")
+      allow(request_mock).to receive(:host).and_return("/my/url")
+      allow(request_mock).to receive(:scheme).and_return("https")
+      m = double("controller")
+      allow(m).to receive(:css_url_for).with(:common).and_return("/path/to/common.scss")
       allow(m).to receive(:request).and_return(request_mock)
       allow(m).to receive(:logged_in_user).and_return(user)
-      allow(m).to receive(:named_context_url).and_return('url')
-      allow(m).to receive(:polymorphic_url).and_return('url')
-      view_context_mock = double('view_context')
+      allow(m).to receive(:named_context_url).and_return("url")
+      allow(m).to receive(:polymorphic_url).and_return("url")
+      view_context_mock = double("view_context")
       allow(view_context_mock).to receive(:stylesheet_path)
         .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
       allow(m).to receive(:view_context).and_return(view_context_mock)
@@ -71,10 +71,10 @@ module Lti
 
     let(:variable_expander) { Lti::VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
 
-    let(:invalid_enabled_caps) { %w(InvalidCap.Foo AnotherInvalid.Bar) }
-    let(:valid_enabled_caps) { %w(ToolConsumerInstance.guid Membership.role CourseSection.sourcedId) }
-    let(:supported_capabilities) {
-      %w(ToolConsumerInstance.guid
+    let(:invalid_enabled_caps) { %w[InvalidCap.Foo AnotherInvalid.Bar] }
+    let(:valid_enabled_caps) { %w[ToolConsumerInstance.guid Membership.role CourseSection.sourcedId] }
+    let(:supported_capabilities) do
+      %w[ToolConsumerInstance.guid
          Canvas.term.name
          CourseSection.sourcedId
          Membership.role
@@ -115,44 +115,44 @@ module Lti
          com.instructure.Person.pronouns
          com.instructure.User.observees
          com.instructure.User.sectionNames
-         com.instructure.Observee.sisIds)
-    }
+         com.instructure.Observee.sisIds]
+    end
 
-    describe '#supported_capabilities' do
-      it 'returns all supported capabilities asociated with launch params' do
-        expect(CapabilitiesHelper.supported_capabilities).to match_array(supported_capabilities)
+    describe "#supported_capabilities" do
+      it "returns all supported capabilities asociated with launch params" do
+        expect(CapabilitiesHelper.supported_capabilities).to include(*supported_capabilities)
       end
     end
 
-    describe '#filter_capabilities' do
-      it 'removes invalid capabilities' do
+    describe "#filter_capabilities" do
+      it "removes invalid capabilities" do
         valid_capabilities = CapabilitiesHelper.filter_capabilities(valid_enabled_caps + invalid_enabled_caps)
         expect(valid_capabilities).not_to include(*invalid_enabled_caps)
       end
 
-      it 'does not remove valid capabilities' do
+      it "does not remove valid capabilities" do
         valid_capabilities = CapabilitiesHelper.filter_capabilities(valid_enabled_caps + invalid_enabled_caps)
         expect(valid_capabilities).to match_array valid_enabled_caps
       end
     end
 
-    describe '#capability_params_hash' do
-      let(:valid_keys) { %w(tool_consumer_instance_guid roles lis_course_section_sourcedid) }
+    describe "#capability_params_hash" do
+      let(:valid_keys) { %w[tool_consumer_instance_guid roles lis_course_section_sourcedid] }
 
-      it 'does not include a name (key) for invalid capabilities' do
+      it "does not include a name (key) for invalid capabilities" do
         params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
         expect(params_hash.keys).not_to include(*invalid_enabled_caps)
       end
 
-      context 'in a course' do
+      context "in a course" do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
 
-        it 'does include a valid name (key) for valid capabilities' do
+        it "does include a valid name (key) for valid capabilities" do
           params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
           expect(params_hash.keys).to include(*valid_keys)
         end
 
-        it 'does include a value for each valid capability' do
+        it "does include a value for each valid capability" do
           params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
           expect(params_hash.values.length).to eq valid_keys.length
         end

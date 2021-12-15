@@ -50,7 +50,7 @@ class EffectiveDueDates
       @filtered_students = students
     end
 
-    return self # allows us to chain this method
+    self # allows us to chain this method
   end
 
   def to_hash(included = [])
@@ -144,9 +144,9 @@ class EffectiveDueDates
 
   def filter_students_sql(table)
     if @filtered_students.present?
-      "AND #{table}.user_id IN (#{filtered_students.join(',')})"
+      "AND #{table}.user_id IN (#{filtered_students.join(",")})"
     else
-      ''
+      ""
     end
   end
 
@@ -188,14 +188,14 @@ class EffectiveDueDates
         assignment_collection.flatten!
         assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
         assignment_collection.compact!
-        assignment_collection = assignment_collection.join(',')
+        assignment_collection = assignment_collection.join(",")
       end
 
       if assignment_collection.empty?
         {}
       else
-        ActiveRecord::Base.connection.select_all(<<~SQL)
-          -- fetch the assignment itself
+        ActiveRecord::Base.connection.select_all(<<~SQL.squish)
+          /* fetch the assignment itself */
           WITH models AS (
             SELECT *
             FROM #{Assignment.quoted_table_name}
@@ -205,7 +205,7 @@ class EffectiveDueDates
               context_id = #{@context.id} AND context_type = 'Course'
           ),
 
-          -- fetch all overrides for this assignment
+          /* fetch all overrides for this assignment */
           overrides AS (
             SELECT
               o.id,
@@ -221,7 +221,7 @@ class EffectiveDueDates
               o.workflow_state = 'active'
           ),
 
-          -- fetch all students affected by adhoc overrides
+          /* fetch all students affected by adhoc overrides */
           override_adhoc_students AS (
             SELECT
               os.user_id AS student_id,
@@ -238,10 +238,10 @@ class EffectiveDueDates
               os.workflow_state = 'active'
             WHERE
               o.set_type = 'ADHOC'
-              #{filter_students_sql('os')}
+              #{filter_students_sql("os")}
           ),
 
-          -- fetch all students affected by group overrides
+          /* fetch all students affected by group overrides */
           override_groups_students AS (
             SELECT
               gm.user_id AS student_id,
@@ -260,10 +260,10 @@ class EffectiveDueDates
               o.set_type = 'Group' AND
               g.workflow_state <> 'deleted' AND
               gm.workflow_state = 'accepted'
-              #{filter_students_sql('gm')}
+              #{filter_students_sql("gm")}
           ),
 
-          -- fetch all students affected by section overrides
+          /* fetch all students affected by section overrides */
           override_sections_students AS (
             SELECT
               e.user_id AS student_id,
@@ -283,11 +283,11 @@ class EffectiveDueDates
               s.workflow_state <> 'deleted' AND
               e.workflow_state NOT IN #{filter_section_assigned_enrollments_sql} AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-              #{filter_students_sql('e')}
+              #{filter_students_sql("e")}
           ),
 
-          -- fetch all students who have an 'Everyone Else'
-          -- due date applied to them from the assignment
+          /* fetch all students who have an 'Everyone Else'
+            due date applied to them from the assignment */
           override_everyonelse_students AS (
             SELECT
               e.user_id AS student_id,
@@ -305,10 +305,10 @@ class EffectiveDueDates
               e.workflow_state NOT IN ('rejected', 'deleted') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
               a.only_visible_to_overrides IS NOT TRUE
-              #{filter_students_sql('e')}
+              #{filter_students_sql("e")}
           ),
 
-          -- join all these students together into a single table
+          /* join all these students together into a single table */
           override_all_students AS (
             SELECT * FROM override_adhoc_students
             UNION ALL
@@ -319,7 +319,7 @@ class EffectiveDueDates
             SELECT * FROM override_everyonelse_students
           ),
 
-          -- and pick the latest override date as the effective due date
+          /* and pick the latest override date as the effective due date */
           calculated_overrides AS (
             SELECT DISTINCT ON (student_id, assignment_id)
               *
@@ -327,8 +327,8 @@ class EffectiveDueDates
             ORDER BY student_id ASC, assignment_id ASC, priority ASC, due_at_overridden DESC, due_at DESC NULLS FIRST
           ),
 
-          -- now find all grading periods, including both
-          -- legacy course periods and newer account-level periods
+          /* now find all grading periods, including both
+             legacy course periods and newer account-level periods */
           course_and_account_grading_periods AS (
               SELECT DISTINCT ON (gp.id)
                 gp.id,
@@ -349,9 +349,9 @@ class EffectiveDueDates
                 gp.workflow_state = 'active'
           ),
 
-          -- then filter down to the grading periods we care about:
-          -- if legacy periods exist, only return those. Otherwise,
-          -- return the account-level periods.
+          /* then filter down to the grading periods we care about:
+             if legacy periods exist, only return those. Otherwise,
+             return the account-level periods. */
           applied_grading_periods AS (
             SELECT *
             FROM course_and_account_grading_periods
@@ -368,13 +368,13 @@ class EffectiveDueDates
               ) AND account_id IS NOT NULL
           ),
 
-          -- infinite due dates are put in the last grading period.
-          -- better to fetch it once since we'll likely reference it multiple times below
+          /* infinite due dates are put in the last grading period.
+             better to fetch it once since we'll likely reference it multiple times below */
           last_period AS (
             SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1
           )
 
-          -- finally bring it all together!
+          /* finally bring it all together! */
           SELECT
             overrides.assignment_id,
             overrides.student_id,
@@ -382,23 +382,23 @@ class EffectiveDueDates
             overrides.override_type,
             overrides.override_id,
             CASE
-              -- check whether or not this due date falls in a closed grading period
+              /* check whether or not this due date falls in a closed grading period */
               WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE
-              -- when no explicit due date is provided, we treat it as if it's in the latest grading period
+              /* when no explicit due date is provided, we treat it as if it's in the latest grading period */
               WHEN overrides.due_at IS NULL AND
                   overrides.override_type <> 'Submission' AND
                   '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE
               ELSE FALSE
             END AS closed,
             CASE
-              -- if infinite due date, put it in the last grading period
+              /* if infinite due date, put it in the last grading period */
               WHEN overrides.due_at IS NULL AND
                   overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)
-              -- otherwise, put it in whatever grading period id we found for it
+              /* otherwise, put it in whatever grading period id we found for it */
               ELSE periods.id
             END AS grading_period_id
           FROM calculated_overrides overrides
-          -- match the effective due date with its grading period
+          /* match the effective due date with its grading period */
           LEFT OUTER JOIN applied_grading_periods periods ON
               periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date
         SQL

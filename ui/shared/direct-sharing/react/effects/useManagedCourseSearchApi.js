@@ -30,9 +30,16 @@ export default function useManagedCourseSearchApi(fetchApiOpts = {}, includeConc
   if (includeConcluded) {
     fetchApiOpts.params.include = 'concluded'
   }
+
+  // search term of at least 2 characters required
+  const searchTerm = fetchApiOpts.params.term || ''
+  let forceResult
+  if (searchTerm.length < 2) forceResult = null
+
   useFetchApi({
     path: `/users/self/manageable_courses`,
     convert: convertManageableCoursesToApi,
+    forceResult,
     ...fetchApiOpts
   })
 }

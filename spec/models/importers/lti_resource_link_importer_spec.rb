@@ -26,35 +26,35 @@ describe Importers::LtiResourceLinkImporter do
   let!(:migration) { ContentMigration.create(context: destination_course, source_course: source_course) }
   let!(:tool) { external_tool_model(context: destination_course) }
 
-  context 'when `lti_resource_links` is not given' do
+  context "when `lti_resource_links` is not given" do
     let(:hash) { { lti_resource_links: nil } }
 
-    it 'does not import lti resource links' do
+    it "does not import lti resource links" do
       expect(subject).to eq false
     end
   end
 
-  context 'when `lti_resource_links` is given' do
+  context "when `lti_resource_links` is given" do
     let(:custom_params) do
-      { 'param1' => 'value1 ' }
+      { "param1" => "value1 " }
     end
-    let(:lookup_uuid) { '1b302c1e-c0a2-42dc-88b6-c029699a7c7a' }
+    let(:lookup_uuid) { "1b302c1e-c0a2-42dc-88b6-c029699a7c7a" }
     let(:hash) do
       {
-        'lti_resource_links' => [
+        "lti_resource_links" => [
           {
-            'custom' => custom_params,
-            'lookup_uuid' => lookup_uuid,
-            'launch_url' => tool.url
+            "custom" => custom_params,
+            "lookup_uuid" => lookup_uuid,
+            "launch_url" => tool.url
           }
         ]
       }
     end
 
-    context 'when the Lti::ResourceLink.context_type is an Assignment' do
+    context "when the Lti::ResourceLink.context_type is an Assignment" do
       let!(:assignment) do
         destination_course.assignments.create!(
-          submission_types: 'external_tool',
+          submission_types: "external_tool",
           external_tool_tag_attributes: { content: tool }
         )
       end
@@ -67,7 +67,7 @@ describe Importers::LtiResourceLinkImporter do
         )
       end
 
-      it 'update the custom params' do
+      it "update the custom params" do
         expect(resource_link.custom).to be_nil
 
         expect(subject).to eq true
@@ -78,9 +78,9 @@ describe Importers::LtiResourceLinkImporter do
       end
     end
 
-    context 'when the Lti::ResourceLink.context_type is a Course' do
-      context 'and the resource link was not recorded' do
-        it 'create the new resource link' do
+    context "when the Lti::ResourceLink.context_type is a Course" do
+      context "and the resource link was not recorded" do
+        it "create the new resource link" do
           expect(subject).to eq true
 
           expect(destination_course.lti_resource_links.size).to eq 1
@@ -89,7 +89,7 @@ describe Importers::LtiResourceLinkImporter do
         end
       end
 
-      context 'and the resource link was recorded' do
+      context "and the resource link was recorded" do
         before do
           destination_course.lti_resource_links.create!(
             context_external_tool: tool,
@@ -98,7 +98,7 @@ describe Importers::LtiResourceLinkImporter do
           )
         end
 
-        it 'update the custom params' do
+        it "update the custom params" do
           expect(subject).to eq true
 
           expect(destination_course.lti_resource_links.size).to eq 1

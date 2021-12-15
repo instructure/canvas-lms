@@ -43,7 +43,7 @@ describe Types::LearningOutcomeType do
 
   context "without edit permission" do
     before(:once) do
-      RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", :override => false)
+      RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", override: false)
     end
 
     it "returns canEdit false" do
@@ -105,6 +105,9 @@ describe Types::LearningOutcomeType do
     let(:course) { Course.create! }
 
     it "resolves friendly description correctly" do
+      Account.site_admin.enable_feature!(:outcomes_friendly_description)
+      course.account.enable_feature!(:improved_outcomes_management)
+
       course_fd = OutcomeFriendlyDescription.create!({
                                                        learning_outcome: @outcome,
                                                        context: course,

@@ -22,11 +22,11 @@ class UserNote < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
+  belongs_to :creator, class_name: "User", foreign_key: :created_by_id
 
-  validates_presence_of :user_id, :created_by_id, :workflow_state
-  validates_length_of :note, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates :user_id, :created_by_id, :workflow_state, presence: true
+  validates :note, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_blank: true }
   after_save :update_last_user_note
 
   sanitize_field :note, CanvasSanitize::SANITIZE
@@ -37,10 +37,10 @@ class UserNote < ActiveRecord::Base
   end
 
   scope :active, -> { where("workflow_state<>'deleted'") }
-  scope :desc_by_date, -> { order('created_at DESC') }
+  scope :desc_by_date, -> { order("created_at DESC") }
 
   set_policy do
-    given { |user| self.creator == user }
+    given { |user| creator == user }
     can :delete and can :read
 
     given { |user| self.user.grants_right?(user, :delete_user_notes) }
@@ -52,24 +52,24 @@ class UserNote < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save!
   end
 
   def formatted_note(truncate = nil)
-    self.extend TextHelper
-    res = self.note
-    res = truncate_html(self.note, :max_length => truncate, :words => true) if truncate
+    extend TextHelper
+    res = note
+    res = truncate_html(note, max_length: truncate, words: true) if truncate
     res
   end
 
   def creator_name
-    self.creator ? self.creator.name : nil
+    creator ? creator.name : nil
   end
 
   def update_last_user_note
-    self.user.update_last_user_note
-    self.user.save
+    user.update_last_user_note
+    user.save
   end
 end

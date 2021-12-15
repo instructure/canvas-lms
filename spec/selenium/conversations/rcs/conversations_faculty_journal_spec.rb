@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/conversations_common'
-require_relative '../../helpers/assignment_overrides'
+require_relative "../../helpers/conversations_common"
+require_relative "../../helpers/assignment_overrides"
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
@@ -34,10 +34,10 @@ describe "conversations new" do
     conversation_setup
     @s1 = user_factory(name: "first student")
     @s2 = user_factory(name: "second student")
-    @s3 = user_factory(name: 'third student')
-    [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
-    cat = @course.group_categories.create(:name => "the groups")
-    @group = cat.groups.create(:name => "the group", :context => @course)
+    @s3 = user_factory(name: "third student")
+    [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, "active") }
+    cat = @course.group_categories.create(name: "the groups")
+    @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
   end
 
@@ -47,12 +47,12 @@ describe "conversations new" do
       stub_rcs_config
     end
 
-    it "allows a site admin to enable faculty journal", priority: "2", test_id: 75005 do
+    it "allows a site admin to enable faculty journal", priority: "2" do
       get account_settings_url
-      f('#account_enable_user_notes').click
+      f("#account_enable_user_notes").click
       f('.Button.Button--primary[type="submit"]').click
       wait_for_ajaximations
-      expect(is_checked('#account_enable_user_notes')).to be_truthy
+      expect(is_checked("#account_enable_user_notes")).to be_truthy
     end
   end
 
@@ -62,6 +62,6 @@ describe "conversations new" do
       @course.account.update_attribute(:enable_user_notes, true)
     end
 
-    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518
+    it "should clear the subject and body when cancel is clicked", priority: "1"
   end
 end

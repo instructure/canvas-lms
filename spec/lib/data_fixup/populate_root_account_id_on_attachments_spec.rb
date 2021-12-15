@@ -20,8 +20,8 @@
 describe DataFixup::PopulateRootAccountIdOnAttachments do
   let(:account) { account_model }
 
-  describe('.populate') do
-    it 'updates the root_account_id' do
+  describe(".populate") do
+    it "updates the root_account_id" do
       attachment1 = attachment_model(context: account)
       attachment1.update!(root_account_id: nil)
       attachment2 = attachment_model(context: account)
@@ -37,8 +37,8 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
     end
   end
 
-  describe('.from_model') do
-    it 'updates the root_account_id using the fixup model' do
+  describe(".from_model") do
+    it "updates the root_account_id using the fixup model" do
       attachment1 = attachment_model(context: account)
       attachment1.update!(root_account_id: nil)
       attachment2 = attachment_model(context: account)
@@ -47,15 +47,15 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
       expect(attachment1.reload.root_account_id).to be_nil
       expect(attachment2.reload.root_account_id).to be_nil
 
-      DataFixup::PopulateRootAccountIdOnAttachments.from_model(attachment1.id, attachment2.id,)
+      DataFixup::PopulateRootAccountIdOnAttachments.from_model(attachment1.id, attachment2.id)
 
       expect(attachment1.reload.root_account_id).to eq account.id
       expect(attachment2.reload.root_account_id).to eq account.id
     end
   end
 
-  describe('.from_namespace') do
-    it 'updates the root_account_id using the namespace' do
+  describe(".from_namespace") do
+    it "updates the root_account_id using the namespace" do
       attachment1 = attachment_model(context: account)
       attachment1.update!(root_account_id: nil)
       attachment2 = attachment_model(context: account)
@@ -70,7 +70,7 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
       expect(attachment2.reload.root_account_id).to eq account.id
     end
 
-    it 'leaves nil root_account_id if there is no namespace' do
+    it "leaves nil root_account_id if there is no namespace" do
       attachment1 = attachment_model(context: account)
       attachment1.update!(root_account_id: nil, namespace: nil)
       attachment2 = attachment_model(context: account)
@@ -86,8 +86,8 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
     end
   end
 
-  describe('.default_to_zero') do
-    it 'updates the root_account_id to zero when nil' do
+  describe(".default_to_zero") do
+    it "updates the root_account_id to zero when nil" do
       attachment1 = attachment_model(context: account)
       attachment1.update!(root_account_id: nil)
       attachment2 = attachment_model(context: account)

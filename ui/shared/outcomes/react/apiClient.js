@@ -18,14 +18,19 @@
 
 import axios from '@canvas/axios'
 
-export function createImport(contextRoot, file) {
+export function createImport(contextRoot, file, learningOutcomeGroupId) {
   const data = new FormData()
+  const groupParam = learningOutcomeGroupId ? `/group/${learningOutcomeGroupId}` : ''
   // xsslint safeString.identifier file
   data.append('attachment', file)
-  const url = `/api/v1${contextRoot}/outcome_imports?import_type=instructure_csv`
+  const url = `/api/v1${contextRoot}/outcome_imports/${groupParam}?import_type=instructure_csv`
   return axios.post(url, data)
 }
 
 export function queryImportStatus(contextRoot, outcomeImportId) {
   return axios.get(`/api/v1${contextRoot}/outcome_imports/${outcomeImportId}`)
+}
+
+export function queryImportCreatedGroupIds(contextRoot, outcomeImportId) {
+  return axios.get(`/api/v1${contextRoot}/outcome_imports/${outcomeImportId}/created_group_ids`)
 }

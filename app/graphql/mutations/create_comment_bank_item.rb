@@ -21,7 +21,7 @@
 class Mutations::CreateCommentBankItem < Mutations::BaseMutation
   graphql_name "CreateCommentBankItem"
 
-  argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
+  argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
   argument :comment, String, required: true
   field :comment_bank_item, Types::CommentBankItemType, null: true
 
@@ -38,7 +38,7 @@ class Mutations::CreateCommentBankItem < Mutations::BaseMutation
 
   def get_course(course_id)
     Course.active.find_by(id: course_id).tap do |course|
-      raise GraphQL::ExecutionError, I18n.t('Course not found') if course.nil?
+      raise GraphQL::ExecutionError, I18n.t("Course not found") if course.nil?
     end
   end
 end

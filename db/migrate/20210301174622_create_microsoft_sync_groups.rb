@@ -25,7 +25,7 @@ class CreateMicrosoftSyncGroups < ActiveRecord::Migration[6.0]
     create_table :microsoft_sync_groups do |t|
       t.references :course, foreign_key: true, index: { unique: true }, null: false
 
-      t.string :workflow_state, null: false, default: 'pending'
+      t.string :workflow_state, null: false, default: "pending"
       t.string :job_state
 
       t.datetime :last_synced_at
@@ -36,7 +36,7 @@ class CreateMicrosoftSyncGroups < ActiveRecord::Migration[6.0]
       t.timestamps
 
       t.index [:root_account_id, :id], unique: true,
-                                       name: 'index_microsoft_sync_groups_replica_identity'
+                                       name: "index_microsoft_sync_groups_replica_identity"
     end
     set_replica_identity(:microsoft_sync_groups, :index_microsoft_sync_groups_replica_identity)
   end

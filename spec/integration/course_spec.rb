@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "course" do
   # normally this would be a controller test, but there is a some code in the
@@ -42,18 +42,18 @@ describe "course" do
       course_factory(active_all: true)
       user_session(@teacher)
       migration = @course.content_migrations.build
-      migration.migration_settings[:import_in_progress_notice] = '1'
+      migration.migration_settings[:import_in_progress_notice] = "1"
       migration.save!
 
-      migration.update_attribute(:workflow_state, 'importing')
+      migration.update_attribute(:workflow_state, "importing")
       get "/courses/#{@course.id}"
       expect(response).to be_successful
-      expect(controller.js_env[:CONTENT_NOTICES].map { |cn| cn[:tag] }).to include :import_in_progress
+      expect(controller.js_env[:CONTENT_NOTICES].pluck(:tag)).to include :import_in_progress
 
-      migration.update_attribute(:workflow_state, 'imported')
+      migration.update_attribute(:workflow_state, "imported")
       get "/courses/#{@course.id}"
       expect(response).to be_successful
-      expect((controller.js_env[:CONTENT_NOTICES] || []).map { |cn| cn[:tag] }).not_to include :import_in_progress
+      expect((controller.js_env[:CONTENT_NOTICES] || []).pluck(:tag)).not_to include :import_in_progress
     end
   end
 
@@ -63,53 +63,53 @@ describe "course" do
       student_in_course active_all: true
       user_session(@student)
       migration = @course.content_migrations.build
-      migration.migration_settings[:import_in_progress_notice] = '1'
+      migration.migration_settings[:import_in_progress_notice] = "1"
       migration.save!
 
-      migration.update_attribute(:workflow_state, 'importing')
+      migration.update_attribute(:workflow_state, "importing")
       get "/courses/#{@course.id}"
       expect(response).to be_successful
-      expect((controller.js_env[:CONTENT_NOTICES] || []).map { |cn| cn[:tag] }).not_to include :import_in_progress
+      expect((controller.js_env[:CONTENT_NOTICES] || []).pluck(:tag)).not_to include :import_in_progress
     end
   end
 
   it "uses nicknames in the course index" do
-    course_with_student(:active_all => true, :course_name => "Course 1")
-    course_with_student(:user => @student, :active_all => true, :course_name => "Course 2")
-    @student.set_preference(:course_nicknames, @course.id, 'A nickname or something')
+    course_with_student(active_all: true, course_name: "Course 1")
+    course_with_student(user: @student, active_all: true, course_name: "Course 2")
+    @student.set_preference(:course_nicknames, @course.id, "A nickname or something")
     user_session(@student)
     get "/courses"
     doc = Nokogiri::HTML5(response.body)
-    course_rows = doc.css('#my_courses_table tr')
+    course_rows = doc.css("#my_courses_table tr")
     expect(course_rows.size).to eq 3
-    expect(course_rows[1].to_s).to include 'Course 1'
-    expect(course_rows[2].to_s).to include 'A nickname or something'
+    expect(course_rows[1].to_s).to include "Course 1"
+    expect(course_rows[2].to_s).to include "A nickname or something"
   end
 
   it "does not show links to unpublished courses in course index" do
-    course_with_student(:course_name => "Course 1")
+    course_with_student(course_name: "Course 1")
     c1 = @course
     @student.enrollments.first.update_attribute(:workflow_state, "active") # force active, like with sis
-    course_with_student(:user => @student, :active_all => true, :course_name => "Course 2")
+    course_with_student(user: @student, active_all: true, course_name: "Course 2")
     c2 = @course
     user_session(@student)
     get "/courses"
     doc = Nokogiri::HTML5(response.body)
-    course_rows = doc.css('#my_courses_table tr')
+    course_rows = doc.css("#my_courses_table tr")
     expect(course_rows.size).to eq 3
-    expect(course_rows[2].to_s).to include 'Course 1'
+    expect(course_rows[2].to_s).to include "Course 1"
     expect(course_rows[2].to_s).to_not include("href=\"/courses/#{c1.id}\"") # unpublished
-    expect(course_rows[1].to_s).to include 'Course 2'
+    expect(course_rows[1].to_s).to include "Course 2"
     expect(course_rows[1].to_s).to include("href=\"/courses/#{c2.id}\"") # published
   end
 
   it "does not show students' nicknames to admins on the student's account profile page" do
-    course_with_student(:active_all => true)
-    @student.set_preference(:course_nicknames, @course.id, 'STUDENT_NICKNAME')
+    course_with_student(active_all: true)
+    @student.set_preference(:course_nicknames, @course.id, "STUDENT_NICKNAME")
     user_session(account_admin_user)
     get "/accounts/#{@course.root_account.id}/users/#{@student.id}"
     doc = Nokogiri::HTML5(response.body)
-    course_list = doc.at_css('#courses_list').to_s
-    expect(course_list).not_to include 'STUDENT_NICKNAME'
+    course_list = doc.at_css("#courses_list").to_s
+    expect(course_list).not_to include "STUDENT_NICKNAME"
   end
 end

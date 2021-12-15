@@ -25,7 +25,7 @@ module AttachmentFu
     end
 
     def self.setup_tempfile_path
-      AttachmentFu.tempfile_path = '/tmp/attachment_fu'
+      AttachmentFu.tempfile_path = "/tmp/attachment_fu"
       AttachmentFu.tempfile_path = ATTACHMENT_FU_TEMPFILE_PATH if Object.const_defined?(:ATTACHMENT_FU_TEMPFILE_PATH)
 
       begin

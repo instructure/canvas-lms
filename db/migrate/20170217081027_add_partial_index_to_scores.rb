@@ -24,7 +24,7 @@ class AddPartialIndexToScores < ActiveRecord::Migration[4.2]
   def up
     DataFixup::DeleteDuplicateRows.run(Score.where(grading_period_id: nil), :enrollment_id, :grading_period_id, order: :enrollment_id)
 
-    add_index :scores, :enrollment_id, unique: true, where: 'grading_period_id is null', algorithm: :concurrently
+    add_index :scores, :enrollment_id, unique: true, where: "grading_period_id is null", algorithm: :concurrently
   end
 
   def down

@@ -20,8 +20,8 @@
 
 class PacePlanModuleItem < ActiveRecord::Base
   belongs_to :pace_plan
-  belongs_to :module_item, class_name: 'ContentTag'
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :module_item, class_name: "ContentTag"
+  belongs_to :root_account, class_name: "Account"
 
   extend RootAccountResolver
   resolves_root_account through: :pace_plan
@@ -31,14 +31,14 @@ class PacePlanModuleItem < ActiveRecord::Base
 
   scope :active, -> { joins(:module_item).merge(ContentTag.active) }
   scope :not_deleted, -> { joins(:module_item).merge(ContentTag.not_deleted) }
-  scope :ordered, -> {
+  scope :ordered, lambda {
                     joins(module_item: :context_module)
-                      .order('context_modules.position, context_modules.id, content_tags.position, content_tags.id')
+                      .order("context_modules.position, context_modules.id, content_tags.position, content_tags.id")
                   }
 
   def assignable_module_item
     unless module_item&.assignment
-      self.errors.add(:module_item, 'is not assignable')
+      errors.add(:module_item, "is not assignable")
     end
   end
 end

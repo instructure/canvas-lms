@@ -32,17 +32,17 @@ class AuthenticationProvidersPresenter
   end
 
   def new_auth_types
-    AuthenticationProvider.valid_auth_types.map do |auth_type|
+    AuthenticationProvider.valid_auth_types.filter_map do |auth_type|
       klass = AuthenticationProvider.find_sti_class(auth_type)
       next unless klass.enabled?(account)
-      next if klass.singleton? && configs.any? { |aac| aac.is_a?(klass) }
+      next if klass.singleton? && configs.any?(klass)
 
       klass
-    end.compact
+    end
   end
 
   def needs_unknown_user_url?
-    configs.any? { |c| c.is_a?(AuthenticationProvider::Delegated) }
+    configs.any?(AuthenticationProvider::Delegated)
   end
 
   def login_url_options(aac)
@@ -59,7 +59,7 @@ class AuthenticationProvidersPresenter
   end
 
   def ldap_config?
-    ldap_configs.size > 0
+    !ldap_configs.empty?
   end
 
   def ldap_ips
@@ -152,7 +152,7 @@ class AuthenticationProvidersPresenter
         text_field_tag(nil)
       end
     else
-      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: 'ic-Input', id: id)
+      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: "ic-Input", id: id)
     end
   end
 
@@ -165,6 +165,6 @@ class AuthenticationProvidersPresenter
   private
 
   def ip_addresses_setting
-    Setting.get('account_authorization_config_ip_addresses', nil)
+    Setting.get("account_authorization_config_ip_addresses", nil)
   end
 end

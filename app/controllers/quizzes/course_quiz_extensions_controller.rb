@@ -124,7 +124,7 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
   #
   def create
     unless params[:quiz_extensions].is_a?(Array)
-      reject! 'missing required key :quiz_extensions'
+      reject! "missing required key :quiz_extensions"
     end
 
     # check permissions on all extensions before performing on submissions
@@ -132,7 +132,7 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
       students, quizzes, params[:quiz_extensions]
     ) do |extension|
       unless extension.quiz_submission.grants_right?(participant.user, :add_attempts)
-        reject! 'you are not allowed to change extension settings for these submissions', 403
+        reject! "you are not allowed to change extension settings for these submissions", 403
       end
     end
 

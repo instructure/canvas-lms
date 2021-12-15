@@ -20,12 +20,12 @@
 class SisPseudonym
   # type: :exact, :trusted, or :implicit
   def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false)
-    raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
+    raise ArgumentError("type must be :exact, :trusted, or :implicit") unless %i[exact trusted implicit].include?(type)
     raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
     raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
 
     sis_pseudonym =
-      self.new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region, include_all_pseudonyms: include_all_pseudonyms)
+      new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region, include_all_pseudonyms: include_all_pseudonyms)
     include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
   end
 
@@ -48,8 +48,8 @@ class SisPseudonym
     result = nil if exclude_deleted?(result)
     result ||= find_in_home_account
     result ||= find_in_other_accounts
-    if result
-      result.account = root_account if result.account_id == root_account.id
+    if result && result.account_id == root_account.id
+      result.account = root_account
     end
     result
   end
@@ -74,7 +74,7 @@ class SisPseudonym
   private
 
   def exclude_deleted?(result)
-    result&.workflow_state == 'deleted' && !@include_deleted
+    result&.workflow_state == "deleted" && !@include_deleted
   end
 
   def find_on_enrollment_for_context
@@ -86,7 +86,7 @@ class SisPseudonym
       # but if the sis_user_id got moved to another pseudonym
       # it will grab that one instead.
       return nil if pseudonym&.sis_user_id.nil?
-      return nil if pseudonym&.workflow_state == 'deleted' && !@include_deleted
+      return nil if pseudonym&.workflow_state == "deleted" && !@include_deleted
 
       pseudonym
     end
@@ -108,12 +108,10 @@ class SisPseudonym
     # try the user's home shard first if it's fast
     # the default shard has a replica in every region, so is always fast
     user_shard_is_in_region = user.shard.in_current_region? || user.shard.default?
-    if user_shard_is_in_region
-      if type != :trusted || (account_ids = trusted_account_ids[user.shard])
-        user.shard.activate do
-          result = find_in_trusted_accounts(account_ids)
-          return result if result
-        end
+    if user_shard_is_in_region && (type != :trusted || (account_ids = trusted_account_ids[user.shard]))
+      user.shard.activate do
+        result = find_in_trusted_accounts(account_ids)
+        return result if result
       end
     end
 
@@ -211,7 +209,7 @@ class SisPseudonym
         next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
         next if require_sis && !p.sis_user_id
 
-        include_deleted || p.workflow_state != 'deleted'
+        include_deleted || p.workflow_state != "deleted"
       end
     end
   end

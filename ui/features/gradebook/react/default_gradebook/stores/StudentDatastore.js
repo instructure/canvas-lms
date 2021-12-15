@@ -66,6 +66,15 @@ export default class StudentDatastore {
     })
   }
 
+  student(id, {includePlaceholder = true} = {}) {
+    const user = this.userStudentMap[id] || this.testStudentMap[id]
+    if (!user && includePlaceholder) {
+      return createStudentPlaceholder(id)
+    }
+
+    return user
+  }
+
   listStudents({includePlaceholders = true} = {}) {
     return this.studentIds.reduce((students, id) => {
       const student =

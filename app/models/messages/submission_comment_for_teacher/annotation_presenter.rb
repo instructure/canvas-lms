@@ -49,7 +49,7 @@ module Messages::SubmissionCommentForTeacher
         I18n.t(
           "%{author_name} just made a new annotation on the submission for %{user_name} for %{assignment_title}",
           assignment_title: assignment.title,
-          author_name: @data.dig(:author_name),
+          author_name: @data[:author_name],
           user_name: submission.user.short_name
         )
       end

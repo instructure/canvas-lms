@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "admin settings tab" do
   include_context "in-process server selenium tests"
@@ -39,7 +39,7 @@ describe "admin settings tab" do
     default_services
   end
 
-  def state_checker checker, check_state
+  def state_checker(checker, check_state)
     if checker
       expect(check_state).to be_truthy
     else
@@ -76,22 +76,20 @@ describe "admin settings tab" do
     if is_symbol == false
       check_state = Account.default.service_enabled?(features[:allowed_services])
       state_checker checker, check_state
-    else
-      if features.is_a? Array
-        default_selectors = []
-        features.each do |feature|
-          check_state = Account.default.service_enabled?(feature)
-          state_checker checker, check_state
-          default_selectors.push("#account_services_#{feature}")
-        end
-        if checker
-          default_selectors += css_selectors
-        end
-        css_selectors = default_selectors
-      else
-        check_state = Account.default.settings[features]
+    elsif features.is_a? Array
+      default_selectors = []
+      features.each do |feature|
+        check_state = Account.default.service_enabled?(feature)
         state_checker checker, check_state
+        default_selectors.push("#account_services_#{feature}")
       end
+      if checker
+        default_selectors += css_selectors
+      end
+      css_selectors = default_selectors
+    else
+      check_state = Account.default.settings[features]
+      state_checker checker, check_state
     end
     css_selectors.each do |selector|
       check_state = is_checked(selector)
@@ -130,8 +128,8 @@ describe "admin settings tab" do
     end
 
     describe "allow self-enrollment" do
-      def enrollment_helper(value = '')
-        if value == ''
+      def enrollment_helper(value = "")
+        if value == ""
           f("#account_settings_self_enrollment option[value='']").click
         else
           f("#account_settings_self_enrollment option[value=#{value}]").click
@@ -167,16 +165,16 @@ describe "admin settings tab" do
     end
 
     it "sets trusted referers for account" do
-      trusted_referers = 'https://example.com,http://example.com'
+      trusted_referers = "https://example.com,http://example.com"
       set_value f("#account_settings_trusted_referers"), trusted_referers
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to eq trusted_referers
       expect(f("#account_settings_trusted_referers")).to have_value trusted_referers
 
-      set_value f("#account_settings_trusted_referers"), ''
+      set_value f("#account_settings_trusted_referers"), ""
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to be_nil
-      expect(f("#account_settings_trusted_referers")).to have_value ''
+      expect(f("#account_settings_trusted_referers")).to have_value ""
     end
   end
 
@@ -185,7 +183,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
     end
 
-    def add_quiz_filter name = "www.canvas.instructure.com", value = "192.168.217.1/24"
+    def add_quiz_filter(name = "www.canvas.instructure.com", value = "192.168.217.1/24")
       fj("#ip_filters .name[value='']:visible").send_keys name
       fj("#ip_filters .value[value='']:visible").send_keys value
       click_submit
@@ -314,23 +312,23 @@ describe "admin settings tab" do
     end
 
     it "unclicks and then click on skype" do
-      check_box_verifier("#account_services_skype", { :allowed_services => :skype }, false)
-      check_box_verifier("#account_services_skype", { :allowed_services => :skype })
+      check_box_verifier("#account_services_skype", { allowed_services: :skype }, false)
+      check_box_verifier("#account_services_skype", { allowed_services: :skype })
     end
 
     it "unclicks and then click on delicious" do
-      check_box_verifier("#account_services_delicious", { :allowed_services => :delicious }, false)
-      check_box_verifier("#account_services_delicious", { :allowed_services => :delicious })
+      check_box_verifier("#account_services_delicious", { allowed_services: :delicious }, false)
+      check_box_verifier("#account_services_delicious", { allowed_services: :delicious })
     end
 
     it "unclicks and click on google docs previews" do
-      check_box_verifier("#account_services_google_docs_previews", { :allowed_services => :google_docs_previews }, false)
-      check_box_verifier("#account_services_google_docs_previews", { :allowed_services => :google_docs_previews })
+      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
+      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })
     end
 
     it "clicks on user avatars" do
-      check_box_verifier("#account_services_avatars", { :allowed_services => :avatars })
-      check_box_verifier("#account_services_avatars", { :allowed_services => :avatars }, false)
+      check_box_verifier("#account_services_avatars", { allowed_services: :avatars })
+      check_box_verifier("#account_services_avatars", { allowed_services: :avatars }, false)
     end
 
     it "disables all web services" do
@@ -342,17 +340,17 @@ describe "admin settings tab" do
     end
 
     it "enables and disable a plugin service (setting)" do
-      AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
+      AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :setting, default: false })
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
     end
 
     it "enables and disable a plugin service (service)" do
-      AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false })
+      AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :service, default: false })
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
     end
   end
 
@@ -382,13 +380,13 @@ describe "admin settings tab" do
 
   context "custom help links" do
     def set_checkbox(checkbox, checked)
-      selector = "##{checkbox['id']}"
+      selector = "##{checkbox["id"]}"
       checkbox.click if is_checked(selector) != checked
     end
 
     it "sets custom help link text and icon" do
-      link_name = 'Links'
-      icon = 'cog'
+      link_name = "Links"
+      icon = "cog"
       help_link_name_input = '[name="account[settings][help_link_name]"]'
       help_link_icon_option = '[data-icon-value="cog"]'
 
@@ -408,7 +406,7 @@ describe "admin settings tab" do
 
     it "does not delete all of the pre-existing custom help links if notifications tab is submitted" do
       Account.default.settings[:custom_help_links] = [
-        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => %w[user student teacher] }
       ]
       Account.default.save!
 
@@ -419,49 +417,49 @@ describe "admin settings tab" do
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
-        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => %w[user student teacher] }
       ]
     end
 
     it "preserves the default help links if the account hasn't been configured with the new ui yet" do
-      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"] }
+      help_link = { text: "text", subtext: "subtext", url: "http://www.example.com/example", available_to: %w[user student teacher] }
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
       help_links = Account.default.help_links
-      expect(help_links).to include(help_link.merge(:type => "custom"))
+      expect(help_links).to include(help_link.merge(type: "custom"))
       expect(help_links & Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)).to eq(
         Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)
       )
 
       get "/accounts/#{Account.default.id}/settings"
 
-      top = f('#custom_help_link_settings .ic-Sortable-item')
-      top.find_elements(:css, 'button').last.click
+      top = f("#custom_help_link_settings .ic-Sortable-item")
+      top.find_elements(:css, "button").last.click
       wait_for_ajaximations
 
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links.map { |x| x[:id] }).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
-      expect(new_help_links.map { |x| x[:id] }).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
+      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
+      expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
 
     it "adds a custom link" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
-      f('.HelpMenuOptions__Container button').click
+      f(".HelpMenuOptions__Container button").click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
-      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
-      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://url.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      expect(fj('.ic-Sortable-item:first .ic-Sortable-item__Text')).to include_text('text')
-      form = f('#account_settings')
+      expect(fj(".ic-Sortable-item:first .ic-Sortable-item__Text")).to include_text("text")
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://url.example.com" }
       expect(cl).to include(
         {
           "text" => "text",
@@ -470,7 +468,7 @@ describe "admin settings tab" do
           "type" => "custom",
           "is_featured" => true,
           "is_new" => false,
-          "available_to" => ["user", "student", "teacher", "admin", "observer", "unenrolled"]
+          "available_to" => %w[user student teacher admin observer unenrolled]
         }
       )
     end
@@ -478,16 +476,16 @@ describe "admin settings tab" do
     it "adds a custom link with New designation" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
-      f('.HelpMenuOptions__Container button').click
+      f(".HelpMenuOptions__Container button").click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
-      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
-      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://newurl.example.com'
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://newurl.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      form = f('#account_settings')
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://newurl.example.com' }
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://newurl.example.com" }
       expect(cl).to include(
         {
           "is_featured" => false,
@@ -498,43 +496,43 @@ describe "admin settings tab" do
 
     it "edits a custom link" do
       a = Account.default
-      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => ["user", "student", "teacher", "admin"] }]
+      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => %w[user student teacher admin] }]
       a.save!
       get "/accounts/#{Account.default.id}/settings"
-      fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://whatever.example.com'
+      fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, "..").click
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://whatever.example.com"
       f('#custom_help_link_settings button[type="submit"]').click
-      expect(fj('.ic-Sortable-item:last .ic-Sortable-item__Text')).to include_text('custom-link-text-frd')
-      form = f('#account_settings')
+      expect(fj(".ic-Sortable-item:last .ic-Sortable-item__Text")).to include_text("custom-link-text-frd")
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://whatever.example.com' }
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://whatever.example.com" }
       expect(cl).not_to be_blank
     end
 
     it "edits a default link" do
-      Setting.set('show_feedback_link', 'true')
+      Setting.set("show_feedback_link", "true")
 
       get "/accounts/#{Account.default.id}/settings"
-      fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
+      fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, "..").click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
       expect(url).to be_disabled
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      expect(f('.ic-Sortable-item:nth-of-type(3) .ic-Sortable-item__Text')).to include_text('Report a Problem')
-      form = f('#account_settings')
+      expect(f(".ic-Sortable-item:nth-of-type(3) .ic-Sortable-item__Text")).to include_text("Report a Problem")
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == '#create_ticket' }
-      expect(cl['available_to']).not_to include('teacher')
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "#create_ticket" }
+      expect(cl["available_to"]).not_to include("teacher")
     end
   end
 
   context "external integration keys" do
-    let!(:key_value) { '42' }
+    let!(:key_value) { "42" }
 
     before(:once) do
-      ExternalIntegrationKey.key_type :external_key0, label: 'External Key 0', rights: { read: proc { true }, write: true }
-      ExternalIntegrationKey.key_type :external_key1, label: proc { 'External Key 1' }, rights: { read: true, write: false }
-      ExternalIntegrationKey.key_type :external_key2, label: 'External Key 2', rights: { read: proc { false }, write: false }
+      ExternalIntegrationKey.key_type :external_key0, label: "External Key 0", rights: { read: proc { true }, write: true }
+      ExternalIntegrationKey.key_type :external_key1, label: proc { "External Key 1" }, rights: { read: true, write: false }
+      ExternalIntegrationKey.key_type :external_key2, label: "External Key 2", rights: { read: proc { false }, write: false }
     end
 
     it "does not display external integration keys if no key types exist" do
@@ -554,20 +552,20 @@ describe "admin settings tab" do
 
       eik = ExternalIntegrationKey.new
       eik.context = Account.default
-      eik.key_type = 'external_key0'
+      eik.key_type = "external_key0"
       eik.key_value = key_value
       eik.save
 
       eik = ExternalIntegrationKey.new
       eik.context = Account.default
-      eik.key_type = 'external_key1'
+      eik.key_type = "external_key1"
       eik.key_value = key_value
       eik.save
 
       get "/accounts/#{Account.default.id}/settings"
 
-      expect(f("label[for='account_external_integration_keys_external_key0']").text).to eq 'External Key 0:'
-      expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq 'External Key 1:'
+      expect(f("label[for='account_external_integration_keys_external_key0']").text).to eq "External Key 0:"
+      expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq "External Key 1:"
       expect(f("#account_settings")).not_to contain_css("label[for='account_external_integration_keys_external_key2']")
 
       expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
@@ -583,10 +581,10 @@ describe "admin settings tab" do
 
       expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
 
-      set_value f("#account_external_integration_keys_external_key0"), ''
+      set_value f("#account_external_integration_keys_external_key0"), ""
       click_submit
 
-      expect(f("#account_external_integration_keys_external_key0")).to have_value ''
+      expect(f("#account_external_integration_keys_external_key0")).to have_value ""
     end
   end
 
@@ -611,24 +609,6 @@ describe "admin settings tab" do
     end
   end
 
-  context 'feature flag search and filters' do
-    before do
-      user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-      course_with_admin_logged_in(account: Account.default, user: user)
-      Account.site_admin.enable_feature!(:feature_flag_filters)
-    end
-
-    it 'allows for searching and deleting a feature flag filter ' do
-      go_to_feature_options(Account.site_admin.id)
-      select_filter_option('Pending Enforcement')
-      pending_enforcement_filter_button_selector = "button[title='Remove Pending Enforcement']"
-
-      expect(f(pending_enforcement_filter_button_selector)).to be_displayed
-      f(pending_enforcement_filter_button_selector).click
-      expect(element_exists?(pending_enforcement_filter_button_selector)).to be_falsey
-    end
-  end
-
   context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
     before :once do
       @account = Account.default
@@ -636,7 +616,7 @@ describe "admin settings tab" do
     end
 
     it "is locked and enabled for subaccounts of an account where setting is enabled" do
-      account_admin_user(:account => @account)
+      account_admin_user(account: @account)
       user_session(@admin)
       get "/accounts/#{@account.id}/settings"
       checkbox = "#account_settings_enable_as_k5_account_value"

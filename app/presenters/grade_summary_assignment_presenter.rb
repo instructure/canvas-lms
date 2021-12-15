@@ -37,8 +37,7 @@ class GradeSummaryAssignmentPresenter
     # first one.
     submission.attachments
               .map { |a| AttachmentUploadStatus.upload_status(a) }
-              .sort
-              .first
+              .min
   end
 
   def originality_report?
@@ -65,11 +64,11 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_letter_graded?
-    assignment.grading_type == 'letter_grade'
+    assignment.grading_type == "letter_grade"
   end
 
   def is_gpa_scaled?
-    assignment.grading_type == 'gpa_scale'
+    assignment.grading_type == "gpa_scale"
   end
 
   def is_letter_graded_or_gpa_scaled?
@@ -89,7 +88,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def original_points
-    has_no_score_display? ? '' : submission.published_score
+    has_no_score_display? ? "" : submission.published_score
   end
 
   def unchangeable?
@@ -97,7 +96,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def has_comments?
-    submission && submission.visible_submission_comments && !submission.visible_submission_comments.empty?
+    submission&.visible_submission_comments && !submission.visible_submission_comments.empty?
   end
 
   def has_scoring_details?
@@ -117,11 +116,11 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_text_entry?
-    submission.submission_type == 'online_text_entry'
+    submission.submission_type == "online_text_entry"
   end
 
   def is_online_upload?
-    submission.submission_type == 'online_upload'
+    submission.submission_type == "online_upload"
   end
 
   def should_display_details?
@@ -164,7 +163,7 @@ class GradeSummaryAssignmentPresenter
     if is_letter_graded_or_gpa_scaled? && submission.entered_grade.present?
       "(#{submission.entered_grade})"
     else
-      ''
+      ""
     end
   end
 
@@ -180,32 +179,32 @@ class GradeSummaryAssignmentPresenter
     if is_letter_graded_or_gpa_scaled? && !submission.published_grade.nil?
       "(#{submission.published_grade})"
     else
-      ''
+      ""
     end
   end
 
   def display_score
     if has_no_score_display?
-      ''
+      ""
     else
       "#{I18n.n round_if_whole(submission.published_score)} #{published_grade}"
     end
   end
 
   def turnitin
-    plagiarism('turnitin')
+    plagiarism("turnitin")
   end
 
   def vericite
-    plagiarism('vericite')
+    plagiarism("vericite")
   end
 
   def plagiarism(type)
-    if type == 'vericite'
-      plag_data = submission.vericite_data(true)
-    else
-      plag_data = submission.originality_data
-    end
+    plag_data = if type == "vericite"
+                  submission.vericite_data(true)
+                else
+                  submission.originality_data
+                end
     t = if is_text_entry?
           plag_data[OriginalityReport.submission_asset_key(submission)] ||
             plag_data[submission.asset_string]
@@ -224,7 +223,7 @@ class GradeSummaryAssignmentPresenter
   def graph
     @graph ||= begin
       high, low, mean = grade_distribution
-      score = submission && submission.score
+      score = submission&.score
       GradeSummaryGraph.new(high, low, mean, assignment.points_possible, score)
     end
   end
@@ -250,7 +249,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def group
-    @group ||= assignment && assignment.assignment_group
+    @group ||= assignment&.assignment_group
   end
 
   def viewing_fake_student?
@@ -302,7 +301,7 @@ class GradeSummaryGraph
   end
 
   def title
-    I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
+    I18n.t("#grade_summary.graph_title", "Mean %{mean}, High %{high}, Low %{low}", {
              mean: I18n.n(@mean), high: I18n.n(@high), low: I18n.n(@low)
            })
   end

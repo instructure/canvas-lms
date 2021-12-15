@@ -117,7 +117,7 @@ class AssignmentExtensionsController < ApplicationController
         { user_id: submission.user.id, errors: submission.errors.full_messages }
       end
 
-      render json: { errors: errors }, status: 400
+      render json: { errors: errors }, status: :bad_request
     end
   end
 

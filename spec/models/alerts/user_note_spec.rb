@@ -28,28 +28,28 @@ module Alerts
     # student_in_course(:active_all => 1)
     # UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
 
-    describe '#should_not_receive_message?' do
+    describe "#should_not_receive_message?" do
       before :once do
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @root_account = @course.root_account
         @root_account.enable_user_notes = true
         @root_account.save!
         @teacher = @user
         @user = nil
-        student_in_course(:active_all => 1)
+        student_in_course(active_all: 1)
       end
 
-      it 'validates the length of title' do
+      it "validates the length of title" do
         @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-        expect(lambda { ::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days } })
+        expect(-> { ::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days } })
           .to raise_error("Validation failed: Title is too long (maximum is 255 characters)")
       end
 
-      it 'returns true when the course root account has user notes disabled' do
+      it "returns true when the course root account has user notes disabled" do
         @root_account.enable_user_notes = false
         @root_account.save!
 
@@ -59,21 +59,21 @@ module Alerts
         expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq true
       end
 
-      it 'returns true when the student has received a note less than threshold days ago' do
+      it "returns true when the student has received a note less than threshold days ago" do
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
         expect(user_note_alert.should_not_receive_message?(@student.id, 31)).to eq true
       end
 
-      it 'returns false when the student has not received a note less than threshold days ago' do
+      it "returns false when the student has not received a note less than threshold days ago" do
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
         expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq false
       end
 
-      it 'handles multiple user notes' do
+      it "handles multiple user notes" do
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
 
@@ -81,7 +81,7 @@ module Alerts
         expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq true
       end
 
-      it 'handles notes from multiple students' do
+      it "handles notes from multiple students" do
         student_1 = @student
         course_with_student({ course: @course })
         student_2 = @student
@@ -92,9 +92,9 @@ module Alerts
         expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to eq false
       end
 
-      context 'when the student has not received any notes' do
-        context 'when there is a course start_at' do
-          it 'returns true when threshold days from course start are exceeded' do
+      context "when the student has not received any notes" do
+        context "when there is a course start_at" do
+          it "returns true when threshold days from course start are exceeded" do
             @course.start_at = Time.now - 2.days
             @course.save!
 
@@ -102,7 +102,7 @@ module Alerts
             expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq true
           end
 
-          it 'returns false when threshold days from course start are not exceeded' do
+          it "returns false when threshold days from course start are not exceeded" do
             @course.start_at = Time.now - 7.days
             @course.save!
 
@@ -111,8 +111,8 @@ module Alerts
           end
         end
 
-        context 'when there is no course start_at' do
-          it 'returns true when threshold days from course created at are exceeded' do
+        context "when there is no course start_at" do
+          it "returns true when threshold days from course created at are exceeded" do
             @course.created_at = Time.now - 2.days
             @course.start_at = nil
             @course.save!
@@ -121,7 +121,7 @@ module Alerts
             expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq true
           end
 
-          it 'returns false when threshold days from course created at are not exceeded' do
+          it "returns false when threshold days from course created at are not exceeded" do
             @course.created_at = Time.now - 7.days
             @course.start_at = nil
             @course.save!

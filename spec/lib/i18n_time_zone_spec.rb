@@ -28,7 +28,7 @@ describe I18nTimeZone do
 
   context "#keyify" do
     it "provides a translation key for valid time zone name" do
-      t_key = I18nTimeZone['International Date Line West'].keyify
+      t_key = I18nTimeZone["International Date Line West"].keyify
       expect(t_key).to eq "time_zones.international_date_line_west"
     end
   end
@@ -41,7 +41,7 @@ describe I18nTimeZone do
     it "presents a localized name with offset when responding to #to_s" do
       I18n.locale = :es
       I18n.backend.stub({ es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" } } }) do
-        tz = I18nTimeZone['International Date Line West']
+        tz = I18nTimeZone["International Date Line West"]
         expect(tz.to_s).to include "Línea de fecha internacional del oeste"
       end
     end

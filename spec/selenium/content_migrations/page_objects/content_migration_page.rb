@@ -23,11 +23,11 @@ class ContentMigrationPage
 
     # Selectors
     def selective_imports(index)
-      ff('[name=selective_import]')[index].click
+      ff("[name=selective_import]")[index].click
     end
 
     def selective_content
-      f('.migrationProgressItem .selectContentBtn').click
+      f(".migrationProgressItem .selectContentBtn").click
       wait_for_ajax_requests
     end
   end

@@ -27,14 +27,14 @@ describe SubmissionVersion do
 
   before do
     @submission = unversioned_submission
-    @version = Version.create(:versionable => @submission, :yaml => @submission.attributes.to_yaml)
+    @version = Version.create(versionable: @submission, yaml: @submission.attributes.to_yaml)
   end
 
   describe "index_version" do
     it "creates a new record" do
-      expect {
+      expect do
         SubmissionVersion.index_version(@version)
-      }.to change(SubmissionVersion, :count)
+      end.to change(SubmissionVersion, :count)
     end
 
     it "sets the index record's version_id" do
@@ -44,7 +44,7 @@ describe SubmissionVersion do
 
     it "sets the index record's context" do
       index = SubmissionVersion.index_version(@version)
-      expect(index.context_type).to eq 'Course'
+      expect(index.context_type).to eq "Course"
       expect(index.context_id).to eq @course.id
     end
 
@@ -68,12 +68,12 @@ describe SubmissionVersion do
     it "creates a new record for each version" do
       n = 5
 
-      submissions = n.times.map { unversioned_submission }
-      versions = submissions.map { |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
+      submissions = Array.new(n) { unversioned_submission }
+      versions = submissions.map { |submission| Version.create(versionable: submission, yaml: submission.attributes.to_yaml) }
 
-      expect {
+      expect do
         SubmissionVersion.index_versions(versions)
-      }.to change(SubmissionVersion, :count).by(n)
+      end.to change(SubmissionVersion, :count).by(n)
     end
 
     context "invalid yaml" do
@@ -82,27 +82,27 @@ describe SubmissionVersion do
       end
 
       it "errors on invalid yaml by default" do
-        expect {
+        expect do
           SubmissionVersion.index_versions([@version])
-        }.to raise_error(Psych::SyntaxError)
+        end.to raise_error(Psych::SyntaxError)
       end
 
       it "allows ignoring invalid yaml errors" do
-        expect {
+        expect do
           SubmissionVersion.index_versions([@version], ignore_errors: true)
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
   end
 
   it "skips submissions with no assignment" do
     attrs = YAML.load(@version.yaml)
-    attrs.delete('assignment_id')
+    attrs.delete("assignment_id")
     @version.update_attribute(:yaml, attrs.to_yaml)
-    expect {
+    expect do
       SubmissionVersion.index_version(@version)
       SubmissionVersion.index_versions([@version])
-    }.not_to change(SubmissionVersion, :count)
+    end.not_to change(SubmissionVersion, :count)
   end
 
   it "does not create a SubmissionVersion when the Version doesn't save" do
@@ -117,9 +117,9 @@ describe SubmissionVersion do
 
   it "lets you preload current_version in one query" do
     sub1 = unversioned_submission
-    3.times { Version.create(:versionable => sub1, :yaml => sub1.attributes.to_yaml) }
+    3.times { Version.create(versionable: sub1, yaml: sub1.attributes.to_yaml) }
     sub2 = unversioned_submission
-    2.times { Version.create(:versionable => sub2, :yaml => sub2.attributes.to_yaml) }
+    2.times { Version.create(versionable: sub2, yaml: sub2.attributes.to_yaml) }
 
     Version.preload_version_number([sub1, sub2])
 

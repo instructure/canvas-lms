@@ -24,14 +24,14 @@ module CC::Importer::Canvas
     def convert_tool_profiles
       tool_profiles = []
 
-      @manifest.css('resource[type=tool_profile]').each do |res|
-        file = res.at_css('file')
+      @manifest.css("resource[type=tool_profile]").each do |res|
+        file = res.at_css("file")
         next unless file
 
-        file_path = @package_root.item_path file['href']
+        file_path = @package_root.item_path file["href"]
         json = JSON.parse(File.read(file_path))
-        json['resource_href'] = file['href']
-        json['migration_id'] = res['identifier']
+        json["resource_href"] = file["href"]
+        json["migration_id"] = res["identifier"]
         tool_profiles << json
       end
 

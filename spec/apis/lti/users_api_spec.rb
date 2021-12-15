@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'lti2_api_spec_helper'
-require_relative '../api_spec_helper'
+require_relative "lti2_api_spec_helper"
+require_relative "../api_spec_helper"
 
 require_dependency "lti/ims/access_token_helper"
 require_dependency "lti/users_api_controller"
 module Lti
   describe UsersApiController, type: :request do
-    include_context 'lti2_api_spec_helper'
+    include_context "lti2_api_spec_helper"
 
     let(:authorized_services) do
       [
@@ -35,7 +35,7 @@ module Lti
     end
 
     let(:assignment) do
-      a = course.assignments.new(:title => "some assignment")
+      a = course.assignments.new(title: "some assignment")
       a.workflow_state = "published"
       a.tool_settings_tool = message_handler
       a.save!
@@ -44,13 +44,13 @@ module Lti
 
     before do
       message_handler.update(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
-      tool_proxy.raw_data['security_contract']['tool_service'] = authorized_services
+      tool_proxy.raw_data["security_contract"]["tool_service"] = authorized_services
       tool_proxy.save!
       assignment.tool_settings_tool = message_handler
       assignment.save!
     end
 
-    describe '#show' do
+    describe "#show" do
       let(:service_name) { UsersApiController::USER_SERVICE }
       let(:canvas_id_endpoint) { "/api/lti/users/#{student.id}" }
       let(:student) do
@@ -70,53 +70,53 @@ module Lti
         }
       end
 
-      it 'verifies the tool has the required services' do
-        tool_proxy.raw_data['security_contract']['tool_service'] = []
+      it "verifies the tool has the required services" do
+        tool_proxy.raw_data["security_contract"]["tool_service"] = []
         tool_proxy.save!
         get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
       it "verifies the tool is associated with at least one of the user's assignments" do
-        second_course = Course.create!(name: 'second course')
+        second_course = Course.create!(name: "second course")
         assignment.update!(course: second_course)
         get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
-      it 'does not grant access if the tool and the user have no associated assignments' do
+      it "does not grant access if the tool and the user have no associated assignments" do
         assignment.destroy!
         get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
-      context 'course' do
+      context "course" do
         before do
           tool_proxy.update!(context: course)
         end
 
-        it 'returns a user by lti id' do
+        it "returns a user by lti id" do
           get canvas_id_endpoint, params: { id: student.lti_context_id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
 
-        it 'returns a user by old lti id' do
-          UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
-          get canvas_id_endpoint, params: { id: 'old_lti_id' }, headers: request_headers
+        it "returns a user by old lti id" do
+          UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
+          get canvas_id_endpoint, params: { id: "old_lti_id" }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           new_expected_student = expected_student
-          new_expected_student['lti_id'] = 'old_lti_id'
+          new_expected_student["lti_id"] = "old_lti_id"
           expect(parsed_body).to eq expected_student
         end
 
-        it 'returns a user by Canvas id' do
+        it "returns a user by Canvas id" do
           get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
 
-        it 'does not grant access if the course is inactive and the user has no associated assignments' do
+        it "does not grant access if the course is inactive and the user has no associated assignments" do
           id = student.id
           course.destroy!
           get canvas_id_endpoint, params: { id: id }, headers: request_headers
@@ -124,14 +124,14 @@ module Lti
         end
       end
 
-      context 'account' do
-        it 'returns a user by lti id' do
+      context "account" do
+        it "returns a user by lti id" do
           get canvas_id_endpoint, params: { id: student.lti_context_id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
 
-        it 'returns a user by Canvas id' do
+        it "returns a user by Canvas id" do
           get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
@@ -139,7 +139,7 @@ module Lti
       end
     end
 
-    describe '#group_index' do
+    describe "#group_index" do
       include Api::V1::User
 
       let(:service_name) { UsersApiController::USER_SERVICE }
@@ -161,56 +161,56 @@ module Lti
 
       let(:student_three) do
         student_in_course(course: group.context)
-        @student.update!(email: 'student@test.com')
+        @student.update!(email: "student@test.com")
         @student
       end
 
       before do
         group.context.update!(account: tool_proxy.account)
-        group.add_user(student_one, 'accepted')
-        group.add_user(student_two, 'accepted')
-        group.add_user(student_three, 'accepted')
+        group.add_user(student_one, "accepted")
+        group.add_user(student_two, "accepted")
+        group.add_user(student_three, "accepted")
       end
 
-      it 'returns a list of users in the specified group' do
+      it "returns a list of users in the specified group" do
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expected_json = group.users.map do |user|
-          user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
+          user_json(user, user, nil, [], group.context, tool_includes: %w[email lti_id])
         end
         expect(parsed_body.sort_by { |u| u[:id] }).to eq(expected_json.sort_by { |u| u[:id] })
       end
 
-      it 'responds with 401 if group is not in tool context' do
+      it "responds with 401 if group is not in tool context" do
         group.context.update!(account: account_model)
         get group_index_endpoint, headers: request_headers
         expect(response).to be_unauthorized
       end
 
-      it 'responds with 401 if the group is not active' do
-        group.update!(workflow_state: 'deleted')
+      it "responds with 401 if the group is not active" do
+        group.update!(workflow_state: "deleted")
         get group_index_endpoint, headers: request_headers
         expect(response).to be_unauthorized
       end
 
-      it 'responds with 404 if group is not found' do
+      it "responds with 404 if group is not found" do
         get "/api/lti/groups/#{group.global_id + 1}/users", headers: request_headers
         expect(response).to be_not_found
       end
 
-      it 'includes user lti id' do
+      it "includes user lti id" do
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
-        user_json = parsed_body.find { |u| u['id'] == student_one.id }
-        expect(user_json['lti_id']).to eq student_one.lti_context_id
+        user_json = parsed_body.find { |u| u["id"] == student_one.id }
+        expect(user_json["lti_id"]).to eq student_one.lti_context_id
       end
 
-      it 'does not include students who are not in the group' do
+      it "does not include students who are not in the group" do
         student_in_course(course: group.context)
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expected_json = group.users.map do |user|
-          user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
+          user_json(user, user, nil, [], group.context, tool_includes: %w[email lti_id])
         end
         expect(parsed_body.sort_by { |u| u[:id] }).to eq(expected_json.sort_by { |u| u[:id] })
       end

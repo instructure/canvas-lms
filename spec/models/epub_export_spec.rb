@@ -44,7 +44,7 @@ describe EpubExport do
 
       it "sets state to 'exporting'" do
         epub_export.export(synchronous: true)
-        expect(epub_export.workflow_state).to eq 'exporting'
+        expect(epub_export.workflow_state).to eq "exporting"
       end
 
       it "starts job_progress" do
@@ -102,12 +102,12 @@ describe EpubExport do
 
     context "when content export is successful" do
       before(:once) do
-        epub_export.content_export.update_attribute(:workflow_state, 'exported')
+        epub_export.content_export.update_attribute(:workflow_state, "exported")
         epub_export.mark_exported(synchronous: true)
       end
 
       it "changes the workflow state of epub_export to exported" do
-        expect(epub_export.workflow_state).to eq 'exported'
+        expect(epub_export.workflow_state).to eq "exported"
       end
 
       it "updates job_progress completion" do
@@ -117,9 +117,9 @@ describe EpubExport do
 
     context "when content export is failed" do
       it "changes the workflow state of epub_export to failed" do
-        epub_export.content_export.update_attribute(:workflow_state, 'failed')
+        epub_export.content_export.update_attribute(:workflow_state, "failed")
         epub_export.mark_exported(synchronous: true)
-        expect(epub_export.workflow_state).to eq 'failed'
+        expect(epub_export.workflow_state).to eq "failed"
       end
     end
   end
@@ -129,7 +129,7 @@ describe EpubExport do
       @course.epub_exports.create({
                                     user: @student
                                   }).tap do |epub_export|
-        epub_export.update_attribute(:workflow_state, 'exported')
+        epub_export.update_attribute(:workflow_state, "exported")
       end
     end
 
@@ -168,9 +168,9 @@ describe EpubExport do
                                   })
     end
 
-    it 'creates and associate an attachment' do
-      expect(epub_export.epub_attachment).to be_nil, 'precondition'
-      expect(epub_export.zip_attachment).to be_nil, 'precondition'
+    it "creates and associate an attachment" do
+      expect(epub_export.epub_attachment).to be_nil, "precondition"
+      expect(epub_export.zip_attachment).to be_nil, "precondition"
 
       expect { epub_export.convert_to_epub(synchronous: true) }.to change { Attachment.count }.by(2)
 
@@ -184,14 +184,14 @@ describe EpubExport do
     describe ":create" do
       context "when user can :read_as_admin" do
         it "is able to :create an epub export instance" do
-          expect(@course.grants_right?(@teacher, :read_as_admin)).to be_truthy, 'precondition'
+          expect(@course.grants_right?(@teacher, :read_as_admin)).to be_truthy, "precondition"
           expect(EpubExport.new(course: @course).grants_right?(@teacher, :create)).to be_truthy
         end
       end
 
       context "when user can :participate_as_student" do
         it "is able to :create an epub export instance" do
-          expect(@course.grants_right?(@student, :participate_as_student)).to be_truthy, 'precondition'
+          expect(@course.grants_right?(@student, :participate_as_student)).to be_truthy, "precondition"
           expect(EpubExport.new(course: @course).grants_right?(@student, :create)).to be_truthy
         end
       end
@@ -199,7 +199,7 @@ describe EpubExport do
       context "when user cannot :participate_as_student" do
         it "is not able to :create an epub export" do
           student_in_course
-          expect(@course.grants_right?(@student, :participate_as_student)).to be_falsey, 'precondition'
+          expect(@course.grants_right?(@student, :participate_as_student)).to be_falsey, "precondition"
           expect(EpubExport.new(course: @course).grants_right?(@student, :create)).to be_falsey
         end
       end
@@ -229,14 +229,14 @@ describe EpubExport do
     end
 
     context "running" do
-      ['created', 'exporting', 'exported', 'generating'].each do |state|
+      %w[created exporting exported generating].each do |state|
         it "returns epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
           epub_export.update_attribute(:workflow_state, state)
           expect(EpubExport.running.count).to eq 1
         end
       end
 
-      ['generated', 'failed', 'deleted'].each do |state|
+      %w[generated failed deleted].each do |state|
         it "returns epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
           epub_export.update_attribute(:workflow_state, state)
           expect(EpubExport.running.count).to eq 0
@@ -255,7 +255,7 @@ describe EpubExport do
     end
   end
 
-  describe '#set_locale' do
+  describe "#set_locale" do
     let_once(:cartridge_path) do
       File.join(File.dirname(__FILE__), "/../fixtures/migration/unicode-filename-test-export.imscc")
     end
@@ -277,7 +277,7 @@ describe EpubExport do
                                   })
     end
 
-    it 'is called during export and resets locale after' do
+    it "is called during export and resets locale after" do
       expect(epub_export).to receive(:infer_locale).once
                                                    .with(context: @course, user: @student, root_account: @course.root_account)
                                                    .and_return(:ru)
@@ -285,21 +285,21 @@ describe EpubExport do
       expect(I18n.locale).to be :en
     end
 
-    it 'sets locale based on user preference' do
-      @student.update_attribute(:locale, 'es')
+    it "sets locale based on user preference" do
+      @student.update_attribute(:locale, "es")
       epub_export.reload.send(:set_locale)
       expect(I18n.locale).to eq :es
     end
 
-    it 'sets locale based on course override' do
-      @course.update_attribute(:locale, 'da')
+    it "sets locale based on course override" do
+      @course.update_attribute(:locale, "da")
       epub_export.reload.send(:set_locale)
       expect(I18n.locale).to eq :da
     end
 
-    it 'allows course locale to override user locale' do
-      @student.update_attribute(:locale, 'es')
-      @course.update_attribute(:locale, 'da')
+    it "allows course locale to override user locale" do
+      @student.update_attribute(:locale, "es")
+      @course.update_attribute(:locale, "da")
       epub_export.reload.send(:set_locale)
       expect(I18n.locale).to eq :da
     end
@@ -307,50 +307,50 @@ describe EpubExport do
 
   context "notifications" do
     before :once do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @ce = @course.content_exports.create! { |ce| ce.user = @user }
       @epub = EpubExport.create!(course: @course, user: @user, content_export: @ce)
 
-      Notification.create!(:name => 'Content Export Finished', :category => 'Migration')
-      Notification.create!(:name => 'Content Export Failed', :category => 'Migration')
+      Notification.create!(name: "Content Export Finished", category: "Migration")
+      Notification.create!(name: "Content Export Failed", category: "Migration")
     end
 
     it "sends notifications immediately" do
       communication_channel_model.confirm!
 
-      @epub.workflow_state = 'generated'
+      @epub.workflow_state = "generated"
       expect { @epub.save! }.to change(DelayedMessage, :count).by 0
-      expect(@epub.messages_sent['Content Export Finished']).not_to be_blank
+      expect(@epub.messages_sent["Content Export Finished"]).not_to be_blank
 
-      @epub.workflow_state = 'failed'
+      @epub.workflow_state = "failed"
       expect { @epub.save! }.to change(DelayedMessage, :count).by 0
-      expect(@epub.messages_sent['Content Export Failed']).not_to be_blank
+      expect(@epub.messages_sent["Content Export Failed"]).not_to be_blank
     end
 
     it "does not send emails for epub or webzip exports when content export has exported" do
-      @ce.workflow_state = 'exported'
+      @ce.workflow_state = "exported"
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-      expect(@ce.messages_sent['Content Export Finished']).to be_blank
+      expect(@ce.messages_sent["Content Export Finished"]).to be_blank
 
-      @ce.workflow_state = 'failed'
+      @ce.workflow_state = "failed"
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-      expect(@ce.messages_sent['Content Export Failed']).to be_blank
+      expect(@ce.messages_sent["Content Export Failed"]).to be_blank
     end
   end
 
   it "escapes html characters in titles" do
     course_with_student(active_all: true)
     @course.assignments.create!({
-                                  title: 'here you go </html> lol',
+                                  title: "here you go </html> lol",
                                   description: "beep beep"
                                 })
 
     EpubExports::CreateService.new(@course, @student, :epub_export).save
     run_jobs
 
-    epub_export = @course.epub_exports.where(:user_id => @student).first
+    epub_export = @course.epub_exports.where(user_id: @student).first
     expect(epub_export).to be_generated
-    path = epub_export.epub_attachment.open(:need_local_file => true).path
+    path = epub_export.epub_attachment.open(need_local_file: true).path
     zip_file = Zip::File.open(path)
     html = zip_file.read(zip_file.entries.map(&:name).detect { |n| n.include?("assignments") })
     expect(html).to include("here you go &lt;/html&gt; lol")

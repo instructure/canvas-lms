@@ -22,8 +22,8 @@ class Csp::Domain < ActiveRecord::Base
 
   belongs_to :account
 
-  validates_presence_of :account_id, :domain
-  validates_length_of :domain, :maximum => maximum_string_length
+  validates :account_id, :domain, presence: true
+  validates :domain, length: { maximum: maximum_string_length }
 
   validate :validate_domain
 
@@ -33,18 +33,18 @@ class Csp::Domain < ActiveRecord::Base
   after_save :invalidate_domain_list_cache
 
   def validate_domain
-    URI.parse(self.domain)
+    URI.parse(domain)
   rescue
-    self.errors.add(:domain, "Invalid domain")
-    return false
+    errors.add(:domain, "Invalid domain")
+    false
   end
 
   def downcase_domain
-    self.domain = self.domain.downcase
+    self.domain = domain.downcase
   end
 
   def invalidate_domain_list_cache
-    self.class.clear_cached_domains(self.global_account_id)
+    self.class.clear_cached_domains(global_account_id)
   end
 
   def self.get_cached_domains_for_account(global_account_id)
@@ -57,7 +57,7 @@ class Csp::Domain < ActiveRecord::Base
   def self.domains_for_account(global_account_id)
     local_id, shard = Shard.local_id_for(global_account_id)
     (shard || Shard.current).activate do
-      self.where(:account_id => local_id).active.pluck(:domain).sort
+      where(account_id: local_id).active.pluck(:domain).sort
     end
   end
 

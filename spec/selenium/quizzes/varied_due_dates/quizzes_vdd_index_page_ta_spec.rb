@@ -21,12 +21,12 @@ require_relative "../../common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/assignment_overrides"
 
-describe 'viewing a quiz with variable due dates on the quizzes index page' do
+describe "viewing a quiz with variable due dates on the quizzes index page" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  context 'as a TA in both sections' do
+  context "as a TA in both sections" do
     before(:once) { prepare_vdd_scenario_for_ta }
 
     before do
@@ -34,30 +34,30 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
       get "/courses/#{@course.id}/quizzes"
     end
 
-    it 'shows the due dates for Section A', priority: "2", test_id: 282168 do
+    it "shows the due dates for Section A", priority: "2" do
       validate_vdd_quiz_tooltip_dates(
-        '.date-due',
+        ".date-due",
         "Everyone else\n#{format_date_for_view(@due_at_a, :short)}"
       )
     end
 
-    it 'shows the due dates for Section B', priority: "2", test_id: 315651 do
+    it "shows the due dates for Section B", priority: "2" do
       validate_vdd_quiz_tooltip_dates(
-        '.date-due',
+        ".date-due",
         "#{@section_b.name}\n#{format_date_for_view(@due_at_b, :short)}"
       )
     end
 
-    it 'shows the availability dates for Section A', priority: "2", test_id: 282395 do
+    it "shows the availability dates for Section A", priority: "2" do
       validate_vdd_quiz_tooltip_dates(
-        '.date-available',
+        ".date-available",
         "Everyone else\nAvailable until #{format_date_for_view(@lock_at_a, :short)}"
       )
     end
 
-    it 'shows the availability dates for Section B', priority: "2", test_id: 315653 do
+    it "shows the availability dates for Section B", priority: "2" do
       validate_vdd_quiz_tooltip_dates(
-        '.date-available',
+        ".date-available",
         "#{@section_b.name}\nNot available until #{format_date_for_view(@unlock_at_b, :short)}"
       )
     end

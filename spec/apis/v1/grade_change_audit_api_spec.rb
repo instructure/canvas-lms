@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
-require_relative '../../cassandra_spec_helper'
+require_relative "../api_spec_helper"
+require_relative "../../cassandra_spec_helper"
 
 describe "GradeChangeAudit API", type: :request do
   context "not configured" do
@@ -40,7 +40,7 @@ describe "GradeChangeAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
+      allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)
@@ -49,7 +49,7 @@ describe "GradeChangeAudit API", type: :request do
       course_with_teacher(account: @domain_root_account, user: user_with_pseudonym(account: @domain_root_account))
       student_in_course(user: user_with_pseudonym(account: @domain_root_account))
 
-      @assignment = @course.assignments.create!(title: 'Assignment', points_possible: 10)
+      @assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
       @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
       @event = Auditors::GradeChange.record(submission: @submission)
     end
@@ -84,12 +84,12 @@ describe "GradeChangeAudit API", type: :request do
       arguments[:include] = options.delete(:include) if options.key?(:include)
 
       path = "/api/v1/audit/grade_change/#{type.pluralize}/#{id}"
-      path += "?" + query_string.join('&') if query_string.present?
+      path += "?" + query_string.join("&") if query_string.present?
       api_call_as_user(user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
     def fetch_for_course_and_other_contexts(contexts, options = {})
-      expected_contexts = [:course, :assignment, :grader, :student].freeze
+      expected_contexts = %i[course assignment grader student].freeze
       sorted_contexts = contexts.select { |key, _| expected_contexts.include?(key) }
                                 .sort_by { |key, _| expected_contexts.index(key) }
 
@@ -128,17 +128,17 @@ describe "GradeChangeAudit API", type: :request do
 
       user = options[:user] || @viewing_user
 
-      path_args = sorted_contexts.map { |key, value| "#{key.to_s.pluralize}/#{value.id}" }.join('/')
+      path_args = sorted_contexts.map { |key, value| "#{key.to_s.pluralize}/#{value.id}" }.join("/")
 
       path = "/api/v1/audit/grade_change/#{path_args}"
-      path += "?" + query_string.join('&') if query_string.present?
+      path += "?" + query_string.join("&") if query_string.present?
       api_call_as_user(user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
     def events_for_context(context, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map { |e| [e['id'], e['event_type']] }
+      json["events"].map { |e| [e["id"], e["event_type"]] }
     end
 
     def expect_event_for_context(context, event, options = {})
@@ -151,7 +151,7 @@ describe "GradeChangeAudit API", type: :request do
     def events_for_course_and_contexts(contexts, options)
       json = options.delete(:json)
       json ||= fetch_for_course_and_other_contexts(contexts, options)
-      json['events'].map { |e| [e['id'], e['event_type']] }
+      json["events"].map { |e| [e["id"], e["event_type"]] }
     end
 
     def expect_event_for_course_and_contexts(contexts, event, options = {})
@@ -164,7 +164,7 @@ describe "GradeChangeAudit API", type: :request do
     def forbid_event_for_context(context, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+      expect(json["events"].map { |e| [e["id"], e["event_type"]] })
         .not_to include([event.id, event.event_type])
       json
     end
@@ -172,7 +172,7 @@ describe "GradeChangeAudit API", type: :request do
     def forbid_event_for_course_and_contexts(contexts, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_course_and_contexts(contexts, options)
-      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+      expect(json["events"].map { |e| [e["id"], e["event_type"]] })
         .not_to include([event.id, event.event_type])
       json
     end
@@ -269,8 +269,8 @@ describe "GradeChangeAudit API", type: :request do
     describe "arguments" do
       before do
         record = Auditors::GradeChange::Record.new(
-          'created_at' => 1.day.ago,
-          'submission' => @submission,
+          "created_at" => 1.day.ago,
+          "submission" => @submission
         )
         @event2 = Auditors::GradeChange::Stream.insert(record)
       end
@@ -494,7 +494,7 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       it "does not allow other account models" do
-        new_root_account = Account.create!(name: 'New Account')
+        new_root_account = Account.create!(name: "New Account")
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @viewing_user = user_with_pseudonym(account: new_root_account)
 
@@ -554,7 +554,7 @@ describe "GradeChangeAudit API", type: :request do
         specs_require_sharding
 
         before do
-          @new_root_account = @shard2.activate { Account.create!(name: 'New Account') }
+          @new_root_account = @shard2.activate { Account.create!(name: "New Account") }
           allow(LoadAccount).to receive(:default_domain_root_account).and_return(@new_root_account)
           allow(@new_root_account).to receive(:grants_right?).and_return(true)
           @viewing_user = user_with_pseudonym(account: @new_root_account)
@@ -585,11 +585,11 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       it "only returns one page of results" do
-        expect(@json['events'].size).to eq 2
+        expect(@json["events"].size).to eq 2
       end
 
       it "has pagination headers" do
-        expect(response.headers['Link']).to match(/rel="next"/)
+        expect(response.headers["Link"]).to match(/rel="next"/)
       end
     end
   end

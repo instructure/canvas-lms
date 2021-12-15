@@ -19,9 +19,9 @@
 #
 
 class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
-  graphql_name 'UpdateConversationParticipants'
+  graphql_name "UpdateConversationParticipants"
 
-  argument :conversation_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Conversation')
+  argument :conversation_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Conversation")
 
   # update params
   argument :starred, Boolean, required: false
@@ -36,11 +36,11 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     update_params[:workflow_state] = input[:workflow_state] unless input[:workflow_state].nil?
 
     c_ids = Conversation.where(id: input[:conversation_ids]).pluck(:id).map(&:to_s)
-    errors = (input[:conversation_ids] - c_ids).map { |id| [id, 'Unable to find Conversation'] }.to_h
+    errors = (input[:conversation_ids] - c_ids).index_with { "Unable to find Conversation" }
 
     conversation_participants = current_user.all_conversations.where(conversation_id: c_ids)
     cp_ids = conversation_participants.map(&:conversation_id).map(&:to_s)
-    errors.merge!((c_ids - cp_ids).map { |id| [id, 'Insufficient permissions'] }.to_h)
+    errors.merge!((c_ids - cp_ids).index_with { "Insufficient permissions" })
 
     # update_all cannot be used as the ConversationParticipant model
     # extends the methods used for updating attributes due to the

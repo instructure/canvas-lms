@@ -32,15 +32,17 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #
     # @throw NameError if no serializer was found for the given question
     def serializer_for(question)
-      question_type = question.respond_to?(:data) ?
-        question.data[:question_type] :
-        question[:question_type]
+      question_type = if question.respond_to?(:data)
+                        question.data[:question_type]
+                      else
+                        question[:question_type]
+                      end
 
-      klass = question_type.gsub(/_question$/, '').demodulize.camelize
+      klass = question_type.gsub(/_question$/, "").demodulize.camelize
 
       begin
         # raise name_error because `::Error` is in the namespace, but is not a valid answer type
-        raise NameError if klass == 'Error'
+        raise NameError if klass == "Error"
 
         "Quizzes::QuizQuestion::AnswerSerializers::#{klass}".constantize.new(question)
       rescue NameError

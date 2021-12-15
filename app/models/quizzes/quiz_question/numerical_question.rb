@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'bigdecimal'
+require "bigdecimal"
 
 class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
   class FlexRange
@@ -34,10 +34,10 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
 
   def i18n_decimal(val)
     value = if val.is_a? String
-              separator = I18n.t('number.format.separator')
-              delimiter = I18n.t('number.format.delimiter')
+              separator = I18n.t("number.format.separator")
+              delimiter = I18n.t("number.format.delimiter")
 
-              val.gsub(delimiter, '').gsub(separator, '.')
+              val.gsub(delimiter, "").gsub(separator, ".")
             else
               # If val is already a number, when we stringify it
               # we won't gsub the string as it will already be
@@ -50,7 +50,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     begin
       BigDecimal(value)
     rescue ArgumentError
-      BigDecimal('0.0')
+      BigDecimal("0.0")
     end
   end
 
@@ -66,21 +66,22 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     answer_number = i18n_decimal(answer_text)
 
     match = answers.find do |answer|
-      if answer[:numerical_answer_type] == "exact_answer"
-        val = BigDecimal(answer[:exact].to_s.presence || '0.0')
+      case answer[:numerical_answer_type]
+      when "exact_answer"
+        val = BigDecimal(answer[:exact].to_s.presence || "0.0")
 
         # calculate margin value using percentage
         if answer[:margin].to_s.ends_with?("%")
           answer[:margin] = (answer[:margin].to_f / 100.0 * val).abs
         end
 
-        margin = BigDecimal(answer[:margin].to_s.presence || '0.0')
+        margin = BigDecimal(answer[:margin].to_s.presence || "0.0")
         min = val - margin
         max = val + margin
         answer_number >= min && answer_number <= max
-      elsif answer[:numerical_answer_type] == "precision_answer"
+      when "precision_answer"
         submission = answer_number.split
-        expected = BigDecimal(answer[:approximate].to_s.presence || '0.0').split
+        expected = BigDecimal(answer[:approximate].to_s.presence || "0.0").split
         precision = answer[:precision].to_i
 
         # compare sign
@@ -107,13 +108,14 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     super
 
     @question_data.answers.each do |answer|
-      if answer[:numerical_answer_type] == 'exact_answer'
-        answer[:text] = I18n.t("%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
-      elsif answer[:numerical_answer_type] == 'precision_answer'
-        answer[:text] = I18n.t("%{approximate_value} with precision %{precision}", :approximate_value => answer[:approximate], :precision => answer[:precision])
-      else
-        answer[:text] = I18n.t("%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
-      end
+      answer[:text] = case answer[:numerical_answer_type]
+                      when "exact_answer"
+                        I18n.t("%{exact_value} +/- %{margin}", exact_value: answer[:exact], margin: answer[:margin])
+                      when "precision_answer"
+                        I18n.t("%{approximate_value} with precision %{precision}", approximate_value: answer[:approximate], precision: answer[:precision])
+                      else
+                        I18n.t("%{lower_bound} to %{upper_bound}", lower_bound: answer[:start], upper_bound: answer[:end])
+                      end
     end
 
     @question_data

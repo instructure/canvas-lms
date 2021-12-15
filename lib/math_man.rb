@@ -22,7 +22,7 @@ require "addressable/uri"
 module MathMan
   class InvalidConfigurationError < StandardError; end
 
-  def self.url_for(latex:, target:, scale: '')
+  def self.url_for(latex:, target:, scale: "")
     scale_param = "&scale=#{scale}" if scale.present?
     uri = base_url.join(target.to_s)
     uri.query = "tex=#{latex}#{scale_param}"
@@ -30,7 +30,7 @@ module MathMan
   end
 
   def self.cache_key_for(latex, target)
-    ["mathman", dynamic_settings.fetch('version'), Digest::MD5.hexdigest(latex), target].compact.cache_key
+    ["mathman", dynamic_settings.fetch("version"), Digest::MD5.hexdigest(latex), target].compact.cache_key
   end
 
   def self.use_for_mml?
@@ -50,7 +50,7 @@ module MathMan
       raise InvalidConfigurationError unless url
 
       Addressable::URI.parse(url).tap do |uri|
-        uri.path << '/' unless uri.path.end_with?('/')
+        uri.path << "/" unless uri.path.end_with?("/")
       end
     end
 
@@ -59,7 +59,7 @@ module MathMan
     end
 
     def dynamic_settings
-      Canvas::DynamicSettings.find('math-man')
+      Canvas::DynamicSettings.find("math-man")
     end
   end
 end

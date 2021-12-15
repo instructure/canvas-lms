@@ -28,7 +28,7 @@ class AssignmentCreateEditPage
 
     # Selectors
     def assignment_form
-      f('#edit_assignment_form')
+      f("#edit_assignment_form")
     end
 
     def assignment_name_textfield
@@ -36,23 +36,23 @@ class AssignmentCreateEditPage
     end
 
     def assignment_save_button
-      find_button('Save')
+      find_button("Save")
     end
 
     def save_publish_button
-      find_button('Save & Publish')
+      find_button("Save & Publish")
     end
 
     def points_possible
-      f('#assignment_points_possible')
+      f("#assignment_points_possible")
     end
 
     def display_grade_as
-      f('#assignment_grading_type')
+      f("#assignment_grading_type")
     end
 
     def submission_type
-      f('#assignment_submission_type')
+      f("#assignment_submission_type")
     end
 
     def limited_attempts_fieldset

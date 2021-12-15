@@ -119,8 +119,10 @@ $(document).ready(function () {
 
     RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
 
-    $(this).find("button[type='submit']").text(I18n.t('messages.submitting', 'Submitting...'))
-    $(this).find('button').attr('disabled', true)
+    $(this)
+      .find("button[type='submit']")
+      .text(I18n.t('messages.submitting', 'Submitting...'))
+      .attr('disabled', true)
 
     if ($(this).attr('id') == 'submit_online_upload_form') {
       event.preventDefault() && event.stopPropagation()

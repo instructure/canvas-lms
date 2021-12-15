@@ -24,25 +24,25 @@ module Canvas
   describe Vault do
     include WebMock::API
 
-    let(:token) { 'canvas_token' }
-    let(:token_path) { '/path/to/token' }
-    let(:addr) { 'http://vault:8200' }
-    let(:addr_path) { '/path/to/addr' }
-    let(:static_config) {
+    let(:token) { "canvas_token" }
+    let(:token_path) { "/path/to/token" }
+    let(:addr) { "http://vault:8200" }
+    let(:addr_path) { "/path/to/addr" }
+    let(:static_config) do
       {
         token: token,
         addr: addr,
-        kv_mount: 'app-canvas'
+        kv_mount: "app-canvas"
       }
-    }
-    let(:path_config) {
+    end
+    let(:path_config) do
       {
         token_path: token_path,
         addr_path: addr_path,
-        kv_mount: 'app-canvas'
+        kv_mount: "app-canvas"
       }
-    }
-    let(:local_config) { { token: 'file', addr: 'file' } }
+    end
+    let(:local_config) { { token: "file", addr: "file" } }
 
     before do
       LocalCache.clear(force: true)
@@ -54,9 +54,9 @@ module Canvas
       WebMock.enable_net_connect!
     end
 
-    describe '.api_client' do
-      context 'Static config' do
-        it 'Constructs a client using the address and path from the config' do
+    describe ".api_client" do
+      context "Static config" do
+        it "Constructs a client using the address and path from the config" do
           allow(described_class).to receive(:config).and_return(static_config)
 
           expect(described_class.api_client.address).to eq(addr)
@@ -64,65 +64,65 @@ module Canvas
         end
       end
 
-      context 'Path config' do
-        it 'Constructs a client using the address and path from the config' do
+      context "Path config" do
+        it "Constructs a client using the address and path from the config" do
           allow(described_class).to receive(:config).and_return(path_config)
 
-          allow(File).to receive(:read).with(token_path).and_return(token + '_frompath')
-          allow(File).to receive(:read).with(addr_path).and_return(addr + '_frompath')
-          expect(described_class.api_client.address).to eq(addr + '_frompath')
-          expect(described_class.api_client.token).to eq(token + '_frompath')
+          allow(File).to receive(:read).with(token_path).and_return(token + "_frompath")
+          allow(File).to receive(:read).with(addr_path).and_return(addr + "_frompath")
+          expect(described_class.api_client.address).to eq(addr + "_frompath")
+          expect(described_class.api_client.token).to eq(token + "_frompath")
         end
       end
     end
 
-    describe '.read' do
+    describe ".read" do
       before do
         allow(described_class).to receive(:config).and_return(static_config)
         @stub = stub_request(:get, "#{addr}/v1/test/path")
                 .to_return(status: 200, body: {
                   data: {
-                    foo: 'bar'
+                    foo: "bar"
                   },
                   lease_duration: 3600,
-                }.to_json, headers: { 'content-type': 'application/json' })
+                }.to_json, headers: { "content-type": "application/json" })
         stub_request(:get, "#{addr}/v1/bad/test/path")
-          .to_return(status: 404, headers: { 'content-type': 'application/json' })
+          .to_return(status: 404, headers: { "content-type": "application/json" })
       end
 
-      it 'Caches the read' do
-        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+      it "Caches the read" do
+        expect(described_class.read("test/path")).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(1)
         # uses the cache
-        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+        expect(described_class.read("test/path")).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(1)
       end
 
-      it 'Does not cache the read if not desired' do
-        expect(described_class.read('test/path', cache: false)).to eq({ foo: 'bar' })
+      it "Does not cache the read if not desired" do
+        expect(described_class.read("test/path", cache: false)).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(1)
         # still does not use the cache
-        expect(described_class.read('test/path', cache: false)).to eq({ foo: 'bar' })
+        expect(described_class.read("test/path", cache: false)).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(2)
       end
 
-      it 'Caches the read for less than the lease_duration' do
-        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+      it "Caches the read for less than the lease_duration" do
+        expect(described_class.read("test/path")).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(1)
         # does not use the cache
         Timecop.travel(Time.zone.now + 3600.seconds) do
-          expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+          expect(described_class.read("test/path")).to eq({ foo: "bar" })
           expect(@stub).to have_been_requested.times(2)
         end
       end
 
-      it 'Uses the cache if vault is unavailible' do
-        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+      it "Uses the cache if vault is unavailible" do
+        expect(described_class.read("test/path")).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(1)
         # restub to return an error now
-        stub_request(:get, "#{addr}/v1/test/path").to_return(status: 500, body: 'error')
+        stub_request(:get, "#{addr}/v1/test/path").to_return(status: 500, body: "error")
         Timecop.travel(Time.zone.now + 3600.seconds) do
-          expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+          expect(described_class.read("test/path")).to eq({ foo: "bar" })
         end
       end
 
@@ -140,23 +140,23 @@ module Canvas
         }
         allow(described_class).to receive(:config).and_return(local_config)
         allow(ConfigFile).to receive(:load).and_call_original
-        allow(ConfigFile).to receive(:load).with('vault_contents').and_return(creds_hash)
+        allow(ConfigFile).to receive(:load).with("vault_contents").and_return(creds_hash)
         result = described_class.read(cred_path)
         expect(result[:security_token]).to eq("fake-security-token")
       end
 
-      it 'Throws an error if not found by default' do
-        expect { described_class.read('bad/test/path') }.to raise_error(Vault::MissingVaultSecret)
+      it "Throws an error if not found by default" do
+        expect { described_class.read("bad/test/path") }.to raise_error(Vault::MissingVaultSecret)
       end
 
-      it 'Returns nil if not found and not required' do
-        expect(described_class.read('bad/test/path', required: false)).to be_nil
+      it "Returns nil if not found and not required" do
+        expect(described_class.read("bad/test/path", required: false)).to be_nil
       end
 
-      describe 'locking and loading' do
-        let(:credential_path) { 'test/vault/creds/path' }
+      describe "locking and loading" do
+        let(:credential_path) { "test/vault/creds/path" }
         let(:lease_duration) { 3600 }
-        let(:credential_data) { { credential_id: 'aabbccdd', credential_secret: 'pampelmousse' } }
+        let(:credential_data) { { credential_id: "aabbccdd", credential_secret: "pampelmousse" } }
 
         before do
           skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
@@ -171,7 +171,7 @@ module Canvas
                        .to_return(status: 200, body: {
                          data: credential_data,
                          lease_duration: lease_duration,
-                       }.to_json, headers: { 'content-type': 'application/json' })
+                       }.to_json, headers: { "content-type": "application/json" })
         end
 
         it "will queue if the lock is taken and there is no value in the cache" do
@@ -183,7 +183,7 @@ module Canvas
             Thread.new { t3_val = described_class.read(credential_path) },
             Thread.new { t4_val = described_class.read(credential_path) }
           ]
-          threads.each { |t| t.join }
+          threads.each(&:join)
           expect(t1_val).to eq(credential_data)
           expect(t2_val).to eq(credential_data)
           expect(t3_val).to eq(credential_data)

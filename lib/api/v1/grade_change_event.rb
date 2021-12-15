@@ -31,7 +31,7 @@ module Api::V1::GradeChangeEvent
       course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current)&.to_s,
       grader: Shard.relative_id_for(event.grader_id, Shard.current, Shard.current)&.to_s,
-      page_view: event.request_id && PageView.find_by_id(event.request_id).try(:id)
+      page_view: event.request_id && PageView.find_by(id: event.request_id).try(:id)
     }
     links[:assignment] = Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current) unless event.override_grade?
 
@@ -72,7 +72,7 @@ module Api::V1::GradeChangeEvent
   def links_json
     # This should include users and page_views.  There is no end point
     # for returning single json objects for those models.
-    user = { href: nil, type: 'user' }
+    user = { href: nil, type: "user" }
     {
       "events.assignment" => templated_url(:api_v1_course_assignment_url, "{events.course}", "{events.assignment}"),
       "events.course" => templated_url(:api_v1_course_url, "{events.course}"),
@@ -83,21 +83,21 @@ module Api::V1::GradeChangeEvent
   end
 
   def linked_json(events, user, session)
-    course_ids = events.map { |event| event.course_id }.compact
-    courses = Course.where(id: course_ids).to_a if course_ids.length > 0
+    course_ids = events.filter_map(&:course_id)
+    courses = Course.where(id: course_ids).to_a unless course_ids.empty?
     courses ||= []
 
-    assignment_ids = events.map { |event| event.assignment_id }.compact
-    assignments = Assignment.where(id: assignment_ids).to_a if assignment_ids.length > 0
+    assignment_ids = events.filter_map(&:assignment_id)
+    assignments = Assignment.where(id: assignment_ids).to_a unless assignment_ids.empty?
     assignments ||= []
 
-    user_ids = events.map { |event| event.grader_id }.compact
-    user_ids.concat(events.map { |event| event.student_id }.compact)
-    users = User.where(id: user_ids).to_a if user_ids.length > 0
+    user_ids = events.filter_map(&:grader_id)
+    user_ids.concat(events.filter_map(&:student_id))
+    users = User.where(id: user_ids).to_a unless user_ids.empty?
     users ||= []
 
-    page_view_ids = events.map { |event| event.request_id }.compact
-    page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
+    page_view_ids = events.filter_map(&:request_id)
+    page_views = PageView.find_all_by_id(page_view_ids) unless page_view_ids.empty?
     page_views ||= []
 
     {

@@ -22,5 +22,5 @@ class AssessmentQuestionBankUser < ActiveRecord::Base
   belongs_to :assessment_question_bank
   belongs_to :user
 
-  validates_presence_of :assessment_question_bank_id, :user_id
+  validates :assessment_question_bank_id, :user_id, presence: true
 end

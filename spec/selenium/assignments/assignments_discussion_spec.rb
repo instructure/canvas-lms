@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/assignments_common'
-require_relative '../helpers/discussions_common'
-require_relative '../helpers/files_common'
-require_relative '../helpers/wiki_and_tiny_common'
-require_relative '../rcs/pages/rce_next_page'
+require_relative "../helpers/assignments_common"
+require_relative "../helpers/discussions_common"
+require_relative "../helpers/files_common"
+require_relative "../helpers/wiki_and_tiny_common"
+require_relative "../rcs/pages/rce_next_page"
 
 describe "discussion assignments" do
   include_context "in-process server selenium tests"
@@ -38,44 +38,44 @@ describe "discussion assignments" do
   end
 
   context "created with 'more options'" do
-    it "redirects to the discussion new page and maintain parameters", priority: "1", test_id: 209966 do
-      ag = @course.assignment_groups.create!(:name => "Stuff")
+    it "redirects to the discussion new page and maintain parameters", priority: "1" do
+      ag = @course.assignment_groups.create!(name: "Stuff")
       get "/courses/#{@course.id}/assignments"
-      expect_new_page_load { build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "More options created discussion", :points => '30', :more_options => true) }
+      expect_new_page_load { build_assignment_with_type("Discussion", assignment_group_id: ag.id, name: "More options created discussion", points: "30", more_options: true) }
       # check the content of the discussion page for our set point value and name and the URL to make sure were in /discussions
       expect(driver.current_url).to include("discussion_topics/new?assignment_group_id=#{ag.id}&due_at=null&points_possible=30&title=More+options+created+discussion")
-      expect(f('#discussion-title')).to have_value "More options created discussion"
-      expect(f('#discussion_topic_assignment_points_possible')).to have_value "30"
+      expect(f("#discussion-title")).to have_value "More options created discussion"
+      expect(f("#discussion_topic_assignment_points_possible")).to have_value "30"
     end
   end
 
   context "edited from the index page" do
-    it "updates discussion when updated", priority: "2", test_id: 209967 do
-      assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
+    it "updates discussion when updated", priority: "2" do
+      assign = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       get "/courses/#{@course.id}/assignments"
-      edit_assignment(assign.id, :name => 'Rediscuss!', :submit => true)
+      edit_assignment(assign.id, name: "Rediscuss!", submit: true)
       expect(assign.reload.discussion_topic.title).to eq "Rediscuss!"
     end
   end
 
   context "edited with 'more options'" do
-    it "redirects to the discussion edit page and maintain parameters", priority: "2", test_id: 209968 do
-      assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
+    it "redirects to the discussion edit page and maintain parameters", priority: "2" do
+      assign = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       get "/courses/#{@course.id}/assignments"
-      expect_new_page_load { edit_assignment(assign.id, :name => "Rediscuss!", :points => "10", :more_options => true) }
-      expect(f('#discussion-title')).to have_value "Rediscuss!"
-      expect(f('#discussion_topic_assignment_points_possible')).to have_value "10"
+      expect_new_page_load { edit_assignment(assign.id, name: "Rediscuss!", points: "10", more_options: true) }
+      expect(f("#discussion-title")).to have_value "Rediscuss!"
+      expect(f("#discussion_topic_assignment_points_possible")).to have_value "10"
     end
   end
 
   context "created with html in title" do
-    it "does not render html in flash notice", priority: "2", test_id: 132616 do
-      discussion_title = '<s>broken</s>'
-      topic = create_discussion(discussion_title, 'threaded')
+    it "does not render html in flash notice", priority: "2" do
+      discussion_title = "<s>broken</s>"
+      topic = create_discussion(discussion_title, "threaded")
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
       wait_for_ajaximations
-      f('.announcement_cog').click
-      fln('Delete').click
+      f(".announcement_cog").click
+      fln("Delete").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
       assert_flash_notice_message("#{discussion_title} deleted successfully")
@@ -83,25 +83,25 @@ describe "discussion assignments" do
   end
 
   context "insert content using RCE" do
-    it "inserts file using rce in a discussion", priority: "1", test_id: 126674 do
-      discussion_title = 'New Discussion'
-      topic = create_discussion(discussion_title, 'threaded')
+    it "inserts file using rce in a discussion", priority: "1" do
+      discussion_title = "New Discussion"
+      topic = create_discussion(discussion_title, "threaded")
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
       add_file_to_rce_next
-      submit_form('.form-actions')
+      submit_form(".form-actions")
       wait_for_ajax_requests
       expect(fln("text_file.txt")).to be_displayed
     end
   end
 
   context "created by different users" do
-    it "lists identical authors after a user merge", priority: "2", test_id: 85899 do
-      @student_a = User.create!(:name => 'Student A')
-      @student_b = User.create!(:name => 'Student B')
-      discussion_a = @course.discussion_topics.create!(user: @student_a, title: 'title a', message: 'from student a')
-      discussion_b = @course.discussion_topics.create!(user: @student_b, title: 'title b', message: 'from student b')
-      discussion_b.discussion_entries.create!(user: @student_a, message: 'reply from student a')
-      discussion_a.discussion_entries.create!(user: @student_b, message: 'reply from student b')
+    it "lists identical authors after a user merge", priority: "2" do
+      @student_a = User.create!(name: "Student A")
+      @student_b = User.create!(name: "Student B")
+      discussion_a = @course.discussion_topics.create!(user: @student_a, title: "title a", message: "from student a")
+      discussion_b = @course.discussion_topics.create!(user: @student_b, title: "title b", message: "from student b")
+      discussion_b.discussion_entries.create!(user: @student_a, message: "reply from student a")
+      discussion_a.discussion_entries.create!(user: @student_b, message: "reply from student b")
       UserMerge.from(@student_a).into(@student_b)
       @student_a.reload
       @student_b.reload

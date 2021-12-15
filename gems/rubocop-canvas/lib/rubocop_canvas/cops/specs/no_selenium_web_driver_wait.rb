@@ -37,11 +37,11 @@ module RuboCop
         # (const
         #   (const
         #     (const nil :Selenium) :WebDriver) :Wait)
-        def_node_matcher :bad_const?, <<-PATTERN
+        def_node_matcher :bad_const?, <<~AST
           (const
             (const
               (const ... #{BAD_CONST_MATCHER}
-        PATTERN
+        AST
 
         def on_const(node)
           return unless bad_const?(node)

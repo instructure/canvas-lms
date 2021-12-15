@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 class SisAssignmentHarness
   include Api::V1::SisAssignment
@@ -81,13 +81,13 @@ describe Api::V1::SisAssignment do
 
       allow(course_sections).to receive(:loaded?).and_return(true)
       allow(course_sections).to receive(:active_course_sections).and_return(course_sections)
-      allow(course_sections).to receive(:association).and_return(OpenStruct.new(:loaded? => true))
+      allow(course_sections).to receive(:association).and_return(OpenStruct.new(loaded?: true))
     end
 
     it "creates assignment groups that have name and integration_data with proper data" do
-      ag_name = 'chumba choo choo'
+      ag_name = "chumba choo choo"
       sis_source_id = "my super unique goo-id"
-      integration_data = { 'something' => 'else', 'foo' => { 'bar' => 'baz' } }
+      integration_data = { "something" => "else", "foo" => { "bar" => "baz" } }
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
                                              integration_data: integration_data, group_weight: 8.7)
@@ -100,7 +100,7 @@ describe Api::V1::SisAssignment do
     end
 
     it "creates assignment groups where integration_data is nil" do
-      ag_name = 'too much tuna'
+      ag_name = "too much tuna"
       sis_source_id = "some super cool id"
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
@@ -115,26 +115,26 @@ describe Api::V1::SisAssignment do
 
     it "returns false for include_in_final_grade when omit_from_final_grade is true" do
       assignment_1[:omit_from_final_grade] = true
-      assignment_1[:grading_type] = 'points'
+      assignment_1[:grading_type] = "points"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]['include_in_final_grade']).to eq(false)
+      expect(result[0]["include_in_final_grade"]).to eq(false)
     end
 
     it "returns false for include_in_final_grade when grading_type is not_graded" do
       assignment_1[:omit_from_final_grade] = false
-      assignment_1[:grading_type] = 'not_graded'
+      assignment_1[:grading_type] = "not_graded"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]['include_in_final_grade']).to eq(false)
+      expect(result[0]["include_in_final_grade"]).to eq(false)
     end
 
     it "returns true for include_in_final_grade when appropriate" do
       assignment_1[:omit_from_final_grade] = false
-      assignment_1[:grading_type] = 'points'
+      assignment_1[:grading_type] = "points"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]['include_in_final_grade']).to eq(true)
+      expect(result[0]["include_in_final_grade"]).to eq(true)
     end
 
     it "returns an empty hash for 0 assignments" do
@@ -152,22 +152,22 @@ describe Api::V1::SisAssignment do
 
     it "displays all section overrides" do
       course = assignment_1.course
-      new_section = course.course_sections.create!(:name => 'new section')
+      new_section = course.course_sections.create!(name: "new section")
       create_section_override_for_assignment(assignment_1, course_section: course.default_section)
       create_section_override_for_assignment(assignment_1, course_section: new_section)
 
       result = generator.sis_assignments_json([assignment_1])
 
-      expect(result[0]['sections'].size).to eq(2)
-      expect(result[0]['sections'][0]["id"]).to eq(new_section.id)
-      expect(result[0]['sections'][1]["id"]).to eq(course.default_section.id)
+      expect(result[0]["sections"].size).to eq(2)
+      expect(result[0]["sections"][0]["id"]).to eq(new_section.id)
+      expect(result[0]["sections"][1]["id"]).to eq(course.default_section.id)
     end
 
     it "includes unlock_at and lock_at attributes" do
       result = generator.sis_assignments_json([assignment_1])
 
-      expect(result[0].key?('unlock_at')).to eq(true)
-      expect(result[0].key?('lock_at')).to eq(true)
+      expect(result[0]).to have_key("unlock_at")
+      expect(result[0]).to have_key("lock_at")
     end
 
     it "includes unlock_at and lock_at attributes in section overrides" do
@@ -176,8 +176,8 @@ describe Api::V1::SisAssignment do
 
       result = generator.sis_assignments_json([assignment_1])
 
-      expect(result[0]['sections'][0]['override'].key?('unlock_at')).to eq(true)
-      expect(result[0]['sections'][0]['override'].key?('lock_at')).to eq(true)
+      expect(result[0]["sections"][0]["override"]).to have_key("unlock_at")
+      expect(result[0]["sections"][0]["override"]).to have_key("lock_at")
     end
 
     it "can return an empty due_at" do
@@ -188,12 +188,12 @@ describe Api::V1::SisAssignment do
 
       result = generator.sis_assignments_json(assignments)
 
-      expect(result[0]['due_at']).to eq nil
+      expect(result[0]["due_at"]).to eq nil
     end
 
     context "mastery paths overrides" do
       it "uses a mastery paths due date as the course due date" do
-        due_at = Time.zone.parse('2017-02-08 22:11:10')
+        due_at = Time.zone.parse("2017-02-08 22:11:10")
         assignment_1.update(due_at: nil)
         create_mastery_paths_override_for_assignment(assignment_1, due_at: due_at)
         assignments = Assignment.where(id: assignment_1.id)
@@ -201,14 +201,14 @@ describe Api::V1::SisAssignment do
 
         result = generator.sis_assignments_json(assignments)
 
-        expect(result[0]['due_at']).to eq due_at
+        expect(result[0]["due_at"]).to eq due_at
       end
 
       it "prefers the assignment due_at over an override" do
-        assignment_due_at = Time.zone.parse('2017-03-08 22:11:10')
+        assignment_due_at = Time.zone.parse("2017-03-08 22:11:10")
         assignment_1.update(due_at: assignment_due_at)
 
-        override_due_at = Time.zone.parse('2017-02-08 22:11:10')
+        override_due_at = Time.zone.parse("2017-02-08 22:11:10")
         create_mastery_paths_override_for_assignment(assignment_1, due_at: override_due_at)
 
         assignments = Assignment.where(id: assignment_1.id)
@@ -216,7 +216,7 @@ describe Api::V1::SisAssignment do
 
         result = generator.sis_assignments_json(assignments)
 
-        expect(result[0]['due_at']).to eq assignment_due_at
+        expect(result[0]["due_at"]).to eq assignment_due_at
       end
     end
 
@@ -224,11 +224,11 @@ describe Api::V1::SisAssignment do
       let(:course) { assignment_1.course }
 
       before do
-        @student1 = student_in_course(course: course, workflow_state: 'active').user
-        @student2 = student_in_course(course: course, workflow_state: 'active').user
-        managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2', account: Account.default)
+        @student1 = student_in_course(course: course, workflow_state: "active").user
+        @student2 = student_in_course(course: course, workflow_state: "active").user
+        managed_pseudonym(@student2, sis_user_id: "SIS_ID_2", account: Account.default)
 
-        due_at = Time.zone.parse('2017-02-08 22:11:10')
+        due_at = Time.zone.parse("2017-02-08 22:11:10")
         @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at: due_at)
       end
 
@@ -240,47 +240,47 @@ describe Api::V1::SisAssignment do
 
         user_overrides = result[0]["user_overrides"]
         expect(user_overrides.size).to eq 1
-        expect(user_overrides.first).to include({ "id" => @override.id, due_at: @override.due_at })
+        expect(user_overrides.first).to include({ "id" => @override.id, :due_at => @override.due_at })
 
         students = user_overrides.first["students"]
-        expect(students).to include({ "user_id" => @student1.id, 'sis_user_id' => nil })
-        expect(students).to include({ "user_id" => @student2.id, 'sis_user_id' => 'SIS_ID_2' })
+        expect(students).to include({ "user_id" => @student1.id, "sis_user_id" => nil })
+        expect(students).to include({ "user_id" => @student2.id, "sis_user_id" => "SIS_ID_2" })
         expect(students.size).to eq 2
       end
 
       it "raises an error when active_assignment_overrides are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id)
 
-        expect {
+        expect do
           generator.sis_assignments_json(assignments, student_overrides: true)
-        }.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
+        end.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
       end
 
       it "raises an error when assignment_override_students are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id).preload(:active_assignment_overrides)
 
-        expect {
+        expect do
           generator.sis_assignments_json(assignments, student_overrides: true)
-        }.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
+        end.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
       end
 
       it "does not list student sis_ids when users are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id)
                                 .preload(active_assignment_overrides: [:assignment_override_students])
 
-        user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
+        user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]["user_overrides"]
 
-        expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
+        expect(user_overrides.first["students"].first).not_to have_key("sis_user_id")
       end
 
-      it 'provides an empty list when there are no overrides' do
+      it "provides an empty list when there are no overrides" do
         assignment_2 = assignment_model(course: course)
         assignments = Assignment.where(id: assignment_2.id)
                                 .preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
 
         assignment_hash = generator.sis_assignments_json(assignments, student_overrides: true)[0]
 
-        expect(assignment_hash['user_overrides']).to eq []
+        expect(assignment_hash["user_overrides"]).to eq []
       end
     end
   end

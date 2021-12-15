@@ -20,11 +20,11 @@
 class Login::ExternalAuthObserversController < ApplicationController
   def redirect_login
     if observer_email_taken?
-      render json: { error: { input_name: "pseudonym[unique_id]", message: t("Email already in use") } }, status: 422
+      render json: { error: { input_name: "pseudonym[unique_id]", message: t("Email already in use") } }, status: :unprocessable_entity
       return
     end
     unless valid_observee_unique_id?
-      render json: { error: { input_name: "observee[unique_id]", message: t("Username could not be found") } }, status: 422
+      render json: { error: { input_name: "observee[unique_id]", message: t("Username could not be found") } }, status: :unprocessable_entity
       return
     end
     session[:parent_registration] = {}

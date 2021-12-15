@@ -19,11 +19,11 @@
 #
 module Lti
   class AppLaunchCollator
-    CONTENT_MESSAGE_TYPES = %w(
+    CONTENT_MESSAGE_TYPES = %w[
       ContentItemSelection
       ContentItemSelectionRequest
       LtiDeepLinkingRequest
-    ).freeze
+    ].freeze
 
     class << self
       def external_tools_for(context, placements, options = {})
@@ -43,7 +43,7 @@ module Lti
 
       def message_handlers_for(context, placements)
         MessageHandler.for_context(context).has_placements(*placements)
-                      .by_message_types('basic-lti-launch-request')
+                      .by_message_types("basic-lti-launch-request")
       end
 
       def bookmarked_collection(context, placements, options = {})
@@ -54,8 +54,8 @@ module Lti
         message_handlers = BookmarkedCollection.wrap(MessageHandlerNameBookmarker, message_handlers)
 
         BookmarkedCollection.merge(
-          ['external_tools', external_tools],
-          ['message_handlers', message_handlers]
+          ["external_tools", external_tools],
+          ["message_handlers", message_handlers]
         )
       end
 
@@ -98,27 +98,27 @@ module Lti
           placements: {}
         }
         placements.each do |p|
-          if tool.has_placement?(p)
-            definition[:placements][p.to_sym] = {
-              message_type: tool.extension_setting(p, :message_type) || tool.extension_default_value(p, :message_type),
-              url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
-              title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
-            }
+          next unless tool.has_placement?(p)
 
-            message_type = definition.dig(:placements, p.to_sym, :message_type)
+          definition[:placements][p.to_sym] = {
+            message_type: tool.extension_setting(p, :message_type) || tool.extension_default_value(p, :message_type),
+            url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
+            title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
+          }
 
-            if (width = selection_property_value(:selection_width, tool, p, message_type))
-              definition[:placements][p.to_sym][:selection_width] = width
-            end
+          message_type = definition.dig(:placements, p.to_sym, :message_type)
 
-            if (height = selection_property_value(:selection_height, tool, p, message_type))
-              definition[:placements][p.to_sym][:selection_height] = height
-            end
+          if (width = selection_property_value(:selection_width, tool, p, message_type))
+            definition[:placements][p.to_sym][:selection_width] = width
+          end
 
-            %i[launch_width launch_height].each do |property|
-              if tool.extension_setting(p, property)
-                definition[:placements][p.to_sym][property] = tool.extension_setting(p, property)
-              end
+          if (height = selection_property_value(:selection_height, tool, p, message_type))
+            definition[:placements][p.to_sym][:selection_height] = height
+          end
+
+          %i[launch_width launch_height].each do |property|
+            if tool.extension_setting(p, property)
+              definition[:placements][p.to_sym][property] = tool.extension_setting(p, property)
             end
           end
         end
@@ -132,7 +132,7 @@ module Lti
           name: message_handler.resource_handler.name,
           description: message_handler.resource_handler.description,
           domain: URI(message_handler.launch_path).host,
-          placements: self.lti2_placements(message_handler, placements)
+          placements: lti2_placements(message_handler, placements)
         }
       end
 

@@ -7,13 +7,13 @@ assignments_2_student:
     assignments_2_student_description: This feature enhances the assignment submission and feedback workflow for students. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Assignment Enhancements User Group* in the Canvas Community.
   applies_to: Course
   root_opt_in: true
+  beta: true
 assignments_2_teacher:
   state: hidden
   display_name: Assignments 2 Teacher View
   description: Use the new assignments teacher page
   applies_to: Course
   root_opt_in: true
-  beta: false
   environments:
     production:
       state: disabled
@@ -46,7 +46,6 @@ auto_show_cc:
     Automatically show closed captions in the user's current
     language (if available) when playing canvas media.
   applies_to: User
-  autoexpand: true
 k5_parent_support:
   state: hidden
   display_name: 'Canvas for Elementary: Parent Support'
@@ -82,11 +81,10 @@ create_course_subaccount_picker:
     "Manually Created Courses" sub-account, when enabled, this feature allows
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
-  enable_at: Date.new(2021, 11, 20)
-  beta: true
+  enable_at: "2021-11-20"
   environments:
     beta:
-      enable_at: Date.new(2021, 10, 18)
+      enable_at: "2021-10-18"
 conferencing_in_planner:
   state: hidden
   applies_to: SiteAdmin
@@ -94,10 +92,10 @@ conferencing_in_planner:
   description: |-
     When enabled, this flag shows a "Join" button on Canvas calendar
     events in the student planner
-  enable_at: Date.new(2021, 11, 20)
+  enable_at: "2021-11-20"
   environments:
     beta:
-      enable_at: Date.new(2021, 10, 18)
+      enable_at: "2021-10-18"
 remember_settings_tab:
   state: hidden
   applies_to: SiteAdmin

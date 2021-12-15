@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "shared/_flash_notices" do
   it "renders" do
     course_with_student
     view_context
-    render :partial => "shared/flash_notices"
+    render partial: "shared/flash_notices"
     expect(response).not_to be_nil
   end
 end

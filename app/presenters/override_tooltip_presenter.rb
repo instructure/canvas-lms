@@ -26,7 +26,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def default_link_text
-    I18n.t('#assignments.multiple_due_dates', 'Multiple Due Dates')
+    I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
   end
 
   def link_text
@@ -38,9 +38,9 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def more_message
-    return '' unless dates_hidden > 0
+    return "" unless dates_hidden > 0
 
-    I18n.t('#tooltips.vdd.more_message', 'and %{count} more...', :count => dates_hidden)
+    I18n.t("#tooltips.vdd.more_message", "and %{count} more...", count: dates_hidden)
   end
 
   # Pass in a :max_dates option to adjust how many dates are shown
@@ -67,17 +67,17 @@ class OverrideTooltipPresenter < OverrideListPresenter
 
   def due_date_summary
     visible_due_dates[0...dates_visible].map do |date|
-      { :due_for => date[:due_for], :due_at => date[:due_at] }
+      { due_for: date[:due_for], due_at: date[:due_at] }
     end
   end
 
   def as_json
     {
-      :selector => selector,
-      :link_text => link_text,
-      :link_href => link_href,
-      :due_dates => due_date_summary,
-      :more_message => more_message
+      selector: selector,
+      link_text: link_text,
+      link_href: link_href,
+      due_dates: due_date_summary,
+      more_message: more_message
     }
   end
 end

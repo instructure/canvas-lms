@@ -23,7 +23,7 @@ module Users
   describe CreationNotifyPolicy do
     describe "#is_self_registration?" do
       it "is true when forced" do
-        policy = CreationNotifyPolicy.new(false, { force_self_registration: '1' })
+        policy = CreationNotifyPolicy.new(false, { force_self_registration: "1" })
         expect(policy.is_self_registration?).to be(true)
       end
 
@@ -36,9 +36,9 @@ module Users
     end
 
     describe "#dispatch!" do
-      let(:user) { double() }
+      let(:user) { double }
       let(:pseudonym) { double(account: Account.default) }
-      let(:channel) { double() }
+      let(:channel) { double }
 
       context "for self_registration" do
         let(:policy) { CreationNotifyPolicy.new(true, { force_self_registration: true }) }
@@ -59,14 +59,14 @@ module Users
         end
 
         it "sends the registration notification if should notify" do
-          policy = CreationNotifyPolicy.new(true, { send_confirmation: '1' })
+          policy = CreationNotifyPolicy.new(true, { send_confirmation: "1" })
           expect(pseudonym).to receive(:send_registration_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(true)
         end
 
         it "doesnt send the registration notification if shouldnt notify" do
-          policy = CreationNotifyPolicy.new(true, { send_confirmation: '0' })
+          policy = CreationNotifyPolicy.new(true, { send_confirmation: "0" })
           expect(pseudonym).not_to receive(:send_registration_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)

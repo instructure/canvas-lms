@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 module Api
   module Html
@@ -33,13 +33,13 @@ module Api
       attr_reader :media_track, :doc, :node_builder
 
       def to_node(url_helper)
-        node_builder.new('track', doc).tap do |n|
-          n['kind'] = media_track.kind
-          n['srclang'] = media_track.locale
-          n['src'] = url_helper.show_media_tracks_url(
+        node_builder.new("track", doc).tap do |n|
+          n["kind"] = media_track.kind
+          n["srclang"] = media_track.locale
+          n["src"] = url_helper.show_media_tracks_url(
             media_track.media_object_id, media_track.id
           )
-          n['label'] = language_name
+          n["label"] = language_name
         end
       end
 

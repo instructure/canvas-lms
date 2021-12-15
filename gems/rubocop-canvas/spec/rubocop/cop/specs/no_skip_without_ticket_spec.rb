@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
   subject(:cop) { described_class.new }
 
-  it 'disallows skipping without referencing a ticket' do
+  it "disallows skipping without referencing a ticket" do
     inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
@@ -34,7 +34,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
-  it 'allows skipping if referencing a ticket' do
+  it "allows skipping if referencing a ticket" do
     inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
@@ -46,7 +46,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'allows conditional skipping without a ticket' do
+  it "allows conditional skipping without a ticket" do
     inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do

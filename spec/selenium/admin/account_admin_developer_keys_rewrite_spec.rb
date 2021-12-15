@@ -17,37 +17,37 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/developer_keys_rewrite_common'
+require_relative "../helpers/developer_keys_rewrite_common"
 
-describe 'Developer Keys' do
-  include_context 'in-process server selenium tests'
+describe "Developer Keys" do
+  include_context "in-process server selenium tests"
   include DeveloperKeysRewriteCommon
 
-  describe 'with developer key management UI rewrite feature flag' do
+  describe "with developer key management UI rewrite feature flag" do
     before do
       admin_logged_in
-      Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
+      Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, "true")
     end
 
     let(:root_developer_key) do
       Account.default.developer_keys.create!(
-        name: 'Cool Tool',
-        email: 'admin@example.com',
-        redirect_uris: ['http://example.com'],
-        icon_url: '/images/delete.png'
+        name: "Cool Tool",
+        email: "admin@example.com",
+        redirect_uris: ["http://example.com"],
+        icon_url: "/images/delete.png"
       )
     end
 
     let(:site_admin_developer_key) do
       DeveloperKey.create!(
-        name: 'Site Admin Dev Key',
-        email: 'siteadmin@example.com',
-        redirect_uris: ['http://example.com'],
-        icon_url: '/images/delete.png'
+        name: "Site Admin Dev Key",
+        email: "siteadmin@example.com",
+        redirect_uris: ["http://example.com"],
+        icon_url: "/images/delete.png"
       )
     end
 
-    it "allows creation through 'add developer key button'", test_id: 344077 do
+    it "allows creation through 'add developer key button'" do
       get "/accounts/#{Account.default.id}/developer_keys"
 
       find_button("Developer Key").click
@@ -68,7 +68,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/delete.png"
     end
 
-    it "allows update through 'edit this key button'", test_id: 344078 do
+    it "allows update through 'edit this key button'" do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
       click_edit_icon
@@ -90,7 +90,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/add.png"
     end
 
-    it 'allows editing of developer key', test_id: 3469351 do
+    it "allows editing of developer key" do
       dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
@@ -113,7 +113,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/add.png"
     end
 
-    it "allows deletion through 'delete this key button'", test_id: 344079 do
+    it "allows deletion through 'delete this key button'" do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
@@ -124,7 +124,7 @@ describe 'Developer Keys' do
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
-    it "allows for pagination on account tab", test_id: 344532 do
+    it "allows for pagination on account tab" do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(10)
@@ -132,7 +132,7 @@ describe 'Developer Keys' do
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
-    it "allows for pagination on inherited tab", test_id: 344532 do
+    it "allows for pagination on inherited tab" do
       site_admin_logged_in
       11.times { |i| DeveloperKey.create!(name: "tool #{i}") }
       DeveloperKey.all.each { |key| key.update(visible: true) }
@@ -143,7 +143,7 @@ describe 'Developer Keys' do
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
-    it "renders the key not visible by default upon creation", test_id: 3485785 do
+    it "renders the key not visible by default upon creation" do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
@@ -151,7 +151,7 @@ describe 'Developer Keys' do
       expect(site_admin_developer_key.reload.visible).to eq false
     end
 
-    it "renders the key visible", test_id: 3485785 do
+    it "renders the key visible" do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
@@ -161,32 +161,32 @@ describe 'Developer Keys' do
     end
 
     context "Account Binding" do
-      it "creates an account binding with default workflow_state 'off'", test_id: 3482823 do
+      it "creates an account binding with default workflow_state 'off'" do
         site_admin_developer_key
-        expect(DeveloperKeyAccountBinding.last.workflow_state).to eq 'off'
+        expect(DeveloperKeyAccountBinding.last.workflow_state).to eq "off"
         expect(DeveloperKeyAccountBinding.last.account_id).to eq Account.site_admin.id
       end
 
-      it "site admin dev key is visible and set to 'off' in root account", test_id: 3482823 do
+      it "site admin dev key is visible and set to 'off' in root account" do
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
-        expect(fj("input[type='radio']:checked").attribute('value')).to eq 'off'
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+        expect(fj("input[type='radio']:checked").attribute("value")).to eq "off"
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
 
-      it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
+      it "root account inherits 'on' binding workflow state from site admin key" do
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
         fj("span:contains('On'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
-        expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
+        expect(fj("fieldset:last").attribute("aria-disabled")).to eq "true"
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
       end
 
-      it "root account inherits 'off' binding workflow state from site admin key", test_id: 3482823 do
+      it "root account inherits 'off' binding workflow state from site admin key" do
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
@@ -194,64 +194,64 @@ describe 'Developer Keys' do
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         # checks that the state toggle is disabled from interaction
-        expect(fj("fieldset:last").attribute('aria-disabled')).to eq 'true'
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+        expect(fj("fieldset:last").attribute("aria-disabled")).to eq "true"
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
 
-      it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
+      it "root account keeps self binding workflow state if site admin key state is 'allow'" do
         site_admin_logged_in
         site_admin_developer_key.update!(visible: true)
-        site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
+        site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: "allow")
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         fj("span:contains('On'):last").click
         get "/accounts/site_admin/developer_keys"
         fj("span:contains('Off'):last").click
-        expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq 'off'
+        expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq "off"
         fj("span:contains('Allow'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
-        expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq 'on'
+        expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq "on"
         # checks that the state toggle is enabled for interaction
-        expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
+        expect(fj("fieldset:last")).not_to have_attribute("aria-disabled")
       end
 
-      it "allows for root account dev key status 'on'", test_id: 3482823 do
+      it "allows for root account dev key status 'on'" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('On'):last").click
-        keep_trying_until { expect(current_active_element.attribute('value')).to eq 'on' }
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
+        keep_trying_until { expect(current_active_element.attribute("value")).to eq "on" }
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
       end
 
-      it "allows for root account dev key status 'off'", test_id: 3482823 do
+      it "allows for root account dev key status 'off'" do
         root_developer_key
-        DeveloperKeyAccountBinding.last.update(workflow_state: 'on')
+        DeveloperKeyAccountBinding.last.update(workflow_state: "on")
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('Off'):last").click
-        keep_trying_until { expect(current_active_element.attribute('value')).to eq 'off' }
-        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
+        keep_trying_until { expect(current_active_element.attribute("value")).to eq "off" }
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
 
-      it "persists state when switching between account and inheritance tabs", test_id: 3488599 do
+      it "persists state when switching between account and inheritance tabs" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('On'):last").click
         click_inherited_tab
         click_account_tab
-        expect(f("table[data-automation='devKeyAdminTable'] input[value='on']").attribute('tabindex')).to eq "0"
+        expect(f("table[data-automation='devKeyAdminTable'] input[value='on']").attribute("tabindex")).to eq "0"
       end
 
-      it "persists state when switching between inheritance and account tabs", test_id: 3488600 do
+      it "persists state when switching between inheritance and account tabs" do
         site_admin_developer_key
         DeveloperKey.find(site_admin_developer_key.id).update(visible: true)
-        DeveloperKeyAccountBinding.first.update(workflow_state: 'allow')
+        DeveloperKeyAccountBinding.first.update(workflow_state: "allow")
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         fj("span:contains('Off'):last").click
         click_account_tab
         click_inherited_tab
-        expect(f("table[data-automation='devKeyAdminTable'] input[value='off']").attribute('tabindex')).to eq "0"
+        expect(f("table[data-automation='devKeyAdminTable'] input[value='off']").attribute("tabindex")).to eq "0"
       end
 
       it "only show create developer key button for account tab panel" do
@@ -263,7 +263,7 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
-      unless File.exist?(Rails.root.join('lib/api_scope_mapper.rb'))
+      unless Rails.root.join("lib/api_scope_mapper.rb").file?
         before do
           stub_const("ApiScopeMapper", Class.new do
             def self.lookup_resource(controller, _action)
@@ -271,7 +271,7 @@ describe 'Developer Keys' do
             end
 
             def self.name_for_resource(resource)
-              resource == :assignment_groups ? 'Assignment Groups' : resource.to_s
+              resource == :assignment_groups ? "Assignment Groups" : resource.to_s
             end
           end)
 
@@ -295,7 +295,7 @@ describe 'Developer Keys' do
       end
       let(:developer_key_with_scopes) do
         DeveloperKey.create!(
-          name: 'Developer Key With Scopes',
+          name: "Developer Key With Scopes",
           account: Account.default,
           scopes: api_token_scopes + assignment_groups_scopes,
           require_scopes: true
@@ -311,7 +311,7 @@ describe 'Developer Keys' do
       end
 
       it "enforce scopes toggle allows scope creation" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_scope_group_checkbox
         expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheck']")
         find_button("Save").click
@@ -320,18 +320,18 @@ describe 'Developer Keys' do
       end
 
       it "allows filtering by scope group name" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         expect(ff("[data-automation='toggle-scope-group']")).to have_size(1)
       end
 
       it "expands scope group when group name is selected" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        expect(f("[data-automation='toggle-scope-group'] button").attribute('aria-expanded')).to eq 'true'
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
+        expect(f("[data-automation='toggle-scope-group'] button").attribute("aria-expanded")).to eq "true"
         expect(ff("[data-automation='developer-key-scope']")).to have_size(5)
       end
 
       it "includes proper scopes for scope group" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         scope_group = f("[data-automation='toggle-scope-group']")
         expect(scope_group).to include_text("GET")
         expect(scope_group).to include_text("POST")
@@ -340,7 +340,7 @@ describe 'Developer Keys' do
       end
 
       it "scope group select all checkbox adds all associated scopes" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
         expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('GET')")).to have_size(3)
@@ -350,7 +350,7 @@ describe 'Developer Keys' do
       end
 
       it "scope group individual checkbox adds only associated scope" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
         expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('GET')")).to have_size(3)
@@ -360,7 +360,7 @@ describe 'Developer Keys' do
       end
 
       it "adds scopes to backend developer key via UI" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_scope_group_checkbox
         find_button("Save").click
         wait_for_ajaximations
@@ -369,7 +369,7 @@ describe 'Developer Keys' do
 
       it "adds scopes to backend developer key via UI in site admin" do
         site_admin_logged_in
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_scope_group_checkbox
         find_button("Save").click
         wait_for_ajaximations
@@ -380,7 +380,7 @@ describe 'Developer Keys' do
         developer_key_with_scopes
         get "/accounts/#{Account.default.id}/developer_keys"
         click_edit_icon
-        filter_scopes_by_name('Assignment Groups')
+        filter_scopes_by_name("Assignment Groups")
         click_scope_group_checkbox
         find_button("Save").click
         wait_for_ajax_requests
@@ -400,7 +400,7 @@ describe 'Developer Keys' do
       end
 
       it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
+        expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_select_all_readonly_checkbox
         click_scope_checkbox
         expect(f("[data-automation='toggle-scope-group'] input[type='checkbox']").selected?).to eq false
@@ -423,7 +423,7 @@ describe 'Developer Keys' do
         find_button("Save").click
         flash_holder = f("#flash_message_holder")
         keep_trying_until do
-          expect(flash_holder.text).to eq 'At least one scope must be selected.' if flash_holder.text.present?
+          expect(flash_holder.text).to eq "At least one scope must be selected." if flash_holder.text.present?
         end
       end
 
@@ -436,17 +436,17 @@ describe 'Developer Keys' do
         wait_for_dev_key_modal_to_close
         find_button("Developer Key").click
         find_button("API Key").click
-        expect(f("input[name='developer_key[name]']").attribute('value')).not_to be_present
+        expect(f("input[name='developer_key[name]']").attribute("value")).not_to be_present
       end
 
       it "allows saving developer key when scopes are present" do
         developer_key_with_scopes
         get "/accounts/#{Account.default.id}/developer_keys"
         click_edit_icon
-        f("input[name='developer_key[email]']").send_keys('admin@example.com')
+        f("input[name='developer_key[email]']").send_keys("admin@example.com")
         find_button("Save").click
         wait_for_ajax_requests
-        expect(developer_key_with_scopes.reload.email).to eq 'admin@example.com'
+        expect(developer_key_with_scopes.reload.email).to eq "admin@example.com"
       end
     end
   end

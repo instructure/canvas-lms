@@ -33,8 +33,8 @@ module SearchHelper
     include_all_permissions = (permissions == :all)
     permissions = permissions.presence && Array(permissions).map(&:to_sym)
 
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user, context, permissions].cache_key, :expires_in => 10.minutes) do
-      contexts = { :courses => {}, :groups => {}, :sections => {} }
+    @contexts = Rails.cache.fetch(["all_conversation_contexts", @current_user, context, permissions].cache_key, expires_in: 10.minutes) do
+      contexts = { courses: {}, groups: {}, sections: {} }
 
       term_for_course = lambda do |course|
         course.enrollment_term.default_term? ? nil : course.enrollment_term.name
@@ -44,14 +44,20 @@ module SearchHelper
         courses.each do |course|
           course_url = options[:base_url] ? "#{options[:base_url]}/courses/#{course.id}" : course_url(course)
           contexts[:courses][course.id] = {
-            :id => course.id,
-            :url => course_url,
-            :name => course.name,
-            :type => :course,
-            :term => term_for_course.call(course),
-            :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
-            :available => type == :current && course.available?,
-            :default_section_id => course.default_section(no_create: true).try(:id)
+            id: course.id,
+            url: course_url,
+            name: course.name,
+            type: :course,
+            term: term_for_course.call(course),
+            state: if type == :current
+                     :active
+                   elsif course.recently_ended?
+                     :recently_active
+                   else
+                     :inactive
+                   end,
+            available: type == :current && course.available?,
+            default_section_id: course.default_section(no_create: true).try(:id)
           }.tap do |hash|
             hash[:permissions] =
               if include_all_permissions
@@ -68,13 +74,13 @@ module SearchHelper
       add_sections = lambda do |sections|
         sections.each do |section|
           contexts[:sections][section.id] = {
-            :id => section.id,
-            :name => section.name,
-            :type => :section,
-            :term => contexts[:courses][section.course_id][:term],
-            :state => section.active? ? :active : :inactive,
-            :parent => { :course => section.course_id },
-            :context_name => contexts[:courses][section.course_id][:name]
+            id: section.id,
+            name: section.name,
+            type: :section,
+            term: contexts[:courses][section.course_id][:term],
+            state: section.active? ? :active : :inactive,
+            parent: { course: section.course_id },
+            context_name: contexts[:courses][section.course_id][:name]
             # if we decide to return permissions here, we should ensure those
             # are cached in adheres_to_policy
           }
@@ -87,13 +93,13 @@ module SearchHelper
         groups.each do |group|
           group.can_participate = true
           contexts[:groups][group.id] = {
-            :id => group.id,
-            :name => group.name,
-            :type => :group,
-            :state => group.active? ? :active : :inactive,
-            :parent => group.context_type == 'Course' ? { :course => group.context_id } : nil,
-            :context_name => (group_context || group.context).name,
-            :category => group.category
+            id: group.id,
+            name: group.name,
+            type: :group,
+            state: group.active? ? :active : :inactive,
+            parent: group.context_type == "Course" ? { course: group.context_id } : nil,
+            context_name: (group_context || group.context).name,
+            category: group.category
           }.tap do |hash|
             hash[:permissions] =
               if include_all_permissions
@@ -107,7 +113,8 @@ module SearchHelper
         end
       end
 
-      if context.is_a?(Course)
+      case context
+      when Course
         add_courses.call [context], :current
         visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), require_message_permission: true)
         sections = case visibility
@@ -120,12 +127,12 @@ module SearchHelper
                    end
         add_sections.call sections
         add_groups.call context.groups.active, context
-      elsif context.is_a?(Group)
+      when Group
         if context.grants_right?(@current_user, session, :read)
           add_groups.call [context]
           add_courses.call [context.context], :current if context.context.is_a?(Course)
         end
-      elsif context.is_a?(CourseSection)
+      when CourseSection
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), require_message_permission: true)
         sections = visibility == :restricted ? [] : [context]
         add_courses.call [context.course], :current
@@ -143,18 +150,18 @@ module SearchHelper
 
   def search_contexts_and_users(options = {})
     types = (options[:types] || ([] + [options[:type]])).compact
-    types |= [:course, :section, :group] if types.delete('context')
+    types |= %i[course section group] if types.delete("context")
     types = if types.present?
-              { user: types.delete('user').present?, context: types.present? && types.map(&:to_sym) }
+              { user: types.delete("user").present?, context: types.present? && types.map(&:to_sym) }
             else
-              { user: true, context: [:course, :section, :group] }
+              { user: true, context: %i[course section group] }
             end
 
     collections = []
     exclude_users, exclude_contexts = AddressBook.partition_recipients(options[:exclude] || [])
 
     if types[:context]
-      collections << ['contexts', search_messageable_contexts(
+      collections << ["contexts", search_messageable_contexts(
         search: options[:search],
         context: options[:context],
         synthetic_contexts: options[:synthetic_contexts],
@@ -168,7 +175,7 @@ module SearchHelper
     end
 
     if types[:user] && !@skip_users
-      collections << ['participants', @current_user.address_book.search_users(
+      collections << ["participants", @current_user.address_book.search_users(
         search: options[:search],
         exclude_ids: exclude_users,
         context: options[:context],
@@ -201,8 +208,8 @@ module SearchHelper
                end
     elsif options[:synthetic_contexts]
       if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][Regexp.last_match(1).to_i]) && messageable_context_states[course[:state]]
-        sections = @contexts[:sections].values.select { |section| section[:parent] == { :course => course[:id] } }
-        groups = @contexts[:groups].values.select { |group| group[:parent] == { :course => course[:id] } }
+        sections = @contexts[:sections].values.select { |section| section[:parent] == { course: course[:id] } }
+        groups = @contexts[:groups].values.select { |group| group[:parent] == { course: course[:id] } }
         case context_name
         when /\Acourse_\d+\z/
           if terms.present? || options[:search_all_contexts] # search all groups and sections (and users)
@@ -210,8 +217,8 @@ module SearchHelper
           else # otherwise we show synthetic contexts
             result = synthetic_contexts_for(course, context_name, options[:base_url])
             found_custom_sections = sections.any? { |s| s[:id] != course[:default_section_id] }
-            result << { :id => "#{context_name}_sections", :name => I18n.t(:course_sections, "Course Sections"), :item_count => sections.size, :type => :context } if found_custom_sections
-            result << { :id => "#{context_name}_groups", :name => I18n.t(:student_groups, "Student Groups"), :item_count => groups.size, :type => :context } if groups.size > 0
+            result << { id: "#{context_name}_sections", name: I18n.t(:course_sections, "Course Sections"), item_count: sections.size, type: :context } if found_custom_sections
+            result << { id: "#{context_name}_groups", name: I18n.t(:student_groups, "Student Groups"), item_count: groups.size, type: :context } unless groups.empty?
             return result
           end
         when /\Acourse_\d+_groups\z/
@@ -277,18 +284,18 @@ module SearchHelper
     end
 
     # bulk count users in the remainder
-    asset_strings = result.map { |context| context[:asset_string] }
+    asset_strings = result.pluck(:asset_string)
     user_counts = @current_user.address_book.count_in_contexts(asset_strings)
 
     # build up the final representations
     result.map do |context|
       ret = {
-        :id => context[:asset_string],
-        :name => context[:name],
-        :avatar_url => avatar_url,
-        :type => :context,
-        :user_count => user_counts[context[:asset_string]] || 0,
-        :permissions => context[:permissions],
+        id: context[:asset_string],
+        name: context[:name],
+        avatar_url: avatar_url,
+        type: :context,
+        user_count: user_counts[context[:asset_string]] || 0,
+        permissions: context[:permissions],
       }
       ret[:context_name] = context[:context_name] if context[:context_name] && context_name.nil?
       ret
@@ -314,7 +321,7 @@ class ContextBookmarker
   end
 
   def self.wrap(collection)
-    BookmarkedCollection.build(self.new(collection)) do |pager|
+    BookmarkedCollection.build(new(collection)) do |pager|
       page_start = pager.current_bookmark ? pager.current_bookmark + 1 : 0
       page_end = page_start + pager.per_page
       pager.replace collection[page_start, page_end]
@@ -338,7 +345,7 @@ def synthetic_contexts_for(course, context, base_url)
   # TODO: move the aggregation entirely into the DB. we only select a little
   # bit of data per user, but this still isn't ideal
   users = @current_user.address_book.known_in_context(context)
-  enrollment_counts = { :all => users.size }
+  enrollment_counts = { all: users.size }
   users.each do |user|
     common_courses = @current_user.address_book.common_courses(user)
     next unless common_courses.key?(course[:id])
@@ -351,22 +358,22 @@ def synthetic_contexts_for(course, context, base_url)
   end
   avatar_url = avatar_url_for_group(base_url: base_url)
   result = []
-  synthetic_context = { :avatar_url => avatar_url, :type => :context, :permissions => course[:permissions] }
-  result << synthetic_context.merge({ :id => "#{context}_teachers", :name => I18n.t(:enrollments_teachers, "Teachers"), :user_count => enrollment_counts['TeacherEnrollment'] }) if enrollment_counts['TeacherEnrollment'].to_i > 0
-  result << synthetic_context.merge({ :id => "#{context}_tas", :name => I18n.t(:enrollments_tas, "Teaching Assistants"), :user_count => enrollment_counts['TaEnrollment'] }) if enrollment_counts['TaEnrollment'].to_i > 0
-  result << synthetic_context.merge({ :id => "#{context}_students", :name => I18n.t(:enrollments_students, "Students"), :user_count => enrollment_counts['StudentEnrollment'] }) if enrollment_counts['StudentEnrollment'].to_i > 0
-  result << synthetic_context.merge({ :id => "#{context}_observers", :name => I18n.t(:enrollments_observers, "Observers"), :user_count => enrollment_counts['ObserverEnrollment'] }) if enrollment_counts['ObserverEnrollment'].to_i > 0
+  synthetic_context = { avatar_url: avatar_url, type: :context, permissions: course[:permissions] }
+  result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts["TeacherEnrollment"] }) if enrollment_counts["TeacherEnrollment"].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts["TaEnrollment"] }) if enrollment_counts["TaEnrollment"].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts["StudentEnrollment"] }) if enrollment_counts["StudentEnrollment"].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_observers", name: I18n.t(:enrollments_observers, "Observers"), user_count: enrollment_counts["ObserverEnrollment"] }) if enrollment_counts["ObserverEnrollment"].to_i > 0
   result
 end
 
 def context_state_ranks
-  { :active => 0, :recently_active => 1, :inactive => 2 }
+  { active: 0, recently_active: 1, inactive: 2 }
 end
 
 def context_type_ranks
-  { :course => 0, :section => 1, :group => 2 }
+  { course: 0, section: 1, group: 2 }
 end
 
 def messageable_context_states
-  { :active => true, :recently_active => true, :inactive => false }
+  { active: true, recently_active: true, inactive: false }
 end

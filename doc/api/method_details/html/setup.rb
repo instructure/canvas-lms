@@ -19,15 +19,15 @@
 #
 def init
   get_routes
-  sections :header, [:method_signature, T('docstring')]
+  sections :header, [:method_signature, T("docstring")]
 end
 
 def header
   get_routes
-  @subtopic = (object.tag('subtopic') || object.parent.tag('subtopic') || object.parent.tag('API')).text
+  @subtopic = (object.tag("subtopic") || object.parent.tag("subtopic") || object.parent.tag("API")).text
   route = @routes.first
   @method_link = "method.#{route.requirements[:controller]}.#{route.requirements[:action]}"
-  @beta = object.tag('beta') || object.parent.tag('beta')
+  @beta = object.tag("beta") || object.parent.tag("beta")
 
   if object.has_tag?(:deprecated_method)
     @deprecated_method = DeprecatedMethodView.new(object.tag(:deprecated_method))
@@ -37,11 +37,11 @@ def header
 end
 
 def get_routes
-  @controller = object.parent.path.underscore.sub("_controller", '')
-  @action = object.path.sub(/^.*#/, '')
-  @action = @action.sub(/_with_.*$/, '')
+  @controller = object.parent.path.underscore.sub("_controller", "")
+  @action = object.path.sub(/^.*#/, "")
+  @action = @action.sub(/_with_.*$/, "")
   @routes = ApiRouteSet.api_methods_for_controller_and_action(@controller, @action)
   @route = @routes.first
   @controller_path = "app/controllers/#{@route.requirements[:controller]}_controller.rb"
-  @controller_path = nil unless File.file?(Rails.root + @controller_path)
+  @controller_path = nil unless Rails.root.join(@controller_path).file?
 end

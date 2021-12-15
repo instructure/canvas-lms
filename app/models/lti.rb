@@ -19,6 +19,6 @@
 
 module Lti
   def self.table_name_prefix
-    'lti_'
+    "lti_"
   end
 end

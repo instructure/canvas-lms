@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/assignments_common'
-require_relative '../helpers/differentiated_assignments'
+require_relative "../helpers/assignments_common"
+require_relative "../helpers/differentiated_assignments"
 
 describe "interaction with differentiated quizzes" do
   include_context "in-process server selenium tests"
@@ -132,6 +132,7 @@ describe "interaction with differentiated quizzes" do
       end
     end
   end
+
   context "Observer with student" do
     before do
       observer_setup

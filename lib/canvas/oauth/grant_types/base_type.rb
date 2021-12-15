@@ -27,11 +27,11 @@ module Canvas::OAuth
       end
 
       def validate_type
-        raise 'Abstract Method'
+        raise "Abstract Method"
       end
 
       def generate_token
-        raise 'Abstract Method'
+        raise "Abstract Method"
       end
     end
   end

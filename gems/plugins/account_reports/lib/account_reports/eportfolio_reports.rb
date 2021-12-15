@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class EportfolioReports
@@ -30,23 +30,23 @@ module AccountReports
     end
 
     EPORTFOLIO_REPORT_HEADERS = [
-      I18n.t('eportfolio_name'),
-      I18n.t('eportfolio_id'),
-      I18n.t('author_name'),
-      I18n.t('author_id'),
-      I18n.t('author_sis_id'),
-      I18n.t('author_login_id'),
-      I18n.t('created_at'),
-      I18n.t('updated_at'),
-      I18n.t('is_public'),
-      I18n.t('workflow_state')
+      I18n.t("eportfolio_name"),
+      I18n.t("eportfolio_id"),
+      I18n.t("author_name"),
+      I18n.t("author_id"),
+      I18n.t("author_sis_id"),
+      I18n.t("author_login_id"),
+      I18n.t("created_at"),
+      I18n.t("updated_at"),
+      I18n.t("is_public"),
+      I18n.t("workflow_state")
     ].freeze
 
     def eportfolio_report
-      add_extra_text(I18n.t('Only users with no enrollments')) if only_users_with_no_enrollments?
+      add_extra_text(I18n.t("Only users with no enrollments")) if only_users_with_no_enrollments?
 
       write_report EPORTFOLIO_REPORT_HEADERS do |csv|
-        eportfolio_scope.select('eportfolios.*, users.name AS user_name, pseudonyms.sis_user_id, pseudonyms.unique_id').find_each do |e|
+        eportfolio_scope.select("eportfolios.*, users.name AS user_name, pseudonyms.sis_user_id, pseudonyms.unique_id").find_each do |e|
           csv <<
             [
               e.name,
@@ -67,8 +67,8 @@ module AccountReports
     private
 
     def only_users_with_no_enrollments?
-      if @account_report.value_for_param 'no_enrollments'
-        return value_to_boolean(@account_report.parameters['no_enrollments'])
+      if @account_report.value_for_param "no_enrollments"
+        return value_to_boolean(@account_report.parameters["no_enrollments"])
       end
 
       false
@@ -83,7 +83,7 @@ module AccountReports
     def eportfolio_scope
       scope = Eportfolio.joins(user: :pseudonyms)
                         .where(pseudonyms: { account_id: root_account.id })
-                        .where.not(users: { workflow_state: 'deleted' })
+                        .where.not(users: { workflow_state: "deleted" })
 
       scope = @include_deleted ? scope.deleted : scope.active
       scope = scope.where(no_enrollment_sql) if only_users_with_no_enrollments?

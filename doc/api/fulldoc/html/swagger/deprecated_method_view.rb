@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'canvas_api/deprecatable'
-require 'hash_view'
+require_relative "canvas_api/deprecatable"
+require "hash_view"
 
 class DeprecatedMethodView < HashView
   include CanvasAPI::Deprecatable
@@ -38,7 +38,7 @@ class DeprecatedMethodView < HashView
   private
 
   def parse_line(text)
-    description = (text || '').split("\n", 2).second
+    description = (text || "").split("\n", 2).second
     @description = description && format(description.strip)
     parse_deprecation_info(text)
   end

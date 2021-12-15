@@ -25,12 +25,12 @@ module CC::Exporter::Epub::Converters
     def convert_wikis
       wikis = []
 
-      wiki_dir = @package_root.item_path('wiki_content')
+      wiki_dir = @package_root.item_path("wiki_content")
       Dir["#{wiki_dir}/**/**"].each do |path|
         doc = open_file_xml(path)
-        workflow_state = get_node_val(doc, 'meta[name=workflow_state] @content')
-        module_locked = get_bool_val(doc, 'meta[name=module_locked] @content')
-        next unless workflow_state == 'active' && !module_locked
+        workflow_state = get_node_val(doc, "meta[name=workflow_state] @content")
+        module_locked = get_bool_val(doc, "meta[name=module_locked] @content")
+        next unless workflow_state == "active" && !module_locked
 
         wikis << convert_wiki(doc, path)
       end
@@ -40,10 +40,10 @@ module CC::Exporter::Epub::Converters
 
     def convert_wiki(doc, path)
       wiki = {}
-      wiki_name = File.basename(path, '.html')
+      wiki_name = File.basename(path, ".html")
       title, body, meta = get_html_title_and_body_and_meta_fields(doc)
       wiki[:title] = title
-      wiki[:front_page] = meta['front_page'] == 'true'
+      wiki[:front_page] = meta["front_page"] == "true"
       wiki[:text] = body
       wiki[:identifier] = wiki_name
       wiki[:href] = "pages.xhtml##{wiki[:identifier]}"

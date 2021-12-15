@@ -924,7 +924,7 @@ is:
   locales:
     is: Íslenska
   time:
-    event: "%{date} á %{time}"
+    event: "%{date} kl. %{time}"
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"

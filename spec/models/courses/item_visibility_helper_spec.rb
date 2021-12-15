@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe Courses::ItemVisibilityHelper do
   before :once do
@@ -42,7 +42,7 @@ describe Courses::ItemVisibilityHelper do
     assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
 
     enrolls = []
-    2.times { enrolls << student_in_course(:course => @course) }
+    2.times { enrolls << student_in_course(course: @course) }
 
     expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
     @course.cache_item_visibilities_for_user_ids(enrolls.map(&:user_id)) # should call once and cache

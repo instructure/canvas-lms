@@ -36,7 +36,7 @@ describe SisPseudonym do
   context "when there is a deleted pseudonym" do
     before do
       @deleted_pseudonym = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
-        x.workflow_state = 'deleted'
+        x.workflow_state = "deleted"
         x.sis_user_id = "user2"
       end
     end
@@ -44,7 +44,7 @@ describe SisPseudonym do
     it "returns active pseudonyms only" do
       expect(SisPseudonym.for(u, course1)).to be_nil
       active_pseudonym = u.pseudonyms.create!(pseud_params("user1@example.com")) do |x|
-        x.workflow_state = 'active'
+        x.workflow_state = "active"
         x.sis_user_id = "user1"
       end
       expect(SisPseudonym.for(u, course1)).to eq(active_pseudonym)
@@ -56,7 +56,7 @@ describe SisPseudonym do
       e.save!
       expect(SisPseudonym.for(u, course1)).to be_nil
       active_pseudonym = u.pseudonyms.create!(pseud_params("user1@example.com")) do |x|
-        x.workflow_state = 'active'
+        x.workflow_state = "active"
         x.sis_user_id = "user1"
       end
       expect(SisPseudonym.for(u, course1)).to eq(active_pseudonym)
@@ -72,12 +72,12 @@ describe SisPseudonym do
   it "returns pseudonyms in the right account" do
     other_account = account_model
     u.pseudonyms.create!(pseud_params("user1@example.com", other_account)) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = "user1"
     end
     expect(SisPseudonym.for(u, course1)).to be_nil
     @p = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = "user2"
     end
     expect(SisPseudonym.for(u, course1)).to eq @p
@@ -85,11 +85,11 @@ describe SisPseudonym do
 
   it "returns pseudonyms with a sis id only" do
     u.pseudonyms.create!(pseud_params("user1@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
     end
     expect(SisPseudonym.for(u, course1)).to be_nil
     @p = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = "user2"
     end
     expect(SisPseudonym.for(u, course1)).to eq @p
@@ -97,18 +97,18 @@ describe SisPseudonym do
 
   it "returns pseudonym for specfic enrollment" do
     @p = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = "user2"
     end
     @p2 = u.pseudonyms.create!(pseud_params("user2b@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = "user2b"
     end
-    e = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active')
+    e = course1.enroll_user(u, "StudentEnrollment", enrollment_state: "active")
     e.sis_pseudonym_id = @p.id
     e.save!
     section = course1.course_sections.create
-    e2 = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active', section: section, allow_multiple_enrollments: true)
+    e2 = course1.enroll_user(u, "StudentEnrollment", enrollment_state: "active", section: section, allow_multiple_enrollments: true)
     e2.sis_pseudonym_id = @p2.id
     e2.save!
     expect(SisPseudonym.for(u, e)).to eq @p
@@ -117,14 +117,14 @@ describe SisPseudonym do
 
   it "follows ths sis_user_id if it moves between pseudonyms" do
     pseudonym1 = u.pseudonyms.create!(pseud_params("testuser41@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = "user2"
     end
     pseudonym2 = u.pseudonyms.create!(pseud_params("testuser42@example.com")) do |x|
-      x.workflow_state = 'active'
+      x.workflow_state = "active"
       x.sis_user_id = nil
     end
-    enrollment = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active')
+    enrollment = course1.enroll_user(u, "StudentEnrollment", enrollment_state: "active")
     enrollment.sis_pseudonym_id = pseudonym1.id
     enrollment.save!
     expect(SisPseudonym.for(u, course1)).to eq(pseudonym1)
@@ -136,27 +136,27 @@ describe SisPseudonym do
   end
 
   it "finds the right root account for a course" do
-    pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') do |p|
-      p.sis_user_id = 'abc'
+    pseudonym = account2.pseudonyms.create!(user: u, unique_id: "user") do |p|
+      p.sis_user_id = "abc"
     end
     expect(SisPseudonym.for(u, course2)).to eq(pseudonym)
   end
 
   it "finds the right root account for a group" do
-    @group = group :group_context => course2
-    pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+    @group = group group_context: course2
+    pseudonym = account2.pseudonyms.create!(user: u, unique_id: "user") { |p| p.sis_user_id = "abc" }
     expect(SisPseudonym.for(u, @group)).to eq(pseudonym)
   end
 
   it "finds the right root account for a non-root-account" do
     @root_account = account1
     @account = @root_account.sub_accounts.create!
-    pseudonym = @root_account.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+    pseudonym = @root_account.pseudonyms.create!(user: u, unique_id: "user") { |p| p.sis_user_id = "abc" }
     expect(SisPseudonym.for(u, @account)).to eq(pseudonym)
   end
 
   it "finds the right root account for a root account" do
-    pseudonym = account1.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+    pseudonym = account1.pseudonyms.create!(user: u, unique_id: "user") { |p| p.sis_user_id = "abc" }
     expect(SisPseudonym.for(u, account1)).to eq(pseudonym)
   end
 
@@ -166,7 +166,7 @@ describe SisPseudonym do
   end
 
   it "includes a pseudonym from a trusted account" do
-    pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+    pseudonym = account2.pseudonyms.create!(user: u, unique_id: "user") { |p| p.sis_user_id = "abc" }
     allow(account1).to receive(:trust_exists?).and_return(true)
     allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
     expect(SisPseudonym.for(u, account1)).to be_nil
@@ -176,15 +176,15 @@ describe SisPseudonym do
   context "with multiple acceptable sis pseudonyms" do
     before do
       u.pseudonyms.create!(pseud_params("user2@example.com")) do |p|
-        p.workflow_state = 'active'
+        p.workflow_state = "active"
         p.sis_user_id = "SIS1"
       end
       u.pseudonyms.create!(pseud_params("alphabet@example.com")) do |p|
-        p.workflow_state = 'active'
+        p.workflow_state = "active"
         p.sis_user_id = "SIS2"
       end
       u.pseudonyms.create!(pseud_params("zebra@example.com")) do |p|
-        p.workflow_state = 'active'
+        p.workflow_state = "active"
         p.sis_user_id = "SIS3"
       end
       u.reload # to clear psuedonyms collection for sure
@@ -204,7 +204,7 @@ describe SisPseudonym do
 
   context "with multiple acceptable pseudonyms" do
     let_once(:non_sis_pseudo) { u.pseudonyms.create!(pseud_params("a")) }
-    let_once(:sis_pseudo) { u.pseudonyms.create!(pseud_params("user").merge(sis_user_id: 'abc')) }
+    let_once(:sis_pseudo) { u.pseudonyms.create!(pseud_params("user").merge(sis_user_id: "abc")) }
 
     it "finds the SIS pseudonym first from db" do
       u.reload
@@ -257,8 +257,8 @@ describe SisPseudonym do
       @shard1.activate do
         @user = User.create!
       end
-      @pseudonym = Account.default.pseudonyms.create!(user: @user, unique_id: 'user') do |p|
-        p.sis_user_id = 'abc'
+      @pseudonym = Account.default.pseudonyms.create!(user: @user, unique_id: "user") do |p|
+        p.sis_user_id = "abc"
       end
       @shard2.activate do
         expect(SisPseudonym.for(@user, Account.default)).to eq @pseudonym
@@ -272,8 +272,8 @@ describe SisPseudonym do
       @shard1.activate do
         @s1root = account_model
         @user = User.create!
-        @pseudonym = @s1root.pseudonyms.create!(user: @user, unique_id: 'user') do |p|
-          p.sis_user_id = 'abc'
+        @pseudonym = @s1root.pseudonyms.create!(user: @user, unique_id: "user") do |p|
+          p.sis_user_id = "abc"
         end
         allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(Account.default, true).and_return(true)
       end
@@ -281,13 +281,13 @@ describe SisPseudonym do
       expect(SisPseudonym.for(@user, Account.default, type: :implicit, in_region: true)).to eq @pseudonym
     end
 
-    it 'returns a collection of all relevant pseudonyms' do
+    it "returns a collection of all relevant pseudonyms" do
       @shard1.activate { @user = User.create! }
       @pseudonym =
         Account
         .default
         .pseudonyms
-        .create!(user: @user, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+        .create!(user: @user, unique_id: "user") { |p| p.sis_user_id = "abc" }
       @shard2.activate do
         expect(
           SisPseudonym.for(@user, Account.default, type: :implicit, include_all_pseudonyms: true)
@@ -295,9 +295,9 @@ describe SisPseudonym do
       end
     end
 
-    it 'returns a collection of all relevant pre-loaded pseudonyms' do
+    it "returns a collection of all relevant pre-loaded pseudonyms" do
       @shard1.activate { @user = User.create! }
-      @pseudonym = Account.default.pseudonyms.create!(user: @user, unique_id: 'user')
+      @pseudonym = Account.default.pseudonyms.create!(user: @user, unique_id: "user")
       @shard2.activate do
         @user.pseudonyms.to_a
         expect(
@@ -312,17 +312,17 @@ describe SisPseudonym do
       end
     end
 
-    it 'returns a collection of all relevant non-duplicated pseudonyms' do
+    it "returns a collection of all relevant non-duplicated pseudonyms" do
       @user = u
-      p1 = @user.pseudonyms.create!(pseud_params('a'))
-      p2 = @user.pseudonyms.create!(pseud_params('b'))
+      p1 = @user.pseudonyms.create!(pseud_params("a"))
+      p2 = @user.pseudonyms.create!(pseud_params("b"))
       @shard1.activate do
         account = account_model
         course = account.courses.create!
         course.enroll_student(@user)
-        @user.pseudonyms.create!(pseud_params('a', account))
-        @user.pseudonyms.create!(pseud_params('b', account))
-        @user.pseudonyms.create!(pseud_params('c', account))
+        @user.pseudonyms.create!(pseud_params("a", account))
+        @user.pseudonyms.create!(pseud_params("b", account))
+        @user.pseudonyms.create!(pseud_params("c", account))
       end
       expect(
         SisPseudonym.for(

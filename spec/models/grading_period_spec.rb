@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe GradingPeriod do
   subject(:grading_period) { grading_period_group.grading_periods.create!(params) }
@@ -35,7 +35,7 @@ describe GradingPeriod do
   let(:now) { Time.zone.now }
   let(:params) do
     {
-      title: 'A Grading Period',
+      title: "A Grading Period",
       start_date: now,
       end_date: 1.day.from_now(now),
       close_date: 5.days.from_now(now)
@@ -56,7 +56,7 @@ describe GradingPeriod do
 
   it "requires start_date to be before end_date" do
     subject.assign_attributes(start_date: now.change(sec: 59), end_date: now.change(sec: 0))
-    is_expected.not_to be_valid
+    expect(subject).not_to be_valid
   end
 
   it "requires a title" do
@@ -142,7 +142,7 @@ describe GradingPeriod do
 
     context "no periods" do
       it "finds no current periods" do
-        is_expected.to be_empty
+        expect(subject).to be_empty
       end
     end
 
@@ -157,48 +157,48 @@ describe GradingPeriod do
       end
 
       it "finds one current period" do
-        is_expected.to eq [period]
+        expect(subject).to eq [period]
       end
 
       it "includes the period if the current time is the same as the grading period end date" do
         Timecop.freeze(now) do
           period.update!(end_date: now)
-          is_expected.to be_present
+          expect(subject).to be_present
         end
       end
 
       it "includes the period if the current time is past the end date but the minute has not passed" do
         Timecop.freeze(now.change(sec: 59)) do
           period.update!(end_date: now.change(sec: 0))
-          is_expected.to be_present
+          expect(subject).to be_present
         end
       end
 
       it "does not include the period if the current time is past the end date and the minute has passed" do
         Timecop.freeze(1.minute.from_now(now)) do
           period.update!(end_date: now)
-          is_expected.to be_empty
+          expect(subject).to be_empty
         end
       end
 
       it "does not include the period if start_date equals Time.now" do
         Timecop.freeze(now) do
           period.update!(start_date: now)
-          is_expected.to be_empty
+          expect(subject).to be_empty
         end
       end
 
       it "does not include period if the current time is past the start date and the minute has not passed" do
         Timecop.freeze(now.change(sec: 59)) do
           period.update!(start_date: now.change(sec: 0))
-          is_expected.to be_empty
+          expect(subject).to be_empty
         end
       end
 
       it "includes the period if the current time is past the start date and the minute has passed" do
         Timecop.freeze(1.minute.from_now(now)) do
           period.update!(start_date: now)
-          is_expected.to be_present
+          expect(subject).to be_present
         end
       end
     end
@@ -366,13 +366,14 @@ describe GradingPeriod do
     end
   end
 
-  describe '#destroy' do
-    it_behaves_like 'soft deletion' do
-      let(:creation_arguments) { params }
+  describe "#destroy" do
+    it_behaves_like "soft deletion" do
       subject { grading_period_group.grading_periods }
+
+      let(:creation_arguments) { params }
     end
 
-    it 'destroys associated scores' do
+    it "destroys associated scores" do
       course = Course.create!
       enrollment = student_in_course(course: course)
       score = enrollment.scores.create!(grading_period: grading_period)
@@ -380,7 +381,7 @@ describe GradingPeriod do
       expect(score.reload).to be_deleted
     end
 
-    it 'recalculates course scores if the grading period group is weighted' do
+    it "recalculates course scores if the grading period group is weighted" do
       course = Course.create!
       grading_period_group.enrollment_terms << course.enrollment_term
       enrollment = student_in_course(course: course)
@@ -390,7 +391,7 @@ describe GradingPeriod do
       grading_period.destroy
     end
 
-    it 'runs DueDateCacher for courses from the same enrollment term when the grading period is deleted' do
+    it "runs DueDateCacher for courses from the same enrollment term when the grading period is deleted" do
       course2 = account.courses.create!
       course2.enrollment_term = account.enrollment_terms.create!
       course2.save!
@@ -402,7 +403,7 @@ describe GradingPeriod do
       grading_period.destroy
     end
 
-    it 'runs DueDateCacher for courses from the same enrollment term when the grading period set is deleted' do
+    it "runs DueDateCacher for courses from the same enrollment term when the grading period set is deleted" do
       course2 = account.courses.create!
       course2.enrollment_term = account.enrollment_terms.create!
       course2.save!
@@ -414,13 +415,13 @@ describe GradingPeriod do
       grading_period_group.destroy
     end
 
-    it 'does not destroy the set when the last grading period is destroyed (account grading periods)' do
+    it "does not destroy the set when the last grading period is destroyed (account grading periods)" do
       grading_period.save!
       grading_period.destroy
       expect(grading_period_group).not_to be_deleted
     end
 
-    it 'updates the grading_period_id to nil on submissions that were in the deleted grading period' do
+    it "updates the grading_period_id to nil on submissions that were in the deleted grading period" do
       student = User.create!
       course.enroll_student(student, enrollment_state: :active)
       grading_period.save!
@@ -447,24 +448,24 @@ describe GradingPeriod do
       }.from(grading_period.id).to(other_period.id)
     end
 
-    context 'course grading periods (legacy support)' do
+    context "course grading periods (legacy support)" do
       before(:once) do
         @grading_period_set = course.grading_period_groups.create!
         @period = @grading_period_set.grading_periods.create!(
-          title: 'Grading Period',
+          title: "Grading Period",
           start_date: 5.days.ago,
           end_date: 2.days.ago
         )
       end
 
-      it 'destroys the set when the last grading period is destroyed' do
+      it "destroys the set when the last grading period is destroyed" do
         @period.destroy
         expect(@grading_period_set).to be_deleted
       end
 
-      it 'does not destroy the set when a grading period is destroyed and it is not the last period' do
+      it "does not destroy the set when a grading period is destroyed and it is not the last period" do
         @grading_period_set.grading_periods.create!(
-          title: 'A New Grading Period',
+          title: "A New Grading Period",
           start_date: 2.days.from_now,
           end_date: 5.days.from_now
         )
@@ -638,12 +639,12 @@ describe GradingPeriod do
       @course.enroll_student(student, enrollment_state: :active)
       @grading_period_group = group_helper.legacy_create_for_course(@course)
       @first_grading_period = @grading_period_group.grading_periods.create!(
-        title: '1st period',
+        title: "1st period",
         start_date: 2.months.from_now(now),
         end_date: 3.months.from_now(now)
       )
       @second_grading_period = @grading_period_group.grading_periods.create!(
-        title: '2nd period',
+        title: "2nd period",
         start_date: 3.months.from_now(now),
         end_date: 4.months.from_now(now)
       )
@@ -677,7 +678,7 @@ describe GradingPeriod do
 
       let(:third_grading_period) do
         @grading_period_group.grading_periods.create!(
-          title: '3rd period',
+          title: "3rd period",
           start_date: 5.months.from_now(now),
           end_date: 6.months.from_now(now)
         )
@@ -685,7 +686,7 @@ describe GradingPeriod do
 
       let(:fourth_grading_period) do
         @grading_period_group.grading_periods.create!(
-          title: '4th period',
+          title: "4th period",
           start_date: 7.months.from_now(now),
           end_date: 8.months.from_now(now)
         )
@@ -715,7 +716,7 @@ describe GradingPeriod do
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)",
-       test_id: 2528634, priority: "2" do
+       priority: "2" do
       grading_period.assign_attributes(
         start_date: 1.month.ago(now),
         end_date: 1.month.from_now(now)
@@ -732,61 +733,61 @@ describe GradingPeriod do
     end
   end
 
-  context 'given an existing grading_period' do
+  context "given an existing grading_period" do
     let(:course) { Course.create! }
     let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
-    describe '#overlapping?' do
+    describe "#overlapping?" do
       before(:once) do
         @existing_grading_period = grading_period_group.grading_periods.create!(
-          title: 'a title',
+          title: "a title",
           start_date: now.change(sec: 0),
           end_date: 2.days.from_now(now).change(sec: 59)
         )
         @grading_period = grading_period_group.grading_periods.build
       end
 
-      it 'is overlapping if the start date and end date match an existing period' do
+      it "is overlapping if the start date and end date match an existing period" do
         @grading_period.start_date = @existing_grading_period.start_date
         @grading_period.end_date = @existing_grading_period.end_date
         expect(@grading_period).to be_overlapping
       end
 
-      it 'is not overlapping if the start date is the end date of an existing period' do
+      it "is not overlapping if the start date is the end date of an existing period" do
         @grading_period.start_date = @existing_grading_period.end_date
         @grading_period.end_date = 1.month.from_now(@existing_grading_period.end_date)
         expect(@grading_period).not_to be_overlapping
       end
 
-      it 'is not overlapping if the start date is before the end date of an existing period ' \
-         'but they are in the same minute' do
+      it "is not overlapping if the start date is before the end date of an existing period " \
+         "but they are in the same minute" do
         @grading_period.start_date = @existing_grading_period.end_date.change(sec: 0)
         @grading_period.end_date = 1.month.from_now(@existing_grading_period.end_date)
         expect(@grading_period).not_to be_overlapping
       end
 
-      it 'is overlapping if the start date is before the end date of an existing period and ' \
-         'they are not in the same minute' do
+      it "is overlapping if the start date is before the end date of an existing period and " \
+         "they are not in the same minute" do
         @grading_period.start_date = 1.minute.ago(@existing_grading_period.end_date)
         @grading_period.end_date = 1.month.from_now(@existing_grading_period.end_date)
         expect(@grading_period).to be_overlapping
       end
 
-      it 'is not overlapping if the end date is the start date of an existing period' do
+      it "is not overlapping if the end date is the start date of an existing period" do
         @grading_period.start_date = 1.month.from_now(@existing_grading_period.start_date)
         @grading_period.end_date = @existing_grading_period.start_date
         expect(@grading_period).not_to be_overlapping
       end
 
-      it 'is not overlapping if the end date is past the start date of an existing period, ' \
-         'but there are in the same minute' do
+      it "is not overlapping if the end date is past the start date of an existing period, " \
+         "but there are in the same minute" do
         @grading_period.start_date = 1.month.ago(@existing_grading_period.start_date)
         @grading_period.end_date = @existing_grading_period.start_date.change(sec: 59)
         expect(@grading_period).not_to be_overlapping
       end
 
-      it 'is overlapping if the end date is past the start date of an existing period and ' \
-         'they are not in the same minute' do
+      it "is overlapping if the end date is past the start date of an existing period and " \
+         "they are not in the same minute" do
         @grading_period.start_date = 1.month.ago(@existing_grading_period.start_date)
         @grading_period.end_date = 1.minute.from_now(@existing_grading_period.start_date)
         expect(@grading_period).to be_overlapping
@@ -800,9 +801,10 @@ describe GradingPeriod do
 
   describe "Soft deletion" do
     subject { grading_period_group.grading_periods }
+
     let(:creation_arguments) { [period_one, period_two] }
-    let(:period_one) { { title: 'an title', start_date: 1.week.ago(now), end_date: 2.weeks.from_now(now) } }
-    let(:period_two) { { title: 'an title', start_date: 2.weeks.from_now(now), end_date: 5.weeks.from_now(now) } }
+    let(:period_one) { { title: "an title", start_date: 1.week.ago(now), end_date: 2.weeks.from_now(now) } }
+    let(:period_two) { { title: "an title", start_date: 2.weeks.from_now(now), end_date: 5.weeks.from_now(now) } }
 
     include_examples "soft deletion"
   end
@@ -810,42 +812,42 @@ describe GradingPeriod do
   describe ".in_date_range?" do
     subject(:period) do
       grading_period_group.grading_periods.build(
-        title: 'a period',
+        title: "a period",
         start_date: 1.week.ago(now).change(sec: 0),
         end_date: 2.weeks.from_now(now).change(sec: 0)
       )
     end
 
     it "is in date range for a date that equals end_date" do
-      is_expected.to be_in_date_range(period.end_date)
+      expect(subject).to be_in_date_range(period.end_date)
     end
 
     it "is in date range for a date that is past the end date but the minute has not yet passed" do
-      is_expected.to be_in_date_range(period.end_date.change(sec: 59))
+      expect(subject).to be_in_date_range(period.end_date.change(sec: 59))
     end
 
     it "is not in date range for a date that is past the end date and the minute has passed" do
-      is_expected.not_to be_in_date_range(1.minute.from_now(period.end_date))
+      expect(subject).not_to be_in_date_range(1.minute.from_now(period.end_date))
     end
 
     it "is not in date range for a date before the period" do
-      is_expected.not_to be_in_date_range(2.weeks.ago(now))
+      expect(subject).not_to be_in_date_range(2.weeks.ago(now))
     end
 
     it "is not in date range for or a date after the period" do
-      is_expected.not_to be_in_date_range(3.weeks.from_now(now))
+      expect(subject).not_to be_in_date_range(3.weeks.from_now(now))
     end
 
     it "is not in date range for a date that equals start_date" do
-      is_expected.not_to be_in_date_range(period.start_date)
+      expect(subject).not_to be_in_date_range(period.start_date)
     end
 
     it "is not in date range for a date that is past the start_date but the minute has not yet passed" do
-      is_expected.not_to be_in_date_range(period.start_date.change(sec: 59))
+      expect(subject).not_to be_in_date_range(period.start_date.change(sec: 59))
     end
 
     it "is in date range for a date that is past the start_date and the minute has passed" do
-      is_expected.to be_in_date_range(1.minute.from_now(period.start_date))
+      expect(subject).to be_in_date_range(1.minute.from_now(period.start_date))
     end
   end
 
@@ -856,41 +858,43 @@ describe GradingPeriod do
         group.grading_periods.create!(
           start_date: 1.week.ago(now),
           end_date: 2.weeks.from_now(now),
-          title: 'C'
+          title: "C"
         )
         group.grading_periods.create!(
           start_date: 4.weeks.ago(now),
           end_date: 3.weeks.ago(now),
-          title: 'A'
+          title: "A"
         )
         group.grading_periods.create!(
           start_date: 3.weeks.ago(now),
           end_date: 2.weeks.ago(now),
-          title: 'B'
+          title: "B"
         )
         json = GradingPeriod.json_for(course, nil)
-        expect(json.map { |el| el['title'] }).to eq %w(A B C)
-        expect(json.map { |el| el['is_last'] }).to eq [false, false, true]
+        expect(json.map { |el| el["title"] }).to eq %w[A B C]
+        expect(json.map { |el| el["is_last"] }).to eq [false, false, true]
       end
     end
   end
 
-  describe '#account_group?' do
+  describe "#account_group?" do
     context "given an account grading period group" do
       it { is_expected.to be_account_group }
     end
 
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
+
       let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
       it { is_expected.not_to be_account_group }
     end
   end
 
-  describe '#course_group?' do
+  describe "#course_group?" do
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
+
       let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
       it { is_expected.to be_course_group }
@@ -901,7 +905,7 @@ describe GradingPeriod do
     end
   end
 
-  describe '#weight' do
+  describe "#weight" do
     it "can persist double precision values" do
       subject.update!(weight: 1.5)
       expect(subject.reload.weight).to eql 1.5
@@ -943,7 +947,7 @@ describe GradingPeriod do
     end
   end
 
-  describe 'grading period scores' do
+  describe "grading period scores" do
     before do
       student_in_course(course: course, active_all: true)
       teacher_in_course(course: course, active_all: true)
@@ -951,11 +955,11 @@ describe GradingPeriod do
       @assignment.grade_student(@student, grade: 8, grader: @teacher)
     end
 
-    it 'creates scores for the grading period upon its creation' do
+    it "creates scores for the grading period upon its creation" do
       expect { grading_period.save! }.to change { Score.count }.by(1)
     end
 
-    it 'updates grading period scores when the grading period end date is changed' do
+    it "updates grading period scores when the grading period end date is changed" do
       grading_period.save!
       expect do
         day_after_assignment_is_due = 1.day.from_now(@assignment.due_at)
@@ -968,7 +972,7 @@ describe GradingPeriod do
       }.from(nil).to(80.0)
     end
 
-    it 'updates grading period scores when the grading period start date is changed' do
+    it "updates grading period scores when the grading period start date is changed" do
       day_before_grading_period_starts = 1.day.ago(grading_period.start_date)
       @assignment.update!(due_at: day_before_grading_period_starts)
       grading_period.save!
@@ -998,7 +1002,7 @@ describe GradingPeriod do
       }.from(grading_period.id).to(other_period.id)
     end
 
-    it 'updates course score when the grading period weight is changed' do
+    it "updates course score when the grading period weight is changed" do
       grading_period.save!
       grading_period_group.update!(weighted: true)
       expect { grading_period.update!(weight: 50) }.to change {
@@ -1006,7 +1010,7 @@ describe GradingPeriod do
       }
     end
 
-    it 'does not update grading period score when the grading period weight is changed' do
+    it "does not update grading period score when the grading period weight is changed" do
       grading_period.save!
       grading_period_group.update!(weighted: true)
       expect { grading_period.update!(weight: 20) }.not_to change {
@@ -1014,7 +1018,7 @@ describe GradingPeriod do
       }
     end
 
-    it 'does not update course score when weight is changed but weighted grading periods are disabled' do
+    it "does not update course score when weight is changed but weighted grading periods are disabled" do
       grading_period.save!
       grading_period_group.update!(weighted: false)
       expect { grading_period.update!(weight: 50) }.not_to change {
@@ -1025,7 +1029,7 @@ describe GradingPeriod do
       }
     end
 
-    it 'does not update grading period score when weight is changed but weighted grading periods are disabled' do
+    it "does not update grading period score when weight is changed but weighted grading periods are disabled" do
       grading_period.save!
       grading_period_group.update!(weighted: false)
       expect { grading_period.update!(weight: 20) }.not_to change {

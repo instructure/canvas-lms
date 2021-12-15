@@ -21,7 +21,6 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {getDiscussionSubentriesQueryMock} from '../../../../graphql/Mocks'
-import {ISOLATED_VIEW_INITIAL_PAGE_SIZE, PER_PAGE} from '../../../utils/constants'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
 import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
@@ -39,8 +38,13 @@ describe('IsolatedViewContainer', () => {
   const goToTopic = jest.fn()
   const onClose = jest.fn()
 
+  const per_page = 20
+  const isolated_view_initial_page_size = 5
+
   beforeAll(() => {
     window.ENV = {
+      per_page,
+      isolated_view_initial_page_size,
       discussion_topic_id: '1',
       manual_mark_as_read: false,
       current_user: {
@@ -94,7 +98,7 @@ describe('IsolatedViewContainer', () => {
 
   it('should render a back button', async () => {
     const mocks = getDiscussionSubentriesQueryMock({
-      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      last: isolated_view_initial_page_size,
       includeRelativeEntry: false
     })
     mocks[0].result.data.legacyNode.parentId = '77'
@@ -113,7 +117,7 @@ describe('IsolatedViewContainer', () => {
     const {findAllByTestId, findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -133,7 +137,7 @@ describe('IsolatedViewContainer', () => {
     const {findAllByTestId, findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -153,7 +157,7 @@ describe('IsolatedViewContainer', () => {
     const {findAllByTestId, findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -183,7 +187,7 @@ describe('IsolatedViewContainer', () => {
       const {findAllByTestId, findByTestId} = setup(
         defaultProps(),
         getDiscussionSubentriesQueryMock({
-          last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+          last: isolated_view_initial_page_size,
           includeRelativeEntry: false
         })
       )
@@ -204,7 +208,7 @@ describe('IsolatedViewContainer', () => {
     const {findByText, queryByTestId} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -215,11 +219,11 @@ describe('IsolatedViewContainer', () => {
   it('allows fetching older discussion entries', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       }),
       ...getDiscussionSubentriesQueryMock({
-        last: PER_PAGE,
+        last: per_page,
         before: 'MQ',
         includeRelativeEntry: false
       })
@@ -253,7 +257,7 @@ describe('IsolatedViewContainer', () => {
   it('allows fetching newer discussion entries', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: true,
         relativeEntryId: '10'
       }),
@@ -264,7 +268,7 @@ describe('IsolatedViewContainer', () => {
         relativeEntryId: '10'
       }),
       ...getDiscussionSubentriesQueryMock({
-        first: PER_PAGE,
+        first: per_page,
         after: 'MjA',
         includeRelativeEntry: false,
         beforeRelativeEntry: false,
@@ -299,7 +303,7 @@ describe('IsolatedViewContainer', () => {
 
   it('should not show "Show older replies" button initially if hasPreviousPage is false', async () => {
     const mocks = getDiscussionSubentriesQueryMock({
-      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      last: isolated_view_initial_page_size,
       includeRelativeEntry: false
     })
     mocks[0].result.data.legacyNode.discussionSubentriesConnection.pageInfo = PageInfo.mock({
@@ -315,7 +319,7 @@ describe('IsolatedViewContainer', () => {
   it('should call query with relative id params', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: true,
         relativeEntryId: '10'
       }),
@@ -334,7 +338,7 @@ describe('IsolatedViewContainer', () => {
   it('show newer button should be visible when relativeEntryId is present', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: true,
         relativeEntryId: '10'
       }),
@@ -353,7 +357,7 @@ describe('IsolatedViewContainer', () => {
     const {queryByText} = setup(
       defaultProps({relativeEntryId: null}),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -364,7 +368,7 @@ describe('IsolatedViewContainer', () => {
     const {findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -379,7 +383,7 @@ describe('IsolatedViewContainer', () => {
     const {findAllByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -398,7 +402,7 @@ describe('IsolatedViewContainer', () => {
         const {queryByTestId} = setup(
           props,
           getDiscussionSubentriesQueryMock({
-            last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+            last: isolated_view_initial_page_size,
             includeRelativeEntry: false
           })
         )
@@ -413,7 +417,7 @@ describe('IsolatedViewContainer', () => {
         const {findByTestId} = setup(
           props,
           getDiscussionSubentriesQueryMock({
-            last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+            last: isolated_view_initial_page_size,
             includeRelativeEntry: false
           })
         )
@@ -427,7 +431,7 @@ describe('IsolatedViewContainer', () => {
     const {findByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -442,7 +446,7 @@ describe('IsolatedViewContainer', () => {
     const {findAllByTestId, queryByTestId} = setup(
       defaultProps({RCEOpen: false, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -459,7 +463,7 @@ describe('IsolatedViewContainer', () => {
     const {findByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -473,7 +477,7 @@ describe('IsolatedViewContainer', () => {
     const {findAllByTestId} = setup(
       defaultProps({RCEOpen: false, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -487,7 +491,7 @@ describe('IsolatedViewContainer', () => {
     const {findByTestId} = setup(
       defaultProps({highlightEntryId: '104'}),
       getDiscussionSubentriesQueryMock({
-        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        last: isolated_view_initial_page_size,
         includeRelativeEntry: false
       })
     )
@@ -500,7 +504,7 @@ describe('IsolatedViewContainer', () => {
       const container = setup(
         defaultProps({highlightEntryId: '104'}),
         getDiscussionSubentriesQueryMock({
-          last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+          last: isolated_view_initial_page_size,
           includeRelativeEntry: false,
           shouldError: true
         })

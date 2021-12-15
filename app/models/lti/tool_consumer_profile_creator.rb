@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'ims/lti'
+require "ims/lti"
 
 module Lti
   class ToolConsumerProfileCreator
     PRODUCT_INSTANCE_JSON = {
-      guid: 'replace this',
+      guid: "replace this",
       product_info: {
-        product_version: 'none',
+        product_version: "none",
         product_family: {
-          code: 'canvas',
+          code: "canvas",
           vendor: {
-            code: 'https://instructure.com',
+            code: "https://instructure.com",
             vendor_name: {
-              default_value: 'Instructure',
-              key: 'vendor.name'
+              default_value: "Instructure",
+              key: "vendor.name"
             }.freeze,
-            timestamp: '2008-03-27T06:00:00Z'
+            timestamp: "2008-03-27T06:00:00Z"
           }.freeze
         }.freeze,
         product_name: {
-          default_value: 'Canvas by Instructure',
-          key: 'product.name'
+          default_value: "Canvas by Instructure",
+          key: "product.name"
         }.freeze
       }.freeze
     }.freeze
@@ -104,7 +104,7 @@ module Lti
         reg_srv = ::IMS::LTI::Models::RestService.new
         reg_srv.id = "#{@tcp_url}##{service[:id]}"
         reg_srv.endpoint = "#{endpoint_slug}#{endpoint}"
-        reg_srv.type = 'RestService'
+        reg_srv.type = "RestService"
         reg_srv.format = service[:format]
         reg_srv.action = service[:action]
         reg_srv
@@ -114,19 +114,19 @@ module Lti
     def security_profiles
       [
         ::IMS::LTI::Models::SecurityProfile.new(
-          security_profile_name: 'lti_oauth_hash_message_security',
-          digest_algorithm: ['HMAC-SHA1']
+          security_profile_name: "lti_oauth_hash_message_security",
+          digest_algorithm: ["HMAC-SHA1"]
         ),
         ::IMS::LTI::Models::SecurityProfile.new(
-          security_profile_name: 'oauth2_access_token_ws_security'
+          security_profile_name: "oauth2_access_token_ws_security"
         ),
         ::IMS::LTI::Models::SecurityProfile.new(
-          security_profile_name: 'lti_jwt_ws_security',
-          digest_algorithm: ['HS256']
+          security_profile_name: "lti_jwt_ws_security",
+          digest_algorithm: ["HS256"]
         ),
         ::IMS::LTI::Models::SecurityProfile.new(
-          security_profile_name: 'lti_jwt_message_security',
-          digest_algorithm: ['HS256']
+          security_profile_name: "lti_jwt_message_security",
+          digest_algorithm: ["HS256"]
         )
       ]
     end

@@ -24,7 +24,7 @@ describe SisBatchRollBackData do
     @batch = @account.sis_batches.create!
   end
 
-  it 'creates successfully' do
+  it "creates successfully" do
     c1 = Course.create!
     c2 = Course.create!
     d1 = SisBatchRollBackData.build_data(sis_batch: @batch,
@@ -35,9 +35,9 @@ describe SisBatchRollBackData do
     expect(@batch.roll_back_data.count).to eq 2
   end
 
-  it 'has each context respond to updated_at' do
+  it "has each context respond to updated_at" do
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
-      expect(type.constantize.column_names.include?('updated_at')).to eq true
+      expect(type.constantize.column_names.include?("updated_at")).to eq true
     end
   end
 end

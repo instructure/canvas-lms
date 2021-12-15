@@ -51,61 +51,61 @@ describe Mutations::CreateCommentBankItem do
   end
 
   let(:valid_query) do
-    <<~QUERY
+    <<~GQL
       courseId: #{@course.id}
       comment: "this is my assignment comment"
-    QUERY
+    GQL
   end
 
   it "creates a comment bank item for the current_user" do
     result = execute_with_input(valid_query)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'createCommentBankItem', 'errors')).to be_nil
-    result = result.dig('data', 'createCommentBankItem', 'commentBankItem')
-    record = CommentBankItem.find(result.dig('_id'))
-    expect(result.dig('courseId')).to eq @course.id.to_s
-    expect(result.dig('userId')).to eq @admin.id.to_s
-    expect(result.dig('comment')).to eq record.comment
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "createCommentBankItem", "errors")).to be_nil
+    result = result.dig("data", "createCommentBankItem", "commentBankItem")
+    record = CommentBankItem.find(result["_id"])
+    expect(result["courseId"]).to eq @course.id.to_s
+    expect(result["userId"]).to eq @admin.id.to_s
+    expect(result["comment"]).to eq record.comment
   end
 
   it "allows relay id for course_id" do
-    query = <<~QUERY
-      courseId: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('Course').call(@course.id.to_s)},
+    query = <<~GQL
+      courseId: #{GraphQLHelpers.relay_or_legacy_id_prepare_func("Course").call(@course.id.to_s)},
       comment: "assignment comment"
-    QUERY
-    courseId = execute_with_input(query).dig('data', 'createCommentBankItem', 'commentBankItem', 'courseId')
+    GQL
+    courseId = execute_with_input(query).dig("data", "createCommentBankItem", "commentBankItem", "courseId")
     expect(courseId).to eq @course.id.to_s
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'createCommentBankItem', 'errors')
+      errors = result["errors"] || result.dig("data", "createCommentBankItem", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "invalid course id" do
-      query = <<~QUERY
+      query = <<~GQL
         courseId: 0,
         comment: "comment"
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'Course not found')
+      expect_error(result, "Course not found")
     end
 
     it "inactive course" do
       @course.destroy
       result = execute_with_input(valid_query)
-      expect_error(result, 'Course not found')
+      expect_error(result, "Course not found")
     end
 
     it "invalid permissions" do
-      query = <<~QUERY
+      query = <<~GQL
         courseId: #{@course.id},
         comment: "comment"
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @student)
-      expect_error(result, 'not found')
+      expect_error(result, "not found")
     end
   end
 end

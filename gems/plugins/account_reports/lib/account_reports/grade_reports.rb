@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class GradeReports
@@ -26,7 +26,7 @@ module AccountReports
 
     def initialize(account_report, runner = nil)
       @account_report = account_report
-      @include_deleted = value_to_boolean(account_report.parameters&.dig('include_deleted'))
+      @include_deleted = value_to_boolean(account_report.parameters&.dig("include_deleted"))
 
       # we do not want to add extra_text more than one time.
       unless runner
@@ -34,8 +34,8 @@ module AccountReports
         include_deleted_objects
 
         if @account_report.value_for_param("limiting_period")
-          add_extra_text(I18n.t('account_reports.grades.limited',
-                                'deleted objects limited by days specified;'))
+          add_extra_text(I18n.t("account_reports.grades.limited",
+                                "deleted objects limited by days specified;"))
         end
       end
     end
@@ -61,24 +61,24 @@ module AccountReports
     # - enrollment status
     def grade_export
       headers = []
-      headers << I18n.t('student name')
-      headers << I18n.t('student id')
-      headers << I18n.t('student sis')
-      headers << I18n.t('student integration id') if include_integration_id?
-      headers << I18n.t('course')
-      headers << I18n.t('course id')
-      headers << I18n.t('course sis')
-      headers << I18n.t('section')
-      headers << I18n.t('section id')
-      headers << I18n.t('section sis')
-      headers << I18n.t('term')
-      headers << I18n.t('term id')
-      headers << I18n.t('term sis')
+      headers << I18n.t("student name")
+      headers << I18n.t("student id")
+      headers << I18n.t("student sis")
+      headers << I18n.t("student integration id") if include_integration_id?
+      headers << I18n.t("course")
+      headers << I18n.t("course id")
+      headers << I18n.t("course sis")
+      headers << I18n.t("section")
+      headers << I18n.t("section id")
+      headers << I18n.t("section sis")
+      headers << I18n.t("term")
+      headers << I18n.t("term id")
+      headers << I18n.t("term sis")
 
       headers.concat(grading_field_headers)
 
       courses = root_account.all_courses
-      courses = courses.where(:enrollment_term_id => term) if term
+      courses = courses.where(enrollment_term_id: term) if term
       courses = add_course_sub_account_scope(courses)
       courses = courses.active unless @include_deleted
       total = courses.count
@@ -91,7 +91,7 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
 
       students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
+        users = student_chunk.filter_map { |e| User.new(id: e.user_id) }
         users.uniq!
         users_by_id = users.index_by(&:id)
         courses_by_id = Course.where(id: student_chunk.map(&:course_id)).preload(:grading_standard).index_by(&:id)
@@ -130,9 +130,11 @@ module AccountReports
     end
 
     def mgp_grade_export
-      terms = @account_report.parameters[:enrollment_term_id].blank? ?
-        root_account.enrollment_terms.active :
-        root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
+      terms = if @account_report.parameters[:enrollment_term_id].blank?
+                root_account.enrollment_terms.active
+              else
+                root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
+              end
 
       courses = root_account.all_courses.order(:id)
       courses = courses.where(enrollment_term_id: terms)
@@ -161,33 +163,33 @@ module AccountReports
       return false unless gp_set
 
       headers = []
-      headers << I18n.t('student name')
-      headers << I18n.t('student id')
-      headers << I18n.t('student sis')
-      headers << I18n.t('student integration id') if include_integration_id?
-      headers << I18n.t('course')
-      headers << I18n.t('course id')
-      headers << I18n.t('course sis')
-      headers << I18n.t('section')
-      headers << I18n.t('section id')
-      headers << I18n.t('section sis')
-      headers << I18n.t('term')
-      headers << I18n.t('term id')
-      headers << I18n.t('term sis')
-      headers << I18n.t('grading period set')
-      headers << I18n.t('grading period set id')
+      headers << I18n.t("student name")
+      headers << I18n.t("student id")
+      headers << I18n.t("student sis")
+      headers << I18n.t("student integration id") if include_integration_id?
+      headers << I18n.t("course")
+      headers << I18n.t("course id")
+      headers << I18n.t("course sis")
+      headers << I18n.t("section")
+      headers << I18n.t("section id")
+      headers << I18n.t("section sis")
+      headers << I18n.t("term")
+      headers << I18n.t("term id")
+      headers << I18n.t("term sis")
+      headers << I18n.t("grading period set")
+      headers << I18n.t("grading period set id")
       gp_set.grading_periods.active.order(:start_date).each do |gp|
-        headers << I18n.t('%{name} grading period id', name: gp.title)
-        headers << I18n.t('%{name} current score', name: gp.title)
-        headers << I18n.t('%{name} final score', name: gp.title)
-        headers << I18n.t('%{name} unposted current score', name: gp.title)
-        headers << I18n.t('%{name} unposted final score', name: gp.title)
-        headers << I18n.t('%{name} override score', name: gp.title) if include_override_score?
-        headers << I18n.t('%{name} current grade', name: gp.title)
-        headers << I18n.t('%{name} final grade', name: gp.title)
-        headers << I18n.t('%{name} unposted current grade', name: gp.title)
-        headers << I18n.t('%{name} unposted final grade', name: gp.title)
-        headers << I18n.t('%{name} override grade', name: gp.title) if include_override_score?
+        headers << I18n.t("%{name} grading period id", name: gp.title)
+        headers << I18n.t("%{name} current score", name: gp.title)
+        headers << I18n.t("%{name} final score", name: gp.title)
+        headers << I18n.t("%{name} unposted current score", name: gp.title)
+        headers << I18n.t("%{name} unposted final score", name: gp.title)
+        headers << I18n.t("%{name} override score", name: gp.title) if include_override_score?
+        headers << I18n.t("%{name} current grade", name: gp.title)
+        headers << I18n.t("%{name} final grade", name: gp.title)
+        headers << I18n.t("%{name} unposted current grade", name: gp.title)
+        headers << I18n.t("%{name} unposted final grade", name: gp.title)
+        headers << I18n.t("%{name} override grade", name: gp.title) if include_override_score?
       end
       headers.concat(grading_field_headers)
     end
@@ -201,11 +203,11 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
       courses_by_id = Course.where(id: runner.batch_items).preload(:grading_standard).index_by(&:id)
       students.where(course_id: runner.batch_items).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
+        users = student_chunk.filter_map { |e| User.new(id: e.user_id) }
         users.uniq!
         users_by_id = users.index_by(&:id)
         pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
-        students_by_course = student_chunk.group_by { |x| x.course_id }
+        students_by_course = student_chunk.group_by(&:course_id)
         students_by_course.each do |_course_id, course_students|
           scores = indexed_scores(course_students, grading_periods)
           course_students.each_with_index do |student, i|
@@ -265,7 +267,7 @@ module AccountReports
     end
 
     def grading_period_scores_for_student(student, grading_period, scores)
-      scores["#{student['enrollment_id']}:#{grading_period.id}"] || {}
+      scores["#{student["enrollment_id"]}:#{grading_period.id}"] || {}
     end
 
     def student_grade_scope
@@ -297,8 +299,8 @@ module AccountReports
 
       if @include_deleted
         students = students.where("enrollments.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
-        if @account_report.parameters.has_key? 'limiting_period'
-          limiting_period = @account_report.parameters['limiting_period'].to_i
+        if @account_report.parameters.key? "limiting_period"
+          limiting_period = @account_report.parameters["limiting_period"].to_i
           students = students.where("enrollments.workflow_state = 'active'
                                     OR c.conclude_at >= ?
                                     OR (enrollments.workflow_state IN ('inactive', 'deleted')

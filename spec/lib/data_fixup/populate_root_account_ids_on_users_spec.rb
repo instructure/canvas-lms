@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe DataFixup::PopulateRootAccountIdsOnUsers do
-  it 'populates from user account associations' do
+  it "populates from user account associations" do
     user = User.create!
     a1 = Account.create!
     a2 = Account.create!
-    p1 = a1.pseudonyms.create!(user: user, unique_id: 'user')
-    p2 = a2.pseudonyms.create!(user: user, unique_id: 'user')
+    p1 = a1.pseudonyms.create!(user: user, unique_id: "user")
+    p2 = a2.pseudonyms.create!(user: user, unique_id: "user")
     expect(p1.root_account_id).to eq a1.id
     expect(p2.root_account_id).to eq a2.id
     expect(user.reload.root_account_ids).to eq([])
@@ -31,18 +31,18 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
     expect(user.reload.root_account_ids).to eq([a1.id, a2.id])
   end
 
-  it 'appends to an existing array' do
+  it "appends to an existing array" do
     user = User.create!
     a1 = Account.create!
     a2 = Account.create!
-    p1 = a1.pseudonyms.create!(user: user, unique_id: 'user')
+    p1 = a1.pseudonyms.create!(user: user, unique_id: "user")
     expect(p1.root_account_id).to eq a1.id
     expect(user.reload.root_account_ids).to eq([])
 
     DataFixup::PopulateRootAccountIdsOnUsers.populate(user.id, user.id)
     expect(user.reload.root_account_ids).to eq([a1.id])
 
-    p2 = a2.pseudonyms.create!(user: user, unique_id: 'user')
+    p2 = a2.pseudonyms.create!(user: user, unique_id: "user")
     expect(p2.root_account_id).to eq a2.id
     DataFixup::PopulateRootAccountIdsOnUsers.populate(user.id, user.id)
     expect(user.reload.root_account_ids).to eq([a1.id, a2.id])
@@ -51,7 +51,7 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
   context "sharding" do
     specs_require_sharding
 
-    it 'populates root account ids from a different shard' do
+    it "populates root account ids from a different shard" do
       user1 = User.create!
       a1 = nil
       user2 = @shard2.activate { User.create! }
@@ -60,8 +60,8 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
         # users from 2 different foreign shards are associated with this shard
         # this ensures we exercise the part where each foreign shard is addressed
         # separately
-        p1 = a1.pseudonyms.create!(user: user1, unique_id: 'user1')
-        p2 = a1.pseudonyms.create!(user: user2, unique_id: 'user2')
+        p1 = a1.pseudonyms.create!(user: user1, unique_id: "user1")
+        p2 = a1.pseudonyms.create!(user: user2, unique_id: "user2")
         expect(p1.root_account_id).to eq a1.id
         expect(p2.root_account_id).to eq a1.id
         expect(user1.reload.root_account_ids).to eq([])

@@ -24,6 +24,8 @@ describe Lti::ContentItemUtil do
   context "with callback url" do
     include WebMock::API
 
+    subject { described_class.new(content_item) }
+
     let(:content_item) do
       JSON.parse('{
         "@type" : "LtiLinkItem",
@@ -43,28 +45,28 @@ describe Lti::ContentItemUtil do
       }')
     end
 
-    subject { described_class.new(content_item) }
-
-    it 'makes a POST to confirm creation' do
+    it "makes a POST to confirm creation" do
       stub_request(:post, url)
-        .to_return(:status => 200, :body => "", :headers => {})
+        .to_return(status: 200, body: "", headers: {})
 
       subject.success_callback
       run_jobs
-      expect(WebMock).to have_requested(:post, url).with(:body => "")
+      expect(WebMock).to have_requested(:post, url).with(body: "")
     end
 
-    it 'makes a DELETE to signify Cancelation' do
+    it "makes a DELETE to signify Cancelation" do
       stub_request(:delete, url)
-        .to_return(:status => 200, :body => "", :headers => {})
+        .to_return(status: 200, body: "", headers: {})
 
       subject.failure_callback
       run_jobs
-      expect(WebMock).to have_requested(:delete, url).with(:body => "")
+      expect(WebMock).to have_requested(:delete, url).with(body: "")
     end
   end
 
   context "without callback url" do
+    subject { described_class.new(content_item) }
+
     let(:content_item) do
       JSON.parse('{
         "@type" : "LtiLinkItem",
@@ -82,8 +84,6 @@ describe Lti::ContentItemUtil do
         }
       }')
     end
-
-    subject { described_class.new(content_item) }
 
     it "will not call back for success if no confirmUrl is present" do
       expect(CanvasHttp).not_to receive(:post)

@@ -54,6 +54,7 @@ export default {
       },
       showNotes: true,
       showUnpublishedAssignments: true,
+      showSeparateFirstLastNames: true,
       statusColors: {
         dropped: '#FEF0E5',
         excused: '#E5F7E5',

@@ -20,7 +20,7 @@
 
 module BasicLTI
   class Sourcedid
-    SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
 
     attr_reader :tool, :course, :assignment, :user
 
@@ -51,18 +51,18 @@ module BasicLTI
     private :jwt_payload
 
     def validate!
-      raise Errors::InvalidSourceId, 'Course is invalid' unless course
-      raise Errors::InvalidSourceId, 'User is no longer in course' unless user
-      raise Errors::InvalidSourceId, 'Assignment is invalid' unless assignment
+      raise Errors::InvalidSourceId.new("Course is invalid", :course_invalid) unless course
+      raise Errors::InvalidSourceId.new("User is no longer in course", :user_not_in_course) unless user
+      raise Errors::InvalidSourceId.new("Assignment is invalid", :assignment_invalid) unless assignment
 
       tag = assignment.external_tool_tag
-      raise Errors::InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag &&
-                                                                                                (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
-                                                                                                tool.workflow_state != 'deleted'
+      raise Errors::InvalidSourceId.new("Assignment is no longer associated with this tool", :assignment_tool_mismatch) unless tag &&
+                                                                                                                               (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
+                                                                                                                               tool.workflow_state != "deleted"
     end
 
     def self.load!(sourcedid_string)
-      raise Errors::InvalidSourceId, 'Invalid sourcedid' if sourcedid_string.blank?
+      raise Errors::InvalidSourceId.new("Invalid sourcedid", :sourcedid_invalid) if sourcedid_string.blank?
 
       token = load_from_legacy_sourcedid!(sourcedid_string) ||
               token_from_sourcedid!(sourcedid_string)
@@ -74,7 +74,7 @@ module BasicLTI
         assignment = course.assignments.active.find_by(id: token[:assignment_id])
       end
 
-      sourcedid = self.new(tool, course, assignment, user)
+      sourcedid = new(tool, course, assignment, user)
       sourcedid.validate!
       sourcedid
     end
@@ -84,11 +84,11 @@ module BasicLTI
       md = sourcedid.match(SOURCE_ID_REGEX)
       if md
         tool = ContextExternalTool.find_by(id: md[1])
-        raise Errors::InvalidSourceId, 'Tool is invalid' unless tool
+        raise Errors::InvalidSourceId.new("Tool is invalid", :tool_invalid) unless tool
 
-        new_encoding = [md[1], md[2], md[3], md[4]].join('-')
-        raise Errors::InvalidSourceId, 'Invalid signature' unless Canvas::Security
-                                                                  .verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+        new_encoding = [md[1], md[2], md[3], md[4]].join("-")
+        raise Errors::InvalidSourceId.new("Invalid signature", :signature_invalid) unless Canvas::Security
+                                                                                          .verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
 
         token = { tool_id: md[1].to_i, course_id: md[2], assignment_id: md[3], user_id: md[4] }
       end
@@ -102,15 +102,15 @@ module BasicLTI
         encryption_secret
       )
     rescue JSON::JWT::InvalidFormat
-      raise Errors::InvalidSourceId, 'Invalid sourcedid'
+      raise Errors::InvalidSourceId.new("Invalid sourcedid", :sourcedid_invalid)
     end
 
     def self.signing_secret
-      Canvas::DynamicSettings.find()["lti-signing-secret"]
+      Canvas::DynamicSettings.find["lti-signing-secret"]
     end
 
     def self.encryption_secret
-      Canvas::DynamicSettings.find()["lti-encryption-secret"]
+      Canvas::DynamicSettings.find["lti-encryption-secret"]
     end
   end
 end

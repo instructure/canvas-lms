@@ -20,7 +20,7 @@
 module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
   LOG_PREFIX = "RebuildingQuizSubmissions - "
 
-  SQL_SEARCH_STRING = <<-SQL
+  SQL_SEARCH_STRING = <<~SQL.squish
     select
       distinct submissions.id
     from
@@ -38,7 +38,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       users
     on submissions.user_id = users.id
       and users.workflow_state<>'deleted'
-    -- inner join quiz_submission_events on submissions.quiz_submission_id = quiz_submission_events.quiz_submission_id
+    /* inner join quiz_submission_events on submissions.quiz_submission_id = quiz_submission_events.quiz_submission_id */
     left outer join
       quiz_submissions
     on quiz_submissions.id = submissions.quiz_submission_id
@@ -80,7 +80,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       quiz_submission = build_new_submission_from_quiz_submission_events(submission)
 
       # save the result
-      quiz_submission.save_with_versioning! if quiz_submission
+      quiz_submission&.save_with_versioning!
     end
 
     def find_missing_submissions_on_current_shard
@@ -119,12 +119,12 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
         tally += (user_answer[:points] || 0) if user_answer[:correct]
       end
       qs.score = tally
-      qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == 'graded_survey'
+      qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == "graded_survey"
       qs.submission_data = user_answers
       qs.workflow_state = "complete"
       user_answers.each do |answer|
         if answer[:correct] == "undefined" && !qs.quiz.survey?
-          qs.workflow_state = 'pending_review'
+          qs.workflow_state = "pending_review"
         end
       end
       qs.score_before_regrade = nil
@@ -172,14 +172,14 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
     # we need to select the quiz_questions from the questions we can know the student has
     # seen.
     def aggregate_quiz_data_from_events(qs, events)
-      question_events = events.select { |e| ["question_answered", "question_viewed", "question_flagged"].include?(e.event_type) }
+      question_events = events.select { |e| %w[question_answered question_viewed question_flagged].include?(e.event_type) }
       seen_question_ids = []
       question_events.each do |event|
-        if event.event_type == "question_viewed"
-          seen_question_ids << event.answers
-        else
-          seen_question_ids << event.answers.flatten.map { |h| h["quiz_question_id"] }
-        end
+        seen_question_ids << if event.event_type == "question_viewed"
+                               event.answers
+                             else
+                               event.answers.flatten.map { |h| h["quiz_question_id"] }
+                             end
       end
       seen_question_ids = seen_question_ids.flatten.uniq
 
@@ -214,7 +214,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: qs_id)
 
       # Check if there are any events in the QLA
-      if events.size == 0
+      if events.empty?
         Rails.logger.warn LOG_PREFIX + "Skipping because there are no QLA events\tsubmission_id: #{submission.id}"
         return false
       end
@@ -226,7 +226,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       end
 
       # Assume final attempt
-      attempt = attempts.sort.last
+      attempt = attempts.max
       events.select!(&:attempt)
 
       times = events.map(&:created_at).sort
@@ -247,7 +247,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       qs.attempt = attempt
 
       # This is sad because assumptions
-      qs.quiz_version = qs.versions.map { |v| v.model.quiz_version }.sort.last
+      qs.quiz_version = qs.versions.map { |v| v.model.quiz_version }.max
       qs.quiz_data = aggregate_quiz_data_from_events(qs, events)
 
       # Set reasonable timestamps

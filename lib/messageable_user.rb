@@ -19,15 +19,15 @@
 #
 
 class MessageableUser < User
-  COLUMNS = ['id', 'updated_at', 'pronouns', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map { |col| "users.#{col}" }
+  COLUMNS = %w[id updated_at pronouns short_name name avatar_image_url avatar_image_source].map { |col| "users.#{col}" }
   SELECT = COLUMNS.join(", ")
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 
   def self.build_select(options = {})
     options = {
-      :common_course_column => nil,
-      :common_group_column => nil,
-      :common_role_column => nil
+      common_course_column: nil,
+      common_group_column: nil,
+      common_role_column: nil
     }.merge(options)
 
     bookmark_sql = User.sortable_name_order_by_clause
@@ -39,7 +39,7 @@ class MessageableUser < User
         connection.func(:group_concat,
                         :"#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text")
       else
-        'NULL::text'
+        "NULL::text"
       end
 
     common_group_sql =
@@ -48,7 +48,7 @@ class MessageableUser < User
       elsif options[:common_group_column]
         options[:common_group_column].to_s
       else
-        'NULL::text'
+        "NULL::text"
       end
 
     "#{SELECT}, #{bookmark_sql} AS bookmark, #{common_course_sql} AS common_courses, #{common_group_sql} AS common_groups"
@@ -56,8 +56,8 @@ class MessageableUser < User
 
   def self.prepped(options = {})
     options = {
-      :strict_checks => true,
-      :include_deleted => false
+      strict_checks: true,
+      include_deleted: false
     }.merge(options)
 
     # if either of our common course/group id columns are column names (vs.
@@ -88,11 +88,11 @@ class MessageableUser < User
   end
 
   def self.unfiltered(options = {})
-    prepped(options.merge(:strict_checks => false))
+    prepped(options.merge(strict_checks: false))
   end
 
   def self.available(options = {})
-    prepped(options.merge(:strict_checks => true))
+    prepped(options.merge(strict_checks: true))
   end
 
   def self.context_recipients(recipients)
@@ -100,10 +100,10 @@ class MessageableUser < User
   end
 
   def self.individual_recipients(recipients)
-    recipients.select { |id|
+    recipients.select do |id|
       !id.is_a?(String) ||
         id =~ Calculator::INDIVIDUAL_RECIPIENT
-    }.map(&:to_i)
+    end.map(&:to_i)
   end
 
   def common_groups
@@ -126,8 +126,8 @@ class MessageableUser < User
   # common_groups
   def populate_common_contexts
     @global_common_courses = {}
-    read_attribute(:common_courses)&.to_s&.split(',')&.each do |common_course|
-      course_id, role = common_course.split(':')
+    read_attribute(:common_courses)&.to_s&.split(",")&.each do |common_course|
+      course_id, role = common_course.split(":")
       course_id = course_id.to_i
       # a course id of 0 indicates admin visibility without an actual shared
       # course; don't "globalize" it
@@ -137,17 +137,17 @@ class MessageableUser < User
     end
 
     @global_common_groups = {}
-    read_attribute(:common_groups)&.to_s&.split(',')&.each do |group_id|
+    read_attribute(:common_groups)&.to_s&.split(",")&.each do |group_id|
       group_id = Shard.global_id_for(group_id.to_i)
       @global_common_groups[group_id] ||= []
-      @global_common_groups[group_id] << 'Member'
+      @global_common_groups[group_id] << "Member"
     end
   end
   after_find :populate_common_contexts
 
   def include_common_contexts_from(other)
-    combine_common_contexts(self.global_common_courses, other.global_common_courses)
-    combine_common_contexts(self.global_common_groups, other.global_common_groups)
+    combine_common_contexts(global_common_courses, other.global_common_courses)
+    combine_common_contexts(global_common_groups, other.global_common_groups)
   end
 
   def serializable_hash(options = {})
@@ -199,14 +199,14 @@ class MessageableUser < User
     def self.restrict_scope(scope, pager)
       if pager.current_bookmark
         name, id = pager.current_bookmark
-        if MessageableUser.connection.adapter_name == 'PostgreSQL'
+        if MessageableUser.connection.adapter_name == "PostgreSQL"
           name = MessageableUser.connection.escape_bytea(name)
         end
         scope_shard = scope.shard_value
         id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
         condition = [
-          <<~SQL,
+          <<~SQL.squish,
             #{User.sortable_name_order_by_clause} > ? OR
             #{User.sortable_name_order_by_clause} = ? AND users.id > ?
           SQL

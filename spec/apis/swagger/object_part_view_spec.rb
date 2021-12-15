@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'swagger_helper'
-require 'object_part_view'
+require_relative "swagger_helper"
+require "object_part_view"
 
 describe ObjectPartView do
   let(:name) { "Tag" }

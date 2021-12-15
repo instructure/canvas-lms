@@ -150,15 +150,15 @@ class MicrosoftSync::GroupsController < ApplicationController
   def check_for_enrollment_limits
     if MicrosoftSync::CanvasModelsHelpers.max_enrollment_owners_reached?(course)
       error_msg = t(
-        'This course has too many teachers or other owner-type enrollments to ' \
-        'be synced. Microsoft 365 allows a maximum of %{max_allowed} owners ' \
-        'in a Team.',
+        "This course has too many teachers or other owner-type enrollments to " \
+        "be synced. Microsoft 365 allows a maximum of %{max_allowed} owners " \
+        "in a Team.",
         max_allowed: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
       )
     elsif MicrosoftSync::CanvasModelsHelpers.max_enrollment_members_reached?(course)
       error_msg = t(
-        'This course has too many enrolled users to be synced. Microsoft 365 ' \
-        'allows a maximum of %{max_allowed} members in a Team.',
+        "This course has too many enrolled users to be synced. Microsoft 365 " \
+        "allows a maximum of %{max_allowed} members in a Team.",
         max_allowed: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
       )
     end
@@ -174,7 +174,7 @@ class MicrosoftSync::GroupsController < ApplicationController
     )
 
     render(
-      json: { errors: ['A sync job is already running for the specified group'] },
+      json: { errors: ["A sync job is already running for the specified group"] },
       status: :bad_request
     )
   end
@@ -195,7 +195,7 @@ class MicrosoftSync::GroupsController < ApplicationController
     return if group.last_manually_synced_at.blank?
     return if Time.zone.now.to_i - group.last_manually_synced_at.to_i >= MicrosoftSync::Group.manual_sync_cooldown
 
-    render json: { errors: ['Not enough time elapsed since last manual sync'] }, status: :bad_request
+    render json: { errors: ["Not enough time elapsed since last manual sync"] }, status: :bad_request
   end
 
   def require_feature
@@ -207,7 +207,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   def require_integration_available
     return if course.root_account.settings[:microsoft_sync_enabled]
 
-    render json: { errors: ['Integration not available'] }, status: :bad_request
+    render json: { errors: ["Integration not available"] }, status: :bad_request
   end
 
   def validate_user_permissions

@@ -31,7 +31,7 @@ module DrDiff
     private :severe_anywhere
 
     # all levels: %w(error warn info)
-    SEVERE_LEVELS = %w(error warn).freeze
+    SEVERE_LEVELS = %w[error warn].freeze
 
     def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, heavy: false, base_dir: nil, severe_anywhere: true)
       @git_dir = git_dir
@@ -68,7 +68,7 @@ module DrDiff
 
       command_comments.each do |comment|
         path = comment[:path]
-        path = path[git_dir.length..-1] if git_dir
+        path = path[git_dir.length..] if git_dir
         severe = severe?(comment[:severity], severe_levels)
         next unless heavy ||
                     (severe && severe_anywhere) ||

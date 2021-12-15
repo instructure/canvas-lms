@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 module Qti
   class AssessmentTestConverter
@@ -28,17 +28,17 @@ module Qti
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :quiz
 
     def initialize(manifest_node, base_dir, opts = {})
-      @log = Canvas::Migration::logger
+      @log = Canvas::Migration.logger
       @manifest_node = manifest_node
       @package_root = PackageRoot.new(base_dir)
-      @href = @package_root.item_path(@manifest_node['href'])
+      @href = @package_root.item_path(@manifest_node["href"])
       @converted_questions = opts[:converted_questions]
       @opts = opts
 
       @quiz = {
-        :questions => [],
-        :quiz_type => nil,
-        :question_count => 0
+        questions: [],
+        quiz_type: nil,
+        question_count: 0
       }
     end
 
@@ -46,27 +46,27 @@ module Qti
       begin
         # Get manifest data
         if (md = @manifest_node.at_css("instructureMetadata"))
-          if (item = get_node_att(md, 'instructureField[name=show_score]', 'value'))
-            @quiz[:show_score] = item =~ /true/i ? true : false
+          if (item = get_node_att(md, "instructureField[name=show_score]", "value"))
+            @quiz[:show_score] = /true/i.match?(item)
           end
-          if (item = get_node_att(md, 'instructureField[name=quiz_type]', 'value') ||
-             get_node_att(md, 'instructureField[name=bb8_assessment_type]', 'value'))
+          if (item = get_node_att(md, "instructureField[name=quiz_type]", "value") ||
+             get_node_att(md, "instructureField[name=bb8_assessment_type]", "value"))
             # known possible values: Self-assessment, Survey, Examination (practice is instructure default)
             # BB8: Test, Pool
-            @quiz[:quiz_type] = "assignment" if item =~ /examination|test|quiz/i
-            if item =~ /pool/i
+            @quiz[:quiz_type] = "assignment" if /examination|test|quiz/i.match?(item)
+            if /pool/i.match?(item)
               # if it's pool we don't need to make a quiz object.
               return nil
             end
           end
-          if (item = get_node_att(md, 'instructureField[name=which_attempt_to_keep]', 'value'))
+          if (item = get_node_att(md, "instructureField[name=which_attempt_to_keep]", "value")) && /last/i.match?(item)
             # known possible values: Highest, First, Last (highest is instructure default)
-            @quiz[:which_attempt_to_keep] = "keep_latest" if item =~ /last/i
+            @quiz[:which_attempt_to_keep] = "keep_latest"
           end
-          if (item = get_node_att(md, 'instructureField[name=max_score]', 'value'))
+          if (item = get_node_att(md, "instructureField[name=max_score]", "value"))
             @quiz[:points_possible] = item
           end
-          if (item = get_node_att(md, 'instructureField[name=bb8_object_id]', 'value'))
+          if (item = get_node_att(md, "instructureField[name=bb8_object_id]", "value"))
             @quiz[:alternate_migration_id] = item
           end
         end
@@ -76,14 +76,14 @@ module Qti
         parse_quiz_data(doc)
         parse_instructure_metadata(doc)
 
-        if @quiz[:quiz_type] == 'assignment'
+        if @quiz[:quiz_type] == "assignment"
           grading = {}
           grading[:migration_id] = @quiz[:migration_id]
           grading[:points_possible] = @quiz[:points_possible]
           grading[:weight] = nil
           grading[:due_date] = nil
           grading[:title] = @quiz[:title]
-          grading[:grade_type] = 'numeric' if grading[:points_possible]
+          grading[:grade_type] = "numeric" if grading[:points_possible]
           @quiz[:grading] = grading
         end
       rescue
@@ -95,19 +95,19 @@ module Qti
     end
 
     def parse_instructure_metadata(doc)
-      if (meta = doc.at_css('instructureMetadata'))
-        if (password = get_node_att(meta, 'instructureField[name=password]', 'value'))
+      if (meta = doc.at_css("instructureMetadata"))
+        if (password = get_node_att(meta, "instructureField[name=password]", "value"))
           @quiz[:access_code] = password
         end
-        if (id = get_node_att(meta, 'instructureField[name=assignment_identifierref]', 'value'))
+        if (id = get_node_att(meta, "instructureField[name=assignment_identifierref]", "value"))
           @quiz[:assignment_migration_id] = id
         end
 
         if @opts[:flavor] == Qti::Flavors::D2L
-          if (intro = get_node_att(meta, 'instructureField[name=d2l_intro_message]', 'value'))
-            @quiz[:questions].unshift({ :question_type => 'text_only_question', :question_text => intro, :migration_id => unique_local_id })
+          if (intro = get_node_att(meta, "instructureField[name=d2l_intro_message]", "value"))
+            @quiz[:questions].unshift({ question_type: "text_only_question", question_text: intro, migration_id: unique_local_id })
           end
-          if (html = get_node_att(meta, 'instructureField[name=assessment_rubric_html]', 'value')) &&
+          if (html = get_node_att(meta, "instructureField[name=assessment_rubric_html]", "value")) &&
              (node = (Nokogiri::HTML5.fragment(html) rescue nil))
             description = sanitize_html_string(node.text)
             @quiz[:description] = description if description.present?
@@ -117,22 +117,22 @@ module Qti
     end
 
     def parse_quiz_data(doc)
-      @quiz[:title] = @title || get_node_att(doc, 'assessmentTest', 'title')
+      @quiz[:title] = @title || get_node_att(doc, "assessmentTest", "title")
       @quiz[:quiz_name] = @quiz[:title]
-      @quiz[:migration_id] = get_node_att(doc, 'assessmentTest', 'identifier')
-      if (limit = doc.at_css('timeLimits'))
-        @quiz[:time_limit] = AssessmentTestConverter.parse_time_limit(limit['maxTime'])
+      @quiz[:migration_id] = get_node_att(doc, "assessmentTest", "identifier")
+      if (limit = doc.at_css("timeLimits"))
+        @quiz[:time_limit] = AssessmentTestConverter.parse_time_limit(limit["maxTime"])
       end
-      if (part = doc.at_css('testPart[identifier=BaseTestPart]') || doc.at_css('testPart'))
-        if (control = part.at_css('itemSessionControl'))
-          if (max = control['maxAttempts'])
-            max = -1 if max =~ /unlimited/i
+      if (part = doc.at_css("testPart[identifier=BaseTestPart]") || doc.at_css("testPart"))
+        if (control = part.at_css("itemSessionControl"))
+          if (max = control["maxAttempts"])
+            max = -1 if /unlimited/i.match?(max)
             max = max.to_i
             # -1 means no limit in instructure, 0 means no limit in QTI
             @quiz[:allowed_attempts] = max >= 1 ? max : -1
           end
-          if (show = control['showSolution'])
-            @quiz[:show_correct_answers] = show.downcase == "true"
+          if (show = control["showSolution"])
+            @quiz[:show_correct_answers] = show.casecmp?("true")
           end
         end
 
@@ -144,27 +144,25 @@ module Qti
     end
 
     def self.parse_time_limit(time_limit)
-      limit = 0
-      time_indicator = time_limit[0..0].downcase if time_limit.length > 0
-      if time_indicator == 'd'
-        limit = 24 * 60 * time_limit[1..-1].to_i
-      elsif time_indicator == 'h'
-        limit = 60 * time_limit[1..-1].to_i
-      elsif time_indicator == 'm'
-        limit = time_limit[1..-1].to_i
+      time_indicator = time_limit[0..0].downcase unless time_limit.empty?
+      case time_indicator
+      when "d"
+        24 * 60 * time_limit[1..].to_i
+      when "h"
+        60 * time_limit[1..].to_i
+      when "m"
+        time_limit[1..].to_i
       else
         # instructure uses minutes, QTI uses seconds
-        limit = time_limit.to_i / 60
+        time_limit.to_i / 60
       end
-
-      limit
     end
 
     def self.parse_pick_count(section)
       select_node = section.children.find { |child| child.name == "selection" }
       return nil unless select_node
 
-      val = select_node['select']&.strip
+      val = select_node["select"]&.strip
       val =~ /^\d+$/ && val.to_i
     end
 
@@ -172,44 +170,43 @@ module Qti
       group = nil
       questions_list = @quiz[:questions]
 
-      if (shuffle = get_node_att(section, 'ordering', 'shuffle'))
-        @quiz[:shuffle_answers] = true if shuffle =~ /true/i
+      if (shuffle = get_node_att(section, "ordering", "shuffle")) && /true/i.match?(shuffle)
+        @quiz[:shuffle_answers] = true
       end
       if (select = AssessmentTestConverter.parse_pick_count(section))
-        group = { :questions => [], :pick_count => select, :question_type => 'question_group', :title => section['title'] }
-        if (weight = get_node_att(section, 'weight', 'value'))
+        group = { questions: [], pick_count: select, question_type: "question_group", title: section["title"] }
+        if (weight = get_node_att(section, "weight", "value"))
           group[:question_points] = convert_weight_to_points(weight)
         end
-        if (val = get_float_val(section, 'points_per_item'))
+        if (val = get_float_val(section, "points_per_item"))
           group[:question_points] = val
         end
-        bank_refs = section.css('sourcebank_ref')
+        bank_refs = section.css("sourcebank_ref")
         if bank_refs.count > 1
           # multiple source banks for one section - duplicate the groups (see below)
           group[:question_bank_migration_ids] = bank_refs.map { |br| translate_bank_id(br.text) }
         elsif bank_refs.count == 1
           group[:question_bank_migration_id] = translate_bank_id(bank_refs.first.text)
         end
-        if (val = get_node_val(section, 'sourcebank_context'))
+        if (val = get_node_val(section, "sourcebank_context"))
           group[:question_bank_context] = val
         end
-        if (val = get_bool_val(section, 'sourcebank_is_external'))
+        if (val = get_bool_val(section, "sourcebank_is_external"))
           group[:question_bank_is_external] = val
         end
-        group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : unique_local_id
+        group[:migration_id] = section["identifier"] && section["identifier"] != "" ? section["identifier"] : unique_local_id
         questions_list = group[:questions]
       end
-      if section['visible'] and section['visible'] =~ /true/i
-        if (title = section['title'])
-          # Create an empty question with a title in it
-          @quiz[:questions] << { :question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id }
-        end
+      if section["visible"] && section["visible"] =~ /true/i && (title = section["title"])
+        # Create an empty question with a title in it
+        @quiz[:questions] << { question_type: "text_only_question", question_text: title, migration_id: unique_local_id }
       end
 
       section.children.each do |child|
-        if child.name == "assessmentSection"
+        case child.name
+        when "assessmentSection"
           process_section(child)
-        elsif child.name == "assessmentItemRef"
+        when "assessmentItemRef"
           process_question(child, questions_list)
         end
       end
@@ -217,13 +214,12 @@ module Qti
       # if we didn't get a question weight, and all the questions have the same
       # points possible, use that as the group points possible per question
       if @converted_questions && select && select > 0 && group[:question_points].blank? && group[:questions].present?
-        migration_ids = group[:questions].map { |q| q[:migration_id] }
+        migration_ids = group[:questions].pluck(:migration_id)
         questions = @converted_questions.find_all { |q| migration_ids.include?(q[:migration_id]) }
 
         points = questions.first ? (questions.first[:points_possible] || 0) : 0
         if points > 0 && questions.size == group[:questions].size && questions.all? { |q| q[:points_possible] == points }
           group[:question_points] = points
-        else
         end
       end
 
@@ -255,16 +251,16 @@ module Qti
     end
 
     def process_question(item_ref, questions_list)
-      question = { :question_type => 'question_reference' }
+      question = { question_type: "question_reference" }
       questions_list << question
       @quiz[:question_count] += 1
       # The colons are replaced with dashes in the conversion from QTI 1.2
-      question[:migration_id] = item_ref['identifier'].gsub(/:/, '-')
+      question[:migration_id] = item_ref["identifier"].tr(":", "-")
       # D2L references questions by label instead of ident
-      if @opts[:flavor] == Qti::Flavors::D2L && item_ref['label'].present?
-        question[:migration_id] = item_ref['label']
+      if @opts[:flavor] == Qti::Flavors::D2L && item_ref["label"].present?
+        question[:migration_id] = item_ref["label"]
       end
-      if (weight = get_node_att(item_ref, 'weight', 'value'))
+      if (weight = get_node_att(item_ref, "weight", "value"))
         question[:points_possible] = convert_weight_to_points(weight)
       end
     end
@@ -276,7 +272,7 @@ module Qti
       begin
         weight = weight.to_f
         if @opts[:flavor] == Qti::Flavors::WEBCT
-          weight = weight * 100
+          weight *= 100
         end
       rescue
         weight = DEFAULT_POINTS_POSSIBLE

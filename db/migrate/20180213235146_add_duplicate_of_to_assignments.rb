@@ -24,6 +24,6 @@ class AddDuplicateOfToAssignments < ActiveRecord::Migration[5.0]
 
   def change
     add_reference :assignments, :duplicate_of, type: :bigint, foreign_key: { to_table: :assignments }, index: false
-    add_index :assignments, :duplicate_of_id, where: 'duplicate_of_id IS NOT NULL', algorithm: :concurrently
+    add_index :assignments, :duplicate_of_id, where: "duplicate_of_id IS NOT NULL", algorithm: :concurrently
   end
 end

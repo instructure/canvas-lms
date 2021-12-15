@@ -23,7 +23,7 @@ def environment_configuration(_config)
 end
 
 # Load the rails application
-require_relative 'application'
+require_relative "application"
 
 # Initialize the rails application
 CanvasRails::Application.initialize!

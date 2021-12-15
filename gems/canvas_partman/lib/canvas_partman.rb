@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'canvas_partman/partition_manager'
-require 'canvas_partman/migration'
-require 'canvas_partman/dynamic_relation'
-require 'canvas_partman/concerns/partitioned'
+require "canvas_partman/partition_manager"
+require "canvas_partman/migration"
+require "canvas_partman/dynamic_relation"
+require "canvas_partman/concerns/partitioned"
 
 module CanvasPartman
   class << self
@@ -43,6 +43,6 @@ module CanvasPartman
     end
   end
 
-  self.migrations_scope = 'partitions'
+  self.migrations_scope = "partitions"
   self.timeout_seconds = -> { 90 }
 end

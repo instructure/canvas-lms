@@ -95,9 +95,9 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
   end
 
   def point_biserials
-    @answers.map { |answer|
+    @answers.map do |answer|
       point_biserial_for(answer)
-    }
+    end
   end
 
   def ratio_for(answer)
@@ -110,7 +110,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
   end
 
   def sort_key
-    [question[:position] || 10000, question_text, question[:id], -all_respondents.size]
+    [question[:position] || 10_000, question_text, question[:id], -all_respondents.size]
   end
 
   private

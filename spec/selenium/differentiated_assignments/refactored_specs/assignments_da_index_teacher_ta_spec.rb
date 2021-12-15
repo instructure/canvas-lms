@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/differentiated_assignments/da_common'
+require_relative "../../helpers/differentiated_assignments/da_common"
 
-describe 'Viewing differentiated assignments' do
-  include_context 'differentiated assignments'
+describe "Viewing differentiated assignments" do
+  include_context "differentiated assignments"
 
-  context 'as the teacher' do
+  context "as the teacher" do
     before { login_as(users.teacher) }
 
-    context 'on the assignments index page' do
-      it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618802 do
+    context "on the assignments index page" do
+      it "shows all quizzes, assignments, and discussions", priority: "1" do
         go_to(urls.assignments_index_page)
         expect(list_of_assignments.text).to include(
           *assignments.short_list.map(&:title),
@@ -37,11 +37,11 @@ describe 'Viewing differentiated assignments' do
     end
   end
 
-  context 'as the TA' do
+  context "as the TA" do
     before { login_as(users.ta) }
 
-    context 'on the assignments index page' do
-      it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618803 do
+    context "on the assignments index page" do
+      it "shows all quizzes, assignments, and discussions", priority: "1" do
         go_to(urls.assignments_index_page)
         expect(list_of_assignments.text).to include(
           *assignments.short_list.map(&:title),

@@ -30,7 +30,7 @@ describe ImportedHtmlConverter do
     end
 
     def convert_and_replace(test_string)
-      html = @migration.convert_html(test_string, 'sometype', 'somemigid', 'somefield')
+      html = @migration.convert_html(test_string, "sometype", "somemigid", "somefield")
       link_map = @converter.link_parser.unresolved_link_map
 
       @converter.link_resolver.resolve_links!(link_map)
@@ -41,53 +41,53 @@ describe ImportedHtmlConverter do
     end
 
     it "converts a wiki reference" do
-      test_string = %{<a href="%24WIKI_REFERENCE%24/wiki/test-wiki-page?query=blah">Test Wiki Page</a>}
-      @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
+      test_string = %(<a href="%24WIKI_REFERENCE%24/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
+      @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
 
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>}
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
     it "converts a wiki reference without $ escaped" do
-      test_string = %{<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>}
-      @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
+      test_string = %(<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
+      @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
 
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>}
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
     it "converts a wiki reference by migration id" do
-      test_string = %{<a href="wiki_page_migration_id=123456677788">Test Wiki Page</a>}
-      wiki = @course.wiki_pages.create(:title => "Test Wiki Page", :body => "stuff")
+      test_string = %(<a href="wiki_page_migration_id=123456677788">Test Wiki Page</a>)
+      wiki = @course.wiki_pages.create(title: "Test Wiki Page", body: "stuff")
       wiki.migration_id = "123456677788"
       wiki.save!
 
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}pages/test-wiki-page">Test Wiki Page</a>}
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page">Test Wiki Page</a>)
     end
 
     it "converts a discussion reference by migration id" do
-      test_string = %{<a href="discussion_topic_migration_id=123456677788">Test topic</a>}
-      topic = @course.discussion_topics.create(:title => "Test discussion")
+      test_string = %(<a href="discussion_topic_migration_id=123456677788">Test topic</a>)
+      topic = @course.discussion_topics.create(title: "Test discussion")
       topic.migration_id = "123456677788"
       topic.save!
 
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}discussion_topics/#{topic.id}">Test topic</a>}
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}discussion_topics/#{topic.id}">Test topic</a>)
     end
 
     def make_test_att
-      att = Attachment.create(:filename => 'test.png', :display_name => "test.png", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      att = Attachment.create(filename: "test.png", display_name: "test.png", uploaded_data: StringIO.new("psych!"), folder: Folder.unfiled_folder(@course), context: @course)
       att.migration_id = "1768525836051"
       att.save!
       att
     end
 
     it "finds an attachment by migration id" do
-      att = make_test_att()
+      att = make_test_att
 
       test_string = %{<p>This is an image: <br /><img src="%24CANVAS_OBJECT_REFERENCE%24/attachments/1768525836051" alt=":(" /></p>}
       expect(convert_and_replace(test_string)).to eq %{<p>This is an image: <br><img src="#{@path}files/#{att.id}/preview" alt=":("></p>}
     end
 
     it "finds an attachment by path" do
-      att = make_test_att()
+      att = make_test_att
 
       test_string = %{<p>This is an image: <br /><img src="%24IMS_CC_FILEBASE%24/test.png" alt=":(" /></p>}
 
@@ -99,104 +99,104 @@ describe ImportedHtmlConverter do
     end
 
     it "finds an attachment by a path with a space" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/with a space/test.png" => att.migration_id }
 
-      test_string = %{<img src="subfolder/with%20a%20space/test.png" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+      test_string = %(<img src="subfolder/with%20a%20space/test.png" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)
 
-      test_string = %{<img src="subfolder/with+a+space/test.png" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+      test_string = %(<img src="subfolder/with+a+space/test.png" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)
     end
 
     it "finds an attachment even if the link has an extraneous folder" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/test.png" => att.migration_id }
 
-      test_string = %{<img src="anotherfolder/subfolder/test.png" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+      test_string = %(<img src="anotherfolder/subfolder/test.png" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)
     end
 
     it "finds an attachment by path if capitalization is different" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/withCapital/test.png" => "wrong!" }
       @migration.attachment_path_id_lookup_lower = { "subfolder/withcapital/test.png" => att.migration_id }
 
-      test_string = %{<img src="subfolder/WithCapital/TEST.png" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+      test_string = %(<img src="subfolder/WithCapital/TEST.png" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)
     end
 
     it "finds an attachment with query params" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "test.png" => att.migration_id }
 
-      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_customaction=1&canvas_qs_customparam=1" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/customaction?customparam=1" alt="nope">}
+      test_string = %(<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_customaction=1&canvas_qs_customparam=1" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/customaction?customparam=1" alt="nope">)
 
-      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_qs_customparam2=3" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview?customparam2=3" alt="nope">}
+      test_string = %(<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_qs_customparam2=3" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview?customparam2=3" alt="nope">)
 
-      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?notarelevantparam" alt="nope" />}
-      expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+      test_string = %(<img src="%24IMS_CC_FILEBASE%24/test.png?notarelevantparam" alt="nope" />)
+      expect(convert_and_replace(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)
     end
 
     it "converts course section urls" do
-      test_string = %{<a href="%24CANVAS_COURSE_REFERENCE%24/discussion_topics">discussions</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}discussion_topics">discussions</a>}
+      test_string = %(<a href="%24CANVAS_COURSE_REFERENCE%24/discussion_topics">discussions</a>)
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}discussion_topics">discussions</a>)
     end
 
     it "leaves invalid and absolute urls alone" do
-      test_string = %{<a href="stupid &^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="stupid &amp;^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
+      test_string = %(<a href="stupid &^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>)
+      expect(convert_and_replace(test_string)).to eq %(<a href="stupid &amp;^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>)
     end
 
     it "leaves invalid mailto addresses alone" do
-      test_string = %{<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>}
+      test_string = %(<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>)
       expect(convert_and_replace(test_string)).to eq(
-        %{<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>}
+        %(<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>)
       )
     end
 
     it "recognizes and relative-ize absolute links outside the course but in one of the course's domains" do
-      allow(HostUrl).to receive(:context_hosts).with(@course.root_account).and_return(['my-canvas.example.com', 'vanity.my-canvas.edu'])
-      test_string = %{<a href="https://my-canvas.example.com/courses/123">Mine</a><br><a href="https://vanity.my-canvas.edu/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="/courses/123">Mine</a><br><a href="/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>}
+      allow(HostUrl).to receive(:context_hosts).with(@course.root_account).and_return(["my-canvas.example.com", "vanity.my-canvas.edu"])
+      test_string = %(<a href="https://my-canvas.example.com/courses/123">Mine</a><br><a href="https://vanity.my-canvas.edu/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>)
+      expect(convert_and_replace(test_string)).to eq %(<a href="/courses/123">Mine</a><br><a href="/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>)
     end
 
     it "prepends course files for unrecognized relative urls" do
-      test_string = %{<a href="/relative/path/to/file">Linkage</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}file_contents/course%20files/relative/path/to/file">Linkage</a>}
-      test_string = %{<a href="relative/path/to/file">Linkage</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}file_contents/course%20files/relative/path/to/file">Linkage</a>}
-      test_string = %{<a href="relative/path/to/file%20with%20space.html">Linkage</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}file_contents/course%20files/relative/path/to/file%20with%20space.html">Linkage</a>}
+      test_string = %(<a href="/relative/path/to/file">Linkage</a>)
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}file_contents/course%20files/relative/path/to/file">Linkage</a>)
+      test_string = %(<a href="relative/path/to/file">Linkage</a>)
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}file_contents/course%20files/relative/path/to/file">Linkage</a>)
+      test_string = %(<a href="relative/path/to/file%20with%20space.html">Linkage</a>)
+      expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}file_contents/course%20files/relative/path/to/file%20with%20space.html">Linkage</a>)
     end
 
     it "preserves media comment links" do
-      test_string = <<-HTML.strip
-      <p>
-        with media object url: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
-        with file content url: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@course.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
-      </p>
+      test_string = <<~HTML.strip
+        <p>
+          with media object url: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+          with file content url: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@course.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
+        </p>
       HTML
 
       expect(convert_and_replace(test_string)).to eq test_string
     end
 
     it "handles and repair half broken media links" do
-      test_string = %{<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
+      test_string = %(<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>)
 
-      expect(convert_and_replace(test_string)).to eq %{<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
+      expect(convert_and_replace(test_string)).to eq %(<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>)
     end
 
     it "preserves new RCE media iframes" do
-      test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>}
+      test_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>)
       expect(convert_and_replace(test_string)).to eq test_string
     end
 
     it "handles and repair half broken new RCE media iframes" do
-      test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
-      repaired_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
+      test_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>)
+      repaired_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>)
       expect(convert_and_replace(test_string)).to eq repaired_string
     end
 
@@ -234,7 +234,7 @@ describe ImportedHtmlConverter do
       test_string = "<p><img src=\"data:image/gif;base64,#{base64}\"></p>"
       new_string = convert_and_replace(test_string)
       attachment = Attachment.last
-      expect(attachment.content_type).to eq 'image/gif'
+      expect(attachment.content_type).to eq "image/gif"
       expect(attachment.name).to eq "1d1fde3d669ed5c4fc68a49d643f140d.gif"
       expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
     end

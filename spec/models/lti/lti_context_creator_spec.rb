@@ -21,33 +21,33 @@
 describe Lti::LtiContextCreator do
   let(:root_account) do
     Account.create!.tap do |account|
-      account.name = 'root_account'
-      account.lti_guid = 'lti_guid'
-      allow(account).to receive(:domain).and_return('account_domain')
+      account.name = "root_account"
+      account.lti_guid = "lti_guid"
+      allow(account).to receive(:domain).and_return("account_domain")
       allow(account).to receive(:id).and_return(42)
-      account.sis_source_id = 'account_sis_id'
+      account.sis_source_id = "account_sis_id"
     end
   end
   let(:canvas_tool) do
     ContextExternalTool.new.tap do |canvas_tool|
       canvas_tool.context = root_account
-      allow(canvas_tool).to receive(:opaque_identifier_for).and_return('opaque_id')
+      allow(canvas_tool).to receive(:opaque_identifier_for).and_return("opaque_id")
     end
   end
 
   describe "#convert" do
     describe "consumer instance" do
-      let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
+      let(:canvas_user) { user_factory(name: "Shorty McLongishname") }
       let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }
 
       it "generates a consumer instance from the tool" do
         consumer_instance = lti_context_creator.convert.consumer_instance
 
         expect(consumer_instance).to be_a(LtiOutbound::LTIConsumerInstance)
-        expect(consumer_instance.name).to eq 'root_account'
-        expect(consumer_instance.lti_guid).to eq 'lti_guid'
+        expect(consumer_instance.name).to eq "root_account"
+        expect(consumer_instance.lti_guid).to eq "lti_guid"
         expect(consumer_instance.id).to eq 42
-        expect(consumer_instance.sis_source_id).to eq 'account_sis_id'
+        expect(consumer_instance.sis_source_id).to eq "account_sis_id"
       end
 
       it "uses the consumer_instance_class property of LtiOutboundAdapter" do
@@ -63,7 +63,7 @@ describe Lti::LtiContextCreator do
     end
 
     describe "for canvas user" do
-      let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
+      let(:canvas_user) { user_factory(name: "Shorty McLongishname") }
       let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }
 
       it "converts a user to an lti_user" do
@@ -72,17 +72,17 @@ describe Lti::LtiContextCreator do
 
         expect(lti_user).to be_a(LtiOutbound::LTIUser)
 
-        expect(lti_user.opaque_identifier).to eq 'opaque_id'
+        expect(lti_user.opaque_identifier).to eq "opaque_id"
         expect(lti_user.id).to eq 123
-        expect(lti_user.name).to eq 'Shorty McLongishname'
+        expect(lti_user.name).to eq "Shorty McLongishname"
       end
     end
 
     describe "for a canvas course" do
       let(:canvas_course) do
-        course_factory(active_course: true, course_name: 'my course').tap do |course|
-          course.course_code = 'abc'
-          course.sis_source_id = 'sis_id'
+        course_factory(active_course: true, course_name: "my course").tap do |course|
+          course.course_code = "abc"
+          course.sis_source_id = "sis_id"
           course.root_account = root_account
           allow(course).to receive(:id).and_return(123)
         end
@@ -94,12 +94,12 @@ describe Lti::LtiContextCreator do
         lti_course = lti_context_creator.convert
 
         expect(lti_course).to be_a(LtiOutbound::LTICourse)
-        expect(lti_course.opaque_identifier).to eq 'opaque_id'
+        expect(lti_course.opaque_identifier).to eq "opaque_id"
         expect(lti_course.id).to eq 123
-        expect(lti_course.name).to eq 'my course'
+        expect(lti_course.name).to eq "my course"
 
-        expect(lti_course.course_code).to eq 'abc'
-        expect(lti_course.sis_source_id).to eq 'sis_id'
+        expect(lti_course.course_code).to eq "abc"
+        expect(lti_course.sis_source_id).to eq "sis_id"
       end
 
       it "generates a consumer instance from the course" do
@@ -110,10 +110,10 @@ describe Lti::LtiContextCreator do
 
     describe "for a canvas account" do
       let(:canvas_account) do
-        root_account.sub_accounts.create!(name: 'account name').tap do |account|
+        root_account.sub_accounts.create!(name: "account name").tap do |account|
           account.root_account = root_account
           allow(account).to receive(:id).and_return(123)
-          account.sis_source_id = 'sis_id'
+          account.sis_source_id = "sis_id"
         end
       end
 
@@ -123,11 +123,11 @@ describe Lti::LtiContextCreator do
         lti_account = lti_context_creator.convert
 
         expect(lti_account).to be_a(LtiOutbound::LTIContext)
-        expect(lti_account.opaque_identifier).to eq 'opaque_id'
+        expect(lti_account.opaque_identifier).to eq "opaque_id"
         expect(lti_account.id).to eq 123
-        expect(lti_account.name).to eq 'account name'
+        expect(lti_account.name).to eq "account name"
 
-        expect(lti_account.sis_source_id).to eq 'sis_id'
+        expect(lti_account.sis_source_id).to eq "sis_id"
       end
 
       it "generates a consumer instance from the course" do

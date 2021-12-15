@@ -20,7 +20,7 @@
 module DataFixup
   module FixPointsPossibleSumsInQuizzes
     def self.run
-      Quizzes::Quiz.find_ids_in_ranges(:batch_size => 10000) do |min_id, max_id|
+      Quizzes::Quiz.find_ids_in_ranges(batch_size: 10_000) do |min_id, max_id|
         affected_quizzes.where(id: min_id..max_id).find_each do |quiz|
           possible = Quizzes::Quiz.count_points_possible(quiz.root_entries(true))
           quiz.update!(points_possible: possible)
@@ -31,7 +31,7 @@ module DataFixup
     end
 
     def self.affected_quizzes
-      Quizzes::Quiz.where('CHAR_LENGTH(CAST(points_possible AS text)) > 8')
+      Quizzes::Quiz.where("CHAR_LENGTH(CAST(points_possible AS text)) > 8")
     end
   end
 end

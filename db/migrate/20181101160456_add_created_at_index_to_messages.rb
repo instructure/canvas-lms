@@ -22,6 +22,6 @@ class AddCreatedAtIndexToMessages < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def change
-    add_index :messages, :created_at, :algorithm => :concurrently
+    add_index :messages, :created_at, algorithm: :concurrently
   end
 end

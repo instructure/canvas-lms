@@ -21,45 +21,45 @@ describe Quizzes::QuizSubmissionZipper do
   context "common" do
     let(:attachments) do
       [
-        double(:id => 1, :display_name => "Foobar.ppt"),
-        double(:id => 2, :display_name => "Cats.docx"),
-        double(:id => 3, :display_name => "Pandas.png"),
-        double(:id => 4)
+        double(id: 1, display_name: "Foobar.ppt"),
+        double(id: 2, display_name: "Cats.docx"),
+        double(id: 3, display_name: "Pandas.png"),
+        double(id: 4)
       ]
     end
     let(:submissions) do
       [
-        double(:user => double(:id => 1, :last_name_first => "Dale Tom"),
-               :submission_data => [{
-                 :attachment_ids => ["1"],
-                 :question_id => 1,
-                 :was_preview => false
+        double(user: double(id: 1, last_name_first: "Dale Tom"),
+               submission_data: [{
+                 attachment_ids: ["1"],
+                 question_id: 1,
+                 was_preview: false
                }]),
-        double(:user => double(:id => 2, :last_name_first => "Florence Ryan"),
-               :submission_data => [{
-                 :question_id => 2,
-                 :attachment_ids => ["2"],
-                 :was_preview => false
+        double(user: double(id: 2, last_name_first: "Florence Ryan"),
+               submission_data: [{
+                 question_id: 2,
+                 attachment_ids: ["2"],
+                 was_preview: false
                }]),
         # Teacher upload from Quiz preview:
-        double(:user => double(:id => nil, :last_name_first => "Petty Bryan"),
-               :submission_data => [{
-                 :question_id => 3,
-                 :attachment_ids => ["3"],
-                 :was_preview => true
+        double(user: double(id: nil, last_name_first: "Petty Bryan"),
+               submission_data: [{
+                 question_id: 3,
+                 attachment_ids: ["3"],
+                 was_preview: true
                }]),
-        double(:user => nil, :submission_data => [{}])
+        double(user: nil, submission_data: [{}])
       ]
     end
     let(:submission_stubs) do
       submissions.map do |sub|
         double(
-          :latest_submitted_attempt => sub,
-          :was_preview => sub.submission_data.first[:was_preview]
+          latest_submitted_attempt: sub,
+          was_preview: sub.submission_data.first[:was_preview]
         )
       end
     end
-    let(:zip_attachment) { double(:id => 1, :user => nil) }
+    let(:zip_attachment) { double(id: 1, user: nil) }
 
     before :once do
       @student = course_with_student
@@ -69,8 +69,8 @@ describe Quizzes::QuizSubmissionZipper do
     before do
       allow(@quiz).to receive(:quiz_submissions).and_return submission_stubs
       allow(Attachment).to receive(:where).with(id: ["1", "2"]).and_return([attachments.first, attachments.second])
-      @zipper = Quizzes::QuizSubmissionZipper.new(:quiz => @quiz,
-                                                  :zip_attachment => zip_attachment)
+      @zipper = Quizzes::QuizSubmissionZipper.new(quiz: @quiz,
+                                                  zip_attachment: zip_attachment)
     end
 
     describe "#initialize" do
@@ -111,13 +111,13 @@ describe Quizzes::QuizSubmissionZipper do
   describe "#zip!" do
     it "creates a zip file with all the necessary info" do
       local_storage!
-      course_with_student :active_all => true
+      course_with_student active_all: true
       student = @student
       quiz = course_quiz(true)
-      question = quiz.quiz_questions.create! :question_data => {
-        :name => 'q1', :points_possible => 1,
-        :question_type => 'file_upload_question',
-        :question_text => 'ohai mark'
+      question = quiz.quiz_questions.create! question_data: {
+        name: "q1", points_possible: 1,
+        question_type: "file_upload_question",
+        question_text: "ohai mark"
       }
       quiz.generate_quiz_data
       quiz.save!
@@ -127,11 +127,11 @@ describe Quizzes::QuizSubmissionZipper do
       submission.save!
       Quizzes::SubmissionGrader.new(submission).grade_submission
       quiz.reload
-      attachment = quiz.attachments.build(:filename => 'submissions.zip',
-                                          :display_name => 'submissions.zip')
-      attachment.workflow_state = 'to_be_zipped'
+      attachment = quiz.attachments.build(filename: "submissions.zip",
+                                          display_name: "submissions.zip")
+      attachment.workflow_state = "to_be_zipped"
       attachment.save!
-      teacher_in_course(:course => @course, :active_all => true)
+      teacher_in_course(course: @course, active_all: true)
 
       Quizzes::QuizSubmissionZipper.new(
         quiz: quiz,

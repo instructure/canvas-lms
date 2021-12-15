@@ -181,7 +181,7 @@ class GradingPeriodsController < ApplicationController
   def grading_period(inherit: true)
     @grading_period ||= begin
       grading_period = GradingPeriod.for(@context, inherit: inherit).find_by(id: params[:id])
-      fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
+      raise ActionController::RoutingError, "Not Found" if grading_period.blank?
 
       grading_period
     end
@@ -248,7 +248,7 @@ class GradingPeriodsController < ApplicationController
 
     set_subquery = GradingPeriodGroup.active.select(:account_id).where(id: params[:set_id])
     @context = Account.active.where(id: set_subquery).take
-    render json: { message: t('Page not found') }, status: :not_found unless @context
+    render json: { message: t("Page not found") }, status: :not_found unless @context
   end
 
   # model level validations
@@ -264,7 +264,7 @@ class GradingPeriodsController < ApplicationController
       first_period.skip_not_overlapping_validator
       second_period.skip_not_overlapping_validator
       if second_period.start_date.change(sec: 0) < first_period.end_date.change(sec: 0)
-        second_period.errors.add(:start_date, 'Start Date overlaps with another period')
+        second_period.errors.add(:start_date, "Start Date overlaps with another period")
       end
     end
     sorted_periods.select { |period| period.errors.present? }.map(&:errors)
@@ -272,11 +272,11 @@ class GradingPeriodsController < ApplicationController
 
   def find_or_build_periods(periods_params, grading_period_group)
     periods_params.map do |period_params|
-      if period_params[:id].present?
-        period = grading_period_group.grading_periods.active.find(period_params[:id])
-      else
-        period = grading_period_group.grading_periods.build
-      end
+      period = if period_params[:id].present?
+                 grading_period_group.grading_periods.active.find(period_params[:id])
+               else
+                 grading_period_group.grading_periods.build
+               end
       period.assign_attributes(period_params.permit(:weight, :start_date, :end_date, :close_date, :title))
       period
     end
@@ -302,7 +302,7 @@ class GradingPeriodsController < ApplicationController
 
   def paginate_for(grading_periods)
     paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
-    meta[:primaryCollection] = 'grading_periods'
+    meta[:primaryCollection] = "grading_periods"
     [paginated_grading_periods, meta]
   end
 

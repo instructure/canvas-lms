@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module OutcomeCommon
   # when 'teacher'; course_with_teacher_logged_in
@@ -48,7 +48,7 @@ module OutcomeCommon
   def goto_state_outcomes(outcome_url = "/accounts/#{Account.default.id}/outcomes")
     get outcome_url
     wait_for_ajaximations
-    f('.find_outcome').click
+    f(".find_outcome").click
     wait_for_ajaximations
     ff(".outcome-level .outcome-group").last.click
     wait_for_ajaximations
@@ -60,13 +60,13 @@ module OutcomeCommon
     @cm.reload
     expect(@cm.old_warnings_format).to eq []
     expect(@cm.migration_settings[:last_error]).to be_nil
-    expect(@cm.workflow_state).to eq 'imported'
+    expect(@cm.workflow_state).to eq "imported"
   end
 
   def context_outcome(context, num_of_outcomes)
     num_of_outcomes.times do |o|
       @outcome_group ||= context.root_outcome_group
-      @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+      @outcome = context.created_learning_outcomes.create!(title: "outcome #{o}")
       @outcome.rubric_criterion = valid_outcome_data
       @outcome.save!
       @outcome_group.add_outcome(@outcome)
@@ -77,9 +77,9 @@ module OutcomeCommon
   def create_bulk_outcomes_groups(context, num_of_groups, num_of_outcomes)
     @root = context.root_outcome_group
     num_of_groups.times do |g|
-      @group = context.learning_outcome_groups.create!(:title => "group #{g}")
+      @group = context.learning_outcome_groups.create!(title: "group #{g}")
       num_of_outcomes.times do |o|
-        @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+        @outcome = context.created_learning_outcomes.create!(title: "outcome #{o}")
         @group.add_outcome(@outcome)
       end
       @root.adopt_outcome_group(@group)
@@ -88,20 +88,19 @@ module OutcomeCommon
 
   def valid_outcome_data
     {
-      :mastery_points => 3,
-      :ratings => [
-        { :points => 3, :description => "Rockin" },
-        { :points => 0, :description => "Lame" }
+      mastery_points: 3,
+      ratings: [
+        { points: 3, description: "Rockin" },
+        { points: 0, description: "Lame" }
       ]
     }
   end
 
   def state_outcome
-    state_outcome = [
-      'CCSS.ELA-Literacy.CCRA.R - Reading',
-      'Craft and Structure'
+    [
+      "CCSS.ELA-Literacy.CCRA.R - Reading",
+      "Craft and Structure"
     ]
-    state_outcome
   end
 
   def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)
@@ -125,23 +124,23 @@ module OutcomeCommon
 
     ## when
     # create outcome
-    f('.add_outcome_link').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
-    outcome_name = 'first new outcome'
-    outcome_description = 'new learning outcome'
-    replace_content f('.outcomes-content input[name=title]'), outcome_name
-    type_in_tiny '.outcomes-content textarea[name=description]', outcome_description
+    f(".add_outcome_link").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
+    outcome_name = "first new outcome"
+    outcome_description = "new learning outcome"
+    replace_content f(".outcomes-content input[name=title]"), outcome_name
+    type_in_tiny ".outcomes-content textarea[name=description]", outcome_description
     # add a new rating
-    f('.insert_rating').click
-    f('input[name="ratings[1][description]"]').send_keys('almost exceeds')
-    f('input[name="ratings[1][points]"]').send_keys('4')
+    f(".insert_rating").click
+    f('input[name="ratings[1][description]"]').send_keys("almost exceeds")
+    f('input[name="ratings[1][points]"]').send_keys("4")
     # submit
     driver.execute_script("$('.submit_button').click()")
     wait_for_ajaximations
 
     ## expect
     # should show up in directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:first li.outcome-link')
+    expect(ffj(".outcomes-sidebar .outcome-level:first li.outcome-link")
         .detect { |li| li.text == outcome_name }).not_to be_nil
     # should show outcome in main content window
     # title
@@ -149,7 +148,7 @@ module OutcomeCommon
     # description
     expect(f(".outcomes-content .description").text).to eq outcome_description
     # ratings
-    descriptions = ff('table.criterion th.rating')
+    descriptions = ff("table.criterion th.rating")
     expect(descriptions.size).to eq 4
     expect(descriptions.map(&:text)).to eq [
       "Exceeds Expectations",
@@ -157,7 +156,7 @@ module OutcomeCommon
       "Meets Expectations",
       "Does Not Meet Expectations"
     ]
-    ratings = ff('table.criterion td.rating')
+    ratings = ff("table.criterion td.rating")
     expect(ratings.size).to eq 4
     expect(ratings.map(&:text)).to eq [
       "5 Points",
@@ -165,8 +164,8 @@ module OutcomeCommon
       "3 Points",
       "0 Points"
     ]
-    expect(f('table.criterion th.total').text).to eq "Total Points"
-    expect(f('table.criterion td.total').text).to eq "5 Points"
+    expect(f("table.criterion th.total").text).to eq "Total Points"
+    expect(f("table.criterion td.total").text).to eq "5 Points"
     # db
     expect(LearningOutcome.where(short_description: outcome_name).first).to be_present
   end
@@ -177,36 +176,36 @@ module OutcomeCommon
 
     ## when
     # create group
-    f('.add_outcome_group').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
-    group_title = 'my group'
-    replace_content f('.outcomes-content input[name=title]'), group_title
+    f(".add_outcome_group").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
+    group_title = "my group"
+    replace_content f(".outcomes-content input[name=title]"), group_title
     # submit
     driver.execute_script("$('.submit_button').click()")
     wait_for_ajaximations
 
     # create outcome
-    f('.add_outcome_link').click
+    f(".add_outcome_link").click
     wait_for_ajaximations
-    outcome_name = 'first new outcome'
-    replace_content(f('.outcomes-content input[name=title]'), outcome_name)
+    outcome_name = "first new outcome"
+    replace_content(f(".outcomes-content input[name=title]"), outcome_name)
 
     # submit
-    f('.submit_button').click
+    f(".submit_button").click
     wait_for_ajaximations
     refresh_page
 
     # select group
     wait_for_ajaximations
-    f('.outcome-group').click
+    f(".outcome-group").click
     wait_for_ajaximations
     # select nested outcome
-    f('.outcome-link').click
+    f(".outcome-link").click
     wait_for_ajaximations
 
     ## expect
     # should show up in nested directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-link')
+    expect(ffj(".outcomes-sidebar .outcome-level:eq(1) li.outcome-link")
         .detect { |li| li.text == outcome_name }).not_to be_nil
     # should show outcome in main content window
     expect(f(".outcomes-content .title").text).to eq outcome_name
@@ -215,54 +214,54 @@ module OutcomeCommon
   end
 
   def should_edit_a_learning_outcome_and_delete_a_rating
-    edited_title = 'edit outcome'
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    edited_title = "edit outcome"
+    @context = who_to_login == "teacher" ? @course : account
     outcome_model
     get outcome_url
 
-    fj('.outcomes-sidebar .outcome-level:first li').click
+    fj(".outcomes-sidebar .outcome-level:first li").click
     wait_for_ajaximations
-    f('.edit_button').click
+    f(".edit_button").click
     wait_for_ajaximations
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
 
     ## when
     # edit title
-    replace_content f('.outcomes-content input[name=title]'), edited_title
+    replace_content f(".outcomes-content input[name=title]"), edited_title
     # delete a rating
-    f('.edit_rating').click
-    f('.delete_rating_link').click
+    f(".edit_rating").click
+    f(".delete_rating_link").click
     # edit a rating
-    f('.edit_rating').click
-    replace_content f('input[name="ratings[0][points]"]'), '1'
-    replace_content f('input[name="mastery_points"]'), '1'
+    f(".edit_rating").click
+    replace_content f('input[name="ratings[0][points]"]'), "1"
+    replace_content f('input[name="mastery_points"]'), "1"
     # submit
-    f('.submit_button').click
+    f(".submit_button").click
     wait_for_ajaximations
 
     ## expect
     # should be edited in directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }).not_to be_nil
+    expect(ffj(".outcomes-sidebar .outcome-level:first li").detect { |li| li.text == edited_title }).not_to be_nil
     # title
     expect(f(".outcomes-content .title").text).to eq edited_title
     # ratings
-    descriptions = ff('table.criterion th.rating')
+    descriptions = ff("table.criterion th.rating")
     expect(descriptions.size).to eq 1
     expect(descriptions.map(&:text)).to eq ["Lame"]
-    ratings = ff('table.criterion td.rating')
+    ratings = ff("table.criterion td.rating")
     expect(ratings.size).to eq 1
     expect(ratings.map(&:text)).to eq ["1 Points"]
-    expect(f('table.criterion th.total').text).to eq "Total Points"
-    expect(f('table.criterion td.total').text).to eq "1 Points"
+    expect(f("table.criterion th.total").text).to eq "Total Points"
+    expect(f("table.criterion td.total").text).to eq "1 Points"
     # db
     expect(LearningOutcome.where(short_description: edited_title).first).to be_present
   end
 
   def should_delete_a_learning_outcome
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    @context = who_to_login == "teacher" ? @course : account
     outcome_model
     get outcome_url
-    fj('.outcomes-sidebar .outcome-level:first li').click
+    fj(".outcomes-sidebar .outcome-level:first li").click
     wait_for_ajaximations
 
     ## when
@@ -273,58 +272,58 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
-    expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
+    expect(f(".outcomes-sidebar")).not_to contain_jqcss(".outcome-level:first li")
+    expect(f(".outcomes-content .title").text).to eq "Setting up Outcomes"
     # db
-    expect(LearningOutcome.where(id: @outcome).first.workflow_state).to eq 'deleted'
+    expect(LearningOutcome.where(id: @outcome).first.workflow_state).to eq "deleted"
     refresh_page # to make sure it was correctly deleted
     expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 
   def should_validate_decaying_average_range
     get outcome_url
-    f('.add_outcome_link').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
+    f(".add_outcome_link").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
     below_range = 0
     above_range = 100
-    replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
-    click_option('#calculation_method', "Decaying Average")
+    replace_content(f(".outcomes-content input[name=title]"), "Decaying Average")
+    click_option("#calculation_method", "Decaying Average")
     # enter invalid number below range
-    replace_content(f('input[name=calculation_int]'), below_range)
-    f('.submit_button').click
+    replace_content(f("input[name=calculation_int]"), below_range)
+    f(".submit_button").click
     wait_for_ajaximations
-    error_box = f('.errorBox:not(#error_box_template)')
+    error_box = f(".errorBox:not(#error_box_template)")
     expect(error_box).to be_present
     expect(error_box).to include_text("'#{below_range}' is not a valid value")
     # enter invalid number above range
-    replace_content(f('input[name=calculation_int]'), above_range)
-    f('.submit_button').click
+    replace_content(f("input[name=calculation_int]"), above_range)
+    f(".submit_button").click
     wait_for_ajaximations
-    error_box = f('.errorBox:not(#error_box_template)')
+    error_box = f(".errorBox:not(#error_box_template)")
     expect(error_box).to be_present
     expect(error_box).to include_text("'#{above_range}' is not a valid value")
   end
 
   def should_validate_n_mastery_range
     get outcome_url
-    f('.add_outcome_link').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
+    f(".add_outcome_link").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
     below_range = 0
     above_range = 6
-    replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
-    click_option('#calculation_method', "n Number of Times")
+    replace_content(f(".outcomes-content input[name=title]"), "n Number of Times")
+    click_option("#calculation_method", "n Number of Times")
     # enter invalid number below range
-    replace_content(f('input[name=calculation_int]'), below_range)
-    f('.submit_button').click
+    replace_content(f("input[name=calculation_int]"), below_range)
+    f(".submit_button").click
     wait_for_ajaximations
-    error_box = f('.errorBox:not(#error_box_template)')
+    error_box = f(".errorBox:not(#error_box_template)")
     expect(error_box).to be_present
     expect(error_box).to include_text("'#{below_range}' is not a valid value")
     # enter invalid number above range
-    replace_content(f('input[name=calculation_int]'), above_range)
-    f('.submit_button').click
+    replace_content(f("input[name=calculation_int]"), above_range)
+    f(".submit_button").click
     wait_for_ajaximations
-    error_box = f('.errorBox:not(#error_box_template)')
+    error_box = f(".errorBox:not(#error_box_template)")
     expect(error_box).to be_present
     expect(error_box).to include_text("'#{above_range}' is not a valid value")
   end
@@ -334,17 +333,17 @@ module OutcomeCommon
 
     ## when
     # create group
-    f('.add_outcome_group').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
-    group_title = 'my group'
-    replace_content f('.outcomes-content input[name=title]'), group_title
+    f(".add_outcome_group").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
+    group_title = "my group"
+    replace_content f(".outcomes-content input[name=title]"), group_title
     # submit
     driver.execute_script("$('.submit_button').click()")
     wait_for_ajaximations
 
     ## expect
     # should show up in directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == group_title }).not_to be_nil
+    expect(ffj(".outcomes-sidebar .outcome-level:first li").detect { |li| li.text == group_title }).not_to be_nil
     # should show outcome in main content window
     # title
     expect(f(".outcomes-content .title").text).to eq group_title
@@ -357,10 +356,10 @@ module OutcomeCommon
 
     ## when
     # create group
-    f('.add_outcome_group').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
-    group_title = 'my group'
-    replace_content f('.outcomes-content input[name=title]'), group_title
+    f(".add_outcome_group").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
+    group_title = "my group"
+    replace_content f(".outcomes-content input[name=title]"), group_title
     wait_for_animations
     # submit
     f(".submit_button").click
@@ -368,10 +367,10 @@ module OutcomeCommon
     dismiss_flash_messages_if_present
 
     # create nested group
-    f('.add_outcome_group').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
-    nested_group_title = 'my nested group'
-    replace_content f('.outcomes-content input[name=title]'), nested_group_title
+    f(".add_outcome_group").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
+    nested_group_title = "my nested group"
+    replace_content f(".outcomes-content input[name=title]"), nested_group_title
     wait_for_animations
     # submit
     f(".submit_button").click
@@ -381,16 +380,16 @@ module OutcomeCommon
     wait_for_ajaximations
 
     # select group
-    fj('.outcome-level:eq(0) .outcome-group').click
+    fj(".outcome-level:eq(0) .outcome-group").click
     wait_for_ajaximations
 
     # select nested group
-    fj('.outcome-level:eq(1) .outcome-group').click
+    fj(".outcome-level:eq(1) .outcome-group").click
     wait_for_ajaximations
 
     ## expect
     # should show up in nested directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-group')
+    expect(ffj(".outcomes-sidebar .outcome-level:eq(1) li.outcome-group")
         .detect { |li| li.text == nested_group_title }).not_to be_nil
     # should show group in main content window
     expect(f(".outcomes-content .title").text).to eq nested_group_title
@@ -399,25 +398,25 @@ module OutcomeCommon
   end
 
   def should_edit_an_outcome_group
-    edited_title = 'edited group'
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    edited_title = "edited group"
+    @context = who_to_login == "teacher" ? @course : account
     outcome_group_model
     get outcome_url
 
-    fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
+    fj(".outcomes-sidebar .outcome-level:first li.outcome-group").click
 
-    f('.edit_button').click
-    wait_for_tiny(f('.outcomes-content textarea[name=description]'))
-    expect(f('.outcomes-content input[name=title]')).to be_displayed
+    f(".edit_button").click
+    wait_for_tiny(f(".outcomes-content textarea[name=description]"))
+    expect(f(".outcomes-content input[name=title]")).to be_displayed
 
-    replace_content f('.outcomes-content input[name=title]'), edited_title
+    replace_content f(".outcomes-content input[name=title]"), edited_title
     wait_for_animations
-    f('.submit_button').click
+    f(".submit_button").click
     wait_for_ajaximations
 
     ## expect
     # should be edited in directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }).not_to be_nil
+    expect(ffj(".outcomes-sidebar .outcome-level:first li").detect { |li| li.text == edited_title }).not_to be_nil
     # title
     expect(f(".outcomes-content .title").text).to eq edited_title
     # db
@@ -425,10 +424,10 @@ module OutcomeCommon
   end
 
   def should_delete_an_outcome_group
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    @context = who_to_login == "teacher" ? @course : account
     outcome_group_model
     get outcome_url
-    fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
+    fj(".outcomes-sidebar .outcome-level:first li.outcome-group").click
     wait_for_ajaximations
     ## when
     # delete the outcome
@@ -439,10 +438,10 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
-    expect(f('.outcomes-content .title').text).to eq "Setting up Outcomes"
+    expect(f(".outcomes-sidebar")).not_to contain_jqcss(".outcome-level:first li")
+    expect(f(".outcomes-content .title").text).to eq "Setting up Outcomes"
     # db
-    expect(LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state).to eq 'deleted'
+    expect(LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state).to eq "deleted"
     refresh_page # to make sure it was correctly deleted
     expect(f("#content")).not_to contain_css(".learning_outcome")
   end

@@ -27,3 +27,6 @@
 <div style="display:none;">
   <%= render :partial => "shared/message_students" %>
 </div>
+<% if show_message_students_with_observers_dialog? %>
+  <span data-component="MessageStudentsWithObserversModal"></span>
+<% end %>

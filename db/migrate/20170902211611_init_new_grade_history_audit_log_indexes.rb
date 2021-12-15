@@ -23,7 +23,7 @@ class InitNewGradeHistoryAuditLogIndexes < ActiveRecord::Migration[4.2]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.up

@@ -24,10 +24,10 @@ module Lti
   describe Launch do
     let(:launch) { Launch.new }
 
-    describe '#iframe_allowances' do
+    describe "#iframe_allowances" do
       subject { Launch.iframe_allowances(user_agent) }
 
-      context 'when Chrome is used' do
+      context "when Chrome is used" do
         let(:user_agent) do
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36"
         end
@@ -40,12 +40,13 @@ module Lti
             "midi *",
             "encrypted-media *",
             "autoplay *",
+            "clipboard-write *",
             "display-capture *"
           ]
         end
       end
 
-      context 'when Chrome is not used' do
+      context "when Chrome is not used" do
         let(:user_agent) do
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15"
         end
@@ -58,12 +59,13 @@ module Lti
             midi
             encrypted-media
             autoplay
+            clipboard-write
             display-capture
           ]
         end
       end
 
-      context 'when FF >= 74 is used' do
+      context "when FF >= 74 is used" do
         let(:user_agent) do
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/74.0"
         end
@@ -76,12 +78,13 @@ module Lti
             "midi *",
             "encrypted-media *",
             "autoplay *",
+            "clipboard-write *",
             "display-capture *"
           ]
         end
       end
 
-      context 'when FF < 74 is used' do
+      context "when FF < 74 is used" do
         let(:user_agent) do
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/73.0"
         end
@@ -94,12 +97,13 @@ module Lti
             midi
             encrypted-media
             autoplay
+            clipboard-write
             display-capture
           ]
         end
       end
 
-      context 'when Edge >= 79 is used' do
+      context "when Edge >= 79 is used" do
         let(:user_agent) do
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edg/86.0.622.31"
         end
@@ -112,12 +116,13 @@ module Lti
             "midi *",
             "encrypted-media *",
             "autoplay *",
+            "clipboard-write *",
             "display-capture *"
           ]
         end
       end
 
-      context 'when Edge < 79 is used' do
+      context "when Edge < 79 is used" do
         let(:user_agent) do
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/12.10136"
         end
@@ -130,33 +135,34 @@ module Lti
             midi
             encrypted-media
             autoplay
+            clipboard-write
             display-capture
           ]
         end
       end
     end
 
-    describe 'initialize' do
-      it 'correctly sets tool dimension default' do
-        expect(subject.tool_dimensions).to eq({ selection_height: '100%', selection_width: '100%' })
+    describe "initialize" do
+      it "correctly sets tool dimension default" do
+        expect(subject.tool_dimensions).to eq({ selection_height: "100%", selection_width: "100%" })
       end
 
-      it 'uses specified tool dimensions if they are provided' do
+      it "uses specified tool dimensions if they are provided" do
         options = {
-          tool_dimensions: { selection_height: '800', selection_width: '600' }
+          tool_dimensions: { selection_height: "800", selection_width: "600" }
         }
         launch = Launch.new(options)
         expect(launch.tool_dimensions).to eq options[:tool_dimensions]
       end
 
       it 'returns "about:blank" if resource_url has an unsupported protocol' do
-        launch.resource_url = 'javascript:x/x%250aalert(badstuff)'
-        expect(launch.resource_url).to eq 'about:blank'
+        launch.resource_url = "javascript:x/x%250aalert(badstuff)"
+        expect(launch.resource_url).to eq "about:blank"
       end
 
       it 'returns "about:blank" if resource_url is an invalid url' do
         launch.resource_url = '"'
-        expect(launch.resource_url).to eq 'about:blank'
+        expect(launch.resource_url).to eq "about:blank"
       end
     end
   end

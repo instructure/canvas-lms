@@ -22,7 +22,7 @@ module CanvasQuizStatistics::Analyzers
     inherit_metrics :essay_question
 
     metric :graded do |responses|
-      responses.select { |r| r[:correct].to_s == 'true' }.length
+      responses.select { |r| r[:correct].to_s == "true" }.length
     end
   end
 end

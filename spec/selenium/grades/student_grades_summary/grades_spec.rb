@@ -25,21 +25,21 @@ describe "grades" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    @teacher1 = course_with_teacher(name: 'Dedicated Teacher1', active_user: true, active_enrollment: true, active_course: true).user
+    @teacher1 = course_with_teacher(name: "Dedicated Teacher1", active_user: true, active_enrollment: true, active_course: true).user
     @student_1 = course_with_student(course: @course, name: "Student 1", active_all: true).user
     @student_2 = course_with_student(course: @course, name: "Student 2", active_all: true).user
 
     # first assignment data
     due_date = Time.now.utc + 2.days
-    @group = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 33.3)
-    @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 33.3)
-    @group3 = @course.assignment_groups.create!(name: 'third assignment group', group_weight: 33.3)
+    @group = @course.assignment_groups.create!(name: "first assignment group", group_weight: 33.3)
+    @group2 = @course.assignment_groups.create!(name: "second assignment group", group_weight: 33.3)
+    @group3 = @course.assignment_groups.create!(name: "third assignment group", group_weight: 33.3)
     @first_assignment = assignment_model({
                                            course: @course,
-                                           title: 'first assignment',
+                                           title: "first assignment",
                                            due_at: due_date,
                                            points_possible: 10,
-                                           submission_types: 'online_text_entry',
+                                           submission_types: "online_text_entry",
                                            assignment_group: @group,
                                            peer_reviews: true,
                                            anonymous_peer_reviews: true
@@ -47,18 +47,18 @@ describe "grades" do
     rubric_model
     @rubric.criteria[0][:criterion_use_range] = true
     @rubric.save!
-    @association = @rubric.associate_with(@first_assignment, @course, purpose: 'grading')
+    @association = @rubric.associate_with(@first_assignment, @course, purpose: "grading")
     @assignment.assign_peer_review(@student_2, @student_1)
     @assignment.reload
 
-    @submission = @first_assignment.submit_homework(@student_1, body: 'student first submission')
+    @submission = @first_assignment.submit_homework(@student_1, body: "student first submission")
     @first_assignment.grade_student(@student_1, grade: 10, grader: @teacher)
     @assessment = @association.assess({
                                         user: @student_1,
                                         assessor: @teacher,
                                         artifact: @submission,
                                         assessment: {
-                                          assessment_type: 'grading',
+                                          assessment_type: "grading",
                                           criterion_crit1: {
                                             points: 10,
                                             comments: "cool, yo"
@@ -67,7 +67,7 @@ describe "grades" do
                                       })
     @submission.reload
     @submission.score = 3
-    @submission.add_comment(author: @teacher, comment: 'submission comment')
+    @submission.add_comment(author: @teacher, comment: "submission comment")
     @submission.add_comment({
                               author: @student_2,
                               comment: "Anonymous Peer Review"
@@ -75,24 +75,24 @@ describe "grades" do
     @submission.save!
 
     # second student submission
-    @student_2_submission = @first_assignment.submit_homework(@student_2, body: 'second student second submission')
+    @student_2_submission = @first_assignment.submit_homework(@student_2, body: "second student second submission")
     @first_assignment.grade_student(@student_2, grade: 4, grader: @teacher)
     @student_2_submission.score = 3
     @submission.save!
 
     # second assigmnent data
-    due_date = due_date + 1.days
+    due_date += 1.day
     @second_assignment = assignment_model({
                                             course: @course,
-                                            title: 'second assignment',
+                                            title: "second assignment",
                                             due_at: due_date,
                                             points_possible: 5,
-                                            submission_types: 'online_text_entry',
+                                            submission_types: "online_text_entry",
                                             assignment_group: @group
                                           })
 
-    @second_association = @rubric.associate_with(@second_assignment, @course, purpose: 'grading')
-    @second_submission = @second_assignment.submit_homework(@student_1, body: 'student second submission')
+    @second_association = @rubric.associate_with(@second_assignment, @course, purpose: "grading")
+    @second_submission = @second_assignment.submit_homework(@student_1, body: "student second submission")
     @second_assignment.grade_student(@student_1, grade: 2, grader: @teacher)
     @second_submission.save!
     @second_assessment = @second_association.assess({
@@ -100,7 +100,7 @@ describe "grades" do
                                                       assessor: @teacher,
                                                       artifact: @second_submission,
                                                       assessment: {
-                                                        assessment_type: 'grading',
+                                                        assessment_type: "grading",
                                                         criterion_crit1: {
                                                           points: 2
                                                         }
@@ -108,8 +108,8 @@ describe "grades" do
                                                     })
 
     # third assignment data
-    due_date = due_date + 1.days
-    @third_assignment = assignment_model({ title: 'third assignment', due_at: due_date, course: @course })
+    due_date += 1.day
+    @third_assignment = assignment_model({ title: "third assignment", due_at: due_date, course: @course })
   end
 
   context "as a teacher" do
@@ -117,31 +117,31 @@ describe "grades" do
       user_session(@teacher)
     end
 
-    context 'overall grades' do
+    context "overall grades" do
       before do
         @course_names = []
         @course_names << @course
         3.times do |i|
           course = Course.create!(name: "course #{i}", account: Account.default)
-          course.enroll_user(@teacher, 'TeacherEnrollment').accept!
+          course.enroll_user(@teacher, "TeacherEnrollment").accept!
           course.offer!
           @course_names << course
         end
         GlobalGrades.visit
       end
 
-      it "validates courses display", priority: "1", test_id: 222510 do
+      it "validates courses display", priority: "1" do
         4.times { |c| expect(GlobalGrades.course_details).to include_text(@course_names[c].name) }
       end
     end
 
-    it "shows the student outcomes report if enabled", priority: "1", test_id: 229447 do
+    it "shows the student outcomes report if enabled", priority: "1" do
       @outcome_group ||= @course.root_outcome_group
-      @outcome = @course.created_learning_outcomes.create!(title: 'outcome')
+      @outcome = @course.created_learning_outcomes.create!(title: "outcome")
       @outcome_group.add_outcome(@outcome)
-      Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
+      Account.default.set_feature_flag!("student_outcome_gradebook", "on")
       StudentGradesPage.visit_as_teacher(@course, @student_1)
-      expect(f('#navpills')).not_to be_nil
+      expect(f("#navpills")).not_to be_nil
       f('a[href="#outcomes"]').click
       wait_for_ajaximations
       expect(fj("span:contains('Toggle outcomes for Unnamed Course')")).to be_present
@@ -150,10 +150,10 @@ describe "grades" do
       expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
     end
 
-    context 'student view' do
-      it "is available to student view student", priority: "1", test_id: 229448 do
+    context "student view" do
+      it "is available to student view student", priority: "1" do
         @fake_student = @course.student_view_student
-        @fake_submission = @first_assignment.submit_homework(@fake_student, body: 'fake student submission')
+        @fake_submission = @first_assignment.submit_homework(@fake_student, body: "fake student submission")
         @first_assignment.grade_student(@fake_student, grade: 8, grader: @teacher)
 
         enter_student_view
@@ -170,21 +170,21 @@ describe "grades" do
     end
 
     it "does not send PII to google analytics" do
-      Setting.set('google_analytics_key', 'testing123')
+      Setting.set("google_analytics_key", "testing123")
       StudentGradesPage.visit_as_student(@course)
-      analytics_snippet_script = ff('script').find { |s| s.attribute('innerHTML').include? "ga('create', \"testing123\", 'auto');" }
-      expect(analytics_snippet_script.attribute('innerHTML')).to include("ga('set', 'title', \"Grades for Student\");")
+      analytics_snippet_script = ff("script").find { |s| s.attribute("innerHTML").include? "ga('create', \"testing123\", 'auto');" }
+      expect(analytics_snippet_script.attribute("innerHTML")).to include("ga('set', 'title', \"Grades for Student\");")
     end
 
-    it "displays tooltip on focus", priority: "1", test_id: 229659 do
+    it "displays tooltip on focus", priority: "1" do
       StudentGradesPage.visit_as_student(@course)
 
       expect(driver.execute_script(
                "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
-             )).to eq('hidden')
+             )).to eq("hidden")
 
       driver.execute_script(
-        'window.focus()'
+        "window.focus()"
       )
 
       driver.execute_script(
@@ -193,27 +193,27 @@ describe "grades" do
 
       expect(driver.execute_script(
                "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
-             )).to eq('visible')
+             )).to eq("visible")
     end
 
-    it "allows student to test modifying grades", priority: "1", test_id: 229660 do
-      skip_if_chrome('issue with blur')
+    it "allows student to test modifying grades", priority: "1" do
+      skip_if_chrome("issue with blur")
       StudentGradesPage.visit_as_student(@course)
 
       expect_any_instantiation_of(@first_assignment).to receive(:find_or_create_submission).and_return(@submission)
 
       # check initial total
-      expect(f('#submission_final-grade .assignment_score .grade').text).to eq '33.33%'
+      expect(f("#submission_final-grade .assignment_score .grade").text).to eq "33.33%"
 
       edit_grade = lambda do |field, score|
         field.click
-        set_value field.find_element(:css, 'input'), score.to_s
+        set_value field.find_element(:css, "input"), score.to_s
         driver.execute_script '$("#grade_entry").blur()'
       end
 
       assert_grade = lambda do |grade|
         wait_for_ajaximations
-        expect(f('#submission_final-grade .grade')).to include_text grade.to_s
+        expect(f("#submission_final-grade .grade")).to include_text grade.to_s
       end
 
       # test changing existing scores
@@ -231,9 +231,9 @@ describe "grades" do
       driver.execute_script '$("#grade_entry").focus()'
     end
 
-    it "displays rubric on assignment and properly highlight levels", priority: "1", test_id: 229661 do
-      zero_assignment = assignment_model({ title: 'zero assignment', course: @course })
-      zero_association = @rubric.associate_with(zero_assignment, @course, purpose: 'grading')
+    it "displays rubric on assignment and properly highlight levels", priority: "1" do
+      zero_assignment = assignment_model({ title: "zero assignment", course: @course })
+      zero_association = @rubric.associate_with(zero_assignment, @course, purpose: "grading")
       zero_submission = zero_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       zero_association.assess({
@@ -241,7 +241,7 @@ describe "grades" do
                                 assessor: @teacher,
                                 artifact: zero_submission,
                                 assessment: {
-                                  assessment_type: 'grading',
+                                  assessment_type: "grading",
                                   criterion_crit1: {
                                     points: 0
                                   }
@@ -252,15 +252,15 @@ describe "grades" do
       # click first rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_ajaximations
-      expect(fj('.react-rubric caption:visible')).to include_text(@rubric.title)
-      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('10')
+      expect(fj(".react-rubric caption:visible")).to include_text(@rubric.title)
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text("10")
 
       # check if only proper rating is highlighted for a score of 10 on scale of 10|5|0
-      expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
-      expect(fj('.rubric_assessments:visible .selected')).to include_text('10')
+      expect(ffj(".rubric_assessments:visible .selected").length).to eq 1
+      expect(fj(".rubric_assessments:visible .selected")).to include_text("10")
 
       # check rubric comment
-      expect(fj('.rubric-freeform:visible div')).to include_text 'cool, yo'
+      expect(fj(".rubric-freeform:visible div")).to include_text "cool, yo"
 
       # close first rubric
       scroll_into_view("a:contains('Close Rubric'):visible")
@@ -269,11 +269,11 @@ describe "grades" do
       # click second rubric
       scroll_into_view("#submission_#{zero_assignment.id} .toggle_rubric_assessments_link")
       f("#submission_#{zero_assignment.id} .toggle_rubric_assessments_link").click
-      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('0')
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text("0")
 
       # check if only proper rating is highlighted for a score of 0 on scale of 10|5|0
-      expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
-      expect(fj('.rubric_assessments:visible .selected')).to include_text('0')
+      expect(ffj(".rubric_assessments:visible .selected").length).to eq 1
+      expect(fj(".rubric_assessments:visible .selected")).to include_text("0")
     end
 
     context "rubric criterion ranges disabled" do
@@ -294,7 +294,7 @@ describe "grades" do
         f("#submission_#{@second_assignment.id} .toggle_rubric_assessments_link").click
 
         # check if no highlights exist on a non-range criterion for a score of 2 on scale of 10|5|0
-        expect(find_with_jquery('.rubric_assessments:visible .selected')).to be nil
+        expect(find_with_jquery(".rubric_assessments:visible .selected")).to be nil
       end
     end
 
@@ -307,8 +307,8 @@ describe "grades" do
         f("#submission_#{@second_assignment.id} .toggle_rubric_assessments_link").click
 
         # check if proper highlights exist on a range criterion for a score of 2 on scale of 10|5|0
-        expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
-        expect(fj('.rubric_assessments:visible .selected')).to include_text('5')
+        expect(ffj(".rubric_assessments:visible .selected").length).to eq 1
+        expect(fj(".rubric_assessments:visible .selected")).to include_text("5")
       end
     end
 
@@ -321,7 +321,7 @@ describe "grades" do
       expect(assessments_link).to be_present
     end
 
-    it "does not display rubric on muted assignment", priority: "1", test_id: 229662 do
+    it "does not display rubric on muted assignment", priority: "1" do
       StudentGradesPage.visit_as_student(@course)
 
       @first_assignment.mute!
@@ -330,27 +330,27 @@ describe "grades" do
       expect(f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link")).not_to be_displayed
     end
 
-    it "does not display letter grade score on muted assignment", priority: "1", test_id: 229663 do
+    it "does not display letter grade score on muted assignment", priority: "1" do
       StudentGradesPage.visit_as_student(@course)
 
       @another_assignment = assignment_model({
                                                course: @course,
-                                               title: 'another assignment',
+                                               title: "another assignment",
                                                points_possible: 100,
-                                               submission_types: 'online_text_entry',
+                                               submission_types: "online_text_entry",
                                                assignment_group: @group,
-                                               grading_type: 'letter_grade',
+                                               grading_type: "letter_grade",
                                                muted: true
                                              })
       @another_assignment.ensure_post_policy(post_manually: true)
-      @another_submission = @another_assignment.submit_homework(@student_1, body: 'student second submission')
+      @another_submission = @another_assignment.submit_homework(@student_1, body: "student second submission")
       @another_assignment.grade_student(@student_1, grade: 81, grader: @teacher)
       @another_submission.save!
       StudentGradesPage.visit_as_student(@course)
-      expect(f('.score_value').text).to eq ''
+      expect(f(".score_value").text).to eq ""
     end
 
-    it "displays assignment statistics", priority: "1", test_id: 229664 do
+    it "displays assignment statistics", priority: "1" do
       5.times do |count|
         @s = course_with_student(course: @course, name: "Student #{count}", active_all: true).user
         @first_assignment.grade_student(@s, grade: 4, grader: @teacher)
@@ -359,22 +359,22 @@ describe "grades" do
       ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       StudentGradesPage.visit_as_student(@course)
-      f('.toggle_score_details_link').click
+      f(".toggle_score_details_link").click
 
-      score_row = f('#grades_summary tr.grade_details')
-      expect(score_row).to include_text('Mean:')
-      expect(score_row).to include_text('High: 4')
-      expect(score_row).to include_text('Low: 3')
+      score_row = f("#grades_summary tr.grade_details")
+      expect(score_row).to include_text("Mean:")
+      expect(score_row).to include_text("High: 4")
+      expect(score_row).to include_text("Low: 3")
     end
 
     it "does not show assignment statistics on assignments with less than 5 submissions",
-       priority: "1", test_id: 229667 do
+       priority: "1" do
       StudentGradesPage.visit_as_student(@course)
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
     it "does not show assignment statistics on assignments when it is disabled on the course",
-       priority: "1", test_id: 229668 do
+       priority: "1" do
       # get up to a point where statistics can be shown
       5.times do |count|
         s = course_with_student(course: @course, name: "Student_#{count}", active_all: true).user
@@ -387,25 +387,25 @@ describe "grades" do
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
-    it "displays teacher comments", priority: "1", test_id: 229665 do
+    it "displays teacher comments", priority: "1" do
       StudentGradesPage.visit_as_student(@course)
 
       # check comment
-      f('.toggle_comments_link').click
-      comment_row = f('#grades_summary tr.comments_thread')
-      expect(comment_row).to include_text('submission comment')
+      f(".toggle_comments_link").click
+      comment_row = f("#grades_summary tr.comments_thread")
+      expect(comment_row).to include_text("submission comment")
     end
 
-    it 'does not display name of anonymous reviewer', priority: "1", test_id: 229666 do
+    it "does not display name of anonymous reviewer", priority: "1" do
       StudentGradesPage.visit_as_student(@course)
 
-      f('.toggle_comments_link').click
-      comment_row = f('#grades_summary tr.comments_thread')
-      expect(comment_row).to include_text('Anonymous User')
+      f(".toggle_comments_link").click
+      comment_row = f("#grades_summary tr.comments_thread")
+      expect(comment_row).to include_text("Anonymous User")
     end
 
-    it "shows rubric even if there are no comments", priority: "1", test_id: 229669 do
-      @third_association = @rubric.associate_with(@third_assignment, @course, purpose: 'grading')
+    it "shows rubric even if there are no comments", priority: "1" do
+      @third_association = @rubric.associate_with(@third_assignment, @course, purpose: "grading")
       @third_submission = @third_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       @third_association.assess({
@@ -413,7 +413,7 @@ describe "grades" do
                                   assessor: @teacher,
                                   artifact: @third_submission,
                                   assessment: {
-                                    assessment_type: 'grading',
+                                    assessment_type: "grading",
                                     criterion_crit1: {
                                       points: 2,
                                       comments: "not bad, not bad"
@@ -425,25 +425,25 @@ describe "grades" do
 
       # click rubric
       f("#submission_#{@third_assignment.id} .toggle_rubric_assessments_link").click
-      expect(fj('.react-rubric caption:visible')).to include_text(@rubric.title)
-      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2')
+      expect(fj(".react-rubric caption:visible")).to include_text(@rubric.title)
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text("2")
 
       # check rubric comment
-      expect(fj('.rubric-freeform:visible div')).to include_text 'not bad, not bad'
+      expect(fj(".rubric-freeform:visible div")).to include_text "not bad, not bad"
     end
 
     context "with outcome gradebook enabled" do
       before :once do
-        Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
+        Account.default.set_feature_flag!("student_outcome_gradebook", "on")
 
         @outcome_group ||= @course.root_outcome_group
-        @outcome = @course.created_learning_outcomes.create!(title: 'outcome')
+        @outcome = @course.created_learning_outcomes.create!(title: "outcome")
         @outcome_group.add_outcome(@outcome)
       end
 
-      it "shows the outcome gradebook", priority: "1", test_id: 229670 do
+      it "shows the outcome gradebook", priority: "1" do
         StudentGradesPage.visit_as_student(@course)
-        expect(f('#navpills')).not_to be_nil
+        expect(f("#navpills")).not_to be_nil
         f('a[href="#outcomes"]').click
         wait_for_ajaximations
         expect(fj("span:contains('Toggle outcomes for Unnamed Course')")).to be_present
@@ -452,12 +452,12 @@ describe "grades" do
         expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
       end
 
-      it "shows the outcome gradebook if the student is in multiple sections", priority: "1", test_id: 229671 do
+      it "shows the outcome gradebook if the student is in multiple sections", priority: "1" do
         @other_section = @course.course_sections.create(name: "the other section")
         @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
 
         StudentGradesPage.visit_as_student(@course)
-        expect(f('#navpills')).not_to be_nil
+        expect(f("#navpills")).not_to be_nil
         f('a[href="#outcomes"]').click
         wait_for_ajaximations
         expect(fj("span:contains('Toggle outcomes for Unnamed Course')")).to be_present
@@ -469,7 +469,7 @@ describe "grades" do
   end
 
   context "as an observer" do
-    it "allows observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
+    it "allows observers to see grades of all enrollment associations", priority: "1" do
       @obs = user_model(name: "Observer")
       e1 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
       e1.associated_user = @student_1
@@ -486,14 +486,14 @@ describe "grades" do
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
       click_option("#student_select_menu", "Student 2")
-      expect_new_page_load { f('#apply_select_menus').click }
+      expect_new_page_load { f("#apply_select_menus").click }
 
       expect(f("#student_select_menu")).to be_displayed
       expect(f("#student_select_menu").attribute("value")).to eq "Student 2"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
       click_option("#student_select_menu", "Student 1")
-      expect_new_page_load { f('#apply_select_menus').click }
+      expect_new_page_load { f("#apply_select_menus").click }
 
       expect(f("#student_select_menu")).to be_displayed
       expect(f("#student_select_menu").attribute("value")).to eq "Student 1"

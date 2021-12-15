@@ -19,7 +19,7 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(<<-TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
+      <td colspan="2"><%= mt(<<~TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
 You will need to [register an application on Twitter](%{twitter_url}).
 You should configure %{callback_url} as the Callback URL, and set Access Level to
 Read, Write, and Access direct messages

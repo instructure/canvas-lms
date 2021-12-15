@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../common'
+require_relative "../common"
 
 shared_context "announcements_page_shared_context" do
-  let(:unauthorized_message) { '#unauthorized_message' }
+  let(:unauthorized_message) { "#unauthorized_message" }
   let(:announcements_page) { "/courses/#{@course.id}/announcements" }
   let(:permissions_page) { "/account/#{@account.id}/permissions" }
-  let(:course_section_tabs) { '#section-tabs' }
-  let(:announcement_link) { '.announcements' }
+  let(:course_section_tabs) { "#section-tabs" }
+  let(:announcement_link) { ".announcements" }
   let(:announcement_message) { '.discussion-summary.ellipsis:contains("Announcement 1 detail")' }
   let(:stream_announcement) { '.title:contains("Announcement")' }
   let(:announcement_title) { '.content_summary:contains("Announcement 1")' }
@@ -38,17 +38,17 @@ module AnnouncementHelpers
   end
 
   def disable_view_announcements(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'read_announcements',
+    course.root_account.role_overrides.create!(permission: "read_announcements",
                                                role: context_role, enabled: false)
   end
 
   def enable_view_announcements(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'read_announcements',
+    course.root_account.role_overrides.create!(permission: "read_announcements",
                                                role: context_role, enabled: true)
   end
 
   def view_announcement_detail
-    fj(stream_announcement).click()
-    fj(announcement_title).click()
+    fj(stream_announcement).click
+    fj(announcement_title).click
   end
 end

@@ -159,7 +159,7 @@ class Quizzes::QuizReportsController < ApplicationController
         end || {}
 
     unless Quizzes::QuizStatistics::REPORTS.include?(p[:report_type])
-      reject! 'invalid quiz report type', 400
+      reject! "invalid quiz report type", 400
     end
 
     statistics = @quiz.current_statistics_for(p[:report_type], {
@@ -168,7 +168,7 @@ class Quizzes::QuizReportsController < ApplicationController
                                               })
 
     if statistics.generating_csv?
-      reject! 'report is already being generated', 409
+      reject! "report is already being generated", 409
     end
 
     statistics.abort_csv_generation if statistics.csv_generation_failed?
@@ -220,9 +220,9 @@ class Quizzes::QuizReportsController < ApplicationController
         statistics.progress.destroy if statistics.progress.present?
       # case 2: abort the generation process if we can:
       elsif statistics.progress.blank?
-        reject! 'report is not being generated', 422
+        reject! "report is not being generated", 422
       elsif !statistics.csv_generation_abortable?
-        reject! 'report generation can not be aborted', 422
+        reject! "report generation can not be aborted", 422
       else
         statistics.abort_csv_generation
       end
@@ -272,7 +272,7 @@ class Quizzes::QuizReportsController < ApplicationController
                                                       include_root: false,
                                                       includes: includes,
                                                       meta: {
-                                                        primaryCollection: 'quiz_reports'
+                                                        primaryCollection: "quiz_reports"
                                                       }
                                                     }).as_json
 

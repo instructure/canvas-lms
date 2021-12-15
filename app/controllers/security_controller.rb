@@ -36,14 +36,14 @@ class SecurityController < ApplicationController
   # @returns JWKs
   def jwks
     key_storage = case request.path
-                  when '/internal/services/jwks'
+                  when "/internal/services/jwks"
                     CanvasSecurity::ServicesJwt::KeyStorage
-                  when '/login/oauth2/jwks'
+                  when "/login/oauth2/jwks"
                     Canvas::OAuth::KeyStorage
-                  when '/api/lti/security/jwks'
+                  when "/api/lti/security/jwks"
                     Lti::KeyStorage
                   end
-    response.set_header('Cache-Control', "max-age=#{key_storage.max_cache_age}")
+    response.set_header("Cache-Control", "max-age=#{key_storage.max_cache_age}")
     render json: key_storage.public_keyset
   end
 end

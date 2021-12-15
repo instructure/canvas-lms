@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'turnitin_api'
+require "turnitin_api"
 module Turnitin
   class TiiClient < TurnitinApi::OutcomesResponseTransformer
     def initialize(user, assignment, tool, outcomes_response_json)
       lti_params = {
-        'user_id' => Lti::Asset.opaque_identifier_for(user),
-        'context_id' => Lti::Asset.opaque_identifier_for(assignment.context),
-        'context_title' => assignment.context.name,
-        'lis_person_contact_email_primary' => user.email
+        "user_id" => Lti::Asset.opaque_identifier_for(user),
+        "context_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+        "context_title" => assignment.context.name,
+        "lis_person_contact_email_primary" => user.email
       }
 
       super(

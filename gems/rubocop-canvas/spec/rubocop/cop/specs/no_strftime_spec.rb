@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Specs::NoStrftime do
   subject(:cop) { described_class.new }
 
-  it 'disallows strftime' do
+  it "disallows strftime" do
     inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do

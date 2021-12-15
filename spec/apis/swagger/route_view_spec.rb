@@ -17,56 +17,56 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../spec_helper'
-require_relative 'swagger_helper'
-require 'argument_view'
-require 'route_view'
-require 'response_field_view'
+require_relative "../../spec_helper"
+require_relative "swagger_helper"
+require "argument_view"
+require "route_view"
+require "response_field_view"
 
 describe RouteView do
   let(:raw_route) do
-    double(verb: 'GET', path: double(spec: 'foo'))
+    double(verb: "GET", path: double(spec: "foo"))
   end
 
-  describe '#query_args' do
+  describe "#query_args" do
     let(:argument_tag) do
       text = "foo [String]\nA description."
-      double(tag_name: 'argument', text: text)
+      double(tag_name: "argument", text: text)
     end
 
     let(:deprecated_argument_tag) do
       text = "foo NOTICE 2018-01-05 EFFECTIVE 2018-05-05\nA description."
-      double(tag_name: 'deprecated_argument', text: text)
+      double(tag_name: "deprecated_argument", text: text)
     end
 
-    it 'argument views it returns respond with false to deprecated?' do
+    it "argument views it returns respond with false to deprecated?" do
       view = RouteView.new(raw_route, double(raw_arguments: [argument_tag]))
       expect(view.query_args.first).not_to be_deprecated
     end
 
-    it 'deprecated argument views it returns respond with true to deprecated?' do
+    it "deprecated argument views it returns respond with true to deprecated?" do
       view = RouteView.new(raw_route, double(raw_arguments: [deprecated_argument_tag]))
       expect(view.query_args.first).to be_deprecated
     end
   end
 
-  describe '#response_fields' do
+  describe "#response_fields" do
     let(:response_field_tag) do
-      double(tag_name: 'response_field', text: 'bar A description.', types: ['String'])
+      double(tag_name: "response_field", text: "bar A description.", types: ["String"])
     end
 
     let(:deprecated_response_field_tag) do
       text = "baz NOTICE 2018-01-05 EFFECTIVE 2018-05-05\nA description."
-      double(tag_name: 'deprecated_response_field', text: text, types: ['String'])
+      double(tag_name: "deprecated_response_field", text: text, types: ["String"])
     end
 
-    it 'returns response fields' do
+    it "returns response fields" do
       view = RouteView.new(raw_route, double(raw_response_fields: [response_field_tag]))
       field = view.response_fields.first
       expect(field).to eq({ "name" => "bar", "description" => "A description.", "deprecated" => false })
     end
 
-    it 'returns deprecated response fields' do
+    it "returns deprecated response fields" do
       view = RouteView.new(raw_route, double(raw_response_fields: [deprecated_response_field_tag]))
       field = view.response_fields.first
       expect(field).to eq({ "name" => "baz", "description" => "A description.", "deprecated" => true })

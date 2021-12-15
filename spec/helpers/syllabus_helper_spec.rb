@@ -19,31 +19,31 @@
 #
 
 describe SyllabusHelper do
-  describe '#syllabus_user_content' do
+  describe "#syllabus_user_content" do
     before :once do
       course_with_teacher(active_all: true)
-      @course.syllabus_body = '<p>Here is your syllabus</p>'
+      @course.syllabus_body = "<p>Here is your syllabus</p>"
       @course.save!
       assign(:context, @course)
     end
 
-    context 'when context grants :read permission to current_user' do
+    context "when context grants :read permission to current_user" do
       before :once do
         assign(:current_user, @user)
       end
 
-      it 'sends two arguments to `pulic_user_content`' do
+      it "sends two arguments to `pulic_user_content`" do
         expect(helper).to receive(:public_user_content).with(@course.syllabus_body, @course).once
         helper.syllabus_user_content
       end
     end
 
-    context 'when context does not grant :read permission to current_user' do
+    context "when context does not grant :read permission to current_user" do
       before :once do
         assign(:current_user, nil)
       end
 
-      it 'sends two arguments to `pulic_user_content`' do
+      it "sends two arguments to `pulic_user_content`" do
         expect(helper).to receive(:public_user_content).with(@course.syllabus_body, @course, nil, true).once
         helper.syllabus_user_content
       end

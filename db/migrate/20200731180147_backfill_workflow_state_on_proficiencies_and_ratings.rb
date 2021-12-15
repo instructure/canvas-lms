@@ -22,9 +22,9 @@ class BackfillWorkflowStateOnProficienciesAndRatings < ActiveRecord::Migration[5
   disable_ddl_transaction!
 
   def up
-    DataFixup::BackfillNulls.run(OutcomeProficiency, :workflow_state, default_value: 'active')
+    DataFixup::BackfillNulls.run(OutcomeProficiency, :workflow_state, default_value: "active")
     change_column_null(:outcome_proficiencies, :workflow_state, false)
-    DataFixup::BackfillNulls.run(OutcomeProficiencyRating, :workflow_state, default_value: 'active')
+    DataFixup::BackfillNulls.run(OutcomeProficiencyRating, :workflow_state, default_value: "active")
     change_column_null(:outcome_proficiency_ratings, :workflow_state, false)
   end
 

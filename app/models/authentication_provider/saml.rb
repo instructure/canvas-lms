@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'saml2'
+require "saml2"
 
 class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def self.sti_name
-    'saml'
+    "saml"
   end
 
   def self.enabled?(_account = nil)
@@ -30,25 +30,25 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.recognized_params
-    super + [
-      :log_in_url,
-      :log_out_url,
-      :requested_authn_context,
-      :certificate_fingerprint,
-      :identifier_format,
-      :login_attribute,
-      :idp_entity_id,
-      :parent_registration,
-      :jit_provisioning,
-      :metadata,
-      :metadata_uri,
-      :sig_alg,
-      :strip_domain_from_login_attribute
+    super + %i[
+      log_in_url
+      log_out_url
+      requested_authn_context
+      certificate_fingerprint
+      identifier_format
+      login_attribute
+      idp_entity_id
+      parent_registration
+      jit_provisioning
+      metadata
+      metadata_uri
+      sig_alg
+      strip_domain_from_login_attribute
     ].freeze
   end
 
   def self.deprecated_params
-    [:change_password_url, :login_handle_name, :unknown_user_url].freeze
+    %i[change_password_url login_handle_name unknown_user_url].freeze
   end
 
   def self.recognized_federated_attributes
@@ -108,7 +108,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   after_initialize do |ap|
     # default to the most secure signature we support, but only for new objects
     if ap.new_record?
-      ap.sig_alg ||= 'RSA-SHA256'
+      ap.sig_alg ||= "RSA-SHA256"
       ap.identifier_format ||= SAML2::NameID::Format::UNSPECIFIED
     end
   end
@@ -116,7 +116,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def destroy
     super
     if account.settings[:saml_entity_id] &&
-       !account.authentication_providers.active.where(auth_type: 'saml').exists?
+       !account.authentication_providers.active.where(auth_type: "saml").exists?
       account.settings.delete(:saml_entity_id)
       account.save!
     end
@@ -128,11 +128,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def entity_id
-    self.class.saml_default_entity_id_for_account(self.account, persist: !new_record?)
+    self.class.saml_default_entity_id_for_account(account, persist: !new_record?)
   end
 
   def set_saml_defaults
-    self.requested_authn_context = nil if self.requested_authn_context.blank?
+    self.requested_authn_context = nil if requested_authn_context.blank?
   end
 
   def validate_urls
@@ -189,8 +189,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def self.login_attributes
     {
-      'NameID' => 'NameID',
-      'eduPersonPrincipalName' => 'eduPersonPrincipalName',
+      "NameID" => "NameID",
+      "eduPersonPrincipalName" => "eduPersonPrincipalName",
     }
   end
 
@@ -206,40 +206,40 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def login_attribute
-    return 'NameID' unless read_attribute(:login_attribute)
+    return "NameID" unless read_attribute(:login_attribute)
 
     result = super
     # backcompat
-    return 'NameID' if result == 'nameid'
-    return 'eduPersonPrincipalName' if result == 'eduPersonPrincipalName_stripped'
+    return "NameID" if result == "nameid"
+    return "eduPersonPrincipalName" if result == "eduPersonPrincipalName_stripped"
 
     result
   end
 
   def strip_domain_from_login_attribute?
     # backcompat
-    return true if read_attribute(:login_attribute) == 'eduPersonPrincipalName_stripped'
+    return true if read_attribute(:login_attribute) == "eduPersonPrincipalName_stripped"
 
-    !!settings['strip_domain_from_login_attribute']
+    !!settings["strip_domain_from_login_attribute"]
   end
   alias_method :strip_domain_from_login_attribute, :strip_domain_from_login_attribute?
 
   def strip_domain_from_login_attribute=(value)
-    settings['strip_domain_from_login_attribute'] = ::Canvas::Plugin.value_to_boolean(value)
+    settings["strip_domain_from_login_attribute"] = ::Canvas::Plugin.value_to_boolean(value)
   end
 
   def signing_certificates
-    settings['signing_certificates'] ||= []
+    settings["signing_certificates"] ||= []
   end
 
   def sig_alg
-    settings['sig_alg'].presence
+    settings["sig_alg"].presence
   end
 
   def sig_alg=(value)
     value = value.presence
-    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1 if value&.downcase == 'rsa-sha1'
-    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256 if value&.downcase == 'rsa-sha256'
+    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1 if value&.downcase == "rsa-sha1"
+    value = SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA256 if value&.downcase == "rsa-sha256"
     # support using 'false' to disable
     value = nil if ::Canvas::Plugin.value_to_boolean(value, ignore_unrecognized: true) == false
 
@@ -249,7 +249,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       errors.add("Unsupported signing algorithm #{value}")
       return
     end
-    settings['sig_alg'] = value
+    settings["sig_alg"] = value
   end
 
   def self.name_id_formats
@@ -264,7 +264,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     self.idp_entity_id = entity.entity_id
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
-    self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).compact.join(' ').presence || idp.keys.first&.fingerprint
+    self.certificate_fingerprint = idp.signing_keys.filter_map(&:fingerprint).join(" ").presence || idp.keys.first&.fingerprint
 
     recognized_formats = (idp.name_id_formats & self.class.name_id_formats)
     if recognized_formats.length == 1
@@ -274,13 +274,13 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       self.identifier_format = SAML2::NameID::Format::UNSPECIFIED
     end
 
-    self.settings[:signing_certificates] = idp.signing_keys.map(&:x509).compact
-    self.settings[:signing_keys] = idp.signing_keys.map(&:key).compact.map(&:to_s)
+    settings[:signing_certificates] = idp.signing_keys.filter_map(&:x509)
+    settings[:signing_keys] = idp.signing_keys.filter_map(&:key).map(&:to_s)
     case idp.want_authn_requests_signed?
     when true
       # use ||= to not overwrite a specific algorithm that has otherwise been
       # chosen
-      self.sig_alg ||= 'RSA-SHA1'
+      self.sig_alg ||= "RSA-SHA1"
     when false
       self.sig_alg = nil
       # else nil
@@ -325,11 +325,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
         idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
                                                           SAML2::Bindings::HTTPRedirect::URN)
       end
-      idp.fingerprints = (certificate_fingerprint || '').split
-      Array.wrap(settings['signing_certificates']).each do |cert|
+      idp.fingerprints = (certificate_fingerprint || "").split
+      Array.wrap(settings["signing_certificates"]).each do |cert|
         idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
       end
-      Array.wrap(settings['signing_keys']).each do |key|
+      Array.wrap(settings["signing_keys"]).each do |key|
         key_descriptor = SAML2::KeyDescriptor.new(nil, SAML2::KeyDescriptor::Type::SIGNING)
         key_descriptor.key = OpenSSL::PKey.read(key)
         idp.keys << key
@@ -347,7 +347,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     entity.entity_id = entity_id
 
     contact = SAML2::Contact.new(SAML2::Contact::Type::TECHNICAL)
-    contact.surname = app_config[:tech_contact_name] || 'Webmaster'
+    contact.surname = app_config[:tech_contact_name] || "Webmaster"
     contact.email_addresses = Array.wrap(app_config[:tech_contact_email])
     entity.contacts << contact
 
@@ -423,8 +423,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.sp_metadata_for_account(account, current_host = nil, include_all_encryption_certificates: true)
-    aps = account.authentication_providers.active.where(auth_type: 'saml').to_a
-    entity = sp_metadata(saml_default_entity_id_for_account(account, persist: aps.length != 0),
+    aps = account.authentication_providers.active.where(auth_type: "saml").to_a
+    entity = sp_metadata(saml_default_entity_id_for_account(account, persist: !aps.empty?),
                          HostUrl.context_hosts(account, current_host),
                          include_all_encryption_certificates: include_all_encryption_certificates)
     prior_configs = Set.new
@@ -435,10 +435,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
       prior_configs << federated_attributes
 
-      acs = SAML2::AttributeConsumingService.new(en: 'Canvas')
+      acs = SAML2::AttributeConsumingService.new(en: "Canvas")
       acs.index = ap.id
       federated_attributes.each do |(_canvas_attribute_name, provider_attribute_config)|
-        acs.requested_attributes << SAML2::RequestedAttribute.create(provider_attribute_config['attribute'])
+        acs.requested_attributes << SAML2::RequestedAttribute.create(provider_attribute_config["attribute"])
       end
       entity.roles.last.attribute_consuming_services << acs
     end
@@ -450,7 +450,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.config
-    ConfigFile.load('saml') || {}
+    ConfigFile.load("saml") || {}
   end
 
   def self.private_key
@@ -464,12 +464,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def self.private_keys
     return {} unless (encryption = config[:encryption])
 
-    ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).map do |key|
+    ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).filter_map do |key|
       path = resolve_saml_key_path(key)
       next unless path
 
       [path, File.read(path)]
-    end.compact.to_h
+    end.to_h
   end
 
   ::Canvas::Reloader.on_reload do
@@ -482,7 +482,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     path = Pathname(path)
 
     if path.relative?
-      path = Rails.root.join 'config', path
+      path = Rails.root.join "config", path
     end
 
     path.exist? ? path.to_s : nil
@@ -513,7 +513,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       debug_set(:logout_request_id, logout_request.id)
       debug_set(:logout_to_idp_url, result)
       debug_set(:logout_to_idp_xml, logout_request.to_s)
-      debug_set(:debugging, t('debug.logout_redirect', "LogoutRequest sent to IdP"))
+      debug_set(:debugging, t("debug.logout_redirect", "LogoutRequest sent to IdP"))
     end
 
     result

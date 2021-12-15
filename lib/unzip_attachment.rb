@@ -21,7 +21,7 @@
 # This is used to take a zipped file, unzip it, add directories to a
 # context, and attach the files in the correct directories.
 class UnzipAttachment
-  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
+  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/.freeze
 
   def self.process(opts = {})
     @ua = new(opts)
@@ -34,11 +34,11 @@ class UnzipAttachment
 
   # for backwards compatibility
   def course
-    self.context
+    context
   end
 
   def course_files_folder
-    self.context_files_folder
+    context_files_folder
   end
 
   def initialize(opts = {})
@@ -53,9 +53,9 @@ class UnzipAttachment
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
 
-    raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
-    raise ArgumentError, "Must provide a filename." unless self.filename
-    raise ArgumentError, "Must provide a context files folder." unless self.context_files_folder
+    raise ArgumentError, "Must provide a context." unless context&.is_a_context?
+    raise ArgumentError, "Must provide a filename." unless filename
+    raise ArgumentError, "Must provide a context files folder." unless context_files_folder
   end
 
   def update_progress(pct)
@@ -63,7 +63,7 @@ class UnzipAttachment
 
     if @progress_proc.arity == 0
       # for backwards compatibility with callback procs that expect no arguments
-      @progress_proc.call()
+      @progress_proc.call
     else
       @progress_proc.call(pct)
     end
@@ -96,7 +96,7 @@ class UnzipAttachment
 
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
-      CanvasUnzip.extract_archive(self.filename) do |entry, index|
+      CanvasUnzip.extract_archive(filename) do |entry, index|
         next if should_skip?(entry)
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
@@ -104,7 +104,7 @@ class UnzipAttachment
         entry_path_array.pop
 
         folder_path_array += entry_path_array
-        folder_name = folder_path_array.join('/')
+        folder_name = folder_path_array.join("/")
         folder = Folder.assert_path(folder_name, @context)
 
         update_progress(zip_stats.percent_complete(index))
@@ -126,7 +126,7 @@ class UnzipAttachment
           f.unlink
           raise
         rescue => e
-          @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
+          @logger&.warn "Couldn't unzip archived file #{f.path}: #{e.message}"
         end
       end
       update_attachment_positions(id_positions)
@@ -146,16 +146,16 @@ class UnzipAttachment
     end
 
     if updates.any?
-      Attachment.where(id: id_positions.keys).update_all("position=CASE #{updates.join(' ')} ELSE position END")
+      Attachment.where(id: id_positions.keys).update_all("position=CASE #{updates.join(" ")} ELSE position END")
     end
   end
 
   def attach(path, entry, folder, md5, migration_id: nil)
-    FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-                                             explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
+                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
   rescue
-    FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-                                             explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
+                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
   end
 
   def with_unzip_configuration
@@ -173,18 +173,18 @@ class UnzipAttachment
   end
 
   def last_position
-    @last_position ||= (@context.attachments.active.map(&:position).compact.last || 0)
+    @last_position ||= (@context.attachments.active.filter_map(&:position).last || 0)
   end
 
   def should_skip?(entry)
     entry.directory? ||
-      entry.name.split('/').any? { |p| p =~ THINGS_TO_IGNORE_REGEX } ||
+      entry.name.split("/").any? { |p| p =~ THINGS_TO_IGNORE_REGEX } ||
       (@valid_paths && !@valid_paths.include?(entry.name))
   end
 
   def path_elements_for(path)
     list = File.split(path) rescue []
-    list.shift if list[0] == '.'
+    list.shift if list[0] == "."
     list
   end
 
@@ -198,7 +198,7 @@ class UnzipAttachment
 
   # Finds the folder in the database, creating the path if necessary
   def infer_folder(path)
-    list = path.split('/')
+    list = path.split("/")
     current = (@root_directory ||= folders.root_directory)
     # For every directory in the path...
     # (-2 means all entries but the last, which should be a filename)
@@ -214,8 +214,8 @@ class UnzipAttachment
 
   # Actually creates the folder in the database.
   def assert_folder(root, dir)
-    folder = Folder.new(:parent_folder_id => root.id, :name => dir)
-    folder.context = self.context
+    folder = Folder.new(parent_folder_id: root.id, name: dir)
+    folder.context = context
     folder.save!
     folder
   end
@@ -226,7 +226,7 @@ class UnzipAttachment
     @folders = nil if reset
     return @folders if @folders
 
-    @folders = OpenStruct.new(:root_directory => self.context_files_folder)
+    @folders = OpenStruct.new(root_directory: context_files_folder)
   end
 end
 
@@ -248,7 +248,7 @@ class ZipFileStats
   end
 
   def validate_against(context)
-    max = Setting.get('max_zip_file_count', '100000').to_i
+    max = Setting.get("max_zip_file_count", "100000").to_i
     if file_count > max
       raise ArgumentError, "Zip File cannot have more than #{max} entries"
     end
@@ -289,7 +289,7 @@ class ZipFileStats
   private
 
   def process!
-    CanvasUnzip::extract_archive(filename) do |entry|
+    CanvasUnzip.extract_archive(filename) do |entry|
       @file_count += 1
       @total_size += [entry.size, Attachment.minimum_size_for_quota].max
       @paths << entry.name

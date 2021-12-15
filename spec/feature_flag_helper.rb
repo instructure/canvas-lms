@@ -41,7 +41,7 @@ module FeatureFlagHelper
     [Account, Course, User].each do |model|
       original_method = model.instance_method(:lookup_feature_flag)
       allow_any_instance_of(model).to receive(:lookup_feature_flag) do |m, feature, **kwargs|
-        original_method.bind(m).call(feature, **kwargs)
+        original_method.bind_call(m, feature, **kwargs)
       rescue
         nil
       end

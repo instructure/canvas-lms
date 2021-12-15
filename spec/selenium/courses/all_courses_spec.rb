@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "course catalog" do
   include_context "in-process server selenium tests"
@@ -32,7 +32,7 @@ describe "course catalog" do
   end
 
   def course_elements
-    ff('#course_summaries > li')
+    ff("#course_summaries > li")
   end
 
   def catalog_setup
@@ -44,12 +44,12 @@ describe "course catalog" do
 
   def public_indexed_course_attrs
     {
-      name: 'Intro to Testing',
-      public_description: 'An overview of testing with Selenium',
+      name: "Intro to Testing",
+      public_description: "An overview of testing with Selenium",
       is_public: true,
       indexed: true,
       self_enrollment: true,
-      workflow_state: 'available'
+      workflow_state: "available"
     }
   end
 
@@ -68,9 +68,9 @@ describe "course catalog" do
     expect(course_elements.size).to eql 1
   end
 
-  it "lists a next button when >12 courses are in the index and public", priority: "1", test_id: 2963672 do
-    create_courses(13.times.map { |i| public_indexed_course_attrs.merge(name: i.to_s) })
+  it "lists a next button when >12 courses are in the index and public", priority: "1" do
+    create_courses(Array.new(13) { |i| public_indexed_course_attrs.merge(name: i.to_s) })
     refresh_page
-    expect(f('#next-link').displayed?).to be(true)
+    expect(f("#next-link").displayed?).to be(true)
   end
 end

@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples '[:correct]' do
-  it 'counts all fully correct responses' do
+shared_examples "[:correct]" do
+  it "counts all fully correct responses" do
     stats = subject.run([
                           { correct: "true" },
                           { correct: true },
                           { correct: false },
                           { correct: nil },
-                          { correct: 'partial' },
-                          { correct: 'undefined' },
-                          { correct: 'defined' }
+                          { correct: "partial" },
+                          { correct: "undefined" },
+                          { correct: "defined" }
                         ])
 
     expect(stats[:correct]).to eq(2)

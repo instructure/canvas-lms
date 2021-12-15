@@ -18,24 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'session token', type: :request do
+describe "session token", type: :request do
   before do
     user_with_pseudonym
     enable_default_developer_key!
   end
 
-  let(:access_token) { @user.access_tokens.create!(:purpose => "test").full_token }
+  let(:access_token) { @user.access_tokens.create!(purpose: "test").full_token }
 
   it "works" do
-    get 'https://www.example.com/login/session_token?return_to=https://www.example.com/courses',
+    get "https://www.example.com/login/session_token?return_to=https://www.example.com/courses",
         params: { access_token: access_token }
     expect(response).to be_successful
     json = JSON.parse(response.body)
-    expect(json['session_url']).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_\-]+$}
+    expect(json["session_url"]).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_\-]+$}
 
-    get json['session_url']
+    get json["session_url"]
     expect(response).to be_redirect
-    expect(response.location).to eq 'https://www.example.com/courses'
+    expect(response.location).to eq "https://www.example.com/courses"
 
     follow_redirect!
     expect(response).to be_successful
@@ -46,7 +46,7 @@ describe 'session token', type: :request do
     @pseudonym = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
     @pseudonym.save!
     get "http://test1.instructure.com/?session_token=#{SessionToken.new(@pseudonym.id, used_remember_me_token: true)}"
-    expect(response).to redirect_to 'http://test1.instructure.com/'
+    expect(response).to redirect_to "http://test1.instructure.com/"
 
     follow_redirect!
     expect(response).to be_successful
@@ -54,22 +54,22 @@ describe 'session token', type: :request do
   end
 
   it "rejects bad tokens" do
-    get 'http://test1.instructure.com/?session_token=garbage'
+    get "http://test1.instructure.com/?session_token=garbage"
     expect(response).to be_redirect
-    expect(response.location).to eq 'http://test1.instructure.com/login'
+    expect(response.location).to eq "http://test1.instructure.com/login"
 
     token = SessionToken.new(@pseudonym.id)
     token.created_at = 1.day.ago
     token.signature = Canvas::Security.hmac_sha1(token.signature_string)
     get "http://test1.instructure.com/?session_token=#{token}"
     expect(response).to be_redirect
-    expect(response.location).to eq 'http://test1.instructure.com/login'
+    expect(response.location).to eq "http://test1.instructure.com/login"
 
     token = SessionToken.new(@pseudonym.id)
     token.pseudonym_id = @pseudonym.id - 1
     get "http://test1.instructure.com/?session_token=#{token}"
     expect(response).to be_redirect
-    expect(response.location).to eq 'http://test1.instructure.com/login'
+    expect(response.location).to eq "http://test1.instructure.com/login"
   end
 
   it "removes the token from the url when already logged in" do
@@ -79,7 +79,7 @@ describe 'session token', type: :request do
     user_session(@user, @pseudonym)
 
     get "http://test1.instructure.com/?session_token=#{SessionToken.new(@pseudonym.id)}"
-    expect(response).to redirect_to 'http://test1.instructure.com/'
+    expect(response).to redirect_to "http://test1.instructure.com/"
     follow_redirect!
     expect(response).to be_successful
   end

@@ -39,7 +39,7 @@ module ApplicationHelper
     user_id = user.is_a?(OpenObject) ? user.id : user
     Rails
       .cache
-      .fetch(['context_user_name', context, user_id].cache_key, { expires_in: 15.minutes }) do
+      .fetch(["context_user_name", context, user_id].cache_key, { expires_in: 15.minutes }) do
         context_user_name_display(User.find(user_id))
       end
   end
@@ -55,16 +55,16 @@ module ApplicationHelper
       content += "    <span class='description'>#{h(hash[:description])}</span>\n"
       content += "  </li>\n"
     end
-    content += '</ul>'
+    content += "</ul>"
     content_for(:keyboard_navigation) { raw(content) }
   end
 
   def context_prefix(code)
-    return '/{{ context_type_pluralized }}/{{ context_id }}' unless code
+    return "/{{ context_type_pluralized }}/{{ context_id }}" unless code
 
-    split = code.split(/_/)
+    split = code.split("_")
     id = split.pop
-    type = split.join('_')
+    type = split.join("_")
     "/#{type.pluralize}/#{id}"
   end
 
@@ -75,19 +75,19 @@ module ApplicationHelper
     @cached_context_names[code] ||=
       Rails
       .cache
-      .fetch(['short_name_lookup', code].cache_key) do
+      .fetch(["short_name_lookup", code].cache_key) do
         Context.find_by_asset_string(code).short_name
-      rescue StandardError
-        ''
+      rescue
+        ""
       end
   end
 
-  def slugify(text = '')
-    text.gsub(/[^\w]/, '_').downcase
+  def slugify(text = "")
+    text.gsub(/[^\w]/, "_").downcase
   end
 
   def count_if_any(count = nil)
-    count && count > 0 ? "(#{count})" : ''
+    count && count > 0 ? "(#{count})" : ""
   end
 
   # Used to generate context_specific urls, as in:
@@ -111,7 +111,7 @@ module ApplicationHelper
         nil
       end
       opts[-1][:only_path] = true unless opts[-1][:only_path] == false
-      res = self.send name, *opts
+      res = send name, *opts
     elsif opts[0].is_a? Hash
       opts = opts[0]
       begin
@@ -121,7 +121,7 @@ module ApplicationHelper
       end
       opts[:only_path] = true
       opts["#{context_name}_id"] = context.id
-      res = self.url_for opts
+      res = url_for opts
     else
       res = context_name.to_s + opts.to_json.to_s
     end
@@ -130,8 +130,8 @@ module ApplicationHelper
 
   def full_url(path)
     uri = URI.parse(request.url)
-    uri.path = ''
-    uri.query = ''
+    uri.path = ""
+    uri.query = ""
     URI.join(uri, path).to_s
   end
 
@@ -140,7 +140,7 @@ module ApplicationHelper
   end
 
   def message_user_path(user, context = nil)
-    context = context || @context
+    context ||= @context
 
     # If context is a group that belongs to a course, use the course as the context instead
     context = context.context if context.is_a?(Group) && context.context.is_a?(Course)
@@ -164,7 +164,7 @@ module ApplicationHelper
   end
 
   def hidden(include_style = false)
-    include_style ? "style='display:none;'".html_safe : 'display: none;'
+    include_style ? "style='display:none;'".html_safe : "display: none;"
   end
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
@@ -178,9 +178,9 @@ module ApplicationHelper
   # See `js_base_url`
   def use_optimized_js?
     if params.key?(:optimized_js)
-      params[:optimized_js] == 'true' || params[:optimized_js] == '1'
+      params[:optimized_js] == "true" || params[:optimized_js] == "1"
     else
-      ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+      ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
     end
   end
 
@@ -195,7 +195,7 @@ module ApplicationHelper
   #   * when ENV['USE_OPTIMIZED_JS'] is false
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
-    (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
+    (use_optimized_js? ? "/dist/webpack-production" : "/dist/webpack-dev").freeze
   end
 
   def load_scripts_async_in_order(script_urls)
@@ -214,7 +214,7 @@ module ApplicationHelper
   # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
   def include_head_js
     paths = []
-    paths << active_brand_config_url('js')
+    paths << active_brand_config_url("js")
 
     # We preemptive load these timezone/locale data files so they are ready
     # by the time our app-code runs and so webpack doesn't need to know how to load them
@@ -226,12 +226,12 @@ module ApplicationHelper
 
     # if there is a moment locale besides english set, put a script tag for it
     # so it is loaded and ready before we run any of our app code
-    if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
+    if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != "en"
       moment_chunks =
         Canvas::Cdn::RevManifest.all_webpack_chunks_for("moment/locale/#{js_env[:MOMENT_LOCALE]}")
       @script_chunks += moment_chunks if moment_chunks
     end
-    @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for('main')
+    @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("main")
     @script_chunks.uniq!
 
     chunk_urls = @script_chunks.map { |s| "#{js_base_url}/#{s}" }
@@ -259,7 +259,7 @@ module ApplicationHelper
     @rendered_preload_chunks ||= []
     preload_chunks =
       new_js_bundles.map do |(bundle, plugin, *)|
-        key = "#{plugin ? "#{plugin}-" : ''}#{bundle}"
+        key = "#{plugin ? "#{plugin}-" : ""}#{bundle}"
         Canvas::Cdn::RevManifest.all_webpack_chunks_for(key)
       end.flatten.uniq - @script_chunks - @rendered_preload_chunks # subtract out the ones we already preloaded in the <head>
     @rendered_preload_chunks += preload_chunks
@@ -275,11 +275,13 @@ module ApplicationHelper
       #
       # preloading works similarily for window.deferredBundles only that their
       # execution is delayed until the DOM is ready.
-      concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
-                              defer ||= defer_js_bundle?(bundle)
-                              container = defer ? 'window.deferredBundles' : 'window.bundles'
-                              "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
-                            }.join("\n") if new_js_bundles.present?
+      if new_js_bundles.present?
+        concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
+                                defer ||= defer_js_bundle?(bundle)
+                                container = defer ? "window.deferredBundles" : "window.bundles"
+                                "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ""}#{bundle}');"
+                              }.join("\n")
+      end
     end
   end
 
@@ -296,28 +298,28 @@ module ApplicationHelper
 
     unless new_css_bundles.empty?
       bundles = new_css_bundles.map { |(bundle, plugin)| css_url_for(bundle, plugin) }
-      bundles << css_url_for('disable_transitions') if disable_css_transitions?
-      bundles << { media: 'all' }
+      bundles << css_url_for("disable_transitions") if disable_css_transitions?
+      bundles << { media: "all" }
       stylesheet_link_tag(*bundles)
     end
   end
 
   def disable_css_transitions?
-    Rails.env.test? && ENV.fetch('DISABLE_CSS_TRANSITIONS', '1') == '1'
+    Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
   # this is exactly the same as our sass helper with the same name
   # see: https://www.npmjs.com/package/sass-direction
   def direction(left_or_right)
-    I18n.rtl? ? { 'left' => 'right', 'right' => 'left' }[left_or_right] : left_or_right
+    I18n.rtl? ? { "left" => "right", "right" => "left" }[left_or_right] : left_or_right
   end
 
   def css_variant(opts = {})
-    variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
+    variant = use_responsive_layout? ? "responsive_layout" : "new_styles"
     use_high_contrast =
-      (@current_user && @current_user.prefers_high_contrast?) || opts[:force_high_contrast]
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') +
-      (I18n.rtl? ? '_rtl' : '')
+      @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
+    variant + (use_high_contrast ? "_high_contrast" : "_normal_contrast") +
+      (I18n.rtl? ? "_rtl" : "")
   end
 
   def css_url_for(bundle_name, plugin = false, opts = {})
@@ -329,8 +331,8 @@ module ApplicationHelper
       end
 
     cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
-    base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant(opts)
-    File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
+    base_dir = cache[:includesNoVariables] ? "no_variables" : css_variant(opts)
+    File.join("/dist", "brandable_css", base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 
   def font_url_for(nominal_font_href)
@@ -344,31 +346,31 @@ module ApplicationHelper
 
   # returns the proper alt text for the logo
   def alt_text_for_login_logo
-    possibly_customized_login_logo = brand_variable('ic-brand-Login-logo')
-    default_login_logo = BrandableCSS.brand_variable_value('ic-brand-Login-logo')
+    possibly_customized_login_logo = brand_variable("ic-brand-Login-logo")
+    default_login_logo = BrandableCSS.brand_variable_value("ic-brand-Login-logo")
     if possibly_customized_login_logo == default_login_logo
-      I18n.t('Canvas by Instructure')
+      I18n.t("Canvas by Instructure")
     else
       @domain_root_account.short_name
     end
   end
 
   def favicon
-    possibly_customized_favicon = brand_variable('ic-brand-favicon')
-    default_favicon = BrandableCSS.brand_variable_value('ic-brand-favicon')
+    possibly_customized_favicon = brand_variable("ic-brand-favicon")
+    default_favicon = BrandableCSS.brand_variable_value("ic-brand-favicon")
     if possibly_customized_favicon == default_favicon
-      return 'favicon-green.ico' if Rails.env.development?
-      return 'favicon-yellow.ico' if Rails.env.test?
+      return "favicon-green.ico" if Rails.env.development?
+      return "favicon-yellow.ico" if Rails.env.test?
     end
     possibly_customized_favicon
   end
 
   def include_common_stylesheets
-    stylesheet_link_tag css_url_for(:common), media: 'all'
+    stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
   def quiz_lti_tab?(tab)
-    if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] &&
+    if tab[:id].is_a?(String) && tab[:id].start_with?("context_external_tool_") && tab[:args] &&
        tab[:args][1]
       return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
     end
@@ -387,26 +389,26 @@ module ApplicationHelper
     tabs.select do |tab|
       if begin
         tab[:id] == @context.class::TAB_COLLABORATIONS
-      rescue StandardError
+      rescue
         false
       end
         Collaboration.any_collaborations_configured?(@context) &&
           !@context.feature_enabled?(:new_collaborations)
       elsif begin
         quiz_lti_tab?(tab)
-      rescue StandardError
+      rescue
         false
       end
         new_quizzes_navigation_placements_enabled?(@context)
       elsif begin
         tab[:id] == @context.class::TAB_COLLABORATIONS_NEW
-      rescue StandardError
+      rescue
         false
       end
         @context.feature_enabled?(:new_collaborations)
       elsif begin
         tab[:id] == @context.class::TAB_CONFERENCES
-      rescue StandardError
+      rescue
         false
       end
         feature_enabled?(:web_conferences)
@@ -415,7 +417,7 @@ module ApplicationHelper
           (
             begin
               @context.class::TAB_SETTINGS
-            rescue StandardError
+            rescue
               nil
             end
           )
@@ -433,23 +435,23 @@ module ApplicationHelper
   end
 
   def embedded_chat_url
-    chat_tool = active_external_tool_by_id('chat')
-    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
+    chat_tool = active_external_tool_by_id("chat")
+    return unless chat_tool&.url && chat_tool.custom_fields["mini_view_url"]
 
     uri = URI.parse(chat_tool.url)
-    uri.path = chat_tool.custom_fields['mini_view_url']
+    uri.path = chat_tool.custom_fields["mini_view_url"]
     uri.to_s
   end
 
   def embedded_chat_enabled
-    chat_tool = active_external_tool_by_id('chat')
-    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url'] &&
-      Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
+    chat_tool = active_external_tool_by_id("chat")
+    chat_tool&.url && chat_tool.custom_fields["mini_view_url"] &&
+      Canvas::Plugin.value_to_boolean(chat_tool.custom_fields["embedded_chat_enabled"])
   end
 
   def embedded_chat_visible
     @show_embedded_chat != false && !@embedded_view && !@body_class_no_headers && @current_user &&
-      @context.is_a?(Course) && external_tool_tab_visible('chat') && embedded_chat_enabled
+      @context.is_a?(Course) && external_tool_tab_visible("chat") && embedded_chat_enabled
   end
 
   def active_external_tool_by_id(tool_id)
@@ -457,7 +459,7 @@ module ApplicationHelper
     @cached_external_tools[tool_id] ||=
       Rails
       .cache
-      .fetch(['active_external_tool_for', @context, tool_id].cache_key, expires_in: 1.hour) do
+      .fetch(["active_external_tool_for", @context, tool_id].cache_key, expires_in: 1.hour) do
         # don't use for groups. they don't have account_chain_ids
         tool = @context.context_external_tools.active.where(tool_id: tool_id).first
 
@@ -470,7 +472,7 @@ module ApplicationHelper
           tools =
             ContextExternalTool
             .active
-            .where(context_type: 'Account', context_id: account_chain_ids, tool_id: tool_id)
+            .where(context_type: "Account", context_id: account_chain_ids, tool_id: tool_id)
             .to_a
           account_chain_ids.each do |account_id|
             tool = tools.find { |t| t.context_id == account_id }
@@ -492,25 +494,25 @@ module ApplicationHelper
 
   def license_help_link
     @include_license_dialog = true
-    css_bundle('license_help')
-    js_bundle('license_help')
+    css_bundle("license_help")
+    js_bundle("license_help")
     icon = safe_join ["<i class='icon-question' aria-hidden='true'></i>".html_safe]
     link_to(
       icon,
-      '#',
-      class: 'license_help_link no-hover',
-      title: I18n.t('Help with content licensing')
+      "#",
+      class: "license_help_link no-hover",
+      title: I18n.t("Help with content licensing")
     )
   end
 
   def visibility_help_link
-    js_bundle('visibility_help')
+    js_bundle("visibility_help")
     icon = safe_join ["<i class='icon-question' aria-hidden='true'></i>".html_safe]
     link_to(
       icon,
-      '#',
-      class: 'visibility_help_link no-hover',
-      title: I18n.t('Help with course visibilities')
+      "#",
+      class: "visibility_help_link no-hover",
+      title: I18n.t("Help with course visibilities")
     )
   end
 
@@ -544,9 +546,9 @@ module ApplicationHelper
 
   def hash_get(hash, key, default = nil)
     if hash
-      if hash[key.to_s] != nil
+      if !hash[key.to_s].nil?
         hash[key.to_s]
-      elsif hash[key.to_sym] != nil
+      elsif !hash[key.to_sym].nil?
         hash[key.to_sym]
       else
         default
@@ -567,26 +569,26 @@ module ApplicationHelper
 
     # TODO: get these kaltura settings out of the global INST object completely.
     # Only load them when trying to record a video
-    if @context.try_rescue(:allow_media_comments?) || controller_name == 'conversations'
+    if @context.try_rescue(:allow_media_comments?) || controller_name == "conversations"
       kalturaConfig = CanvasKaltura::ClientV3.config
       if kalturaConfig
         global_inst_object[:allowMediaComments] = true
         global_inst_object[:kalturaSettings] =
           kalturaConfig.try(
             :slice,
-            'domain',
-            'resource_domain',
-            'rtmp_domain',
-            'partner_id',
-            'subpartner_id',
-            'player_ui_conf',
-            'player_cache_st',
-            'kcw_ui_conf',
-            'upload_ui_conf',
-            'max_file_size_bytes',
-            'do_analytics',
-            'hide_rte_button',
-            'js_uploader'
+            "domain",
+            "resource_domain",
+            "rtmp_domain",
+            "partner_id",
+            "subpartner_id",
+            "player_ui_conf",
+            "player_cache_st",
+            "kcw_ui_conf",
+            "upload_ui_conf",
+            "max_file_size_bytes",
+            "do_analytics",
+            "hide_rte_button",
+            "js_uploader"
           )
       end
     end
@@ -596,7 +598,7 @@ module ApplicationHelper
       disableGooglePreviews: !service_enabled?(:google_docs_previews),
       logPageViews: !@body_class_no_headers,
       editorButtons: editor_buttons,
-      pandaPubSettings: CanvasPandaPub::Client.config.try(:slice, 'push_url', 'application_id')
+      pandaPubSettings: CanvasPandaPub::Client.config.try(:slice, "push_url", "application_id")
     }.each do |key, value|
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
@@ -612,12 +614,12 @@ module ApplicationHelper
     cached_tools =
       Rails
       .cache
-      .fetch((['editor_buttons_for2'] + contexts.uniq).cache_key) do
+      .fetch((["editor_buttons_for2"] + contexts.uniq).cache_key) do
         tools =
           ContextExternalTool
           .shard(@context.shard)
           .active
-          .having_setting('editor_button')
+          .having_setting("editor_button")
           .where(context: contexts)
           .order(:id)
 
@@ -630,24 +632,24 @@ module ApplicationHelper
   end
 
   def nbsp
-    raw('&nbsp;')
+    raw("&nbsp;")
   end
 
   def dataify(obj, *attributes)
     hash = obj.respond_to?(:to_hash) && obj.to_hash
-    res = +''
+    res = +""
     if !attributes.empty?
       attributes.each do |attribute|
         res << " data-#{h attribute}=\"#{h(hash ? hash[attribute] : obj.send(attribute))}\""
       end
     elsif hash
-      res << hash.map { |key, value| "data-#{h key}=\"#{h value}\"" }.join(' ')
+      res << hash.map { |key, value| "data-#{h key}=\"#{h value}\"" }.join(" ")
     end
     raw(" #{res} ")
   end
 
   def inline_media_comment_link(comment = nil)
-    if comment && comment.media_comment_id
+    if comment&.media_comment_id
       raw "<a href=\"#\" class=\"instructure_inline_media_comment no-underline\" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>"
     end
   end
@@ -660,25 +662,25 @@ module ApplicationHelper
     uri =
       begin
         URI.parse(src)
-      rescue StandardError
+      rescue
         nil
       end
     if uri
       query = Rack::Utils.parse_query(uri.query)
-      if uri.host == 'www.youtube.com' && uri.path == '/watch' && query['v'].present?
-        src = "//www.youtube.com/embed/#{query['v']}"
+      if uri.host == "www.youtube.com" && uri.path == "/watch" && query["v"].present?
+        src = "//www.youtube.com/embed/#{query["v"]}"
         html_options.merge!(
           {
-            title: 'Youtube video player',
+            title: "Youtube video player",
             width: 640,
             height: 480,
             frameborder: 0,
-            allowfullscreen: 'allowfullscreen'
+            allowfullscreen: "allowfullscreen"
           }
         )
       end
     end
-    content_tag('iframe', '', { src: src }.merge(html_options))
+    content_tag("iframe", "", { src: src }.merge(html_options))
   end
 
   # returns a time object at 00:00:00 tomorrow
@@ -691,23 +693,23 @@ module ApplicationHelper
     opts[:indent_width] ||= 3
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
-    if opts.has_key?(:all_folders)
-      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by { |f| f.parent_folder_id }
+    if opts.key?(:all_folders)
+      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by(&:parent_folder_id)
     end
 
     folders.each do |folder|
       opts[:options_so_far] <<
-        "<option value=\"#{folder.id}\" #{'selected' if opts[:selected_folder_id] == folder.id}>#{'&nbsp;' * opts[:indent_width] * opts[:depth]}#{'- ' if opts[:depth] > 0}#{html_escape folder.name}</option>"
-      if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
-        child_folders =
-          if opts[:sub_folders]
-            opts[:sub_folders][folder.id] || []
-          else
-            folder.active_sub_folders.by_position
-          end
-        if child_folders.any?
-          folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
+        "<option value=\"#{folder.id}\" #{"selected" if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>"
+      next unless opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
+
+      child_folders =
+        if opts[:sub_folders]
+          opts[:sub_folders][folder.id] || []
+        else
+          folder.active_sub_folders.by_position
         end
+      if child_folders.any?
+        folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
     opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
@@ -724,29 +726,26 @@ module ApplicationHelper
   end
 
   def join_title(*parts)
-    parts.join(t('#title_separator', ': '))
+    parts.join(t("#title_separator", ": "))
   end
 
   def cache(name = {}, options = {}, &block)
     unless options && options[:no_locale]
       name = name.cache_key if name.respond_to?(:cache_key)
-      name = name + "/#{I18n.locale}" if name.is_a?(String)
+      name += "/#{I18n.locale}" if name.is_a?(String)
     end
     super
   end
 
   # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
-    mapped =
-      groups.map do |g|
-        { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
-      end
-
-    mapped
+    groups.map do |g|
+      { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
+    end
   end
 
   def show_feedback_link?
-    Setting.get('show_feedback_link', 'false') == 'true'
+    Setting.get("show_feedback_link", "false") == "true"
   end
 
   def support_url
@@ -755,23 +754,23 @@ module ApplicationHelper
   end
 
   def help_link_url
-    support_url || '#'
+    support_url || "#"
   end
 
   def help_link_classes(additional_classes = [])
     css_classes = []
-    css_classes << 'support_url' if support_url
-    css_classes << 'help_dialog_trigger'
+    css_classes << "support_url" if support_url
+    css_classes << "help_dialog_trigger"
     css_classes.concat(additional_classes) if additional_classes
-    css_classes.join(' ')
+    css_classes.join(" ")
   end
 
   def help_link_icon
-    (@domain_root_account && @domain_root_account.settings[:help_link_icon]) || 'help'
+    (@domain_root_account && @domain_root_account.settings[:help_link_icon]) || "help"
   end
 
   def default_help_link_name
-    I18n.t('Help')
+    I18n.t("Help")
   end
 
   def help_link_name
@@ -780,7 +779,7 @@ module ApplicationHelper
   end
 
   def help_link_data
-    { 'track-category': 'help system', 'track-label': 'help button' }
+    { "track-category": "help system", "track-label": "help button" }
   end
 
   def help_link
@@ -842,7 +841,7 @@ module ApplicationHelper
     # for finding which values to show in the theme editor
     return @brand_account if opts[:ignore_parents]
 
-    if !@brand_account
+    unless @brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
@@ -872,7 +871,7 @@ module ApplicationHelper
   end
 
   def include_account_js
-    return if params[:global_includes] == '0' || !@domain_root_account
+    return if params[:global_includes] == "0" || !@domain_root_account
     return unless pseudonym_can_see_custom_assets
 
     includes =
@@ -897,7 +896,7 @@ module ApplicationHelper
   end
 
   def disable_account_css?
-    @disable_account_css || params[:global_includes] == '0' || !@domain_root_account
+    @disable_account_css || params[:global_includes] == "0" || !@domain_root_account
   end
 
   def include_account_css
@@ -912,7 +911,7 @@ module ApplicationHelper
         Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :css_overrides)
       end
 
-    stylesheet_link_tag(*(includes + [{ media: 'all' }])) if includes.present?
+    stylesheet_link_tag(*(includes + [{ media: "all" }])) if includes.present?
   end
 
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
@@ -921,9 +920,9 @@ module ApplicationHelper
     context = opts[:context]
     tag_type = opts.fetch(:tag_type, :time)
     if datetime.present?
-      attributes['data-html-tooltip-title'] ||=
+      attributes["data-html-tooltip-title"] ||=
         context_sensitive_datetime_title(datetime, context, just_text: true)
-      attributes['data-tooltip'] ||= 'top'
+      attributes["data-tooltip"] ||= "top"
     end
 
     content_tag(tag_type, attributes) { datetime_string(datetime) }
@@ -931,7 +930,7 @@ module ApplicationHelper
 
   def context_sensitive_datetime_title(datetime, context, options = {})
     just_text = options.fetch(:just_text, false)
-    default_text = options.fetch(:default_text, '')
+    default_text = options.fetch(:default_text, "")
     return default_text unless datetime.present?
 
     local_time = datetime_string(datetime)
@@ -940,7 +939,7 @@ module ApplicationHelper
       course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
       if course_time != local_time
         text =
-          "#{h I18n.t('#helpers.local', 'Local')}: #{h local_time}<br>#{h I18n.t('#helpers.course', 'Course')}: #{h course_time}"
+          "#{h I18n.t("#helpers.local", "Local")}: #{h local_time}<br>#{h I18n.t("#helpers.course", "Course")}: #{h course_time}"
           .html_safe
       end
     end
@@ -953,8 +952,8 @@ module ApplicationHelper
   # used for generating a
   # prompt for use with date pickers
   # so it doesn't need to be declared all over the place
-  def datepicker_screenreader_prompt(format_input = 'datetime')
-    prompt_text = I18n.t('#helpers.accessible_date_prompt', 'Format Like')
+  def datepicker_screenreader_prompt(format_input = "datetime")
+    prompt_text = I18n.t("#helpers.accessible_date_prompt", "Format Like")
     format = accessible_date_format(format_input)
     "#{prompt_text} #{format}"
   end
@@ -964,17 +963,18 @@ module ApplicationHelper
   # useful for presenting a consistent
   # date format to screenreader users across the app
   # when telling them how to fill in a datetime field
-  def accessible_date_format(format = 'datetime')
-    if !ACCEPTABLE_FORMAT_TYPES.include?(format)
-      raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(',')}"
+  def accessible_date_format(format = "datetime")
+    unless ACCEPTABLE_FORMAT_TYPES.include?(format)
+      raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(",")}"
     end
 
-    if format == 'date'
-      I18n.t('#helpers.accessible_date_only_format', 'YYYY-MM-DD')
-    elsif format == 'time'
-      I18n.t('#helpers.accessible_time_only_format', 'hh:mm')
+    case format
+    when "date"
+      I18n.t("#helpers.accessible_date_only_format", "YYYY-MM-DD")
+    when "time"
+      I18n.t("#helpers.accessible_time_only_format", "hh:mm")
     else
-      I18n.t('#helpers.accessible_date_format', 'YYYY-MM-DD hh:mm')
+      I18n.t("#helpers.accessible_date_format", "YYYY-MM-DD hh:mm")
     end
   end
 
@@ -982,23 +982,23 @@ module ApplicationHelper
   def multiple_due_date_tooltip(assignment, user, opts = {})
     user ||= @current_user
     presenter = OverrideTooltipPresenter.new(assignment, user, opts)
-    render 'shared/vdd_tooltip', presenter: presenter
+    render "shared/vdd_tooltip", presenter: presenter
   end
 
-  require 'digest'
+  require "digest"
 
   # create a checksum of an array of objects' cache_key values.
   # useful if we have a whole collection of objects that we want to turn into a
   # cache key, so that we don't make an overly-long cache key.
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
-    keys = collection.map { |element| element.cache_key }
-    Digest::MD5.hexdigest(keys.join('/'))
+    keys = collection.map(&:cache_key)
+    Digest::MD5.hexdigest(keys.join("/"))
   end
 
   def add_uri_scheme_name(uri)
     noSchemeName = !uri.match(%r{^(.+)://(.+)})
-    uri = 'http://' + uri if noSchemeName
+    uri = "http://" + uri if noSchemeName
     uri
   end
 
@@ -1006,9 +1006,9 @@ module ApplicationHelper
     # may be overridden by a plugin
     @agree_to_terms ||
       t(
-        'I agree to the *terms of use*.',
+        "I agree to the *terms of use*.",
         wrapper: {
-          '*' => link_to('\1', '#', class: 'terms_of_service_link')
+          "*" => link_to('\1', "#", class: "terms_of_service_link")
         }
       )
   end
@@ -1026,10 +1026,12 @@ module ApplicationHelper
   end
 
   def custom_dashboard_url
-    url =
-      @domain_root_account.settings[
-        "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
-      ] if ApplicationController.test_cluster_name
+    if ApplicationController.test_cluster_name
+      url =
+        @domain_root_account.settings[
+          "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
+        ]
+    end
     url ||= @domain_root_account.settings[:dashboard_url]
     if url.present?
       url += "?current_user_id=#{@current_user.id}" if @current_user
@@ -1054,8 +1056,8 @@ module ApplicationHelper
 
     # set this if you want android users of your site to be prompted to install an android app
     # you can see an example of the one that instructure uses in InfoController#web_app_manifest
-    manifest_url = Setting.get('web_app_manifest_url', '')
-    output << tag.link(rel: 'manifest', href: manifest_url) if manifest_url.present?
+    manifest_url = Setting.get("web_app_manifest_url", "")
+    output << tag.link(rel: "manifest", href: manifest_url) if manifest_url.present?
 
     output.join("\n").html_safe.presence
   end
@@ -1071,12 +1073,13 @@ module ApplicationHelper
         @csp_context_is_submission = false
         attachment = @attachment || @context
         if attachment.is_a?(Attachment)
-          if attachment.context_type == 'User'
+          case attachment.context_type
+          when "User"
             # search for an attachment association
             aas =
               attachment
               .attachment_associations
-              .where(context_type: 'Submission')
+              .where(context_type: "Submission")
               .preload(:context)
               .to_a
             ActiveRecord::Associations::Preloader.new.preload(
@@ -1088,10 +1091,10 @@ module ApplicationHelper
               @csp_context_is_submission = true
               courses.first
             end
-          elsif attachment.context_type == 'Submission'
+          when "Submission"
             @csp_context_is_submission = true
             attachment.submission.assignment.course
-          elsif attachment.context_type == 'Course'
+          when "Course"
             attachment.course
           else
             brand_config_account
@@ -1118,16 +1121,16 @@ module ApplicationHelper
 
   def csp_report_uri
     @csp_report_uri ||=
-      if (host = csp_context.root_account.csp_logging_config['host'])
+      if (host = csp_context.root_account.csp_logging_config["host"])
         "; report-uri #{host}report/#{csp_context.root_account.global_id}"
       else
-        ''
+        ""
       end
   end
 
   def csp_header
-    header = +'Content-Security-Policy'
-    header << '-Report-Only' unless csp_enforced?
+    header = +"Content-Security-Policy"
+    header << "-Report-Only" unless csp_enforced?
 
     header.freeze
   end
@@ -1138,7 +1141,7 @@ module ApplicationHelper
   end
 
   def add_csp_for_root
-    return unless response.media_type == 'text/html'
+    return unless response.media_type == "text/html"
     return unless csp_enabled?
     return if csp_report_uri.empty? && !csp_enforced?
 
@@ -1146,7 +1149,7 @@ module ApplicationHelper
     domains =
       csp_context
       .csp_whitelisted_domains(request, include_files: true, include_tools: true)
-      .join(' ')
+      .join(" ")
     headers[csp_header] = "frame-src 'self' #{domains}#{csp_report_uri}; "
   end
 
@@ -1175,13 +1178,13 @@ module ApplicationHelper
       object_domains = ["'self'"] + script_domains
       script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
     end
-    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}; "
+    "frame-src #{frame_domains.join(" ")}; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
   end
 
   # Returns true if the current_path starts with the given value
   def active_path?(to_test)
     # Make sure to not include account external tools
-    if controller.controller_name == 'external_tools' && Account === @context
+    if controller.controller_name == "external_tools" && @context.is_a?(Account)
       false
     else
       request.fullpath.start_with?(to_test)
@@ -1196,12 +1199,12 @@ module ApplicationHelper
   def link_to_parent_signup(auth_type)
     data = reg_link_data(auth_type)
     link_to(
-      t('Parents sign up here'),
-      '#',
-      id: 'signup_parent',
-      class: 'signup_link',
+      t("Parents sign up here"),
+      "#",
+      id: "signup_parent",
+      class: "signup_link",
       data: data,
-      title: t('Parent Signup')
+      title: t("Parent Signup")
     )
   end
 
@@ -1222,7 +1225,7 @@ module ApplicationHelper
 
   def planner_enabled?
     !!@current_user&.has_student_enrollment? ||
-      (Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?('observer') && k5_user?)
+      (Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?("observer") && k5_user?)
   end
 
   def will_paginate(collection, options = {})
@@ -1255,8 +1258,8 @@ module ApplicationHelper
   def file_access_real_user
     if !@files_domain
       logged_in_user
-    elsif session['file_access_real_user_id'].present?
-      @file_access_real_user ||= User.where(id: session['file_access_real_user_id']).first
+    elsif session["file_access_real_user_id"].present?
+      @file_access_real_user ||= User.where(id: session["file_access_real_user_id"]).first
     else
       file_access_user
     end
@@ -1265,9 +1268,9 @@ module ApplicationHelper
   def file_access_developer_key
     if !@files_domain
       @access_token&.developer_key
-    elsif session['file_access_developer_key_id'].present?
+    elsif session["file_access_developer_key_id"].present?
       @file_access_developer_key ||=
-        DeveloperKey.where(id: session['file_access_developer_key_id']).first
+        DeveloperKey.where(id: session["file_access_developer_key_id"]).first
     else
       nil
     end
@@ -1276,8 +1279,8 @@ module ApplicationHelper
   def file_access_root_account
     if !@files_domain
       @domain_root_account
-    elsif session['file_access_root_account_id'].present?
-      @file_access_root_account ||= Account.where(id: session['file_access_root_account_id']).first
+    elsif session["file_access_root_account_id"].present?
+      @file_access_root_account ||= Account.where(id: session["file_access_root_account_id"]).first
     else
       nil
     end
@@ -1294,11 +1297,11 @@ module ApplicationHelper
 
     # find content tags to include
     tag_indices = []
-    if asset_type == 'ContentTag'
+    if asset_type == "ContentTag"
       tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if tag_id == asset_id.to_i }
     else
       # map wiki page url to id
-      if asset_type == 'WikiPage'
+      if asset_type == "WikiPage"
         page = @context.wiki_pages.not_deleted.where(url: asset_id).first
         asset_id = page.id if page
       else
@@ -1306,12 +1309,12 @@ module ApplicationHelper
       end
 
       # find the associated assignment id, if applicable
-      if asset_type == 'Quizzes::Quiz'
+      if asset_type == "Quizzes::Quiz"
         asset = @context.quizzes.where(id: asset_id.to_i).first
         associated_assignment_id = asset.assignment_id if asset
       end
 
-      if asset_type == 'DiscussionTopic'
+      if asset_type == "DiscussionTopic"
         asset = @context.send(asset_type.tableize).where(id: asset_id.to_i).first
         associated_assignment_id = asset.assignment_id if asset
       end
@@ -1328,7 +1331,7 @@ module ApplicationHelper
           @context
           .context_module_tags
           .where(id: tag_ids)
-          .where(content_type: 'Assignment', content_id: associated_assignment_id)
+          .where(content_type: "Assignment", content_id: associated_assignment_id)
           .pluck(:id)
       end
 
@@ -1379,8 +1382,8 @@ module ApplicationHelper
   def file_access_oauth_host
     if logged_in_user && !@files_domain
       request.host_with_port
-    elsif session['file_access_oauth_host'].present?
-      session['file_access_oauth_host']
+    elsif session["file_access_oauth_host"].present?
+      session["file_access_oauth_host"]
     else
       nil
     end
@@ -1405,11 +1408,11 @@ module ApplicationHelper
   end
 
   def file_location_mode?
-    in_app? && request.headers['X-Canvas-File-Location'] == 'True'
+    in_app? && request.headers["X-Canvas-File-Location"] == "True"
   end
 
   def render_file_location(location)
-    headers['X-Canvas-File-Location'] = 'True'
+    headers["X-Canvas-File-Location"] = "True"
     render json: { location: location, token: file_authenticator.instfs_bearer_token }
   end
 
@@ -1434,9 +1437,9 @@ module ApplicationHelper
   end
 
   def prefetch_assignment_external_tools
-    content_tag(:div, id: 'assignment_external_tools') do
+    content_tag(:div, id: "assignment_external_tools") do
       prefetch_xhr(
-        api_v1_course_launch_definitions_path(@context, 'placements[]' => 'assignment_view')
+        api_v1_course_launch_definitions_path(@context, "placements[]" => "assignment_view")
       )
     end
   end
@@ -1448,10 +1451,10 @@ module ApplicationHelper
     # and it would be nice to combine them so that they don't have to be copied here.
     opts =
       {
-        credentials: 'same-origin',
+        credentials: "same-origin",
         headers: {
-          :Accept => 'application/json+canvas-string-ids, application/json',
-          'X-Requested-With' => 'XMLHttpRequest'
+          :Accept => "application/json+canvas-string-ids, application/json",
+          "X-Requested-With" => "XMLHttpRequest"
         }
       }.deep_merge(options)
     javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"
@@ -1475,5 +1478,15 @@ module ApplicationHelper
     k5_student = k5_user? && (@current_user.roles(@domain_root_account) - %w[user student]).empty?
     @current_pseudonym && @current_pseudonym.login_count < 10 && @current_user &&
       !@current_user.fake_student? && !@current_user.used_feature?(:cc_prefs) && !k5_student
+  end
+
+  def individual_outcome_rating_and_calculation_js_env
+    if @domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation) && !@domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      js_env(
+        INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION: true,
+        IMPROVED_OUTCOMES_MANAGEMENT:
+          @domain_root_account.feature_enabled?(:improved_outcomes_management)
+      )
+    end
   end
 end

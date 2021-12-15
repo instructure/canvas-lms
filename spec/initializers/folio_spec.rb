@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe Folio do
   it "skips the count for a grouped query that takes a long time" do
     User.create!
     User.create!
-    Setting.set('pagination_count_timeout', '5ms')
+    Setting.set("pagination_count_timeout", "5ms")
     result = User.group(:id).where("pg_sleep(0.1) IS NOT NULL").paginate(per_page: 1)
     expect(result.length).to eq 1
     expect(result.total_entries).to be_nil
@@ -32,7 +32,7 @@ describe Folio do
   it "skips the count for a regular query that takes a long time" do
     User.create!
     User.create!
-    Setting.set('pagination_count_timeout', '5ms')
+    Setting.set("pagination_count_timeout", "5ms")
     result = User.where("pg_sleep(0.1) IS NOT NULL").paginate(per_page: 1)
     expect(result.length).to eq 1
     expect(result.total_entries).to be_nil

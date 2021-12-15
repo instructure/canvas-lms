@@ -20,14 +20,14 @@
 
 describe Turnitin::Client do
   def turnitin_assignment
-    @assignment = @course.assignments.new(:title => "some assignment")
+    @assignment = @course.assignments.new(title: "some assignment")
     @assignment.workflow_state = "published"
     @assignment.turnitin_enabled = true
     @assignment.save!
   end
 
   def turnitin_submission
-    @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
+    @submission = @assignment.submit_homework(@user, submission_type: "online_upload", attachments: [attachment_model(context: @user, content_type: "text/plain")])
     @submission.reload
   end
 
@@ -36,165 +36,165 @@ describe Turnitin::Client do
     expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body: body))
   end
 
-  describe '#state_from_similarity_score' do
+  describe "#state_from_similarity_score" do
     it "returns 'none' if the similarity score is zero" do
-      expect(Turnitin.state_from_similarity_score(0)).to eq 'none'
+      expect(Turnitin.state_from_similarity_score(0)).to eq "none"
     end
 
     it "returns 'acceptable' if similarity score is less than 25" do
-      expect(Turnitin.state_from_similarity_score(24)).to eq 'acceptable'
+      expect(Turnitin.state_from_similarity_score(24)).to eq "acceptable"
     end
 
     it "returns 'warning' if similarity score is between 25 and 50" do
-      expect(Turnitin.state_from_similarity_score(49)).to eq 'warning'
+      expect(Turnitin.state_from_similarity_score(49)).to eq "warning"
     end
 
     it "returns 'problem' if similarity score is between 50 and 75" do
-      expect(Turnitin.state_from_similarity_score(74)).to eq 'problem'
+      expect(Turnitin.state_from_similarity_score(74)).to eq "problem"
     end
 
     it "returns 'failure' if score is greater or equal to 75" do
-      expect(Turnitin.state_from_similarity_score(75)).to eq 'failure'
+      expect(Turnitin.state_from_similarity_score(75)).to eq "failure"
     end
   end
 
   describe "initialize" do
     it "defaults to using api.turnitin.com" do
-      expect(Turnitin::Client.new('test_account', 'sekret').host).to eq "api.turnitin.com"
+      expect(Turnitin::Client.new("test_account", "sekret").host).to eq "api.turnitin.com"
     end
 
     it "allows the endpoint to be configurable" do
-      expect(Turnitin::Client.new('test_account', 'sekret', 'www.blah.com').host).to eq "www.blah.com"
+      expect(Turnitin::Client.new("test_account", "sekret", "www.blah.com").host).to eq "www.blah.com"
     end
   end
 
-  describe 'class methods' do
+  describe "class methods" do
     before do
       @default_settings = {
-        :originality_report_visibility => 'immediate',
-        :s_paper_check => '1',
-        :internet_check => '1',
-        :journal_check => '1',
-        :exclude_biblio => '1',
-        :exclude_quoted => '1',
-        :exclude_type => '0',
-        :exclude_value => '',
-        :submit_papers_to => '1'
+        originality_report_visibility: "immediate",
+        s_paper_check: "1",
+        internet_check: "1",
+        journal_check: "1",
+        exclude_biblio: "1",
+        exclude_quoted: "1",
+        exclude_type: "0",
+        exclude_value: "",
+        submit_papers_to: "1"
       }
     end
 
-    it 'has correct default assignment settings' do
+    it "has correct default assignment settings" do
       expect(Turnitin::Client.default_assignment_turnitin_settings).to eq @default_settings
     end
 
-    it 'normalizes assignment settings' do
-      @default_settings[:originality_report_visibility] = 'never'
-      @default_settings[:exclude_type] = '1'
-      @default_settings[:exclude_value] = '50'
+    it "normalizes assignment settings" do
+      @default_settings[:originality_report_visibility] = "never"
+      @default_settings[:exclude_type] = "1"
+      @default_settings[:exclude_value] = "50"
       normalized_settings = Turnitin::Client.normalize_assignment_turnitin_settings(@default_settings)
       expect(normalized_settings).to eq({
-                                          :originality_report_visibility => "never",
-                                          :s_paper_check => "1",
-                                          :internet_check => "1",
-                                          :journal_check => "1",
-                                          :exclude_biblio => "1",
-                                          :exclude_quoted => "1",
-                                          :exclude_type => "1",
-                                          :exclude_value => "50",
-                                          :submit_papers_to => "1",
-                                          :s_view_report => "0"
+                                          originality_report_visibility: "never",
+                                          s_paper_check: "1",
+                                          internet_check: "1",
+                                          journal_check: "1",
+                                          exclude_biblio: "1",
+                                          exclude_quoted: "1",
+                                          exclude_type: "1",
+                                          exclude_value: "50",
+                                          submit_papers_to: "1",
+                                          s_view_report: "0"
                                         })
     end
 
-    it 'determines student visibility' do
-      expect(Turnitin::Client.determine_student_visibility('after_grading')).to eq '1'
-      expect(Turnitin::Client.determine_student_visibility('never')).to eq '0'
+    it "determines student visibility" do
+      expect(Turnitin::Client.determine_student_visibility("after_grading")).to eq "1"
+      expect(Turnitin::Client.determine_student_visibility("never")).to eq "0"
     end
   end
 
   describe "create assignment" do
     before do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       turnitin_assignment
-      @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
+      @turnitin_api = Turnitin::Client.new("test_account", "sekret")
       expect(@assignment.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(Turnitin::Client).to receive(:new).with(:placeholder).and_return(@turnitin_api)
 
       @sample_turnitin_settings = {
-        :originality_report_visibility => 'after_grading',
-        :s_paper_check => '0',
-        :internet_check => '0',
-        :journal_check => '0',
-        :exclude_biblio => '0',
-        :exclude_quoted => '0',
-        :exclude_type => '1',
-        :exclude_value => '5'
+        originality_report_visibility: "after_grading",
+        s_paper_check: "0",
+        internet_check: "0",
+        journal_check: "0",
+        exclude_biblio: "0",
+        exclude_quoted: "0",
+        exclude_type: "1",
+        exclude_value: "5"
       }
-      @assignment.update(:turnitin_settings => @sample_turnitin_settings)
+      @assignment.update(turnitin_settings: @sample_turnitin_settings)
     end
 
     it "marks assignment as created and current on success" do
       # doesn't matter what the assignmentid is, it's existance is simply used as a request success test
-      stub_net_http_to_return('<assignmentid>12345</assignmentid>')
+      stub_net_http_to_return("<assignmentid>12345</assignmentid>")
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0' })
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ created: true, current: true, s_view_report: "1", submit_papers_to: "0" })
     end
 
     it "stores error code and message on failure" do
       # doesn't matter what the assignmentid is, it's existance is simply used as a request success test
-      stub_net_http_to_return '<rcode>123</rcode><rmessage>You cannot create this assignment right now</rmessage>'
+      stub_net_http_to_return "<rcode>123</rcode><rmessage>You cannot create this assignment right now</rmessage>"
       status = @assignment.create_in_turnitin
 
       expect(status).to be_falsey
       expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({
-                                                                                            :s_view_report => "1",
-                                                                                            :submit_papers_to => '0',
-                                                                                            :error => {
-                                                                                              :error_code => 123,
-                                                                                              :error_message => 'You cannot create this assignment right now',
-                                                                                              :public_error_message => 'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+                                                                                            s_view_report: "1",
+                                                                                            submit_papers_to: "0",
+                                                                                            error: {
+                                                                                              error_code: 123,
+                                                                                              error_message: "You cannot create this assignment right now",
+                                                                                              public_error_message: "There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support."
                                                                                             }
                                                                                           })
     end
 
     it "does not make api call if assignment is marked current" do
-      stub_net_http_to_return('<assignmentid>12345</assignmentid')
+      stub_net_http_to_return("<assignmentid>12345</assignmentid")
       @assignment.create_in_turnitin
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0' })
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ created: true, current: true, s_view_report: "1", submit_papers_to: "0" })
     end
 
     it "sets s_view_report to 0 if originality_report_visibility is 'never'" do
-      @sample_turnitin_settings[:originality_report_visibility] = 'never'
-      @assignment.update(:turnitin_settings => @sample_turnitin_settings)
-      stub_net_http_to_return('<assignmentid>12345</assignmentid>')
+      @sample_turnitin_settings[:originality_report_visibility] = "never"
+      @assignment.update(turnitin_settings: @sample_turnitin_settings)
+      stub_net_http_to_return("<assignmentid>12345</assignmentid>")
       @assignment.create_in_turnitin
 
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0', :submit_papers_to => '0' })
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ created: true, current: true, s_view_report: "0", submit_papers_to: "0" })
     end
   end
 
   describe "submit paper" do
     before do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       turnitin_assignment
       turnitin_submission
-      @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
+      @turnitin_api = Turnitin::Client.new("test_account", "sekret")
 
       expect(@submission.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(@submission.assignment.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(Turnitin::Client).to receive(:new).at_least(1).with(:placeholder).and_return(@turnitin_api)
-      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(double(:success? => true))
-      expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
+      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(double(success?: true))
+      expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
       expect_any_instantiation_of(@attachment).to receive(:open).and_return(:my_stub)
     end
 
     it "submits attached files to turnitin" do
-      stub_net_http_to_return('<objectID>12345</objectID>')
+      stub_net_http_to_return("<objectID>12345</objectID>")
       status = @submission.submit_to_turnitin
 
       expect(status).to be_truthy
@@ -202,7 +202,7 @@ describe Turnitin::Client do
     end
 
     it "stores errors in the turnitin_data hash" do
-      stub_net_http_to_return('<rmessage>I am a random turnitin error message.</rmessage>', 216)
+      stub_net_http_to_return("<rmessage>I am a random turnitin error message.</rmessage>", 216)
       status = @submission.submit_to_turnitin
 
       expect(status).to be_falsey
@@ -215,22 +215,22 @@ describe Turnitin::Client do
 
   describe "#prepare_params" do
     before do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       turnitin_assignment
       turnitin_submission
-      @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
+      @turnitin_api = Turnitin::Client.new("test_account", "sekret")
     end
 
     let(:turnitin_submit_args) do
       {
-        :post => true,
-        :utp => '1',
-        :ptl => @attachment.display_name,
-        :ptype => "2",
-        :user => @student,
-        :course => @course,
-        :assignment => @assignment,
-        :tem => "spec@null.instructure.example.com"
+        post: true,
+        utp: "1",
+        ptl: @attachment.display_name,
+        ptype: "2",
+        user: @student,
+        course: @course,
+        assignment: @assignment,
+        tem: "spec@null.instructure.example.com"
       }
     end
 
@@ -238,7 +238,7 @@ describe Turnitin::Client do
       let(:teacher_email_arg) { turnitin_submit_args[:tem] }
       let(:paper_title_arg) { turnitin_submit_args[:ptl] }
 
-      let(:processed_params) { @turnitin_api.prepare_params(:submit_paper, '2', turnitin_submit_args) }
+      let(:processed_params) { @turnitin_api.prepare_params(:submit_paper, "2", turnitin_submit_args) }
 
       let(:processed_teacher_email) { processed_params[:tem] }
       let(:processed_paper_title) { processed_params[:ptl] }
@@ -280,7 +280,7 @@ describe Turnitin::Client do
     end
 
     context "when creating a user" do
-      let(:processed_params) { @turnitin_api.prepare_params(:create_user, '2', turnitin_submit_args) }
+      let(:processed_params) { @turnitin_api.prepare_params(:create_user, "2", turnitin_submit_args) }
 
       let(:processed_user_first_name) { processed_params[:ufn] }
       let(:processed_user_last_name) { processed_params[:uln] }
@@ -309,7 +309,7 @@ describe Turnitin::Client do
         args = turnitin_submit_args.clone # we have to #clone this and call #prepare_params maually because rspec only evaluates 'let' blocks once per test
         args[:assignment] = @assignment
 
-        params = @turnitin_api.prepare_params(:this_param_is_irrelevant_for_this_test, '2', args)
+        params = @turnitin_api.prepare_params(:this_param_is_irrelevant_for_this_test, "2", args)
 
         processed_title = params[:assign]
         processed_title
@@ -337,17 +337,17 @@ describe Turnitin::Client do
       doc_sample_account_id = "100"
       doc_sample_shared_secret = "hothouse123"
       doc_sample_params = {
-        :gmtime => "200310311",
-        :fid => "1",
-        :fcmd => "1",
-        :encrypt => "0",
-        :aid => doc_sample_account_id,
-        :diagnostic => "0",
-        :uem => "john.doe@myschool.edu",
-        :upw => "john123",
-        :ufn => "John",
-        :uln => "Doe",
-        :utp => "2"
+        gmtime: "200310311",
+        fid: "1",
+        fcmd: "1",
+        encrypt: "0",
+        aid: doc_sample_account_id,
+        diagnostic: "0",
+        uem: "john.doe@myschool.edu",
+        upw: "john123",
+        ufn: "John",
+        uln: "Doe",
+        utp: "2"
       }
       doc_sample_md5 = "12a4e7b0bfc5f55b4b1ef252b1b05919"
 
@@ -356,19 +356,19 @@ describe Turnitin::Client do
     end
   end
 
-  describe '#email' do
+  describe "#email" do
     it "uses turnitin_id for courses" do
       course_factory
-      t = Turnitin::Client.new('blah', 'blah')
+      t = Turnitin::Client.new("blah", "blah")
       expect(@course.turnitin_id).to be_nil
       expect(t.email(@course)).to eq "course_#{@course.global_id}@null.instructure.example.com"
       expect(@course.turnitin_id).to eql @course.global_id
     end
   end
 
-  describe '#id' do
+  describe "#id" do
     it "uses turnitin_id when defined" do
-      turnitin = Turnitin::Client.new('blah', 'blah')
+      turnitin = Turnitin::Client.new("blah", "blah")
       student_in_course active_all: true
       assignment = @course.assignments.create!
 

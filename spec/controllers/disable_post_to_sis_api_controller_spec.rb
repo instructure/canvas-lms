@@ -20,7 +20,7 @@
 describe DisablePostToSisApiController do
   describe "PUT disable_post_to_sis" do
     let(:account) { account_model }
-    let(:course) { course_model(account: account, workflow_state: 'available') }
+    let(:course) { course_model(account: account, workflow_state: "available") }
     let(:admin) { account_admin_user(account: account) }
 
     before do
@@ -28,35 +28,35 @@ describe DisablePostToSisApiController do
       user_session(admin)
     end
 
-    it 'works even when post_to_sis/new_sis_integrations disabled' do
+    it "works even when post_to_sis/new_sis_integrations disabled" do
       assignment = assignment_model(course: course,
                                     post_to_sis: true,
-                                    workflow_state: 'published')
+                                    workflow_state: "published")
 
-      put 'disable_post_to_sis', params: { course_id: course.id }
+      put "disable_post_to_sis", params: { course_id: course.id }
 
       expect(response).to be_successful
       expect(assignment.reload.post_to_sis).to eq false
     end
 
-    context 'with new_sis_integrations enabled' do
+    context "with new_sis_integrations enabled" do
       before do
         account.enable_feature!(:new_sis_integrations)
       end
 
-      it 'responds with 200' do
-        put 'disable_post_to_sis', params: { course_id: course.id }
+      it "responds with 200" do
+        put "disable_post_to_sis", params: { course_id: course.id }
 
         expect(response.code).to eq "204"
         expect(response).to be_successful
       end
 
-      it 'disables assignments with post_to_sis enabled' do
+      it "disables assignments with post_to_sis enabled" do
         assignment = assignment_model(course: course,
                                       post_to_sis: true,
-                                      workflow_state: 'published')
+                                      workflow_state: "published")
 
-        put 'disable_post_to_sis', params: { course_id: course.id }
+        put "disable_post_to_sis", params: { course_id: course.id }
         assignment = Assignment.find(assignment.id)
 
         expect(response.code).to eq "204"
@@ -64,7 +64,7 @@ describe DisablePostToSisApiController do
         expect(assignment.post_to_sis).to be_falsey
       end
 
-      context 'with assignments in a grading_period' do
+      context "with assignments in a grading_period" do
         let(:grading_period_group) do
           group = account.grading_period_groups.create!(title: "A Group")
           term = course.enrollment_term
@@ -74,28 +74,28 @@ describe DisablePostToSisApiController do
 
         let(:grading_period) do
           grading_period_group.grading_periods.create!(
-            title: 'Too Much Tuna',
+            title: "Too Much Tuna",
             start_date: 2.months.from_now(Time.zone.now),
             end_date: 3.months.from_now(Time.zone.now)
           )
         end
 
-        it 'responds with 400 when grading period does not exist' do
-          put 'disable_post_to_sis', params: { course_id: course.id,
-                                               grading_period_id: 789465789 }
+        it "responds with 400 when grading period does not exist" do
+          put "disable_post_to_sis", params: { course_id: course.id,
+                                               grading_period_id: 789_465_789 }
 
           parsed_json = json_parse(response.body)
           expect(response.code).to eq "400"
-          expect(parsed_json['code']).to eq 'not_found'
+          expect(parsed_json["code"]).to eq "not_found"
         end
 
-        it 'disables assignments with post_to_sis enabled based on grading period' do
+        it "disables assignments with post_to_sis enabled based on grading period" do
           assignment = assignment_model(course: course,
                                         post_to_sis: true,
-                                        workflow_state: 'published',
+                                        workflow_state: "published",
                                         due_at: grading_period.start_date + 1.minute)
 
-          put 'disable_post_to_sis', params: { course_id: course.id,
+          put "disable_post_to_sis", params: { course_id: course.id,
                                                grading_period_id: grading_period.id }
           assignment = Assignment.find(assignment.id)
 

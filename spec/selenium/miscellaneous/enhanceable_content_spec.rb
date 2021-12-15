@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "enhanceable_content" do
   include_context "in-process server selenium tests"
@@ -26,7 +26,7 @@ describe "enhanceable_content" do
     stub_kaltura
     course_with_teacher_logged_in
 
-    page = @course.wiki_pages.build(:title => 'title')
+    page = @course.wiki_pages.build(title: "title")
     page.body = %{
       <div id="dialog_for_link1" class="enhanceable_content dialog">dialog for link 1</div>
       <a href="#dialog_for_link1" id="link1">link 1</a>
@@ -69,29 +69,29 @@ describe "enhanceable_content" do
 
     f("#link1").click
     expect(dialog).to be_displayed
-    expect(dialog).to have_class('ui-dialog')
+    expect(dialog).to have_class("ui-dialog")
     f(".ui-dialog .ui-dialog-titlebar-close").click
     expect(dialog).not_to be_displayed
 
-    expect(f(".enhanceable_content.draggable")).to have_class('ui-draggable')
-    expect(f(".enhanceable_content.resizable")).to have_class('ui-resizable')
+    expect(f(".enhanceable_content.draggable")).to have_class("ui-draggable")
+    expect(f(".enhanceable_content.resizable")).to have_class("ui-resizable")
 
     ul = f(".enhanceable_content.sortable")
     expect(ul).to be_displayed
-    expect(ul).to have_class('ui-sortable')
+    expect(ul).to have_class("ui-sortable")
 
     tabs = f(".enhanceable_content.tabs")
-    expect(tabs).to have_class('ui-tabs')
+    expect(tabs).to have_class("ui-tabs")
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")
     expect(headers.length).to eq 3
     divs = tabs.find_elements(:css, ".ui-tabs-panel")
     expect(divs.length).to eq 3
-    expect(headers[0]).to have_class('ui-state-active')
-    expect(headers[1]).to have_class('ui-state-default')
+    expect(headers[0]).to have_class("ui-state-active")
+    expect(headers[1]).to have_class("ui-state-default")
     expect(divs[0]).to be_displayed
     expect(divs[1]).not_to be_displayed
 
-    expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).not_to be_nil
+    expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).not_to be_nil
   end
 
   context "media file preview thumbnails" do
@@ -99,20 +99,20 @@ describe "enhanceable_content" do
       stub_kaltura
       course_factory(active_all: true)
 
-      @attachment = @course.attachments.create!(:uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
-      @page = @course.wiki_pages.build(:title => 'title')
-      @page.body = %{
+      @attachment = @course.attachments.create!(uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
+      @page = @course.wiki_pages.build(title: "title")
+      @page.body = <<~HTML
         <a id="media_comment_0_deadbeef" class="instructure_file_link instructure_video_link" title="Video.mp4"
           href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">Video</a>
-      }
+      HTML
       @page.save!
     end
 
     it "shows for students" do
-      student_in_course(:course => @course, :active_user => true)
+      student_in_course(course: @course, active_user: true)
       user_session(@student)
       get "/courses/#{@course.id}/wiki/#{@page.url}"
-      expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).to_not be_nil
+      expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).to_not be_nil
     end
 
     describe "for locked files" do
@@ -122,17 +122,17 @@ describe "enhanceable_content" do
       end
 
       it "does not show for students" do
-        student_in_course(:course => @course, :active_user => true)
+        student_in_course(course: @course, active_user: true)
         user_session(@student)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
-        expect(f("#content")).not_to contain_css('#media_comment_0_deadbeef span.media_comment_thumbnail')
+        expect(f("#content")).not_to contain_css("#media_comment_0_deadbeef span.media_comment_thumbnail")
       end
 
       it "shows for teachers" do
-        teacher_in_course(:course => @course, :active_user => true)
+        teacher_in_course(course: @course, active_user: true)
         user_session(@teacher)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
-        expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).to_not be_nil
+        expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).to_not be_nil
       end
     end
   end

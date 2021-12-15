@@ -24,12 +24,12 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-require 'broadcast_policy'
-require_relative 'support/mock_notifier'
-require_relative 'support/mock_notification_finder'
+require "broadcast_policy"
+require_relative "support/mock_notifier"
+require_relative "support/mock_notification_finder"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
-  config.order = 'random'
+  config.order = "random"
 end

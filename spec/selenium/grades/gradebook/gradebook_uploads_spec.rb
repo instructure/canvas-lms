@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/gradebook_page'
+require_relative "../../common"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - uploads" do
   include_context "in-process server selenium tests"
 
   before do
-    course_with_teacher_logged_in(active_all: 1, username: 'teacher@example.com')
-    @student = user_factory(username: 'student@example.com', active_all: 1)
+    course_with_teacher_logged_in(active_all: 1, username: "teacher@example.com")
+    @student = user_factory(username: "student@example.com", active_all: 1)
     @course.enroll_student(@student).accept!
 
     Gradebook.visit_upload(@course)
@@ -36,16 +36,16 @@ describe "Gradebook - uploads" do
   end
 
   def assert_assignment_is_highlighted
-    expect(ff('.left-highlight').length).to eq 1
-    expect(ff('.right-highlight').length).to eq 1
+    expect(ff(".left-highlight").length).to eq 1
+    expect(ff(".right-highlight").length).to eq 1
   end
 
   def assert_assignment_is_not_highlighted
-    expect(f("#content")).not_to contain_css('.left-highlight')
-    expect(f("#content")).not_to contain_css('.right-highlight')
+    expect(f("#content")).not_to contain_css(".left-highlight")
+    expect(f("#content")).not_to contain_css(".right-highlight")
   end
 
-  it "updates grades for assignments with GPA Scale grading type correctly", priority: "1", test_id: 209969 do
+  it "updates grades for assignments with GPA Scale grading type correctly", priority: "1" do
     assignment = @course.assignments.create!(title: "GPA Scale Assignment",
                                              grading_type: "gpa_scale", points_possible: 5)
     assignment.grade_student(@student, grade: "D", grader: @teacher)
@@ -56,12 +56,12 @@ describe "Gradebook - uploads" do
     wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
-    wait_for_new_page_load(true) { submit_form('#gradebook_grid_form') }
+    wait_for_new_page_load(true) { submit_form("#gradebook_grid_form") }
     run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"
   end
 
-  it "says no changes if no changes", priority: "1", test_id: 209970 do
+  it "says no changes if no changes", priority: "1" do
     assignment = @course.assignments.create!(title: "Assignment 1")
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -73,10 +73,10 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).not_to be_displayed
   end
 
-  it "shows only changed assignment", priority: "1", test_id: 209972 do
+  it "shows only changed assignment", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
     assignment2 = @course.assignments.create!(title: "Assignment 2")
@@ -90,14 +90,14 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
-    expect(f('#no_changes_detected')).not_to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).not_to be_displayed
+    expect(f("#no_changes_detected")).not_to be_displayed
 
-    expect(ff('.slick-header-column.assignment').length).to eq 1
-    expect(f('#assignments_without_changes_alert')).to be_displayed
+    expect(ff(".slick-header-column.assignment").length).to eq 1
+    expect(f("#assignments_without_changes_alert")).to be_displayed
   end
 
-  it "shows a new assignment", priority: "1", test_id: 209975 do
+  it "shows a new assignment", priority: "1" do
     _filename, fullpath, _data = gradebook_file("gradebook3.csv",
                                                 "Student Name,ID,Section,New Assignment",
                                                 "User,#{@student.id},,0")
@@ -106,22 +106,22 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).to be_displayed
 
-    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
-    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'New Assignment'
+    expect(ff(".assignment_section #assignment_resolution_template").length).to eq 1
+    expect(f(".assignment_section #assignment_resolution_template .title").text).to eq "New Assignment"
 
-    click_option('.assignment_section #assignment_resolution_template select', 'new', :value)
+    click_option(".assignment_section #assignment_resolution_template select", "new", :value)
 
-    submit_form('#gradebook_importer_resolution_section')
+    submit_form("#gradebook_importer_resolution_section")
 
-    expect(f('#no_changes_detected')).not_to be_displayed
+    expect(f("#no_changes_detected")).not_to be_displayed
 
-    expect(ff('.slick-header-column.assignment').length).to eq 1
-    expect(f('#assignments_without_changes_alert')).not_to be_displayed
+    expect(ff(".slick-header-column.assignment").length).to eq 1
+    expect(f("#assignments_without_changes_alert")).not_to be_displayed
 
     assignment_count = @course.assignments.count
-    wait_for_new_page_load(true) { submit_form('#gradebook_grid_form') }
+    wait_for_new_page_load(true) { submit_form("#gradebook_grid_form") }
     run_jobs
     expect(@course.assignments.count).to eql(assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
@@ -129,7 +129,7 @@ describe "Gradebook - uploads" do
     expect(submission.score).to eq 0
   end
 
-  it "creates an assignment with no grades", priority: "1", test_id: 209971 do
+  it "creates an assignment with no grades", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -141,27 +141,27 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).to be_displayed
 
-    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
-    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'Assignment 2'
+    expect(ff(".assignment_section #assignment_resolution_template").length).to eq 1
+    expect(f(".assignment_section #assignment_resolution_template .title").text).to eq "Assignment 2"
 
-    click_option('.assignment_section #assignment_resolution_template select', 'new', :value)
+    click_option(".assignment_section #assignment_resolution_template select", "new", :value)
 
-    submit_form('#gradebook_importer_resolution_section')
+    submit_form("#gradebook_importer_resolution_section")
 
-    expect(f('#no_changes_detected')).not_to be_displayed
+    expect(f("#no_changes_detected")).not_to be_displayed
 
-    expect(ff('.slick-header-column.assignment').length).to eq 1
+    expect(ff(".slick-header-column.assignment").length).to eq 1
 
     assignment_count = @course.assignments.count
-    wait_for_new_page_load { submit_form('#gradebook_grid_form') }
+    wait_for_new_page_load { submit_form("#gradebook_grid_form") }
     run_jobs
     expect(@course.assignments.count).to eql(assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
     expect(assignment.name).to eq "Assignment 2"
     expect(assignment.submissions.having_submission.count).to eql 0
-    expect(f('#gradebook_wrapper')).to be_displayed
+    expect(f("#gradebook_wrapper")).to be_displayed
   end
 
   it "says no changes if no changes after matching assignment" do
@@ -176,19 +176,19 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).to be_displayed
 
-    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
-    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'Assignment 2'
+    expect(ff(".assignment_section #assignment_resolution_template").length).to eq 1
+    expect(f(".assignment_section #assignment_resolution_template .title").text).to eq "Assignment 2"
 
-    click_option('.assignment_section #assignment_resolution_template select', assignment.id.to_s, :value)
+    click_option(".assignment_section #assignment_resolution_template select", assignment.id.to_s, :value)
 
-    submit_form('#gradebook_importer_resolution_section')
+    submit_form("#gradebook_importer_resolution_section")
 
-    expect(f('#no_changes_detected')).to be_displayed
+    expect(f("#no_changes_detected")).to be_displayed
   end
 
-  it "shows assignment with changes after matching assignment", priority: "1", test_id: 209977 do
+  it "shows assignment with changes after matching assignment", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
     assignment2 = @course.assignments.create!(title: "Assignment 2")
@@ -202,22 +202,22 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).to be_displayed
 
-    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
-    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'Assignment 3'
+    expect(ff(".assignment_section #assignment_resolution_template").length).to eq 1
+    expect(f(".assignment_section #assignment_resolution_template .title").text).to eq "Assignment 3"
 
-    click_option('.assignment_section #assignment_resolution_template select', assignment2.id.to_s, :value)
+    click_option(".assignment_section #assignment_resolution_template select", assignment2.id.to_s, :value)
 
-    submit_form('#gradebook_importer_resolution_section')
+    submit_form("#gradebook_importer_resolution_section")
 
-    expect(f('#no_changes_detected')).not_to be_displayed
+    expect(f("#no_changes_detected")).not_to be_displayed
 
-    expect(ff('.slick-header-column.assignment').length).to eq 1
-    expect(f('#assignments_without_changes_alert')).to be_displayed
+    expect(ff(".slick-header-column.assignment").length).to eq 1
+    expect(f("#assignments_without_changes_alert")).to be_displayed
   end
 
-  it "says no changes after matching student", priority: "1", test_id: 209978 do
+  it "says no changes after matching student", priority: "1" do
     assignment = @course.assignments.create!(title: "Assignment 1")
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -229,19 +229,19 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).to be_displayed
 
-    expect(ff('.student_section #student_resolution_template').length).to eq 1
-    expect(f('.student_section #student_resolution_template .name').text).to eq 'Student'
+    expect(ff(".student_section #student_resolution_template").length).to eq 1
+    expect(f(".student_section #student_resolution_template .name").text).to eq "Student"
 
-    click_option('.student_section #student_resolution_template select', @student.id.to_s, :value)
+    click_option(".student_section #student_resolution_template select", @student.id.to_s, :value)
 
-    submit_form('#gradebook_importer_resolution_section')
+    submit_form("#gradebook_importer_resolution_section")
 
-    expect(f('#no_changes_detected')).to be_displayed
+    expect(f("#no_changes_detected")).to be_displayed
   end
 
-  it "shows assignment with changes after matching student", priority: "1", test_id: 209979 do
+  it "shows assignment with changes after matching student", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
     assignment2 = @course.assignments.create!(title: "Assignment 2")
@@ -255,22 +255,22 @@ describe "Gradebook - uploads" do
     run_jobs
     Gradebook.wait_for_spinner
 
-    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+    expect(f("#gradebook_importer_resolution_section")).to be_displayed
 
-    expect(ff('.student_section #student_resolution_template').length).to eq 1
-    expect(f('.student_section #student_resolution_template .name').text).to eq 'Student'
+    expect(ff(".student_section #student_resolution_template").length).to eq 1
+    expect(f(".student_section #student_resolution_template .name").text).to eq "Student"
 
-    click_option('.student_section #student_resolution_template select', @student.id.to_s, :value)
+    click_option(".student_section #student_resolution_template select", @student.id.to_s, :value)
 
-    submit_form('#gradebook_importer_resolution_section')
+    submit_form("#gradebook_importer_resolution_section")
 
-    expect(f('#no_changes_detected')).not_to be_displayed
+    expect(f("#no_changes_detected")).not_to be_displayed
 
-    expect(ff('.slick-header-column.assignment').length).to eq 1
-    expect(f('#assignments_without_changes_alert')).to be_displayed
+    expect(ff(".slick-header-column.assignment").length).to eq 1
+    expect(f("#assignments_without_changes_alert")).to be_displayed
   end
 
-  it "highlights scores if the original grade is more than the new grade", priority: "1", test_id: 209981 do
+  it "highlights scores if the original grade is more than the new grade", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -286,7 +286,7 @@ describe "Gradebook - uploads" do
     assert_assignment_is_highlighted
   end
 
-  it "highlights scores if the original grade is replaced by empty grade", priority: "1", test_id: 209982 do
+  it "highlights scores if the original grade is replaced by empty grade", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -302,7 +302,7 @@ describe "Gradebook - uploads" do
     assert_assignment_is_highlighted
   end
 
-  it "does not highlight scores if the original grade is less than the new grade", priority: "1", test_id: 209983 do
+  it "does not highlight scores if the original grade is less than the new grade", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -318,7 +318,7 @@ describe "Gradebook - uploads" do
     assert_assignment_is_not_highlighted
   end
 
-  it "does not highlight scores if the assignment is excused", priority: "1", test_id: 209983 do
+  it "does not highlight scores if the assignment is excused", priority: "1" do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -350,7 +350,7 @@ describe "Gradebook - uploads" do
       Gradebook.visit_upload(@course1)
     end
 
-    it 'finds changes to override scores when flag enabled' do
+    it "finds changes to override scores when flag enabled" do
       Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
 
       _filename, fullpath, _data = gradebook_file("gradebook.csv",
@@ -362,14 +362,14 @@ describe "Gradebook - uploads" do
       run_jobs
       Gradebook.wait_for_spinner
 
-      expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
-      expect(f('#no_changes_detected')).not_to be_displayed
+      expect(f("#gradebook_importer_resolution_section")).not_to be_displayed
+      expect(f("#no_changes_detected")).not_to be_displayed
 
-      expect(ff('.slick-header-column.assignment').length).to eq 1
-      expect(f('#assignments_without_changes_alert')).to be_displayed
+      expect(ff(".slick-header-column.assignment").length).to eq 1
+      expect(f("#assignments_without_changes_alert")).to be_displayed
     end
 
-    it 'does not find changes to override scores when flag disabled' do
+    it "does not find changes to override scores when flag disabled" do
       Account.site_admin.disable_feature!(:import_override_scores_in_gradebook)
 
       _filename, fullpath, _data = gradebook_file("gradebook.csv",
@@ -381,7 +381,7 @@ describe "Gradebook - uploads" do
       run_jobs
       Gradebook.wait_for_spinner
 
-      expect(f('#no_changes_detected')).to be_displayed
+      expect(f("#no_changes_detected")).to be_displayed
     end
   end
 end

@@ -38,18 +38,18 @@
 # to the given url with a query param of `url=` and the website to snapshot, and a header
 # X-API-Key with the given key.
 
-require 'resolv'
-require 'ipaddr'
+require "resolv"
+require "ipaddr"
 
 class CutyCapt
   CUTYCAPT_DEFAULTS = {
-    :delay => 3000,
-    :timeout => 60000,
-    :ip_blacklist => ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8'],
-    :domain_blacklist => [],
-    :allowed_schemes => ['http', 'https'],
-    :lang => 'en,*;q=0.9'
-  }
+    delay: 3000,
+    timeout: 60_000,
+    ip_blacklist: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.169.254", "127.0.0.0/8"],
+    domain_blacklist: [],
+    allowed_schemes: ["http", "https"],
+    lang: "en,*;q=0.9"
+  }.freeze
 
   cattr_writer :config
 
@@ -57,12 +57,12 @@ class CutyCapt
     return @@config if defined?(@@config) && @@config
 
     setting = begin
-      consul_config = Canvas::DynamicSettings.find(tree: :private)['cutycapt.yml']
-      (consul_config && YAML.load(consul_config).with_indifferent_access) || ConfigFile.load('cutycapt') || {}
+      consul_config = Canvas::DynamicSettings.find(tree: :private)["cutycapt.yml"]
+      (consul_config && YAML.safe_load(consul_config).with_indifferent_access) || ConfigFile.load("cutycapt") || {}
     end
     setting = setting.symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
-    self.process_config
+    process_config
     @@config = nil unless @@config[:path] || @@config[:screencap_service]
     @@config
   end
@@ -85,20 +85,20 @@ class CutyCapt
   end
 
   def self.enabled?
-    return !self.config.nil?
+    !config.nil?
   end
 
   def self.verify_url(url)
     config = self.config
 
     uri = URI.parse(url)
-    unless config[:allowed_schemes] && config[:allowed_schemes].include?(uri.scheme)
+    unless config[:allowed_schemes]&.include?(uri.scheme)
       logger.warn("Skipping non-http[s] URL: #{url}")
       return false
     end
 
     dns_host = Resolv::DNS::Name.create(uri.host)
-    if config[:domain_blacklist] && config[:domain_blacklist].any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
+    if config[:domain_blacklist]&.any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
       logger.warn("Skipping url because of blacklisted domain: #{url}")
       return false
     end
@@ -120,11 +120,11 @@ class CutyCapt
 
   def self.snapshot_url(url)
     return nil unless (config = self.config)
-    return nil unless self.verify_url(url)
+    return nil unless verify_url(url)
 
     format = "png"
 
-    tmp_file = Tempfile.new(['websnappr', ".#{format}"], :encoding => 'ascii-8bit')
+    tmp_file = Tempfile.new(["websnappr", ".#{format}"], encoding: "ascii-8bit")
     img_file = tmp_file.path
     success = true
 
@@ -145,7 +145,7 @@ class CutyCapt
         Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
       else
         begin
-          Timeout::timeout(config[:timeout].to_i / 1000) do
+          Timeout.timeout(config[:timeout].to_i / 1000) do
             Process.waitpid(pid)
             unless $?.success?
               logger.error("Capture failed with code: #{$?.exitstatus}")
@@ -161,11 +161,11 @@ class CutyCapt
       end
     end
 
-    if !success
+    if success
+      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
+    else
       File.unlink(img_file) if File.exist?(img_file)
       return nil
-    else
-      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
     end
 
     if block_given?
@@ -179,11 +179,11 @@ class CutyCapt
 
   def self.snapshot_attachment_for_url(url)
     attachment = nil
-    self.snapshot_url(url) do |file_path|
+    snapshot_url(url) do |file_path|
       # this is a really odd way to get Attachment the data it needs, which
       # should probably be remedied at some point
-      attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))
+      attachment = Attachment.new(uploaded_data: Rack::Test::UploadedFile.new(file_path, "image/png"))
     end
-    return attachment
+    attachment
   end
 end

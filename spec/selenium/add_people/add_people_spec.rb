@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'rubygems'
-require_relative '../common'
+require "rubygems"
+require_relative "../common"
 
 describe "add_people" do
   include_context "in-process server selenium tests"
@@ -28,8 +28,8 @@ describe "add_people" do
     before do
       course_with_teacher_logged_in
       4.times { |i| add_section("Section #{i}") }
-      user_with_pseudonym(:name => "Foo Foo", :active_user => true, :username => "foo", :account => @account)
-      user_with_pseudonym(:name => "Foo Bar", :active_user => true, :username => "bar", :account => @account)
+      user_with_pseudonym(name: "Foo Foo", active_user: true, username: "foo", account: @account)
+      user_with_pseudonym(name: "Foo Bar", active_user: true, username: "bar", account: @account)
     end
 
     # this is one giant test because it has to walk through the panels of a
@@ -43,9 +43,9 @@ describe "add_people" do
       enrollee_count = ff("tbody.collectionViewItems tr").length
 
       # open the add people modal dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
-      expect(f('#application')).to have_attribute("aria-hidden", "true")
+      expect(f("#application")).to have_attribute("aria-hidden", "true")
 
       # can't click the 'login id' radio button directly, since it's covered
       # with inst-ui prettiness and selenium won't allow it.
@@ -62,13 +62,13 @@ describe "add_people" do
       expect(f(".addpeople__peoplevalidationissues")).to be_displayed
 
       # there should be 1 row in the missing table (baz)
-      expect(ff('.addpeople__peoplevalidationissues tbody tr')).to have_size(1)
+      expect(ff(".addpeople__peoplevalidationissues tbody tr")).to have_size(1)
 
       # click the next button
       f("#addpeople_next").click
 
       # there should be 2 rows in the ready to add table (foo, bar)
-      expect(ff('.addpeople__peoplereadylist tbody tr')).to have_size(2)
+      expect(ff(".addpeople__peoplereadylist tbody tr")).to have_size(2)
 
       # force next button into view, then click it
       f("#addpeople_next").click
@@ -84,7 +84,7 @@ describe "add_people" do
       get "/courses/#{@course.id}/users"
 
       # open the dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
 
       # search for some gibberish
@@ -100,11 +100,11 @@ describe "add_people" do
       f("#addpeople_next").click
 
       # the people ready panel is displayed
-      people_ready_panel = f('.addpeople__peoplereadylist')
+      people_ready_panel = f(".addpeople__peoplereadylist")
       expect(people_ready_panel).to be_displayed
 
       # no table
-      expect(f('body')).not_to contain_css('.addpeople__peoplereadylist table')
+      expect(f("body")).not_to contain_css(".addpeople__peoplereadylist table")
 
       # the message_user_path
       msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
@@ -113,48 +113,48 @@ describe "add_people" do
 
     it "includes only manageable roles (non-granular)" do
       @course.root_account.disable_feature!(:granular_permissions_manage_users)
-      @course.account.role_overrides.create! :role => teacher_role,
-                                             :permission => :manage_students,
-                                             :enabled => false
+      @course.account.role_overrides.create! role: teacher_role,
+                                             permission: :manage_students,
+                                             enabled: false
       get "/courses/#{@course.id}/users"
-      f('#addUsers').click
-      expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
+      f("#addUsers").click
+      expect(INSTUI_Select_options("#peoplesearch_select_role").map(&:text)).not_to include "Student"
     end
 
     it "includes only manageable roles (granular)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_users)
-      @course.account.role_overrides.create! :role => teacher_role,
-                                             :permission => :add_student_to_course,
-                                             :enabled => false
+      @course.account.role_overrides.create! role: teacher_role,
+                                             permission: :add_student_to_course,
+                                             enabled: false
       get "/courses/#{@course.id}/users"
-      f('#addUsers').click
-      expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
+      f("#addUsers").click
+      expect(INSTUI_Select_options("#peoplesearch_select_role").map(&:text)).not_to include "Student"
     end
 
     # CNVS-34781
     it "has a working checkbox after cancelling and reopening" do
-      skip('fragile after upgrading modal to inst-ui 5')
+      skip("fragile after upgrading modal to inst-ui 5")
       get "/courses/#{@course.id}/users"
 
       # open the dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
 
       # check the checkbox
       f('label[for="limit_privileges_to_course_section"]').click
-      expect(f('#limit_privileges_to_course_section')).to be_selected
+      expect(f("#limit_privileges_to_course_section")).to be_selected
 
       # cancel the dialog
-      f('#addpeople_cancel').click
+      f("#addpeople_cancel").click
       expect(f("body")).not_to contain_css(".addpeople")
 
       # reopen the dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
 
       # check the checkbox again
       f('label[for="limit_privileges_to_course_section"]').click
-      expect(f('#limit_privileges_to_course_section')).to be_selected
+      expect(f("#limit_privileges_to_course_section")).to be_selected
     end
 
     # tests that INSTUI fixed a bug in Select that would close the Modal
@@ -163,23 +163,23 @@ describe "add_people" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
 
       # expand the roles
-      roleselect = f('#peoplesearch_select_role')
+      roleselect = f("#peoplesearch_select_role")
       roleselect.click
-      option_list_id = roleselect.attribute('aria-controls')
-      expect(f('body')).to contain_css("##{option_list_id}")
+      option_list_id = roleselect.attribute("aria-controls")
+      expect(f("body")).to contain_css("##{option_list_id}")
 
       roleselect.send_keys(:escape)
-      expect(f('body')).not_to contain_css("##{option_list_id}")
+      expect(f("body")).not_to contain_css("##{option_list_id}")
 
       expect(f(".addpeople")).to be_displayed # still
     end
   end
 
-  context('as an admin') do
+  context("as an admin") do
     before do
       course_with_admin_logged_in
     end
@@ -189,7 +189,7 @@ describe "add_people" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
 
       # search for some emails
@@ -207,27 +207,27 @@ describe "add_people" do
 
       # all the checkboxes are checket
       ff(".peoplevalidationissues__missing input[type='checkbox']").each do |checkbox|
-        expect(checkbox.attribute('checked')).to eq("true")
+        expect(checkbox.attribute("checked")).to eq("true")
       end
 
       # uncheck the first name
       f(".peoplevalidationissues__missing tbody label").click
 
       # select all should be unchecked
-      expect(f("#missing_users_select_all").attribute('checked')).to eq(nil)
+      expect(f("#missing_users_select_all").attribute("checked")).to eq(nil)
 
       # re-check the first name
       f(".peoplevalidationissues__missing tbody label").click
 
       # select all is checked
-      expect(f("#missing_users_select_all").attribute('checked')).to eq("true")
+      expect(f("#missing_users_select_all").attribute("checked")).to eq("true")
 
       # uncheck all
       f('label[for="missing_users_select_all"]').click
 
       # none of the name checkboxes are checked
       ff(".peoplevalidationissues__missing input[type='checkbox']").each do |checkbox|
-        expect(checkbox.attribute('checked')).to eq(nil)
+        expect(checkbox.attribute("checked")).to eq(nil)
       end
     end
 
@@ -235,7 +235,7 @@ describe "add_people" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog
-      f('a#addUsers').click
+      f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
 
       # search for some emails

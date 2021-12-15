@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/rubrics_common'
+require_relative "../../common"
+require_relative "../../helpers/rubrics_common"
 
 describe "sub account shared rubric specs" do
   include_context "in-process server selenium tests"
   include RubricsCommon
 
-  let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
+  let(:account) { Account.create(name: "sub account from default account", parent_account: Account.default) }
   let(:rubric_url) { "/accounts/#{account.id}/rubrics" }
-  let(:who_to_login) { 'admin' }
+  let(:who_to_login) { "admin" }
 
   before do
     course_with_admin_logged_in
@@ -53,7 +53,7 @@ describe "sub account shared rubric specs" do
   end
 
   it "picks the lower value when splitting without room for an integer" do
-    skip('fragile - need to refactor split_ratings method')
+    skip("fragile - need to refactor split_ratings method")
     should_pick_the_lower_value_when_splitting_without_room_for_an_integer
   end
 end

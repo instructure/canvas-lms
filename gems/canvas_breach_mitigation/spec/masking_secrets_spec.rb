@@ -30,7 +30,7 @@ describe CanvasBreachMitigation::MaskingSecrets do
     it "puts :_csrf_token into the supplied object" do
       hash = {}
       masking_secrets.masked_authenticity_token(hash)
-      expect(hash['_csrf_token']).not_to be nil
+      expect(hash["_csrf_token"]).not_to be nil
     end
 
     it "returns a byte string" do
@@ -40,7 +40,7 @@ describe CanvasBreachMitigation::MaskingSecrets do
 
   describe ".valid_authenticity_token?" do
     let(:unmasked_token) { SecureRandom.base64(32) }
-    let(:cookies) { { '_csrf_token' => masking_secrets.masked_token(unmasked_token) } }
+    let(:cookies) { { "_csrf_token" => masking_secrets.masked_token(unmasked_token) } }
 
     it "returns true for a valid masked token" do
       valid_masked = masking_secrets.masked_token(unmasked_token)
@@ -61,46 +61,46 @@ describe CanvasBreachMitigation::MaskingSecrets do
 
     it "initializes the _csrf_token cookie" do
       token = masking_secrets.masked_authenticity_token(cookies)
-      expect(cookies['_csrf_token'][:value]).to eq token
+      expect(cookies["_csrf_token"][:value]).to eq token
     end
 
     it "initializes the _csrf_token cookie without explicit domain by default" do
       masking_secrets.masked_authenticity_token(cookies)
-      expect(cookies['_csrf_token']).not_to be_has_key(:domain)
+      expect(cookies["_csrf_token"]).not_to be_has_key(:domain)
     end
 
     it "initializes the _csrf_token cookie without explicit httponly by default" do
       masking_secrets.masked_authenticity_token(cookies)
-      expect(cookies['_csrf_token']).not_to be_has_key(:httponly)
+      expect(cookies["_csrf_token"]).not_to be_has_key(:httponly)
     end
 
     it "initializes the _csrf_token cookie without explicit secure by default" do
       masking_secrets.masked_authenticity_token(cookies)
-      expect(cookies['_csrf_token']).not_to be_has_key(:secure)
+      expect(cookies["_csrf_token"]).not_to be_has_key(:secure)
     end
 
     it "copies domain option to _csrf_token cookie" do
       masking_secrets.masked_authenticity_token(cookies, domain: "domain")
-      expect(cookies['_csrf_token'][:domain]).to eq "domain"
+      expect(cookies["_csrf_token"][:domain]).to eq "domain"
     end
 
     it "copies httponly option to _csrf_token cookie" do
       masking_secrets.masked_authenticity_token(cookies, httponly: true)
-      expect(cookies['_csrf_token'][:httponly]).to be true
+      expect(cookies["_csrf_token"][:httponly]).to be true
     end
 
     it "copies secure option to _csrf_token cookie" do
       masking_secrets.masked_authenticity_token(cookies, secure: true)
-      expect(cookies['_csrf_token'][:secure]).to be true
+      expect(cookies["_csrf_token"][:secure]).to be true
     end
 
     it "remasks an existing _csrf_token cookie" do
       original_token = masking_secrets.masked_token(SecureRandom.base64(32))
-      cookies['_csrf_token'] = original_token
+      cookies["_csrf_token"] = original_token
       token = masking_secrets.masked_authenticity_token(cookies)
       expect(token).not_to eq original_token
-      expect(cookies['_csrf_token'][:value]).to eq token
-      expect(masking_secrets.valid_authenticity_token?({ '_csrf_token' => token }, original_token)).to be true
+      expect(cookies["_csrf_token"][:value]).to eq token
+      expect(masking_secrets.valid_authenticity_token?({ "_csrf_token" => token }, original_token)).to be true
     end
   end
 end

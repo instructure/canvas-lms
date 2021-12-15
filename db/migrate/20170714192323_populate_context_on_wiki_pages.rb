@@ -25,7 +25,4 @@ class PopulateContextOnWikiPages < ActiveRecord::Migration[5.0]
   def up
     DataFixup::PopulateContextOnWikiPages.run
   end
-
-  def down
-  end
 end

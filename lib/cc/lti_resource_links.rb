@@ -67,7 +67,7 @@ module CC
 
       document_info = { file_name: "#{migration_id}.xml" }
       path = File.join(folder, document_info[:file_name])
-      document_info[:file] = File.new(path, 'w')
+      document_info[:file] = File.new(path, "w")
       document_info[:document] = Builder::XmlMarkup.new(target: document_info[:file], indent: 2)
 
       OpenStruct.new(document_info)
@@ -82,18 +82,18 @@ module CC
     def add_lti_resource_link(resource_link, tool, document)
       document.instruct!
       document.cartridge_basiclti_link(
-        xmlns: 'http://www.imsglobal.org/xsd/imslticc_v1p3',
-        'xmlns:blti' => 'http://www.imsglobal.org/xsd/imsbasiclti_v1p0',
-        'xmlns:lticm' => 'http://www.imsglobal.org/xsd/imslticm_v1p0',
-        'xmlns:lticp' => 'http://www.imsglobal.org/xsd/imslticp_v1p0',
-        'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-        'xsi:schemaLocation' => %w(
+        :xmlns => "http://www.imsglobal.org/xsd/imslticc_v1p3",
+        "xmlns:blti" => "http://www.imsglobal.org/xsd/imsbasiclti_v1p0",
+        "xmlns:lticm" => "http://www.imsglobal.org/xsd/imslticm_v1p0",
+        "xmlns:lticp" => "http://www.imsglobal.org/xsd/imslticp_v1p0",
+        "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation" => %w[
           http://www.imsglobal.org/xsd/imslticc_v1p3.xsd
           http://www.imsglobal.org/xsd/imslticp_v1p0
           imslticp_v1p0.xsd http://www.imsglobal.org/xsd/imslticm_v1p0
           imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0
           imsbasiclti_v1p0p1.xsd
-        ).join(' ')
+        ].join(" ")
       ) do |cartridge_basiclti_link|
         # Basic elements
         cartridge_basiclti_link.blti :title, tool.name
@@ -101,9 +101,9 @@ module CC
 
         # URL element (choose secure or not based on protocol)
         case tool.url
-        when /^http:\/\//
+        when %r{^http://}
           cartridge_basiclti_link.blti :launch_url, tool.url
-        when /^https:\/\//
+        when %r{^https://}
           cartridge_basiclti_link.blti :secure_launch_url, tool.url
         end
 
@@ -119,7 +119,7 @@ module CC
           extensions.lticm(
             :property,
             resource_link.lookup_uuid,
-            name: 'lookup_uuid'
+            name: "lookup_uuid"
           )
         end
       end

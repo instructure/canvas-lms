@@ -116,6 +116,7 @@ const locale = {
   "options_3ab0ea65": { "message": "אפשרויות" },
   "pages_e5414c2c": { "message": "דפים" },
   "people_b4ebb13c": { "message": "אנשים " },
+  "percentage_34ab7c2c": { "message": "אחוז" },
   "preview_53003fd2": { "message": "תצוגה מקדימה" },
   "published_c944a23d": { "message": "פורסם" },
   "quizzes_7e598f57": { "message": "בחנים" },

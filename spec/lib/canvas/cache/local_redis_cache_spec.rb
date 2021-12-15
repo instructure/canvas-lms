@@ -67,7 +67,7 @@ module Canvas
           @slow_cache.write_set(data_set)
         end
         fast_thread = Thread.new do
-          while @fast_cache.read('keya') != 'vala'
+          while @fast_cache.read("keya") != "vala"
             sleep(0.025)
           end
           # once any data is there, it should all be there
@@ -82,7 +82,7 @@ module Canvas
       end
 
       it "handles concurrent traffic" do
-        skip 'FOO-1895 4/21/21'
+        skip "FOO-1895 4/21/21"
         lock_taken = false
         cache_key = "some-cache-key"
         cache_value = "THE VALUE"
@@ -101,14 +101,14 @@ module Canvas
           c2 = new_redis_client
           sleep(0.1) until lock_taken # make sure t1 goes first
           v2 = c2.fetch(cache_key, expires_in: 30.seconds, race_condition_ttl: 10.seconds) do
-            raise RuntimeError, "should have waited for t1"
+            raise "should have waited for t1"
           end
         end
         t3 = Thread.new do
           c3 = new_redis_client
           sleep(0.1) until lock_taken # make sure t1 goes first
           v3 = c3.fetch(cache_key, expires_in: 30.seconds, race_condition_ttl: 10.seconds) do
-            raise RuntimeError, "should have waited for t1"
+            raise "should have waited for t1"
           end
         end
         t1.join
@@ -120,15 +120,15 @@ module Canvas
       end
 
       it "will only clear once in a short window, unless forced" do
-        skip 'FOO-1895 4/21/21'
+        skip "FOO-1895 4/21/21"
         @fast_cache.write("pre-clear-key", "pre-clear-value")
         expect(@fast_cache.read("pre-clear-key")).to eq("pre-clear-value")
         @fast_cache.clear
         expect(@fast_cache.read("pre-clear-key")).to be_nil
-        @fast_cache.write("post-clear-key", 'post-key-val')
+        @fast_cache.write("post-clear-key", "post-key-val")
         @fast_cache.clear
         expect(@fast_cache.read("pre-clear-key")).to be_nil
-        expect(@fast_cache.read("post-clear-key")).to eq('post-key-val')
+        expect(@fast_cache.read("post-clear-key")).to eq("post-key-val")
         @fast_cache.clear(force: true)
         expect(@fast_cache.read("pre-clear-key")).to be_nil
         expect(@fast_cache.read("post-clear-key")).to be_nil

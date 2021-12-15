@@ -32,7 +32,7 @@ module Factories
 
   def valid_planner_override_attributes
     {
-      :marked_complete => false
+      marked_complete: false
     }
   end
 end

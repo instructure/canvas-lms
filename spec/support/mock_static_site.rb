@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 # A MockStaticSite blocks any requests to the specified host, and instead
 # returns a corresponding file (using the path in the request) from the
@@ -31,7 +31,7 @@ require_relative '../spec_helper'
 # shouldn't be used for massive files. Plain text, Javascript files, and
 # reasonably-sized images will be fine.
 
-MOCK_SITES_DIRECTORY = 'mock_static_sites'
+MOCK_SITES_DIRECTORY = "mock_static_sites"
 
 class NonexistentMockSiteError < StandardError
 end
@@ -43,7 +43,7 @@ class MockStaticSite
     @url = url
     @mock_site = mock_site.to_s
 
-    current_location = File.expand_path(File.dirname(__FILE__))
+    current_location = __dir__
     @root_dir_path = "#{current_location}/#{MOCK_SITES_DIRECTORY}/#{mock_site}"
     begin
       root_dir = Dir.entries(root_dir_path)
@@ -52,7 +52,7 @@ class MockStaticSite
             "There is no directory for #{mock_site}; create one at #{root_dir_path}"
     end
 
-    index = root_dir.index { |file_name| file_name.start_with?('index.') }
+    index = root_dir.index { |file_name| file_name.start_with?("index.") }
     @index_file = index ? root_dir[index] : nil
 
     WebMock.enable!
@@ -73,7 +73,7 @@ class MockStaticSite
   end
 
   def get_requested_file_name(path)
-    if ['', '/'].include?(path) && index_file
+    if ["", "/"].include?(path) && index_file
       index_file
     else
       path

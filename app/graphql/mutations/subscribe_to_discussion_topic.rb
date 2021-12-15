@@ -19,9 +19,9 @@
 #
 
 class Mutations::SubscribeToDiscussionTopic < Mutations::BaseMutation
-  graphql_name 'SubscribeToDiscussionTopic'
+  graphql_name "SubscribeToDiscussionTopic"
 
-  argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionTopic')
+  argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :subscribed, Boolean, required: true
 
   field :discussion_topic, Types::DiscussionType, null: false
@@ -33,6 +33,6 @@ class Mutations::SubscribeToDiscussionTopic < Mutations::BaseMutation
       discussion_topic: discussion_topic
     }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

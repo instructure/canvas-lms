@@ -150,7 +150,7 @@
         if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible || !@quiz.points_possible
           t('labels.fudge_points_generic_explanation', "You can manually adjust the score by adding positive or negative points to this box.")
         elsif @quiz.survey?
-          t('labels.fudge_points_changed_points_survey', <<-TEXT,
+          t('labels.fudge_points_changed_points_survey', <<~TEXT,
             Since %{user} took this survey, the number of points possible
             has changed by %{difference}. You can adjust for this
             change and manually add positive or negative points using
@@ -159,7 +159,7 @@
             :user => @submission.user.name,
             :difference => render_score(@quiz.points_possible - @submission.quiz_points_possible))
         else
-          t('labels.fudge_points_changed_points_quiz', <<-TEXT,
+          t('labels.fudge_points_changed_points_quiz', <<~TEXT,
             Since %{user} took this quiz, the number of points possible
             has changed by %{difference}. You can adjust for this
             change and manually add positive or negative points using

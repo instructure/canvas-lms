@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'lti_advantage'
+require "lti_advantage"
 
 module Lti
   # Responsible for generating parameters for both Login requests
@@ -154,8 +154,8 @@ module Lti
         return resource_link_request.generate_post_payload
       end
 
-      if resource_type&.to_sym == :module_index_menu &&
-         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu)
+      if resource_type&.to_sym == :module_index_menu_modal &&
+         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
         return resource_link_request.generate_post_payload
       end
 
@@ -172,12 +172,12 @@ module Lti
       login_hint = Lti::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
 
       LtiAdvantage::Messages::LoginRequest.new(
-        iss: Canvas::Security.config['lti_iss'],
+        iss: Canvas::Security.config["lti_iss"],
         login_hint: login_hint,
         client_id: @tool.global_developer_key_id,
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,
-        canvas_region: @context.shard.database_server.config[:region] || 'not_configured'
+        canvas_region: @context.shard.database_server.config[:region] || "not_configured"
       ).as_json
     end
 

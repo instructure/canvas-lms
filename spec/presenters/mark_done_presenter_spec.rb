@@ -20,25 +20,25 @@
 
 describe MarkDonePresenter do
   before do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
   end
 
-  let(:the_module) { @course.context_modules.create(:name => "mark_as_done_module") }
-  let(:wiki_page) { @course.wiki_pages.create(:title => "mark_as_done page", :body => "") }
+  let(:the_module) { @course.context_modules.create(name: "mark_as_done_module") }
+  let(:wiki_page) { @course.wiki_pages.create(title: "mark_as_done page", body: "") }
 
   def add_wiki_page_to_module
-    the_module.add_item(:id => wiki_page.id, :type => 'wiki_page')
+    the_module.add_item(id: wiki_page.id, type: "wiki_page")
   end
 
   def create_presenter(tag)
-    ctrl = double('Controller', session: true)
-    context = double('Context', "grants_any_right?" => true)
+    ctrl = double("Controller", session: true)
+    context = double("Context", "grants_any_right?" => true)
     MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
   end
 
   def add_mark_done_requirement(tag)
     the_module.completion_requirements = {
-      tag.id => { :type => 'must_mark_done' },
+      tag.id => { type: "must_mark_done" },
     }
     the_module.save!
   end

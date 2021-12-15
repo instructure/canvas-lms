@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe Login::CanvasHelper do
   describe "#session_timeout_enabled" do
     context "when the sessions plugin is enabled" do
       it "returns true" do
         ps = PluginSetting.new
-        ps.name = 'sessions'
+        ps.name = "sessions"
         ps.disabled = false
         ps.settings = { "session_timeout" => 123 }
         ps.save!
@@ -40,17 +40,17 @@ describe Login::CanvasHelper do
     end
   end
 
-  describe '#reg_link_data' do
+  describe "#reg_link_data" do
     before :once do
       @domain_root_account = account_model
     end
 
-    it 'returns the proper template when an auth type is present' do
-      expect(helper.reg_link_data('customAuth')[:template]).to eq 'customauthDialog'
+    it "returns the proper template when an auth type is present" do
+      expect(helper.reg_link_data("customAuth")[:template]).to eq "customauthDialog"
     end
 
-    it 'returns the proper template without an auth type' do
-      expect(helper.reg_link_data(nil)[:template]).to eq 'newParentDialog'
+    it "returns the proper template without an auth type" do
+      expect(helper.reg_link_data(nil)[:template]).to eq "newParentDialog"
     end
   end
 end

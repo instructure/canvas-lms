@@ -31,7 +31,7 @@
     "installTranslations": "scripts/installTranslations.js",
     "build:all": "scripts/build.js",
     "build:canvas": "scripts/build-canvas",
-    "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch",
+    "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch --verbose",
     "build:cafe": "webpack --config webpack.testcafe.config.js",
     "prepublishOnly": "yarn build:all && yarn test",
     "fmt:check": "prettier -l '**/*.js'",
@@ -132,7 +132,7 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "^3.0.0"
+    "tinymce-a11y-checker": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -159,7 +159,7 @@
     "fetch-mock": "^6",
     "format-message-cli": "^6",
     "format-message-parse": "^6",
-    "jest": "^24",
+    "jest": "^26",
     "jest-canvas-mock": "^2",
     "jest-environment-jsdom-fourteen": "^0.1.0",
     "jest-junit": "^7",
@@ -184,6 +184,6 @@
     "webpack-plugin-serve": "^1"
   },
   "resolutions": {
-    "format-message-estree-util": "../packages/format-message-estree-util"
+    "format-message-estree-util": "./packages/format-message-estree-util"
   }
 }

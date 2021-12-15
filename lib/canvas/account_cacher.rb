@@ -23,7 +23,7 @@ module Canvas
     class CacheAccountOnAssociation < ActiveRecord::Associations::BelongsToAssociation
       def find_target
         key = ["account2", owner._read_attribute(reflection.foreign_key)].cache_key
-        return RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
+        RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
       end
     end
 
@@ -32,7 +32,7 @@ module Canvas
         return super unless klass == Account
 
         key = ["account", owner._read_attribute(reflection.foreign_key)].cache_key
-        return RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
+        RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
       end
     end
 
@@ -51,12 +51,12 @@ module Canvas
     def self.apply_to_reflections(klass)
       klass.reflections.each do |(name, r)|
         next unless r.macro == :belongs_to
-        next if name == 'root_account'
+        next if name == "root_account"
 
         if r.options[:polymorphic]
-          next unless klass.canonicalize_polymorph_list(r.options[:polymorphic]).map(&:last).include?('Account')
+          next unless klass.canonicalize_polymorph_list(r.options[:polymorphic]).map(&:last).include?("Account")
         else
-          next unless r.class_name == 'Account'
+          next unless r.class_name == "Account"
         end
 
         next if [Canvas::RootAccountCacher::ExtendRootAccountReflection,
@@ -65,17 +65,17 @@ module Canvas
 
         r.extend(r.options[:polymorphic] ? ExtendPolymorphicAccountReflection : ExtendAccountReflection)
 
-        if klass.reflections.key?('root_account')
-          m = Module.new
-          polymorphic_condition = "#{r.foreign_type} == 'Account' && " if r.options[:polymorphic]
-          m.module_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def #{name}
-              return root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{polymorphic_condition}root_account_id && #{r.foreign_key} == root_account_id
-              super
-            end
-          RUBY
-          klass.include(m)
-        end
+        next unless klass.reflections.key?("root_account")
+
+        m = Module.new
+        polymorphic_condition = "#{r.foreign_type} == 'Account' && " if r.options[:polymorphic]
+        m.module_eval <<~RUBY, __FILE__, __LINE__ + 1
+          def #{name}
+            return root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{polymorphic_condition}root_account_id && #{r.foreign_key} == root_account_id
+            super
+          end
+        RUBY
+        klass.include(m)
       end
     end
   end

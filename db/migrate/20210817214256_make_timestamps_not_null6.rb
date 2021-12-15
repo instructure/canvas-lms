@@ -21,7 +21,7 @@ class MakeTimestampsNotNull6 < ActiveRecord::Migration[6.0]
   tag :postdeploy
   disable_ddl_transaction!
 
-  TABLES = %w{
+  TABLES = %w[
     abstract_courses
     account_reports
     account_users
@@ -99,7 +99,7 @@ class MakeTimestampsNotNull6 < ActiveRecord::Migration[6.0]
     web_conferences
     wiki_pages
     wikis
-  }.freeze
+  ].freeze
 
   def change
     tries = 0

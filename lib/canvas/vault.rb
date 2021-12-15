@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'vault'
+require "vault"
 
 module Canvas::Vault
-  CACHE_KEY_PREFIX = 'vault/'
+  CACHE_KEY_PREFIX = "vault/"
   class MissingVaultSecret < StandardError; end
 
   class << self
@@ -53,9 +53,9 @@ module Canvas::Vault
         cache_ttl = fetched_lease_value / 2
         LocalCache.write(cache_key, cached_data, expires_in: cache_ttl)
       end
-      return cached_data
-    rescue => exception
-      Canvas::Errors.capture_exception(:vault, exception)
+      cached_data
+    rescue => e
+      Canvas::Errors.capture_exception(:vault, e)
       stale_value = LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
       return stale_value if stale_value.present?
 
@@ -71,11 +71,11 @@ module Canvas::Vault
     end
 
     def kv_mount
-      config[:kv_mount] || 'app-canvas'
+      config[:kv_mount] || "app-canvas"
     end
 
     def config
-      ConfigFile.load('vault').try(:symbolize_keys) || {}
+      ConfigFile.load("vault").try(:symbolize_keys) || {}
     end
 
     private

@@ -20,6 +20,7 @@ import I18n from 'i18n!direct_share_course_panel'
 
 import React, {useState} from 'react'
 import {func, string} from 'prop-types'
+import {Alert} from '@instructure/ui-alerts'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import contentSelectionShape from '../proptypes/contentSelection'
@@ -82,6 +83,11 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         setModuleItemPosition={setSelectedPosition}
         disableModuleInsertion={contentSelection && 'modules' in contentSelection}
       />
+      <Alert variant="warning" hasShadow={false}>
+        {I18n.t(
+          'Importing the same course content more than once will overwrite any existing content in the course.'
+        )}
+      </Alert>
       <ConfirmActionButtonBar
         padding="small 0 0 0"
         primaryLabel={startCopyOperationPromise ? null : I18n.t('Copy')}

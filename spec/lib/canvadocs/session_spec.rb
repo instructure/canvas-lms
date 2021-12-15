@@ -26,35 +26,35 @@ describe Canvadocs::Session do
   describe ".observing?" do
     it "returns true if the user is acting as an observer" do
       course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
-      observer = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      section = course.course_sections.create!(name: 'Section A')
+      student = user_factory(active_all: true, active_state: "active")
+      observer = user_factory(active_all: true, active_state: "active")
+      assignment = course.assignments.create!(title: "assignment 1", name: "assignment 1")
+      section = course.course_sections.create!(name: "Section A")
       observer_enrollment = course.enroll_user(
         observer,
-        'ObserverEnrollment',
-        enrollment_state: 'active',
+        "ObserverEnrollment",
+        enrollment_state: "active",
         section: section
       )
       observer_enrollment.update!(associated_user_id: student.id)
-      assignment.update!(submission_types: 'online_upload')
+      assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(observing?(observer)).to eq true
     end
 
     it "returns false if the user is not an observer" do
       course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
-      not_observer = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      section = course.course_sections.create!(name: 'Section A')
+      student = user_factory(active_all: true, active_state: "active")
+      not_observer = user_factory(active_all: true, active_state: "active")
+      assignment = course.assignments.create!(title: "assignment 1", name: "assignment 1")
+      section = course.course_sections.create!(name: "Section A")
       course.enroll_user(
         not_observer,
-        'StudentEnrollment',
-        enrollment_state: 'active',
+        "StudentEnrollment",
+        enrollment_state: "active",
         section: section
       )
-      assignment.update!(submission_types: 'online_upload')
+      assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(observing?(not_observer)).to eq false
     end
@@ -63,34 +63,34 @@ describe Canvadocs::Session do
   describe ".managing?" do
     it "returns true if the user has TeacherEnrollment" do
       course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
-      teacher = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      section = course.course_sections.create!(name: 'Section A')
+      student = user_factory(active_all: true, active_state: "active")
+      teacher = user_factory(active_all: true, active_state: "active")
+      assignment = course.assignments.create!(title: "assignment 1", name: "assignment 1")
+      section = course.course_sections.create!(name: "Section A")
       course.enroll_user(
         teacher,
-        'TeacherEnrollment',
-        enrollment_state: 'active',
+        "TeacherEnrollment",
+        enrollment_state: "active",
         section: section
       )
-      assignment.update!(submission_types: 'online_upload')
+      assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(managing?(teacher)).to eq true
     end
 
     it "returns false if the user does not have a TeacherEnrollment" do
       course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
-      not_teacher = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      section = course.course_sections.create!(name: 'Section A')
+      student = user_factory(active_all: true, active_state: "active")
+      not_teacher = user_factory(active_all: true, active_state: "active")
+      assignment = course.assignments.create!(title: "assignment 1", name: "assignment 1")
+      section = course.course_sections.create!(name: "Section A")
       course.enroll_user(
         not_teacher,
-        'DesignerEnrollment',
-        enrollment_state: 'active',
+        "DesignerEnrollment",
+        enrollment_state: "active",
         section: section
       )
-      assignment.update!(submission_types: 'online_upload')
+      assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(managing?(not_teacher)).to eq false
     end
@@ -99,18 +99,18 @@ describe Canvadocs::Session do
   describe ".canvadoc_permissions_for_user" do
     before(:once) do
       @course = course_factory(active_all: true)
-      @student = user_factory(active_all: true, active_state: 'active')
-      @assignment = @course.assignments.create!(title: 'assignment 1', name: 'assignment 1', submission_types: 'online_upload')
+      @student = user_factory(active_all: true, active_state: "active")
+      @assignment = @course.assignments.create!(title: "assignment 1", name: "assignment 1", submission_types: "online_upload")
       @submission = submission_model(user: @student, course: @course, assignment: @assignment)
     end
 
     it "returns read permissions for observers" do
-      observer = user_factory(active_all: true, active_state: 'active')
-      section = @course.course_sections.create!(name: 'Section A')
+      observer = user_factory(active_all: true, active_state: "active")
+      section = @course.course_sections.create!(name: "Section A")
       observer_enrollment = @course.enroll_user(
         observer,
-        'ObserverEnrollment',
-        enrollment_state: 'active',
+        "ObserverEnrollment",
+        enrollment_state: "active",
         section: section
       )
       observer_enrollment.update!(associated_user_id: @student.id)
@@ -124,12 +124,12 @@ describe Canvadocs::Session do
     end
 
     it "returns readwritemanage permissions for teacher" do
-      teacher = user_factory(active_all: true, active_state: 'active')
-      section = @course.course_sections.create!(name: 'Section A')
+      teacher = user_factory(active_all: true, active_state: "active")
+      section = @course.course_sections.create!(name: "Section A")
       @course.enroll_user(
         teacher,
-        'TeacherEnrollment',
-        enrollment_state: 'active',
+        "TeacherEnrollment",
+        enrollment_state: "active",
         section: section
       )
       permissions = canvadoc_permissions_for_user(teacher, true)

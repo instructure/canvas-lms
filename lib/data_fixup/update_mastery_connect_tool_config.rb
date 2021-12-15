@@ -19,10 +19,10 @@
 
 module DataFixup::UpdateMasteryConnectToolConfig
   def self.run
-    ContextExternalTool.active.where(domain: 'app.masteryconnect.com').find_each do |cet|
-      next if cet.settings['submission_type_selection']
+    ContextExternalTool.active.where(domain: "app.masteryconnect.com").find_each do |cet|
+      next if cet.settings["submission_type_selection"]
 
-      cet.settings['submission_type_selection'] = {
+      cet.settings["submission_type_selection"] = {
         "text" => "Link Assessment",
         "url" => "https://app.masteryconnect.com/lti/v1.1/launch/classrooms",
         "message_type" => "ContentItemSelectionRequest",

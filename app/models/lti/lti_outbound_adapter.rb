@@ -35,7 +35,7 @@ module Lti
       elsif @tool.context.respond_to? :root_account
         @root_account = @tool.context.root_account
       else
-        raise('Root account required for generating LTI content')
+        raise("Root account required for generating LTI content")
       end
     end
 
@@ -80,13 +80,13 @@ module Lti
     end
 
     def generate_post_payload(assignment: nil, student_id: nil)
-      raise('Called generate_post_payload before calling prepare_tool_launch') unless @tool_launch
+      raise("Called generate_post_payload before calling prepare_tool_launch") unless @tool_launch
 
       hash = @tool_launch.generate(@overrides)
       hash[:ext_lti_assignment_id] = assignment&.lti_context_id if assignment&.lti_context_id.present?
       hash[:ext_lti_student_id] = student_id if student_id
       begin
-        return Lti::Security.signed_post_params(
+        Lti::Security.signed_post_params(
           hash,
           @tool_launch.url,
           @tool.consumer_key,
@@ -99,7 +99,7 @@ module Lti
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-      raise('Called generate_post_payload_for_assignment before calling prepare_tool_launch') unless @tool_launch
+      raise("Called generate_post_payload_for_assignment before calling prepare_tool_launch") unless @tool_launch
 
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
       @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
@@ -107,7 +107,7 @@ module Lti
     end
 
     def generate_post_payload_for_homework_submission(assignment)
-      raise('Called generate_post_payload_for_homework_submission before calling prepare_tool_launch') unless @tool_launch
+      raise("Called generate_post_payload_for_homework_submission before calling prepare_tool_launch") unless @tool_launch
 
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
       @tool_launch.for_homework_submission!(lti_assignment)
@@ -115,9 +115,9 @@ module Lti
     end
 
     def launch_url(post_only: false)
-      raise('Called launch_url before calling prepare_tool_launch') unless @tool_launch
+      raise("Called launch_url before calling prepare_tool_launch") unless @tool_launch
 
-      post_only && !disable_post_only? ? @tool_launch.url.split('?').first : @tool_launch.url
+      post_only && !disable_post_only? ? @tool_launch.url.split("?").first : @tool_launch.url
     end
 
     # this is the lis_result_sourcedid field in the launch, and the
@@ -130,7 +130,7 @@ module Lti
         if @root_account.feature_enabled?(:encrypted_sourcedids)
           BasicLTI::Sourcedid.new(@tool, @context, assignment, @user).to_s
         else
-          payload = [@tool.id, @context.id, assignment.id, @user.id].join('-')
+          payload = [@tool.id, @context.id, assignment.id, @user.id].join("-")
           "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
         end
       end

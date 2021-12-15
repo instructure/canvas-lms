@@ -36,15 +36,15 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
   end
 
   let(:legacy_group_for_sub_account) do
-    ->(sub_account) {
+    lambda do |sub_account|
       group = sub_account.grading_period_groups.build(group_helper.valid_attributes)
       group.save(validate: false)
       group
-    }
+    end
   end
 
   before do
-    @root_account = Account.create(name: 'new account')
+    @root_account = Account.create(name: "new account")
     @sub_account = @root_account.sub_accounts.create!
   end
 
@@ -92,7 +92,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
       @course = @sub_account_of_sub_account.courses.create!
     end
 
-    context " with grading periods" do
+    context "with grading periods" do
       before do
         group = group_helper.legacy_create_for_course(@course)
         period_helper.create_presets_for_group(group, :past, :current, :future)
@@ -217,7 +217,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
           run_data_fixup
         end
 
-        it "receives copies of the next 'nearest' sub-account's grading periods " do
+        it "receives copies of the next 'nearest' sub-account's grading periods" do
           expect(course_periods_attrs).to eq(sub_account_periods_attrs)
         end
 

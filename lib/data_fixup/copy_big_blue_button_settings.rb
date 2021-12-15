@@ -19,12 +19,12 @@
 
 module DataFixup::CopyBigBlueButtonSettings
   def self.run
-    PluginSetting.where(:name => "big_blue_button").where.not(:disabled => true).to_a.each do |ps|
-      if ps.settings && ps.settings.with_indifferent_access["free_trial"]
-        copy = PluginSetting.new(ps.attributes.except("id", "name", "created_at", "updated_at").merge("name" => "big_blue_button_fallback"))
-        unless copy.save
-          ::Rails.logger.warn("Could not copy big blue button plugin setting - #{copy.errors.full_messages}")
-        end
+    PluginSetting.where(name: "big_blue_button").where.not(disabled: true).to_a.each do |ps|
+      next unless ps.settings && ps.settings.with_indifferent_access["free_trial"]
+
+      copy = PluginSetting.new(ps.attributes.except("id", "name", "created_at", "updated_at").merge("name" => "big_blue_button_fallback"))
+      unless copy.save
+        ::Rails.logger.warn("Could not copy big blue button plugin setting - #{copy.errors.full_messages}")
       end
     end
   end

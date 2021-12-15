@@ -36,7 +36,7 @@ describe CanvasCassandra::DatabaseBuilder do
   end
 
   before do
-    target_location = Pathname.new(File.join(File.dirname(__FILE__), '..', 'fixtures'))
+    target_location = Pathname.new(File.join(File.dirname(__FILE__), "..", "fixtures"))
     allow(Rails).to receive(:root).and_return(target_location)
   end
 
@@ -58,7 +58,7 @@ describe CanvasCassandra::DatabaseBuilder do
 
   describe ".from_config" do
     it "boots a DB instance from config" do
-      allow(CassandraCQL::Database).to receive(:new).and_return(double())
+      allow(CassandraCQL::Database).to receive(:new).and_return(double)
       db = CanvasCassandra::DatabaseBuilder.from_config("foobars")
       expect(@logger_obj.logs[0]).to be_nil
       expect(db).to be_a(CanvasCassandra::Database)
@@ -78,7 +78,7 @@ describe CanvasCassandra::DatabaseBuilder do
       end
       prev_store = CanvasCassandra.settings_store(true)
       settings = {
-        'event_stream.read_consistency.foobars' => 'local_quorum'
+        "event_stream.read_consistency.foobars" => "local_quorum"
       }
       CanvasCassandra.settings_store = store_klass.new(settings)
       val = CanvasCassandra::DatabaseBuilder.read_consistency_setting("foobars")

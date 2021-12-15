@@ -40,7 +40,10 @@ describe ProgressRunner do
     progress_runner = ProgressRunner.new(@progress)
 
     completed_message_value = nil
-    progress_runner.completed_message { |completed| completed_message_value = completed; "foo" }
+    progress_runner.completed_message do |completed|
+      completed_message_value = completed
+      "foo"
+    end
 
     error_callback_called = false
     progress_runner.error_message do
@@ -76,7 +79,7 @@ describe ProgressRunner do
     error_callback_count = 0
     progress_runner.error_message do |error, ids|
       error_callback_count += 1
-      "#{error}: #{ids.join(', ')}"
+      "#{error}: #{ids.join(", ")}"
     end
 
     ids = (1..3).to_a

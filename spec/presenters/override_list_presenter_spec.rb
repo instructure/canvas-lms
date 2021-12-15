@@ -63,22 +63,22 @@ describe OverrideListPresenter do
   describe "#formatted_date_string" do
     context "due_at" do
       it "returns - if due_at isn't present" do
-        due_date_hash = { :due_at => nil }
-        expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq '-'
+        due_date_hash = { due_at: nil }
+        expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq "-"
         due_date_hash[:due_at] = ""
-        expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq '-'
+        expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq "-"
       end
 
       it "returns a shortened version with just the date if time is 11:59" do
         fancy_midnight = CanvasTime.fancy_midnight Time.zone.now
-        due_date_hash = { :due_at => fancy_midnight }
+        due_date_hash = { due_at: fancy_midnight }
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq(
           date_string(fancy_midnight, :no_words)
         )
       end
 
       it "returns returns datetime_string if not all day but date present" do
-        due_date_hash = { :due_at => Time.now }
+        due_date_hash = { due_at: Time.now }
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
@@ -87,7 +87,7 @@ describe OverrideListPresenter do
 
     context "lock_at and unlock_at" do
       it "returns returns datetime_string of not all day but date present" do
-        due_date_hash = { :lock_at => Time.now, :unlock_at => Time.now - 1.day }
+        due_date_hash = { lock_at: Time.now, unlock_at: Time.now - 1.day }
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
@@ -97,22 +97,22 @@ describe OverrideListPresenter do
       end
 
       it "returns - if due_at isn't present" do
-        due_date_hash = { :lock_at => nil }
-        expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq '-'
+        due_date_hash = { lock_at: nil }
+        expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq "-"
         due_date_hash[:lock_at] = ""
-        expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq '-'
-        due_date_hash = { :unlock_at => nil }
-        expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq '-'
+        expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq "-"
+        due_date_hash = { unlock_at: nil }
+        expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq "-"
         due_date_hash[:unlock_at] = ""
-        expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq '-'
+        expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq "-"
       end
 
       it "never takes all_day into effect" do
-        due_date_hash = { :lock_at => Time.now, :all_day => true }
+        due_date_hash = { lock_at: Time.now, all_day: true }
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
-        due_date_hash = { :unlock_at => Time.now, :all_day => true }
+        due_date_hash = { unlock_at: Time.now, all_day: true }
         expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
@@ -136,15 +136,15 @@ describe OverrideListPresenter do
 
   describe "#due_for" do
     it "returns the due date's title if it is present?" do
-      due_date = { :title => "default" }
-      expect(presenter.due_for(due_date)).to eq 'default'
+      due_date = { title: "default" }
+      expect(presenter.due_for(due_date)).to eq "default"
     end
 
     it "returns 'Everyone else' if multiple due dates for assignment" do
       expect(assignment).to receive(:has_active_overrides?).once.and_return true
       due_date = {}
       expect(presenter.due_for(due_date)).to eq(
-        I18n.t('overrides.everyone_else', 'Everyone else')
+        I18n.t("overrides.everyone_else", "Everyone else")
       )
     end
 
@@ -152,7 +152,7 @@ describe OverrideListPresenter do
       expect(assignment).to receive(:has_active_overrides?).once.and_return false
       due_date = {}
       expect(presenter.due_for(due_date)).to eq(
-        I18n.t('overrides.everyone', 'Everyone')
+        I18n.t("overrides.everyone", "Everyone")
       )
     end
 
@@ -167,34 +167,35 @@ describe OverrideListPresenter do
       end
 
       it "returns a dynamically generated title based on the number of current and invited users" do
-        expect(presenter.due_for(@due_date)).to eql('2 students')
+        expect(presenter.due_for(@due_date)).to eql("2 students")
       end
 
       it "does not count concluded students" do
         course.enrollments.find_by(user: second_user).conclude
-        expect(presenter.due_for(@due_date)).to eql('1 student')
+        expect(presenter.due_for(@due_date)).to eql("1 student")
       end
 
       it "does not count inactive students" do
         course.enrollments.find_by(user: second_user).deactivate
-        expect(presenter.due_for(@due_date)).to eql('1 student')
+        expect(presenter.due_for(@due_date)).to eql("1 student")
       end
 
       it "does not count deleted students" do
         course.enrollments.find_by(user: second_user).destroy
-        expect(presenter.due_for(@due_date)).to eql('1 student')
+        expect(presenter.due_for(@due_date)).to eql("1 student")
       end
 
       it "does not double-count students that have multiple enrollments in the course" do
         section = course.course_sections.create!
-        course.enroll_student(user, section: section, enrollment_state: 'active', allow_multiple_enrollments: true)
-        expect(presenter.due_for(@due_date)).to eql('2 students')
+        course.enroll_student(user, section: section, enrollment_state: "active", allow_multiple_enrollments: true)
+        expect(presenter.due_for(@due_date)).to eql("2 students")
       end
     end
   end
 
   describe "#visible_due_dates" do
-    def visible_due_dates; @visible_due_dates; end
+    attr_reader :visible_due_dates
+
     let(:sections) do
       # the count is the important part, the actual course sections are
       # not used
@@ -203,10 +204,10 @@ describe OverrideListPresenter do
 
     def dates_visible_to_user
       [
-        { :due_at => "", :lock_at => nil, :unlock_at => nil, :set_type => 'CourseSection' },
-        { :due_at => Time.now + 1.day, :lock_at => nil, :unlock_at => nil, :set_type => 'CourseSection' },
-        { :due_at => Time.now + 2.days, :lock_at => nil, :unlock_at => nil, :set_type => 'CourseSection' },
-        { :due_at => Time.now - 2.days, :lock_at => nil, :unlock_at => nil, :base => true }
+        { due_at: "", lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: Time.now + 1.day, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: Time.now + 2.days, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: Time.now - 2.days, lock_at: nil, unlock_at: nil, base: true }
       ]
     end
 
@@ -249,7 +250,7 @@ describe OverrideListPresenter do
     end
 
     context "only some sections have overrides" do
-      let(:dates_visible) { dates_visible_to_user[1..-1] }
+      let(:dates_visible) { dates_visible_to_user[1..] }
 
       before do
         allow(assignment.context).to receive(:active_section_count)

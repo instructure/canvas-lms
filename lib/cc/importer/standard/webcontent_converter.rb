@@ -28,16 +28,16 @@ module CC::Importer::Standard
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
         if res[:intended_use] || @convert_html_to_pages
           path = get_full_path(res[:href])
-          if path && File.exist?(path) && Attachment.mimetype(path).include?('html')
+          if path && File.exist?(path) && Attachment.mimetype(path).include?("html")
             case res[:intended_use]
             when "assignment"
-              new_assignments << { :migration_id => res[:migration_id], :description => File.read(path) }
+              new_assignments << { migration_id: res[:migration_id], description: File.read(path) }
             when "syllabus"
               @course[:course] ||= {}
               @course[:course][:syllabus_body] = File.read(path)
             else
               if @convert_html_to_pages
-                new_pages << { :migration_id => res[:migration_id], :text => File.read(path) }
+                new_pages << { migration_id: res[:migration_id], text: File.read(path) }
               end
             end
           end
@@ -46,7 +46,7 @@ module CC::Importer::Standard
         main_file = {}
         main_file[:migration_id] = res[:migration_id]
         main_file[:path_name] = res[:href]
-        if res[:intended_user_role] == 'Instructor'
+        if res[:intended_user_role] == "Instructor"
           main_file[:locked] = true
         end
 
@@ -65,15 +65,15 @@ module CC::Importer::Standard
           sub_file[:path_name] = file_ref[:href]
           sub_file[:migration_id] = Digest::MD5.hexdigest(sub_file[:path_name])
           sub_file[:file_name] = File.basename sub_file[:path_name]
-          sub_file[:type] = 'FILE_TYPE'
+          sub_file[:type] = "FILE_TYPE"
           add_course_file(sub_file)
         end
 
-        if main_file[:path_name].present?
-          main_file[:file_name] = File.basename main_file[:path_name]
-          main_file[:type] = 'FILE_TYPE'
-          add_course_file(main_file, true)
-        end
+        next unless main_file[:path_name].present?
+
+        main_file[:file_name] = File.basename main_file[:path_name]
+        main_file[:type] = "FILE_TYPE"
+        add_course_file(main_file, true)
       end
 
       new_assignments.each do |a|
@@ -89,7 +89,7 @@ module CC::Importer::Standard
     end
 
     def package_course_files(file_map)
-      zip_file = File.join(@base_export_dir, 'all_files.zip')
+      zip_file = File.join(@base_export_dir, "all_files.zip")
       make_export_dir
 
       return if file_map.empty?
@@ -100,11 +100,11 @@ module CC::Importer::Standard
 
           file_path = @package_root.item_path(val[:path_name])
           if File.exist?(file_path)
-            zipfile.add(val[:path_name], file_path) if !File.directory?(file_path)
+            zipfile.add(val[:path_name], file_path) unless File.directory?(file_path)
           else
             web_file_path = @package_root.item_path(WEB_RESOURCES_FOLDER, val[:path_name])
             if File.exist?(web_file_path)
-              zipfile.add(val[:path_name], web_file_path) if !File.directory?(web_file_path)
+              zipfile.add(val[:path_name], web_file_path) unless File.directory?(web_file_path)
             else
               val[:errored] = true
             end

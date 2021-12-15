@@ -64,7 +64,7 @@ module Canvas
         end
         begin
           a_regrettable_method
-          raise RuntimeError, "How did we get here? More regrettable than expected..."
+          raise "How did we get here? More regrettable than expected..."
         rescue OuterErrorStatsError => e
           described_class.capture(e, {}, :warn)
         end

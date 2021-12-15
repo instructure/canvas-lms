@@ -22,13 +22,13 @@ class AddReplicaIdentityForLtiResults < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Lti::Result', :root_account_id, 0
-    remove_index :lti_results, name: 'index_lti_results_on_root_account_id', if_exists: true
+    add_replica_identity "Lti::Result", :root_account_id, 0
+    remove_index :lti_results, name: "index_lti_results_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :lti_results, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'Lti::Result'
+    remove_replica_identity "Lti::Result"
     change_column_null :lti_results, :root_account_id, true
   end
 end

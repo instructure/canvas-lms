@@ -23,7 +23,7 @@ module Canvas::OAuth
   module GrantTypes
     class ClientCredentials < BaseType
       def initialize(opts, host, protocol = nil) # rubocop:disable Lint/MissingSuper
-        if opts[:client_assertion_type] == 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+        if opts[:client_assertion_type] == "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
           raw_jwt = opts.fetch(:client_assertion)
           @provider = Canvas::OAuth::AsymmetricClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)
           @secret = @provider.key&.api_key
@@ -31,7 +31,7 @@ module Canvas::OAuth
           client_id = opts.fetch(:client_id)
           @provider = Canvas::OAuth::SymmetricClientCredentialsProvider.new(client_id, host, scopes_from_opts(opts), protocol)
           if @provider.key&.client_credentials_audience != "external"
-            raise Canvas::OAuth::InvalidRequestError, 'assertion method not supported for this grant_type'
+            raise Canvas::OAuth::InvalidRequestError, "assertion method not supported for this grant_type"
           end
 
           @secret = opts.fetch(:client_secret)
@@ -54,11 +54,11 @@ module Canvas::OAuth
       end
 
       def basic_auth?(opts)
-        opts[:client_assertion_type] != 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+        opts[:client_assertion_type] != "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
       end
 
       def scopes_from_opts(opts)
-        (opts[:scope] || opts[:scopes] || '').split(' ')
+        (opts[:scope] || opts[:scopes] || "").split
       end
     end
   end

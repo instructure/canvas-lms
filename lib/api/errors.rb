@@ -37,7 +37,7 @@ module Api
     self.errors = {}
 
     def self.define_error(error_id, opts)
-      self.errors[error_id] = opts
+      errors[error_id] = opts
     end
 
     define_error :deprecated_request_syntax,
@@ -71,11 +71,10 @@ module Api
     # API JSON error responses.
     class Reporter < ActiveModel::BetterErrors::HashReporter
       def to_hash
-        error_list = collection.to_hash.inject([]) do |list, (attribute, error_message_set)|
+        error_list = collection.to_hash.each_with_object([]) do |(attribute, error_message_set), list|
           error_message_set.each do |error_message|
             list << format_error_message(attribute, error_message)
           end
-          list
         end
         { errors: error_list }
       end

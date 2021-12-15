@@ -17,26 +17,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe Anonymity do
-  describe '.generate_id' do
-    let(:short_id) { 'aB123' }
+  describe ".generate_id" do
+    let(:short_id) { "aB123" }
 
-    context 'given no existing_anonymous_ids' do
+    context "given no existing_anonymous_ids" do
       subject(:generate_id) do
         -> { Anonymity.generate_id }
       end
 
-      it 'creates an anonymous_id' do
+      it "creates an anonymous_id" do
         allow(Anonymity).to receive(:generate_short_id).and_return(short_id)
         expect(generate_id.call).to eql short_id
       end
 
-      it 'creates a unique anonymous_id when collisions happen' do
+      it "creates a unique anonymous_id when collisions happen" do
         first_anonymous_id = short_id
         colliding_anonymous_id = first_anonymous_id
-        unused_anonymous_id = 'eeeee'
+        unused_anonymous_id = "eeeee"
 
         allow(Anonymity).to receive(:generate_short_id).exactly(3).times.and_return(
           first_anonymous_id, colliding_anonymous_id, unused_anonymous_id
@@ -48,23 +48,23 @@ describe Anonymity do
       end
     end
 
-    context 'given a list of existing_anonymous_ids' do
+    context "given a list of existing_anonymous_ids" do
       subject do
         Anonymity.generate_id(existing_ids: existing_anonymous_ids_fake)
       end
 
-      let(:existing_anonymous_ids_fake) { double('Array') }
+      let(:existing_anonymous_ids_fake) { double("Array") }
 
-      it 'queries the passed in existing_anonymous_ids' do
+      it "queries the passed in existing_anonymous_ids" do
         allow(Anonymity).to receive(:generate_short_id).and_return(short_id)
         expect(existing_anonymous_ids_fake).to receive(:include?).with(short_id).and_return(false)
-        is_expected.to eql short_id
+        expect(subject).to eql short_id
       end
     end
   end
 
-  describe '.generate_short_id' do
-    it 'generates a short id' do
+  describe ".generate_short_id" do
+    it "generates a short id" do
       expect(SecureRandom).to receive(:base58).with(5)
       Anonymity.generate_short_id
     end

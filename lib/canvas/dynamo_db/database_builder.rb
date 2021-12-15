@@ -74,7 +74,7 @@ module Canvas
       end
 
       def self.configs(environment = default_environment)
-        ConfigFile.load('dynamodb', environment) || {}
+        ConfigFile.load("dynamodb", environment) || {}
       end
 
       def self.categories

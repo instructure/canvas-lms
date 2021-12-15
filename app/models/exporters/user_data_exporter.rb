@@ -22,7 +22,7 @@ module Exporters
     def self.create_user_data_export(user)
       root_folder = Folder.root_folders(user).first
 
-      sub_folder ||= root_folder.sub_folders.active.where(name: I18n.t(:data_exports, 'data exports')).first_or_initialize
+      sub_folder ||= root_folder.sub_folders.active.where(name: I18n.t(:data_exports, "data exports")).first_or_initialize
       if sub_folder.new_record?
         sub_folder.context = user
         sub_folder.save!
@@ -32,7 +32,7 @@ module Exporters
 
       folder_name = "#{time_zone.today} data export"
       filename = "#{folder_name}.zip"
-      attachment = sub_folder.file_attachments.build(:display_name => filename)
+      attachment = sub_folder.file_attachments.build(display_name: filename)
       attachment.user_id = user.id
       attachment.context = user
       attachment.folder_id = sub_folder.id
@@ -45,10 +45,10 @@ module Exporters
           Exporters::SubmissionExporter.export_user_submissions(user, folder_name, zipfile, files_in_zip)
         end
 
-        uploaded_data = Rack::Test::UploadedFile.new(zip_name, 'application/zip')
+        uploaded_data = Rack::Test::UploadedFile.new(zip_name, "application/zip")
         Attachments::Storage.store_for_attachment(attachment, uploaded_data)
-        attachment.workflow_state = 'zipped'
-        attachment.file_state = 'available'
+        attachment.workflow_state = "zipped"
+        attachment.file_state = "available"
         attachment.save!
       end
 

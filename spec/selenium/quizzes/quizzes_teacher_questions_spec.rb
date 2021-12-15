@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
 describe "quizzes questions" do
   include_context "in-process server selenium tests"
@@ -26,8 +26,8 @@ describe "quizzes questions" do
 
   before(:once) do
     course_with_teacher(active_all: true)
-    @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+    @student = user_with_pseudonym(active_user: true, username: "student@example.com", password: "qwertyuiop")
+    @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
   end
 
   before do
@@ -35,10 +35,10 @@ describe "quizzes questions" do
   end
 
   context "as a teacher" do
-    it "edits a quiz question", priority: "1", test_id: 209946 do
+    it "edits a quiz question", priority: "1" do
       @context = @course
       q = quiz_model
-      quest1 = q.quiz_questions.create!(:question_data => { :name => "first question" })
+      quest1 = q.quiz_questions.create!(question_data: { name: "first question" })
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
@@ -49,8 +49,8 @@ describe "quizzes questions" do
       hover_and_click(".edit_question_link")
       wait_for_ajaximations
       question = fj(".question_form:visible")
-      click_option('.question_form:visible .question_type', 'Multiple Choice')
-      replace_content(question.find_element(:css, 'input[name="question_name"]'), 'edited question')
+      click_option(".question_form:visible .question_type", "Multiple Choice")
+      replace_content(question.find_element(:css, 'input[name="question_name"]'), "edited question")
 
       answers = question.find_elements(:css, ".form_answers > .answer")
       expect(answers.length).to eq 2
@@ -66,12 +66,12 @@ describe "quizzes questions" do
       submit_form(question)
       wait_for_ajaximations
       question = f("#question_#{quest1.id}")
-      expect(question.find_element(:css, ".question_name")).to include_text('edited question')
-      f('#show_question_details').click
-      expect(question.find_elements(:css, '.answers .answer').length).to eq 3
+      expect(question.find_element(:css, ".question_name")).to include_text("edited question")
+      f("#show_question_details").click
+      expect(question.find_elements(:css, ".answers .answer").length).to eq 3
     end
 
-    it "sanitizes any html added to the quiz question description", priority: "1", test_id: 209947 do
+    it "sanitizes any html added to the quiz question description", priority: "1" do
       bad_html = '<div id="question_16740547_question_text" class="question_text user_content enhanced">
                     <p>For Mead, what is the "essence" of the self?</p>
                   </div>
@@ -84,8 +84,8 @@ describe "quizzes questions" do
       start_quiz_question
 
       question = fj(".question_form:visible")
-      click_option('.question_form:visible .question_type', 'True/False')
-      type_in_tiny '.question:visible textarea.question_content', bad_html
+      click_option(".question_form:visible .question_type", "True/False")
+      type_in_tiny ".question:visible textarea.question_content", bad_html
       submit_form(question)
 
       hover_and_click(".edit_question_link")
@@ -94,7 +94,7 @@ describe "quizzes questions" do
       expect(ffj(".question_form:visible .form_answers .answer").size).to eq 2
     end
 
-    it "does not show Missing Word option in question types dropdown", priority: "1", test_id: 209948 do
+    it "does not show Missing Word option in question types dropdown", priority: "1" do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
 
@@ -105,42 +105,42 @@ describe "quizzes questions" do
       expect(f("#questions")).not_to contain_css(".question_holder option.missing_word")
     end
 
-    it "does not show the display details for text questions", priority: "1", test_id: 209951 do
+    it "does not show the display details for text questions", priority: "1" do
       quiz = start_quiz_question
 
       question = fj(".question_form:visible")
-      click_option('.question_form:visible .question_type', 'Text (no question)')
+      click_option(".question_form:visible .question_type", "Text (no question)")
       submit_form(question)
       wait_for_ajax_requests
 
       quiz.reload
 
-      show_el = f('#show_question_details')
+      show_el = f("#show_question_details")
       expect(show_el).not_to be_displayed
     end
 
-    it "does not show the display details for essay questions", priority: "1", test_id: 209950 do
+    it "does not show the display details for essay questions", priority: "1" do
       quiz = start_quiz_question
 
       question = fj(".question_form:visible")
-      click_option('.question_form:visible .question_type', 'Essay Question')
+      click_option(".question_form:visible .question_type", "Essay Question")
       submit_form(question)
       wait_for_ajax_requests
 
       quiz.reload
 
-      show_el = f('#show_question_details')
+      show_el = f("#show_question_details")
       expect(show_el).not_to be_displayed
     end
 
-    it "shows the display details when questions other than text or essay questions exist", priority: "1", test_id: 209952 do
+    it "shows the display details when questions other than text or essay questions exist", priority: "1" do
       quiz = start_quiz_question
-      show_el = f('#show_question_details')
+      show_el = f("#show_question_details")
       question = fj(".question_form:visible")
 
       expect(show_el).not_to be_displayed
 
-      click_option('.question_form:visible .question_type', 'Multiple Choice')
+      click_option(".question_form:visible .question_type", "Multiple Choice")
       submit_form(question)
       wait_for_ajax_requests
       quiz.reload
@@ -148,37 +148,37 @@ describe "quizzes questions" do
       expect(show_el).to be_displayed
     end
 
-    it "calculates correct quiz question points total", priority: "1", test_id: 209953 do
+    it "calculates correct quiz question points total", priority: "1" do
       quiz = quiz_model(course: @course)
       quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       open_quiz_edit_form
 
-      expect(f(".points_possible").text).to eq '50'
-      add_quiz_question('10')
-      expect(f(".points_possible").text).to eq '60'
+      expect(f(".points_possible").text).to eq "50"
+      add_quiz_question("10")
+      expect(f(".points_possible").text).to eq "60"
     end
 
-    it "should round published quiz points correctly on main quiz page", priority: "2", test_id: 209954
+    it "should round published quiz points correctly on main quiz page", priority: "2"
 
-    it "rounds numeric questions when creating a quiz", priority: "1", test_id: 209955 do
+    it "rounds numeric questions when creating a quiz", priority: "1" do
       start_quiz_question
-      click_option('.question_form:visible .question_type', 'Numerical Answer')
+      click_option(".question_form:visible .question_type", "Numerical Answer")
 
-      type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
+      type_in_tiny ".question:visible textarea.question_content", "This is a numerical question."
 
-      answer_exact = fj('[name=answer_exact]')
-      answer_exact.send_keys('0.000675', :tab)
-      expect(answer_exact).to have_value('0.0007')
+      answer_exact = fj("[name=answer_exact]")
+      answer_exact.send_keys("0.000675", :tab)
+      expect(answer_exact).to have_value("0.0007")
     end
 
-    it "allows points with various delimiters", priority: "1", test_id: 209956 do
+    it "allows points with various delimiters", priority: "1" do
       quiz = quiz_model(course: @course)
       quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       open_quiz_edit_form
 
-      expect(f(".points_possible").text).to eq '50'
-      add_quiz_question('1234.5')
-      expect(f(".points_possible").text).to eq '1,284.5'
+      expect(f(".points_possible").text).to eq "50"
+      add_quiz_question("1234.5")
+      expect(f(".points_possible").text).to eq "1,284.5"
     end
   end
 end

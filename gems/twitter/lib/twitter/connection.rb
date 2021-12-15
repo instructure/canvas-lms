@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth'
+require "oauth"
 
 module Twitter
   class Connection
@@ -27,7 +27,7 @@ module Twitter
         twitter_consumer,
         request_token,
         request_secret
-      ).get_access_token(:oauth_verifier => oauth_verifier)
+      ).get_access_token(oauth_verifier: oauth_verifier)
       Twitter::Connection.new(access_token)
     end
 
@@ -55,13 +55,13 @@ module Twitter
     end
 
     def service_user
-      url = '/1.1/account/verify_credentials.json'
+      url = "/1.1/account/verify_credentials.json"
       @service_user ||= JSON.parse(access_token.get(url).body)
     end
 
     # public (to gem)
     def send_direct_message(user_name, user_id, message)
-      url = '/1.1/direct_messages/new.json'
+      url = "/1.1/direct_messages/new.json"
       response = access_token.post(url, {
                                      screen_name: user_name,
                                      user_id: user_id,
@@ -72,21 +72,21 @@ module Twitter
 
     def self.request_token(success_url)
       consumer = twitter_consumer
-      consumer.get_request_token(:oauth_callback => success_url)
+      consumer.get_request_token(oauth_callback: success_url)
     end
 
     def self.twitter_consumer(key = nil, secret = nil)
-      require 'oauth'
-      require 'oauth/consumer'
+      require "oauth"
+      require "oauth/consumer"
       twitter_config = Twitter::Connection.config
-      key ||= twitter_config['api_key']
-      secret ||= twitter_config['secret_key']
+      key ||= twitter_config["api_key"]
+      secret ||= twitter_config["secret_key"]
       OAuth::Consumer.new(key, secret, {
-                            :site => "https://api.twitter.com",
-                            :request_token_path => "/oauth/request_token",
-                            :access_token_path => "/oauth/access_token",
-                            :authorize_path => "/oauth/authorize",
-                            :signature_method => "HMAC-SHA1"
+                            site: "https://api.twitter.com",
+                            request_token_path: "/oauth/request_token",
+                            access_token_path: "/oauth/access_token",
+                            authorize_path: "/oauth/authorize",
+                            signature_method: "HMAC-SHA1"
                           })
     end
     private_class_method :twitter_consumer
@@ -98,7 +98,7 @@ module Twitter
     end
 
     def self.config=(config)
-      if !config.respond_to?(:call)
+      unless config.respond_to?(:call)
         raise "Config must respond to #call"
       end
 
@@ -106,7 +106,7 @@ module Twitter
     end
 
     def self.config
-      @config.call()
+      @config.call
     end
   end
 end

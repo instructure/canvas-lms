@@ -26,13 +26,13 @@ describe Mutations::UpdateOutcomeProficiency do
     @account = Account.default
     @course = @account.courses.create!
     @admin = account_admin_user(account: @account)
-    @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
+    @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
   end
 
   let!(:original_record) { outcome_proficiency_model(@account) }
 
   let(:good_query) do
-    <<~QUERY
+    <<~GQL
       id: #{original_record.id}
       proficiencyRatings: [
         {
@@ -42,7 +42,7 @@ describe Mutations::UpdateOutcomeProficiency do
           points: 1.0
         }
       ]
-    QUERY
+    GQL
   end
 
   def execute_with_input(update_input, user_executing: @admin)
@@ -78,35 +78,35 @@ describe Mutations::UpdateOutcomeProficiency do
 
   it "updates an outcome proficiency" do
     result = execute_with_input(good_query)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateOutcomeProficiency', 'errors')).to be_nil
-    result = result.dig('data', 'updateOutcomeProficiency', 'outcomeProficiency')
-    ratings = result.dig('proficiencyRatingsConnection', 'nodes')
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateOutcomeProficiency", "errors")).to be_nil
+    result = result.dig("data", "updateOutcomeProficiency", "outcomeProficiency")
+    ratings = result.dig("proficiencyRatingsConnection", "nodes")
     expect(ratings.length).to eq 1
-    expect(ratings[0]['color']).to eq 'FFFFFF'
-    expect(ratings[0]['description']).to eq 'white'
-    expect(ratings[0]['mastery']).to eq true
-    expect(ratings[0]['points']).to eq 1.0
+    expect(ratings[0]["color"]).to eq "FFFFFF"
+    expect(ratings[0]["description"]).to eq "white"
+    expect(ratings[0]["mastery"]).to eq true
+    expect(ratings[0]["points"]).to eq 1.0
   end
 
   it "restores previously soft-deleted record" do
     original_record.destroy
     result = execute_with_input(good_query)
-    result = result.dig('data', 'updateOutcomeProficiency', 'outcomeProficiency')
-    record = OutcomeProficiency.find(result.dig('_id'))
+    result = result.dig("data", "updateOutcomeProficiency", "outcomeProficiency")
+    record = OutcomeProficiency.find(result["_id"])
     expect(record.id).to eq original_record.id
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
+      errors = result["errors"] || result.dig("data", "updateOutcomeCalculationMethod", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "requires manage_proficiency_scales permission" do
       result = execute_with_input(good_query, user_executing: @student)
-      expect_error(result, 'insufficient permission')
+      expect_error(result, "insufficient permission")
     end
   end
 end

@@ -32,13 +32,13 @@ module Types
 
     field :start_date, DateTimeType, null: true
     field :end_date, DateTimeType, null: true
-    field :close_date, DateTimeType, <<-DOC, null: true
-    assignments can only be graded before the grading period closes
-    DOC
+    field :close_date, DateTimeType, <<~MD, null: true
+      assignments can only be graded before the grading period closes
+    MD
 
-    field :weight, Float, <<-DOC, null: true
-    used to calculate how much the assignments in this grading period
-    contribute to the overall grade
-    DOC
+    field :weight, Float, <<~MD, null: true
+      used to calculate how much the assignments in this grading period
+      contribute to the overall grade
+    MD
   end
 end

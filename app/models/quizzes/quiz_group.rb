@@ -20,17 +20,17 @@
 
 class Quizzes::QuizGroup < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quiz_groups'
+  self.table_name = "quiz_groups"
 
   attr_readonly :quiz_id
 
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
   belongs_to :assessment_question_bank
-  has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :dependent => :destroy
+  has_many :quiz_questions, class_name: "Quizzes::QuizQuestion", dependent: :destroy
 
-  validates_presence_of :quiz_id
-  validates_length_of :name, maximum: maximum_string_length, allow_nil: true
-  validates_numericality_of :pick_count, :question_points, allow_nil: true
+  validates :quiz_id, presence: true
+  validates :name, length: { maximum: maximum_string_length, allow_nil: true }
+  validates :pick_count, :question_points, numericality: { allow_nil: true }
 
   before_validation :set_default_pick_count
   before_save :infer_position
@@ -45,14 +45,14 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   restrict_columns :content, [:name, :pick_count]
 
   def actual_pick_count
-    count = if self.assessment_question_bank
+    count = if assessment_question_bank
               # don't do a valid question check because we don't want to instantiate all the bank's questions
-              self.assessment_question_bank.assessment_question_count
+              assessment_question_bank.assessment_question_count
             else
-              self.quiz_questions.active.count
+              quiz_questions.active.count
             end
 
-    [self.pick_count.to_i, count].min
+    [pick_count.to_i, count].min
   end
 
   # QuizGroup.data is used when creating and editing a quiz, but
@@ -62,34 +62,34 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   # the quiz, as students see it.
   def data
     {
-      "id" => self.id,
-      "name" => self.name,
-      "pick_count" => self.pick_count,
-      "question_points" => self.question_points,
-      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map { |q| q.data },
-      "assessment_question_bank_id" => self.assessment_question_bank_id
+      "id" => id,
+      "name" => name,
+      "pick_count" => pick_count,
+      "question_points" => question_points,
+      "questions" => assessment_question_bank_id ? [] : quiz_questions.active.map(&:data),
+      "assessment_question_bank_id" => assessment_question_bank_id
     }.with_indifferent_access
   end
 
   def self.update_all_positions!(groups)
-    return unless groups.size > 0
+    return if groups.empty?
 
     updates = groups.map do |group|
       "WHEN id=#{group.id.to_i} THEN #{group.position.to_i}"
     end
     set = "position=CASE #{updates.join(" ")} ELSE NULL END"
-    where(:id => groups).update_all(set)
+    where(id: groups).update_all(set)
   end
 
   private
 
   def update_quiz
-    Quizzes::Quiz.mark_quiz_edited(self.quiz_id)
+    Quizzes::Quiz.mark_quiz_edited(quiz_id)
   end
 
   def infer_position
-    if !self.position && self.quiz
-      self.position = self.quiz.root_entries_max_position + 1
+    if !position && quiz
+      self.position = quiz.root_entries_max_position + 1
     end
   end
 

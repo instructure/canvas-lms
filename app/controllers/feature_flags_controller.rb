@@ -69,7 +69,7 @@
 #           "type": "boolean"
 #         },
 #         "beta": {
-#           "description": "Whether the feature is a beta feature. If true, the feature may not be fully polished and may be subject to change in the future.",
+#           "description": "Whether the feature is a feature preview. If true, opting in includes ongoing updates outside the regular release schedule.",
 #           "example": true,
 #           "type": "boolean"
 #         },
@@ -162,14 +162,14 @@ class FeatureFlagsController < ApplicationController
       skip_cache = @context.grants_right?(@current_user, session, :manage_feature_flags)
       @context.feature_flags.load if skip_cache
 
-      flags = features.map { |fd|
+      flags = features.filter_map do |fd|
         @context.lookup_feature_flag(fd.feature,
                                      override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
                                      skip_cache: skip_cache,
                                      # Hide flags that are forced ON at a higher level
                                      # Undocumented flag for frontend use only
                                      hide_inherited_enabled: params[:hide_inherited_enabled])
-      }.compact
+      end
 
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
     end
@@ -190,15 +190,15 @@ class FeatureFlagsController < ApplicationController
   #   ["fancy_wickets", "automatic_essay_grading", "telepathic_navigation"]
   def enabled_features
     if authorized_action(@context, @current_user, :read)
-      features = Feature.applicable_features(@context).map { |fd| @context.lookup_feature_flag(fd.feature) }.compact
-                        .select { |ff| ff.enabled? }.map(&:feature)
+      features = Feature.applicable_features(@context).filter_map { |fd| @context.lookup_feature_flag(fd.feature) }
+                        .select(&:enabled?).map(&:feature)
       render json: features
     end
   end
 
   # @API List environment features
   #
-  # Return a hash of global feature settings that pertain to the
+  # Return a hash of global feature options that pertain to the
   # Canvas user interface. This is the same information supplied to the
   # web interface as +ENV.FEATURES+.
   #
@@ -234,7 +234,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "missing feature parameter" }, status: :bad_request unless params[:feature].present?
 
       feature = params[:feature]
-      raise ActiveRecord::RecordNotFound unless Feature.definitions.has_key?(feature.to_s)
+      raise ActiveRecord::RecordNotFound unless Feature.definitions.key?(feature.to_s)
 
       flag = @context.lookup_feature_flag(feature,
                                           override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
@@ -268,7 +268,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
 
       feature_def = Feature.definitions[params[:feature]]
-      return render json: { message: "invalid feature" }, status: :bad_request unless feature_def && feature_def.applies_to_object(@context)
+      return render json: { message: "invalid feature" }, status: :bad_request unless feature_def&.applies_to_object(@context)
 
       # check whether the feature is locked
       current_flag = @context.lookup_feature_flag(params[:feature], skip_cache: true)
@@ -282,7 +282,7 @@ class FeatureFlagsController < ApplicationController
       if !current_flag && feature_def.hidden?
         return render json: { message: "invalid feature" }, status: :bad_request unless Account.site_admin.grants_right?(@current_user, session, :read)
 
-        prior_state = 'hidden'
+        prior_state = "hidden"
       end
 
       new_attrs = { feature: params[:feature] }
@@ -290,7 +290,7 @@ class FeatureFlagsController < ApplicationController
       # check transition
       if params[:state].present?
         transitions = Feature.transitions(params[:feature], @current_user, @context, prior_state)
-        if transitions[params[:state]] && transitions[params[:state]]['locked']
+        if transitions[params[:state]] && transitions[params[:state]]["locked"]
           return render json: { message: "state change not allowed" }, status: :forbidden
         end
 

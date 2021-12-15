@@ -22,7 +22,7 @@ class SetDefaultOnDeveloperKeyAccountBindingsWorkflowState < ActiveRecord::Migra
   tag :predeploy
 
   def up
-    change_column_default :developer_key_account_bindings, :workflow_state, 'off'
+    change_column_default :developer_key_account_bindings, :workflow_state, "off"
     change_column_null :developer_key_account_bindings, :created_at, false
     change_column_null :developer_key_account_bindings, :updated_at, false
   end

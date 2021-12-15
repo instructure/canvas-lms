@@ -22,7 +22,7 @@ class FillLookupUuidAndResourceLinkUuidColumnsAtLtiResourceLinks < ActiveRecord:
   def up
     DataFixup::Lti::FillLookupUuidAndResourceLinkUuidColumns.delay_if_production(
       priority: Delayed::LOWER_PRIORITY,
-      n_strand: 'fill_lookup_uuid_and_resource_link_uuid'
+      n_strand: "fill_lookup_uuid_and_resource_link_uuid"
     ).run
   end
 

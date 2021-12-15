@@ -18,11 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Quizzes::QuizRegradeRun < ActiveRecord::Base
-  self.table_name = 'quiz_regrade_runs'
+  self.table_name = "quiz_regrade_runs"
 
-  belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
+  belongs_to :quiz_regrade, class_name: "Quizzes::QuizRegrade"
 
-  validates_presence_of :quiz_regrade_id
+  validates :quiz_regrade_id, presence: true
+  delegate :root_account, to: :quiz_regrade
 
   def self.perform(regrade)
     run = create!(quiz_regrade_id: regrade.id, started_at: Time.now)
@@ -39,12 +40,12 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   set_broadcast_policy do |policy|
     policy.dispatch :quiz_regrade_finished
     policy.to { teachers }
-    policy.whenever { |run| run.send_messages? }
+    policy.whenever(&:send_messages?)
     policy.data { course_broadcast_data }
   end
 
   def send_messages?
-    old, new = saved_changes['finished_at']
+    old, new = saved_changes["finished_at"]
     !!(new && old.nil?) && Quizzes::QuizRegradeRun.where(quiz_regrade_id: quiz_regrade).count == 1
   end
 

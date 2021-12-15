@@ -28,7 +28,7 @@ shared_context "grading periods within controller" do
     expect(assigns[:js_env]).to have_key(:active_grading_periods)
   end
 
-  it "includes 'last' and 'closed' data on each grading period " do
+  it "includes 'last' and 'closed' data on each grading period" do
     group = root_account.grading_period_groups.create!
     group.enrollment_terms << course.enrollment_term
     group.grading_periods.create!(title: "hi", start_date: 3.days.ago, end_date: 3.days.from_now)

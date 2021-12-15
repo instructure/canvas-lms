@@ -18,24 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe PluginsController do
   include Rails.application.routes.url_helpers
 
   describe "#update" do
     it "still enables plugins even with no settings posted" do
-      expect(PluginSetting.find_by(name: 'account_reports')).to be_nil
+      expect(PluginSetting.find_by(name: "account_reports")).to be_nil
       allow(controller).to receive(:require_setting_site_admin).and_return(true)
 
-      put 'update', params: { id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false } }
+      put "update", params: { id: "account_reports", account_id: Account.default.id, plugin_setting: { disabled: false } }
       expect(response).to be_redirect
-      ps = PluginSetting.find_by!(name: 'account_reports')
+      ps = PluginSetting.find_by!(name: "account_reports")
       expect(ps).to be_enabled
     end
 
-    it 'trims posted params' do
-      ps = PluginSetting.new(name: 'big_blue_button')
+    it "trims posted params" do
+      ps = PluginSetting.new(name: "big_blue_button")
       ps.settings = {}.with_indifferent_access
       ps.disabled = false
       ps.save!
@@ -43,22 +43,22 @@ describe PluginsController do
       allow(controller).to receive(:require_setting_site_admin).and_return(true)
       # The 'all' parameter is necessary for this test to pass when the
       # multiple root acoounts plugin is installed
-      put 'update', params: { id: 'big_blue_button', settings: { domain: ' abc ', secret: 'secret', recording_enabled: '0', free_trial: true, replace_with_alternatives: false, use_fallback: false }, all: 1 }
+      put "update", params: { id: "big_blue_button", settings: { domain: " abc ", secret: "secret", recording_enabled: "0", free_trial: true, replace_with_alternatives: false, use_fallback: false }, all: 1 }
       expect(response).to be_redirect
       ps.reload
-      expect(ps.settings[:domain]).to eq 'abc'
+      expect(ps.settings[:domain]).to eq "abc"
     end
 
     context "account_reports" do
-      it 'can disable reports' do
-        ps = PluginSetting.new(name: 'account_reports')
+      it "can disable reports" do
+        ps = PluginSetting.new(name: "account_reports")
         ps.settings = { course_storage_csv: true }.with_indifferent_access
         ps.save!
 
         allow(controller).to receive(:require_setting_site_admin).and_return(true)
         # The 'all' parameter is necessary for this test to pass when the
         # multiple root acoounts plugin is installed
-        put 'update', params: { id: 'account_reports', settings: { 'course_storage_csv' => '0' }, all: 1 }
+        put "update", params: { id: "account_reports", settings: { "course_storage_csv" => "0" }, all: 1 }
         expect(response).to be_redirect
         ps.reload
         expect(ps.settings[:course_storage_csv]).to eq false

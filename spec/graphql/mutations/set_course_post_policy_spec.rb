@@ -114,25 +114,25 @@ describe Mutations::SetCoursePostPolicy do
       it "does not update assignments that have an equivalent post policy" do
         assignment.ensure_post_policy(post_manually: true)
 
-        expect {
+        expect do
           execute_query(post_manually_mutation, context)
-        }.not_to change {
+        end.not_to change {
           PostPolicy.find_by!(assignment: assignment).updated_at
         }
       end
 
       it "does not update anonymous assignments" do
-        expect {
+        expect do
           execute_query(post_manually_mutation, context)
-        }.not_to change {
+        end.not_to change {
           PostPolicy.find_by!(assignment: anonymous_assignment).updated_at
         }
       end
 
       it "does not update moderated assignments" do
-        expect {
+        expect do
           execute_query(post_manually_mutation, context)
-        }.not_to change {
+        end.not_to change {
           PostPolicy.find_by!(assignment: moderated_assignment).updated_at
         }
       end

@@ -19,8 +19,8 @@
 
 describe DataFixup::ReclaimInstfsAttachments do
   describe "reclaim_attachment" do
-    let(:file_contents) { 'file contents' }
-    let(:instfs_uuid) { 'uuid' }
+    let(:file_contents) { "file contents" }
+    let(:instfs_uuid) { "uuid" }
     let(:instfs_body) { StringIO.new(file_contents) }
     let(:attachment) { attachment_model(instfs_uuid: instfs_uuid) }
 
@@ -56,9 +56,9 @@ describe DataFixup::ReclaimInstfsAttachments do
       question = account1.assessment_question_banks.create!.assessment_questions.create!
       folder = folder_model(context: subaccount)
 
-      attachment1 = attachment_model(context: subaccount, instfs_uuid: 'uuid1')
-      attachment2 = attachment_model(context: question, instfs_uuid: 'uuid2')
-      attachment3 = attachment_model(context: folder, instfs_uuid: 'uuid3')
+      attachment1 = attachment_model(context: subaccount, instfs_uuid: "uuid1")
+      attachment2 = attachment_model(context: question, instfs_uuid: "uuid2")
+      attachment3 = attachment_model(context: folder, instfs_uuid: "uuid3")
 
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment1)
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment2)
@@ -74,9 +74,9 @@ describe DataFixup::ReclaimInstfsAttachments do
       group2 = group_model(context: course_model(account: subaccount))
       folder = folder_model(context: group1)
 
-      attachment1 = attachment_model(context: group1, instfs_uuid: 'uuid1')
-      attachment2 = attachment_model(context: group2, instfs_uuid: 'uuid2')
-      attachment3 = attachment_model(context: folder, instfs_uuid: 'uuid3')
+      attachment1 = attachment_model(context: group1, instfs_uuid: "uuid1")
+      attachment2 = attachment_model(context: group2, instfs_uuid: "uuid2")
+      attachment3 = attachment_model(context: folder, instfs_uuid: "uuid3")
 
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment1)
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment2)
@@ -94,11 +94,11 @@ describe DataFixup::ReclaimInstfsAttachments do
       submission = submission_model(assignment: assignment_model(context: course), user: user_model)
       quiz = quiz_model(course: course, assignment: assignment_model(course: course))
 
-      attachment1 = attachment_model(context: course, instfs_uuid: 'uuid1')
-      attachment2 = attachment_model(context: question, instfs_uuid: 'uuid2')
-      attachment3 = attachment_model(context: folder, instfs_uuid: 'uuid3')
-      attachment4 = attachment_model(context: submission, instfs_uuid: 'uuid4')
-      attachment5 = attachment_model(context: quiz, instfs_uuid: 'uuid5')
+      attachment1 = attachment_model(context: course, instfs_uuid: "uuid1")
+      attachment2 = attachment_model(context: question, instfs_uuid: "uuid2")
+      attachment3 = attachment_model(context: folder, instfs_uuid: "uuid3")
+      attachment4 = attachment_model(context: submission, instfs_uuid: "uuid4")
+      attachment5 = attachment_model(context: quiz, instfs_uuid: "uuid5")
 
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment1)
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment2)
@@ -111,8 +111,8 @@ describe DataFixup::ReclaimInstfsAttachments do
     it "reclaims inst-fs attachments associated with any of the specified root accounts" do
       skip("unskip in FOO-2401")
 
-      attachment1 = attachment_model(context: account1, instfs_uuid: 'uuid1')
-      attachment2 = attachment_model(context: account2, instfs_uuid: 'uuid2')
+      attachment1 = attachment_model(context: account1, instfs_uuid: "uuid1")
+      attachment2 = attachment_model(context: account2, instfs_uuid: "uuid2")
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment1)
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment2)
       DataFixup::ReclaimInstfsAttachments.run([account1, account2])
@@ -121,8 +121,8 @@ describe DataFixup::ReclaimInstfsAttachments do
     it "ignores attachments from other root accounts" do
       skip("unskip in FOO-2401")
 
-      attachment1 = attachment_model(context: account1, instfs_uuid: 'uuid1')
-      attachment2 = attachment_model(context: account3, instfs_uuid: 'uuid3')
+      attachment1 = attachment_model(context: account1, instfs_uuid: "uuid1")
+      attachment2 = attachment_model(context: account3, instfs_uuid: "uuid3")
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment1)
       expect(DataFixup::ReclaimInstfsAttachments).not_to receive(:reclaim_attachment).with(attachment2)
       DataFixup::ReclaimInstfsAttachments.run([account1])
@@ -131,7 +131,7 @@ describe DataFixup::ReclaimInstfsAttachments do
     it "ignores non inst-fs attachments" do
       skip("unskip in FOO-2401")
 
-      attachment1 = attachment_model(context: account1, instfs_uuid: 'uuid1')
+      attachment1 = attachment_model(context: account1, instfs_uuid: "uuid1")
       attachment2 = attachment_model(context: account1, instfs_uuid: nil)
       expect(DataFixup::ReclaimInstfsAttachments).to receive(:reclaim_attachment).with(attachment1)
       expect(DataFixup::ReclaimInstfsAttachments).not_to receive(:reclaim_attachment).with(attachment2)

@@ -4,44 +4,44 @@
 # check if the bundle installed gems somewhere besides the system, and if it
 # did manually add that path to the GEM_PATH. all without actually loading the
 # bundle, because it's huge
-require 'pathname'
+require "pathname"
 expanded_path = Pathname.new(__FILE__).realpath
 rails_root = File.expand_path("../..", expanded_path)
 bundle_config_file = "#{rails_root}/.bundle/config"
 if File.exist?(bundle_config_file)
-  require 'yaml'
+  require "yaml"
   bundle_config = YAML.load_file(bundle_config_file)
-  if bundle_config['BUNDLE_PATH']
-    bundle_gem_path = File.expand_path("#{bundle_config['BUNDLE_PATH']}/#{RUBY_ENGINE}/#{RbConfig::CONFIG['ruby_version']}", rails_root)
+  if bundle_config["BUNDLE_PATH"]
+    bundle_gem_path = File.expand_path("#{bundle_config["BUNDLE_PATH"]}/#{RUBY_ENGINE}/#{RbConfig::CONFIG["ruby_version"]}", rails_root)
     Gem::Specification.dirs = (Array(Gem.path) + [bundle_gem_path]).uniq
   end
 end
 
-gem 'redis'
+gem "redis"
 
-require 'base64'
-require 'json'
-require 'redis'
+require "base64"
+require "json"
+require "redis"
 
 # this purposely has no config so that it can spin up quickly;
 # just copy this script elsewhere and modify if you have a
 # non-default configuration
 cache = Redis.new
 
-data = JSON.load(STDIN.read)
+data = JSON.parse($stdin.read)
 data.each do |event|
-  id = event['ID']
+  id = event["ID"]
   # only invalidate events we haven't seen yet
-  if cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
-    key = Base64.decode64(event['Payload'])
-    # Special-case flushall
-    if key == 'FLUSHDB'
-      cache.flushdb
-      # Readd this event so that it doesn't get forgotten about in the future
-      cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
-    else
-      cache.del(key)
-    end
+  next unless cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+
+  key = Base64.decode64(event["Payload"])
+  # Special-case flushall
+  if key == "FLUSHDB"
+    cache.flushdb
+    # Readd this event so that it doesn't get forgotten about in the future
+    cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+  else
+    cache.del(key)
   end
 end
 # limit the set to the 256 newest elements

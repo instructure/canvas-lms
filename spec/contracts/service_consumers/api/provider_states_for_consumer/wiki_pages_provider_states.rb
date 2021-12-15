@@ -21,7 +21,7 @@ PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
     # Course ID: 1
     # Wiki Page ID: 1
-    provider_state 'a wiki page in a course' do
+    provider_state "a wiki page in a course" do
       set_up do
         @course = Pact::Canvas.base_state.course
         @course.wiki_pages.create!(title: "wiki_page", body: "Here is the body")

@@ -21,11 +21,11 @@
 describe AssetUserAccess do
   describe "with course context" do
     before :once do
-      @course = Account.default.courses.create!(:name => 'My Course')
-      @assignment = @course.assignments.create!(:title => 'My Assignment')
+      @course = Account.default.courses.create!(name: "My Course")
+      @assignment = @course.assignments.create!(title: "My Assignment")
       @user = User.create!
 
-      @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => @assignment.asset_string)
+      @asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @course, asset_code: @assignment.asset_string)
       @asset.display_name = @assignment.asset_string
       @asset.save!
     end
@@ -39,15 +39,15 @@ describe AssetUserAccess do
     end
 
     it "updates existing records that have changed display names" do
-      @assignment.title = 'My changed Assignment'
+      @assignment.title = "My changed Assignment"
       @assignment.save!
-      AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
-      expect(@asset.reload.display_name).to eq 'My changed Assignment'
+      AssetUserAccess.log @user, @course, { level: "view", code: @assignment.asset_string }
+      expect(@asset.reload.display_name).to eq "My changed Assignment"
     end
 
     it "works for assessment questions" do
       question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
-      asset = AssetUserAccess.log @user, question, { level: 'view', code: @assignment.asset_string }
+      asset = AssetUserAccess.log @user, question, { level: "view", code: @assignment.asset_string }
       expect(asset.context).to eq @course
     end
 
@@ -58,20 +58,20 @@ describe AssetUserAccess do
         # updating view level which hasn't been set before,
         # so this one should write to the table
         cur_view_count = @asset.view_score
-        AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+        AssetUserAccess.log @user, @course, { level: "view", code: @assignment.asset_string }
         expect(@asset.reload.view_score).to_not eq(cur_view_count)
         expect(AssetUserAccessLog.for_today(@asset).count).to eq(0)
         # this time it's just a bump of the views, should get
         # sent to the log
         cur_view_count = @asset.view_score
-        AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+        AssetUserAccess.log @user, @course, { level: "view", code: @assignment.asset_string }
         expect(@asset.reload.view_score).to eq(cur_view_count)
         expect(AssetUserAccessLog.for_today(@asset).count).to eq(1)
       end
 
       describe "#eligible_for_log_path?" do
         it "is eligible only for view bumps" do
-          AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+          AssetUserAccess.log @user, @course, { level: "view", code: @assignment.asset_string }
           @asset.reload
           @asset.display_name = "foo_bar"
           expect(@asset.eligible_for_log_path?).to be_falsey
@@ -109,32 +109,32 @@ describe AssetUserAccess do
       end
     end
 
-    describe '#icon' do
-      it 'works for quizzes' do
-        quiz = @course.quizzes.create!(:title => 'My Quiz')
+    describe "#icon" do
+      it "works for quizzes" do
+        quiz = @course.quizzes.create!(title: "My Quiz")
 
-        asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => quiz.asset_string)
-        asset.log(@course, { category: 'quizzes' })
+        asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @course, asset_code: quiz.asset_string)
+        asset.log(@course, { category: "quizzes" })
         asset.save!
 
-        expect(asset.icon).to eq 'icon-quiz'
+        expect(asset.icon).to eq "icon-quiz"
       end
 
       it "falls back with an unexpected asset_category" do
-        asset = AssetUserAccess.create asset_category: 'blah'
-        expect(asset.icon).to eq 'icon-question'
-        expect(asset.readable_category).to eq ''
+        asset = AssetUserAccess.create asset_category: "blah"
+        expect(asset.icon).to eq "icon-question"
+        expect(asset.readable_category).to eq ""
       end
     end
   end
 
   describe "with user context" do
     before :once do
-      @course = Account.default.courses.create!(:name => 'My Course')
-      @assignment = @course.assignments.create!(:title => 'My Assignment')
+      @course = Account.default.courses.create!(name: "My Course")
+      @assignment = @course.assignments.create!(title: "My Assignment")
       @user = User.create!
 
-      @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @user, :asset_code => @assignment.asset_string)
+      @asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @user, asset_code: @assignment.asset_string)
       @asset.display_name = @assignment.asset_string
       @asset.save!
     end
@@ -148,171 +148,189 @@ describe AssetUserAccess do
     end
   end
 
-  describe '#log_action' do
-    let(:scores) { Hash.new }
-    let(:asset) { AssetUserAccess.new(scores) }
-
+  describe "#log_action" do
     subject { asset }
 
-    describe 'when action level is nil' do
-      describe 'with nil scores' do
-        describe 'view level' do
-          before { asset.log_action 'view' }
+    let(:scores) { {} }
+    let(:asset) { AssetUserAccess.new(scores) }
 
-          describe '#view_score' do
+    describe "when action level is nil" do
+      describe "with nil scores" do
+        describe "view level" do
+          before { asset.log_action "view" }
+
+          describe "#view_score" do
             subject { super().view_score }
+
             it { is_expected.to eq 1 }
           end
 
-          describe '#participate_score' do
+          describe "#participate_score" do
             subject { super().participate_score }
+
             it { is_expected.to be_nil }
           end
 
-          describe '#action_level' do
+          describe "#action_level" do
             subject { super().action_level }
-            it { is_expected.to eq 'view' }
+
+            it { is_expected.to eq "view" }
           end
         end
 
-        describe 'participate level' do
-          before { asset.log_action 'participate' }
+        describe "participate level" do
+          before { asset.log_action "participate" }
 
-          describe '#view_score' do
+          describe "#view_score" do
             subject { super().view_score }
+
             it { is_expected.to eq 1 }
           end
 
-          describe '#participate_score' do
+          describe "#participate_score" do
             subject { super().participate_score }
+
             it { is_expected.to eq 1 }
           end
 
-          describe '#action_level' do
+          describe "#action_level" do
             subject { super().action_level }
-            it { is_expected.to eq 'participate' }
+
+            it { is_expected.to eq "participate" }
           end
         end
 
-        describe 'submit level' do
-          before { asset.log_action 'submit' }
+        describe "submit level" do
+          before { asset.log_action "submit" }
 
-          describe '#view_score' do
+          describe "#view_score" do
             subject { super().view_score }
+
             it { is_expected.to be_nil }
           end
 
-          describe '#participate_score' do
+          describe "#participate_score" do
             subject { super().participate_score }
+
             it { is_expected.to eq 1 }
           end
 
-          describe '#action_level' do
+          describe "#action_level" do
             subject { super().action_level }
-            it { is_expected.to eq 'participate' }
+
+            it { is_expected.to eq "participate" }
           end
         end
       end
 
-      describe 'with existing scores' do
+      describe "with existing scores" do
         before { asset.view_score = asset.participate_score = 3 }
 
-        describe 'view level' do
-          before { asset.log_action 'view' }
+        describe "view level" do
+          before { asset.log_action "view" }
 
-          describe '#view_score' do
+          describe "#view_score" do
             subject { super().view_score }
+
             it { is_expected.to eq 4 }
           end
 
-          describe '#participate_score' do
+          describe "#participate_score" do
             subject { super().participate_score }
+
             it { is_expected.to eq 3 }
           end
 
-          describe '#action_level' do
+          describe "#action_level" do
             subject { super().action_level }
-            it { is_expected.to eq 'view' }
+
+            it { is_expected.to eq "view" }
           end
         end
 
-        describe 'participate level' do
-          before { asset.log_action 'participate' }
+        describe "participate level" do
+          before { asset.log_action "participate" }
 
-          describe '#view_score' do
+          describe "#view_score" do
             subject { super().view_score }
+
             it { is_expected.to eq 4 }
           end
 
-          describe '#participate_score' do
+          describe "#participate_score" do
             subject { super().participate_score }
+
             it { is_expected.to eq 4 }
           end
 
-          describe '#action_level' do
+          describe "#action_level" do
             subject { super().action_level }
-            it { is_expected.to eq 'participate' }
+
+            it { is_expected.to eq "participate" }
           end
         end
 
-        describe 'submit level' do
-          before { asset.log_action 'submit' }
+        describe "submit level" do
+          before { asset.log_action "submit" }
 
-          describe '#view_score' do
+          describe "#view_score" do
             subject { super().view_score }
+
             it { is_expected.to eq 3 }
           end
 
-          describe '#participate_score' do
+          describe "#participate_score" do
             subject { super().participate_score }
+
             it { is_expected.to eq 4 }
           end
 
-          describe '#action_level' do
+          describe "#action_level" do
             subject { super().action_level }
-            it { is_expected.to eq 'participate' }
+
+            it { is_expected.to eq "participate" }
           end
         end
       end
     end
 
-    describe 'when action level is view' do
-      before { asset.action_level = 'view' }
+    describe "when action level is view" do
+      before { asset.action_level = "view" }
 
-      it 'gets overridden by participate' do
-        asset.log_action 'participate'
-        expect(asset.action_level).to eq 'participate'
+      it "gets overridden by participate" do
+        asset.log_action "participate"
+        expect(asset.action_level).to eq "participate"
       end
 
-      it 'gets overridden by submit' do
-        asset.log_action 'submit'
-        expect(asset.action_level).to eq 'participate'
+      it "gets overridden by submit" do
+        asset.log_action "submit"
+        expect(asset.action_level).to eq "participate"
       end
     end
 
-    it 'does not overwrite the participate level with view' do
-      asset.action_level = 'participate'
-      asset.log_action 'view'
-      expect(asset.action_level).to eq 'participate'
+    it "does not overwrite the participate level with view" do
+      asset.action_level = "participate"
+      asset.log_action "view"
+      expect(asset.action_level).to eq "participate"
     end
   end
 
-  describe '#log' do
+  describe "#log" do
+    subject { access }
+
     let(:access) { AssetUserAccess.new }
     let(:context) { User.new }
 
-    subject { access }
-
     before { allow(access).to receive :save }
 
-    describe 'attribute values directly from hash' do
+    describe "attribute values directly from hash" do
       def it_sets_if_nil(attribute, hash_key = nil)
         hash_key ||= attribute
-        access.log(context, { hash_key => 'value' })
-        expect(access.send(attribute)).to eq 'value'
-        access.send("#{attribute}=", 'other')
-        access.log(context, { hash_key => 'value' })
-        expect(access.send(attribute)).to eq 'other'
+        access.log(context, { hash_key => "value" })
+        expect(access.send(attribute)).to eq "value"
+        access.send("#{attribute}=", "other")
+        access.log(context, { hash_key => "value" })
+        expect(access.send(attribute)).to eq "other"
       end
 
       specify { it_sets_if_nil(:asset_category, :category) }
@@ -320,87 +338,92 @@ describe AssetUserAccess do
       specify { it_sets_if_nil(:membership_type) }
     end
 
-    describe 'interally set or calculated attribute values' do
-      before { access.log context, { :level => 'view' } }
+    describe "interally set or calculated attribute values" do
+      before { access.log context, { level: "view" } }
 
-      describe '#context' do
+      describe "#context" do
         subject { super().context }
+
         it { is_expected.to eq context }
       end
 
-      describe '#last_access' do
+      describe "#last_access" do
         subject { super().last_access }
+
         it { is_expected.not_to be_nil }
       end
 
-      describe '#view_score' do
+      describe "#view_score" do
         subject { super().view_score }
+
         it { is_expected.to eq 1 }
       end
 
-      describe '#participate_score' do
+      describe "#participate_score" do
         subject { super().participate_score }
+
         it { is_expected.to be_nil }
       end
 
-      describe '#action_level' do
+      describe "#action_level" do
         subject { super().action_level }
-        it { is_expected.to eq 'view' }
+
+        it { is_expected.to eq "view" }
       end
     end
 
-    describe 'setting root account id' do
+    describe "setting root account id" do
       before :once do
-        @course = Account.default.courses.create!(:name => 'My Course')
+        @course = Account.default.courses.create!(name: "My Course")
         @user = User.create!
       end
 
       it "loads root account id from context" do
-        assignment = @course.assignments.create!(:title => 'My Assignment2')
-        AssetUserAccess.log @user, @course, { level: 'view', code: assignment.asset_string }
+        assignment = @course.assignments.create!(title: "My Assignment2")
+        AssetUserAccess.log @user, @course, { level: "view", code: assignment.asset_string }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end
 
       it "loads root account id from asset_for_root_account_id when context is a User" do
-        assignment = @course.assignments.create!(:title => 'My Assignment2')
-        AssetUserAccess.log @user, @user, { level: 'view', code: assignment.asset_string, asset_for_root_account_id: assignment }
+        assignment = @course.assignments.create!(title: "My Assignment2")
+        AssetUserAccess.log @user, @user, { level: "view", code: assignment.asset_string, asset_for_root_account_id: assignment }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end
 
       it "loads root account id from asset_for_root_account_id when context is a User and asset has a resolved_root_account_id but not a root_account_id" do
         # Not sure if this really ever happens but handle it on the safe side
-        @course.assignments.create!(:title => 'My Assignment2')
-        AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @course.root_account }
+        @course.assignments.create!(title: "My Assignment2")
+        AssetUserAccess.log @user, @user, { level: "view", code: @user.asset_string, asset_for_root_account_id: @course.root_account }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end
 
       it "sets root account id to 0 when context is a User and asset is a User" do
-        AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @user }
+        AssetUserAccess.log @user, @user, { level: "view", code: @user.asset_string, asset_for_root_account_id: @user }
         expect(AssetUserAccess.last.root_account_id).to eq(0)
       end
     end
   end
 
-  describe '#corrected_view_score' do
-    it 'deducts the participation score from the view score for a quiz' do
+  describe "#corrected_view_score" do
+    it "deducts the participation score from the view score for a quiz" do
       subject.view_score = 10
       subject.participate_score = 4
-      subject.asset_group_code = 'quizzes'
+      subject.asset_group_code = "quizzes"
 
       expect(subject.corrected_view_score).to eq 6
     end
 
-    it 'returns the normal view score for anything but a quiz' do
+    it "returns the normal view score for anything but a quiz" do
       subject.view_score = 10
       subject.participate_score = 4
 
       expect(subject.corrected_view_score).to eq 10
     end
 
-    it 'does not complain if there is no current score' do
+    it "does not complain if there is no current score" do
       subject.view_score = nil
       subject.participate_score = 4
-      allow(subject).to receive(:asset_group_code).and_return('quizzes')
+      allow(subject).to receive(:asset_group_code).and_return("quizzes")
 
       expect(subject.corrected_view_score).to eq(-4)
     end
@@ -414,7 +437,7 @@ describe AssetUserAccess do
     it "reads plugin setting for override" do
       ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs")
       ps.inheritance_scope = "shard"
-      ps.settings = { max_log_ids: [0, 0, 0, 0, 0, 0, 0], write_path: 'log' }
+      ps.settings = { max_log_ids: [0, 0, 0, 0, 0, 0, 0], write_path: "log" }
       ps.save!
       expect(AssetUserAccess.view_counting_method).to eq("log")
     end

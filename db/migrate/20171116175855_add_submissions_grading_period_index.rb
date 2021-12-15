@@ -25,6 +25,6 @@ class AddSubmissionsGradingPeriodIndex < ActiveRecord::Migration[5.0]
     add_index :submissions, [:assignment_id, :grading_period_id],
               where: "workflow_state<>'deleted' AND grading_period_id IS NOT NULL",
               algorithm: :concurrently,
-              name: 'index_active_submissions_gp'
+              name: "index_active_submissions_gp"
   end
 end

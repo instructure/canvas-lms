@@ -20,7 +20,7 @@
 
 module DataFixup
   class InitAccountIndexForCourseAuditLog
-    LAST_BATCH_TABLE = 'courses_index_last_batch'
+    LAST_BATCH_TABLE = "courses_index_last_batch"
 
     def self.run
       fixup = new
@@ -49,30 +49,30 @@ module DataFixup
     end
 
     def drop_table
-      database.execute %{DROP TABLE #{LAST_BATCH_TABLE};}
+      database.execute %(DROP TABLE #{LAST_BATCH_TABLE};)
     end
 
-    SEARCH_CQL = %{
+    SEARCH_CQL = <<~SQL.squish
       SELECT id, created_at, course_id, account_id
       FROM courses
       WHERE token(id) > token(?)
       LIMIT ?
-    }
+    SQL
 
-    UPDATE_CQL = %{
+    UPDATE_CQL = <<~SQL.squish
       UPDATE courses SET account_id = ? WHERE id = ?
-    }
+    SQL
 
     ResultStruct = Struct.new(:index, :record, :key)
 
     def read_batch_size
       @read_batch_size ||=
-        Setting.get('init_account_index_for_course_audit_log_read_batch_size', 1000).to_i
+        Setting.get("init_account_index_for_course_audit_log_read_batch_size", 1000).to_i
     end
 
     def write_batch_size
       @write_batch_size ||=
-        Setting.get('init_account_index_for_course_audit_log_write_batch_size', 200).to_i
+        Setting.get("init_account_index_for_course_audit_log_write_batch_size", 200).to_i
     end
 
     def database
@@ -94,23 +94,23 @@ module DataFixup
         end
 
         # build course_id to account_id lookup map to speed things up
-        course_ids = rows.map { |r| r['course_id'] }.uniq
-        account_course_map = Hash[Course.where(:id => course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] }]
+        course_ids = rows.map { |r| r["course_id"] }.uniq
+        account_course_map = Course.where(id: course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] }.to_h
 
         batch_updates = []
         batch_inserts = []
         last_id = nil
 
         rows.each do |row|
-          if row['account_id'].nil?
+          if row["account_id"].nil?
             # lookup account from course id, can also cache here
-            account_id = account_course_map[row['course_id']]
+            account_id = account_course_map[row["course_id"]]
             # update course row with account id
-            batch_updates << [account_id, row['id']]
+            batch_updates << [account_id, row["id"]]
             # write account id to index
             batch_inserts << add_course_account_index(row, account_id)
           end
-          last_id = row['id']
+          last_id = row["id"]
         end
 
         log_message("Writing #{batch_updates.count} updates to courses table")
@@ -127,7 +127,7 @@ module DataFixup
     end
 
     def write_updates_in_batches(updates)
-      while updates.size > 0
+      until updates.empty?
         write_batch_updates(updates.shift(write_batch_size))
       end
     end
@@ -139,7 +139,7 @@ module DataFixup
     end
 
     def write_inserts_in_batches(inserts)
-      while inserts.size > 0
+      until inserts.empty?
         write_batch_inserts(inserts.shift(write_batch_size))
       end
     end
@@ -158,7 +158,7 @@ module DataFixup
 
     def fetch_last_id
       database.execute("SELECT last_id FROM #{LAST_BATCH_TABLE}").fetch do |row|
-        return row.to_hash['last_id']
+        return row.to_hash["last_id"]
       end
       nil
     end
@@ -172,11 +172,11 @@ module DataFixup
     end
 
     def table_exists?(table)
-      cql = %{
+      cql = <<~SQL.squish
         SELECT *
         FROM #{table}
         LIMIT 1
-      }
+      SQL
       database.execute(cql)
       true
     rescue CassandraCQL::Error::InvalidRequestException

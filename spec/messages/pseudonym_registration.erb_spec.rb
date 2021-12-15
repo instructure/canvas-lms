@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'pseudonym_registration' do
+describe "pseudonym_registration" do
   before :once do
     pseudonym_model
   end
@@ -39,6 +39,6 @@ describe 'pseudonym_registration' do
     msg = generate_message(notification_name, :email, asset, message_data)
     expect(msg.html_body).to include "for a Canvas account at Default Account!"
     expect(msg.html_body).not_to include "Update your notification settings"
-    expect(msg.body).not_to include 'To change or turn off email notifications,'
+    expect(msg.body).not_to include "To change or turn off email notifications,"
   end
 end

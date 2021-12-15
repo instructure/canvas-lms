@@ -36,7 +36,7 @@ module QuizzesNext
     def_delegators :@controller
 
     def quiz_type
-      'quizzes.next'
+      "quizzes.next"
     end
 
     def published
@@ -88,23 +88,23 @@ module QuizzesNext
     end
 
     def require_lockdown_browser
-      object.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false
+      object.settings&.dig("lockdown_browser", "require_lockdown_browser") || false
     end
 
     def require_lockdown_browser_for_results
-      object.settings&.dig('lockdown_browser', 'require_lockdown_browser_for_results') || false
+      object.settings&.dig("lockdown_browser", "require_lockdown_browser_for_results") || false
     end
 
     def require_lockdown_browser_monitor
-      object.settings&.dig('lockdown_browser', 'require_lockdown_browser_monitor') || false
+      object.settings&.dig("lockdown_browser", "require_lockdown_browser_monitor") || false
     end
 
     def lockdown_browser_monitor_data
-      object.settings&.dig('lockdown_browser', 'lockdown_browser_monitor_data')
+      object.settings&.dig("lockdown_browser", "lockdown_browser_monitor_data")
     end
 
     def access_code
-      object.settings&.dig('lockdown_browser', 'access_code')
+      object.settings&.dig("lockdown_browser", "access_code")
     end
   end
 end

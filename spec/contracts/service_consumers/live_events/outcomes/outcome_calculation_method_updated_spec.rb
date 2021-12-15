@@ -18,21 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../live_events_pact_helper'
+require_relative "../live_events_pact_helper"
 
-RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
-  describe 'outcome_calculation_method_updated' do
+RSpec.describe "Canvas LMS Live Events", :pact_live_events do
+  describe "outcome_calculation_method_updated" do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
-        event_name: 'outcome_calculation_method_updated',
+        event_name: "outcome_calculation_method_updated",
         event_subscriber: PactConfig::LiveEventConsumers::OUTCOMES
       )
     end
 
-    it 'keeps the contract' do
+    it "keeps the contract" do
       live_event.emit_with do
         calc_method = outcome_calculation_method_model(course_model)
-        calc_method.update!(calculation_method: 'decaying_average', calculation_int: 60)
+        calc_method.update!(calculation_method: "decaying_average", calculation_int: 60)
       end
 
       expect(live_event).to have_kept_the_contract

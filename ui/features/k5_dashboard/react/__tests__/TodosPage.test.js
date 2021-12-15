@@ -27,6 +27,13 @@ import TodosPage, {sortTodos} from '../TodosPage'
 
 const FETCH_TODOS_URL = /\/api\/v1\/users\/self\/todo.*/
 
+const getProps = overrides => ({
+  timeZone: 'America/Denver',
+  visible: true,
+  openTodosInNewTab: true,
+  ...overrides
+})
+
 describe('TodosPage', () => {
   beforeEach(() => {
     fetchMock.get(FETCH_TODOS_URL, MOCK_TODOS)
@@ -40,12 +47,12 @@ describe('TodosPage', () => {
 
   it('renders todo items for each todo once loaded', async () => {
     const {getAllByTestId, getAllByText, getByRole, findByRole, rerender, queryByRole} = render(
-      <TodosPage visible={false} timeZone="America/Denver" />
+      <TodosPage {...getProps({visible: false})} />
     )
     // Displays nothing when not visible
     expect(queryByRole('link')).not.toBeInTheDocument()
 
-    rerender(<TodosPage visible timeZone="America/Denver" />)
+    rerender(<TodosPage {...getProps()} />)
     // Displays loading skeletons when visible and todos are loading
     expect(getAllByTestId('todo-loading-skeleton').length).toBe(5)
     expect(getAllByText('Loading Todo Title')[0]).toBeInTheDocument()
@@ -63,12 +70,12 @@ describe('TodosPage', () => {
 
   it('renders an error if loading todos fails', async () => {
     fetchMock.get(FETCH_TODOS_URL, 500, {overwriteRoutes: true})
-    const {findAllByText} = render(<TodosPage visible timeZone="America/Denver" />)
+    const {findAllByText} = render(<TodosPage {...getProps()} />)
     expect((await findAllByText('Failed to load todos'))[0]).toBeInTheDocument()
   })
 
   it('ignores submitting-type todos', async () => {
-    const {findByRole, queryByText} = render(<TodosPage visible timeZone="America/Denver" />)
+    const {findByRole, queryByText} = render(<TodosPage {...getProps()} />)
     expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
     expect(queryByText('Long essay', {exact: false})).not.toBeInTheDocument()
   })
@@ -80,9 +87,7 @@ describe('Empty todos', () => {
   })
 
   it('shows an empty state if there are no todos', async () => {
-    const {getAllByText, findByText, findByTestId} = render(
-      <TodosPage visible timeZone="America/Denver" />
-    )
+    const {getAllByText, findByText, findByTestId} = render(<TodosPage {...getProps()} />)
     expect(getAllByText('Loading Todo Title')[0]).toBeInTheDocument()
 
     // Displays the empty state if no todos were found

@@ -36,7 +36,7 @@ module CanvasCrummy
       return render_k5_crumbs if @k5_details_view
 
       if crumbs.length > 1
-        content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs') do
+        content_tag(:nav, :id => "breadcrumbs", :role => "navigation", "aria-label" => "breadcrumbs") do
           content_tag(:ul, nil, nil, false) do
             crumbs.collect do |crumb|
               content_tag(:li, crumb_to_html(crumb), crumb[2])
@@ -48,7 +48,7 @@ module CanvasCrummy
 
     def crumb_to_html(crumb)
       name, url = crumb
-      span = content_tag(:span, name, :class => 'ellipsible')
+      span = content_tag(:span, name, class: "ellipsible")
       url ? link_to(span, url) : span
     end
 
@@ -59,7 +59,7 @@ module CanvasCrummy
       # Update the home crumb to include an open arrow and the full course name
       home_crumb = k5_crumbs.last
       home_crumb[0] = "<i class=\"icon-Solid icon-arrow-open-start\"></i> ".html_safe + @context.name
-      content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs', :class => 'k5-breadcrumbs') do
+      content_tag(:nav, :id => "breadcrumbs", :role => "navigation", "aria-label" => "breadcrumbs", :class => "k5-breadcrumbs") do
         content_tag(:ul, nil, nil, false) do
           k5_crumbs.collect do |crumb|
             content_tag(:li, crumb_to_html(crumb), crumb[2])

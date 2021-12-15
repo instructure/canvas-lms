@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/assignments_common'
-require_relative '../helpers/differentiated_assignments'
+require_relative "../helpers/assignments_common"
+require_relative "../helpers/differentiated_assignments"
 
 describe "interaction with differentiated assignments" do
   include_context "in-process server selenium tests"
@@ -81,7 +81,7 @@ describe "interaction with differentiated assignments" do
         AssignmentOverride.find(@da_assignment.assignment_overrides.first!.id).destroy
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}/submissions/#{@student.id}"
         # check the preview frame for the success banner and for your submission text
-        in_frame('preview_frame') do
+        in_frame("preview_frame") do
           expect(f("#flash_message_holder")).to include_text("This assignment will no longer count towards your grade.")
         end
       end
@@ -164,7 +164,7 @@ describe "interaction with differentiated assignments" do
         AssignmentOverride.find(@da_assignment.assignment_overrides.first!.id).destroy
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}/submissions/#{@student.id}"
         # check the preview frame for the success banner and for your submission text
-        in_frame('preview_frame') do
+        in_frame("preview_frame") do
           expect(f("#flash_message_holder")).to include_text("This assignment will no longer count towards your grade.")
         end
       end

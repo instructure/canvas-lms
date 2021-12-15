@@ -18,33 +18,33 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe CanvasPartman::PartitionManager do
-  describe '.create' do
-    it 'whines if the target class is not Partitioned' do
-      expect {
+  describe ".create" do
+    it "whines if the target class is not Partitioned" do
+      expect do
         CanvasPartman::PartitionManager.create(Object)
-      }.to raise_error(ArgumentError, /can only work on models that are partitioned/i)
+      end.to raise_error(ArgumentError, /can only work on models that are partitioned/i)
     end
   end
 
   context :by_date do
     subject { CanvasPartman::PartitionManager.create(Animal) }
 
-    describe '#create_partition' do
-      context 'precision = :months' do
-        it 'creates a partition suffixed by YYYY_MM' do
-          expect {
+    describe "#create_partition" do
+      context "precision = :months" do
+        it "creates a partition suffixed by YYYY_MM" do
+          expect do
             subject.create_partition(Time.new(2014, 11))
-          }.not_to raise_error
+          end.not_to raise_error
 
-          expect(SchemaHelper.table_exists?('partman_animals_2014_11')).to be true
+          expect(SchemaHelper.table_exists?("partman_animals_2014_11")).to be true
         end
 
-        it 'creates multiple partitions' do
+        it "creates multiple partitions" do
           subject.create_partition(Time.new(2014, 11, 5))
           subject.create_partition(Time.new(2014, 12, 5))
 
-          expect(SchemaHelper.table_exists?('partman_animals_2014_11')).to be true
-          expect(SchemaHelper.table_exists?('partman_animals_2014_12')).to be true
+          expect(SchemaHelper.table_exists?("partman_animals_2014_11")).to be true
+          expect(SchemaHelper.table_exists?("partman_animals_2014_12")).to be true
         end
       end
 
@@ -60,9 +60,9 @@ describe CanvasPartman::PartitionManager do
     describe "#ensure_partitions" do
       it "creates the proper number of partitions" do
         expect(subject).to receive(:partition_exists?).at_least(:once).and_return(false)
-        expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
-        expect(subject).to receive(:create_partition).with(Time.utc(2015, 05, 01))
-        expect(subject).to receive(:create_partition).with(Time.utc(2015, 06, 01))
+        expect(Time).to receive(:now).and_return(Time.utc(2015, 5, 2))
+        expect(subject).to receive(:create_partition).with(Time.utc(2015, 5, 1))
+        expect(subject).to receive(:create_partition).with(Time.utc(2015, 6, 1))
 
         subject.ensure_partitions(1)
       end
@@ -70,8 +70,8 @@ describe CanvasPartman::PartitionManager do
 
     describe "#prune_partitions" do
       it "prunes the proper number of partitions" do
-        expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
-        expect(subject).to receive(:partition_tables).and_return(%w{
+        expect(Time).to receive(:now).and_return(Time.utc(2015, 5, 2))
+        expect(subject).to receive(:partition_tables).and_return(%w[
                                                                    partman_animals_2014_9
                                                                    partman_animals_2014_10
                                                                    partman_animals_2014_11
@@ -82,27 +82,27 @@ describe CanvasPartman::PartitionManager do
                                                                    partman_animals_2015_4
                                                                    partman_animals_2015_5
                                                                    partman_animals_2015_6
-                                                                 })
+                                                                 ])
 
-        expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_9')
-        expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_10')
+        expect(subject.base_class.connection).to receive(:drop_table).with("partman_animals_2014_9")
+        expect(subject.base_class.connection).to receive(:drop_table).with("partman_animals_2014_10")
         subject.prune_partitions(6)
       end
 
       it "prunes weekly partitions too" do
-        expect(Time).to receive(:now).and_return(Time.utc(2015, 02, 05))
+        expect(Time).to receive(:now).and_return(Time.utc(2015, 2, 5))
         allow(Animal).to receive(:partitioning_interval).and_return(:weeks)
-        expect(subject).to receive(:partition_tables).and_return(%w{
+        expect(subject).to receive(:partition_tables).and_return(%w[
                                                                    partman_animals_2015_01
                                                                    partman_animals_2015_02
                                                                    partman_animals_2015_03
                                                                    partman_animals_2015_04
                                                                    partman_animals_2015_05
                                                                    partman_animals_2015_06
-                                                                 })
+                                                                 ])
 
-        expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2015_01')
-        expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2015_02')
+        expect(subject.base_class.connection).to receive(:drop_table).with("partman_animals_2015_01")
+        expect(subject.base_class.connection).to receive(:drop_table).with("partman_animals_2015_02")
         subject.prune_partitions(3)
       end
     end
@@ -111,17 +111,17 @@ describe CanvasPartman::PartitionManager do
   context "by_date + weeks" do
     subject { CanvasPartman::PartitionManager.create(WeekEvent) }
 
-    describe '#create_partition' do
-      it 'creates partitions suffixed by year and week number' do
-        expect {
+    describe "#create_partition" do
+      it "creates partitions suffixed by year and week number" do
+        expect do
           subject.create_partition(Time.new(2018, 12, 24))
           subject.create_partition(Time.new(2018, 12, 31)) # beginning of next year's first week
           subject.create_partition(Time.new(2021, 1, 1)) # part of last year's 53rd week
-        }.not_to raise_error
+        end.not_to raise_error
 
-        expect(SchemaHelper.table_exists?('partman_week_events_2018_52')).to be true
-        expect(SchemaHelper.table_exists?('partman_week_events_2019_01')).to be true
-        expect(SchemaHelper.table_exists?('partman_week_events_2020_53')).to be true
+        expect(SchemaHelper.table_exists?("partman_week_events_2018_52")).to be true
+        expect(SchemaHelper.table_exists?("partman_week_events_2019_01")).to be true
+        expect(SchemaHelper.table_exists?("partman_week_events_2020_53")).to be true
       end
     end
   end
@@ -129,13 +129,13 @@ describe CanvasPartman::PartitionManager do
   context :by_id do
     subject { CanvasPartman::PartitionManager.create(Trail) }
 
-    describe '#create_partition' do
-      it 'creates multiple partitions' do
+    describe "#create_partition" do
+      it "creates multiple partitions" do
         subject.create_partition(0)
         subject.create_partition(5)
 
-        expect(SchemaHelper.table_exists?('partman_trails_0')).to be true
-        expect(SchemaHelper.table_exists?('partman_trails_1')).to be true
+        expect(SchemaHelper.table_exists?("partman_trails_0")).to be true
+        expect(SchemaHelper.table_exists?("partman_trails_1")).to be true
       end
 
       it "brings along foreign keys" do
@@ -182,7 +182,7 @@ describe CanvasPartman::PartitionManager do
       end
 
       it "detects when enough partitions already exist" do
-        expect(subject).to receive(:partition_tables).and_return(['partman_trails_0', 'partman_trails_1'])
+        expect(subject).to receive(:partition_tables).and_return(["partman_trails_0", "partman_trails_1"])
         expect(Zoo).to receive(:maximum).and_return(nil)
         expect(subject).not_to receive(:create_partition)
 
@@ -203,8 +203,8 @@ describe CanvasPartman::PartitionManager do
     end
   end
 
-  describe '#with_timeout_protection' do
-    it 'errors if the query goes beyond the timeout' do
+  describe "#with_timeout_protection" do
+    it "errors if the query goes beyond the timeout" do
       pm = CanvasPartman::PartitionManager.create(Trail)
       expect do
         pm.with_statement_timeout(timeout_override: 1) do

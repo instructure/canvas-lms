@@ -66,13 +66,14 @@ describe('Pace plans actions', () => {
       await thunkedAction(dispatch, getState)
 
       expect(dispatch.mock.calls[0]).toEqual([uiActions.showLoadingOverlay('Starting publish...')])
-      expect(dispatch.mock.calls[1]).toEqual([pacePlanActions.setPacePlan(updatedPlan)])
-      expect(dispatch.mock.calls[2]).toEqual([pacePlanActions.setProgress(PROGRESS_RUNNING)])
+      expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('publish')])
+      expect(dispatch.mock.calls[2]).toEqual([pacePlanActions.setPacePlan(updatedPlan)])
+      expect(dispatch.mock.calls[3]).toEqual([pacePlanActions.setProgress(PROGRESS_RUNNING)])
       // Compare dispatched functions by name since they won't be directly equal
-      expect(JSON.stringify(dispatch.mock.calls[3])).toEqual(
+      expect(JSON.stringify(dispatch.mock.calls[4])).toEqual(
         JSON.stringify([pacePlanActions.pollForPublishStatus()])
       )
-      expect(dispatch.mock.calls[4]).toEqual([uiActions.hideLoadingOverlay()])
+      expect(dispatch.mock.calls[5]).toEqual([uiActions.hideLoadingOverlay()])
       expect(fetchMock.called(UPDATE_API, 'PUT')).toBe(true)
     })
 
@@ -89,9 +90,10 @@ describe('Pace plans actions', () => {
 
     it('Sets an error message if the plan update fails', async () => {
       const updatedPlan = {...PRIMARY_PLAN, excludeWeekends: false}
+      const error = new Error("You don't actually want to publish this")
       const getState = mockGetState(updatedPlan, PRIMARY_PLAN)
       fetchMock.put(UPDATE_API, {
-        throws: new Error("You don't actually want to publish this")
+        throws: error
       })
 
       const thunkedAction = pacePlanActions.publishPlan()
@@ -99,8 +101,9 @@ describe('Pace plans actions', () => {
 
       expect(dispatch.mock.calls).toEqual([
         [uiActions.showLoadingOverlay('Starting publish...')],
+        [uiActions.clearCategoryError('publish')],
         [uiActions.hideLoadingOverlay()],
-        [uiActions.setErrorMessage('There was an error publishing your plan.')]
+        [uiActions.setCategoryError('publish', error.toString())]
       ])
     })
   })
@@ -135,7 +138,8 @@ describe('Pace plans actions', () => {
 
       await pacePlanActions.pollForPublishStatus()(dispatch, getState)
 
-      expect(dispatch.mock.calls).toEqual([[pacePlanActions.setProgress(progressUpdated)]])
+      expect(dispatch.mock.calls[0]).toEqual([pacePlanActions.setProgress(progressUpdated)])
+      expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('checkPublishStatus')])
       expect(setTimeout).toHaveBeenCalledTimes(1)
 
       const progressCompleted = {...PROGRESS_RUNNING, completion: 100, workflow_state: 'completed'}
@@ -144,8 +148,9 @@ describe('Pace plans actions', () => {
       jest.advanceTimersByTime(PUBLISH_STATUS_POLLING_MS)
 
       await waitFor(() => {
-        expect(dispatch.mock.calls.length).toBe(2)
-        expect(dispatch.mock.calls[1]).toEqual([pacePlanActions.setProgress(undefined)])
+        expect(dispatch.mock.calls.length).toBe(4)
+        expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('checkPublishStatus')])
+        expect(dispatch.mock.calls[2]).toEqual([pacePlanActions.setProgress(undefined)])
         expect(screen.getByText('Finished publishing plan')).toBeInTheDocument()
       })
     })
@@ -155,12 +160,13 @@ describe('Pace plans actions', () => {
         ...DEFAULT_STORE_STATE,
         pacePlan: {publishingProgress: {...PROGRESS_RUNNING}}
       })
-      fetchMock.get(PROGRESS_API, {throws: new Error('Progress? What progress?')})
+      const error = new Error('Progress? What progress?')
+      fetchMock.get(PROGRESS_API, {throws: error})
 
       await pacePlanActions.pollForPublishStatus()(dispatch, getState)
 
       expect(dispatch.mock.calls).toEqual([
-        [uiActions.setErrorMessage('There was an error checking plan publishing status')]
+        [uiActions.setCategoryError('checkPublishStatus', error?.toString())]
       ])
       expect(setTimeout).not.toHaveBeenCalled()
     })

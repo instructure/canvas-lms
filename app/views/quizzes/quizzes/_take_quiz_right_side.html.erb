@@ -31,16 +31,18 @@
     </div>
   <% end %>
   <div id="quiz-time-elapsed">
-    <span class="time_header">
-      <% if @quiz.time_limit %>
-        <%= before_label(:time_running, "Time Running") %>
-      <% else %>
-        <%= before_label(:time_elapsed, "Time Elapsed") %>
-      <% end %>
-    </span>
-    <span style="font-size: 0.8em; padding-<%= direction('left') %>: 10px;">
-      <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
-    </span>
+    <div style="display: flex; align-items: center;">
+      <span class="time_header">
+        <% if @quiz.time_limit %>
+          <%= before_label(:time_running, "Time Running") %>
+        <% else %>
+          <%= before_label(:time_elapsed, "Time Elapsed") %>
+        <% end %>
+      </span>
+      <span style="padding-<%= direction('left') %>: 10px;">
+        <a style="font-size: 0.8em; padding: 3px 6px" href="#" class="btn hide_time_link"><%= t('links.hide_time_running', "Hide Time") %></a>
+      </span>
+    </div>
     <% if @quiz.due_at %>
       <div style="font-size: 0.8em;">
         <%= before_label(:attempt_due, "Attempt due") %>

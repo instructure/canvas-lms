@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe "BookmarkedCollection::Collection" do
   before do
-    @bookmark = double('bookmark')
-    @bookmarker = double('bookmarker', :validate => true, :bookmark_for => @bookmark)
+    @bookmark = double("bookmark")
+    @bookmarker = double("bookmarker", validate: true, bookmark_for: @bookmark)
     @collection = BookmarkedCollection::Collection.new(@bookmarker)
   end
 
@@ -104,7 +104,7 @@ describe "BookmarkedCollection::Collection" do
 
   describe "round-tripping dates" do
     it "converts to UTC" do
-      timestamp = DateTime.parse('2020-12-31T22:00:00-09:00').in_time_zone('Alaska')
+      timestamp = DateTime.parse("2020-12-31T22:00:00-09:00").in_time_zone("Alaska")
       page = @collection.bookmark_to_page([1, timestamp])
       expect(page).to match(/^bookmark:/)
       bookmark = @collection.page_to_bookmark(page)
@@ -112,7 +112,7 @@ describe "BookmarkedCollection::Collection" do
     end
 
     it "preserves fractional times" do
-      timestamp = DateTime.parse('2020-02-22T22:22:22.22Z')
+      timestamp = DateTime.parse("2020-02-22T22:22:22.22Z")
       page = @collection.bookmark_to_page([1, [2, timestamp]])
       expect(page).to match(/^bookmark:/)
       bookmark = @collection.page_to_bookmark(page)
@@ -163,9 +163,9 @@ describe "BookmarkedCollection::Collection" do
 
   describe "#has_more!" do
     before do
-      @item = double('item')
+      @item = double("item")
       @collection << @item
-      @bookmark = double('bookmark')
+      @bookmark = double("bookmark")
     end
 
     it "uses the bookmarker on the last item" do

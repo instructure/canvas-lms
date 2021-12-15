@@ -29,11 +29,11 @@ module Submissions
     def attachment
       raise ActiveRecord::RecordNotFound unless download_id.present?
 
-      return attachment_from_submission_comment ||
-             attachment_belonging_to_submission ||
-             prior_attachment ||
-             attachment_from_submission_attachments ||
-             attachment_from_versioned_attachments
+      attachment_from_submission_comment ||
+        attachment_belonging_to_submission ||
+        prior_attachment ||
+        attachment_from_submission_attachments ||
+        attachment_from_versioned_attachments
     end
 
     private

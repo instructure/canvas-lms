@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ModeratedGrading
-  GRADE_ATTRIBUTES_ONLY = [:grade, :score, :graded_at, :scorer_id, :final, :graded_anonymously].freeze
+  GRADE_ATTRIBUTES_ONLY = %i[grade score graded_at scorer_id final graded_anonymously].freeze
 
   def self.table_name_prefix
-    'moderated_grading_'
+    "moderated_grading_"
   end
 end

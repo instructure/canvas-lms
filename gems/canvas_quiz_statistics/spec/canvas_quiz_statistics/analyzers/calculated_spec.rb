@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasQuizStatistics::Analyzers::Calculated do
-  let(:question_data) { QuestionHelpers.fixture('calculated_question') }
-
   subject { described_class.new(question_data) }
 
-  it 'does not blow up when no responses are provided' do
+  let(:question_data) { QuestionHelpers.fixture("calculated_question") }
+
+  it "does not blow up when no responses are provided" do
     expect { expect(subject.run([])).to be_present }.to_not raise_error
   end
 
-  describe '[:graded]' do
-    it 'reflects the number of graded answers' do
+  describe "[:graded]" do
+    it "reflects the number of graded answers" do
       output = subject.run([
-                             { correct: true }, { correct: 'true' }, { correct: 'undefined' },
-                             { correct: false }, { correct: 'false' }, {}
+                             { correct: true }, { correct: "true" }, { correct: "undefined" },
+                             { correct: false }, { correct: "false" }, {}
                            ])
 
       expect(output[:graded]).to eq(2)

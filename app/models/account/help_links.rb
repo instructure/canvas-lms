@@ -27,48 +27,48 @@ class Account::HelpLinks
   def default_links(filter = true)
     defaults = [
       {
-        :available_to => ['student'],
-        :text => -> { I18n.t('#help_dialog.instructor_question', 'Ask Your Instructor a Question') },
-        :subtext => -> { I18n.t('#help_dialog.instructor_question_sub', 'Questions are submitted to your instructor') },
-        :url => '#teacher_feedback',
-        :type => 'default',
-        :id => :instructor_question,
-        :is_featured => false,
-        :is_new => false,
-        :feature_headline => -> { '' }
+        available_to: ["student"],
+        text: -> { I18n.t("#help_dialog.instructor_question", "Ask Your Instructor a Question") },
+        subtext: -> { I18n.t("#help_dialog.instructor_question_sub", "Questions are submitted to your instructor") },
+        url: "#teacher_feedback",
+        type: "default",
+        id: :instructor_question,
+        is_featured: false,
+        is_new: false,
+        feature_headline: -> { "" }
       }.freeze,
       {
-        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
-        :text => -> { I18n.t('#help_dialog.search_the_canvas_guides', 'Search the Canvas Guides') },
-        :subtext => -> { I18n.t('#help_dialog.canvas_help_sub', 'Find answers to common questions') },
-        :url => Setting.get('help_dialog_canvas_guide_url', I18n.t(:'community.guides_home')),
-        :type => 'default',
-        :id => :search_the_canvas_guides,
-        :is_featured => true,
-        :is_new => false,
-        :feature_headline => -> { I18n.t('Little lost? Try here first!') }
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t("#help_dialog.search_the_canvas_guides", "Search the Canvas Guides") },
+        subtext: -> { I18n.t("#help_dialog.canvas_help_sub", "Find answers to common questions") },
+        url: Setting.get("help_dialog_canvas_guide_url", I18n.t(:"community.guides_home")),
+        type: "default",
+        id: :search_the_canvas_guides,
+        is_featured: true,
+        is_new: false,
+        feature_headline: -> { I18n.t("Little lost? Try here first!") }
       }.freeze,
       {
-        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
-        :text => -> { I18n.t('#help_dialog.report_problem', 'Report a Problem') },
-        :subtext => -> { I18n.t('#help_dialog.report_problem_sub', 'If Canvas misbehaves, tell us about it') },
-        :url => '#create_ticket',
-        :type => 'default',
-        :id => :report_a_problem,
-        :is_featured => false,
-        :is_new => false,
-        :feature_headline => -> { '' }
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t("#help_dialog.report_problem", "Report a Problem") },
+        subtext: -> { I18n.t("#help_dialog.report_problem_sub", "If Canvas misbehaves, tell us about it") },
+        url: "#create_ticket",
+        type: "default",
+        id: :report_a_problem,
+        is_featured: false,
+        is_new: false,
+        feature_headline: -> { "" }
       }.freeze,
       {
-        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
-        :text => -> { I18n.t('#help_dialog.covid', 'COVID-19 Canvas Resources') },
-        :subtext => -> { I18n.t('#help_dialog.covid_sub', 'Tips for teaching and learning online') },
-        :url => Setting.get('help_dialog_covid_url', I18n.t(:'community.contingency_covid')),
-        :type => 'default',
-        :id => :covid,
-        :is_new => true,
-        :is_featured => false,
-        :feature_headline => -> { '' }
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t("#help_dialog.covid", "COVID-19 Canvas Resources") },
+        subtext: -> { I18n.t("#help_dialog.covid_sub", "Tips for teaching and learning online") },
+        url: Setting.get("help_dialog_covid_url", I18n.t(:"community.contingency_covid")),
+        type: "default",
+        id: :covid,
+        is_new: true,
+        is_featured: false,
+        feature_headline: -> { "" }
       }.freeze
     ]
     filter ? filtered_links(defaults) : defaults
@@ -82,9 +82,9 @@ class Account::HelpLinks
   def filtered_links(links)
     show_feedback_link = Setting.get("show_feedback_link", "false") == "true"
     links.select do |link|
-      link[:id].to_s == 'covid' ? Account.site_admin.feature_enabled?(:featured_help_links) : true
+      link[:id].to_s == "covid" ? Account.site_admin.feature_enabled?(:featured_help_links) : true
     end.select do |link|
-      link[:id].to_s == 'report_a_problem' || link[:id].to_s == 'instructor_question' ? show_feedback_link : true
+      link[:id].to_s == "report_a_problem" || link[:id].to_s == "instructor_question" ? show_feedback_link : true
     end
   end
 
@@ -105,7 +105,7 @@ class Account::HelpLinks
   # (text is only stored in account settings if it's customized)
   def map_default_links(links)
     links.map do |link|
-      default_link = link[:type] == 'default' && default_links_hash[link[:id]&.to_sym]
+      default_link = link[:type] == "default" && default_links_hash[link[:id]&.to_sym]
       if default_link
         link = link.dup
         link[:text] ||= default_link[:text]
@@ -130,7 +130,7 @@ class Account::HelpLinks
     end
 
     links.map do |link|
-      default_link = link[:type] == 'default' && default_links_hash[link[:id]&.to_sym]
+      default_link = link[:type] == "default" && default_links_hash[link[:id]&.to_sym]
       if default_link
         link.delete(:text) if link[:text] == default_link[:text].call
         link.delete(:subtext) if link[:subtext] == default_link[:subtext].call
@@ -146,11 +146,11 @@ class Account::HelpLinks
   def self.validate_links(links)
     errors = []
     if links.count { |link| link[:is_featured] } > 1
-      errors << 'at most one featured link is permitted'
+      errors << "at most one featured link is permitted"
     elsif links.count { |link| link[:is_new] } > 1
-      errors << 'at most one new link is permitted'
+      errors << "at most one new link is permitted"
     elsif links.any? { |link| link[:is_new] && link[:is_featured] }
-      errors << 'a link cannot be featured and new'
+      errors << "a link cannot be featured and new"
     end
     errors
   end

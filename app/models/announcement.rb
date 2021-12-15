@@ -30,14 +30,14 @@ class Announcement < DiscussionTopic
   before_save :infer_content
   before_save :respect_context_lock_rules
   after_save :create_alert
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :message
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :message, presence: true
 
-  acts_as_list scope: { context: self, type: 'Announcement' }
+  acts_as_list scope: { context: self, type: "Announcement" }
 
   scope :between, lambda { |start_date, end_date|
-    where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', start_date, end_date)
+    where("COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?", start_date, end_date)
   }
 
   scope :ordered_between, lambda { |start_date, end_date|
@@ -49,8 +49,8 @@ class Announcement < DiscussionTopic
   }
 
   def validate_draft_state_change
-    _old_draft_state, new_draft_state = self.changes['workflow_state']
-    self.errors.add :workflow_state, I18n.t('#announcements.error_draft_state', "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == 'unpublished'
+    _old_draft_state, new_draft_state = changes["workflow_state"]
+    errors.add :workflow_state, I18n.t("#announcements.error_draft_state", "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == "unpublished"
   end
 
   def infer_content
@@ -67,10 +67,10 @@ class Announcement < DiscussionTopic
 
   def self.lock_from_course(course)
     Announcement.where(
-      :context_type => 'Course',
-      :context_id => course,
-      :workflow_state => 'active'
-    ).update_all(:locked => true)
+      context_type: "Course",
+      context_id: course,
+      workflow_state: "active"
+    ).update_all(locked: true)
   end
 
   def course_broadcast_data
@@ -80,18 +80,18 @@ class Announcement < DiscussionTopic
   set_broadcast_policy! do
     dispatch :new_announcement
     to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
-    whenever { |record|
+    whenever do |record|
       record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
-    }
+    end
     data { course_broadcast_data }
 
     dispatch :announcement_created_by_you
     to { user }
-    whenever { |record|
+    whenever do |record|
       record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
-    }
+    end
     data { course_broadcast_data }
   end
 
@@ -99,39 +99,41 @@ class Announcement < DiscussionTopic
     given { |user| self.user.present? && self.user == user }
     can :update and can :reply and can :read
 
-    given { |user| self.user.present? && self.user == user && self.discussion_entries.active.empty? }
+    given { |user| self.user.present? && self.user == user && discussion_entries.active.empty? }
     can :delete
 
     given do |user|
-      self.grants_right?(user, :read) &&
-        (self.context.is_a?(Group) ||
+      grants_right?(user, :read) &&
+        (context.is_a?(Group) ||
          (user &&
-          (self.context.grants_right?(user, :read_as_admin) ||
-           (self.context.is_a?(Course) &&
-            self.context.includes_user?(user)))))
+          (context.grants_right?(user, :read_as_admin) ||
+           (context.is_a?(Course) &&
+            context.includes_user?(user)))))
     end
     can :read_replies
 
-    given { |user, session| self.context.grants_right?(user, session, :read_announcements) && self.visible_for?(user) }
+    given { |user, session| context.grants_right?(user, session, :read_announcements) && visible_for?(user) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked? }
+    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !locked? }
     can :reply
 
-    given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :create_forum) }
+    given { |user, session| context.is_a?(Group) && context.grants_right?(user, session, :create_forum) }
     can :create
 
-    given { |user, session| self.context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } # admins.include?(user) }
+    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } # admins.include?(user) }
     can :update and can :read_as_admin and can :delete and can :reply and can :create and can :read and can :attach
 
     given do |user, session|
-      self.allow_rating && (!self.only_graders_can_rate ||
-                            self.context.grants_right?(user, session, :manage_grades))
+      allow_rating && (!only_graders_can_rate ||
+                            context.grants_right?(user, session, :manage_grades))
     end
     can :rate
   end
 
-  def is_announcement; true end
+  def is_announcement
+    true
+  end
 
   def homeroom_announcement?(context)
     context.is_a?(Course) && context.elementary_homeroom_course?
@@ -159,21 +161,21 @@ class Announcement < DiscussionTopic
   end
 
   def create_alert
-    return if !saved_changes.keys.include?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
-    return if self.context_type != 'Course'
+    return if !saved_changes.key?("workflow_state") || saved_changes["workflow_state"][1] != "active"
+    return if context_type != "Course"
 
-    observer_enrollments = self.course.enrollments.active.where(type: 'ObserverEnrollment')
+    observer_enrollments = course.enrollments.active.where(type: "ObserverEnrollment")
     observer_enrollments.each do |enrollment|
       observer = enrollment.user
       student = enrollment.associated_user
-      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: 'course_announcement', student: student).first
+      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: "course_announcement", student: student).first
       next unless threshold
 
       ObserverAlert.create!(observer: observer, student: student, observer_alert_threshold: threshold,
-                            context: self, alert_type: 'course_announcement', action_date: self.updated_at,
+                            context: self, alert_type: "course_announcement", action_date: updated_at,
                             title: I18n.t("Course announcement: \"%{title}\" in %{course_code}", {
                                             title: self.title,
-                                            course_code: self.course.course_code
+                                            course_code: course.course_code
                                           }))
     end
   end

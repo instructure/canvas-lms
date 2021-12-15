@@ -77,11 +77,11 @@ describe Types::UserType do
 
   context "shortName" do
     before(:once) do
-      @student.update! short_name: 'new display name'
+      @student.update! short_name: "new display name"
     end
 
     it "is displayed if set" do
-      expect(user_type.resolve("shortName")).to eq 'new display name'
+      expect(user_type.resolve("shortName")).to eq "new display name"
     end
 
     it "returns full name if shortname is not set" do
@@ -92,7 +92,7 @@ describe Types::UserType do
 
   context "avatarUrl" do
     before(:once) do
-      @student.update! avatar_image_url: 'not-a-fallback-avatar.png'
+      @student.update! avatar_image_url: "not-a-fallback-avatar.png"
     end
 
     it "is nil when avatars are not enabled" do
@@ -126,12 +126,12 @@ describe Types::UserType do
       @student.pseudonyms.create!(
         account: @course.account,
         unique_id: "alex@columbia.edu",
-        workflow_state: 'active',
+        workflow_state: "active",
         sis_user_id: "a.ham"
       )
     end
 
-    context 'as admin' do
+    context "as admin" do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
         GraphQLTypeTester.new(@student, current_user: admin,
@@ -152,14 +152,14 @@ describe Types::UserType do
       end
     end
 
-    context 'as teacher' do
-      it 'returns the sis user id if the user has permissions to read it' do
+    context "as teacher" do
+      it "returns the sis user id if the user has permissions to read it" do
         expect(user_type.resolve("sisId")).to eq "a.ham"
       end
 
-      it 'returns null if the user does not have permission to read the sis user id' do
+      it "returns null if the user does not have permission to read the sis user id" do
         @teacher.enrollments.find_by(course: @course).role
-                .role_overrides.create!(permission: 'read_sis', enabled: false, account: @course.account)
+                .role_overrides.create!(permission: "read_sis", enabled: false, account: @course.account)
         expect(user_type.resolve("sisId")).to be_nil
       end
     end
@@ -170,12 +170,12 @@ describe Types::UserType do
       @student.pseudonyms.create!(
         account: @course.account,
         unique_id: "rlands@eab.com",
-        workflow_state: 'active',
+        workflow_state: "active",
         integration_id: "Rachel.Lands"
       )
     end
 
-    context 'as admin' do
+    context "as admin" do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
         GraphQLTypeTester.new(@student, current_user: admin,
@@ -196,14 +196,14 @@ describe Types::UserType do
       end
     end
 
-    context 'as teacher' do
-      it 'returns the integration id if teacher user has permissions to read SIS info' do
+    context "as teacher" do
+      it "returns the integration id if teacher user has permissions to read SIS info" do
         expect(user_type.resolve("integrationId")).to eq "Rachel.Lands"
       end
 
-      it 'returns null if teacher user does not have permission to read SIS info' do
+      it "returns null if teacher user does not have permission to read SIS info" do
         @teacher.enrollments.find_by(course: @course).role
-                .role_overrides.create!(permission: 'read_sis', enabled: false, account: @course.account)
+                .role_overrides.create!(permission: "read_sis", enabled: false, account: @course.account)
         expect(user_type.resolve("integrationId")).to be_nil
       end
     end
@@ -289,7 +289,7 @@ describe Types::UserType do
     let!(:read_email_override) do
       RoleOverride.create!(
         context: @teacher.account,
-        permission: 'read_email_addresses',
+        permission: "read_email_addresses",
         role: teacher_role,
         enabled: true
       )
@@ -301,7 +301,7 @@ describe Types::UserType do
       @student.update! email: "cooldude@example.com"
     end
 
-    it 'returns email for admins' do
+    it "returns email for admins" do
       admin_tester = GraphQLTypeTester.new(
         @student,
         current_user: admin,
@@ -339,18 +339,18 @@ describe Types::UserType do
 
   context "groups" do
     before(:once) do
-      @user_group_ids = (1..5).map {
+      @user_group_ids = (1..5).map do
         group_with_user({ user: @student, active_all: true }).group_id.to_s
-      }
-      @deleted_user_group_ids = (1..3).map {
+      end
+      @deleted_user_group_ids = (1..3).map do
         group = group_with_user({ user: @student, active_all: true })
         group.destroy
         group.group_id.to_s
-      }
+      end
     end
 
     it "fetches the groups associated with a user" do
-      user_type.resolve('groups { _id }', current_user: @student).all? do |id|
+      user_type.resolve("groups { _id }", current_user: @student).all? do |id|
         expect(@user_group_ids.include?(id)).to be true
         expect(@deleted_user_group_ids.include?(id)).to be false
       end
@@ -358,35 +358,35 @@ describe Types::UserType do
 
     it "only returns groups for current_user" do
       expect(
-        user_type.resolve('groups { _id }', current_user: @teacher)
+        user_type.resolve("groups { _id }", current_user: @teacher)
       ).to be_nil
     end
   end
 
-  context 'notificationPreferences' do
-    it 'returns the users notification preferences' do
+  context "notificationPreferences" do
+    it "returns the users notification preferences" do
       Notification.delete_all
-      @student.communication_channels.create!(path: 'test@test.com').confirm!
-      notification_model(:name => 'test', :category => 'Announcement')
+      @student.communication_channels.create!(path: "test@test.com").confirm!
+      notification_model(name: "test", category: "Announcement")
 
       expect(
-        user_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
-      ).to eq 'test'
+        user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }")[0][0]
+      ).to eq "test"
     end
 
-    it 'only returns active communication channels' do
+    it "only returns active communication channels" do
       Notification.delete_all
-      communication_channel = @student.communication_channels.create!(path: 'test@test.com')
+      communication_channel = @student.communication_channels.create!(path: "test@test.com")
       communication_channel.confirm!
-      notification_model(:name => 'test', :category => 'Announcement')
+      notification_model(name: "test", category: "Announcement")
 
       expect(
-        user_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
-      ).to eq 'test'
+        user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }")[0][0]
+      ).to eq "test"
 
       communication_channel.destroy
       expect(
-        user_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }').count
+        user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }").count
       ).to eq 0
     end
 
@@ -408,88 +408,88 @@ describe Types::UserType do
     end
   end
 
-  context 'conversations' do
-    it 'returns conversations for the user' do
+  context "conversations" do
+    it "returns conversations for the user" do
       c = conversation(@student, @teacher)
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       expect(
-        type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }')[0][0]
+        type.resolve("conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")[0][0]
       ).to eq c.conversation.conversation_messages.first.body
     end
 
-    it 'has createdAt field for conversationMessagesConnection' do
+    it "has createdAt field for conversationMessagesConnection" do
       Timecop.freeze do
         c = conversation(@student, @teacher)
         type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
         expect(
-          type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0]
+          type.resolve("conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }")[0][0]
         ).to eq c.conversation.conversation_messages.first.created_at.iso8601
       end
     end
 
-    it 'has updatedAt field for conversations and conversationParticipants' do
+    it "has updatedAt field for conversations and conversationParticipants" do
       Timecop.freeze do
         convo = conversation(@student, @teacher)
         type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-        res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
+        res_node = type.resolve("conversationsConnection { nodes { updatedAt }}")[0]
         expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
       end
     end
 
-    it 'has updatedAt field for conversationParticipantsConnection' do
+    it "has updatedAt field for conversationParticipantsConnection" do
       Timecop.freeze do
         convo = conversation(@student, @teacher)
         type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-        res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
+        res_node = type.resolve("conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }")[0][0]
         expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
       end
     end
 
-    it 'does not return conversations for other users' do
+    it "does not return conversations for other users" do
       conversation(@student, @teacher)
       type = GraphQLTypeTester.new(@teacher, current_user: @student, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
       expect(
-        type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }')
+        type.resolve("conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
       ).to be nil
     end
 
-    it 'filters the conversations' do
-      conversation(@student, @teacher, { body: 'Howdy Partner' })
-      conversation(@student, @random_person, { body: 'Not in course' })
+    it "filters the conversations" do
+      conversation(@student, @teacher, { body: "Howdy Partner" })
+      conversation(@student, @random_person, { body: "Not in course" })
 
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(filter: \"course_#{@course.id}\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
       expect(result.count).to eq 1
-      expect(result[0][0]).to eq 'Howdy Partner'
+      expect(result[0][0]).to eq "Howdy Partner"
 
       result = type.resolve(
         "conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
       expect(result.count).to eq 2
-      expect(result.flatten).to match_array ['Howdy Partner', 'Not in course']
+      expect(result.flatten).to match_array ["Howdy Partner", "Not in course"]
     end
 
-    it 'scopes the conversations' do
-      conversation(@student, @teacher, { body: 'You get that thing I sent ya?' })
-      conversation(@teacher, @student, { body: 'oh yea =)' })
-      conversation(@student, @random_person, { body: 'Whats up?', starred: true })
+    it "scopes the conversations" do
+      conversation(@student, @teacher, { body: "You get that thing I sent ya?" })
+      conversation(@teacher, @student, { body: "oh yea =)" })
+      conversation(@student, @random_person, { body: "Whats up?", starred: true })
 
       # used for the sent scope
-      conversation(@random_person, @teacher, { body: 'Help! Please make me non-random!' })
+      conversation(@random_person, @teacher, { body: "Help! Please make me non-random!" })
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(scope: \"inbox\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
       expect(result.flatten.count).to eq 3
-      expect(result.flatten).to match_array ['You get that thing I sent ya?', 'oh yea =)', 'Whats up?']
+      expect(result.flatten).to match_array ["You get that thing I sent ya?", "oh yea =)", "Whats up?"]
 
       result = type.resolve(
         "conversationsConnection(scope: \"starred\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
       expect(result.count).to eq 1
-      expect(result[0][0]).to eq 'Whats up?'
+      expect(result[0][0]).to eq "Whats up?"
 
       type = GraphQLTypeTester.new(
         @random_person,
@@ -502,7 +502,7 @@ describe Types::UserType do
     end
   end
 
-  context 'recipients' do
+  context "recipients" do
     let(:type) do
       GraphQLTypeTester.new(
         @student,
@@ -512,25 +512,25 @@ describe Types::UserType do
       )
     end
 
-    it 'returns nil if the user is not the current user' do
-      result = user_type.resolve('recipients { usersConnection { nodes { _id } } }')
+    it "returns nil if the user is not the current user" do
+      result = user_type.resolve("recipients { usersConnection { nodes { _id } } }")
       expect(result).to be nil
     end
 
-    it 'returns known users' do
-      known_users = @student.address_book.search_users().paginate(per_page: 4)
-      result = type.resolve('recipients { usersConnection { nodes { _id } } }')
+    it "returns known users" do
+      known_users = @student.address_book.search_users.paginate(per_page: 4)
+      result = type.resolve("recipients { usersConnection { nodes { _id } } }")
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
     end
 
-    it 'returns contexts' do
-      result = type.resolve('recipients { contextsConnection { nodes { name } } }')
+    it "returns contexts" do
+      result = type.resolve("recipients { contextsConnection { nodes { name } } }")
       expect(result[0]).to eq(@course.name)
     end
 
-    it 'searches users' do
-      known_users = @student.address_book.search_users().paginate(per_page: 3)
-      User.find(known_users.first.id).update!(name: 'Matthew Lemon')
+    it "searches users" do
+      known_users = @student.address_book.search_users.paginate(per_page: 3)
+      User.find(known_users.first.id).update!(name: "Matthew Lemon")
       result = type.resolve('recipients(search: "lemon") { usersConnection { nodes { _id } } }')
       expect(result[0]).to eq(known_users.first.id.to_s)
 
@@ -538,7 +538,7 @@ describe Types::UserType do
       expect(result).to match_array([])
     end
 
-    it 'searches contexts' do
+    it "searches contexts" do
       result = type.resolve('recipients(search: "unnamed") { contextsConnection { nodes { name } } }')
       expect(result[0]).to eq(@course.name)
 
@@ -546,14 +546,14 @@ describe Types::UserType do
       expect(result).to match_array([])
     end
 
-    it 'filters results based on context' do
+    it "filters results based on context" do
       known_users = @student.address_book.search_users(context: "course_#{@course.id}_students").paginate(per_page: 3)
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { _id } } }")
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
     end
   end
 
-  context 'favorite_courses' do
+  context "favorite_courses" do
     before(:once) do
       @course1 = @course
       course_with_user("StudentEnrollment", user: @student, active_all: true)
@@ -569,19 +569,19 @@ describe Types::UserType do
       )
     end
 
-    it 'returns primary enrollment courses if there are no favorite courses' do
-      result = type.resolve('favoriteCoursesConnection { nodes { _id } }')
+    it "returns primary enrollment courses if there are no favorite courses" do
+      result = type.resolve("favoriteCoursesConnection { nodes { _id } }")
       expect(result).to match_array([@course1.id.to_s, @course2.id.to_s])
     end
 
-    it 'returns favorite courses' do
+    it "returns favorite courses" do
       @student.favorites.create!(context: @course1)
-      result = type.resolve('favoriteCoursesConnection { nodes { _id } }')
+      result = type.resolve("favoriteCoursesConnection { nodes { _id } }")
       expect(result).to match_array([@course1.id.to_s])
     end
   end
 
-  context 'favorite_groups' do
+  context "favorite_groups" do
     let(:type) do
       GraphQLTypeTester.new(
         @student,
@@ -591,25 +591,25 @@ describe Types::UserType do
       )
     end
 
-    it 'returns all groups if there are no favorite groups' do
+    it "returns all groups if there are no favorite groups" do
       group_with_user(user: @student, active_all: true)
-      result = type.resolve('favoriteGroupsConnection { nodes { _id } }')
+      result = type.resolve("favoriteGroupsConnection { nodes { _id } }")
       expect(result).to match_array([@group.id.to_s])
     end
 
-    it 'return favorite groups' do
+    it "return favorite groups" do
       2.times do
         group_with_user(user: @student, active_all: true)
       end
       @student.favorites.create!(context: @group)
-      result = type.resolve('favoriteGroupsConnection { nodes { _id } }')
+      result = type.resolve("favoriteGroupsConnection { nodes { _id } }")
       expect(result).to match_array([@group.id.to_s])
     end
   end
 
-  context 'CommentBankItemsConnection' do
+  context "CommentBankItemsConnection" do
     before do
-      @comment_bank_item = comment_bank_item_model(user: @teacher, context: @course, comment: 'great comment!')
+      @comment_bank_item = comment_bank_item_model(user: @teacher, context: @course, comment: "great comment!")
     end
 
     let(:type) do
@@ -621,56 +621,56 @@ describe Types::UserType do
       )
     end
 
-    it 'returns comment bank items for the queried user' do
+    it "returns comment bank items for the queried user" do
       expect(
-        type.resolve('commentBankItemsConnection { nodes { _id } }')
+        type.resolve("commentBankItemsConnection { nodes { _id } }")
       ).to eq [@comment_bank_item.id.to_s]
     end
 
-    describe 'cross sharding' do
+    describe "cross sharding" do
       specs_require_sharding
 
-      it 'returns comments across shards' do
+      it "returns comments across shards" do
         @shard1.activate do
-          account = Account.create!(name: 'new shard account')
+          account = Account.create!(name: "new shard account")
           @course2 = course_factory(account: account)
           @course2.enroll_user(@teacher)
-          @comment2 = comment_bank_item_model(user: @teacher, context: @course2, comment: 'shard 2 comment')
+          @comment2 = comment_bank_item_model(user: @teacher, context: @course2, comment: "shard 2 comment")
         end
 
         expect(
-          type.resolve('commentBankItemsConnection { nodes { comment } }').sort
-        ).to eq ['great comment!', 'shard 2 comment']
+          type.resolve("commentBankItemsConnection { nodes { comment } }").sort
+        ).to eq ["great comment!", "shard 2 comment"]
       end
     end
 
-    describe 'with the limit argument' do
-      it 'returns a limited number of results' do
-        comment_bank_item_model(user: @teacher, context: @course, comment: '2nd great comment!')
+    describe "with the limit argument" do
+      it "returns a limited number of results" do
+        comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
         expect(
-          type.resolve('commentBankItemsConnection(limit: 1) { nodes { comment } }').length
+          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }").length
         ).to eq 1
       end
     end
 
-    describe 'with a search query' do
+    describe "with a search query" do
       before do
-        @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: 'new comment!')
+        @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: "new comment!")
       end
 
-      it 'returns results that match the query' do
+      it "returns results that match the query" do
         expect(
           type.resolve("commentBankItemsConnection(query: \"new\") { nodes { _id } }").length
         ).to eq 1
       end
 
-      it 'strips leading/trailing white space' do
+      it "strips leading/trailing white space" do
         expect(
           type.resolve("commentBankItemsConnection(query: \"    new   \") { nodes { _id } }").length
         ).to eq 1
       end
 
-      it 'does not query results if query.strip is blank' do
+      it "does not query results if query.strip is blank" do
         expect(
           type.resolve("commentBankItemsConnection(query: \"  \") { nodes { _id } }").length
         ).to eq 2
@@ -682,15 +682,15 @@ describe Types::UserType do
     before do
       @teacher_with_multiple_roles = user_factory(name: "blah")
       @course.enroll_user(@teacher_with_multiple_roles, "TeacherEnrollment")
-      @course.enroll_user(@teacher_with_multiple_roles, "TaEnrollment", :allow_multiple_enrollments => true)
+      @course.enroll_user(@teacher_with_multiple_roles, "TaEnrollment", allow_multiple_enrollments: true)
 
       @custom_teacher = user_factory(name: "blah")
-      role = custom_teacher_role('CustomTeacher', :account => @course.account)
-      @course.enroll_user(@custom_teacher, 'TeacherEnrollment', role: role)
+      role = custom_teacher_role("CustomTeacher", account: @course.account)
+      @course.enroll_user(@custom_teacher, "TeacherEnrollment", role: role)
 
       @teacher_with_duplicate_roles = user_factory(name: "blah")
       @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment")
-      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment", :allow_multiple_enrollments => true)
+      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment", allow_multiple_enrollments: true)
     end
 
     let(:user_ta_type) do
@@ -761,7 +761,7 @@ describe Types::UserType do
       ).to eq ["TeacherEnrollment"]
     end
 
-    it "returns all roles if no role types are specified " do
+    it "returns all roles if no role types are specified" do
       expect(
         teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id})|)
       ).to include("TaEnrollment", "TeacherEnrollment")
@@ -802,7 +802,7 @@ describe Types::UserType do
     GQL
   end
 
-  describe 'submission comments' do
+  describe "submission comments" do
     before(:once) do
       course = Course.create! name: "TEST"
 
@@ -823,7 +823,7 @@ describe Types::UserType do
       submission.add_comment(author: @teacher, comment: "Third comment")
     end
 
-    it 'can get comments' do
+    it "can get comments" do
       result = CanvasSchema.execute(
         submission_comments_mutation_str(@teacher.id),
         context: { current_user: @teacher }
@@ -834,7 +834,7 @@ describe Types::UserType do
       expect(nodes.map { |c| c["comment"] }).to match_array ["First comment", "Second comment", "Third comment"]
     end
 
-    it 'can get assignment names' do
+    it "can get assignment names" do
       result = CanvasSchema.execute(
         submission_comments_mutation_str(@teacher.id),
         context: { current_user: @teacher }
@@ -845,7 +845,7 @@ describe Types::UserType do
       expect(nodes.map { |c| c["assignment"]["name"] }).to match_array ["Test Assignment", "Test Assignment", "Test Assignment"]
     end
 
-    it 'can get course names' do
+    it "can get course names" do
       result = CanvasSchema.execute(
         submission_comments_mutation_str(@teacher.id),
         context: { current_user: @teacher }

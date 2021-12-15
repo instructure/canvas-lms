@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::SectionType do
-  let_once(:course) { course_with_student(active_all: true); @course }
+  let_once(:course) do
+    course_with_student(active_all: true)
+    @course
+  end
   let_once(:section) { course.course_sections.create! name: "Whatever", sis_source_id: "sisSection" }
   let(:section_type) { GraphQLTypeTester.new(section, current_user: @teacher) }
 

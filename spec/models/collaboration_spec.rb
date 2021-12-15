@@ -33,14 +33,14 @@ describe Collaboration do
           name: "bob",
           consumer_key: "bob",
           shared_secret: "bob",
-          tool_id: 'some_tool',
-          privacy_level: 'public'
+          tool_id: "some_tool",
+          privacy_level: "public"
         )
         tool.url = "http://www.example.com/basic_lti"
         tool.collaboration = {
-          :url => "http://#{HostUrl.default_host}/selection_test",
-          :selection_width => 400,
-          :selection_height => 400
+          url: "http://#{HostUrl.default_host}/selection_test",
+          selection_width: 400,
+          selection_height: 400
         }
         tool.save!
         expect(Collaboration.any_collaborations_configured?(context)).to eq true
@@ -48,27 +48,27 @@ describe Collaboration do
     end
 
     it "allows google docs collaborations" do
-      expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
-      plugin_setting = PluginSetting.new(:name => "google_drive", :settings => {})
+      expect(Collaboration.collaboration_class("GoogleDocs")).to eql(nil)
+      plugin_setting = PluginSetting.new(name: "google_drive", settings: {})
       plugin_setting.save!
-      expect(Collaboration.collaboration_class('GoogleDocs')).to eql(GoogleDocsCollaboration)
+      expect(Collaboration.collaboration_class("GoogleDocs")).to eql(GoogleDocsCollaboration)
       plugin_setting.disabled = true
       plugin_setting.save!
-      expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
+      expect(Collaboration.collaboration_class("GoogleDocs")).to eql(nil)
     end
 
     it "allows etherpad collaborations" do
-      expect(Collaboration.collaboration_class('Etherpad')).to eql(nil)
-      plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
+      expect(Collaboration.collaboration_class("Etherpad")).to eql(nil)
+      plugin_setting = PluginSetting.new(name: "etherpad", settings: {})
       plugin_setting.save!
-      expect(Collaboration.collaboration_class('Etherpad')).to eql(EtherpadCollaboration)
+      expect(Collaboration.collaboration_class("Etherpad")).to eql(EtherpadCollaboration)
       plugin_setting.disabled = true
       plugin_setting.save!
-      expect(Collaboration.collaboration_class('Etherpad')).to eql(nil)
+      expect(Collaboration.collaboration_class("Etherpad")).to eql(nil)
     end
 
     it "does not allow invalid collaborations" do
-      expect(Collaboration.collaboration_class('Bacon')).to eql(nil)
+      expect(Collaboration.collaboration_class("Bacon")).to eql(nil)
     end
   end
 
@@ -79,26 +79,26 @@ describe Collaboration do
 
     it "is able to parse the data stored as JSON" do
       ae = @collaboration.parse_data
-      expect(ae['title']).to eql('Biology 100 Collaboration')
+      expect(ae["title"]).to eql("Biology 100 Collaboration")
     end
 
     it "has Google Docs as a default service name" do
-      expect(@collaboration.service_name).to eql('Google Docs')
+      expect(@collaboration.service_name).to eql("Google Docs")
     end
   end
 
   context "a collaboration with collaborators" do
     before :once do
-      PluginSetting.create!(:name => "etherpad", :settings => {})
-      @other_user = user_with_pseudonym(:active_all => true)
-      @users = (1..4).map { user_with_pseudonym(:active_all => true) }
-      course_factory(:active_all => true)
+      PluginSetting.create!(name: "etherpad", settings: {})
+      @other_user = user_with_pseudonym(active_all: true)
+      @users = (1..4).map { user_with_pseudonym(active_all: true) }
+      course_factory(active_all: true)
       @users.each { |u| @course.enroll_student(u) }
-      @groups = [group_model(:context => @course)]
-      @groups.first.add_user(@users.last, 'active')
-      @collaboration = @course.collaborations.new(:title => 'Test collaboration',
-                                                  :user => @users.first)
-      @collaboration.type = 'EtherpadCollaboration'
+      @groups = [group_model(context: @course)]
+      @groups.first.add_user(@users.last, "active")
+      @collaboration = @course.collaborations.new(title: "Test collaboration",
+                                                  user: @users.first)
+      @collaboration.type = "EtherpadCollaboration"
       @collaboration.save!
     end
 
@@ -109,7 +109,7 @@ describe Collaboration do
     end
 
     it "updates existing collaborators" do
-      @collaboration.update_members(@users[0..-1], @groups.map(&:id))
+      @collaboration.update_members(@users[0..], @groups.map(&:id))
       @collaboration.update_members(@users[0..-2])
       @collaboration.reload
       expect(@collaboration.collaborators.map(&:user_id).uniq.count).to eq 3
@@ -122,7 +122,7 @@ describe Collaboration do
       @collaboration.update_members([@users[0]], @groups)
       @collaboration.reload
 
-      expect(@collaboration.collaborators.map(&:group_id).compact).to eq @groups.map(&:id)
+      expect(@collaboration.collaborators.filter_map(&:group_id)).to eq @groups.map(&:id)
     end
 
     it "doesn't add users outside the course" do
@@ -132,7 +132,7 @@ describe Collaboration do
     end
 
     it "doesn't add groups outside the course" do
-      other_group = @course.account.groups.create! :name => 'eh'
+      other_group = @course.account.groups.create! name: "eh"
       @collaboration.update_members([], [other_group])
       @collaboration.reload
       expect(@collaboration.collaborators.pluck(:group_id)).not_to include other_group.id
@@ -140,7 +140,7 @@ describe Collaboration do
 
     it "allows course admins (and group members) to be added to a group collaboration" do
       @users.each { |u| u.student_enrollments.first.accept! }
-      gc = @groups.first.collaborations.create! :title => 'derp', :user => @teacher
+      gc = @groups.first.collaborations.create! title: "derp", user: @teacher
       gc.update_members([@teacher, @users.first, @users.last])
       users = gc.reload.collaborators.pluck(:user_id)
       expect(users).to match_array([@teacher.id, @users.last.id])

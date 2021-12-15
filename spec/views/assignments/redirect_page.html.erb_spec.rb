@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/assignments/redirect_page" do
   it "renders" do
     course_with_student
     view_context(@course, @user)
-    a = @course.assignments.create(:title => "some assignment")
+    a = @course.assignments.create(title: "some assignment")
     s = a.submit_homework(@user)
     assign(:assignment, a)
     assign(:submission, s)
-    render 'assignments/redirect_page'
+    render "assignments/redirect_page"
     expect(response).not_to be_nil
   end
 end

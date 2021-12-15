@@ -52,9 +52,9 @@ module Types
 
     implements Interfaces::AssignmentsConnectionInterface
     def assignments_connection(filter: {})
-      load_association(:context).then { |course|
+      load_association(:context).then do |course|
         super(course: course, filter: filter)
-      }
+      end
     end
 
     field :grades_connection, GradesType.connection_type, null: true do

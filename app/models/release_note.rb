@@ -56,15 +56,15 @@ class ReleaseNote
     @created_at = nil
     return if ddb_item.nil?
 
-    @id = ddb_item['Id']
-    @show_ats = ddb_item['ShowAts'].transform_values { |v| Time.parse(v).utc }
-    @target_roles = ddb_item['TargetRoles']
-    @published = ddb_item['Published']
-    @created_at = Time.parse(ddb_item['CreatedAt']).utc
+    @id = ddb_item["Id"]
+    @show_ats = ddb_item["ShowAts"].transform_values { |v| Time.parse(v).utc }
+    @target_roles = ddb_item["TargetRoles"]
+    @published = ddb_item["Published"]
+    @created_at = Time.parse(ddb_item["CreatedAt"]).utc
   end
 
   def attributes
-    { 'id' => nil, 'show_ats' => nil, 'target_roles' => nil, 'published' => nil, 'langs' => nil }
+    { "id" => nil, "show_ats" => nil, "target_roles" => nil, "published" => nil, "langs" => nil }
   end
 
   def target_roles
@@ -106,14 +106,14 @@ class ReleaseNote
         put_request: {
           item: {
             "PartitionKey" => id,
-            "RangeKey" => 'info'
+            "RangeKey" => "info"
           }.merge(common_attributes)
         }
       },
       {
         put_request: {
           item: {
-            "PartitionKey" => 'all_notes',
+            "PartitionKey" => "all_notes",
             "RangeKey" => "#{created_at.utc.iso8601}|#{id}"
           }.merge(common_attributes)
         }
@@ -172,14 +172,14 @@ class ReleaseNote
         delete_request: {
           key: {
             "PartitionKey" => id,
-            "RangeKey" => 'info'
+            "RangeKey" => "info"
           }
         }
       },
       {
         delete_request: {
           key: {
-            "PartitionKey" => 'all_notes',
+            "PartitionKey" => "all_notes",
             "RangeKey" => "#{created_at.utc.iso8601}|#{id}"
           }
         }
@@ -234,18 +234,18 @@ class ReleaseNote
 
     res = self.class.ddb_client.query(
       expression_attribute_values: {
-        ':id' => id,
-        ':sort' => "lang|",
+        ":id" => id,
+        ":sort" => "lang|",
       },
-      key_condition_expression: 'PartitionKey = :id AND begins_with(RangeKey, :sort)',
+      key_condition_expression: "PartitionKey = :id AND begins_with(RangeKey, :sort)",
       table_name: self.class.ddb_table_name
     )
     res.items.each do |translations|
-      lang = translations['RangeKey'].split('|')[1]
+      lang = translations["RangeKey"].split("|")[1]
       @langs[lang] ||= {
-        title: translations['Title'],
-        description: translations['Description'],
-        url: translations['Url']
+        title: translations["Title"],
+        description: translations["Description"],
+        url: translations["Url"]
       }
     end
 
@@ -255,19 +255,19 @@ class ReleaseNote
   def fetch_i18n(lang)
     res = self.class.ddb_client.query(
       expression_attribute_values: {
-        ':id' => id,
-        ':sort' => "lang|#{lang}",
+        ":id" => id,
+        ":sort" => "lang|#{lang}",
       },
-      key_condition_expression: 'PartitionKey = :id AND RangeKey = :sort',
+      key_condition_expression: "PartitionKey = :id AND RangeKey = :sort",
       table_name: self.class.ddb_table_name
     )
     return nil unless res.items.length.positive?
 
     translations = res.items.first
     {
-      title: translations['Title'],
-      description: translations['Description'],
-      url: translations['Url']
+      title: translations["Title"],
+      description: translations["Description"],
+      url: translations["Url"]
     }
   end
 
@@ -284,13 +284,13 @@ class ReleaseNote
   class << self
     def find(ids, include_langs: false)
       ids_arr = Array.wrap(ids)
-      return [] if ids_arr.length == 0
+      return [] if ids_arr.empty?
 
       res = ddb_client.batch_get_item(request_items: { ddb_table_name => {
                                         keys: ids_arr.map do |id|
                                           {
                                             PartitionKey: id,
-                                            RangeKey: 'info'
+                                            RangeKey: "info"
                                           }
                                         end
                                       } })
@@ -305,14 +305,14 @@ class ReleaseNote
       BookmarkedCollection.build(Bookmarker) do |pager|
         start = nil
         if pager.current_bookmark
-          start = { PartitionKey: 'all_notes', RangeKey: pager.current_bookmark }
+          start = { PartitionKey: "all_notes", RangeKey: pager.current_bookmark }
         end
 
         res = ddb_client.query(
           expression_attribute_values: {
-            ':id' => "all_notes"
+            ":id" => "all_notes"
           },
-          key_condition_expression: 'PartitionKey = :id',
+          key_condition_expression: "PartitionKey = :id",
           table_name: ddb_table_name,
           limit: pager.per_page,
           scan_index_forward: false,
@@ -328,10 +328,10 @@ class ReleaseNote
     def latest(env:, role:, limit: 10)
       res = ddb_client.query(
         expression_attribute_values: {
-          ':id' => "#{env}_release|#{role}",
-          ':sort' => Time.now.utc.iso8601,
+          ":id" => "#{env}_release|#{role}",
+          ":sort" => Time.now.utc.iso8601,
         },
-        key_condition_expression: 'PartitionKey = :id AND RangeKey <= :sort',
+        key_condition_expression: "PartitionKey = :id AND RangeKey <= :sort",
         table_name: ddb_table_name,
         limit: limit,
         scan_index_forward: false
@@ -351,20 +351,20 @@ class ReleaseNote
     end
 
     def settings
-      YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['release_notes.yml'] || '{}')
+      YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["release_notes.yml"] || "{}")
     end
 
     def ddb_table_name
-      settings['ddb_table_name']
+      settings["ddb_table_name"]
     end
 
     def ddb_client
       @ddb_client ||= begin
         config = {
-          region: settings['ddb_region'] || 'us-east-1'
+          region: settings["ddb_region"] || "us-east-1"
         }
-        config[:endpoint] = settings['ddb_endpoint'] if settings['ddb_endpoint']
-        config[:credentials] = Canvas::AwsCredentialProvider.new('release_notes_creds', settings['vault_credential_path'])
+        config[:endpoint] = settings["ddb_endpoint"] if settings["ddb_endpoint"]
+        config[:credentials] = Canvas::AwsCredentialProvider.new("release_notes_creds", settings["vault_credential_path"])
         aws_client = Aws::DynamoDB::Client.new(config)
         CanvasDynamoDB::Database.new("release_notes:#{Rails.env}", client_opts: { client: aws_client }, logger: Rails.logger)
       end

@@ -110,7 +110,7 @@ describe Mutations::HideAssignmentGradesForSections do
       assignment.update!(anonymous_grading: true)
       assignment.post_submissions
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result.dig("errors")).to be nil
+      expect(result["errors"]).to be nil
     end
 
     it "does not allow hiding by section for moderated assignments that have not had grades published yet" do
@@ -124,7 +124,7 @@ describe Mutations::HideAssignmentGradesForSections do
       now = Time.zone.now
       assignment.update!(moderated_grading: true, grader_count: 2, final_grader: teacher, grades_published_at: now)
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result.dig("errors")).to be nil
+      expect(result["errors"]).to be nil
     end
 
     describe "hiding the grades" do

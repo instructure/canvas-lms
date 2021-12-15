@@ -54,11 +54,11 @@ class PseudonymSession < Authlogic::Session::Base
 
     token = SessionPersistenceToken.generate(record)
     controller.cookies[cookie_key] = {
-      :value => token.pseudonym_credentials,
-      :expires => remember_me_until,
-      :domain => controller.cookie_domain,
-      :httponly => httponly,
-      :secure => secure,
+      value: token.pseudonym_credentials,
+      expires: remember_me_until,
+      domain: controller.cookie_domain,
+      httponly: httponly,
+      secure: secure,
     }
   end
 
@@ -67,13 +67,13 @@ class PseudonymSession < Authlogic::Session::Base
     if cookie
       token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)
       self.unauthorized_record = token.use! if token
-      is_valid = self.valid?
+      is_valid = valid?
       if is_valid
         # this token has been used -- destroy it, and generate a new one
         # remember_me is implicitly true when they login via the remember_me token
         controller.session[:used_remember_me_token] = true
         self.remember_me = true
-        self.save!
+        save!
       end
       is_valid
     else
@@ -83,7 +83,7 @@ class PseudonymSession < Authlogic::Session::Base
 
   # added behavior: destroy the server-side SessionPersistenceToken as well as the browser cookie
   def destroy_cookie
-    cookie = controller.cookies.delete cookie_key, :domain => controller.cookie_domain
+    cookie = controller.cookies.delete cookie_key, domain: controller.cookie_domain
     return true unless cookie
 
     token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)
@@ -105,8 +105,8 @@ class PseudonymSession < Authlogic::Session::Base
     # have to call super first, as that's what loads attempted_record
     if too_many_attempts? || attempted_record.try(:audit_login, remote_ip, !invalid_password?) == :too_many_attempts
       self.too_many_attempts = true
-      errors.add(password_field, I18n.t('errors.max_attempts', 'Too many failed login attempts. Please try again later or contact your system administrator.'))
-      return
+      errors.add(password_field, I18n.t("errors.max_attempts", "Too many failed login attempts. Please try again later or contact your system administrator."))
+      nil
     end
   end
 
@@ -119,8 +119,8 @@ class PseudonymSession < Authlogic::Session::Base
   # to know why your user that was previously logged in is now not
   # logged in.
   def self.find_with_validation
-    self.with_scope(find_options: Pseudonym.eager_load(:user)) do
-      sess = self.new({ priority_record: nil }, nil)
+    with_scope(find_options: Pseudonym.eager_load(:user)) do
+      sess = new({ priority_record: nil }, nil)
       if sess.nil?
         Rails.logger.info "[AUTH] Failed to create pseudonym session"
         return false
@@ -153,22 +153,20 @@ class PseudonymSession < Authlogic::Session::Base
   # when we have last_request_at tweaks piling up
   def save_record(alternate_record = nil)
     r = alternate_record || record
-    if r != priority_record
-      if r&.has_changes_to_save? && !r.readonly?
-        changed_columns = r.changes_to_save.keys
-        if changed_columns == ["last_request_at"]
-          # we're ONLY updating the last_request_at field.  This
-          # can create a problem when we're trying to do many of these at
-          # once, they pile up waiting on locks and each successful one writes
-          # a new version of the row which is I/O intensive since this happens
-          # a lot.  We want to use the SAME threshold we use for telling authlogic
-          # to not bother incrementing the value to make sure we don't update
-          # here if another process has already done so while we were waiting on the lock
-          time_clause = Pseudonym.arel_table[:last_request_at].lt(LAST_REQUEST_WINDOW.ago)
-          Pseudonym.where(id: r).where(time_clause).update_all(last_request_at: r.last_request_at)
-        else
-          r.save_without_transaction
-        end
+    if r != priority_record && r&.has_changes_to_save? && !r.readonly?
+      changed_columns = r.changes_to_save.keys
+      if changed_columns == ["last_request_at"]
+        # we're ONLY updating the last_request_at field.  This
+        # can create a problem when we're trying to do many of these at
+        # once, they pile up waiting on locks and each successful one writes
+        # a new version of the row which is I/O intensive since this happens
+        # a lot.  We want to use the SAME threshold we use for telling authlogic
+        # to not bother incrementing the value to make sure we don't update
+        # here if another process has already done so while we were waiting on the lock
+        time_clause = Pseudonym.arel_table[:last_request_at].lt(LAST_REQUEST_WINDOW.ago)
+        Pseudonym.where(id: r).where(time_clause).update_all(last_request_at: r.last_request_at)
+      else
+        r.save_without_transaction
       end
     end
   end

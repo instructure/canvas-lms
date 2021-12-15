@@ -26,7 +26,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
     let(:valid_session) { {} }
 
     before do
-      request.accept = 'application/json'
+      request.accept = "application/json"
       @root_user = root_account.users.create! do |user|
         user.accept_terms
         user.register!
@@ -43,31 +43,31 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
       it "fetches grading period sets" do
         get :index, params: { account_id: root_account.to_param }, session: valid_session
-        expect(json_parse.fetch('grading_period_sets').count).to be 10
+        expect(json_parse.fetch("grading_period_sets").count).to be 10
       end
 
       it "includes grading periods" do
         group = @groups.first
         period = Factories::GradingPeriodHelper.new.create_for_group(group)
         get :index, params: { account_id: root_account.to_param }, session: valid_session
-        set = json_parse.fetch('grading_period_sets').detect { |s| s['id'] == group.id.to_s }
-        periods = set.fetch('grading_periods')
+        set = json_parse.fetch("grading_period_sets").detect { |s| s["id"] == group.id.to_s }
+        periods = set.fetch("grading_periods")
         expect(periods.count).to be 1
-        expect(periods.first.fetch('id').to_s).to eql period.id.to_s
+        expect(periods.first.fetch("id").to_s).to eql period.id.to_s
       end
 
       it "paginates the grading period sets" do
         get :index, params: { account_id: root_account.to_param }, session: valid_session
-        expect(json_parse['meta']).to have_key('pagination')
+        expect(json_parse["meta"]).to have_key("pagination")
       end
 
       it "orders the grading period sets by id" do
         # the next two lines force an unordered query to be consistently out of
         # natural order, which ensures the assertion can predictably fail
         @groups.take(5).map(&:destroy)
-        @groups.take(5).each { |group| group.update!(workflow_state: 'active') }
+        @groups.take(5).each { |group| group.update!(workflow_state: "active") }
         get :index, params: { account_id: root_account.to_param }, session: valid_session
-        set_ids = json_parse.fetch('grading_period_sets').map { |set| set['id'] }
+        set_ids = json_parse.fetch("grading_period_sets").map { |set| set["id"] }
         expect(set_ids).to eql(@groups.sort_by(&:id).map { |group| group.id.to_s })
       end
     end
@@ -88,7 +88,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
         it "returns a json representation of a new set" do
           post_create
-          set_json = json_parse.fetch('grading_period_set')
+          set_json = json_parse.fetch("grading_period_set")
           expect(response.status).to eql Rack::Utils.status_code(:created)
           expect(set_json["title"]).to eql group_helper.valid_attributes[:title]
           expect(set_json["weighted"]).to be true
@@ -121,7 +121,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
     end
 
     describe "PATCH #update" do
-      let(:new_attributes) { { title: 'An updated title!', weighted: false } }
+      let(:new_attributes) { { title: "An updated title!", weighted: false } }
       let(:grading_period_set) { group_helper.create_for_account(root_account) }
 
       context "with valid params" do
@@ -146,7 +146,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
           expect(response.status).to eql Rack::Utils.status_code(:no_content)
         end
 
-        it 'recomputes grades when an enrollment term is removed from the set' do
+        it "recomputes grades when an enrollment term is removed from the set" do
           term = root_account.enrollment_terms.create!
           course = root_account.courses.create!(enrollment_term: term)
           grading_period_set.enrollment_terms << term
@@ -194,12 +194,12 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
     describe "DELETE #destroy" do
       it "destroys the requested grading period set" do
         grading_period_set = group_helper.create_for_account(root_account)
-        expect(grading_period_set.reload.workflow_state).to eq 'active'
+        expect(grading_period_set.reload.workflow_state).to eq "active"
         delete :destroy, params: {
           account_id: Account.default,
           id: grading_period_set.to_param
         }, session: valid_session
-        expect(grading_period_set.reload.workflow_state).to eq 'deleted'
+        expect(grading_period_set.reload.workflow_state).to eq "deleted"
       end
     end
 
@@ -212,7 +212,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
           get :index, params: { account_id: sub_account.to_param }, session: valid_session
 
-          expect(json_parse.fetch('grading_period_sets').count).to eql 1
+          expect(json_parse.fetch("grading_period_sets").count).to eql 1
         end
       end
     end

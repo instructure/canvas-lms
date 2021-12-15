@@ -34,7 +34,7 @@ module BroadcastPolicies
     def should_dispatch_submission_grade_changed?
       quiz_is_accepting_messages_for_student? &&
         quiz_submission.submission.try(:graded_at) &&
-        quiz_submission.changed_in_state(:complete, :fields => [:score]) &&
+        quiz_submission.changed_in_state(:complete, fields: [:score]) &&
         user_is_actively_enrolled? &&
         user_has_visibility?
     end
@@ -68,7 +68,7 @@ module BroadcastPolicies
     end
 
     def manually_graded
-      quiz_submission.changed_in_state(:pending_review, :fields => [:fudge_points])
+      quiz_submission.changed_in_state(:pending_review, fields: [:fudge_points])
     end
 
     def user_has_visibility?

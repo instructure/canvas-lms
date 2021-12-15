@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'shellwords'
-require 'json'
-require 'jira_ref_parser'
-require 'yaml'
+require "shellwords"
+require "json"
+require "jira_ref_parser"
+require "yaml"
 
 GERGICH_GIT_PATH = ENV.fetch("GERGICH_GIT_PATH", ".")
 
@@ -16,7 +16,7 @@ end
 
 # rubocop:disable Style/GlobalVars yeah a global, I'm being lazy and refactoring to an object
 def comment(severity, line, message, link_to_guidelines: false)
-  if ENV['GERRIT_REFSPEC']
+  if ENV["GERRIT_REFSPEC"]
     if link_to_guidelines
       message += "\n\nHere are some guidelines to keep our git log pretty and useful: http://chris.beams.io/posts/git-commit/"
     end
@@ -24,12 +24,12 @@ def comment(severity, line, message, link_to_guidelines: false)
     # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
     payload = { path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message }
     `gergich comment #{Shellwords.escape(payload.to_json)}`
-    $stderr.puts "line #{line}: [#{severity}]: #{message}"
+    warn "line #{line}: [#{severity}]: #{message}"
   elsif line
-    $stderr.puts $lines[line - 1]
-    $stderr.puts "  ^: [#{severity}]: #{message}"
+    warn $lines[line - 1]
+    warn "  ^: [#{severity}]: #{message}"
   else
-    $stderr.puts "[#{severity}]: #{message}"
+    warn "[#{severity}]: #{message}"
   end
 end
 
@@ -98,7 +98,7 @@ long_lines = lines.each_with_index.select do |line, _i|
   line.size > BODY_IDEAL_LINE_LENGTH
 end
 
-if long_lines.size > 0
+unless long_lines.empty?
   comment "warn", long_lines.first[1] + 3,
           "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
           (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),
@@ -109,7 +109,7 @@ starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
 commit_files = git("show --pretty=format:'' --name-only").split("\n")
-if ENV['GERRIT_REFSPEC']
+if ENV["GERRIT_REFSPEC"]
   puts "detected file changes"
   puts commit_files
 end
@@ -152,7 +152,7 @@ unless has_a_test_plan
   comment "warn", nil, "y u no add test plan? ლ(ಠ益ಠლ)"
 end
 
-skip_eslint_flag = commit_message.include? '[skip-eslint]'
+skip_eslint_flag = commit_message.include? "[skip-eslint]"
 if skip_eslint_flag
   comment "error", nil,
           "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../helpers/manage_groups_common'
+require_relative "../helpers/manage_groups_common"
 describe "manage groups" do
   include_context "in-process server selenium tests"
   include ManageGroupsCommon
@@ -33,27 +33,27 @@ describe "manage groups" do
         groups_student_enrollment 4
         get "/courses/#{@course.id}/groups"
 
-        f('#add-group-set').click
-        set_value f('#new_category_name'), "zomg"
-        f('[name=split_groups]').click
+        f("#add-group-set").click
+        set_value f("#new_category_name"), "zomg"
+        f("[name=split_groups]").click
         driver.execute_script("$('[name=create_group_count]:enabled').val(2)")
-        submit_form f('.group-category-create')
+        submit_form f(".group-category-create")
 
         wait_for_ajaximations
 
         # yay, added
-        expect(f('#group_categories_tabs .collectionViewItems').text).to include('Everyone')
-        expect(f('#group_categories_tabs .collectionViewItems').text).to include('zomg')
+        expect(f("#group_categories_tabs .collectionViewItems").text).to include("Everyone")
+        expect(f("#group_categories_tabs .collectionViewItems").text).to include("zomg")
 
         run_jobs
 
-        groups = ff('.collectionViewItems > .group')
+        groups = ff(".collectionViewItems > .group")
         expect(groups.size).to eq 2
       end
     end
 
     it "allows a teacher to create a group set, a group, and add a user" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       student_in_course
       student_in_course
 
@@ -62,12 +62,12 @@ describe "manage groups" do
 
       f("#add-group-set").click
       wait_for_animations
-      f("#new_category_name").send_keys('Group Set 1')
+      f("#new_category_name").send_keys("Group Set 1")
       f("form.group-category-create").submit
       wait_for_ajaximations
 
       # verify the group set tab is created
-      expect(fj("#group_categories_tabs li[role='tab']:nth-child(2)").text).to eq 'Group Set 1'
+      expect(fj("#group_categories_tabs li[role='tab']:nth-child(2)").text).to eq "Group Set 1"
       # verify has the two created but unassigned students
       expect(ff("div[data-view='unassignedUsers'] .group-user-name").length).to eq 2
 
@@ -148,7 +148,7 @@ describe "manage groups" do
     end
 
     it "supports student-organized groups" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       student_in_course
       student_in_course
 
@@ -158,11 +158,11 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
-      expect(f("#content")).not_to contain_css('.group-category-actions .al-trigger') # can't edit/delete etc.
+      expect(f("#content")).not_to contain_css(".group-category-actions .al-trigger") # can't edit/delete etc.
 
       # user never leaves "Everyone" list, only gets added to a group once
       2.times do
-        expect(f('.unassigned-users-heading').text).to eq "Everyone (2)"
+        expect(f(".unassigned-users-heading").text).to eq "Everyone (2)"
         ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
         wait_for_animations
         ff(".assign-to-group-menu .set-group").first.click
@@ -172,7 +172,7 @@ describe "manage groups" do
     end
 
     it "allows a teacher to reassign a student with an accessible modal dialog" do
-      skip('KNO-190')
+      skip("KNO-190")
       groups_student_enrollment 2
       group_categories = create_categories(@course, 1)
       groups = add_groups_in_category(group_categories[0], 2)
@@ -197,7 +197,7 @@ describe "manage groups" do
       fj(".edit-group-assignment:first").click
       f("div[aria-label='Move Student']") # wait for element
       f(".move-select .move-select__group option:last-child").click
-      expect(f('body')).to contain_jqcss(".move-select button[type='submit']:visible")
+      expect(f("body")).to contain_jqcss(".move-select button[type='submit']:visible")
       f(".move-select button[type='submit']").click
       # wait for tray to not exist
       keep_trying_until { element_exists?("div[aria-label='Move Student']") == false }
@@ -206,11 +206,11 @@ describe "manage groups" do
 
       # Move the user back
       f(".groups .group .group-user .group-user-actions").click
-      scroll_into_view('.edit-group-assignment:first')
+      scroll_into_view(".edit-group-assignment:first")
       fj(".edit-group-assignment:first").click
       f("div[aria-label='Move Student']") # wait for element
       ff(".move-select .move-select__group option").last.click
-      expect(f('body')).to contain_jqcss(".move-select button[type='submit']:visible")
+      expect(f("body")).to contain_jqcss(".move-select button[type='submit']:visible")
       f(".move-select button[type='submit']").click
       # wait for tray to not exist
       keep_trying_until { element_exists?("div[aria-label='Move Student']") == false }
@@ -251,19 +251,19 @@ describe "manage groups" do
   end
 
   it "lets students create groups and invite other users" do
-    course_with_student_logged_in(:active_all => true)
-    student_in_course(:course => @course, :active_all => true, :name => "other student")
+    course_with_student_logged_in(active_all: true)
+    student_in_course(course: @course, active_all: true, name: "other student")
     other_student = @student
 
     get "/courses/#{@course.id}/groups"
     f('button[data-test-id="add-group-button"]').click
     wait_for_ajaximations
-    f('#groupName').send_keys("group name")
-    click_option('#joinLevelSelect', 'invitation_only', :value)
-    ff('#add_group_form input[type=checkbox]').each(&:click)
+    f("#groupName").send_keys("group name")
+    click_option("#joinLevelSelect", "invitation_only", :value)
+    ff("#add_group_form input[type=checkbox]").each(&:click)
     wait_for_ajaximations
 
-    submit_form(f('#add_group_form'))
+    submit_form(f("#add_group_form"))
     wait_for_ajaximations
     new_group = @course.groups.first
     expect(new_group.name).to eq "group name"

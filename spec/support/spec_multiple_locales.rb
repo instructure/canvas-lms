@@ -31,7 +31,7 @@ module SpecMultipleLocales
       all_locales.each do |locale|
         example.metadata[:locale] = locale
         example.run
-        locale_message = 'Locale: ' + locale.to_s
+        locale_message = "Locale: " + locale.to_s
 
         if example.exception
           if example.exception.respond_to?(:all_exceptions) # multiple exceptions present

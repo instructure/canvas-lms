@@ -22,28 +22,28 @@ require_dependency "canvas/oauth/client_credentials_provider"
 module Canvas::OAuth
   describe ClientCredentialsProvider do
     let(:dev_key) { DeveloperKey.create! }
-    let(:provider) { described_class.new dev_key.id, 'example.com' }
+    let(:provider) { described_class.new dev_key.id, "example.com" }
 
-    before {
-      allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    }
+    before do
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({ host: "example.com" })
+    end
 
-    describe 'generate_token' do
+    describe "generate_token" do
       subject { provider.generate_token }
 
       it { is_expected.to be_a Hash }
 
-      it 'has the correct expected keys' do
-        %i(access_token token_type expires_in scope).each do |key|
+      it "has the correct expected keys" do
+        %i[access_token token_type expires_in scope].each do |key|
           expect(subject).to have_key key
         end
       end
 
-      context 'with iat in the future by a small amount' do
+      context "with iat in the future by a small amount" do
         let(:future_iat_time) { 5.seconds.from_now }
         let(:iat) { future_iat_time.to_i }
 
-        it 'returns an access token' do
+        it "returns an access token" do
           Timecop.freeze(future_iat_time - 5.seconds) do
             expect(subject).to be_a Hash
           end
@@ -67,7 +67,7 @@ module Canvas::OAuth
   end
 
   describe AsymmetricClientCredentialsProvider do
-    let(:provider) { described_class.new jws, 'example.com' }
+    let(:provider) { described_class.new jws, "example.com" }
     let(:alg) { :RS256 }
     let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
     let(:iat) { 1.minute.ago.to_i }
@@ -76,7 +76,7 @@ module Canvas::OAuth
     let(:signing_key) { JSON::JWK.new(rsa_key_pair.to_jwk) }
     let(:jwt) do
       {
-        iss: 'someiss',
+        iss: "someiss",
         sub: dev_key.id,
         aud: aud,
         iat: iat,
@@ -87,11 +87,11 @@ module Canvas::OAuth
     let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
     let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
 
-    before {
-      allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    }
+    before do
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({ host: "example.com" })
+    end
 
-    describe 'using public jwk url' do
+    describe "using public jwk url" do
       subject { provider.valid? }
 
       let(:url) { "https://get.public.jwk" }
@@ -104,29 +104,29 @@ module Canvas::OAuth
       end
       let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
 
-      context 'when there is no public jwk' do
+      context "when there is no public jwk" do
         before do
           dev_key.update!(public_jwk: nil, public_jwk_url: url)
         end
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq true
+          expect(subject).to eq true
         end
       end
 
-      context 'when there is a public jwk' do
+      context "when there is a public jwk" do
         before do
           dev_key.update!(public_jwk_url: url)
         end
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq true
+          expect(subject).to eq true
         end
       end
 
-      context 'when an empty object is returned' do
+      context "when an empty object is returned" do
         let(:public_jwk_url_response) { {} }
 
         before do
@@ -135,11 +135,11 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq false
+          expect(subject).to eq false
         end
       end
 
-      context 'when the url is not valid giving a 404' do
+      context "when the url is not valid giving a 404" do
         let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
 
         before do
@@ -148,13 +148,13 @@ module Canvas::OAuth
 
         let(:public_jwk_url_response) do
           {
-            success?: false, code: '404'
+            success?: false, code: "404"
           }
         end
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq false
+          expect(subject).to eq false
         end
       end
 
@@ -163,19 +163,19 @@ module Canvas::OAuth
       end
     end
 
-    describe 'generate_token' do
+    describe "generate_token" do
       subject { provider.generate_token }
 
       it { is_expected.to be_a Hash }
 
-      it 'has the correct expected keys' do
-        %i(access_token token_type expires_in scope).each do |key|
+      it "has the correct expected keys" do
+        %i[access_token token_type expires_in scope].each do |key|
           expect(subject).to have_key key
         end
       end
     end
 
-    describe '#error_message' do
+    describe "#error_message" do
       subject { provider.error_message }
 
       before do |ex|
@@ -186,45 +186,45 @@ module Canvas::OAuth
 
       it { is_expected.to be_empty }
 
-      context 'with unsupported algorithm' do
+      context "with unsupported algorithm" do
         let(:alg) { :HS256 }
-        let(:signing_key) { 'lowentropy' }
+        let(:signing_key) { "lowentropy" }
 
         it { is_expected.not_to be_empty }
       end
 
-      context 'with bad aud' do
-        let(:aud) { 'doesnotexist' }
+      context "with bad aud" do
+        let(:aud) { "doesnotexist" }
 
         it { is_expected.not_to be_empty }
       end
 
-      context 'with bad exp' do
+      context "with bad exp" do
         let(:exp) { 1.minute.ago.to_i }
 
         it { is_expected.not_to be_empty }
       end
 
-      context 'with bad iat' do
+      context "with bad iat" do
         let(:iat) { 1.minute.from_now.to_i }
 
         it { is_expected.not_to be_empty }
 
-        context 'with iat too far in future' do
+        context "with iat too far in future" do
           let(:iat) { 6.minutes.from_now.to_i }
 
           it { is_expected.not_to be_empty }
         end
       end
 
-      context 'with bad signing key' do
+      context "with bad signing key" do
         let(:signing_key) { JSON::JWK.new(CanvasSecurity::RSAKeyPair.new.to_jwk) }
 
         it { is_expected.not_to be_empty }
       end
 
-      context 'with missing assertion' do
-        (Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS + ['iss']).each do |assertion|
+      context "with missing assertion" do
+        (Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS + ["iss"]).each do |assertion|
           before do
             jwt.delete assertion.to_sym
             provider.valid?
@@ -237,44 +237,44 @@ module Canvas::OAuth
       end
     end
 
-    describe '#valid?' do
+    describe "#valid?" do
       subject { provider.valid? }
 
       it { is_expected.to be true }
 
-      context 'with unsupported algorithm' do
+      context "with unsupported algorithm" do
         let(:alg) { :HS256 }
-        let(:signing_key) { 'lowentropy' }
+        let(:signing_key) { "lowentropy" }
 
         it { is_expected.to be false }
       end
 
-      context 'with bad aud' do
-        let(:aud) { 'doesnotexist' }
+      context "with bad aud" do
+        let(:aud) { "doesnotexist" }
 
         it { is_expected.to be false }
       end
 
-      context 'with bad exp' do
+      context "with bad exp" do
         let(:exp) { 1.minute.ago.to_i }
 
         it { is_expected.to be false }
       end
 
-      context 'with bad iat' do
+      context "with bad iat" do
         let(:iat) { 1.minute.from_now.to_i }
 
         it { is_expected.to be false }
 
-        context 'with iat too far in future' do
+        context "with iat too far in future" do
           let(:iat) { 6.minutes.from_now.to_i }
 
           it { is_expected.to be false }
         end
       end
 
-      context 'jti check' do
-        it 'is true when when validated twice' do
+      context "jti check" do
+        it "is true when when validated twice" do
           enable_cache do
             subject
             expect(subject).to eq true
@@ -282,8 +282,8 @@ module Canvas::OAuth
         end
       end
 
-      context 'with missing assertion' do
-        (Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS + ['iss']).each do |assertion|
+      context "with missing assertion" do
+        (Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS + ["iss"]).each do |assertion|
           it "is invalid when #{assertion} missing" do
             jwt.delete assertion.to_sym
             expect(subject).to be false
@@ -295,46 +295,50 @@ module Canvas::OAuth
 
   describe SymmetricClientCredentialsProvider do
     let(:dev_key) { DeveloperKey.create! client_credentials_audience: "external" }
-    let(:provider) { described_class.new dev_key.id, 'example.com' }
+    let(:provider) { described_class.new dev_key.id, "example.com" }
 
-    before {
-      allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    }
+    before do
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({ host: "example.com" })
+    end
 
-    context 'with valid client_id' do
-      describe '#error_message' do
+    context "with valid client_id" do
+      describe "#error_message" do
         subject { provider.error_message }
+
         it { is_expected.to be_empty }
       end
 
-      describe '#valid?' do
+      describe "#valid?" do
         subject { provider.valid? }
+
         it { is_expected.to be true }
       end
 
-      describe 'generate_token' do
+      describe "generate_token" do
         subject { provider.generate_token }
 
         it { is_expected.to be_a Hash }
 
-        it 'has the correct expected keys' do
-          %i(access_token token_type expires_in scope).each do |key|
+        it "has the correct expected keys" do
+          %i[access_token token_type expires_in scope].each do |key|
             expect(subject).to have_key key
           end
         end
       end
     end
 
-    context 'with invalid client_id' do
-      let(:provider) { described_class.new 'invalid', 'example.com' }
+    context "with invalid client_id" do
+      let(:provider) { described_class.new "invalid", "example.com" }
 
-      describe '#error_message' do
+      describe "#error_message" do
         subject { provider.error_message }
+
         it { is_expected.to eq("Unknown client_id") }
       end
 
-      describe '#valid?' do
+      describe "#valid?" do
         subject { provider.valid? }
+
         it { is_expected.to be false }
       end
     end

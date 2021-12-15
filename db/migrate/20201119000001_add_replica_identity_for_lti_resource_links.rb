@@ -22,13 +22,13 @@ class AddReplicaIdentityForLtiResourceLinks < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Lti::ResourceLink', :root_account_id, 0
-    remove_index :lti_resource_links, name: 'index_lti_resource_links_on_root_account_id', if_exists: true
+    add_replica_identity "Lti::ResourceLink", :root_account_id, 0
+    remove_index :lti_resource_links, name: "index_lti_resource_links_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :lti_resource_links, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'Lti::ResourceLink'
+    remove_replica_identity "Lti::ResourceLink"
     change_column_null :lti_resource_links, :root_account_id, true
   end
 end

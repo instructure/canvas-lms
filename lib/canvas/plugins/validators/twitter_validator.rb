@@ -22,18 +22,16 @@ module Canvas::Plugins::Validators::TwitterValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
       {}
+    elsif settings.map(&:last).any?(&:blank?)
+      plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
+      false
     else
-      if settings.map(&:last).any?(&:blank?)
-        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+      res = Twitter::Connection.config_check(api_key: settings[:consumer_key], secret_key: settings[:consumer_secret])
+      if res
+        plugin_setting.errors.add(:base, res)
         false
       else
-        res = Twitter::Connection.config_check(api_key: settings[:consumer_key], secret_key: settings[:consumer_secret])
-        if res
-          plugin_setting.errors.add(:base, res)
-          false
-        else
-          settings.slice(:consumer_key, :consumer_secret).to_h.with_indifferent_access
-        end
+        settings.slice(:consumer_key, :consumer_secret).to_h.with_indifferent_access
       end
     end
   end

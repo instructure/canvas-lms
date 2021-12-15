@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 begin
-  require 'yard'
-  require 'yard-appendix'
-  require 'config/initializers/json'
+  require "yard"
+  require "yard-appendix"
+  require "config/initializers/json"
 
   DOC_DIR     = File.join(%w[public doc api])
-  API_DOC_DIR = File.expand_path(Rails.root + DOC_DIR)
+  API_DOC_DIR = Rails.root.join(DOC_DIR).expand_path
   DOC_OPTIONS = {
     # turning this on will show all the appendixes of all
     # controllers in the All Resources page
-    :all_resource_appendixes => false
+    all_resource_appendixes: false
   }.freeze
 
   namespace :doc do
@@ -40,7 +40,7 @@ begin
     end
 
     desc "generate API docs"
-    task 'api' do # rubocop:disable Rails/RakeEnvironment
+    task "api" do # rubocop:disable Rails/RakeEnvironment
       puts "API Documentation successfully generated in #{DOC_DIR}\n" \
            "See #{DOC_DIR}/index.html"
     end

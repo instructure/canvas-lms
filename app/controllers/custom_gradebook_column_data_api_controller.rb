@@ -63,7 +63,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
       data = Api.paginate(scope, self,
                           api_v1_course_custom_gradebook_column_data_url(@context, col))
 
-      render :json => data.map { |d|
+      render json: data.map { |d|
         custom_gradebook_column_datum_json(d, @current_user, session)
       }
     end
@@ -78,7 +78,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   #
   # @returns ColumnDatum
   def update
-    user = allowed_users.where(:id => params[:user_id]).first
+    user = allowed_users.where(id: params[:user_id]).first
     raise ActiveRecord::RecordNotFound unless user
 
     column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
@@ -129,7 +129,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   # @returns Progress
 
   def bulk_update
-    bulk_update_params = params.permit(column_data: [:user_id, :column_id, :content])
+    bulk_update_params = params.permit(column_data: %i[user_id column_id content])
     column_data_as_array = bulk_update_params.to_h[:column_data]
     raise ActionController::BadRequest if column_data_as_array.blank?
 
@@ -148,7 +148,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   end
 
   def allowed_users
-    @context.students_visible_to(@current_user, include: %i{inactive completed})
+    @context.students_visible_to(@current_user, include: %i[inactive completed])
   end
   private :allowed_users
 

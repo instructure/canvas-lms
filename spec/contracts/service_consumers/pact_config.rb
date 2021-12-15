@@ -22,30 +22,30 @@ module PactConfig
   # These constants ensure we use the correct strings and thus help avoid our
   # accidentally breaking the contract tests
   module Providers
-    CANVAS_LMS_API = 'Canvas LMS API'
-    CANVAS_API_VERSION = '1.0'
-    CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'
-    OUTCOMES = 'Outcomes'
+    CANVAS_LMS_API = "Canvas LMS API"
+    CANVAS_API_VERSION = "1.0"
+    CANVAS_LMS_LIVE_EVENTS = "Canvas LMS Live Events"
+    OUTCOMES = "Outcomes"
     ALL = Providers.constants.map { |c| Providers.const_get(c) }
   end
 
   # Add new API consumers to this module
   module Consumers
     # common consumer
-    CANVAS_API_VERSION = '1.0'
-    CANVAS_LMS_API = 'Canvas LMS API'
-    QUIZ_LTI = 'Quiz LTI'
-    SISTEMIC = 'Sistemic'
-    ANDROID = 'android'
-    CANVAS_IOS = 'canvas-ios'
+    CANVAS_API_VERSION = "1.0"
+    CANVAS_LMS_API = "Canvas LMS API"
+    QUIZ_LTI = "Quiz LTI"
+    SISTEMIC = "Sistemic"
+    ANDROID = "android"
+    CANVAS_IOS = "canvas-ios"
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }
   end
 
   # Add new Live Events consumers to this module
   module LiveEventConsumers
-    CATALOG = 'Catalog'
-    OUTCOMES = 'Outcomes'
-    QUIZ_LTI = 'Quiz LTI'
+    CATALOG = "Catalog"
+    OUTCOMES = "Outcomes"
+    QUIZ_LTI = "Quiz LTI"
   end
 
   class << self
@@ -65,28 +65,28 @@ module PactConfig
     end
 
     def broker_host
-      ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
+      ENV.fetch("PACT_BROKER_HOST", "pact-broker.docker")
     end
 
     def consumer_tag
-      ENV.fetch('PACT_BROKER_TAG', 'latest')
+      ENV.fetch("PACT_BROKER_TAG", "latest")
     end
 
     def consumer_version
-      sha = ENV['SHA']
+      sha = ENV["SHA"]
       sha.blank? ? Consumers::CANVAS_API_VERSION : "#{Consumers::CANVAS_API_VERSION}+#{sha}"
     end
 
     def broker_password
-      ENV.fetch('PACT_BROKER_PASSWORD', 'broker')
+      ENV.fetch("PACT_BROKER_PASSWORD", "broker")
     end
 
     def broker_username
-      ENV.fetch('PACT_BROKER_USERNAME', 'pact')
+      ENV.fetch("PACT_BROKER_USERNAME", "pact")
     end
 
     def protocol
-      ENV.fetch('PACT_BROKER_PROTOCOL', 'http')
+      ENV.fetch("PACT_BROKER_PROTOCOL", "http")
     end
   end
 end

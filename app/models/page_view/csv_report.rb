@@ -24,7 +24,7 @@ class PageView
 
     def initialize(user, viewer = nil, options = {})
       @user = user
-      @limit = Setting.get('page_views_csv_export_rows', '300').to_i
+      @limit = Setting.get("page_views_csv_export_rows", "300").to_i
       @options = {}
       @options[:viewer] = viewer if viewer
       @options.merge!(options)

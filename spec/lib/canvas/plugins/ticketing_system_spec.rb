@@ -22,7 +22,7 @@ require_dependency "canvas/plugins/ticketing_system"
 module Canvas::Plugins
   describe TicketingSystem do
     describe ".is_selected?" do
-      let(:fake_settings) { double(settings_for_plugin: { type: 'some_service' }) }
+      let(:fake_settings) { double(settings_for_plugin: { type: "some_service" }) }
 
       it "is true if the provided plugin id is the byots selection" do
         expect(TicketingSystem.is_selected?("some_service", fake_settings)).to be(true)
@@ -56,11 +56,11 @@ module Canvas::Plugins
       it "returns the settings from Canvas::Plugin for that plugin id" do
         plugin_id = "some_plugin"
         allow(Canvas::Plugin).to receive(:find).with(plugin_id).and_return(double(settings: { "a" => "b" }))
-        expect(TicketingSystem.get_settings(plugin_id)['a']).to eq('b')
+        expect(TicketingSystem.get_settings(plugin_id)["a"]).to eq("b")
       end
 
-      it 'returns an empty hash if nothing is registered' do
-        expect(TicketingSystem.get_settings('none')).to be_empty
+      it "returns an empty hash if nothing is registered" do
+        expect(TicketingSystem.get_settings("none")).to be_empty
       end
     end
   end

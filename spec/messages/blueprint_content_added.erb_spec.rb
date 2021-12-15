@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'blueprint_content_added' do
+describe "blueprint_content_added" do
   before :once do
-    @master = course_model(:reusable => true)
-    @minion = course_model(:reusable => true)
+    @master = course_model(reusable: true)
+    @minion = course_model(reusable: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
     sub = @template.add_child_course!(@minion)
-    mm = @template.master_migrations.create!(:imports_completed_at => 1.day.ago, :workflow_state => 'completed', :comment => 'ohai')
+    mm = @template.master_migrations.create!(imports_completed_at: 1.day.ago, workflow_state: "completed", comment: "ohai")
     @cm = @minion.content_migrations.build
     @cm.migration_type = "master_course_import"
     @cm.migration_settings[:master_migration_id] = mm.id
     @cm.child_subscription_id = sub.id
-    @cm.workflow_state = 'imported'
+    @cm.workflow_state = "imported"
     @cm.save!
   end
 

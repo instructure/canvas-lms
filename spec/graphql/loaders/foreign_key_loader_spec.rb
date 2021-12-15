@@ -23,12 +23,12 @@ describe Loaders::ForeignKeyLoader do
     course_with_student(active_all: true)
     GraphQL::Batch.batch do
       enrollments_loader = Loaders::ForeignKeyLoader.for(Enrollment, :course_id)
-      enrollments_loader.load(@course.id).then { |enrollments|
+      enrollments_loader.load(@course.id).then do |enrollments|
         expect(enrollments).to match_array [@teacher.enrollments.first, @student.enrollments.first]
-      }
-      enrollments_loader.load(-1).then { |enrollments|
+      end
+      enrollments_loader.load(-1).then do |enrollments|
         expect(enrollments).to be_nil
-      }
+      end
     end
   end
 
@@ -41,39 +41,39 @@ describe Loaders::ForeignKeyLoader do
       @shard_a_student = @student
       @shard_a_teacher = @teacher
 
-      @shard1.activate {
+      @shard1.activate do
         shard_b_account = Account.create! name: "shard b account"
         course_with_student(active_all: true, account: shard_b_account)
         @shard_b_course = @course
         @shard_b_student = @student
         @shard_b_teacher = @teacher
-      }
+      end
     end
 
     it "works across multiple shards" do
       GraphQL::Batch.batch do
         enrollments_loader = Loaders::ForeignKeyLoader.for(Enrollment, :course_id)
-        enrollments_loader.load(@shard_a_course.id).then { |enrollments|
+        enrollments_loader.load(@shard_a_course.id).then do |enrollments|
           expect(enrollments).to match_array [@shard_a_teacher.enrollments.first, @shard_a_student.enrollments.first]
-        }
-        enrollments_loader.load(@shard_a_course.global_id).then { |enrollments|
+        end
+        enrollments_loader.load(@shard_a_course.global_id).then do |enrollments|
           expect(enrollments).to match_array [@shard_a_teacher.enrollments.first, @shard_a_student.enrollments.first]
-        }
-        enrollments_loader.load(@shard_b_course.global_id).then { |enrollments|
+        end
+        enrollments_loader.load(@shard_b_course.global_id).then do |enrollments|
           expect(enrollments).to match_array [@shard_b_teacher.enrollments.first, @shard_b_student.enrollments.first]
-        }
+        end
       end
     end
 
     it "doesn't get cross-shard data when scoped" do
       GraphQL::Batch.batch do
         enrollments_loader = Loaders::ForeignKeyLoader.for(@shard_a_course.enrollments, :user_id)
-        enrollments_loader.load(@shard_a_student.id).then { |students|
+        enrollments_loader.load(@shard_a_student.id).then do |students|
           expect(students).to match_array [@shard_a_student.enrollments.first]
-        }
-        enrollments_loader.load(@shard_b_student.global_id).then { |students|
+        end
+        enrollments_loader.load(@shard_b_student.global_id).then do |students|
           expect(students).to be_nil
-        }
+        end
       end
     end
   end

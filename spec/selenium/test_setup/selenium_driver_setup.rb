@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "fileutils"
-require 'webdrivers/chromedriver'
+require "webdrivers/chromedriver"
 require_relative "common_helper_methods/custom_alert_actions"
-require_relative 'common_helper_methods/custom_screen_actions'
-require_relative 'patches/selenium/webdriver/remote/w3c/bridge'
+require_relative "common_helper_methods/custom_screen_actions"
+require_relative "patches/selenium/webdriver/remote/w3c/bridge"
 
 # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
 # that we don't launch two Firefox instances at the same time. Each
@@ -108,7 +108,7 @@ module SeleniumDriverSetup
         ].each(&:join)
       rescue Selenium::WebDriver::Error::WebDriverError
         driver.quit if saucelabs_test_run?
-      rescue StandardError
+      rescue
         puts "selenium startup failed: #{$ERROR_INFO}"
         puts "exiting :'("
         # if either one fails, it's before any specs run, so we can bail
@@ -123,12 +123,12 @@ module SeleniumDriverSetup
     end
 
     def shutdown
-      server.shutdown if server
+      server&.shutdown
       if driver
         driver.close
         driver.quit
       end
-    rescue StandardError
+    rescue
       nil
     end
 
@@ -174,7 +174,7 @@ module SeleniumDriverSetup
     end
 
     def webdriver_failure_proc
-      -> do
+      lambda do
         # ensure we quit frd, cuz it's not going to work (otherwise rspec
         # would keep retrying on subsequent groups/examples)
         RSpec.world.wants_to_quit = true
@@ -244,7 +244,7 @@ module SeleniumDriverSetup
     # see https://github.com/SeleniumHQ/selenium/issues/2435#issuecomment-245458210
     def with_vanilla_json
       orig_options = Oj.default_options
-      Oj.default_options = { :escape_mode => :json }
+      Oj.default_options = { escape_mode: :json }
       yield
     ensure
       Oj.default_options = orig_options
@@ -261,7 +261,7 @@ module SeleniumDriverSetup
     rescue error_class => e
       puts "Attempt #{tries += 1} got error: #{e}"
       if tries >= how_many
-        $stderr.puts "Giving up"
+        warn "Giving up"
         failure_proc ? failure_proc.call : raise
       else
         sleep delay
@@ -289,8 +289,8 @@ module SeleniumDriverSetup
       puts "Thread: provisioning remote #{browser} driver"
       driver = Selenium::WebDriver.for(
         :remote,
-        :url => selenium_url,
-        :desired_capabilities => desired_capabilities
+        url: selenium_url,
+        desired_capabilities: desired_capabilities
       )
 
       driver.file_detector = lambda do |args|
@@ -308,26 +308,26 @@ module SeleniumDriverSetup
         caps = Selenium::WebDriver::Remote::Capabilities.firefox
       when :chrome
         caps = Selenium::WebDriver::Remote::Capabilities.chrome
-        caps['goog:chromeOptions'] = {
+        caps["goog:chromeOptions"] = {
           args: %w[disable-dev-shm-usage no-sandbox start-maximized]
         }
-        caps['goog:loggingPrefs'] = {
-          browser: 'ALL'
+        caps["goog:loggingPrefs"] = {
+          browser: "ALL"
         }
         # put `auto_open_devtools: true` in your selenium.yml if you want to have
         # the chrome dev tools open by default by selenium
         if CONFIG[:auto_open_devtools]
-          caps['goog:chromeOptions'][:args].append('auto-open-devtools-for-tabs')
+          caps["goog:chromeOptions"][:args].append("auto-open-devtools-for-tabs")
         end
         # put `headless: true` and `window_size: "<x>,<y>"` in your selenium.yml
         # if you want to run against headless chrome
         if CONFIG[:headless]
-          caps['goog:chromeOptions'][:args].append('headless')
+          caps["goog:chromeOptions"][:args].append("headless")
         end
         if CONFIG[:window_size].present?
-          caps['goog:chromeOptions'][:args].append("window-size=#{CONFIG[:window_size]}")
+          caps["goog:chromeOptions"][:args].append("window-size=#{CONFIG[:window_size]}")
         end
-        caps['unexpectedAlertBehaviour'] = 'ignore'
+        caps["unexpectedAlertBehaviour"] = "ignore"
       when :edge
         # TODO: options for edge driver
       when :safari
@@ -396,25 +396,25 @@ module SeleniumDriverSetup
     end
 
     def set_up_host_and_port
-      server_ip = UDPSocket.open { |s| s.connect('8.8.8.8', 1) && s.addr.last }
+      server_ip = UDPSocket.open { |s| s.connect("8.8.8.8", 1) && s.addr.last }
       s = Socket.new(:INET, :STREAM)
       s.setsockopt(:SOCKET, :REUSEADDR, true)
       s.bind(Addrinfo.tcp(server_ip, 0))
 
       self.server_port = s.local_address.ip_port
       self.server_ip = s.local_address.ip_address
-      if CONFIG[:browser] == 'ie'
+      if CONFIG[:browser] == "ie"
         # makes default URL for selenium the external IP of the box for standalone sel servers
         self.server_ip = `curl http://instance-data/latest/meta-data/public-ipv4`
       end
 
       puts "found available port: #{app_host_and_port}"
     ensure
-      s.close() if s
+      s&.close()
     end
 
     def start_webserver
-      ENV['CANVAS_CDN_HOST'] = "canvas.instructure.com"
+      ENV["CANVAS_CDN_HOST"] = "canvas.instructure.com"
 
       with_retries(error_class: ServerStartupError) do
         set_up_host_and_port
@@ -429,7 +429,7 @@ module SeleniumDriverSetup
       end.to_app
     end
 
-    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
+    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}.freeze
     def asset_request?(url)
       url =~ ASSET_PATH
     end
@@ -471,7 +471,7 @@ module SeleniumDriverSetup
         asset_request = asset_request?(env["REQUEST_URI"])
         return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
 
-        req = "#{env['REQUEST_METHOD']} #{env['REQUEST_URI']}"
+        req = "#{env["REQUEST_METHOD"]} #{env["REQUEST_URI"]}"
         Rails.logger.info "STARTING REQUEST #{req}" unless asset_request
         result = app.call(env)
         Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" unless asset_request
@@ -512,7 +512,7 @@ end
 # get some extra verbose logging from firefox for when things go wrong
 Selenium::WebDriver::Firefox::Binary.class_eval do
   def execute(*extra_args)
-    args = [self.class.path, '-no-remote'] + extra_args
+    args = [self.class.path, "-no-remote"] + extra_args
     SeleniumDriverSetup.browser_process = @process = ChildProcess.build(*args)
     SeleniumDriverSetup.browser_log = @process.io.stdout = @process.io.stderr = Tempfile.new("firefox")
     $DEBUG = true

@@ -21,7 +21,7 @@ import I18n from 'i18n!app_shared_components'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
 import {Tag} from '@instructure/ui-tag'
-import {func, string, node, arrayOf, oneOf, oneOfType, bool} from 'prop-types'
+import {func, string, node, arrayOf, oneOfType, bool} from 'prop-types'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
@@ -54,7 +54,7 @@ function CanvasMultiSelect(props) {
     noOptionsLabel,
     disabled,
     customRenderBeforeInput,
-    matchStrategy,
+    customMatcher,
     ...otherProps
   } = props
 
@@ -157,8 +157,9 @@ function CanvasMultiSelect(props) {
 
   function onInputChange(e) {
     const {value} = e.target
-    const matcher = new RegExp(`${matchStrategy === 'stringStart' ? '^' : ''}${value.trim()}`, 'i')
-    const filtered = childProps.filter(x => x.label.match(matcher))
+    const defaultMatcher = (option, term) => option.label.match(new RegExp(`^${term}`, 'i'))
+    const matcher = customMatcher || defaultMatcher
+    const filtered = childProps.filter(child => matcher(child, value.trim()))
     let message =
       // if number of options has changed, announce the new total.
       filtered.length !== filteredOptionIds?.length
@@ -269,22 +270,22 @@ function CanvasMultiSelect(props) {
 
 CanvasMultiSelect.propTypes = {
   id: string,
+  customMatcher: func,
   customRenderBeforeInput: func,
   disabled: bool,
   label: oneOfType([node, func]).isRequired,
   onChange: func.isRequired,
   children: node.isRequired,
   selectedOptionIds: arrayOf(string).isRequired,
-  noOptionsLabel: string,
-  matchStrategy: oneOf(['stringStart', 'substring'])
+  noOptionsLabel: string
 }
 
 CanvasMultiSelect.defaultProps = {
+  customMatcher: null,
   customRenderBeforeInput: null,
   noOptionsLabel: '---',
   selectedOptionIds: [],
-  disabled: false,
-  matchStrategy: 'stringStart'
+  disabled: false
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption

@@ -18,43 +18,43 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../live_events_pact_helper'
+require_relative "../live_events_pact_helper"
 
-RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
-  describe 'quizzes_next_quiz_duplicated' do
+RSpec.describe "Canvas LMS Live Events", :pact_live_events do
+  describe "quizzes_next_quiz_duplicated" do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
-        event_name: 'quizzes_next_quiz_duplicated',
+        event_name: "quizzes_next_quiz_duplicated",
         event_subscriber: PactConfig::LiveEventConsumers::QUIZ_LTI
       )
     end
 
-    it 'keeps the contract' do
+    it "keeps the contract" do
       live_event.emit_with do
         # arrange
         params = {
-          :name => "Quizzes.Next",
-          :url => 'http://example.com/launch',
-          :domain => "example.com",
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :privacy_level => 'public',
-          :tool_id => 'Quizzes 2'
+          name: "Quizzes.Next",
+          url: "http://example.com/launch",
+          domain: "example.com",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          privacy_level: "public",
+          tool_id: "Quizzes 2"
         }
         Account.default.context_external_tools.create!(params)
         # Account.default.lti_context_id = 1
         # Account.default.save!
 
-        old_course = course_model(uuid: '100005')
-        old_course.root_account.settings[:provision] = { 'lti' => 'lti url' }
+        old_course = course_model(uuid: "100005")
+        old_course.root_account.settings[:provision] = { "lti" => "lti url" }
         old_course.root_account.save!
         old_course.enable_feature!(:quizzes_next)
         old_assignment = assignment_model(course: old_course)
         old_assignment.quiz_lti!
         old_assignment.save!
 
-        new_course = course_model(uuid: '100006')
-        new_course.root_account.settings[:provision] = { 'lti' => 'lti url' }
+        new_course = course_model(uuid: "100006")
+        new_course.root_account.settings[:provision] = { "lti" => "lti url" }
         new_course.root_account.save!
         new_course.enable_feature!(:quizzes_next)
         new_course.lti_context_id = 2

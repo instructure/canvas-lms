@@ -23,15 +23,15 @@ class ConversationBatchScrubber < MessageScrubber
   protected
 
   def filter_attribute
-    'updated_at'
+    "updated_at"
   end
 
   def klass
-    ConversationBatch.where(workflow_state: 'sent')
+    ConversationBatch.where(workflow_state: "sent")
   end
 
   def limit_setting
-    'conversation_batch_scrubber_limit'
+    "conversation_batch_scrubber_limit"
   end
 
   def limit_size

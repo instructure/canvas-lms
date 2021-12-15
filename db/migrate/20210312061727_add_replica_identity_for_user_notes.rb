@@ -22,13 +22,13 @@ class AddReplicaIdentityForUserNotes < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'UserNote', :root_account_id, 0
+    add_replica_identity "UserNote", :root_account_id, 0
     remove_index :user_notes, column: :root_account_id, if_exists: true
   end
 
   def down
     add_index :user_notes, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'UserNote'
+    remove_replica_identity "UserNote"
     change_column_null :user_notes, :root_account_id, true
   end
 end

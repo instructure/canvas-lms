@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth'
+require "oauth"
 
 module LtiOutbound
   class ToolLaunch
@@ -28,83 +28,84 @@ module LtiOutbound
                 :post_only
 
     def initialize(options)
-      @url = options[:url] || raise('URL required for generating LTI content')
-      @tool = options[:tool] || raise('Tool required for generating LTI content')
+      @url = options[:url] || raise("URL required for generating LTI content")
+      @tool = options[:tool] || raise("Tool required for generating LTI content")
       @user = options[:user] || LTIUser.new # || raise('User required for generating LTI content')
-      @account = options[:account] || raise('Account required for generating LTI content')
-      @context = options[:context] || raise('Context required for generating LTI content')
-      @link_code = options[:link_code] || raise('Link Code required for generating LTI content')
-      @return_url = options[:return_url] || raise('Return URL required for generating LTI content')
+      @account = options[:account] || raise("Account required for generating LTI content")
+      @context = options[:context] || raise("Context required for generating LTI content")
+      @link_code = options[:link_code] || raise("Link Code required for generating LTI content")
+      @return_url = options[:return_url] || raise("Return URL required for generating LTI content")
       @resource_type = options[:resource_type]
       @outgoing_email_address = options[:outgoing_email_address]
       @selected_html = options[:selected_html]
       @link_params = options[:link_params] || {}
-      @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
+      @consumer_instance = context.consumer_instance || raise("Consumer instance required for generating LTI content")
       @include_module_context = options[:include_module_context] || false
 
-      @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
+      @variable_expander = options[:variable_expander] || raise("VariableExpander is required for generating LTI content")
       @hash = {}
     end
 
     def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       @assignment = assignment
-      hash['lis_result_sourcedid'] = assignment.source_id if user.learner?
-      hash['lis_outcome_service_url'] = outcome_service_url
-      hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
-      hash['ext_outcome_data_values_accepted'] = assignment.return_types.join(',')
-      hash['ext_outcome_result_total_score_accepted'] = true
-      hash['ext_outcome_submission_submitted_at_accepted'] = true
-      hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
+      hash["lis_result_sourcedid"] = assignment.source_id if user.learner?
+      hash["lis_outcome_service_url"] = outcome_service_url
+      hash["ext_ims_lis_basic_outcome_url"] = legacy_outcome_service_url
+      hash["ext_outcome_data_values_accepted"] = assignment.return_types.join(",")
+      hash["ext_outcome_result_total_score_accepted"] = true
+      hash["ext_outcome_submission_submitted_at_accepted"] = true
+      hash["ext_outcomes_tool_placement_url"] = lti_turnitin_outcomes_placement_url
 
       add_assignment_substitutions!
     end
 
     def for_homework_submission!(assignment)
       @assignment = assignment
-      @resource_type = 'homework_submission'
+      @resource_type = "homework_submission"
 
-      hash['ext_content_return_types'] = assignment.return_types.join(',')
-      hash['ext_content_file_extensions'] = assignment.allowed_extensions.join(',') if assignment.allowed_extensions
+      hash["ext_content_return_types"] = assignment.return_types.join(",")
+      hash["ext_content_file_extensions"] = assignment.allowed_extensions.join(",") if assignment.allowed_extensions
 
       add_assignment_substitutions!
     end
 
     def generate(overrides = {})
-      hash['lti_message_type'] = 'basic-lti-launch-request'
-      hash['lti_version'] = 'LTI-1p0'
-      hash['resource_link_id'] = link_code
-      hash['resource_link_title'] = overrides['resource_link_title'] || tool.name
-      hash['user_id'] = user.opaque_identifier
-      hash['text'] = CGI::escape(selected_html) if selected_html
+      hash["lti_message_type"] = "basic-lti-launch-request"
+      hash["lti_version"] = "LTI-1p0"
+      hash["resource_link_id"] = link_code
+      hash["resource_link_title"] = overrides["resource_link_title"] || tool.name
+      hash["user_id"] = user.opaque_identifier
+      hash["text"] = CGI.escape(selected_html) if selected_html
 
-      hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
-      hash['ext_roles'] = '$Canvas.xuser.allRoles'
+      hash["roles"] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
+      hash["ext_roles"] = "$Canvas.xuser.allRoles"
 
-      hash['custom_canvas_enrollment_state'] = '$Canvas.enrollment.enrollmentState'
+      hash["custom_canvas_enrollment_state"] = "$Canvas.enrollment.enrollmentState"
 
       if tool.include_name?
-        hash['lis_person_name_given'] = user.first_name
-        hash['lis_person_name_family'] = user.last_name
-        hash['lis_person_name_full'] = user.name
+        hash["lis_person_name_given"] = user.first_name
+        hash["lis_person_name_family"] = user.last_name
+        hash["lis_person_name_full"] = user.name
       end
       if tool.include_email?
-        hash['lis_person_contact_email_primary'] = user.email
+        hash["lis_person_contact_email_primary"] = user.email
       end
       if tool.public?
-        hash['user_image'] = user.avatar_url
-        hash['custom_canvas_user_id'] = '$Canvas.user.id'
-        hash['lis_person_sourcedid'] = '$Person.sourcedId' if user.sis_source_id
-        hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
-        if context.is_a?(LTICourse)
-          hash['custom_canvas_course_id'] = '$Canvas.course.id'
-          hash['custom_canvas_workflow_state'] = '$Canvas.course.workflowState'
-          hash['lis_course_offering_sourcedid'] = '$CourseSection.sourcedId' if context.sis_source_id
-        elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
-          hash['custom_canvas_account_id'] = '$Canvas.account.id'
-          hash['custom_canvas_account_sis_id'] = '$Canvas.account.sisSourceId'
+        hash["user_image"] = user.avatar_url
+        hash["custom_canvas_user_id"] = "$Canvas.user.id"
+        hash["lis_person_sourcedid"] = "$Person.sourcedId" if user.sis_source_id
+        hash["custom_canvas_user_login_id"] = "$Canvas.user.loginId"
+        case context
+        when LTICourse
+          hash["custom_canvas_course_id"] = "$Canvas.course.id"
+          hash["custom_canvas_workflow_state"] = "$Canvas.course.workflowState"
+          hash["lis_course_offering_sourcedid"] = "$CourseSection.sourcedId" if context.sis_source_id
+        when LTIAccount, LTIUser
+          hash["custom_canvas_account_id"] = "$Canvas.account.id"
+          hash["custom_canvas_account_sis_id"] = "$Canvas.account.sisSourceId"
         end
-        hash['custom_canvas_api_domain'] = '$Canvas.api.domain'
-        hash['role_scope_mentor'] = user.current_observee_ids.join(',') if user.observer?
+        hash["custom_canvas_api_domain"] = "$Canvas.api.domain"
+        hash["role_scope_mentor"] = user.current_observee_ids.join(",") if user.observer?
       end
 
       # need to set the locale here (instead of waiting for the first call to
@@ -112,28 +113,28 @@ module LtiOutbound
       # for the launch_presentation_locale.
       I18n.set_locale_with_localizer
 
-      hash['context_id'] = context.opaque_identifier
-      hash['context_title'] = context.name
-      hash['context_label'] = context.course_code if context.respond_to?(:course_code)
-      hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
-      hash['launch_presentation_document_target'] = 'iframe'
+      hash["context_id"] = context.opaque_identifier
+      hash["context_title"] = context.name
+      hash["context_label"] = context.course_code if context.respond_to?(:course_code)
+      hash["launch_presentation_locale"] = I18n.locale || I18n.default_locale.to_s
+      hash["launch_presentation_document_target"] = "iframe"
       if resource_type
-        hash['launch_presentation_width'] = tool.selection_width(resource_type)
-        hash['launch_presentation_height'] = tool.selection_height(resource_type)
+        hash["launch_presentation_width"] = tool.selection_width(resource_type)
+        hash["launch_presentation_height"] = tool.selection_height(resource_type)
       end
-      hash['launch_presentation_return_url'] = return_url
-      hash['tool_consumer_instance_guid'] = consumer_instance.lti_guid
-      hash['tool_consumer_instance_name'] = consumer_instance.name
-      hash['tool_consumer_instance_contact_email'] = outgoing_email_address # TODO: find a better email address to use here
-      hash['tool_consumer_info_product_family_code'] = 'canvas'
-      hash['tool_consumer_info_version'] = 'cloud'
+      hash["launch_presentation_return_url"] = return_url
+      hash["tool_consumer_instance_guid"] = consumer_instance.lti_guid
+      hash["tool_consumer_instance_name"] = consumer_instance.name
+      hash["tool_consumer_instance_contact_email"] = outgoing_email_address # TODO: find a better email address to use here
+      hash["tool_consumer_info_product_family_code"] = "canvas"
+      hash["tool_consumer_info_version"] = "cloud"
       tool.set_custom_fields(hash, resource_type)
-      hash.merge!(tool.format_lti_params('custom', @link_params[:custom] || {}))
-      hash.merge!(tool.format_lti_params('ext', @link_params[:ext] || {}))
-      set_resource_type_keys()
-      hash['oauth_callback'] = 'about:blank'
+      hash.merge!(tool.format_lti_params("custom", @link_params[:custom] || {}))
+      hash.merge!(tool.format_lti_params("ext", @link_params[:ext] || {}))
+      set_resource_type_keys
+      hash["oauth_callback"] = "about:blank"
 
-      hash['ext_platform'] = overrides[:platform] if overrides.key?(:platform)
+      hash["ext_platform"] = overrides[:platform] if overrides.key?(:platform)
 
       @variable_expander.expand_variables!(hash)
       hash
@@ -143,36 +144,37 @@ module LtiOutbound
 
     def add_assignment_substitutions!
       if tool.public?
-        hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
+        hash["custom_canvas_assignment_id"] = "$Canvas.assignment.id"
         if @include_module_context
-          hash['custom_canvas_module_id'] = '$Canvas.module.id'
-          hash['custom_canvas_module_item_id'] = '$Canvas.moduleItem.id'
+          hash["custom_canvas_module_id"] = "$Canvas.module.id"
+          hash["custom_canvas_module_item_id"] = "$Canvas.moduleItem.id"
         end
       end
 
-      hash['custom_canvas_assignment_title'] = '$Canvas.assignment.title'
-      hash['custom_canvas_assignment_points_possible'] = '$Canvas.assignment.pointsPossible'
+      hash["custom_canvas_assignment_title"] = "$Canvas.assignment.title"
+      hash["custom_canvas_assignment_points_possible"] = "$Canvas.assignment.pointsPossible"
     end
 
     def set_resource_type_keys
-      if resource_type == 'editor_button'
-        hash['selection_directive'] = 'embed_content' # backwards compatibility
-        hash['ext_content_intended_use'] = 'embed'
-        hash['ext_content_return_types'] = 'oembed,lti_launch_url,url,image_url,iframe'
-        hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'resource_selection'
-        hash['selection_directive'] = 'select_link' # backwards compatibility
-        hash['ext_content_intended_use'] = 'navigation'
-        hash['ext_content_return_types'] = 'lti_launch_url'
-        hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'homework_submission'
-        hash['ext_content_intended_use'] = 'homework'
-        hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'migration_selection'
-        hash['ext_content_intended_use'] = 'content_package'
-        hash['ext_content_return_types'] = 'file'
-        hash['ext_content_file_extensions'] = 'zip,imscc'
-        hash['ext_content_return_url'] = return_url
+      case resource_type
+      when "editor_button"
+        hash["selection_directive"] = "embed_content" # backwards compatibility
+        hash["ext_content_intended_use"] = "embed"
+        hash["ext_content_return_types"] = "oembed,lti_launch_url,url,image_url,iframe"
+        hash["ext_content_return_url"] = return_url
+      when "resource_selection"
+        hash["selection_directive"] = "select_link" # backwards compatibility
+        hash["ext_content_intended_use"] = "navigation"
+        hash["ext_content_return_types"] = "lti_launch_url"
+        hash["ext_content_return_url"] = return_url
+      when "homework_submission"
+        hash["ext_content_intended_use"] = "homework"
+        hash["ext_content_return_url"] = return_url
+      when "migration_selection"
+        hash["ext_content_intended_use"] = "content_package"
+        hash["ext_content_return_types"] = "file"
+        hash["ext_content_file_extensions"] = "zip,imscc"
+        hash["ext_content_return_url"] = return_url
       end
     end
   end

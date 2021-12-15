@@ -22,13 +22,13 @@ class AddReplicaIdentityForOriginalityReports < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'OriginalityReport', :root_account_id, 0
-    remove_index :originality_reports, name: 'index_originality_reports_on_root_account_id', if_exists: true
+    add_replica_identity "OriginalityReport", :root_account_id, 0
+    remove_index :originality_reports, name: "index_originality_reports_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :originality_reports, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'OriginalityReport'
+    remove_replica_identity "OriginalityReport"
     change_column_null :originality_reports, :root_account_id, true
   end
 end

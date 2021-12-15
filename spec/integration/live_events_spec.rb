@@ -19,109 +19,109 @@
 #
 
 describe LiveEvents do
-  it 'triggers a live event on login' do
+  it "triggers a live event on login" do
     expect(Canvas::LiveEvents).to receive(:logged_in).once
-    user_with_pseudonym(:username => 'jtfrd@instructure.com', :active_user => true, :password => 'qwertyuiop')
-    post '/login/canvas', params: { :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' } }
+    user_with_pseudonym(username: "jtfrd@instructure.com", active_user: true, password: "qwertyuiop")
+    post "/login/canvas", params: { pseudonym_session: { unique_id: "jtfrd@instructure.com", password: "qwertyuiop" } }
     expect(response).to be_redirect
   end
 
-  context 'Courses' do
+  context "Courses" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
     end
 
-    context 'Discussion Topics' do
+    context "Discussion Topics" do
       let(:discussion_topic) { DiscussionTopic.create!(context: @course) }
 
-      it 'triggers a live event on topic created' do
+      it "triggers a live event on topic created" do
         expect(Canvas::LiveEvents).to receive(:discussion_topic_created).once
         discussion_topic
       end
 
-      it 'triggers a live event on topic updated' do
+      it "triggers a live event on topic updated" do
         expect(Canvas::LiveEvents).to receive(:discussion_topic_updated).once
-        discussion_topic.update!(title: 'New topic')
+        discussion_topic.update!(title: "New topic")
       end
     end
 
-    context 'Assignment Groups' do
-      let(:assignment_group) { AssignmentGroup.create!(name: 'test', context: @course) }
+    context "Assignment Groups" do
+      let(:assignment_group) { AssignmentGroup.create!(name: "test", context: @course) }
 
-      it 'triggers a live event on group created' do
+      it "triggers a live event on group created" do
         expect(Canvas::LiveEvents).to receive(:assignment_group_created).once
         assignment_group
       end
 
-      it 'triggers a live event on group updated' do
+      it "triggers a live event on group updated" do
         expect(Canvas::LiveEvents).to receive(:assignment_group_updated).once
-        assignment_group.update!(name: 'changed name')
+        assignment_group.update!(name: "changed name")
       end
     end
 
-    context 'Wiki Pages' do
+    context "Wiki Pages" do
       def create_page(attrs)
         page = @course.wiki_pages.create!(attrs)
         page.publish! if page.unpublished?
         page
       end
 
-      it 'triggers a live event on page creation' do
+      it "triggers a live event on page creation" do
         expect(Canvas::LiveEvents).to receive(:wiki_page_created).once
-        create_page :title => 'a-page', :body => 'body'
+        create_page title: "a-page", body: "body"
       end
 
-      it 'triggers a live event on page update' do
+      it "triggers a live event on page update" do
         expect(Canvas::LiveEvents).to receive(:wiki_page_updated).twice
-        page = create_page :title => 'a-page', :body => 'body'
+        page = create_page title: "a-page", body: "body"
 
         # Updating the page body should trigger a live event
-        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: { :wiki_page => { body: 'UPDATED' } }
-        expect(response.code).to eq '200'
+        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: { wiki_page: { body: "UPDATED" } }
+        expect(response.code).to eq "200"
 
         # Updating the page title should trigger a live event
-        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: { :wiki_page => { title: 'UPDATED' } }
-        expect(response.code).to eq '200'
+        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: { wiki_page: { title: "UPDATED" } }
+        expect(response.code).to eq "200"
       end
 
-      it 'triggers a live event on page delete' do
+      it "triggers a live event on page delete" do
         expect(Canvas::LiveEvents).to receive(:wiki_page_deleted).once
-        page = create_page :title => 'a-page', :body => 'body'
+        page = create_page title: "a-page", body: "body"
 
         # Updating the page body should trigger a live event
         delete "/api/v1/courses/#{@course.id}/pages/#{page.url}"
-        expect(response.code).to eq '200'
+        expect(response.code).to eq "200"
       end
     end
 
-    context 'Files' do
+    context "Files" do
       def course_file
-        data = fixture_file_upload('docs/doc.doc', 'application/msword', true)
-        factory_with_protected_attributes(@course.attachments, :uploaded_data => data)
+        data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+        factory_with_protected_attributes(@course.attachments, uploaded_data: data)
       end
 
-      it 'triggers a live event on files being added to the course' do
+      it "triggers a live event on files being added to the course" do
         expect(Canvas::LiveEvents).to receive(:attachment_created).once
         course_file
       end
 
-      it 'triggers a live event on file updates' do
+      it "triggers a live event on file updates" do
         expect(Canvas::LiveEvents).to receive(:attachment_updated).once
         file = course_file
-        put "/api/v1/files/#{file.id}", params: { :name => 'UPDATED' }
-        expect(response.code).to eq '200'
+        put "/api/v1/files/#{file.id}", params: { name: "UPDATED" }
+        expect(response.code).to eq "200"
       end
 
-      it 'triggers a live event on file deletes' do
+      it "triggers a live event on file deletes" do
         expect(Canvas::LiveEvents).to receive(:attachment_deleted).once
         file = course_file
         delete "/api/v1/files/#{file.id}"
-        expect(response.code).to eq '200'
+        expect(response.code).to eq "200"
       end
     end
   end
 
-  context 'Enrollments' do
+  context "Enrollments" do
     it "triggers a live event on limit_privileges_to_course_section!" do
       course_with_student
       expect(Canvas::LiveEvents).to receive(:enrollment_updated).once

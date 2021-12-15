@@ -22,11 +22,11 @@ module Types
   class PostPolicyType < ApplicationObjectType
     graphql_name "PostPolicy"
 
-    description <<~DOC
+    description <<~MD
       A PostPolicy sets the policy for whether a Submission's grades are posted
       automatically or manually. A PostPolicy can be set at the Course and/or
       Assignment level.
-    DOC
+    MD
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface

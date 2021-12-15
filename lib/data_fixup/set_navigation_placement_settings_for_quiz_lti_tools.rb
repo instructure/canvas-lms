@@ -20,7 +20,7 @@
 module DataFixup::SetNavigationPlacementSettingsForQuizLtiTools
   def self.run
     quiz_lti_tools = ContextExternalTool.quiz_lti
-                                        .where(context_type: 'Account').where.not(workflow_state: 'deleted')
+                                        .where(context_type: "Account").where.not(workflow_state: "deleted")
 
     quiz_lti_tools.find_each do |quiz_lti_tool|
       quiz_lti_tool.set_extension_setting(

@@ -20,7 +20,7 @@
 
 module Types
   class ConversationMessageType < ApplicationObjectType
-    graphql_name 'ConversationMessage'
+    graphql_name "ConversationMessage"
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false

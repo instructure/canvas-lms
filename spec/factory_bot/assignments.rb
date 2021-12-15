@@ -19,6 +19,6 @@
 #
 FactoryBot.define do
   factory :assignment do
-    context :factory => :course
+    context factory: :course
   end
 end

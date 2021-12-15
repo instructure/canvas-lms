@@ -21,6 +21,6 @@ class RunDeveloperKeyAccountBindingDataFixup < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def change
-    DataFixup::SetExistingBindingState.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
+    DataFixup::SetExistingBindingState.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run
   end
 end

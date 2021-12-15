@@ -24,7 +24,7 @@ module Lti::IMS
 
       def initialize(msg = nil, opts = {})
         super(msg)
-        @api_message = opts.fetch(:api_message, 'Failed LTI Advantage service invocation')
+        @api_message = opts.fetch(:api_message, "Failed LTI Advantage service invocation")
         @status_code = opts.fetch(:status_code, :internal_server_error)
         @opts = opts
       end
@@ -37,55 +37,55 @@ module Lti::IMS
     # Anything that could reasonably map to a 4xx response
     class AdvantageClientError < AdvantageServiceError
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Invalid LTI Advantage service invocation', status_code: :bad_request }.merge(opts))
+        super(msg, { api_message: "Invalid LTI Advantage service invocation", status_code: :bad_request }.merge(opts))
       end
     end
 
     class InvalidLaunchError < AdvantageClientError
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Invalid LTI launch attempt', status_code: :bad_request }.merge(opts))
+        super(msg, { api_message: "Invalid LTI launch attempt", status_code: :bad_request }.merge(opts))
       end
     end
 
     class AdvantageSecurityError < AdvantageClientError
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Service invocation refused', status_code: :unauthorized }.merge(opts))
+        super(msg, { api_message: "Service invocation refused", status_code: :unauthorized }.merge(opts))
       end
     end
 
     class InvalidAccessToken < AdvantageSecurityError
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Invalid access token' }.merge(opts))
+        super(msg, { api_message: "Invalid access token" }.merge(opts))
       end
     end
 
     class InvalidAccessTokenSignature < InvalidAccessToken
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Invalid access token signature' }.merge(opts))
+        super(msg, { api_message: "Invalid access token signature" }.merge(opts))
       end
     end
 
     class InvalidAccessTokenSignatureType < InvalidAccessToken
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Access token signature algorithm not allowed' }.merge(opts))
+        super(msg, { api_message: "Access token signature algorithm not allowed" }.merge(opts))
       end
     end
 
     class MalformedAccessToken < InvalidAccessToken
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Invalid access token format' }.merge(opts))
+        super(msg, { api_message: "Invalid access token format" }.merge(opts))
       end
     end
 
     class InvalidAccessTokenClaims < InvalidAccessToken
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Access token contains invalid claims' }.merge(opts))
+        super(msg, { api_message: "Access token contains invalid claims" }.merge(opts))
       end
     end
 
     class InvalidResourceLinkIdFilter < AdvantageClientError
       def initialize(msg = nil, opts = {})
-        super(msg, { api_message: 'Invalid \'rlid\' parameter' }.merge(opts))
+        super(msg, { api_message: "Invalid 'rlid' parameter" }.merge(opts))
       end
     end
   end

@@ -24,15 +24,15 @@ class AddContentLinkErrorNotifications < ActiveRecord::Migration[5.1]
     return unless Shard.current == Shard.default
 
     Canvas::MessageHelper.create_notification({
-                                                name: 'Content Link Error',
+                                                name: "Content Link Error",
                                                 delay_for: 120,
-                                                category: 'Content Link Error'
+                                                category: "Content Link Error"
                                               })
   end
 
   def down
     return unless Shard.current == Shard.default
 
-    Notification.where(name: 'Content Link Error').delete_all
+    Notification.where(name: "Content Link Error").delete_all
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream do
   before do
@@ -31,22 +31,22 @@ describe EventStream do
     EventStream.get_index_ids_lookup = nil
   end
 
-  describe '.current_shard' do
-    it 'returns the current shard' do
-      shard = double('shard')
+  describe ".current_shard" do
+    it "returns the current shard" do
+      shard = double("shard")
       EventStream.current_shard_lookup = -> { shard }
 
       expect(EventStream.current_shard).to eq shard
     end
 
-    it 'returns nil if lookup not set' do
+    it "returns nil if lookup not set" do
       expect(EventStream.current_shard).to eq nil
     end
   end
 
-  describe '.get_index_ids' do
+  describe ".get_index_ids" do
     let(:index) do
-      index = double('index')
+      index = double("index")
       allow(index).to receive(:id_column).and_return(:id)
       index
     end
@@ -57,15 +57,15 @@ describe EventStream do
       end
     end
 
-    it 'returns the index ids' do
-      EventStream.get_index_ids_lookup = lambda { |index, rows|
+    it "returns the index ids" do
+      EventStream.get_index_ids_lookup = lambda do |index, rows|
         rows.map { |row| row[index.id_column] + 1 }
-      }
+      end
 
       expect(EventStream.get_index_ids(index, index_rows)).to eq (2..11).to_a
     end
 
-    it 'returns id_column if lookup not set' do
+    it "returns id_column if lookup not set" do
       expect(EventStream.get_index_ids(index, index_rows)).to eq index_ids
     end
   end

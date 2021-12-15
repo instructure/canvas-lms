@@ -59,7 +59,7 @@ module DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall
   end
 
   def populate_nils_on_table(model, field_name, fill_with)
-    while model.where(field_name => nil).limit(10000).update_all(field_name => fill_with) > 0
+    while model.where(field_name => nil).limit(10_000).update_all(field_name => fill_with) > 0
     end
   end
 
@@ -68,7 +68,7 @@ module DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall
     # key to be a little safer.
     sa_id = Account.site_admin.id
     loop do
-      ids = DeveloperKey.where(root_account_id: nil, account_id: nil).limit(10000).pluck(:id)
+      ids = DeveloperKey.where(root_account_id: nil, account_id: nil).limit(10_000).pluck(:id)
       break if ids.empty?
 
       DeveloperKey.where(id: ids).update_all(root_account_id: sa_id)

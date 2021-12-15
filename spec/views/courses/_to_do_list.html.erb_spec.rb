@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "courses/_to_do_list.html.erb" do
   include AssignmentsHelper
@@ -46,7 +46,7 @@ describe "courses/_to_do_list.html.erb" do
 
         2.times do
           @course.enroll_student(user_factory).accept!
-          @assignment.submit_homework(@user, { :submission_type => 'online_text_entry', :body => 'blah' })
+          @assignment.submit_homework(@user, { submission_type: "online_text_entry", body: "blah" })
         end
 
         @user = @teacher

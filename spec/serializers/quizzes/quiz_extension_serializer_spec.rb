@@ -27,7 +27,7 @@ describe Quizzes::QuizExtensionSerializer do
 
   let(:user) { User.new }
   let(:session) { double }
-  let(:host_name) { 'example.com' }
+  let(:host_name) { "example.com" }
 
   let :controller do
     options = {

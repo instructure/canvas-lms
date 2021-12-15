@@ -54,6 +54,9 @@ services:
       <<: *BASE-ENV
       VIRTUAL_HOST: .canvas.docker
       HTTPS_METHOD: noredirect
+      # AR_QUERY_TRACE: 'true'
+      # AR_QUERY_TRACE_TYPE: 'all' # 'all', 'write', or 'read'
+      # AR_QUERY_TRACE_LINES: 10
 
   postgres:
     volumes:

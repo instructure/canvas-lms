@@ -52,7 +52,7 @@ module SIS
       def add_crosslist(xlist_course_id, section_id, status)
         raise ImportError, "No xlist_course_id given for a cross-listing" if xlist_course_id.blank?
         raise ImportError, "No section_id given for a cross-listing" if section_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless status =~ /\A(active|deleted)\z/i
+        raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless /\A(active|deleted)\z/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         section = @root_account.course_sections.where(sis_source_id: section_id).take
@@ -74,7 +74,7 @@ module SIS
             @course.restrict_enrollments_to_course_dates = section.course.restrict_enrollments_to_course_dates
             @course.sis_source_id = xlist_course_id
             @course.sis_batch_id = @batch.id
-            @course.workflow_state = 'claimed'
+            @course.workflow_state = "claimed"
             @course.template_course = section.course
             @course.save_without_broadcasting!
             @course_ids_to_update_associations.add @course.id
@@ -82,10 +82,11 @@ module SIS
         end
 
         unless section.stuck_sis_fields.include?(:course_id)
-          if status =~ /\Aactive\z/i
+          case status
+          when /\Aactive\z/i
 
             if @course.deleted?
-              @course.workflow_state = 'claimed'
+              @course.workflow_state = "claimed"
               @course.save_without_broadcasting!
               @course.update_enrolled_users
               @course_ids_to_update_associations.add @course.id
@@ -103,7 +104,7 @@ module SIS
               raise ImportError, "An active cross-listing failed: #{e}"
             end
 
-          elsif status =~ /\Adeleted\z/i
+          when /\Adeleted\z/i
             if @course && section.course_id != @course.id
               @success_count += 1
               return

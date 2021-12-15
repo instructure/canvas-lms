@@ -18,54 +18,54 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'report_spec_helper'
+require_relative "report_spec_helper"
 
-describe 'lti report' do
+describe "lti report" do
   include ReportSpecHelper
 
   before(:once) do
-    @type = 'lti_report_csv'
-    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @sub_account = Account.create(parent_account: @account, name: 'Sub Account')
-    @sub_account2 = Account.create(parent_account: @account, name: 'Sister Sub Account')
-    @course2 = Course.create(name: 'New Course', account: @sub_account2)
-    @course = Course.create(name: 'New Course', account: @sub_account)
+    @type = "lti_report_csv"
+    @account = Account.create(name: "New Account", default_time_zone: "UTC")
+    @sub_account = Account.create(parent_account: @account, name: "Sub Account")
+    @sub_account2 = Account.create(parent_account: @account, name: "Sister Sub Account")
+    @course2 = Course.create(name: "New Course", account: @sub_account2)
+    @course = Course.create(name: "New Course", account: @sub_account)
 
     @t1 = ContextExternalTool.new.tap do |t|
       t.context_id = @account.id
-      t.context_type = 'Account'
-      t.name = 'Account Tool'
-      t.consumer_key = 'key'
-      t.shared_secret = 'secret'
-      t.tool_id = 'Vimeo'
-      t.url = 'https://launch_url.test'
+      t.context_type = "Account"
+      t.name = "Account Tool"
+      t.consumer_key = "key"
+      t.shared_secret = "secret"
+      t.tool_id = "Vimeo"
+      t.url = "https://launch_url.test"
       t.save
     end
 
     @t2 = ContextExternalTool.new.tap do |t|
       t.context_id = @course.id
-      t.context_type = 'Course'
-      t.name = 'Course Tool'
-      t.consumer_key = 'key'
-      t.shared_secret = 'secret'
-      t.tool_id = 'Youtube'
-      t.url = 'https://launch_url.test'
+      t.context_type = "Course"
+      t.name = "Course Tool"
+      t.consumer_key = "key"
+      t.shared_secret = "secret"
+      t.tool_id = "Youtube"
+      t.url = "https://launch_url.test"
       t.save
     end
 
     @t3 = ContextExternalTool.new.tap do |t|
       t.context_id = @course2.id
-      t.context_type = 'Course'
-      t.name = 'Course Tool2'
-      t.consumer_key = 'key'
-      t.shared_secret = 'secret'
-      t.tool_id = 'Youtube'
-      t.url = 'https://launch_url.test'
+      t.context_type = "Course"
+      t.name = "Course Tool2"
+      t.consumer_key = "key"
+      t.shared_secret = "secret"
+      t.tool_id = "Youtube"
+      t.url = "https://launch_url.test"
       t.save
     end
   end
 
-  it 'runs on a root account' do
+  it "runs on a root account" do
     parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 3
     expect(parsed[0]).to eq([
@@ -82,7 +82,7 @@ describe 'lti report' do
                             ])
   end
 
-  it 'runs on a sub account' do
+  it "runs on a sub account" do
     parsed = read_report(@type, { order: 4, account: @sub_account })
     expect(parsed.length).to eq 1
     expect(parsed[0]).to eq([
@@ -99,20 +99,20 @@ describe 'lti report' do
                             ])
   end
 
-  it 'does not include tools from deleted courses' do
+  it "does not include tools from deleted courses" do
     @course.destroy
     parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 2
   end
 
-  it 'does not include tools from courses in deleted accounts' do
-    Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
+  it "does not include tools from courses in deleted accounts" do
+    Account.where(id: @sub_account2).update_all(workflow_state: "deleted")
     parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 2
   end
 
-  it 'includes tools from deleted courses for include deleted objects' do
-    Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
+  it "includes tools from deleted courses for include deleted objects" do
+    Account.where(id: @sub_account2).update_all(workflow_state: "deleted")
     @course.destroy
     parsed = read_report(@type, { params: { "include_deleted" => true }, order: 4 })
     expect(parsed.length).to eq 3

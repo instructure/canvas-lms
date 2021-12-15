@@ -58,48 +58,48 @@ describe Types::SubmissionType do
     end
   end
 
-  describe 'unread_comment_count' do
-    let(:valid_submission_comment_attributes) { { comment: 'some comment' } }
+  describe "unread_comment_count" do
+    let(:valid_submission_comment_attributes) { { comment: "some comment" } }
 
-    it 'returns 0 if the submission is read' do
+    it "returns 0 if the submission is read" do
       @submission.mark_read(@teacher)
-      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      submission_unread_count = submission_type.resolve("unreadCommentCount")
       expect(submission_unread_count).to eq 0
     end
 
-    it 'returns unread count if the submission is unread' do
+    it "returns unread count if the submission is unread" do
       @submission.mark_unread(@teacher)
       @submission.submission_comments.create!(valid_submission_comment_attributes)
       @submission.submission_comments.create!(valid_submission_comment_attributes)
       @submission.submission_comments.create!(valid_submission_comment_attributes)
-      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      submission_unread_count = submission_type.resolve("unreadCommentCount")
       expect(submission_unread_count).to eq 3
     end
 
-    it 'returns 0 if the submission is unread and all comments are read' do
+    it "returns 0 if the submission is unread and all comments are read" do
       comment = @submission.submission_comments.create!(valid_submission_comment_attributes)
       comment.mark_read!(@teacher)
       @submission.mark_unread(@teacher)
-      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      submission_unread_count = submission_type.resolve("unreadCommentCount")
       expect(submission_unread_count).to eq 0
     end
 
-    it 'treats submission comments for attempt nil, 0, and 1 as the same' do
-      @submission.submission_comments.create!(comment: 'foo', attempt: nil)
-      @submission.submission_comments.create!(comment: 'foo', attempt: 0)
-      @submission.submission_comments.create!(comment: 'foo', attempt: 1)
-      submission_unread_count = submission_type.resolve('unreadCommentCount')
+    it "treats submission comments for attempt nil, 0, and 1 as the same" do
+      @submission.submission_comments.create!(comment: "foo", attempt: nil)
+      @submission.submission_comments.create!(comment: "foo", attempt: 0)
+      @submission.submission_comments.create!(comment: "foo", attempt: 1)
+      submission_unread_count = submission_type.resolve("unreadCommentCount")
       expect(submission_unread_count).to eq 3
     end
 
-    it 'only displays unread count for the given submission attempt' do
+    it "only displays unread count for the given submission attempt" do
       @submission.attempt = 2
       @submission.save!
-      @submission.submission_comments.create!(comment: 'foo', attempt: nil)
-      @submission.submission_comments.create!(comment: 'foo', attempt: 0)
-      @submission.submission_comments.create!(comment: 'foo', attempt: 1)
-      @submission.submission_comments.create!(comment: 'foo', attempt: 2)
-      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      @submission.submission_comments.create!(comment: "foo", attempt: nil)
+      @submission.submission_comments.create!(comment: "foo", attempt: 0)
+      @submission.submission_comments.create!(comment: "foo", attempt: 1)
+      @submission.submission_comments.create!(comment: "foo", attempt: 2)
+      submission_unread_count = submission_type.resolve("unreadCommentCount")
       expect(submission_unread_count).to eq 1
     end
   end
@@ -213,47 +213,47 @@ describe Types::SubmissionType do
     end
   end
 
-  describe '#attempt' do
-    it 'shows the attempt' do
+  describe "#attempt" do
+    it "shows the attempt" do
       @submission.update_column(:attempt, 1) # bypass infer_values callback
-      expect(submission_type.resolve('attempt')).to eq 1
+      expect(submission_type.resolve("attempt")).to eq 1
     end
 
-    it 'translates nil in the database to 0 in graphql' do
+    it "translates nil in the database to 0 in graphql" do
       @submission.update_column(:attempt, nil) # bypass infer_values callback
-      expect(submission_type.resolve('attempt')).to eq 0
+      expect(submission_type.resolve("attempt")).to eq 0
     end
   end
 
-  describe 'submission comments' do
+  describe "submission comments" do
     before(:once) do
       student_in_course(active_all: true)
       @submission.update_column(:attempt, 2) # bypass infer_values callback
-      @comment1 = @submission.add_comment(author: @teacher, comment: 'test1', attempt: 1)
-      @comment2 = @submission.add_comment(author: @teacher, comment: 'test2', attempt: 2)
+      @comment1 = @submission.add_comment(author: @teacher, comment: "test1", attempt: 1)
+      @comment2 = @submission.add_comment(author: @teacher, comment: "test2", attempt: 2)
     end
 
-    it 'will only be shown for the current submission attempt by default' do
+    it "will only be shown for the current submission attempt by default" do
       expect(
-        submission_type.resolve('commentsConnection { nodes { _id }}')
+        submission_type.resolve("commentsConnection { nodes { _id }}")
       ).to eq [@comment2.id.to_s]
     end
 
-    it 'will show comments for a given attempt using the target_attempt argument' do
+    it "will show comments for a given attempt using the target_attempt argument" do
       expect(
-        submission_type.resolve('commentsConnection(filter: {forAttempt: 1}) { nodes { _id }}')
+        submission_type.resolve("commentsConnection(filter: {forAttempt: 1}) { nodes { _id }}")
       ).to eq [@comment1.id.to_s]
     end
 
-    it 'will show alll comments for all attempts if all_comments is true' do
+    it "will show alll comments for all attempts if all_comments is true" do
       expect(
-        submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { _id }}')
+        submission_type.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}")
       ).to eq [@comment1.id.to_s, @comment2.id.to_s]
     end
 
-    it 'will combine comments for attempt nil, 0, and 1' do
-      @comment0 = @submission.add_comment(author: @teacher, comment: 'test1', attempt: 0)
-      @commentNil = @submission.add_comment(author: @teacher, comment: 'test1', attempt: nil)
+    it "will combine comments for attempt nil, 0, and 1" do
+      @comment0 = @submission.add_comment(author: @teacher, comment: "test1", attempt: 0)
+      @commentNil = @submission.add_comment(author: @teacher, comment: "test1", attempt: nil)
 
       (0..1).each do |i|
         expect(
@@ -262,150 +262,150 @@ describe Types::SubmissionType do
       end
     end
 
-    it 'will only return published drafts' do
-      @submission.add_comment(author: @teacher, comment: 'test3', attempt: 2, draft_comment: true)
+    it "will only return published drafts" do
+      @submission.add_comment(author: @teacher, comment: "test3", attempt: 2, draft_comment: true)
       expect(
-        submission_type.resolve('commentsConnection { nodes { _id }}')
+        submission_type.resolve("commentsConnection { nodes { _id }}")
       ).to eq [@comment2.id.to_s]
     end
 
-    it 'requires permission' do
+    it "requires permission" do
       other_course_student = student_in_course(course: course_factory).user
       expect(
-        submission_type.resolve('commentsConnection { nodes { _id }}', current_user: other_course_student)
+        submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
       ).to be nil
     end
   end
 
-  describe 'submission_drafts' do
-    it 'returns the draft for attempt 0 when the submission attempt is nil' do
+  describe "submission_drafts" do
+    it "returns the draft for attempt 0 when the submission attempt is nil" do
       @submission.update_columns(attempt: nil) # bypass #infer_details for test
       SubmissionDraft.create!(submission: @submission, submission_attempt: 1)
       expect(
-        submission_type.resolve('submissionDraft { submissionAttempt }', current_user: @student)
+        submission_type.resolve("submissionDraft { submissionAttempt }", current_user: @student)
       ).to eq 1
     end
 
-    it 'returns nil for a non current submission history that has a draft' do
+    it "returns nil for a non current submission history that has a draft" do
       assignment = @course.assignments.create! name: "asdf", points_possible: 10
-      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
-      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @submission1 = assignment.submit_homework(@student, body: "Attempt 1", submitted_at: 2.hours.ago)
+      @submission2 = assignment.submit_homework(@student, body: "Attempt 2", submitted_at: 1.hour.ago)
       SubmissionDraft.create!(submission: @submission1, submission_attempt: @submission1.attempt + 1)
       SubmissionDraft.create!(submission: @submission2, submission_attempt: @submission2.attempt + 1)
       resolver = GraphQLTypeTester.new(@submission2, current_user: @student)
       expect(
         resolver.resolve(
-          'submissionHistoriesConnection { nodes { submissionDraft { submissionAttempt }}}'
+          "submissionHistoriesConnection { nodes { submissionDraft { submissionAttempt }}}"
         )
       ).to eq [nil, @submission2.attempt + 1]
     end
 
-    it 'returns nil for a submission draft not belonging to current user' do
+    it "returns nil for a submission draft not belonging to current user" do
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
       @submission.submission_drafts.create!(submission_attempt: 1)
       resolver = GraphQLTypeTester.new(@submission, current_user: observer)
       expect(
         resolver.resolve(
-          'submissionHistoriesConnection { nodes { submissionDraft { _id }}}'
+          "submissionHistoriesConnection { nodes { submissionDraft { _id }}}"
         )
       ).to eq [nil]
     end
   end
 
-  describe 'attachments' do
+  describe "attachments" do
     before(:once) do
       assignment = @course.assignments.create! name: "asdf", points_possible: 10
       @attachment1 = attachment_model
       @attachment2 = attachment_model
-      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission1 = assignment.submit_homework(@student, body: "Attempt 1", submitted_at: 2.hours.ago)
       @submission1.attachments = [@attachment1]
       @submission1.save!
-      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @submission2 = assignment.submit_homework(@student, body: "Attempt 2", submitted_at: 1.hour.ago)
       @submission2.attachments = [@attachment2]
       @submission2.save!
     end
 
     let(:submission_type) { GraphQLTypeTester.new(@submission2, current_user: @teacher) }
 
-    it 'works for a submission' do
-      expect(submission_type.resolve('attachments { _id }')).to eq [@attachment2.id.to_s]
+    it "works for a submission" do
+      expect(submission_type.resolve("attachments { _id }")).to eq [@attachment2.id.to_s]
     end
 
-    it 'works for a submission history' do
+    it "works for a submission history" do
       expect(
         submission_type.resolve(
-          'submissionHistoriesConnection(first: 1) { nodes { attachments { _id }}}'
+          "submissionHistoriesConnection(first: 1) { nodes { attachments { _id }}}"
         )
       ).to eq [[@attachment1.id.to_s]]
     end
   end
 
-  describe 'submission histories connection' do
+  describe "submission histories connection" do
     before(:once) do
       assignment = @course.assignments.create! name: "asdf2", points_possible: 10
-      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
-      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
-      @submission3 = assignment.submit_homework(@student, body: 'Attempt 3')
+      @submission1 = assignment.submit_homework(@student, body: "Attempt 1", submitted_at: 2.hours.ago)
+      @submission2 = assignment.submit_homework(@student, body: "Attempt 2", submitted_at: 1.hour.ago)
+      @submission3 = assignment.submit_homework(@student, body: "Attempt 3")
     end
 
     let(:submission_history_type) { GraphQLTypeTester.new(@submission3, current_user: @teacher) }
 
-    it 'returns the submission histories' do
+    it "returns the submission histories" do
       expect(
-        submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+        submission_history_type.resolve("submissionHistoriesConnection { nodes { attempt }}")
       ).to eq [1, 2, 3]
     end
 
-    it 'properly handles cursors for submission histories' do
+    it "properly handles cursors for submission histories" do
       expect(
-        submission_history_type.resolve('submissionHistoriesConnection { edges { cursor }}')
-      ).to eq ["MQ", "Mg", "Mw"]
+        submission_history_type.resolve("submissionHistoriesConnection { edges { cursor }}")
+      ).to eq %w[MQ Mg Mw]
     end
 
-    context 'filter' do
-      describe 'states' do
+    context "filter" do
+      describe "states" do
         before(:once) do
           # Cannot use .first here, because versionable changes .first to .last :knife:
           history_version = @submission3.versions[0]
           history = YAML.load(history_version.yaml)
-          history['workflow_state'] = 'unsubmitted'
+          history["workflow_state"] = "unsubmitted"
           history_version.update!(yaml: history.to_yaml)
         end
 
-        it 'does not filter by states by default' do
+        it "does not filter by states by default" do
           expect(
-            submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+            submission_history_type.resolve("submissionHistoriesConnection { nodes { attempt }}")
           ).to eq [1, 2, 3]
         end
 
-        it 'can be used to filter by workflow state' do
+        it "can be used to filter by workflow state" do
           expect(
             submission_history_type.resolve(
-              'submissionHistoriesConnection(filter: {states: [submitted]}) { nodes { attempt }}'
+              "submissionHistoriesConnection(filter: {states: [submitted]}) { nodes { attempt }}"
             )
           ).to eq [1, 2]
         end
       end
 
-      describe 'include_current_submission' do
-        it 'includes the current submission history by default' do
+      describe "include_current_submission" do
+        it "includes the current submission history by default" do
           expect(
-            submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+            submission_history_type.resolve("submissionHistoriesConnection { nodes { attempt }}")
           ).to eq [1, 2, 3]
         end
 
-        it 'includes the current submission history when true' do
+        it "includes the current submission history when true" do
           expect(
             submission_history_type.resolve(
-              'submissionHistoriesConnection(filter: {includeCurrentSubmission: true}) { nodes { attempt }}'
+              "submissionHistoriesConnection(filter: {includeCurrentSubmission: true}) { nodes { attempt }}"
             )
           ).to eq [1, 2, 3]
         end
 
-        it 'does not includes the current submission history when false' do
+        it "does not includes the current submission history when false" do
           expect(
             submission_history_type.resolve(
-              'submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) { nodes { attempt }}'
+              "submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) { nodes { attempt }}"
             )
           ).to eq [1, 2]
         end
@@ -413,114 +413,114 @@ describe Types::SubmissionType do
     end
   end
 
-  describe 'late' do
+  describe "late" do
     before(:once) do
       assignment = @course.assignments.create!(name: "late assignment", points_possible: 10, due_at: 2.hours.ago)
-      @submission1 = assignment.submit_homework(@student, body: 'late', submitted_at: 1.hour.ago)
+      @submission1 = assignment.submit_homework(@student, body: "late", submitted_at: 1.hour.ago)
     end
 
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
-    it 'returns late' do
+    it "returns late" do
       expect(submission_type.resolve("late")).to eq true
     end
   end
 
-  describe 'missing' do
+  describe "missing" do
     before(:once) do
       assignment = @course.assignments.create!(
         name: "missing assignment",
         points_possible: 10,
         due_at: 1.hour.ago,
-        submission_types: ['online_text_entry']
+        submission_types: ["online_text_entry"]
       )
       @submission1 = Submission.where(assignment_id: assignment.id, user_id: @student.id).first
     end
 
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
-    it 'returns missing' do
+    it "returns missing" do
       expect(submission_type.resolve("missing")).to eq true
     end
   end
 
-  describe 'gradeMatchesCurrentSubmission' do
+  describe "gradeMatchesCurrentSubmission" do
     before(:once) do
       assignment = @course.assignments.create!(name: "assignment", points_possible: 10)
-      assignment.submit_homework(@student, body: 'asdf')
+      assignment.submit_homework(@student, body: "asdf")
       assignment.grade_student(@student, score: 8, grader: @teacher)
-      @submission1 = assignment.submit_homework(@student, body: 'asdf')
+      @submission1 = assignment.submit_homework(@student, body: "asdf")
     end
 
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
-    it 'returns gradeMatchesCurrentSubmission' do
+    it "returns gradeMatchesCurrentSubmission" do
       expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
     end
   end
 
-  describe 'rubric_Assessments_connection' do
+  describe "rubric_Assessments_connection" do
     before(:once) do
       rubric_for_course
       rubric_association_model(
         context: @course,
         rubric: @rubric,
         association_object: @assignment,
-        purpose: 'grading'
+        purpose: "grading"
       )
 
-      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hour.ago)
+      @assignment.submit_homework(@student, body: "foo", submitted_at: 2.hours.ago)
 
       rubric_assessment_model(
         user: @student,
         assessor: @teacher,
         rubric_association: @rubric_association,
-        assessment_type: 'grading'
+        assessment_type: "grading"
       )
     end
 
-    it 'works' do
+    it "works" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }")
       ).to eq [@rubric_assessment.id.to_s]
     end
 
-    it 'requires permission' do
+    it "requires permission" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }', current_user: @student)
+        submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }", current_user: @student)
       ).to eq [@rubric_assessment.id.to_s]
     end
 
-    it 'grabs the assessment for the current submission attempt by default' do
-      @submission2 = @assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+    it "grabs the assessment for the current submission attempt by default" do
+      @submission2 = @assignment.submit_homework(@student, body: "Attempt 2", submitted_at: 1.hour.ago)
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }")
       ).to eq []
     end
 
-    it 'grabs the assessment for the given submission attempt when using the for_attempt filter' do
-      @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+    it "grabs the assessment for the given submission attempt when using the for_attempt filter" do
+      @assignment.submit_homework(@student, body: "bar", submitted_at: 1.hour.since)
       expect(
-        submission_type.resolve('rubricAssessmentsConnection(filter: {forAttempt: 2}) { nodes { _id } }')
+        submission_type.resolve("rubricAssessmentsConnection(filter: {forAttempt: 2}) { nodes { _id } }")
       ).to eq [@rubric_assessment.id.to_s]
     end
 
-    it 'works with submission histories' do
-      @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+    it "works with submission histories" do
+      @assignment.submit_homework(@student, body: "bar", submitted_at: 1.hour.since)
       expect(
         submission_type.resolve(
-          'submissionHistoriesConnection { nodes { rubricAssessmentsConnection { nodes { _id } } } }'
+          "submissionHistoriesConnection { nodes { rubricAssessmentsConnection { nodes { _id } } } }"
         )
       ).to eq [[], [@rubric_assessment.id.to_s], []]
     end
   end
 
-  describe 'turnitin_data' do
+  describe "turnitin_data" do
     tii_data = {
       similarity_score: 10,
-      state: 'acceptable',
-      report_url: 'http://example.com',
-      status: 'scored'
+      state: "acceptable",
+      report_url: "http://example.com",
+      status: "scored"
     }
 
     before(:once) do
@@ -529,28 +529,28 @@ describe Types::SubmissionType do
       @submission.save!
     end
 
-    it 'returns turnitin_data' do
+    it "returns turnitin_data" do
       expect(
-        submission_type.resolve('turnitinData { target { ...on Submission { _id } } }')
+        submission_type.resolve("turnitinData { target { ...on Submission { _id } } }")
       ).to eq [@submission.id.to_s]
       expect(
-        submission_type.resolve('turnitinData { status }')
+        submission_type.resolve("turnitinData { status }")
       ).to eq [tii_data[:status]]
       expect(
-        submission_type.resolve('turnitinData { score }')
+        submission_type.resolve("turnitinData { score }")
       ).to eq [tii_data[:similarity_score]]
     end
   end
 
-  describe 'submissionType' do
+  describe "submissionType" do
     before(:once) do
-      @assignment.submit_homework(@student, body: 'bar', submission_type: 'online_text_entry')
+      @assignment.submit_homework(@student, body: "bar", submission_type: "online_text_entry")
     end
 
-    it 'returns the submissionType' do
+    it "returns the submissionType" do
       expect(
-        submission_type.resolve('submissionType')
-      ).to eq 'online_text_entry'
+        submission_type.resolve("submissionType")
+      ).to eq "online_text_entry"
     end
   end
 end

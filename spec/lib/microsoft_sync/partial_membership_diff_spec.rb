@@ -79,24 +79,24 @@ describe MicrosoftSync::PartialMembershipDiff do
     ]
   end
 
-  let(:student_enrollment_type) { 'StudentEnrollment' }
-  let(:teacher_enrollment_type) { 'TeacherEnrollment' }
+  let(:student_enrollment_type) { "StudentEnrollment" }
+  let(:teacher_enrollment_type) { "TeacherEnrollment" }
   let(:slice_size) { 20 }
 
   let(:member_mappings) do
     {
-      'm_X' => 101,
-      'm_M' => 102,
-      'm_O' => 103,
-      'm_MO' => 104,
-      'o_X' => 105,
-      'o_M' => 106,
-      'o_O' => 107,
-      'o_MO' => 108,
-      'mo_X' => 109,
-      'mo_M' => 110,
-      'mo_O' => 111,
-      'mo_MO' => 112,
+      "m_X" => 101,
+      "m_M" => 102,
+      "m_O" => 103,
+      "m_MO" => 104,
+      "o_X" => 105,
+      "o_M" => 106,
+      "o_O" => 107,
+      "o_MO" => 108,
+      "mo_X" => 109,
+      "mo_M" => 110,
+      "mo_O" => 111,
+      "mo_MO" => 112,
     }
   end
 
@@ -162,30 +162,30 @@ describe MicrosoftSync::PartialMembershipDiff do
     end
   end
 
-  it 'dedupes aads' do
-    subject.set_member_mapping(111, 'mo_MO')
-    expect(actions_by_aad['mo_O']).to_not be_present
-    expect(actions_by_aad['mo_MO']).to match_array(%i[add_member add_owner])
+  it "dedupes aads" do
+    subject.set_member_mapping(111, "mo_MO")
+    expect(actions_by_aad["mo_O"]).to_not be_present
+    expect(actions_by_aad["mo_MO"]).to match_array(%i[add_member add_owner])
   end
 
-  context 'when mappings are missing' do
-    it 'does not suggest any changes for those users' do
-      mappings2 = member_mappings.except('m_X', 'o_M')
+  context "when mappings are missing" do
+    it "does not suggest any changes for those users" do
+      mappings2 = member_mappings.except("m_X", "o_M")
       diff2 = create_diff(users_to_msft_role_types, local_members, mappings2)
       actions2 = actions_by_aad_for_diff(diff2)
 
       expect(actions2.keys).to match_array(%w[m_M m_MO o_X o_O o_MO mo_X mo_M mo_O mo_MO])
-      expect(actions2).to eq(actions_by_aad.except('m_X', 'o_M'))
+      expect(actions2).to eq(actions_by_aad.except("m_X", "o_M"))
     end
   end
 
-  describe 'enrollment type classification' do
+  describe "enrollment type classification" do
     %w[TeacherEnrollment TaEnrollment DesignerEnrollment].each do |owner_enrollment|
       context "when an enrollment is of type #{owner_enrollment}" do
         let(:teacher_enrollment_type) { owner_enrollment }
 
         it "classifies it as an owner" do
-          expect(actions_by_aad['o_O']).to match_array(expected_actions[:o_O])
+          expect(actions_by_aad["o_O"]).to match_array(expected_actions[:o_O])
         end
       end
     end
@@ -195,13 +195,13 @@ describe MicrosoftSync::PartialMembershipDiff do
         let(:student_enrollment_type) { member_enrollment }
 
         it "classifies it as an member" do
-          expect(actions_by_aad['o_M']).to match_array(expected_actions[:o_M])
+          expect(actions_by_aad["o_M"]).to match_array(expected_actions[:o_M])
         end
       end
     end
   end
 
-  context 'slices' do
+  context "slices" do
     let(:slice_size) { 3 }
 
     let(:removals_slices) do
@@ -214,7 +214,7 @@ describe MicrosoftSync::PartialMembershipDiff do
 
     before { allow(MicrosoftSync::MembershipDiff).to receive(:in_slices_of).and_call_original }
 
-    it 'batches additions in slices, owners first' do
+    it "batches additions in slices, owners first" do
       expect(additions_slices.map { |slice| slice.transform_values(&:count) }).to eq([
                                                                                        { members: 0, owners: 3 },
                                                                                        { members: 2, owners: 1 },
@@ -223,7 +223,7 @@ describe MicrosoftSync::PartialMembershipDiff do
                                                                                      ])
     end
 
-    it 'batches removals in slices, owners first' do
+    it "batches removals in slices, owners first" do
       expect(removals_slices.map { |slice| slice.transform_values(&:count) }).to eq([
                                                                                       { members: 0, owners: 3 },
                                                                                       { members: 2, owners: 1 },
@@ -231,19 +231,19 @@ describe MicrosoftSync::PartialMembershipDiff do
                                                                                     ])
     end
 
-    it 'uses MembershipDiff.in_slices_of for additions' do
+    it "uses MembershipDiff.in_slices_of for additions" do
       additions_slices
       expect(MicrosoftSync::MembershipDiff).to have_received(:in_slices_of).once
     end
 
-    it 'uses MembershipDiff.in_slices_of for removals' do
+    it "uses MembershipDiff.in_slices_of for removals" do
       removals_slices
       expect(MicrosoftSync::MembershipDiff).to have_received(:in_slices_of).once
     end
   end
 
-  describe '#log_all_actions' do
-    it 'logs user ids, aad ids, change types, enrollment types, and actions' do
+  describe "#log_all_actions" do
+    it "logs user ids, aad ids, change types, enrollment types, and actions" do
       logs = []
       expect(Rails.logger).to receive(:info).at_least(:once) do |line|
         logs << line
@@ -251,7 +251,7 @@ describe MicrosoftSync::PartialMembershipDiff do
 
       subject.log_all_actions
 
-      logs = logs.map { |l| l.dup.gsub!(/^MicrosoftSync::PartialMembershipDiff: /, '') }.compact.sort
+      logs = logs.filter_map { |l| l.dup.gsub!(/^MicrosoftSync::PartialMembershipDiff: /, "") }.sort
 
       expect(logs.join("\n")).to eq([
         'User 101 (m_X): change ["member"], enrolls [] -> [:remove_member]',

@@ -33,7 +33,7 @@ class PatchedArrayConnection < GraphQL::Pagination::ArrayConnection
   end
 
   def cursor_for(item)
-    return cursor_for_submission_node(item) if item.class.name == 'Submission'
+    return cursor_for_submission_node(item) if item.instance_of?(Submission)
 
     super
   end

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
-gem 'bookmarked_collection', path: '../bookmarked_collection'
-gem 'canvas_cassandra', path: '../canvas_cassandra'
-gem 'json_token', path: '../json_token'
-gem 'paginated_collection', path: '../paginated_collection'
-gem 'simplecov', '0.14.1', :require => false
+gem "bookmarked_collection", path: "../bookmarked_collection"
+gem "canvas_cassandra", path: "../canvas_cassandra"
+gem "json_token", path: "../json_token"
+gem "paginated_collection", path: "../paginated_collection"
+gem "simplecov", "0.14.1", require: false

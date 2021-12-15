@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe UserContent do
   describe ".find_user_content" do
     it "does not yield non-string width/height fields" do
       doc = Nokogiri::HTML5.fragment('<object width="100%" />')
       UserContent.find_user_content(doc) do |_, uc|
-        expect(uc.width).to eq '100%'
+        expect(uc.width).to eq "100%"
       end
     end
   end
@@ -47,39 +47,39 @@ describe UserContent do
   describe "css_size" do
     it "is nil for non-numbers" do
       expect(UserContent.css_size(nil)).to be_nil
-      expect(UserContent.css_size('')).to be_nil
-      expect(UserContent.css_size('non-number')).to be_nil
+      expect(UserContent.css_size("")).to be_nil
+      expect(UserContent.css_size("non-number")).to be_nil
     end
 
     it "is nil for numbers that equate to 0" do
-      expect(UserContent.css_size('0%')).to be_nil
-      expect(UserContent.css_size('0px')).to be_nil
-      expect(UserContent.css_size('0')).to be_nil
+      expect(UserContent.css_size("0%")).to be_nil
+      expect(UserContent.css_size("0px")).to be_nil
+      expect(UserContent.css_size("0")).to be_nil
     end
 
     it "preserves percents" do
-      expect(UserContent.css_size('100%')).to eq '100%'
+      expect(UserContent.css_size("100%")).to eq "100%"
     end
 
     it "preserves px" do
-      expect(UserContent.css_size('100px')).to eq '100px'
+      expect(UserContent.css_size("100px")).to eq "100px"
     end
 
     # TODO: these ones are questionable
     it "adds 10 to raw numbers and make them px" do
-      expect(UserContent.css_size('100')).to eq '110px'
+      expect(UserContent.css_size("100")).to eq "110px"
     end
 
     it "is nil for numbers with an unrecognized prefix" do
-      expect(UserContent.css_size('x-100')).to be_nil
+      expect(UserContent.css_size("x-100")).to be_nil
     end
 
     it "keeps just the raw number from numbers with an unrecognized suffix" do
-      expect(UserContent.css_size('100-x')).to eq '100'
+      expect(UserContent.css_size("100-x")).to eq "100"
     end
   end
 
-  describe 'HtmlRewriter' do
+  describe "HtmlRewriter" do
     let(:rewriter) do
       course_with_teacher
       UserContent::HtmlRewriter.new(@course, @teacher)
@@ -87,7 +87,7 @@ describe UserContent do
 
     it "handler should not convert id to integer for 'wiki' matches" do
       called = false
-      rewriter.set_handler('wiki') do |match|
+      rewriter.set_handler("wiki") do |match|
         called = true
         expect(match.obj_id.class).to eq String
       end
@@ -97,7 +97,7 @@ describe UserContent do
 
     it "handler should not convert id to integer for 'pages' matches" do
       called = false
-      rewriter.set_handler('pages') do |match|
+      rewriter.set_handler("pages") do |match|
         called = true
         expect(match.obj_id.class).to eq String
       end
@@ -143,25 +143,25 @@ describe UserContent do
       end
 
       it "matches absolute paths with http" do
-        expect(regex.match(%Q{<img src="http://localhost:3000/files/110/preview">}).to_a).to eq([
-                                                                                                  "http://localhost:3000/files/110/preview",
-                                                                                                  "http://localhost:3000",
-                                                                                                  nil,
-                                                                                                  "files",
-                                                                                                  "110",
-                                                                                                  "/preview"
-                                                                                                ])
+        expect(regex.match('<img src="http://localhost:3000/files/110/preview">').to_a).to eq([
+                                                                                                "http://localhost:3000/files/110/preview",
+                                                                                                "http://localhost:3000",
+                                                                                                nil,
+                                                                                                "files",
+                                                                                                "110",
+                                                                                                "/preview"
+                                                                                              ])
       end
 
       it "matches absolute paths with https" do
-        expect(regex.match(%Q{<a href="https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0">}).to_a).to eq([
-                                                                                                                                                    "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
-                                                                                                                                                    "https://this-is-terrible.example.com",
-                                                                                                                                                    "/courses/#{rewriter.context.id}",
-                                                                                                                                                    "pages",
-                                                                                                                                                    "whatever",
-                                                                                                                                                    "?srsly=0"
-                                                                                                                                                  ])
+        expect(regex.match(%(<a href="https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0">)).to_a).to eq([
+                                                                                                                                                   "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
+                                                                                                                                                   "https://this-is-terrible.example.com",
+                                                                                                                                                   "/courses/#{rewriter.context.id}",
+                                                                                                                                                   "pages",
+                                                                                                                                                   "whatever",
+                                                                                                                                                   "?srsly=0"
+                                                                                                                                                 ])
       end
 
       it "doesn't match invalid hostnames" do

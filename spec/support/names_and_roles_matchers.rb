@@ -40,25 +40,25 @@ module Lti::IMS::NamesAndRolesMatchers
 
   def map_course_enrollment_role(enrollment)
     case enrollment.role.base_role_type
-    when 'TeacherEnrollment'
-      ['http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor']
-    when 'TaEnrollment'
-      ['http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
-       'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor']
-    when 'DesignerEnrollment'
-      ['http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper']
-    when 'StudentEnrollment'
-      ['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner']
-    when 'ObserverEnrollment'
-      ['http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor']
+    when "TeacherEnrollment"
+      ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]
+    when "TaEnrollment"
+      ["http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant",
+       "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]
+    when "DesignerEnrollment"
+      ["http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper"]
+    when "StudentEnrollment"
+      ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
+    when "ObserverEnrollment"
+      ["http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor"]
     else
       []
     end
   end
 
   def expected_group_lti_roles(membership)
-    ['http://purl.imsglobal.org/vocab/lis/v2/membership#Member',
-     *('http://purl.imsglobal.org/vocab/lis/v2/membership#Manager' if is_group_leader(membership))]
+    ["http://purl.imsglobal.org/vocab/lis/v2/membership#Member",
+     *("http://purl.imsglobal.org/vocab/lis/v2/membership#Manager" if is_group_leader(membership))]
   end
 
   def is_group_leader(membership)
@@ -67,8 +67,8 @@ module Lti::IMS::NamesAndRolesMatchers
 
   def expected_base_membership_context(context)
     {
-      'id' => expected_lti_id(context),
-      'title' => context.name
+      "id" => expected_lti_id(context),
+      "title" => context.name
     }.compact
   end
 
@@ -77,7 +77,7 @@ module Lti::IMS::NamesAndRolesMatchers
   end
 
   def expected_course_membership_context(context)
-    expected_base_membership_context(context).merge!({ 'label' => context.course_code }).compact
+    expected_base_membership_context(context).merge!({ "label" => context.course_code }).compact
   end
 
   def expected_sourced_id(user)
@@ -93,29 +93,29 @@ module Lti::IMS::NamesAndRolesMatchers
   # expanded field is blank, you'll get the custom param echoed back. (This way we get symmetry between NRPS and
   # LTI launches for this particular field.)
   def expected_login_id_extension(user)
-    SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.unique_id.presence || '$Canvas.user.loginId'
+    SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.unique_id.presence || "$Canvas.user.loginId"
   end
 
   def expected_base_membership(user, opts)
     {
-      'status' => 'Active',
-      'name' => (user.name if %w(public name_only).include?(privacy(opts))),
-      'picture' => (user.avatar_url if privacy(opts) == 'public'),
-      'given_name' => (user.first_name if %w(public name_only).include?(privacy(opts))),
-      'family_name' => (user.last_name if %w(public name_only).include?(privacy(opts))),
-      'email' => (user.email if %w(public email_only).include?(privacy(opts))),
-      'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy(opts))),
-      'user_id' => expected_lti_id(Lti::IMS::Providers::MembershipsProvider.unwrap(user)),
-      'lti11_legacy_user_id' => Lti::Asset.opaque_identifier_for(user)
+      "status" => "Active",
+      "name" => (user.name if %w[public name_only].include?(privacy(opts))),
+      "picture" => (user.avatar_url if privacy(opts) == "public"),
+      "given_name" => (user.first_name if %w[public name_only].include?(privacy(opts))),
+      "family_name" => (user.last_name if %w[public name_only].include?(privacy(opts))),
+      "email" => (user.email if %w[public email_only].include?(privacy(opts))),
+      "lis_person_sourcedid" => (expected_sourced_id(user) if %w[public name_only].include?(privacy(opts))),
+      "user_id" => expected_lti_id(Lti::IMS::Providers::MembershipsProvider.unwrap(user)),
+      "lti11_legacy_user_id" => Lti::Asset.opaque_identifier_for(user)
     }.compact
   end
 
   def expected_message_array(user, opts)
     [
       {
-        'https://purl.imsglobal.org/spec/lti/claim/message_type' => 'LtiResourceLinkRequest',
-        'locale' => (user.locale || I18n.default_locale.to_s),
-        'https://purl.imsglobal.org/spec/lti/claim/custom' => {},
+        "https://purl.imsglobal.org/spec/lti/claim/message_type" => "LtiResourceLinkRequest",
+        "locale" => (user.locale || I18n.default_locale.to_s),
+        "https://purl.imsglobal.org/spec/lti/claim/custom" => {},
         "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id" => tool.opaque_identifier_for(user),
         "https://purl.imsglobal.org/spec/lti/claim/lti1p1" => {
           "user_id" => user.lti_context_id
@@ -126,8 +126,8 @@ module Lti::IMS::NamesAndRolesMatchers
 
   def expected_context_membership(user, roles_matcher, opts)
     expected_base_membership(user, opts)
-      .merge!('roles' => roles_matcher.call)
-      .merge('message' => opts[:message_matcher] ? match_array(expected_message_array(user, opts)) : nil)
+      .merge!("roles" => roles_matcher.call)
+      .merge("message" => opts[:message_matcher] ? match_array(expected_message_array(user, opts)) : nil)
       .compact
   end
 
@@ -148,7 +148,7 @@ module Lti::IMS::NamesAndRolesMatchers
   end
 
   def privacy(opts)
-    opts[:privacy_level].presence || 'public'
+    opts[:privacy_level].presence || "public"
   end
 
   RSpec::Matchers.define :be_lti_course_membership_context do |expected|
@@ -202,9 +202,9 @@ module Lti::IMS::NamesAndRolesMatchers
   RSpec::Matchers.define :be_lti_advantage_error_response_body do |expected_type, expected_message|
     match do |actual|
       @expected = {
-        'errors' => {
-          'type' => expected_type,
-          'message' => expected_message
+        "errors" => {
+          "type" => expected_type,
+          "message" => expected_message
         }
       }.compact
 

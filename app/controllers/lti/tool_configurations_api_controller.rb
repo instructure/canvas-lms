@@ -46,7 +46,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   before_action :require_manage_developer_keys, except: :show
   before_action :require_key_in_context, only: :show
   before_action :require_lti_add_edit, only: :show
-  before_action :require_tool_configuration, only: [:show, :update, :destroy]
+  before_action :require_tool_configuration, only: %i[show update destroy]
 
   # @API Create Tool configuration
   # Creates tool configuration with the provided parameters.
@@ -172,9 +172,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def update_developer_key!(tool_config, redirect_uris = nil)
     developer_key = tool_config.developer_key
     developer_key.redirect_uris = redirect_uris unless redirect_uris.nil?
-    developer_key.public_jwk = tool_config.settings['public_jwk']
-    developer_key.public_jwk_url = tool_config.settings['public_jwk_url']
-    developer_key.oidc_initiation_url = tool_config.settings['oidc_initiation_url']
+    developer_key.public_jwk = tool_config.settings["public_jwk"]
+    developer_key.public_jwk_url = tool_config.settings["public_jwk_url"]
+    developer_key.oidc_initiation_url = tool_config.settings["oidc_initiation_url"]
     developer_key.is_lti_key = true
     developer_key.update!(developer_key_params)
   end
@@ -186,7 +186,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def account
-    return @context if params[:action] == 'create'
+    return @context if params[:action] == "create"
 
     developer_key.owner_account
   end

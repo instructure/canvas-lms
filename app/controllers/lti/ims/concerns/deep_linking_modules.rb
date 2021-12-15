@@ -30,8 +30,8 @@ module Lti::IMS::Concerns
       end
     end
 
-    CREATE_NEW_MODULE_PLACEMENTS = %w(course_assignments_menu module_index_menu).freeze
-    ALLOW_LINE_ITEM_PLACEMENTS = %w(course_assignments_menu module_index_menu).freeze
+    CREATE_NEW_MODULE_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
+    ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
 
     def content_items_for_modules
       @content_items_for_modules ||= lti_resource_links.reject { |item| item.key? :lineItem }
@@ -54,7 +54,7 @@ module Lti::IMS::Concerns
     end
 
     def create_new_module?
-      CREATE_NEW_MODULE_PLACEMENTS.include?(params[:placement]) && @context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu)
+      CREATE_NEW_MODULE_PLACEMENTS.include?(params[:placement]) && @context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
     end
 
     def multiple_items_for_existing_module?
@@ -91,7 +91,7 @@ module Lti::IMS::Concerns
 
     def create_module
       @context_module =
-        @context.context_modules.create!(name: 'New Content From App', workflow_state: 'unpublished')
+        @context.context_modules.create!(name: "New Content From App", workflow_state: "unpublished")
     end
 
     def add_module_items
@@ -100,7 +100,7 @@ module Lti::IMS::Concerns
       content_items_for_modules.each do |content_item|
         context_module.add_item(
           {
-            type: 'context_external_tool',
+            type: "context_external_tool",
             id: tool.id,
             new_tab: 0,
             indent: 0,
@@ -120,8 +120,12 @@ module Lti::IMS::Concerns
       return unless @context.root_account.feature_enabled? :lti_deep_linking_line_items
 
       content_items_for_assignments.each do |content_item|
+        if content_item.dig(:lineItem, :label)
+          content_item[:title] = content_item.dig(:lineItem, :label)
+        end
+
         unless content_item.dig(:lineItem, :scoreMaximum)
-          content_item[:errors] = 'lineItem.scoreMaximum is a required field'
+          content_item[:errors] = { "lineItem.scoreMaximum": I18n.t("lineItem.scoreMaximum is a required field") }
           next
         end
 
@@ -129,15 +133,15 @@ module Lti::IMS::Concerns
           assignment =
             @context.assignments.create!(
               {
-                submission_types: 'external_tool',
-                title: content_item.dig(:lineItem, :label) || content_item[:title],
+                submission_types: "external_tool",
+                title: content_item[:title],
                 description: content_item[:text],
                 points_possible: content_item.dig(:lineItem, :scoreMaximum),
                 unlock_at: content_item.dig(:available, :startDateTime),
                 lock_at: content_item.dig(:available, :endDateTime),
                 due_at: content_item.dig(:submission, :endDateTime),
                 external_tool_tag_attributes: {
-                  content_type: 'ContextExternalTool',
+                  content_type: "ContextExternalTool",
                   content_id: tool.id,
                   new_tab: 0,
                   url: content_item[:url]
@@ -162,6 +166,8 @@ module Lti::IMS::Concerns
           line_item.resource_link.update!(
             custom: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
           )
+
+          context_module.add_item({ type: "assignment", id: assignment.id }) if create_new_module?
 
           content_item[:errors] = assignment.errors unless assignment.valid?
         end

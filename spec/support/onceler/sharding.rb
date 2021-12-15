@@ -20,7 +20,7 @@
 module Onceler
   module Sharding
     def self.included(klass)
-      klass.onceler_connections = ->(_) do
+      klass.onceler_connections = lambda do |_|
         next [] if Switchman::RSpecHelper.class_variable_get(:@@sharding_failed)
 
         shard1 = Switchman::RSpecHelper.class_variable_get(:@@shard1)

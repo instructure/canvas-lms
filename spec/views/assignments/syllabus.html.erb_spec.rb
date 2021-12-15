@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/assignments/syllabus" do
   it "renders" do
     course_with_student
     view_context(@course, @user)
 
-    events = assign(:events, [@course.assignments.create!(:title => "some assignment", :due_at => Time.now), @course.calendar_events.create!(:title => "some event", :start_at => Time.now, :end_at => Time.now)])
-    assign(:dates, events.map { |e| e.start_at })
-    assign(:undated_events, [@course.assignments.create!(:title => "assignment 2"), @course.calendar_events.create!(:title => "event 2")])
-    render 'assignments/syllabus'
+    events = assign(:events, [@course.assignments.create!(title: "some assignment", due_at: Time.now), @course.calendar_events.create!(title: "some event", start_at: Time.now, end_at: Time.now)])
+    assign(:dates, events.map(&:start_at))
+    assign(:undated_events, [@course.assignments.create!(title: "assignment 2"), @course.calendar_events.create!(title: "event 2")])
+    render "assignments/syllabus"
     expect(response).not_to be_nil
   end
 end

@@ -22,10 +22,10 @@ class CreateAuthenticationProvidersView < ActiveRecord::Migration[5.1]
   tag :predeploy
 
   def up
-    execute("CREATE VIEW #{connection.quote_table_name('authentication_providers')} AS SELECT * FROM #{connection.quote_table_name('account_authorization_configs')}")
+    execute("CREATE VIEW #{connection.quote_table_name("authentication_providers")} AS SELECT * FROM #{connection.quote_table_name("account_authorization_configs")}")
   end
 
   def down
-    execute("DROP VIEW #{connection.quote_table_name('authentication_providers')}")
+    execute("DROP VIEW #{connection.quote_table_name("authentication_providers")}")
   end
 end

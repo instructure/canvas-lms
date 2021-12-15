@@ -75,10 +75,10 @@ module DataFixup::PopulateRootAccountIdsOnUsers
         # yes, this could probably done in a single query with a VALUES table, but this should be a relatively
         # small case and I don't want to figure out the JOIN with the UPDATE
         root_accounts.each do |(user_id, root_accounts_for_user)|
-          root_accounts_for_user = root_accounts_for_user[1..-1].split(',').map(&:to_i)
+          root_accounts_for_user = root_accounts_for_user[1..].split(",").map(&:to_i)
           translated_ids = root_accounts_for_user.map { |id| Shard.relative_id_for(id, source_shard, foreign_shard) }
 
-          uniquify = "SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, ('{#{translated_ids.join(',')}}'))) AS a(e) ORDER BY e)"
+          uniquify = "SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, ('{#{translated_ids.join(",")}}'))) AS a(e) ORDER BY e)"
 
           User.where(id: user_id).update_all("root_account_ids=(#{uniquify})")
         end

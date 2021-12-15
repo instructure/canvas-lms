@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'saml2'
+require "saml2"
 
 class AuthenticationProvider::SAML::InCommon < AuthenticationProvider::SAML::Federation
-  URN = 'urn:mace:incommon'
+  URN = "urn:mace:incommon"
 
   class << self
     def endpoint
-      Setting.get('incommon_metadata_url', 'http://md.incommon.org/InCommon/InCommon-metadata.xml')
+      Setting.get("incommon_metadata_url", "http://md.incommon.org/InCommon/InCommon-metadata.xml")
     end
 
     protected
 
     def cert
-      Rails.root.join("config", "saml", "inc-md-cert.pem").read
+      Rails.root.join("config/saml/inc-md-cert.pem").read
     end
   end
 end

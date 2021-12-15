@@ -28,15 +28,15 @@ module SpecComponents
     end
 
     def add_assignment(assignment)
-      @component_course_module.add_item(id: assignment.id, type: 'assignment')
+      @component_course_module.add_item(id: assignment.id, type: "assignment")
     end
 
     def add_quiz(quiz)
-      @component_course_module.add_item(id: quiz.id, type: 'quiz')
+      @component_course_module.add_item(id: quiz.id, type: "quiz")
     end
 
     def add_discussion(discussion)
-      @component_course_module.add_item(id: discussion.id, type: 'discussion')
+      @component_course_module.add_item(id: discussion.id, type: "discussion")
     end
   end
 end

@@ -89,9 +89,9 @@ describe Canvas do
   end
 
   if Canvas.redis_enabled?
-    describe '.lookup_cache_store' do
+    describe ".lookup_cache_store" do
       it "has the switchman namespace when using the pre-existing data redis" do
-        store = Canvas.lookup_cache_store({ 'cache_store' => 'redis_cache_store' }, Rails.env)
+        store = Canvas.lookup_cache_store({ "cache_store" => "redis_cache_store" }, Rails.env)
         expect(store.options[:namespace]).not_to be_nil
         expect(store.redis).to eq Canvas.redis
       end

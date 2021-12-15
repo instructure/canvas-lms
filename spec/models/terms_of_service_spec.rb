@@ -28,11 +28,11 @@ describe TermsOfService do
   describe "::terms_of_service_workflow_state" do
     it "returns 'deleted' for deleted terms of service" do
       @terms_of_service.destroy!
-      expect(@terms_of_service.workflow_state).to eq 'deleted'
+      expect(@terms_of_service.workflow_state).to eq "deleted"
     end
 
     it "returns 'active' for Terms of Service Content even if its terms has been deleted" do
-      expect(@terms_of_service_content.workflow_state).to eq 'active'
+      expect(@terms_of_service_content.workflow_state).to eq "active"
     end
   end
 

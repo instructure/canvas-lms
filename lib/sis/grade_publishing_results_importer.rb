@@ -23,7 +23,7 @@ module SIS
     def process
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
-      return importer.success_count
+      importer.success_count
     end
 
     class Work
@@ -39,12 +39,12 @@ module SIS
       def add_grade_publishing_result(enrollment_id, grade_publishing_status, message = nil)
         raise ImportError, "No enrollment_id given" if enrollment_id.blank?
         raise ImportError, "No grade_publishing_status given for enrollment #{enrollment_id}" if grade_publishing_status.blank?
-        raise ImportError, "Improper grade_publishing_status \"#{grade_publishing_status}\" for enrollment #{enrollment_id}" unless %w{published error}.include?(grade_publishing_status.downcase)
+        raise ImportError, "Improper grade_publishing_status \"#{grade_publishing_status}\" for enrollment #{enrollment_id}" unless %w[published error].include?(grade_publishing_status.downcase)
 
-        if Enrollment.where(:id => enrollment_id, :root_account_id => @root_account)
-                     .update_all(:grade_publishing_status => grade_publishing_status.downcase,
-                                 :grade_publishing_message => message.to_s,
-                                 :updated_at => Time.now.utc) != 1
+        if Enrollment.where(id: enrollment_id, root_account_id: @root_account)
+                     .update_all(grade_publishing_status: grade_publishing_status.downcase,
+                                 grade_publishing_message: message.to_s,
+                                 updated_at: Time.now.utc) != 1
           raise ImportError, "Enrollment #{enrollment_id} doesn't exist"
         end
 

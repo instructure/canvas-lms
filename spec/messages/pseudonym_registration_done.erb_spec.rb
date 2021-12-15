@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'pseudonym_registration_done' do
+describe "pseudonym_registration_done" do
   before :once do
     pseudonym_model
   end

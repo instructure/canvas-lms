@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/calendar2_common'
+require_relative "../common"
+require_relative "../helpers/calendar2_common"
 
 describe "scheduler" do
   include_context "in-process server selenium tests"
@@ -38,20 +38,20 @@ describe "scheduler" do
       user_session(@teacher)
     end
 
-    it "validates the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
+    it "validates the appointment group shows on all views after a student signed up", priority: "1" do
       date = Time.zone.today.to_s
-      create_appointment_group(:new_appointments => [
-                                 [date + ' 12:00:00', date + ' 13:00:00'],
+      create_appointment_group(new_appointments: [
+                                 [date + " 12:00:00", date + " 13:00:00"],
                                ])
       ag = AppointmentGroup.first
       student_in_course(course: @course, active_all: true)
-      ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')
+      ag.appointments.first.reserve_for(@user, @user, comments: "this is important")
       load_month_view
-      expect(f('.fc-content .fc-title').text).to include('new appointment group')
-      f('#week').click
-      expect(f('.fc-content .fc-title').text).to include('new appointment group')
-      f('#agenda').click
-      expect(agenda_item.text).to include('new appointment group')
+      expect(f(".fc-content .fc-title").text).to include("new appointment group")
+      f("#week").click
+      expect(f(".fc-content .fc-title").text).to include("new appointment group")
+      f("#agenda").click
+      expect(agenda_item.text).to include("new appointment group")
     end
   end
 end

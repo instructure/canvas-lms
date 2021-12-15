@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative 'post_grades_tray_page'
-require_relative 'hide_grades_tray_page'
+require_relative "../../common"
+require_relative "post_grades_tray_page"
+require_relative "hide_grades_tray_page"
 
 module Gradebook
   module GradeDetailTray
@@ -28,7 +28,7 @@ module Gradebook
     extend HideGradesTray
 
     def self.submission_tray_full_content
-      f('#SubmissionTray__Content')
+      f("#SubmissionTray__Content")
     end
 
     def self.close_tray_button
@@ -80,11 +80,11 @@ module Gradebook
     end
 
     def self.next_assignment_button
-      f('#assignment-carousel .right-arrow-button-container button')
+      f("#assignment-carousel .right-arrow-button-container button")
     end
 
     def self.previous_assignment_button
-      f('#assignment-carousel .left-arrow-button-container button')
+      f("#assignment-carousel .left-arrow-button-container button")
     end
 
     def self.assignment_link(assignment_name)
@@ -136,7 +136,7 @@ module Gradebook
     end
 
     def self.grade_input
-      f('#grade-detail-tray--grade-input')
+      f("#grade-detail-tray--grade-input")
     end
 
     def self.hidden_pill_locator
@@ -154,7 +154,7 @@ module Gradebook
     end
 
     def self.fetch_late_by_value
-      late_by_input['value']
+      late_by_input["value"]
     end
 
     def self.edit_late_by_input(value)

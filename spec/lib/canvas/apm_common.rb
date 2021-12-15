@@ -28,7 +28,7 @@ shared_context "apm" do
           attr_accessor :resource, :span_type
 
           def initialize
-            self.reset!
+            reset!
           end
 
           def reset!

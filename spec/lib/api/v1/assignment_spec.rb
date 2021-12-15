@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 class AssignmentApiHarness
   include Api::V1::Assignment
@@ -57,6 +57,7 @@ end
 
 describe "Api::V1::Assignment" do
   subject(:api) { AssignmentApiHarness.new }
+
   let(:assignment) { assignment_model }
 
   describe "#assignment_json" do
@@ -82,8 +83,8 @@ describe "Api::V1::Assignment" do
       po = planner_override_model(user: user, plannable: assignment)
       json = api.assignment_json(assignment, user, session,
                                  { include_planner_override: true })
-      expect(json.key?('planner_override')).to be_present
-      expect(json['planner_override']['id']).to eq po.id
+      expect(json).to have_key("planner_override")
+      expect(json["planner_override"]["id"]).to eq po.id
     end
 
     it "includes the assignment's post policy" do
@@ -95,8 +96,8 @@ describe "Api::V1::Assignment" do
 
     it "returns nil for planner override when flag is passed and there is no override" do
       json = api.assignment_json(assignment, user, session, { include_planner_override: true })
-      expect(json.key?('planner_override')).to be_present
-      expect(json['planner_override']).to be_nil
+      expect(json).to have_key("planner_override")
+      expect(json["planner_override"]).to be_nil
     end
 
     describe "the allowed_attempts attribute" do
@@ -127,7 +128,7 @@ describe "Api::V1::Assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)
 
-        expect(json['submissions_download_url']).to eq "/course/#{@course.id}/assignment/#{assignment.id}/submissions?zip=1"
+        expect(json["submissions_download_url"]).to eq "/course/#{@course.id}/assignment/#{assignment.id}/submissions?zip=1"
       end
 
       it "optionally includes 'grades_published' for moderated assignments" do
@@ -144,7 +145,7 @@ describe "Api::V1::Assignment" do
     context "for a quiz" do
       before do
         @assignment = assignment_model
-        @assignment.submission_types = 'online_quiz'
+        @assignment.submission_types = "online_quiz"
         @quiz = quiz_model(course: @course)
         @assignment.quiz = @quiz
       end
@@ -152,16 +153,16 @@ describe "Api::V1::Assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(@assignment, user, session)
 
-        expect(json['submissions_download_url']).to eq "/course/#{@course.id}/quizzes/#{@quiz.id}/submissions?zip=1"
+        expect(json["submissions_download_url"]).to eq "/course/#{@course.id}/quizzes/#{@quiz.id}/submissions?zip=1"
       end
     end
 
     it "includes all assignment overrides fields when an assignment_override exists" do
-      assignment.assignment_overrides.create(:workflow_state => 'active')
+      assignment.assignment_overrides.create(workflow_state: "active")
       overrides = assignment.assignment_overrides
       json = api.assignment_json(assignment, user, session, { overrides: overrides })
       expect(json).to be_a(Hash)
-      expect(json["overrides"].first.keys.sort).to eq ["assignment_id", "id", "title", "student_ids"].sort
+      expect(json["overrides"].first.keys.sort).to eq %w[assignment_id id title student_ids].sort
     end
 
     it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do
@@ -170,10 +171,10 @@ describe "Api::V1::Assignment" do
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
-      expect(json['description']).to eq(api.api_user_content("Foobers", @course, user, {}))
+      expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}))
 
       json = api.assignment_json(assignment, user, session,
-                                 { override_dates: false, exclude_response_fields: ['description'] })
+                                 { override_dates: false, exclude_response_fields: ["description"] })
       expect(json).to be_a(Hash)
       expect(json).not_to have_key "description"
 
@@ -181,12 +182,12 @@ describe "Api::V1::Assignment" do
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
-      expect(json['description']).to eq(api.api_user_content("Foobers", @course, user, {}))
+      expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}))
     end
 
     it "excludes needs_grading_counts when exclude_response_fields flag is " \
        "passed and includes 'needs_grading_count'" do
-      params = { override_dates: false, exclude_response_fields: ['needs_grading_count'] }
+      params = { override_dates: false, exclude_response_fields: ["needs_grading_count"] }
       json = api.assignment_json(assignment, user, session, params)
       expect(json).not_to have_key "needs_grading_count"
     end
@@ -198,12 +199,12 @@ describe "Api::V1::Assignment" do
       end
 
       it "returns false when the assignment is in an unpublished module when checking as a student" do
-        assignment.update!(submission_types: 'online_text_entry', could_be_locked: true)
+        assignment.update!(submission_types: "online_text_entry", could_be_locked: true)
         course = assignment.course
-        student = course.enroll_student(User.create!, enrollment_state: 'active').user
-        course.update(workflow_state: 'available')
-        context_module = ContextModule.create!(context: course, workflow_state: 'unpublished')
-        context_module.content_tags.create!(content: assignment, context: course, tag_type: 'context_module')
+        student = course.enroll_student(User.create!, enrollment_state: "active").user
+        course.update(workflow_state: "available")
+        context_module = ContextModule.create!(context: course, workflow_state: "unpublished")
+        context_module.content_tags.create!(content: assignment, context: course, tag_type: "context_module")
 
         expect(context_module.published?).to eq false
         expect(assignment.published?).to eq true
@@ -213,7 +214,7 @@ describe "Api::V1::Assignment" do
       end
     end
 
-    context 'rubrics' do
+    context "rubrics" do
       before do
         rubric_model({
                        context: assignment.course,
@@ -221,24 +222,24 @@ describe "Api::V1::Assignment" do
                        data: [{
                          description: "Some criterion",
                          points: 10,
-                         id: 'crit1',
+                         id: "crit1",
                          ignore_for_scoring: true,
                          ratings: [
-                           { description: "Good", points: 10, id: 'rat1', criterion_id: 'crit1' }
+                           { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" }
                          ]
                        }]
                      })
-        @rubric.associate_with(assignment, assignment.course, purpose: 'grading')
+        @rubric.associate_with(assignment, assignment.course, purpose: "grading")
       end
 
       it "includes ignore_for_scoring when it is on the rubric" do
         json = api.assignment_json(assignment, user, session)
-        expect(json['rubric'][0]['ignore_for_scoring']).to eq true
+        expect(json["rubric"][0]["ignore_for_scoring"]).to eq true
       end
 
       it "includes hide_score_total setting in rubric_settings" do
         json = api.assignment_json(assignment, user, session)
-        expect(json['rubric_settings']['hide_score_total']).to eq false
+        expect(json["rubric_settings"]["hide_score_total"]).to eq false
       end
 
       it "returns true for hide_score_total if set to true on the rubric association" do
@@ -246,12 +247,12 @@ describe "Api::V1::Assignment" do
         ra.hide_score_total = true
         ra.save!
         json = api.assignment_json(assignment, user, session)
-        expect(json['rubric_settings']['hide_score_total']).to eq true
+        expect(json["rubric_settings"]["hide_score_total"]).to eq true
       end
 
       it "includes hide_points setting in rubric_settings" do
         json = api.assignment_json(assignment, user, session)
-        expect(json['rubric_settings']['hide_points']).to eq false
+        expect(json["rubric_settings"]["hide_points"]).to eq false
       end
 
       it "returns true for hide_points if set to true on the rubric association" do
@@ -259,62 +260,62 @@ describe "Api::V1::Assignment" do
         ra.hide_points = true
         ra.save!
         json = api.assignment_json(assignment, user, session)
-        expect(json['rubric_settings']['hide_points']).to eq true
+        expect(json["rubric_settings"]["hide_points"]).to eq true
       end
 
       it "excludes rubric when exclude_response_fields contains 'rubric'" do
-        opts = { exclude_response_fields: ['rubric'] }
+        opts = { exclude_response_fields: ["rubric"] }
         json = api.assignment_json(assignment, user, session, opts)
-        expect(json).not_to have_key 'rubric'
+        expect(json).not_to have_key "rubric"
       end
 
       it "excludes rubric when no active rubric" do
-        @rubric.update!(workflow_state: 'deleted')
+        @rubric.update!(workflow_state: "deleted")
         json = api.assignment_json(assignment, user, session)
-        expect(json).not_to have_key 'rubric'
+        expect(json).not_to have_key "rubric"
       end
     end
 
-    describe 'N.Q respondus setting' do
-      context 'when N.Q respondus setting is on' do
+    describe "N.Q respondus setting" do
+      context "when N.Q respondus setting is on" do
         before do
           assignment.settings = {
-            'lockdown_browser' => {
-              'require_lockdown_browser' => true
+            "lockdown_browser" => {
+              "require_lockdown_browser" => true
             }
           }
           assignment.save!
         end
 
-        it 'serializes require_lockdown_browser to be true' do
+        it "serializes require_lockdown_browser to be true" do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
-          expect(json['require_lockdown_browser']).to be_truthy
+          expect(json).to have_key("require_lockdown_browser")
+          expect(json["require_lockdown_browser"]).to be_truthy
         end
       end
 
-      context 'when N.Q respondus setting is off' do
+      context "when N.Q respondus setting is off" do
         before do
           assignment.settings = {
-            'lockdown_browser' => {
-              'require_lockdown_browser' => false
+            "lockdown_browser" => {
+              "require_lockdown_browser" => false
             }
           }
           assignment.save!
         end
 
-        it 'serializes require_lockdown_browser to be false' do
+        it "serializes require_lockdown_browser to be false" do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
-          expect(json['require_lockdown_browser']).to be_falsy
+          expect(json).to have_key("require_lockdown_browser")
+          expect(json["require_lockdown_browser"]).to be_falsy
         end
       end
 
-      context 'when N.Q respondus setting is off (default)' do
-        it 'serializes require_lockdown_browser to be false' do
+      context "when N.Q respondus setting is off (default)" do
+        it "serializes require_lockdown_browser to be false" do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
-          expect(json['require_lockdown_browser']).to be_falsy
+          expect(json).to have_key("require_lockdown_browser")
+          expect(json["require_lockdown_browser"]).to be_falsy
         end
       end
     end
@@ -345,8 +346,8 @@ describe "Api::V1::Assignment" do
     let(:course) { Course.new }
     let(:assignment) do
       Assignment.new do |a|
-        a.title = 'foo'
-        a.submission_types = 'online'
+        a.title = "foo"
+        a.submission_types = "online"
         a.course = course
       end
     end
@@ -357,7 +358,7 @@ describe "Api::V1::Assignment" do
       end
 
       it "is valid when user is an account admin" do
-        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+        expect(subject).to be_assignment_editable_fields_valid(assignment, user)
       end
     end
 
@@ -368,13 +369,13 @@ describe "Api::V1::Assignment" do
 
       it "is valid when not in a closed grading period" do
         expect(assignment).to receive(:in_closed_grading_period?).and_return(false)
-        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+        expect(subject).to be_assignment_editable_fields_valid(assignment, user)
       end
 
       context "in a closed grading period" do
         let(:course) { Course.create! }
         let(:assignment) do
-          course.assignments.create!(title: 'First Title', submission_types: 'online_quiz')
+          course.assignments.create!(title: "First Title", submission_types: "online_quiz")
         end
 
         before do
@@ -383,34 +384,34 @@ describe "Api::V1::Assignment" do
 
         it "is valid when it was not gradeable and is still not gradeable " \
            "(!gradeable_was? && !gradeable?)" do
-          assignment.update!(submission_types: 'not_gradeable')
-          assignment.submission_types = 'wiki_page'
+          assignment.update!(submission_types: "not_gradeable")
+          assignment.submission_types = "wiki_page"
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
 
         it "is invalid when it was gradeable and is now not gradeable" do
-          assignment.update!(submission_types: 'online')
-          assignment.title = 'Changed Title'
-          assignment.submission_types = 'not_graded'
+          assignment.update!(submission_types: "online")
+          assignment.title = "Changed Title"
+          assignment.submission_types = "not_graded"
           expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
         end
 
         it "is invalid when it was not gradeable and is now gradeable" do
-          assignment.update!(submission_types: 'not_gradeable')
-          assignment.title = 'Changed Title'
-          assignment.submission_types = 'online_quiz'
+          assignment.update!(submission_types: "not_gradeable")
+          assignment.title = "Changed Title"
+          assignment.submission_types = "online_quiz"
           expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
         end
 
         it "is invalid when it was gradeable and is still gradeable" do
-          assignment.update!(submission_types: 'on_paper')
-          assignment.title = 'Changed Title'
-          assignment.submission_types = 'online_upload'
+          assignment.update!(submission_types: "on_paper")
+          assignment.title = "Changed Title"
+          assignment.submission_types = "online_upload"
           expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
         end
 
         it "detects changes to title and responds with those errors on the name field" do
-          assignment.title = 'Changed Title'
+          assignment.title = "Changed Title"
           expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
           expect(assignment.errors).to include :name
         end
@@ -422,7 +423,7 @@ describe "Api::V1::Assignment" do
         end
 
         it "is valid if submission_types changed" do
-          assignment.submission_types = 'on_paper'
+          assignment.submission_types = "on_paper"
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
 
@@ -437,7 +438,7 @@ describe "Api::V1::Assignment" do
         end
 
         it "is valid if time_zone_edited changed" do
-          assignment.time_zone_edited = 'Some New Time Zone'
+          assignment.time_zone_edited = "Some New Time Zone"
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
 
@@ -466,29 +467,29 @@ describe "Api::V1::Assignment" do
 
   describe "update lockdown browser settings" do
     let(:course) { Course.create! }
-    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
 
     let(:initial_lockdown_browser_params) do
       ActionController::Parameters.new({
-                                         'require_lockdown_browser' => 'true',
-                                         'require_lockdown_browser_for_results' => 'false',
-                                         'require_lockdown_browser_monitor' => 'true',
-                                         'lockdown_browser_monitor_data' => 'some monitor data',
-                                         'access_code' => 'magggic code'
+                                         "require_lockdown_browser" => "true",
+                                         "require_lockdown_browser_for_results" => "false",
+                                         "require_lockdown_browser_monitor" => "true",
+                                         "lockdown_browser_monitor_data" => "some monitor data",
+                                         "access_code" => "magggic code"
                                        })
     end
 
     let(:lockdown_browser_params) do
       ActionController::Parameters.new({
-                                         'require_lockdown_browser_for_results' => 'true',
-                                         'lockdown_browser_monitor_data' => 'some monitor data cchanges',
-                                         'access_code' => 'magggic coddddde'
+                                         "require_lockdown_browser_for_results" => "true",
+                                         "lockdown_browser_monitor_data" => "some monitor data cchanges",
+                                         "access_code" => "magggic coddddde"
                                        })
     end
 
     let(:assignment) do
       course.assignments.create!(
-        title: 'hi',
+        title: "hi",
         moderated_grading: true,
         grader_count: 1,
         final_grader: teacher
@@ -501,108 +502,108 @@ describe "Api::V1::Assignment" do
 
     it "creates and updates lockdown browser settings" do
       api.update_api_assignment(assignment, initial_lockdown_browser_params, teacher)
-      expect(assignment.settings['lockdown_browser']).to eq(
-        'require_lockdown_browser' => true,
-        'require_lockdown_browser_for_results' => false,
-        'require_lockdown_browser_monitor' => true,
-        'lockdown_browser_monitor_data' => 'some monitor data',
-        'access_code' => 'magggic code'
+      expect(assignment.settings["lockdown_browser"]).to eq(
+        "require_lockdown_browser" => true,
+        "require_lockdown_browser_for_results" => false,
+        "require_lockdown_browser_monitor" => true,
+        "lockdown_browser_monitor_data" => "some monitor data",
+        "access_code" => "magggic code"
       )
 
       api.update_api_assignment(assignment, lockdown_browser_params, teacher)
-      expect(assignment.settings['lockdown_browser']).to eq(
-        'require_lockdown_browser' => true,
-        'require_lockdown_browser_for_results' => true,
-        'require_lockdown_browser_monitor' => true,
-        'lockdown_browser_monitor_data' => 'some monitor data cchanges',
-        'access_code' => 'magggic coddddde'
+      expect(assignment.settings["lockdown_browser"]).to eq(
+        "require_lockdown_browser" => true,
+        "require_lockdown_browser_for_results" => true,
+        "require_lockdown_browser_monitor" => true,
+        "lockdown_browser_monitor_data" => "some monitor data cchanges",
+        "access_code" => "magggic coddddde"
       )
     end
   end
 
-  describe 'Updating submission type' do
+  describe "Updating submission type" do
     let(:user) { user_model }
     let(:course) { course_factory }
-    let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+    let(:student) { course.enroll_student(User.create!, enrollment_state: "active").user }
     let(:assignment_update_params) do
       ActionController::Parameters.new(
-        name: 'Edited name',
-        submission_types: ['on_paper']
+        name: "Edited name",
+        submission_types: ["on_paper"]
       )
     end
 
-    context 'when the assignment does not have student submissions' do
-      it 'allows updating the submission_types field' do
+    context "when the assignment does not have student submissions" do
+      it "allows updating the submission_types field" do
         expect(assignment.submissions.having_submission.count).to eq 0
-        expect(assignment.submission_types).to eq 'none'
+        expect(assignment.submission_types).to eq "none"
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.submission_types).to eq 'on_paper'
+        expect(assignment.submission_types).to eq "on_paper"
       end
     end
 
     context 'when an assignment with submission type other than "online_quiz" has one student submission' do
       before do
-        assignment.submit_homework(student, :body => "my homework")
+        assignment.submit_homework(student, body: "my homework")
       end
 
-      it 'allows updating the submission_types field' do
+      it "allows updating the submission_types field" do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.submission_types).to eq 'on_paper'
+        expect(assignment.submission_types).to eq "on_paper"
       end
     end
 
     context 'when an assignment with submission type "online - text entry" has one student submission' do
       before do
-        assignment.update!(submission_types: 'online_text_entry')
-        assignment.submit_homework(student, :body => "my homework")
+        assignment.update!(submission_types: "online_text_entry")
+        assignment.submit_homework(student, body: "my homework")
       end
 
       let(:assignment_update_params) do
         ActionController::Parameters.new(
-          name: 'Edited name',
-          submission_types: ['online_url', 'online_upload']
+          name: "Edited name",
+          submission_types: ["online_url", "online_upload"]
         )
       end
 
-      it 'allows updating the submission entry options' do
+      it "allows updating the submission entry options" do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.submission_types).to eq 'online_url,online_upload'
+        expect(assignment.submission_types).to eq "online_url,online_upload"
       end
     end
 
     context 'when an assignment with submission type "online_quiz" has one student submission' do
       before do
-        assignment.update!(submission_types: 'online_quiz')
-        assignment.submit_homework(student, :body => "my homework")
+        assignment.update!(submission_types: "online_quiz")
+        assignment.submit_homework(student, body: "my homework")
       end
 
-      it 'does not allow updating the submission_types field' do
+      it "does not allow updating the submission_types field" do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.submission_types).to eq 'online_quiz'
+        expect(assignment.submission_types).to eq "online_quiz"
       end
 
-      it 'allows updating other fields' do
+      it "allows updating other fields" do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.name).to eq 'Edited name'
+        expect(assignment.name).to eq "Edited name"
       end
     end
   end

@@ -21,12 +21,12 @@ describe UuidHelper do
   describe ".valid_format?" do
     it { expect(described_class.valid_format?(nil)).to be false }
 
-    it { expect(described_class.valid_format?('')).to be false }
+    it { expect(described_class.valid_format?("")).to be false }
 
-    it { expect(described_class.valid_format?('foo')).to be false }
+    it { expect(described_class.valid_format?("foo")).to be false }
 
-    it { expect(described_class.valid_format?('09c1686-cab5-4df-b13-c77f76f75db')).to be false }
+    it { expect(described_class.valid_format?("09c1686-cab5-4df-b13-c77f76f75db")).to be false }
 
-    it { expect(described_class.valid_format?('309c1686-cab5-44df-8b13-fc77f76f75db')).to be true }
+    it { expect(described_class.valid_format?("309c1686-cab5-44df-8b13-fc77f76f75db")).to be true }
   end
 end

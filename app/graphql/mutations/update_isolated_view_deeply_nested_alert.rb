@@ -19,7 +19,7 @@
 #
 
 class Mutations::UpdateIsolatedViewDeeplyNestedAlert < Mutations::BaseMutation
-  graphql_name 'UpdateIsolatedViewDeeplyNestedAlert'
+  graphql_name "UpdateIsolatedViewDeeplyNestedAlert"
 
   argument :isolated_view_deeply_nested_alert, Boolean, required: true
 

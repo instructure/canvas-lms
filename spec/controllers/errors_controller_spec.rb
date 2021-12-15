@@ -24,11 +24,11 @@ describe ErrorsController do
     user_session(@user)
   end
 
-  describe 'index' do
+  describe "index" do
     before { authenticate_user! }
 
     it "does not error" do
-      get 'index'
+      get "index"
     end
   end
 
@@ -39,9 +39,9 @@ describe ErrorsController do
       expect(response).to redirect_to(root_url)
     end
 
-    it 'creates a new error report' do
+    it "creates a new error report" do
       authenticate_user!
-      post 'create', params: {
+      post "create", params: {
         error: {
           url: "someurl",
           message: "BigError",
@@ -55,35 +55,35 @@ describe ErrorsController do
     end
 
     it "doesnt need authentication" do
-      post 'create', params: { error: { message: "BigError" } }
+      post "create", params: { error: { message: "BigError" } }
       assert_recorded_error
     end
 
     it "is successful without data" do
-      post 'create'
+      post "create"
       assert_recorded_error
     end
 
     it "is successful with limited data" do
-      post 'create', params: { error: { title: 'ugly', message: 'bacon', fried_ham: 'stupid' } }
+      post "create", params: { error: { title: "ugly", message: "bacon", fried_ham: "stupid" } }
       assert_recorded_error
     end
 
     it "does not choke on non-integer ids" do
-      post 'create', params: { error: { id: 'garbage' } }
+      post "create", params: { error: { id: "garbage" } }
       assert_recorded_error
       expect(ErrorReport.last.message).not_to eq "Error Report Creation failed"
     end
 
     it "does not return nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
-      post 'create', params: { error: { id: 1 } }, format: 'json'
-      expect(JSON.parse(response.body)).to eq({ 'logged' => true, 'id' => nil })
+      post "create", params: { error: { id: 1 } }, format: "json"
+      expect(JSON.parse(response.body)).to eq({ "logged" => true, "id" => nil })
     end
 
     it "does not record the user as nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
-      post 'create', params: { error: { id: 1 } }
+      post "create", params: { error: { id: 1 } }
       expect(ErrorReport.last.user_id).to be_nil
     end
 
@@ -91,7 +91,7 @@ describe ErrorsController do
       user = User.create!
       user_session(user)
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
-      post 'create', params: { error: { id: 1 } }
+      post "create", params: { error: { id: 1 } }
       expect(ErrorReport.last.user_id).to eq user.id
     end
 
@@ -99,15 +99,15 @@ describe ErrorsController do
       authenticate_user!
       svs = course_factory.student_view_student
       session[:become_user_id] = svs.id
-      post 'create', params: { error: { message: 'test message' } }
+      post "create", params: { error: { message: "test message" } }
       expect(ErrorReport.order(:id).last.user_id).to eq @user.id
     end
 
     it "records the masqueradee user if not in student view" do
-      other_user = user_with_pseudonym(name: 'other', active_all: true)
+      other_user = user_with_pseudonym(name: "other", active_all: true)
       authenticate_user! # reassigns @user
       session[:become_user_id] = other_user.id
-      post 'create', params: { eerror: { message: 'test message' } }
+      post "create", params: { eerror: { message: "test message" } }
       expect(ErrorReport.order(:id).last.user_id).to eq other_user.id
     end
   end

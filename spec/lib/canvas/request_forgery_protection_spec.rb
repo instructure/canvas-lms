@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe Canvas::RequestForgeryProtection do
   before do
     # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
-    raw_headers = { 'X-CSRF-Token' => "bogus" }
+    raw_headers = { "X-CSRF-Token" => "bogus" }
     raw_headers = ActionDispatch::Request.new(raw_headers)
     headers = ActionDispatch::Http::Headers.new(raw_headers)
     cookies = ActionDispatch::Cookies::CookieJar.new(nil)
@@ -96,7 +96,7 @@ describe Canvas::RequestForgeryProtection do
 
     it "counts token as verified if X-CSRF-Token header is valid" do
       token = @controller.form_authenticity_token
-      @controller.request.headers['X-CSRF-Token'] = token
+      @controller.request.headers["X-CSRF-Token"] = token
       expect(@controller.verified_request?).to be_truthy
     end
   end

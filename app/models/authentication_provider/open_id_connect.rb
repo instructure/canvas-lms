@@ -22,23 +22,23 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   attr_accessor :instance_debugging
 
   def self.sti_name
-    self == OpenIDConnect ? 'openid_connect' : super
+    self == OpenIDConnect ? "openid_connect" : super
   end
 
   def self.display_name
-    self == OpenIDConnect ? 'OpenID Connect' : super
+    self == OpenIDConnect ? "OpenID Connect" : super
   end
 
   def self.open_id_connect_params
-    [:client_id,
-     :client_secret,
-     :authorize_url,
-     :token_url,
-     :scope,
-     :login_attribute,
-     :end_session_endpoint,
-     :userinfo_endpoint,
-     :jit_provisioning].freeze
+    %i[client_id
+       client_secret
+       authorize_url
+       token_url
+       scope
+       login_attribute
+       end_session_endpoint
+       userinfo_endpoint
+       jit_provisioning].freeze
   end
 
   def self.recognized_params
@@ -79,7 +79,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   def login_attribute
-    super.presence || 'sub'
+    super.presence || "sub"
   end
 
   def unique_id(token)
@@ -95,14 +95,14 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   def userinfo_endpoint
-    settings['userinfo_endpoint']
+    settings["userinfo_endpoint"]
   end
 
   def userinfo_endpoint=(value)
     value = value.presence
     unless userinfo_endpoint == value
       settings_will_change!
-      settings['userinfo_endpoint'] = value
+      settings["userinfo_endpoint"] = value
     end
   end
 
@@ -116,7 +116,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
 
   def claims(token)
     token.options[:claims] ||= begin
-      jwt_string = token.params['id_token']
+      jwt_string = token.params["id_token"]
       debug_set(:id_token, jwt_string) if instance_debugging
       id_token = {} if jwt_string.blank?
 
@@ -133,7 +133,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
         debug_set(:userinfo, userinfo.to_json) if instance_debugging
         # but only use it if it's for the user we logged in as
         # see http://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse
-        if userinfo['sub'] == id_token['sub']
+        if userinfo["sub"] == id_token["sub"]
           id_token.merge!(userinfo)
         end
       end
@@ -142,23 +142,23 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   def requested_claims
-    ([login_attribute] + federated_attributes.map { |_canvas_attribute, details| details['attribute'] }).uniq
+    ([login_attribute] + federated_attributes.map { |_canvas_attribute, details| details["attribute"] }).uniq
   end
 
-  PROFILE_CLAIMS = ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username',
-                    'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale', 'updated_at'].freeze
+  PROFILE_CLAIMS = %w[name family_name given_name middle_name nickname preferred_username
+                      profile picture website gender birthdate zoneinfo locale updated_at].freeze
   def scope_for_options
-    result = (scope || '').split(' ')
+    result = (scope || "").split
 
-    result.unshift('openid')
+    result.unshift("openid")
     claims = requested_claims
     # see http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
-    result << 'profile' unless (claims & PROFILE_CLAIMS).empty?
-    result << 'email' if claims.include?('email') || claims.include?('email_verified')
-    result << 'address' if claims.include?('address')
-    result << 'phone' if claims.include?('phone_number') || claims.include?('phone_number_verified')
+    result << "profile" unless (claims & PROFILE_CLAIMS).empty?
+    result << "email" if claims.include?("email") || claims.include?("email_verified")
+    result << "address" if claims.include?("address")
+    result << "phone" if claims.include?("phone_number") || claims.include?("phone_number_verified")
 
     result.uniq!
-    result.join(' ')
+    result.join(" ")
   end
 end

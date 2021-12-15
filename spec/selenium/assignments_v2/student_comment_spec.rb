@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative './page_objects/student_assignment_page_v2'
-require_relative '../common'
+require_relative "./page_objects/student_assignment_page_v2"
+require_relative "../common"
 
-describe 'assignments' do
+describe "assignments" do
   include_context "in-process server selenium tests"
 
-  context 'as a student' do
+  context "as a student" do
     before(:once) do
       Account.default.enable_feature!(:assignments_2_student)
       course_with_student(course: @course, active_all: true)
       @assignment = @course.assignments.create!(
-        name: 'assignment',
+        name: "assignment",
         due_at: 5.days.ago,
         points_possible: 10,
-        submission_types: 'online_upload'
+        submission_types: "online_upload"
       )
       @course.enroll_teacher(user_factory)
       @submission = @assignment.submit_homework(@student)
@@ -49,38 +49,38 @@ describe 'assignments' do
       StudentAssignmentPageV2.visit(@course, @assignment)
     end
 
-    it 'allows a student to submit a comment when there is no submission' do
-      StudentAssignmentPageV2.leave_a_comment('test comment')
+    it "allows a student to submit a comment when there is no submission" do
+      StudentAssignmentPageV2.leave_a_comment("test comment")
 
-      expect(StudentAssignmentPageV2.comment_container).to include_text('test comment')
+      expect(StudentAssignmentPageV2.comment_container).to include_text("test comment")
     end
 
-    it 'notifies student of the number of unread submission comments' do
-      expect(StudentAssignmentPageV2.view_feedback_badge).to include_text('22')
+    it "notifies student of the number of unread submission comments" do
+      expect(StudentAssignmentPageV2.view_feedback_badge).to include_text("22")
     end
 
-    it 'allows student to read submission comments by in view feedback tray' do
-      expect(StudentAssignmentPageV2.comment_container).to include_text('Nice Work!')
+    it "allows student to read submission comments by in view feedback tray" do
+      expect(StudentAssignmentPageV2.comment_container).to include_text("Nice Work!")
       expect(StudentAssignmentPageV2.tray_close_button).to be_displayed
       StudentAssignmentPageV2.tray_close_button.click
     end
 
-    it 'displays submission comment attachments in feedback tray' do
-      expect(StudentAssignmentPageV2.comment_container).to include_text('doc.doc')
+    it "displays submission comment attachments in feedback tray" do
+      expect(StudentAssignmentPageV2.comment_container).to include_text("doc.doc")
     end
 
-    it 'allows students to post media submission comments with media modal' do
+    it "allows students to post media submission comments with media modal" do
       StudentAssignmentPageV2.media_comment_button.click
 
       expect(StudentAssignmentPageV2.media_modal).to be_displayed
     end
 
-    it 'paginates the comments starting with most recent into batches of 20 with a button to load more comments' do
-      expect(StudentAssignmentPageV2.comment_container).to include_text('20')
-      expect(StudentAssignmentPageV2.comment_container).to_not include_text('First')
+    it "paginates the comments starting with most recent into batches of 20 with a button to load more comments" do
+      expect(StudentAssignmentPageV2.comment_container).to include_text("20")
+      expect(StudentAssignmentPageV2.comment_container).to_not include_text("First")
       StudentAssignmentPageV2.load_more_comments_button.click
 
-      expect(StudentAssignmentPageV2.comment_container).to include_text('First')
+      expect(StudentAssignmentPageV2.comment_container).to include_text("First")
     end
   end
 end

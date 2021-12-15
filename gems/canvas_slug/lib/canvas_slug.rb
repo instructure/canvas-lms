@@ -23,7 +23,7 @@ require "swearjar"
 
 class CanvasSlug
   class << self
-    CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
+    CHARS = ("0".."9").to_a + ("a".."z").to_a + ("A".."Z").to_a
     SJ = Swearjar.default
 
     def generate_securish_uuid(length = 40)
@@ -42,8 +42,8 @@ class CanvasSlug
     end
 
     def generate(purpose = nil, length = 4)
-      slug = +''
-      slug << purpose << '-' if purpose
+      slug = +""
+      slug << purpose << "-" if purpose
       slug << generate_securish_uuid(length)
       slug
     end

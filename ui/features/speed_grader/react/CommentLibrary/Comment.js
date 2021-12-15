@@ -23,11 +23,11 @@ import {IconButton, Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!CommentLibrary'
 import CommentEditView from './CommentEditView'
+import shave from '@canvas/shave'
 
 const Comment = ({
   comment,
@@ -149,6 +149,16 @@ const Comment = ({
 
 const FocusedComment = ({onClick, comment, handleUpdate, isExpanded}) => {
   const [isFocused, setIsFocused] = useState(false)
+  const commentRef = useRef(null)
+
+  useEffect(() => {
+    if (!isExpanded) {
+      const truncated = shave(commentRef.current, 70)
+
+      handleUpdate(truncated)
+    }
+  }, [handleUpdate, isExpanded])
+
   return (
     <View
       as="div"
@@ -163,13 +173,10 @@ const FocusedComment = ({onClick, comment, handleUpdate, isExpanded}) => {
       onBlur={() => setIsFocused(false)}
     >
       <PresentationContent>
-        {!isExpanded ? (
-          <TruncateText onUpdate={handleUpdate} maxLines={4}>
-            {comment}
-          </TruncateText>
-        ) : (
-          <Text wrap="break-word">{comment}</Text>
-        )}
+        {/* key=isExpanded make sure it'll rebuild this component when key changes */}
+        <Text key={isExpanded} wrap="break-word" elementRef={el => (commentRef.current = el)}>
+          {comment}
+        </Text>
       </PresentationContent>
       <ScreenReaderContent>
         <Button onClick={() => onClick(comment)}>

@@ -17,30 +17,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'item_analysis/common'
-require_relative 'common'
+require_relative "item_analysis/common"
+require_relative "common"
 
-require 'csv'
+require "csv"
 
 describe Quizzes::QuizStatistics::ItemAnalysis do
-  let(:report_type) { 'item_analysis' }
+  let(:report_type) { "item_analysis" }
 
   include_examples "Quizzes::QuizStatistics::Report"
 
   before(:once) do
     simple_quiz_with_submissions(
-      %w{T D F A},
-      %w{T B T A}, # 2 wrong
-      %w{T D F A}, # correct
-      %w{F A T C}, # 4 wrong
-      %w{T D F B}, # 1 wrong
-      %w{T D F A}, # correct
-      %w{F D}      # 3 wrong
+      %w[T D F A],
+      %w[T B T A], # 2 wrong
+      %w[T D F A], # correct
+      %w[F A T C], # 4 wrong
+      %w[T D F B], # 1 wrong
+      %w[T D F A], # correct
+      %w[F D]      # 3 wrong
     )
   end
 
   it "generates a csv" do
-    quiz_statistics = @quiz.statistics_csv('item_analysis')
+    quiz_statistics = @quiz.statistics_csv("item_analysis")
     qs = @quiz.active_quiz_questions
     csv = quiz_statistics.csv_attachment.open.read
     stats = CSV.parse(csv)
@@ -51,9 +51,9 @@ describe Quizzes::QuizStatistics::ItemAnalysis do
     expect(stats[4]).to eq [qs[3].id.to_s, "Question text", "5", "2", "2", "1", "4", "3", "2", "0.6", "0.4", "2", "1", "0", "0.24000000000000005", "0.48989794855663565", "0.6", "0.7786666666666666", "0.6000991981489792", "0.13363062095621223", "-0.8685990362153794", nil]
   end
 
-  it 'generates' do
+  it "generates" do
     qs = @quiz.active_quiz_questions
-    stats = @quiz.current_statistics_for('item_analysis')
+    stats = @quiz.current_statistics_for("item_analysis")
     items = stats.report.generate
 
     item = items[0].with_indifferent_access

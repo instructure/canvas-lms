@@ -23,15 +23,15 @@ class ApiScopeMappingWriter
   def initialize(resources)
     @resources = resources
     dir = File.dirname(__FILE__)
-    @template = File.read(File.join(dir, '/scope_mapper_template.erb'))
-    @output_file = Rails.root.join("lib", "api_scope_mapper.rb")
+    @template = File.read(File.join(dir, "/scope_mapper_template.erb"))
+    @output_file = Rails.root.join("lib/api_scope_mapper.rb")
     @resource_lookup = {}
   end
 
   def generate_scope_mapper
     mapping = generate_scopes_mapping(@resources)
-    out = ERB.new(@template, trim_mode: '-').result(binding)
-    File.open(@output_file, 'w') { |file| file.write(out) }
+    out = ERB.new(@template, trim_mode: "-").result(binding)
+    File.open(@output_file, "w") { |file| file.write(out) }
   end
 
   private
@@ -44,7 +44,7 @@ class ApiScopeMappingWriter
 
   def process_controllers(controllers, name, resource_hash)
     controllers.each_with_object(resource_hash) do |controller, hash|
-      scope_resource = controller.name.to_s.underscore.gsub('_controller', '')
+      scope_resource = controller.name.to_s.underscore.gsub("_controller", "")
       children = process_children(controller.children, name)
       hash[scope_resource] = hash[scope_resource].nil? ? children : hash[scope_resource].merge(children)
     end

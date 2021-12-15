@@ -160,6 +160,82 @@ describe('buildShape()', () => {
     })
   })
 
+  describe('when shape is diamond', () => {
+    beforeEach(() => {
+      settings = {...settings, shape: 'diamond'}
+    })
+
+    it('builds the x-small <path />', () => {
+      expect(buildShape({...settings, size: 'x-small'})).toMatchInlineSnapshot(`
+        <path
+          d="M33 4L66 33L33 66L4 33L33 4Z"
+        />
+      `)
+    })
+
+    it('builds the small <path />', () => {
+      expect(buildShape({...settings, size: 'small'})).toMatchInlineSnapshot(`
+        <path
+          d="M57 4L114 57L57 114L4 57L57 4Z"
+        />
+      `)
+    })
+
+    it('builds the medium <path />', () => {
+      expect(buildShape({...settings, size: 'medium'})).toMatchInlineSnapshot(`
+        <path
+          d="M75 4L150 75L75 150L4 75L75 4Z"
+        />
+      `)
+    })
+
+    it('builds the large <path />', () => {
+      expect(buildShape({...settings, size: 'large'})).toMatchInlineSnapshot(`
+        <path
+          d="M105 4L210 105L105 210L4 105L105 4Z"
+        />
+      `)
+    })
+  })
+
+  describe('when shape is pentagon', () => {
+    beforeEach(() => {
+      settings = {...settings, shape: 'pentagon'}
+    })
+
+    it('builds the x-small <path />', () => {
+      expect(buildShape({...settings, size: 'x-small'})).toMatchInlineSnapshot(`
+        <path
+          d="M37.0623 14L61 32.75L53.5195 62H21.1039L13 32.75L37.0623 14Z"
+        />
+      `)
+    })
+
+    it('builds the small <path />', () => {
+      expect(buildShape({...settings, size: 'small'})).toMatchInlineSnapshot(`
+        <path
+          d="M61.1247 13L109 50.5L94.039 109H29.2078L13 50.5L61.1247 13Z"
+        />
+      `)
+    })
+
+    it('builds the medium <path />', () => {
+      expect(buildShape({...settings, size: 'medium'})).toMatchInlineSnapshot(`
+        <path
+          d="M79.1714 13L145 64.56L124.429 145H35.285L13 64.5625L79.1714 13Z"
+        />
+      `)
+    })
+
+    it('builds the large <path />', () => {
+      expect(buildShape({...settings, size: 'large'})).toMatchInlineSnapshot(`
+        <path
+          d="M109.249 13L205 88L175.078 205H45.4156L13 88L109.249 13Z"
+        />
+      `)
+    })
+  })
+
   describe('when shape is hexagon', () => {
     beforeEach(() => {
       settings = {...settings, shape: 'hexagon'}

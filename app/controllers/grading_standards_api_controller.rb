@@ -139,9 +139,9 @@ class GradingStandardsApiController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
-          format.json { render :json => grading_standard_json(@standard, @current_user, session) }
+          format.json { render json: grading_standard_json(@standard, @current_user, session) }
         else
-          format.json { render :json => @standard.errors, :status => :bad_request }
+          format.json { render json: @standard.errors, status: :bad_request }
         end
       end
     end
@@ -184,13 +184,11 @@ class GradingStandardsApiController < ApplicationController
   private
 
   def build_grading_scheme(params)
-    grading_standard_params = params.permit('title')
-    grading_standard_params['standard_data'] = {}
-    grading_standard_params['standard_data'].permit!
-    if params['grading_scheme_entry']
-      params['grading_scheme_entry'].each_with_index do |scheme, index|
-        grading_standard_params['standard_data']["scheme_#{index}"] = scheme.permit(:name, :value)
-      end
+    grading_standard_params = params.permit("title")
+    grading_standard_params["standard_data"] = {}
+    grading_standard_params["standard_data"].permit!
+    params["grading_scheme_entry"]&.each_with_index do |scheme, index|
+      grading_standard_params["standard_data"]["scheme_#{index}"] = scheme.permit(:name, :value)
     end
     grading_standard_params
   end

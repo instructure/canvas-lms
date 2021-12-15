@@ -25,9 +25,9 @@ class UserNotesController < ApplicationController
       @can_delete_user_notes = @user.grants_right?(@current_user, session, :delete_user_notes)
       @user_note = UserNote.new
       @user_notes = @user.user_notes.active.desc_by_date
-      @user_notes = @user_notes.paginate(:page => params[:page], :per_page => 20)
+      @user_notes = @user_notes.paginate(page: params[:page], per_page: 20)
       if request.xhr?
-        render :partial => @user_notes
+        render partial: @user_notes
       end
     end
   end
@@ -37,14 +37,14 @@ class UserNotesController < ApplicationController
     return render_unauthorized_action unless @context.root_account.enable_user_notes
 
     if authorized_action(@context, @current_user, :manage_user_notes)
-      if @context && @context.is_a?(Account)
+      if @context.is_a?(Account)
         @users = @context.all_users.active.has_current_student_enrollments
       else # it's a course
         @users = @context.students_visible_to(@current_user).order_by_sortable_name
         @is_course = true
       end
       @users = @users.order("users.last_user_note").order_by_sortable_name
-      @users = @users.paginate(:page => params[:page], :per_page => 20)
+      @users = @users.paginate(page: params[:page], per_page: 20)
     end
   end
 
@@ -53,8 +53,8 @@ class UserNotesController < ApplicationController
     if authorized_action(@user_note, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
-        format.json { render :json => @user_note.as_json(:methods => [:creator_name]), :status => :created }
-        format.text { render :json => @user_note, :status => :created }
+        format.json { render json: @user_note.as_json(methods: [:creator_name]), status: :created }
+        format.text { render json: @user_note, status: :created }
       end
     end
   end
@@ -67,7 +67,7 @@ class UserNotesController < ApplicationController
     # We want notes to be an html field, but we're only using a plaintext box for now. That's why we're
     # doing the trip to html now, instead of on the way out. This should be removed once the user notes
     # entry form is replaced with the rich text editor.
-    self.extend TextHelper
+    extend TextHelper
     user_note_params[:note] = format_message(user_note_params[:note]).first if user_note_params[:note]
     user_note_params[:root_account_id] = @domain_root_account.id
     @user_note = user.user_notes.new(user_note_params)
@@ -76,14 +76,14 @@ class UserNotesController < ApplicationController
     if authorized_action(@user_note.user, @current_user, :create_user_notes)
       respond_to do |format|
         if @user_note.save
-          flash[:notice] = t 'notices.created', "Journal Entry was successfully created."
+          flash[:notice] = t "notices.created", "Journal Entry was successfully created."
           format.html { redirect_to user_user_notes_path }
-          format.json { render :json => @user_note.as_json(:methods => [:creator_name, :formatted_note]), :status => :created }
-          format.text { render :json => @user_note, :status => :created }
+          format.json { render json: @user_note.as_json(methods: [:creator_name, :formatted_note]), status: :created }
+          format.text { render json: @user_note, status: :created }
         else
           format.html { redirect_to(user_user_notes_path) }
-          format.json { render :json => @user_note.errors, :status => :bad_request }
-          format.text { render :json => @user_note.errors, :status => :bad_request }
+          format.json { render json: @user_note.errors, status: :bad_request }
+          format.text { render json: @user_note.errors, status: :bad_request }
         end
       end
     end
@@ -96,7 +96,7 @@ class UserNotesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
-        format.json { render :json => @user_note.as_json(:methods => [:creator_name]), :status => :ok }
+        format.json { render json: @user_note.as_json(methods: [:creator_name]), status: :ok }
       end
     end
   end

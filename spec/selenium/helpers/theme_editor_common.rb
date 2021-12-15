@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module ThemeEditorCommon
   def open_theme_editor_with_btn
-    f('.btn.button-sidebar-wide').click
+    f(".btn.button-sidebar-wide").click
   end
 
   def open_theme_editor(account_id)
@@ -35,24 +35,24 @@ module ThemeEditorCommon
 
   def select_template(template)
     # "Canvas Default" "K12 Theme"
-    select_list = Selenium::WebDriver::Support::Select.new(f('#sharedThemes'))
+    select_list = Selenium::WebDriver::Support::Select.new(f("#sharedThemes"))
     select_list.select_by(:text, template)
   end
 
   def apply_settings
-    f('div.Theme__editor-header_actions > span').click
+    f("div.Theme__editor-header_actions > span").click
     wait_for_ajaximations
     preview_your_changes
     accept_alert
   end
 
   def preview_your_changes
-    f('button.Button.Button--primary > span').click
+    f("button.Button.Button--primary > span").click
     wait_for_ajaximations
   end
 
   def warning_message_css
-    '.ic-Form-message--error'
+    ".ic-Form-message--error"
   end
 
   def all_warning_messages
@@ -72,63 +72,63 @@ module ThemeEditorCommon
   end
 
   def primary_color
-    f('#brand_config\\[variables\\]\\[ic-brand-primary\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-primary\\]")
   end
 
   def primary_button
-    f('#brand_config\\[variables\\]\\[ic-brand-button--primary-bgd\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-button--primary-bgd\\]")
   end
 
   def primary_button_text
-    f('#brand_config\\[variables\\]\\[ic-brand-button--primary-text\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-button--primary-text\\]")
   end
 
   def secondary_button
-    f('#brand_config\\[variables\\]\\[ic-brand-button--secondary-bgd\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-button--secondary-bgd\\]")
   end
 
   def secondary_button_text
-    f('#brand_config\\[variables\\]\\[ic-brand-button--secondary-text\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-button--secondary-text\\]")
   end
 
   def link_color
-    f('#brand_config\\[variables\\]\\[ic-link-color\\]')
+    f("#brand_config\\[variables\\]\\[ic-link-color\\]")
   end
 
   def nav_background
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-bgd\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-bgd\\]")
   end
 
   def nav_icon
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-ic-icon-svg-fill\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-ic-icon-svg-fill\\]")
   end
 
   def nav_icon_active
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-ic-icon-svg-fill--active\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-ic-icon-svg-fill--active\\]")
   end
 
   def nav_text
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__text-color\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__text-color\\]")
   end
 
   def nav_text_active
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__text-color--active\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__text-color--active\\]")
   end
 
   def nav_avatar_border
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-avatar-border\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-avatar-border\\]")
   end
 
   def nav_badge
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__badge-bgd\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-menu-item__badge-bgd\\]")
   end
 
   def logo_background
-    f('#brand_config\\[variables\\]\\[ic-brand-global-nav-logo-bgd\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-global-nav-logo-bgd\\]")
   end
 
   def window_title_color
-    f('#brand_config\\[variables\\]\\[ic-brand-msapplication-tile-color\\]')
+    f("#brand_config\\[variables\\]\\[ic-brand-msapplication-tile-color\\]")
   end
 
   def all_global_branding
@@ -150,13 +150,13 @@ module ThemeEditorCommon
     [window_title_color]
   end
 
-  def all_colors(array, color = 'random')
+  def all_colors(array, color = "random")
     array.each do |x|
-      x.send_keys(color == 'random' ? random_hex_color : color)
+      x.send_keys(color == "random" ? random_hex_color : color)
     end
   end
 
-  def create_theme(color = 'random')
+  def create_theme(color = "random")
     click_global_branding
     all_colors(all_global_branding, color)
 

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-%w{Twitter}.each do |integration|
+%w[Twitter].each do |integration|
   describe integration do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
     end
 
     def oauth_start(integration)
@@ -33,7 +33,7 @@
       end
 
       # mock up the response from the 3rd party service, so we don't actually contact it
-      expect_any_instance_of(OAuth::Consumer).to receive(:token_request).and_return({ :oauth_token => "test_token", :oauth_token_secret => "test_secret", :authorize_url => "http://oauth.example.com/start" })
+      expect_any_instance_of(OAuth::Consumer).to receive(:token_request).and_return({ oauth_token: "test_token", oauth_token_secret: "test_secret", authorize_url: "http://oauth.example.com/start" })
       expect_any_instance_of(OAuth::RequestToken).to receive(:authorize_url).and_return("http://oauth.example.com/start")
       get "/oauth?service=#{integration.underscore}"
     end
@@ -61,12 +61,12 @@
     describe "oauth_success" do
       before do
         OAuthRequest.create!({
-                               :service => integration.underscore,
-                               :token => "test_token",
-                               :secret => "test_secret",
-                               :return_url => user_profile_url(@user),
-                               :user => @user,
-                               :original_host_with_port => "www.example.com",
+                               service: integration.underscore,
+                               token: "test_token",
+                               secret: "test_secret",
+                               return_url: user_profile_url(@user),
+                               user: @user,
+                               original_host_with_port: "www.example.com",
                              })
       end
 
@@ -93,7 +93,7 @@
 
         if integration == "Twitter"
           expect(Twitter::Connection).to receive(:from_request_token).and_return(double("TwitterConnection",
-                                                                                        access_token: double("AccessToken", token: 'test_token', secret: 'test_secret'),
+                                                                                        access_token: double("AccessToken", token: "test_token", secret: "test_secret"),
                                                                                         service_user_id: "test_user_id",
                                                                                         service_user_name: "test_user_name"))
         end

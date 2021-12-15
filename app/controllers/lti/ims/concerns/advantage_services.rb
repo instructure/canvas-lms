@@ -42,7 +42,7 @@ module Lti::IMS::Concerns
       end
 
       def context
-        raise 'Abstract Method'
+        raise "Abstract Method"
       end
 
       def active_binding_for_account?

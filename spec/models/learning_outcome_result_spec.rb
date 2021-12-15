@@ -40,11 +40,11 @@ describe LearningOutcomeResult do
   end
 
   def create_and_associate_lor(association_object, associated_asset = nil)
-    outcome = course.created_learning_outcomes.create!(title: 'outcome')
+    outcome = course.created_learning_outcomes.create!(title: "outcome")
 
     LearningOutcomeResult.new(
       alignment: ContentTag.create!({
-                                      title: 'content',
+                                      title: "content",
                                       context: course,
                                       learning_outcome: outcome
                                     }),
@@ -57,22 +57,23 @@ describe LearningOutcomeResult do
     end
   end
 
-  it_behaves_like 'soft deletion' do
+  it_behaves_like "soft deletion" do
+    subject { LearningOutcomeResult.all }
+
     let(:first) { learning_outcome_result }
     let(:second) { create_and_associate_lor(course.assignments.create!) }
-    subject { LearningOutcomeResult.all }
   end
 
-  describe '#submitted_or_assessed_at' do
+  describe "#submitted_or_assessed_at" do
     let_once(:submitted_at) { 1.month.ago }
     let_once(:assessed_at) { 2.weeks.ago }
 
-    it 'returns #submitted_at when present' do
+    it "returns #submitted_at when present" do
       learning_outcome_result.update(submitted_at: submitted_at)
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(submitted_at)
     end
 
-    it 'returns #assessed_at when #submitted_at is not present' do
+    it "returns #assessed_at when #submitted_at is not present" do
       learning_outcome_result.assign_attributes({
                                                   assessed_at: assessed_at,
                                                   submitted_at: nil
@@ -81,8 +82,8 @@ describe LearningOutcomeResult do
     end
   end
 
-  describe 'exclude_muted_associations scope' do
-    shared_examples_for 'muting assignment' do
+  describe "exclude_muted_associations scope" do
+    shared_examples_for "muting assignment" do
       let(:outcome_result_scope) do
         LearningOutcomeResult.where(
           association_type: outcome_result_association_object.class,
@@ -90,15 +91,15 @@ describe LearningOutcomeResult do
         )
       end
 
-      context 'assignment with posted submissions' do
-        it 'includes assignment result' do
+      context "assignment with posted submissions" do
+        it "includes assignment result" do
           assignment.submission_for_student(student).update!(posted_at: Time.zone.now)
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
       end
 
-      context 'assignment with unposted submissions with default posting policy' do
-        it 'includes assignment result' do
+      context "assignment with unposted submissions with default posting policy" do
+        it "includes assignment result" do
           # By default, an automatic post policy (post_manually: false) is associated to
           # an assignment.  Now that post policy is included in exclude_muted_associations
           # the outcome result will appear in LMGB/SLMGB.  It will not appear for manual
@@ -108,37 +109,37 @@ describe LearningOutcomeResult do
         end
       end
 
-      context 'not graded assignment with unposted submissions with default posting policy' do
-        it 'includes assignment result' do
-          assignment.update!(grading_type: 'not_graded')
+      context "not graded assignment with unposted submissions with default posting policy" do
+        it "includes assignment result" do
+          assignment.update!(grading_type: "not_graded")
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
       end
 
-      context 'graded assignment with unposted submissions with manual posting policy' do
-        it 'excludes assignment results' do
+      context "graded assignment with unposted submissions with manual posting policy" do
+        it "excludes assignment results" do
           assignment.post_policy.update!(post_manually: true)
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 0
         end
       end
 
-      context 'not graded assignment with unposted submissions with manual posting policy' do
-        it 'includes assignment results' do
+      context "not graded assignment with unposted submissions with manual posting policy" do
+        it "includes assignment results" do
           assignment.post_policy.update!(post_manually: true)
-          assignment.update!(grading_type: 'not_graded')
+          assignment.update!(grading_type: "not_graded")
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
       end
     end
 
-    context 'with quiz assignment' do
+    context "with quiz assignment" do
       let_once(:assignment) { quiz.assignment }
       let_once(:outcome_result_association_object) { quiz }
 
-      include_examples 'muting assignment'
+      include_examples "muting assignment"
     end
 
-    context 'with assignment result' do
+    context "with assignment result" do
       let_once(:assignment) { course.assignments.create! }
       let_once(:outcome_result_association_object) { assignment }
 
@@ -146,13 +147,13 @@ describe LearningOutcomeResult do
         create_and_associate_lor(assignment)
       end
 
-      include_examples 'muting assignment'
+      include_examples "muting assignment"
     end
 
-    context 'with rubric association result' do
+    context "with rubric association result" do
       let_once(:assignment) { course.assignments.create! }
       let_once(:rubric_association) do
-        rubric_assessment_model(user: student, context: course, association_object: assignment, purpose: 'grading')
+        rubric_assessment_model(user: student, context: course, association_object: assignment, purpose: "grading")
         @rubric_association
       end
       let_once(:outcome_result_association_object) { rubric_association }
@@ -161,14 +162,14 @@ describe LearningOutcomeResult do
         create_and_associate_lor(rubric_association, assignment)
       end
 
-      include_examples 'muting assignment'
+      include_examples "muting assignment"
     end
   end
 
   describe "with_active_link scope" do
     it "doesn't return deleted outcomes" do
       expect(LearningOutcomeResult.with_active_link.count).to eq(1), "precondition"
-      learning_outcome_result.alignment.workflow_state = 'deleted'
+      learning_outcome_result.alignment.workflow_state = "deleted"
       learning_outcome_result.alignment.save!
       expect(LearningOutcomeResult.with_active_link.count).to eq 0
     end
@@ -349,37 +350,37 @@ describe LearningOutcomeResult do
     end
   end
 
-  describe '#assignment' do
-    it 'returns the Assignment if association object is Assignment' do
+  describe "#assignment" do
+    it "returns the Assignment if association object is Assignment" do
       assignment = assignment_model
       lor = create_and_associate_lor(assignment)
 
       expect(lor.assignment).to eq(assignment)
     end
 
-    it 'returns the Assignment from the artifact if one doesnt explicitly exist' do
+    it "returns the Assignment from the artifact if one doesnt explicitly exist" do
       lor = create_and_associate_lor(nil)
       lor.artifact = rubric_assessment_model(user: student, context: course)
       expect(lor.assignment).to eq(lor.artifact.submission.assignment)
     end
 
-    it 'returns nil if no explicit assignment or artifact exists' do
+    it "returns nil if no explicit assignment or artifact exists" do
       lor = create_and_associate_lor(nil)
 
       expect(lor.assignment).to eq(nil)
     end
   end
 
-  describe 'before save' do
-    describe '#ensure_user_uuid' do
-      it 'sets user uuid if one is not present' do
+  describe "before save" do
+    describe "#ensure_user_uuid" do
+      it "sets user uuid if one is not present" do
         learning_outcome_result.save!
         expect(learning_outcome_result.user_uuid).to eq(student.uuid)
       end
     end
 
-    describe 'set_root_account_id' do
-      it 'sets root_account_id using course' do
+    describe "set_root_account_id" do
+      it "sets root_account_id using course" do
         learning_outcome_result.save!
         expect(learning_outcome_result.root_account_id).to be_present
         expect(learning_outcome_result.root_account_id).to eq(course.root_account_id)
@@ -387,8 +388,8 @@ describe LearningOutcomeResult do
     end
   end
 
-  describe '#save_to_version' do
-    it 'updates the attempt version with the current model state' do
+  describe "#save_to_version" do
+    it "updates the attempt version with the current model state" do
       learning_outcome_result.attempt = 1
       learning_outcome_result.save!
       attempt1_version = learning_outcome_result.versions.current

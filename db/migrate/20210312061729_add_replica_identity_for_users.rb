@@ -22,14 +22,14 @@ class AddReplicaIdentityForUsers < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'User', :root_account_ids, []
+    add_replica_identity "User", :root_account_ids, []
     change_column_default :users, :root_account_ids, []
     remove_index :users, column: :root_account_ids, if_exists: true
   end
 
   def down
     add_index :users, :root_account_ids, algorithm: :concurrently, using: :gin, if_not_exists: true
-    remove_replica_identity 'User'
+    remove_replica_identity "User"
     change_column_null :users, :root_account_ids, true
     change_column_default :users, :root_account_ids, nil
   end

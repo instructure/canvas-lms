@@ -24,7 +24,7 @@ class UserService < ActiveRecord::Base
   belongs_to :user
   attr_reader :password
 
-  validates_presence_of :user_id, :service, :service_user_id, :workflow_state
+  validates :user_id, :service, :service_user_id, :workflow_state, presence: true
 
   before_save :infer_defaults
   after_save :assert_relations
@@ -32,30 +32,30 @@ class UserService < ActiveRecord::Base
   after_save :clear_cache_key
 
   def should_have_communication_channel?
-    [CommunicationChannel::TYPE_TWITTER].include?(service) && self.user
+    [CommunicationChannel::TYPE_TWITTER].include?(service) && user
   end
 
   def assert_relations
     if should_have_communication_channel?
-      cc = self.user.communication_channels.where(path_type: service).first_or_initialize
+      cc = user.communication_channels.where(path_type: service).first_or_initialize
       cc.path_type = service
-      cc.workflow_state = 'active'
-      cc.path = "#{self.service_user_id}@#{service}.com"
+      cc.workflow_state = "active"
+      cc.path = "#{service_user_id}@#{service}.com"
       cc.save!
     end
-    if self.user_id && self.service
-      UserService.where(:user_id => self.user_id, :service => self.service).where("id<>?", self).delete_all
+    if user_id && service
+      UserService.where(user_id: user_id, service: service).where("id<>?", self).delete_all
     end
     true
   end
 
   def clear_cache_key
-    self.user.clear_cache_key(:user_services)
+    user.clear_cache_key(:user_services)
   end
 
   def assert_communication_channel
     # why is twitter getting special treatment?
-    self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
+    touch if should_have_communication_channel? && !user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
 
   def infer_defaults
@@ -65,34 +65,34 @@ class UserService < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :failed_request, :transitions_to => :failed
+      event :failed_request, transitions_to: :failed
     end
 
     state :failed
   end
 
-  scope :of_type, lambda { |type| where(:type => type.to_s) }
+  scope :of_type, ->(type) { where(type: type.to_s) }
 
   scope :to_be_polled, -> { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
-  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
   scope :for_service, lambda { |service|
     service = service.service if service.is_a?(UserService)
-    where(:service => service.to_s)
+    where(service: service.to_s)
   }
   scope :visible, -> { where("visible") }
 
   def service_name
-    self.service.titleize rescue ""
+    service.titleize rescue ""
   end
 
   def password=(password)
-    self.crypted_password, self.password_salt = Canvas::Security.encrypt_password(password, 'instructure_user_service')
+    self.crypted_password, self.password_salt = Canvas::Security.encrypt_password(password, "instructure_user_service")
   end
 
   def decrypted_password
-    return nil unless self.password_salt && self.crypted_password
+    return nil unless password_salt && crypted_password
 
-    Canvas::Security.decrypt_password(self.crypted_password, self.password_salt, 'instructure_user_service')
+    Canvas::Security.decrypt_password(crypted_password, password_salt, "instructure_user_service")
   end
 
   def self.register(opts = {})
@@ -124,19 +124,19 @@ class UserService < ActiveRecord::Base
     opts[:secret] = nil
     opts[:service] = params[:service]
     case opts[:service]
-    when 'delicious'
+    when "delicious"
       opts[:service_domain] = "delicious.com"
       opts[:protocol] = "http-auth"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
       opts[:password] = params[:password]
-    when 'diigo'
+    when "diigo"
       opts[:service_domain] = "diigo.com"
       opts[:protocol] = "http-auth"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
       opts[:password] = params[:password]
-    when 'skype'
+    when "skype"
       opts[:service_domain] = "skype.com"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
@@ -152,20 +152,20 @@ class UserService < ActiveRecord::Base
   end
 
   def has_readable_user_name?
-    service == 'google_drive'
+    service == "google_drive"
   end
 
   def self.sort_position(type)
     case type
-    when 'google_drive'
+    when "google_drive"
       2
-    when 'skype'
+    when "skype"
       3
     when CommunicationChannel::TYPE_TWITTER
       4
-    when 'delicious'
+    when "delicious"
       7
-    when 'diigo'
+    when "diigo"
       8
     else
       999
@@ -174,35 +174,35 @@ class UserService < ActiveRecord::Base
 
   def self.short_description(type)
     case type
-    when 'google_drive'
-      t '#user_service.descriptions.google_drive', 'Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.'
+    when "google_drive"
+      t "#user_service.descriptions.google_drive", "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
     when CommunicationChannel::TYPE_TWITTER
-      t '#user_service.descriptions.twitter', 'Twitter is a great resource for out-of-class communication.'
-    when 'delicious'
-      t '#user_service.descriptions.delicious', 'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
-    when 'diigo'
-      t '#user_service.descriptions.diigo', 'Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Diigo accounts to share links of similar interest.'
-    when 'skype'
-      t '#user_service.descriptions.skype', 'Skype is a free tool for online voice and video calls.'
+      t "#user_service.descriptions.twitter", "Twitter is a great resource for out-of-class communication."
+    when "delicious"
+      t "#user_service.descriptions.delicious", "Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Delicious accounts to share links of similar interest."
+    when "diigo"
+      t "#user_service.descriptions.diigo", "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
+    when "skype"
+      t "#user_service.descriptions.skype", "Skype is a free tool for online voice and video calls."
     else # 'google_calendar'
-      ''
+      ""
     end
   end
 
   def self.registration_url(type)
     case type
-    when 'google_drive'
-      'https://www.google.com/drive/'
-    when 'google_calendar'
-      'http://calendar.google.com'
+    when "google_drive"
+      "https://www.google.com/drive/"
+    when "google_calendar"
+      "http://calendar.google.com"
     when CommunicationChannel::TYPE_TWITTER
-      'http://twitter.com/signup'
-    when 'delicious'
-      'http://delicious.com/'
-    when 'diigo'
-      'https://www.diigo.com/sign-up'
-    when 'skype'
-      'http://www.skype.com/go/register'
+      "http://twitter.com/signup"
+    when "delicious"
+      "http://delicious.com/"
+    when "diigo"
+      "https://www.diigo.com/sign-up"
+    when "skype"
+      "http://www.skype.com/go/register"
     else
       nil
     end
@@ -210,34 +210,37 @@ class UserService < ActiveRecord::Base
 
   def service_user_link
     case service
-    when 'google_drive'
-      'https://myaccount.google.com/?pli=1'
-    when 'google_calendar'
-      'http://calendar.google.com'
+    when "google_drive"
+      "https://myaccount.google.com/?pli=1"
+    when "google_calendar"
+      "http://calendar.google.com"
     when CommunicationChannel::TYPE_TWITTER
       "http://www.twitter.com/#{service_user_name}"
-    when 'delicious'
+    when "delicious"
       "http://www.delicious.com/#{service_user_name}"
-    when 'diigo'
+    when "diigo"
       "http://www.diigo.com/user/#{service_user_name}"
-    when 'skype'
+    when "skype"
       "skype:#{service_user_name}?add"
     else
-      'http://www.instructure.com'
+      "http://www.instructure.com"
     end
   end
 
   def self.service_type(type)
-    if type == 'google_docs' || type == 'google_drive'
-      'DocumentService'
-    elsif type == 'delicious' || type == 'diigo'
-      'BookmarkService'
+    case type
+    when "google_docs", "google_drive"
+      "DocumentService"
+    when "delicious", "diigo"
+      "BookmarkService"
     else
-      'UserService'
+      "UserService"
     end
   end
 
-  def self.serialization_excludes; [:crypted_password, :password_salt, :token, :secret]; end
+  def self.serialization_excludes
+    %i[crypted_password password_salt token secret]
+  end
 
   def self.associated_shards(_service, _service_user_id)
     [Shard.default]

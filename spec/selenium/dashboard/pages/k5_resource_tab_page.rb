@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/color_common'
+require_relative "../../common"
+require_relative "../../helpers/color_common"
 
 module K5ResourceTabPageObject
   include ColorCommon
@@ -196,7 +196,7 @@ module K5ResourceTabPageObject
   end
 
   def is_cancel_available?
-    element_value_for_attr(cancel_button, 'cursor') == 'pointer'
+    element_value_for_attr(cancel_button, "cursor") == "pointer"
   end
 
   def is_modal_gone?(user_name)
@@ -204,7 +204,7 @@ module K5ResourceTabPageObject
   end
 
   def is_send_available?
-    element_value_for_attr(send_button, 'cursor') == 'pointer'
+    element_value_for_attr(send_button, "cursor") == "pointer"
   end
 
   def message_modal_displayed?(user_name)

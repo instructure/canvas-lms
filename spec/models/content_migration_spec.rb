@@ -24,7 +24,7 @@ describe ContentMigration do
     @cm = ContentMigration.create!(context: @course, user: @teacher)
   end
 
-  describe '#trigger_live_events!' do
+  describe "#trigger_live_events!" do
     subject do
       content_migration.instance_variable_set(:@imported_migration_items_hash, migration_items)
       content_migration
@@ -35,7 +35,7 @@ describe ContentMigration do
         context: destination,
         workflow_state: workflow_state,
         user: user,
-        migration_type: 'course_copy_importer',
+        migration_type: "course_copy_importer",
         source_course: context
       )
     end
@@ -45,7 +45,7 @@ describe ContentMigration do
     end
     let(:context) { course_model }
     let(:destination) { course_model }
-    let(:workflow_state) { 'started' }
+    let(:workflow_state) { "started" }
     let(:migration_items) { {} }
 
     before do
@@ -53,10 +53,10 @@ describe ContentMigration do
       allow(Canvas::LiveEventsCallbacks).to receive(:after_create).and_return(true)
     end
 
-    context 'when the class is not observed by live events observer' do
+    context "when the class is not observed by live events observer" do
       let(:migration_items) do
         {
-          'ContextExternalTool' => {
+          "ContextExternalTool" => {
             SecureRandom.uuid => external_tool
           }
         }
@@ -64,26 +64,26 @@ describe ContentMigration do
       let(:external_tool) do
         ContextExternalTool.create!(
           context: context,
-          url: 'https://www.test.com',
-          name: 'test tool',
-          shared_secret: 'secret',
-          consumer_key: 'key'
+          url: "https://www.test.com",
+          name: "test tool",
+          shared_secret: "secret",
+          consumer_key: "key"
         )
       end
 
-      it 'does not trigger an event' do
+      it "does not trigger an event" do
         expect(Canvas::LiveEventsCallbacks).not_to receive(:after_create).with(external_tool)
         expect(Canvas::LiveEventsCallbacks).not_to receive(:after_update).with(external_tool)
         subject.trigger_live_events!
       end
     end
 
-    context 'when an item is created after the started_at time' do
+    context "when an item is created after the started_at time" do
       let(:start_time) { Time.zone.now }
-      let(:assignment) { Assignment.create(course: context, name: 'Test Assignment') }
+      let(:assignment) { Assignment.create(course: context, name: "Test Assignment") }
       let(:migration_items) do
         {
-          'Assignment' => {
+          "Assignment" => {
             SecureRandom.uuid => assignment
           }
         }
@@ -101,11 +101,11 @@ describe ContentMigration do
       end
     end
 
-    context 'when an item was created before the started_at time' do
-      let(:assignment) { Assignment.create(course: context, name: 'Test Assignment') }
+    context "when an item was created before the started_at time" do
+      let(:assignment) { Assignment.create(course: context, name: "Test Assignment") }
       let(:migration_items) do
         {
-          'Assignment' => {
+          "Assignment" => {
             SecureRandom.uuid => assignment
           }
         }
@@ -127,8 +127,8 @@ describe ContentMigration do
   describe "#prepare_data" do
     it "strips invalid utf8" do
       data = {
-        'assessment_questions' => [{
-          'question_name' => +"hai\xfbabcd"
+        "assessment_questions" => [{
+          "question_name" => +"hai\xfbabcd"
         }]
       }
       expect(ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name]).to eq "haiabcd"
@@ -141,12 +141,12 @@ describe ContentMigration do
     end
 
     it "returns true for everything if 'everything' is selected" do
-      @cm.migration_ids_to_import = { :copy => { :everything => "1" } }
+      @cm.migration_ids_to_import = { copy: { everything: "1" } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
     it "returns true if there are no copy options" do
-      @cm.migration_ids_to_import = { :copy => {} }
+      @cm.migration_ids_to_import = { copy: {} }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
@@ -155,23 +155,23 @@ describe ContentMigration do
     end
 
     it "returns true for all object types if the all_ option is true" do
-      @cm.migration_ids_to_import = { :copy => { :all_content_migrations => "1" } }
+      @cm.migration_ids_to_import = { copy: { all_content_migrations: "1" } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
     it "returns false for objects not selected" do
       @cm.save!
-      @cm.migration_ids_to_import = { :copy => { :all_content_migrations => "0" } }
+      @cm.migration_ids_to_import = { copy: { all_content_migrations: "0" } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
-      @cm.migration_ids_to_import = { :copy => { :content_migrations => {} } }
+      @cm.migration_ids_to_import = { copy: { content_migrations: {} } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
-      @cm.migration_ids_to_import = { :copy => { :content_migrations => { CC::CCHelper.create_key(@cm) => "0" } } }
+      @cm.migration_ids_to_import = { copy: { content_migrations: { CC::CCHelper.create_key(@cm) => "0" } } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
     end
 
     it "returns true for selected objects" do
       @cm.save!
-      @cm.migration_ids_to_import = { :copy => { :content_migrations => { CC::CCHelper.create_key(@cm) => "1" } } }
+      @cm.migration_ids_to_import = { copy: { content_migrations: { CC::CCHelper.create_key(@cm) => "1" } } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
   end
@@ -184,15 +184,15 @@ describe ContentMigration do
   context "zip file import" do
     def setup_zip_import(context, filename = "file.zip", import_immediately: false)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
-      cm = ContentMigration.new(:context => context, :user => @user)
-      cm.migration_type = 'zip_file_importer'
+      cm = ContentMigration.new(context: context, user: @user)
+      cm.migration_type = "zip_file_importer"
       cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
-      cm.migration_settings['import_immediately'] = import_immediately
+      cm.migration_settings["import_immediately"] = import_immediately
       cm.save!
 
       attachment = Attachment.new
       attachment.context = cm
-      attachment.uploaded_data = File.open(zip_path, 'rb')
+      attachment.uploaded_data = File.open(zip_path, "rb")
       attachment.filename = filename
       attachment.save!
 
@@ -267,13 +267,13 @@ describe ContentMigration do
 
   it "uses url for migration file" do
     cm = @cm
-    cm.migration_type = 'zip_file_importer'
+    cm.migration_type = "zip_file_importer"
     cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
     # the double below should prevent it from actually hitting the url
     cm.migration_settings[:file_url] = "http://localhost:3000/file.zip"
     cm.save!
 
-    expect_any_instance_of(Attachment).to receive(:clone_url).with(cm.migration_settings[:file_url], false, true, :quota_context => cm.context)
+    expect_any_instance_of(Attachment).to receive(:clone_url).with(cm.migration_settings[:file_url], false, true, quota_context: cm.context)
 
     cm.queue_migration
     worker = CC::Importer::CCWorker.new
@@ -284,21 +284,21 @@ describe ContentMigration do
     it "imports question banks from qti migrations" do
       skip unless Qti.qti_enabled?
 
-      account = Account.create!(:name => 'account')
+      account = Account.create!(name: "account")
       account.account_users.create!(user: @user)
-      cm = ContentMigration.new(:context => account, :user => @user)
-      cm.migration_type = 'qti_converter'
-      cm.migration_settings['import_immediately'] = true
-      qb_name = 'Import Unfiled Questions Into Me'
-      cm.migration_settings['question_bank_name'] = qb_name
+      cm = ContentMigration.new(context: account, user: @user)
+      cm.migration_type = "qti_converter"
+      cm.migration_settings["import_immediately"] = true
+      qb_name = "Import Unfiled Questions Into Me"
+      cm.migration_settings["question_bank_name"] = qb_name
       cm.save!
       expect(cm.root_account_id).to eq account.id
 
       package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_default_qb_test.zip")
       attachment = Attachment.new
       attachment.context = cm
-      attachment.uploaded_data = File.open(package_path, 'rb')
-      attachment.filename = 'file.zip'
+      attachment.uploaded_data = File.open(package_path, "rb")
+      attachment.filename = "file.zip"
       attachment.save!
 
       cm.attachment = attachment
@@ -319,18 +319,18 @@ describe ContentMigration do
     it "imports questions from quizzes into question banks" do
       skip unless Qti.qti_enabled?
 
-      account = Account.create!(:name => 'account')
+      account = Account.create!(name: "account")
       account.account_users.create!(user: @user)
-      cm = ContentMigration.new(:context => account, :user => @user)
-      cm.migration_type = 'qti_converter'
-      cm.migration_settings['import_immediately'] = true
+      cm = ContentMigration.new(context: account, user: @user)
+      cm.migration_type = "qti_converter"
+      cm.migration_settings["import_immediately"] = true
       cm.save!
 
       package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
       attachment = Attachment.new
       attachment.context = cm
-      attachment.uploaded_data = File.open(package_path, 'rb')
-      attachment.filename = 'file.zip'
+      attachment.uploaded_data = File.open(package_path, "rb")
+      attachment.filename = "file.zip"
       attachment.save!
 
       cm.attachment = attachment
@@ -351,18 +351,18 @@ describe ContentMigration do
     it "does not re-use the question_bank without overwrite_quizzes" do
       skip unless Qti.qti_enabled?
 
-      account = Account.create!(:name => 'account')
+      account = Account.create!(name: "account")
       account.account_users.create!(user: @user)
-      cm = ContentMigration.new(:context => account, :user => @user)
-      cm.migration_type = 'qti_converter'
-      cm.migration_settings['import_immediately'] = true
+      cm = ContentMigration.new(context: account, user: @user)
+      cm.migration_type = "qti_converter"
+      cm.migration_settings["import_immediately"] = true
       cm.save!
 
       package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
       attachment = Attachment.new
       attachment.context = cm
-      attachment.uploaded_data = File.open(package_path, 'rb')
-      attachment.filename = 'file.zip'
+      attachment.uploaded_data = File.open(package_path, "rb")
+      attachment.filename = "file.zip"
       attachment.save!
 
       cm.attachment = attachment
@@ -387,21 +387,21 @@ describe ContentMigration do
     it "re-uses the question_bank (and everything else) with overwrite_quizzes" do
       skip unless Qti.qti_enabled?
 
-      account = Account.create!(:name => 'account')
+      account = Account.create!(name: "account")
       account.account_users.create!(user: @user)
-      cm = ContentMigration.new(:context => account, :user => @user)
-      cm.migration_type = 'qti_converter'
-      cm.migration_settings['import_immediately'] = true
+      cm = ContentMigration.new(context: account, user: @user)
+      cm.migration_type = "qti_converter"
+      cm.migration_settings["import_immediately"] = true
 
       # having this set used to always prepend the id, and it would get set it there were any other imported quizzes/questions
-      cm.migration_settings['id_prepender'] = 'thisusedtobreakstuff'
+      cm.migration_settings["id_prepender"] = "thisusedtobreakstuff"
       cm.save!
 
       package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
       attachment = Attachment.new
       attachment.context = cm
-      attachment.uploaded_data = File.open(package_path, 'rb')
-      attachment.filename = 'file.zip'
+      attachment.uploaded_data = File.open(package_path, "rb")
+      attachment.filename = "file.zip"
       attachment.save!
 
       cm.attachment = attachment
@@ -410,8 +410,8 @@ describe ContentMigration do
       cm.queue_migration
       run_jobs
 
-      cm.migration_settings['overwrite_quizzes'] = true
-      cm.migration_settings['id_prepender'] = 'somethingelse'
+      cm.migration_settings["overwrite_quizzes"] = true
+      cm.migration_settings["id_prepender"] = "somethingelse"
       cm.save!
       # run again
       cm.queue_migration
@@ -431,18 +431,18 @@ describe ContentMigration do
     skip unless Qti.qti_enabled?
 
     cm = @cm
-    cm.migration_type = 'qti_converter'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "qti_converter"
+    cm.migration_settings["import_immediately"] = true
 
     # having this set used to always prepend the id, and it would get set it there were any other imported quizzes/questions
-    cm.migration_settings['id_prepender'] = 'thisusedtobreakstuff'
+    cm.migration_settings["id_prepender"] = "thisusedtobreakstuff"
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
     attachment = Attachment.new
     attachment.context = cm
-    attachment.uploaded_data = File.open(package_path, 'rb')
-    attachment.filename = 'file.zip'
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
     attachment.save!
 
     cm.attachment = attachment
@@ -458,7 +458,7 @@ describe ContentMigration do
     qq.save!
     orig_quiz.destroy
 
-    cm.migration_settings['id_prepender'] = 'somethingelse'
+    cm.migration_settings["id_prepender"] = "somethingelse"
     cm.save!
     # run again, should create a new quiz
     cm.queue_migration
@@ -470,8 +470,8 @@ describe ContentMigration do
 
     new_quiz = @course.quizzes.active.first
 
-    cm.migration_settings['overwrite_quizzes'] = true
-    cm.migration_settings['id_prepender'] = 'somethingelse_again'
+    cm.migration_settings["overwrite_quizzes"] = true
+    cm.migration_settings["id_prepender"] = "somethingelse_again"
     cm.save!
     # run again, but this time restore the deleted quiz
     cm.queue_migration
@@ -492,15 +492,15 @@ describe ContentMigration do
     skip unless Qti.qti_enabled?
 
     cm = @cm
-    cm.migration_type = 'qti_converter'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "qti_converter"
+    cm.migration_settings["import_immediately"] = true
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
     attachment = Attachment.new
     attachment.context = cm
-    attachment.uploaded_data = File.open(package_path, 'rb')
-    attachment.filename = 'file.zip'
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
     attachment.save!
 
     cm.attachment = attachment
@@ -513,8 +513,8 @@ describe ContentMigration do
     teh_quiz = @course.quizzes.first
     teh_quiz.destroy!
 
-    cm.migration_settings['id_prepender'] = 'blah!'
-    cm.migration_settings['migration_ids_to_import'] = { 'copy' => { 'quizzes' => { teh_quiz.migration_id => '1' } } }
+    cm.migration_settings["id_prepender"] = "blah!"
+    cm.migration_settings["migration_ids_to_import"] = { "copy" => { "quizzes" => { teh_quiz.migration_id => "1" } } }
     cm.save!
     cm.queue_migration
     run_jobs
@@ -525,21 +525,21 @@ describe ContentMigration do
     skip unless Qti.qti_enabled?
 
     cm = @cm
-    cm.migration_type = 'qti_converter'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "qti_converter"
+    cm.migration_settings["import_immediately"] = true
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
-    attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
+    attachment = Attachment.create!(context: cm, uploaded_data: File.open(package_path, "rb"), filename: "file.zip")
     cm.attachment = attachment
     cm.save!
 
     cm.queue_migration
     run_jobs
 
-    html_text = @course.quiz_questions.where(:migration_id => "ID_5eb2ac5ba1c19_100").first.question_data[:question_text]
+    html_text = @course.quiz_questions.where(migration_id: "ID_5eb2ac5ba1c19_100").first.question_data[:question_text]
     expect(html_text).to eq "This is <b>Bold</b>"
-    plain_text = @course.quiz_questions.where(:migration_id => "ID_5eb2ac5ba1c19_104").first.question_data[:question_text]
+    plain_text = @course.quiz_questions.where(migration_id: "ID_5eb2ac5ba1c19_104").first.question_data[:question_text]
     expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 
@@ -547,15 +547,15 @@ describe ContentMigration do
     skip unless Qti.qti_enabled?
 
     cm = @cm
-    cm.migration_type = 'qti_converter'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "qti_converter"
+    cm.migration_settings["import_immediately"] = true
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_default_qb_test.tar.gz")
     attachment = Attachment.new
     attachment.context = cm
-    attachment.uploaded_data = File.open(package_path, 'rb')
-    attachment.filename = 'file.zip'
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
     attachment.save!
 
     cm.attachment = attachment
@@ -571,15 +571,15 @@ describe ContentMigration do
 
   it "tries to handle utf-16 encoding errors" do
     cm = @cm
-    cm.migration_type = 'canvas_cartridge_importer'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "canvas_cartridge_importer"
+    cm.migration_settings["import_immediately"] = true
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/canvas_cc_utf16_error.zip")
     attachment = Attachment.new
     attachment.context = cm
-    attachment.uploaded_data = File.open(package_path, 'rb')
-    attachment.filename = 'file.zip'
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
     attachment.save!
 
     cm.attachment = attachment
@@ -592,18 +592,18 @@ describe ContentMigration do
   end
 
   it "correclties handle media comment resolution in quizzes" do
-    skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+    skip "Requires QtiMigrationTool" unless Qti.qti_enabled?
 
     cm = @cm
-    cm.migration_type = 'canvas_cartridge_importer'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "canvas_cartridge_importer"
+    cm.migration_settings["import_immediately"] = true
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/canvas_quiz_media_comment.zip")
     attachment = Attachment.new
     attachment.context = cm
-    attachment.uploaded_data = File.open(package_path, 'rb')
-    attachment.filename = 'file.zip'
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
     attachment.save!
 
     cm.attachment = attachment
@@ -624,12 +624,12 @@ describe ContentMigration do
 
   context "migrations with skip_job_progress enabled" do
     before :once do
-      @account = Account.create!(:name => 'account')
+      @account = Account.create!(name: "account")
     end
 
     def create_ab_cm
-      cm = ContentMigration.new(:context => @account)
-      cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
+      cm = ContentMigration.new(context: @account)
+      cm.migration_settings[:migration_type] = "academic_benchmark_importer"
       cm.migration_settings[:import_immediately] = true
       cm.migration_settings[:no_archive_file] = true
       cm.migration_settings[:skip_import_notification] = true
@@ -650,15 +650,15 @@ describe ContentMigration do
       cm1.queue_migration
       cm2 = create_ab_cm
       cm2.queue_migration
-      cm1.workflow_state = 'imported'
+      cm1.workflow_state = "imported"
       expect { cm1.save! }.not_to raise_error
     end
   end
 
   it "expires migration jobs after 48 hours" do
     cm = @cm
-    cm.migration_type = 'common_cartridge_importer'
-    cm.workflow_state = 'created'
+    cm.migration_type = "common_cartridge_importer"
+    cm.workflow_state = "created"
     cm.save!
     cm.queue_migration
 
@@ -670,13 +670,13 @@ describe ContentMigration do
     cm.reload
     expect(cm).to be_failed
     expect(cm.migration_issues).not_to be_empty
-    expect(cm.migration_issues.last.error_report.message).to include 'job expired'
+    expect(cm.migration_issues.last.error_report.message).to include "job expired"
   end
 
   it "expires import jobs after 48 hours" do
     cm = @cm
-    cm.migration_type = 'common_cartridge_importer'
-    cm.workflow_state = 'exported'
+    cm.migration_type = "common_cartridge_importer"
+    cm.workflow_state = "exported"
     cm.save!
     expect(CC::Importer::CCWorker).not_to receive(:new)
     cm.queue_migration
@@ -689,16 +689,16 @@ describe ContentMigration do
     cm.reload
     expect(cm).to be_failed
     expect(cm.migration_issues).not_to be_empty
-    expect(cm.migration_issues.last.error_report.message).to include 'job expired'
+    expect(cm.migration_issues.last.error_report.message).to include "job expired"
   end
 
   it "delays queueing imports if one in course is already running" do
     cms = []
     Timecop.freeze(Time.zone.now) do
       2.times do
-        cm = ContentMigration.new(:context => @course, :user => @teacher)
-        cm.migration_type = 'common_cartridge_importer'
-        cm.workflow_state = 'exported'
+        cm = ContentMigration.new(context: @course, user: @teacher)
+        cm.migration_type = "common_cartridge_importer"
+        cm.workflow_state = "exported"
         cm.save!
         cm.queue_migration
         cms << cm
@@ -719,13 +719,13 @@ describe ContentMigration do
 
   it "tries to handle zip files with a nested root directory" do
     cm = @cm
-    cm.migration_type = 'common_cartridge_importer'
-    cm.migration_settings['import_immediately'] = true
+    cm.migration_type = "common_cartridge_importer"
+    cm.migration_settings["import_immediately"] = true
     cm.save!
 
     package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_nested.zip")
-    attachment = Attachment.new(:context => cm, :filename => 'file.zip')
-    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment = Attachment.new(context: cm, filename: "file.zip")
+    attachment.uploaded_data = File.open(package_path, "rb")
     attachment.save!
 
     cm.update_attribute(:attachment, attachment)
@@ -746,7 +746,7 @@ describe ContentMigration do
     end
 
     it "does not mark as expired if setting is 0" do
-      Setting.set('content_migrations_expire_after_days', '0')
+      Setting.set("content_migrations_expire_after_days", "0")
       ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
       expect(@cm.reload).not_to be_expired
     end
@@ -763,13 +763,13 @@ describe ContentMigration do
     end
 
     it "does not mark as expired if setting is 0" do
-      Setting.set('content_migrations_expire_after_days', '0')
+      Setting.set("content_migrations_expire_after_days", "0")
       ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
       expect(ContentMigration.expired.pluck(:id)).to be_empty
     end
   end
 
-  context 'Quizzes.Next CC import' do
+  context "Quizzes.Next CC import" do
     before do
       allow(@cm.context)
         .to receive(:feature_enabled?)
@@ -781,9 +781,9 @@ describe ContentMigration do
         .and_return(true)
     end
 
-    let(:importer) { instance_double('QuizzesNext::Importers::CourseContentImporter') }
+    let(:importer) { instance_double("QuizzesNext::Importers::CourseContentImporter") }
 
-    it 'calls QuizzesNext::Importers' do
+    it "calls QuizzesNext::Importers" do
       expect(@cm.migration_settings)
         .to receive(:[])
         .with(:migration_ids_to_import)
@@ -795,19 +795,19 @@ describe ContentMigration do
     end
   end
 
-  context 'importing to NQ with the new_quizzes_bank_migrations FF enabled' do
+  context "importing to NQ with the new_quizzes_bank_migrations FF enabled" do
     before do
       allow_any_instance_of(ContentMigration).to receive(:quizzes_next_banks_migration?).and_return(true)
     end
 
     it "imports assignments from a qti zip file without creating assessment_question_banks" do
       cm = @cm
-      cm.migration_type = 'qti_converter'
-      cm.migration_settings['import_immediately'] = true
+      cm.migration_type = "qti_converter"
+      cm.migration_settings["import_immediately"] = true
       cm.save!
 
       package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
-      attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
+      attachment = Attachment.create!(context: cm, uploaded_data: File.open(package_path, "rb"), filename: "file.zip")
       cm.attachment = attachment
       cm.save!
 
@@ -823,13 +823,13 @@ describe ContentMigration do
 
     it "imports assignments from a common_cartridge zip file without creating assessment_question_banks" do
       cm = @cm
-      cm.migration_type = 'common_cartridge_importer'
-      cm.migration_settings['import_immediately'] = true
+      cm.migration_type = "common_cartridge_importer"
+      cm.migration_settings["import_immediately"] = true
       cm.save!
 
       package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_nested.zip")
-      attachment = Attachment.new(:context => cm, :filename => 'file.zip')
-      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment = Attachment.new(context: cm, filename: "file.zip")
+      attachment.uploaded_data = File.open(package_path, "rb")
       attachment.save!
 
       cm.update_attribute(:attachment, attachment)
@@ -850,33 +850,33 @@ describe ContentMigration do
     let(:err) { StandardError.new("TestError") }
 
     it "doesn't overreeact to todo issues" do
-      expect {
+      expect do
         @cm.add_todo("test todo", { exception: err })
-      }.to change { ErrorReport.count }.by(0)
+      end.to change { ErrorReport.count }.by(0)
     end
 
     it "doesn't overreeact to warning issues" do
-      expect {
+      expect do
         @cm.add_warning("test warn", { exception: err })
-      }.to change { ErrorReport.count }.by(0)
+      end.to change { ErrorReport.count }.by(0)
     end
 
     it "reports error issues appropriately" do
-      expect {
+      expect do
         @cm.add_error("test error", { exception: err })
-      }.to change { ErrorReport.count }.by(1)
+      end.to change { ErrorReport.count }.by(1)
     end
 
     it "accepts downgrades for real errors" do
-      expect {
+      expect do
         @cm.add_error("test error", { exception: err, issue_level: :warning })
-      }.to change { ErrorReport.count }.by(0)
+      end.to change { ErrorReport.count }.by(0)
     end
 
     it "accepts issue level option when failing a migration" do
-      expect {
+      expect do
         @cm.fail_with_error!(err, error_message: "foo", issue_level: :warning)
-      }.to change { ErrorReport.count }.by(0)
+      end.to change { ErrorReport.count }.by(0)
     end
   end
 
@@ -890,30 +890,30 @@ describe ContentMigration do
 
   describe "import_class_name" do
     it "converts various forms of name to the proper AR class name" do
-      expect(ContentMigration.import_class_name('assignment')).to eq 'Assignment'
-      expect(ContentMigration.import_class_name('assignments')).to eq 'Assignment'
-      expect(ContentMigration.import_class_name('announcement')).to eq 'DiscussionTopic'
-      expect(ContentMigration.import_class_name('announcements')).to eq 'DiscussionTopic'
-      expect(ContentMigration.import_class_name('discussion_topic')).to eq 'DiscussionTopic'
-      expect(ContentMigration.import_class_name('discussion_topics')).to eq 'DiscussionTopic'
-      expect(ContentMigration.import_class_name('attachment')).to eq 'Attachment'
-      expect(ContentMigration.import_class_name('attachments')).to eq 'Attachment'
-      expect(ContentMigration.import_class_name('file')).to eq 'Attachment'
-      expect(ContentMigration.import_class_name('files')).to eq 'Attachment'
-      expect(ContentMigration.import_class_name('page')).to eq 'WikiPage'
-      expect(ContentMigration.import_class_name('pages')).to eq 'WikiPage'
-      expect(ContentMigration.import_class_name('wiki_page')).to eq 'WikiPage'
-      expect(ContentMigration.import_class_name('wiki_pages')).to eq 'WikiPage'
-      expect(ContentMigration.import_class_name('quiz')).to eq 'Quizzes::Quiz'
-      expect(ContentMigration.import_class_name('quizzes')).to eq 'Quizzes::Quiz'
-      expect(ContentMigration.import_class_name('module')).to eq 'ContextModule'
-      expect(ContentMigration.import_class_name('modules')).to eq 'ContextModule'
-      expect(ContentMigration.import_class_name('context_module')).to eq 'ContextModule'
-      expect(ContentMigration.import_class_name('context_modules')).to eq 'ContextModule'
-      expect(ContentMigration.import_class_name('module_item')).to eq 'ContentTag'
-      expect(ContentMigration.import_class_name('module_items')).to eq 'ContentTag'
-      expect(ContentMigration.import_class_name('content_tag')).to eq 'ContentTag'
-      expect(ContentMigration.import_class_name('content_tags')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name("assignment")).to eq "Assignment"
+      expect(ContentMigration.import_class_name("assignments")).to eq "Assignment"
+      expect(ContentMigration.import_class_name("announcement")).to eq "DiscussionTopic"
+      expect(ContentMigration.import_class_name("announcements")).to eq "DiscussionTopic"
+      expect(ContentMigration.import_class_name("discussion_topic")).to eq "DiscussionTopic"
+      expect(ContentMigration.import_class_name("discussion_topics")).to eq "DiscussionTopic"
+      expect(ContentMigration.import_class_name("attachment")).to eq "Attachment"
+      expect(ContentMigration.import_class_name("attachments")).to eq "Attachment"
+      expect(ContentMigration.import_class_name("file")).to eq "Attachment"
+      expect(ContentMigration.import_class_name("files")).to eq "Attachment"
+      expect(ContentMigration.import_class_name("page")).to eq "WikiPage"
+      expect(ContentMigration.import_class_name("pages")).to eq "WikiPage"
+      expect(ContentMigration.import_class_name("wiki_page")).to eq "WikiPage"
+      expect(ContentMigration.import_class_name("wiki_pages")).to eq "WikiPage"
+      expect(ContentMigration.import_class_name("quiz")).to eq "Quizzes::Quiz"
+      expect(ContentMigration.import_class_name("quizzes")).to eq "Quizzes::Quiz"
+      expect(ContentMigration.import_class_name("module")).to eq "ContextModule"
+      expect(ContentMigration.import_class_name("modules")).to eq "ContextModule"
+      expect(ContentMigration.import_class_name("context_module")).to eq "ContextModule"
+      expect(ContentMigration.import_class_name("context_modules")).to eq "ContextModule"
+      expect(ContentMigration.import_class_name("module_item")).to eq "ContentTag"
+      expect(ContentMigration.import_class_name("module_items")).to eq "ContentTag"
+      expect(ContentMigration.import_class_name("content_tag")).to eq "ContentTag"
+      expect(ContentMigration.import_class_name("content_tags")).to eq "ContentTag"
     end
   end
 end

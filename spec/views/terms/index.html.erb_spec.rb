@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/terms/index" do
   it "allows deletion of terms with only deleted courses" do
     assign(:context, assign(:root_account, Account.default))
     term = Account.default.enrollment_terms.create!
-    term.courses.create! { |c| c.workflow_state = 'deleted' }
+    term.courses.create! { |c| c.workflow_state = "deleted" }
     terms = assign(:terms, Account.default.enrollment_terms.active.sort_by { |t| t.start_at || t.created_at }.reverse)
     assign(:course_counts_by_term, EnrollmentTerm.course_counts(terms))
     render "terms/index"
-    page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css(".delete_term_link")[0]['href']).to eq '#'
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css(".delete_term_link")[0]["href"]).to eq "#"
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-sns'
+require "aws-sdk-sns"
 
 class NotificationEndpoint < ActiveRecord::Base
   class FailedSnsInteraction < StandardError; end
@@ -27,7 +27,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   belongs_to :access_token
 
-  validates_presence_of :token, :access_token
+  validates :token, :access_token, presence: true
 
   before_create :create_platform_endpoint
   after_destroy :delete_platform_endpoint
@@ -35,19 +35,19 @@ class NotificationEndpoint < ActiveRecord::Base
   def push_json(json)
     return false unless endpoint_exists? && own_endpoint? && endpoint_enabled? && !token_changed?
 
-    sns_client.publish(target_arn: self.arn, message: json, message_structure: 'json')
+    sns_client.publish(target_arn: arn, message: json, message_structure: "json")
   end
 
   private
 
-  DIFFERENT_ATTRIBUTES_ERROR_REGEX = %r{^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$}
+  DIFFERENT_ATTRIBUTES_ERROR_REGEX = /^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$/.freeze
 
   def sns_client
     DeveloperKey.sns
   end
 
   def endpoint_attributes
-    @endpoint_attributes ||= sns_client.get_endpoint_attributes(endpoint_arn: self.arn).attributes
+    @endpoint_attributes ||= sns_client.get_endpoint_attributes(endpoint_arn: arn).attributes
   end
 
   def endpoint_exists?
@@ -58,15 +58,15 @@ class NotificationEndpoint < ActiveRecord::Base
   end
 
   def own_endpoint?
-    endpoint_attributes['CustomUserData'] == access_token.global_id.to_s
+    endpoint_attributes["CustomUserData"] == access_token.global_id.to_s
   end
 
   def endpoint_enabled?
-    endpoint_attributes['Enabled'] == 'true'
+    endpoint_attributes["Enabled"] == "true"
   end
 
   def token_changed?
-    self.token != endpoint_attributes['Token']
+    token != endpoint_attributes["Token"]
   end
 
   def create_platform_endpoint
@@ -75,7 +75,7 @@ class NotificationEndpoint < ActiveRecord::Base
     begin
       response = sns_client.create_platform_endpoint(
         platform_application_arn: access_token.developer_key.sns_arn,
-        token: self.token,
+        token: token,
         custom_user_data: access_token.global_id.to_s
       )
       self.arn = response[:endpoint_arn]
@@ -89,8 +89,8 @@ class NotificationEndpoint < ActiveRecord::Base
       endpoint_updated = false
       begin
         sns_client.set_endpoint_attributes(
-          endpoint_arn: self.arn,
-          attributes: { 'CustomUserData' => access_token.global_id.to_s }
+          endpoint_arn: arn,
+          attributes: { "CustomUserData" => access_token.global_id.to_s }
         )
         endpoint_updated = true
       rescue Aws::SNS::Errors::NotFound => ex
@@ -115,6 +115,6 @@ class NotificationEndpoint < ActiveRecord::Base
   def delete_platform_endpoint
     return unless endpoint_exists? && own_endpoint?
 
-    sns_client.delete_endpoint(endpoint_arn: self.arn)
+    sns_client.delete_endpoint(endpoint_arn: arn)
   end
 end

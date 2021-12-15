@@ -26,13 +26,13 @@ module SIS
       yield importer
 
       types = {
-        'user' => { scope: @root_account.pseudonyms },
-        'course' => { scope: @root_account.all_courses },
-        'section' => { scope: @root_account.course_sections },
-        'term' => { scope: @root_account.enrollment_terms },
-        'account' => { scope: @root_account.all_accounts },
-        'group' => { scope: @root_account.all_groups },
-        'group_category' => { scope: @root_account.all_group_categories },
+        "user" => { scope: @root_account.pseudonyms },
+        "course" => { scope: @root_account.all_courses },
+        "section" => { scope: @root_account.course_sections },
+        "term" => { scope: @root_account.enrollment_terms },
+        "account" => { scope: @root_account.all_accounts },
+        "group" => { scope: @root_account.all_groups },
+        "group_category" => { scope: @root_account.all_group_categories },
       }
 
       importer.things_to_update_batch_ids.each do |key, value|
@@ -69,13 +69,13 @@ module SIS
         things_to_update_batch_ids[type] ||= Set.new
 
         types = {
-          'user' => { scope: @root_account.pseudonyms, column: :sis_user_id },
-          'course' => { scope: @root_account.all_courses },
-          'section' => { scope: @root_account.course_sections },
-          'term' => { scope: @root_account.enrollment_terms },
-          'account' => { scope: @root_account.all_accounts },
-          'group' => { scope: @root_account.all_groups },
-          'group_category' => { scope: @root_account.all_group_categories },
+          "user" => { scope: @root_account.pseudonyms, column: :sis_user_id },
+          "course" => { scope: @root_account.all_courses },
+          "section" => { scope: @root_account.course_sections },
+          "term" => { scope: @root_account.enrollment_terms },
+          "account" => { scope: @root_account.all_accounts },
+          "group" => { scope: @root_account.all_groups },
+          "group_category" => { scope: @root_account.all_group_categories },
         }
 
         details = types[type]
@@ -100,16 +100,16 @@ module SIS
           updates[column] = data_change.new_id
         end
         if data_change.new_integration_id.present?
-          updates['integration_id'] = data_change.new_integration_id
-          if data_change.new_integration_id == '<delete>'
-            updates['integration_id'] = nil
+          updates["integration_id"] = data_change.new_integration_id
+          if data_change.new_integration_id == "<delete>"
+            updates["integration_id"] = nil
           end
         end
         updates
       end
 
       def check_for_conflicting_ids(column, details, type, data_change)
-        if type == 'group_category' && (data_change.old_integration_id || data_change.new_integration_id)
+        if type == "group_category" && (data_change.old_integration_id || data_change.new_integration_id)
           raise ImportError, "Group categories should not have integration IDs."
         end
 
@@ -125,7 +125,7 @@ module SIS
           old_item = details[:scope].where(column => data_change.old_id).take
         end
         if data_change.old_integration_id.present?
-          old_int_item = details[:scope].where(integration_id: data_change.old_integration_id).take if data_change.old_integration_id.present?
+          old_int_item = details[:scope].where(integration_id: data_change.old_integration_id).take
         end
         if data_change.old_id.present? && data_change.old_integration_id.present?
           raise ImportError, "An old_id, '#{data_change.old_id}', referenced a different #{type} than the old_integration_id, '#{data_change.old_integration_id}'" unless old_item == old_int_item
@@ -140,7 +140,7 @@ module SIS
         if data_change.old_id.blank? && data_change.old_integration_id.present?
           raise ImportError, "An old_integration_id, '#{data_change.old_integration_id}', referenced a non-existent #{type} and was not changed." unless old_int_item
 
-          return old_int_item
+          old_int_item
         end
       end
     end

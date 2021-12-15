@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {act, render} from '@testing-library/react'
 import {UnpublishedChangesIndicator} from '../unpublished_changes_indicator'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
@@ -62,7 +62,7 @@ describe('UnpublishedChangesIndicator', () => {
         <UnpublishedChangesIndicator {...defaultProps} changeCount={3} onClick={onClick} />
       )
 
-      userEvent.click(getByRole('button', {name: '3 unpublished changes'}))
+      act(() => userEvent.click(getByRole('button', {name: '3 unpublished changes'})))
       expect(onClick).toHaveBeenCalled()
     })
 
@@ -71,7 +71,7 @@ describe('UnpublishedChangesIndicator', () => {
         <UnpublishedChangesIndicator {...defaultProps} changeCount={0} onClick={onClick} />
       )
 
-      userEvent.click(getByText('All changes published'))
+      act(() => userEvent.click(getByText('All changes published')))
       expect(onClick).not.toHaveBeenCalled()
     })
   })

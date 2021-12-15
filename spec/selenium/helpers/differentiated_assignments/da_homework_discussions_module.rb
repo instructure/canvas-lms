@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'da_discussion'
+require_relative "da_discussion"
 
 module DifferentiatedAssignments
   module Homework
@@ -51,20 +51,20 @@ module DifferentiatedAssignments
 
         def all
           [
-            self.discussion_for_everyone,
-            self.discussion_for_section_a,
-            self.discussion_for_section_b,
-            self.discussion_for_sections_a_and_b,
-            self.discussion_for_section_c,
-            self.discussion_for_first_student,
-            self.discussion_for_second_and_third_students
+            discussion_for_everyone,
+            discussion_for_section_a,
+            discussion_for_section_b,
+            discussion_for_sections_a_and_b,
+            discussion_for_section_c,
+            discussion_for_first_student,
+            discussion_for_second_and_third_students
           ]
         end
 
         def short_list
           [
-            self.discussion_for_sections_a_and_b,
-            self.discussion_for_second_and_third_students
+            discussion_for_sections_a_and_b,
+            discussion_for_second_and_third_students
           ]
         end
 
@@ -76,22 +76,22 @@ module DifferentiatedAssignments
 
         def assign_discussion_overrides(short = false)
           if short
-            self.short_list.each(&:assign_overrides)
+            short_list.each(&:assign_overrides)
           else
-            self.all.each(&:assign_overrides)
+            all.each(&:assign_overrides)
           end
         end
 
         def submit_discussions
           users = DifferentiatedAssignments::Users
-          self.discussion_for_everyone.submit_as(users.first_student)
-          self.discussion_for_section_a.submit_as(users.first_student)
-          self.discussion_for_section_b.submit_as(users.second_student)
-          self.discussion_for_sections_a_and_b.submit_as(users.third_student)
-          self.discussion_for_section_c.submit_as(users.fourth_student)
-          self.discussion_for_first_student.submit_as(users.first_student)
-          self.discussion_for_second_and_third_students.submit_as(users.second_student)
-          self.discussion_for_second_and_third_students.submit_as(users.third_student)
+          discussion_for_everyone.submit_as(users.first_student)
+          discussion_for_section_a.submit_as(users.first_student)
+          discussion_for_section_b.submit_as(users.second_student)
+          discussion_for_sections_a_and_b.submit_as(users.third_student)
+          discussion_for_section_c.submit_as(users.fourth_student)
+          discussion_for_first_student.submit_as(users.first_student)
+          discussion_for_second_and_third_students.submit_as(users.second_student)
+          discussion_for_second_and_third_students.submit_as(users.third_student)
         end
       end
     end

@@ -18,49 +18,49 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Mailer do
-  describe 'create_message' do
-    it 'passes through to address' do
+  describe "create_message" do
+    it "passes through to address" do
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
       expect(mail.to).to eq ["someemail@example.com"]
     end
 
-    it 'has defaults for critical fields' do
-      message = message_model()
+    it "has defaults for critical fields" do
+      message = message_model
       mail = Mailer.create_message(message)
-      expect(mail.header['From'].to_s).to eq "#{HostUrl.outgoing_email_default_name} <#{HostUrl.outgoing_email_address}>"
-      expect(mail.header['Reply-To'].to_s).to eq IncomingMail::ReplyToAddress.new(message).address
+      expect(mail.header["From"].to_s).to eq "#{HostUrl.outgoing_email_default_name} <#{HostUrl.outgoing_email_address}>"
+      expect(mail.header["Reply-To"].to_s).to eq IncomingMail::ReplyToAddress.new(message).address
     end
 
-    it 'allows overrides for critical fields' do
-      message = message_model()
+    it "allows overrides for critical fields" do
+      message = message_model
       message.from_name = "Handy Randy"
       message.reply_to_name = "Stan Theman"
       mail = Mailer.create_message(message)
-      expect(mail.header['Reply-To'].to_s).to eq "Stan Theman <#{IncomingMail::ReplyToAddress.new(message).address}>"
-      expect(mail.header['From'].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
+      expect(mail.header["Reply-To"].to_s).to eq "Stan Theman <#{IncomingMail::ReplyToAddress.new(message).address}>"
+      expect(mail.header["From"].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
     end
 
-    it 'omits reply_to for sms' do
-      message = message_model(path_type: 'sms')
+    it "omits reply_to for sms" do
+      message = message_model(path_type: "sms")
       message.from_name = "Handy Randy"
       message.reply_to_name = "Stan Theman"
       mail = Mailer.create_message(message)
-      expect(mail.header['Reply-To']).to be_nil
-      expect(mail.header['From'].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
+      expect(mail.header["Reply-To"]).to be_nil
+      expect(mail.header["From"].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
     end
 
-    it 'truncates the message body if it exceeds the maximum text length' do
-      message = message_model()
-      message.body = 'a' * 300.kilobytes
-      message.html_body = 'a' * 300.kilobytes
+    it "truncates the message body if it exceeds the maximum text length" do
+      message = message_model
+      message.body = "a" * 300.kilobytes
+      message.html_body = "a" * 300.kilobytes
       mail = Mailer.create_message(message)
-      expect(mail.message.html_part.body.raw_source).to eq 'message preview unavailable'
+      expect(mail.message.html_part.body.raw_source).to eq "message preview unavailable"
     end
   end
 
-  describe 'deliver_now' do
-    it 'calls deliver_now if notification_service is not configured' do
+  describe "deliver_now" do
+    it "calls deliver_now if notification_service is not configured" do
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
       expect(mail).to receive(:deliver_now)
@@ -68,7 +68,7 @@ describe Mailer do
       Mailer.deliver(mail)
     end
 
-    it 'sends stat to stat service' do
+    it "sends stat to stat service" do
       allow(InstStatsd::Statsd).to receive(:increment)
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
@@ -77,11 +77,11 @@ describe Mailer do
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver",
         { short_stat: "message.deliver",
-          tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' } }
+          tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" } }
       )
     end
 
-    it 'calls the notification service if configured' do
+    it "calls the notification service if configured" do
       Account.site_admin.enable_feature!(:notification_service)
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)

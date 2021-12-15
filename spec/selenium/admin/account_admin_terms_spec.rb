@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "account admin terms" do
   include_context "in-process server selenium tests"
@@ -26,8 +26,8 @@ describe "account admin terms" do
     term_div.find_element(:css, action_link_css).click
   end
 
-  def validate_term_display(term_div_index = 0, title = 'Default Term', course_count = 1)
-    term_header = ff('.term .header')[term_div_index]
+  def validate_term_display(term_div_index = 0, title = "Default Term", course_count = 1)
+    term_header = ff(".term .header")[term_div_index]
     expect(term_header).to include_text(title)
     expect(term_header).to include_text("#{course_count} Course")
 
@@ -42,7 +42,7 @@ describe "account admin terms" do
   context "default term" do
     before do
       get "/accounts/#{Account.default.id}/terms"
-      @default_term = ff('.term')[0]
+      @default_term = ff(".term")[0]
     end
 
     it "validates default term" do
@@ -50,51 +50,51 @@ describe "account admin terms" do
     end
 
     it "cancels editing" do
-      click_term_action_link(@default_term, '.edit_term_link')
-      f('.cancel_button').click
+      click_term_action_link(@default_term, ".edit_term_link")
+      f(".cancel_button").click
       wait_for_animations
       validate_term_display
       check_element_has_focus f(".edit_term_link", @default_term)
     end
 
     it "validates that you cannot delete a term with courses in it" do
-      expect {
-        click_term_action_link(@default_term, '.cant_delete_term_link')
+      expect do
+        click_term_action_link(@default_term, ".cant_delete_term_link")
         alert = driver.switch_to.alert
         expect(alert.text).to eq "You can't delete a term that still has classes in it."
         alert.accept
-      }.to change(EnrollmentTerm, :count).by(0)
+      end.to change(EnrollmentTerm, :count).by(0)
       validate_term_display
     end
   end
 
   context "not default term" do
     it "adds a new term" do
-      new_term_name = 'New Term'
+      new_term_name = "New Term"
       get "/accounts/#{Account.default.id}/terms"
 
       expect do
-        f('.add_term_link').click
-        replace_content(f('#enrollment_term_name_new'), new_term_name)
-        replace_content(f('#enrollment_term_sis_source_id_new'), '(sis id goes here)')
-        f('.submit_button').click
+        f(".add_term_link").click
+        replace_content(f("#enrollment_term_name_new"), new_term_name)
+        replace_content(f("#enrollment_term_sis_source_id_new"), "(sis id goes here)")
+        f(".submit_button").click
         wait_for_ajax_requests
       end.to change(EnrollmentTerm, :count).by(1)
-      expect(ff('.term .header .name')[0].text).to eq new_term_name
-      expect(ff('.term .header .sis_source_id')[0].text).to eq '(sis id goes here)'
+      expect(ff(".term .header .name")[0].text).to eq new_term_name
+      expect(ff(".term .header .sis_source_id")[0].text).to eq "(sis id goes here)"
       check_element_has_focus f("#term_#{EnrollmentTerm.last.id} .edit_term_link")
     end
 
     it "deletes a term" do
       term_name = "delete term"
-      @course.root_account.enrollment_terms.create!(:name => term_name)
+      @course.root_account.enrollment_terms.create!(name: term_name)
       get "/accounts/#{Account.default.id}/terms"
 
       validate_term_display(0, term_name, 0)
-      click_term_action_link(ff('.term')[0], '.delete_term_link')
+      click_term_action_link(ff(".term")[0], ".delete_term_link")
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(EnrollmentTerm.where(name: term_name).first.workflow_state).to eq 'deleted'
+      expect(EnrollmentTerm.where(name: term_name).first.workflow_state).to eq "deleted"
       validate_term_display
       check_element_has_focus f(".cant_delete_term_link", @default_term)
     end
@@ -102,11 +102,11 @@ describe "account admin terms" do
     it "cancels term creation and validate nothing was created" do
       get "/accounts/#{Account.default.id}/terms"
 
-      expect {
-        f('.add_term_link').click
-        replace_content(f('#enrollment_term_name_new'), 'false add')
-        f('.cancel_button').click
-      }.to change(EnrollmentTerm, :count).by(0)
+      expect do
+        f(".add_term_link").click
+        replace_content(f("#enrollment_term_name_new"), "false add")
+        f(".cancel_button").click
+      end.to change(EnrollmentTerm, :count).by(0)
       validate_term_display
       check_element_has_focus f(".add_term_link")
     end
@@ -127,10 +127,10 @@ describe "account admin terms" do
         group.enrollment_terms = [term]
       end
 
-      it "displays link to grading standards page", test_id: 2528663, priority: "1" do
+      it "displays link to grading standards page", priority: "1" do
         get "/accounts/#{account.id}/terms"
         standards_url = "/accounts/#{account.id}/grading_standards"
-        expect(fln(group.title).attribute('href')).to include(standards_url)
+        expect(fln(group.title).attribute("href")).to include(standards_url)
       end
     end
   end

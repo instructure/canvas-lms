@@ -51,14 +51,14 @@ module Lti
         end
       end
 
-      let_once(:context) { course_model(workflow_state: 'available') }
+      let_once(:context) { course_model(workflow_state: "available") }
       let_once(:user) { student_in_course(course: context).user }
       let_once(:assignment) do
         opts = { course: context }
-        opts[:submission_types] = 'external_tool'
+        opts[:submission_types] = "external_tool"
         opts[:external_tool_tag_attributes] = {
           url: tool.url,
-          content_type: 'context_external_tool',
+          content_type: "context_external_tool",
           content_id: tool.id
         }
         assignment_model(opts)
@@ -67,139 +67,166 @@ module Lti
       let_once(:tool) do
         ContextExternalTool.create!(
           context: context,
-          consumer_key: 'key',
-          shared_secret: 'secret',
-          name: 'test tool',
-          url: 'http://www.tool.com/launch',
+          consumer_key: "key",
+          shared_secret: "secret",
+          name: "test tool",
+          url: "http://www.tool.com/launch",
           developer_key: developer_key,
           settings: { use_1_3: true },
-          workflow_state: 'public'
+          workflow_state: "public"
         )
       end
       let_once(:line_item) { assignment.line_items.first }
       let(:parsed_response_body) { JSON.parse(response.body) }
       let(:valid_params) { { course_id: context.id, userId: user.id, line_item_id: line_item.id } }
 
-      describe '#before_actions' do
-        context 'with user and line item in context' do
-          before { user.enrollments.first.update!(workflow_state: 'active') }
+      describe "#before_actions" do
+        context "with user and line item in context" do
+          before { user.enrollments.first.update!(workflow_state: "active") }
 
-          it 'processes the request' do
+          it "processes the request" do
             get :index, params: valid_params
             expect(response).to be_successful
           end
         end
 
-        context 'with user not active in context' do
-          it 'fails to process the request' do
+        context "with user not active in context" do
+          it "fails to process the request" do
             get :index, params: valid_params
-            expect(response.code).to eq '422'
+            expect(response.code).to eq "422"
           end
         end
 
-        context 'with user not in context' do
+        context "with user not in context" do
           before { user.enrollments.destroy_all }
 
-          it 'fails to process the request' do
+          it "fails to process the request" do
             get :index, params: valid_params
-            expect(response.code).to eq '422'
+            expect(response.code).to eq "422"
           end
         end
 
-        context 'with uuid that first digit matches user_id' do
-          before { user.enrollments.first.update!(workflow_state: 'active') }
+        context "with uuid that first digit matches user_id" do
+          before { user.enrollments.first.update!(workflow_state: "active") }
 
-          let(:valid_params) { { course_id: context.id, user_id: "#{user.id}apzx", line_item_id: line_item.id } }
+          let(:some_lti_id) do
+            "#{user.id}a000000"[0...8] + "-1234-1234-1234-e1214b67696d"
+          end
+          let(:valid_params) { { course_id: context.id, user_id: some_lti_id, line_item_id: line_item.id } }
 
-          it 'fails to find user' do
+          it "fails to find user" do
             get :index, params: valid_params
-            expect(response.code).to eq '422'
-            expect(JSON.parse(response.body)['errors']['message']).to eq('User not found in course or is not a student')
+            expect(response.code).to eq "422"
+            expect(JSON.parse(response.body)["errors"]["message"]).to eq("User not found in course or is not a student")
+          end
+
+          it "still uses such a user_id to look up by lti_id" do
+            User.where(id: user.id).update_all lti_id: some_lti_id
+            get :index, params: valid_params
+
+            expect(response.code).to eq "200"
+            expect(parsed_response_body["user_id"]).to eq user.id
           end
         end
 
-        context 'when two students with enrollments were merged' do
+        context "when two students with enrollments were merged" do
           let_once(:user_to_merge) { student_in_course(course: context).user }
           let(:lti_id) { user_to_merge.lti_id }
-          let(:valid_params) do
-            { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
-          end
 
           before do
-            user.enrollments.first.update!(workflow_state: 'active')
-            user_to_merge.enrollments.first.update!(workflow_state: 'active')
+            user.enrollments.first.update!(workflow_state: "active")
+            user_to_merge.enrollments.first.update!(workflow_state: "active")
 
             UserMerge.from(user_to_merge).into(user)
           end
 
-          it 'successfuly find the active user using the user past lti id' do
-            get :index, params: valid_params
+          context "when using the user_id parameter (LTI spec)" do
+            let(:valid_params) do
+              { course_id: context.id, user_id: lti_id, line_item_id: line_item.id }
+            end
 
-            expect(response.code).to eq '200'
-            expect(parsed_response_body['user_id']).to eq user.id
+            it "successfuly finds the active user using the user past lti id" do
+              get :index, params: valid_params
+
+              expect(response.code).to eq "200"
+              expect(parsed_response_body["user_id"]).to eq user.id
+            end
+          end
+
+          context "when using the userId parameter (backwards compatibility)" do
+            let(:valid_params) do
+              { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
+            end
+
+            it "successfuly finds the active user using the user past lti id" do
+              get :index, params: valid_params
+
+              expect(response.code).to eq "200"
+              expect(parsed_response_body["user_id"]).to eq user.id
+            end
           end
         end
 
-        context 'when student was deleted and it was not merged (is not a past user)' do
+        context "when student was deleted and it was not merged (is not a past user)" do
           let(:lti_id) { user.lti_id }
           let(:valid_params) do
             { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
           end
 
           before do
-            user.update!(workflow_state: 'deleted')
+            user.update!(workflow_state: "deleted")
           end
 
-          it 'fails to find user' do
+          it "fails to find user" do
             get :index, params: valid_params
-            expect(response.code).to eq '422'
-            expect(JSON.parse(response.body)['errors']['message']).to eq('User not found in course or is not a student')
+            expect(response.code).to eq "422"
+            expect(JSON.parse(response.body)["errors"]["message"]).to eq("User not found in course or is not a student")
           end
         end
 
-        context 'when line item does not exist' do
-          before { user.enrollments.first.update!(workflow_state: 'active') }
+        context "when line item does not exist" do
+          before { user.enrollments.first.update!(workflow_state: "active") }
 
-          it 'fails to process the request' do
+          it "fails to process the request" do
             get :index, params: { course_id: context.id, userId: user.id, line_item_id: LineItem.last.id + 1 }
             expect(response).to be_not_found
           end
         end
       end
 
-      describe '#prepare_line_item_for_ags!' do
+      describe "#prepare_line_item_for_ags!" do
         before do
           allow(controller).to receive(:developer_key).and_return(developer_key)
         end
 
-        context 'when resource link id is missing' do
+        context "when resource link id is missing" do
           let(:valid_params) { { course_id: context.id, userId: user.id, line_item_id: line_item.id } }
 
-          it 'is ignored' do
+          it "is ignored" do
             expect_any_instance_of(Assignment).not_to receive(:prepare_for_ags_if_needed!)
             get :index, params: valid_params
           end
         end
 
-        context 'when resource link id points to wrong assignment' do
-          let(:valid_params) {
+        context "when resource link id points to wrong assignment" do
+          let(:valid_params) do
             a2 = assignment.clone
             a2.lti_context_id = nil
             a2.save
             { course_id: context.id, userId: user.id, resourceLinkId: a2.lti_context_id }
-          }
+          end
 
-          it 'fails to match assignment tool' do
+          it "fails to match assignment tool" do
             get :index, params: valid_params
-            expect(response.code).to eq '422'
-            expect(parsed_response_body['errors']['message']).to eq('Resource link id points to Tool not associated with this Context')
+            expect(response.code).to eq "422"
+            expect(parsed_response_body["errors"]["message"]).to eq("Resource link id points to Tool not associated with this Context")
           end
         end
 
-        context 'with correct resource link id' do
+        context "with correct resource link id" do
           let(:valid_params) { { course_id: context.id, userId: user.id, resourceLinkId: assignment.lti_context_id } }
 
-          it 'fixes up line items on assignment' do
+          it "fixes up line items on assignment" do
             expect_any_instance_of(Assignment).to receive(:prepare_for_ags_if_needed!)
             get :index, params: valid_params
           end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class CourseReports
@@ -31,8 +31,8 @@ module AccountReports
 
     def default_courses
       root_account.all_courses
-                  .select([:id, :sis_source_id, :name, :course_code, :start_at,
-                           :conclude_at, :restrict_enrollments_to_course_dates])
+                  .select(%i[id sis_source_id name course_code start_at
+                             conclude_at restrict_enrollments_to_course_dates])
     end
 
     def recently_deleted
@@ -45,7 +45,7 @@ module AccountReports
     end
 
     def unpublished_courses
-      csv(default_courses.where(:workflow_state => ['claimed', 'created']))
+      csv(default_courses.where(workflow_state: ["claimed", "created"]))
     end
 
     def course_storage
@@ -54,15 +54,15 @@ module AccountReports
       courses = add_term_scope(courses)
 
       headers = []
-      headers << I18n.t('id')
-      headers << I18n.t('sis id')
-      headers << I18n.t('short name')
-      headers << I18n.t('name')
-      headers << I18n.t('account id')
-      headers << I18n.t('account sis id')
-      headers << I18n.t('account name')
-      headers << I18n.t('storage used in MB')
-      headers << I18n.t('sum of all files in MB')
+      headers << I18n.t("id")
+      headers << I18n.t("sis id")
+      headers << I18n.t("short name")
+      headers << I18n.t("name")
+      headers << I18n.t("account id")
+      headers << I18n.t("account sis id")
+      headers << I18n.t("account name")
+      headers << I18n.t("storage used in MB")
+      headers << I18n.t("sum of all files in MB")
       write_report headers do |csv|
         total = courses.count(:all)
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
@@ -91,12 +91,12 @@ module AccountReports
       courses = add_term_scope(courses)
 
       headers = []
-      headers << I18n.t('#account_reports.report_header_id', 'id')
-      headers << I18n.t('#account_reports.report_header_sis_id', 'sis id')
-      headers << I18n.t('#account_reports.report_header_short_name', 'short name')
-      headers << I18n.t('#account_reports.report_header_name', 'name')
-      headers << I18n.t('#account_reports.report_header_start_date', 'start date')
-      headers << I18n.t('#account_reports.report_header_end_date', 'end date')
+      headers << I18n.t("#account_reports.report_header_id", "id")
+      headers << I18n.t("#account_reports.report_header_sis_id", "sis id")
+      headers << I18n.t("#account_reports.report_header_short_name", "short name")
+      headers << I18n.t("#account_reports.report_header_name", "name")
+      headers << I18n.t("#account_reports.report_header_start_date", "start date")
+      headers << I18n.t("#account_reports.report_header_end_date", "end date")
       write_report headers do |csv|
         total = courses.count(:all)
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
@@ -121,7 +121,7 @@ module AccountReports
       end
     end
 
-    def unused_courses()
+    def unused_courses
       courses = root_account.all_courses.active
                             .select("courses.id, courses.name, courses.course_code,
                 courses.sis_source_id, courses.created_at,
@@ -164,12 +164,12 @@ module AccountReports
       courses = add_course_sub_account_scope(courses)
 
       headers = []
-      headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
-      headers << I18n.t('#account_reports.report_header_short_name', 'short name')
-      headers << I18n.t('#account_reports.report_header_long_name', 'long name')
-      headers << I18n.t('#account_reports.report_header_status', 'status')
-      headers << I18n.t('#account_reports.report_header_created_at', 'created at')
+      headers << I18n.t("#account_reports.report_header_course_id", "course id")
+      headers << I18n.t("#account_reports.report_header_course_sis_id", "course sis id")
+      headers << I18n.t("#account_reports.report_header_short_name", "short name")
+      headers << I18n.t("#account_reports.report_header_long_name", "long name")
+      headers << I18n.t("#account_reports.report_header_status", "status")
+      headers << I18n.t("#account_reports.report_header_created_at", "created at")
 
       write_report headers do |csv|
         courses.find_each do |c|

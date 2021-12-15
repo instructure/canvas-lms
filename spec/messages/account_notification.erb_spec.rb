@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'account_notification' do
+describe "account_notification" do
   before :once do
-    account = Account.create!(:name => "some account", :settings => { :outgoing_email_default_name => "Custom From" })
+    account = Account.create!(name: "some account", settings: { outgoing_email_default_name: "Custom From" })
     @announcement = account_notification(account: account)
   end
 

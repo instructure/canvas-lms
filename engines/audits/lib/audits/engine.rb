@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'rails'
+require "rails"
 
 module Audits
   class Engine < ::Rails::Engine
@@ -25,8 +25,8 @@ module Audits
 
     initializer :append_migrations do |app|
       unless app.root.to_s.match root.to_s
-        config.paths['db/migrate'].expanded.each do |expanded_path|
-          app.config.paths['db/migrate'] << expanded_path
+        config.paths["db/migrate"].expanded.each do |expanded_path|
+          app.config.paths["db/migrate"] << expanded_path
         end
       end
     end

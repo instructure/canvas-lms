@@ -30,7 +30,7 @@ module CC::Exporter::Epub
       @base_template = base_template
       @exporter = exporter
       @title = Exporter::RESOURCE_TITLES[@reference] || @content[:title]
-      css = File.expand_path("../templates/css_template.css", __FILE__)
+      css = File.expand_path("templates/css_template.css", __dir__)
       @style = File.read(css)
     end
     attr_reader :content, :base_template, :exporter, :title, :reference, :style
@@ -64,7 +64,7 @@ module CC::Exporter::Epub
 
     def remove_empty_ids!(node)
       node.search("a[id='']").each do |tag|
-        tag.remove_attribute('id')
+        tag.remove_attribute("id")
       end
       node
     end
@@ -85,7 +85,7 @@ module CC::Exporter::Epub
     end
 
     def display_prerequisites(prerequisites)
-      prerequisites.map { |prerequisite| prerequisite[:title] }.join(', ')
+      prerequisites.pluck(:title).join(", ")
     end
 
     def friendly_date(date)
@@ -105,7 +105,7 @@ module CC::Exporter::Epub
     end
 
     def item_details_present?(item)
-      details = [:due_at, :unlock_at, :lock_at, :grading_type, :points_possible, :submission_types]
+      details = %i[due_at unlock_at lock_at grading_type points_possible submission_types]
       details.any? { |detail| item[detail].present? }
     end
   end

@@ -17,6 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'dr_diff'
+require "dr_diff"
 
 require "byebug"

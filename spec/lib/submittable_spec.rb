@@ -30,7 +30,7 @@ shared_examples_for "submittable" do
 
       @course_section = @course.course_sections.create
       @student1, @student2, @student3 = create_users(3, return_type: :record)
-      @course.enroll_student(@student2, enrollment_state: 'active')
+      @course.enroll_student(@student2, enrollment_state: "active")
       @section = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "second test section")
       student_in_section(@section, user: @student1)
@@ -68,7 +68,7 @@ describe DiscussionTopic do
     def submittable_and_assignment(opts = {})
       assignment = @course.assignments.create!({
         title: "some discussion assignment",
-        submission_types: 'discussion_topic'
+        submission_types: "discussion_topic"
       }.merge(opts))
       [assignment.discussion_topic, assignment]
     end
@@ -86,7 +86,7 @@ describe WikiPage do
     def submittable_and_assignment(opts = {})
       assignment = @course.assignments.create!({
         title: "glorious page assignment",
-        submission_types: 'wiki_page'
+        submission_types: "wiki_page"
       }.merge(opts))
       page = submittable_without_assignment
       page.assignment_id = assignment.id
@@ -101,9 +101,9 @@ describe "section specific topic" do
     topic.is_section_specific = true
     topic.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
-        :discussion_topic => topic,
-        :course_section => section,
-        :workflow_state => 'active'
+        discussion_topic: topic,
+        course_section: section,
+        workflow_state: "active"
       )
     topic.save!
   end
@@ -112,14 +112,14 @@ describe "section specific topic" do
     course = course_factory(active_course: true)
     section1 = course.course_sections.create!(name: "test section")
     section2 = course.course_sections.create!(name: "second test section")
-    section_specific_topic1 = course.discussion_topics.create!(:title => "section specific topic 1")
-    section_specific_topic2 = course.discussion_topics.create!(:title => "section specific topic 2")
+    section_specific_topic1 = course.discussion_topics.create!(title: "section specific topic 1")
+    section_specific_topic2 = course.discussion_topics.create!(title: "section specific topic 2")
     add_section_to_topic(section_specific_topic1, section1)
     add_section_to_topic(section_specific_topic2, section2)
     student = create_users(1, return_type: :record).first
-    course.enroll_student(student, :section => section1)
+    course.enroll_student(student, section: section1)
     course.reload
-    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], :item_type => :discussion)
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
     expect(vis_hash[student.id].length).to eq(1)
     expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
   end
@@ -127,13 +127,13 @@ describe "section specific topic" do
   it "properly filters section specific topics for deleted section visibilities" do
     course = course_factory(active_course: true)
     section1 = course.course_sections.create!(name: "section for student")
-    section_specific_topic1 = course.discussion_topics.create!(:title => "section specific topic 1")
+    section_specific_topic1 = course.discussion_topics.create!(title: "section specific topic 1")
     add_section_to_topic(section_specific_topic1, section1)
     student = create_users(1, return_type: :record).first
-    course.enroll_student(student, :section => section1)
+    course.enroll_student(student, section: section1)
     course.reload
     section_specific_topic1.destroy
-    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], :item_type => :discussion)
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
     expect(vis_hash[student.id].length).to eq(0)
   end
 end

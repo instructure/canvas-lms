@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'da_homework_assignee_module'
+require_relative "da_homework_assignee_module"
 
 module DifferentiatedAssignments
   module Users
@@ -26,17 +26,17 @@ module DifferentiatedAssignments
                   :ta, :first_observer, :third_observer, :student_group_x, :student_group_y, :student_group_z
 
       def initialize
-        @first_student   = create_user('Student1')
-        @second_student  = create_user('Student2')
-        @third_student   = create_user('Student3')
-        @fourth_student  = create_user('Student4')
-        @teacher         = create_user('Teacher1')
-        @ta              = create_user('TeacherAssistant1')
-        @first_observer  = create_user('Observer1')
-        @third_observer  = create_user('Observer3')
-        @student_group_x = create_student_group('Student Group X')
-        @student_group_y = create_student_group('Student Group Y')
-        @student_group_z = create_student_group('Student Group Z')
+        @first_student   = create_user("Student1")
+        @second_student  = create_user("Student2")
+        @third_student   = create_user("Student3")
+        @fourth_student  = create_user("Student4")
+        @teacher         = create_user("Teacher1")
+        @ta              = create_user("TeacherAssistant1")
+        @first_observer  = create_user("Observer1")
+        @third_observer  = create_user("Observer3")
+        @student_group_x = create_student_group("Student Group X")
+        @student_group_y = create_student_group("Student Group Y")
+        @student_group_z = create_student_group("Student Group Z")
         enroll_users
       end
 
@@ -110,28 +110,28 @@ module DifferentiatedAssignments
       end
 
       def enroll_first_student
-        student = self.first_student
+        student = first_student
         enroll_student_in_section_a(student)
-        add_user_to_group(group: self.student_group_x, user: student, is_leader: true)
+        add_user_to_group(group: student_group_x, user: student, is_leader: true)
       end
 
       def enroll_second_student
-        student = self.second_student
+        student = second_student
         enroll_student_in_section_b(student)
-        add_user_to_group(group: self.student_group_x, user: student)
+        add_user_to_group(group: student_group_x, user: student)
       end
 
       def enroll_third_student
-        student = self.third_student
+        student = third_student
         enroll_student_in_section_a(student)
         enroll_student_in_section_b(student)
-        add_user_to_group(group: self.student_group_y, user: student, is_leader: true)
+        add_user_to_group(group: student_group_y, user: student, is_leader: true)
       end
 
       def enroll_fourth_student
-        student = self.fourth_student
+        student = fourth_student
         enroll_student_in_section_c(student)
-        add_user_to_group(group: self.student_group_y, user: student)
+        add_user_to_group(group: student_group_y, user: student)
       end
 
       def enroll_student_in_section_a(student)
@@ -168,18 +168,18 @@ module DifferentiatedAssignments
       end
 
       def enroll_first_observer
-        enroll_observer(self.first_observer, self.first_student)
+        enroll_observer(first_observer, first_student)
       end
 
       def enroll_third_observer
-        enroll_observer(self.third_observer, self.third_student)
+        enroll_observer(third_observer, third_student)
       end
 
       def enroll_observer(an_observer, student_to_observe)
         DifferentiatedAssignments.the_course.enroll_user(
           an_observer,
-          'ObserverEnrollment',
-          enrollment_state: 'active',
+          "ObserverEnrollment",
+          enrollment_state: "active",
           associated_user_id: student_to_observe.id
         )
       end

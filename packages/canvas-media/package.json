@@ -7,6 +7,8 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
+    "i18n:extract": "format-message extract \"src*/**/*.js\" -g underscored_crc32 -o locales/en.json",
+    "installTranslations": "scripts/installTranslations.js",
     "test": "jest --color --runInBand",
     "jest": "jest --runInBand",
     "test:debug": "node --inspect-brk ../../node_modules/.bin/jest --runInBand",
@@ -71,6 +73,7 @@
     "@testing-library/react": "^11",
     "@testing-library/user-event": "^5",
     "moxios": "^0.4",
+    "shelljs": "^0.8.4",
     "sinon": "^7"
   }
 }

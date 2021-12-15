@@ -21,20 +21,20 @@
 module DashboardHelper
   def user_dashboard_view
     dashboard_view = @current_user&.dashboard_view
-    dashboard_view = 'activity' if @current_user&.preferences&.dig(:recent_activity_dashboard) && !@current_user.preferences[:dashboard_view]
+    dashboard_view = "activity" if @current_user&.preferences&.dig(:recent_activity_dashboard) && !@current_user.preferences[:dashboard_view]
     dashboard_view
   end
 
   def show_cards?
-    user_dashboard_view == 'cards'
+    user_dashboard_view == "cards"
   end
 
   def show_planner?
-    user_dashboard_view == 'planner' || k5_user?
+    user_dashboard_view == "planner" || k5_user?
   end
 
   def show_recent_activity?
-    user_dashboard_view == 'activity'
+    user_dashboard_view == "activity"
   end
 
   def show_welcome_message?
@@ -43,18 +43,18 @@ module DashboardHelper
 
   def welcome_message
     if @current_user.has_future_enrollment?
-      t('#users.welcome.unpublished_courses_message', <<-BODY)
+      t("#users.welcome.unpublished_courses_message", <<~TEXT)
         You've enrolled in one or more courses that have not started yet. Once
         those courses are available, you will see information about them here
         and in the navigation on the left side. In the meantime, feel free to sign up for
         more courses or set up your profile.
-      BODY
+      TEXT
     else
-      t('#users.welcome.no_courses_message', <<-BODY)
+      t("#users.welcome.no_courses_message", <<~TEXT)
         You don't have any courses, so this page won't be very exciting for now.
         Once you've created or signed up for courses, you'll start to see
         conversations from all of your classes.
-      BODY
+      TEXT
     end
   end
 
@@ -66,11 +66,11 @@ module DashboardHelper
     # use the "and x more..." phrasing if > max_contexts contexts
     if contexts_count > max_contexts
       contexts = contexts.take(max_contexts)
-      contexts << [I18n.t('helpers.dashboard_helper.x_more', "%{x} more...", :x => contexts_count - max_contexts), nil]
+      contexts << [I18n.t("helpers.dashboard_helper.x_more", "%{x} more...", x: contexts_count - max_contexts), nil]
     end
 
     contexts.map do |name, url|
-      url = nil if category == 'Conversation'
+      url = nil if category == "Conversation"
       url.present? ? "<a href=\"#{url}\" aria-label=\"#{accessibility_category_label(category)} for #{h(name)}\">#{h(name)}</a>" : h(name)
     end.to_sentence.html_safe
   end
@@ -78,15 +78,15 @@ module DashboardHelper
   def accessibility_category_label(category)
     case category
     when "Announcement"
-      return I18n.t('helpers.dashboard_helper.announcement_label', "Visit Course Announcements")
+      I18n.t("helpers.dashboard_helper.announcement_label", "Visit Course Announcements")
     when "Conversation"
-      return I18n.t('helpers.dashboard_helper.conversation_label', "Visit Conversations")
+      I18n.t("helpers.dashboard_helper.conversation_label", "Visit Conversations")
     when "Assignment"
-      return I18n.t('helpers.dashboard_helper.assignment_label', "Visit Course Assignments")
+      I18n.t("helpers.dashboard_helper.assignment_label", "Visit Course Assignments")
     when "DiscussionEntry", "DiscussionTopic"
-      return I18n.t('helpers.dashboard_helper.discussion_label', "Visit Course Discussions")
+      I18n.t("helpers.dashboard_helper.discussion_label", "Visit Course Discussions")
     when "AssessmentRequest"
-      return I18n.t('helpers.dashboard_helper.peer_review_label', "Visit Course Peer Reviews")
+      I18n.t("helpers.dashboard_helper.peer_review_label", "Visit Course Peer Reviews")
     else
       raise "Unknown activity category"
     end
@@ -95,15 +95,15 @@ module DashboardHelper
   def category_details_label(category)
     case category
     when "Announcement"
-      return I18n.t('helpers.dashboard_helper.announcement_details', "Announcement Details")
+      I18n.t("helpers.dashboard_helper.announcement_details", "Announcement Details")
     when "Conversation"
-      return I18n.t('helpers.dashboard_helper.conversation_details', "Conversation Details")
+      I18n.t("helpers.dashboard_helper.conversation_details", "Conversation Details")
     when "Assignment"
-      return I18n.t('helpers.dashboard_helper.assignment_details', "Assignment Details")
+      I18n.t("helpers.dashboard_helper.assignment_details", "Assignment Details")
     when "DiscussionEntry", "DiscussionTopic"
-      return I18n.t('helpers.dashboard_helper.discussion_details', "Discussion Details")
+      I18n.t("helpers.dashboard_helper.discussion_details", "Discussion Details")
     when "AssessmentRequest"
-      return I18n.t('helpers.dashboard_helper.peer_review_details', "Peer Review Details")
+      I18n.t("helpers.dashboard_helper.peer_review_details", "Peer Review Details")
     else
       raise "Unknown activity category"
     end
@@ -112,25 +112,25 @@ module DashboardHelper
   def activity_category_title(category, items)
     case category
     when "Announcement"
-      return I18n.t('helpers.dashboard_helper.x_new_in_announcements',
-                    { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t("helpers.dashboard_helper.x_new_in_announcements",
+             { one: "*1* Announcement", other: "*%{count}* Announcements" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "Conversation"
-      return I18n.t('helpers.dashboard_helper.x_new_in_conversations',
-                    { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t("helpers.dashboard_helper.x_new_in_conversations",
+             { one: "*1* Conversation Message", other: "*%{count}* Conversation Messages" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "Assignment"
-      return I18n.t('helpers.dashboard_helper.x_new_in_assignments',
-                    { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t("helpers.dashboard_helper.x_new_in_assignments",
+             { one: "*1* Assignment Notification", other: "*%{count}* Assignment Notifications" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "DiscussionEntry", "DiscussionTopic"
-      return I18n.t('helpers.dashboard_helper.x_new_in_discussions',
-                    { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t("helpers.dashboard_helper.x_new_in_discussions",
+             { one: "*1* Discussion", other: "*%{count}* Discussions" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "AssessmentRequest"
-      return I18n.t('helpers.dashboard_helper.x_new_in_peer_reviews',
-                    { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t("helpers.dashboard_helper.x_new_in_peer_reviews",
+             { one: "*1* Peer Review", other: "*%{count}* Peer Reviews" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     else
       raise "Unknown activity category"
     end
@@ -147,7 +147,7 @@ module DashboardHelper
   end
 
   def todo_link_classes(activity_type)
-    todo_ignore_dropdown_type?(activity_type) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
+    todo_ignore_dropdown_type?(activity_type) ? "al-trigger disable_item_link" : "disable_item_link disable-todo-item-link"
   end
 
   def map_courses_for_menu(courses, opts = {})

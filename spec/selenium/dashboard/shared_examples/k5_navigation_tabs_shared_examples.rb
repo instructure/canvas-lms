@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/k5_dashboard_page'
-require_relative '../pages/k5_dashboard_common_page'
-require_relative '../../../helpers/k5_common'
-require_relative '../../helpers/shared_examples_common'
+require_relative "../../common"
+require_relative "../pages/k5_dashboard_page"
+require_relative "../pages/k5_dashboard_common_page"
+require_relative "../../../helpers/k5_common"
+require_relative "../../helpers/shared_examples_common"
 
-shared_examples_for 'k5 subject navigation tabs' do
+shared_examples_for "k5 subject navigation tabs" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
   include SharedExamplesCommon
 
-  let(:lti_a) { 'LTI Resource A' }
-  let(:lti_b) { 'LTI Resource B' }
-  let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', 'Groups', lti_a, lti_b] }
+  let(:lti_a) { "LTI Resource A" }
+  let(:lti_b) { "LTI Resource B" }
+  let(:navigation_names) { ["Home", "Schedule", "Modules", "Grades", "Groups", lti_a, lti_b] }
 
   before :once do
     Account.site_admin.enable_feature!(:k5_parent_support)
@@ -39,7 +39,7 @@ shared_examples_for 'k5 subject navigation tabs' do
     @resource_b = "context_external_tool_#{create_lti_resource(lti_b).id}"
   end
 
-  it 'has tabs rearranged in new configuration on the subject page' do
+  it "has tabs rearranged in new configuration on the subject page" do
     @subject_course.update!(
       tab_configuration: [
         { id: Course::TAB_SCHEDULE },
@@ -60,7 +60,7 @@ shared_examples_for 'k5 subject navigation tabs' do
     expect(k5_tablist).to include_text(tab_list_text)
   end
 
-  it 'has tabs that are hidden from the subject page' do
+  it "has tabs that are hidden from the subject page" do
     @subject_course.update!(
       tab_configuration: [
         { id: Course::TAB_SCHEDULE },
@@ -78,7 +78,7 @@ shared_examples_for 'k5 subject navigation tabs' do
     expect(k5_tablist).to include_text(tab_list_text)
   end
 
-  it 'has ltis that are rearranged in new order on the resources page' do
+  it "has ltis that are rearranged in new order on the resources page" do
     @subject_course.update!(
       tab_configuration: [
         { id: Course::TAB_HOME },
@@ -96,7 +96,7 @@ shared_examples_for 'k5 subject navigation tabs' do
     expect(k5_app_buttons[1].text).to eq lti_a
   end
 
-  it 'has ltis that are hidden on the resources page' do
+  it "has ltis that are hidden on the resources page" do
     @subject_course.update!(
       tab_configuration: [
         { id: @resource_a, hidden: true },

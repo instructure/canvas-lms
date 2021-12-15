@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
-require_relative '../../config/initializers/twitter'
+require_relative "../spec_helper"
+require_relative "../../config/initializers/twitter"
 
 describe CanvasTwitterConfig do
   describe "#call" do
@@ -26,7 +26,7 @@ describe CanvasTwitterConfig do
       plugin = double(settings: { consumer_key: "abcdefg", consumer_secret_dec: "12345" })
       allow(Canvas::Plugin).to receive(:find).with(:twitter).and_return(plugin)
       output = described_class.call
-      expect(output['api_key']).to eq("abcdefg")
+      expect(output["api_key"]).to eq("abcdefg")
       expect(output[:api_key]).to eq("abcdefg")
     end
   end

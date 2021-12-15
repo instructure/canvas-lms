@@ -29,22 +29,22 @@ class Login::OAuthBaseController < ApplicationController
     # it from the URL
     return if @aac
 
-    auth_type = params[:controller].sub(%r{^login/}, '')
+    auth_type = params[:controller].sub(%r{^login/}, "")
     # ActionController::TestCase can't deal with aliased controllers, so we have to
     # explicitly specify this
     auth_type = params[:auth_type] if Rails.env.test?
     scope = @domain_root_account.authentication_providers.active.where(auth_type: auth_type)
-    if params[:id]
-      @aac = scope.find(params[:id])
-    else
-      @aac = scope.first!
-    end
+    @aac = if params[:id]
+             scope.find(params[:id])
+           else
+             scope.first!
+           end
   end
 
   protected
 
   def timeout_protection
-    default_timeout = Setting.get('oauth_timelimit', 10.seconds.to_s).to_f
+    default_timeout = Setting.get("oauth_timelimit", 10.seconds.to_s).to_f
 
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
 
@@ -95,7 +95,7 @@ class Login::OAuthBaseController < ApplicationController
     else
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}, redirecting to: #{unknown_user_url}."
-      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => unique_ids.first
+      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", user: unique_ids.first
       redirect_to unknown_user_url
     end
   end

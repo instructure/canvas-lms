@@ -20,7 +20,7 @@
 
 module Types
   class CommentBankItemType < ApplicationObjectType
-    description 'Comment bank items'
+    description "Comment bank items"
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface

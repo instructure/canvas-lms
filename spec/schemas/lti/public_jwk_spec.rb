@@ -33,7 +33,7 @@ describe Schemas::Lti::PublicJwk do
       }
     end
 
-    context 'when the json is valid' do
+    context "when the json is valid" do
       let(:json_hash) { valid_json_hash }
 
       it { is_expected.to eq true }

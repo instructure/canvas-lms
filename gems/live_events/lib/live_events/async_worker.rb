@@ -35,7 +35,7 @@ module LiveEvents
       @stream_client = stream_client
       @stream_name = stream_name
 
-      self.start! if start_thread
+      start! if start_thread
     end
 
     def push(event, partition_key = SecureRandom.uuid)
@@ -54,7 +54,7 @@ module LiveEvents
         data: event_json,
         partition_key: partition_key,
         statsd_prefix: "live_events.events",
-        tags: { event: event.dig(:attributes, :event_name) || 'event_name_not_found' },
+        tags: { event: event.dig(:attributes, :event_name) || "event_name_not_found" },
         total_bytes: total_bytes
       }
       true
@@ -76,23 +76,23 @@ module LiveEvents
     def start!
       return if @running
 
-      @thread = Thread.new { self.run_thread }
+      @thread = Thread.new { run_thread }
       @running = true
       at_exit { stop! unless stopped? }
     end
 
     def run_thread
       loop do
-        return unless @running || @queue.size > 0
+        return unless @running || !@queue.empty?
 
         # pause thread so it will allow main thread to run
-        r = @queue.pop if @queue.size == 0
+        r = @queue.pop if @queue.empty?
 
         begin
           # r will be nil on first pass
           records = [r].compact
           total_bytes = (r.is_a?(Hash) && r[:total_bytes]) || 0
-          while @queue.size > 0 && total_bytes < MAX_BYTE_THRESHOLD
+          while !@queue.empty? && total_bytes < MAX_BYTE_THRESHOLD
             r = @queue.pop
             break if r == :stop || (records.size == 1 && records.first == :stop)
 
@@ -106,7 +106,7 @@ module LiveEvents
           end
           send_events(records)
         rescue => e
-          logger.error("Exception making LiveEvents async call: #{e}")
+          logger.error("Exception making LiveEvents async call: #{e}\n#{e.backtrace.first}")
         end
         LiveEvents.on_work_unit_end&.call
       end
@@ -116,17 +116,18 @@ module LiveEvents
 
     def time_block
       res = nil
-      unless LiveEvents&.statsd.nil?
+      if LiveEvents&.statsd.nil?
+        res = yield
+      else
         LiveEvents.statsd.time("live_events.put_records") do
           res = yield
         end
-      else
-        res = yield
       end
     end
 
     def send_events(records)
       return if records.empty?
+      return if records.include? :stop
 
       res = time_block do
         @stream_client.put_records(

@@ -24,15 +24,15 @@ module CC
         # the CC Web Link
         link_file_name = "#{tag[:migration_id]}.xml"
         link_path = File.join(@export_dir, link_file_name)
-        link_file = File.new(link_path, 'w')
-        link_doc = Builder::XmlMarkup.new(:target => link_file, :indent => 2)
+        link_file = File.new(link_path, "w")
+        link_doc = Builder::XmlMarkup.new(target: link_file, indent: 2)
         link_doc.instruct!
 
         link_doc.webLink("xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imswl_v1p1",
                          "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
                          "xsi:schemaLocation" => "http://www.imsglobal.org/xsd/imsccv1p1/imswl_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imswl_v1p1.xsd") do |l|
           l.title tag[:title]
-          l.url(:href => tag[:url])
+          l.url(href: tag[:url])
         end
         link_file.close
 
@@ -40,7 +40,7 @@ module CC
           :identifier => tag[:migration_id],
           "type" => CCHelper::WEB_LINK
         ) do |res|
-          res.file(:href => link_file_name)
+          res.file(href: link_file_name)
         end
       end
     end

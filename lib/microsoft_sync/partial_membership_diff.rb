@@ -31,7 +31,7 @@
 # same time period), because we don't know the state on the Microsoft side,
 # this may indicate unnecessary changes (such as removing a user from a group
 # it is not in); by executing the actions recommended by this class with
-# GraphService's remove_group_users_ignore_missing(), such actions turn into
+# graph_service.groups's remove_users_ignore_missing(), such actions turn into
 # no-ops.
 # For instance, here is an example where what seems like the "optimal" method
 # could lead to us never adding an owner. You can check that the actions we
@@ -57,8 +57,8 @@
 
 module MicrosoftSync
   class PartialMembershipDiff
-    OWNER_MSFT_ROLE_TYPE = 'owner'
-    MEMBER_MSFT_ROLE_TYPE = 'member'
+    OWNER_MSFT_ROLE_TYPE = "owner"
+    MEMBER_MSFT_ROLE_TYPE = "member"
 
     def initialize(user_id_to_msft_role_types)
       @user_infos = user_id_to_msft_role_types.to_h.transform_values { |ctypes| UserInfo.new(ctypes) }
@@ -97,7 +97,7 @@ module MicrosoftSync
     private
 
     def aads_with_action(action)
-      @user_infos.values.select { |info| info.actions.include?(action) }.map(&:aad_id).compact.uniq
+      @user_infos.values.select { |info| info.actions.include?(action) }.filter_map(&:aad_id).uniq
     end
 
     class UserInfo
@@ -148,9 +148,9 @@ module MicrosoftSync
       def enrollment_msft_role_types
         @enrollment_types.map do |e_type|
           if MicrosoftSync::MembershipDiff::OWNER_ENROLLMENT_TYPES.include?(e_type)
-            'owner'
+            "owner"
           else
-            'member'
+            "member"
           end
         end.uniq.sort
       end

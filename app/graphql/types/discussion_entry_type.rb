@@ -20,7 +20,7 @@
 
 module Types
   class DiscussionEntryType < ApplicationObjectType
-    graphql_name 'DiscussionEntry'
+    graphql_name "DiscussionEntry"
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface

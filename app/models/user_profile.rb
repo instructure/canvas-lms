@@ -23,16 +23,16 @@ class UserProfile < ActiveRecord::Base
 
   delegate :short_name, :name, :asset_string, :opaque_identifier, to: :user
 
-  has_many :links, inverse_of: :user_profile, class_name: 'UserProfileLink', dependent: :destroy
+  has_many :links, inverse_of: :user_profile, class_name: "UserProfileLink", dependent: :destroy
 
   validates :title,
             length: {
-              maximum: maximum_string_length, too_long: '%{count} characters is the maximum allowed'
+              maximum: maximum_string_length, too_long: "%{count} characters is the maximum allowed"
             },
             allow_blank: true
   validates :bio,
             length: {
-              maximum: maximum_text_length, too_long: '%{count} characters is the maximum allowed'
+              maximum: maximum_text_length, too_long: "%{count} characters is the maximum allowed"
             },
             allow_blank: true
 
@@ -50,22 +50,22 @@ class UserProfile < ActiveRecord::Base
   BASE_TABS = [
     {
       id: TAB_COMMUNICATION_PREFERENCES,
-      label: -> { I18n.t('#user_profile.tabs.notifications', 'Notifications') },
-      css_class: 'notifications',
+      label: -> { I18n.t("#user_profile.tabs.notifications", "Notifications") },
+      css_class: "notifications",
       href: :communication_profile_path,
       no_args: true
     }.freeze,
     {
       id: TAB_FILES,
-      label: -> { I18n.t('#tabs.files', 'Files') },
-      css_class: 'files',
+      label: -> { I18n.t("#tabs.files", "Files") },
+      css_class: "files",
       href: :files_path,
       no_args: true
     }.freeze,
     {
       id: TAB_PROFILE_SETTINGS,
-      label: -> { I18n.t('#user_profile.tabs.settings', 'Settings') },
-      css_class: 'profile_settings',
+      label: -> { I18n.t("#user_profile.tabs.settings", "Settings") },
+      css_class: "profile_settings",
       href: :settings_profile_path,
       no_args: true
     }.freeze
@@ -76,7 +76,7 @@ class UserProfile < ActiveRecord::Base
       return unless user
 
       user_roles = Lti::SubstitutionsHelper.new(account, account.root_account, user).all_roles
-      user_roles.include?('urn:lti:instrole:ims/lis/Administrator')
+      user_roles.include?("urn:lti:instrole:ims/lis/Administrator")
     end
     can :view_lti_tool
   end
@@ -109,8 +109,8 @@ class UserProfile < ActiveRecord::Base
       tabs.insert 1,
                   {
                     id: TAB_PROFILE,
-                    label: I18n.t('#user_profile.tabs.profile', 'Profile'),
-                    css_class: 'profile',
+                    label: I18n.t("#user_profile.tabs.profile", "Profile"),
+                    css_class: "profile",
                     href: :profile_path,
                     no_args: true
                   }
@@ -122,8 +122,8 @@ class UserProfile < ActiveRecord::Base
       tabs <<
         {
           id: TAB_EPORTFOLIOS,
-          label: I18n.t('#tabs.eportfolios', 'ePortfolios'),
-          css_class: 'eportfolios',
+          label: I18n.t("#tabs.eportfolios", "ePortfolios"),
+          css_class: "eportfolios",
           href: :dashboard_eportfolios_path,
           no_args: true
         }
@@ -131,12 +131,12 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_content_shares_tab(tabs, user, **)
-    if user && user.can_content_share?
+    if user&.can_content_share?
       tabs <<
         {
           id: TAB_CONTENT_SHARES,
-          label: I18n.t('Shared Content'),
-          css_class: 'content_shares',
+          label: I18n.t("Shared Content"),
+          css_class: "content_shares",
           href: :content_shares_profile_path,
           no_args: true
         }
@@ -145,7 +145,7 @@ class UserProfile < ActiveRecord::Base
 
   def insert_lti_tool_tabs(tabs, user, opts)
     tools =
-      opts[:root_account].context_external_tools.active.having_setting('user_navigation')
+      opts[:root_account].context_external_tools.active.having_setting("user_navigation")
                          .select { |t| t.permission_given?(:user_navigation, user, opts[:root_account]) }
     tabs.concat(
       Lti::ExternalToolTab.new(user, :user_navigation, tools, opts[:language]).tabs
@@ -154,7 +154,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def show_lti_tab?(tab, user, account)
-    tab[:visibility] != 'admins' || self.grants_right?(user, account, :view_lti_tool)
+    tab[:visibility] != "admins" || grants_right?(user, account, :view_lti_tool)
   end
 
   def insert_observer_tabs(tabs, user)
@@ -162,8 +162,8 @@ class UserProfile < ActiveRecord::Base
       tabs <<
         {
           id: TAB_OBSERVEES,
-          label: I18n.t('#tabs.observees', 'Observing'),
-          css_class: 'observees',
+          label: I18n.t("#tabs.observees", "Observing"),
+          css_class: "observees",
           href: :observees_profile_path,
           no_args: true
         }
@@ -175,8 +175,8 @@ class UserProfile < ActiveRecord::Base
       tabs <<
         {
           id: TAB_QR_MOBILE_LOGIN,
-          label: I18n.t('#tabs.qr_mobile_login', 'QR for Mobile Login'),
-          css_class: 'qr_mobile_login',
+          label: I18n.t("#tabs.qr_mobile_login", "QR for Mobile Login"),
+          css_class: "qr_mobile_login",
           href: :qr_mobile_login_path,
           no_args: true
         }
@@ -188,8 +188,8 @@ class UserProfile < ActiveRecord::Base
       tabs <<
         {
           id: TAB_PAST_GLOBAL_ANNOUNCEMENTS,
-          label: I18n.t('#tabs.past_global_announcements', 'Global Announcements'),
-          css_class: 'past_global_announcements',
+          label: I18n.t("#tabs.past_global_announcements", "Global Announcements"),
+          css_class: "past_global_announcements",
           href: :account_notifications_path,
           no_args: { include_past: true }
         }

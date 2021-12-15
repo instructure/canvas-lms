@@ -18,22 +18,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe Canvadocs do
-  describe '.user_session_params' do
+  describe ".user_session_params" do
     let(:course) { Course.create! }
-    let(:student) { User.create!(name: 'Severus Student', short_name: 'Sev, the Student') }
-    let(:teacher) { User.create!(name: 'Giselle Grader', short_name: 'Gise, the Grader') }
-    let(:assignment) { course.assignments.create!(title: 'an assignment') }
+    let(:student) { User.create!(name: "Severus Student", short_name: "Sev, the Student") }
+    let(:teacher) { User.create!(name: "Giselle Grader", short_name: "Gise, the Grader") }
+    let(:assignment) { course.assignments.create!(title: "an assignment") }
     let(:submission) { assignment.submission_for_student(student) }
     let(:attachment) do
       Attachment.create!(
-        content_type: 'application/pdf',
+        content_type: "application/pdf",
         context: course,
         user: student,
         uploaded_data: stub_png_data,
-        filename: 'file.png'
+        filename: "file.png"
       )
     end
 
@@ -46,7 +46,7 @@ describe Canvadocs do
       @current_user = student
     end
 
-    context 'when passed an attachment' do
+    context "when passed an attachment" do
       let(:session_params) { Canvadocs.user_session_params(@current_user, attachment: attachment) }
 
       # We don't really want this behaviour long term, but that's the
@@ -64,71 +64,71 @@ describe Canvadocs do
         expect(Canvadocs.user_session_params(@current_user)).to be_empty
       end
 
-      describe 'parameters describing the current user' do
-        it 'includes the short name of the current user with commas removed' do
+      describe "parameters describing the current user" do
+        it "includes the short name of the current user with commas removed" do
           # This format for the name is in line with what we send in
           # the canvadocs default user options.
-          expect(session_params[:user_name]).to eq 'Sev the Student'
+          expect(session_params[:user_name]).to eq "Sev the Student"
         end
 
-        it 'includes the real global ID of the current user' do
+        it "includes the real global ID of the current user" do
           expect(session_params[:user_id]).to eq student.global_id.to_s
         end
 
-        context 'when a student is viewing' do
+        context "when a student is viewing" do
           it 'includes a user_role of "student"' do
-            expect(session_params[:user_role]).to eq 'student'
+            expect(session_params[:user_role]).to eq "student"
           end
 
-          it 'includes the anonymous ID of the student' do
+          it "includes the anonymous ID of the student" do
             expect(session_params[:user_anonymous_id]).to eq submission.anonymous_id
           end
         end
 
-        context 'when a grader is viewing' do
+        context "when a grader is viewing" do
           before do
             @current_user = teacher
           end
 
-          it 'includes a user_role that is based on the user enrollment type' do
-            expect(session_params[:user_role]).to eq 'teacher'
+          it "includes a user_role that is based on the user enrollment type" do
+            expect(session_params[:user_role]).to eq "teacher"
           end
 
-          it 'does not include an anonymous ID if the assignment is not moderated' do
+          it "does not include an anonymous ID if the assignment is not moderated" do
             assignment.update!(moderated_grading: false)
             expect(session_params).not_to include(:user_anonymous_id)
           end
 
-          context 'when the assignment is moderated' do
+          context "when the assignment is moderated" do
             before do
               assignment.update!(moderated_grading: true, final_grader: teacher, grader_count: 1)
             end
 
-            it 'includes the anonymous ID of the grader when the grader has taken a slot' do
-              assignment.moderation_graders.create!(user: teacher, anonymous_id: 'abcde', slot_taken: true)
-              expect(session_params[:user_anonymous_id]).to eq 'abcde'
+            it "includes the anonymous ID of the grader when the grader has taken a slot" do
+              assignment.moderation_graders.create!(user: teacher, anonymous_id: "abcde", slot_taken: true)
+              expect(session_params[:user_anonymous_id]).to eq "abcde"
             end
 
-            it 'includes the anonymous ID of the grader when the grader has not taken a slot' do
-              assignment.moderation_graders.create!(user: teacher, anonymous_id: 'abcde', slot_taken: false)
-              expect(session_params[:user_anonymous_id]).to eq 'abcde'
+            it "includes the anonymous ID of the grader when the grader has not taken a slot" do
+              assignment.moderation_graders.create!(user: teacher, anonymous_id: "abcde", slot_taken: false)
+              expect(session_params[:user_anonymous_id]).to eq "abcde"
             end
 
-            it 'does not include the anonymous ID if the grader does not have a moderation_grader record' do
+            it "does not include the anonymous ID if the grader does not have a moderation_grader record" do
               expect(session_params[:user_anonymous_id]).to be nil
             end
           end
         end
       end
 
-      describe 'user filter' do
-        let(:peer_reviewer) { User.create!(name: 'Percy the Peer Reviewer') }
-        let(:peer_reviewer_real_data) { { type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: 'Percy the Peer Reviewer' } }
-        let(:peer_reviewer2) { User.create!(name: 'Penny the Peer Reviewer') }
-        let(:peer_reviewer2_real_data) { { type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer' } }
-        let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student' } }
-        let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
-        let(:teacher_real_data) { { type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader' } }
+      describe "user filter" do
+        let(:peer_reviewer) { User.create!(name: "Percy the Peer Reviewer") }
+        let(:peer_reviewer_real_data) { { type: "real", role: "student", id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer" } }
+        let(:peer_reviewer2) { User.create!(name: "Penny the Peer Reviewer") }
+        let(:peer_reviewer2_real_data) { { type: "real", role: "student", id: peer_reviewer2.global_id.to_s, name: "Penny the Peer Reviewer" } }
+        let(:student_real_data) { { type: "real", role: "student", id: student.global_id.to_s, name: "Sev the Student" } }
+        let(:student_anonymous_data) { hash_including(type: "anonymous", role: "student", id: submission.anonymous_id) }
+        let(:teacher_real_data) { { type: "real", role: "teacher", id: teacher.global_id.to_s, name: "Gise the Grader" } }
 
         context "when an assignment posts manually and a submission is unposted" do
           before do
@@ -181,6 +181,26 @@ describe Canvadocs do
             end
           end
 
+          context "when an observer is viewing" do
+            before do
+              course_with_observer(
+                course: @course,
+                associated_user_id: student.id,
+                active_all: true,
+                active_cc: true
+              )
+              user_session(@observer)
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes only the observed student in the user_filter" do
+              expect(user_filter).to match [student_real_data]
+            end
+          end
+
           context "when a peer reviewer is viewing" do
             before do
               @current_user = peer_reviewer
@@ -207,19 +227,19 @@ describe Canvadocs do
               expect(user_filter).to match [peer_reviewer_real_data]
             end
 
-            context 'student annotations' do
+            context "student annotations" do
               before do
-                submission.update!(submission_type: 'student_annotation')
+                submission.update!(submission_type: "student_annotation")
                 attachment.associate_with(submission)
               end
 
-              it 'sets user filter type to anonymous when the peer reviews are anonymous' do
+              it "sets user filter type to anonymous when the peer reviews are anonymous" do
                 assignment.update!(anonymous_peer_reviews: true)
 
                 expect(user_filter).to include(student_anonymous_data)
               end
 
-              it 'sets user filter type to real when the peer reviews are not anonymous' do
+              it "sets user filter type to real when the peer reviews are not anonymous" do
                 expect(user_filter).to include(student_real_data)
               end
             end
@@ -289,109 +309,109 @@ describe Canvadocs do
           end
         end
 
-        context 'for an unmoderated anonymized assignment' do
+        context "for an unmoderated anonymized assignment" do
           before do
             assignment.update!(anonymous_grading: true, muted: true)
           end
 
-          context 'when a student is viewing' do
+          context "when a student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'includes only the current user' do
+            it "includes only the current user" do
               @current_user = student
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when a teacher is viewing' do
+          context "when a teacher is viewing" do
             before do
               @current_user = teacher
             end
 
-            it 'includes anonymous information for the student' do
+            it "includes anonymous information for the student" do
               expect(user_filter).to include(student_anonymous_data)
             end
 
-            it 'does not request that all returned annotations belong to users in the user_filter' do
+            it "does not request that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be false
             end
           end
         end
 
-        context 'for an unmoderated non-anonymized assignment' do
+        context "for an unmoderated non-anonymized assignment" do
           before do
             assignment.update!(anonymous_grading: false, muted: false)
           end
 
-          context 'when a student is viewing' do
+          context "when a student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'omits the user filter entirely when a student is viewing' do
+            it "omits the user filter entirely when a student is viewing" do
               expect(session_params).not_to include(:user_filter)
             end
 
-            it 'omits the restrict_annotations_to_user_filter entirely' do
+            it "omits the restrict_annotations_to_user_filter entirely" do
               expect(session_params).not_to have_key(:restrict_annotations_to_user_filter)
             end
           end
 
-          context 'when a teacher is viewing' do
+          context "when a teacher is viewing" do
             before do
               @current_user = teacher
             end
 
-            it 'omits the user filter entirely' do
+            it "omits the user filter entirely" do
               expect(session_params).not_to include(:user_filter)
             end
 
-            it 'omits the restrict_annotations_to_user_filter entirely' do
+            it "omits the restrict_annotations_to_user_filter entirely" do
               expect(session_params).not_to have_key(:restrict_annotations_to_user_filter)
             end
           end
         end
 
-        context 'for a moderated assignment' do
+        context "for a moderated assignment" do
           let(:final_grader) { teacher }
           let(:final_grader_real_data) do
-            { type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader' }
+            { type: "real", role: "teacher", id: teacher.global_id.to_s, name: "Gise the Grader" }
           end
 
-          let(:final_grader_anonymous_data) { hash_including(type: 'anonymous', role: 'teacher', id: 'qqqqq') }
-          let(:provisional_grader_anonymous_data) { hash_including(type: 'anonymous', role: 'ta', id: 'wwwww') }
-          let(:provisional_grader) { User.create!(name: 'Publius Provisional', short_name: 'Pub, the Prov') }
+          let(:final_grader_anonymous_data) { hash_including(type: "anonymous", role: "teacher", id: "qqqqq") }
+          let(:provisional_grader_anonymous_data) { hash_including(type: "anonymous", role: "ta", id: "wwwww") }
+          let(:provisional_grader) { User.create!(name: "Publius Provisional", short_name: "Pub, the Prov") }
           let(:provisional_grader_real_data) do
-            { type: 'real', role: 'ta', id: provisional_grader.global_id.to_s, name: 'Pub the Prov' }
+            { type: "real", role: "ta", id: provisional_grader.global_id.to_s, name: "Pub the Prov" }
           end
 
           before do
             assignment.update!(moderated_grading: true, final_grader: final_grader, grader_count: 1)
-            assignment.moderation_graders.create!(user: final_grader, anonymous_id: 'qqqqq')
+            assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
             course.enroll_ta(provisional_grader).accept(true)
-            assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: 'wwwww')
+            assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
           end
 
-          context 'when a student is viewing' do
+          context "when a student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'includes the student' do
+            it "includes the student" do
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'excludes graders if the submission is not posted' do
-              expect(user_filter).not_to include(hash_including(role: 'teacher'))
+            it "excludes graders if the submission is not posted" do
+              expect(user_filter).not_to include(hash_including(role: "teacher"))
             end
 
-            it 'includes the selected grader if the submission is posted' do
+            it "includes the selected grader if the submission is posted" do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
@@ -400,7 +420,7 @@ describe Canvadocs do
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'excludes graders that were not selected if the submission is posted' do
+            it "excludes graders that were not selected if the submission is posted" do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
@@ -409,92 +429,92 @@ describe Canvadocs do
               expect(user_filter).not_to include(final_grader_real_data)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when a provisional grader is viewing' do
+          context "when a provisional grader is viewing" do
             before do
               @current_user = provisional_grader
             end
 
-            it 'includes real data for the current grader' do
+            it "includes real data for the current grader" do
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'includes anonymous student data when anonymizing students' do
+            it "includes anonymous student data when anonymizing students" do
               assignment.update!(anonymous_grading: true, muted: true)
               expect(user_filter).to include(student_anonymous_data)
             end
 
-            it 'returns an anonymous name for the student when anonymizing students' do
+            it "returns an anonymous name for the student when anonymizing students" do
               assignment.update!(anonymous_grading: true, muted: true)
-              student_entry = user_filter.find { |entry| entry[:role] == 'student' }
-              expect(student_entry[:name]).to eq 'Student'
+              student_entry = user_filter.find { |entry| entry[:role] == "student" }
+              expect(student_entry[:name]).to eq "Student"
             end
 
-            it 'includes real student data when not anonymizing students' do
+            it "includes real student data when not anonymizing students" do
               assignment.update!(anonymous_grading: false, muted: false)
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'includes real grader data when showing identities of other graders' do
+            it "includes real grader data when showing identities of other graders" do
               assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: false)
               expect(user_filter).to include(final_grader_real_data)
             end
 
-            it 'includes anonymous grader data when hiding identities of other graders' do
+            it "includes anonymous grader data when hiding identities of other graders" do
               assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: true)
               expect(user_filter).to include(final_grader_anonymous_data)
             end
 
             it 'returns names in the format "Grader #" for graders whose identities are hidden' do
               assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: true)
-              final_grader_entry = user_filter.find { |entry| entry[:id] == 'qqqqq' }
-              expect(final_grader_entry[:name]).to eq 'Grader 1'
+              final_grader_entry = user_filter.find { |entry| entry[:id] == "qqqqq" }
+              expect(final_grader_entry[:name]).to eq "Grader 1"
             end
 
-            it 'omits other graders when comments from other graders are hidden' do
+            it "omits other graders when comments from other graders are hidden" do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expect(user_filter_ids).to match_array([student.global_id.to_s, provisional_grader.global_id.to_s])
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when the final grader is viewing' do
+          context "when the final grader is viewing" do
             before do
               @current_user = final_grader
             end
 
-            it 'includes real grader data when grader names are visible to the final grader' do
+            it "includes real grader data when grader names are visible to the final grader" do
               assignment.update!(grader_names_visible_to_final_grader: true)
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'includes anonymous grader data when grader names are not visible to the final grader' do
+            it "includes anonymous grader data when grader names are not visible to the final grader" do
               assignment.update!(grader_names_visible_to_final_grader: false)
               expect(user_filter).to include(provisional_grader_anonymous_data)
             end
 
             it 'returns names in the format "Grader #" for graders not visible to the final grader' do
               assignment.update!(grader_names_visible_to_final_grader: false)
-              final_grader_entry = user_filter.find { |entry| entry[:id] == 'wwwww' }
-              expect(final_grader_entry[:name]).to eq 'Grader 2'
+              final_grader_entry = user_filter.find { |entry| entry[:id] == "wwwww" }
+              expect(final_grader_entry[:name]).to eq "Grader 2"
             end
 
-            it 'always includes other graders when the final grader is viewing' do
+            it "always includes other graders when the final grader is viewing" do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expected_ids = [final_grader.global_id.to_s, provisional_grader.global_id.to_s, student.global_id.to_s]
               expect(user_filter_ids).to match_array(expected_ids)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
@@ -502,191 +522,191 @@ describe Canvadocs do
       end
     end
 
-    context 'when passed a submission' do
+    context "when passed a submission" do
       let(:session_params) { Canvadocs.user_session_params(@current_user, submission: submission) }
 
-      describe 'parameters describing the current user' do
-        it 'includes the short name of the current user with commas removed' do
+      describe "parameters describing the current user" do
+        it "includes the short name of the current user with commas removed" do
           # This format for the name is in line with what we send in
           # the canvadocs default user options.
-          expect(session_params[:user_name]).to eq 'Sev the Student'
+          expect(session_params[:user_name]).to eq "Sev the Student"
         end
 
-        it 'includes the real global ID of the current user' do
+        it "includes the real global ID of the current user" do
           expect(session_params[:user_id]).to eq student.global_id.to_s
         end
 
-        context 'when a student is viewing' do
+        context "when a student is viewing" do
           it 'includes a user_role of "student"' do
-            expect(session_params[:user_role]).to eq 'student'
+            expect(session_params[:user_role]).to eq "student"
           end
 
-          it 'includes the anonymous ID of the student' do
+          it "includes the anonymous ID of the student" do
             expect(session_params[:user_anonymous_id]).to eq submission.anonymous_id
           end
         end
 
-        context 'when a grader is viewing' do
+        context "when a grader is viewing" do
           before do
             @current_user = teacher
           end
 
-          it 'includes a user_role that is based on the user enrollment type' do
-            expect(session_params[:user_role]).to eq 'teacher'
+          it "includes a user_role that is based on the user enrollment type" do
+            expect(session_params[:user_role]).to eq "teacher"
           end
 
-          it 'does not include an anonymous ID if the assignment is not moderated' do
+          it "does not include an anonymous ID if the assignment is not moderated" do
             assignment.update!(moderated_grading: false)
             expect(session_params).not_to include(:user_anonymous_id)
           end
 
-          context 'when the assignment is moderated' do
+          context "when the assignment is moderated" do
             before do
               assignment.update!(moderated_grading: true, final_grader: teacher, grader_count: 1)
             end
 
-            it 'includes the anonymous ID of the grader when the grader has taken a slot' do
-              assignment.moderation_graders.create!(user: teacher, anonymous_id: 'abcde', slot_taken: true)
-              expect(session_params[:user_anonymous_id]).to eq 'abcde'
+            it "includes the anonymous ID of the grader when the grader has taken a slot" do
+              assignment.moderation_graders.create!(user: teacher, anonymous_id: "abcde", slot_taken: true)
+              expect(session_params[:user_anonymous_id]).to eq "abcde"
             end
 
-            it 'includes the anonymous ID of the grader when the grader has not taken a slot' do
-              assignment.moderation_graders.create!(user: teacher, anonymous_id: 'abcde', slot_taken: false)
-              expect(session_params[:user_anonymous_id]).to eq 'abcde'
+            it "includes the anonymous ID of the grader when the grader has not taken a slot" do
+              assignment.moderation_graders.create!(user: teacher, anonymous_id: "abcde", slot_taken: false)
+              expect(session_params[:user_anonymous_id]).to eq "abcde"
             end
 
-            it 'does not include the anonymous ID if the grader does not have a moderation_grader record' do
+            it "does not include the anonymous ID if the grader does not have a moderation_grader record" do
               expect(session_params[:user_anonymous_id]).to be nil
             end
           end
         end
       end
 
-      describe 'user filter' do
-        let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student' } }
-        let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
-        let(:teacher_real_data) { { type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader' } }
-        let(:ta) { User.create!(name: 'Tory the TA', short_name: 'Tory') }
-        let(:ta_real_data) { { type: 'real', role: 'ta', id: ta.global_id.to_s, name: 'Tory the TA' } }
-        let(:ta_anonymous_data) { hash_including(type: 'anonymous', role: 'ta', id: 'tttt') }
+      describe "user filter" do
+        let(:student_real_data) { { type: "real", role: "student", id: student.global_id.to_s, name: "Sev the Student" } }
+        let(:student_anonymous_data) { hash_including(type: "anonymous", role: "student", id: submission.anonymous_id) }
+        let(:teacher_real_data) { { type: "real", role: "teacher", id: teacher.global_id.to_s, name: "Gise the Grader" } }
+        let(:ta) { User.create!(name: "Tory the TA", short_name: "Tory") }
+        let(:ta_real_data) { { type: "real", role: "ta", id: ta.global_id.to_s, name: "Tory the TA" } }
+        let(:ta_anonymous_data) { hash_including(type: "anonymous", role: "ta", id: "tttt") }
 
-        context 'for an unmoderated anonymized assignment' do
+        context "for an unmoderated anonymized assignment" do
           before do
             assignment.update!(anonymous_grading: true, muted: true)
           end
 
-          context 'when a student is viewing' do
+          context "when a student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'includes only the current user' do
+            it "includes only the current user" do
               @current_user = student
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when a teacher is viewing' do
+          context "when a teacher is viewing" do
             before do
               @current_user = teacher
             end
 
-            it 'includes anonymous information for the student' do
+            it "includes anonymous information for the student" do
               expect(user_filter).to include(student_anonymous_data)
             end
 
-            it 'does not request that all returned annotations belong to users in the user_filter' do
+            it "does not request that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be false
             end
           end
 
-          context 'when a ta is viewing' do
+          context "when a ta is viewing" do
             before do
               @current_user = ta
             end
 
-            it 'includes anonymous information for the student' do
+            it "includes anonymous information for the student" do
               expect(user_filter).to include(student_anonymous_data)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
         end
 
-        context 'for an unmoderated non-anonymized assignment' do
+        context "for an unmoderated non-anonymized assignment" do
           before do
             assignment.update!(anonymous_grading: false, muted: false)
           end
 
-          context 'when a student is viewing' do
+          context "when a student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'omits the user filter entirely when a student is viewing' do
+            it "omits the user filter entirely when a student is viewing" do
               expect(session_params).not_to include(:user_filter)
             end
 
-            it 'omits the restrict_annotations_to_user_filter entirely' do
+            it "omits the restrict_annotations_to_user_filter entirely" do
               expect(session_params).not_to have_key(:restrict_annotations_to_user_filter)
             end
           end
 
-          context 'when a teacher is viewing' do
+          context "when a teacher is viewing" do
             before do
               @current_user = teacher
             end
 
-            it 'omits the user filter entirely' do
+            it "omits the user filter entirely" do
               expect(session_params).not_to include(:user_filter)
             end
 
-            it 'omits the restrict_annotations_to_user_filter entirely' do
+            it "omits the restrict_annotations_to_user_filter entirely" do
               expect(session_params).not_to have_key(:restrict_annotations_to_user_filter)
             end
           end
         end
 
-        context 'for a moderated assignment' do
+        context "for a moderated assignment" do
           let(:final_grader) { teacher }
           let(:final_grader_real_data) do
-            { type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader' }
+            { type: "real", role: "teacher", id: teacher.global_id.to_s, name: "Gise the Grader" }
           end
 
-          let(:final_grader_anonymous_data) { hash_including(type: 'anonymous', role: 'teacher', id: 'qqqqq') }
-          let(:provisional_grader_anonymous_data) { hash_including(type: 'anonymous', role: 'ta', id: 'wwwww') }
-          let(:provisional_grader) { User.create!(name: 'Publius Provisional', short_name: 'Pub, the Prov') }
+          let(:final_grader_anonymous_data) { hash_including(type: "anonymous", role: "teacher", id: "qqqqq") }
+          let(:provisional_grader_anonymous_data) { hash_including(type: "anonymous", role: "ta", id: "wwwww") }
+          let(:provisional_grader) { User.create!(name: "Publius Provisional", short_name: "Pub, the Prov") }
           let(:provisional_grader_real_data) do
-            { type: 'real', role: 'ta', id: provisional_grader.global_id.to_s, name: 'Pub the Prov' }
+            { type: "real", role: "ta", id: provisional_grader.global_id.to_s, name: "Pub the Prov" }
           end
 
           before do
             assignment.update!(moderated_grading: true, final_grader: final_grader, grader_count: 1)
-            assignment.moderation_graders.create!(user: final_grader, anonymous_id: 'qqqqq')
+            assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
             course.enroll_ta(provisional_grader).accept(true)
-            assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: 'wwwww')
+            assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
           end
 
-          context 'when a student is viewing' do
+          context "when a student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'includes the student' do
+            it "includes the student" do
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'excludes graders if the submission is not posted' do
-              expect(user_filter).not_to include(hash_including(role: 'teacher'))
+            it "excludes graders if the submission is not posted" do
+              expect(user_filter).not_to include(hash_including(role: "teacher"))
             end
 
-            it 'includes the selected grader if the submission is posted' do
+            it "includes the selected grader if the submission is posted" do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
@@ -695,7 +715,7 @@ describe Canvadocs do
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'excludes graders that were not selected if the submission is posted' do
+            it "excludes graders that were not selected if the submission is posted" do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
@@ -704,122 +724,122 @@ describe Canvadocs do
               expect(user_filter).not_to include(final_grader_real_data)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when a provisional grader is viewing' do
+          context "when a provisional grader is viewing" do
             before do
               @current_user = provisional_grader
             end
 
-            it 'includes real data for the current grader' do
+            it "includes real data for the current grader" do
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'includes anonymous student data when anonymizing students' do
+            it "includes anonymous student data when anonymizing students" do
               assignment.update!(anonymous_grading: true, muted: true)
               expect(user_filter).to include(student_anonymous_data)
             end
 
-            it 'returns an anonymous name for the student when anonymizing students' do
+            it "returns an anonymous name for the student when anonymizing students" do
               assignment.update!(anonymous_grading: true, muted: true)
-              student_entry = user_filter.find { |entry| entry[:role] == 'student' }
-              expect(student_entry[:name]).to eq 'Student'
+              student_entry = user_filter.find { |entry| entry[:role] == "student" }
+              expect(student_entry[:name]).to eq "Student"
             end
 
-            it 'includes real student data when not anonymizing students' do
+            it "includes real student data when not anonymizing students" do
               assignment.update!(anonymous_grading: false, muted: false)
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'includes real grader data when showing identities of other graders' do
+            it "includes real grader data when showing identities of other graders" do
               assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: false)
               expect(user_filter).to include(final_grader_real_data)
             end
 
-            it 'includes anonymous grader data when hiding identities of other graders' do
+            it "includes anonymous grader data when hiding identities of other graders" do
               assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: true)
               expect(user_filter).to include(final_grader_anonymous_data)
             end
 
             it 'returns names in the format "Grader #" for graders whose identities are hidden' do
               assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: true)
-              final_grader_entry = user_filter.find { |entry| entry[:id] == 'qqqqq' }
-              expect(final_grader_entry[:name]).to eq 'Grader 1'
+              final_grader_entry = user_filter.find { |entry| entry[:id] == "qqqqq" }
+              expect(final_grader_entry[:name]).to eq "Grader 1"
             end
 
-            it 'omits other graders when comments from other graders are hidden' do
+            it "omits other graders when comments from other graders are hidden" do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expect(user_filter_ids).to match_array([student.global_id.to_s, provisional_grader.global_id.to_s])
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when the final grader is viewing' do
+          context "when the final grader is viewing" do
             before do
               @current_user = final_grader
             end
 
-            it 'includes real grader data when grader names are visible to the final grader' do
+            it "includes real grader data when grader names are visible to the final grader" do
               assignment.update!(grader_names_visible_to_final_grader: true)
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'includes anonymous grader data when grader names are not visible to the final grader' do
+            it "includes anonymous grader data when grader names are not visible to the final grader" do
               assignment.update!(grader_names_visible_to_final_grader: false)
               expect(user_filter).to include(provisional_grader_anonymous_data)
             end
 
             it 'returns names in the format "Grader #" for graders not visible to the final grader' do
               assignment.update!(grader_names_visible_to_final_grader: false)
-              final_grader_entry = user_filter.find { |entry| entry[:id] == 'wwwww' }
-              expect(final_grader_entry[:name]).to eq 'Grader 2'
+              final_grader_entry = user_filter.find { |entry| entry[:id] == "wwwww" }
+              expect(final_grader_entry[:name]).to eq "Grader 2"
             end
 
-            it 'always includes other graders when the final grader is viewing' do
+            it "always includes other graders when the final grader is viewing" do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expected_ids = [final_grader.global_id.to_s, provisional_grader.global_id.to_s, student.global_id.to_s]
               expect(user_filter_ids).to match_array(expected_ids)
             end
 
-            it 'requests that all returned annotations belong to users in the user_filter' do
+            it "requests that all returned annotations belong to users in the user_filter" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
         end
 
-        context 'for a student annotation assignment' do
+        context "for a student annotation assignment" do
           before do
-            assignment.update!(submission_types: 'student_annotation', annotatable_attachment: attachment)
+            assignment.update!(submission_types: "student_annotation", annotatable_attachment: attachment)
             assignment.submit_homework(
               submission.user,
-              submission_type: 'student_annotation',
+              submission_type: "student_annotation",
               annotatable_attachment_id: attachment.id
             )
             submission.reload
           end
 
-          context 'when the student is viewing' do
+          context "when the student is viewing" do
             before do
               @current_user = student
             end
 
-            it 'sets the user_filter to empty if submission is posted' do
+            it "sets the user_filter to empty if submission is posted" do
               expect(user_filter).to be_empty
             end
 
-            it 'sets restrict_annotations_to_user_filter to false if submission is posted' do
+            it "sets restrict_annotations_to_user_filter to false if submission is posted" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be false
             end
 
-            it 'sets the user_filter to just the student if submission is unposted' do
+            it "sets the user_filter to just the student if submission is unposted" do
               assignment.ensure_post_policy(post_manually: true)
 
               aggregate_failures do
@@ -828,18 +848,18 @@ describe Canvadocs do
               end
             end
 
-            it 'sets restrict_annotations_to_user_filter to true if submission is unposted' do
+            it "sets restrict_annotations_to_user_filter to true if submission is unposted" do
               assignment.ensure_post_policy(post_manually: true)
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when a peer reviewer is viewing' do
+          context "when a peer reviewer is viewing" do
             let(:peer_reviewer) { course.enroll_student(User.create!(name: "Percy the Peer Reviewer")).user }
-            let(:peer_reviewer_real_data) { { type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer" } }
-            let(:peer_reviewer2) { User.create!(name: 'Penny the Peer Reviewer') }
-            let(:peer_reviewer2_real_data) { { type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer' } }
-            let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: "Sev the Student" } }
+            let(:peer_reviewer_real_data) { { type: "real", role: "student", id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer" } }
+            let(:peer_reviewer2) { User.create!(name: "Penny the Peer Reviewer") }
+            let(:peer_reviewer2_real_data) { { type: "real", role: "student", id: peer_reviewer2.global_id.to_s, name: "Penny the Peer Reviewer" } }
+            let(:student_real_data) { { type: "real", role: "student", id: student.global_id.to_s, name: "Sev the Student" } }
 
             before do
               assignment.update!(peer_reviews: true)
@@ -859,44 +879,44 @@ describe Canvadocs do
               @current_user = peer_reviewer
             end
 
-            it 'sets the user_filter to themself and the submission user if submission is posted' do
+            it "sets the user_filter to themself and the submission user if submission is posted" do
               expect(user_filter).to eq [peer_reviewer_real_data, student_real_data]
             end
 
-            it 'sets restrict_annotations_to_user_filter to true if submission is posted' do
+            it "sets restrict_annotations_to_user_filter to true if submission is posted" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
 
-            it 'sets the user_filter to themself and the submission user if submission is unposted' do
+            it "sets the user_filter to themself and the submission user if submission is unposted" do
               assignment.ensure_post_policy(post_manually: true)
               expect(user_filter).to eq [peer_reviewer_real_data, student_real_data]
             end
 
-            it 'sets restrict_annotations_to_user_filter to true if submission is unposted' do
+            it "sets restrict_annotations_to_user_filter to true if submission is unposted" do
               assignment.ensure_post_policy(post_manually: true)
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
             end
           end
 
-          context 'when an instructor is viewing' do
+          context "when an instructor is viewing" do
             before do
               @current_user = teacher
             end
 
-            it 'sets the user_filter to empty if submission is posted' do
+            it "sets the user_filter to empty if submission is posted" do
               expect(user_filter).to be_empty
             end
 
-            it 'sets restrict_annotations_to_user_filter to false if submission is posted' do
+            it "sets restrict_annotations_to_user_filter to false if submission is posted" do
               expect(session_params[:restrict_annotations_to_user_filter]).to be false
             end
 
-            it 'sets the user_filter to empty if submission is unposted' do
+            it "sets the user_filter to empty if submission is unposted" do
               assignment.ensure_post_policy(post_manually: true)
               expect(user_filter).to be_empty
             end
 
-            it 'sets restrict_annotations_to_user_filter to false if submission is unposted' do
+            it "sets restrict_annotations_to_user_filter to false if submission is unposted" do
               assignment.ensure_post_policy(post_manually: true)
               expect(session_params[:restrict_annotations_to_user_filter]).to be false
             end

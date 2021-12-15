@@ -24,40 +24,40 @@ module Lti
   describe ProductFamily do
     let(:account) { Account.new }
 
-    describe 'validations' do
+    describe "validations" do
       before do
-        subject.vendor_code = 'vendor_code'
-        subject.product_code = 'product_code'
-        subject.vendor_name = 'vendor_name'
+        subject.vendor_code = "vendor_code"
+        subject.product_code = "product_code"
+        subject.vendor_name = "vendor_name"
         subject.root_account_id = account
       end
 
-      it 'requires a vendor_code' do
+      it "requires a vendor_code" do
         subject.vendor_code = nil
         subject.save
         expect(subject.errors.first).to eq [:vendor_code, "can't be blank"]
       end
 
-      it 'requires a product_code' do
+      it "requires a product_code" do
         subject.product_code = nil
         subject.save
         expect(subject.errors.first).to eq [:product_code, "can't be blank"]
       end
 
-      it 'requires a vendor_name' do
+      it "requires a vendor_name" do
         subject.vendor_name = nil
         subject.save
         expect(subject.errors.first).to eq [:vendor_name, "can't be blank"]
       end
 
-      it 'requires a root_account' do
+      it "requires a root_account" do
         subject.root_account = nil
         subject.save
         expect(subject.errors.first).to eq [:root_account, "can't be blank"]
       end
 
-      it 'requires unique productcode,vendorcode,rootaccount,developerkey combo' do
-        dev_key = DeveloperKey.create(api_key: 'testapikey')
+      it "requires unique productcode,vendorcode,rootaccount,developerkey combo" do
+        dev_key = DeveloperKey.create(api_key: "testapikey")
         subject.update(developer_key: dev_key, root_account: account)
         dup_subject = subject.dup
         dup_subject.save

@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe ScoreStatistic, type: :model do
-  describe 'relationships' do
+  describe "relationships" do
     it { is_expected.to belong_to(:assignment).required }
   end
 
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to validate_presence_of(:assignment) }
     it { is_expected.to validate_presence_of(:maximum) }
     it { is_expected.to validate_presence_of(:minimum) }

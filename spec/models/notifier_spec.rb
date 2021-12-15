@@ -19,14 +19,14 @@
 #
 
 describe Notifier do
-  describe '#send_notification' do
-    it 'caches messages for inspection in test' do
+  describe "#send_notification" do
+    it "caches messages for inspection in test" do
       group_user = user_with_communication_channel(active_all: true)
       group_membership = group_with_user(user: group_user, active_all: true)
       notification = Notification.create!(name: "New Context Group Membership", category: "Registration")
       to_list = [group_user]
       dispatch = :test_dispatch
-      message = double('message')
+      message = double("message")
 
       expect(DelayedNotification).to receive(:delay_if_production).and_return(DelayedNotification)
       expect(DelayedNotification).to receive(:process).with(

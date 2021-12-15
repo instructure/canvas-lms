@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative './gradebook_student_common'
-require_relative '../setup/gradebook_setup'
-require_relative '../pages/student_grades_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "./gradebook_student_common"
+require_relative "../setup/gradebook_setup"
+require_relative "../pages/student_grades_page"
 
-describe 'Student Gradebook' do
+describe "Student Gradebook" do
   include_context "in-process server selenium tests"
   include GradebookCommon
   include GradebookSetup
@@ -45,17 +45,16 @@ describe 'Student Gradebook' do
     4,  6, 17
   ]
 
-  shared_examples 'Student Gradebook View' do |role|
-    it "for #{role == 'observer' ? 'an Observer' : 'a Student'}", priority: '1',
-                                                                  test_id: role == 'observer' ? 164027 : 164024 do
-      course_with_student_logged_in({ course_name: 'Course A' })
+  shared_examples "Student Gradebook View" do |role|
+    it "for #{role == "observer" ? "an Observer" : "a Student"}", priority: "1" do
+      course_with_student_logged_in({ course_name: "Course A" })
       course1 = @course
       student = @user
       @teacher = User.create!
 
-      course_with_user 'StudentEnrollment', { user: student, course_name: 'Course B', active_all: true }
+      course_with_user "StudentEnrollment", { user: student, course_name: "Course B", active_all: true }
       course2 = @course
-      course_with_user 'StudentEnrollment', { user: student, course_name: 'Course C', active_all: true }
+      course_with_user "StudentEnrollment", { user: student, course_name: "Course C", active_all: true }
       course3 = @course
 
       gi = 0
@@ -75,12 +74,12 @@ describe 'Student Gradebook' do
       end
 
       scores = []
-      if role == 'observer'
-        observer = user_factory(name: 'Observer', active_all: true, active_state: 'active')
+      if role == "observer"
+        observer = user_factory(name: "Observer", active_all: true, active_state: "active")
         [course1, course2, course3].each do |course|
           enrollment = ObserverEnrollment.new(user: observer,
                                               course: course,
-                                              workflow_state: 'active')
+                                              workflow_state: "active")
 
           enrollment.associated_user_id = student
           enrollment.save!
@@ -92,8 +91,8 @@ describe 'Student Gradebook' do
       # we used to loop through [course1, course2, course3] and
       # do this next bit for each one, but it caused the test
       # to exceed jenkins' selenium 15sec time limit
-      click_option('#course_select_menu', course2.name)
-      expect_new_page_load { f('#apply_select_menus').click }
+      click_option("#course_select_menu", course2.name)
+      expect_new_page_load { f("#apply_select_menus").click }
       details = ff('[id^="submission_"].assignment_graded .grade')
       details.each { |detail| scores.push detail.text[/\d+/].to_i }
 
@@ -101,21 +100,21 @@ describe 'Student Gradebook' do
     end
   end
 
-  it 'shows assignment details', priority: '1', test_id: 164023 do
+  it "shows assignment details", priority: "1" do
     init_course_with_students 3
     user_session(@teacher)
 
     means = []
     [0, 3, 6].each do |i|
       # the format below ensures that 18.0 is displayed as 18.
-      mean = format('%g' % (('%.2f' % (grades[i, 3].inject { |a, e| a + e }.to_f / 3))))
+      mean = format("%g" % (("%.2f" % (grades[i, 3].sum.to_f / 3))))
       means.push mean
     end
 
     expectations = [
-      { high: '15', low: '5', mean: means[0] },
-      { high: '19', low: '10', mean: means[1] },
-      { high: '17', low: '4', mean: means[2] }
+      { high: "15", low: "5", mean: means[0] },
+      { high: "19", low: "10", mean: means[1] },
+      { high: "17", low: "4", mean: means[2] }
     ]
 
     grades.each_with_index do |grade, index|
@@ -123,7 +122,7 @@ describe 'Student Gradebook' do
     end
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    f('#show_all_details_button').click
+    f("#show_all_details_button").click
     details = ff('[id^="score_details"] td')
 
     expectations.each_with_index do |expectation, index|
@@ -133,19 +132,19 @@ describe 'Student Gradebook' do
       expect(details[i + 2]).to include_text "Low: #{expectation[:low]}"
     end
 
-    f('#show_all_details_button').click
+    f("#show_all_details_button").click
     details = ff('[id^="grade_info"]')
     details.each do |detail|
-      expect(detail.css_value 'display').to eq 'none'
+      expect(detail.css_value("display")).to eq "none"
     end
   end
 
-  context 'Student Grades' do
-    it_behaves_like 'Student Gradebook View', 'observer'
-    it_behaves_like 'Student Gradebook View'
+  context "Student Grades" do
+    it_behaves_like "Student Gradebook View", "observer"
+    it_behaves_like "Student Gradebook View"
   end
 
-  it 'calculates grades based on graded assignments', priority: '1', test_id: 164025 do
+  it "calculates grades based on graded assignments", priority: "1" do
     init_course_with_students
     user_session(@teacher)
 
@@ -153,15 +152,15 @@ describe 'Student Gradebook' do
     assignments[1].grade_student @students[0], grade: 20, grader: @teacher
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.final_grade .grade')).to include_text '100%'
+    expect(f(".final_grade .grade")).to include_text "100%"
 
-    f('#only_consider_graded_assignments_wrapper').click
-    expect(f('.final_grade .grade')).to include_text '66.67%'
+    f("#only_consider_graded_assignments_wrapper").click
+    expect(f(".final_grade .grade")).to include_text "66.67%"
   end
 
-  it 'follows grade dropping rules', test_id: 164009, priority: '1' do
+  it "follows grade dropping rules", priority: "1" do
     add_teacher_and_student
-    @group = @course.assignment_groups.create!(name: 'Group1', rules: 'drop_lowest:1')
+    @group = @course.assignment_groups.create!(name: "Group1", rules: "drop_lowest:1")
 
     a1 = @course.assignments.create!(points_possible: 20, title: "Assignment 1", assignment_group: @group)
     a2 = @course.assignments.create!(points_possible: 20, title: "Assignment 2", assignment_group: @group)
@@ -173,80 +172,80 @@ describe 'Student Gradebook' do
 
     user_session(@teacher)
     StudentGradesPage.visit_as_teacher(@course, @student)
-    expect(StudentGradesPage.assignment_row(a3)).to have_class 'dropped'
+    expect(StudentGradesPage.assignment_row(a3)).to have_class "dropped"
 
     user_session(@student)
     StudentGradesPage.visit_as_student(@course)
-    expect(StudentGradesPage.assignment_row(a3)).to have_class 'dropped'
+    expect(StudentGradesPage.assignment_row(a3)).to have_class "dropped"
   end
 
-  context 'Comments' do
+  context "Comments" do
     # create a course, publish and enroll teacher and student
-    let_once(:test_course) { course_factory() }
+    let_once(:test_course) { course_factory }
     let_once(:teacher) { user_factory(active_all: true) }
     let_once(:student) { user_factory(active_all: true) }
     let_once(:published_course) do
-      test_course.workflow_state = 'available'
+      test_course.workflow_state = "available"
       test_course.save!
       test_course
     end
     let_once(:enroll_teacher_and_students) do
       published_course.enroll_teacher(teacher).accept!
-      published_course.enroll_student(student, enrollment_state: 'active')
+      published_course.enroll_student(student, enrollment_state: "active")
     end
     # create an assignment and submit as a student
     let_once(:assignment) do
       published_course.assignments.create!(
-        title: 'Assignment Yay',
-        grading_type: 'points',
+        title: "Assignment Yay",
+        grading_type: "points",
         points_possible: 10,
-        submission_types: 'online_upload'
+        submission_types: "online_upload"
       )
     end
-    let_once(:file_attachment) { attachment_model(content_type: 'application/pdf', context: student) }
+    let_once(:file_attachment) { attachment_model(content_type: "application/pdf", context: student) }
     let_once(:student_submission) do
       assignment.submit_homework(
         student,
-        submission_type: 'online_upload',
+        submission_type: "online_upload",
         attachments: [file_attachment]
       )
     end
     # leave a comment as a teacher
-    let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job') }
+    let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: "good job") }
 
-    it 'displays comments from a teacher on student grades page', priority: "1", test_id: 537621 do
+    it "displays comments from a teacher on student grades page", priority: "1" do
       user_session(student)
       get "/courses/#{published_course.id}/grades"
 
       StudentGradesPage.toggle_comment_module
-      unless f('.score_details_table').displayed?
+      unless f(".score_details_table").displayed?
         # 1st click seems to fail on chrome 1 out of 5 times so adding a second click
         StudentGradesPage.toggle_comment_module
       end
-      expect(fj('.score_details_table span:first')).to include_text('good job')
+      expect(fj(".score_details_table span:first")).to include_text("good job")
     end
 
-    it 'does not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
+    it "does not display comments from a teacher on student grades page if assignment is muted", priority: "1" do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 
       get "/courses/#{published_course.id}/grades"
-      expect(f("#comments_thread_#{assignment.id}")).not_to include_text('good job')
+      expect(f("#comments_thread_#{assignment.id}")).not_to include_text("good job")
     end
 
-    it 'displays comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
+    it "displays comments from a teacher on assignment show page if assignment is muted", priority: "1" do
       user_session(student)
 
       get "/courses/#{published_course.id}/assignments/#{assignment.id}"
-      expect(fj('.comments.module .comment:first')).to include_text('good job')
+      expect(fj(".comments.module .comment:first")).to include_text("good job")
     end
 
-    it 'does not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
+    it "does not display comments from a teacher on assignment show page if assignment is muted", priority: "1" do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 
       get "/courses/#{published_course.id}/assignments/#{assignment.id}"
-      expect(fj('.comments.module p')).to include_text('You may not see all comments right now because the assignment is currently being graded.')
+      expect(fj(".comments.module p")).to include_text("You may not see all comments right now because the assignment is currently being graded.")
     end
   end
 
@@ -261,7 +260,7 @@ describe 'Student Gradebook' do
       @assignment0 = @course.assignments.create!(
         name: "Physics Alpha Assign",
         due_at: Time.now.utc + 3.days,
-        assignment_group: group0,
+        assignment_group: group0
       )
 
       @quiz = @course.quizzes.create!(
@@ -290,26 +289,26 @@ describe 'Student Gradebook' do
       module0 = ContextModule.create!(name: "Beta Mod", context: @course)
       module1 = ContextModule.create!(name: "Alpha Mod", context: @course)
 
-      module0.content_tags.create!(context: @course, content: @quiz, tag_type: 'context_module')
-      module0.content_tags.create!(context: @course, content: @assignment0, tag_type: 'context_module')
-      module1.content_tags.create!(context: @course, content: @assignment1, tag_type: 'context_module')
-      module1.content_tags.create!(context: @course, content: @discussion, tag_type: 'context_module')
+      module0.content_tags.create!(context: @course, content: @quiz, tag_type: "context_module")
+      module0.content_tags.create!(context: @course, content: @assignment0, tag_type: "context_module")
+      module1.content_tags.create!(context: @course, content: @assignment1, tag_type: "context_module")
+      module1.content_tags.create!(context: @course, content: @discussion, tag_type: "context_module")
     end
 
     context "as a student" do
-      it_behaves_like 'Arrange By dropdown', :student
+      it_behaves_like "Arrange By dropdown", :student
     end
 
     context "as a teacher" do
-      it_behaves_like 'Arrange By dropdown', :teacher
+      it_behaves_like "Arrange By dropdown", :teacher
     end
 
     context "as an admin" do
-      it_behaves_like 'Arrange By dropdown', :admin
+      it_behaves_like "Arrange By dropdown", :admin
     end
 
     context "as a ta" do
-      it_behaves_like 'Arrange By dropdown', :ta
+      it_behaves_like "Arrange By dropdown", :ta
     end
   end
 end

@@ -817,14 +817,22 @@ $(function () {
 
   $questions.find('.question_input').trigger('change', [false, {}])
 
-  $('.hide_time_link').click(function (event) {
+  const $hideTimeLink = $('.hide_time_link')
+  $hideTimeLink.click(function (event) {
     event.preventDefault()
-    if ($('.time_running').css('visibility') != 'hidden') {
+    if ($('.time_running').css('visibility') !== 'hidden') {
       $('.time_running').css('visibility', 'hidden')
-      $(this).text(I18n.t('show_time_link', 'Show'))
+      $(this).text(I18n.t('show_time_link', 'Show Time'))
     } else {
       $('.time_running').css('visibility', 'visible')
-      $(this).text(I18n.t('hide_time_link', 'Hide'))
+      $(this).text(I18n.t('hide_time_link', 'Hide Time'))
+    }
+  })
+
+  $hideTimeLink.keydown(function (event) {
+    // spacebar
+    if (event.keyCode === 32) {
+      $hideTimeLink.click()
     }
   })
 

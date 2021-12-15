@@ -33,7 +33,7 @@ module AssignmentUtil
   def self.due_date_ok?(assignment)
     !due_date_required?(assignment) ||
       assignment.due_at.present? ||
-      assignment.grading_type == 'not_graded'
+      assignment.grading_type == "not_graded"
   end
 
   def self.assignment_name_length_required?(assignment)
@@ -66,12 +66,12 @@ module AssignmentUtil
 
   def self.sis_integration_settings_enabled?(context)
     account = Context.get_account(context)
-    account.try(:feature_enabled?, 'new_sis_integrations').present?
+    account.try(:feature_enabled?, "new_sis_integrations").present?
   end
 
   def self.process_due_date_reminder(context_type, context_id)
     analyzer = StudentAwarenessAnalyzer.new(context_type, context_id)
-    notification = BroadcastPolicy.notification_finder.by_name('Upcoming Assignment Alert')
+    notification = BroadcastPolicy.notification_finder.by_name("Upcoming Assignment Alert")
 
     # in the rather unlikely case where the due date gets reset *while* we're
     # scheduled to do this work, we don't want to end up alerting students for
@@ -100,16 +100,16 @@ module AssignmentUtil
 
     def initialize(context_type, context_id)
       @context = case context_type
-                 when 'Assignment'
+                 when "Assignment"
                    Assignment.active.where(id: context_id).first
-                 when 'AssignmentOverride'
+                 when "AssignmentOverride"
                    AssignmentOverride.active.where(id: context_id).first
                  end
 
       @assignment = case context_type
-                    when 'Assignment'
+                    when "Assignment"
                       @context
-                    when 'AssignmentOverride'
+                    when "AssignmentOverride"
                       @context&.assignment
                     end
     end
@@ -134,21 +134,21 @@ module AssignmentUtil
     def submissions
       case @context
       when Assignment
-        @context.submissions.active.where(workflow_state: 'unsubmitted')
+        @context.submissions.active.where(workflow_state: "unsubmitted")
       when AssignmentOverride
         students = case @context.set_type
-                   when 'ADHOC'
+                   when "ADHOC"
                      @context.assignment_override_students
-                   when 'CourseSection'
+                   when "CourseSection"
                      @context.set.participating_students
-                   when 'Group'
+                   when "Group"
                      @context.set.participants
                    else
                      []
                    end
 
         @context.assignment.submissions.active.where(
-          workflow_state: 'unsubmitted',
+          workflow_state: "unsubmitted",
           user_id: students
         )
       else

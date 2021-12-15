@@ -149,7 +149,7 @@ class PlannerNotesController < ApplicationController
       context_codes = Array(context_codes)
 
       # Append to our notes scope to include the context codes for courses
-      contexts = Course.find_all_by_asset_string(context_codes, ['Course'])
+      contexts = Course.find_all_by_asset_string(context_codes, ["Course"])
       accessible_courses = contexts.select { |c| c.grants_right?(@current_user, :read) }
 
       # include course-less events if the current user is passed in as a context
@@ -158,12 +158,12 @@ class PlannerNotesController < ApplicationController
       notes = accessible_courses.any? ? notes.for_course(accessible_courses) : PlannerNote.none
     end
 
-    start_at = formatted_planner_date('start_date', params.delete(:start_date))
-    end_at = formatted_planner_date('end_date', params.delete(:end_date), end_of_day: true)
+    start_at = formatted_planner_date("start_date", params.delete(:start_date))
+    end_at = formatted_planner_date("end_date", params.delete(:end_date), end_of_day: true)
     notes = notes.after(start_at) if start_at
     notes = notes.before(end_at) if end_at
 
-    render :json => planner_notes_json(notes, @current_user, session)
+    render json: planner_notes_json(notes, @current_user, session)
   rescue InvalidDates => e
     render json: { errors: e.message.as_json }, status: :bad_request
   end
@@ -200,7 +200,7 @@ class PlannerNotesController < ApplicationController
     if update_params.key?(:course_id)
       course_id = update_params.delete(:course_id)
       if note.linked_object_id.present? && note.course_id != course_id
-        return render json: { message: 'course_id cannot be changed for linked planner notes' }, status: :bad_request
+        return render json: { message: "course_id cannot be changed for linked planner notes" }, status: :bad_request
       end
 
       if course_id.present?
@@ -255,12 +255,12 @@ class PlannerNotesController < ApplicationController
     asset_id = create_params.delete(:linked_object_id)
     asset_type = create_params.delete(:linked_object_type)
     if asset_id.present? && asset_type.present?
-      return render(json: { message: 'must specify course_id' }, status: :bad_request) unless course_id
+      return render(json: { message: "must specify course_id" }, status: :bad_request) unless course_id
 
       asset_klass = LINKED_OBJECT_TYPES[asset_type]&.constantize
-      return render(json: { message: 'invalid linked_object_type' }, status: :bad_request) unless asset_klass
+      return render(json: { message: "invalid linked_object_type" }, status: :bad_request) unless asset_klass
 
-      asset = asset_klass.find_by!(id: asset_id, context_id: course_id, context_type: 'Course')
+      asset = asset_klass.find_by!(id: asset_id, context_id: course_id, context_type: "Course")
       return unless authorized_action(asset, @current_user, :read)
 
       create_params[:linked_object] = asset
@@ -276,7 +276,7 @@ class PlannerNotesController < ApplicationController
         render json: note.errors, status: :bad_request
       end
     rescue ActiveRecord::RecordNotUnique
-      render json: { message: 'a planner note linked to that object already exists' }, status: :bad_request
+      render json: { message: "a planner note linked to that object already exists" }, status: :bad_request
     end
   end
 

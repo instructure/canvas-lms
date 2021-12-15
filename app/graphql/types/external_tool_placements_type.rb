@@ -20,7 +20,7 @@
 
 module Types
   class ExternalToolPlacementsType < ApplicationObjectType
-    graphql_name 'ExternalToolPlacements'
+    graphql_name "ExternalToolPlacements"
 
     field :canvas_icon_class, String, null: true
 

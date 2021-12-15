@@ -292,8 +292,8 @@ class Quizzes::QuizzesApiController < ApplicationController
   include SubmittablesGradingPeriodProtection
 
   before_action :require_context
-  before_action :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]
-  before_action :check_differentiated_assignments, :only => [:show]
+  before_action :require_quiz, only: %i[show update destroy reorder validate_access_code]
+  before_action :check_differentiated_assignments, only: [:show]
 
   # @API List quizzes in a course
   #
@@ -309,9 +309,9 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @returns [Quiz]
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
-      log_api_asset_access(["quizzes", @context], "quizzes", 'other')
-      updated = @context.quizzes.active.reorder('updated_at DESC').limit(1).pluck(:updated_at).first
-      cache_key = ['quizzes', @context.id, @context.quizzes.active.size,
+      log_api_asset_access(["quizzes", @context], "quizzes", "other")
+      updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
+      cache_key = ["quizzes", @context.id, @context.quizzes.active.size,
                    @current_user, updated, accepts_jsonapi?,
                    params[:search_term], params[:page], params[:per_page]].cache_key
 
@@ -480,10 +480,10 @@ class Quizzes::QuizzesApiController < ApplicationController
       return render_create_error(:forbidden) unless grading_periods_allow_submittable_create?(@quiz, quiz_params)
 
       update_api_quiz(@quiz, params)
-      unless @quiz.new_record?
-        render_json
-      else
+      if @quiz.new_record?
         render_create_error(:bad_request)
+      else
+        render_json
       end
     end
   end
@@ -545,7 +545,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   # <b>204 No Content</b> response code is returned if the reorder was successful.
   def reorder
     if authorized_action(@quiz, @current_user, :update)
-      Quizzes::QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!
+      Quizzes::QuizSortables.new(quiz: @quiz, order: params[:order]).reorder!
 
       head :no_content
     end

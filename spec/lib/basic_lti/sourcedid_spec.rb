@@ -30,7 +30,7 @@ describe BasicLTI::Sourcedid do
         description: "value for description",
         due_at: Time.zone.now,
         points_possible: "1.5",
-        submission_types: 'external_tool',
+        submission_types: "external_tool",
         external_tool_tag_attributes: { url: tool.url }
       }
     )
@@ -39,21 +39,21 @@ describe BasicLTI::Sourcedid do
 
   before do
     fake_secrets = {
-      'lti-signing-secret' => 'signing-secret-vp04BNqApwdwUYPUI',
-      'lti-encryption-secret' => 'encryption-secret-5T14NjaTbcYjc4',
+      "lti-signing-secret" => "signing-secret-vp04BNqApwdwUYPUI",
+      "lti-encryption-secret" => "encryption-secret-5T14NjaTbcYjc4",
     }
 
     allow(Canvas::DynamicSettings).to receive(:find).and_return(fake_secrets)
   end
 
-  it 'creates a signed and encrypted sourcedid' do
+  it "creates a signed and encrypted sourcedid" do
     timestamp = Time.zone.now
     allow(Time.zone).to receive(:now).and_return(timestamp)
 
     token = BasicLTI::Sourcedid.token_from_sourcedid!(sourcedid.to_s)
 
-    expect(token[:iss]).to eq 'Canvas'
-    expect(token[:aud]).to eq ['Instructure']
+    expect(token[:iss]).to eq "Canvas"
+    expect(token[:aud]).to eq ["Instructure"]
     expect(token[:iat]).to eq timestamp.to_i
     expect(token[:tool_id]).to eq tool.id
     expect(token[:course_id]).to eq course.id
@@ -62,35 +62,35 @@ describe BasicLTI::Sourcedid do
   end
 
   describe ".load!" do
-    it 'raises an exception for an invalid sourcedid' do
-      expect { described_class.load!('invalid-sourcedid') }.to raise_error(
-        BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid'
+    it "raises an exception for an invalid sourcedid" do
+      expect { described_class.load!("invalid-sourcedid") }.to raise_error(
+        BasicLTI::Errors::InvalidSourceId, "Invalid sourcedid"
       )
     end
 
-    it 'raises an exception for a nil sourcedid' do
+    it "raises an exception for a nil sourcedid" do
       expect { described_class.load!(nil) }.to raise_error(
-        BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid'
+        BasicLTI::Errors::InvalidSourceId, "Invalid sourcedid"
       )
     end
 
     context "legacy sourcedid" do
-      it 'raises an exception when improperly signed' do
+      it "raises an exception when improperly signed" do
         sourcedid = "#{tool.id}-#{course.id}-#{assignment.id}-#{user.id}-badsignature"
         expect { described_class.load!(sourcedid) }.to raise_error(
-          BasicLTI::Errors::InvalidSourceId, 'Invalid signature'
+          BasicLTI::Errors::InvalidSourceId, "Invalid signature"
         )
       end
 
-      it 'raises an exception when the tool id is invalid' do
+      it "raises an exception when the tool id is invalid" do
         sourcedid = "9876543210-#{course.id}-#{assignment.id}-#{user.id}-badsignature"
         expect { described_class.load!(sourcedid) }.to raise_error(
-          BasicLTI::Errors::InvalidSourceId, 'Tool is invalid'
+          BasicLTI::Errors::InvalidSourceId, "Tool is invalid"
         )
       end
 
-      it 'builds a sourcedid' do
-        payload = [tool.id, course.id, assignment.id, user.id].join('-')
+      it "builds a sourcedid" do
+        payload = [tool.id, course.id, assignment.id, user.id].join("-")
         legacy_sourcedid = "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
 
         sourcedid = described_class.load!(legacy_sourcedid)
@@ -102,35 +102,35 @@ describe BasicLTI::Sourcedid do
       end
     end
 
-    it 'raises an exception when the course is invalid' do
+    it "raises an exception when the course is invalid" do
       course.destroy!
 
       expect { described_class.load!(sourcedid.to_s) }.to raise_error(
-        BasicLTI::Errors::InvalidSourceId, 'Course is invalid'
+        BasicLTI::Errors::InvalidSourceId, "Course is invalid"
       )
     end
 
-    it 'raises an exception when the user is not in the course' do
+    it "raises an exception when the user is not in the course" do
       user.enrollments.find_by(course_id: course.id).destroy!
 
       expect { described_class.load!(sourcedid.to_s) }.to raise_error(
-        BasicLTI::Errors::InvalidSourceId, 'User is no longer in course'
+        BasicLTI::Errors::InvalidSourceId, "User is no longer in course"
       )
     end
 
-    it 'raises an exception when the assignment is not valid' do
+    it "raises an exception when the assignment is not valid" do
       assignment.destroy!
 
       expect { described_class.load!(sourcedid.to_s) }.to raise_error(
-        BasicLTI::Errors::InvalidSourceId, 'Assignment is invalid'
+        BasicLTI::Errors::InvalidSourceId, "Assignment is invalid"
       )
     end
 
-    it 'raises an exception when the assignment is not associated with the tool' do
-      assignment.external_tool_tag.update(url: 'http://invalidurl.com')
+    it "raises an exception when the assignment is not associated with the tool" do
+      assignment.external_tool_tag.update(url: "http://invalidurl.com")
 
       expect { described_class.load!(sourcedid.to_s) }.to raise_error(
-        BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool'
+        BasicLTI::Errors::InvalidSourceId, "Assignment is no longer associated with this tool"
       )
     end
   end

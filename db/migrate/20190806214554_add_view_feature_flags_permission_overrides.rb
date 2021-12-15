@@ -6,7 +6,4 @@ class AddViewFeatureFlagsPermissionOverrides < ActiveRecord::Migration[5.2]
   def up
     DataFixup::AddRoleOverridesForNewPermission.run(:manage_feature_flags, :view_feature_flags)
   end
-
-  def down
-  end
 end

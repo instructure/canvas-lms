@@ -66,6 +66,7 @@
         <xs:element name="allow_student_wiki_edits" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_assignment_edits" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_reporting" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_anonymous_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hashtag" type="xs:string" minOccurs="0"/>
         <xs:element name="show_public_context_messages" type="xs:boolean" minOccurs="0"/>
         <xs:element name="filter_speed_grader_by_student_group" type="xs:boolean" minOccurs="0"/>
@@ -139,6 +140,7 @@
         </xs:element>
         <xs:element name="root_account_uuid" type="xs:string" minOccurs="0"/>
         <xs:element name="default_post_policy" type="postPolicyType" minOccurs="0"/>
+        <xs:element name="late_policy" type="latePolicyType" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>
@@ -869,5 +871,17 @@
       </xs:all>
     </xs:complexType>
   </xs:element>
+
+  <xs:complexType name="latePolicyType">
+    <xs:all minOccurs="0" maxOccurs="1">
+      <xs:element name="missing_submission_deduction_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="missing_submission_deduction" type="optional_float" minOccurs="0"/>
+      <xs:element name="late_submission_deduction_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="late_submission_deduction" type="optional_float" minOccurs="0"/>
+      <xs:element name="late_submission_interval" type="xs:string" minOccurs="0"/>
+      <xs:element name="late_submission_minimum_percent_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="late_submission_minimum_percent" type="optional_float" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
 
 </xs:schema>

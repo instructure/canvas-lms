@@ -27,10 +27,10 @@ module CC::Exporter::WebZip
       @topics = exporter.cartridge_json[:topics]
       @quizzes = exporter.cartridge_json[:quizzes]
       @filename_prefix = exporter.filename_prefix
-      @viewer_path_prefix = @filename_prefix + '/viewer'
-      @files_path_prefix = @viewer_path_prefix + '/files'
+      @viewer_path_prefix = @filename_prefix + "/viewer"
+      @files_path_prefix = @viewer_path_prefix + "/files"
       @path_to_files = nil
-      @course_data_filename = 'course-data.js'
+      @course_data_filename = "course-data.js"
       @course = course
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
@@ -41,8 +41,8 @@ module CC::Exporter::WebZip
     attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data
 
-    ASSIGNMENT_TYPES = ['Assignment', 'Quizzes::Quiz', 'DiscussionTopic'].freeze
-    CONTENT_TYPES = [*ASSIGNMENT_TYPES, 'WikiPage'].freeze
+    ASSIGNMENT_TYPES = ["Assignment", "Quizzes::Quiz", "DiscussionTopic"].freeze
+    CONTENT_TYPES = [*ASSIGNMENT_TYPES, "WikiPage"].freeze
     CONTENT_TOKENS = [CC::CCHelper::OBJECT_TOKEN, CC::CCHelper::COURSE_TOKEN, CC::CCHelper::WIKI_TOKEN].freeze
 
     def create_key(obj)
@@ -56,14 +56,14 @@ module CC::Exporter::WebZip
     def convert_html_to_local(html)
       exported_html = @html_converter.html_content(html)
       # see below
-      exported_html&.gsub!(CC::CCHelper::WEB_CONTENT_TOKEN, 'viewer/files')
-      exported_html&.gsub!(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), 'viewer/files')
+      exported_html&.gsub!(CC::CCHelper::WEB_CONTENT_TOKEN, "viewer/files")
+      exported_html&.gsub!(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), "viewer/files")
       CONTENT_TOKENS.each do |token|
         # tokens contain $'s. content exported with an HTML4 parser will have
         # escaped it, but newere content will not; check both ways
-        exported_html&.gsub!("#{token}/", '')
+        exported_html&.gsub!("#{token}/", "")
         # HTML4 parser does
-        exported_html&.gsub!("#{CGI.escape(token)}/", '')
+        exported_html&.gsub!("#{CGI.escape(token)}/", "")
       end
       exported_html
     end
@@ -78,7 +78,7 @@ module CC::Exporter::WebZip
           @path_to_files = match.to_s
         end
         File.open(file_data[:path_to_file]) do |file|
-          file_path = file_data[:local_path].sub(%r{^media/}, @files_path_prefix + '/')
+          file_path = file_data[:local_path].sub(%r{^media/}, @files_path_prefix + "/")
           zip_file.add(file_path, file) { add_clone(file_path, file) }
         end
       end
@@ -87,13 +87,13 @@ module CC::Exporter::WebZip
     def filter_and_clean_files(files)
       export_files = filter_for_export_safe_items(files, :attachments)
       cleanup_files = files - export_files
-      cleanup_files.select { |file_data| file_data[:exists] }.map { |file_data| file_data[:path_to_file] }.uniq.each { |path| File.delete(path) }
+      cleanup_files.select { |file_data| file_data[:exists] }.pluck(:path_to_file).uniq.each { |path| File.delete(path) }
       export_files
     end
 
     def filter_for_export_safe_items(item_list, type)
       item_list.select do |export_item|
-        ident = type == :attachments ? export_item[:local_path].sub('media', '') : export_item[:identifier]
+        ident = type == :attachments ? export_item[:local_path].sub("media", "") : export_item[:identifier]
         next true if @linked_items.include?(ident)
 
         next unless [:quizzes, :discussion_topics].include?(type)
@@ -120,16 +120,16 @@ module CC::Exporter::WebZip
         assignment_export_id = export_id
         export_id = real_export_id
       end
-      export_id ||= item[:content]&.sub('viewer/files', '')
+      export_id ||= item[:content]&.sub("viewer/files", "")
       [export_id, assignment_export_id]
     end
 
     def string_to_symbol_type(type)
       case type
-      when 'pages'
+      when "pages"
         :wiki_pages
       else
-        type.underscore.pluralize.split('/').first.to_sym
+        type.underscore.pluralize.split("/").first.to_sym
       end
     end
 
@@ -142,7 +142,7 @@ module CC::Exporter::WebZip
 
       linked_items.add(export_id)
       linked_items.add(assignment_export_id) if assignment_export_id
-      return if export_item[:type] == 'Attachment'
+      return if export_item[:type] == "Attachment"
 
       type = string_to_symbol_type(export_item[:type])
       match_item = @export_item_map.dig(type, export_id)
@@ -155,7 +155,7 @@ module CC::Exporter::WebZip
 
     def format_linked_objects(canvas_objects)
       canvas_objects.map do |lo|
-        key, canvas_key = lo[:type] == 'Attachment' ? [:content, :local_path] : [:exportId, :identifier]
+        key, canvas_key = lo[:type] == "Attachment" ? [:content, :local_path] : [:exportId, :identifier]
         lo[key] = lo.delete(canvas_key)
         lo
       end
@@ -166,7 +166,7 @@ module CC::Exporter::WebZip
       items_to_check = []
       module_data.each do |mod|
         mod[:items].each do |item|
-          next unless CONTENT_TYPES.include?(item[:type]) || item[:type] == 'Attachment'
+          next unless CONTENT_TYPES.include?(item[:type]) || item[:type] == "Attachment"
 
           check_for_links_and_mark_exportable(item, linked_items, items_to_check)
         end
@@ -195,7 +195,7 @@ module CC::Exporter::WebZip
       module_data = parse_module_data
       @linked_items = find_linked_items(module_data) if any_hidden_tabs?
       course_data = {
-        language: course.locale || user.locale || Account.recursive_default_locale_for_id(course.account_id) || 'en',
+        language: course.locale || user.locale || Account.recursive_default_locale_for_id(course.account_id) || "en",
         lastDownload: force_timezone(course.web_zip_exports.where(user: user).last&.created_at),
         title: course.name,
         modules: module_data,
@@ -210,7 +210,7 @@ module CC::Exporter::WebZip
     end
 
     def add_course_data(course_data)
-      f = File.new(@course_data_filename, 'w+')
+      f = File.new(@course_data_filename, "w+")
       f.write("window.COURSE_DATA = #{course_data.to_json}")
       zip_file.add("#{@viewer_path_prefix}/#{@course_data_filename}", f)
       f.close
@@ -227,7 +227,7 @@ module CC::Exporter::WebZip
     def walk(dir, accumulator)
       Dir.foreach(dir) do |file|
         path = File.join(dir, file)
-        next if ['.', '..'].include? file
+        next if [".", ".."].include? file
 
         is_dir = File.directory?(path)
         if is_dir
@@ -235,7 +235,7 @@ module CC::Exporter::WebZip
           walk(path, next_files)
         end
         accumulator << {
-          type: is_dir ? 'folder' : 'file',
+          type: is_dir ? "folder" : "file",
           name: file,
           size: is_dir ? nil : File.size(path),
           files: is_dir ? next_files : nil
@@ -252,7 +252,7 @@ module CC::Exporter::WebZip
           name: mod.name,
           status: user_module_status(mod),
           unlockDate: unlock_date,
-          prereqs: mod.prerequisites.map { |pre| pre[:id] }.select { |id| active_module_ids.include?(id) },
+          prereqs: mod.prerequisites.pluck(:id).select { |id| active_module_ids.include?(id) },
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
           exportId: create_key(mod),
@@ -262,10 +262,10 @@ module CC::Exporter::WebZip
     end
 
     def user_module_status(modul)
-      return 'locked' if modul.locked_for?(user, deep_check_if_needed: true)
+      return "locked" if modul.locked_for?(user, deep_check_if_needed: true)
 
-      status = current_progress&.dig(modul.id, :status) || 'unlocked'
-      status == 'locked' ? 'unlocked' : status
+      status = current_progress&.dig(modul.id, :status) || "unlocked"
+      status == "locked" ? "unlocked" : status
     end
 
     def item_completed?(item)
@@ -295,7 +295,7 @@ module CC::Exporter::WebZip
           indent: item.indent,
           locked: mod_item_or_content_locked?(item)
         }
-        parse_module_item_details(item, item_hash) if item.content_type != 'ContextModuleSubHeader'
+        parse_module_item_details(item, item_hash) if item.content_type != "ContextModuleSubHeader"
         item_hash
       end
     end
@@ -306,16 +306,16 @@ module CC::Exporter::WebZip
       item_hash[:requirement] = requirement
       item_hash[:requiredPoints] = score if score
       item_hash[:completed] = item_completed?(item)
-      item_hash[:content] = parse_content(item.content) unless item_hash[:locked] || item.content_type == 'ExternalUrl'
-      item_hash[:content] = item.url if !item_hash[:locked] && item.content_type == 'ExternalUrl'
+      item_hash[:content] = parse_content(item.content) unless item_hash[:locked] || item.content_type == "ExternalUrl"
+      item_hash[:content] = item.url if !item_hash[:locked] && item.content_type == "ExternalUrl"
       item_hash[:exportId] = find_export_id(item) if CONTENT_TYPES.include?(item.content_type)
     end
 
     def find_export_id(item)
       case item.content_type
-      when 'Assignment', 'DiscussionTopic', 'Quizzes::Quiz'
+      when "Assignment", "DiscussionTopic", "Quizzes::Quiz"
         create_key(item.content)
-      when 'WikiPage'
+      when "WikiPage"
         item.content&.url
       end
     end
@@ -324,13 +324,13 @@ module CC::Exporter::WebZip
       case item_content
       when Assignment
         item_hash[:submissionTypes] = item_content.readable_submission_types
-        item_hash[:graded] = item_content.grading_type != 'not_graded'
+        item_hash[:graded] = item_content.grading_type != "not_graded"
       when Quizzes::Quiz
         item_hash[:assignmentExportId] = create_key(item_content.assignment)
         item_hash[:questionCount] = item_content.question_count
         item_hash[:timeLimit] = item_content.time_limit
         item_hash[:attempts] = item_content.allowed_attempts
-        item_hash[:graded] = item_content.quiz_type != 'survey'
+        item_hash[:graded] = item_content.quiz_type != "survey"
       when DiscussionTopic
         item_hash[:lockAt] = force_timezone(item_content.lock_at)
         item_hash[:unlockAt] = force_timezone(item_content.unlock_at)
@@ -387,7 +387,7 @@ module CC::Exporter::WebZip
     def map_canvas_objects_to_export_ids
       canvas_object_export_hash = {}
       @discussion_quiz_export_id_map = {}
-      [:wiki_pages, :assignments, :discussion_topics, :quizzes].each do |type|
+      %i[wiki_pages assignments discussion_topics quizzes].each do |type|
         type_export_hash, assignment_export_hash = map_object_type_to_export_ids(type)
         canvas_object_export_hash[type] = type_export_hash
         canvas_object_export_hash[:assignments] ||= {}
@@ -440,20 +440,20 @@ module CC::Exporter::WebZip
     end
 
     def file_path(item_content)
-      folder = item_content&.folder&.full_name || ''
-      local_folder = folder.sub(/\/?course files\/?/, '')
-      local_folder.length > 0 ? "/#{local_folder}/" : '/'
+      folder = item_content&.folder&.full_name || ""
+      local_folder = folder.sub(%r{/?course files/?}, "")
+      local_folder.empty? ? "/" : "/#{local_folder}/"
     end
 
     def dist_package_path
-      'node_modules/canvas_offline_course_viewer/dist'
+      "node_modules/canvas_offline_course_viewer/dist"
     end
 
     def pull_dist_package
       path = dist_package_path
-      config = ConfigFile.load('offline_web')
-      if config&.fetch('local')
-        path = config['path_to_dist']
+      config = ConfigFile.load("offline_web")
+      if config&.fetch("local")
+        path = config["path_to_dist"]
       end
       add_dir_to_zip(path, path)
     end
@@ -461,7 +461,7 @@ module CC::Exporter::WebZip
     def add_dir_to_zip(dir, base_path)
       Dir.foreach(dir) do |file|
         path = File.join(dir, file)
-        next if ['.', '..'].include? file
+        next if [".", ".."].include? file
 
         if File.directory?(path)
           add_dir_to_zip(path, base_path)

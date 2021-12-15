@@ -2136,7 +2136,7 @@ nn:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ein spesifikk seksjon"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gjer at hjelpelenker merkast som Framheva eller Ny og at dei får ei utheva vising i hjelpemenyen."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Lar deg velje læringsmål når emnet vert eksportert"
-  allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillet å setje meistringsskalaar og utrekningsmetodar på konto- og emnenivå, og erstattar per-resultat kriteriumsvurderingane og utrekningsmetodane."
+  allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillet å setje meistringsskalaar og utrekningsmetodar på konto- og emnenivå, som erstattar per-resultat kriteriumsvurderingane og utrekningsmetodane."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gir rollene faglærar/designar/undervisingsassistent tilgang til chatverktøyet."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gir rollene faglærar/designar/undervisingsassistent tilgang til frammøteverktøyet."
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Tillet lærarar å gøyme emneseksjonar på sida \"Personar\" frå studentar når det er meir enn ein seksjon i emnet."
@@ -7003,7 +7003,7 @@ nn:
         choose_home_page: "Vel startside"
         course_setup: "Sjekkliste for emneoppsett"
         drop_course: "Vel bort dette emnet"
-        import: "Importer innhald"
+        import: "Importer eksisterande innhald"
         join_course: "Ta del i dette emnet"
         new_announcement: "Ny kunngjering"
         student_view: Studentvising
@@ -9220,8 +9220,8 @@ nn:
   failed_to_create_domain_lookup_4d40fa17: "Mislukka å opprette domeneoppslag"
   failed_to_create_new_role_e336e461: "Kan ikkje opprette ny rolle"
   failed_to_create_webhook_b766cf5c: "Kan ikkje opprette webkrok."
-  failed_to_delete_auth_tokens_on_canvas_side_1d871f46: "Mislukka å slette auth tokens hos Canvas"
-  failed_to_delete_auth_tokens_on_catalog_side_54aa9a8c: "Mislukka å slette auth tokens hos Catalog"
+  failed_to_delete_auth_tokens_on_canvas_side_1d871f46: "Sletting auth tokens hos Canvas vart mislukka"
+  failed_to_delete_auth_tokens_on_catalog_side_54aa9a8c: "Sletting auth tokens hos Catalog vart mislukka"
   failed_to_delete_discussion_title_986df717: "Kan ikkje slette diskusjon %{title}"
   failed_to_delete_domain_lookup_7e73d3e7: "Kunne ikkje slette domeneoppslag"
   failed_to_delete_external_feed_36f19d70: "Kunne ikkje slette ekstern straum"
@@ -9229,7 +9229,7 @@ nn:
   failed_to_delete_selected_pages_26fa87db: "Kunne ikkje slette valde sider"
   failed_to_export_some_tool_settings_c992fc56: "Kan ikke eksportere enkelte verktøyinnstillingar"
   failed_to_import_media_objects_4c1fcb4f: "Kan ikkje importere medieobjekt"
-  failed_to_invalidate_portal_path_5bc31b91: "Mislukka å invalidisere portal path"
+  failed_to_invalidate_portal_path_5bc31b91: "Ugyldiggjering av portal path vart mislukka"
   failed_to_laod_more_submissions_990aacee: "Kunne ikkje laste fleire innleveringar"
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Det oppstod ein feil under lasting av CSP-informasjon, forsøk å laste sida på nytt."
   failed_to_load_external_feeds_7ac8411d: "Kunne ikkje laste eksterne datastraumar"
@@ -9239,7 +9239,7 @@ nn:
   failed_to_perform_search_c918100f: "Kunne ikkje gjennomføre søk"
   failed_to_publish_draft_comment_853761e9: "Kunne ikkje publisere kommentar til utkast"
   failed_to_remove_catalog_settings_f5359b2b: "Kan ikkje fjerne kataloginnstillingar"
-  failed_to_remove_special_catalog_users_8889b686: "Mislukka å fjerne spesielle katalogbrukarar"
+  failed_to_remove_special_catalog_users_8889b686: "Fjerning av spesielle katalogbrukarar vart mislukka"
   failed_to_save_changes_errors_6920f334: "Kunne ikkje lagre endringar: %{errors}%"
   failed_to_save_dashboard_selection_32e71c72: "Kan ikkje lagre dashbordval"
   failed_to_save_please_try_again_later_bb7070fb: "Kan ikkje lagre. Prøv på nytt seinare."
@@ -11335,7 +11335,7 @@ nn:
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Dersom skrudd på, vil områdeadministrator utviklarnøkkel-brukargrensesnittet kun vise
       områdeadministrators utviklarnøklar. Merk at dette kun påverkar
-      Canvas førekomstar kor root kontoar er på same fragment
+      Canvas førekomstar der root kontoar er på same fragment
       som områdeadministratorkontoen. Funksjonar i andre førekomstar
       fungerer allereie slik.
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Dersom meistringsskalaer er skrudd på, vil rapporten bli trunkert for å ikkje inkludere utrekningsmetode, utrekning heiltal, meistringspoeng, eller vurderingar"
@@ -11531,7 +11531,7 @@ nn:
   individual_assignment_grade_posting_d8322b99: "Postar vurderingar for individuelle oppgåver"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Individuelle resultatutrekningsverdiar kan ikkje endrast."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Kan ikkje endre poeng for individuelle meistringsmål."
-  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Ugyldige resultatvurderingar kan ikkje endrast."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Individuelle resultatvurderingar kan ikkje endrast."
   individual_view_81c2f124: "Individuell vising"
   individual_view_d60b9132: "Individuell vising..."
   indonesia_62_4c35bd62: "Indonesia (+62)"
@@ -14722,8 +14722,8 @@ nn:
   new_analytics_api_access_7eec1ead: "Nye analysar API-tilgang"
   new_analytics_f6147886: "Nye analysar"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
-      New Analytics er eit interaktivt verktøy som hjelper deg og studentane å følgje med på prestasjon og aktivitet i emnet. Sjå kven som har sett sider og ressursar og deltatt i oppgåver - og kven som treng
-      litt oppmuntring
+      New Analytics er eit interaktivt verktøy som hjelper deg og studentane å følgje med på prestasjon og aktivitet i emnet. Sjå kven som har sett sider og ressursar og deltatt i oppgåver—og kven som treng
+      litt meir oppmuntring
   new_analytics_tutorial_tray_2511a34a: "Nye analysar opplæringsmeny"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjering"
@@ -16886,7 +16886,7 @@ nn:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Legg til opplæringsinformasjon for nye brukarar i ein undermeny"
   provider_attribute_b1cad655: Tilbyderattributt
   provider_icon_5064fa6e: Leverandørikon
-  provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Gir eit flag på utviklarnøkkel for å støtte Include parameter ved API førespurnadar"
+  provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Gir eit flagg på utviklarnøkkel for å støtte inkluder parameter ved API førespurnadar"
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gi brukarane gjeremålsliste som dashbordval."
   provision_a_catalog_account_8cea67f6: "Klargjer ein Canvas Catalog-konto"
   provision_a_quiz_next_service_c7c6bd87: "Sett opp Quiz.Next-teneste"
@@ -20240,7 +20240,7 @@ nn:
   show_links_to_unpublished_content_30c0450d: "Vis lenker til upublisert innhald"
   show_more_af9cbc16: "Vis meir"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Vis namn på studentar som er observerte i varslingar."
-  show_name_of_observed_students_in_notifications_d38b53ca: "Vi namn på observerte studentar i varslingar"
+  show_name_of_observed_students_in_notifications_d38b53ca: "Vis namn på observerte studentar i varslingar"
   show_navigation_menu_34e7f441: "Vis navigeringsmeny"
   show_new_analytics_for_course_and_user_data_18e92636: "Vis nye analysedata for emne og brukarar"
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Vis New Analytics for emne- og brukardata. Det kan ta 24 timer før data er tilgjengeleg i New Analytics etter at funksjonen er satt til ON. "
@@ -20822,7 +20822,7 @@ nn:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Levert fleire gonger, vel kva du vil sjå:"
     update_grade: "Oppdater vurdering"
     view_rubric_assessment_in_the_speedgrader: "Vis vurderingsskjemaet i SpeedGrader"
-  submission_draft_cannot_be_more_then_one_attempt_a_43f45197: "Innleveringsutkast kan ikkje være meir enn eitt forsøk foran den noverande innleveringa"
+  submission_draft_cannot_be_more_then_one_attempt_a_43f45197: "Innleveringsutkast kan ikkje være meir enn eitt forsøk før den noverande innleveringa"
   submission_draft_updated_e953166a: "Innleveringsutkast er oppdatert"
   submission_failed_to_submit_8de4efcd: "Innlevering mislukkast"
   submission_in_another_grading_period_e754b329: "Innlevering i annan karaktersetjingsperiode"
@@ -21440,7 +21440,7 @@ nn:
   the_term_to_get_courses_from_f6af2678: "Semester å hente emne frå"
   the_term_to_report_on_5f586e7c: "Semesteret som rapporten gjeld for"
   the_term_to_report_on_needed_for_report_type_stude_623bffbc: "Semesteret som rapporten gjeld for (for rapporttype kun student)"
-  the_terms_to_report_submissions_on_60c250db: "Semestera rapporten skal vise innleveringar for"
+  the_terms_to_report_submissions_on_60c250db: "Dei semestera rapporten skal vise innleveringar for"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Tittelen kan ikke vere lengre enn %{length} teikn"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Tittelen til følgande spørsmålsbank er avkorta: \"%{title}\""
   the_tool_is_not_installed_in_the_course_or_account_1be7230b: "Verktøyet er ikkje installert for emnet eller konto"

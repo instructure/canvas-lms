@@ -20,7 +20,7 @@
 
 module Types
   class SubmissionDraftType < ApplicationObjectType
-    graphql_name 'SubmissionDraft'
+    graphql_name "SubmissionDraft"
 
     implements Interfaces::LegacyIDInterface
 
@@ -47,7 +47,7 @@ module Types
                 request: context[:request],
                 preloaded_attachments: preloaded_attachments,
                 user: current_user,
-                options: { :rewrite_api_urls => rewrite_urls }
+                options: { rewrite_api_urls: rewrite_urls }
               )
             end
           end

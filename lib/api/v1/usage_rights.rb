@@ -23,6 +23,6 @@ module Api::V1::UsageRights
   include Api::V1::User
 
   def usage_rights_json(usage_rights, current_user)
-    api_json(usage_rights, current_user, session, :only => %w(legal_copyright use_justification license), :methods => %w(license_name))
+    api_json(usage_rights, current_user, session, only: %w[legal_copyright use_justification license], methods: %w[license_name])
   end
 end

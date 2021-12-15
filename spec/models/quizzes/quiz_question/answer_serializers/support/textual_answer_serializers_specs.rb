@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples_for 'Textual Answer Serializers' do
-  it '[auto] should reject an answer that is too long' do
-    input = 'a' * (Quizzes::QuizQuestion::AnswerSerializers::Util::MaxTextualAnswerLength + 1)
+shared_examples_for "Textual Answer Serializers" do
+  it "[auto] should reject an answer that is too long" do
+    input = "a" * (Quizzes::QuizQuestion::AnswerSerializers::Util::MaxTextualAnswerLength + 1)
     input = format(input) if respond_to?(:format)
 
     rc = subject.serialize(input)
@@ -27,7 +27,7 @@ shared_examples_for 'Textual Answer Serializers' do
     expect(rc.error).to match(/too long/i)
   end
 
-  it '[auto] should reject a textual answer that is not a String' do
+  it "[auto] should reject a textual answer that is not a String" do
     [nil, [], {}].each do |bad_input|
       bad_input = format(bad_input) if respond_to?(:format)
 

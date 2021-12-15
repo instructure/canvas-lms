@@ -33,7 +33,7 @@ module Quizzes
     end
 
     def self.grade_by_course(course)
-      Quizzes::QuizSubmission.where('quizzes.context_id =?', course.id)
+      Quizzes::QuizSubmission.where("quizzes.context_id =?", course.id)
                              .where(user: course.gradable_students)
                              .eager_load(:quiz)
                              .needs_grading

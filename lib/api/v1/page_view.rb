@@ -22,8 +22,8 @@ module Api::V1::PageView
   include Api::V1::Json
 
   API_PAGE_VIEW_JSON_OPTS = {
-    :methods => ::PageView::EXPORTED_COLUMNS,
-  }
+    methods: ::PageView::EXPORTED_COLUMNS,
+  }.freeze
 
   def page_views_json(page_views, current_user, session)
     page_views.map { |pv| page_view_json(pv, current_user, session) }
@@ -34,11 +34,11 @@ module Api::V1::PageView
     json_hash[:id] = json_hash.delete(:request_id)
     json_hash[:contributed] = false # for backwards compatibility
     json_hash[:links] = {
-      :user => json_hash.delete(:user_id),
-      :context => json_hash.delete(:context_id),
-      :asset => json_hash.delete(:asset_id),
-      :real_user => json_hash.delete(:real_user_id),
-      :account => json_hash.delete(:account_id),
+      user: json_hash.delete(:user_id),
+      context: json_hash.delete(:context_id),
+      asset: json_hash.delete(:asset_id),
+      real_user: json_hash.delete(:real_user_id),
+      account: json_hash.delete(:account_id),
     }
     json_hash[:app_name] = page_view.app_name
     json_hash

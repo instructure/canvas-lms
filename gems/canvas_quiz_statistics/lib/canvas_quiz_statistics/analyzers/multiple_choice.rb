@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasQuizStatistics::Analyzers
-  require 'canvas_quiz_statistics/analyzers/essay'
+  require "canvas_quiz_statistics/analyzers/essay"
 
   # Generates statistics for a set of student responses to a multiple-choice
   # question.

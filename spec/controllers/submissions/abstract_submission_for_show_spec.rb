@@ -18,27 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 RSpec.describe Submissions::AbstractSubmissionForShow do
   let(:course) { Account.default.courses.create! }
   let(:assignment) { course.assignments.create! }
 
-  describe '#assignment' do
+  describe "#assignment" do
     subject(:abstract_submission_for_show) do
       Submissions::AbstractSubmissionForShow.new(context: course, assignment_id: assignment.id)
     end
 
-    it 'finds the active assignment' do
+    it "finds the active assignment" do
       expect(abstract_submission_for_show.assignment).to eql assignment
     end
 
-    it 'raises an error when assignment is not active' do
+    it "raises an error when assignment is not active" do
       assignment.destroy!
       expect { abstract_submission_for_show.assignment }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'raises an error when assignment is not in the course' do
+    it "raises an error when assignment is not in the course" do
       other_assignment = Account.default.courses.create!.assignments.create!
       abstract_submission_for_show =
         Submissions::AbstractSubmissionForShow.new(context: course, assignment_id: other_assignment.id)

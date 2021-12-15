@@ -329,6 +329,12 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-lisens:"
     },
+    "crop_image_807ebb08": {
+        "message": "Skjær bilete"
+    },
+    "current_image_f16c249c": {
+        "message": "Gjeldande bilete"
+    },
     "custom_6979cd81": {
         "message": "Eigendefinert"
     },
@@ -376,6 +382,12 @@
     },
     "details_a6f427c3": {
         "message": "Detaljar:"
+    },
+    "diamond_b8dfe7ae": {
+        "message": "Diamant"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Dimensjonstype"
     },
     "dimensions_45ddb7b7": {
         "message": "Dimensjonar"
@@ -547,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Tilbakemelding"
+    },
+    "file_name_8fd421ff": {
+        "message": "Filnamn"
     },
     "file_url_c12b64be": {
         "message": "Fil-URL"
@@ -794,6 +809,9 @@
     "loading_please_wait_d276220a": {
         "message": "Lastar, vent"
     },
+    "loading_preview_9f077aa1": {
+        "message": "Lastar førehandsvisning"
+    },
     "location_3b6ff307": {
         "message": "Plassering:"
     },
@@ -826,6 +844,9 @@
     },
     "modules_c4325335": {
         "message": "Modular"
+    },
+    "multi_color_image_63d7372f": {
+        "message": "Fleirfargebilete"
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Må vere minst { width } x { height }px"
@@ -883,6 +904,9 @@
     },
     "none_3b5e34d2": {
         "message": "Ingen"
+    },
+    "none_selected_b93d56d2": {
+        "message": "Ingen vald"
     },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Ingen oppgåver denne veka"
@@ -956,8 +980,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Fagfellevurdering for { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Pentagon"
+    },
     "people_b4ebb13c": {
         "message": "Personar"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Prosenttal"
+    },
+    "pixels_52ece7d1": {
+        "message": "Pixlar"
     },
     "points_bceb5005": {
         "message": "poeng"
@@ -976,6 +1009,9 @@
     },
     "preview_53003fd2": {
         "message": "Førehandsvising"
+    },
+    "preview_in_overlay_ed772c46": {
+        "message": "Førehandsvisning i nytt lag"
     },
     "preview_inline_9787330": {
         "message": "Førehandsvising i teksten"
@@ -1064,6 +1100,9 @@
     "search_term_b2d2235": {
         "message": "Søkeord"
     },
+    "select_crop_shape_d441feeb": {
+        "message": "Vel skjæringsform"
+    },
     "select_language_7c93a900": {
         "message": "Vel språk"
     },
@@ -1090,6 +1129,9 @@
     },
     "show_video_options_6ed3721a": {
         "message": "Vis videoalternativ"
+    },
+    "single_color_image_4e5d4dbc": {
+        "message": "Monokromt bilete"
     },
     "size_b30e1077": {
         "message": "Storleik"
@@ -1253,6 +1295,9 @@
     "today_at_date_8ac30d6": {
         "message": "I dag på { date }"
     },
+    "toggle_summary_group_413df9ac": {
+        "message": "Veksle { summary } gruppe"
+    },
     "tomorrow_9a6c9a00": {
         "message": "I morgon"
     },
@@ -1393,6 +1438,9 @@
     },
     "view_title_description_67940918": {
         "message": "Vis { title } skildring"
+    },
+    "weekly_schedule_navigation_6b042645": {
+        "message": "Navigasjon for ukestimeplan"
     },
     "width_492fec76": {
         "message": "Vidde"

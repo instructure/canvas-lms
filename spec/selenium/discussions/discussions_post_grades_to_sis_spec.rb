@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../feature_flag_helper'
-require_relative '../grades/pages/gradebook_page'
-require_relative '../helpers/discussions_common'
+require_relative "../../feature_flag_helper"
+require_relative "../grades/pages/gradebook_page"
+require_relative "../helpers/discussions_common"
 
 describe "sync grades to sis" do
   include FeatureFlagHelper
@@ -28,40 +28,40 @@ describe "sync grades to sis" do
   before do
     course_with_admin_logged_in
     mock_feature_flag(:post_grades, true)
-    @course.sis_source_id = 'xyz'
+    @course.sis_source_id = "xyz"
     @course.save
-    @assignment_group = @course.assignment_groups.create!(name: 'Assignment Group')
+    @assignment_group = @course.assignment_groups.create!(name: "Assignment Group")
   end
 
   context "editing an existing topic with post_to_sis checked" do
     before do
       get "/courses/#{@course.id}/discussion_topics/new"
-      f('#discussion-title').send_keys('New Discussion Title')
-      f('#use_for_grading').click
-      f('#assignment_post_to_sis').click
+      f("#discussion-title").send_keys("New Discussion Title")
+      f("#use_for_grading").click
+      f("#assignment_post_to_sis").click
       wait_for_ajaximations
-      click_option('#assignment_group_id', 'Assignment Group')
-      wait_for_new_page_load { submit_form('.form-actions') }
+      click_option("#assignment_group_id", "Assignment Group")
+      wait_for_new_page_load { submit_form(".form-actions") }
 
       @discussion_topic = DiscussionTopic.last
     end
 
-    it "shows post grades to sis box checked", priority: "1", test_id: 150520 do
+    it "shows post grades to sis box checked", priority: "1" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
-      expect(f('#assignment_post_to_sis')).to be_enabled
+      expect(f("#assignment_post_to_sis")).to be_enabled
     end
   end
 
-  it "does not display Sync to SIS option when feature not configured", priority: "1", test_id: 246614 do
+  it "does not display Sync to SIS option when feature not configured", priority: "1" do
     mock_feature_flag(:post_grades, false)
     get "/courses/#{@course.id}/discussion_topics/new"
-    f('#use_for_grading').click
-    expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
+    f("#use_for_grading").click
+    expect(f("#content")).not_to contain_css("#assignment_post_to_sis")
   end
 
   shared_examples "gradebook_sync_grades" do
     before(:once) do
-      plugin = Canvas::Plugin.find('grade_export')
+      plugin = Canvas::Plugin.find("grade_export")
       plugin_setting = PluginSetting.find_by(name: plugin.id)
       plugin_setting ||= PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
       plugin_setting.update(disabled: false)
@@ -71,8 +71,8 @@ describe "sync grades to sis" do
       if @enhanced_filters
         Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       end
-      @assignment = @course.assignments.create!(name: 'assignment', assignment_group: @assignment_group,
-                                                post_to_sis: true, workflow_state: 'published')
+      @assignment = @course.assignments.create!(name: "assignment", assignment_group: @assignment_group,
+                                                post_to_sis: true, workflow_state: "published")
     end
 
     def post_grades_dialog
@@ -82,34 +82,34 @@ describe "sync grades to sis" do
       else
         Gradebook.open_action_menu
       end
-      expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
-      Gradebook.action_menu_item_selector('post_grades_feature_tool').click
+      expect(f("body")).to contain_css("[data-menu-id='post_grades_feature_tool']")
+      Gradebook.action_menu_item_selector("post_grades_feature_tool").click
       wait_for_ajaximations
-      expect(f('.post-grades-dialog')).to be_displayed
+      expect(f(".post-grades-dialog")).to be_displayed
     end
 
-    it "syncs grades in a sync grades to SIS discussion", priority: "1", test_id: 150521 do
+    it "syncs grades in a sync grades to SIS discussion", priority: "1" do
       @assignment.due_at = Time.zone.now.advance(days: 3)
       @course.discussion_topics.create!(user: @admin,
-                                        title: 'Sync to SIS discussion',
-                                        message: 'Discussion topic message',
+                                        title: "Sync to SIS discussion",
+                                        message: "Discussion topic message",
                                         assignment: @assignment)
       post_grades_dialog
-      expect(f('.assignments-to-post-count').text).to include("You are ready to sync 1 assignment")
+      expect(f(".assignments-to-post-count").text).to include("You are ready to sync 1 assignment")
     end
 
-    it "asks for due dates in gradebook if due date is not given", priority: "1", test_id: 244916 do
+    it "asks for due dates in gradebook if due date is not given", priority: "1" do
       @course.discussion_topics.create!(user: @admin,
-                                        title: 'Sync to SIS discussion',
-                                        message: 'Discussion topic message',
+                                        title: "Sync to SIS discussion",
+                                        message: "Discussion topic message",
                                         assignment: @assignment)
       due_at = Time.zone.now + 3.days
       post_grades_dialog
-      expect(f('#assignment-errors').text).to include("1 Assignment with Errors")
+      expect(f("#assignment-errors").text).to include("1 Assignment with Errors")
       f(".assignment-due-at").send_keys(format_date_for_view(due_at))
-      f(' .form-dialog-content').click
-      f('.form-controls button[type=button]').click
-      expect(f('.assignments-to-post-count')).to include_text("You are ready to sync 1 assignment")
+      f(" .form-dialog-content").click
+      f(".form-controls button[type=button]").click
+      expect(f(".assignments-to-post-count")).to include_text("You are ready to sync 1 assignment")
     end
   end
 

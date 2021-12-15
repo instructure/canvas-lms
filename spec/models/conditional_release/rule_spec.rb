@@ -18,23 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../conditional_release_spec_helper'
+require_relative "../../conditional_release_spec_helper"
 
 module ConditionalRelease
-  describe Rule, :type => :model do
-    it_behaves_like 'a soft-deletable model'
+  describe Rule, type: :model do
+    it_behaves_like "a soft-deletable model"
 
-    describe 'rule definition' do
-      it 'must have a root account id' do
+    describe "rule definition" do
+      it "must have a root account id" do
         rule = build :rule
         rule.root_account_id = nil
         expect(rule.valid?).to be false
-        rule.root_account_id = ''
+        rule.root_account_id = ""
         expect(rule.valid?).to be false
       end
     end
 
-    describe 'assignment_sets_for_score' do
+    describe "assignment_sets_for_score" do
       before :once do
         @rule = create :rule
         create :scoring_range_with_assignments,
@@ -54,7 +54,7 @@ module ConditionalRelease
                assignment_set_count: 1
       end
 
-      it 'must apply all scoring ranges' do
+      it "must apply all scoring ranges" do
         expect(@rule.assignment_sets_for_score(91).length).to eq(1)
         # create a range that crosses the ranges above
         create :scoring_range_with_assignments,
@@ -65,17 +65,17 @@ module ConditionalRelease
         expect(@rule.assignment_sets_for_score(91).length).to eq(3)
       end
 
-      it 'must return [] if no assignments match' do
+      it "must return [] if no assignments match" do
         expect(@rule.assignment_sets_for_score(10)).to eq([])
       end
 
-      it 'must return [] if no scoring ranges are defined' do
+      it "must return [] if no scoring ranges are defined" do
         rule = create :rule
         expect(rule.assignment_sets_for_score(10)).to eq([])
       end
     end
 
-    describe 'with_assignments' do
+    describe "with_assignments" do
       before do
         @rule1 = create :rule_with_scoring_ranges
         @rule1.scoring_ranges.last.assignment_sets.destroy_all
@@ -90,11 +90,11 @@ module ConditionalRelease
 
       let(:rules) { Rule.with_assignments.to_a }
 
-      it 'only returns rules with assignments' do
+      it "only returns rules with assignments" do
         expect(rules).to match_array [@rule1, @rule4]
       end
 
-      it 'returns complete rules when assignments are present' do
+      it "returns complete rules when assignments are present" do
         rule = rules.find { |r| r.id == @rule1.id }
         expect(rule.scoring_ranges.length).to eq @rule1.scoring_ranges.length
       end

@@ -18,33 +18,33 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe PacePlanPresenter do
-  describe '#as_json' do
+  describe "#as_json" do
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
       pace_plan_model(course: @course)
 
-      @mod1 = @course.context_modules.create! name: 'M1'
-      @a1 = @course.assignments.create! name: 'A1', workflow_state: 'active'
-      @mod1.add_item id: @a1.id, type: 'assignment'
+      @mod1 = @course.context_modules.create! name: "M1"
+      @a1 = @course.assignments.create! name: "A1", points_possible: 100, workflow_state: "active"
+      @ct1 = @mod1.add_item id: @a1.id, type: "assignment"
 
-      @mod2 = @course.context_modules.create! name: 'M2'
-      @a2 = @course.assignments.create! name: 'A2', workflow_state: 'unpublished'
-      @mod2.add_item id: @a2.id, type: 'assignment'
-      @a3 = @course.assignments.create! name: 'A3', workflow_state: 'active'
-      @mod2.add_item id: @a3.id, type: 'assignment'
+      @mod2 = @course.context_modules.create! name: "M2"
+      @a2 = @course.assignments.create! name: "A2", points_possible: 50, workflow_state: "unpublished"
+      @ct2 = @mod2.add_item id: @a2.id, type: "assignment"
+      @a3 = @course.assignments.create! name: "A3", workflow_state: "active"
+      @ct3 = @mod2.add_item id: @a3.id, type: "assignment"
 
       @course.context_module_tags.each do |tag|
         @pace_plan.pace_plan_module_items.create! module_item: tag
       end
     end
 
-    it 'returns all necessary data for the pace plan' do
+    it "returns all necessary data for the pace plan" do
       formatted_plan = PacePlanPresenter.new(@pace_plan).as_json
 
       expect(formatted_plan[:id]).to eq(@pace_plan.id)
       expect(formatted_plan[:context_id]).to eq(@pace_plan.course_id)
-      expect(formatted_plan[:context_type]).to eq('Course')
+      expect(formatted_plan[:context_type]).to eq("Course")
       expect(formatted_plan[:course_id]).to eq(@pace_plan.course_id)
       expect(formatted_plan[:course_section_id]).to eq(@pace_plan.course_section_id)
       expect(formatted_plan[:user_id]).to eq(@pace_plan.user_id)
@@ -65,7 +65,9 @@ describe PacePlanPresenter do
       first_module_item = first_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a1.name)
       expect(first_module_item[:position]).to eq(1)
-      expect(first_module_item[:module_item_type]).to eq('Assignment')
+      expect(first_module_item[:points_possible]).to eq(100)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct1.id}")
+      expect(first_module_item[:module_item_type]).to eq("Assignment")
       expect(first_module_item[:published]).to eq(true)
 
       second_module = formatted_plan[:modules].second
@@ -75,16 +77,20 @@ describe PacePlanPresenter do
       first_module_item = second_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a2.name)
       expect(first_module_item[:position]).to eq(1)
-      expect(first_module_item[:module_item_type]).to eq('Assignment')
+      expect(first_module_item[:points_possible]).to eq(50)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct2.id}")
+      expect(first_module_item[:module_item_type]).to eq("Assignment")
       expect(first_module_item[:published]).to eq(false)
       second_module_item = second_module[:items].second
       expect(second_module_item[:assignment_title]).to eq(@a3.name)
       expect(second_module_item[:position]).to eq(2)
-      expect(second_module_item[:module_item_type]).to eq('Assignment')
+      expect(second_module_item[:points_possible]).to be_nil
+      expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
+      expect(second_module_item[:module_item_type]).to eq("Assignment")
       expect(second_module_item[:published]).to eq(true)
     end
 
-    it 'returns necessary data if the pace plan is only instantiated' do
+    it "returns necessary data if the pace plan is only instantiated" do
       pace_plan = @course.pace_plans.new
       @course.context_module_tags.each do |module_item|
         pace_plan.pace_plan_module_items.new module_item: module_item, duration: 0
@@ -93,7 +99,7 @@ describe PacePlanPresenter do
 
       expect(formatted_plan[:id]).to eq(pace_plan.id)
       expect(formatted_plan[:context_id]).to eq(pace_plan.course_id)
-      expect(formatted_plan[:context_type]).to eq('Course')
+      expect(formatted_plan[:context_type]).to eq("Course")
       expect(formatted_plan[:course_id]).to eq(pace_plan.course_id)
       expect(formatted_plan[:course_section_id]).to eq(pace_plan.course_section_id)
       expect(formatted_plan[:user_id]).to eq(pace_plan.user_id)
@@ -114,7 +120,9 @@ describe PacePlanPresenter do
       first_module_item = first_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a1.name)
       expect(first_module_item[:position]).to eq(1)
-      expect(first_module_item[:module_item_type]).to eq('Assignment')
+      expect(first_module_item[:points_possible]).to eq(100)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct1.id}")
+      expect(first_module_item[:module_item_type]).to eq("Assignment")
       expect(first_module_item[:published]).to eq(true)
 
       second_module = formatted_plan[:modules].second
@@ -124,12 +132,16 @@ describe PacePlanPresenter do
       first_module_item = second_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a2.name)
       expect(first_module_item[:position]).to eq(1)
-      expect(first_module_item[:module_item_type]).to eq('Assignment')
+      expect(first_module_item[:points_possible]).to eq(50)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct2.id}")
+      expect(first_module_item[:module_item_type]).to eq("Assignment")
       expect(first_module_item[:published]).to eq(false)
       second_module_item = second_module[:items].second
       expect(second_module_item[:assignment_title]).to eq(@a3.name)
       expect(second_module_item[:position]).to eq(2)
-      expect(second_module_item[:module_item_type]).to eq('Assignment')
+      expect(second_module_item[:points_possible]).to be_nil
+      expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
+      expect(second_module_item[:module_item_type]).to eq("Assignment")
       expect(second_module_item[:published]).to eq(true)
     end
   end

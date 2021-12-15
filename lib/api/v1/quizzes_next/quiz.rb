@@ -37,6 +37,6 @@ module Api::V1::QuizzesNext::Quiz
 
     return Quizzes::QuizSerializer if quiz.is_a?(Quizzes::Quiz)
 
-    raise ArgumentError, 'An invalid quiz object is passed to quizzes_next_json'
+    raise ArgumentError, "An invalid quiz object is passed to quizzes_next_json"
   end
 end

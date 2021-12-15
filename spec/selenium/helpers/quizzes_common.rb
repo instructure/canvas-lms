@@ -45,14 +45,14 @@ module QuizzesCommon
   end
 
   def assign_quiz_to_no_one
-    f('.ContainerDueDate .ic-token-delete-button').click
+    f(".ContainerDueDate .ic-token-delete-button").click
   end
 
   def create_multiple_choice_question(opts = {})
     question = fj(".question_form:visible")
-    click_option('.question_form:visible .question_type', 'Multiple Choice')
+    click_option(".question_form:visible .question_type", "Multiple Choice")
 
-    question_description = opts.fetch(:description, 'Hi, this is a multiple choice question.')
+    question_description = opts.fetch(:description, "Hi, this is a multiple choice question.")
     type_in_tiny ".question_form:visible textarea.question_content", question_description
 
     answers = question.find_elements(:css, ".form_answers > .answer")
@@ -77,11 +77,11 @@ module QuizzesCommon
 
   def create_true_false_question
     question = fj(".question_form:visible")
-    click_option('.question_form:visible .question_type', 'True/False')
+    click_option(".question_form:visible .question_type", "True/False")
 
-    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+    replace_content(question.find_element(:css, "input[name='question_points']"), "4")
 
-    type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
+    type_in_tiny ".question:visible textarea.question_content", "This is not a true/false question."
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     expect(answers.length).to eq 2
@@ -94,11 +94,11 @@ module QuizzesCommon
 
   def create_fill_in_the_blank_question
     question = fj(".question_form:visible")
-    click_option('.question_form:visible .question_type', 'Fill In the Blank')
+    click_option(".question_form:visible .question_type", "Fill In the Blank")
 
-    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+    replace_content(question.find_element(:css, "input[name='question_points']"), "4")
 
-    type_in_tiny '.question_form:visible textarea.question_content', 'This is a fill in the _________ question.'
+    type_in_tiny ".question_form:visible textarea.question_content", "This is a fill in the _________ question."
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
@@ -110,9 +110,9 @@ module QuizzesCommon
 
   def create_essay_question
     question = fj(".question_form:visible")
-    click_option('.question_form:visible .question_type', 'Essay Question')
+    click_option(".question_form:visible .question_type", "Essay Question")
 
-    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+    replace_content(question.find_element(:css, "input[name='question_points']"), "4")
 
     submit_form(question)
     wait_for_ajaximations
@@ -120,11 +120,11 @@ module QuizzesCommon
 
   def create_file_upload_question
     question = fj(".question_form:visible")
-    click_option('.question_form:visible .question_type', 'File Upload Question')
+    click_option(".question_form:visible .question_type", "File Upload Question")
 
-    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+    replace_content(question.find_element(:css, "input[name='question_points']"), "4")
 
-    type_in_tiny '.question_form:visible textarea.question_content', 'This is a file upload question.'
+    type_in_tiny ".question_form:visible textarea.question_content", "This is a file upload question."
 
     submit_form(question)
     wait_for_ajaximations
@@ -134,7 +134,7 @@ module QuizzesCommon
     click_questions_tab
     click_new_question_button
     wait_for_ajaximations
-    question = fj('.question_form:visible')
+    question = fj(".question_form:visible")
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
     wait_for_ajaximations
@@ -143,17 +143,17 @@ module QuizzesCommon
 
   def quiz_with_multiple_type_questions(goto_edit = true)
     @context = @course
-    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    bank = @context.assessment_question_banks.create!(title: "Test Bank")
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
-    answers = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
+    answers = [{ "id" => 1 }, { "id" => 2 }, { "id" => 3 }]
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'first question',
-        question_type: 'multiple_choice_question',
+        name: "first question",
+        question_type: "multiple_choice_question",
         answers: answers,
         points_possible: 1
       },
@@ -162,9 +162,9 @@ module QuizzesCommon
 
     @quest2 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'second question',
-        question_text: 'What is 5+5?',
-        question_type: 'numerical_question',
+        name: "second question",
+        question_text: "What is 5+5?",
+        question_type: "numerical_question",
         answers: [],
         points_possible: 1
       },
@@ -173,8 +173,8 @@ module QuizzesCommon
 
     @quest3 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'third question',
-        question_type: 'essay_question',
+        name: "third question",
+        question_type: "essay_question",
         answers: [],
         points_possible: 1
       },
@@ -192,7 +192,7 @@ module QuizzesCommon
   def quiz_with_essay_questions(goto_edit = true)
     # TODO: DRY this up
     @context = @course
-    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    bank = @context.assessment_question_banks.create!(title: "Test Bank")
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
@@ -200,8 +200,8 @@ module QuizzesCommon
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'first question',
-        question_type: 'essay_question',
+        name: "first question",
+        question_type: "essay_question",
         answers: [],
         points_possible: 1
       },
@@ -210,8 +210,8 @@ module QuizzesCommon
 
     @quest2 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'second question',
-        question_type: 'essay_question',
+        name: "second question",
+        question_type: "essay_question",
         answers: [],
         points_possible: 1
       },
@@ -220,8 +220,8 @@ module QuizzesCommon
 
     @quest3 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'third question',
-        question_type: 'essay_question',
+        name: "third question",
+        question_type: "essay_question",
         answers: [],
         points_possible: 1
       },
@@ -238,7 +238,7 @@ module QuizzesCommon
 
   def quiz_with_new_questions(*answers, goto_edit: true)
     @context = @course
-    bank = @context.assessment_question_banks.create!(title: 'Test Bank')
+    bank = @context.assessment_question_banks.create!(title: "Test Bank")
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
@@ -247,8 +247,8 @@ module QuizzesCommon
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'first question',
-        question_type: 'multiple_choice_question',
+        name: "first question",
+        question_type: "multiple_choice_question",
         answers: answers,
         points_possible: 1
       },
@@ -257,8 +257,8 @@ module QuizzesCommon
 
     @quest2 = @quiz.quiz_questions.create!(
       question_data: {
-        name: 'second question',
-        question_type: 'multiple_choice_question',
+        name: "second question",
+        question_type: "multiple_choice_question",
         answers: answers,
         points_possible: 1
       },
@@ -275,14 +275,15 @@ module QuizzesCommon
 
   def click_settings_tab
     wait_for_ajaximations
-    fj('#quiz_tabs ul:first a:eq(0)').click
+    fj("#quiz_tabs ul:first a:eq(0)").click
   end
 
   def click_questions_tab
     wait_for_ajaximations
     tab = f("a[href='#questions_tab']")
     keep_trying_until do
-      tab.click; true
+      tab.click
+      true
     end
   end
 
@@ -321,20 +322,20 @@ module QuizzesCommon
   end
 
   def click_new_quiz_button
-    f('.new-quiz-link').click
+    f(".new-quiz-link").click
     wait_for_new_page_load
   end
 
   def click_new_question_button
-    find_accessible_link('New Question').click
+    find_accessible_link("New Question").click
   end
 
   def click_quiz_statistics_button
-    find_accessible_link('Quiz Statistics').click
+    find_accessible_link("Quiz Statistics").click
   end
 
   def click_save_settings_button
-    f('.save_quiz_button').click
+    f(".save_quiz_button").click
   end
 
   def start_quiz_question
@@ -344,7 +345,7 @@ module QuizzesCommon
     wait_for_rce
     click_questions_tab
     click_new_question_button
-    wait_for_rce('.question .rce-wrapper')
+    wait_for_rce(".question .rce-wrapper")
     Quizzes::Quiz.last
   end
 
@@ -376,7 +377,7 @@ module QuizzesCommon
     yield
   ensure
     # This step is to prevent selenium from freezing when the dialog appears when leaving the page
-    fln('Quizzes').click
+    fln("Quizzes").click
     driver.switch_to.alert.accept if alert_present?
   end
 
@@ -399,31 +400,31 @@ module QuizzesCommon
     end
 
     if access_code.nil?
-      wait_for_new_page_load { f('#take_quiz_link').click }
+      wait_for_new_page_load { f("#take_quiz_link").click }
     else
-      f('#quiz_access_code').send_keys(access_code)
-      wait_for_new_page_load { fj('.btn', '#main').click }
+      f("#quiz_access_code").send_keys(access_code)
+      wait_for_new_page_load { fj(".btn", "#main").click }
     end or raise "unable to start quiz"
   end
 
   def submit_quiz
-    f('#submit_quiz_button').click
+    f("#submit_quiz_button").click
     accept_alert if alert_present?
     wait_for_ajax_requests
 
-    expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
+    expect(f(".quiz-submission .quiz_score .score_value")).to be_truthy
   end
 
   def preview_quiz(submit = true)
     open_quiz_show_page
 
-    expect_new_page_load { f('#preview_quiz_button').click }
+    expect_new_page_load { f("#preview_quiz_button").click }
 
     complete_and_submit_quiz(submit)
   end
 
   def wait_for_quiz_publish_button_to_populate
-    link = f('#quiz-publish-link')
+    link = f("#quiz-publish-link")
     keep_trying_until { link.text.present? }
   end
 
@@ -451,9 +452,9 @@ module QuizzesCommon
       when "multiple_choice_question"
         fj("input[type=radio][name= 'question_#{question}']").click
       when "essay_question"
-        type_in_tiny ".question:visible textarea[name = 'question_#{question}']", 'This is an essay question.'
+        type_in_tiny ".question:visible textarea[name = 'question_#{question}']", "This is an essay question."
       when "numerical_question"
-        fj("input[type=text][name= 'question_#{question}']").send_keys('10')
+        fj("input[type=text][name= 'question_#{question}']").send_keys("10")
       end
     end
 
@@ -473,44 +474,44 @@ module QuizzesCommon
   end
 
   def question_answers
-    ffj('.answer', '.form_answers')
+    ffj(".answer", ".form_answers")
   end
 
   def delete_possible_answer(question_answer_index)
     question_answer = question_answers[question_answer_index]
     hover(question_answer)
 
-    delete_question_link = fj('.delete_answer_link', question_answer)
+    delete_question_link = fj(".delete_answer_link", question_answer)
     hover(delete_question_link)
     delete_question_link.click
   end
 
   def select_different_correct_answer(index_of_new_correct_answer)
-    new_correct_answer = fj('.select_answer_link', question_answers[index_of_new_correct_answer])
+    new_correct_answer = fj(".select_answer_link", question_answers[index_of_new_correct_answer])
     hover(new_correct_answer)
     new_correct_answer.click
     wait_for_ajaximations
   end
 
   def hover_first_question
-    question = f('.display_question')
+    question = f(".display_question")
     hover(question)
   end
 
   def select_regrade_option(option_index = 0)
     visible_regrade_options[option_index].click
-    fj('.ui-dialog:visible .btn-primary').click
+    fj(".ui-dialog:visible .btn-primary").click
     wait_for_ajaximations
   end
 
   def visible_regrade_options
-    ffj('label.checkbox:visible', '.regrade_enabled')
+    ffj("label.checkbox:visible", ".regrade_enabled")
   end
 
   # clicks |Okay, fine|
   def close_times_up_dialog
-    times_up_dialog = fj('div#times_up_dialog:visible')
-    fj('button.submit_quiz_button', times_up_dialog).click unless times_up_dialog.nil?
+    times_up_dialog = fj("div#times_up_dialog:visible")
+    fj("button.submit_quiz_button", times_up_dialog).click unless times_up_dialog.nil?
   end
 
   def edit_first_question
@@ -519,7 +520,7 @@ module QuizzesCommon
     begin
       # for some reason in flakey-spec-catcher this will fail 1/10 times
       #  have a backup plan
-      f('.edit_question_link').click
+      f(".edit_question_link").click
     rescue Selenium::WebDriver::Error::ElementNotInteractableError
       # rubocop:disable Specs/NoExecuteScript
       driver.execute_script "document.querySelector('.edit_question_link').click()"
@@ -530,28 +531,28 @@ module QuizzesCommon
   end
 
   def save_question
-    submit_form('.question_form')
+    submit_form(".question_form")
     wait_for_ajax_requests
   end
 
   def change_quiz_type_to(option_text)
-    click_option '#quiz_assignment_id', option_text
+    click_option "#quiz_assignment_id", option_text
   end
 
   def save_settings
-    wait_for_new_page_load { f('.save_quiz_button').click }
+    wait_for_new_page_load { f(".save_quiz_button").click }
   end
 
   def edit_quiz
-    expect_new_page_load { f('.quiz-edit-button').click }
+    expect_new_page_load { f(".quiz-edit-button").click }
   end
 
   def cancel_quiz_edit
-    expect_new_page_load { fj('#cancel_button', 'div#quiz_edit_actions').click }
+    expect_new_page_load { fj("#cancel_button", "div#quiz_edit_actions").click }
   end
 
   def edit_first_multiple_choice_answer(text)
-    element = fj('input[name=answer_text]:visible')
+    element = fj("input[name=answer_text]:visible")
     element.click
     element.send_keys text
   end
@@ -564,15 +565,15 @@ module QuizzesCommon
 
   def delete_first_multiple_choice_answer
     driver.execute_script "$('.answer').addClass('hover');"
-    fj('.delete_answer_link:visible').click
+    fj(".delete_answer_link:visible").click
   end
 
   ##
   # creates a question group through the browser
   def create_question_group
     click_questions_tab
-    find_accessible_link('New Question Group').click
-    submit_form('#group_top_new form')
+    find_accessible_link("New Question Group").click
+    submit_form("#group_top_new form")
     wait_for_ajax_requests
     @group = Quizzes::QuizGroup.last
   end
@@ -590,17 +591,17 @@ module QuizzesCommon
   #
   # where :questions is an array of questions in the group
   def get_question_data
-    els = ff '#questions > *'
+    els = ff "#questions > *"
     last_group_id = nil
     data = []
     els.each do |el|
       # its a question
-      if el['class'].include?('question_holder')
-        id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
+      if el["class"].include?("question_holder")
+        id = el.find_element(:css, "a")["name"].gsub(/question_/, "")
         question = {
-          :id => id.to_i,
-          :el => el,
-          :type => 'question'
+          id: id.to_i,
+          el: el,
+          type: "question"
         }
 
         if last_group_id
@@ -612,17 +613,17 @@ module QuizzesCommon
         end
 
         # its a group
-      elsif el['class'].include?('group_top')
-        last_group_id = el['id'].gsub(/group_top_/, '').to_i
+      elsif el["class"].include?("group_top")
+        last_group_id = el["id"].gsub(/group_top_/, "").to_i
         data << {
-          :id => last_group_id,
-          :questions => [],
-          :type => 'group',
-          :el => el
+          id: last_group_id,
+          questions: [],
+          type: "group",
+          el: el
         }
 
         # group ended
-      elsif el['class'].include?('group_bottom')
+      elsif el["class"].include?("group_bottom")
         last_group_id = nil
       end
     end
@@ -635,7 +636,7 @@ module QuizzesCommon
   def get_question_data_for_group(id)
     data = get_question_data
     group_data = data.detect do |item|
-      item[:type] == 'group' && item[:id] == id
+      item[:type] == "group" && item[:id] == id
     end
     group_data[:questions]
   end
@@ -684,7 +685,7 @@ module QuizzesCommon
   def drag_question_to_top(id)
     move_to_question id
     source = "#question_#{id} .draggable-handle"
-    target = '#questions > *'
+    target = "#questions > *"
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
@@ -695,7 +696,7 @@ module QuizzesCommon
   def drag_group_to_top(id)
     move_to_group id
     source = "#group_top_#{id} .draggable-handle"
-    target = '#questions > *'
+    target = "#questions > *"
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
@@ -717,15 +718,15 @@ module QuizzesCommon
     @quiz = course.quizzes.create
 
     data = {
-      question_name: 'Question 1',
+      question_name: "Question 1",
       points_possible: 1,
-      question_text: 'This is a multiple choice question',
+      question_text: "This is a multiple choice question",
       answers: [
-        { weight: 100, answer_text: 'A', answer_comments: '', id: 1490 },
-        { weight: 0, answer_text: 'B', answer_comments: '', id: 1020 },
-        { weight: 0, answer_text: 'C', answer_comments: '', id: 7051 }
+        { weight: 100, answer_text: "A", answer_comments: "", id: 1490 },
+        { weight: 0, answer_text: "B", answer_comments: "", id: 1020 },
+        { weight: 0, answer_text: "C", answer_comments: "", id: 7051 }
       ],
-      question_type: 'multiple_choice_question'
+      question_type: "multiple_choice_question"
     }
 
     @quiz.quiz_questions.create!(question_data: data)
@@ -744,47 +745,47 @@ module QuizzesCommon
   def seed_quiz_with_submission(num = 1, opts = {})
     quiz_data = opts[:question_data] || [
       {
-        question_name: 'Multiple Choice',
+        question_name: "Multiple Choice",
         points_possible: 10,
-        question_text: 'Pick wisely...',
+        question_text: "Pick wisely...",
         answers: [
-          { weight: 100, answer_text: 'Correct', id: 1 },
-          { weight: 0, answer_text: 'Wrong', id: 2 },
-          { weight: 0, answer_text: 'Wrong', id: 3 }
+          { weight: 100, answer_text: "Correct", id: 1 },
+          { weight: 0, answer_text: "Wrong", id: 2 },
+          { weight: 0, answer_text: "Wrong", id: 3 }
         ],
-        question_type: 'multiple_choice_question'
+        question_type: "multiple_choice_question"
       },
       {
-        question_name: 'File Upload',
+        question_name: "File Upload",
         points_possible: 5,
-        question_text: 'Upload a file',
-        question_type: 'file_upload_question'
+        question_text: "Upload a file",
+        question_type: "file_upload_question"
       },
       {
-        question_name: 'Short Essay',
+        question_name: "Short Essay",
         points_possible: 20,
-        question_text: 'Write an essay',
-        question_type: 'essay_question'
+        question_text: "Write an essay",
+        question_type: "essay_question"
       },
       {
-        question_name: 'Text (no question)',
-        question_text: 'This is just text',
-        question_type: 'text_only_question'
+        question_name: "Text (no question)",
+        question_text: "This is just text",
+        question_type: "text_only_question"
       }
     ]
 
-    quiz = @course.quizzes.create title: 'Quiz Me!'
+    quiz = @course.quizzes.create title: "Quiz Me!"
     num.times do
       quiz_data.each do |question|
         quiz.quiz_questions.create! question_data: question
       end
     end
 
-    quiz.workflow_state = 'available'
+    quiz.workflow_state = "available"
     quiz.save!
 
     submission = quiz.generate_submission opts[:student] || @students[0]
-    submission.workflow_state = 'complete'
+    submission.workflow_state = "complete"
     submission.save!
 
     quiz
@@ -792,17 +793,17 @@ module QuizzesCommon
 
   def verify_quiz_show_page_due_date(due_date)
     open_quiz_show_page
-    expect(f('#quiz_show')).to include_text due_date
+    expect(f("#quiz_show")).to include_text due_date
   end
 
   def verify_quiz_is_locked
     open_quiz_show_page unless driver.current_url == quiz_show_page_url
-    expect(fj('.lock_explanation')).to include_text 'This quiz was locked'
+    expect(fj(".lock_explanation")).to include_text "This quiz was locked"
   end
 
   def verify_quiz_is_submitted
     open_quiz_show_page unless driver.current_url == quiz_show_page_url
-    expect(fj('.quiz-submission')).to include_text 'Submitted'
+    expect(fj(".quiz-submission")).to include_text "Submitted"
   end
 
   def verify_quiz_submission_is_late
@@ -863,29 +864,29 @@ module QuizzesCommon
 
   def verify_quiz_submission_late_status(late:)
     open_student_quiz_submission
-    submission_page_info = f('.submission_details', f('#not_right_side'))
+    submission_page_info = f(".submission_details", f("#not_right_side"))
 
     if late
-      expect(submission_page_info).to contain_css('.submission-late-pill')
+      expect(submission_page_info).to contain_css(".submission-late-pill")
     else
-      expect(submission_page_info).not_to contain_css('.submission-late-pill')
+      expect(submission_page_info).not_to contain_css(".submission-late-pill")
     end
   end
 
   def verify_quiz_submission_status_in_speedgrader(late:)
     open_quiz_in_speedgrader
-    speedgrader_submission_details = f('#submission_details', f('.right_side_content'))
+    speedgrader_submission_details = f("#submission_details", f(".right_side_content"))
 
     if late
-      expect(speedgrader_submission_details).to contain_css('.submission-late-pill')
+      expect(speedgrader_submission_details).to contain_css(".submission-late-pill")
     else
-      expect(speedgrader_submission_details).not_to contain_css('.submission-late-pill')
+      expect(speedgrader_submission_details).not_to contain_css(".submission-late-pill")
     end
   end
 
   def generate_and_save_submission(quiz, student)
     submission = quiz.generate_submission student
-    submission.workflow_state = 'complete'
+    submission.workflow_state = "complete"
     submission.save!
   end
 end

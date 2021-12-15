@@ -38,10 +38,10 @@ module CopyAuthorizedLinks
       columns.each do |column|
         next if column == :custom
 
-        html = self.read_attribute(column) rescue nil
+        html = read_attribute(column) rescue nil
         next if html.blank?
 
-        context, inferred_user = self.instance_eval(&block) if block
+        context, inferred_user = instance_eval(&block) if block
         user = @copy_authorized_links_override_user || inferred_user
         re = Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/(\\d+)")
         ids = []
@@ -51,23 +51,21 @@ module CopyAuthorizedLinks
         Attachment.where(id: ids.uniq).each do |file|
           html = html.gsub(Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/#{file.id}"), "/#{file.context_type.pluralize.underscore}/#{file.context_id}/files/#{file.id}")
         end
-        self.write_attribute(column, html) if html.present?
+        write_attribute(column, html) if html.present?
       end
-      self.save
+      save
     end
 
     def copy_authorized_links_to_context
       columns = (self.class.copy_authorized_links_columns || []).compact
       columns.each do |column|
         if column == :custom
-          if self.respond_to?(:copy_authorized_content_custom_column)
-            self.copy_authorized_content_custom_column(context, user)
+          if respond_to?(:copy_authorized_content_custom_column)
+            copy_authorized_content_custom_column(context, user)
           end
         else
-          html = self.read_attribute(column) rescue nil
-          if html && !html.empty?
-            self.write_attribute(column, html) if html && !html.empty?
-          end
+          html = read_attribute(column) rescue nil
+          write_attribute(column, html) if html.present?
         end
       end
       true

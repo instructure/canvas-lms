@@ -36,7 +36,7 @@ module BrokenLinkHelper
     recipient_keys = users.select { |admin| record.grants_any_right?(admin, :update, :update_content) }.map(&:asset_string)
     return false unless recipient_keys.present? && recipient_keys.exclude?(@current_user.asset_string)
 
-    notification = BroadcastPolicy.notification_finder.by_name('Content Link Error')
+    notification = BroadcastPolicy.notification_finder.by_name("Content Link Error")
     error_type = error_type(record.context, request.url)
     data = { location: request.referer, url: request.url, anchor: anchor, error_type: error_type }
     DelayedNotification.delay_if_production(priority: Delayed::LOW_PRIORITY)
@@ -47,7 +47,7 @@ module BrokenLinkHelper
   end
 
   def error_type(course, url)
-    course_id = url.match(/\/courses\/(\d+)/)&.[](1)&.to_i
+    course_id = url.match(%r{/courses/(\d+)})&.[](1)&.to_i
     return :course_mismatch if course_id && course_id != course.id
 
     link_obj = Context.find_asset_by_url(url)

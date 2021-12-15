@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
-describe 'drag and drop reordering' do
+describe "drag and drop reordering" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
@@ -31,7 +31,7 @@ describe 'drag and drop reordering' do
     create_question_group
   end
 
-  it 'reorders quiz questions', priority: "1", test_id: 206021 do
+  it "reorders quiz questions", priority: "1" do
     click_questions_tab
     old_data = get_question_data
     drag_question_to_top @quest2.id
@@ -42,8 +42,8 @@ describe 'drag and drop reordering' do
     expect(new_data[2][:id]).to eq old_data[2][:id]
   end
 
-  it 'adds questions to a group', priority: "1", test_id: 140588 do
-    skip_if_chrome('fragile in chrome')
+  it "adds questions to a group", priority: "1" do
+    skip_if_chrome("fragile in chrome")
 
     create_question_group
     drag_question_into_group(@quest1.id, @group.id)
@@ -55,7 +55,7 @@ describe 'drag and drop reordering' do
     group_should_contain_question(@group, @quest1)
   end
 
-  it 'removes questions from a group', priority: "1", test_id: 201951 do
+  it "removes questions from a group", priority: "1" do
     # drag it out
     click_questions_tab
     drag_question_to_top @quest1.id
@@ -64,7 +64,7 @@ describe 'drag and drop reordering' do
     expect(data[0][:id]).to eq @quest1.id
   end
 
-  it 'reorders questions within a group', priority: "1", test_id: 201952 do
+  it "reorders questions within a group", priority: "1" do
     create_question_group
     drag_question_into_group @quest1.id, @group.id
     drag_question_into_group @quest2.id, @group.id
@@ -79,7 +79,7 @@ describe 'drag and drop reordering' do
     expect(data[1][:id]).to eq @quest2.id
   end
 
-  it 'reorders groups and questions', priority: "1", test_id: 206020 do
+  it "reorders groups and questions", priority: "1" do
     click_questions_tab
     old_data = get_question_data
     drag_group_to_top @group.id

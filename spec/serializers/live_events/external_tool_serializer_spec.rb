@@ -20,25 +20,25 @@
 RSpec.describe LiveEvents::ExternalToolSerializer do
   let(:serializer) { LiveEvents::ExternalToolSerializer.new(tool) }
 
-  describe '#as_json' do
+  describe "#as_json" do
     subject { serializer.as_json }
 
     let(:tool) { external_tool_model(context: course, opts: tool_options) }
     let(:course) { course_model }
-    let(:tool_options) { { domain: 'test.com' } }
+    let(:tool_options) { { domain: "test.com" } }
 
-    it 'includes the url' do
+    it "includes the url" do
       expect(subject[:url]).to eq tool.url
     end
 
-    it 'includes the domain' do
+    it "includes the domain" do
       expect(subject[:domain]).to eq tool_options[:domain]
     end
 
-    context 'when a tool attribute is nil' do
+    context "when a tool attribute is nil" do
       let(:tool_options) { {} }
 
-      it 'does not include nil attributes' do
+      it "does not include nil attributes" do
         expect(subject[:domain]).to be_nil
       end
     end

@@ -54,20 +54,20 @@ describe GradingPeriodGradeSummaryPresenter do
     )
   end
 
-  describe '#no_calculations?' do
-    it 'calculates subtotals when summarizing by grading period' do
-      presenter.periods_assignments = ['dummy']
+  describe "#no_calculations?" do
+    it "calculates subtotals when summarizing by grading period" do
+      presenter.periods_assignments = ["dummy"]
       presenter.groups_assignments = []
       expect(presenter.no_calculations?).to be(false)
     end
 
-    it 'calculates subtotals when summarizing by assignment group' do
+    it "calculates subtotals when summarizing by assignment group" do
       presenter.periods_assignments = []
-      presenter.groups_assignments = ['dummy']
+      presenter.groups_assignments = ["dummy"]
       expect(presenter.no_calculations?).to be(false)
     end
 
-    it 'no subtotals with no assignment groups nor grading periods' do
+    it "no subtotals with no assignment groups nor grading periods" do
       presenter.periods_assignments = []
       presenter.groups_assignments = []
       expect(presenter.no_calculations?).to be(true)

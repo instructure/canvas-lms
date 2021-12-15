@@ -19,7 +19,7 @@
 #
 
 describe Auditors::ActiveRecord::CourseRecord do
-  let(:request_id) { 'abcde-12345' }
+  let(:request_id) { "abcde-12345" }
 
   before(:once) do
     Auditors::ActiveRecord::Partitioner.process
@@ -34,7 +34,7 @@ describe Auditors::ActiveRecord::CourseRecord do
     let(:course_record) { course_enrollment.course }
     let(:user_record) { course_enrollment.user }
     let(:event_data) { { "data-key" => "data-val" } }
-    let(:es_record) { Auditors::Course::Record.generate(course_record, user_record, 'unconcluded', event_data) }
+    let(:es_record) { Auditors::Course::Record.generate(course_record, user_record, "unconcluded", event_data) }
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::CourseRecord.create_from_event_stream!(es_record)

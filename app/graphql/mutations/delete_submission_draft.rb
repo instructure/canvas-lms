@@ -19,9 +19,9 @@
 #
 
 class Mutations::DeleteSubmissionDraft < Mutations::BaseMutation
-  graphql_name 'DeleteSubmissionDraft'
+  graphql_name "DeleteSubmissionDraft"
 
-  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
+  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
 
   field :submission_draft_ids, [ID], null: true
 

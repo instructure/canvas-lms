@@ -47,24 +47,24 @@ describe Api::V1::ContextModule do
   end
 
   describe "#module_item_json" do
-    subject { dummy_class.new(double(params: { frame_external_urls: 'http://www.instructure.com' })) }
+    subject { dummy_class.new(double(params: { frame_external_urls: "http://www.instructure.com" })) }
 
     before do
       course_with_teacher(account: Account.default)
       course_with_student(course: @course)
 
       @cm = ContextModule.new(context: @course)
-      @cm.prerequisites = { :type => "context_module", :name => 'test', :id => 1 }
+      @cm.prerequisites = { type: "context_module", name: "test", id: 1 }
       @cm.save!
 
-      @tool = @course.context_external_tools.create(name: "a", domain: "instructure.com", consumer_key: '12345', shared_secret: 'secret', url: 'http://www.toolurl.com')
+      @tool = @course.context_external_tools.create(name: "a", domain: "instructure.com", consumer_key: "12345", shared_secret: "secret", url: "http://www.toolurl.com")
       @tool.save!
 
       @content = @tool
       allow(@content).to receive_messages(tool_id: 1)
       @content.save!
 
-      @tg = ContentTag.new(context: @course, context_module: @cm, content_type: 'ContextExternalTool', content: @content)
+      @tg = ContentTag.new(context: @course, context_module: @cm, content_type: "ContextExternalTool", content: @content)
       @tg.save!
     end
 
@@ -77,7 +77,7 @@ describe Api::V1::ContextModule do
       @tool.url = nil
       @tool.save!
 
-      @tg.url = 'http://www.tagurl.com'
+      @tg.url = "http://www.tagurl.com"
       @tg.save!
 
       @cm = ContextModule.new(context: @course)

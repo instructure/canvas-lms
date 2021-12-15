@@ -32,13 +32,13 @@ class AccessToken < ActiveRecord::Base
 
   belongs_to :developer_key, counter_cache: :access_token_count
   belongs_to :user, inverse_of: :access_tokens
-  belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: 'User'
+  belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
   has_one :account, through: :developer_key
 
   serialize :scopes, Array
   validate :must_only_include_valid_scopes, unless: :deleted?
 
-  has_many :notification_endpoints, -> { where(:workflow_state => "active") }, dependent: :destroy
+  has_many :notification_endpoints, -> { where(workflow_state: "active") }, dependent: :destroy
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
 
@@ -60,7 +60,7 @@ class AccessToken < ActiveRecord::Base
   # yet been implemented)
 
   scope :active, -> { not_deleted.where("permanent_expires_at IS NULL OR permanent_expires_at>?", Time.now.utc) }
-  scope :not_deleted, -> { where(:workflow_state => "active") }
+  scope :not_deleted, -> { where(workflow_state: "active") }
 
   TOKEN_SIZE = 64
 
@@ -71,7 +71,7 @@ class AccessToken < ActiveRecord::Base
   def destroy
     return true if deleted?
 
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     run_callbacks(:destroy) { save! }
   end
 
@@ -79,7 +79,7 @@ class AccessToken < ActiveRecord::Base
     # hash the user supplied token with all of our known keys
     # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
-    token = self.not_deleted.where(token_key => hashed_tokens).first
+    token = not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
       token.send("#{token_key}=", hashed_tokens.first)
@@ -90,7 +90,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.authenticate_refresh_token(token_string)
-    self.authenticate(token_string, :crypted_refresh_token)
+    authenticate(token_string, :crypted_refresh_token)
   end
 
   def self.hashed_token(token)
@@ -130,13 +130,13 @@ class AccessToken < ActiveRecord::Base
   end
 
   def record_last_used_threshold
-    Setting.get('access_token_last_used_threshold', 10.minutes).to_i
+    Setting.get("access_token_last_used_threshold", 10.minutes).to_i
   end
 
   def used!
     if !last_used_at || last_used_at < record_last_used_threshold.seconds.ago
       self.last_used_at = Time.now.utc
-      self.save
+      save
     end
   end
 
@@ -159,7 +159,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def generate_token(overwrite = false)
-    if overwrite || !self.crypted_token
+    if overwrite || !crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
       self.expires_at = Time.now.utc + 1.hour if developer_key&.auto_expire_tokens
@@ -180,7 +180,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def regenerate=(val)
-    if val == '1' && manually_created?
+    if val == "1" && manually_created?
       generate_token(true)
     end
   end
@@ -208,12 +208,12 @@ class AccessToken < ActiveRecord::Base
 
   def url_scopes_for_method(method)
     re = /^url:#{method}\|/
-    scopes.select { |scope| re =~ scope }.map do |scope|
-      path = scope.split('|').last
+    scopes.grep(re).map do |scope|
+      path = scope.split("|").last
       # build up the scope matching regexp from the route path
-      path = path.gsub(/:[^\/)]+/, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
-      path = path.gsub(/\*[^\/)]+/, '.+') # handle glob segments /files/*path -> /files/.+
-      path = path.gsub(/\(/, '(?:').gsub(/\)/, '|)') # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
+      path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
+      path = path.gsub(/\(/, "(?:").gsub(/\)/, "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
       path = "#{path}(?:\\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end
@@ -225,24 +225,24 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.scopes_match?(scopes, req_scopes)
-    return req_scopes.size == 0 if scopes.nil?
+    return req_scopes.empty? if scopes.nil?
 
     scopes.size == req_scopes.size &&
       scopes.all? do |scope|
-        req_scopes.any? { |req_scope| scope[/(^|\/)#{req_scope}$/] }
+        req_scopes.any? { |req_scope| scope[%r{(^|/)#{req_scope}$}] }
       end
   end
 
   def must_only_include_valid_scopes
     return true if scopes.nil? || !developer_key.require_scopes?
 
-    errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
+    errors.add(:scopes, "requested scopes must match scopes on developer key") unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
   end
 
   # It's encrypted, but end users still shouldn't see this.
   # The hint is only returned in visible_token, if protected_token is false.
   def self.serialization_excludes
-    [:crypted_token, :token_hint, :crypted_refresh_token]
+    %i[crypted_token token_hint crypted_refresh_token]
   end
 
   def dev_key_account_id

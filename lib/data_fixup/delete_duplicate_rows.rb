@@ -21,7 +21,7 @@ module DataFixup
   module DeleteDuplicateRows
     def self.run(base_scope, *unique_columns, order: nil, strategy: nil, batch_size: 10_000)
       model = base_scope.is_a?(ActiveRecord::Relation) ? base_scope.klass : base_scope
-      partition_by = unique_columns.map { |c| model.connection.quote_column_name(c) }.join(', ')
+      partition_by = unique_columns.map { |c| model.connection.quote_column_name(c) }.join(", ")
       order ||= model.primary_key
       inner_scope = base_scope
                     .select(model.primary_key)

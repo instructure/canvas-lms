@@ -28,13 +28,13 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase
   def resolve(input:)
     course_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:course_id], "Course")
 
-    @course = Course.find_by_id(course_id)
+    @course = Course.find_by(id: course_id)
     @working_assignment = @course.assignments.build if @course
 
     raise GraphQL::ExecutionError, "invalid course: #{course_id}" unless @working_assignment&.grants_right? current_user, :create
 
     # initialize published argument
-    @working_assignment.workflow_state = 'unpublished'
+    @working_assignment.workflow_state = "unpublished"
     input_hash = input.to_h
     if input_hash.key? :state
       asked_state = input_hash.delete :state

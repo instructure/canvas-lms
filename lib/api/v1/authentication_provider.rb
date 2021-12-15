@@ -28,7 +28,7 @@ module Api::V1::AuthenticationProvider
   end
 
   def aac_json(aac)
-    result = api_json(aac, nil, nil, :only => [:auth_type, :id, :position])
+    result = api_json(aac, nil, nil, only: %i[auth_type id position])
     allowed_params = aac.class.recognized_params
     sensitive_params = aac.class.const_get(:SENSITIVE_PARAMS)
     (allowed_params - sensitive_params).each do |param|
@@ -36,7 +36,7 @@ module Api::V1::AuthenticationProvider
     end
 
     if aac.class.recognized_federated_attributes != []
-      result['federated_attributes'] = aac.federated_attributes_for_api
+      result["federated_attributes"] = aac.federated_attributes_for_api
     end
 
     # These settings were moved to the account settings level,

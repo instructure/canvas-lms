@@ -20,7 +20,7 @@
 
 module Courses
   module ItemVisibilityHelper
-    ITEM_TYPES = [:assignment, :discussion, :page, :quiz].freeze
+    ITEM_TYPES = %i[assignment discussion page quiz].freeze
 
     def visible_item_ids_for_users(item_type, user_ids)
       # return all the item ids that are visible to _any_ of the users
@@ -56,12 +56,12 @@ module Courses
 
     def get_visibilities_for_user_ids(item_type, user_ids)
       GuardRail.activate(:secondary) do
-        opts = { user_id: user_ids, course_id: [self.id] }
+        opts = { user_id: user_ids, course_id: [id] }
         case item_type
         when :assignment
           AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
         when :discussion
-          DiscussionTopic.visible_ids_by_user(opts.merge(:item_type => item_type))
+          DiscussionTopic.visible_ids_by_user(opts.merge(item_type: item_type))
         when :page
           WikiPage.visible_ids_by_user(opts)
         when :quiz

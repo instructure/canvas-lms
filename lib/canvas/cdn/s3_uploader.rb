@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'benchmark'
-require 'parallel'
+require "benchmark"
+require "parallel"
 
 module Canvas
   module Cdn
     class S3Uploader
       attr_accessor :bucket, :config, :mutex, :verbose
 
-      def initialize(folder = 'dist', verbose: false)
-        require 'aws-sdk-s3'
+      def initialize(folder = "dist", verbose: false)
+        require "aws-sdk-s3"
         @folder = folder
         @verbose = verbose
         @config = Canvas::Cdn.config
@@ -46,7 +46,7 @@ module Canvas
 
         return if upload_files.empty? # nothing to change
 
-        opts = { in_threads: 16, progress: 'uploading to S3' }
+        opts = { in_threads: 16, progress: "uploading to S3" }
         if block_given?
           opts[:finish] = ->(_, i, _) { yield (100.0 * i / upload_files.count) }
         end
@@ -59,7 +59,7 @@ module Canvas
       # tl;dr store a list of assets for a given tag on the bucket itself
       # so we don't have to make 10,000 s3 get calls every time to make sure they're all still there
       def manifest_path
-        tag = ENV['MANIFEST_TAG']
+        tag = ENV["MANIFEST_TAG"]
         tag && "manifests/#{tag}.json"
       end
 
@@ -83,19 +83,17 @@ module Canvas
       end
 
       def mime_for(path)
-        ext = path.extname[1..-1]
+        ext = path.extname[1..]
         # Mime::Type.lookup_by_extension doesn't have some types (like svg), so fall back to others
         content_type = Mime::Type.lookup_by_extension(ext) || Rack::Mime.mime_type(".#{ext}") || MIME::Types.type_for(ext).first
-        content_type = 'text/css; charset=utf-8' if content_type == 'text/css'
+        content_type = "text/css; charset=utf-8" if content_type == "text/css"
         content_type
       end
 
       def options_for(path)
-        options = { acl: 'public-read', content_type: mime_for(path).to_s }
+        options = { acl: "public-read", content_type: mime_for(path).to_s }
         if fingerprinted?(path)
-          options.merge!({
-                           cache_control: "public, max-age=#{1.year}"
-                         })
+          options[:cache_control] = "public, max-age=#{1.year}"
         end
 
         options
@@ -105,7 +103,7 @@ module Canvas
         return if previous_manifest.include?(remote_path)
 
         local_path = Pathname.new("#{Rails.public_path}/#{remote_path}")
-        return if (local_path.extname == '.gz') || local_path.directory?
+        return if (local_path.extname == ".gz") || local_path.directory?
 
         s3_object = mutex.synchronize { bucket.object(remote_path) }
         return log("skipping already existing #{remote_path}") if s3_object.exists?

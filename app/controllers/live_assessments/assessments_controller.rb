@@ -76,7 +76,7 @@ module LiveAssessments
     def create
       return unless authorized_action(Assessment.new(context: @context), @current_user, :create)
 
-      reject! 'missing required key :assessments' unless params[:assessments].is_a?(Array)
+      reject! "missing required key :assessments" unless params[:assessments].is_a?(Array)
 
       @assessments = []
 
@@ -86,11 +86,11 @@ module LiveAssessments
             return unless authorized_action(@context, @current_user, :manage_outcomes)
 
             @outcome = @context.linked_learning_outcomes.where(id: outcome_id).first
-            reject! 'outcome must be linked to the context' unless @outcome
+            reject! "outcome must be linked to the context" unless @outcome
           end
 
-          reject! 'missing required key :title' if assessment_hash[:title].blank?
-          reject! 'missing required key :key' if assessment_hash[:key].blank?
+          reject! "missing required key :title" if assessment_hash[:title].blank?
+          reject! "missing required key :key" if assessment_hash[:key].blank?
           assessment = Assessment.where(context_id: @context.id, context_type: @context.class.to_s, key: assessment_hash[:key]).first_or_initialize
           assessment.title = assessment_hash[:title]
           assessment.save!
@@ -139,7 +139,7 @@ module LiveAssessments
                                                   }).as_json
       {
         links: {
-          'assessments.results' => polymorphic_url([:api_v1, @context]) + '/live_assessments/{assessments.id}/results'
+          "assessments.results" => polymorphic_url([:api_v1, @context]) + "/live_assessments/{assessments.id}/results"
         },
         assessments: serialized
       }

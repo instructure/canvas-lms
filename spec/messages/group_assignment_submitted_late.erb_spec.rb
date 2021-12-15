@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'group_assignment_submitted_late' do
+describe "group_assignment_submitted_late" do
   before :once do
     submission_model
     @submission.group = @course.groups.create!

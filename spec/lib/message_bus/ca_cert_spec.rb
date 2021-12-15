@@ -19,11 +19,11 @@
 
 describe MessageBus::CaCert do
   let(:cert_location) { "/tmp/fake_pulsar_cert_#{SecureRandom.hex(3)}.pem" }
-  let(:fake_vault_path) { 'fake/vault/path' }
+  let(:fake_vault_path) { "fake/vault/path" }
   let(:conf_hash) do
     {
-      'PULSAR_CERT_VAULT_PATH' => fake_vault_path,
-      'PULSAR_CERT_PATH' => cert_location
+      "PULSAR_CERT_VAULT_PATH" => fake_vault_path,
+      "PULSAR_CERT_PATH" => cert_location
     }
   end
 

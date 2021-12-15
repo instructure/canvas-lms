@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 describe Api::V1::QuizSubmissionQuestion do
   before :once do
@@ -30,11 +30,13 @@ describe Api::V1::QuizSubmissionQuestion do
     factory = method(:"#{type}_question_data")
 
     # can't test for #arity directly since it might be an optional parameter
-    data = factory.parameters.include?([:opt, :options]) ?
-    factory.call(factory_options) :
-    factory.call
+    data = if factory.parameters.include?([:opt, :options])
+             factory.call(factory_options)
+           else
+             factory.call
+           end
 
-    data = data.except('id', 'assessment_question_id')
+    data = data.except("id", "assessment_question_id")
 
     qq = quiz.quiz_questions.create!({ question_data: data })
     qq.assessment_question.question_data = data
@@ -63,20 +65,24 @@ describe Api::V1::QuizSubmissionQuestion do
       Array.new(3) { create_question "multiple_choice" }
     end
 
-    let(:submission_data) do
-      {}
+    context "with submission_data as a hash" do
+      let(:submission_data) do
+        {}
+      end
+
+      it "returns json" do
+        expect(subject).to be_a Hash
+      end
     end
 
-    it "returns json" do
-      is_expected.to be_a Hash
-    end
+    context "with submission_data as an array" do
+      let(:submission_data) do
+        []
+      end
 
-    let(:submission_data) do
-      []
-    end
-
-    it "handles submitted submission_data" do
-      is_expected.to be_a Hash
+      it "handles submitted submission_data" do
+        expect(subject).to be_a Hash
+      end
     end
   end
 
@@ -93,6 +99,7 @@ describe Api::V1::QuizSubmissionQuestion do
 
     describe "shuffle_answers true" do
       subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission, { shuffle_answers: true }) }
+
       it "shuffles answers when opt is given" do
         expect_any_instance_of(Array).to receive(:shuffle!).at_least(:once)
         subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
@@ -101,10 +108,11 @@ describe Api::V1::QuizSubmissionQuestion do
 
     describe "shuffle_answers false" do
       subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission, { shuffle_answers: false }) }
+
       it "shuffles answers when opt is given" do
         expect_any_instance_of(Array).not_to receive(:shuffle!)
         answer_text = subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
-        expect(answer_text).to eq(["a", "b", "c", "d"])
+        expect(answer_text).to eq(%w[a b c d])
       end
     end
   end

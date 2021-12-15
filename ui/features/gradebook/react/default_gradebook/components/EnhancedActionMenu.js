@@ -74,7 +74,7 @@ export default function EnhancedActionMenu(props) {
     $.flashMessage(I18n.t('Gradebook export started'))
 
     return exportManager.current
-      .startExport(props.gradingPeriodId, props.getAssignmentOrder)
+      .startExport(props.gradingPeriodId, props.getAssignmentOrder, props.showStudentFirstLastName)
       .then(resolution => {
         setExportInProgress(false)
 
@@ -339,7 +339,8 @@ EnhancedActionMenu.propTypes = {
     publishToSisUrl: string
   }),
 
-  gradingPeriodId: string.isRequired
+  gradingPeriodId: string.isRequired,
+  showStudentFirstLastName: bool
 }
 
 EnhancedActionMenu.defaultProps = {
@@ -348,5 +349,6 @@ EnhancedActionMenu.defaultProps = {
   postGradesLtis: [],
   publishGradesToSis: {
     publishToSisUrl: undefined
-  }
+  },
+  showStudentFirstLastName: false
 }

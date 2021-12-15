@@ -58,41 +58,45 @@ module Api::V1::Outcome
   # (if any).
   def outcome_json(outcome, user, session, opts = {})
     can_edit = lambda do
-      outcome.context_id ?
-          outcome.context.grants_right?(user, session, :manage_outcomes) :
-          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+      if outcome.context_id
+        outcome.context.grants_right?(user, session, :manage_outcomes)
+      else
+        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+      end
     end
 
-    json_attributes = %w(id context_type context_id vendor_guid display_name)
-    api_json(outcome, user, session, :only => json_attributes, :methods => [:title]).tap do |hash|
-      hash['url'] = api_v1_outcome_path :id => outcome.id
-      hash['can_edit'] = can_edit.call
-      hash['has_updateable_rubrics'] = outcome.updateable_rubrics?
+    json_attributes = %w[id context_type context_id vendor_guid display_name]
+    api_json(outcome, user, session, only: json_attributes, methods: [:title]).tap do |hash|
+      hash["url"] = api_v1_outcome_path id: outcome.id
+      hash["can_edit"] = can_edit.call
+      hash["has_updateable_rubrics"] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
-        hash['description'] = outcome.description
-        hash['friendly_description'] = opts.dig(:friendly_descriptions, outcome.id)
+        hash["description"] = outcome.description
+        hash["friendly_description"] = opts.dig(:friendly_descriptions, outcome.id)
         context = opts[:context]
         mastery_scale_opts = mastery_scale_opts(context)
         if mastery_scale_opts.any?
           hash.merge!(mastery_scale_opts)
         elsif !mastery_scales_flag_enabled(context)
-          hash['points_possible'] = outcome.rubric_criterion[:points_possible]
-          hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
-          hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
+          hash["points_possible"] = outcome.rubric_criterion[:points_possible]
+          hash["mastery_points"] = outcome.rubric_criterion[:mastery_points]
+          hash["ratings"] = outcome.rubric_criterion[:ratings]&.clone
           # existing outcomes that have a nil calculation method should be handled as highest
-          hash['calculation_method'] = outcome.calculation_method || 'highest'
+          hash["calculation_method"] = outcome.calculation_method || "highest"
           if ["decaying_average", "n_mastery"].include? outcome.calculation_method
-            hash['calculation_int'] = outcome.calculation_int
+            hash["calculation_int"] = outcome.calculation_int
           end
         end
-        hash['ratings']&.each_with_index do |rating, i|
-          rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
-        end if opts[:rating_percents]
-        if opts[:assessed_outcomes] && outcome.context_type != "Account"
-          hash['assessed'] = opts[:assessed_outcomes].include?(outcome.id)
-        else
-          hash['assessed'] = outcome.assessed?
+        if opts[:rating_percents]
+          hash["ratings"]&.each_with_index do |rating, i|
+            rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
+          end
         end
+        hash["assessed"] = if opts[:assessed_outcomes] && outcome.context_type != "Account"
+                             opts[:assessed_outcomes].include?(outcome.id)
+                           else
+                             outcome.assessed?
+                           end
       end
     end
   end
@@ -103,22 +107,24 @@ module Api::V1::Outcome
   # context id and type, and description.
   def outcome_group_json(outcome_group, user, session, style = :full)
     path_context = outcome_group.context || :global
-    api_json(outcome_group, user, session, :only => %w(id title vendor_guid)).tap do |hash|
-      hash['url'] = polymorphic_path [:api_v1, path_context, :outcome_group], :id => outcome_group.id
-      hash['subgroups_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], :id => outcome_group.id
-      hash['outcomes_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], :id => outcome_group.id
-      hash['can_edit'] = outcome_group.context_id ?
-        outcome_group.context.grants_right?(user, session, :manage_outcomes) :
-        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+    api_json(outcome_group, user, session, only: %w[id title vendor_guid]).tap do |hash|
+      hash["url"] = polymorphic_path [:api_v1, path_context, :outcome_group], id: outcome_group.id
+      hash["subgroups_url"] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], id: outcome_group.id
+      hash["outcomes_url"] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], id: outcome_group.id
+      hash["can_edit"] = if outcome_group.context_id
+                           outcome_group.context.grants_right?(user, session, :manage_outcomes)
+                         else
+                           Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+                         end
 
       unless style == :abbrev
-        hash['import_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_import], :id => outcome_group.id
+        hash["import_url"] = polymorphic_path [:api_v1, path_context, :outcome_group_import], id: outcome_group.id
         if outcome_group.learning_outcome_group_id
-          hash['parent_outcome_group'] = outcome_group_json(outcome_group.parent_outcome_group, user, session, :abbrev)
+          hash["parent_outcome_group"] = outcome_group_json(outcome_group.parent_outcome_group, user, session, :abbrev)
         end
-        hash['context_id'] = outcome_group.context_id
-        hash['context_type'] = outcome_group.context_type
-        hash['description'] = outcome_group.description
+        hash["context_id"] = outcome_group.context_id
+        hash["context_type"] = outcome_group.context_type
+        hash["description"] = outcome_group.description
       end
     end
   end
@@ -141,11 +147,11 @@ module Api::V1::Outcome
   def outcome_link_json(outcome_link, user, session, opts = {})
     opts[:outcome_style] ||= :abbrev
     opts[:outcome_group_style] ||= :abbrev
-    api_json(outcome_link, user, session, :only => %w(context_type context_id)).tap do |hash|
-      hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
-                                     :id => outcome_link.associated_asset_id,
-                                     :outcome_id => outcome_link.content_id
-      hash['outcome_group'] = outcome_group_json(
+    api_json(outcome_link, user, session, only: %w[context_type context_id]).tap do |hash|
+      hash["url"] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
+                                     id: outcome_link.associated_asset_id,
+                                     outcome_id: outcome_link.content_id
+      hash["outcome_group"] = outcome_group_json(
         outcome_link.associated_asset,
         user,
         session,
@@ -154,7 +160,7 @@ module Api::V1::Outcome
       # use learning_outcome_content vs. content in case
       # learning_outcome_content has been preloaded (e.g. by
       # ContentTag.order_by_outcome_title)
-      hash['outcome'] = outcome_json(
+      hash["outcome"] = outcome_json(
         outcome_link.learning_outcome_content,
         user,
         session,
@@ -162,16 +168,19 @@ module Api::V1::Outcome
       )
 
       unless outcome_link.deleted?
-        can_manage = outcome_link.context ? outcome_link.context.grants_right?(user, session, :manage_outcomes) :
-          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
-        hash['can_unlink'] = can_manage && outcome_link.can_destroy?
+        can_manage = if outcome_link.context
+                       outcome_link.context.grants_right?(user, session, :manage_outcomes)
+                     else
+                       Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+                     end
+        hash["can_unlink"] = can_manage && outcome_link.can_destroy?
       end
 
-      if opts[:assessed_outcomes]
-        hash['assessed'] = opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
-      else
-        hash['assessed'] = outcome_link.learning_outcome_content.assessed?(outcome_link[:context_id])
-      end
+      hash["assessed"] = if opts[:assessed_outcomes]
+                           opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
+                         else
+                           outcome_link.learning_outcome_content.assessed?(outcome_link[:context_id])
+                         end
     end
   end
 end

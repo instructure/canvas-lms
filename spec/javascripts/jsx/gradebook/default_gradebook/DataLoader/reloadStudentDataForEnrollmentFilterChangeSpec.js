@@ -275,12 +275,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 0)
     })
 
-    test('does not load context modules', async () => {
-      sinon.spy(dataLoader.contextModulesLoader, 'loadContextModules')
-      await reloadData()
-      strictEqual(dataLoader.contextModulesLoader.loadContextModules.callCount, 0)
-    })
-
     test('does not load custom columns', async () => {
       sinon.spy(dataLoader.customColumnsLoader, 'loadCustomColumns')
       await reloadData()

@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'pathname'
+require "pathname"
 
 class PackageRoot
   # initialize with the root directory of an extracted package
   def initialize(root_path)
     @root_path = Pathname(root_path).realpath
-    @prefix = @root_path.to_s + '/'
+    @prefix = @root_path.to_s + "/"
   end
 
   # return the root path. NOTE: don't manually File.join this; use item_path instead
@@ -48,7 +48,7 @@ class PackageRoot
   end
 
   # enumerate files matching the given pattern
-  def contents(pattern = '**/*')
+  def contents(pattern = "**/*")
     Dir[@root_path.join(pattern).to_s]
   end
 end

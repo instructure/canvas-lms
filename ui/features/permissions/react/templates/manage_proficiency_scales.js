@@ -30,9 +30,9 @@ export const template = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Feature Preview'),
+      title: I18n.t('Feature Option'),
       description: I18n.t(
-        'This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which must be enabled by a Customer Success Manager.'
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature option, which must be enabled by a Customer Success Manager.'
       )
     },
     {
@@ -41,7 +41,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+        'If the feature option is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
       )
     },
     {
@@ -66,9 +66,9 @@ export const template = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Feature Preview'),
+      title: I18n.t('Feature Option'),
       description: I18n.t(
-        'This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which can only be enabled at the account level.'
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature option, which can only be enabled at the account level.'
       )
     },
     {
@@ -77,7 +77,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+        'If the feature option is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
       )
     },
     {

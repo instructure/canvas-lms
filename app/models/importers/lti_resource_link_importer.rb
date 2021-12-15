@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class LtiResourceLinkImporter < Importer
     self.item_class = Lti::ResourceLink
 
     def self.process_migration(hash, migration)
-      lti_resource_links = hash.with_indifferent_access['lti_resource_links']
+      lti_resource_links = hash.with_indifferent_access["lti_resource_links"]
 
       return false unless lti_resource_links
 
@@ -48,11 +48,11 @@ module Importers
     def self.create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
       resource_link_for_course = Lti::ResourceLink.find_or_initialize_for_context_and_lookup_uuid(
         context: migration.context,
-        lookup_uuid: lti_resource_link['lookup_uuid'],
-        context_external_tool_launch_url: lti_resource_link['launch_url']
+        lookup_uuid: lti_resource_link["lookup_uuid"],
+        context_external_tool_launch_url: lti_resource_link["launch_url"]
       )
       resource_link_for_course.custom =
-        Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link['custom'])
+        Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link["custom"])
       resource_link_for_course.save
     end
 
@@ -67,13 +67,13 @@ module Importers
     def self.update_custom_for_resource_link_from_assignment_context(resource_links_from_assignments, lti_resource_link)
       resource_link = find_resource_link_from_assignment_context(
         resource_links_from_assignments,
-        lti_resource_link['lookup_uuid']
+        lti_resource_link["lookup_uuid"]
       )
 
       return false unless resource_link
 
       resource_link.update(
-        custom: Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link['custom'])
+        custom: Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link["custom"])
       )
 
       true

@@ -17,36 +17,36 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module CourseSettingsPage
   #------------------------- Selectors --------------------------
   def course_details_tab_link_selector
-    '#course_details_tab'
+    "#course_details_tab"
   end
 
   def sections_tab_link_selector
-    '#sections_tab'
+    "#sections_tab"
   end
 
   def navigation_tab_link_selector
-    '#navigation_tab'
+    "#navigation_tab"
   end
 
   def apps_tab_link_selector
-    '#external_tools_tab'
+    "#external_tools_tab"
   end
 
   def feature_options_tab_link_selector
-    '#feature_flags_tab'
+    "#feature_flags_tab"
   end
 
   def course_show_announcements_on_home_page_selector
-    '#course_show_announcements_on_home_page'
+    "#course_show_announcements_on_home_page"
   end
 
   def course_show_announcements_on_home_page_label_selector
-    'label[for=course_show_announcements_on_home_page]'
+    "label[for=course_show_announcements_on_home_page]"
   end
 
   #------------------------- Elements ---------------------------

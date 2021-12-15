@@ -54,7 +54,7 @@ module CanvasSecurity
       data = CanvasSecurity.decode_jwt(token)
       return nil unless data
 
-      return {
+      {
         request_id: data[:i],
         user_id: data[:u],
         created_at: data[:c]

@@ -24,12 +24,12 @@ class PopulateProficiencyPermissions < ActiveRecord::Migration[5.2]
     DataFixup::AddRoleOverridesForNewPermission.run(
       :manage_outcomes,
       :manage_proficiency_calculations,
-      base_role_type: 'AccountMembership'
+      base_role_type: "AccountMembership"
     )
     DataFixup::AddRoleOverridesForNewPermission.run(
       :manage_outcomes,
       :manage_proficiency_scales,
-      base_role_type: 'AccountMembership'
+      base_role_type: "AccountMembership"
     )
   end
 end

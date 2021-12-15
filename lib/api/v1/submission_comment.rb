@@ -37,25 +37,27 @@ module Api::V1::SubmissionComment
 
   def submission_comment_json(submission_comment, user)
     sc_hash = submission_comment.as_json(
-      :include_root => false,
-      :only => %w(id author_id author_name created_at edited_at comment)
+      include_root: false,
+      only: %w[id author_id author_name created_at edited_at comment]
     )
 
     if submission_comment.media_comment?
-      sc_hash['media_comment'] = media_comment_json(
-        :media_id => submission_comment.media_comment_id,
-        :media_type => submission_comment.media_comment_type
+      sc_hash["media_comment"] = media_comment_json(
+        media_id: submission_comment.media_comment_id,
+        media_type: submission_comment.media_comment_type
       )
     end
 
-    sc_hash['attachments'] = submission_comment.attachments.map do |a|
-      attachment_json(a, user)
-    end unless submission_comment.attachments.blank?
+    unless submission_comment.attachments.blank?
+      sc_hash["attachments"] = submission_comment.attachments.map do |a|
+        attachment_json(a, user)
+      end
+    end
     if @current_user && submission_comment.grants_right?(@current_user, :read_author)
-      sc_hash['author'] = user_display_json(submission_comment.author, submission_comment.context)
+      sc_hash["author"] = user_display_json(submission_comment.author, submission_comment.context)
     else
-      if sc_hash.delete('avatar_path')
-        sc_hash['avatar_path'] = User.default_avatar_fallback
+      if sc_hash.delete("avatar_path")
+        sc_hash["avatar_path"] = User.default_avatar_fallback
       end
       sc_hash.merge!({
                        author: {},

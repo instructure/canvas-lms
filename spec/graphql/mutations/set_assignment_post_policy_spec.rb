@@ -102,7 +102,7 @@ describe Mutations::SetAssignmentPostPolicy do
       it "allows setting an automatic post policy when grades have been published" do
         moderated_assignment.update!(grades_published_at: Time.zone.now)
         result = execute_query(mutation_str(assignment_id: moderated_assignment.id, post_manually: false), context)
-        expect(result.dig("data", "setAssignmentPostPolicy")).to have_key('postPolicy')
+        expect(result.dig("data", "setAssignmentPostPolicy")).to have_key("postPolicy")
       end
     end
 

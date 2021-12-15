@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Bundler.require 'redis'
+Bundler.require "redis"
 
 class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
   include ActiveSupport::Cache::SafeRedisRaceCondition
@@ -40,7 +40,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
       datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
       datacenters.each do |dc|
         # Diplomat is silly and doesn't use kwargs for some reason
-        Diplomat::Event.fire(options[:consul_event], 'FLUSHDB', nil, nil, nil, dc)
+        Diplomat::Event.fire(options[:consul_event], "FLUSHDB", nil, nil, nil, dc)
       end
     end
   end

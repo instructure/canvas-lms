@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasHttp::CircuitBreaker do
   let(:redis_client_klass) do
@@ -57,7 +57,7 @@ describe CanvasHttp::CircuitBreaker do
       end
 
       def setnx(key, value)
-        @state[key] = value unless @state.keys.include?(key)
+        @state[key] = value unless @state.key?(key)
       end
 
       def setex(key, ttl, value)

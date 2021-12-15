@@ -26,6 +26,10 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
     @parent_account = account_model
     @course_account.parent_account = @parent_account
     @course_account.save!
+
+    Account.site_admin.enable_feature!(:outcomes_friendly_description)
+    @parent_account.enable_feature!(:improved_outcomes_management)
+    @course_account.enable_feature!(:improved_outcomes_management)
   end
 
   def create_course_fd
@@ -52,6 +56,20 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
                                                             })
   end
 
+  it "correctly detect IOM FF for manually created courses" do
+    course_model(account: Account.default.manually_created_courses_account)
+
+    expect(@course.account.feature_enabled?(:improved_outcomes_management)).to be_falsey
+
+    GraphQL::Batch.batch do
+      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
+        @course.id, "Course"
+      )
+      fd_loader.valid_context? # this is needed to initialize @context
+      expect(fd_loader.friendly_description_enabled?).to be_truthy
+    end
+  end
+
   it "prioritizes course fd" do
     create_course_fd
     create_account_fd
@@ -59,11 +77,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id, 'Course'
+        @course.id, "Course"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @course_fd
-      }
+      end
     end
   end
 
@@ -74,11 +92,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course_account.id, 'Account'
+        @course_account.id, "Account"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @account_fd
-      }
+      end
     end
   end
 
@@ -87,11 +105,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id, 'Course'
+        @course.id, "Course"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @account_fd
-      }
+      end
     end
   end
 
@@ -100,11 +118,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id, 'Course'
+        @course.id, "Course"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @parent_account_fd
-      }
+      end
     end
   end
 
@@ -113,11 +131,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @account.id, 'Account'
+        @account.id, "Account"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @parent_account_fd
-      }
+      end
     end
   end
 
@@ -128,11 +146,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id, 'Course'
+        @course.id, "Course"
       )
-      fd_loader.load(@outcome.id + 1).then { |fd|
+      fd_loader.load(@outcome.id + 1).then do |fd|
         expect(fd).to be_nil
-      }
+      end
     end
   end
 
@@ -141,11 +159,11 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id, 'InvalidContextType'
+        @course.id, "InvalidContextType"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to be_nil
-      }
+      end
     end
   end
 
@@ -154,11 +172,43 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
     GraphQL::Batch.batch do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id + 99, 'Course'
+        @course.id + 99, "Course"
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to be_nil
-      }
+      end
+    end
+  end
+
+  it "resolves to nil if OFD FF disabled" do
+    Account.site_admin.disable_feature!(:outcomes_friendly_description)
+
+    create_course_fd
+
+    GraphQL::Batch.batch do
+      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
+        @course.id, "Course"
+      )
+      fd_loader.load(@outcome.id).then do |fd|
+        expect(fd).to eq nil
+      end
+    end
+  end
+
+  it "resolves to nil if IOM FF disabled" do
+    @parent_account.disable_feature!(:improved_outcomes_management)
+
+    create_course_fd
+    create_account_fd
+    create_parent_account_fd
+
+    GraphQL::Batch.batch do
+      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
+        @course.id, "Course"
+      )
+      fd_loader.load(@outcome.id).then do |fd|
+        expect(fd).to eq nil
+      end
     end
   end
 end

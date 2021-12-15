@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe AdheresToPolicy::ClassMethods do
   before do
@@ -30,14 +30,14 @@ describe AdheresToPolicy::ClassMethods do
   it "filters policy_block through a block filter with set_policy" do
     expect(@some_class).to respond_to(:set_policy)
     expect { @some_class.set_policy(1) }.to raise_error(ArgumentError)
-    b = lambda { 1 }
+    b = -> { 1 }
     expect { @some_class.set_policy(&b) }.not_to raise_error
   end
 
   it "uses set_permissions as set_policy" do
     expect(@some_class).to respond_to(:set_permissions)
     expect { @some_class.set_permissions(1) }.to raise_error(ArgumentError)
-    b = lambda { 1 }
+    b = -> { 1 }
     expect { @some_class.set_permissions(&b) }.not_to raise_error
   end
 

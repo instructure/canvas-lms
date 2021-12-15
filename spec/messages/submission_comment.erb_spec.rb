@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'submission_comment' do
+describe "submission_comment" do
   include MessagesCommon
 
   before :once do
     submission_model
-    @comment = @submission.add_comment(:comment => "new comment")
+    @comment = @submission.add_comment(comment: "new comment")
   end
 
   let(:notification_name) { :submission_comment }
   let(:asset) { @comment }
-  let(:anonymous_user) { 'Anonymous User' }
+  let(:anonymous_user) { "Anonymous User" }
 
   context "anonymous peer disabled" do
     context ".email" do
@@ -85,7 +85,7 @@ describe 'submission_comment' do
     context ".email" do
       let(:path_type) { :email }
 
-      it 'shows anonymous when anonymous peer review enabled' do
+      it "shows anonymous when anonymous peer review enabled" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include(anonymous_user)
       end
@@ -94,7 +94,7 @@ describe 'submission_comment' do
     context ".sms" do
       let(:path_type) { :sms }
 
-      it 'shows anonymous when anonymous peer review enabled' do
+      it "shows anonymous when anonymous peer review enabled" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include(anonymous_user)
       end
@@ -103,7 +103,7 @@ describe 'submission_comment' do
     context ".summary" do
       let(:path_type) { :summary }
 
-      it 'shows anonymous when anonymous peer review enabled' do
+      it "shows anonymous when anonymous peer review enabled" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include(anonymous_user)
       end
@@ -112,7 +112,7 @@ describe 'submission_comment' do
     context ".twitter" do
       let(:path_type) { :twitter }
 
-      it 'shows anonymous when anonymous peer review enabled' do
+      it "shows anonymous when anonymous peer review enabled" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include(anonymous_user)
       end

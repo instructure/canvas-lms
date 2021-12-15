@@ -54,7 +54,7 @@ export default class Placement extends React.Component {
     'link_selection',
     'collaboration',
     'course_assignments_menu',
-    'module_index_menu'
+    'module_index_menu_modal'
   ]
 
   isAlwaysDeeplinking(placementName) {
@@ -68,7 +68,10 @@ export default class Placement extends React.Component {
     ) {
       return false
     }
-    if (placementName === 'module_index_menu' && !ENV.FEATURES.lti_deep_linking_module_index_menu) {
+    if (
+      placementName === 'module_index_menu_modal' &&
+      !ENV.FEATURES.lti_deep_linking_module_index_menu_modal
+    ) {
       return false
     }
     return this.canBeEither.includes(placementName)

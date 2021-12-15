@@ -20,7 +20,7 @@
 
 module Types
   class MessageableContextType < ApplicationObjectType
-    graphql_name 'MessageableContext'
+    graphql_name "MessageableContext"
 
     implements GraphQL::Types::Relay::Node
 

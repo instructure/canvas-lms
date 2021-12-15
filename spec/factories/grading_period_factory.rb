@@ -24,7 +24,7 @@
 module Factories
   def grading_periods(options = {})
     now = Time.zone.now
-    course = options[:context] || @course || course_factory()
+    course = options[:context] || @course || course_factory
     count = options[:count] || 2
 
     default_weights = [1] * count
@@ -38,7 +38,7 @@ module Factories
     period_duration = options[:duration] || 1.month
 
     grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
-    count.times.map do |n|
+    Array.new(count) do |n|
       grading_period_group.grading_periods.create!(
         title: "Period #{n}",
         start_date: start_dates[n],

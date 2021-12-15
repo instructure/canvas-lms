@@ -18,32 +18,32 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../live_events_pact_helper'
+require_relative "../live_events_pact_helper"
 
-RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
-  describe 'assignment_created' do
+RSpec.describe "Canvas LMS Live Events", :pact_live_events do
+  describe "assignment_created" do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
-        event_name: 'assignment_created',
+        event_name: "assignment_created",
         event_subscriber: PactConfig::LiveEventConsumers::QUIZ_LTI
       )
     end
 
-    it 'keeps the contract' do
+    it "keeps the contract" do
       live_event.emit_with do
         params = {
-          :name => "Quizzes.Next",
-          :url => 'http://example.com/launch',
-          :domain => "example.com",
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :privacy_level => 'public',
-          :tool_id => 'Quizzes 2'
+          name: "Quizzes.Next",
+          url: "http://example.com/launch",
+          domain: "example.com",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          privacy_level: "public",
+          tool_id: "Quizzes 2"
         }
         Account.default.context_external_tools.create!(params)
 
         course = course_model
-        course.root_account.settings[:provision] = { 'lti' => 'lti url' }
+        course.root_account.settings[:provision] = { "lti" => "lti url" }
         course.root_account.save!
         course.enable_feature!(:quizzes_next)
 

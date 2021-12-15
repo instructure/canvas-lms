@@ -315,6 +315,7 @@ da:
     turnitin_pledge: "Denne opgaveaflevering er mit personlige, originale arbejde"
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Kontoadministratorer kan altid oprette fag"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Skalaer for opfyldelse af læringsmål for læringsudbytter på konto- og fagniveau"
   account_and_course_level_outcome_proficiencies_1cfa260: "Færdigheder for læringsudbytter på konto- og fagniveau"
   account_and_subaccount_40c6430: "Konto og underkonto"
@@ -427,6 +428,7 @@ da:
       login_handle_name_description: "Det mærke, der bruges til unikke login-identifikatorer. Eksempler: Login, Brugernavn, elev-ID osv."
       unknown_user_url_description: "Den URL, der skal omdirigeres til, når en godkendt bruger ikke kan findes i Canvas."
   account_course_and_user_search_22bf297a: "Konto-, fag- og brugersøgning"
+  account_creation_still_in_progress_ac0e0a18: "Kontooprettelse er stadig i gang"
   account_domain_78f43049: Kontodomæne
   account_domain_lookups_f9d1147e: Kontodomæneopslag
   account_groups_2f301732: Kontogrupper
@@ -981,10 +983,10 @@ da:
       custom_reports: 
         end: 
           parameters: 
-            header: Tilmeldings-status
+            header: "Slut:"
         start: 
           parameters: 
-            header: Tilmeldings-status
+            header: "Start:"
     default_account_quotas_not_updated: "Standardkontoens kvoter blev ikke opdateret"
     default_account_quotas_updated: "Standardkontoens kvoter opdateret"
     devry: 
@@ -1347,7 +1349,7 @@ da:
         media_quota: Mediekvote
         site_admin_quotas: "Kvoter til sideadministratorer"
         student_quota: "Studerendes kvote"
-        update: "Opdater begivenhed"
+        update: Opdatering
       account_roles: "Kontoroller:"
       account_settings_title: Kontoindstillinger
       add_a_custom_help_link: "Opret et brugertilpasset hjælpelink"
@@ -1529,7 +1531,7 @@ da:
       open_registration_delegated_warning_tooltip: "En ekstern identitetsudbyder er aktiveret"
       open_report_description: "Åbn rapportbeskrivelse"
       page_header_title: Kontoindstillinger
-      page_title: "Delt indhold"
+      page_title: Kontoindstillinger
       quiz_ip_filters_delete: "Fjern IP-filter for test"
       quiz_ip_filters_help_message: |-
           IP-filtre for test er en måde til at begrænse adgang til test for computere i et specificeret IP-interval.
@@ -2335,6 +2337,7 @@ da:
       Gør det muligt at sortere svar på diskussioner efter oprettelsestidsstempler
       . Standardrækkefølgen er nyeste til ældste for svar på rodniveau.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillader, at hjælpelinks kan markeres som Fremhævede eller Nye og viser tydeligt det fremhævede hjælpelink i hjælpemenuen."
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Giver instruktører mulighed for at give en score til ikke bedømte afleveringer en masse."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gør, at læringsudbytter kan vælges, når man overfører fagindhold"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillader ændring af meddelelses-indstillinger for ethvert fag fra siden Meddelelses-indstillinger på kontoniveau."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillader indstilling af skalaer og beregningsmetoder for opfyldelse af læringsmål på konto- og fagniveau, hvilket erstatter kriteriebedømmelser og beregningsmetoder for læringsudbytter"
@@ -3273,6 +3276,7 @@ da:
   anonymous_submission_assignment_title_896654de: "Anonym aflevering: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Anonym aflevering kommentarer: Studerende (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Anonym aflevering kommentarer: Studerende (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "Emnet kræver, at funktionsflaget for Diskussioner/beskeder gen-design er aktiveret"
   anonymous_turned_off_8118a0b: "Anonym slået fra"
   anonymous_turned_on_fe56f997: "Anonym slået til"
   anonymous_user: "Anonym bruger"
@@ -3372,6 +3376,7 @@ da:
   apply_date_range_selection_cc4351ed: "Anvend valg af datointerval"
   apply_filter_7e4f6113: "Anvend filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Anvend filtre. Bemærk: Ved at klikke på denne knap bliver siden genindlæst."
+  apply_score_to_ungraded_afd025d0: "Giv score til ikke bedømte"
   apply_settings_10409ad9: "Anvend indstillinger"
   apply_theme_7af08387: "Benyt tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Anvender ny stil til underkonti"
@@ -6690,7 +6695,7 @@ da:
         default_select_folder: "Vælg mappe"
         upload_to: "Upload til"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importér vurderingsindhold som New Quizzes"
+        import_new_quizzes: "Importér vurderingsindhold som *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes er den nye vurderingsfunktion i Canvas.%{p_p}For at lære mere skal du kontakte din systemadministrator eller besøge"
         import_quizzesNext_help_label: "Importér vurdering som New Quizzes-hjælpeikon"
         import_quizzesNext_help_text: "Quizzes.Next er den nye vurderingsmotor til Canvas.%{p_p}For at få flere oplysninger skal du kontakte din systemadministrator eller besøge"
@@ -7764,6 +7769,7 @@ da:
       file_meta: "Eksport af filmetadata mislykkedes"
       files: "Eksport af visse filer mislykkedes"
       grading_standards: "Eksport af karakterstandarder mislykkedes"
+      late_policy: "Eksport af sen-politik lykkedes ikke"
       learning_outcomes: "Eksport af læringsudbytte mislykkedes"
       lti_links: "Eksport af visse eksterne værktøjskonfigurationer mislykkedes"
       media_file: "Det mislykkedes at eksportere en mediefil"
@@ -8649,6 +8655,7 @@ da:
   create_an_ba36d171: "Opret en"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Opret og administrer online test og undersøgelser, både med og uden karakter."
   create_announcements_above_1c36202b: "Opret beskeder ovenfor"
+  create_anonymous_discussion_topics_d573e88e: "Opret anonyme diskussionsemner"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Opret så mange diskussionsemner, du har behov for, som
       opgaver til karaktergivning eller som et forum for fælles ideer og information.
@@ -9877,6 +9884,7 @@ da:
             diskussioner er perfekte til at organisere dybdegående eller langsigtede diskussioner
             , mens fokuserede diskussioner er bedst egnede til kortvarig udveksling.
   discussions_announcements_redesign_901c5528: "Diskussioner/beskeder gen-design"
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "Diskussioner/beskeder gen-design – anonymitet"
   discussions_create_94dff604: "Diskussioner - opret"
   discussions_index_menu_42591bc9: "Indeksmenu for diskussioner"
   discussions_menu_f18eb4a2: Diskussionsmenu
@@ -11262,6 +11270,7 @@ da:
   failed_to_load_apps_db37e651: "Kunne ikke indlæse apps."
   failed_to_load_apps_for_name_fc6ce1c: "Kunne ikke indlæse apps til %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Kunne ikke indlæse opgaver på vigtige datoer."
+  failed_to_load_conversation_messages_9b4546fc: "Kunne ikke indlæse diskussionsbeskeder."
   failed_to_load_course_navigation_for_name_aded3650: "Kunne ikke indlæse fagnavigation for %{name}."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Kunne ikke indlæse fag. Opdater siden for at prøve igen."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Det lykkedes ikke at indlæse CSP-oplysninger, prøv at opdatere siden."
@@ -11344,6 +11353,7 @@ da:
   feature_options_enable_disable_7e748054: "Funktionsindstillinger - aktivér/deaktivér"
   feature_options_view_a170e80c: "Funktionsindstillinger - vis"
   feature_preview_5e1216a0: "Forhåndsvisning af funktion"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Forhåndsvisninger af funktion – tilmelding inkluderer løbende opdateringer uden for den almindelige udgivelsesplan"
   feature_previews_2700a397: "Forhåndsvisninger af funktion"
   feature_previews_account_settings_274440bc: "Forhåndsvisninger af funktion (Kontoindstillinger)"
   feature_previews_enable_disable_707af910: "Forhåndsvisninger af funktion - aktiver / deaktiver"
@@ -11710,6 +11720,7 @@ da:
   full_name_23fdfb6d: "Fulde navn"
   full_name_83cf5453: "Fulde navn"
   full_name_is_required_8efbdc84: "Fuldt navn er påkrævet"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Hel: Studerendes navne og profilbilleder bliver skjult."
   future_5416ea92: Fremtid
   future_terms_7fba2ae6: "Fremtidige semesre"
   galician_7e4508b5: Galicisk
@@ -13236,6 +13247,7 @@ da:
   handlebars_helpers: 
     time: 
       event: "%{date} ved %{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "Er valgt automatisk ud fra dér, hvor kontoens Canvas-opsætning befinder sig. Det kan i nogle tilfælde være en anden region."
   has_similarity_score_d5f332b4: "Har originalitetsscore"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-score"
@@ -13640,6 +13652,7 @@ da:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis dette er deaktiveret, har brugeren stadig adgang til Fagindstillinger. Brugeren kan ikke administrere enkelt fagindhold uden den passende tilladelse for det pågældende indholdselement. Hvis fagsynlighed er begrænset til brugere, der er tilmeldt faget, så giver denne tilladelse brugeren mulighed for at se fagindhold uden at være tilmeldt faget."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Hvis dette er deaktiveret, har brugeren stadig adgang til Fagindstillinger."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Hvis aktiveret, vil adgang til LTI 1.3 og LTI Advantage blive aktiveret."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Hvis aktiveret, tillades dyblinkning fra modulindekset via et modal."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Hvis aktiveret, tillades dyblinkning fra modulindekset."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Hvis aktiveret, tillades mere end det maksimalt mulige resultat på et læringsudbytte, der skal angives på en rubrik."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Hvis aktiveret, er det tilladt at understøtte flere dybe links til opgaver og moduler."
@@ -14000,7 +14013,7 @@ da:
   include_scores_when_alerting_about_grades_89728ae1: "Inkluder scores når der notificeres om karakterer."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultater, når der gives besked om karakterer.
-                Hvis din e-mail ikke er en institution-e-mail, betyder dette at følsomme oplysninger vil blive sendt udenfor institutionen.
+      Hvis din e-mail ikke er en institution-e-mail, betyder dette, at følsomme oplysninger vil blive sendt udenfor institutionen.
   include_speedgrader_in_assignment_header_menu_69cd8656: "Inkluder SpeedGrader i menuen Opgave-overskrift"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Inkluder Datadog RUM JS Agent i dokumentets overskrift."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne opgaves karakterer, når du lægger dem ud på de studerendes informationssystem"
@@ -14263,6 +14276,8 @@ da:
                                     Tag kontakt i #canvas-sre i Slack.
   invalid_restrictions_316cd740: "Ugyldige restriktioner"
   invalid_score_3d247da7: "Ugyldigt resultat"
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Ugyldigt sftp-brugernavn. Vi kunne ikke afgøre, hvilket brugernavn der skulle bruges, da der ikke er noget domæne, der ender på .instructure.\n\
+      Du bedes tage kontakt i #canvas-sre i Slack.   "
   invalid_sis_sync_status_b68db497: "Ugyldig SIS-synkroniseringsstatus"
   invalid_state_parameter_7a5aa108: "Ugyldigt statusparameter"
   invalid_submission_file_type_cda6742a: "Ugyldig filtype for aflevering"
@@ -14852,6 +14867,7 @@ da:
   loading_comment_library_3131e5c6: "Indlæser kommentarbibliotek"
   loading_comments_32366acf: "Indlæser kommentarer"
   loading_compose_modal_f6da0e8b: "Indlæser modal til at komponere"
+  loading_conversation_messages_71e9050e: "Indlæser diskussionsbeskeder"
   loading_courses_409a3641: "Indlæser fag"
   loading_courses_bd1bffe: "Indlæser fag ..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -14862,6 +14878,7 @@ da:
   loading_discussions_8ed5fcd7: "Indlæser diskussioner"
   loading_external_tool_d839042c: "Indlæser eksternt værktøj"
   loading_f99d93d4: "... indlæser"
+  loading_feature_options_82e07ee4: "Indlæser funktionsindstillinger"
   loading_features_d26820f6: "Indlæser funktioner"
   loading_folders_d8b5869e: "Indlæser mapper"
   loading_graders_f6a76142: "Eksaminatorer indlæses"
@@ -16204,7 +16221,6 @@ da:
             
             %{course}, dit fag på Canvas Network startede for et par dage siden, og vi har bemærket, at du ikke har logget ind endnu. Vi ville bare sende dig en sidste påmindelse, hvis du har glemt det.
             
-            
             For at logge ind skal du gå til %{site} og indtaste dit brugernavn og adgangskode. Hvis du ikke har angivet en adgangskode endnu, kan du indstille en her: %{password_url}
             
             Hvis du simpelthen ikke kan deltage i netop dette fag, er du velkommen til at gennemse vores fagkatalog på %{site} for at finde noget andet, der inspirerer dig. Der kommer hele tiden flere fag!
@@ -16251,7 +16267,6 @@ da:
             Hvad kan du gøre for at blive klar?
             
             Hvis du ikke allerede har oprettet din Canvas Network-profil, kan du logge ind og konfigurere den på Canvas.net. Din profil hjælper andre på faget med at vide, hvem du er. Der kan du også konfigurere dine meddelelsespræferencer.
-            
             
             Og du kan gennemgå de nødvendige materialer og eventuelle instruktioner til dit fag her: %{url}
             
@@ -17283,6 +17298,7 @@ da:
   mfa_required_ca66e177: "MFA påkrævet"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP karakter-eksport"
+  miami_utilization_report_9c927880: "Miami udnyttelsesrapport"
   mic_a7f3d311: Mikrofon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 tillader maksimalt %{max} medlemmer i et team."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 tillader maksimalt %{max} ejere i et team."
@@ -17567,6 +17583,8 @@ da:
   modules_group_menu_4aae0d5f: "Gruppemenu for moduler"
   modules_home_page_568c6bb9: "Moduler forside"
   modules_index_menu_c8748e7c: "Indeksmenu for moduler"
+  modules_index_menu_modal_79123a19: "Indeksmenu for moduler (Modal)"
+  modules_index_menu_tray_3f9975d9: "Indeksmenu for moduler (Tray)"
   modules_item_controller: 
     max_score_complete: "scorede ikke mere end *score*"
     max_score_incomplete: "skal ikke score mere end *score*"
@@ -17934,7 +17952,7 @@ da:
       partnerprodukter, bør aktivere denne funktion for at forbedre valideringsarbejdsprocesserne for
       opgavedata. Når denne funktion er aktiveret, viser den de nye SIS
       -integrationsindstillinger for SIS Sync (karaktertilbagesendelse på opgaveniveau) i Konto-
-      indstillinger. Forhåndsvisning af funktionen Slå op til SIS er blevet indarbejdet i denne nye
+      indstillinger. Funktionen Slå op til SIS er blevet indarbejdet i denne nye
       indstilling og vil som standard blive aktiveret.
   new_slack_api_key_453d04d: "Ny Slack api-nøgle"
   new_topic_for_course_3d98222a: "Nyt emne for %{course}"
@@ -18216,7 +18234,7 @@ da:
     blueprint_description: |-
         *Kun instruktør og admin:*
         
-              Indholdet blev synkroniseret fra et blueprint-fag til tilhørende fag
+        Indholdet blev synkroniseret fra et blueprint-fag til tilhørende fag
     blueprint_display: "Blueprint synkronisering"
     calendar_description: "Nye og ændrede elementer i dit fags kalender"
     calendar_display: Kalender
@@ -18251,7 +18269,7 @@ da:
     content_link_error_description: |-
         *Kun instruktør og admin:*
         
-                Placering og indhold af et mislykket link, som en studerende har interageret med
+        Placering og indhold af et mislykket link, som en studerende har interageret med
     content_link_error_display: Indholdslinkfejl
     conversation_created_description: "Du oprettede en diskussion"
     conversation_created_display: "Diskussioner som jeg har oprettet"
@@ -18260,9 +18278,9 @@ da:
     course_content_description: |-
         Skift til fagindhold: 
         
-              * Sideindhold
-              * Testindhold
-              * Opgaveindhold
+        * Sideindhold
+        * Testindhold
+        * Opgaveindhold
     course_content_display: Fagindhold
     discussion_description: "Nyt diskussionsemne i dit fag"
     discussion_display: "Nyt emne"
@@ -18275,8 +18293,8 @@ da:
     grading_description: |-
         Inkluderer: 
         
-              * Opgaver / indtastet/ændret indsendelseskarakter
-              * Ændret karaktervægt
+        * Opgaver / indtastet/ændret indsendelseskarakter
+        * Ændret karaktervægt
     grading_display: Karaktergivning
     grading_notify_include_grade: "Inkluder scorer når der alarmeres om karakterændringer."
     grading_policies_description: "Ændring i fagets karakterbestemmelser"
@@ -18284,21 +18302,21 @@ da:
     invitation_description: |-
         Invitation til: 
         
-              * Webkonference
-              * Gruppe
-              * Samarbejde
-              * Peer review & påmindelse
+        * Webkonference
+        * Gruppe
+        * Samarbejde
+        * Peer review & påmindelse
     invitation_display: Invitation
     late_grading_description: |-
         *Kun instruktør og admin:*
         
-              Sen opgaveindsendelse
+        Sen opgaveindsendelse
     late_grading_display: "Sen karaktergivning"
     membership_update_description: |-
         *Kun admin: afventende tilmelding aktiveret*
         
-              * Gruppetilmelding
-              * godkendt/afvist
+        * Gruppetilmelding
+        * godkendt/afvist
     membership_update_display: "Opdatering af medlemskab"
     missing_description_description: "Til %{category} meddelelser"
     missing_display_display: "Til %{category} meddelelser"
@@ -18383,19 +18401,19 @@ da:
     other_description: |-
         *Kun instruktør og administrator:*
         
-              * Tilmelding til fag
-              * Rapport genereret
-              * Eksport af indhold
-              * Overførselsrapport
-              * Ny kontobruger
-              * Ny studiegruppe
+        * Tilmelding til fag
+        * Rapport genereret
+        * Eksport af indhold
+        * Overførselsrapport
+        * Ny kontobruger
+        * Ny studiegruppe
     other_display: "Administrative meddelelser"
     recording_ready_display: "Optagelse er klar"
     reminder_display: Påmindelse
     student_appointment_description: |-
         *Kun instruktør og administrator:*
         
-              Tilmelding til studieaftale
+        Tilmelding til studieaftale
     student_appointment_display: "Tilmeldinger til studieaftale"
     submission_comment_description: "Kommentar til opgaveaflevering"
     submission_comment_display: Afleveringskommentar
@@ -18589,6 +18607,7 @@ da:
   of_students_5d1af0d2: "antal studerende"
   off_5385ef3f: "Slået fra"
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Off - Politikken gælder ikke for denne underkonto"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Fra: Studerendes navne og profilbilleder er synlige for andre fagdeltagere"
   offensive_abusive_c41dcb08: "Stødende, krænkende"
   offline_score_8d7b4779: "Offline-resultat:"
   offline_web_export_dca67174: "Offline webeksport"
@@ -18698,6 +18717,7 @@ da:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Åbn dialogen for denne genvejstast"
   open_title_in_a_new_window_b29fed77: "Åbn %{title} i et nyt vindue"
   open_to_comments_23d5585e: "Åbn for kommentarer"
+  open_to_do_items_in_a_new_tab_120ea5f4: "Åbn opgaveliste i en ny fane"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect initierings-url"
   opens_in_new_window_b4b99243: "åbnes i et nyt vindue"
   option_1_dea39f90: "Mulighed 1"
@@ -19265,6 +19285,7 @@ da:
   please_provide_a_pairing_code_530d1e9d: "Angiv en parringskode."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Angiv et gyldigt lejerdomæne. Tjek dine Azure Active Directory-indstillinger for at finde det."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Tag kontakt i Slack i #canvas-sre, hvis dette bliver ved med at ske."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Tag kontakt i Slack i #canvas-sre. Den region, som denne kundes Canvas-opsætning befinder sig i, understøtter ikke SFTP."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Tag kontakt i Slack i #canvas-sre for at oprette SFTP for denne konto."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Vælg en studiegruppe til denne opgave"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Vælg en årsag til at rapportere dette svar"
@@ -21692,7 +21713,7 @@ da:
           time_elapsed: "Tid forløbet"
           time_running: "Tilbageværende tid"
         links: 
-          hide_time_running: Skjul
+          hide_time_running: "Skjul tid"
           keep_editing_quiz: "Bliv ved med at redigere testen"
           keep_editing_survey: "Bliv ved med at redigere spørgeundersøgelsen"
     retrieving_filters: "Henter filtre ..."
@@ -21751,7 +21772,7 @@ da:
       errors: 
         connection_lost: "Forbindelse med %{host} gik tabt. Sørg for, at du er koblet til nettet, inden du fortsætter."
         only_numerical_values: "der accepteres kun numeriske værdier"
-      hide_time_link: Skjul
+      hide_time_link: "Skjul tid"
       hours_count: 
         one: "1 time"
         other: "%{count} timer"
@@ -21782,7 +21803,7 @@ da:
       seconds_count: 
         one: "1 sekund"
         other: "%{count} sekunder"
-      show_time_link: Vis
+      show_time_link: "Vis tid"
       titles: 
         come_back_later: "Du afmærkede dette spørgsmål for at vende tilbage senere"
         times_up: "Tiden er udløbet!"
@@ -23424,6 +23445,7 @@ da:
                                     fire timer, før denne nøgle begynder at virke.
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "SFTP-nøglen er ugyldig. Sørg for, at den er korrekt formateret."
   sftp_key_removed_from_user_42318725: "SFTP-nøgle fjernet fra bruger."
+  sftp_region_invalid_216caa40: "SFTP-region ugyldig"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       SFTP-bruger eksisterer allerede eller er deaktiveret.
                                     Tag kontakt i #canvas-sre i Slack.
@@ -25966,6 +25988,7 @@ da:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolio er identificeret som spam. Den er i øjeblikket kun synlig for administratorer og forfatter. Hvis du er sikker på, at dette indhold ikke er spam, kan du markere det som sikkert."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Denne funktion påvirker eksisterende data for alle fag på kontoen."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Denne funktion påvirker eksisterende data for en hel konto."
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Denne funktion giver lærere mulighed for at oprette anonyme diskussioner og aktivere en indstilling på fagniveau, hvorved studerende kan oprette anonyme diskussioner."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Denne funktion giver lærere let mulighed for at kopiere enkelte elementer fra et fag til et andet og dele et enkelt indholdselement med andre brugere, så de også kan importere disse elementer til deres fag."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funktion kan ikke deaktiveres, fordi der er mindst en underkonto eller et fag med denne funktion aktiveret."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denne funktion kan ikke aktiveres, mens autodetektering af feltseparatorer er aktiveret"
@@ -26162,7 +26185,6 @@ da:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Denne rapport viser al aktivitet fra brugere, der er tilmeldt alle fag
         i en given periode. Den resulterende csv-fil har én række pr. studerendes
-        
         aktivitet og følgende overskrifter: sektion-ID, sektion SIS-ID,
         sektionsnavn, fag-ID, fag SIS-ID, fagets navn, semester-ID, semester SIS-ID,
         semestrets navn, bruger-ID, bruger SIS-ID, brugernavn, indholdstype, indhold, gange vist,
@@ -26205,6 +26227,7 @@ da:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Denne bruger kan ikke få adgang til faget på nuværende tidspunkt"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Denne bruger kan ikke få adgang til faget på nuværende tidspunkt\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Denne bruger udførte handlinger, mens anonym var slået fra"
+  this_user_will_be_created_in_3b2a2b52: "Denne bruger oprettes i:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Denne version af Karakteroversigten erstattes af en opdateret Karakteroversigt på eller før den 18. januar 2020."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       Dette skete allerede for billeder i spørgsmålet, men ikke svar,
@@ -28216,6 +28239,7 @@ da:
   view_description_b6d8e52b: "Vis beskrivelse"
   view_due_items_due_today_for_course_coursename_129e433: "Vis %{due} elementer i dag for fag %{courseName}"
   view_faculty_journals_ad0e8c8f: "Vis undervisernotater"
+  view_feature_options_at_an_account_level_a84cedbe: "Se funktionsindstillinger på kontoniveau"
   view_feature_settings_at_an_account_level_ec7f5e10: "Se funktionsindstillinger på kontoniveau"
   view_feedback_b88c99c: "Vis feedback"
   view_feedback_f2feabca: "Vis feedback"
@@ -28422,6 +28446,7 @@ da:
       Når aktiveret, viser dette flag en "Deltag"-knap i Canvas-kalenderbegivenheder
       i de studerendes planlægger
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Når aktiveret, viser dette flag en studentervælger for observatører på oversigten."
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Når denne indstilling er aktiveret, åbner den automatisk elementerne på lærerens opgaveliste i en ny fane."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Når aktiveret, tænder du \"@nævn\"-funktionaliteten i fagdiskussioner."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når man skjuler karakterer for anonyme opgaver, skjules karakterer for alle i faget. Anonymitet vil blive anvendt igen."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når deltagere besøger faget, er det denne side, som de ser. Du kan konfigurere den til at vise de seneste aktiviteter, listen over fagmoduler, en læseplan eller en brugertilpasset side, som du selv skriver. Standard er fagets seneste aktiviteter."

@@ -23,22 +23,22 @@
 # to ensure values are persisted correctly
 describe ReleaseNote do
   around do |example|
-    override_dynamic_settings(private: { canvas: { 'release_notes.yml': {
-      ddb_endpoint: ENV.fetch('DDB_ENDPOINT', 'http://dynamodb:8000/'),
-      ddb_table_name: "canvas_test_release_notes#{ENV.fetch('PARALLEL_INDEX', '')}"
+    override_dynamic_settings(private: { canvas: { "release_notes.yml": {
+      ddb_endpoint: ENV.fetch("DDB_ENDPOINT", "http://dynamodb:8000/"),
+      ddb_table_name: "canvas_test_release_notes#{ENV.fetch("PARALLEL_INDEX", "")}"
     }.to_json } }) do
       ReleaseNotes::DevUtils.initialize_ddb_for_development!(recreate: true)
       example.run
     end
   end
 
-  it 'persists all attributes' do
+  it "persists all attributes" do
     show_at = Time.now.utc - 1.hour
     # For validaton later, since subsecond timestamps are lost and that's fine
     show_at = show_at.change(usec: 0)
     note = ReleaseNote.new
-    note.target_roles = ['student', 'ta']
-    note.set_show_at('prod', show_at)
+    note.target_roles = ["student", "ta"]
+    note.set_show_at("prod", show_at)
     note.published = true
     note.save
     id = note.id
@@ -46,107 +46,107 @@ describe ReleaseNote do
     note = ReleaseNote.find(id)
     expect(note.id).not_to be nil
     expect(note.id).to eq(id)
-    expect(note.target_roles).to eq(['student', 'ta'])
-    expect(note.show_ats).to eq({ 'prod' => show_at })
+    expect(note.target_roles).to eq(["student", "ta"])
+    expect(note.show_ats).to eq({ "prod" => show_at })
     expect(note.published).to be true
   end
 
-  it 'persists languages' do
+  it "persists languages" do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
-    note.target_roles = ['student', 'ta']
-    note.set_show_at('prod', show_at)
+    note.target_roles = ["student", "ta"]
+    note.set_show_at("prod", show_at)
     note.published = true
-    note['en'] = {
-      title: 'a title',
-      description: 'a description',
-      url: 'https://example.com'
+    note["en"] = {
+      title: "a title",
+      description: "a description",
+      url: "https://example.com"
     }
     note.save
     id = note.id
 
     note = ReleaseNote.find(id)
-    expect(note['en']).not_to be nil
-    expect(note['en'][:title]).to eq('a title')
-    expect(note['en'][:description]).to eq('a description')
-    expect(note['en'][:url]).to eq('https://example.com')
+    expect(note["en"]).not_to be nil
+    expect(note["en"][:title]).to eq("a title")
+    expect(note["en"][:description]).to eq("a description")
+    expect(note["en"][:url]).to eq("https://example.com")
   end
 
-  it 'shows the notes in latest by category when published' do
+  it "shows the notes in latest by category when published" do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
-    note.target_roles = ['student', 'ta']
-    note.set_show_at('prod', show_at)
+    note.target_roles = ["student", "ta"]
+    note.set_show_at("prod", show_at)
     note.published = true
     note.save
     id = note.id
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(1)
     expect(notes.first.id).to eq(id)
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'teacher')
+    notes = ReleaseNote.latest(env: "prod", role: "teacher")
     expect(notes.length).to eq(0)
   end
 
-  it 'does not show the notes in latest except when published' do
+  it "does not show the notes in latest except when published" do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
-    note.target_roles = ['student', 'ta']
-    note.set_show_at('prod', show_at)
+    note.target_roles = ["student", "ta"]
+    note.set_show_at("prod", show_at)
     note.published = false
     note.save
     id = note.id
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(0)
 
     note.published = true
     note.save
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(1)
     expect(notes.first.id).to eq(id)
 
     note.published = false
     note.save
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(0)
   end
 
-  it 'remvoves published notes when deleted' do
+  it "remvoves published notes when deleted" do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
-    note.target_roles = ['student', 'ta']
-    note.set_show_at('prod', show_at)
+    note.target_roles = ["student", "ta"]
+    note.set_show_at("prod", show_at)
     note.published = true
     note.save
     id = note.id
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(1)
     expect(notes.first.id).to eq(id)
 
     note.delete
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(0)
   end
 
-  it 'does not show future notes' do
+  it "does not show future notes" do
     show_at = Time.now.utc + 1.hour
     note = ReleaseNote.new
-    note.target_roles = ['student', 'ta']
-    note.set_show_at('prod', show_at)
+    note.target_roles = ["student", "ta"]
+    note.set_show_at("prod", show_at)
     note.published = true
     note.save
 
-    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    notes = ReleaseNote.latest(env: "prod", role: "student")
     expect(notes.length).to eq(0)
   end
 
-  it 'paginates correctly' do
+  it "paginates correctly" do
     # Custom times to ensure that they are returned in the right order, since the serialized timestamps have second precision
     note = ReleaseNote.new
     note.instance_variable_set(:@created_at, Time.now.utc - 20.minutes)
@@ -164,7 +164,7 @@ describe ReleaseNote do
     id_3 = note.id
 
     pager = ReleaseNote.paginated
-    page1 = pager.paginate(:per_page => 2)
+    page1 = pager.paginate(per_page: 2)
     expect(page1.length).to eq(2)
     expect(page1.next_page).to be_truthy
     expect(page1[0].id).to eq(id_3)

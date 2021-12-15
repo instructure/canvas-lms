@@ -74,14 +74,14 @@ module Canvas
           @raised_error = nil
           begin
             begin
-              raise RuntimeError, "FOO"
+              raise "FOO"
             rescue RuntimeError
               raise ArgumentError, "Test Message"
             end
           rescue ArgumentError
             raise StandardError, "TopException"
           end
-        rescue StandardError => e
+        rescue => e
           @raised_error = e
           @entry = LogEntry.new(e, data)
         end

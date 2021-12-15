@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class ObserverAlertsApiController < ApplicationController
   include Api::V1::ObserverAlert
@@ -58,10 +58,10 @@ class ObserverAlertsApiController < ApplicationController
     return render_unauthorized_action unless alert.observer_id == @current_user.id && alert.users_are_still_linked?
 
     case params[:workflow_state]
-    when 'read'
-      alert.workflow_state = 'read'
-    when 'dismissed'
-      alert.workflow_state = 'dismissed'
+    when "read"
+      alert.workflow_state = "read"
+    when "dismissed"
+      alert.workflow_state = "dismissed"
     end
 
     if alert.save

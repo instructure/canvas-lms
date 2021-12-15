@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
-require 'controller_view'
+require "hash_view"
+require "controller_view"
 
 class ControllerListView < HashView
   def initialize(name, controllers)
@@ -31,20 +31,20 @@ class ControllerListView < HashView
   end
 
   def symbolic_name
-    @name.underscore.gsub(/\s+/, '_')
+    @name.underscore.gsub(/\s+/, "_")
   end
 
   def config_domain_yaml
-    YAML.load(File.read(File.join(Rails.root, 'config', 'domain.yml'))) if File.exist?(File.join(Rails.root, 'config', 'domain.yml'))
+    YAML.safe_load(Rails.root.join("config/domain.yml").read) if Rails.root.join("config/domain.yml").file?
   end
 
   def canvas_url
     if (config = config_domain_yaml[Rails.env])
-      if config['ssl']
+      if config["ssl"]
         "https://"
       else
         "http://"
-      end + config['domain']
+      end + config["domain"]
     end
   end
 
@@ -58,7 +58,7 @@ class ControllerListView < HashView
 
   def swagger_reference
     {
-      "path" => '/' + swagger_file,
+      "path" => "/" + swagger_file,
       "description" => @name,
     }
   end

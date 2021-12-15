@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/k5_dashboard_page'
-require_relative '../pages/k5_dashboard_common_page'
-require_relative '../pages/k5_schedule_tab_page'
-require_relative '../../../helpers/k5_common'
-require_relative '../shared_examples/k5_schedule_shared_examples'
-require_relative '../../grades/setup/gradebook_setup'
+require_relative "../../common"
+require_relative "../pages/k5_dashboard_page"
+require_relative "../pages/k5_dashboard_common_page"
+require_relative "../pages/k5_schedule_tab_page"
+require_relative "../../../helpers/k5_common"
+require_relative "../shared_examples/k5_schedule_shared_examples"
+require_relative "../../grades/setup/gradebook_setup"
 
 describe "student k5 dashboard schedule" do
   include_context "in-process server selenium tests"
@@ -42,14 +42,14 @@ describe "student k5 dashboard schedule" do
     @now = Time.zone.now
   end
 
-  context 'student events and todos' do
+  context "student events and todos" do
     let(:title) { "Student Todo" }
 
     before :once do
       @student.planner_notes.create!(todo_date: Time.zone.now, title: title)
     end
 
-    it 'shows student todo in modal when todo title selected' do
+    it "shows student todo in modal when todo title selected" do
       get "/#schedule"
 
       expect(todo_edit_pencil).to be_displayed
@@ -59,7 +59,7 @@ describe "student k5 dashboard schedule" do
       expect(todo_editor_modal).to be_displayed
     end
 
-    it 'provide close without edit button', ignore_js_errors: true do
+    it "provide close without edit button", ignore_js_errors: true do
       get "/#schedule"
 
       click_todo_edit_pencil
@@ -71,7 +71,7 @@ describe "student k5 dashboard schedule" do
       expect(todo_item).to include_text(title)
     end
 
-    it 'updates student todo with modal' do
+    it "updates student todo with modal" do
       get "/#schedule"
 
       click_todo_edit_pencil
@@ -83,8 +83,8 @@ describe "student k5 dashboard schedule" do
     end
   end
 
-  context 'student-created events' do
-    it 'shows student-created calender event info when selected' do
+  context "student-created events" do
+    it "shows student-created calender event info when selected" do
       title = "Student Event"
       @student.calendar_events.create!(title: title, start_at: Time.zone.now)
 
@@ -99,9 +99,9 @@ describe "student k5 dashboard schedule" do
     end
   end
 
-  context 'missing items dropdown' do
-    it 'finds no missing dropdown if there are no missing items' do
-      assignment = create_dated_assignment(@subject_course, 'missing assignment', @now)
+  context "missing items dropdown" do
+    it "finds no missing dropdown if there are no missing items" do
+      assignment = create_dated_assignment(@subject_course, "missing assignment", @now)
       assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
 
       get "/#schedule"
@@ -109,27 +109,27 @@ describe "student k5 dashboard schedule" do
       expect(items_missing_exists?).to be_falsey
     end
 
-    it 'finds the missing dropdown if there are missing items' do
-      create_dated_assignment(@subject_course, 'missing assignment', 1.day.ago(@now))
+    it "finds the missing dropdown if there are missing items" do
+      create_dated_assignment(@subject_course, "missing assignment", 1.day.ago(@now))
 
       get "/#schedule"
 
       expect(items_missing_exists?).to be_truthy
     end
 
-    it 'shows missing items and count if there are missing items' do
-      create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
-      create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
+    it "shows missing items and count if there are missing items" do
+      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
+      create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(@now))
 
       get "/#schedule"
 
-      expect(missing_data.text).to eq('Show 2 missing items')
+      expect(missing_data.text).to eq("Show 2 missing items")
     end
 
-    it 'shows the list of missing assignments in dropdown' do
-      skip('LS-2203 click_missing items is not working right all the time. unskip when fixed')
-      assignment1 = create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
-      create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
+    it "shows the list of missing assignments in dropdown" do
+      skip("LS-2203 click_missing items is not working right all the time. unskip when fixed")
+      assignment1 = create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
+      create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(@now))
 
       get "/#schedule"
       wait_for_ajaximations
@@ -140,13 +140,13 @@ describe "student k5 dashboard schedule" do
       assignments_list = missing_assignments
 
       expect(assignments_list.count).to eq(2)
-      expect(assignments_list.first.text).to include('missing assignment1')
+      expect(assignments_list.first.text).to include("missing assignment1")
       expect(assignment_link(missing_assignments[0], @subject_course.id, assignment1.id)).to be_displayed
     end
 
-    it 'clicking list twice hides missing assignments' do
-      skip('LS-2203 click_missing items is not working right all the time. unskip when fixed')
-      create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
+    it "clicking list twice hides missing assignments" do
+      skip("LS-2203 click_missing items is not working right all the time. unskip when fixed")
+      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
 
       get "/#schedule"
       wait_for_ajaximations
@@ -164,8 +164,8 @@ describe "student k5 dashboard schedule" do
     end
   end
 
-  context 'course-scoped schedule tab included student-only items' do
-    it 'has todo capabilities for specific student course', custom_timeout: 20 do
+  context "course-scoped schedule tab included student-only items" do
+    it "has todo capabilities for specific student course", custom_timeout: 20 do
       title = "Student Course Todo"
       @student.planner_notes.create!(todo_date: Time.zone.now, title: title, course_id: @subject_course.id)
 
@@ -178,7 +178,7 @@ describe "student k5 dashboard schedule" do
     end
   end
 
-  context 'schedule shared examples' do
-    it_behaves_like 'k5 schedule'
+  context "schedule shared examples" do
+    it_behaves_like "k5 schedule"
   end
 end

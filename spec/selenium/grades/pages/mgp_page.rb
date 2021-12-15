@@ -35,12 +35,12 @@ module GradingStandards
     end
 
     def search_box
-      f('.GradingPeriodSearchField input')
+      f(".GradingPeriodSearchField input")
     end
 
     # Set components
     def set_name_input
-      f('#set-name')
+      f("#set-name")
     end
 
     def term_input
@@ -88,16 +88,16 @@ module GradingStandards
     end
 
     def first_collapsed_set
-      f('.GradingPeriodSet--collapsed')
+      f(".GradingPeriodSet--collapsed")
     end
 
     def all_sets_css
-      '.GradingPeriodSet__title'
+      ".GradingPeriodSet__title"
     end
 
     # Period components
     def period_title_input
-      f('#title')
+      f("#title")
     end
 
     def start_date_input
@@ -113,7 +113,7 @@ module GradingStandards
     end
 
     def weight_input
-      f('#weight')
+      f("#weight")
     end
 
     def save_period_button
@@ -121,11 +121,11 @@ module GradingStandards
     end
 
     def grading_period_list
-      f('.GradingPeriodList')
+      f(".GradingPeriodList")
     end
 
     def period_css
-      '.GradingPeriodList__period span'
+      ".GradingPeriodList__period span"
     end
 
     def period_delete_button
@@ -229,15 +229,15 @@ module GradingStandards
       all_sets.each do |title|
         if title.text == set_name then return title end
       end
-      return nil
+      nil
     end
 
     def grading_period_set_displayed?(set_name)
       set = find_set(set_name)
       if set.nil?
-        return false
+        false
       else
-        return set.displayed?
+        set.displayed?
       end
     end
 
@@ -249,13 +249,13 @@ module GradingStandards
       all_periods.each do |period|
         if period.text == period_name then return period end
       end
-      return nil
+      nil
     end
 
     def add_grading_period_link_displayed?
       link = add_grading_period_link
       if link.nil?
-        return false
+        false
       else
         link.displayed?
       end
@@ -264,7 +264,7 @@ module GradingStandards
     def grading_period_displayed?(period_name)
       period = find_period(period_name)
       if period.nil?
-        return false
+        false
       else
         period.displayed?
       end

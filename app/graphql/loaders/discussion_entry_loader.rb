@@ -36,7 +36,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       scope = scope_for(object)
       scope = scope.reorder("created_at #{@sort_order}")
 
-      if @filter == 'drafts'
+      if @filter == "drafts"
         object.shard.activate do
           drafts = scope.map do |draft|
             de = DiscussionEntry.new(id: -draft.id,
@@ -47,7 +47,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
                                      user_id: @current_user.id,
                                      created_at: draft.created_at,
                                      updated_at: draft.updated_at,
-                                     workflow_state: 'active')
+                                     workflow_state: "active")
             de.readonly!
             de
           end
@@ -59,8 +59,12 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       if @search_term.present?
         # search results cannot look at the messages from deleted
         # discussion_entries, so they need to be excluded.
-        scope = scope.active.joins(:user).where(UserSearch.like_condition('message'), pattern: UserSearch.like_string_for(@search_term))
-                     .or(scope.joins(:user).where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(@search_term)))
+        scope = if object.is_a?(DiscussionTopic) && object.anonymous_state != "full_anonymity"
+                  scope.active.joins(:user).where(UserSearch.like_condition("message"), pattern: UserSearch.like_string_for(@search_term))
+                       .or(scope.joins(:user).where(UserSearch.like_condition("users.name"), pattern: UserSearch.like_string_for(@search_term)))
+                else
+                  scope.active.where(UserSearch.like_condition("message"), pattern: UserSearch.like_string_for(@search_term))
+                end
       end
 
       if @root_entries
@@ -82,17 +86,17 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       end
 
       # unread filter is used like search results and need to exclude deleted entries
-      scope = scope.active.unread_for_user(@current_user) if @filter == 'unread'
-      scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
+      scope = scope.active.unread_for_user(@current_user) if @filter == "unread"
+      scope = scope.where(workflow_state: "deleted") if @filter == "deleted"
       scope = scope.preload(:user, :editor)
       fulfill(object, scope)
     rescue ActiveRecord::RecordNotFound
-      raise GraphQL::ExecutionError, 'relative entry not found'
+      raise GraphQL::ExecutionError, "relative entry not found"
     end
   end
 
   def scope_for(object)
-    if @filter == 'drafts'
+    if @filter == "drafts"
       object.discussion_entry_drafts.where(user: @current_user, discussion_entry_id: nil)
     elsif object.is_a?(DiscussionTopic)
       object.discussion_entries

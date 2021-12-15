@@ -42,7 +42,7 @@ SearchItemSelector.defaultProps = {
 }
 
 function isSearchableTerm(value) {
-  return value.length === 0 || value.length >= MINIMUM_SEARCH_LENGTH
+  return value.length >= MINIMUM_SEARCH_LENGTH
 }
 
 export default function SearchItemSelector({

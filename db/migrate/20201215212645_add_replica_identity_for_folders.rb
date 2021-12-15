@@ -22,13 +22,13 @@ class AddReplicaIdentityForFolders < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Folder', :root_account_id, 0
-    remove_index :folders, name: 'index_folders_on_root_account_id', if_exists: true
+    add_replica_identity "Folder", :root_account_id, 0
+    remove_index :folders, name: "index_folders_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :folders, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'Folder'
+    remove_replica_identity "Folder"
     change_column_null :folders, :root_account_id, true
   end
 end

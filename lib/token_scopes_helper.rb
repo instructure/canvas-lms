@@ -19,6 +19,6 @@
 #
 module TokenScopesHelper
   def self.scope_from_route(route)
-    "url:#{route.verb}|#{route.path.spec.to_s.gsub(/\(\.:format\)$/, '')}"
+    "url:#{route.verb}|#{route.path.spec.to_s.gsub(/\(\.:format\)$/, "")}"
   end
 end

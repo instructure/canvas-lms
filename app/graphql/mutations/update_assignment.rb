@@ -68,7 +68,7 @@ class Mutations::UpdateAssignment < Mutations::AssignmentBase
     module_ids = prepare_module_ids!(input_hash)
 
     # make sure to do other required updates
-    self.send(other_update_on_assignment) if other_update_on_assignment
+    send(other_update_on_assignment) if other_update_on_assignment
 
     # ensure the assignment is part of all required modules
     ensure_modules(module_ids) if module_ids

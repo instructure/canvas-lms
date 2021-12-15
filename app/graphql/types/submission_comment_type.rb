@@ -26,7 +26,7 @@ class SubmissionCommentReadLoader < GraphQL::Batch::Loader
   def perform(submission_comments)
     vsc = ViewedSubmissionComment
           .where(submission_comment_id: submission_comments, user: @current_user)
-          .pluck('submission_comment_id')
+          .pluck("submission_comment_id")
           .to_set
 
     submission_comments.each do |sc|
@@ -37,7 +37,7 @@ end
 
 module Types
   class SubmissionCommentType < ApplicationObjectType
-    graphql_name 'SubmissionComment'
+    graphql_name "SubmissionComment"
 
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface

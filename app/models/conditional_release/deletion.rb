@@ -24,7 +24,7 @@ module ConditionalRelease
     extend ActiveSupport::Concern
 
     included do
-      scope :active, -> { where(:deleted_at => nil) }
+      scope :active, -> { where(deleted_at: nil) }
 
       alias_method :destroy_permanently!, :destroy
       def destroy

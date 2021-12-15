@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+require_relative "../common"
 
 describe "Discussion Topic Show" do
   include_context "in-process server selenium tests"
@@ -24,11 +24,11 @@ describe "Discussion Topic Show" do
   context "when Discussions Redesign feature flag is ON" do
     before :once do
       Account.default.enable_feature!(:react_discussions_post)
-      course_with_teacher(active_course: true, active_all: true, name: 'teacher')
-      @topic_title = 'Our Discussion Topic'
+      course_with_teacher(active_course: true, active_all: true, name: "teacher")
+      @topic_title = "Our Discussion Topic"
       @topic = @course.discussion_topics.create!(
         title: @topic_title,
-        discussion_type: 'threaded',
+        discussion_type: "threaded",
         posted_at: "2017-07-09 16:32:34",
         user: @teacher
       )
@@ -66,21 +66,35 @@ describe "Discussion Topic Show" do
       end
     end
 
+    it "Displays when all features are turned on" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussions_reporting
+      Account.site_admin.enable_feature! :discussion_anonymity
+
+      gc = @course.account.group_categories.create(name: "Group Category")
+      group = group_model(name: "Group", group_category: gc, context: @course.account)
+      group_membership_model(group: group, user: @teacher)
+      topic = discussion_topic_model(context: group)
+
+      get "/groups/#{group.id}/discussion_topics/#{topic.id}"
+      expect(fj("h1:contains('value for title')")).to be_present
+    end
+
     it "has a module progression section when applicable" do
-      module1 = @course.context_modules.create!(:name => "module1")
+      module1 = @course.context_modules.create!(name: "module1")
       item1 = @course.assignments.create!(
-        :name => "First Item",
-        :submission_types => ["online_text_entry"],
-        :points_possible => 20
+        name: "First Item",
+        submission_types: ["online_text_entry"],
+        points_possible: 20
       )
-      module1.add_item(:id => item1.id, :type => 'assignment')
+      module1.add_item(id: item1.id, type: "assignment")
       item2 = @course.discussion_topics.create!(
-        title: 'Second Item',
-        discussion_type: 'threaded',
+        title: "Second Item",
+        discussion_type: "threaded",
         posted_at: "2017-07-09 16:32:34",
         user: @teacher
       )
-      module1.add_item(:id => item2.id, :type => 'discussion_topic')
+      module1.add_item(id: item2.id, type: "discussion_topic")
       get "/courses/#{@course.id}/discussion_topics/#{item2.id}"
       expect(f("a[aria-label='Previous Module Item']")).to be_present
     end
@@ -92,7 +106,7 @@ describe "Discussion Topic Show" do
 
       it "loads older replies" do
         parent_reply = @topic.discussion_entries.create!(
-          user: @teacher, message: 'I am the parent entry'
+          user: @teacher, message: "I am the parent entry"
         )
         (1..6).each do |number|
           @topic.discussion_entries.create!(
@@ -118,19 +132,20 @@ describe "Discussion Topic Show" do
       end
 
       it "can mention users in the reply" do
-        student_in_course(course: @course, name: 'Jeff', active_all: true).user
-        student_in_course(course: @course, name: 'Jefferson', active_all: true).user
-        student_in_course(course: @course, name: 'Jeffrey', active_all: true).user
+        student_in_course(course: @course, name: "Jeff", active_all: true).user
+        student_in_course(course: @course, name: "Jefferson", active_all: true).user
+        student_in_course(course: @course, name: "Jeffrey", active_all: true).user
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         f("button[data-testid='discussion-topic-reply']").click
         wait_for_ajaximations
-        type_in_tiny 'textarea', '@'
+        type_in_tiny "textarea", "@"
         wait_for_ajaximations
         driver.action.send_keys(:arrow_down).perform # Jefferson
         driver.action.send_keys(:arrow_down).perform # Jeffrey
         driver.action.send_keys(:enter).perform
         wait_for_ajaximations
         driver.action.send_keys("HI!").perform
+        wait_for_ajaximations
         fj("button:contains('Reply')").click
         wait_for_ajaximations
         expect(fj("p:contains('@JeffreyHI!')")).to be_present

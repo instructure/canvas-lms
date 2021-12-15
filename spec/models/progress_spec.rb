@@ -19,7 +19,7 @@
 #
 
 describe Progress do
-  describe '#process_job' do
+  describe "#process_job" do
     before do
       stub_const("Jerbs", Class.new do
         cattr_accessor :flag

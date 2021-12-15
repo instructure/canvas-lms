@@ -667,9 +667,9 @@ class AuthenticationProvidersController < ApplicationController
     unless AuthenticationProvider.valid_auth_types.include?(aac_data[:auth_type])
       msg =
         "invalid or missing auth_type '#{aac_data[:auth_type]}', must be one of #{
-          AuthenticationProvider.valid_auth_types.join(',')
+          AuthenticationProvider.valid_auth_types.join(",")
         }"
-      return render(status: 400, json: { errors: [{ message: msg }] })
+      return render(status: :bad_request, json: { errors: [{ message: msg }] })
     end
 
     position = aac_data.delete(:position)
@@ -688,7 +688,7 @@ class AuthenticationProvidersController < ApplicationController
         end
         format.json do
           msg = "duplicate provider #{account_config.auth_type}"
-          render json: { errors: [{ message: msg }] }, status: 422
+          render json: { errors: [{ message: msg }] }, status: :unprocessable_entity
         end
       end
       return
@@ -738,11 +738,11 @@ class AuthenticationProvidersController < ApplicationController
 
     if aac.auth_type != data[:auth_type]
       render(json: {
-               message: t('no_changing_auth_types',
-                          'Can not change type of authorization config, '\
-                          'please delete and create new config.')
+               message: t("no_changing_auth_types",
+                          "Can not change type of authorization config, "\
+                          "please delete and create new config.")
              },
-             status: 400)
+             status: :bad_request)
       return
     end
 
@@ -781,7 +781,7 @@ class AuthenticationProvidersController < ApplicationController
   # @returns AuthenticationProvider
   def show
     aac = @account.authentication_providers.active.find(params[:id])
-    return if aac.auth_type != 'canvas' && !require_root_account_management
+    return if aac.auth_type != "canvas" && !require_root_account_management
 
     render json: aac_json(aac)
   rescue ActiveRecord::RecordNotFound
@@ -873,24 +873,24 @@ class AuthenticationProvidersController < ApplicationController
     results = []
     ldap_providers(@account).each do |config|
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_connection_test => config.test_ldap_connection
+        account_authorization_config_id: config.id,
+        ldap_connection_test: config.test_ldap_connection
       }
-      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
     end
-    render :json => results
+    render json: results
   end
 
   def test_ldap_bind
     results = []
     ldap_providers(@account).each do |config|
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_bind_test => config.test_ldap_bind
+        account_authorization_config_id: config.id,
+        ldap_bind_test: config.test_ldap_bind
       }
-      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
     end
-    render :json => results
+    render json: results
   end
 
   def test_ldap_search
@@ -898,47 +898,47 @@ class AuthenticationProvidersController < ApplicationController
     ldap_providers(@account).each do |config|
       res = config.test_ldap_search
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_search_test => res
+        account_authorization_config_id: config.id,
+        ldap_search_test: res
       }
-      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
     end
-    render :json => results
+    render json: results
   end
 
   def test_ldap_login
     results = []
     unless params[:username]
       return render(
-        :json => { :errors => { :login => t(:login_required, 'must be supplied') } },
-        :status_code => 400
+        json: { errors: { login: t(:login_required, "must be supplied") } },
+        status_code: 400
       )
     end
     unless params[:password]
       return render(
-        :json => { :errors => { :password => t(:password_required, 'must be supplied') } },
-        :status_code => 400
+        json: { errors: { password: t(:password_required, "must be supplied") } },
+        status_code: 400
       )
     end
 
     ldap_providers(@account).each do |config|
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
+        account_authorization_config_id: config.id,
+        ldap_login_test: config.test_ldap_login(params[:username], params[:password])
       }
-      results << h.merge({ :errors => config.errors.map { |attr, msg| { attr => msg } } })
+      results << h.merge({ errors: config.errors.map { |attr, msg| { attr => msg } } })
     end
 
     if results.empty?
       return render(
-        :json => { :errors => { :account => t(:account_required, 'must be LDAP-authenticated') } },
-        :status_code => 400
+        json: { errors: { account: t(:account_required, "must be LDAP-authenticated") } },
+        status_code: 400
       )
     end
 
     render(
-      :json => results,
-      :status_code => 200
+      json: results,
+      status_code: 200
     )
   end
 
@@ -950,7 +950,7 @@ class AuthenticationProvidersController < ApplicationController
   def start_debugging
     ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
 
-    return render(status: 400, json: { errors: ["Unsupported authentication type"] }) unless ap.class.supports_debugging?
+    return render(status: :bad_request, json: { errors: ["Unsupported authentication type"] }) unless ap.class.supports_debugging?
 
     ap.start_debugging
     debug_data(ap)
@@ -959,19 +959,19 @@ class AuthenticationProvidersController < ApplicationController
   def debug_data(ap = nil)
     unless ap
       ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
-      return render(status: 400, json: { errors: ["Provider is not currently debugging"] }) unless ap.debugging?
+      return render(status: :bad_request, json: { errors: ["Provider is not currently debugging"] }) unless ap.debugging?
     end
 
     respond_to do |format|
       format.html do
-        render partial: 'debug_data',
+        render partial: "debug_data",
                locals: { provider: ap },
                layout: false
       end
       format.json do
         render json: {
           debugging: ap.debugging?,
-          debug_data: render_to_string(partial: 'debug_data',
+          debug_data: render_to_string(partial: "debug_data",
                                        locals: { provider: ap },
                                        formats: [:html],
                                        layout: false)
@@ -998,8 +998,8 @@ class AuthenticationProvidersController < ApplicationController
     data = data.reject { |k, _| klass.site_admin_params.include?(k.to_sym) } unless @domain_root_account.grants_right?(@current_user, :manage_site_settings)
     data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type
-    if data[:auth_type] == 'ldap'
-      data[:auth_over_tls] = 'start_tls' unless data.key?(:auth_over_tls)
+    if data[:auth_type] == "ldap"
+      data[:auth_over_tls] = "start_tls" unless data.key?(:auth_over_tls)
       data[:auth_over_tls] = AuthenticationProvider::LDAP.auth_over_tls_setting(data[:auth_over_tls])
     end
     data
@@ -1026,14 +1026,14 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   def deselect_parent_registration(data, aac = nil)
-    if data[:parent_registration] == 'true' || data[:parent_registration] == '1'
+    if data[:parent_registration] == "true" || data[:parent_registration] == "1"
       auth_providers = @account.authentication_providers
-      auth_providers = auth_providers.where('id <> ?', aac) if aac
+      auth_providers = auth_providers.where.not(id: aac) if aac
       auth_providers.update_all(parent_registration: false)
     end
   end
 
   def ldap_providers(account)
-    account.authentication_providers.active.where(auth_type: 'ldap')
+    account.authentication_providers.active.where(auth_type: "ldap")
   end
 end

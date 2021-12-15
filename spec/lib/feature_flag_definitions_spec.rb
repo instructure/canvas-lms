@@ -31,12 +31,12 @@ describe "feature_flag_definition_spec" do
   end
 
   FeatureFlags::Loader.load_yaml_files.each do |name, definition|
-    [:custom_transition_proc, :after_state_change_proc, :visible_on].each do |hook|
-      if definition[hook]
-        hook_name = definition[hook]
-        it "#{name} hook for #{hook} (#{hook_name}) should exist in FeatureFlags::Hooks as a static method" do
-          expect(FeatureFlags::Hooks.respond_to?(hook_name)).to be true
-        end
+    %i[custom_transition_proc after_state_change_proc visible_on].each do |hook|
+      next unless definition[hook]
+
+      hook_name = definition[hook]
+      it "#{name} hook for #{hook} (#{hook_name}) should exist in FeatureFlags::Hooks as a static method" do
+        expect(FeatureFlags::Hooks.respond_to?(hook_name)).to be true
       end
     end
   end

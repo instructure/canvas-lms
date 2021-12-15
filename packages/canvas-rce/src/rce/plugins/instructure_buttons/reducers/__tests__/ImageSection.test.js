@@ -50,6 +50,34 @@ describe('imageSection()', () => {
     })
   })
 
+  it('handles "StartLoading" actions', () => {
+    expect(subject({type: 'StartLoading'})).toMatchObject({
+      ...defaultState,
+      loading: true
+    })
+  })
+
+  it('handles "StopLoading" actions', () => {
+    expect(subject({type: 'StopLoading'})).toMatchObject({
+      ...defaultState,
+      loading: false
+    })
+  })
+
+  it('handles "SetImage" actions', () => {
+    expect(subject({type: 'SetImage', payload: 'img'})).toMatchObject({
+      ...defaultState,
+      image: 'img'
+    })
+  })
+
+  it('handles "SetImageName" actions', () => {
+    expect(subject({type: 'SetImageName', payload: 'name'})).toMatchObject({
+      ...defaultState,
+      imageName: 'name'
+    })
+  })
+
   describe('with an invalid action', () => {
     expect(() => subject({type: 'Banana'})).toThrow('Unknown action for image selection reducer')
   })

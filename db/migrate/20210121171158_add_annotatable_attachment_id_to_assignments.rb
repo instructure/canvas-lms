@@ -33,7 +33,7 @@ class AddAnnotatableAttachmentIdToAssignments < ActiveRecord::Migration[5.2]
                   if_not_exists: true
     add_index :assignments,
               :annotatable_attachment_id,
-              where: 'annotatable_attachment_id IS NOT NULL',
+              where: "annotatable_attachment_id IS NOT NULL",
               algorithm: :concurrently,
               if_not_exists: true
   end

@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'web_conference_invitation' do
+describe "web_conference_invitation" do
   before :once do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.create!(name: 'wimba')
-    @plugin.update_attribute(:settings, { domain: 'www.example.com' })
-    course_model(:reusable => true)
-    @object = @course.web_conferences.create!(conference_type: 'Wimba',
+    @plugin = PluginSetting.create!(name: "wimba")
+    @plugin.update_attribute(:settings, { domain: "www.example.com" })
+    course_model(reusable: true)
+    @object = @course.web_conferences.create!(conference_type: "Wimba",
                                               user: user_factory)
   end
 

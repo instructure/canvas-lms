@@ -18,24 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'Canvadoc' do
+describe "Canvadoc" do
   def stub_upload
-    expectation = receive(:upload).and_return "id" => 123456, "status" => "pending"
+    expectation = receive(:upload).and_return "id" => 123_456, "status" => "pending"
     allow_any_instance_of(Canvadocs::API).to expectation
     expectation
   end
 
   before do
-    PluginSetting.create! :name => 'canvadocs',
-                          :settings => { "api_key" => "blahblahblahblahblah",
-                                         "base_url" => "http://example.com",
-                                         "annotations_supported" => true }
+    PluginSetting.create! name: "canvadocs",
+                          settings: { "api_key" => "blahblahblahblahblah",
+                                      "base_url" => "http://example.com",
+                                      "annotations_supported" => true }
     stub_upload
     allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "blah",
                                                                           "status" => "pending"
     @user = user_model
     @attachment = attachment_model(user: @user, content_type: "application/pdf")
-    @doc = @attachment.create_canvadoc()
+    @doc = @attachment.create_canvadoc
   end
 
   def disable_canvadocs
@@ -63,16 +63,16 @@ describe 'Canvadoc' do
     end
 
     it "doesn't upload again" do
-      @doc.update_attribute :document_id, 999999
+      @doc.update_attribute :document_id, 999_999
       @doc.upload
       expect(@doc.document_id.to_s).to eq "999999"  # not 123456
     end
 
     it "doesn't upload when canvadocs isn't configured" do
       disable_canvadocs
-      expect {
+      expect do
         @doc.upload
-      }.to raise_error("Canvadocs isn't enabled")
+      end.to raise_error("Canvadocs isn't enabled")
     end
 
     it "ignores annotatable if unavailable" do
@@ -96,20 +96,20 @@ describe 'Canvadoc' do
       @doc.upload
       @doc.has_annotations = true
       canvadocs_api = @doc.send(:canvadocs_api)
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default')).and_return({})
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: "default")).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
     it "Creates test context for annotation session" do
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-      allow(ApplicationController).to receive(:test_cluster_name).and_return('super-secret-testing')
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("super-secret-testing")
 
       @doc.upload
       @doc.has_annotations = true
 
       canvadocs_api = @doc.send(:canvadocs_api)
 
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_return({})
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: "default-super-secret-testing")).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 

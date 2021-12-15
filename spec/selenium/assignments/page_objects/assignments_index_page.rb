@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module AssignmentsIndexPage
   #------------------------------ Selectors -----------------------------
@@ -24,7 +24,7 @@ module AssignmentsIndexPage
   #------------------------------ Elements ------------------------------
 
   def assignments_rows
-    f('#ag-list')
+    f("#ag-list")
   end
 
   def assignment_row(assignment_id)
@@ -48,7 +48,7 @@ module AssignmentsIndexPage
   end
 
   def assignment_groups_div
-    f('div.item-group-container')
+    f("div.item-group-container")
   end
 
   def manage_assignment_group_menu(assignment_group)
@@ -60,7 +60,7 @@ module AssignmentsIndexPage
   end
 
   def assignment_group_loading_spinner
-    f('div.loadingIndicator')
+    f("div.loadingIndicator")
   end
 
   def tool_dialog
@@ -88,11 +88,11 @@ module AssignmentsIndexPage
   end
 
   def bulk_edit_root
-    f('#bulkEditRoot')
+    f("#bulkEditRoot")
   end
 
   def bulk_edit_tr_rows
-    ff('#bulkEditRoot tbody tr')
+    ff("#bulkEditRoot tbody tr")
   end
 
   def bulk_edit_loading_spinner

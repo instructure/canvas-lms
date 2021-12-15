@@ -5,7 +5,7 @@
     number: {
       nth: {
         ordinals: lambda do |_key, _options|
-          '第'
+          "第"
         end,
 
         ordinalized: lambda do |_key, options|

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasCache::HashRing do
   describe "consistent hashing" do
@@ -31,8 +31,8 @@ describe CanvasCache::HashRing do
           @name
         end
       end
-      ring = CanvasCache::HashRing.new(["node1", "node2", "node3"].map { |n| node_klass.new(n) })
-      keys = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"]
+      ring = CanvasCache::HashRing.new(%w[node1 node2 node3].map { |n| node_klass.new(n) })
+      keys = %w[a b c d e f g h i j k l m n o p]
       mapping_1 = keys.map { |k| ring.get_node(k) }
       ring.add_node(node_klass.new("node4"))
       mapping_2 = keys.map { |k| ring.get_node(k) }

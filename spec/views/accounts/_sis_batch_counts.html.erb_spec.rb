@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "accounts/_sis_batch_counts.html.erb" do
   it "renders sis count data" do
@@ -26,9 +26,9 @@ describe "accounts/_sis_batch_counts.html.erb" do
                        group_memberships: 7, group_categories: 2, groups: 8,
                        sections: 9, accounts: 10, admins: 1, user_observers: 3,
                        change_sis_ids: 3, logins: 0 } }
-    report = double()
+    report = double
     expect(report).to receive(:data).and_return(data)
-    render :partial => 'accounts/sis_batch_counts', :object => report
+    render partial: "accounts/sis_batch_counts", object: report
 
     map = { xlists: "Crosslists", group_memberships: "Group Enrollments",
             user_observers: "User Observers", change_sis_ids: "Change SIS IDs",

@@ -24,13 +24,13 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 begin
-  require '../../spec/coverage_tool.rb'
-  CoverageTool.start('canvas-text-helper-gem')
+  require "../../spec/coverage_tool"
+  CoverageTool.start("canvas-text-helper-gem")
 rescue LoadError => e
   puts "Error: #{e} "
 end
 
-require 'canvas_text_helper'
+require "canvas_text_helper"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
@@ -40,5 +40,5 @@ RSpec.configure do |config|
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
   #     --seed 1234
-  config.order = 'random'
+  config.order = "random"
 end

@@ -31,50 +31,50 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_dependency "utils/date_presenter"
 
 module Utils
   describe DatePresenter do
     describe "#as_string" do
-      it 'uses the medium date in long format' do
+      it "uses the medium date in long format" do
         date = Date.parse("2010-10-1")
         string = DatePresenter.new(date).as_string(:long)
         expect(string).to eq("Oct 1, 2010")
       end
 
-      it 'can use the short format' do
+      it "can use the short format" do
         date = Date.parse("2010-10-1")
         string = DatePresenter.new(date).as_string(:short)
         expect(string).to eq("Oct 1")
       end
 
-      it 'can use the full format' do
+      it "can use the full format" do
         date = Date.parse("2010-10-1")
         string = DatePresenter.new(date).as_string(:full)
         expect(string).to eq("Oct 1, 2010 12:00")
       end
 
-      describe 'on relative dates' do
+      describe "on relative dates" do
         let(:today) { Date.parse("2014-10-1") }
 
         around do |example|
           Timecop.freeze(today, &example)
         end
 
-        it 'returns Today for today' do
+        it "returns Today for today" do
           expect(DatePresenter.new(today).as_string).to eq("Today")
         end
 
-        it 'returns Tomorrow for tomorrow' do
+        it "returns Tomorrow for tomorrow" do
           expect(DatePresenter.new(today + 1).as_string).to eq("Tomorrow")
         end
 
-        it 'returns Yesterday for yesterday' do
+        it "returns Yesterday for yesterday" do
           expect(DatePresenter.new(today - 1).as_string).to eq("Yesterday")
         end
 
-        it 'provides weekday names for this week' do
+        it "provides weekday names for this week" do
           expect(DatePresenter.new(today + 2).as_string).to eq("Friday")
         end
       end

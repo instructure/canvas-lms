@@ -21,7 +21,7 @@ class CreateAccount0 < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    Account.create_with(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: 0)
+    Account.create_with(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: 0)
            .find_or_create_by!(id: 0)
   end
 

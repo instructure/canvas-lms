@@ -22,11 +22,11 @@ class IgnoreDeletedSubmissionsForAssignmentVisibility < ActiveRecord::Migration[
   tag :postdeploy
 
   def up
-    self.connection.execute "DROP VIEW #{connection.quote_table_name('assignment_student_visibilities')}"
-    self.connection.execute "DROP VIEW #{connection.quote_table_name('quiz_student_visibilities')}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("assignment_student_visibilities")}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("quiz_student_visibilities")}"
 
     # Update the view so submission scores aren't as important as the submission's workflow_state
-    self.connection.execute %(CREATE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+    connection.execute %(CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
       SELECT DISTINCT a.id as assignment_id,
       e.user_id as user_id,
       c.id as course_id
@@ -81,7 +81,7 @@ class IgnoreDeletedSubmissionsForAssignmentVisibility < ActiveRecord::Migration[
         )
       )
 
-    self.connection.execute %(CREATE VIEW #{connection.quote_table_name('quiz_student_visibilities')} AS
+    connection.execute %(CREATE VIEW #{connection.quote_table_name("quiz_student_visibilities")} AS
       SELECT DISTINCT q.id as quiz_id,
       e.user_id as user_id,
       c.id as course_id
@@ -132,11 +132,11 @@ class IgnoreDeletedSubmissionsForAssignmentVisibility < ActiveRecord::Migration[
   end
 
   def down
-    self.connection.execute "DROP VIEW #{connection.quote_table_name('assignment_student_visibilities')}"
-    self.connection.execute "DROP VIEW #{connection.quote_table_name('quiz_student_visibilities')}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("assignment_student_visibilities")}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("quiz_student_visibilities")}"
 
     # Recreate the old view where submission scores are significant
-    self.connection.execute %(CREATE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+    connection.execute %(CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
       SELECT DISTINCT a.id as assignment_id,
       e.user_id as user_id,
       c.id as course_id
@@ -191,7 +191,7 @@ class IgnoreDeletedSubmissionsForAssignmentVisibility < ActiveRecord::Migration[
         )
       )
 
-    self.connection.execute %(CREATE VIEW #{connection.quote_table_name('quiz_student_visibilities')} AS
+    connection.execute %(CREATE VIEW #{connection.quote_table_name("quiz_student_visibilities")} AS
       SELECT DISTINCT q.id as quiz_id,
       e.user_id as user_id,
       c.id as course_id

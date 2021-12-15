@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative 'da_module'
+require_relative "../../common"
+require_relative "da_module"
 
-shared_context 'differentiated assignments' do
+shared_context "differentiated assignments" do
   include DifferentiatedAssignments
-  include_context 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
 
   before(:once) { DifferentiatedAssignments.short_list_initialize }
 
@@ -41,10 +41,10 @@ shared_context 'differentiated assignments' do
   end
 
   def list_of_assignments
-    find('.assignment-list')
+    find(".assignment-list")
   end
 
   def list_of_modules
-    find('#context_modules')
+    find("#context_modules")
   end
 end

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative './pages/permissions_page'
+require_relative "../common"
+require_relative "./pages/permissions_page"
 
 describe "permissions index" do
   include_context "in-process server selenium tests"
@@ -30,9 +30,9 @@ describe "permissions index" do
   end
 
   def create_role_override(permission_name, role, account, opts)
-    new_role = RoleOverride.create!(:permission => permission_name, :enabled => opts[:enabled],
-                                    :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
-                                    :role_id => role.id, :context_type => 'Account')
+    new_role = RoleOverride.create!(permission: permission_name, enabled: opts[:enabled],
+                                    locked: opts[:locked], context: account, applies_to_self: true, applies_to_descendants: true,
+                                    role_id: role.id, context_type: "Account")
     new_role.id
   end
 
@@ -44,7 +44,7 @@ describe "permissions index" do
     end
 
     it "updates the role to the new name after editing" do
-      PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty") # TODO flakiness lies within
+      PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty") # TODO: flakiness lies within
       expect { PermissionsIndex.role_name(@custom_student_role).text }.to become("A Better Kitty")
       expect { PermissionsIndex.edit_tray_header.text }.to become("Edit A Better Kitty")
     end
@@ -52,7 +52,7 @@ describe "permissions index" do
     it "updates the permission to the correct selection" do
       PermissionsIndex.open_edit_role_tray(@custom_student_role)
       PermissionsIndex.disable_tray_permission("read_announcements", @custom_student_role.id)
-      expect { PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id) }.to become('Disabled')
+      expect { PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id) }.to become("Disabled")
     end
   end
 
@@ -116,7 +116,7 @@ describe "permissions index" do
 
       it "permissions unlocks on grid" do
         permission_name = "read_announcements"
-        id = create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+        id = create_role_override(permission_name, student_role, @account, enabled: false, locked: true)
         PermissionsIndex.visit(@account)
         PermissionsIndex.change_permission(permission_name, student_role.id, "lock")
         r = RoleOverride.find(id)
@@ -128,19 +128,19 @@ describe "permissions index" do
 
       it "permissions default on grid works" do
         permission_name = "read_announcements"
-        create_role_override(permission_name, student_role, @account, :enabled => false, :locked => false)
+        create_role_override(permission_name, student_role, @account, enabled: false, locked: false)
         PermissionsIndex.visit(@account)
         PermissionsIndex.change_permission(permission_name, student_role.id, "use_default")
-        r = RoleOverride.where(:id => @account.id, :permission => permission_name, :role_id => student_role.id)
+        r = RoleOverride.where(id: @account.id, permission: permission_name, role_id: student_role.id)
         expect(r).to be_empty
       end
 
       it "autoscrolls so expanded granular permissions are visible" do
         PermissionsIndex.visit(@account)
         PermissionsIndex.expand_manage_wiki
-        expect(PermissionsIndex.permission_link('manage_wiki_create')).to be_displayed
-        expect(PermissionsIndex.permission_link('manage_wiki_delete')).to be_displayed
-        expect(PermissionsIndex.permission_link('manage_wiki_update')).to be_displayed
+        expect(PermissionsIndex.permission_link("manage_wiki_create")).to be_displayed
+        expect(PermissionsIndex.permission_link("manage_wiki_delete")).to be_displayed
+        expect(PermissionsIndex.permission_link("manage_wiki_update")).to be_displayed
       end
     end
 
@@ -151,9 +151,9 @@ describe "permissions index" do
 
       it "locked permission cannot be edited" do
         permission_name = "read_announcements"
-        create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+        create_role_override(permission_name, student_role, @account, enabled: false, locked: true)
         PermissionsIndex.visit(@subaccount)
-        expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find('button')).to be_disabled
+        expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find("button")).to be_disabled
       end
     end
   end
@@ -161,16 +161,16 @@ describe "permissions index" do
   context "in the permissions tray" do
     before do
       admin_logged_in
-      @role = custom_teacher_role('test role', account: @account)
-      @permission_name = 'manage_students'
+      @role = custom_teacher_role("test role", account: @account)
+      @permission_name = "manage_students"
       PermissionsIndex.visit(@account)
     end
 
     it "updates a permission when changed in the tray" do
       PermissionsIndex.open_permission_tray(@permission_name)
       PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
-      expect { PermissionsIndex.role_tray_permission_state(@permission_name, @role.id) }.to become('Disabled')
-      expect { PermissionsIndex.grid_permission_state(@permission_name, @role.id) }.to become('Disabled')
+      expect { PermissionsIndex.role_tray_permission_state(@permission_name, @role.id) }.to become("Disabled")
+      expect { PermissionsIndex.grid_permission_state(@permission_name, @role.id) }.to become("Disabled")
     end
   end
 
@@ -184,23 +184,23 @@ describe "permissions index" do
       role_name = "TA"
       PermissionsIndex.select_filter(role_name)
       expect(PermissionsIndex.role_link(role_name)).to be_displayed
-      expect(f('#content')).not_to contain_css(PermissionsIndex.role_link_css("Teacher"))
+      expect(f("#content")).not_to contain_css(PermissionsIndex.role_link_css("Teacher"))
     end
 
-    it 'search by permission name works correctly' do
-      PermissionsIndex.enter_search('Manage Pages')
-      expect(PermissionsIndex.permission_link('manage_wiki')).to be_displayed
-      expect(f('#content')).not_to contain_css('#permission_manage_interaction_alerts')
+    it "search by permission name works correctly" do
+      PermissionsIndex.enter_search("Manage Pages")
+      expect(PermissionsIndex.permission_link("manage_wiki")).to be_displayed
+      expect(f("#content")).not_to contain_css("#permission_manage_interaction_alerts")
     end
 
-    it 'search by permission filters according to course / account context type' do
-      PermissionsIndex.enter_search('SIS Data')
+    it "search by permission filters according to course / account context type" do
+      PermissionsIndex.enter_search("SIS Data")
       expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become 1
-      PermissionsIndex.choose_tab('account')
+      PermissionsIndex.choose_tab("account")
       wait_for_ajaximations
-      PermissionsIndex.enter_search('SIS Data')
+      PermissionsIndex.enter_search("SIS Data")
       expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become 3
-      PermissionsIndex.enter_search('')
+      PermissionsIndex.enter_search("")
       expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become > 3
     end
   end

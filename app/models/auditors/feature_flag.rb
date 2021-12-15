@@ -38,23 +38,23 @@ class Auditors::FeatureFlag
     # if they need to.
     def self.generate(feature_flag, user, previous_state, post_state = nil)
       new(
-        'feature_flag' => feature_flag,
-        'user' => user,
-        'state_before' => previous_state,
-        'state_after' => post_state || feature_flag.state
+        "feature_flag" => feature_flag,
+        "user" => user,
+        "state_before" => previous_state,
+        "state_after" => post_state || feature_flag.state
       )
     end
 
     def initialize(*args)
       super(*args)
 
-      if attributes['feature_flag']
-        self.feature_flag = attributes.delete('feature_flag')
+      if attributes["feature_flag"]
+        self.feature_flag = attributes.delete("feature_flag")
       end
 
-      if attributes.key?('user')
+      if attributes.key?("user")
         # might be nil in a rare circumstance with an unprovisioned console user
-        self.user = attributes.delete('user')
+        self.user = attributes.delete("user")
       end
     end
 
@@ -70,17 +70,17 @@ class Auditors::FeatureFlag
     # That's taken care of in the active_record/feature_flag_record.rb file.
     def feature_flag=(feature_flag)
       @feature_flag = feature_flag
-      attributes['feature_flag_id'] = @feature_flag.global_id
-      attributes['context_id'] = Shard.global_id_for(@feature_flag.context_id)
-      attributes['context_type'] = @feature_flag.context_type
-      attributes['feature_name'] = @feature_flag.feature
+      attributes["feature_flag_id"] = @feature_flag.global_id
+      attributes["context_id"] = Shard.global_id_for(@feature_flag.context_id)
+      attributes["context_type"] = @feature_flag.context_type
+      attributes["feature_name"] = @feature_flag.feature
       # this should be safe because we don't care about auditing feature
       # flags that are for specific users.
-      attributes['root_account_id'] = Shard.global_id_for(@feature_flag.context.root_account_id)
-      if attributes['root_account_id'].nil? && @feature_flag.context.is_a?(Account)
+      attributes["root_account_id"] = Shard.global_id_for(@feature_flag.context.root_account_id)
+      if attributes["root_account_id"].nil? && @feature_flag.context.is_a?(Account)
         # if the context IS a root account, we still need to tie it to this
         # record, and it's root_account_id will be nil.
-        attributes['root_account_id'] = @feature_flag.context.global_id
+        attributes["root_account_id"] = @feature_flag.context.global_id
       end
     end
 
@@ -91,7 +91,7 @@ class Auditors::FeatureFlag
     def user=(user)
       @user ||= user
       # might be nil in a rare circumstance with an unprovisioned console user
-      attributes['user_id'] = @user&.global_id
+      attributes["user_id"] = @user&.global_id
     end
   end
 
@@ -107,9 +107,9 @@ class Auditors::FeatureFlag
 
     add_index :feature_flag do
       table :feature_flag_changes_by_feature_flag
-      entry_proc lambda { |record| record.feature_flag }
-      key_proc lambda { |feature_flag| feature_flag.global_id }
-      ar_scope_proc lambda { |feature_flag| auth_ar_type.where(feature_flag_id: feature_flag.id) }
+      entry_proc ->(record) { record.feature_flag }
+      key_proc ->(feature_flag) { feature_flag.global_id }
+      ar_scope_proc ->(feature_flag) { auth_ar_type.where(feature_flag_id: feature_flag.id) }
     end
   end
 

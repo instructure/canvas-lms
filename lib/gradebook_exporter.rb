@@ -28,11 +28,11 @@ class GradebookExporter
   # hash. Use the buffer_columns and buffer_column_headers methods to populate the
   # relevant rows.
   BUFFER_COLUMN_DEFINITIONS = {
-    grading_standard: ['Current Grade', 'Unposted Current Grade', 'Final Grade', 'Unposted Final Grade'].freeze,
-    override_score: ['Override Score'].freeze,
-    override_grade: ['Override Grade'].freeze,
-    points: ['Current Points', 'Final Points'].freeze,
-    total_scores: ['Current Score', 'Unposted Current Score', 'Final Score', 'Unposted Final Score'].freeze
+    grading_standard: ["Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"].freeze,
+    override_score: ["Override Score"].freeze,
+    override_grade: ["Override Grade"].freeze,
+    points: ["Current Points", "Final Points"].freeze,
+    total_scores: ["Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"].freeze
   }.freeze
 
   def initialize(course, user, options = {})
@@ -114,7 +114,7 @@ class GradebookExporter
 
     groups = calc.groups
 
-    read_only = I18n.t('csv.read_only_field', '(read only)')
+    read_only = I18n.t("csv.read_only_field", "(read only)")
     include_root_account = @course.root_account.trust_exists?
     should_show_totals = show_totals?
     include_sis_id = @options[:include_sis_id]
@@ -329,7 +329,7 @@ class GradebookExporter
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
     # user > pseudonyms > account: used in SisPseudonym > works_for_account
-    includes = { :user => { :pseudonyms => :account }, :course_section => [], :scores => [] }
+    includes = { user: { pseudonyms: :account }, course_section: [], scores: [] }
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
     enrollments.each { |e| e.course = @course }
@@ -396,7 +396,7 @@ class GradebookExporter
     @course.display_totals_for_all_grading_periods?
   end
 
-  STARTS_WITH_EQUAL = /^\s*=/
+  STARTS_WITH_EQUAL = /^\s*=/.freeze
 
   # Returns the student name to use for the export.  If the name
   # starts with =, quote it so anyone pulling the data into Excel

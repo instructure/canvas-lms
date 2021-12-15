@@ -18,21 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-require 'json/jwt'
+require "spec_helper"
+require "json/jwt"
 
 describe CanvasPandaPub::Client do
   include WebMock::API
 
   def stub_config(opts = {})
-    base = 'http://pandapub.example.com/'
+    base = "http://pandapub.example.com/"
     allow(CanvasPandaPub::Client).to receive(:config) {
       {
-        'base_url' => base,
-        'application_id' => 'qwerty',
-        'key_id' => 'key',
-        'key_secret' => 'secret',
-        'push_url' => "#{base}push"
+        "base_url" => base,
+        "application_id" => "qwerty",
+        "key_id" => "key",
+        "key_secret" => "secret",
+        "push_url" => "#{base}push"
       }.merge(opts)
     }
   end
@@ -52,7 +52,7 @@ describe CanvasPandaPub::Client do
   describe "push" do
     it "fires an HTTP request to post a message" do
       stub = stub_request(:post, "http://pandapub.example.com/channel/qwerty/foo")
-             .with(basic_auth: ['key', 'secret'], body: '{"a":1}')
+             .with(basic_auth: ["key", "secret"], body: '{"a":1}')
 
       @client.post_update "/foo", { a: 1 }
 
@@ -67,11 +67,11 @@ describe CanvasPandaPub::Client do
       expires = Time.now + 60
       token = @client.generate_token "/foo", true, true, expires
       payload, _ = JSON::JWT.decode(token, "secret")
-      expect(payload['keyId']).to eq("key")
-      expect(payload['channel']).to eq("/qwerty/foo")
-      expect(payload['pub']).to be true
-      expect(payload['sub']).to be true
-      expect(payload['exp']).to eq(expires.to_i)
+      expect(payload["keyId"]).to eq("key")
+      expect(payload["channel"]).to eq("/qwerty/foo")
+      expect(payload["pub"]).to be true
+      expect(payload["sub"]).to be true
+      expect(payload["exp"]).to eq(expires.to_i)
     end
   end
 end

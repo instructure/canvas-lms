@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/concern'
+require "active_support/concern"
 
 module Canvas::SoftDeletable
   extend ActiveSupport::Concern
@@ -39,12 +39,12 @@ module Canvas::SoftDeletable
     def destroy
       return true if deleted?
 
-      self.workflow_state = 'deleted'
+      self.workflow_state = "deleted"
       run_callbacks(:destroy) { save! }
     end
 
     # `restore` was taken by too many other methods...
-    def undestroy(active_state: 'active')
+    def undestroy(active_state: "active")
       self.workflow_state = active_state
       save!
       true

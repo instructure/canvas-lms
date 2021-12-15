@@ -42,20 +42,20 @@ describe SubmissionList do
     Timecop.travel(Time.utc(2011, 12, 31, 23, 0)) do
       Auditors::ActiveRecord::Partitioner.process
     end
-    course_with_teacher(:active_all => true)
-    course_with_student(:course => @course, :active_all => true)
+    course_with_teacher(active_all: true)
+    course_with_student(course: @course, active_all: true)
 
-    @assignment1 = @course.assignments.create!(:title => 'one', :points_possible => 10)
-    @assignment2 = @course.assignments.create!(:title => 'two', :points_possible => 10)
-    @assignment3 = @course.assignments.create!(:title => 'three', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(title: "one", points_possible: 10)
+    @assignment2 = @course.assignments.create!(title: "two", points_possible: 10)
+    @assignment3 = @course.assignments.create!(title: "three", points_possible: 10)
 
-    Time.zone = 'Alaska'
+    Time.zone = "Alaska"
     allow(Time).to receive(:now).and_return(Time.utc(2011, 12, 31, 23, 0))   # 12/31 14:00 local time
-    @assignment1.grade_student(@student, { :grade => 10, :grader => @teacher })
+    @assignment1.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 1, 0))      # 12/31 16:00 local time
-    @assignment2.grade_student(@student, { :grade => 10, :grader => @teacher })
+    @assignment2.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 10, 0))     #  1/01 01:00 local time
-    @assignment3.grade_student(@student, { :grade => 10, :grader => @teacher })
+    @assignment3.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_call_original
 
     @days = SubmissionList.new(@course).days
@@ -67,12 +67,16 @@ describe SubmissionList do
   end
 
   it "handles excused assignments" do
-    course_with_teacher(:active_all => true)
-    course_with_student(:course => @course, :active_all => true)
+    course_with_teacher(active_all: true)
+    course_with_student(course: @course, active_all: true)
 
-    @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
+    @some_assignment = @course.assignments.create!(title: "one", points_possible: 10)
     subs = @some_assignment.grade_student(@student, { grade: 8, grader: @teacher })
-    subs.each { |s| s.created_at = 3.days.ago; s.updated_at = 3.days.ago; s.save }
+    subs.each do |s|
+      s.created_at = 3.days.ago
+      s.updated_at = 3.days.ago
+      s.save
+    end
     @some_assignment.grade_student(@student, { excuse: true, grader: @teacher })
     @days = SubmissionList.days(@course)
     submissions = @days[0].graders[0].assignments[0].submissions
@@ -99,7 +103,7 @@ describe SubmissionList do
     end
 
     it "is able to loop on graders" do
-      available_keys = [:grader_id, :assignments, :name]
+      available_keys = %i[grader_id assignments name]
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           expect(grader).to be_is_a(OpenStruct)
@@ -125,7 +129,7 @@ describe SubmissionList do
     end
 
     it "is able to loop on assignments" do
-      available_keys = [:submission_count, :name, :submissions, :assignment_id]
+      available_keys = %i[submission_count name submissions assignment_id]
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           grader.assignments.each do |assignment|
@@ -144,16 +148,16 @@ describe SubmissionList do
 
     context "submissions" do
       it "is able to loop on submissions" do
-        available_keys = [
-          :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
-          :body, :course_id, :created_at, :current_grade, :current_graded_at,
-          :current_grader, :grade_matches_current_submission, :graded_at,
-          :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
-          :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-          :previous_grader, :processed, :published_grade,
-          :published_score, :safe_grader_id, :score, :student_entered_score,
-          :student_user_id, :submission_id, :student_name, :submission_type,
-          :updated_at, :url, :user_id, :workflow_state
+        available_keys = %i[
+          assignment_id assignment_name attachment_id attachment_ids
+          body course_id created_at current_grade current_graded_at
+          current_grader grade_matches_current_submission graded_at
+          graded_on grader grader_id group_id id new_grade
+          new_graded_at new_grader previous_grade previous_graded_at
+          previous_grader processed published_grade
+          published_score safe_grader_id score student_entered_score
+          student_user_id submission_id student_name submission_type
+          updated_at url user_id workflow_state
         ]
 
         SubmissionList.days(@course).each do |day|
@@ -172,35 +176,35 @@ describe SubmissionList do
       it "sorts submissions alphabetically by student name" do
         day = SubmissionList.days(@course)[0]
         submissions = day.graders[0].assignments[0].submissions
-        expect(submissions[0].student_name).to eql('student')
-        expect(submissions[1].student_name).to eql('studeñt')
-        expect(submissions[2].student_name).to eql('studeЖt')
+        expect(submissions[0].student_name).to eql("student")
+        expect(submissions[1].student_name).to eql("studeñt")
+        expect(submissions[2].student_name).to eql("studeЖt")
       end
     end
   end
 
   context "regrading" do
-    it 'includes regrade events in the final data' do
+    it "includes regrade events in the final data" do
       # Figure out how to manually regrade a test piece of data
       interesting_submission_data
-      @assignment = @course.assignments.create!(title: 'some_assignment')
-      @quiz = Quizzes::Quiz.create!({ :context => @course, title: "quiz time", points_possible: 10, assignment_id: @assignment.id, quiz_type: "assignment" })
-      @quiz.workflow_state = 'published'
+      @assignment = @course.assignments.create!(title: "some_assignment")
+      @quiz = Quizzes::Quiz.create!({ context: @course, title: "quiz time", points_possible: 10, assignment_id: @assignment.id, quiz_type: "assignment" })
+      @quiz.workflow_state = "published"
       @quiz.quiz_data = [multiple_choice_question_data]
       @quiz.save!
       @qs = @quiz.generate_submission(@student)
 
       @points = 15.0
 
-      @question = double(:id => 1, :question_data => { :id => 1,
-                                                       :regrade_option => 'full_credit',
-                                                       :points_possible => @points },
-                         :quiz_group => nil)
+      @question = double(id: 1, question_data: { id: 1,
+                                                 regrade_option: "full_credit",
+                                                 points_possible: @points },
+                         quiz_group: nil)
 
-      @question_regrade = double(:quiz_question => @question,
-                                 :regrade_option => "full_credit")
+      @question_regrade = double(quiz_question: @question,
+                                 regrade_option: "full_credit")
 
-      @answer = { :question_id => 1, :points => @points, :text => "" }
+      @answer = { question_id: 1, points: @points, text: "" }
 
       @wrapper = Quizzes::QuizRegrader::Answer.new(@answer, @question_regrade)
       Quizzes::SubmissionGrader.new(@qs).grade_submission
@@ -230,7 +234,7 @@ describe SubmissionList do
   end
 
   context "remembers the most recent grade change" do
-    let(:grader)  { User.create name: 'some_grader' }
+    let(:grader)  { User.create name: "some_grader" }
     let(:student) { User.create name: "some student", workflow_state: "registered" }
     let(:course)  { Course.create name: "some course", workflow_state: "available" }
     let(:list)    { SubmissionList.new course }
@@ -259,7 +263,7 @@ describe SubmissionList do
         assignment.grade_student student, { grade: 3, grader: grader }
       end
 
-      it "remembers the 'Before' grade " do
+      it "remembers the 'Before' grade" do
         expect(submission.previous_grade).to eq "5"
       end
 
@@ -307,37 +311,37 @@ def interesting_submission_data(opts = {})
   opts[:assignment] ||= {}
   opts[:submission] ||= {}
 
-  @grader = user_model({ :name => 'some_grader' }.merge(opts[:grader]))
-  @grader2 = user_model({ :name => 'another_grader' }.merge(opts[:grader]))
-  @student = factory_with_protected_attributes(User, { :name => "studeñt", :workflow_state => "registered" }.merge(opts[:user]))
-  @course = factory_with_protected_attributes(Course, { :name => "some course", :workflow_state => "available" }.merge(opts[:course]))
+  @grader = user_model({ name: "some_grader" }.merge(opts[:grader]))
+  @grader2 = user_model({ name: "another_grader" }.merge(opts[:grader]))
+  @student = factory_with_protected_attributes(User, { name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
+  @course = factory_with_protected_attributes(Course, { name: "some course", workflow_state: "available" }.merge(opts[:course]))
   [@grader, @grader2].each do |grader|
     e = @course.enroll_teacher(grader)
     e.accept
   end
   @course.enroll_student(@student)
   @assignment = @course.assignments.new({
-    :title => "some assignment",
-    :points_possible => 10
+    title: "some assignment",
+    points_possible: 10
   }.merge(opts[:assignment]))
   @assignment.workflow_state = "published"
   @assignment.save!
-  @assignment.grade_student(@student, { :grade => 1.5, :grader => @grader }.merge(opts[:submission]))
-  @assignment.grade_student(@student, { :grade => 3, :grader => @grader }.merge(opts[:submission]))
-  @assignment.grade_student(@student, { :grade => 5, :grader => @grader2 }.merge(opts[:submission]))
-  @student = user_model(:name => 'studeЖt')
+  @assignment.grade_student(@student, { grade: 1.5, grader: @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 3, grader: @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 5, grader: @grader2 }.merge(opts[:submission]))
+  @student = user_model(name: "studeЖt")
   @course.enroll_student(@student)
   @assignment.reload
-  @assignment.grade_student(@student, { :grade => 8, :grader => @grader }.merge(opts[:submission]))
-  @student = user_model(:name => 'student')
+  @assignment.grade_student(@student, { grade: 8, grader: @grader }.merge(opts[:submission]))
+  @student = user_model(name: "student")
   @course.enroll_student(@student)
   @assignment.reload
-  @assignment.grade_student(@student, { :grade => 10, :grader => @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 10, grader: @grader }.merge(opts[:submission]))
   @assignment = @course.assignments.create({
-                                             :title => "another assignment",
-                                             :points_possible => 10
+                                             title: "another assignment",
+                                             points_possible: 10
                                            })
   @assignment.workflow_state = "published"
   @assignment.save!
-  @assignment.grade_student(@student, { :grade => 10, :grader => @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 10, grader: @grader }.merge(opts[:submission]))
 end

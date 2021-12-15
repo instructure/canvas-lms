@@ -20,53 +20,53 @@
 
 describe Setting do
   context "getting" do
-    it 'gets the default value as a string' do
-      expect(Setting.get('my_new_setting', true)).to eq 'true'
+    it "gets the default value as a string" do
+      expect(Setting.get("my_new_setting", true)).to eq "true"
     end
 
-    it 'gets the default value as a string for dates' do
+    it "gets the default value as a string for dates" do
       time = Time.now.utc
-      expect(Setting.get('my_new_setting', time)).to eq time.to_s
+      expect(Setting.get("my_new_setting", time)).to eq time.to_s
     end
 
-    it 'returns set values' do
-      Setting.set('my_new_setting', '1')
-      expect(Setting.get('my_new_setting', '0')).to eq '1'
+    it "returns set values" do
+      Setting.set("my_new_setting", "1")
+      expect(Setting.get("my_new_setting", "0")).to eq "1"
     end
 
-    it 'allows passing a cache expiration' do
+    it "allows passing a cache expiration" do
       # cache 0 in process
-      expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '0'
+      expect(Setting.get("my_new_setting", "0", expires_in: 1.minute)).to eq "0"
       # some other process sets the value out from under us
-      Setting.create!(name: 'my_new_setting', value: '1')
+      Setting.create!(name: "my_new_setting", value: "1")
       # but we still see the cached value for now
-      expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '0'
+      expect(Setting.get("my_new_setting", "0", expires_in: 1.minute)).to eq "0"
       # until the expiration has passed
       Timecop.travel(2.minutes.from_now) do
-        expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '1'
+        expect(Setting.get("my_new_setting", "0", expires_in: 1.minute)).to eq "1"
       end
     end
 
     it "doesn't need to query if all settings are already cached, even when skipping cache" do
       Setting.reset_cache!
-      Setting.get('setting1', nil)
+      Setting.get("setting1", nil)
       expect(Setting).not_to receive(:find_by)
       expect(Setting).not_to receive(:pluck)
       expect(MultiCache).not_to receive(:fetch)
-      Setting.skip_cache { Setting.get('setting2', nil) }
+      Setting.skip_cache { Setting.get("setting2", nil) }
     end
   end
 
   context "setting" do
-    it 'sets boolean values as strings' do
-      Setting.set('my_new_setting', true)
-      expect(Setting.get('my_new_setting', '1')).to eq 'true'
+    it "sets boolean values as strings" do
+      Setting.set("my_new_setting", true)
+      expect(Setting.get("my_new_setting", "1")).to eq "true"
     end
 
-    it 'sets time values as strings' do
+    it "sets time values as strings" do
       time = Time.now.utc
-      Setting.set('my_new_setting', time)
-      expect(Setting.get('my_new_setting', '1')).to eq time.to_s
+      Setting.set("my_new_setting", time)
+      expect(Setting.get("my_new_setting", "1")).to eq time.to_s
     end
   end
 end

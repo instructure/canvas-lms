@@ -31,7 +31,7 @@ class CourseGroups
     end
 
     def randomly_assign_students_option
-      f('a.randomly-assign-members')
+      f("a.randomly-assign-members")
     end
 
     def confirm_randomly_assign_students_button
@@ -51,7 +51,7 @@ class CourseGroups
     end
 
     def delete_group_option
-      f('a.delete-group')
+      f("a.delete-group")
     end
 
     def clone_category_submit_button
@@ -71,11 +71,11 @@ class CourseGroups
     end
 
     def group_sets_tabs
-      ff('.group-category-tab-link')
+      ff(".group-category-tab-link")
     end
 
     def all_users_in_group
-      ff('.group-user-name')
+      ff(".group-user-name")
     end
 
     def group_user_action_button(student_id)
@@ -103,7 +103,7 @@ class CourseGroups
     end
 
     def groupset_tabs
-      ff('.group-category-tab-link')
+      ff(".group-category-tab-link")
     end
 
     # methods and actions

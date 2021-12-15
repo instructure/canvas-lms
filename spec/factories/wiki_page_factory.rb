@@ -20,7 +20,8 @@
 
 module Factories
   def wiki_page_model(opts = {})
-    context = opts.delete(:course) || opts.delete(:context) || (course_with_student(active_all: true); @course)
+    context = opts.delete(:course) || opts.delete(:context) || (course_with_student(active_all: true)
+                                                                @course)
     opts = opts.slice(:title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update, :todo_date)
     @page = context.wiki_pages.create!(valid_wiki_page_attributes.merge(opts))
   end
@@ -30,8 +31,8 @@ module Factories
     assignment_model({
       course: @page.course,
       wiki_page: @page,
-      submission_types: 'wiki_page',
-      title: 'Content Page Assignment',
+      submission_types: "wiki_page",
+      title: "Content Page Assignment",
       due_at: nil
     }.merge(opts))
   end

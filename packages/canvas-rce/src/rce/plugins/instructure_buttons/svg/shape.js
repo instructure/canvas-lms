@@ -26,6 +26,10 @@ export function buildShape({shape, size}) {
       return buildCircle(size)
     case 'triangle':
       return buildTriangle(size)
+    case 'diamond':
+      return buildDiamond(size)
+    case 'pentagon':
+      return buildPentagon(size)
     case 'hexagon':
       return buildHexagon(size)
     case 'octagon':
@@ -120,6 +124,52 @@ function buildTriangle(size) {
     case 'large':
       return createSvgElement('path', {
         d: 'M109 8L210 210H8L109 8Z'
+      })
+    default:
+      throw new Error(`Invalid size: ${size}`)
+  }
+}
+
+function buildDiamond(size) {
+  switch (size) {
+    case 'x-small':
+      return createSvgElement('path', {
+        d: 'M33 4L66 33L33 66L4 33L33 4Z'
+      })
+    case 'small':
+      return createSvgElement('path', {
+        d: 'M57 4L114 57L57 114L4 57L57 4Z'
+      })
+    case 'medium':
+      return createSvgElement('path', {
+        d: 'M75 4L150 75L75 150L4 75L75 4Z'
+      })
+    case 'large':
+      return createSvgElement('path', {
+        d: 'M105 4L210 105L105 210L4 105L105 4Z'
+      })
+    default:
+      throw new Error(`Invalid size: ${size}`)
+  }
+}
+
+function buildPentagon(size) {
+  switch (size) {
+    case 'x-small':
+      return createSvgElement('path', {
+        d: 'M37.0623 14L61 32.75L53.5195 62H21.1039L13 32.75L37.0623 14Z'
+      })
+    case 'small':
+      return createSvgElement('path', {
+        d: 'M61.1247 13L109 50.5L94.039 109H29.2078L13 50.5L61.1247 13Z'
+      })
+    case 'medium':
+      return createSvgElement('path', {
+        d: 'M79.1714 13L145 64.56L124.429 145H35.285L13 64.5625L79.1714 13Z'
+      })
+    case 'large':
+      return createSvgElement('path', {
+        d: 'M109.249 13L205 88L175.078 205H45.4156L13 88L109.249 13Z'
       })
     default:
       throw new Error(`Invalid size: ${size}`)

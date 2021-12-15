@@ -34,25 +34,25 @@ RSpec.describe SecurityController, type: :request do
     allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
   end
 
-  it 'returns ok status' do
+  it "returns ok status" do
     get url
     expect(response).to have_http_status :ok
   end
 
-  it 'returns a jwk set' do
+  it "returns a jwk set" do
     get url
-    expect(json['keys']).not_to be_empty
+    expect(json["keys"]).not_to be_empty
   end
 
-  it 'sets the Cache-control header' do
+  it "sets the Cache-control header" do
     get url
-    expect(response.headers['Cache-Control']).to include 'max-age=864000'
+    expect(response.headers["Cache-Control"]).to include "max-age=864000"
   end
 
-  it 'returns well-formed public key jwks' do
+  it "returns well-formed public key jwks" do
     get url
-    expected_keys = %w(kid kty alg e n use)
-    json['keys'].each do |key|
+    expected_keys = %w[kid kty alg e n use]
+    json["keys"].each do |key|
       expect(key.keys - expected_keys).to be_empty
     end
   end

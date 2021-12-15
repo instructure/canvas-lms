@@ -3,7 +3,7 @@
 module DataFixup::PopulateRootAccountIdOnUserObservers
   def self.run
     UserObservationLink.find_ids_in_ranges do |min_id, max_id|
-      UserObservationLink.where(:id => min_id..max_id, :root_account_id => nil)
+      UserObservationLink.where(id: min_id..max_id, root_account_id: nil)
                          .where("user_id < ?", Shard::IDS_PER_SHARD) # otherwise it's a shadow record - handle it on the other side
                          .preload(:student, :observer).each do |link|
         student_ra_ids = link.student.associated_root_accounts.pluck(:id)
@@ -17,7 +17,7 @@ module DataFixup::PopulateRootAccountIdOnUserObservers
         else
           set_root_account_id(link, common_ra_ids.shift) # replace it with one of them
           # create new links for the rest
-          Account.where(:id => common_ra_ids).each do |ra|
+          Account.where(id: common_ra_ids).each do |ra|
             UserObservationLink.create_or_restore(student: link.student, observer: link.observer, root_account: ra)
           end
         end
@@ -31,15 +31,13 @@ module DataFixup::PopulateRootAccountIdOnUserObservers
       if retry_count > 0
         # for the unlikely scenario that somehow an equivalent link was made after the deploy but before the fixup finished
         new_id = -1 * retry_count # just in case
-        updates = { :root_account_id => new_id, :workflow_state => 'deleted' }
-        shadow.update(updates) if shadow
-        link.update(updates)
+        updates = { root_account_id: new_id, workflow_state: "deleted" }
       else
-        updates = { :root_account_id => root_account_id }
-        updates.merge!(:workflow_state => 'deleted') if destroy
-        shadow.update(updates) if shadow
-        link.update(updates)
+        updates = { root_account_id: root_account_id }
+        updates[:workflow_state] = "deleted" if destroy
       end
+      shadow&.update(updates)
+      link.update(updates)
     end
   end
 end

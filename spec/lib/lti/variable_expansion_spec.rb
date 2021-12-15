@@ -34,27 +34,27 @@ module Lti
       end
     end
 
-    it 'must accept multiple guards and combine their results with a logical AND' do
-      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { true }, -> { true })
+    it "must accept multiple guards and combine their results with a logical AND" do
+      var_exp = described_class.new("test", [], -> { @one + @two + @three }, -> { true }, -> { true })
       expect(var_exp.expand(klass.new)).to eq 6
 
-      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false }, -> { true })
-      expect(var_exp.expand(klass.new)).to eq '$test'
+      var_exp = described_class.new("test", [], -> { @one + @two + @three }, -> { false }, -> { true })
+      expect(var_exp.expand(klass.new)).to eq "$test"
     end
 
-    it 'accepts and sets default_name' do
-      var_exp = described_class.new('test', [], -> { 'test' }, -> { true }, default_name: 'test_name')
-      expect(var_exp.default_name).to eq 'test_name'
+    it "accepts and sets default_name" do
+      var_exp = described_class.new("test", [], -> { "test" }, -> { true }, default_name: "test_name")
+      expect(var_exp.default_name).to eq "test_name"
     end
 
-    it 'expands variables' do
-      var_exp = described_class.new('test', [], -> { @one + @two + @three })
+    it "expands variables" do
+      var_exp = described_class.new("test", [], -> { @one + @two + @three })
       expect(var_exp.expand(klass.new)).to eq 6
     end
 
-    it 'does not expand if the guard evals false' do
-      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false })
-      expect(var_exp.expand(klass.new)).to eq '$test'
+    it "does not expand if the guard evals false" do
+      var_exp = described_class.new("test", [], -> { @one + @two + @three }, -> { false })
+      expect(var_exp.expand(klass.new)).to eq "$test"
     end
   end
 end

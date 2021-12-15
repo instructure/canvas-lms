@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
-require 'formatted_type'
+require "hash_view"
+require "formatted_type"
 
 class ObjectPartView < HashView
   attr_reader :name, :part
@@ -47,6 +47,6 @@ class ObjectPartView < HashView
   end
 
   def properties
-    Hash[property_pairs]
+    property_pairs.to_h
   end
 end

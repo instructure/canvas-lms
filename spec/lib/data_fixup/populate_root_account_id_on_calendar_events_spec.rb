@@ -19,24 +19,24 @@
 
 describe DataFixup::PopulateRootAccountIdOnCalendarEvents do
   before(:once) do
-    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
   end
 
-  it 'ignores CalendarEvents with Course context' do
+  it "ignores CalendarEvents with Course context" do
     event = CalendarEvent.create!(context: course_model)
     event.update_column(:root_account_id, nil)
     DataFixup::PopulateRootAccountIdOnCalendarEvents.run(event.id, event.id)
     expect(event.reload.root_account_id).to be_nil
   end
 
-  it 'ignores CalendarEvents with Group context' do
+  it "ignores CalendarEvents with Group context" do
     event = CalendarEvent.create!(context: group_model)
     event.update_column(:root_account_id, nil)
     DataFixup::PopulateRootAccountIdOnCalendarEvents.run(event.id, event.id)
     expect(event.reload.root_account_id).to be_nil
   end
 
-  it 'ignores CalendarEvents with CourseSection context' do
+  it "ignores CalendarEvents with CourseSection context" do
     section = CourseSection.create!(course: course_model)
     event = CalendarEvent.create!(context: section)
     event.update_column(:root_account_id, nil)
@@ -44,14 +44,14 @@ describe DataFixup::PopulateRootAccountIdOnCalendarEvents do
     expect(event.reload.root_account_id).to be_nil
   end
 
-  it 'ignores CalendarEvents with User context and no effective context' do
+  it "ignores CalendarEvents with User context and no effective context" do
     event = CalendarEvent.create!(context: user_model)
     event.update_column(:root_account_id, nil)
     DataFixup::PopulateRootAccountIdOnCalendarEvents.run(event.id, event.id)
     expect(event.reload.root_account_id).to be_nil
   end
 
-  it 'sets root_account_id from effective context for CalendarEvent with User context' do
+  it "sets root_account_id from effective context for CalendarEvent with User context" do
     course = course_model
     event = CalendarEvent.create!(context: user_model, effective_context_code: course.asset_string)
     event.update_column(:root_account_id, nil)
@@ -59,7 +59,7 @@ describe DataFixup::PopulateRootAccountIdOnCalendarEvents do
     expect(event.reload.root_account_id).to eq course.root_account_id
   end
 
-  it 'sets root_account_id from effective context for CalendarEvent with AppointmentGroup context' do
+  it "sets root_account_id from effective context for CalendarEvent with AppointmentGroup context" do
     course = course_model
     ag = AppointmentGroup.create!
     AppointmentGroupContext.create!(appointment_group: ag, context: course)
@@ -69,7 +69,7 @@ describe DataFixup::PopulateRootAccountIdOnCalendarEvents do
     expect(event.reload.root_account_id).to eq course.root_account_id
   end
 
-  it 'sets root_account_id from effective context for child CalendarEvent' do
+  it "sets root_account_id from effective context for child CalendarEvent" do
     course = course_model
     parent = CalendarEvent.create!(context: course)
     event = CalendarEvent.create!(context: user_model, parent_event: parent)
@@ -78,7 +78,7 @@ describe DataFixup::PopulateRootAccountIdOnCalendarEvents do
     expect(event.reload.root_account_id).to eq course.root_account_id
   end
 
-  it 'sets root_account_id from effective context for multiple CalendarEvents' do
+  it "sets root_account_id from effective context for multiple CalendarEvents" do
     course = course_model
     e1 = CalendarEvent.create!(context: user_model, effective_context_code: course.asset_string)
     ag = AppointmentGroup.create!

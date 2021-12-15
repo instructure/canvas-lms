@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'ritex'
+require "ritex"
 
 module Latex
   class MathMl
@@ -51,8 +51,8 @@ module Latex
         request_id_signature = CanvasSecurity.sign_hmac_sha512(request_id)
         val = Canvas.timeout_protection("mathman") do
           response = CanvasHttp.get(url, {
-                                      'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
-                                      'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
+                                      "X-Request-Context-Id" => CanvasSecurity.base64_encode(request_id),
+                                      "X-Request-Context-Signature" => CanvasSecurity.base64_encode(request_id_signature)
                                     })
           if response.code.to_i == 200
             response.body

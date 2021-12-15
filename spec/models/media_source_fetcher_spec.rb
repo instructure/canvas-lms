@@ -27,76 +27,76 @@ describe MediaSourceFetcher do
     MediaSourceFetcher.new(api_client)
   end
 
-  describe '#fetch_preferred_source_url' do
-    context 'when file extension and media_type are provided' do
-      it 'raises an error' do
-        expect {
-          fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4', media_type: 'audio')
-        }.to raise_error(ArgumentError, /file_extension and media_type should not both be present/)
+  describe "#fetch_preferred_source_url" do
+    context "when file extension and media_type are provided" do
+      it "raises an error" do
+        expect do
+          fetcher.fetch_preferred_source_url(media_id: "theMediaId", file_extension: "mp4", media_type: "audio")
+        end.to raise_error(ArgumentError, /file_extension and media_type should not both be present/)
       end
     end
 
-    context 'when no media_sources are found' do
-      it 'returns nil' do
-        expect(api_client).to receive(:media_sources).with('theMediaId').and_return([])
+    context "when no media_sources are found" do
+      it "returns nil" do
+        expect(api_client).to receive(:media_sources).with("theMediaId").and_return([])
 
-        url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4')
+        url = fetcher.fetch_preferred_source_url(media_id: "theMediaId", file_extension: "mp4")
 
         expect(url).to eq nil
       end
     end
 
-    context 'when file extension is provided' do
-      it 'returns the url of the first media source matching that extension, ignoring media_type' do
-        expect(api_client).to receive(:media_sources).with('theMediaId').and_return([
-                                                                                      { url: 'http://example.com/nope.wmv', fileExt: 'wmv' },
-                                                                                      { url: 'http://example.com/yep.mp4', fileExt: 'mp4' },
-                                                                                      { url: 'http://example.com/nope.mp4', fileExt: 'mp4' },
+    context "when file extension is provided" do
+      it "returns the url of the first media source matching that extension, ignoring media_type" do
+        expect(api_client).to receive(:media_sources).with("theMediaId").and_return([
+                                                                                      { url: "http://example.com/nope.wmv", fileExt: "wmv" },
+                                                                                      { url: "http://example.com/yep.mp4", fileExt: "mp4" },
+                                                                                      { url: "http://example.com/nope.mp4", fileExt: "mp4" },
                                                                                     ])
 
-        url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4')
+        url = fetcher.fetch_preferred_source_url(media_id: "theMediaId", file_extension: "mp4")
 
-        expect(url).to eq 'http://example.com/yep.mp4'
+        expect(url).to eq "http://example.com/yep.mp4"
       end
     end
 
-    context 'when media type is video' do
-      it 'returns the first media source with type mp4' do
-        expect(api_client).to receive(:media_sources).with('theMediaId').and_return([
-                                                                                      { url: 'http://example.com/original.mov', fileExt: 'mov' },
-                                                                                      { url: 'http://example.com/web.mp4', fileExt: 'mp4' },
-                                                                                      { url: 'http://example.com/mobile.mp4', fileExt: 'mp4' },
+    context "when media type is video" do
+      it "returns the first media source with type mp4" do
+        expect(api_client).to receive(:media_sources).with("theMediaId").and_return([
+                                                                                      { url: "http://example.com/original.mov", fileExt: "mov" },
+                                                                                      { url: "http://example.com/web.mp4", fileExt: "mp4" },
+                                                                                      { url: "http://example.com/mobile.mp4", fileExt: "mp4" },
                                                                                     ])
 
-        url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', media_type: 'video')
+        url = fetcher.fetch_preferred_source_url(media_id: "theMediaId", media_type: "video")
 
-        expect(url).to eq 'http://example.com/web.mp4'
+        expect(url).to eq "http://example.com/web.mp4"
       end
     end
 
-    context 'when media type is audio' do
-      it 'returns an mp3 if one is present' do
-        expect(api_client).to receive(:media_sources).with('theMediaId').and_return([
-                                                                                      { url: 'http://example.com/yep.mp3', fileExt: 'mp3' },
-                                                                                      { url: 'http://example.com/no.mp4', fileExt: 'mp4' },
-                                                                                      { url: 'http://example.com/nope.mp4', fileExt: 'mp4' },
+    context "when media type is audio" do
+      it "returns an mp3 if one is present" do
+        expect(api_client).to receive(:media_sources).with("theMediaId").and_return([
+                                                                                      { url: "http://example.com/yep.mp3", fileExt: "mp3" },
+                                                                                      { url: "http://example.com/no.mp4", fileExt: "mp4" },
+                                                                                      { url: "http://example.com/nope.mp4", fileExt: "mp4" },
                                                                                     ])
 
-        url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', media_type: 'audio')
+        url = fetcher.fetch_preferred_source_url(media_id: "theMediaId", media_type: "audio")
 
-        expect(url).to eq 'http://example.com/yep.mp3'
+        expect(url).to eq "http://example.com/yep.mp3"
       end
 
-      it 'returns an mp4 when no mp3 sources exist' do
-        expect(api_client).to receive(:media_sources).with('theMediaId').and_return([
-                                                                                      { url: 'http://example.com/nomp3here.wav', fileExt: 'wav' },
-                                                                                      { url: 'http://example.com/butwehave.mp4', fileExt: 'mp4' },
-                                                                                      { url: 'http://example.com/andalso.mp4', fileExt: 'mp4' },
+      it "returns an mp4 when no mp3 sources exist" do
+        expect(api_client).to receive(:media_sources).with("theMediaId").and_return([
+                                                                                      { url: "http://example.com/nomp3here.wav", fileExt: "wav" },
+                                                                                      { url: "http://example.com/butwehave.mp4", fileExt: "mp4" },
+                                                                                      { url: "http://example.com/andalso.mp4", fileExt: "mp4" },
                                                                                     ])
 
-        url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', media_type: 'audio')
+        url = fetcher.fetch_preferred_source_url(media_id: "theMediaId", media_type: "audio")
 
-        expect(url).to eq 'http://example.com/butwehave.mp4'
+        expect(url).to eq "http://example.com/butwehave.mp4"
       end
     end
   end

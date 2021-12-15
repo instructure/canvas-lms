@@ -214,7 +214,7 @@
       </div>
       <% if question_type && question_type.unsupported %>
         <div class="unsupported_question_type_message" style="font-size: 0.8em; font-weight: bold;">
-          <%= t(:unsupported_question_type, <<-TEXT, :question_type => hash_get(question, :question_type))
+          <%= t(:unsupported_question_type, <<~TEXT, :question_type => hash_get(question, :question_type))
           This question was imported from an external source. It was a
           '%{question_type}' question, which is not supported in this quiz
           tool.

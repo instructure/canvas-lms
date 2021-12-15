@@ -18,33 +18,33 @@
 #
 
 describe QuizzesNext::ExportService do
-  describe '.applies_to_course?' do
-    let(:course) { double('course') }
+  describe ".applies_to_course?" do
+    let(:course) { double("course") }
 
-    context 'service enabled for context' do
-      it 'returns true' do
+    context "service enabled for context" do
+      it "returns true" do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(true)
         expect(described_class.applies_to_course?(course)).to eq(true)
       end
     end
 
-    context 'service not enabled for context' do
-      it 'returns false' do
+    context "service not enabled for context" do
+      it "returns false" do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(false)
         expect(described_class.applies_to_course?(course)).to eq(false)
       end
     end
   end
 
-  describe '.begin_export' do
-    let(:course) { double('course') }
+  describe ".begin_export" do
+    let(:course) { double("course") }
 
     before do
       allow(course).to receive(:uuid).and_return(1234)
     end
 
-    context 'no assignments' do
-      it 'does nothing' do
+    context "no assignments" do
+      it "does nothing" do
         allow(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).and_return([])
 
         expect(described_class.begin_export(course, {})).to be_nil
@@ -52,14 +52,14 @@ describe QuizzesNext::ExportService do
     end
 
     it "filters to selected assignments with selective exports" do
-      export_opts = { :selective => true, :exported_assets => ['assignment_42', 'wiki_page_84'] }
+      export_opts = { selective: true, exported_assets: ["assignment_42", "wiki_page_84"] }
       expect(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).with(course, selected_assignment_ids: ["42"]).and_return([])
       described_class.begin_export(course, export_opts)
     end
 
-    it 'returns metadata for each assignment' do
-      assignment1 = double('assignment')
-      assignment2 = double('assignment')
+    it "returns metadata for each assignment" do
+      assignment1 = double("assignment")
+      assignment2 = double("assignment")
       lti_assignments = [
         assignment1,
         assignment2
@@ -84,27 +84,27 @@ describe QuizzesNext::ExportService do
     end
   end
 
-  describe '.retrieve_export' do
-    it 'returns what is sent in' do
-      expect(described_class.retrieve_export('foo')).to eq('foo')
+  describe ".retrieve_export" do
+    it "returns what is sent in" do
+      expect(described_class.retrieve_export("foo")).to eq("foo")
     end
   end
 
-  describe '.send_imported_content' do
-    let(:new_course) { double('course') }
-    let(:root_account) { double('account') }
-    let(:content_migration) { double(:started_at => 1.hour.ago) }
+  describe ".send_imported_content" do
+    let(:new_course) { double("course") }
+    let(:root_account) { double("account") }
+    let(:content_migration) { double(started_at: 1.hour.ago) }
     let(:new_assignment1) { assignment_model(id: 1) }
     let(:new_assignment2) { assignment_model(id: 2) }
     let(:old_assignment1) { assignment_model(id: 3) }
     let(:old_assignment2) { assignment_model(id: 4) }
     let(:basic_import_content) do
       {
-        original_course_uuid: '100005',
+        original_course_uuid: "100005",
         assignments: [
           {
-            original_resource_link_id: 'link-1234',
-            '$canvas_assignment_id': new_assignment1.id,
+            original_resource_link_id: "link-1234",
+            "$canvas_assignment_id": new_assignment1.id,
             original_assignment_id: old_assignment1.id
           }
         ]
@@ -112,26 +112,26 @@ describe QuizzesNext::ExportService do
     end
 
     before do
-      allow(new_course).to receive(:uuid).and_return('100006')
-      allow(new_course).to receive(:lti_context_id).and_return('ctx-1234')
-      allow(new_course).to receive(:name).and_return('Course Name')
+      allow(new_course).to receive(:uuid).and_return("100006")
+      allow(new_course).to receive(:lti_context_id).and_return("ctx-1234")
+      allow(new_course).to receive(:name).and_return("Course Name")
 
-      allow(root_account).to receive(:domain).and_return('canvas.instructure.com')
+      allow(root_account).to receive(:domain).and_return("canvas.instructure.com")
       allow(new_course).to receive(:root_account).and_return(root_account)
     end
 
-    it 'emits live events for each copied assignment' do
+    it "emits live events for each copied assignment" do
       payload = {
-        original_course_uuid: '100005',
-        new_course_uuid: '100006',
-        new_course_resource_link_id: 'ctx-1234',
-        domain: 'canvas.instructure.com',
-        new_course_name: 'Course Name'
+        original_course_uuid: "100005",
+        new_course_uuid: "100006",
+        new_course_resource_link_id: "ctx-1234",
+        domain: "canvas.instructure.com",
+        new_course_name: "Course Name"
       }
 
       basic_import_content[:assignments] << {
-        original_resource_link_id: 'link-5678',
-        '$canvas_assignment_id': new_assignment2.id,
+        original_resource_link_id: "link-5678",
+        "$canvas_assignment_id": new_assignment2.id,
         original_assignment_id: old_assignment2.id
       }
 
@@ -139,18 +139,18 @@ describe QuizzesNext::ExportService do
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
-    it 'ignores not found assignments' do
+    it "ignores not found assignments" do
       basic_import_content[:assignments] << {
-        original_resource_link_id: '5678',
-        '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
+        original_resource_link_id: "5678",
+        "$canvas_assignment_id": Canvas::Migration::ExternalContent::Translator::NOT_FOUND
       }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
-    it 'skips assignments created prior to the current migration' do
-      Assignment.where(:id => new_assignment1).update_all(:created_at => 1.day.ago)
+    it "skips assignments created prior to the current migration" do
+      Assignment.where(id: new_assignment1).update_all(created_at: 1.day.ago)
       expect(Canvas::LiveEvents).not_to receive(:quizzes_next_quiz_duplicated)
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
     end
@@ -159,27 +159,27 @@ describe QuizzesNext::ExportService do
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
-      expect(new_assignment1.reload.workflow_state).to eq('duplicating')
+      expect(new_assignment1.reload.workflow_state).to eq("duplicating")
     end
 
-    it 'sets the new assignment as duplicate of the old assignment' do
+    it "sets the new assignment as duplicate of the old assignment" do
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
       expect(new_assignment1.reload.duplicate_of).to eq(old_assignment1)
     end
 
-    it 'sets the external_tool_tag to be the same as the old tag' do
+    it "sets the external_tool_tag to be the same as the old tag" do
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
       expect(new_assignment1.reload.external_tool_tag).to eq(old_assignment1.external_tool_tag)
     end
 
-    it 'skips assignments that are not duplicates' do
+    it "skips assignments that are not duplicates" do
       basic_import_content[:assignments] << {
-        original_resource_link_id: '5678',
-        '$canvas_assignment_id': new_assignment2.id
+        original_resource_link_id: "5678",
+        "$canvas_assignment_id": new_assignment2.id
       }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once

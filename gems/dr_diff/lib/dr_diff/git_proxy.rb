@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'shellwords'
+require "shellwords"
 
 module DrDiff
   class Change
@@ -20,7 +20,7 @@ module DrDiff
       @git_dir = git_dir
     end
 
-    ROOT_DIR = File.expand_path("../../../../../", __FILE__)
+    ROOT_DIR = File.expand_path("../../../..", __dir__)
     def path_from_root
       File.join(ROOT_DIR, git_dir || ".", path)
     end
@@ -72,7 +72,7 @@ module DrDiff
     end
 
     def wip?
-      first_line =~ /\A(\(|\[)?wip\b/i ? true : false
+      /\A(\(|\[)?wip\b/i.match?(first_line)
     end
 
     private

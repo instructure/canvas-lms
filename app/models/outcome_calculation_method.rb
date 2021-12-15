@@ -22,11 +22,11 @@ class OutcomeCalculationMethod < ApplicationRecord
   include Canvas::SoftDeletable
   extend RootAccountResolver
 
-  CALCULATION_METHODS = [
-    'decaying_average',
-    'n_mastery',
-    'highest',
-    'latest'
+  CALCULATION_METHODS = %w[
+    decaying_average
+    n_mastery
+    highest
+    latest
   ].freeze
 
   VALID_CALCULATION_INTS = {
@@ -46,43 +46,43 @@ class OutcomeCalculationMethod < ApplicationRecord
     message: "calculation_method must be one of #{CALCULATION_METHODS}"
   }
   validates :calculation_int, inclusion: {
-    in: ->(model) {
+    in: lambda do |model|
       VALID_CALCULATION_INTS[model.calculation_method].presence || [nil] # if valid ints == [], value must be nil
-    },
-    if: ->(model) {
+    end,
+    if: lambda do |model|
       CALCULATION_METHODS.include?(model.calculation_method)
-    },
+    end,
     message: "invalid calculation_int for this calculation_method"
   }
 
   after_save :clear_cached_methods
 
   def as_json(options = {})
-    super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
+    super(options.reverse_merge(include_root: false, only: %i[id calculation_method calculation_int context_type context_id]))
   end
 
   def self.find_or_create_default!(context)
     method = OutcomeCalculationMethod.find_by(context: context)
-    if method&.workflow_state == 'active'
+    if method&.workflow_state == "active"
       return method
     end
 
     method ||= OutcomeCalculationMethod.new(context: context)
-    method.workflow_state = 'active'
-    method.calculation_method = 'highest'
+    method.workflow_state = "active"
+    method.calculation_method = "highest"
     method.calculation_int = nil
     GuardRail.activate(:primary) { method.save! }
     method
   rescue ActiveRecord::RecordNotUnique
     retry
   rescue ActiveRecord::RecordInvalid => e
-    raise unless e.record.errors[:context_id] == ['has already been taken']
+    raise unless e.record.errors[:context_id] == ["has already been taken"]
 
     retry
   end
 
   def clear_cached_methods
-    if context_type == 'Account'
+    if context_type == "Account"
       context.clear_downstream_caches(:resolved_outcome_calculation_method)
     end
   end

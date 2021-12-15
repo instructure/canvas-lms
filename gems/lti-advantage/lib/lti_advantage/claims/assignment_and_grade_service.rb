@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_model'
+require "active_model"
 
 module LtiAdvantage::Claims
   # Class represeting an LTI 1.3 message AGS "endpoint" claim.

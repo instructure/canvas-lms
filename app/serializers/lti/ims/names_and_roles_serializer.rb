@@ -61,7 +61,7 @@ module Lti::IMS
           current_user: Lti::IMS::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
           enrollment: enrollment,
-          variable_whitelist: %w(
+          variable_whitelist: %w[
             Person.name.full
             Person.name.display
             Person.name.family
@@ -82,7 +82,7 @@ module Lti::IMS
             Canvas.user.sisIntegrationId
             Canvas.xapi.url
             Caliper.url
-          )
+          ]
         }
       )
     end
@@ -90,7 +90,7 @@ module Lti::IMS
     def member(enrollment, expander)
       user = enrollment.user
       {
-        status: 'Active',
+        status: "Active",
         name: (user.name if page[:tool].include_name?),
         picture: (user.avatar_url if page[:tool].public?),
         given_name: (user.first_name if page[:tool].include_name?),
@@ -104,8 +104,8 @@ module Lti::IMS
     end
 
     def member_sourced_id(expander)
-      expanded = expander.expand_variables!({ value: '$Person.sourcedId' })[:value]
-      expanded == '$Person.sourcedId' ? nil : expanded
+      expanded = expander.expand_variables!({ value: "$Person.sourcedId" })[:value]
+      expanded == "$Person.sourcedId" ? nil : expanded
     end
 
     def message(enrollment, expander)
@@ -124,7 +124,7 @@ module Lti::IMS
           return_url: nil,
           opts: {
             # See #variable_expander for additional constraints on custom param expansion
-            claim_group_whitelist: [:public, :i18n, :custom_params],
+            claim_group_whitelist: %i[public i18n custom_params],
             extension_whitelist: [:canvas_user_id, :canvas_user_login_id]
           }
         ).generate_post_payload_message(validate_launch: false)

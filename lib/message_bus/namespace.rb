@@ -37,7 +37,7 @@ module MessageBus
     def self.build(namespace)
       return namespace if namespace.is_a?(::MessageBus::Namespace)
 
-      self.new(namespace)
+      new(namespace)
     end
 
     # If somehow the consuming code is already injecting

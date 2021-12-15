@@ -21,9 +21,9 @@ import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import EditCalendarEventDetails from '../EditCalendarEventDetails'
 
 const CONTEXTS = [
-  {name: 'course1', asset_string: 'course_1', can_create_calendar_events: true, k5_subject: false},
-  {name: 'course2', asset_string: 'course_2', can_create_calendar_events: true, k5_subject: true},
-  {name: 'course3', asset_string: 'course_3', can_create_calendar_events: true, k5_subject: false}
+  {name: 'course1', asset_string: 'course_1', can_create_calendar_events: true, k5_course: false},
+  {name: 'course2', asset_string: 'course_2', can_create_calendar_events: true, k5_course: true},
+  {name: 'course3', asset_string: 'course_3', can_create_calendar_events: true, k5_course: false}
 ]
 
 describe('EditCalendarEventDetails', () => {

@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../api_spec_helper'
-require_relative '../../locked_spec'
-require_relative '../../../file_upload_helper'
+require_relative "../../api_spec_helper"
+require_relative "../../locked_spec"
+require_relative "../../../file_upload_helper"
 
 describe QuizzesNext::QuizzesApiController, type: :request do
   describe "GET /courses/:course_id/all_quizzes (index)" do
-    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! title: "quiz_#{i}" } }
     let(:assignments) do
       (0..2).map do |i|
-        @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
+        @course.assignments.create! title: "assignment_#{i}", workflow_state: "unpublished"
       end
     end
     let(:new_quizzes) do
       (3..5).map do |i|
-        quiz = @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
+        quiz = @course.assignments.create! title: "assignment_#{i}", workflow_state: "unpublished"
         quiz.quiz_lti!
         quiz.save!
         quiz
@@ -40,15 +40,15 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
     let(:tool) do
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
       )
     end
 
-    before(:once) { teacher_in_course(:active_all => true) }
+    before(:once) { teacher_in_course(active_all: true) }
 
     before do
       quizzes
@@ -57,7 +57,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
       new_quizzes
     end
 
-    context 'as a teacher' do
+    context "as a teacher" do
       subject do
         api_call(
           :get,
@@ -70,24 +70,24 @@ describe QuizzesNext::QuizzesApiController, type: :request do
       end
 
       it "returns list of old quizzes" do
-        quiz_collection = subject.collect.reject { |quiz| quiz['quiz_type'] == 'quizzes.next' }
-        expect(quiz_collection.map { |q| q['id'] }).to eq quizzes.map(&:id)
+        quiz_collection = subject.collect.reject { |quiz| quiz["quiz_type"] == "quizzes.next" }
+        expect(quiz_collection.map { |q| q["id"] }).to eq quizzes.map(&:id)
       end
 
       it "returns list of assignments (new quizzes)" do
-        quiz_collection = subject.collect.select { |quiz| quiz['quiz_type'] == 'quizzes.next' }
-        expect(quiz_collection.map { |q| q['id'] }).to eq new_quizzes.map(&:id)
+        quiz_collection = subject.collect.select { |quiz| quiz["quiz_type"] == "quizzes.next" }
+        expect(quiz_collection.map { |q| q["id"] }).to eq new_quizzes.map(&:id)
       end
 
-      describe 'search_term query param' do
-        let(:search_term) { 'waldo' }
-        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "#{search_term}_#{i}" } }
+      describe "search_term query param" do
+        let(:search_term) { "waldo" }
+        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! title: "#{search_term}_#{i}" } }
         let(:assignments_with_search_term) do
           (3..5).map do |i|
-            @course.assignments.create! :title => "#{search_term}_#{i}"
+            @course.assignments.create! title: "#{search_term}_#{i}"
           end
         end
-        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! title: "quiz_#{i}" } }
         let(:quizzes) { quizzes_with_search_term + quizzes_without_search_term + assignments_with_search_term }
 
         before do
@@ -108,20 +108,20 @@ describe QuizzesNext::QuizzesApiController, type: :request do
             search_term: search_term
           )
 
-          response_quizzes = response.reject { |quiz| quiz['quiz_type'] == 'quizzes.next' }.map { |quiz| quiz['title'] }
+          response_quizzes = response.reject { |quiz| quiz["quiz_type"] == "quizzes.next" }.map { |quiz| quiz["title"] }
           expect(response_quizzes.sort).to eq(quizzes_with_search_term.map(&:title).sort)
 
-          response_quizzes = response.select { |quiz| quiz['quiz_type'] == 'quizzes.next' }.map { |quiz| quiz['title'] }
+          response_quizzes = response.select { |quiz| quiz["quiz_type"] == "quizzes.next" }.map { |quiz| quiz["title"] }
           expect(response_quizzes.sort).to eq(assignments_with_search_term.map(&:title).sort)
         end
       end
 
-      context 'quizzes with the same title' do
+      context "quizzes with the same title" do
         let(:quiz_count) { 10 }
-        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! :title => "the same title" } }
+        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! title: "the same title" } }
         let(:assignments) do
           (0..quiz_count).map do
-            @course.assignments.create! :title => "the same title"
+            @course.assignments.create! title: "the same title"
           end
         end
 
@@ -155,7 +155,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
         end
       end
 
-      context 'when there are multiple data pages' do
+      context "when there are multiple data pages" do
         subject do
           api_call(
             :get,
@@ -170,7 +170,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
         it "include a response header Link" do
           subject
-          link_header = response.headers['Link']
+          link_header = response.headers["Link"]
           expect(link_header).to eq(
             "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"current\","\
             "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=2&per_page=2>; rel=\"next\","\
@@ -182,9 +182,9 @@ describe QuizzesNext::QuizzesApiController, type: :request do
         it "also caches link header" do
           enable_cache do
             subject
-            link_header = response.headers['Link']
+            link_header = response.headers["Link"]
             cache_key = Rails.cache.instance_variable_get(:@data).keys.grep(/quizzes\.next/).first.dup
-            cache_key.sub!(/^rails60:/, '')
+            cache_key.sub!(/^rails60:/, "")
             cached_content = Rails.cache.read(cache_key)
             expect(cached_content[:link]).to eq(link_header)
           end
@@ -192,12 +192,12 @@ describe QuizzesNext::QuizzesApiController, type: :request do
       end
     end
 
-    context 'as a student' do
-      before(:once) { student_in_course(:active_all => true) }
+    context "as a student" do
+      before(:once) { student_in_course(active_all: true) }
 
-      context 'quiz tab is disabled' do
+      context "quiz tab is disabled" do
         before do
-          @course.tab_configuration = [{ :id => Course::TAB_QUIZZES, :hidden => true }]
+          @course.tab_configuration = [{ id: Course::TAB_QUIZZES, hidden: true }]
           @course.save!
         end
 
@@ -214,14 +214,14 @@ describe QuizzesNext::QuizzesApiController, type: :request do
         end
       end
 
-      context 'a published quiz' do
+      context "a published quiz" do
         subject do
           api_call(
             :get,
             "/api/v1/courses/#{@course.id}/all_quizzes",
-            controller: 'quizzes_next/quizzes_api',
-            action: 'index',
-            format: 'json',
+            controller: "quizzes_next/quizzes_api",
+            action: "index",
+            format: "json",
             course_id: @course.id.to_s
           )
         end
@@ -231,11 +231,11 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
         before do
           published_quiz.publish!
-          published_new_quiz.update_attribute(:workflow_state, 'published')
+          published_new_quiz.update_attribute(:workflow_state, "published")
         end
 
         it "only returns published quizzes" do
-          quiz_ids = subject.map { |quiz| quiz['id'] }
+          quiz_ids = subject.map { |quiz| quiz["id"] }
           expect(quiz_ids).to eq([published_quiz.id, published_new_quiz.id])
         end
       end

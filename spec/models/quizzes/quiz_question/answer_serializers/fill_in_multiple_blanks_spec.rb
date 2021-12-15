@@ -17,27 +17,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'support/answer_serializers_specs'
-require_relative 'support/textual_answer_serializers_specs'
+require_relative "support/answer_serializers_specs"
+require_relative "support/textual_answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
-  include_examples 'Answer Serializers'
-
-  let :input do
-    {
-      answer1: 'Red',
-      answer3: 'Green',
-      answer4: 'Blue'
-    }.with_indifferent_access
-  end
-
   let :output do
     {
-      "question_5_#{AssessmentQuestion.variable_id 'answer1'}" => 'red',
-      "question_5_#{AssessmentQuestion.variable_id 'answer3'}" => 'green',
-      "question_5_#{AssessmentQuestion.variable_id 'answer4'}" => 'blue'
+      "question_5_#{AssessmentQuestion.variable_id "answer1"}" => "red",
+      "question_5_#{AssessmentQuestion.variable_id "answer3"}" => "green",
+      "question_5_#{AssessmentQuestion.variable_id "answer4"}" => "blue"
     }.with_indifferent_access
   end
+  let :input do
+    {
+      answer1: "Red",
+      answer3: "Green",
+      answer4: "Blue"
+    }.with_indifferent_access
+  end
+
+  include_examples "Answer Serializers"
 
   # needed for auto specs
   def sanitize(answer_hash)
@@ -54,41 +53,41 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
     { answer1: answer_text }
   end
 
-  describe '#deserialize (full)' do
-    it 'includes all answer/match pairs' do
+  describe "#deserialize (full)" do
+    it "includes all answer/match pairs" do
       output = subject.deserialize({
-        "question_5_#{AssessmentQuestion.variable_id 'answer1'}" => 'red',
-        "question_5_#{AssessmentQuestion.variable_id 'answer2'}" => nil,
-        "question_5_#{AssessmentQuestion.variable_id 'answer3'}" => 'green',
-        "question_5_#{AssessmentQuestion.variable_id 'answer4'}" => 'blue',
-        "question_5_#{AssessmentQuestion.variable_id 'answer5'}" => nil,
-        "question_5_#{AssessmentQuestion.variable_id 'answer6'}" => nil,
+        "question_5_#{AssessmentQuestion.variable_id "answer1"}" => "red",
+        "question_5_#{AssessmentQuestion.variable_id "answer2"}" => nil,
+        "question_5_#{AssessmentQuestion.variable_id "answer3"}" => "green",
+        "question_5_#{AssessmentQuestion.variable_id "answer4"}" => "blue",
+        "question_5_#{AssessmentQuestion.variable_id "answer5"}" => nil,
+        "question_5_#{AssessmentQuestion.variable_id "answer6"}" => nil,
       }.as_json, full: true)
 
       expect(output).to eq({
-        answer1: 'red',
+        answer1: "red",
         answer2: nil,
-        answer3: 'green',
-        answer4: 'blue',
+        answer3: "green",
+        answer4: "blue",
         answer5: nil,
         answer6: nil,
       }.as_json)
     end
   end
 
-  context 'validations' do
-    include_examples 'Textual Answer Serializers'
+  context "validations" do
+    include_examples "Textual Answer Serializers"
 
-    it 'rejects unexpected types' do
-      ['asdf', nil].each do |bad_input|
+    it "rejects unexpected types" do
+      ["asdf", nil].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
         expect(rc.error).to match(/must be of type hash/i)
       end
     end
 
-    it 'rejects an answer to an unknown blank' do
-      rc = subject.serialize({ foobar: 'yeeeeeeeeee' })
+    it "rejects an answer to an unknown blank" do
+      rc = subject.serialize({ foobar: "yeeeeeeeeee" })
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/unknown blank/i)
     end

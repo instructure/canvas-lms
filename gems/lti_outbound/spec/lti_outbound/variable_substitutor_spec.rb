@@ -18,50 +18,50 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe LtiOutbound::VariableSubstitutor do
   describe "#substitute" do
     it "leaves the value unchanged for unkown keys" do
-      data_hash = { 'canvas_course_id' => '$Invalid.key' }
-      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Invalid.key'
+      data_hash = { "canvas_course_id" => "$Invalid.key" }
+      expect(subject.substitute!(data_hash)["canvas_course_id"]).to eq "$Invalid.key"
     end
 
     it "substitutes nil values" do
-      data_hash = { 'canvas_course_id' => '$My.custom.variable' }
-      subject.add_substitution '$My.custom.variable', nil
+      data_hash = { "canvas_course_id" => "$My.custom.variable" }
+      subject.add_substitution "$My.custom.variable", nil
 
-      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq nil
+      expect(subject.substitute!(data_hash)["canvas_course_id"]).to eq nil
     end
 
     it "leaves the value unchanged for missing models" do
-      data_hash = { 'canvas_course_id' => '$Canvas.account.id' }
-      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Canvas.account.id'
+      data_hash = { "canvas_course_id" => "$Canvas.account.id" }
+      expect(subject.substitute!(data_hash)["canvas_course_id"]).to eq "$Canvas.account.id"
     end
 
-    describe 'variable_substitutions' do
-      it 'can accept variable substitutions' do
-        subject.add_substitution '$My.custom.variable', 'blah'
-        data_hash = { custom_var: '$My.custom.variable' }
+    describe "variable_substitutions" do
+      it "can accept variable substitutions" do
+        subject.add_substitution "$My.custom.variable", "blah"
+        data_hash = { custom_var: "$My.custom.variable" }
         subject.substitute!(data_hash)
 
-        expect(data_hash).to eq({ custom_var: 'blah' })
+        expect(data_hash).to eq({ custom_var: "blah" })
       end
 
-      it 'can evaluate a proc' do
-        subject.add_substitution('$My.custom.proc', proc { 'blah' })
-        data_hash = { custom_var: '$My.custom.proc' }
+      it "can evaluate a proc" do
+        subject.add_substitution("$My.custom.proc", proc { "blah" })
+        data_hash = { custom_var: "$My.custom.proc" }
         subject.substitute!(data_hash)
 
-        expect(data_hash).to eq({ custom_var: 'blah' })
+        expect(data_hash).to eq({ custom_var: "blah" })
       end
     end
 
-    it '#has_key?' do
-      subject.add_substitution '$My.custom.variable', 'value'
+    it "#key?" do
+      subject.add_substitution "$My.custom.variable", "value"
 
-      expect(subject.has_key?('$My.custom.variable')).to eq true
-      expect(subject.has_key?('$My.fake.variable')).to eq false
+      expect(subject).to have_key("$My.custom.variable")
+      expect(subject).not_to have_key("$My.fake.variable")
     end
   end
 end

@@ -22,17 +22,17 @@ module SpecComponents
     attr_reader :id, :title
 
     def assign_to(_opts = {})
-      raise NotImplementedError, 'You must implement the assign_to() method!'
+      raise NotImplementedError, "You must implement the assign_to() method!"
     end
 
     def submit_as(_user)
-      raise NotImplementedError, 'You must implement the submit_as() method!'
+      raise NotImplementedError, "You must implement the submit_as() method!"
     end
 
     private
 
     def add_assignment_override(assignment, opts)
-      raise ArgumentError, 'Missing argument for assignment override!' if opts[:user].nil? && opts[:section].nil? && opts[:group].nil?
+      raise ArgumentError, "Missing argument for assignment override!" if opts[:user].nil? && opts[:section].nil? && opts[:group].nil?
 
       add_assignment_override_for_student(opts) if opts[:user]
       add_assignment_override_for_section(opts) if opts[:section]
@@ -47,8 +47,8 @@ module SpecComponents
       assignment_override = create_assignment_override(opts)
       yield assignment_override
 
-      assignment_override.title = 'Student Override'
-      assignment_override.set_type = 'ADHOC'
+      assignment_override.title = "Student Override"
+      assignment_override.set_type = "ADHOC"
       assignment_override.save!
 
       override_student = assignment_override.assignment_override_students.build
@@ -61,7 +61,7 @@ module SpecComponents
       yield assignment_override
 
       assignment_override.set = opts[:section]
-      assignment_override.set_type = 'CourseSection'
+      assignment_override.set_type = "CourseSection"
       assignment_override.save!
     end
 
@@ -70,8 +70,8 @@ module SpecComponents
     end
 
     def create_assignment_override(opts)
-      assignment_override = AssignmentOverride.new()
-      assignment_override.workflow_state = 'active'
+      assignment_override = AssignmentOverride.new
+      assignment_override.workflow_state = "active"
       set_override_dates(assignment_override, opts)
       assignment_override
     end

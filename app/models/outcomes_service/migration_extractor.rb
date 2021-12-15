@@ -24,9 +24,9 @@ module OutcomesService
     end
 
     def learning_outcomes(context)
-      @migration.imported_migration_items_by_class(LearningOutcome).map do |item|
+      @migration.imported_migration_items_by_class(LearningOutcome).filter_map do |item|
         outcome_attributes(item) if item.context == context
-      end.compact
+      end
     end
 
     def learning_outcome_groups(context)
@@ -36,9 +36,9 @@ module OutcomesService
     end
 
     def learning_outcome_links
-      @migration.imported_migration_items_by_class(ContentTag).map do |item|
+      @migration.imported_migration_items_by_class(ContentTag).filter_map do |item|
         link_attributes(item) if valid_link?(item)
-      end.compact
+      end
     end
 
     private
@@ -58,14 +58,14 @@ module OutcomesService
     end
 
     def valid_link?(item)
-      item.tag_type == 'learning_outcome_association' && item.associated_asset_type == 'LearningOutcomeGroup' && item.content_type == 'LearningOutcome'
+      item.tag_type == "learning_outcome_association" && item.associated_asset_type == "LearningOutcomeGroup" && item.content_type == "LearningOutcome"
     end
 
     def link_attributes(learning_outcome_link)
       {
-        '$canvas_learning_outcome_link_id': learning_outcome_link.id,
-        '$canvas_learning_outcome_group_id': learning_outcome_link.associated_asset_id,
-        '$canvas_learning_outcome_id': learning_outcome_link.content_id
+        "$canvas_learning_outcome_link_id": learning_outcome_link.id,
+        "$canvas_learning_outcome_group_id": learning_outcome_link.associated_asset_id,
+        "$canvas_learning_outcome_id": learning_outcome_link.content_id
       }
     end
   end

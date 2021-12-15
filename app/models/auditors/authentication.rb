@@ -25,14 +25,14 @@ class Auditors::Authentication
                :user_id
 
     def self.generate(pseudonym, event_type)
-      new('pseudonym' => pseudonym, 'event_type' => event_type)
+      new("pseudonym" => pseudonym, "event_type" => event_type)
     end
 
     def initialize(*args)
       super(*args)
 
-      if attributes['pseudonym']
-        self.pseudonym = attributes.delete('pseudonym')
+      if attributes["pseudonym"]
+        self.pseudonym = attributes.delete("pseudonym")
       end
     end
 
@@ -42,18 +42,12 @@ class Auditors::Authentication
 
     def pseudonym=(pseudonym)
       @pseudonym = pseudonym
-      attributes['pseudonym_id'] = @pseudonym.global_id
-      attributes['account_id'] = Shard.global_id_for(@pseudonym.account_id)
-      attributes['user_id'] = Shard.global_id_for(@pseudonym.user_id)
+      attributes["pseudonym_id"] = @pseudonym.global_id
+      attributes["account_id"] = Shard.global_id_for(@pseudonym.account_id)
+      attributes["user_id"] = Shard.global_id_for(@pseudonym.user_id)
     end
 
-    def user
-      pseudonym.user
-    end
-
-    def account
-      pseudonym.account
-    end
+    delegate :user, :account, to: :pseudonym
   end
 
   Stream = Audits.stream do
@@ -67,23 +61,23 @@ class Auditors::Authentication
 
     add_index :pseudonym do
       table :authentications_by_pseudonym
-      entry_proc lambda { |record| record.pseudonym }
-      key_proc lambda { |pseudonym| pseudonym.global_id }
-      ar_scope_proc lambda { |pseudonym| auth_ar_type.where(pseudonym_id: pseudonym.id) }
+      entry_proc ->(record) { record.pseudonym }
+      key_proc ->(pseudonym) { pseudonym.global_id }
+      ar_scope_proc ->(pseudonym) { auth_ar_type.where(pseudonym_id: pseudonym.id) }
     end
 
     add_index :user do
       table :authentications_by_user
-      entry_proc lambda { |record| record.user }
-      key_proc lambda { |user| user.global_id }
-      ar_scope_proc lambda { |user| auth_ar_type.where(user_id: user.id) }
+      entry_proc ->(record) { record.user }
+      key_proc ->(user) { user.global_id }
+      ar_scope_proc ->(user) { auth_ar_type.where(user_id: user.id) }
     end
 
     add_index :account do
       table :authentications_by_account
-      entry_proc lambda { |record| record.account }
-      key_proc lambda { |account| account.global_id }
-      ar_scope_proc lambda { |account| auth_ar_type.where(account_id: account.id) }
+      entry_proc ->(record) { record.account }
+      key_proc ->(account) { account.global_id }
+      ar_scope_proc ->(account) { auth_ar_type.where(account_id: account.id) }
     end
   end
 

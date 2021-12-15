@@ -22,9 +22,11 @@ require "json"
 module LuckySneaks
   module Unidecoder
     # Contains Unicode codepoints, loading as needed from JSON files
-    CODEPOINTS = Hash.new { |h, k|
-      h[k] = JSON.load(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
-    } unless defined?(CODEPOINTS)
+    unless defined?(CODEPOINTS)
+      CODEPOINTS = Hash.new do |h, k|
+        h[k] = JSON.parse(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
+      end
+    end
 
     class << self
       # Returns string with its UTF-8 characters transliterated to ASCII ones
@@ -32,7 +34,7 @@ module LuckySneaks
       # You're probably better off just using the added String#to_ascii
       def decode(string)
         string.gsub(/[^\x00-\x7f]/u) do |codepoint|
-          unpacked = codepoint.unpack("U")[0]
+          unpacked = codepoint.unpack1("U")
           begin
             CODEPOINTS[code_group(unpacked)][grouped_point(unpacked)]
           rescue
@@ -50,7 +52,7 @@ module LuckySneaks
       # Returns string indicating which file (and line) contains the
       # transliteration value for the character
       def in_json_file(character)
-        unpacked = character.unpack("U")[0]
+        unpacked = character.unpack1("U")
         "#{code_group(unpacked)}.json (line #{grouped_point(unpacked) + 2})"
       end
 

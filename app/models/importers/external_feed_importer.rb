@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class ExternalFeedImporter < Importer
     self.item_class = ExternalFeed
 
     def self.process_migration(data, migration)
-      tools = data['external_feeds'] ? data['external_feeds'] : []
-      to_import = migration.to_import 'external_feeds'
+      tools = data["external_feeds"] || []
+      to_import = migration.to_import "external_feeds"
       tools.each do |tool|
-        if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-          begin
-            self.import_from_migration(tool, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
-          end
+        next unless tool["migration_id"] && (!to_import || to_import[tool["migration_id"]])
+
+        begin
+          import_from_migration(tool, migration.context, migration)
+        rescue
+          migration.add_import_warning(t("#migration.external_feed_type", "External Feed"), tool[:title], $!)
         end
       end
     end
@@ -54,18 +54,22 @@ module Importers
     end
 
     def self.find_or_initialize_from_migration(hash, context)
-      item = ExternalFeed.where(
-        context_id: context,
-        context_type: context.class.to_s,
-        migration_id: hash[:migration_id]
-      ).first if hash[:migration_id]
-      item ||= ExternalFeed.where(
-        context_id: context,
-        context_type: context.class.to_s,
-        url: hash[:url],
-        header_match: hash[:header_match].presence,
-        verbosity: hash[:verbosity]
-      ).first if hash[:url]
+      if hash[:migration_id]
+        item = ExternalFeed.where(
+          context_id: context,
+          context_type: context.class.to_s,
+          migration_id: hash[:migration_id]
+        ).first
+      end
+      if hash[:url]
+        item ||= ExternalFeed.where(
+          context_id: context,
+          context_type: context.class.to_s,
+          url: hash[:url],
+          header_match: hash[:header_match].presence,
+          verbosity: hash[:verbosity]
+        ).first
+      end
       item ||= context.external_feeds.temp_record
       item
     end

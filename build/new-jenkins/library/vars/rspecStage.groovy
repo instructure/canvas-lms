@@ -23,37 +23,15 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 @Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
 
 def createDistribution(nestedStages) {
-  def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
-  def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
   def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
-  def rspecqEnabled = env.RSPECQ_ENABLED == '1' || configuration.isRspecqEnabled()
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
+    "ENABLE_CRYSTALBALL=${env.ENABLE_CRYSTALBALL}",
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20201119',
     "RSPECQ_ENABLED=${env.RSPECQ_ENABLED}"
-  ]
-
-  def rspecEnvVars = baseEnvVars + [
-    "CI_NODE_TOTAL=$rspecNodeTotal",
-    'COMPOSE_FILE=docker-compose.new-jenkins.yml',
-    'EXCLUDE_TESTS=.*/(selenium|contracts)',
-    "FORCE_FAILURE=${configuration.isForceFailureRSpec() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
-    "RSPEC_PROCESSES=${configuration.getInteger('rspec-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
-  ]
-
-  def seleniumEnvVars = baseEnvVars + [
-    "CI_NODE_TOTAL=$seleniumNodeTotal",
-    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-    'EXCLUDE_TESTS=.*/performance',
-    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
-    "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
   ]
 
   def rspecqEnvVars = baseEnvVars + [
@@ -70,40 +48,20 @@ def createDistribution(nestedStages) {
 
   def rspecNodeRequirements = [label: 'canvas-docker']
 
-  if (rspecqEnabled) {
-    extendedStage('RSpecQ Reporter for Rspec')
-        .envVars(rspecqEnvVars)
-        .hooks([onNodeAcquired: setupNodeHook])
-        .nodeRequirements(rspecNodeRequirements)
-        .timeout(15)
-        .queue(nestedStages, this.&runReporter)
+  extendedStage('RSpecQ Reporter for Rspec')
+      .envVars(rspecqEnvVars)
+      .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook])
+      .nodeRequirements(rspecNodeRequirements)
+      .timeout(15)
+      .queue(nestedStages, this.&runReporter)
 
-    rspecqNodeTotal.times { index ->
-      extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
-          .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
-          .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
-          .nodeRequirements(rspecNodeRequirements)
-          .timeout(15)
-          .queue(nestedStages, this.&runRspecqSuite)
-    }
-  } else {
-    rspecNodeTotal.times { index ->
-      extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
-        .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
-        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
+  rspecqNodeTotal.times { index ->
+    extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
         .nodeRequirements(rspecNodeRequirements)
         .timeout(15)
-        .queue(nestedStages, this.&runLegacySuite)
-    }
-
-    seleniumNodeTotal.times { index ->
-      extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
-        .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
-        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
-        .nodeRequirements(rspecNodeRequirements)
-        .timeout(15)
-        .queue(nestedStages, this.&runLegacySuite)
-    }
+        .queue(nestedStages, this.&runRspecqSuite)
   }
 }
 
@@ -146,6 +104,14 @@ def tearDownNode(prefix) {
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
+  // Don't generate map pre-merge
+  if (env.ENABLE_CRYSTALBALL == '1' && env.RSPECQ_ENABLED != '1') {
+    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
+    sh 'ls tmp/crystalball'
+    sh 'ls -R'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball/**/*'
+  }
+
   if (configuration.getBoolean('upload-docker-logs', 'false')) {
     sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${CI_NODE_INDEX}.log"
     archiveArtifacts(artifacts: "tmp/docker-${prefix}-${CI_NODE_INDEX}.log")
@@ -175,14 +141,7 @@ def tearDownNode(prefix) {
     }
   }
 
-  // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
-  def preStatus = currentBuild.rawBuild.@result
-
-  junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml'
-
-  if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
-    currentBuild.rawBuild.@result = preStatus
-  }
+  junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml', skipMarkingBuildUnstable: true
 
   if (env.RSPEC_LOG == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
@@ -199,6 +158,7 @@ def runRspecqSuite() {
       return
     }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
+                                       -e ENABLE_CRYSTALBALL \
                                        -e RSPECQ_ENABLED \
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
@@ -231,7 +191,7 @@ def runRspecqSuite() {
 
 def runLegacySuite() {
   try {
-    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
+    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM -e ENABLE_CRYSTALBALL canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */

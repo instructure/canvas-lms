@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe PacePlanModuleItem do
   before :once do
     course_with_student active_all: true
 
-    @mod1 = @course.context_modules.create! name: 'M1'
-    @a1 = @course.assignments.create! name: 'A1', workflow_state: 'unpublished'
-    @mod1.add_item id: @a1.id, type: 'assignment'
+    @mod1 = @course.context_modules.create! name: "M1"
+    @a1 = @course.assignments.create! name: "A1", workflow_state: "unpublished"
+    @mod1.add_item id: @a1.id, type: "assignment"
 
-    @mod2 = @course.context_modules.create! name: 'M2'
-    @a2 = @course.assignments.create! name: 'A2', workflow_state: 'unpublished'
-    @mod2.add_item id: @a2.id, type: 'assignment'
-    @a3 = @course.assignments.create! name: 'A3', workflow_state: 'unpublished'
-    @mod2.add_item id: @a3.id, type: 'assignment'
+    @mod2 = @course.context_modules.create! name: "M2"
+    @a2 = @course.assignments.create! name: "A2", workflow_state: "unpublished"
+    @mod2.add_item id: @a2.id, type: "assignment"
+    @a3 = @course.assignments.create! name: "A3", workflow_state: "unpublished"
+    @mod2.add_item id: @a3.id, type: "assignment"
 
     @pace_plan = @course.pace_plans.create!
     @course.context_module_tags.each do |tag|
@@ -76,8 +76,8 @@ describe PacePlanModuleItem do
   context "validation" do
     it "requires the module item to have an assignment" do
       quiz = @course.quizzes.create!
-      quiz_tag = @mod2.add_item id: quiz.id, type: 'quiz'
-      header_tag = @mod2.add_item type: 'context_module_sub_header', title: 'not an assignment'
+      quiz_tag = @mod2.add_item id: quiz.id, type: "quiz"
+      header_tag = @mod2.add_item type: "context_module_sub_header", title: "not an assignment"
       expect(@pace_plan.pace_plan_module_items.build(module_item: quiz_tag)).not_to be_valid
       expect(@pace_plan.pace_plan_module_items.build(module_item: header_tag)).not_to be_valid
       quiz.save! # Save again to create associated assignment

@@ -23,7 +23,7 @@ module RuboCop
       class EagerLoad < Cop
         def on_send(node)
           _receiver, method_name, *_args = *node
-          if method_name.to_s == 'eager_load'
+          if method_name.to_s == "eager_load"
             add_offense(node,
                         message: "eager_load in a data fixup causes errors",
                         severity: :error)

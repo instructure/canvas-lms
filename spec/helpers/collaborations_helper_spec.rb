@@ -19,36 +19,36 @@
 #
 
 describe CollaborationsHelper do
-  let(:user) { double('user') }
+  let(:user) { double("user") }
   let(:course) { Course.new(name: "my course").tap { |t| allow(t).to receive_messages(id: 1) } }
-  let(:collab) { double('single collaboration').tap { |t| allow(t).to receive_messages(id: 1) } }
+  let(:collab) { double("single collaboration").tap { |t| allow(t).to receive_messages(id: 1) } }
 
   describe "collaboration" do
-    it 'renders the collaborations' do
-      expect(helper).to receive(:render).with('collaborations/collaboration', include(collaboration: collab, user: user))
+    it "renders the collaborations" do
+      expect(helper).to receive(:render).with("collaborations/collaboration", include(collaboration: collab, user: user))
       helper.collaboration(collab, user, false)
     end
 
-    it 'renders the google auth for google drive collaborations if the user does not have google docs authorized' do
+    it "renders the google auth for google drive collaborations if the user does not have google docs authorized" do
       allow(collab).to receive(:is_a?).with(GoogleDocsCollaboration).and_return(true)
-      expect(helper).to receive(:render).with('collaborations/auth_google_drive', collaboration: collab)
+      expect(helper).to receive(:render).with("collaborations/auth_google_drive", collaboration: collab)
       helper.collaboration(collab, user, false)
     end
 
-    it 'constructs the data attributes' do
-      expect(helper).to receive(:render).with('collaborations/collaboration', include(
+    it "constructs the data attributes" do
+      expect(helper).to receive(:render).with("collaborations/collaboration", include(
                                                                                 data_attributes: include({ id: 1 })
                                                                               ))
       helper.collaboration(collab, user, false)
     end
 
-    it 'has the data-update-launch-url attribute if it is a ExternalToolCollaboration' do
+    it "has the data-update-launch-url attribute if it is a ExternalToolCollaboration" do
       assign(:context, course)
-      launch_url = 'http://example.com/test'
+      launch_url = "http://example.com/test"
       allow(collab).to receive(:is_a?).and_return false
       allow(collab).to receive(:is_a?).with(ExternalToolCollaboration).and_return true
       allow(collab).to receive(:update_url).and_return(launch_url)
-      expect(helper).to receive(:render).with('collaborations/collaboration',
+      expect(helper).to receive(:render).with("collaborations/collaboration",
                                               include(
                                                 data_attributes: include(
                                                   update_launch_url: include(CGI.escape(launch_url)),
@@ -60,9 +60,9 @@ describe CollaborationsHelper do
   end
 
   describe "#edit_button" do
-    it 'returns the edit button if the user has permissions' do
+    it "returns the edit button if the user has permissions" do
       allow(collab).to receive(:grants_any_right?).and_return(true)
-      expect(helper).to receive(:render).with('collaborations/edit_button', collaboration: collab)
+      expect(helper).to receive(:render).with("collaborations/edit_button", collaboration: collab)
       helper.edit_button(collab, user)
     end
 
@@ -76,23 +76,23 @@ describe CollaborationsHelper do
   end
 
   describe "#delete_button" do
-    it 'returns the delete button if the user has permissions' do
+    it "returns the delete button if the user has permissions" do
       allow(collab).to receive(:grants_any_right?).and_return(true)
-      expect(helper).to receive(:render).with('collaborations/delete_button', collaboration: collab)
+      expect(helper).to receive(:render).with("collaborations/delete_button", collaboration: collab)
       helper.delete_button(collab, user)
     end
   end
 
   describe "#collaboration_links" do
-    it 'returns collaboration links if the user has permissions' do
+    it "returns collaboration links if the user has permissions" do
       allow(collab).to receive(:grants_any_right?).and_return(true)
-      expect(helper).to receive(:render).with('collaborations/collaboration_links', collaboration: collab, user: user)
+      expect(helper).to receive(:render).with("collaborations/collaboration_links", collaboration: collab, user: user)
       helper.collaboration_links(collab, user)
     end
 
     it "doesn't return collaboration links if the user doesn't have permission" do
       allow(collab).to receive(:grants_any_right?).and_return(false)
-      expect(helper).not_to receive(:render).with('collaborations/collaboration_links', collaboration: collab, user: user)
+      expect(helper).not_to receive(:render).with("collaborations/collaboration_links", collaboration: collab, user: user)
       helper.collaboration_links(collab, user)
     end
   end

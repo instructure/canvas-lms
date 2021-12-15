@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module EnrollmentPageObject
   def add_people_button
-    f('#addUsers')
+    f("#addUsers")
   end
 
   def add_people_modal
-    f('#add_people_modal')
+    f("#add_people_modal")
   end
 
   def peopleready_info_box
-    f('.peoplereadylist__pad-box')
+    f(".peoplereadylist__pad-box")
   end
 
   def name_to_be_added(order)
@@ -37,11 +37,11 @@ module EnrollmentPageObject
   end
 
   def cancel_button
-    f('#addpeople_cancel')
+    f("#addpeople_cancel")
   end
 
   def next_button
-    f('#addpeople_next')
+    f("#addpeople_next")
   end
 
   def course_roster(row)

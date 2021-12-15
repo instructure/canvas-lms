@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_discussion_topic' do
+describe "new_discussion_topic" do
   before :once do
     discussion_topic_model
   end
@@ -37,16 +37,16 @@ describe 'new_discussion_topic' do
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
-      message = generate_message(notification_name, :email, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :email, @topic, user: enrollment.user)
       expect(message.body).to include("Discussion content is locked or not yet available")
     end
 
     it "sends locked notification if module is locked for email" do
-      @module = @course.context_modules.create!(:unlock_at => 2.days.from_now)
-      @module.add_item(:id => @topic.id, :type => 'discussion_topic')
+      @module = @course.context_modules.create!(unlock_at: 2.days.from_now)
+      @module.add_item(id: @topic.id, type: "discussion_topic")
       @topic.reload
       enrollment = course_with_student
-      message = generate_message(notification_name, :email, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :email, @topic, user: enrollment.user)
       expect(message.body).to include("Discussion content is locked or not yet available")
     end
 
@@ -57,7 +57,7 @@ describe 'new_discussion_topic' do
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
-      message = generate_message(notification_name, :email, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :email, @topic, user: enrollment.user)
       expect(message.body).to include("the content here of the discussion body")
     end
 
@@ -68,7 +68,7 @@ describe 'new_discussion_topic' do
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
-      message = generate_message(notification_name, :sms, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :sms, @topic, user: enrollment.user)
       expect(message.body).to include("Content not available")
     end
 
@@ -79,7 +79,7 @@ describe 'new_discussion_topic' do
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
-      message = generate_message(notification_name, :sms, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :sms, @topic, user: enrollment.user)
       expect(message.body).to include("the content here of the discussion body")
     end
 
@@ -90,7 +90,7 @@ describe 'new_discussion_topic' do
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
-      message = generate_message(notification_name, :summary, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :summary, @topic, user: enrollment.user)
       expect(message.body).to include("Discussion content is locked or not yet available")
     end
 
@@ -101,7 +101,7 @@ describe 'new_discussion_topic' do
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
-      message = generate_message(notification_name, :summary, @topic, :user => enrollment.user)
+      message = generate_message(notification_name, :summary, @topic, user: enrollment.user)
       expect(message.body).to include("the content here of the discussion body")
     end
   end

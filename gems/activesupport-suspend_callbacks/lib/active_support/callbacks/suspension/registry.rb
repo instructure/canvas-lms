@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/callbacks'
+require "active_support/callbacks"
 
 # Used to maintain a registry of which callbacks have been suspended for which
 # kinds (e.g. :save) and types (e.g. :before) in a specific scope.
@@ -29,9 +29,7 @@ module ActiveSupport::Callbacks
       end
 
       def any_registered?(kind)
-        unless kind.nil?
-          return true if any_registered?(nil)
-        end
+        return true if !kind.nil? && any_registered?(nil)
 
         types = @callbacks[kind]
         return false if types.nil?
@@ -45,9 +43,11 @@ module ActiveSupport::Callbacks
       end
 
       def [](kind, type)
-        @callbacks.has_key?(kind) && @callbacks[kind].has_key?(type) ?
-          @callbacks[kind][type] :
+        if @callbacks.key?(kind) && @callbacks[kind].key?(type)
+          @callbacks[kind][type]
+        else
           []
+        end
       end
 
       def []=(kind, type, value)

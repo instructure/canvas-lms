@@ -59,25 +59,25 @@
 # from that, next_page.
 #
 
-require 'folio/rails'
-require 'folio/page'
-require 'paginated_collection'
-require 'json_token'
+require "folio/rails"
+require "folio/page"
+require "paginated_collection"
+require "json_token"
 
-require 'will_paginate/active_record'
+require "will_paginate/active_record"
 
 module BookmarkedCollection
-  require 'bookmarked_collection/collection'
-  require 'bookmarked_collection/composite_collection'
-  require 'bookmarked_collection/proxy'
-  require 'bookmarked_collection/composite_proxy'
-  require 'bookmarked_collection/concat_collection'
-  require 'bookmarked_collection/concat_proxy'
-  require 'bookmarked_collection/filter_proxy'
-  require 'bookmarked_collection/merge_proxy'
-  require 'bookmarked_collection/simple_bookmarker'
-  require 'bookmarked_collection/wrap_proxy'
-  require 'bookmarked_collection/transform_proxy'
+  require "bookmarked_collection/collection"
+  require "bookmarked_collection/composite_collection"
+  require "bookmarked_collection/proxy"
+  require "bookmarked_collection/composite_proxy"
+  require "bookmarked_collection/concat_collection"
+  require "bookmarked_collection/concat_proxy"
+  require "bookmarked_collection/filter_proxy"
+  require "bookmarked_collection/merge_proxy"
+  require "bookmarked_collection/simple_bookmarker"
+  require "bookmarked_collection/wrap_proxy"
+  require "bookmarked_collection/transform_proxy"
 
   def self.best_unicode_collation_key(col)
     if @best_unicode_collation_key_proc

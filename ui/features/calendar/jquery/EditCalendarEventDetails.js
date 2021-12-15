@@ -162,7 +162,7 @@ export default class EditCalendarEventDetails {
     }
 
     data.important =
-      this.currentContextInfo.k5_subject &&
+      this.currentContextInfo.k5_course &&
       ENV.FEATURES?.important_dates &&
       this.$form.find('#calendar_event_important_dates').prop('checked')
 
@@ -240,7 +240,7 @@ export default class EditCalendarEventDetails {
     // Only show important date checkbox if selected context is k5 subject
     this.$form
       .find('#important_dates')
-      .toggle(this.currentContextInfo.k5_subject && ENV.FEATURES?.important_dates)
+      .toggle(this.currentContextInfo.k5_course && ENV.FEATURES?.important_dates)
   }
 
   duplicateCheckboxChanged = (jsEvent, _propagate) =>

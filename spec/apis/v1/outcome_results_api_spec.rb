@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe "Outcome Results API", type: :request do
   let_once(:outcome_course) do
@@ -88,7 +88,7 @@ describe "Outcome Results API", type: :request do
       assessor: outcome_teacher,
       artifact: submission,
       assessment: {
-        assessment_type: 'grading',
+        :assessment_type => "grading",
         "criterion_#{criterion[:id]}".to_sym => {
           points: points
         }
@@ -108,7 +108,7 @@ describe "Outcome Results API", type: :request do
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
-      points_possible: outcome_rubric.points_possible,
+      points_possible: outcome_rubric.points_possible
     )
   end
 
@@ -117,7 +117,7 @@ describe "Outcome Results API", type: :request do
              outcome_rubric
     assignment = (create_outcome_assignment if opts[:new]) ||
                  outcome_assignment
-    rubric.associate_with(assignment, outcome_course, purpose: 'grading', use_for_grading: true)
+    rubric.associate_with(assignment, outcome_course, purpose: "grading", use_for_grading: true)
   end
 
   def find_outcome_criterion(rubric = outcome_rubric)
@@ -170,14 +170,14 @@ describe "Outcome Results API", type: :request do
       it "requires manage grades permisssion" do
         @user = @student
         raw_api_call(:get, outcome_rollups_url(outcome_course),
-                     controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
+                     controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s)
         assert_status(403)
       end
 
       it "allows students to read their own results" do
         @user = outcome_students[0]
         raw_api_call(:get, outcome_rollups_url(outcome_course),
-                     controller: 'outcome_results', action: 'rollups', format: 'json',
+                     controller: "outcome_results", action: "rollups", format: "json",
                      course_id: outcome_course.id.to_s, user_ids: [outcome_students[0].id])
         assert_status(200)
       end
@@ -185,7 +185,7 @@ describe "Outcome Results API", type: :request do
       it "does not allow students to read other users' results" do
         @user = outcome_students[0]
         raw_api_call(:get, outcome_rollups_url(outcome_course),
-                     controller: 'outcome_results', action: 'rollups', format: 'json',
+                     controller: "outcome_results", action: "rollups", format: "json",
                      course_id: outcome_course.id.to_s, user_ids: [outcome_students[1].id])
         assert_status(403)
       end
@@ -199,36 +199,36 @@ describe "Outcome Results API", type: :request do
       it "requires an existing context" do
         bogus_course = Course.new { |c| c.id = -1 }
         raw_api_call(:get, outcome_rollups_url(bogus_course),
-                     controller: 'outcome_results', action: 'rollups', format: 'json', course_id: bogus_course.id.to_s)
+                     controller: "outcome_results", action: "rollups", format: "json", course_id: bogus_course.id.to_s)
         assert_status(404)
       end
 
       it "verifies the aggregate parameter" do
-        raw_api_call(:get, outcome_rollups_url(@course, aggregate: 'invalid'),
-                     controller: 'outcome_results', action: 'rollups', format: 'json',
-                     course_id: @course.id.to_s, aggregate: 'invalid')
+        raw_api_call(:get, outcome_rollups_url(@course, aggregate: "invalid"),
+                     controller: "outcome_results", action: "rollups", format: "json",
+                     course_id: @course.id.to_s, aggregate: "invalid")
         assert_status(400)
       end
 
       it "requires user ids to be students in the context" do
         raw_api_call(:get, outcome_rollups_url(@course, user_ids: @teacher.id.to_s),
-                     controller: 'outcome_results', action: 'rollups', format: 'json',
+                     controller: "outcome_results", action: "rollups", format: "json",
                      course_id: @course.id.to_s, user_ids: @teacher.id)
         assert_status(400)
       end
 
       it "requires section id to be a section in the context" do
-        bogus_section = course_factory(active_course: true).course_sections.create!(name: 'bogus section')
+        bogus_section = course_factory(active_course: true).course_sections.create!(name: "bogus section")
         raw_api_call(:get, outcome_rollups_url(outcome_course, section_id: bogus_section.id),
-                     controller: 'outcome_results', action: 'rollups', format: 'json',
+                     controller: "outcome_results", action: "rollups", format: "json",
                      course_id: outcome_course.id.to_s, section_id: bogus_section.id.to_s)
         assert_status(400)
       end
 
       it "verifies the include[] parameter" do
-        raw_api_call(:get, outcome_rollups_url(@course, include: ['invalid']),
-                     controller: 'outcome_results', action: 'rollups', format: 'json',
-                     course_id: @course.id.to_s, include: ['invalid'])
+        raw_api_call(:get, outcome_rollups_url(@course, include: ["invalid"]),
+                     controller: "outcome_results", action: "rollups", format: "json",
+                     course_id: @course.id.to_s, include: ["invalid"])
         assert_status(400)
       end
     end
@@ -237,22 +237,22 @@ describe "Outcome Results API", type: :request do
       it "returns a json api structure" do
         outcome_result
         api_call(:get, outcome_rollups_url(outcome_course),
-                 controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
+                 controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s)
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to eq %w(meta rollups)
-        expect(json['rollups'].size).to eq 1
-        json['rollups'].each do |rollup|
-          expect(rollup.keys.sort).to eq %w(links scores)
-          expect(rollup['links'].keys.sort).to eq %w(section user)
-          expect(rollup['links']['section']).to eq @course.course_sections.first.id.to_s
-          expect(rollup['links']['user']).to eq outcome_student.id.to_s
-          expect(rollup['scores'].size).to eq 1
-          rollup['scores'].each do |score|
-            expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
-            expect(score['count']).to eq 1
-            expect(score['score']).to eq first_outcome_rating[:points]
-            expect(score['links'].keys.sort).to eq %w(outcome)
-            expect(score['links']['outcome']).to eq outcome_object.id.to_s
+        expect(json.keys.sort).to eq %w[meta rollups]
+        expect(json["rollups"].size).to eq 1
+        json["rollups"].each do |rollup|
+          expect(rollup.keys.sort).to eq %w[links scores]
+          expect(rollup["links"].keys.sort).to eq %w[section user]
+          expect(rollup["links"]["section"]).to eq @course.course_sections.first.id.to_s
+          expect(rollup["links"]["user"]).to eq outcome_student.id.to_s
+          expect(rollup["scores"].size).to eq 1
+          rollup["scores"].each do |score|
+            expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
+            expect(score["count"]).to eq 1
+            expect(score["score"]).to eq first_outcome_rating[:points]
+            expect(score["links"].keys.sort).to eq %w[outcome]
+            expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
           end
         end
       end
@@ -263,10 +263,10 @@ describe "Outcome Results API", type: :request do
           user_session @user
           get "/courses/#{@course.id}/outcome_rollups.csv"
           expect(response).to be_successful
-          expect(response.body).to eq <<~END
+          expect(response.body).to eq <<~CSV
             Student name,Student ID,new outcome result,new outcome mastery points
             User,#{outcome_student.id},3.0,3.0
-          END
+          CSV
         end
 
         it "obeys csv i18n flags" do
@@ -277,65 +277,65 @@ describe "Outcome Results API", type: :request do
           user_session @user
           get "/courses/#{@course.id}/outcome_rollups.csv"
           expect(response).to be_successful
-          expect(response.body).to eq <<~END
+          expect(response.body).to eq <<~CSV
             \xEF\xBB\xBFStudent name;Student ID;new outcome result;new outcome mastery points
             User;#{outcome_student.id};3.0;3.0
-          END
+          CSV
         end
 
-        context 'when Account-level Mastery Scales flag is on' do
+        context "when Account-level Mastery Scales flag is on" do
           before do
             @course.account.enable_feature!(:account_level_mastery_scales)
           end
 
-          it 'uses default outcome_proficiency values for points scaling if no outcome proficiency exists' do
+          it "uses default outcome_proficiency values for points scaling if no outcome proficiency exists" do
             outcome_result
             user_session @user
 
             get "/courses/#{@course.id}/outcome_rollups.csv"
             outcome_proficiency = OutcomeProficiency.find_or_create_default!(@course)
             expect(response).to be_successful
-            expect(response.body).to eq <<~END
+            expect(response.body).to eq <<~CSV
               Student name,Student ID,new outcome result,new outcome mastery points
               User,#{outcome_student.id},#{outcome_proficiency.points_possible},#{outcome_proficiency.mastery_points}
-            END
+            CSV
           end
 
-          it 'uses resolved_outcome_proficiency for points scaling if one exists' do
+          it "uses resolved_outcome_proficiency for points scaling if one exists" do
             outcome_proficiency_model(@course)
             outcome_result
             user_session @user
 
             get "/courses/#{@course.id}/outcome_rollups.csv"
             expect(response).to be_successful
-            expect(response.body).to eq <<~END
+            expect(response.body).to eq <<~CSV
               Student name,Student ID,new outcome result,new outcome mastery points
               User,#{outcome_student.id},10.0,10.0
-            END
+            CSV
           end
         end
 
-        context 'Student filters in LMGB FF' do
+        context "Student filters in LMGB FF" do
           before do
-            @concluded_student = User.create!(:name => 'Student - Concluded')
+            @concluded_student = User.create!(name: "Student - Concluded")
             @concluded_student.register!
             @course.enroll_student(@concluded_student)
             create_outcome_assessment(student: @concluded_student)
             @concluded_student.enrollments.first.conclude
 
-            @inactive_student = User.create!(:name => 'Student - Inactive')
+            @inactive_student = User.create!(name: "Student - Inactive")
             @inactive_student.register!
             @course.enroll_student(@inactive_student)
             create_outcome_assessment(student: @inactive_student)
             @inactive_student.enrollments.first.deactivate
 
-            @no_results_student = User.create!(:name => 'Student - No Results')
+            @no_results_student = User.create!(name: "Student - No Results")
             @no_results_student.register!
             @course.enroll_student(@no_results_student)
 
-            @observer = User.create!(:name => 'Observer')
+            @observer = User.create!(name: "Observer")
             @observer.register!
-            @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @no_results_student.id, enrollment_state: 'active')
+            @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @no_results_student.id, enrollment_state: "active")
 
             outcome_result # Creates result for enrolled student outcome_student
           end
@@ -353,7 +353,7 @@ describe "Outcome Results API", type: :request do
           end
 
           it "doesn't display concluded students when exclude[]=concluded_enrollments and section_id is given" do
-            section1 = add_section 's1', course: outcome_course
+            section1 = add_section "s1", course: outcome_course
             student_in_section section1, user: outcome_student, allow_multiple_enrollments: true
             student_in_section section1, user: @concluded_student, allow_multiple_enrollments: true
             @concluded_student.enrollments.map(&:conclude)
@@ -380,7 +380,7 @@ describe "Outcome Results API", type: :request do
           end
 
           it "doesn't display concluded students when exclude[]=inactive_enrollments and section_id is given" do
-            section1 = add_section 's1', course: outcome_course
+            section1 = add_section "s1", course: outcome_course
             student_in_section section1, user: outcome_student, allow_multiple_enrollments: true
             student_in_section section1, user: @inactive_student, allow_multiple_enrollments: true
             @inactive_student.enrollments.map(&:deactivate)
@@ -406,7 +406,7 @@ describe "Outcome Results API", type: :request do
             CSV
           end
 
-          it 'displays concluded, inactive, and no results students when they are not excluded' do
+          it "displays concluded, inactive, and no results students when they are not excluded" do
             user_session @user
             get "/courses/#{@course.id}/outcome_rollups.csv"
             expect(response).to be_successful
@@ -419,15 +419,15 @@ describe "Outcome Results API", type: :request do
             CSV
           end
 
-          context 'users with multiple enrollments' do
+          context "users with multiple enrollments" do
             before do
-              @section1 = add_section 's1', course: outcome_course
+              @section1 = add_section "s1", course: outcome_course
               student_in_section @section1, user: outcome_student, allow_multiple_enrollments: true
               student_in_section @section1, user: @inactive_student, allow_multiple_enrollments: true
               student_in_section @section1, user: @concluded_student, allow_multiple_enrollments: true
             end
 
-            it 'displays concluded, inactive, and no results students when they arent excluded in a section' do
+            it "displays concluded, inactive, and no results students when they arent excluded in a section" do
               student_in_section @section1, user: @no_results_student, allow_multiple_enrollments: true
               @no_results_student.enrollments.first.accept
               @inactive_student.enrollments.map(&:deactivate)
@@ -444,7 +444,7 @@ describe "Outcome Results API", type: :request do
               CSV
             end
 
-            it 'students with an active enrollment are always present' do
+            it "students with an active enrollment are always present" do
               user_session @user
               get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
               expect(response).to be_successful
@@ -457,7 +457,7 @@ describe "Outcome Results API", type: :request do
               CSV
             end
 
-            it 'users with inactive and concluded enrollments do display when only one is excluded' do
+            it "users with inactive and concluded enrollments do display when only one is excluded" do
               @inactive_student.enrollments.last.conclude
               @concluded_student.enrollments.last.deactivate
               user_session @user
@@ -472,7 +472,7 @@ describe "Outcome Results API", type: :request do
               CSV
             end
 
-            it 'users with inactive and concluded enrollments dont display when both are excluded' do
+            it "users with inactive and concluded enrollments dont display when both are excluded" do
               @inactive_student.enrollments.last.conclude
               @concluded_student.enrollments.last.deactivate
               user_session @user
@@ -491,42 +491,42 @@ describe "Outcome Results API", type: :request do
       describe "user_ids parameter" do
         it "restricts results to specified users" do
           student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
-          student_id_str = student_ids.join(',')
+          student_id_str = student_ids.join(",")
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ['users']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, user_ids: student_id_str, include: ['users'])
+          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ["users"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, user_ids: student_id_str, include: ["users"])
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(linked meta rollups)
-          expect(json['rollups'].size).to eq 2
-          json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
-            expect(rollup['links'].keys.sort).to eq %w(section user)
-            expect(rollup['links']['section']).to eq @course.course_sections.first.id.to_s
-            expect(student_ids).to be_include(rollup['links']['user'])
-            expect(rollup['scores'].size).to eq 1
-            rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
-              expect(score['count']).to eq 1
-              expect([0, 1]).to be_include(score['score'])
-              expect(score['links'].keys.sort).to eq %w(outcome)
-              expect(score['links']['outcome']).to eq outcome_object.id.to_s
+          expect(json.keys.sort).to eq %w[linked meta rollups]
+          expect(json["rollups"].size).to eq 2
+          json["rollups"].each do |rollup|
+            expect(rollup.keys.sort).to eq %w[links scores]
+            expect(rollup["links"].keys.sort).to eq %w[section user]
+            expect(rollup["links"]["section"]).to eq @course.course_sections.first.id.to_s
+            expect(student_ids).to be_include(rollup["links"]["user"])
+            expect(rollup["scores"].size).to eq 1
+            rollup["scores"].each do |score|
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
+              expect(score["count"]).to eq 1
+              expect([0, 1]).to be_include(score["score"])
+              expect(score["links"].keys.sort).to eq %w[outcome]
+              expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end
           end
-          expect(json['linked'].keys.sort).to eq %w(users)
-          expect(json['linked']['users'].size).to eq 2
+          expect(json["linked"].keys.sort).to eq %w[users]
+          expect(json["linked"]["users"].size).to eq 2
         end
 
         it "can require_outcome_context with sis_user_ids" do
           @user = @student
           pseudonym = pseudonym_model
           pseudonym.user_id = @student.id
-          pseudonym.sis_user_id = '123'
+          pseudonym.sis_user_id = "123"
           pseudonym.save
-          api_call(:get, outcome_results_url(outcome_course, user_ids: "sis_user_id:123", include: ['users']),
-                   controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s,
-                   user_ids: "sis_user_id:123", include: ['users'])
+          api_call(:get, outcome_results_url(outcome_course, user_ids: "sis_user_id:123", include: ["users"]),
+                   controller: "outcome_results", action: "index", format: "json", course_id: outcome_course.id.to_s,
+                   user_ids: "sis_user_id:123", include: ["users"])
           json = JSON.parse(response.body)
-          expect(json['linked']['users'][0]['id'].to_i).to eq @student.id
+          expect(json["linked"]["users"][0]["id"].to_i).to eq @student.id
         end
 
         it "can take sis_user_ids" do
@@ -534,17 +534,17 @@ describe "Outcome Results API", type: :request do
           sis_id_student = outcome_students[2]
           pseudonym = pseudonym_model
           pseudonym.user_id = sis_id_student.id
-          pseudonym.sis_user_id = '123'
+          pseudonym.sis_user_id = "123"
           pseudonym.save
           student_ids << "sis_user_id:123"
-          student_id_str = student_ids.join(',')
+          student_id_str = student_ids.join(",")
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ['users']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s,
-                   user_ids: student_id_str, include: ['users'])
+          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ["users"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s,
+                   user_ids: student_id_str, include: ["users"])
           json = JSON.parse(response.body)
-          expect(json['linked']['users'].size).to eq 3
-          expect(json['linked']['users'].map { |h| h['id'].to_i }.sort.last).to eq sis_id_student.id
+          expect(json["linked"]["users"].size).to eq 3
+          expect(json["linked"]["users"].map { |h| h["id"].to_i }.max).to eq sis_id_student.id
         end
       end
 
@@ -552,104 +552,104 @@ describe "Outcome Results API", type: :request do
         it "restricts results to the specified section" do
           sectioned_outcome_students
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, section_id: outcome_course_sections[0].id, include: ['users']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, section_id: outcome_course_sections[0].id.to_s, include: ['users'])
+          api_call(:get, outcome_rollups_url(outcome_course, section_id: outcome_course_sections[0].id, include: ["users"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, section_id: outcome_course_sections[0].id.to_s, include: ["users"])
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(linked meta rollups)
-          expect(json['rollups'].size).to eq 2
-          json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
-            expect(rollup['links'].keys.sort).to eq %w(section user)
-            expect(rollup['links']['section']).to eq outcome_course_sections[0].id.to_s
-            expect(outcome_course_sections[0].student_ids.map(&:to_s)).to be_include(rollup['links']['user'])
-            expect(rollup['scores'].size).to eq 1
-            rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
-              expect(score['count']).to eq 1
-              expect([0, 2]).to be_include(score['score'])
-              expect(score['links'].keys.sort).to eq %w(outcome)
-              expect(score['links']['outcome']).to eq outcome_object.id.to_s
+          expect(json.keys.sort).to eq %w[linked meta rollups]
+          expect(json["rollups"].size).to eq 2
+          json["rollups"].each do |rollup|
+            expect(rollup.keys.sort).to eq %w[links scores]
+            expect(rollup["links"].keys.sort).to eq %w[section user]
+            expect(rollup["links"]["section"]).to eq outcome_course_sections[0].id.to_s
+            expect(outcome_course_sections[0].student_ids.map(&:to_s)).to be_include(rollup["links"]["user"])
+            expect(rollup["scores"].size).to eq 1
+            rollup["scores"].each do |score|
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
+              expect(score["count"]).to eq 1
+              expect([0, 2]).to be_include(score["score"])
+              expect(score["links"].keys.sort).to eq %w[outcome]
+              expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end
           end
-          expect(json['linked'].keys.sort).to eq %w(users)
-          expect(json['linked']['users'].size).to eq outcome_course_sections[0].students.count
+          expect(json["linked"].keys.sort).to eq %w[users]
+          expect(json["linked"]["users"].size).to eq outcome_course_sections[0].students.count
         end
       end
 
       describe "include[] parameter" do
         it "side loads courses" do
-          api_call(:get, outcome_rollups_url(outcome_course, include: ['courses'], aggregate: 'course'),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['courses'], aggregate: 'course')
+          api_call(:get, outcome_rollups_url(outcome_course, include: ["courses"], aggregate: "course"),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, include: ["courses"], aggregate: "course")
           json = JSON.parse(response.body)
-          expect(json['linked']).to be_present
-          expect(json['linked']['courses']).to be_present
-          expect(json['linked']['courses'][0]['id']).to eq outcome_course.id.to_s
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["courses"]).to be_present
+          expect(json["linked"]["courses"][0]["id"]).to eq outcome_course.id.to_s
         end
 
         it "side loads outcomes" do
-          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes'])
+          api_call(:get, outcome_rollups_url(outcome_course, include: ["outcomes"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, include: ["outcomes"])
           json = JSON.parse(response.body)
-          expect(json['linked']).to be_present
-          expect(json['linked']['outcomes']).to be_present
-          expect(json['linked']['outcomes'][0]['id']).to eq outcome_object.id
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["outcomes"]).to be_present
+          expect(json["linked"]["outcomes"][0]["id"]).to eq outcome_object.id
         end
 
         it "side loads outcome groups" do
           root_group = outcome_course.root_outcome_group
-          child_group = root_group.child_outcome_groups.create!(title: 'child group')
-          grandchild_group = child_group.child_outcome_groups.create!(title: 'grandchild_group')
-          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_groups']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_groups'])
+          child_group = root_group.child_outcome_groups.create!(title: "child group")
+          grandchild_group = child_group.child_outcome_groups.create!(title: "grandchild_group")
+          api_call(:get, outcome_rollups_url(outcome_course, include: ["outcome_groups"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, include: ["outcome_groups"])
           json = JSON.parse(response.body)
-          expect(json['linked']).to be_present
-          expect(json['linked']['outcome_groups']).to be_present
-          group_titles = json['linked']['outcome_groups'].map { |g| g['id'] }.sort
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["outcome_groups"]).to be_present
+          group_titles = json["linked"]["outcome_groups"].map { |g| g["id"] }.sort
           expected_titles = [root_group, child_group, grandchild_group].map(&:id).sort
           expect(group_titles).to eq expected_titles
         end
 
         it "side loads outcome links" do
-          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_links']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_links'])
+          api_call(:get, outcome_rollups_url(outcome_course, include: ["outcome_links"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, include: ["outcome_links"])
           json = JSON.parse(response.body)
-          expect(json['linked']).to be_present
-          expect(json['linked']['outcome_links']).to be_present
-          expect(json['linked']['outcome_links'].first['outcome_group']['id']).to eq(
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["outcome_links"]).to be_present
+          expect(json["linked"]["outcome_links"].first["outcome_group"]["id"]).to eq(
             outcome_course.root_outcome_group.id
           )
-          expect(json['linked']['outcome_links'].first['outcome']['id']).to eq(
+          expect(json["linked"]["outcome_links"].first["outcome"]["id"]).to eq(
             outcome_object.id
           )
         end
 
         it "side loads users" do
           outcome_assessment
-          api_call(:get, outcome_rollups_url(outcome_course, include: ['users']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['users'])
+          api_call(:get, outcome_rollups_url(outcome_course, include: ["users"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, include: ["users"])
           json = JSON.parse(response.body)
-          expect(json['linked']).to be_present
-          expect(json['linked']['users']).to be_present
-          expect(json['linked']['users'][0]['id']).to eq outcome_student.id.to_s
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["users"]).to be_present
+          expect(json["linked"]["users"][0]["id"]).to eq outcome_student.id.to_s
         end
 
         it "side loads alignments" do
           outcome_assessment
-          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes', 'outcomes.alignments']),
-                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes', 'outcomes.alignments'])
+          api_call(:get, outcome_rollups_url(outcome_course, include: ["outcomes", "outcomes.alignments"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, include: ["outcomes", "outcomes.alignments"])
           json = JSON.parse(response.body)
-          expect(json['linked']).to be_present
-          expect(json['linked']['outcomes']).to be_present
-          expect(json['linked']['outcomes.alignments']).to be_present
-          expect(json['linked']['outcomes'][0]['alignments'].sort).to eq [outcome_assignment.asset_string, outcome_rubric.asset_string]
-          alignments = json['linked']['outcomes.alignments']
-          alignments.sort_by! { |a| a['id'] }
-          expect(alignments[0]['id']).to eq outcome_assignment.asset_string
-          expect(alignments[0]['name']).to eq outcome_assignment.name
-          expect(alignments[0]['html_url']).to eq course_assignment_url(outcome_course, outcome_assignment)
-          expect(alignments[1]['id']).to eq outcome_rubric.asset_string
-          expect(alignments[1]['name']).to eq outcome_rubric.title
-          expect(alignments[1]['html_url']).to eq course_rubric_url(outcome_course, outcome_rubric)
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["outcomes"]).to be_present
+          expect(json["linked"]["outcomes.alignments"]).to be_present
+          expect(json["linked"]["outcomes"][0]["alignments"].sort).to eq [outcome_assignment.asset_string, outcome_rubric.asset_string]
+          alignments = json["linked"]["outcomes.alignments"]
+          alignments.sort_by! { |a| a["id"] }
+          expect(alignments[0]["id"]).to eq outcome_assignment.asset_string
+          expect(alignments[0]["name"]).to eq outcome_assignment.name
+          expect(alignments[0]["html_url"]).to eq course_assignment_url(outcome_course, outcome_assignment)
+          expect(alignments[1]["id"]).to eq outcome_rubric.asset_string
+          expect(alignments[1]["name"]).to eq outcome_rubric.title
+          expect(alignments[1]["html_url"]).to eq course_rubric_url(outcome_course, outcome_rubric)
         end
       end
     end
@@ -660,7 +660,7 @@ describe "Outcome Results API", type: :request do
           create_outcome_assessment(new: true)
           @outcome
         end
-        @outcome_group = @course.learning_outcome_groups.create!(:title => 'groupage')
+        @outcome_group = @course.learning_outcome_groups.create!(title: "groupage")
         @outcomes += Array.new(3) do
           create_outcome_assessment(new: true)
           @outcome
@@ -669,54 +669,54 @@ describe "Outcome Results API", type: :request do
 
       it "supports multiple outcomes" do
         api_call(:get, outcome_rollups_url(outcome_course),
-                 controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
+                 controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s)
         json = JSON.parse(response.body)
-        expect(json['rollups'].size).to eq 1
-        rollup = json['rollups'][0]
-        expect(rollup['scores'].size).to eq 7
+        expect(json["rollups"].size).to eq 1
+        rollup = json["rollups"][0]
+        expect(rollup["scores"].size).to eq 7
       end
 
       it "filters by outcome id" do
         outcome_ids = @outcomes[3..4].map(&:id).sort
-        api_call(:get, outcome_rollups_url(outcome_course, outcome_ids: outcome_ids.join(','), include: ['outcomes']),
-                 controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_ids: outcome_ids.join(','), include: ['outcomes'])
+        api_call(:get, outcome_rollups_url(outcome_course, outcome_ids: outcome_ids.join(","), include: ["outcomes"]),
+                 controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, outcome_ids: outcome_ids.join(","), include: ["outcomes"])
         json = JSON.parse(response.body)
-        expect(json['linked']['outcomes'].size).to eq outcome_ids.length
-        expect(json['linked']['outcomes'].map { |x| x['id'] }.sort).to eq outcome_ids
-        rollup = json['rollups'][0]
-        expect(rollup['scores'].size).to eq outcome_ids.length
+        expect(json["linked"]["outcomes"].size).to eq outcome_ids.length
+        expect(json["linked"]["outcomes"].map { |x| x["id"] }.sort).to eq outcome_ids
+        rollup = json["rollups"][0]
+        expect(rollup["scores"].size).to eq outcome_ids.length
       end
 
       it "filters by outcome group id" do
         outcome_ids = @outcome_group.child_outcome_links.map(&:content).map(&:id).sort
-        api_call(:get, outcome_rollups_url(outcome_course, outcome_group_id: @outcome_group.id, include: ['outcomes']),
-                 controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_group_id: @outcome_group.id, include: ['outcomes'])
+        api_call(:get, outcome_rollups_url(outcome_course, outcome_group_id: @outcome_group.id, include: ["outcomes"]),
+                 controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, outcome_group_id: @outcome_group.id, include: ["outcomes"])
         json = JSON.parse(response.body)
-        expect(json['linked']['outcomes'].size).to eq outcome_ids.length
-        expect(json['linked']['outcomes'].map { |x| x['id'] }.sort).to eq outcome_ids
-        rollup = json['rollups'][0]
-        expect(rollup['scores'].size).to eq outcome_ids.length
+        expect(json["linked"]["outcomes"].size).to eq outcome_ids.length
+        expect(json["linked"]["outcomes"].map { |x| x["id"] }.sort).to eq outcome_ids
+        rollup = json["rollups"][0]
+        expect(rollup["scores"].size).to eq outcome_ids.length
       end
     end
 
     describe "aggregate response" do
       it "returns an aggregate json api structure" do
         outcome_result
-        api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course'),
-                 controller: 'outcome_results', action: 'rollups', format: 'json',
-                 course_id: outcome_course.id.to_s, aggregate: 'course')
+        api_call(:get, outcome_rollups_url(outcome_course, aggregate: "course"),
+                 controller: "outcome_results", action: "rollups", format: "json",
+                 course_id: outcome_course.id.to_s, aggregate: "course")
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to eq %w(rollups)
-        expect(json['rollups'].size).to eq 1
-        json['rollups'].each do |rollup|
-          expect(rollup.keys.sort).to eq %w(links scores)
-          expect(rollup['links']['course']).to eq @course.id.to_s
-          expect(rollup['scores'].size).to eq 1
-          rollup['scores'].each do |score|
-            expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
-            expect(score['count']).to eq 1
-            expect(score['score']).to eq first_outcome_rating[:points]
-            expect(score['links'].keys.sort).to eq %w(outcome)
+        expect(json.keys.sort).to eq %w[rollups]
+        expect(json["rollups"].size).to eq 1
+        json["rollups"].each do |rollup|
+          expect(rollup.keys.sort).to eq %w[links scores]
+          expect(rollup["links"]["course"]).to eq @course.id.to_s
+          expect(rollup["scores"].size).to eq 1
+          rollup["scores"].each do |score|
+            expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
+            expect(score["count"]).to eq 1
+            expect(score["score"]).to eq first_outcome_rating[:points]
+            expect(score["links"].keys.sort).to eq %w[outcome]
           end
         end
       end
@@ -724,24 +724,24 @@ describe "Outcome Results API", type: :request do
       describe "user_ids parameter" do
         it "restricts aggregate to specified users" do
           outcome_students
-          student_id_str = outcome_students[0..1].map(&:id).join(',')
+          student_id_str = outcome_students[0..1].map(&:id).join(",")
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course', user_ids: student_id_str),
-                   controller: 'outcome_results', action: 'rollups', format: 'json',
-                   course_id: outcome_course.id.to_s, aggregate: 'course',
+          api_call(:get, outcome_rollups_url(outcome_course, aggregate: "course", user_ids: student_id_str),
+                   controller: "outcome_results", action: "rollups", format: "json",
+                   course_id: outcome_course.id.to_s, aggregate: "course",
                    user_ids: student_id_str)
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(rollups)
-          expect(json['rollups'].size).to eq 1
-          json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
-            expect(rollup['links']['course']).to eq @course.id.to_s
-            expect(rollup['scores'].size).to eq 1
-            rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
-              expect(score['count']).to eq 2
-              expect(score['score']).to eq 0.5
-              expect(score['links'].keys.sort).to eq %w(outcome)
+          expect(json.keys.sort).to eq %w[rollups]
+          expect(json["rollups"].size).to eq 1
+          json["rollups"].each do |rollup|
+            expect(rollup.keys.sort).to eq %w[links scores]
+            expect(rollup["links"]["course"]).to eq @course.id.to_s
+            expect(rollup["scores"].size).to eq 1
+            rollup["scores"].each do |score|
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
+              expect(score["count"]).to eq 2
+              expect(score["score"]).to eq 0.5
+              expect(score["links"].keys.sort).to eq %w[outcome]
             end
           end
         end
@@ -751,22 +751,22 @@ describe "Outcome Results API", type: :request do
         it "restricts aggregate to the specified section" do
           sectioned_outcome_students
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course', section_id: outcome_course_sections[0].id),
-                   controller: 'outcome_results', action: 'rollups', format: 'json',
-                   course_id: outcome_course.id.to_s, aggregate: 'course',
+          api_call(:get, outcome_rollups_url(outcome_course, aggregate: "course", section_id: outcome_course_sections[0].id),
+                   controller: "outcome_results", action: "rollups", format: "json",
+                   course_id: outcome_course.id.to_s, aggregate: "course",
                    section_id: outcome_course_sections[0].id.to_s)
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(rollups)
-          expect(json['rollups'].size).to eq 1
-          json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
-            expect(rollup['links']['course']).to eq outcome_course.id.to_s
-            expect(rollup['scores'].size).to eq 1
-            rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
-              expect(score['count']).to eq outcome_course_sections[0].enrollments.count
-              expect(score['score']).to eq 1
-              expect(score['links'].keys.sort).to eq %w(outcome)
+          expect(json.keys.sort).to eq %w[rollups]
+          expect(json["rollups"].size).to eq 1
+          json["rollups"].each do |rollup|
+            expect(rollup.keys.sort).to eq %w[links scores]
+            expect(rollup["links"]["course"]).to eq outcome_course.id.to_s
+            expect(rollup["scores"].size).to eq 1
+            rollup["scores"].each do |score|
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
+              expect(score["count"]).to eq outcome_course_sections[0].enrollments.count
+              expect(score["score"]).to eq 1
+              expect(score["links"].keys.sort).to eq %w[outcome]
             end
           end
         end
@@ -779,35 +779,35 @@ describe "Outcome Results API", type: :request do
     # we test some of that logic that is more specifically useful to the index endpoint
     it "side loads alignments" do
       outcome_assessment
-      api_call(:get, outcome_results_url(outcome_course, include: ['alignments']),
-               controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s, include: ['alignments'])
+      api_call(:get, outcome_results_url(outcome_course, include: ["alignments"]),
+               controller: "outcome_results", action: "index", format: "json", course_id: outcome_course.id.to_s, include: ["alignments"])
       json = JSON.parse(response.body)
-      expect(json['linked']).to be_present
-      expect(json['linked']['alignments']).to be_present
-      expect(json['linked']['alignments'][0]['id']).to eq outcome_assignment.asset_string
+      expect(json["linked"]).to be_present
+      expect(json["linked"]["alignments"]).to be_present
+      expect(json["linked"]["alignments"][0]["id"]).to eq outcome_assignment.asset_string
     end
 
     it "side loads assignments" do
       outcome_assessment
-      api_call(:get, outcome_results_url(outcome_course, include: ['assignments']),
-               controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s, include: ['assignments'])
+      api_call(:get, outcome_results_url(outcome_course, include: ["assignments"]),
+               controller: "outcome_results", action: "index", format: "json", course_id: outcome_course.id.to_s, include: ["assignments"])
       json = JSON.parse(response.body)
-      expect(json['linked']).to be_present
-      expect(json['linked']['assignments']).to be_present
-      expect(json['linked']['assignments'][0]['id']).to eq outcome_assignment.asset_string
+      expect(json["linked"]).to be_present
+      expect(json["linked"]["assignments"]).to be_present
+      expect(json["linked"]["assignments"][0]["id"]).to eq outcome_assignment.asset_string
     end
 
     it "returns outcome results" do
       outcome_assessment
       api_call(:get, outcome_results_url(outcome_course),
-               controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s)
+               controller: "outcome_results", action: "index", format: "json", course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
-      expect(json['outcome_results']).to be_present
-      expect(json['outcome_results'][0]["id"]).to eq outcome_result.id
-      expect(json['outcome_results'][0]["score"]).to eq outcome_result.score
-      expect(json['outcome_results'][0]["links"]["learning_outcome"]).to eq outcome_object.id.to_s
-      expect(json['outcome_results'][0]["links"]["alignment"]).to eq outcome_assignment.asset_string
-      expect(json['outcome_results'][0]["links"]["user"]).to eq outcome_student.id.to_s
+      expect(json["outcome_results"]).to be_present
+      expect(json["outcome_results"][0]["id"]).to eq outcome_result.id
+      expect(json["outcome_results"][0]["score"]).to eq outcome_result.score
+      expect(json["outcome_results"][0]["links"]["learning_outcome"]).to eq outcome_object.id.to_s
+      expect(json["outcome_results"][0]["links"]["alignment"]).to eq outcome_assignment.asset_string
+      expect(json["outcome_results"][0]["links"]["user"]).to eq outcome_student.id.to_s
     end
   end
 
@@ -817,21 +817,21 @@ describe "Outcome Results API", type: :request do
     it "returns results for users on multiple shards" do
       student = outcome_student
       outcome_assessment
-      student2 = @shard2.activate { User.create!(name: 'outofshard') }
-      @course.enroll_student(student2, enrollment_state: 'active')
+      student2 = @shard2.activate { User.create!(name: "outofshard") }
+      @course.enroll_student(student2, enrollment_state: "active")
       create_outcome_assessment(student: student2)
       @user = @teacher
 
       api_call(:get, outcome_rollups_url(outcome_course),
-               controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
+               controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
-      expect(json.keys.sort).to eq %w(meta rollups)
-      expect(json['rollups'].size).to eq 2
-      expect(json['rollups'].collect { |x| x['links']['user'] }.sort).to eq [student.id.to_s, student2.id.to_s].sort
-      json['rollups'].each do |rollup|
-        expect(rollup.keys.sort).to eq %w(links scores)
-        expect(rollup['scores'].size).to eq 1
-        expect(rollup['links'].keys.sort).to eq %w(section user)
+      expect(json.keys.sort).to eq %w[meta rollups]
+      expect(json["rollups"].size).to eq 2
+      expect(json["rollups"].collect { |x| x["links"]["user"] }.sort).to eq [student.id.to_s, student2.id.to_s].sort
+      json["rollups"].each do |rollup|
+        expect(rollup.keys.sort).to eq %w[links scores]
+        expect(rollup["scores"].size).to eq 1
+        expect(rollup["links"].keys.sort).to eq %w[section user]
       end
     end
   end

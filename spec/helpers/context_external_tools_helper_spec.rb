@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 describe ContextExternalToolsHelper do
   include ContextExternalToolsHelper
@@ -115,14 +115,14 @@ describe ContextExternalToolsHelper do
     before :once do
       course_model
       @root_account = @course.root_account
-      @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+      @account = account_model(root_account: @root_account, parent_account: @root_account)
       @course.update_attribute(:account, @account)
 
       tool_1 = @course.context_external_tools.create(
-        :name => "Awesome Tool with Icon Class",
-        :domain => "example.dev",
-        :consumer_key => '12345',
-        :shared_secret => 'secret'
+        name: "Awesome Tool with Icon Class",
+        domain: "example.dev",
+        consumer_key: "12345",
+        shared_secret: "secret"
       )
 
       tool_1_settings = tool_settings(:course_home_sub_navigation, true)
@@ -131,10 +131,10 @@ describe ContextExternalToolsHelper do
       tool_1.save!
 
       tool_2 = @course.context_external_tools.create(
-        :name => "Awesome Tool with Icon Class",
-        :domain => "example.dev",
-        :consumer_key => '12345',
-        :shared_secret => 'secret'
+        name: "Awesome Tool with Icon Class",
+        domain: "example.dev",
+        consumer_key: "12345",
+        shared_secret: "secret"
       )
 
       tool_2.course_home_sub_navigation = tool_settings(:course_home_sub_navigation)
@@ -143,10 +143,10 @@ describe ContextExternalToolsHelper do
       @mock_tools_hash = [tool_1, tool_2, tool_1]
 
       tool_3 = @course.context_external_tools.create(
-        :name => "Awesome Tool with Icon Class",
-        :domain => "example.dev",
-        :consumer_key => '12345',
-        :shared_secret => 'secret'
+        name: "Awesome Tool with Icon Class",
+        domain: "example.dev",
+        consumer_key: "12345",
+        shared_secret: "secret"
       )
 
       tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, true)

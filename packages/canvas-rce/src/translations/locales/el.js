@@ -118,6 +118,7 @@ const locale = {
   "options_3ab0ea65": { "message": "Επιλογές" },
   "pages_e5414c2c": { "message": "Σελίδες" },
   "people_b4ebb13c": { "message": "Κοινό" },
+  "percentage_34ab7c2c": { "message": "Εκατοστιαία αναλογία" },
   "preview_53003fd2": { "message": "Προεπισκόπηση" },
   "published_c944a23d": { "message": "δημοσιευμένο/α" },
   "quizzes_7e598f57": { "message": "Κουίζ" },

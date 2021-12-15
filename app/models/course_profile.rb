@@ -18,5 +18,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CourseProfile < Profile
-  acts_as_list :scope => :root_account
+  acts_as_list scope: :root_account
 end

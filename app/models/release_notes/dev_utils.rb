@@ -21,12 +21,12 @@ module ReleaseNotes
   module DevUtils
     NOTES_SCHEMA = {
       key_schema: [
-        { attribute_name: 'PartitionKey', key_type: 'HASH' }.freeze,
-        { attribute_name: 'RangeKey', key_type: 'RANGE' }.freeze
+        { attribute_name: "PartitionKey", key_type: "HASH" }.freeze,
+        { attribute_name: "RangeKey", key_type: "RANGE" }.freeze
       ].freeze,
       attribute_definitions: [
-        { attribute_name: 'PartitionKey', attribute_type: 'S' }.freeze,
-        { attribute_name: 'RangeKey', attribute_type: 'S' }.freeze,
+        { attribute_name: "PartitionKey", attribute_type: "S" }.freeze,
+        { attribute_name: "RangeKey", attribute_type: "S" }.freeze,
       ].freeze
     }.freeze
 

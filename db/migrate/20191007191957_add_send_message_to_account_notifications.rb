@@ -24,9 +24,9 @@ class AddSendMessageToAccountNotifications < ActiveRecord::Migration[5.2]
   def up
     if Shard.current.default? && !::Rails.env.test?
       Canvas::MessageHelper.create_notification({
-                                                  name: 'Account Notification',
+                                                  name: "Account Notification",
                                                   delay_for: 0,
-                                                  category: 'Account Notification'
+                                                  category: "Account Notification"
                                                 })
     end
 
@@ -43,7 +43,7 @@ class AddSendMessageToAccountNotifications < ActiveRecord::Migration[5.2]
     remove_column :account_notifications, :messages_sent_at
 
     if Shard.current.default?
-      Notification.where(name: 'Account Notification').delete_all
+      Notification.where(name: "Account Notification").delete_all
     end
   end
 end

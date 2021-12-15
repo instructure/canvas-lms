@@ -21,39 +21,39 @@ class DataServicesEventsLoader
   attr_accessor :json_base_path
 
   CUSTOM_EVENTS_CATEGORIES = {
-    'doc/api/data_services/json/canvas/event-types/course_grade_change.json' => 'grade',
-    'doc/api/data_services/json/canvas/event-types/outcome_proficiency_created.json' => 'learning',
-    'doc/api/data_services/json/canvas/event-types/outcome_proficiency_updated.json' => 'learning',
-    'doc/api/data_services/json/caliper/event-types/quiz_submitted.json' => 'assessment',
-    'doc/api/data_services/json/caliper/event-types/assignment_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/assignment_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/assignment_override_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/assignment_override_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/attachment_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/attachment_deleted.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/attachment_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/course_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/course_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/enrollment_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/enrollment_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/enrollment_state_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/enrollment_state_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/group_category_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/group_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/group_membership_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/submission_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/submission_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/syllabus_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/wiki_page_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/wiki_page_deleted.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/wiki_page_updated.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/user_account_association_created.json' => 'basic',
-    'doc/api/data_services/json/caliper/event-types/discussion_topic_created.json' => 'forum',
-    'doc/api/data_services/json/caliper/event-types/discussion_entry_created.json' => 'forum',
-    'doc/api/data_services/json/caliper/event-types/grade_change.json' => 'grading',
-    'doc/api/data_services/json/caliper/event-types/asset_accessed.json' => 'navigation_events',
-    'doc/api/data_services/json/caliper/event-types/logged_in.json' => 'session',
-    'doc/api/data_services/json/caliper/event-types/logged_out.json' => 'session'
+    "doc/api/data_services/json/canvas/event-types/course_grade_change.json" => "grade",
+    "doc/api/data_services/json/canvas/event-types/outcome_proficiency_created.json" => "learning",
+    "doc/api/data_services/json/canvas/event-types/outcome_proficiency_updated.json" => "learning",
+    "doc/api/data_services/json/caliper/event-types/quiz_submitted.json" => "assessment",
+    "doc/api/data_services/json/caliper/event-types/assignment_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/assignment_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/assignment_override_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/assignment_override_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/attachment_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/attachment_deleted.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/attachment_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/course_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/course_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/enrollment_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/enrollment_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/enrollment_state_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/enrollment_state_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/group_category_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/group_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/group_membership_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/submission_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/submission_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/syllabus_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/wiki_page_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/wiki_page_deleted.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/wiki_page_updated.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/user_account_association_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/discussion_topic_created.json" => "forum",
+    "doc/api/data_services/json/caliper/event-types/discussion_entry_created.json" => "forum",
+    "doc/api/data_services/json/caliper/event-types/grade_change.json" => "grading",
+    "doc/api/data_services/json/caliper/event-types/asset_accessed.json" => "navigation_events",
+    "doc/api/data_services/json/caliper/event-types/logged_in.json" => "session",
+    "doc/api/data_services/json/caliper/event-types/logged_out.json" => "session"
   }.freeze
 
   def initialize(json_base_path)
@@ -84,7 +84,7 @@ class DataServicesEventsLoader
   end
 
   def extrat_category_from_file_path(file_path)
-    CUSTOM_EVENTS_CATEGORIES[file_path] || file_path.split('/').last.split('_').first
+    CUSTOM_EVENTS_CATEGORIES[file_path] || file_path.split("/").last.split("_").first
   end
 
   def load_json_events(event_files)
@@ -92,6 +92,6 @@ class DataServicesEventsLoader
   end
 
   def page_tile_formatter(event_category)
-    event_category.split('_').join(' ').titleize
+    event_category.split("_").join(" ").titleize
   end
 end

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Module do
-  describe '#class_name' do
-    it 'returns the name of the class or module' do
-      expect(subject).to receive(:name).and_return('Deeply::Nested::ClassName')
-      expect(subject.class_name).to eq('ClassName')
+  describe "#class_name" do
+    it "returns the name of the class or module" do
+      expect(subject).to receive(:name).and_return("Deeply::Nested::ClassName")
+      expect(subject.class_name).to eq("ClassName")
     end
   end
 end

@@ -30,10 +30,10 @@ module CanvasOutcomesHelper
 
     # don't show for accounts without provisioned outcomes service
     artifact_type = artifact_type_lookup(artifact)
-    domain, jwt = extract_domain_jwt(context.root_account, 'outcome_alignment_sets.create')
+    domain, jwt = extract_domain_jwt(context.root_account, "outcome_alignment_sets.create")
     return if domain.nil? || jwt.nil?
 
-    protocol = ENV.fetch('OUTCOMES_SERVICE_PROTOCOL', Rails.env.production? ? 'https' : 'http')
+    protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
     host_url = "#{protocol}://#{domain}" if domain.present?
 
     js_env(
@@ -49,7 +49,7 @@ module CanvasOutcomesHelper
   end
 
   def extract_domain_jwt(account, scope)
-    settings = account.settings.dig(:provision, 'outcomes') || {}
+    settings = account.settings.dig(:provision, "outcomes") || {}
     domain = nil
     jwt = nil
     if settings.key?(:consumer_key) && settings.key?(:jwt_secret) && settings.key?(:domain)
@@ -62,7 +62,7 @@ module CanvasOutcomesHelper
         scope: scope,
         exp: 1.day.from_now.to_i
       }
-      jwt = JWT.encode(payload, jwt_secret, 'HS512')
+      jwt = JWT.encode(payload, jwt_secret, "HS512")
     end
 
     [domain, jwt]
@@ -72,8 +72,8 @@ module CanvasOutcomesHelper
 
   def artifact_type_lookup(artifact)
     case artifact.class.to_s
-    when 'WikiPage'
-      'canvas.page'
+    when "WikiPage"
+      "canvas.page"
     else
       raise "Unsupported artifact type: #{artifact.class}"
     end

@@ -25,14 +25,14 @@ describe "rubrics" do
     @rubric.rubric_associations.create!(
       association_object: @course,
       context: @course,
-      purpose: 'bookmark'
+      purpose: "bookmark"
     )
 
     get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
     expect(response).to be_successful
     page = Nokogiri::HTML5(response.body)
-    expect(page.css('#rubrics .rubric_table .criterion:nth-child(1) .edit_criterion_link')).to be_empty
-    expect(page.css('#rubrics .rubric_table .criterion:nth-child(2) .edit_criterion_link')).not_to be_empty
+    expect(page.css("#rubrics .rubric_table .criterion:nth-child(1) .edit_criterion_link")).to be_empty
+    expect(page.css("#rubrics .rubric_table .criterion:nth-child(2) .edit_criterion_link")).not_to be_empty
   end
 end

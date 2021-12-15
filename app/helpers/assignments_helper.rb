@@ -21,13 +21,13 @@
 module AssignmentsHelper
   def completed_link_options
     {
-      title: I18n.t('tooltips.finished', 'finished')
+      title: I18n.t("tooltips.finished", "finished")
     }
   end
 
   def in_progress_link_options
     {
-      title: I18n.t('tooltips.incomplete', 'incomplete')
+      title: I18n.t("tooltips.incomplete", "incomplete")
     }
   end
 
@@ -35,12 +35,12 @@ module AssignmentsHelper
     # can use this method as the single source of rendering multiple due dates
     # for now, just text, but eventually, a bubble/dialog/link/etc, rendering
     # the information contained in the varied_due_date parameter
-    I18n.t '#assignments.multiple_due_dates', 'Multiple Due Dates'
+    I18n.t "#assignments.multiple_due_dates", "Multiple Due Dates"
   end
 
   def student_peer_review_link_for(context, assignment, assessment)
     options = assessment.completed? ? completed_link_options : in_progress_link_options
-    icon_class = assessment.completed? ? 'icon-check' : 'icon-warning'
+    icon_class = assessment.completed? ? "icon-check" : "icon-warning"
     text = safe_join [
       "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
       submission_author_name_for(assessment)
@@ -58,8 +58,8 @@ module AssignmentsHelper
       multiple_due_dates
     else
       assignment = assignment.overridden_for(user)
-      due_date = assignment.due_at || assignment.applied_overrides.map(&:due_at).compact.first
-      due_date ? datetime_string(due_date) : I18n.t('No Due Date')
+      due_date = assignment.due_at || assignment.applied_overrides.filter_map(&:due_at).first
+      due_date ? datetime_string(due_date) : I18n.t("No Due Date")
     end
   end
 
@@ -72,13 +72,13 @@ module AssignmentsHelper
       submit_text = user_submission.try(:has_submission?) ? I18n.t("New Attempt") : I18n.t("Start Assignment")
       late = user_submission.try(:late?) ? "late" : ""
       options = {
-        type: 'button',
+        type: "button",
         class: "Button Button--primary submit_assignment_link #{late}",
         disabled: user_submission && user_submission.attempts_left == 0
       }
       options[:style] = "display: none;" if hidden
 
-      content_tag('button', submit_text, options)
+      content_tag("button", submit_text, options)
     end
   end
 
@@ -101,17 +101,17 @@ module AssignmentsHelper
   end
 
   def i18n_grade(grade, grading_type = nil)
-    if grading_type == "pass_fail" && %w{complete incomplete}.include?(grade)
+    if grading_type == "pass_fail" && %w[complete incomplete].include?(grade)
       return grade == "complete" ? I18n.t("Complete") : I18n.t("Incomplete")
     end
 
-    number = Float(grade.sub(/%$/, '')) rescue nil
+    number = Float(grade.sub(/%$/, "")) rescue nil
     if number.present?
       if grading_type.nil?
-        grading_type = (/%$/ =~ grade) ? 'percent' : 'points'
+        grading_type = (/%$/ =~ grade) ? "percent" : "points"
       end
-      if grading_type == 'points' || grading_type == 'percent'
-        return I18n.n(round_if_whole(number), percentage: (grading_type == 'percent'))
+      if grading_type == "points" || grading_type == "percent"
+        return I18n.n(round_if_whole(number), percentage: (grading_type == "percent"))
       end
     end
     grade

@@ -35,7 +35,7 @@
       <% if @current_user.mfa_settings(pseudonym_hint: @current_pseudonym) == :required %>
         <p><%= t('details.mfa_required', "You are required to set up multi-factor authentication.") %></p>
       <% end %>
-      <p><%=  mt('details.mfa_enrollment', <<-BODY, :secret_key => session[:pending_otp_secret_key], :iphone_url => 'http://itunes.apple.com/us/app/google-authenticator/id388497605', :android_url => 'https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2')
+      <p><%=  mt('details.mfa_enrollment', <<~BODY, :secret_key => session[:pending_otp_secret_key], :iphone_url => 'http://itunes.apple.com/us/app/google-authenticator/id388497605', :android_url => 'https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2')
 Multi-factor authentication increases security by requiring that you have something in your physical possession,
 in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
 verification codes, or a phone that can receive text messages. The Google Authenticator app for [iPhone](%{iphone_url}) or

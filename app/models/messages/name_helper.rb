@@ -30,7 +30,7 @@ module Messages
     def from_name
       return nil unless asset && named_source?
 
-      CanvasTextHelper.truncate_text(anonymized_user_name, :max_length => 50)
+      CanvasTextHelper.truncate_text(anonymized_user_name, max_length: 50)
     end
 
     def reply_to_name

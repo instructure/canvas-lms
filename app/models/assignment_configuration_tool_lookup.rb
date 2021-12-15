@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AssignmentConfigurationToolLookup < ActiveRecord::Base
-  SUBSCRIPTION_MANAGEMENT_STRAND = 'plagiarism-platform-subscription-management'
+  SUBSCRIPTION_MANAGEMENT_STRAND = "plagiarism-platform-subscription-management"
 
   validates :context_type, presence: true
 
-  belongs_to :tool, polymorphic: [:context_external_tool, message_handler: 'Lti::MessageHandler']
+  belongs_to :tool, polymorphic: [:context_external_tool, message_handler: "Lti::MessageHandler"]
   belongs_to :assignment
   # Do not add before_destroy or after_destroy, these records are "delete_all"ed
 
@@ -62,7 +62,7 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
   def lti_tool
     @_lti_tool ||= if tool_id.present?
                      tool
-                   elsif tool_type == 'Lti::MessageHandler'
+                   elsif tool_type == "Lti::MessageHandler"
                      Lti::MessageHandler.by_resource_codes(
                        vendor_code: tool_vendor_code,
                        product_code: tool_product_code,
@@ -73,13 +73,13 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
   end
 
   def resource_codes
-    if tool_type == 'Lti::MessageHandler' && tool_id.blank?
+    if tool_type == "Lti::MessageHandler" && tool_id.blank?
       return {
         product_code: tool_product_code,
         vendor_code: tool_vendor_code,
         resource_type_code: tool_resource_type_code
       }
-    elsif tool_type == 'Lti::MessageHandler' && tool_id.present?
+    elsif tool_type == "Lti::MessageHandler" && tool_id.present?
       return lti_tool.resource_codes
     end
     {}

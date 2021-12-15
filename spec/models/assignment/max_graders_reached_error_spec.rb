@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe Assignment::MaxGradersReachedError do
   subject { Assignment::MaxGradersReachedError.new }
 
   it { is_expected.to be_a Assignment::GradeError }
 
-  it 'has an error_code of MAX_GRADERS_REACHED' do
-    expect(subject.error_code).to eq 'MAX_GRADERS_REACHED'
+  it "has an error_code of MAX_GRADERS_REACHED" do
+    expect(subject.error_code).to eq "MAX_GRADERS_REACHED"
   end
 end

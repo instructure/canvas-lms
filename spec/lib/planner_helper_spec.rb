@@ -22,11 +22,11 @@ describe PlannerHelper do
   context "on a submission" do
     before(:once) do
       student_in_course(active_all: true)
-      @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
+      @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 42)
       @assignment.publish
 
-      @discussion_assignment = @course.assignments.create!(title: 'graded discussion assignment', due_at: 1.day.from_now, points_possible: 10)
-      @discussion = @course.discussion_topics.create!(assignment: @discussion_assignment, title: 'graded discussion')
+      @discussion_assignment = @course.assignments.create!(title: "graded discussion assignment", due_at: 1.day.from_now, points_possible: 10)
+      @discussion = @course.discussion_topics.create!(assignment: @discussion_assignment, title: "graded discussion")
       @discussion.publish
 
       @quiz = generate_quiz(@course)
@@ -40,13 +40,13 @@ describe PlannerHelper do
 
     describe "#completes_planner_item_for_submission" do
       it "completes an assignment override" do
-        @assignment.submit_homework(@student, body: 'hello world')
+        @assignment.submit_homework(@student, body: "hello world")
         @assignment_po.reload
         expect(@assignment_po.marked_complete).to be_truthy
       end
 
       it "completes a discussion override" do
-        @discussion.reply_from(:user => @student, :text => "reply")
+        @discussion.reply_from(user: @student, text: "reply")
         @discussion_po.reload
         expect(@discussion_po.marked_complete).to be_truthy
       end
@@ -67,7 +67,7 @@ describe PlannerHelper do
 
     describe "#complete_planner_item_for_quiz_submission" do
       it "completes an ungraded survey override" do
-        survey = @course.quizzes.create!(:title => "survey", :due_at => 1.day.from_now, :quiz_type => "survey")
+        survey = @course.quizzes.create!(title: "survey", due_at: 1.day.from_now, quiz_type: "survey")
         survey_po = planner_override_model(user: @student, plannable: survey, marked_complete: false)
         sub = survey.generate_submission(@user)
         Quizzes::SubmissionGrader.new(sub).grade_submission
@@ -76,7 +76,7 @@ describe PlannerHelper do
       end
 
       it "creates completed override when ungraded survey is submitted" do
-        survey = @course.quizzes.create!(:title => "survey", :due_at => 1.day.from_now, :quiz_type => "survey")
+        survey = @course.quizzes.create!(title: "survey", due_at: 1.day.from_now, quiz_type: "survey")
         sub = survey.generate_submission(@user)
         Quizzes::SubmissionGrader.new(sub).grade_submission
         survey_po = PlannerOverride.find_by(user: @student, plannable: survey)

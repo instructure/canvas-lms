@@ -27,8 +27,8 @@ class ChangeOriginalityReportAttachmentUniquenessIndex < ActiveRecord::Migration
     # This is required because all submissions in a group assignment
     # share the same attachment and each submission gets its own
     # OriginalityReport.
-    add_index :originality_reports, :attachment_id, algorithm: :concurrently, name: 'temporary_index_originality_reports_on_attachment_id'
-    remove_index :originality_reports, name: 'index_originality_reports_on_attachment_id'
-    rename_index :originality_reports, 'temporary_index_originality_reports_on_attachment_id', 'index_originality_reports_on_attachment_id'
+    add_index :originality_reports, :attachment_id, algorithm: :concurrently, name: "temporary_index_originality_reports_on_attachment_id"
+    remove_index :originality_reports, name: "index_originality_reports_on_attachment_id"
+    rename_index :originality_reports, "temporary_index_originality_reports_on_attachment_id", "index_originality_reports_on_attachment_id"
   end
 end

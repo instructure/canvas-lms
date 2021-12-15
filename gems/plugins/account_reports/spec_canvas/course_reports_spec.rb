@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'report_spec_helper'
+require_relative "report_spec_helper"
 
 describe "Course Account Reports" do
   include ReportSpecHelper
@@ -26,54 +26,54 @@ describe "Course Account Reports" do
   before(:once) do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
-    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @admin = account_admin_user(:account => @account)
+    @account = Account.create(name: "New Account", default_time_zone: "UTC")
+    @admin = account_admin_user(account: @account)
     @default_term = @account.default_enrollment_term
 
-    @sub_account = Account.create(:parent_account => @account, :name => 'Math')
-    @sub_account.sis_source_id = 'sub1'
+    @sub_account = Account.create(parent_account: @account, name: "Math")
+    @sub_account.sis_source_id = "sub1"
     @sub_account.save!
 
-    @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago,
-                                   :end_at => 1.year.from_now)
+    @term1 = EnrollmentTerm.create(name: "Fall", start_at: 6.months.ago,
+                                   end_at: 1.year.from_now)
     @term1.root_account = @account
-    @term1.sis_source_id = 'fall12'
+    @term1.sis_source_id = "fall12"
     @term1.save!
 
     start_at = 1.day.ago
     end_at = 3.months.from_now
-    @course1 = Course.create(:name => 'English 101', :course_code => 'ENG101',
-                             :start_at => start_at, :conclude_at => end_at,
-                             :account => @sub_account, :enrollment_term => @term1)
+    @course1 = Course.create(name: "English 101", course_code: "ENG101",
+                             start_at: start_at, conclude_at: end_at,
+                             account: @sub_account, enrollment_term: @term1)
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.restrict_enrollments_to_course_dates = true
     @course1.save!
 
-    @course2 = Course.create(:name => 'Math 101', :course_code => 'MAT101',
-                             :conclude_at => end_at, :account => @account)
+    @course2 = Course.create(name: "Math 101", course_code: "MAT101",
+                             conclude_at: end_at, account: @account)
     @course2.sis_source_id = "SIS_COURSE_ID_2"
     @course2.save!
     @course2.destroy
 
-    @course3 = Course.create(:name => 'Science 101', :course_code => 'SCI101',
-                             :account => @account)
-    @course3.workflow_state = 'claimed'
+    @course3 = Course.create(name: "Science 101", course_code: "SCI101",
+                             account: @account)
+    @course3.workflow_state = "claimed"
     @course3.sis_source_id = "SIS_COURSE_ID_3"
     @course3.save!
 
-    @course4 = Course.create(:name => 'self help', :course_code => 'self',
-                             :account => @account)
+    @course4 = Course.create(name: "self help", course_code: "self",
+                             account: @account)
     @course4.offer
 
-    @course5 = Course.create(:name => 'talking 101', :course_code => 'Tal101',
-                             :account => @account)
-    @course5.workflow_state = 'completed'
+    @course5 = Course.create(name: "talking 101", course_code: "Tal101",
+                             account: @account)
+    @course5.workflow_state = "completed"
     @course5.save!
   end
 
   describe "unpublished courses" do
     before do
-      @report = 'unpublished_courses_csv'
+      @report = "unpublished_courses_csv"
     end
 
     it "runs unpublished courses report on a term" do
@@ -108,7 +108,7 @@ describe "Course Account Reports" do
 
   describe "deleted courses" do
     before do
-      @report = 'recently_deleted_courses_csv'
+      @report = "recently_deleted_courses_csv"
     end
 
     it "runs recently deleted courses report on a term" do
@@ -144,19 +144,20 @@ describe "Course Account Reports" do
                                "Math 101", nil, nil]
     end
   end
+
   describe "Unused Course report" do
     before(:once) do
-      @type = 'unused_courses_csv'
+      @type = "unused_courses_csv"
 
-      @course6 = Course.create(:name => 'Theology 101', :course_code => 'THE01',
-                               :account => @account)
+      @course6 = Course.create(name: "Theology 101", course_code: "THE01",
+                               account: @account)
 
-      @assignment = @course1.assignments.create(:title => "some assignment",
-                                                :points_possible => "5")
-      @discussion = @course2.discussion_topics.create!(:message => "hi")
-      @attachment = attachment_model(:context => @course3)
-      @module = @course4.context_modules.create!(:name => "some module")
-      @quiz = @course5.quizzes.create!(:title => "new quiz")
+      @assignment = @course1.assignments.create(title: "some assignment",
+                                                points_possible: "5")
+      @discussion = @course2.discussion_topics.create!(message: "hi")
+      @attachment = attachment_model(context: @course3)
+      @module = @course4.context_modules.create!(name: "some module")
+      @quiz = @course5.quizzes.create!(title: "new quiz")
     end
 
     it "finds courses with no active objects" do
@@ -179,8 +180,8 @@ describe "Course Account Reports" do
 
     it "does not find courses with objects" do
       @wiki_page = @course6.wiki_pages.create(
-        :title => "Some random wiki page",
-        :body => "wiki page content"
+        title: "Some random wiki page",
+        body: "wiki page content"
       )
       report = run_report(@type)
       expect(report.parameters["extra_text"]).to eq "Term: All Terms;"
@@ -194,7 +195,7 @@ describe "Course Account Reports" do
     end
 
     it "runs unused courses report with a term" do
-      @term1 = @account.enrollment_terms.create(:name => 'Fall')
+      @term1 = @account.enrollment_terms.create(name: "Fall")
       @assignment.destroy
       @course5.enrollment_term = @term1
       @course5.save
@@ -211,8 +212,8 @@ describe "Course Account Reports" do
     end
 
     it "runs unused courses report on a sub account" do
-      sub_account = Account.create(:parent_account => @account,
-                                   :name => 'English')
+      sub_account = Account.create(parent_account: @account,
+                                   name: "English")
       @course3.account = sub_account
       @course3.save
       @course4.account = sub_account
@@ -229,7 +230,7 @@ describe "Course Account Reports" do
 
   describe "course storage report" do
     before(:once) do
-      @report = 'course_storage_csv'
+      @report = "course_storage_csv"
       a = attachment_obj_with_context(@course1)
       a.update_attribute(:size, 1.226.megabyte)
       a = attachment_obj_with_context(@course2)
@@ -248,31 +249,31 @@ describe "Course Account Reports" do
       child.save!
     end
 
-    it 'adds up storage for courses' do
+    it "adds up storage for courses" do
       parsed = read_report(@report, { account: @account, order: "skip", header: true })
       expect(parsed.length).to eq 5
       headers = parsed.shift
       expect(headers.length).to eq parsed[0].length
       expect(parsed).to match_array [
-        [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
-         'English 101', @sub_account.id.to_s, 'sub1',
-         'Math', '1.23', '81.23'],
-        [@course3.id.to_s, 'SIS_COURSE_ID_3', 'SCI101',
-         'Science 101', @account.id.to_s, nil,
-         @account.name, '0.0', '0.0'],
-        [@course5.id.to_s, nil, 'Tal101', 'talking 101',
-         @account.id.to_s, nil, @account.name, '92.0', '92.0'],
-        [@course4.id.to_s, nil, 'self', 'self help',
-         @account.id.to_s, nil, @account.name, '4.65', '4.65']
+        [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+         "English 101", @sub_account.id.to_s, "sub1",
+         "Math", "1.23", "81.23"],
+        [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
+         "Science 101", @account.id.to_s, nil,
+         @account.name, "0.0", "0.0"],
+        [@course5.id.to_s, nil, "Tal101", "talking 101",
+         @account.id.to_s, nil, @account.name, "92.0", "92.0"],
+        [@course4.id.to_s, nil, "self", "self help",
+         @account.id.to_s, nil, @account.name, "4.65", "4.65"]
       ]
     end
 
-    it 'adds up storage for courses in sub account' do
+    it "adds up storage for courses in sub account" do
       parsed = read_report(@report, { account: @sub_account })
       expect(parsed.length).to eq 1
-      expect(parsed[0]).to eq [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
-                               'English 101', @sub_account.id.to_s, 'sub1',
-                               'Math', '1.23', '81.23']
+      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+                               "English 101", @sub_account.id.to_s, "sub1",
+                               "Math", "1.23", "81.23"]
     end
   end
 end

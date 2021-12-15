@@ -27,7 +27,7 @@ module Login
       # http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html
       # (because an attacker would be trying to inject his own state param,
       # and starting the login process over will generate a new CSRF nonce)
-      if !params[:state]
+      unless params[:state]
         return redirect_to(clever_login_url)
       end
 

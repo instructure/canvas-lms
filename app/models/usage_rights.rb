@@ -21,32 +21,32 @@
 class UsageRights < ActiveRecord::Base
   include ContentLicenses
 
-  USE_JUSTIFICATIONS = %w(own_copyright public_domain used_by_permission fair_use creative_commons).freeze
+  USE_JUSTIFICATIONS = %w[own_copyright public_domain used_by_permission fair_use creative_commons].freeze
 
-  belongs_to :context, polymorphic: [:course, :group, :user]
+  belongs_to :context, polymorphic: %i[course group user]
 
   before_validation :infer_license
-  validates_inclusion_of :use_justification, in: USE_JUSTIFICATIONS
-  validates_inclusion_of :license, in: licenses.keys, allow_nil: true
+  validates :use_justification, inclusion: { in: USE_JUSTIFICATIONS }
+  validates :license, inclusion: { in: licenses.keys, allow_nil: true }
 
   def infer_license
     if license.blank?
       self.license = case use_justification
-                     when 'public_domain'
-                       'public_domain'
-                     when 'creative_commons'
-                       'cc_by_nc_nd' # assume the most restrictive CC license unless told otherwise
+                     when "public_domain"
+                       "public_domain"
+                     when "creative_commons"
+                       "cc_by_nc_nd" # assume the most restrictive CC license unless told otherwise
                      else
-                       'private'     # default to private (copyrighted)
+                       "private"     # default to private (copyrighted)
                      end
     end
   end
 
   def license_name
-    self.class.licenses[license || 'private'][:readable_license].call
+    self.class.licenses[license || "private"][:readable_license].call
   end
 
   def license_url
-    self.class.licenses[license || 'private'][:license_url]
+    self.class.licenses[license || "private"][:license_url]
   end
 end

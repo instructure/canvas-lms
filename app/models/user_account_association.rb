@@ -26,12 +26,12 @@ class UserAccountAssociation < ActiveRecord::Base
 
   after_commit :update_user_root_account_ids
 
-  validates_presence_of :user_id, :account_id
+  validates :user_id, :account_id, presence: true
 
   resolves_root_account through: :account
 
-  scope :for_root_accounts, -> { where('root_account_id = account_id') }
-  scope :for_user_id, lambda { |user_id| where('user_id =?', user_id) }
+  scope :for_root_accounts, -> { where("root_account_id = account_id") }
+  scope :for_user_id, ->(user_id) { where("user_id =?", user_id) }
 
   def for_root_account?
     account_id == root_account_id
@@ -46,7 +46,7 @@ class UserAccountAssociation < ActiveRecord::Base
     # root_account_ids due to the high number of root account associations
     # per user. This Setting allows us to control if root_account_ids syncing
     # occurs.
-    return unless Setting.get('sync_root_account_ids_on_user_records', 'true') == 'true'
+    return unless Setting.get("sync_root_account_ids_on_user_records", "true") == "true"
 
     user.update_root_account_ids_later
   end

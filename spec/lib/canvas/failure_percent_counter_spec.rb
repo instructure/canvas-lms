@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 if Canvas.redis_enabled?
   describe Canvas::FailurePercentCounter do
-    let(:counter) { Canvas::FailurePercentCounter.new(Canvas.redis, 'counter_spec', 1, 3) }
+    let(:counter) { Canvas::FailurePercentCounter.new(Canvas.redis, "counter_spec", 1, 3) }
 
     it "increments the counter" do
       2.times { counter.increment_count }

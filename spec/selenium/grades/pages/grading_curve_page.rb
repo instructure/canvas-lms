@@ -41,7 +41,7 @@ class GradingCurvePage
   public
 
   def grading_curve_dialog_title
-    f('.ui-dialog-title')
+    f(".ui-dialog-title")
   end
 
   def edit_grade_curve(score = "1")

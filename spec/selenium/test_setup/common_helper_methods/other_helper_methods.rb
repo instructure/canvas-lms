@@ -21,17 +21,17 @@ module OtherHelperMethods
   def stub_kaltura
     # trick kaltura into being activated
     allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
-                                                                    'domain' => 'www.instructuremedia.com',
-                                                                    'resource_domain' => 'www.instructuremedia.com',
-                                                                    'partner_id' => '100',
-                                                                    'subpartner_id' => '10000',
-                                                                    'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-                                                                    'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-                                                                    'player_ui_conf' => '1',
-                                                                    'kcw_ui_conf' => '1',
-                                                                    'upload_ui_conf' => '1'
+                                                                    "domain" => "www.instructuremedia.com",
+                                                                    "resource_domain" => "www.instructuremedia.com",
+                                                                    "partner_id" => "100",
+                                                                    "subpartner_id" => "10000",
+                                                                    "secret_key" => "fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321",
+                                                                    "user_secret_key" => "1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1",
+                                                                    "player_ui_conf" => "1",
+                                                                    "kcw_ui_conf" => "1",
+                                                                    "upload_ui_conf" => "1"
                                                                   })
-    kal = double('CanvasKaltura::ClientV3')
+    kal = double("CanvasKaltura::ClientV3")
     allow(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
   end
@@ -39,16 +39,16 @@ module OtherHelperMethods
   def page_view(opts = {})
     course = opts[:course] || @course
     user = opts[:user] || @student
-    controller = opts[:controller] || 'assignments'
+    controller = opts[:controller] || "assignments"
     summarized = opts[:summarized] || nil
     url = opts[:url]
-    user_agent = opts[:user_agent] || 'firefox'
+    user_agent = opts[:user_agent] || "firefox"
 
     page_view = course.page_views.build(
-      :user => user,
-      :controller => controller,
-      :url => url,
-      :user_agent => user_agent
+      user: user,
+      controller: controller,
+      url: url,
+      user_agent: user_agent
     )
 
     page_view.summarized = summarized
@@ -58,7 +58,7 @@ module OtherHelperMethods
     if opts[:participated]
       page_view.participated = true
       access = page_view.build_asset_user_access
-      access.display_name = 'Some Asset'
+      access.display_name = "Some Asset"
     end
 
     page_view.store
@@ -72,21 +72,21 @@ module OtherHelperMethods
     "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
     "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
-    "attachments.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/attachments.zip')),
-    "graded.png" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../../public/images/graded.png')),
-    "cc_full_test.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/cc_full_test.zip')),
-    "cc_outcomes.imscc" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/cc_outcomes.imscc')),
-    "cc_ark_test.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/cc_ark_test.zip')),
-    "canvas_cc_minimum.zip" => File.read(File.dirname(__FILE__) + '/../../../fixtures/migration/canvas_cc_minimum.zip'),
-    "canvas_cc_only_questions.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/canvas_cc_only_questions.zip')),
-    "qti.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/package_identifier/qti.zip')),
-    "a_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/a_file.txt')),
-    "b_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/b_file.txt')),
-    "c_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/c_file.txt')),
-    "amazing_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/amazing_file.txt')),
-    "Dog_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/Dog_file.txt')),
-    "cn-image.jpg" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/cn_image.jpg')),
-    "empty_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/empty_file.txt')),
+    "attachments.zip" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/attachments.zip")),
+    "graded.png" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../../public/images/graded.png")),
+    "cc_full_test.zip" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_full_test.zip")),
+    "cc_outcomes.imscc" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_outcomes.imscc")),
+    "cc_ark_test.zip" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_ark_test.zip")),
+    "canvas_cc_minimum.zip" => File.read(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_cc_minimum.zip"),
+    "canvas_cc_only_questions.zip" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_cc_only_questions.zip")),
+    "qti.zip" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/migration/package_identifier/qti.zip")),
+    "a_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/a_file.txt")),
+    "b_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/b_file.txt")),
+    "c_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/c_file.txt")),
+    "amazing_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/amazing_file.txt")),
+    "Dog_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/Dog_file.txt")),
+    "cn-image.jpg" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/cn_image.jpg")),
+    "empty_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + "/../../../fixtures/files/empty_file.txt")),
   }.freeze
 
   def get_file(filename, data = nil)
@@ -124,7 +124,7 @@ module OtherHelperMethods
     # encrypted session cookie, each gets a new (different) session cookie in
     # the response, meaning the authenticity token on your new page might
     # already be invalid.
-    driver.execute_script <<-JS
+    driver.execute_script <<~JS
       var highest = setTimeout(function(){}, 1000);
       for (var i = 0; i < highest; i++) {
         clearTimeout(i);
@@ -137,14 +137,14 @@ module OtherHelperMethods
   end
 
   def clear_local_storage
-    driver.execute_script 'localStorage.clear();'
+    driver.execute_script "localStorage.clear();"
   end
 
   def scroll_height
-    driver.execute_script 'return window.pageYOffset'
+    driver.execute_script "return window.pageYOffset"
   end
 
   def focused_element
-    driver.execute_script 'return document.activeElement'
+    driver.execute_script "return document.activeElement"
   end
 end

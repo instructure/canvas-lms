@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path("../lib", __FILE__)
-
-# Maintain your gem's version:
-require "respondus_soap_endpoint/version"
+require_relative "lib/respondus_soap_endpoint/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|

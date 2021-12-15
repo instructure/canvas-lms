@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/engine'
-require 'zip'
+require "account_reports/engine"
+require "zip"
 
 module AccountReports
   class << self
@@ -107,11 +107,11 @@ module AccountReports
   end
 
   def self.generate_report(account_report)
-    account_report.update(workflow_state: 'running', start_at: Time.zone.now)
+    account_report.update(workflow_state: "running", start_at: Time.zone.now)
     begin
       REPORTS[account_report.report_type].proc.call(account_report)
     rescue => e
-      error_report_id = report_on_exception(e, { :user => account_report.user })
+      error_report_id = report_on_exception(e, { user: account_report.user })
       title = account_report.report_type.to_s.titleize
       error_message = "Generating the report, #{title}, failed."
       error_message += if error_report_id
@@ -119,7 +119,7 @@ module AccountReports
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      self.finalize_report(account_report, error_message)
+      finalize_report(account_report, error_message)
       @er = nil
     end
   end
@@ -136,10 +136,10 @@ module AccountReports
   end
 
   def self.generate_file_name(account_report)
-    "#{account_report.report_type}_#{Time.zone.now.strftime('%d_%b_%Y')}_#{account_report.id}"
+    "#{account_report.report_type}_#{Time.zone.now.strftime("%d_%b_%Y")}_#{account_report.id}"
   end
 
-  def self.generate_file(account_report, ext = 'csv')
+  def self.generate_file(account_report, ext = "csv")
     temp = Tempfile.open([generate_file_name(account_report), ".#{ext}"])
     filepath = temp.path
     temp.close!
@@ -162,27 +162,27 @@ module AccountReports
         zipfile.close
         zipfile
       end
-      filetype = 'application/zip'
+      filetype = "application/zip"
     elsif csv
       ext = csv !~ /\n/ && File.extname(csv)
       case ext
       when ".csv"
-        filename = File.basename(csv);
+        filename = File.basename(csv)
         filepath = csv
-        filetype = 'text/csv'
+        filetype = "text/csv"
       when ".zip"
-        filetype = 'application/zip'
+        filetype = "application/zip"
       when ".txt"
-        filename = File.basename(csv);
+        filename = File.basename(csv)
         filepath = csv
-        filetype = 'text/rtf'
+        filetype = "text/rtf"
       else
         filename = generate_file_name(account_report)
         f = Tempfile.open([filename, ".csv"])
         f << csv
         f.close
         filepath = f.path
-        filetype = 'text/csv'
+        filetype = "text/csv"
       end
     end
     if filename
@@ -202,10 +202,10 @@ module AccountReports
         attachment.save!
       else
         attachment = account_report.account.attachments.create!(
-          :uploaded_data => data,
-          :display_name => filename,
-          :filename => filename,
-          :user => account_report.user
+          uploaded_data: data,
+          display_name: filename,
+          filename: filename,
+          user: account_report.user
         )
       end
     end
@@ -226,10 +226,10 @@ module AccountReports
     report_attachment(account_report, csv)
     account_report.message = message
     failed_report(account_report) unless csv
-    if account_report.workflow_state == 'aborted'
-      account_report.parameters["extra_text"] = I18n.t('Report has been aborted')
+    if account_report.workflow_state == "aborted"
+      account_report.parameters["extra_text"] = I18n.t("Report has been aborted")
     else
-      account_report.workflow_state = csv ? 'complete' : 'error'
+      account_report.workflow_state = csv ? "complete" : "error"
     end
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.zone.now
@@ -238,7 +238,7 @@ module AccountReports
   end
 
   def self.message_recipient(account_report)
-    return account_report if account_report.parameters['skip_message']
+    return account_report if account_report.parameters["skip_message"]
 
     notification = account_report.attachment ? NotificationFinder.new.by_name("Report Generated") : NotificationFinder.new.by_name("Report Generation Failed")
     notification&.create_message(account_report, [account_report.user])

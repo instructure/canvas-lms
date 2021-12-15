@@ -24,6 +24,30 @@ import {Enrollment} from './Enrollment'
 import {Course} from './Course'
 import {Group} from './Group'
 
+export const ADDRESS_BOOK_RECIPIENTS = gql`
+  query GetAddressBookRecipients($userID: ID!, $context: String, $search: String) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        recipients(context: $context, search: $search) {
+          contextsConnection(first: 20) {
+            nodes {
+              id
+              name
+            }
+          }
+          usersConnection(first: 20) {
+            nodes {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const CONVERSATIONS_QUERY = gql`
   query GetConversationsQuery($userID: ID!, $course: String, $scope: String = "") {
     legacyNode(_id: $userID, type: User) {
@@ -38,6 +62,11 @@ export const CONVERSATIONS_QUERY = gql`
             ...ConversationParticipant
             conversation {
               ...Conversation
+              conversationMessagesConnection(first: 1) {
+                nodes {
+                  ...ConversationMessage
+                }
+              }
             }
           }
         }
@@ -46,7 +75,26 @@ export const CONVERSATIONS_QUERY = gql`
   }
   ${ConversationParticipant.fragment}
   ${Conversation.fragment}
+  ${ConversationMessage.fragment}
 `
+
+export const CONVERSATION_MESSAGES_QUERY = gql`
+  query GetConversationMessagesQuery($conversationID: ID!) {
+    legacyNode(_id: $conversationID, type: Conversation) {
+      ... on Conversation {
+        ...Conversation
+        conversationMessagesConnection {
+          nodes {
+            ...ConversationMessage
+          }
+        }
+      }
+    }
+  }
+  ${Conversation.fragment}
+  ${ConversationMessage.fragment}
+`
+
 export const COURSES_QUERY = gql`
   query GetUserCourses($userID: ID!) {
     legacyNode(_id: $userID, type: User) {

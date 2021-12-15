@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 class DiscussionsIndex
   class << self
@@ -29,7 +29,7 @@ class DiscussionsIndex
     end
 
     def new_discussion_url
-      '/discussion_topics/new'
+      "/discussion_topics/new"
     end
 
     def individual_discussion_url(discussion)
@@ -52,11 +52,11 @@ class DiscussionsIndex
     end
 
     def add_discussion_button
-      f('#add_discussion')
+      f("#add_discussion")
     end
 
     def confirm_delete_button
-      f('#confirm_delete_discussion')
+      f("#confirm_delete_discussion")
     end
 
     def discussion_css(title)
@@ -64,7 +64,7 @@ class DiscussionsIndex
     end
 
     def discussions_list
-      ff('.ic-item-row')
+      ff(".ic-item-row")
     end
 
     def discussion_group(group_name)
@@ -81,7 +81,7 @@ class DiscussionsIndex
     end
 
     def discussion_title(title)
-      f('a', discussion(title))
+      f("a", discussion(title))
     end
 
     def discussion_sections(title)
@@ -90,7 +90,7 @@ class DiscussionsIndex
     end
 
     def discussion_unread_pill(title)
-      f('.ic-unread-badge__unread-count', discussion(title)).text
+      f(".ic-unread-badge__unread-count", discussion(title)).text
     end
 
     def discussion_unread_number(title)
@@ -98,20 +98,20 @@ class DiscussionsIndex
     end
 
     def publish_button(title)
-      f('.publish-button', discussion(title))
+      f(".publish-button", discussion(title))
     end
 
     def subscribe_button(title)
-      f('.subscribe-button', discussion(title))
+      f(".subscribe-button", discussion(title))
     end
 
     def discussion_availability(title)
-      f('.discussion-availability', discussion(title))
+      f(".discussion-availability", discussion(title))
     end
 
     # ---------------------- Discussion Menu ----------------------
     def discussion_menu(title)
-      f('.discussions-index-manage-menu button', discussion(title))
+      f(".discussions-index-manage-menu button", discussion(title))
     end
 
     def discussion_menu_button
@@ -131,31 +131,31 @@ class DiscussionsIndex
     end
 
     def discussion_settings_button
-      f('#discussion_settings')
+      f("#discussion_settings")
     end
 
     def delete_menu_option
-      f('#delete-discussion-menu-option')
+      f("#delete-discussion-menu-option")
     end
 
     def confirm_delete_modal_button
-      f('#confirm_delete_discussions')
+      f("#confirm_delete_discussions")
     end
 
     def pin_menu_option
-      f('#togglepinned-discussion-menu-option')
+      f("#togglepinned-discussion-menu-option")
     end
 
     def summary_content
-      f('.ic-announcement-row__content')
+      f(".ic-announcement-row__content")
     end
 
     def close_for_comment_menu_option
-      f('#togglelocked-discussion-menu-option')
+      f("#togglelocked-discussion-menu-option")
     end
 
     def duplicate_menu_option
-      f('#duplicate-discussion-menu-option')
+      f("#duplicate-discussion-menu-option")
     end
 
     def create_discussions_checkbox
@@ -163,7 +163,7 @@ class DiscussionsIndex
     end
 
     def discussion_settings_submit_button
-      f('#submit_discussion_settings')
+      f("#submit_discussion_settings")
     end
 
     def tool_dialog

@@ -32,7 +32,7 @@ module RSpec
 
     def log_rerun(example)
       path = RerunArgument.for(example)
-      path_without_line_number = path.gsub(/(\.\/|[:\[].*)/, "")
+      path_without_line_number = path.gsub(%r{(\./|[:\[].*)}, "")
 
       if modified_specs.include?(path_without_line_number)
         puts "not adding modified spec to rerun #{path}"
@@ -43,7 +43,7 @@ module RSpec
     end
 
     def modified_specs
-      @modified_specs ||= (ENV["RELEVANT_SPECS"] && ENV["RELEVANT_SPECS"].split("\n")) || []
+      @modified_specs ||= ENV["RELEVANT_SPECS"]&.split("\n") || []
     end
   end
 end

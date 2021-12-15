@@ -33,14 +33,14 @@ module CustomSidebarLinksHelper
   # add a link to the course page sidebar
   # @context is the course
   def course_custom_links
-    base_placements = RequestCache.cache('course_placement_info', @context) do
+    base_placements = RequestCache.cache("course_placement_info", @context) do
       external_tools_display_hashes(:course_navigation, tool_ids: TOOL_IDS)
     end
     base_placements.map do |placement|
       {
         text: placement[:title],
         url: placement[:base_url],
-        icon_class: placement[:canvas_icon_class] || 'icon-lti',
+        icon_class: placement[:canvas_icon_class] || "icon-lti",
         tool_id: placement[:tool_id]
       }
     end
@@ -51,14 +51,14 @@ module CustomSidebarLinksHelper
   def roster_user_custom_links(user)
     return [] unless @context.is_a?(Course) && @context.user_has_been_student?(user)
 
-    base_placements = RequestCache.cache('user_in_course_placement_info', @context) do
+    base_placements = RequestCache.cache("user_in_course_placement_info", @context) do
       external_tools_display_hashes(:student_context_card, tool_ids: TOOL_IDS)
     end
     base_placements.map do |placement|
       {
         text: placement[:title],
         url: placement[:base_url] + "&student_id=#{user.id}",
-        icon_class: placement[:canvas_icon_class] || 'icon-lti',
+        icon_class: placement[:canvas_icon_class] || "icon-lti",
         tool_id: placement[:tool_id]
       }
     end

@@ -21,12 +21,12 @@ class RenameAccountAuthorizationConfigsToAuthenticationProviders < ActiveRecord:
   tag :postdeploy
 
   def up
-    execute("DROP VIEW #{connection.quote_table_name('authentication_providers')}")
+    execute("DROP VIEW #{connection.quote_table_name("authentication_providers")}")
     rename_table :account_authorization_configs, :authentication_providers
   end
 
   def down
     rename_table :authentication_providers, :account_authorization_configs
-    execute("CREATE VIEW #{connection.quote_table_name('authentication_providers')} AS SELECT * FROM #{connection.quote_table_name('account_authorization_configs')}")
+    execute("CREATE VIEW #{connection.quote_table_name("authentication_providers")} AS SELECT * FROM #{connection.quote_table_name("account_authorization_configs")}")
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe GradingPeriodGroup do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
@@ -32,7 +32,7 @@ describe GradingPeriodGroup do
   it { is_expected.to have_many(:enrollment_terms).inverse_of(:grading_period_group) }
   it { is_expected.to have_many(:grading_periods) }
 
-  describe '#recompute_scores_for_each_term' do
+  describe "#recompute_scores_for_each_term" do
     def course_with_grades(account, term, due_date, student, delete_term: false)
       course = account.courses.create!(enrollment_term: term)
       teacher = User.create!
@@ -52,7 +52,7 @@ describe GradingPeriodGroup do
       @student = User.create!
       @group = account.grading_period_groups.create!(weighted: true)
       @period = @group.grading_periods.create!(
-        title: 'Active Grading Period With No Weight',
+        title: "Active Grading Period With No Weight",
         start_date: 2.months.ago(now),
         end_date: 2.months.from_now(now),
         weight: 0.0
@@ -67,7 +67,7 @@ describe GradingPeriodGroup do
       @course_for_deleted_term = course_with_grades(account, deleted_term, now, @student, delete_term: true)
     end
 
-    it 'computes scores for active terms' do
+    it "computes scores for active terms" do
       # update_columns to avoid a grade recalculation
       @group.update_columns(weighted: false)
       expect { @group.recompute_scores_for_each_term(true) }.to change {
@@ -77,7 +77,7 @@ describe GradingPeriodGroup do
                                                                 }.from([0.0, 0.0]).to([80.0, 80.0])
     end
 
-    it 'does not computes scores for inactive terms' do
+    it "does not computes scores for inactive terms" do
       # update_columns to avoid a grade recalculation
       @group.update_columns(weighted: false)
       expect { @group.recompute_scores_for_each_term(true) }.not_to change {
@@ -85,7 +85,7 @@ describe GradingPeriodGroup do
                                                                     }
     end
 
-    it 'can be passed enrollment term IDs on which to operate' do
+    it "can be passed enrollment term IDs on which to operate" do
       # update_columns to avoid a grade recalculation
       @group.update_columns(weighted: false)
       ids = [@second_course.enrollment_term_id]
@@ -96,7 +96,7 @@ describe GradingPeriodGroup do
       }.from([0.0, 0.0]).to([0.0, 80.0])
     end
 
-    it 'recomputes grading period scores if passed `true`' do
+    it "recomputes grading period scores if passed `true`" do
       assignment = @first_course.assignments.first
       # update_columns to avoid a grade recalculation
       assignment.update_columns(points_possible: 20)
@@ -106,7 +106,7 @@ describe GradingPeriodGroup do
                                                                 }.from(80.0).to(40.0)
     end
 
-    it 'does not recompute grading period scores if passed `false`' do
+    it "does not recompute grading period scores if passed `false`" do
       assignment = @first_course.assignments.first
       # update_columns to avoid a grade recalculation
       assignment.update_columns(points_possible: 20)
@@ -138,45 +138,45 @@ describe GradingPeriodGroup do
     context "when given a course" do
       it "is expected to fail" do
         course = account.courses.create!
-        expect {
+        expect do
           GradingPeriodGroup.for(course)
-        }.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError)
       end
     end
   end
 
-  describe '.for_course' do
+  describe ".for_course" do
     before(:once) do
       @course = account.courses.create!
     end
 
-    it 'returns the set associated with the course' do
+    it "returns the set associated with the course" do
       set = account.grading_period_groups.create!(valid_attributes)
       set.enrollment_terms << @course.enrollment_term
       expect(GradingPeriodGroup.for_course(@course)).to eq(set)
     end
 
-    it 'returns nil if no set is associated with the course' do
+    it "returns nil if no set is associated with the course" do
       expect(GradingPeriodGroup.for_course(@course)).to be_nil
     end
 
-    it 'returns nil if the associated set is soft-deleted' do
+    it "returns nil if the associated set is soft-deleted" do
       set = account.grading_period_groups.create!(valid_attributes)
       set.enrollment_terms << @course.enrollment_term
       set.destroy
       expect(GradingPeriodGroup.for_course(@course)).to be_nil
     end
 
-    context 'legacy grading periods support' do
+    context "legacy grading periods support" do
       before(:once) do
         @set = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
       end
 
-      it 'returns the set associated with the course' do
+      it "returns the set associated with the course" do
         expect(GradingPeriodGroup.for_course(@course)).to eq(@set)
       end
 
-      it 'returns nil if the associated set is soft-deleted' do
+      it "returns nil if the associated set is soft-deleted" do
         @set.destroy
         expect(GradingPeriodGroup.for_course(@course)).to be_nil
       end
@@ -213,42 +213,43 @@ describe GradingPeriodGroup do
     end
 
     it "cannot be created for a soft-deleted account" do
-      account.update_attribute(:workflow_state, 'deleted')
+      account.update_attribute(:workflow_state, "deleted")
       group = account.grading_period_groups.build(title: "Example Group")
       expect(group).not_to be_valid
     end
 
     it "cannot be created for a soft-deleted course" do
       course = Course.create!(account: Account.default)
-      course.update_attribute(:workflow_state, 'deleted')
+      course.update_attribute(:workflow_state, "deleted")
       group = course.grading_period_groups.build(title: "Example Group")
       expect(group).not_to be_valid
     end
 
     it "can belong to a soft-deleted account when also soft-deleted" do
       group = group_helper.create_for_account(account)
-      account.update_attribute(:workflow_state, 'deleted')
+      account.update_attribute(:workflow_state, "deleted")
       group.reload
       expect(group).not_to be_valid
-      group.workflow_state = 'deleted'
+      group.workflow_state = "deleted"
       expect(group).to be_valid
     end
 
     it "can belong to a soft-deleted course when also soft-deleted" do
       course = Course.create!(account: Account.default)
       group = group_helper.legacy_create_for_course(course)
-      course.update_attribute(:workflow_state, 'deleted')
+      course.update_attribute(:workflow_state, "deleted")
       group.reload
       expect(group).not_to be_valid
-      group.workflow_state = 'deleted'
+      group.workflow_state = "deleted"
       expect(group).to be_valid
     end
   end
 
   it_behaves_like "soft deletion" do
+    subject { course.grading_period_groups }
+
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { { title: "A title" } }
-    subject { course.grading_period_groups }
   end
 
   describe "deletion" do
@@ -278,7 +279,7 @@ describe GradingPeriodGroup do
   end
 
   describe "permissions" do
-    let(:permissions) { [:read, :create, :update, :delete] }
+    let(:permissions) { %i[read create update delete] }
 
     context "course belonging to root account" do
       before :once do
@@ -324,7 +325,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read but NOT create, update, not delete root-account " \
-           "grading period groups", priority: "1", test_id: 2528644 do
+           "grading period groups", priority: "1" do
           expect(@root_account_group
             .rights_status(@sub_account_admin, *permissions)).to eq({
                                                                       read: true,
@@ -348,7 +349,7 @@ describe GradingPeriodGroup do
 
       context "teacher" do
         it "can read but NOT create, update, nor delete root-account " \
-           "grading period groups", priority: "1", test_id: 2528645 do
+           "grading period groups", priority: "1" do
           expect(@root_account_group
             .rights_status(@teacher, *permissions)).to eq({
                                                             read: true,
@@ -507,7 +508,7 @@ describe GradingPeriodGroup do
     end
   end
 
-  describe 'computation of course scores' do
+  describe "computation of course scores" do
     before(:once) do
       @grading_period_set = account.grading_period_groups.create!(valid_attributes)
       term = account.enrollment_terms.create!
@@ -515,14 +516,14 @@ describe GradingPeriodGroup do
       account.courses.create!(enrollment_term: term)
     end
 
-    it 'recomputes course scores when the weighted attribute is changed' do
+    it "recomputes course scores when the weighted attribute is changed" do
       expect(Enrollment).to receive(:recompute_final_score).once
       @grading_period_set.update!(weighted: true)
     end
 
-    it 'does not recompute course scores when the weighted attribute is not changed' do
+    it "does not recompute course scores when the weighted attribute is not changed" do
       expect(Enrollment).not_to receive(:recompute_final_score)
-      @grading_period_set.update!(title: 'The Best Set')
+      @grading_period_set.update!(title: "The Best Set")
     end
   end
 

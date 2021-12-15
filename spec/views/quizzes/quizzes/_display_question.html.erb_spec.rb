@@ -18,19 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_display_question" do
   it "renders" do
     course_with_student
     view_context
 
-    @quiz = @course.quizzes.create!(:title => "new quiz")
-    @quiz.quiz_questions.create!(:question_data =>
-      { :name => 'LTUE', :points_possible => 1, 'question_type' => 'numerical_question',
-        'correct_comments_html' => '<img class="equation_image" title="\sqrt{1764}" src="/equation_images/%255Csqrt%257B9%257D" alt="LaTeX: \sqrt{1764}" data-equation-content="\sqrt{1764}" />',
-        'answers' => { 'answer_0' => { 'numerical_answer_type' => 'exact_answer',
-                                       'answer_exact' => 42, 'answer_text' => '', 'answer_weight' => '100' } } })
+    @quiz = @course.quizzes.create!(title: "new quiz")
+    @quiz.quiz_questions.create!(question_data: { :name => "LTUE", :points_possible => 1, "question_type" => "numerical_question",
+                                                  "correct_comments_html" => '<img class="equation_image" title="\sqrt{1764}" src="/equation_images/%255Csqrt%257B9%257D" alt="LaTeX: \sqrt{1764}" data-equation-content="\sqrt{1764}" />',
+                                                  "answers" => { "answer_0" => { "numerical_answer_type" => "exact_answer",
+                                                                                 "answer_exact" => 42, "answer_text" => "", "answer_weight" => "100" } } })
     @quiz.generate_quiz_data
     @quiz.save
 
@@ -41,11 +40,11 @@ describe "/quizzes/quizzes/_display_question" do
     assign(:quiz, @quiz)
     q = @quiz.stored_questions.first
     q[:answers][0].delete(:margin) # sometimes this is missing; see #10785
-    render :partial => "quizzes/quizzes/display_question", :object => q, :locals => {
-      :user_answer => @submission.submission_data.find { |a| a[:question_id] == q[:id] },
-      :assessment_results => true
+    render partial: "quizzes/quizzes/display_question", object: q, locals: {
+      user_answer: @submission.submission_data.find { |a| a[:question_id] == q[:id] },
+      assessment_results: true
     }
     expect(response).not_to be_nil
-    expect(response.body).to include 'data-equation-content'
+    expect(response.body).to include "data-equation-content"
   end
 end

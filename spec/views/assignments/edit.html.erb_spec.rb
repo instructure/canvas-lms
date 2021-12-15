@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/assignments/edit" do
   before do
@@ -27,7 +27,7 @@ describe "/assignments/edit" do
     group = @course.assignment_groups.create!(name: "some group")
     @assignment = @course.assignments.create!(
       title: "some assignment",
-      submission_types: 'external_tool'
+      submission_types: "external_tool"
     )
     @assignment.assignment_group_id = group.id
     @assignment.save!
@@ -37,13 +37,13 @@ describe "/assignments/edit" do
   end
 
   it "renders" do
-    render 'assignments/edit'
+    render "assignments/edit"
     expect(response).not_to be_nil # have_tag()
   end
 
   it "renders rubrics" do
     allow(@assignment).to receive(:quiz_lti?).and_return(true)
-    render 'assignments/edit'
-    expect(response).to render_template(partial: '_rubrics_component')
+    render "assignments/edit"
+    expect(response).to render_template(partial: "_rubrics_component")
   end
 end

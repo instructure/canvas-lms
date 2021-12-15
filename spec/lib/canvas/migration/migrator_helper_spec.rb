@@ -33,76 +33,76 @@ describe Canvas::Migration::MigratorHelper do
         {
           tool_profiles: [
             {
-              'tool_profile' => {
-                'product_instance' => {
-                  'product_info' => {
-                    'product_name' => {
-                      'default_value' => 'Test Tool'
+              "tool_profile" => {
+                "product_instance" => {
+                  "product_info" => {
+                    "product_name" => {
+                      "default_value" => "Test Tool"
                     }
                   }
                 }
               },
-              'migration_id' => 'm_id'
+              "migration_id" => "m_id"
             }
           ]
         }
       end
       let(:content_migration) { ContentMigration.create!(context: course_model) }
 
-      it 'returns nothing if there are no tool_profiles' do
+      it "returns nothing if there are no tool_profiles" do
         helper = subject.new
         helper.course = {}
         helper.settings = { content_migration: content_migration }
-        helper.overview()
+        helper.overview
         expect(helper.overview[:tool_profiles]).to be_nil
       end
 
-      it 'returns a tool profile overview if there is a tool_profile' do
+      it "returns a tool profile overview if there is a tool_profile" do
         helper = subject.new
         helper.course = course
         helper.settings = { content_migration: content_migration }
-        helper.overview()
+        helper.overview
         expect(helper.overview[:tool_profiles]).to match_array [
           {
-            title: 'Test Tool',
-            migration_id: 'm_id'
+            title: "Test Tool",
+            migration_id: "m_id"
           }
         ]
       end
 
-      it 'returns nothing if the tool_profile data is misconfigured' do
+      it "returns nothing if the tool_profile data is misconfigured" do
         helper = subject.new
-        course[:tool_profiles].first['tool_profile']['product_instance'] = {}
+        course[:tool_profiles].first["tool_profile"]["product_instance"] = {}
         helper.course = course
         helper.settings = { content_migration: content_migration }
-        helper.overview()
+        helper.overview
         expect(helper.overview[:tool_profiles]).to match_array []
       end
     end
 
-    context 'learning outcomes' do
+    context "learning outcomes" do
       let(:course) do
         {
           learning_outcomes: [{
-            type: 'learning_outcome_group',
-            migration_id: 'group_1',
-            title: 'course outcomes',
+            type: "learning_outcome_group",
+            migration_id: "group_1",
+            title: "course outcomes",
             outcomes: [{
-              type: 'learning_outcome',
-              migration_id: 'outcome_1',
-              title: 'standard'
+              type: "learning_outcome",
+              migration_id: "outcome_1",
+              title: "standard"
             }]
           }]
         }
       end
       let(:content_migration) { ContentMigration.create!(context: course_model) }
 
-      context 'selectable_outcomes_in_course_copy disabled' do
+      context "selectable_outcomes_in_course_copy disabled" do
         before do
           content_migration.context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
         end
 
-        it 'does not generate learning_outcome_groups overview section' do
+        it "does not generate learning_outcome_groups overview section" do
           helper = subject.new
           helper.course = course
           helper.settings = { content_migration: content_migration }
@@ -111,12 +111,12 @@ describe Canvas::Migration::MigratorHelper do
         end
       end
 
-      context 'selectable_outcomes_in_course_copy enabled' do
+      context "selectable_outcomes_in_course_copy enabled" do
         before do
           content_migration.context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
         end
 
-        it 'generates learning_outcome_groups overview section' do
+        it "generates learning_outcome_groups overview section" do
           helper = subject.new
           helper.course = course
           helper.settings = { content_migration: content_migration }

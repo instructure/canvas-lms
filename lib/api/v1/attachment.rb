@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'uri'
+require "uri"
 
 module Api::V1::Attachment
   include Api::V1::Json
@@ -48,19 +48,19 @@ module Api::V1::Attachment
 
   def attachment_json(attachment, user, url_options = {}, options = {})
     hash = {
-      'id' => attachment.id,
-      'uuid' => attachment.uuid,
-      'folder_id' => attachment.folder_id,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
-      'upload_status' => AttachmentUploadStatus.upload_status(attachment)
+      "id" => attachment.id,
+      "uuid" => attachment.uuid,
+      "folder_id" => attachment.folder_id,
+      "display_name" => attachment.display_name,
+      "filename" => attachment.filename,
+      "upload_status" => AttachmentUploadStatus.upload_status(attachment)
     }
 
     if options[:master_course_status]
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
     end
 
-    return hash if options[:only] && options[:only].include?('names')
+    return hash if options[:only]&.include?("names")
 
     options.reverse_merge!(skip_permission_checks: false)
     includes = options[:include] || []
@@ -76,7 +76,7 @@ module Api::V1::Attachment
     hidden_for_user = if skip_permission_checks ||
                          !attachment.hidden?
                         false
-                      elsif options.has_key?(:can_view_hidden_files)
+                      elsif options.key?(:can_view_hidden_files)
                         options[:can_view_hidden_files]
                       else
                         !can_view_hidden_files?(attachment.context, user)
@@ -95,47 +95,47 @@ module Api::V1::Attachment
       if options[:thumbnail_url]
         url = thumbnail_url
       else
-        h = { :download => '1', :download_frd => '1' }
-        h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+        h = { download: "1", download_frd: "1" }
+        h[:verifier] = attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
-      if !thumbnail_url && attachment.content_type == 'image/svg+xml' && attachment.size < 16_384 # 16k
+      if !thumbnail_url && attachment.content_type == "image/svg+xml" && attachment.size < 16_384 # 16k
         thumbnail_url = url
       end
     else
-      thumbnail_url = ''
-      url = ''
+      thumbnail_url = ""
+      url = ""
     end
 
     hash.merge!(
-      'content-type' => attachment.content_type,
-      'url' => url,
-      'size' => attachment.size,
-      'created_at' => attachment.created_at,
-      'updated_at' => attachment.updated_at,
-      'unlock_at' => attachment.unlock_at,
-      'locked' => !!attachment.locked,
-      'hidden' => skip_permission_checks ? false : !!attachment.hidden?,
-      'lock_at' => attachment.lock_at,
-      'hidden_for_user' => hidden_for_user,
-      'thumbnail_url' => thumbnail_url,
-      'modified_at' => attachment.modified_at ? attachment.modified_at : attachment.updated_at,
-      'mime_class' => attachment.mime_class,
-      'media_entry_id' => attachment.media_entry_id
+      "content-type" => attachment.content_type,
+      "url" => url,
+      "size" => attachment.size,
+      "created_at" => attachment.created_at,
+      "updated_at" => attachment.updated_at,
+      "unlock_at" => attachment.unlock_at,
+      "locked" => !!attachment.locked,
+      "hidden" => skip_permission_checks ? false : !!attachment.hidden?,
+      "lock_at" => attachment.lock_at,
+      "hidden_for_user" => hidden_for_user,
+      "thumbnail_url" => thumbnail_url,
+      "modified_at" => attachment.modified_at || attachment.updated_at,
+      "mime_class" => attachment.mime_class,
+      "media_entry_id" => attachment.media_entry_id
     )
     if skip_permission_checks
-      hash['locked_for_user'] = false
+      hash["locked_for_user"] = false
     else
-      locked_json(hash, attachment, user, 'file')
+      locked_json(hash, attachment, user, "file")
     end
 
-    if includes.include? 'user'
+    if includes.include? "user"
       context = attachment.context
       context = :profile if context == user
-      hash['user'] = user_display_json(attachment.user, context)
+      hash["user"] = user_display_json(attachment.user, context)
     end
-    if includes.include? 'preview_url'
+    if includes.include? "preview_url"
 
       url_opts = {
         moderated_grading_allow_list: options[:moderated_grading_allow_list],
@@ -144,13 +144,13 @@ module Api::V1::Attachment
         anonymous_instructor_annotations: options[:anonymous_instructor_annotations],
         submission_id: options[:submission_id]
       }
-      hash['preview_url'] = attachment.crocodoc_url(user, url_opts) ||
+      hash["preview_url"] = attachment.crocodoc_url(user, url_opts) ||
                             attachment.canvadoc_url(user, url_opts)
     end
-    if includes.include?('canvadoc_document_id')
-      hash['canvadoc_document_id'] = attachment&.canvadoc&.document_id
+    if includes.include?("canvadoc_document_id")
+      hash["canvadoc_document_id"] = attachment&.canvadoc&.document_id
     end
-    if includes.include? 'enhanced_preview_url'
+    if includes.include? "enhanced_preview_url"
       url_opts = {
         annotate: 0
       }
@@ -158,22 +158,22 @@ module Api::V1::Attachment
       if downloadable && !omit_verifier
         url_opts[:verifier] = attachment.uuid
       end
-      hash['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, url_opts)
+      hash["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, url_opts)
     end
-    if includes.include? 'usage_rights'
-      hash['usage_rights'] = usage_rights_json(attachment.usage_rights, user)
+    if includes.include? "usage_rights"
+      hash["usage_rights"] = usage_rights_json(attachment.usage_rights, user)
     end
     if includes.include? "context_asset_string"
-      hash['context_asset_string'] = attachment.context.try(:asset_string)
+      hash["context_asset_string"] = attachment.context.try(:asset_string)
     end
-    if includes.include?('avatar') && respond_to?(:avatar_json)
-      hash['avatar'] = avatar_json(user, attachment, type: 'attachment')
+    if includes.include?("avatar") && respond_to?(:avatar_json)
+      hash["avatar"] = avatar_json(user, attachment, type: "attachment")
     end
-    if includes.include? 'instfs_uuid'
+    if includes.include? "instfs_uuid"
       # This option has been included to facilitate inst-fs end-to-end tests,
       # and is not documented as a publicly available api option.
       # It may be removed at any time.
-      hash['instfs_uuid'] = attachment.instfs_uuid
+      hash["instfs_uuid"] = attachment.instfs_uuid
     end
 
     hash
@@ -186,9 +186,9 @@ module Api::V1::Attachment
   # The `File.mime_types[mime_type]` returns the last extesion recorded in the
   # mime_types.yml.
   def infer_file_extension(params)
-    filenames_with_extension = filenames(params).select { |item| item.include?('.') }
+    filenames_with_extension = filenames(params).select { |item| item.include?(".") }
 
-    extension = filenames_with_extension&.first&.split('.')&.last&.downcase
+    extension = filenames_with_extension&.first&.split(".")&.last&.downcase
 
     return extension if extension
 
@@ -232,24 +232,24 @@ module Api::V1::Attachment
   end
 
   def filenames(params)
-    [:name, :filename, :url].map { |param| params[param] }.compact
+    %i[name filename url].filter_map { |param| params[param] }
   end
 
   def valid_mime_type?(mime_type)
-    mime_type.present? && mime_type != 'unknown/unknown'
+    mime_type.present? && mime_type != "unknown/unknown"
   end
 
   def valid_mime_types(params)
-    filenames(params).map do |filename|
+    filenames(params).filter_map do |filename|
       mime_type = Attachment.mimetype(filename)
       mime_type if valid_mime_type?(mime_type)
-    end.compact
+    end
   end
 
   def validate_on_duplicate(params)
-    if params[:on_duplicate] && !%w(rename overwrite).include?(params[:on_duplicate])
+    if params[:on_duplicate] && !%w[rename overwrite].include?(params[:on_duplicate])
       render status: :bad_request, json: {
-        message: 'invalid on_duplicate option'
+        message: "invalid on_duplicate option"
       }
       false
     else
@@ -258,7 +258,7 @@ module Api::V1::Attachment
   end
 
   def infer_on_duplicate(params)
-    params[:on_duplicate].presence || 'overwrite'
+    params[:on_duplicate].presence || "overwrite"
   end
 
   # create an attachment in the context based on the AR request, and
@@ -271,7 +271,7 @@ module Api::V1::Attachment
     params[:parent_folder_path] ||= params[:folder]
     if params[:parent_folder_path] && params[:parent_folder_id]
       render status: :bad_request, json: {
-        message: I18n.t('lib.api.attachments.only_one_folder', "Can't set folder path and folder id")
+        message: I18n.t("lib.api.attachments.only_one_folder", "Can't set folder path and folder id")
       }
       return
     end
@@ -281,7 +281,7 @@ module Api::V1::Attachment
     if opts[:check_quota]
       get_quota
       if params[:size] && @quota < @quota_used + params[:size].to_i
-        over_quota = I18n.t('lib.api.over_quota', 'file size exceeds quota')
+        over_quota = I18n.t("lib.api.over_quota", "file size exceeds quota")
         if opts[:return_json]
           return { error: true, message: over_quota }
         else
@@ -345,7 +345,7 @@ module Api::V1::Attachment
         access_token: @access_token,
         folder: folder,
         filename: infer_upload_filename(params),
-        content_type: infer_upload_content_type(params, 'unknown/unknown'),
+        content_type: infer_upload_content_type(params, "unknown/unknown"),
         on_duplicate: infer_on_duplicate(params),
         quota_exempt: !opts[:check_quota],
         capture_url: api_v1_files_capture_url,
@@ -360,11 +360,11 @@ module Api::V1::Attachment
       @attachment.context = context
       @attachment.user = current_user
       @attachment.filename = infer_upload_filename(params)
-      @attachment.content_type = infer_upload_content_type(params, 'unknown/unknown')
+      @attachment.content_type = infer_upload_content_type(params, "unknown/unknown")
       @attachment.folder = folder
       @attachment.set_publish_state_for_usage_rights
-      @attachment.file_state = 'deleted'
-      @attachment.workflow_state = opts[:temporary] ? 'unattached_temporary' : 'unattached'
+      @attachment.file_state = "deleted"
+      @attachment.workflow_state = opts[:temporary] ? "unattached_temporary" : "unattached"
       @attachment.modified_at = Time.now.utc
       @attachment.save!
 
@@ -383,8 +383,8 @@ module Api::V1::Attachment
 
         json = { progress: progress_json(progress, current_user, session) }
       else
-        on_duplicate = nil if on_duplicate == 'overwrite'
-        quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]
+        on_duplicate = nil if on_duplicate == "overwrite"
+        quota_exemption = @attachment.quota_exemption_key unless opts[:check_quota]
         json = @attachment.ajax_upload_params(
           api_v1_files_create_url(
             on_duplicate: on_duplicate,
@@ -415,13 +415,13 @@ module Api::V1::Attachment
 
   def api_attachment_preflight_json(context, request, opts = {})
     opts[:return_json] = true
-    { :attachments => [api_attachment_preflight(context, request, opts)] }
+    { attachments: [api_attachment_preflight(context, request, opts)] }
   end
 
   def check_quota_after_attachment
     if Attachment.over_quota?(@attachment.context, @attachment.size)
       render status: :bad_request, json: {
-        message: 'file size exceeds quota limits'
+        message: "file size exceeds quota limits"
       }
       false
     else

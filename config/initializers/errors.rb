@@ -27,19 +27,19 @@
 # disabled individually with a setting.
 #
 Rails.configuration.to_prepare do
-  ErrorReport.configure_to_ignore(%w{
+  ErrorReport.configure_to_ignore(%w[
                                     AuthenticationMethods::AccessTokenError
                                     ActionController::InvalidAuthenticityToken
                                     Turnitin::Errors::SubmissionNotScoredError
                                     ActionController::ParameterMissing
                                     SearchTermHelper::SearchTermTooShortError
-                                  })
+                                  ])
 
   # write a database record to our application DB capturing useful info for looking
   # at this error later
   CanvasErrors.register!(:error_report) do |exception, data, level|
-    setting = Setting.get("error_report_exception_handling", 'true')
-    if setting == 'true' && level == :error
+    setting = Setting.get("error_report_exception_handling", "true")
+    if setting == "true" && level == :error
       report = ErrorReport.log_exception_from_canvas_errors(exception, data)
       report.try(:global_id)
     end
@@ -50,8 +50,8 @@ Rails.configuration.to_prepare do
   # but if they spike we want to see that in a dashboard and maybe
   # even have a monitor fire)
   CanvasErrors.register!(:error_stats) do |exception, data, level|
-    setting = Setting.get("collect_error_statistics", 'true')
-    Canvas::ErrorStats.capture(exception, data, level) if setting == 'true'
+    setting = Setting.get("collect_error_statistics", "true")
+    Canvas::ErrorStats.capture(exception, data, level) if setting == "true"
   end
 
   # output full error stack trace and context to log files

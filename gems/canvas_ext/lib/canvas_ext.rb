@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/all'
+require "active_support/all"
 
 module CanvasExt
   project_root = File.dirname(File.absolute_path(__FILE__))
-  Dir.glob(project_root + '/canvas_ext/*').sort.each { |file| require file }
+  Dir.glob(project_root + "/canvas_ext/*").sort.each { |file| require file }
 end

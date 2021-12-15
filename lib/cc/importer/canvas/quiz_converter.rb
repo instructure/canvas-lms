@@ -50,7 +50,7 @@ module CC::Importer::Canvas
       else
         make_export_dir
         qti_error_file = File.join(@base_export_dir, "qti_conversion_error.log")
-        File.open(qti_error_file, 'w') { |f| f << python_std_out }
+        File.open(qti_error_file, "w") { |f| f << python_std_out }
         raise "Couldn't convert QTI 1.2 to 2.1, see error log: #{qti_error_file}"
       end
     end
@@ -61,7 +61,7 @@ module CC::Importer::Canvas
       questions = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
-        questions[:assessment_questions] = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::CANVAS)
+        questions[:assessment_questions] = Qti.convert_questions(manifest_file, flavor: Qti::Flavors::CANVAS)
       rescue
         questions[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
       end
@@ -74,7 +74,7 @@ module CC::Importer::Canvas
       quizzes = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
-        quizzes[:assessments] = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::CANVAS)
+        quizzes[:assessments] = Qti.convert_assessments(manifest_file, flavor: Qti::Flavors::CANVAS)
       rescue
         quizzes[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
       end

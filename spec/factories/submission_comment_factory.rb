@@ -21,8 +21,8 @@
 module Factories
   def valid_submission_comment_attributes
     {
-      :comment => "This is a test comment",
-      :author => @student
+      comment: "This is a test comment",
+      author: @student
     }
   end
 

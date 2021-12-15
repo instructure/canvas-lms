@@ -19,12 +19,12 @@
 #
 
 class Quizzes::QuizRegrader::Answer
-  REGRADE_OPTIONS = [
-    'full_credit',
-    'current_and_previous_correct',
-    'current_correct_only',
-    'no_regrade',
-    'disabled'
+  REGRADE_OPTIONS = %w[
+    full_credit
+    current_and_previous_correct
+    current_correct_only
+    no_regrade
+    disabled
   ].freeze
 
   attr_accessor :answer, :question, :regrade_option
@@ -35,12 +35,12 @@ class Quizzes::QuizRegrader::Answer
     @regrade_option = question_regrade.regrade_option
 
     unless REGRADE_OPTIONS.include?(regrade_option)
-      raise ArgumentError.new("Regrade option not valid!")
+      raise ArgumentError, "Regrade option not valid!"
     end
   end
 
   def regrade!
-    return 0 if ['no_regrade', 'disabled'].include?(regrade_option)
+    return 0 if ["no_regrade", "disabled"].include?(regrade_option)
 
     previous_score = points
     previous_regrade = score_before_regrade
@@ -85,7 +85,7 @@ class Quizzes::QuizRegrader::Answer
 
       # update points_possible if we are part of a quiz group
       group = question.quiz_group
-      if group && group.pick_count
+      if group&.pick_count
         @question_data[:points_possible] = group.question_points
       end
     end
@@ -97,9 +97,9 @@ class Quizzes::QuizRegrader::Answer
     previously_correct = correct?
     question_id = question.id
 
-    fake_submission_data = if question_data[:question_type] == 'multiple_answers_question'
+    fake_submission_data = if question_data[:question_type] == "multiple_answers_question"
                              hash = {}
-                             answer.each { |k, v| hash["question_#{question_id}_#{k}"] = v if k.to_s.include?('answer') }
+                             answer.each { |k, v| hash["question_#{question_id}_#{k}"] = v if k.to_s.include?("answer") }
                              answer.merge(hash)
                            else
                              answer.merge("question_#{question_id}" => answer[:text])

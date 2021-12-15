@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'switchman/r_spec_helper'
-require_relative 'support/onceler/sharding'
+require "switchman/r_spec_helper"
+require_relative "support/onceler/sharding"
 
 def has_sharding?
   User.instance_method(:associated_shards).owner != User
@@ -31,7 +31,7 @@ def specs_require_sharding
     include Onceler::Sharding
   else
     before(:once) do
-      skip 'Sharding specs fail without additional support from a multi-tenancy plugin'
+      skip "Sharding specs fail without additional support from a multi-tenancy plugin"
     end
   end
 end

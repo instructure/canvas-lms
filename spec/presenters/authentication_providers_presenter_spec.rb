@@ -20,7 +20,7 @@
 describe AuthenticationProvidersPresenter do
   describe "initialization" do
     it "wraps an account" do
-      account = double()
+      account = double
       presenter = described_class.new(account)
       expect(presenter.account).to eq(account)
     end
@@ -45,7 +45,7 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "only pulls from the db connection one time" do
-      account = double()
+      account = double
       expect(account).to receive(:authentication_providers).exactly(1).times.and_return(double(active: []))
       presenter = described_class.new(account)
       5.times { presenter.configs }
@@ -79,8 +79,8 @@ describe AuthenticationProvidersPresenter do
         end
 
         it "sorts the gem values" do
-          contexts = presenter.saml_authn_contexts(['abc', 'xyz', 'bcd'])
-          expect(contexts.index('bcd') < contexts.index('xyz')).to be(true)
+          contexts = presenter.saml_authn_contexts(%w[abc xyz bcd])
+          expect(contexts.index("bcd") < contexts.index("xyz")).to be(true)
         end
 
         it "adds in a nil value result" do
@@ -125,7 +125,7 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "is false for aacs which are not ldap" do
-      account = stubbed_account([double(auth_type: 'saml'), double(auth_type: 'cas')])
+      account = stubbed_account([double(auth_type: "saml"), double(auth_type: "cas")])
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(false)
     end
@@ -143,8 +143,8 @@ describe AuthenticationProvidersPresenter do
       allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(false)
       presenter = described_class.new(stubbed_account)
       options = presenter.sso_options
-      expect(options).to include({ name: 'CAS', value: 'cas' })
-      expect(options).to include({ name: 'LinkedIn', value: 'linkedin' })
+      expect(options).to include({ name: "CAS", value: "cas" })
+      expect(options).to include({ name: "LinkedIn", value: "linkedin" })
     end
 
     it "includes saml if saml enabled" do
@@ -154,20 +154,20 @@ describe AuthenticationProvidersPresenter do
       end
 
       presenter = described_class.new(stubbed_account)
-      expect(presenter.sso_options).to include({ name: 'SAML', value: 'saml' })
+      expect(presenter.sso_options).to include({ name: "SAML", value: "saml" })
     end
   end
 
   describe "ip_configuration" do
     def stub_setting(val)
       allow(Setting).to receive(:get)
-        .with('account_authorization_config_ip_addresses', nil)
+        .with("account_authorization_config_ip_addresses", nil)
         .and_return(val)
     end
 
     describe "#ips_configured?" do
       it "is true if there is anything in the ip addresses setting" do
-        stub_setting('127.0.0.1')
+        stub_setting("127.0.0.1")
         presenter = described_class.new(double)
         expect(presenter.ips_configured?).to be(true)
       end
@@ -271,30 +271,30 @@ describe AuthenticationProvidersPresenter do
 
   describe "#login_url" do
     it "never includes id for LDAP" do
-      config = Account.default.authentication_providers.create!(auth_type: 'ldap')
-      config2 = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      config = Account.default.authentication_providers.create!(auth_type: "ldap")
+      config2 = Account.default.authentication_providers.create!(auth_type: "ldap")
       presenter = described_class.new(Account.default)
-      expect(presenter.login_url_options(config)).to eq(controller: 'login/ldap',
+      expect(presenter.login_url_options(config)).to eq(controller: "login/ldap",
                                                         action: :new)
-      expect(presenter.login_url_options(config2)).to eq(controller: 'login/ldap',
+      expect(presenter.login_url_options(config2)).to eq(controller: "login/ldap",
                                                          action: :new)
     end
 
     it "doesn't include id if there is only one SAML config" do
-      config = Account.default.authentication_providers.create!(auth_type: 'saml')
+      config = Account.default.authentication_providers.create!(auth_type: "saml")
       presenter = described_class.new(Account.default)
-      expect(presenter.login_url_options(config)).to eq(controller: 'login/saml',
+      expect(presenter.login_url_options(config)).to eq(controller: "login/saml",
                                                         action: :new)
     end
 
     it "includes id if there are multiple SAML configs" do
-      config = Account.default.authentication_providers.create!(auth_type: 'saml')
-      config2 = Account.default.authentication_providers.create!(auth_type: 'saml')
+      config = Account.default.authentication_providers.create!(auth_type: "saml")
+      config2 = Account.default.authentication_providers.create!(auth_type: "saml")
       presenter = described_class.new(Account.default)
-      expect(presenter.login_url_options(config)).to eq(controller: 'login/saml',
+      expect(presenter.login_url_options(config)).to eq(controller: "login/saml",
                                                         action: :new,
                                                         id: config)
-      expect(presenter.login_url_options(config2)).to eq(controller: 'login/saml',
+      expect(presenter.login_url_options(config2)).to eq(controller: "login/saml",
                                                          action: :new,
                                                          id: config2)
     end
@@ -303,7 +303,7 @@ describe AuthenticationProvidersPresenter do
   describe "#new_auth_types" do
     it "excludes singletons that have a config" do
       allow(AuthenticationProvider::Facebook).to receive(:enabled?).and_return(true)
-      Account.default.authentication_providers.create!(auth_type: 'facebook')
+      Account.default.authentication_providers.create!(auth_type: "facebook")
       presenter = described_class.new(Account.default)
       expect(presenter.new_auth_types).not_to be_include(AuthenticationProvider::Facebook)
     end

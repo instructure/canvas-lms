@@ -1191,7 +1191,9 @@ function updateSubmissionAndPageEffects(data) {
       refreshGrades(() => {
         EG.showSubmissionDetails()
         styleSubmissionStatusPills(getLateMissingAndExcusedPills())
-        renderStatusMenu(statusMenuComponent(submission), availableMountPointForStatusMenu())
+        if (availableMountPointForStatusMenu()) {
+          renderStatusMenu(statusMenuComponent(submission), availableMountPointForStatusMenu())
+        }
       })
     })
     .catch(showFlashError())
@@ -3248,6 +3250,8 @@ EG = {
       EG.currentStudent,
       $grade
     )
+
+    updateSubmissionAndPageEffects()
 
     if (grade.toUpperCase() === 'EX') {
       formData['submission[excuse]'] = true

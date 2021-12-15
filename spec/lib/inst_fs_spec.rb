@@ -20,12 +20,12 @@
 
 describe InstFS do
   context "settings are set" do
-    let(:app_host) { 'http://test.host' }
+    let(:app_host) { "http://test.host" }
     let(:secret) { "supersecretyup" }
     let(:rotating_secret) { "anothersecret" }
     let(:secrets) { [secret, rotating_secret] }
     let(:encoded_secrets) { secrets.map { |sec| Base64.encode64(sec) }.join(" ") }
-    let(:settings_hash) { { 'app-host' => app_host, 'secret' => encoded_secrets } }
+    let(:settings_hash) { { "app-host" => app_host, "secret" => encoded_secrets } }
 
     before do
       allow(InstFS).to receive(:enabled?).and_return(true)
@@ -87,28 +87,28 @@ describe InstFS do
       it "URI encodes the embedded file name" do
         @attachment.display_name = "안녕 세상"
         url = InstFS.authenticated_url(@attachment, {})
-        filename_segment = URI.parse(url).path.split('/').last
+        filename_segment = URI.parse(url).path.split("/").last
         expect(CGI.unescape(filename_segment)).to eq(@attachment.display_name)
       end
 
       it "doesn't use `+` for spaces in encoded file name" do
         @attachment.display_name = "foo bar.txt"
         url = InstFS.authenticated_url(@attachment, {})
-        filename_segment = URI.parse(url).path.split('/').last
+        filename_segment = URI.parse(url).path.split("/").last
         expect(filename_segment).to eq("foo%20bar.txt")
       end
 
       it "doesn't leave `+` unencoded in encoded file name" do
         @attachment.display_name = "foo+bar.txt"
         url = InstFS.authenticated_url(@attachment, {})
-        filename_segment = URI.parse(url).path.split('/').last
+        filename_segment = URI.parse(url).path.split("/").last
         expect(filename_segment).to eq("foo%2Bbar.txt")
       end
 
       it "doesn't leave `?` unencoded in encoded file name" do
         @attachment.display_name = "foo?bar.txt"
         url = InstFS.authenticated_url(@attachment, {})
-        filename_segment = URI.parse(url).path.split('/').last
+        filename_segment = URI.parse(url).path.split("/").last
         expect(filename_segment).to eq("foo%3Fbar.txt")
       end
 
@@ -119,39 +119,39 @@ describe InstFS do
       it "includes a properly signed token" do
         url = InstFS.authenticated_url(@attachment, {})
         expect(url).to match(/token=/)
-        token = url.split(/token=/).last
-        expect(-> {
+        token = url.split("token=").last
+        expect(lambda do
           Canvas::Security.decode_jwt(token, [secret])
-        }).not_to raise_error
+        end).not_to raise_error
       end
 
       it "includes an expiration on the token" do
         url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
-        token = url.split(/token=/).last
+        token = url.split("token=").last
         Timecop.freeze(2.hours.from_now) do
-          expect(-> {
+          expect(lambda do
             Canvas::Security.decode_jwt(token, [secret])
-          }).to raise_error(Canvas::Security::TokenExpired)
+          end).to raise_error(Canvas::Security::TokenExpired)
         end
       end
 
       describe "jwt claims" do
         def claims_for(options = {})
           url = InstFS.authenticated_url(@attachment, options)
-          token = url.split(/token=/).last
+          token = url.split("token=").last
           Canvas::Security.decode_jwt(token, [secret])
         end
 
         it "no matter what time it is, the token has no less than 12 hours of validity left and never more than 24" do
           24.times do |i|
             Timecop.freeze(i.hours.from_now) do
-              claims = claims_for()
+              claims = claims_for
               now = Time.zone.now
-              exp = Time.zone.at(claims['exp'])
+              exp = Time.zone.at(claims["exp"])
               expect(exp).to be > now + 12.hours
               expect(exp).to be < now + 24.hours
 
-              iat = Time.zone.at(claims['iat'])
+              iat = Time.zone.at(claims["iat"])
               expect(iat).to be <= now
               expect(iat).to be > now - 12.hours
             end
@@ -179,21 +179,21 @@ describe InstFS do
 
         it "includes a jti in the token" do
           url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
-          token = url.split(/token=/).last
+          token = url.split("token=").last
           expect(Canvas::Security.decode_jwt(token, [secret])).to have_key(:jti)
         end
 
         it "includes the original_url claim with the redirect and no_cache param" do
           original_url = "https://example.test/preview"
           url = InstFS.authenticated_url(@attachment, original_url: original_url)
-          token = url.split(/token=/).last
+          token = url.split("token=").last
           expect(Canvas::Security.decode_jwt(token, [secret])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
         end
 
         it "doesn't include the original_url claim if already redirected" do
           original_url = "https://example.test/preview?redirect=true"
           url = InstFS.authenticated_url(@attachment, original_url: original_url)
-          token = url.split(/token=/).last
+          token = url.split("token=").last
           expect(Canvas::Security.decode_jwt(token, [secret])).not_to have_key(:original_url)
         end
 
@@ -203,30 +203,30 @@ describe InstFS do
 
           it "are not added without an access token" do
             claims = claims_for(access_token: nil, root_account: root_account)
-            expect(claims).not_to have_key('legacy_api_developer_key_id')
-            expect(claims).not_to have_key('legacy_api_root_account_id')
+            expect(claims).not_to have_key("legacy_api_developer_key_id")
+            expect(claims).not_to have_key("legacy_api_root_account_id")
           end
 
           describe "with an access token" do
             it "are added when all keys are whitelisted" do
-              Setting.set('instfs.whitelist_all_developer_keys', 'true')
+              Setting.set("instfs.whitelist_all_developer_keys", "true")
               claims = claims_for(access_token: access_token, root_account: root_account)
-              expect(claims['legacy_api_developer_key_id']).to eql(access_token.global_developer_key_id.to_s)
-              expect(claims['legacy_api_root_account_id']).to eql(root_account.global_id.to_s)
+              expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
+              expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
             end
 
             it "are added when its developer key is specifically whitelisted" do
-              Setting.set('instfs.whitelisted_developer_key_global_ids', "999,#{access_token.global_developer_key_id}")
+              Setting.set("instfs.whitelisted_developer_key_global_ids", "999,#{access_token.global_developer_key_id}")
               claims = claims_for(access_token: access_token, root_account: root_account)
-              expect(claims['legacy_api_developer_key_id']).to eql(access_token.global_developer_key_id.to_s)
-              expect(claims['legacy_api_root_account_id']).to eql(root_account.global_id.to_s)
+              expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
+              expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
             end
 
             it "are not added when its developer key is not specifically whitelisted" do
-              Setting.set('instfs.whitelisted_developer_key_global_ids', "999,888")
+              Setting.set("instfs.whitelisted_developer_key_global_ids", "999,888")
               claims = claims_for(access_token: access_token, root_account: root_account)
-              expect(claims).not_to have_key('legacy_api_developer_key_id')
-              expect(claims).not_to have_key('legacy_api_root_account_id')
+              expect(claims).not_to have_key("legacy_api_developer_key_id")
+              expect(claims).not_to have_key("legacy_api_root_account_id")
             end
           end
         end
@@ -246,32 +246,32 @@ describe InstFS do
       end
 
       it "passes geometry param" do
-        expect(InstFS.authenticated_thumbnail_url(@attachment, geometry: '256x256'))
+        expect(InstFS.authenticated_thumbnail_url(@attachment, geometry: "256x256"))
           .to match(/geometry=256x256/)
       end
 
       it "includes a properly signed token" do
         url = InstFS.authenticated_thumbnail_url(@attachment)
         expect(url).to match(/token=/)
-        token = url.split(/token=/).last
-        expect(-> {
+        token = url.split("token=").last
+        expect(lambda do
           Canvas::Security.decode_jwt(token, [secret])
-        }).not_to raise_error
+        end).not_to raise_error
       end
 
       it "includes an expiration on the token" do
         url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
-        token = url.split(/token=/).last
+        token = url.split("token=").last
         Timecop.freeze(2.hours.from_now) do
-          expect(-> {
+          expect(lambda do
             Canvas::Security.decode_jwt(token, [secret])
-          }).to raise_error(Canvas::Security::TokenExpired)
+          end).to raise_error(Canvas::Security::TokenExpired)
         end
       end
 
       it "includes a jti in the token" do
         url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
-        token = url.split(/token=/).last
+        token = url.split("token=").last
         expect(Canvas::Security.decode_jwt(token, [secret])).to have_key(:jti)
       end
     end
@@ -282,14 +282,14 @@ describe InstFS do
       let(:user) { instance_double("User", id: 2, global_id: 102) }
       let(:acting_as) { instance_double("User", id: 4, global_id: 104) }
       let(:folder) { instance_double("Folder", id: 3, global_id: 103) }
-      let(:filename) { 'test.txt' }
-      let(:content_type) { 'text/plain' }
+      let(:filename) { "test.txt" }
+      let(:content_type) { "text/plain" }
       let(:quota_exempt) { true }
-      let(:on_duplicate) { 'rename' }
-      let(:include_param) { ['avatar'] }
-      let(:capture_url) { 'http://canvas.host/api/v1/files/capture' }
+      let(:on_duplicate) { "rename" }
+      let(:include_param) { ["avatar"] }
+      let(:capture_url) { "http://canvas.host/api/v1/files/capture" }
       let(:additional_capture_params) do
-        { additional_note: 'notefull' }
+        { additional_note: "notefull" }
       end
 
       let(:default_args) do
@@ -315,73 +315,73 @@ describe InstFS do
       end
 
       it "includes a static 'file' file_param" do
-        expect(preflight_json[:file_param]).to eq 'file'
+        expect(preflight_json[:file_param]).to eq "file"
       end
 
       it "includes an upload_url pointing at the service" do
         expect(preflight_json[:upload_url]).to match app_host
         upload_url = URI.parse(preflight_json[:upload_url])
-        expect(upload_url.path).to eq '/files'
+        expect(upload_url.path).to eq "/files"
       end
 
       it "include a JWT in the query param of the upload_url" do
         upload_url = URI.parse(preflight_json[:upload_url])
-        expect(upload_url.query).to match %r{token=[^&]+}
-        token = upload_url.query.split('=').last
-        expect(-> {
+        expect(upload_url.query).to match(/token=[^&]+/)
+        token = upload_url.query.split("=").last
+        expect(lambda do
           Canvas::Security.decode_jwt(token, [secret])
-        }).not_to raise_error
+        end).not_to raise_error
       end
 
       describe "the upload JWT" do
         let(:jwt) do
-          token = preflight_json[:upload_url].split('token=').last
+          token = preflight_json[:upload_url].split("token=").last
           Canvas::Security.decode_jwt(token, [secret])
         end
 
         it "embeds the user_id and acting_as_user_id in the token" do
-          expect(jwt['user_id']).to eq user.global_id.to_s
-          expect(jwt['acting_as_user_id']).to eq acting_as.global_id.to_s
+          expect(jwt["user_id"]).to eq user.global_id.to_s
+          expect(jwt["acting_as_user_id"]).to eq acting_as.global_id.to_s
         end
 
         it "embeds a capture_url in the token" do
-          expect(jwt['capture_url']).to eq capture_url
+          expect(jwt["capture_url"]).to eq capture_url
         end
 
         it "embeds a capture_params hash in the token" do
-          expect(jwt['capture_params']).to be_a(Hash)
+          expect(jwt["capture_params"]).to be_a(Hash)
         end
 
         describe "the capture_params" do
-          let(:capture_params) { jwt['capture_params'] }
+          let(:capture_params) { jwt["capture_params"] }
 
           it "include the context" do
-            expect(capture_params['context_type']).to eq context.class.to_s
-            expect(capture_params['context_id']).to eq context.global_id.to_s
+            expect(capture_params["context_type"]).to eq context.class.to_s
+            expect(capture_params["context_id"]).to eq context.global_id.to_s
           end
 
           it "include the acting_as user" do
-            expect(capture_params['user_id']).to eq acting_as.global_id.to_s
+            expect(capture_params["user_id"]).to eq acting_as.global_id.to_s
           end
 
           it "include the folder" do
-            expect(capture_params['folder_id']).to eq folder.global_id.to_s
+            expect(capture_params["folder_id"]).to eq folder.global_id.to_s
           end
 
           it "include the root_account_id" do
-            expect(capture_params['root_account_id']).to eq root_account.global_id.to_s
+            expect(capture_params["root_account_id"]).to eq root_account.global_id.to_s
           end
 
           it "include the quota_exempt flag" do
-            expect(capture_params['quota_exempt']).to eq quota_exempt
+            expect(capture_params["quota_exempt"]).to eq quota_exempt
           end
 
           it "include the on_duplicate method" do
-            expect(capture_params['on_duplicate']).to eq on_duplicate
+            expect(capture_params["on_duplicate"]).to eq on_duplicate
           end
 
           it "include the include options" do
-            expect(capture_params['include']).to eq include_param
+            expect(capture_params["include"]).to eq include_param
           end
 
           it "include additional_capture_params" do
@@ -411,36 +411,36 @@ describe InstFS do
 
         def claims_for(options)
           json = InstFS.upload_preflight_json(default_args.merge(options))
-          token = json[:upload_url].split('token=').last
+          token = json[:upload_url].split("token=").last
           Canvas::Security.decode_jwt(token, [secret])
         end
 
         it "are not added without an access token" do
           claims = claims_for(access_token: nil, root_account: root_account)
-          expect(claims).not_to have_key('legacy_api_developer_key_id')
-          expect(claims).not_to have_key('legacy_api_root_account_id')
+          expect(claims).not_to have_key("legacy_api_developer_key_id")
+          expect(claims).not_to have_key("legacy_api_root_account_id")
         end
 
         describe "with an access token" do
           it "are added when all keys are whitelisted" do
-            Setting.set('instfs.whitelist_all_developer_keys', 'true')
+            Setting.set("instfs.whitelist_all_developer_keys", "true")
             claims = claims_for(access_token: access_token, root_account: root_account)
-            expect(claims['legacy_api_developer_key_id']).to eql(access_token.global_developer_key_id.to_s)
-            expect(claims['legacy_api_root_account_id']).to eql(root_account.global_id.to_s)
+            expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
+            expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
           end
 
           it "are added when its developer key is specifically whitelisted" do
-            Setting.set('instfs.whitelisted_developer_key_global_ids', "999,#{access_token.global_developer_key_id}")
+            Setting.set("instfs.whitelisted_developer_key_global_ids", "999,#{access_token.global_developer_key_id}")
             claims = claims_for(access_token: access_token, root_account: root_account)
-            expect(claims['legacy_api_developer_key_id']).to eql(access_token.global_developer_key_id.to_s)
-            expect(claims['legacy_api_root_account_id']).to eql(root_account.global_id.to_s)
+            expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
+            expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
           end
 
           it "are not added when its developer key is not specifically whitelisted" do
-            Setting.set('instfs.whitelisted_developer_key_global_ids', "999,888")
+            Setting.set("instfs.whitelisted_developer_key_global_ids", "999,888")
             claims = claims_for(access_token: access_token, root_account: root_account)
-            expect(claims).not_to have_key('legacy_api_developer_key_id')
-            expect(claims).not_to have_key('legacy_api_root_account_id')
+            expect(claims).not_to have_key("legacy_api_developer_key_id")
+            expect(claims).not_to have_key("legacy_api_root_account_id")
           end
         end
       end
@@ -456,7 +456,7 @@ describe InstFS do
           target_url = "http://www.example.com/"
           preflight_json = InstFS.upload_preflight_json(default_args.merge({ target_url: target_url, progress_json: progress_json }))
 
-          token = preflight_json[:upload_url].split('token=').last
+          token = preflight_json[:upload_url].split("token=").last
           jwt = Canvas::Security.decode_jwt(token, [secret])
 
           expect(jwt[:capture_params][:progress_id]).to eq(progress_json[:id])
@@ -474,7 +474,7 @@ describe InstFS do
       end
 
       it "includes jwt in DELETE request" do
-        expect(CanvasHttp).to receive(:delete).with(match(%r{\?token=}))
+        expect(CanvasHttp).to receive(:delete).with(match(/\?token=/))
         InstFS.logout(user_model)
       end
 
@@ -499,11 +499,11 @@ describe InstFS do
     context "direct upload" do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
-        allow(CanvasHttp).to receive(:post).and_return(double(
-                                                         class: Net::HTTPCreated,
-                                                         code: 200,
-                                                         body: { instfs_uuid: instfs_uuid }.to_json
-                                                       ))
+        allow(CanvasHttp).to receive(:post).and_return(
+          instance_double("Net::HTTPCreated",
+                          code: "201",
+                          body: { instfs_uuid: instfs_uuid }.to_json)
+        )
 
         res = InstFS.direct_upload(
           file_name: "a.png",
@@ -514,11 +514,11 @@ describe InstFS do
 
       it "requests a streaming upload to allow large files" do
         instfs_uuid = "1234-abcd"
-        expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(double(
-                                                                                                          class: Net::HTTPCreated,
-                                                                                                          code: 200,
-                                                                                                          body: { instfs_uuid: instfs_uuid }.to_json
-                                                                                                        ))
+        expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(
+          instance_double("Net::HTTPCreated",
+                          code: "201",
+                          body: { instfs_uuid: instfs_uuid }.to_json)
+        )
 
         InstFS.direct_upload(
           file_name: "a.png",
@@ -538,11 +538,11 @@ describe InstFS do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
         new_instfs_uuid = "5678-efgh"
-        allow(CanvasHttp).to receive(:post).with(/\/files\/#{instfs_uuid}\/duplicate/).and_return(double(
-                                                                                                    class: Net::HTTPCreated,
-                                                                                                    code: 200,
-                                                                                                    body: { id: new_instfs_uuid }.to_json
-                                                                                                  ))
+        allow(CanvasHttp).to receive(:post).with(%r{/files/#{instfs_uuid}/duplicate}).and_return(
+          instance_double("Net::HTTPCreated",
+                          code: "201",
+                          body: { id: new_instfs_uuid }.to_json)
+        )
         expect(InstFS.duplicate_file(instfs_uuid)).to eq new_instfs_uuid
       end
     end
@@ -550,10 +550,9 @@ describe InstFS do
     context "deletion" do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
-        allow(CanvasHttp).to receive(:delete).with(/\/files\/#{instfs_uuid}/).and_return(double(
-                                                                                           class: Net::HTTPOK,
-                                                                                           code: 200,
-                                                                                         ))
+        allow(CanvasHttp).to receive(:delete).with(%r{/files/#{instfs_uuid}}).and_return(
+          instance_double("Net::HTTPOK", code: "200")
+        )
         expect(InstFS.delete_file(instfs_uuid)).to eq true
       end
     end
@@ -564,8 +563,8 @@ describe InstFS do
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs")
                                                       .and_return({
-                                                                    'app-host' => nil,
-                                                                    'secret' => nil
+                                                                    "app-host" => nil,
+                                                                    "secret" => nil
                                                                   })
     end
 

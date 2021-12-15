@@ -25,17 +25,17 @@ module Canvas::Plugins::TicketingSystem
   # HTTP POST-ed to the URI in the plugin configuration
   class WebPostPlugin < BasePlugin
     def plugin_id
-      'canvas_ticketing_by_web_post'
+      "canvas_ticketing_by_web_post"
     end
 
     def settings
       {
-        name: -> { I18n.t 'Canvas Ticketing Web Post Connector' },
-        description: -> { I18n.t 'pick an endpoint, we\'ll post your error reports there' },
-        author: 'Instructure',
-        author_website: 'http://www.instructure.com',
-        version: '1.0.0',
-        settings_partial: 'plugins/custom_ticketing_web_post_settings'
+        name: -> { I18n.t "Canvas Ticketing Web Post Connector" },
+        description: -> { I18n.t "pick an endpoint, we'll post your error reports there" },
+        author: "Instructure",
+        author_website: "http://www.instructure.com",
+        version: "1.0.0",
+        settings_partial: "plugins/custom_ticketing_web_post_settings"
       }
     end
 

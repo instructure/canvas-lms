@@ -61,7 +61,7 @@ module Lti::IMS::Providers
         # Non-active students get an active ('submitted') Submission, so join on base_users_scope to narrow down
         # Submissions to only active students.
         students_scope = base_users_scope.where(enrollments: { type: student_queryable_roles })
-        narrowed_students_scope = students_scope.where("EXISTS (?)", correlated_assignment_submissions('users.id'))
+        narrowed_students_scope = students_scope.where("EXISTS (?)", correlated_assignment_submissions("users.id"))
         # If we only care about students, this scope is sufficient and can avoid the ugly union down below
         return narrowed_students_scope if filter_non_students?
 
@@ -71,7 +71,7 @@ module Lti::IMS::Providers
     end
 
     def student_queryable_roles
-      queryable_roles('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+      queryable_roles("http://purl.imsglobal.org/vocab/lis/v2/membership#Learner")
     end
 
     def filter_students?
@@ -126,7 +126,7 @@ module Lti::IMS::Providers
       end
 
       def lti_roles
-        @_lti_roles ||= enrollments.map { |e| Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[e.class] }.compact.flatten.uniq
+        @_lti_roles ||= enrollments.filter_map { |e| Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[e.class] }.flatten.uniq
       end
     end
 

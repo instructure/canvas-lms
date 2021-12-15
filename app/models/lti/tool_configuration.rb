@@ -19,8 +19,8 @@
 
 module Lti
   class ToolConfiguration < ActiveRecord::Base
-    CANVAS_EXTENSION_LABEL = 'canvas.instructure.com'
-    DEFAULT_PRIVACY_LEVEL = 'anonymous'
+    CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
+    DEFAULT_PRIVACY_LEVEL = "anonymous"
 
     belongs_to :developer_key
 
@@ -30,7 +30,7 @@ module Lti
 
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
-    validate :valid_configuration?, unless: Proc.new { |c| c.developer_key_id.blank? || c.settings.blank? }
+    validate :valid_configuration?, unless: proc { |c| c.developer_key_id.blank? || c.settings.blank? }
     validate :valid_placements
 
     attr_accessor :configuration_url, :settings_url
@@ -50,7 +50,7 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.workflow_state = canvas_extensions['privacy_level'] || DEFAULT_PRIVACY_LEVEL
+      tool.workflow_state = canvas_extensions["privacy_level"] || DEFAULT_PRIVACY_LEVEL
       tool.use_1_3 = true
       tool
     end
@@ -67,7 +67,7 @@ module Lti
       redirect_uris = settings[:target_link_uri]
 
       raise_error(:configuration, "Configuration must be present") if settings.blank?
-      self.transaction do
+      transaction do
         dk = DeveloperKey.create!(
           account: (account.site_admin? ? nil : account),
           is_lti_key: true,
@@ -76,10 +76,10 @@ module Lti
           redirect_uris: redirect_uris || [],
           scopes: settings[:scopes] || []
         )
-        self.create!(
+        create!(
           developer_key: dk,
           configuration: settings.deep_merge(
-            'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+            "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
           ),
           configuration_url: tool_configuration_params[:settings_url],
           disabled_placements: tool_configuration_params[:disabled_placements]
@@ -92,17 +92,17 @@ module Lti
     def self.retrieve_and_extract_configuration(url)
       response = CanvasHttp.get(url)
 
-      raise_error(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
+      raise_error(:configuration_url, 'Content type must be "application/json"') unless response["content-type"].include? "application/json"
       raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
 
       JSON.parse(response.body).with_indifferent_access
     rescue Timeout::Error
-      raise_error(:configuration_url, 'Could not retrieve settings, the server response timed out.')
+      raise_error(:configuration_url, "Could not retrieve settings, the server response timed out.")
     end
     private_class_method :retrieve_and_extract_configuration
 
     def self.raise_error(type, message)
-      tool_config_obj = self.new
+      tool_config_obj = new
       tool_config_obj.errors.add(type, message)
       raise ActiveRecord::RecordInvalid, tool_config_obj
     end
@@ -117,11 +117,11 @@ module Lti
     end
 
     def valid_configuration?
-      if configuration['public_jwk'].blank? && configuration['public_jwk_url'].blank?
+      if configuration["public_jwk"].blank? && configuration["public_jwk_url"].blank?
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
-      if configuration['public_jwk'].present?
-        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration['public_jwk'])
+      if configuration["public_jwk"].present?
+        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration["public_jwk"])
         errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
       end
       schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration.compact)
@@ -138,7 +138,7 @@ module Lti
       return if disabled_placements.blank?
 
       invalid = disabled_placements.reject { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
-      errors.add(:disabled_placements, "Invalid placements: #{invalid.join(', ')}") if invalid.present?
+      errors.add(:disabled_placements, "Invalid placements: #{invalid.join(", ")}") if invalid.present?
     end
 
     def importable_configuration
@@ -146,20 +146,20 @@ module Lti
     end
 
     def configuration_to_cet_settings_map
-      { url: configuration['target_link_uri'] }
+      { url: configuration["target_link_uri"] }
     end
 
     def canvas_extensions
       return {} if configuration.blank?
 
-      extension = configuration['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL }&.deep_dup || { 'settings' => {} }
+      extension = configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.deep_dup || { "settings" => {} }
       # remove any placements at the root level
-      extension['settings'].delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
+      extension["settings"].delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
       # ensure we only have enabled placements being added
-      extension['settings'].fetch('placements', []).delete_if { |placement| disabled_placements&.include?(placement['placement']) }
+      extension["settings"].fetch("placements", []).delete_if { |placement| disabled_placements&.include?(placement["placement"]) }
       # read valid placements to root settings hash
-      extension['settings'].fetch('placements', []).each do |p|
-        extension['settings'][p['placement']] = p
+      extension["settings"].fetch("placements", []).each do |p|
+        extension["settings"][p["placement"]] = p
       end
       extension
     end

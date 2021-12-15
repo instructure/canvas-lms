@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'openssl'
+require "openssl"
 
 module Users
   module AccessVerifier
@@ -67,7 +67,7 @@ module Users
       oauth_host = claims[:oauth_host]
       return_url = claims[:return_url]
 
-      return {
+      {
         user: user,
         real_user: real_user,
         developer_key: developer_key,

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'report_spec_helper'
+require_relative "report_spec_helper"
 
 describe "Account Reports" do
   include ReportSpecHelper
@@ -26,15 +26,15 @@ describe "Account Reports" do
   before do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
-    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @admin = account_admin_user(:account => @account)
-    @course1 = Course.create(name: 'English 101', course_code: 'ENG101')
+    @account = Account.create(name: "New Account", default_time_zone: "UTC")
+    @admin = account_admin_user(account: @account)
+    @course1 = Course.create(name: "English 101", course_code: "ENG101")
   end
 
   describe "account report files" do
     it "has different filenames for each report even when md5 matches" do
-      report1 = run_report('unpublished_courses_csv')
-      report2 = run_report('unpublished_courses_csv')
+      report1 = run_report("unpublished_courses_csv")
+      report2 = run_report("unpublished_courses_csv")
 
       expect(report1.attachment.md5).to eq report2.attachment.md5
       expect(report1.attachment.filename).not_to be == report2.attachment.filename
@@ -46,8 +46,8 @@ describe "Account Reports" do
     uuid = "1234-abcd"
     allow(InstFS).to receive(:direct_upload).and_return(uuid)
 
-    report1 = run_report('unpublished_courses_csv')
-    report2 = run_report('unpublished_courses_csv')
+    report1 = run_report("unpublished_courses_csv")
+    report2 = run_report("unpublished_courses_csv")
 
     expect(report1.attachment.md5).to eq report2.attachment.md5
     expect(report1.attachment.filename).not_to be == report2.attachment.filename

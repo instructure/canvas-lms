@@ -23,7 +23,7 @@ describe ConversationParticipant do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
-    convo.add_message('test')
+    convo.add_message("test")
 
     expect(sender.conversations).to eq [convo]
     expect(convo.participants.size).to eq 2
@@ -35,12 +35,12 @@ describe ConversationParticipant do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
-    convo.add_message('test')
+    convo.add_message("test")
 
-    User.where(:id => recipient).update_all(:unread_conversations_count => 0) # force into the wrong state
+    User.where(id: recipient).update_all(unread_conversations_count: 0) # force into the wrong state
 
     part = recipient.conversations.first
-    part.update_one(:event => 'mark_as_read')
+    part.update_one(event: "mark_as_read")
 
     recipient.reload
     expect(recipient.unread_conversations_count).to eq 0
@@ -50,8 +50,8 @@ describe ConversationParticipant do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
-    convo.add_message('test')
-    convo.add_message('another')
+    convo.add_message("test")
+    convo.add_message("another")
     rconvo = recipient.conversations.first
     expect(convo.messages.size).to eq 2
     expect(rconvo.messages.size).to eq 2
@@ -83,7 +83,7 @@ describe ConversationParticipant do
     recipient    = user_factory
     updated_at   = sender.updated_at
     conversation = sender.initiate_conversation([recipient])
-    conversation.update_attribute(:workflow_state, 'unread')
+    conversation.update_attribute(:workflow_state, "unread")
     expect(sender.reload.updated_at).not_to eql updated_at
   end
 
@@ -108,12 +108,12 @@ describe ConversationParticipant do
     recipient    = user_factory
     conversation = sender.initiate_conversation([recipient])
 
-    conversation.update(:starred => true)
+    conversation.update(starred: true)
     conversation.save
     conversation.reload
     expect(conversation.starred).to be_truthy
 
-    conversation.update(:starred => false)
+    conversation.update(starred: false)
     conversation.save
     conversation.reload
     expect(conversation.starred).to be_falsey
@@ -151,7 +151,7 @@ describe ConversationParticipant do
     end
 
     it "returns conversations that match all of the given courses" do
-      expect(@me.conversations.tagged("course_1", "course_2", :mode => :and).sort_by(&:id)).to eql [@c2]
+      expect(@me.conversations.tagged("course_1", "course_2", mode: :and).sort_by(&:id)).to eql [@c2]
     end
 
     it "returns conversations that match the given group" do
@@ -167,7 +167,7 @@ describe ConversationParticipant do
     end
 
     it "returns conversations that match all of the given users" do
-      expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string, :mode => :and).sort_by(&:id)).to eql [@c7]
+      expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string, mode: :and).sort_by(&:id)).to eql [@c7]
     end
 
     it "returns conversations that match either the given course or user" do
@@ -175,7 +175,7 @@ describe ConversationParticipant do
     end
 
     it "returns conversations that match both the given course and user" do
-      expect(@me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id)).to eql [@c8]
+      expect(@me.conversations.tagged(@u1.asset_string, "course_1", mode: :and).sort_by(&:id)).to eql [@c8]
     end
 
     context "sharding" do
@@ -199,21 +199,21 @@ describe ConversationParticipant do
       @admin_user = user_factory
       @a1.account_users.create!(user: @admin_user)
       @a2.account_users.create!(user: @admin_user)
-      @a3.pseudonyms.create!(:user => @admin_user, :unique_id => 'a3') # in the account, but not an admin
+      @a3.pseudonyms.create!(user: @admin_user, unique_id: "a3") # in the account, but not an admin
 
       @target_user = user_factory
       # visible to @user
       @c1 = @target_user.initiate_conversation([user_factory])
-      @c1.add_message("hey man", :root_account_id => @a1.id)
+      @c1.add_message("hey man", root_account_id: @a1.id)
       @c2 = @target_user.initiate_conversation([user_factory])
-      @c2.add_message("foo", :root_account_id => @a1.id)
-      @c2.add_message("bar", :root_account_id => @a2.id)
+      @c2.add_message("foo", root_account_id: @a1.id)
+      @c2.add_message("bar", root_account_id: @a2.id)
       # invisible to @user, unless @user is a site admin
       @c3 = @target_user.initiate_conversation([user_factory])
-      @c3.add_message("secret", :root_account_id => @a3.id)
+      @c3.add_message("secret", root_account_id: @a3.id)
       @c4 = @target_user.initiate_conversation([user_factory])
-      @c4.add_message("super", :root_account_id => @a1.id)
-      @c4.add_message("sekrit", :root_account_id => @a3.id)
+      @c4.add_message("super", root_account_id: @a1.id)
+      @c4.add_message("sekrit", root_account_id: @a3.id)
     end
 
     it "lets site admins see everything" do
@@ -233,18 +233,18 @@ describe ConversationParticipant do
 
   context "participants" do
     before :once do
-      @me = course_with_student(:active_all => true).user
-      @u1 = student_in_course(:active_all => true).user
-      @u2 = student_in_course(:active_all => true).user
-      @u3 = student_in_course(:active_all => true).user
+      @me = course_with_student(active_all: true).user
+      @u1 = student_in_course(active_all: true).user
+      @u2 = student_in_course(active_all: true).user
+      @u3 = student_in_course(active_all: true).user
       @convo = @me.initiate_conversation([@u1, @u2, @u3])
       @convo.add_message "ohai"
       @u3.destroy
-      @u4 = student_in_course(:active_all => true).user
+      @u4 = student_in_course(active_all: true).user
 
       other_convo = @u4.initiate_conversation([@me])
       message = other_convo.add_message "just between you and me"
-      @convo.add_message("haha i forwarded it", :forwarded_message_ids => [message.id])
+      @convo.add_message("haha i forwarded it", forwarded_message_ids: [message.id])
     end
 
     matcher :have_same_ids do |expected|
@@ -268,7 +268,7 @@ describe ConversationParticipant do
     end
 
     it "includes shared contexts if requested" do
-      users = @convo.reload.participants(:include_participant_contexts => true)
+      users = @convo.reload.participants(include_participant_contexts: true)
       address_book = @me.address_book
       users.each do |user|
         expect(address_book.cached?(user)).to be_truthy
@@ -284,23 +284,23 @@ describe ConversationParticipant do
     end
 
     it "includes include forwarded participants if requested" do
-      users = @convo.reload.participants(:include_indirect_participants => true)
+      users = @convo.reload.participants(include_indirect_participants: true)
       expect(users).to have_same_ids [@me, @u1, @u2, @u3, @u4]
     end
 
     it "caches participants per conversation" do
       allow(Rails.cache).to receive(:fetch) do |key, &block|
-        expect(key).to eq([@convo.conversation, 'participants'].cache_key)
+        expect(key).to eq([@convo.conversation, "participants"].cache_key)
         expect(block.call).to have_same_ids([@me, @u1, @u2, @u3])
       end
       @convo.participants
     end
 
     it "caches indirect participants per conversation and user" do
-      expect(Rails.cache).to receive(:fetch).with([@convo.conversation, @convo.user, 'indirect_participants'].cache_key)
+      expect(Rails.cache).to receive(:fetch).with([@convo.conversation, @convo.user, "indirect_participants"].cache_key)
       allow(Rails.cache).to receive(:fetch) do |key, &block; users|
         users = block.call
-        if key == [@convo.conversation, @convo.user, 'indirect_participants'].cache_key
+        if key == [@convo.conversation, @convo.user, "indirect_participants"].cache_key
           expect(users).to have_same_ids([@u4])
         end
         users
@@ -319,7 +319,7 @@ describe ConversationParticipant do
       enable_cache do
         c = @user1.initiate_conversation([user_factory, user_factory])
         c.add_message("hello")
-        c.update_attribute(:workflow_state, 'unread')
+        c.update_attribute(:workflow_state, "unread")
 
         # populates the cache
         expect(c.participants.map(&:id)).to include(@user1.id)
@@ -336,7 +336,7 @@ describe ConversationParticipant do
     it "cleans up group conversations having both users" do
       c = @user1.initiate_conversation([@user2, user_factory, user_factory])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       rconvo = c.conversation
       expect(rconvo.participants.size).to eql 4
 
@@ -355,7 +355,7 @@ describe ConversationParticipant do
     it "moves a private conversation to the new user" do
       c = @user1.initiate_conversation([user_factory])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       rconvo = c.conversation
       old_hash = rconvo.private_hash
 
@@ -373,7 +373,7 @@ describe ConversationParticipant do
       other_guy = user_factory
       c = @user1.initiate_conversation([other_guy])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([other_guy])
       c2.add_message("hola")
 
@@ -395,7 +395,7 @@ describe ConversationParticipant do
     it "changes a private conversation between the two users into a monologue" do
       c = @user1.initiate_conversation([@user2])
       c.add_message("hello self")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       @user2.mark_all_conversations_as_read!
       rconvo = c.conversation
       old_hash = rconvo.private_hash
@@ -413,7 +413,7 @@ describe ConversationParticipant do
     it "merges a private conversations between the two users into the existing monologue" do
       c = @user1.initiate_conversation([@user2])
       c.add_message("hello self")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([@user2])
       c2.add_message("monologue!")
       @user2.mark_all_conversations_as_read!
@@ -435,7 +435,7 @@ describe ConversationParticipant do
     it "merges a monologue into the existing monologue" do
       c = @user1.initiate_conversation([@user1])
       c.add_message("monologue 1")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([@user2])
       c2.add_message("monologue 2")
 
@@ -457,12 +457,12 @@ describe ConversationParticipant do
       other_guy = user_factory
       c = @user1.initiate_conversation([other_guy])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([other_guy])
       c2.add_message("hola")
 
       c.reload
-      ConversationParticipant.where(:user_id => @user1.id).scoping do
+      ConversationParticipant.where(user_id: @user1.id).scoping do
         c.move_to_user @user2
       end
 
@@ -503,7 +503,7 @@ describe ConversationParticipant do
           @a1.account_users.create!(user: @admin_user)
           @target_user = user_factory
           @c1 = @target_user.initiate_conversation([user_factory])
-          @c1.add_message("foo", :root_account_id => @a1.id)
+          @c1.add_message("foo", root_account_id: @a1.id)
 
           # not sure how this happens in prod, but it does
           @c1.update_attribute(:root_account_ids, [@a1.id, @a1.global_id].sort.join(","))

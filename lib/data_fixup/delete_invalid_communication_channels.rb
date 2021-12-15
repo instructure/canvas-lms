@@ -21,7 +21,7 @@
 module DataFixup::DeleteInvalidCommunicationChannels
   def self.run
     scope = CommunicationChannel.where(path_type: CommunicationChannel::TYPE_EMAIL)
-    scope.find_ids_in_ranges(batch_size: 10000) do |min_id, max_id|
+    scope.find_ids_in_ranges(batch_size: 10_000) do |min_id, max_id|
       records = scope.where(id: min_id..max_id).pluck(:id, :user_id, :path).reject do |_id, _user_id, path|
         EmailAddressValidator.valid?(path)
       end

@@ -20,10 +20,10 @@
 
 describe StudentEnrollment do
   before do
-    @student = User.create(:name => "some student")
-    @course = Course.create(:name => "some course")
+    @student = User.create(name: "some student")
+    @course = Course.create(name: "some course")
     @se = @course.enroll_student(@student)
-    @assignment = @course.assignments.create!(:title => 'some assignment')
+    @assignment = @course.assignments.create!(title: "some assignment")
     @submission = @assignment.submit_homework(@student)
     @assignment.reload
     @course.save!
@@ -105,9 +105,9 @@ describe StudentEnrollment do
         end_date: 2.months.from_now(now)
       )
 
-      expect {
+      expect do
         enrollment.update_override_score(override_score: 80.0, grading_period_id: other_period.id, updating_user: teacher)
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "records a grade change event if record_grade_change is true and updating_user is supplied" do
@@ -141,9 +141,9 @@ describe StudentEnrollment do
     it "does not record a grade change if the override score did not actually change" do
       enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: true)
 
-      expect {
+      expect do
         enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: true)
-      }.not_to change {
+      end.not_to change {
         Auditors::ActiveRecord::GradeChangeRecord.where(
           context_id: course.id,
           student_id: student.id,
@@ -177,7 +177,7 @@ describe StudentEnrollment do
       end
 
       it "doesn't queue an update if the pace plan isn't published" do
-        @pace_plan.update workflow_state: 'unpublished'
+        @pace_plan.update workflow_state: "unpublished"
         student_in_course(active_all: true, user: user_with_pseudonym)
         expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
       end

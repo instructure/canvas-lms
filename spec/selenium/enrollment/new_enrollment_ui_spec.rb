@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/new_enrollment_page_object_model'
+require_relative "../common"
+require_relative "pages/new_enrollment_page_object_model"
 
 describe "New Enrollment" do
   include_context "in-process server selenium tests"
@@ -26,28 +26,28 @@ describe "New Enrollment" do
 
   before :once do
     course_with_teacher(active_all: true, new_user: true)
-    @section1 = @course.course_sections.create!(:name => 'Section 1')
+    @section1 = @course.course_sections.create!(name: "Section 1")
     @user1 = user_with_pseudonym(name: "user1")
-    communication_channel(@user1, { username: 'user1@example.com', active_cc: true })
+    communication_channel(@user1, { username: "user1@example.com", active_cc: true })
     @user2 = user_with_pseudonym(name: "user2")
-    communication_channel(@user2, { username: 'user2@example.com', active_cc: true })
+    communication_channel(@user2, { username: "user2@example.com", active_cc: true })
   end
 
-  it "opens new enroll dialog", priority: "1", test_id: 3077472 do
+  it "opens new enroll dialog", priority: "1" do
     user_session(@teacher)
     get "/courses/#{@course.id}/users"
     add_people_button.click
     expect(add_people_modal).to be_displayed
-    expect(next_button).to have_attribute('disabled', 'true')
+    expect(next_button).to have_attribute("disabled", "true")
   end
 
-  it "adds new users", priority: "1", test_id: 3077477 do
+  it "adds new users", priority: "1" do
     user_session(@teacher)
     get "/courses/#{@course.id}/users"
     add_people_button.click
-    f('textarea').send_keys(@user1.communication_channels.last.path + ', ' + @user2.communication_channels.last.path)
+    f("textarea").send_keys(@user1.communication_channels.last.path + ", " + @user2.communication_channels.last.path)
     next_button.click
-    expect(peopleready_info_box.text).to include('The following users are ready to be added to the course')
+    expect(peopleready_info_box.text).to include("The following users are ready to be added to the course")
     expect(name_to_be_added(1)).to include(@user1.name)
     expect(name_to_be_added(2)).to include(@user2.name)
     next_button.click

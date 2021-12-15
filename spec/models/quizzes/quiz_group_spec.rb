@@ -22,9 +22,9 @@ describe Quizzes::QuizGroup do
   describe "saving a group" do
     it "marks its quiz as having unpublished changes when updated" do
       course_factory
-      quiz = @course.quizzes.create!(:title => "some quiz")
-      group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 1, :question_points => 5.0)
-      group.quiz_questions.create!(:quiz => quiz, :question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+      quiz = @course.quizzes.create!(title: "some quiz")
+      group = quiz.quiz_groups.create!(name: "question group", pick_count: 1, question_points: 5.0)
+      group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
       quiz.published_at = Time.now
       quiz.publish!
       expect(quiz.unpublished_changes?).to be_falsey
@@ -37,13 +37,13 @@ describe Quizzes::QuizGroup do
   end
 
   describe "#actual_pick_count" do
-    context "with a question bank" do
+    context "with a small question bank" do
       it "returns the correct pick count if there aren't enough questions" do
         course_factory
-        quiz = @course.quizzes.create!(:title => "some quiz")
-        group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
-        group.quiz_questions.create!(:quiz => quiz, :question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
-        group.quiz_questions.create!(:quiz => quiz, :question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
+        quiz = @course.quizzes.create!(title: "some quiz")
+        group = quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
+        group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+        group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
         expect(group.quiz_questions.active.size).to eq 2
 
         expect(group.pick_count).to eq 3
@@ -54,11 +54,11 @@ describe Quizzes::QuizGroup do
     context "with a question bank" do
       before(:once) do
         course_factory
-        @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-        @bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
-        @bank.assessment_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
-        @quiz = @course.quizzes.create!(:title => "some quiz")
-        @group = @quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
+        @bank = @course.assessment_question_banks.create!(title: "Test Bank")
+        @bank.assessment_questions.create!(question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+        @bank.assessment_questions.create!(question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
+        @quiz = @course.quizzes.create!(title: "some quiz")
+        @group = @quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
         @group.assessment_question_bank = @bank
         @group.save
       end
@@ -68,7 +68,7 @@ describe Quizzes::QuizGroup do
         expect(@group.pick_count).to eq 3
         expect(@group.actual_pick_count).to eq 2
 
-        @bank.assessment_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
+        @bank.assessment_questions.create!(question_data: { "name" => "test question 3", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
         @group.reload
         expect(@group.actual_pick_count).to eq 3
       end
@@ -85,10 +85,10 @@ describe Quizzes::QuizGroup do
   describe "#data" do
     it "generates valid data" do
       course_factory
-      quiz = @course.quizzes.create!(:title => "some quiz")
-      g = quiz.quiz_groups.create(:name => "question group", :pick_count => 2, :question_points => 5.0)
-      g.quiz_questions << quiz.quiz_questions.create!(:question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
-      g.quiz_questions << quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
+      quiz = @course.quizzes.create!(title: "some quiz")
+      g = quiz.quiz_groups.create(name: "question group", pick_count: 2, question_points: 5.0)
+      g.quiz_questions << quiz.quiz_questions.create!(question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+      g.quiz_questions << quiz.quiz_questions.create!(question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
       expect(g.name).to eql("question group")
       expect(g.pick_count).to eql(2)
       expect(g.question_points).to eql(5.0)
@@ -108,15 +108,15 @@ describe Quizzes::QuizGroup do
 
   describe ".update_all_positions!" do
     def group_positions(quiz)
-      quiz.quiz_groups.sort_by { |g| g.position }.map { |g| g.id }
+      quiz.quiz_groups.sort_by(&:position).map(&:id)
     end
 
     before :once do
       course_factory
-      @quiz = @course.quizzes.create!(:title => "some quiz")
-      @group1 = @quiz.quiz_groups.create(:name => "question group 1")
-      @group2 = @quiz.quiz_groups.create(:name => "question group 2")
-      @group3 = @quiz.quiz_groups.create(:name => "question group 2")
+      @quiz = @course.quizzes.create!(title: "some quiz")
+      @group1 = @quiz.quiz_groups.create(name: "question group 1")
+      @group2 = @quiz.quiz_groups.create(name: "question group 2")
+      @group3 = @quiz.quiz_groups.create(name: "question group 2")
     end
 
     it "noops if list of items is empty" do
@@ -136,13 +136,13 @@ describe Quizzes::QuizGroup do
     end
   end
 
-  context 'root_account_id' do
+  context "root_account_id" do
     before { quiz_with_graded_submission([]) }
 
     it "uses root_account value from account" do
       course_factory
-      quiz = @course.quizzes.create!(:title => "some quiz")
-      group1 = quiz.quiz_groups.create(:name => "question group 1")
+      quiz = @course.quizzes.create!(title: "some quiz")
+      group1 = quiz.quiz_groups.create(name: "question group 1")
       expect(group1.root_account_id).to eq Account.default.id
     end
   end

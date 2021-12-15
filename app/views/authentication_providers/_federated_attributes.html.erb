@@ -18,7 +18,7 @@
 
 <div class="federated_attributes">
   <h4><%= t 'Federated Attributes' %></h4>
-  <p><%= t <<-TEXT
+  <p><%= t <<~TEXT
 Federated attributes are information sent from your authentication provider that can be used
 to automatically update corresponding information for users in Canvas each time they log in.
 TEXT
@@ -33,7 +33,7 @@ TEXT
           class="icon-info"
           tabindex="0"
           data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
-          title= "<%= t <<-TEXT
+          title= "<%= t <<~TEXT
         If an attribute is marked as provisioning only, then it will only be used when Just in Time
         Provisioning creates a new user, and will not be kept up to date each time the user logs in.
         TEXT

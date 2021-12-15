@@ -32,7 +32,7 @@ class CreatePlannerOverrides < ActiveRecord::Migration[4.2]
       t.timestamps null: false
     end
 
-    add_index :planner_overrides, [:plannable_type, :plannable_id, :user_id], unique: true, name: 'index_planner_overrides_on_plannable_and_user'
+    add_index :planner_overrides, %i[plannable_type plannable_id user_id], unique: true, name: "index_planner_overrides_on_plannable_and_user"
     add_foreign_key :planner_overrides, :users
   end
 

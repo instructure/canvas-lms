@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'report_spec_helper'
+require_relative "report_spec_helper"
 
 describe "Default Account Reports" do
   include ReportSpecHelper
@@ -36,32 +36,32 @@ describe "Default Account Reports" do
   before(:once) do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
-    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
+    @account = Account.create(name: "New Account", default_time_zone: "UTC")
     @account.enable_feature!(:final_grades_override)
     @default_term = @account.default_enrollment_term
 
-    @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
+    @term1 = EnrollmentTerm.create(name: "Fall", start_at: 6.months.ago, end_at: 1.year.from_now)
     @term1.root_account = @account
-    @term1.sis_source_id = 'fall12'
+    @term1.sis_source_id = "fall12"
     @term1.save!
-    @user1 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-                                         :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-                                         :sis_user_id => "user_sis_id_01", integration_id: 'int1')
-    @user2 = user_with_managed_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
-                                         :name => 'Michael Bolton', :account => @account,
-                                         :sis_user_id => "user_sis_id_02")
-    @user3 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "Rick Astley",
-                                         :sortable_name => "Astley, Rick", :username => 'rick@roll.com',
-                                         :sis_user_id => "user_sis_id_03")
-    @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
-                                         :name => 'Jason Donovan', :account => @account,
-                                         :sis_user_id => "user_sis_id_04", integration_id: 'int2')
-    @user5 = user_with_managed_pseudonym(:active_all => true, :username => 'john@smith.com',
-                                         :name => 'John Smith', :sis_user_id => "user_sis_id_05",
-                                         :account => @account)
+    @user1 = user_with_managed_pseudonym(active_all: true, account: @account, name: "John St. Clair",
+                                         sortable_name: "St. Clair, John", username: "john@stclair.com",
+                                         sis_user_id: "user_sis_id_01", integration_id: "int1")
+    @user2 = user_with_managed_pseudonym(active_all: true, username: "micheal@michaelbolton.com",
+                                         name: "Michael Bolton", account: @account,
+                                         sis_user_id: "user_sis_id_02")
+    @user3 = user_with_managed_pseudonym(active_all: true, account: @account, name: "Rick Astley",
+                                         sortable_name: "Astley, Rick", username: "rick@roll.com",
+                                         sis_user_id: "user_sis_id_03")
+    @user4 = user_with_managed_pseudonym(active_all: true, username: "jason@donovan.com",
+                                         name: "Jason Donovan", account: @account,
+                                         sis_user_id: "user_sis_id_04", integration_id: "int2")
+    @user5 = user_with_managed_pseudonym(active_all: true, username: "john@smith.com",
+                                         name: "John Smith", sis_user_id: "user_sis_id_05",
+                                         account: @account)
 
-    @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
-    @course1.workflow_state = 'available'
+    @course1 = Course.new(name: "English 101", course_code: "ENG101", account: @account)
+    @course1.workflow_state = "available"
     @course1.enrollment_term_id = @term1.id
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
@@ -71,18 +71,18 @@ describe "Default Account Reports" do
     )
     @course1.update!(default_grading_standard: grading_standard)
 
-    @course2 = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
+    @course2 = course_factory(course_name: "Math 101", account: @account, active_course: true)
 
     @course1.default_post_policy.update!(post_manually: false)
     @course2.default_post_policy.update!(post_manually: false)
 
-    @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :completed)
-    @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment4 = @course1.enroll_user(@user3, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', :enrollment_state => :active)
-    @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', :enrollment_state => :active)
+    @enrollment1 = @course1.enroll_user(@user1, "StudentEnrollment", enrollment_state: :active)
+    @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", enrollment_state: :completed)
+    @enrollment3 = @course2.enroll_user(@user2, "StudentEnrollment", enrollment_state: :active)
+    @enrollment4 = @course1.enroll_user(@user3, "StudentEnrollment", enrollment_state: :active)
+    @enrollment5 = @course2.enroll_user(@user4, "StudentEnrollment", enrollment_state: :active)
+    @enrollment6 = @course1.enroll_user(@user5, "TeacherEnrollment", enrollment_state: :active)
+    @enrollment7 = @course2.enroll_user(@user5, "TaEnrollment", enrollment_state: :active)
 
     # create some default course scores for these enrollments
     @enrollment1.scores.create!
@@ -113,13 +113,13 @@ describe "Default Account Reports" do
 
     it "runs grade export for a term and return one line per enrollment" do
       user_with_managed_pseudonym(user: @user1, account: @account)
-      p = @account.pseudonyms.where(sis_user_id: 'user_sis_id_01').take
+      p = @account.pseudonyms.where(sis_user_id: "user_sis_id_01").take
       @enrollment1.sis_pseudonym = p
       @enrollment1.save!
 
       parameters = {}
       parameters["enrollment_term"] = @term1.id
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
       expect(parsed.length).to eq 3
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -136,7 +136,7 @@ describe "Default Account Reports" do
     it "runs grade export for a term using sis_id" do
       parameters = {}
       parameters["enrollment_term"] = "sis_term_id:fall12"
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                                "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
@@ -150,7 +150,7 @@ describe "Default Account Reports" do
     end
 
     it "runs grade export with no parameters" do
-      parsed = read_report('grade_export_csv', { order: 13 })
+      parsed = read_report("grade_export_csv", { order: 13 })
       expect(parsed.length).to eq 5
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -173,7 +173,7 @@ describe "Default Account Reports" do
     it "runs grade export with empty string parameter" do
       parameters = {}
       parameters["enrollment_term"] = ""
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
       expect(parsed.length).to eq 5
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -196,12 +196,12 @@ describe "Default Account Reports" do
     it "runs grade export with deleted users" do
       @course2.destroy
       @enrollment1.destroy
-      @enrollment2.workflow_state = 'inactive'
+      @enrollment2.workflow_state = "inactive"
       @enrollment2.save!
 
       parameters = {}
       parameters["include_deleted"] = true
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
       expect(parsed.length).to eq 5
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -222,12 +222,12 @@ describe "Default Account Reports" do
     end
 
     it "runs grade export on a sub account" do
-      sub_account = Account.create(:parent_account => @account, :name => 'English')
+      sub_account = Account.create(parent_account: @account, name: "English")
       @course2.account = sub_account
       @course2.save!
 
       parameters = {}
-      parsed = read_report('grade_export_csv', { order: 13, account: sub_account, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, account: sub_account, params: parameters })
       expect(parsed.length).to eq 2
 
       expect(parsed[0]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
@@ -241,13 +241,13 @@ describe "Default Account Reports" do
     it "runs a grade export on concluded courses with an limiting period given" do
       @course1.complete!
       @enrollment1.conclude
-      @enrollment5.workflow_state = 'inactive'
+      @enrollment5.workflow_state = "inactive"
       @enrollment5.save!
 
       parameters = {}
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
       expect(parsed.length).to eq 5
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01",
@@ -258,7 +258,7 @@ describe "Default Account Reports" do
       expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
                                "English 101", @course1.id.to_s, "SIS_COURSE_ID_1",
                                "English 101", @course1.course_sections.first.id.to_s,
-                               nil, "Fall", @term1.id.to_s, 'fall12', nil, "90.0", "concluded", nil, nil,
+                               nil, "Fall", @term1.id.to_s, "fall12", nil, "90.0", "concluded", nil, nil,
                                nil, nil, "A", nil, nil, nil]
       expect(parsed[2]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
                                "Math 101", @course2.id.to_s, nil, "Math 101",
@@ -284,7 +284,7 @@ describe "Default Account Reports" do
       parameters = {}
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
       expect(parsed.length).to eq 2
       expect(parsed[0]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02",
                                "Math 101", @course2.id.to_s, nil, "Math 101",
@@ -301,7 +301,7 @@ describe "Default Account Reports" do
       parameters = {}
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
       expect(parsed.length).to eq 4
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -324,7 +324,7 @@ describe "Default Account Reports" do
       parameters = {}
       parameters["include_deleted"] = true
       parameters["limiting_period"] = "2"
-      parsed = read_report('grade_export_csv', { order: 13, params: parameters })
+      parsed = read_report("grade_export_csv", { order: 13, params: parameters })
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                                "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
@@ -334,23 +334,23 @@ describe "Default Account Reports" do
     it "returns integration_ids when account setting set" do
       @account.settings[:include_integration_ids_in_gradebook_exports] = true
       @account.save!
-      parsed = read_report('grade_export_csv', { order: 14, header: true })
+      parsed = read_report("grade_export_csv", { order: 14, header: true })
       expect(parsed[0]).to eq ["student name", "student id", "student sis", "student integration id",
                                "course", "course id", "course sis", "section", "section id", "section sis",
                                "term", "term id", "term sis", "current score", "final score", "enrollment state",
-                               "unposted current score", "unposted final score", 'override score', "current grade",
+                               "unposted current score", "unposted final score", "override score", "current grade",
                                "final grade", "unposted current grade", "unposted final grade", "override grade"]
-      expect(parsed[1]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", 'int1', "English 101", @course1.id.to_s,
+      expect(parsed[1]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "int1", "English 101", @course1.id.to_s,
                                "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                                @term1.id.to_s, "fall12", nil, "88.0", "active", "82.0", "92.0", "102.0", nil, "B", "B", "A", "A"]
     end
 
     describe "grading scheme values" do
       context "when the 'Add Grading Scheme to Admin Grade Reports' flag is enabled on the root account" do
-        let(:parsed_report) { read_report('grade_export_csv', { order: 14, header: true }) }
+        let(:parsed_report) { read_report("grade_export_csv", { order: 14, header: true }) }
         let(:header_line) { parsed_report[0] }
 
-        let(:parsed_report_by_column) { read_report('grade_export_csv', { order: 14, header: true, parse_header: true }) }
+        let(:parsed_report_by_column) { read_report("grade_export_csv", { order: 14, header: true, parse_header: true }) }
 
         it "includes columns for the grading scheme values in the report header" do
           aggregate_failures do
@@ -426,9 +426,9 @@ describe "Default Account Reports" do
         )
         @course2.update!(default_grading_standard: grading_standard)
 
-        @course3 = course_factory(:course_name => 'Fun 404', :account => @account, :active_course => true)
-        @course3.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
-        @course3.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
+        @course3 = course_factory(course_name: "Fun 404", account: @account, active_course: true)
+        @course3.enroll_user(@user2, "StudentEnrollment", enrollment_state: :active)
+        @course3.enroll_user(@user4, "StudentEnrollment", enrollment_state: :active)
         @course3.default_post_policy.update!(post_manually: false)
 
         teacher = User.create!
@@ -478,10 +478,10 @@ describe "Default Account Reports" do
         csv = reports["Default Term.csv"]
         expect(csv.size).to eq 4
         expect(
-          csv.all? { |student|
+          csv.all? do |student|
             ["Math 101", "Fun 404"].include?(student["course"])
             student["grading period set"] == "Grading Periods"
-          }
+          end
         ).to eq true
 
         jason1, jason2, mike1, mike2 = csv
@@ -527,7 +527,7 @@ describe "Default Account Reports" do
         section2 = @course2.course_sections.create! name: "section 2"
         @course2.enroll_student(@user2, section: section2,
                                         workflow_state: "active",
-                                        allow_multiple_enrollments: true).tap { |e| e.accept }
+                                        allow_multiple_enrollments: true).tap(&:accept)
 
         reports = read_report("mgp_grade_export_csv",
                               params: { enrollment_term_id: @default_term.id },
@@ -592,7 +592,7 @@ describe "Default Account Reports" do
                               parse_header: true,
                               order: ["student name", "section id"])
         csv = reports["Default Term.csv"]
-        expect(csv[1]["student integration id"]).to eq 'int2'
+        expect(csv[1]["student integration id"]).to eq "int2"
       end
 
       it "omits override scores if Final Grade Override is disabled for the account" do

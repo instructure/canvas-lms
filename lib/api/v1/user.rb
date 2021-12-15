@@ -24,13 +24,13 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w(id name created_at).freeze,
-    :methods => %w(sortable_name short_name).freeze
+    only: %w[id name created_at].freeze,
+    methods: %w[sortable_name short_name].freeze
   }.freeze
 
   def user_json_preloads(users, preload_email = false, opts = {})
     # for User#account
-    ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym => :account) if opts.fetch(:accounts, true)
+    ActiveRecord::Associations::Preloader.new.preload(users, pseudonym: :account) if opts.fetch(:accounts, true)
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
@@ -56,11 +56,11 @@ module Api::V1::User
       json[:created_at] = json[:created_at]&.iso8601
       enrollment_json_opts = {}
       if grading_period.nil?
-        enrollment_json_opts[:current_grading_period_scores] = includes.include?('current_grading_period_scores')
+        enrollment_json_opts[:current_grading_period_scores] = includes.include?("current_grading_period_scores")
       else
         enrollment_json_opts[:grading_period] = grading_period
       end
-      if includes.include?('sis_user_id') || (!excludes.include?('pseudonym') && user_json_is_admin?(context, current_user))
+      if includes.include?("sis_user_id") || (!excludes.include?("pseudonym") && user_json_is_admin?(context, current_user))
         include_root_account = @domain_root_account.trust_exists?
         course_or_section = @context if @context.is_a?(Course) || @context.is_a?(CourseSection)
         sis_context = enrollment || course_or_section || @domain_root_account
@@ -71,11 +71,11 @@ module Api::V1::User
         # that's called sis_source_id.
 
         if user_can_read_sis_data?(current_user, context)
-          json.merge! :sis_user_id => pseudonym&.sis_user_id,
-                      :integration_id => pseudonym&.integration_id
+          json[:sis_user_id] = pseudonym&.sis_user_id
+          json[:integration_id] = pseudonym&.integration_id
         end
 
-        if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
+        if !excludes.include?("pseudonym") && user_json_is_admin?(context, current_user)
           json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
           json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
 
@@ -91,12 +91,12 @@ module Api::V1::User
 
       json[:merged_into_user_id] = user.merged_into_user_id if user.deleted? && user.merged_into_user_id
 
-      if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
+      if includes.include?("avatar_url") && user.account.service_enabled?(:avatars)
         json[:avatar_url] = avatar_url_for_user(user)
       end
 
-      json[:last_name] = user.last_name if includes.include?('last_name')
-      json[:first_name] = user.first_name if includes.include?('first_name')
+      json[:last_name] = user.last_name if includes.include?("last_name")
+      json[:first_name] = user.first_name if includes.include?("first_name")
 
       if enrollments
         json[:enrollments] = enrollments.map do |e|
@@ -105,66 +105,66 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if tool_includes.include?('email') || (includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses))
+      if tool_includes.include?("email") || (includes.include?("email") && !excludes.include?("personal_info") && context.grants_right?(current_user, session, :read_email_addresses))
         json[:email] = user.email
       end
 
-      if !excludes.include?('personal_info') && @domain_root_account&.enable_profiles? && user.profile
-        json[:bio] = user.profile.bio if includes.include?('bio')
-        json[:title] = user.profile.title if includes.include?('title')
+      if !excludes.include?("personal_info") && @domain_root_account&.enable_profiles? && user.profile
+        json[:bio] = user.profile.bio if includes.include?("bio")
+        json[:title] = user.profile.title if includes.include?("title")
       end
 
-      if includes.include?('sections')
+      if includes.include?("sections")
         json[:sections] = user.enrollments
-                              .map(&:course_section).compact.uniq
+                              .filter_map(&:course_section).uniq
                               .map(&:name).join(", ")
       end
 
       # make sure this only runs if user_json_preloads has
       # been called with {group_memberships: true} in opts
-      if includes.include?('group_ids')
+      if includes.include?("group_ids")
         context_group_ids = get_context_groups(context)
         json[:group_ids] = context_group_ids & group_ids(user)
       end
 
-      json[:locale] = user.locale if includes.include?('locale')
-      json[:effective_locale] = I18n.locale if includes.include?('effective_locale') && user == current_user
-      json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?('confirmation_url')
+      json[:locale] = user.locale if includes.include?("locale")
+      json[:effective_locale] = I18n.locale if includes.include?("effective_locale") && user == current_user
+      json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?("confirmation_url")
 
-      if includes.include?('last_login')
+      if includes.include?("last_login")
         last_login = user.last_login || user.read_attribute(:last_login)
         if last_login.is_a?(String)
-          Time.use_zone('UTC') { last_login = Time.zone.parse(last_login) }
+          Time.use_zone("UTC") { last_login = Time.zone.parse(last_login) }
         end
         json[:last_login] = last_login.try(:iso8601)
       end
 
-      if includes.include?('permissions')
+      if includes.include?("permissions")
         json[:permissions] = {
-          :can_update_name => user.user_can_edit_name?,
-          :can_update_avatar => service_enabled?(:avatars) && !user.avatar_locked?,
-          :limit_parent_app_web_access => user.limit_parent_app_web_access?,
+          can_update_name: user.user_can_edit_name?,
+          can_update_avatar: service_enabled?(:avatars) && !user.avatar_locked?,
+          limit_parent_app_web_access: user.limit_parent_app_web_access?,
         }
       end
 
-      if includes.include?('terms_of_use')
+      if includes.include?("terms_of_use")
         json[:terms_of_use] = !!user.preferences[:accepted_terms]
       end
 
-      if includes.include?('custom_links')
+      if includes.include?("custom_links")
         json[:custom_links] = roster_user_custom_links(user)
       end
 
-      if includes.include?('time_zone')
+      if includes.include?("time_zone")
         zone = user.time_zone || @domain_root_account.try(:default_time_zone) || Time.zone
         json[:time_zone] = zone.name
       end
 
-      if tool_includes.include?('lti_id') || includes.include?('lti_id')
+      if tool_includes.include?("lti_id") || includes.include?("lti_id")
         json[:lti_id] = Lti::Asset.old_id_for_user_in_context(user, context) || user.lti_context_id
       end
 
-      if includes.include?('uuid')
+      if includes.include?("uuid")
         past_uuid = UserPastLtiId.uuid_for_user_in_context(user, context)
         json[:past_uuid] = past_uuid unless past_uuid == user.uuid
         json[:uuid] = user.uuid
@@ -173,15 +173,15 @@ module Api::V1::User
   end
 
   def users_json(users, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [])
-    if includes.include?('sections')
+    if includes.include?("sections")
       ActiveRecord::Associations::Preloader.new.preload(users, enrollments: :course_section)
     end
 
-    if includes.include?('group_ids') && !context.is_a?(Groups)
+    if includes.include?("group_ids") && !context.is_a?(Groups)
       ActiveRecord::Associations::Preloader.new.preload(context, :groups)
     end
 
-    if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses)
+    if includes.include?("email") && !excludes.include?("personal_info") && context.grants_right?(current_user, session, :read_email_addresses)
       ActiveRecord::Associations::Preloader.new.preload(users, :communication_channels)
     end
     ActiveRecord::Associations::Preloader.new.preload(users, :pseudonyms)
@@ -238,7 +238,7 @@ module Api::V1::User
     return false if context.nil? || current_user.nil?
 
     @user_json_is_admin ||= {}
-    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= (
+    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= begin
       if context.is_a?(::UserProfile)
         permissions_context = permissions_account = @domain_root_account
       else
@@ -250,30 +250,30 @@ module Api::V1::User
         permissions_account.membership_for_user(current_user) ||
         permissions_account.root_account.grants_right?(current_user, :manage_sis)
       )
-    )
+    end
   end
 
-  API_ENROLLMENT_JSON_OPTS = [:id,
-                              :root_account_id,
-                              :user_id,
-                              :course_id,
-                              :course_section_id,
-                              :associated_user_id,
-                              :limit_privileges_to_course_section,
-                              :workflow_state,
-                              :updated_at,
-                              :created_at,
-                              :start_at,
-                              :end_at,
-                              :type]
+  API_ENROLLMENT_JSON_OPTS = %i[id
+                                root_account_id
+                                user_id
+                                course_id
+                                course_section_id
+                                associated_user_id
+                                limit_privileges_to_course_section
+                                workflow_state
+                                updated_at
+                                created_at
+                                start_at
+                                end_at
+                                type].freeze
 
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup
-    only = only.without(:course_section_id) if excludes.include?('course_section_id')
+    only = only.without(:course_section_id) if excludes.include?("course_section_id")
     api_json(enrollment, user, session, only: only).tap do |json|
-      json[:enrollment_state] = json.delete('workflow_state')
-      if enrollment.course.workflow_state == 'deleted' || enrollment.course_section.workflow_state == 'deleted'
-        json[:enrollment_state] = 'deleted'
+      json[:enrollment_state] = json.delete("workflow_state")
+      if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"
+        json[:enrollment_state] = "deleted"
       end
       json[:role] = enrollment.role.name
       json[:role_id] = enrollment.role_id
@@ -298,18 +298,18 @@ module Api::V1::User
         json[:sis_user_id] = pseudonym.try(:sis_user_id)
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
-      user_includes = includes & %w{avatar_url group_ids uuid}
+      user_includes = includes & %w[avatar_url group_ids uuid]
 
       json[:user] = user_json(enrollment.user, user, session, user_includes, @context, nil, []) if includes.include?(:user)
-      if includes.include?('locked')
+      if includes.include?("locked")
         lockedbysis = enrollment.defined_by_sis?
         lockedbysis &&= !enrollment.course.account.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)
         json[:locked] = lockedbysis
       end
-      if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
-        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id), grading_period: opts[:grading_period])
+      if includes.include?("observed_users") && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
+        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(course_id: enrollment.course_id), grading_period: opts[:grading_period])
       end
-      if includes.include?('can_be_removed')
+      if includes.include?("can_be_removed")
         json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&
                                 enrollment.can_be_deleted_by(@current_user, @context, session)
       end
@@ -378,9 +378,11 @@ module Api::V1::User
 
   def get_context_groups(context)
     # make sure to preload groups if using this
-    context.is_a?(Group) ?
-      [context.id] :
+    if context.is_a?(Group)
+      [context.id]
+    else
       context.groups.map(&:id)
+    end
   end
 
   def sis_id_context(context)

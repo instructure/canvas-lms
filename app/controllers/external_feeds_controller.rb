@@ -87,7 +87,7 @@ class ExternalFeedsController < ApplicationController
     if authorized_action(@context.announcements.temp_record, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
       @feeds = Api.paginate(@context.external_feeds.order(:id), self, api_route)
-      render :json => external_feeds_api_json(@feeds, @context, @current_user, session)
+      render json: external_feeds_api_json(@feeds, @context, @current_user, session)
     end
   end
 
@@ -116,9 +116,9 @@ class ExternalFeedsController < ApplicationController
     if authorized_action(@context.announcements.temp_record, @current_user, :create)
       @feed = create_api_external_feed(@context, params, @current_user)
       if @feed.save
-        render :json => external_feed_api_json(@feed, @context, @current_user, session)
+        render json: external_feed_api_json(@feed, @context, @current_user, session)
       else
-        render :json => @feed.errors, :status => :bad_request
+        render json: @feed.errors, status: :bad_request
       end
     end
   end
@@ -136,9 +136,9 @@ class ExternalFeedsController < ApplicationController
     if authorized_action(@context.announcements.temp_record, @current_user, :create)
       @feed = @context.external_feeds.find(params[:external_feed_id])
       if @feed.destroy
-        render :json => external_feed_api_json(@feed, @context, @current_user, session)
+        render json: external_feed_api_json(@feed, @context, @current_user, session)
       else
-        render :json => @feed.errors, :status => :bad_request
+        render json: @feed.errors, status: :bad_request
       end
     end
   end

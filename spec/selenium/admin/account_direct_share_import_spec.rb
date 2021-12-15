@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/admin_account_page'
-require_relative 'pages/account_content_share_page'
+require_relative "../common"
+require_relative "pages/admin_account_page"
+require_relative "pages/account_content_share_page"
 
 describe "direct share page" do
   include_context "in-process server selenium tests"
@@ -29,23 +29,23 @@ describe "direct share page" do
   # Two courses and two teachers
   # Teacher1 sends an item to Teacher2
   before :once do
-    course_with_teacher(name: 'First Course', active_all: true)
+    course_with_teacher(name: "First Course", active_all: true)
     @course_1 = @course
     @teacher_1 = @teacher
-    course_with_teacher(name: 'Second Course', active_all: true)
+    course_with_teacher(name: "Second Course", active_all: true)
     @course_2 = @course
     @teacher_2 = @teacher
     @course_1.require_assignment_group
-    @assignment_1 = @course_1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
-    assignment_model(course: @course_1, name: 'assignment to share')
+    @assignment_1 = @course_1.assignments.create!(title: "Assignment First", points_possible: 10)
+    assignment_model(course: @course_1, name: "assignment to share")
 
-    @export_1 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })
-    @export_2 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })
-    @export_3 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })
-    @sent_share = @teacher_1.sent_content_shares.create! name: 'a-unread share1', content_export: @export_1, read_state: 'unread'
-    @unread_share1 = @teacher_2.received_content_shares.create! name: 'a-unread share1', content_export: @export_1, sender: @teacher_1, read_state: 'unread'
-    @unread_share2 = @teacher_2.received_content_shares.create! name: 'b-unread share2', content_export: @export_2, sender: @teacher_1, read_state: 'unread'
-    @read_share = @teacher_2.received_content_shares.create! name: 'c-read share', content_export: @export_3, sender: @teacher_1, read_state: 'read'
+    @export_1 = @course_1.content_exports.create!(workflow_state: "exported", settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => "1" } } })
+    @export_2 = @course_1.content_exports.create!(workflow_state: "exported", settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => "1" } } })
+    @export_3 = @course_1.content_exports.create!(workflow_state: "exported", settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => "1" } } })
+    @sent_share = @teacher_1.sent_content_shares.create! name: "a-unread share1", content_export: @export_1, read_state: "unread"
+    @unread_share1 = @teacher_2.received_content_shares.create! name: "a-unread share1", content_export: @export_1, sender: @teacher_1, read_state: "unread"
+    @unread_share2 = @teacher_2.received_content_shares.create! name: "b-unread share2", content_export: @export_2, sender: @teacher_1, read_state: "unread"
+    @read_share = @teacher_2.received_content_shares.create! name: "c-read share", content_export: @export_3, sender: @teacher_1, read_state: "read"
   end
 
   before do
@@ -54,37 +54,37 @@ describe "direct share page" do
   end
 
   it "notifies on user global nav profile avatar" do
-    expect(global_nav_profile_link.text).to include '2 unread shares.'
+    expect(global_nav_profile_link.text).to include "2 unread shares."
   end
 
   it "notifies on global nav tray" do
     global_nav_profile_link.click
     wait_for_ajaximations
     expect(profile_tray_menu_items.text).to match(/Shared Content/i)
-    expect(profile_tray_menu_items.text).to include '2 unread.'
+    expect(profile_tray_menu_items.text).to include "2 unread."
   end
 
   it "displays new share on received tab in most-recent-first order" do
-    expect(content_share_main_content.text).to include 'Received Content'
-    expect(received_table_rows[1].text).to include 'c-read share'
-    expect(received_table_rows[2].text).to include 'b-unread share2'
-    expect(received_table_rows[3].text).to include 'a-unread share1'
+    expect(content_share_main_content.text).to include "Received Content"
+    expect(received_table_rows[1].text).to include "c-read share"
+    expect(received_table_rows[2].text).to include "b-unread share2"
+    expect(received_table_rows[3].text).to include "a-unread share1"
   end
 
   it "marks an unread received item as read when clicked" do
-    expect(received_table_rows[3].text).to include 'a-unread share1 mark as read'
+    expect(received_table_rows[3].text).to include "a-unread share1 mark as read"
 
     unread_item_button_icon(@unread_share1.name).click
     wait_for_ajaximations
-    expect(received_table_rows[3].text).to include 'a-unread share1 mark as unread'
+    expect(received_table_rows[3].text).to include "a-unread share1 mark as unread"
   end
 
   it "marks a read received item as unread when clicked" do
-    expect(received_table_rows[1].text).to include 'c-read share mark as unread'
+    expect(received_table_rows[1].text).to include "c-read share mark as unread"
 
     read_item_button_icon(@read_share.name).click
     wait_for_ajaximations
-    expect(received_table_rows[1].text).to include 'c-read share mark as read'
+    expect(received_table_rows[1].text).to include "c-read share mark as read"
   end
 
   it "displays manage item menu options" do
@@ -100,7 +100,7 @@ describe "direct share page" do
     remove_received_item.click
     driver.switch_to.alert.accept
     wait_for_ajaximations
-    expect(content_share_main_content.text).not_to include 'c-read share'
+    expect(content_share_main_content.text).not_to include "c-read share"
   end
 
   # it "launches the Import tray for a content share" do

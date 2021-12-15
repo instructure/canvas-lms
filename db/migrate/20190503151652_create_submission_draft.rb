@@ -35,7 +35,7 @@ class CreateSubmissionDraft < ActiveRecord::Migration[5.1]
 
     add_index :submission_draft_attachments,
               [:submission_draft_id, :attachment_id],
-              name: 'index_submission_draft_and_attachment_unique',
+              name: "index_submission_draft_and_attachment_unique",
               unique: true
   end
 end

@@ -83,7 +83,7 @@
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
     <% end %>
     <% if can_do(@context, @current_user, :view_feature_flags) %>
-      <li><a href="#tab-features" id="tab-features-link"><%= t("Feature Previews") %></a></li>
+      <li><a href="#tab-features" id="tab-features-link"><%= t("Feature Options") %></a></li>
     <% end %>
     <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
       <li><a href="#tab-security" id="tab-security-link"><%= t("Security") %></a></li>
@@ -768,7 +768,7 @@
               <!-- put all of the helpful dialogs describing what each service does in here
                    the magic is in giving it an id of "<name_of_service>_help_dialog" and class="service_help_dialog" -->
               <div class="service_help_dialog" title="<%= t(:about_google_docs_tooltip, "About Google Docs Previews") %>" id="google_docs_previews_help_dialog">
-                <%= mt(:about_google_docs, <<-TEXT, :terms_url => "https://docs.google.com/viewer/TOS")
+                <%= mt(:about_google_docs, <<~TEXT, :terms_url => "https://docs.google.com/viewer/TOS")
 Google Docs Previews allow users to view documents from
 within Canvas, rather than having to download them and
 open the corresponding program (e.g. Word or Excel).

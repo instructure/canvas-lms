@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support'
-require 'google/api_client'
+require "active_support"
+require "google/api_client"
 
 module GoogleDrive
-  require 'google_drive/no_token_error'
-  require 'google_drive/connection_exception'
-  require 'google_drive/workflow_error'
+  require "google_drive/no_token_error"
+  require "google_drive/connection_exception"
+  require "google_drive/workflow_error"
 
-  require 'google_drive/client'
-  require 'google_drive/connection'
-  require 'google_drive/entry'
-  require 'google_drive/folder'
+  require "google_drive/client"
+  require "google_drive/connection"
+  require "google_drive/entry"
+  require "google_drive/folder"
 end

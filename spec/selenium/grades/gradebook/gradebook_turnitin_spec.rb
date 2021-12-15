@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - turnitin" do
   include_context "in-process server selenium tests"
@@ -31,59 +31,59 @@ describe "Gradebook - turnitin" do
   it "shows turnitin data when the New Gradebook Plagiarism Indicator feature flag is enabled" do
     @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
     @first_assignment.update_attribute(:turnitin_enabled, true)
-    s1 = @first_assignment.submit_homework(@student_1, submission_type: 'online_text_entry', body: 'asdf')
+    s1 = @first_assignment.submit_homework(@student_1, submission_type: "online_text_entry", body: "asdf")
     s1.update_attribute :turnitin_data, {
       "submission_#{s1.id}": {
         similarity_score: 0.0,
         web_overlap: 0.0,
         publication_overlap: 0.0,
         student_overlap: 0.0,
-        state: 'none'
+        state: "none"
       }
     }
-    a = attachment_model(context: @student_2, content_type: 'text/plain')
-    s2 = @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])
+    a = attachment_model(context: @student_2, content_type: "text/plain")
+    s2 = @first_assignment.submit_homework(@student_2, submission_type: "online_upload", attachments: [a])
     s2.update_attribute :turnitin_data, {
       "attachment_#{a.id}": {
         similarity_score: 1.0,
         web_overlap: 5.0,
         publication_overlap: 0.0,
         student_overlap: 0.0,
-        state: 'acceptable'
+        state: "acceptable"
       }
     }
 
     Gradebook.visit(@course)
-    icons = ff('.Grid__GradeCell__OriginalityScore')
+    icons = ff(".Grid__GradeCell__OriginalityScore")
     expect(icons).to have_size 2
   end
 
   it "shows turnitin data when the New Gradebook Plagiarism Indicator feature flag is not enabled" do
     @first_assignment.update_attribute(:turnitin_enabled, true)
-    s1 = @first_assignment.submit_homework(@student_1, submission_type: 'online_text_entry', body: 'asdf')
+    s1 = @first_assignment.submit_homework(@student_1, submission_type: "online_text_entry", body: "asdf")
     s1.update_attribute :turnitin_data, {
       "submission_#{s1.id}": {
         similarity_score: 0.0,
         web_overlap: 0.0,
         publication_overlap: 0.0,
         student_overlap: 0.0,
-        state: 'none'
+        state: "none"
       }
     }
-    a = attachment_model(context: @student_2, content_type: 'text/plain')
-    s2 = @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])
+    a = attachment_model(context: @student_2, content_type: "text/plain")
+    s2 = @first_assignment.submit_homework(@student_2, submission_type: "online_upload", attachments: [a])
     s2.update_attribute :turnitin_data, {
       "attachment_#{a.id}": {
         similarity_score: 1.0,
         web_overlap: 5.0,
         publication_overlap: 0.0,
         student_overlap: 0.0,
-        state: 'acceptable'
+        state: "acceptable"
       }
     }
 
     Gradebook.visit(@course)
-    icons = ff('.gradebook-cell-turnitin')
+    icons = ff(".gradebook-cell-turnitin")
     expect(icons).to have_size 2
   end
 end

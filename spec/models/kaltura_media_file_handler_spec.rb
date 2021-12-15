@@ -19,9 +19,9 @@
 #
 
 describe KalturaMediaFileHandler do
-  describe '#add_media_files' do
+  describe "#add_media_files" do
     let(:kaltura_config) { {} }
-    let(:kaltura_client) { double('CanvasKaltura::ClientV3') }
+    let(:kaltura_client) { double("CanvasKaltura::ClientV3") }
     let(:files_sent_to_kaltura) { [] }
     let(:uploading_user) { user_factory }
     let(:attachment_context) { uploading_user }
@@ -37,7 +37,7 @@ describe KalturaMediaFileHandler do
 
     it "returns without action when all attachments have media objects already" do
       expect(kaltura_client).not_to receive(:bulkUploadAdd)
-      attachment.media_object = media_object()
+      attachment.media_object = media_object
       res = KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
       expect(res).to be_nil
     end
@@ -56,7 +56,7 @@ describe KalturaMediaFileHandler do
 
       it "queues a job to check on the bulk upload later" do
         expect(MediaObject).to receive(:delay).and_return(MediaObject)
-        expect(MediaObject).to receive(:refresh_media_files).with('someBulkUploadId', [attachment.id], attachment.root_account_id)
+        expect(MediaObject).to receive(:refresh_media_files).with("someBulkUploadId", [attachment.id], attachment.root_account_id)
 
         KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
       end
@@ -81,10 +81,10 @@ describe KalturaMediaFileHandler do
         it "times out after media_bulk_upload_timeout, queuing a job to check in later" do
           media_file_handler = KalturaMediaFileHandler.new
 
-          Setting.set('media_bulk_upload_timeout', 0)
+          Setting.set("media_bulk_upload_timeout", 0)
 
           expect(MediaObject).to receive(:delay).and_return(MediaObject)
-          expect(MediaObject).to receive(:refresh_media_files).with('someBulkUploadId', [attachment.id], attachment.root_account_id)
+          expect(MediaObject).to receive(:refresh_media_files).with("someBulkUploadId", [attachment.id], attachment.root_account_id)
 
           media_file_handler.add_media_files(attachment, wait_for_completion)
         end
@@ -105,13 +105,13 @@ describe KalturaMediaFileHandler do
         end
 
         context "when the kaltura settings for the account include 'Write SIS data to Kaltura'" do
-          let(:kaltura_config) { { 'kaltura_sis' => '1' } }
+          let(:kaltura_config) { { "kaltura_sis" => "1" } }
 
           it "adds a context_code to the partner_data" do
             KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
             partner_data = Rack::Utils.parse_nested_query(files_sent_to_kaltura.first[:partner_data])
-            expect(partner_data['context_code']).to eq "user_#{attachment_context.id}"
+            expect(partner_data["context_code"]).to eq "user_#{attachment_context.id}"
           end
 
           context "and the context has a root_account attached" do
@@ -133,7 +133,7 @@ describe KalturaMediaFileHandler do
               end
             end
 
-            context 'and the context has a sis_source_id attached' do
+            context "and the context has a sis_source_id attached" do
               before do
                 attachment_context.sis_source_id = "gooboo"
                 attachment_context.save!

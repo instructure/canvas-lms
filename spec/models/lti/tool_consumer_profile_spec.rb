@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'lti/tool_consumer_profile'
+require_dependency "lti/tool_consumer_profile"
 
 module Lti
   describe ToolConsumerProfile do
@@ -61,7 +61,7 @@ module Lti
     end
 
     describe "clear_cache" do
-      it 'clears the cache after update' do
+      it "clears the cache after update" do
         enable_cache do
           account = Account.create!
           dev_key = account.developer_keys.create!
@@ -74,10 +74,10 @@ module Lti
       end
     end
 
-    describe 'restricted services' do
+    describe "restricted services" do
       it "includes 'vnd.Canvas.OriginalityReport'" do
         service = Lti::ToolConsumerProfile::RESTRICTED_SERVICES.find do |s|
-          s[:id].include? 'vnd.Canvas.submission'
+          s[:id].include? "vnd.Canvas.submission"
         end
 
         expect(service).not_to be_nil
@@ -86,7 +86,7 @@ module Lti
       it "includes 'vnd.Canvas.User'" do
         expect(
           Lti::ToolConsumerProfile::RESTRICTED_SERVICES.any? do |s|
-            s[:id].include? 'vnd.Canvas.User'
+            s[:id].include? "vnd.Canvas.User"
           end
         ).to be_truthy
       end

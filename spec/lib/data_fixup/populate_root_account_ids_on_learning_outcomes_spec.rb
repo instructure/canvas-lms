@@ -22,54 +22,54 @@ describe DataFixup::PopulateRootAccountIdsOnLearningOutcomes do
     DataFixup::PopulateRootAccountIdsOnLearningOutcomes.populate(lo.id, lo.id)
   end
 
-  context 'with context id' do
-    it 'sets root_account_ids with Account context' do
+  context "with context id" do
+    it "sets root_account_ids with Account context" do
       account = account_model
-      lo = LearningOutcome.create!(context: account, short_description: 'test')
+      lo = LearningOutcome.create!(context: account, short_description: "test")
       lo.update_column(:root_account_ids, nil)
       populate(lo)
       expect(lo.reload.root_account_ids).to eq [account.id]
     end
 
-    it 'sets root_account_ids with Course context' do
+    it "sets root_account_ids with Course context" do
       course = course_model
-      lo = LearningOutcome.create!(context: course, short_description: 'test')
+      lo = LearningOutcome.create!(context: course, short_description: "test")
       lo.update_column(:root_account_ids, nil)
       populate(lo)
       expect(lo.reload.root_account_ids).to eq [course.root_account_id]
     end
 
-    it 'finds outcome with empty array of root_account_ids' do
+    it "finds outcome with empty array of root_account_ids" do
       course = course_model
-      lo = LearningOutcome.create!(context: course, short_description: 'test')
+      lo = LearningOutcome.create!(context: course, short_description: "test")
       lo.update_column(:root_account_ids, [])
       populate(lo)
       expect(lo.reload.root_account_ids).to eq [course.root_account_id]
     end
   end
 
-  context 'no context id' do
+  context "no context id" do
     specs_require_sharding
 
-    it 'sets root_account_ids when there is one root account on shard' do
+    it "sets root_account_ids when there is one root account on shard" do
       @shard1.activate do
         account_model
-        lo = LearningOutcome.create!(context_id: nil, short_description: 'test')
+        lo = LearningOutcome.create!(context_id: nil, short_description: "test")
         lo.update_column(:root_account_ids, nil)
         populate(lo)
         expect(lo.reload.root_account_ids).to eq [Account.root_accounts.first.id]
       end
     end
 
-    it 'sets root_account_ids when there are multiple root accounts on shard' do
+    it "sets root_account_ids when there are multiple root accounts on shard" do
       a1 = account_model
       a2 = account_model
       a3 = account_model(root_account: a2)
-      lo = LearningOutcome.create!(context_id: nil, short_description: 'test')
+      lo = LearningOutcome.create!(context_id: nil, short_description: "test")
       lo.update_column(:root_account_ids, nil)
 
-      ContentTag.create!(content: lo, context: a1, tag_type: 'learning_outcome_association', associated_asset_type: 'LearningOutcomeGroup')
-      ContentTag.create!(content: lo, context: a3, tag_type: 'learning_outcome_association', associated_asset_type: 'LearningOutcomeGroup')
+      ContentTag.create!(content: lo, context: a1, tag_type: "learning_outcome_association", associated_asset_type: "LearningOutcomeGroup")
+      ContentTag.create!(content: lo, context: a3, tag_type: "learning_outcome_association", associated_asset_type: "LearningOutcomeGroup")
 
       populate(lo)
       expect(lo.reload.root_account_ids).to eq [a1.id, a2.id]

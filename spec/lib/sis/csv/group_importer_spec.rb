@@ -36,7 +36,7 @@ describe SIS::CSV::GroupImporter do
       "G003,A001,,available,",
       "G004,A004,Group 4,available,",
       ",A001,G1,available,",
-      "G006,A001,Group 6,available,invalid",
+      "G006,A001,Group 6,available,invalid"
     )
     err = ["Course with sis id invalid didn't exist for group G001.",
            "Only one context is allowed and both course_id and account_id where provided for group G001.",
@@ -51,8 +51,8 @@ describe SIS::CSV::GroupImporter do
 
   it "creates groups" do
     account_model
-    sub = @account.all_accounts.create!(name: 'sub')
-    sub.update_attribute('sis_source_id', 'A002')
+    sub = @account.all_accounts.create!(name: "sub")
+    sub.update_attribute("sis_source_id", "A002")
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
@@ -60,9 +60,9 @@ describe SIS::CSV::GroupImporter do
     )
     groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id, sub.id]
-    expect(groups.map(&:sis_source_id)).to eq %w(G001 G002)
+    expect(groups.map(&:sis_source_id)).to eq %w[G001 G002]
     expect(groups.map(&:name)).to eq ["Group 1", "Group 2"]
-    expect(groups.map(&:workflow_state)).to eq %w(available deleted)
+    expect(groups.map(&:workflow_state)).to eq %w[available deleted]
   end
 
   it "creates groups with no account id column" do
@@ -73,12 +73,12 @@ describe SIS::CSV::GroupImporter do
     )
     groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id]
-    expect(groups.map(&:sis_source_id)).to eq %w(G001)
+    expect(groups.map(&:sis_source_id)).to eq %w[G001]
     expect(groups.map(&:name)).to eq ["Group 1"]
-    expect(groups.map(&:workflow_state)).to eq %w(available)
+    expect(groups.map(&:workflow_state)).to eq %w[available]
   end
 
-  it 'creates rollback data' do
+  it "creates rollback data" do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,name,status",
@@ -101,22 +101,22 @@ describe SIS::CSV::GroupImporter do
       "G001,Group 1,deleted",
       batch: batch3
     )
-    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
-    expect(batch3.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 2
+    expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 1
+    expect(batch3.roll_back_data.where(updated_workflow_state: "deleted").count).to eq 2
     batch3.restore_states_for_batch
-    expect(@account.all_groups.where(sis_source_id: 'G001').take.workflow_state).to eq 'available'
+    expect(@account.all_groups.where(sis_source_id: "G001").take.workflow_state).to eq "available"
   end
 
   it "updates group attributes" do
-    sub = @account.sub_accounts.create!(name: 'sub')
-    sub.update_attribute('sis_source_id', 'A002')
+    sub = @account.sub_accounts.create!(name: "sub")
+    sub.update_attribute("sis_source_id", "A002")
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
       "G002,,Group 2,available"
     )
     expect(Group.count).to eq 2
-    Group.where(sis_source_id: 'G001').first.update_attribute(:name, 'Group 1-1')
+    Group.where(sis_source_id: "G001").first.update_attribute(:name, "Group 1-1")
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1-b,available",
@@ -126,13 +126,13 @@ describe SIS::CSV::GroupImporter do
     groups = Group.order(:id).to_a
     expect(groups.map(&:name)).to eq ["Group 1-1", "Group 2-b"]
     expect(groups.map(&:root_account)).to eq [@account, @account]
-    expect(groups.map(&:workflow_state)).to eq %w(available deleted)
+    expect(groups.map(&:workflow_state)).to eq %w[available deleted]
     expect(groups.map(&:account)).to eq [@account, sub]
   end
 
   it "uses group_category_id and set sis_id" do
-    sub = @account.sub_accounts.create!(name: 'sub')
-    sub.update_attribute('sis_source_id', 'A002')
+    sub = @account.sub_accounts.create!(name: "sub")
+    sub.update_attribute("sis_source_id", "A002")
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
@@ -143,25 +143,25 @@ describe SIS::CSV::GroupImporter do
       "G001,,Group 1,available,Gc001",
       "G002,,Group 2,available,Gc002"
     )
-    group1 = Group.where(sis_source_id: 'G001').take
-    group2 = Group.where(sis_source_id: 'G002').take
+    group1 = Group.where(sis_source_id: "G001").take
+    group2 = Group.where(sis_source_id: "G002").take
     groups = [group1, group2]
     expect(groups.map(&:account)).to eq [@account, sub]
     expect(groups.map(&:group_category)).to eq GroupCategory.order(:id).to_a
   end
 
   it "uses course_id" do
-    course = course_factory(account: @account, sis_source_id: 'c001')
+    course = course_factory(account: @account, sis_source_id: "c001")
     process_csv_data_cleanly(
       "group_id,course_id,name,status",
       "G001,c001,Group 1,available"
     )
-    expect(Group.where(sis_source_id: 'G001').take.context).to eq course
+    expect(Group.where(sis_source_id: "G001").take.context).to eq course
   end
 
   it "does not allow changing course_id with group_memberships" do
-    course1 = course_factory(account: @account, sis_source_id: 'c001')
-    course_factory(account: @account, sis_source_id: 'c002')
+    course1 = course_factory(account: @account, sis_source_id: "c001")
+    course_factory(account: @account, sis_source_id: "c002")
     group = group_model(context: course1, sis_source_id: "G001")
     group.group_memberships.create!(user: user_model)
 

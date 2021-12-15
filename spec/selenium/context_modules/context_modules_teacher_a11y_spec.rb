@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/context_modules_common'
-require_relative '../helpers/public_courses_context'
+require_relative "../helpers/context_modules_common"
+require_relative "../helpers/public_courses_context"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -28,16 +28,16 @@ describe "context modules" do
     before(:once) do
       course_with_teacher(active_all: true)
       # have to add quiz and assignment to be able to add them to a new module
-      @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
-      @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-                                                 :submission_types => 'online_text_entry',
-                                                 :due_at => 2.days.from_now,
-                                                 :points_possible => 10)
-      @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
+      @quiz = @course.assignments.create!(title: "quiz assignment", submission_types: "online_quiz")
+      @assignment = @course.assignments.create!(title: "assignment 1", submission_types: "online_text_entry")
+      @assignment2 = @course.assignments.create!(title: "assignment 2",
+                                                 submission_types: "online_text_entry",
+                                                 due_at: 2.days.from_now,
+                                                 points_possible: 10)
+      @assignment3 = @course.assignments.create!(title: "assignment 3", submission_types: "online_text_entry")
 
-      @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
-      @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
+      @ag1 = @course.assignment_groups.create!(name: "Assignment Group 1")
+      @ag2 = @course.assignment_groups.create!(name: "Assignment Group 2")
       @course.reload
     end
 
@@ -48,7 +48,7 @@ describe "context modules" do
     it "publishes a newly created item using keyboard" do
       @course.context_modules.create!(name: "Content Page")
       get "/courses/#{@course.id}/modules"
-      add_new_module_item('#wiki_pages_select', 'Page', '[ New Page ]', 'New Page Title')
+      add_new_module_item("#wiki_pages_select", "Page", "[ New Page ]", "New Page Title")
 
       tag = ContentTag.last
       item = f("#context_module_item_#{tag.id}")
@@ -58,30 +58,30 @@ describe "context modules" do
       expect(tag.reload).to be_published
     end
 
-    it "creates a new module using enter key", priority: "2", test_id: 126705 do
+    it "creates a new module using enter key", priority: "2" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")
+      replace_content(add_form.find_element(:id, "context_module_name"), "module 1")
       3.times do
         driver.action.send_keys(:tab).perform
         wait_for_ajaximations
       end
       driver.action.send_keys(:return).perform
-      expect(f('.name')).to be_present
+      expect(f(".name")).to be_present
     end
 
     it "focuses close button on open edit modal" do
       get "/courses/#{@course.id}/modules"
 
-      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      module_item = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
       edit_module_item(module_item) do
-        divs = ff('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')
+        divs = ff(".ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix")
         close_button = nil
 
         divs.each do |div|
-          title_span = div.find_element(:css, '.ui-dialog-title')
+          title_span = div.find_element(:css, ".ui-dialog-title")
           if title_span.text == "Edit Item Details"
-            close_button = div.find_element(:css, '.ui-dialog-titlebar-close.ui-corner-all')
+            close_button = div.find_element(:css, ".ui-dialog-titlebar-close.ui-corner-all")
           end
         end
         check_element_has_focus(close_button)
@@ -93,9 +93,13 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       mod1 = f("#context_module_#{modules[1].id}")
       f(".ig-header-admin .al-trigger", mod1).click
-      f('.edit_module_link', mod1).click; wait_for_ajaximations
+      f(".edit_module_link", mod1).click
+      wait_for_ajaximations
       add_button = f(".add_prerequisite_link")
-      2.times { add_button.click; wait_for_animations }
+      2.times do
+        add_button.click
+        wait_for_animations
+      end
       links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
       expect(links.size).to eq 2
       links[1].click
@@ -107,9 +111,9 @@ describe "context modules" do
     end
 
     it "adds a title attribute to the text header" do
-      text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'
-      mod = @course.context_modules.create! name: 'TestModule'
-      tag1 = mod.add_item(title: text_header, type: 'sub_header')
+      text_header = "This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really"
+      mod = @course.context_modules.create! name: "TestModule"
+      tag1 = mod.add_item(title: text_header, type: "sub_header")
 
       get "/courses/#{@course.id}/modules"
       locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
@@ -119,7 +123,7 @@ describe "context modules" do
 
     context "module item cog focus management", priority: "1" do
       before :once do
-        create_modules(1)[0].add_item({ id: @assignment.id, type: 'assignment' })
+        create_modules(1)[0].add_item({ id: @assignment.id, type: "assignment" })
         @tag = ContentTag.last
       end
 
@@ -130,7 +134,7 @@ describe "context modules" do
 
       it "returns focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        f('.cancel_button.ui-button').click
+        f(".cancel_button.ui-button").click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
@@ -157,7 +161,7 @@ describe "context modules" do
       end
 
       it "returns focus to the previous module item link when deleting a module item." do
-        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+        add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
         @tag2 = ContentTag.last
         hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil
@@ -179,21 +183,21 @@ describe "context modules" do
     context "Keyboard Accessibility", priority: "1" do
       before :once do
         modules = create_modules(2, true)
-        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
-        modules[0].add_item({ :id => @assignment2.id, :type => 'assignment' })
-        modules[1].add_item({ :id => @assignment3.id, :type => 'assignment' })
+        modules[0].add_item({ id: @assignment.id, type: "assignment" })
+        modules[0].add_item({ id: @assignment2.id, type: "assignment" })
+        modules[1].add_item({ id: @assignment3.id, type: "assignment" })
       end
 
       before do
-        skip_if_chrome('skipped - research find html')
+        skip_if_chrome("skipped - research find html")
         get "/courses/#{@course.id}/modules"
 
         # focus the first item
-        f('html').send_keys("j")
+        f("html").send_keys("j")
       end
 
-      let(:context_modules) { ff('.context_module .collapse_module_link') }
-      let(:context_module_items) { ff('.context_module_item a.title') }
+      let(:context_modules) { ff(".context_module .collapse_module_link") }
+      let(:context_module_items) { ff(".context_module_item a.title") }
 
       # Test these shortcuts (access menu by pressing comma key):
       # Up : Previous Module/Item
@@ -225,12 +229,12 @@ describe "context modules" do
 
       it "edits modules" do
         send_keys("e")
-        expect(f('#add_context_module_form')).to be_displayed
+        expect(f("#add_context_module_form")).to be_displayed
       end
 
       it "creates a module" do
         send_keys("n")
-        expect(f('#add_context_module_form')).to be_displayed
+        expect(f("#add_context_module_form")).to be_displayed
       end
 
       it "indents / outdent" do
@@ -238,15 +242,15 @@ describe "context modules" do
         check_element_has_focus(context_module_items[0])
 
         # Test Indent / Outdent
-        expect(f('.context_module_item')).to have_class('indent_0')
+        expect(f(".context_module_item")).to have_class("indent_0")
 
         send_keys("i")
         wait_for_ajax_requests
-        expect(f('.context_module_item')).to have_class('indent_1')
+        expect(f(".context_module_item")).to have_class("indent_1")
 
         send_keys("o")
         wait_for_ajax_requests
-        expect(f('.context_module_item')).to have_class('indent_0')
+        expect(f(".context_module_item")).to have_class("indent_0")
       end
 
       it "deletes" do

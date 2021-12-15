@@ -23,8 +23,8 @@ module QuizQuestionsCommon
   include QuizzesCommon
 
   def create_oqaat_quiz(opts = {})
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
     @quiz = @course.quizzes.create
     quiz_question("Question 1", "What is the first question?", 1)
     quiz_question("Question 2", "What is the second question?", 2)
@@ -39,14 +39,14 @@ module QuizQuestionsCommon
 
   def quiz_question(name, question, _id)
     answers = [
-      { :weight => 100, :answer_text => "A", :answer_comments => "", :id => 1490 },
-      { :weight => 0, :answer_text => "B", :answer_comments => "", :id => 1020 },
-      { :weight => 0, :answer_text => "C", :answer_comments => "", :id => 7051 }
+      { weight: 100, answer_text: "A", answer_comments: "", id: 1490 },
+      { weight: 0, answer_text: "B", answer_comments: "", id: 1020 },
+      { weight: 0, answer_text: "C", answer_comments: "", id: 7051 }
     ]
-    data = { :question_name => name, :points_possible => 1, :question_text => question,
-             :answers => answers, :question_type => "multiple_choice_question" }
+    data = { question_name: name, points_possible: 1, question_text: question,
+             answers: answers, question_type: "multiple_choice_question" }
 
-    @quiz.quiz_questions.create!(:question_data => data)
+    @quiz.quiz_questions.create!(question_data: data)
   end
 
   def take_the_quiz
@@ -80,64 +80,64 @@ module QuizQuestionsCommon
   def navigate_directly_to_first_question
     # defang the navigate-away-freakout-dialog
     driver.execute_script "window.onbeforeunload = function(){};"
-    get course_quiz_question_path(:course_id => @course.id, :quiz_id => @quiz.id, :question_id => @quiz.quiz_questions.first.id)
+    get course_quiz_question_path(course_id: @course.id, quiz_id: @quiz.id, question_id: @quiz.quiz_questions.first.id)
     wait_for_ajaximations
   end
 
   def it_should_show_cant_go_back_warning
-    expect(f('body')).to include_text \
+    expect(f("body")).to include_text \
       "Once you have submitted an answer, you will not be able to change it later"
   end
 
   def accept_cant_go_back_warning
-    expect_new_page_load {
+    expect_new_page_load do
       fj("button:contains('Begin').ui-button").click
-    }
+    end
     wait_for_ajaximations
   end
 
   def it_should_be_on_first_question
-    it_should_be_on_question 'first question'
+    it_should_be_on_question "first question"
   end
 
   def it_should_be_on_second_question
-    it_should_be_on_question 'second question'
+    it_should_be_on_question "second question"
   end
 
   def it_should_be_on_question(which_question)
-    body = f('body')
+    body = f("body")
     expect(body).to include_text which_question
-    questions = ['first question', 'second question'] - [which_question]
+    questions = ["first question", "second question"] - [which_question]
     questions.each do |question|
       expect(body).not_to include_text question
     end
   end
 
   def it_should_have_sidebar_navigation
-    expect_new_page_load {
+    expect_new_page_load do
       fj("#question_list a:contains('Question 2')").click
-    }
+    end
 
     it_should_be_on_second_question
 
-    expect_new_page_load {
+    expect_new_page_load do
       fj("#question_list a:contains('Question 1')").click
-    }
+    end
     wait_for_ajaximations
     it_should_be_on_first_question
   end
 
   def click_next_button
-    expect_new_page_load {
+    expect_new_page_load do
       f("button.next-question").click
-    }
+    end
     wait_for_ajaximations
   end
 
   def click_previous_button
-    expect_new_page_load {
+    expect_new_page_load do
       f("button.previous-question").click
-    }
+    end
     wait_for_ajaximations
   end
 
@@ -171,11 +171,11 @@ module QuizQuestionsCommon
   end
 
   def click_next_button_and_accept_warning
-    expect_new_page_load {
+    expect_new_page_load do
       f("button.next-question").click
       expect(driver.switch_to.alert.text).to include "leave it blank?"
       driver.switch_to.alert.accept
-    }
+    end
   end
 
   def submit_finished_quiz
@@ -194,7 +194,7 @@ module QuizQuestionsCommon
   end
 
   def it_should_show_one_correct_answer
-    expect(f('body')).to include_text "Score for this quiz: 1"
+    expect(f("body")).to include_text "Score for this quiz: 1"
   end
 
   def back_and_forth_flow

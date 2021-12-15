@@ -17,33 +17,32 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'support/answer_serializers_specs'
-require_relative 'support/textual_answer_serializers_specs'
+require_relative "support/answer_serializers_specs"
+require_relative "support/textual_answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
-  include_examples 'Answer Serializers'
-
-  let :input do
-    'hello world!'
-  end
-
   let :output do
     {
-      question_5: 'hello world!'
+      question_5: "hello world!"
     }.with_indifferent_access
   end
+  let :input do
+    "hello world!"
+  end
 
-  it 'returns nil when un-answered' do
+  include_examples "Answer Serializers"
+
+  it "returns nil when un-answered" do
     expect(subject.deserialize({})).to eq nil
   end
 
-  it 'gracefully sanitizes its text' do
-    expect(subject.serialize('Hello World!').answer).to eq({
-      question_5: 'hello world!'
+  it "gracefully sanitizes its text" do
+    expect(subject.serialize("Hello World!").answer).to eq({
+      question_5: "hello world!"
     }.with_indifferent_access)
   end
 
-  context 'validations' do
-    include_examples 'Textual Answer Serializers'
+  context "validations" do
+    include_examples "Textual Answer Serializers"
   end
 end

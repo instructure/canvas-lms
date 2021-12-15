@@ -62,9 +62,9 @@ module SIS
 
       def login_hash
         hash = {}
-        hash['sis_user_id'] = existing_user_id if existing_user_id.present?
-        hash['integration_id'] = existing_integration_id if existing_integration_id.present?
-        hash['user_id'] = existing_canvas_user_id.to_i if existing_canvas_user_id.present?
+        hash["sis_user_id"] = existing_user_id if existing_user_id.present?
+        hash["integration_id"] = existing_integration_id if existing_integration_id.present?
+        hash["user_id"] = existing_canvas_user_id.to_i if existing_canvas_user_id.present?
         hash
       end
 

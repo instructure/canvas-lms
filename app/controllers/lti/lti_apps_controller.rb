@@ -30,22 +30,22 @@ module Lti
           app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
 
           mc_status = setup_master_course_restrictions(app_defs.select { |o| o.is_a?(ContextExternalTool) }, @context)
-          format.json { render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status) }
+          format.json { render json: app_collator.app_definitions(app_defs, master_course_status: mc_status) }
         end
       end
     end
 
     def launch_definitions
-      placements = params['placements'] || []
+      placements = params["placements"] || []
       if authorized_for_launch_definitions(@context, @current_user, placements)
         # only_visible requires that specific placements are requested.  If a user is not read_admin, and they request only_visible
         # without placements, an empty array will be returned.
-        if placements == ['global_navigation']
-          # We allow global_navigation to pull all the launch_definitions, even if they are not explicitly visible to user.
-          collection = AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: false })
-        else
-          collection = AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: true })
-        end
+        collection = if placements == ["global_navigation"]
+                       # We allow global_navigation to pull all the launch_definitions, even if they are not explicitly visible to user.
+                       AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: false })
+                     else
+                       AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: true })
+                     end
         pagination_args = { max_per_page: 100 }
         respond_to do |format|
           launch_defs = GuardRail.activate(:secondary) do
@@ -59,7 +59,7 @@ module Lti
           format.json do
             cancel_cache_buster
             expires_in 10.minutes
-            render :json => AppLaunchCollator.launch_definitions(launch_defs, placements)
+            render json: AppLaunchCollator.launch_definitions(launch_defs, placements)
           end
         end
       end
@@ -100,7 +100,7 @@ module Lti
       # have any account-level permissions. So instead, just ensure that the user
       # is associated with the current account (not sure how it could be otherwise?)
       return true if context.is_a?(Account) && \
-                     placements == ['global_navigation'] && \
+                     placements == ["global_navigation"] && \
                      user_in_account?(user, context)
 
       authorized_action(context, user, :read)

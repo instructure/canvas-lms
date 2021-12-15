@@ -29,6 +29,6 @@ class CreateUserPastLtiId < ActiveRecord::Migration[5.1]
       t.text :user_lti_id, null: false
       t.string :user_lti_context_id, limit: 255, index: true
     end
-    add_index :user_past_lti_ids, %w(user_id context_id context_type), name: 'user_past_lti_ids_index', unique: true
+    add_index :user_past_lti_ids, %w[user_id context_id context_type], name: "user_past_lti_ids_index", unique: true
   end
 end

@@ -43,8 +43,8 @@ class SubmissionsBaseController < ApplicationController
         js_env({
                  nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
                  outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
-                 rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
-                 rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
+                 rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
+                 rubricAssociation: rubric_association_json ? rubric_association_json["rubric_association"] : nil,
                  outcome_proficiency: outcome_proficiency,
                  media_comment_asset_string: @current_user.asset_string
                })
@@ -52,13 +52,13 @@ class SubmissionsBaseController < ApplicationController
         js_bundle :submissions
         css_bundle :submission
 
-        add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
+        add_crumb(t("crumbs.assignments", "Assignments"), context_url(@context, :context_assignments_url))
         add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
         add_crumb(user_crumb_name)
 
         set_active_tab "assignments"
 
-        render 'submissions/show', stream: can_stream_template?
+        render "submissions/show", stream: can_stream_template?
       end
 
       format.json do
@@ -72,9 +72,9 @@ class SubmissionsBaseController < ApplicationController
 
         @submission.limit_comments(@current_user, session)
 
-        render :json => @submission.as_json(
+        render json: @submission.as_json(
           Submission.json_serialization_full_parameters(
-            except: %i(quiz_submission submission_history)
+            except: %i[quiz_submission submission_history]
           ).merge({
                     except: submission_json_exclusions,
                     permissions: {
@@ -129,18 +129,18 @@ class SubmissionsBaseController < ApplicationController
       unless @submission.grants_right?(@current_user, session, :submit)
         @request = @submission.assessment_requests.where(assessor_id: @current_user).first if @current_user
         params[:submission] = {
-          :attempt => params[:submission][:attempt],
-          :comment => params[:submission][:comment],
-          :comment_attachments => params[:submission][:comment_attachments],
-          :media_comment_id => params[:submission][:media_comment_id],
-          :media_comment_type => params[:submission][:media_comment_type],
-          :commenter => @current_user,
-          :assessment_request => @request,
-          :group_comment => params[:submission][:group_comment],
-          :hidden => @submission.hide_grade_from_student? && admin_in_context,
-          :provisional => provisional,
-          :final => params[:submission][:final],
-          :draft_comment => Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
+          attempt: params[:submission][:attempt],
+          comment: params[:submission][:comment],
+          comment_attachments: params[:submission][:comment_attachments],
+          media_comment_id: params[:submission][:media_comment_id],
+          media_comment_type: params[:submission][:media_comment_type],
+          commenter: @current_user,
+          assessment_request: @request,
+          group_comment: params[:submission][:group_comment],
+          hidden: @submission.hide_grade_from_student? && admin_in_context,
+          provisional: provisional,
+          final: params[:submission][:final],
+          draft_comment: Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
         params[:submission].delete(:attempt) unless @context.feature_enabled?(:assignments_2_student)
       end
@@ -160,7 +160,7 @@ class SubmissionsBaseController < ApplicationController
             s.apply_provisional_grade_filter!(s.provisional_grade(@current_user, final: is_final)) if provisional
           end
 
-          flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
+          flash[:notice] = t("assignment_submitted", "Assignment submitted.")
 
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
@@ -185,7 +185,7 @@ class SubmissionsBaseController < ApplicationController
           format.json { render json: submissions_json, status: :created, location: course_gradebook_url(@submission.assignment.context) }
           format.text { render json: submissions_json, status: :created, location: course_gradebook_url(@submission.assignment.context) }
         else
-          @error_message = t('errors_update_failed', "Update Failed")
+          @error_message = t("errors_update_failed", "Update Failed")
           flash[:error] = @error_message
 
           error_json = { base: @error_message }
@@ -206,10 +206,10 @@ class SubmissionsBaseController < ApplicationController
     elsif @assignment.locked_for?(@submission.user)
       render json: {
         errors: {
-          message: 'Assignment is locked for student.',
-          error_code: 'ASSIGNMENT_LOCKED'
+          message: "Assignment is locked for student.",
+          error_code: "ASSIGNMENT_LOCKED"
         }
-      }, status: 422
+      }, status: :unprocessable_entity
     else
       @submission.update!(redo_request: true)
       head :no_content
@@ -217,23 +217,23 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def turnitin_report
-    plagiarism_report('turnitin')
+    plagiarism_report("turnitin")
   end
 
   def resubmit_to_turnitin
-    resubmit_to_plagiarism('turnitin')
+    resubmit_to_plagiarism("turnitin")
   end
 
   def vericite_report
-    plagiarism_report('vericite')
+    plagiarism_report("vericite")
   end
 
   def resubmit_to_vericite
-    resubmit_to_plagiarism('vericite')
+    resubmit_to_plagiarism("vericite")
   end
 
   def originality_report
-    plagiarism_report('originality_report')
+    plagiarism_report("originality_report")
   end
 
   private
@@ -253,11 +253,11 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def legacy_plagiarism_report(submission, asset_string, type)
-    plag_data = type == 'vericite' ? submission.vericite_data : submission.turnitin_data
+    plag_data = type == "vericite" ? submission.vericite_data : submission.turnitin_data
 
     if plag_data.dig(asset_string, :report_url).present?
-      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: 'borderless')
-    elsif type == 'vericite'
+      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: "borderless")
+    elsif type == "vericite"
       # VeriCite URL
       submission.vericite_report_url(asset_string, @current_user, session)
     else
@@ -276,7 +276,7 @@ class SubmissionsBaseController < ApplicationController
 
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
-      url = if type == 'originality_report'
+      url = if type == "originality_report"
               @submission.originality_report_url(@asset_string, @current_user, params[:attempt])
             else
               legacy_plagiarism_report(@submission, @asset_string, type)
@@ -285,7 +285,7 @@ class SubmissionsBaseController < ApplicationController
       if url
         redirect_to url
       else
-        flash[:error] = t('errors.no_report', "Couldn't find a report for that submission item")
+        flash[:error] = t("errors.no_report", "Couldn't find a report for that submission item")
         redirect_to default_plagiarism_redirect_url
       end
     end
@@ -297,7 +297,7 @@ class SubmissionsBaseController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       Canvas::LiveEvents.plagiarism_resubmit(@submission)
 
-      if type == 'vericite'
+      if type == "vericite"
         # VeriCite
         @submission.resubmit_to_vericite
         message = t("Successfully resubmitted to VeriCite.")

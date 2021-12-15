@@ -25,45 +25,45 @@ module ActiveRecord
           id = ::Shard.global_id_for(id_or_record)
           raise "invalid argument for cache clearing #{id}" if id && !id.is_a?(Integer) && !Rails.env.production?
 
-          id && "cache_register/#{self.model_name.cache_key}/#{id}"
+          id && "cache_register/#{model_name.cache_key}/#{id}"
         end
 
         def valid_cache_key_type?(key_type)
-          if Canvas::CacheRegister::ALLOWED_TYPES[self.base_class.name]&.include?(key_type.to_s)
+          if Canvas::CacheRegister::ALLOWED_TYPES[base_class.name]&.include?(key_type.to_s)
             true
           elsif ::Rails.env.production?
             false # fail gracefully
           else
-            raise "invalid cache_key type '#{key_type}' for #{self.name}"
+            raise "invalid cache_key type '#{key_type}' for #{name}"
           end
         end
 
         def prefer_multi_cache_for_key_type?(key_type)
-          !!Canvas::CacheRegister::PREFER_MULTI_CACHE_TYPES[self.base_class.name]&.include?(key_type.to_s)
+          !!Canvas::CacheRegister::PREFER_MULTI_CACHE_TYPES[base_class.name]&.include?(key_type.to_s)
         end
 
         def skip_touch_for_type?(key_type)
           valid_cache_key_type?(key_type) &&
-            Canvas::CacheRegister::MIGRATED_TYPES[self.base_class.name]&.include?(key_type.to_s) &&
-            Setting.get("revert_cache_register_migration_#{self.base_class.name.downcase}_#{key_type}", "false") != "true"
+            Canvas::CacheRegister::MIGRATED_TYPES[base_class.name]&.include?(key_type.to_s) &&
+            Setting.get("revert_cache_register_migration_#{base_class.name.downcase}_#{key_type}", "false") != "true"
         end
 
         def touch_and_clear_cache_keys(ids_or_records, *key_types)
-          unless key_types.all? { |type| self.skip_touch_for_type?(type) }
+          unless key_types.all? { |type| skip_touch_for_type?(type) }
             Array(ids_or_records).sort.each_slice(1000) do |slice|
-              self.where(id: slice).touch_all
+              where(id: slice).touch_all
             end
           end
-          self.clear_cache_keys(ids_or_records, *key_types)
+          clear_cache_keys(ids_or_records, *key_types)
         end
 
         def clear_cache_keys(ids_or_records, *key_types)
           return unless key_types.all? { |type| valid_cache_key_type?(type) } && Canvas::CacheRegister.enabled?
 
-          multi_key_types, key_types = key_types.partition { |type| Canvas::CacheRegister.can_use_multi_cache_redis? && self.prefer_multi_cache_for_key_type?(type) }
+          multi_key_types, key_types = key_types.partition { |type| Canvas::CacheRegister.can_use_multi_cache_redis? && prefer_multi_cache_for_key_type?(type) }
 
           ::Shard.partition_by_shard(Array(ids_or_records)) do |sharded_ids_or_records|
-            base_keys = sharded_ids_or_records.map { |item| base_cache_register_key_for(item) }.compact
+            base_keys = sharded_ids_or_records.filter_map { |item| base_cache_register_key_for(item) }
             next if base_keys.empty?
 
             if key_types.any?
@@ -92,17 +92,17 @@ module ActiveRecord
         # and thus won't be terribly affected if the caching doesn't work
         def cache_key_for_id(id, key_type, skip_check: false)
           global_id = ::Shard.global_id_for(id)
-          return nil unless skip_check || (global_id && self.valid_cache_key_type?(key_type) && Canvas::CacheRegister.enabled?)
+          return nil unless skip_check || (global_id && valid_cache_key_type?(key_type) && Canvas::CacheRegister.enabled?)
 
-          base_key = self.base_cache_register_key_for(global_id)
-          prefer_multi_cache = self.prefer_multi_cache_for_key_type?(key_type)
+          base_key = base_cache_register_key_for(global_id)
+          prefer_multi_cache = prefer_multi_cache_for_key_type?(key_type)
           redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache: prefer_multi_cache)
           full_key = "#{base_key}/#{key_type}"
           RequestCache.cache(full_key) do
-            now = Time.now.utc.to_s(self.cache_timestamp_format)
+            now = Time.now.utc.to_s(cache_timestamp_format)
             # try to get the timestamp for the type, set it to now if it doesn't exist
             ts = Canvas::CacheRegister.lua.run(:get_key, [full_key], [now], redis)
-            "#{self.model_name.cache_key}/#{global_id}-#{ts}"
+            "#{model_name.cache_key}/#{global_id}-#{ts}"
           end
         end
       end
@@ -112,20 +112,20 @@ module ActiveRecord
       end
 
       def cache_key(key_type = nil)
-        return super() if key_type.nil? || self.new_record? ||
+        return super() if key_type.nil? || new_record? ||
                           !self.class.valid_cache_key_type?(key_type) || !Canvas::CacheRegister.enabled?
 
-        self.class.cache_key_for_id(self.global_id, key_type, skip_check: true)
+        self.class.cache_key_for_id(global_id, key_type, skip_check: true)
       end
     end
 
     module Relation
       def clear_cache_keys(*key_types)
-        klass.clear_cache_keys(self.pluck(klass.primary_key), *key_types)
+        klass.clear_cache_keys(pluck(klass.primary_key), *key_types)
       end
 
       def touch_and_clear_cache_keys(*key_types)
-        klass.touch_and_clear_cache_keys(self.pluck(klass.primary_key), *key_types)
+        klass.touch_and_clear_cache_keys(pluck(klass.primary_key), *key_types)
       end
     end
   end

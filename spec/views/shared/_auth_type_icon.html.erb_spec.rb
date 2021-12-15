@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
-require_relative '../views_helper'
+require_relative "../../spec_helper"
+require_relative "../views_helper"
 
 describe "shared/_flash_notices" do
   def local_options(overrides = {})
     {
-      with_login_text: 'Login with Facebook',
-      auth_type: 'facebook',
+      with_login_text: "Login with Facebook",
+      auth_type: "facebook",
       sr_message: nil
     }.merge(overrides)
   end
@@ -50,8 +50,8 @@ describe "shared/_flash_notices" do
   end
 
   it "uses the button icon based on auth type" do
-    render partial: "shared/auth_type_icon", locals: local_options(auth_type: 'twitter')
+    render partial: "shared/auth_type_icon", locals: local_options(auth_type: "twitter")
     doc = Nokogiri::HTML(response.body)
-    expect(doc.css('svg.ic-icon-svg--twitter')).to be_present
+    expect(doc.css("svg.ic-icon-svg--twitter")).to be_present
   end
 end

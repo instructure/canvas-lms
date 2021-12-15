@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../common'
-require_relative '../pages/gradebook_page'
-require_relative '../../helpers/gradebook_common'
+require_relative "../../common"
+require_relative "../pages/gradebook_page"
+require_relative "../../helpers/gradebook_common"
 
 describe "interaction with grading periods" do
   include_context "in-process server selenium tests"
@@ -77,126 +77,126 @@ describe "interaction with grading periods" do
     end
 
     context "using grading period dropdown" do
-      it 'displays current grading period on load', test_id: 2528634, priority: "2" do
+      it "displays current grading period on load", priority: "2" do
         get_gradebook
-        element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
+        element = ff(".slick-header-column a").select { |a| a.text == "assignment three" }
         expect(element.first).to be_displayed
       end
 
-      it 'filters assignments when different grading periods selected', test_id: 2528635, priority: "2" do
+      it "filters assignments when different grading periods selected", priority: "2" do
         get_gradebook
         Gradebook.select_view_dropdown
         Gradebook.select_filters
         Gradebook.select_view_filter("Grading Periods")
         Gradebook.select_grading_period("Course Period 1: future period")
-        element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
+        element = ff(".slick-header-column a").select { |a| a.text == "second assignment" }
         expect(element.first).to be_displayed
       end
 
-      it 'displays all assignments when all grading periods selected', test_id: 2528636, priority: "2" do
+      it "displays all assignments when all grading periods selected", priority: "2" do
         get_gradebook
         Gradebook.select_view_dropdown
         Gradebook.select_filters
         Gradebook.select_view_filter("Grading Periods")
         Gradebook.select_grading_period("All Grading Periods")
 
-        element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
+        element = ff(".slick-header-column a").select { |a| a.text == "assignment three" }
         expect(element.first).to be_displayed
-        element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
+        element = ff(".slick-header-column a").select { |a| a.text == "second assignment" }
         expect(element.first).to be_displayed
       end
     end
   end
 
-  context 'grading schemes' do
+  context "grading schemes" do
     let(:account) { Account.default }
-    let(:admin) { account_admin_user(:account => account) }
-    let(:test_course) { account.courses.create!(name: 'New Course') }
+    let(:admin) { account_admin_user(account: account) }
+    let(:test_course) { account.courses.create!(name: "New Course") }
 
-    it 'disables adding during edit mode on course page', priority: "1", test_id: 545585 do
+    it "disables adding during edit mode on course page", priority: "1" do
       user_session(admin)
       get "/courses/#{test_course.id}/grading_standards"
-      f('button.add_standard_button').click
-      expect(f('input.scheme_name')).not_to be_nil
-      expect(f('button.add_standard_button')).to have_class('disabled')
+      f("button.add_standard_button").click
+      expect(f("input.scheme_name")).not_to be_nil
+      expect(f("button.add_standard_button")).to have_class("disabled")
     end
 
-    it 'disables adding during edit mode on account page', priority: "1" do
+    it "disables adding during edit mode on account page", priority: "1" do
       user_session(admin)
       get "/accounts/#{account.id}/grading_standards"
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
-      f('button.add_standard_button').click
-      expect(f('input.scheme_name')).not_to be_nil
-      expect(f('button.add_standard_button')).to have_class('disabled')
+      f("button.add_standard_button").click
+      expect(f("input.scheme_name")).not_to be_nil
+      expect(f("button.add_standard_button")).to have_class("disabled")
     end
 
-    context 'assignment index page' do
+    context "assignment index page" do
       let(:account) { Account.default }
       let(:teacher) { user_factory(active_all: true) }
-      let!(:enroll_teacher) { test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active') }
+      let!(:enroll_teacher) { test_course.enroll_user(teacher, "TeacherEnrollment", enrollment_state: "active") }
       let!(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
       let!(:course_grading_period_current) do
         grading_period_group.grading_periods.create!(
-          title: 'Course Grading Period 1',
+          title: "Course Grading Period 1",
           start_date: 1.day.ago(now),
           end_date: 4.weeks.from_now(now)
         )
       end
       let!(:course_grading_period_past) do
         grading_period_group.grading_periods.create!(
-          title: 'Course Grading Period 2',
+          title: "Course Grading Period 2",
           start_date: 4.weeks.ago(now),
           end_date: 1.day.ago(now)
         )
       end
       let!(:assignment) do
         test_course.assignments.create!(
-          title: 'Assignment 1',
+          title: "Assignment 1",
           due_at: 1.day.ago(now),
           points_possible: 10,
-          workflow_state: 'published'
+          workflow_state: "published"
         )
       end
 
-      it 'lists an assignment from a previous grading period', priority: "2", test_course: 381145 do
+      it "lists an assignment from a previous grading period", priority: "2", test_course: 381_145 do
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
-        expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
+        expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text("Assignment 1")
       end
 
-      it 'lists an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
+      it "lists an assignment from a current grading period when due date is updated", priority: "2", test_course: 576_764 do
         assignment.update(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
-        expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
+        expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text("Assignment 1")
       end
     end
   end
 
-  context 'student view' do
+  context "student view" do
     let(:account) { Account.default }
-    let(:test_course) { account.courses.create!(name: 'New Course') }
+    let(:test_course) { account.courses.create!(name: "New Course") }
     let(:student) { user_factory(active_all: true) }
     let(:teacher) { user_factory(active_all: true) }
     let!(:enroll_teacher) { test_course.enroll_teacher(teacher) }
-    let!(:enroll_student) { test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active') }
+    let!(:enroll_student) { test_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active") }
     let!(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
     let!(:course_grading_period_1) do
       grading_period_group.grading_periods.create!(
-        title: 'Course Grading Period 1',
+        title: "Course Grading Period 1",
         start_date: 1.day.ago(now),
         end_date: 3.weeks.from_now(now)
       )
     end
     let!(:course_grading_period_2) do
       grading_period_group.grading_periods.create!(
-        title: 'Course Grading Period 2',
+        title: "Course Grading Period 2",
         start_date: 4.weeks.from_now(now),
         end_date: 7.weeks.from_now(now)
       )
     end
-    let!(:assignment1) { test_course.assignments.create!(title: 'Assignment 1', due_at: 3.days.from_now(now), points_possible: 10) }
-    let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now(now), points_possible: 10) }
+    let!(:assignment1) { test_course.assignments.create!(title: "Assignment 1", due_at: 3.days.from_now(now), points_possible: 10) }
+    let!(:assignment2) { test_course.assignments.create!(title: "Assignment 2", due_at: 6.weeks.from_now(now), points_possible: 10) }
     let!(:grade_assignment1) { assignment1.grade_student(student, grade: 8, grader: teacher) }
 
     before do
@@ -205,22 +205,22 @@ describe "interaction with grading periods" do
       get "/courses/#{test_course.id}/grades"
     end
 
-    it 'displays the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
-      expect(f("#grading_period_select_menu").attribute('value')).to eq "Course Grading Period 1"
-      expect(f("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
+    it "displays the current grading period and assignments in grades page", priority: "1" do
+      expect(f("#grading_period_select_menu").attribute("value")).to eq "Course Grading Period 1"
+      expect(f("#submission_#{assignment1.id} th a")).to include_text("Assignment 1")
     end
 
-    it 'updates assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
-      click_option('#grading_period_select_menu', 'Course Grading Period 2')
-      expect_new_page_load { f('#apply_select_menus').click }
-      expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
+    it "updates assignments when a different period is selected in grades page", priority: "1" do
+      click_option("#grading_period_select_menu", "Course Grading Period 2")
+      expect_new_page_load { f("#apply_select_menus").click }
+      expect(fj("#submission_#{assignment2.id} th a")).to include_text("Assignment 2")
     end
 
-    it 'updates assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
-      click_option("#grading_period_select_menu", 'All Grading Periods')
-      expect_new_page_load { f('#apply_select_menus').click }
-      expect(fj("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
-      expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
+    it "updates assignments when a all periods are selected in grades page", priority: "1" do
+      click_option("#grading_period_select_menu", "All Grading Periods")
+      expect_new_page_load { f("#apply_select_menus").click }
+      expect(fj("#submission_#{assignment1.id} th a")).to include_text("Assignment 1")
+      expect(fj("#submission_#{assignment2.id} th a")).to include_text("Assignment 2")
     end
   end
 end

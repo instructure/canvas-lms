@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 module Qti
   class Converter < Canvas::Migration::Migrator
     include CC::Importer::Canvas::QuizMetadataConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
-    QTI_2_1_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p1'
-    QTI_2_0_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p0'
-    QTI_2_0_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p0'
-    QTI_2_1_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p1'
+    QTI_2_1_URL = "http://www.imsglobal.org/xsd/imsqti_v2p1"
+    QTI_2_0_URL = "http://www.imsglobal.org/xsd/imsqti_v2p0"
+    QTI_2_0_ITEM_URL = "http://www.imsglobal.org/xsd/imsqti_item_v2p0"
+    QTI_2_1_ITEM_URL = "http://www.imsglobal.org/xsd/imsqti_item_v2p1"
     QTI_2_NAMESPACES = %w[
       http://www.imsglobal.org/xsd/imsqti_v2p0
       http://www.imsglobal.org/xsd/imsqti_v2p1
       http://www.imsglobal.org/xsd/qti/qtiv2p0
       http://www.imsglobal.org/xsd/qti/qtiv2p1
-    ]
+    ].freeze
     IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
     QTI_2_OUTPUT_PATH = "qti_2_1"
 
     def initialize(settings)
-      super(settings, 'qti')
+      super(settings, "qti")
       @questions = {}
       @quizzes = {}
       @converted = false
@@ -58,8 +58,10 @@ module Qti
       end
 
       convert_files
-      path_map = @course[:file_map].values.inject({}) { |h, v| h[v[:path_name]] = v[:migration_id]; h }
-      @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
+      path_map = @course[:file_map].values.each_with_object({}) do |v, h|
+        h[v[:path_name]] = v[:migration_id]
+      end
+      @course[:assessment_questions] = convert_questions(file_path_map: path_map, flavor: @flavor)
       @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
 
       original_manifest_path = @package_root.item_path(MANIFEST_FILE)
@@ -74,7 +76,7 @@ module Qti
         apply_respondus_settings
       end
 
-      @course['all_files_zip'] = package_course_files(@dest_dir_2_1)
+      @course["all_files_zip"] = package_course_files(@dest_dir_2_1)
       save_to_file
       delete_unzipped_archive
       @course
@@ -85,7 +87,7 @@ module Qti
 
       xml = Nokogiri::XML(File.open(manifest_path))
       xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.any? { |ns| v.to_s.start_with?(ns) } } ||
-        (xml.at_css('metadata schema')&.text || '') =~ /QTIv2\./i
+        (xml.at_css("metadata schema")&.text || "") =~ /QTIv2\./i
     end
 
     def run_qti_converter
@@ -102,7 +104,7 @@ module Qti
         qti_error_file = File.join(@base_export_dir, "qti_conversion_error.log")
         message = "Couldn't convert QTI 1.2 to 2.1, see error log: #{qti_error_file}"
         logger.error message
-        File.open(qti_error_file, 'w') { |f| f << python_std_out }
+        File.open(qti_error_file, "w") { |f| f << python_std_out }
         raise message
       end
     end
@@ -126,7 +128,7 @@ module Qti
 
       begin
         manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
-        @quizzes[:assessments] = Qti.convert_assessments(manifest_file, @settings.merge({ :converted_questions => questions }))
+        @quizzes[:assessments] = Qti.convert_assessments(manifest_file, @settings.merge({ converted_questions: questions }))
       rescue => e
         message = "Error processing assessment QTI data: #{$!}: #{$!.backtrace.join("\n")}"
         add_error "qti_assessments", message, @questions, e
@@ -142,8 +144,8 @@ module Qti
           mig_id = Digest::MD5.hexdigest(attachment)
           mig_id = ::Canvas::Migration::MigratorHelper.prepend_id(mig_id, id_prepender)
           @course[:file_map][mig_id] = {
-            :migration_id => mig_id,
-            :path_name => attachment,
+            migration_id: mig_id,
+            path_name: attachment,
           }
         end
       rescue => e
@@ -155,7 +157,7 @@ module Qti
     end
 
     def apply_respondus_settings
-      settings_path = @package_root.item_path('settings.xml')
+      settings_path = @package_root.item_path("settings.xml")
       if File.file?(settings_path)
         doc = Nokogiri::XML(File.open(settings_path))
       end

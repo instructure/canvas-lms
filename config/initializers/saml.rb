@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Rails.configuration.to_prepare do
-  require 'saml2'
+  require "saml2"
 
   SAML2.config[:max_message_size] = 1.megabyte
 end

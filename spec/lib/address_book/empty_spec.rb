@@ -46,7 +46,7 @@ describe AddressBook::Empty do
   describe "common_groups" do
     it "returns an empty hash" do
       other_user = user_model
-      expect(@address_book.common_courses(other_user)).to eql({})
+      expect(@address_book.common_groups(other_user)).to eql({})
     end
   end
 
@@ -66,7 +66,7 @@ describe AddressBook::Empty do
 
   describe "search_users" do
     it "returns an empty but paginatable collection" do
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       expect(known_users).to respond_to(:paginate)
       expect(known_users.paginate(per_page: 1).size).to eql(0)
     end

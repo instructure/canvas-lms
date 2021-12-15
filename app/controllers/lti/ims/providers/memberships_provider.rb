@@ -64,16 +64,16 @@ module Lti::IMS::Providers
     end
 
     def base_users_scope
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     def rlid_users_scope
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     # rubocop:disable Lint/UnusedMethodArgument
     def apply_role_filter(scope)
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
     # rubocop:enable Lint/UnusedMethodArgument
 
@@ -100,7 +100,7 @@ module Lti::IMS::Providers
         if rl.present? && rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
           raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
             "Tool does not have acess to rlid #{rlid}",
-            api_message: 'Tool does not have acess to rlid or rlid does not exist'
+            api_message: "Tool does not have acess to rlid or rlid does not exist"
           )
         end
         rl
@@ -149,7 +149,7 @@ module Lti::IMS::Providers
       unless assignment.external_tool?
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
           "Assignment (id: #{assignment.id}, rlid: #{rlid}) is not configured for submissions via external tool",
-          api_message: 'Requested assignment not configured for external tool launches'
+          api_message: "Requested assignment not configured for external tool launches"
         )
       end
 
@@ -157,25 +157,25 @@ module Lti::IMS::Providers
       if tool_tag.blank?
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
           "Assignment (id: #{assignment.id}, rlid: #{rlid}) is not bound to an external tool",
-          api_message: 'Requested assignment not bound to an external tool'
+          api_message: "Requested assignment not bound to an external tool"
         )
       end
       if tool_tag.content_type != "ContextExternalTool"
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
           "Assignment (id: #{assignment.id}, rlid: #{rlid}) needs content tag type 'ContextExternalTool' but found #{tool_tag.content_type}",
-          api_message: 'Requested assignment has unexpected content type'
+          api_message: "Requested assignment has unexpected content type"
         )
       end
       if tool_tag.content_id != tool.id
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
           "Assignment (id: #{assignment.id}, rlid: #{rlid}) needs binding to external tool #{tool.id} but found #{tool_tag.content_id}",
-          api_message: 'Requested assignment bound to unexpected external tool'
+          api_message: "Requested assignment bound to unexpected external tool"
         )
       end
     end
 
     def course
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     def course_rlid
@@ -183,7 +183,7 @@ module Lti::IMS::Providers
     end
 
     def find_memberships
-      throw 'Abstract Method'
+      throw "Abstract Method"
     end
 
     def base_url

@@ -24,8 +24,8 @@ class AddContentMigrationsBlockedMigrationIndex < ActiveRecord::Migration[6.0]
   def change
     add_index :content_migrations,
               [:context_id, :started_at],
-              name: 'index_content_migrations_blocked_migrations',
-              where: 'started_at IS NOT NULL',
+              name: "index_content_migrations_blocked_migrations",
+              where: "started_at IS NOT NULL",
               algorithm: :concurrently,
               if_not_exists: true
   end

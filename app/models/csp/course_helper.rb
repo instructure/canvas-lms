@@ -19,29 +19,27 @@
 #
 module Csp::CourseHelper
   def self.included(course_class)
-    course_class.add_setting :csp_disabled, :boolean => true, :default => false
+    course_class.add_setting :csp_disabled, boolean: true, default: false
   end
 
   def csp_enabled?
-    self.account.csp_enabled? && csp_inherited?
+    account.csp_enabled? && csp_inherited?
   end
 
   def csp_inherited?
-    csp_locked? || !self.csp_disabled?
+    csp_locked? || !csp_disabled?
   end
 
-  def csp_locked?
-    self.account.csp_locked?
-  end
+  delegate :csp_locked?, to: :account
 
   def inherit_csp!
     self.csp_disabled = false
-    self.save!
+    save!
   end
 
   def disable_csp!
     self.csp_disabled = true
-    self.save!
+    save!
   end
 
   def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
@@ -51,13 +49,13 @@ module Csp::CourseHelper
   end
 
   def tool_domain_cache_key
-    ["course_tool_domains", self.global_id].cache_key
+    ["course_tool_domains", global_id].cache_key
   end
 
   def cached_tool_domains
     # invalidate when the course is touched
     Rails.cache.fetch(tool_domain_cache_key) do
-      self.context_external_tools.active.map do |tool|
+      context_external_tools.active.map do |tool|
         Csp::Domain.domains_for_tool(tool)
       end.flatten.compact.uniq
     end

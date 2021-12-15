@@ -61,57 +61,61 @@ describe ExternalFeedAggregator do
   end
 
   def rss_example
-    %{<?xml version="1.0"?>
-<rss version="2.0">
-  <channel>
-    <title>Lift Off News</title>
-    <link>http://liftoff.msfc.nasa.gov/</link>
-    <description>Liftoff to Space Exploration.</description>
-    <language>en-us</language>
-    <pubDate>Tue, 10 Jun 2003 04:00:00 GMT</pubDate>
-    <lastBuildDate>Tue, 10 Jun 2003 09:41:01 GMT</lastBuildDate>
-    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
-    <generator>Weblog Editor 2.0</generator>
-    <managingEditor>editor@example.com</managingEditor>
-    <webMaster>webmaster@example.com</webMaster>
-    <ttl>5</ttl>
+    <<~XML
+      <?xml version="1.0"?>
+      <rss version="2.0">
+        <channel>
+          <title>Lift Off News</title>
+          <link>http://liftoff.msfc.nasa.gov/</link>
+          <description>Liftoff to Space Exploration.</description>
+          <language>en-us</language>
+          <pubDate>Tue, 10 Jun 2003 04:00:00 GMT</pubDate>
+          <lastBuildDate>Tue, 10 Jun 2003 09:41:01 GMT</lastBuildDate>
+          <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+          <generator>Weblog Editor 2.0</generator>
+          <managingEditor>editor@example.com</managingEditor>
+          <webMaster>webmaster@example.com</webMaster>
+          <ttl>5</ttl>
 
-    <item>
-      <title>Star City</title>
-      <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
-      <description>How do Americans get ready to work with Russians aboard the
-        International Space Station? They take a crash course in culture, language
-        and protocol at Russia's Star City.</description>
-      <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
-      <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
-    </item>
-  </channel>
-</rss>}
+          <item>
+            <title>Star City</title>
+            <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
+            <description>How do Americans get ready to work with Russians aboard the
+              International Space Station? They take a crash course in culture, language
+              and protocol at Russia's Star City.</description>
+            <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+            <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
+          </item>
+        </channel>
+      </rss>
+    XML
   end
 
   def atom_example
-    %{<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
+    <<~XML
+      <?xml version="1.0" encoding="utf-8"?>
+      <feed xmlns="http://www.w3.org/2005/Atom">
 
- <title>Example Feed</title>
- <subtitle>A subtitle.</subtitle>
- <link href="http://example.org/feed/" rel="self"/>
- <link href="http://example.org/"/>
- <updated>2003-12-13T18:30:02Z</updated>
- <author>
-   <name>John Doe</name>
-   <email>johndoe@example.com</email>
- </author>
- <id>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6</id>
+       <title>Example Feed</title>
+       <subtitle>A subtitle.</subtitle>
+       <link href="http://example.org/feed/" rel="self"/>
+       <link href="http://example.org/"/>
+       <updated>2003-12-13T18:30:02Z</updated>
+       <author>
+         <name>John Doe</name>
+         <email>johndoe@example.com</email>
+       </author>
+       <id>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6</id>
 
- <entry>
-   <title>Atom-Powered Robots Run Amok</title>
-   <link href="http://example.org/2003/12/13/atom03"/>
-   <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
-   <updated>2003-12-13T18:30:02Z</updated>
-   <summary>Some text.</summary>
- </entry>
+       <entry>
+         <title>Atom-Powered Robots Run Amok</title>
+         <link href="http://example.org/2003/12/13/atom03"/>
+         <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+         <updated>2003-12-13T18:30:02Z</updated>
+         <summary>Some text.</summary>
+       </entry>
 
-</feed>}
+      </feed>
+    XML
   end
 end

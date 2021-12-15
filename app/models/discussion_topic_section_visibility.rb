@@ -29,7 +29,7 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
   validate :discussion_topic_is_section_specific
   validate :course_and_topic_share_context
 
-  validates_uniqueness_of :course_section_id, scope: :discussion_topic_id, conditions: -> { where(:workflow_state => 'active') }
+  validates :course_section_id, uniqueness: { scope: :discussion_topic_id, conditions: -> { where(workflow_state: "active") } }
 
   before_validation :set_discussion_topic_id
 
@@ -40,29 +40,29 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
-    self.save!
+    self.workflow_state = "deleted"
+    save!
   end
 
   def discussion_topic_is_section_specific
-    return true if self.deleted? || self.discussion_topic.is_section_specific
+    return true if deleted? || discussion_topic.is_section_specific
 
-    self.errors.add(:discussion_topic_id, t("Cannot add section to a non-section-specific discussion"))
+    errors.add(:discussion_topic_id, t("Cannot add section to a non-section-specific discussion"))
   end
 
   def course_and_topic_share_context
-    return true if self.deleted? || self.discussion_topic.context_id == self.course_section.course_id
+    return true if deleted? || discussion_topic.context_id == course_section.course_id
 
-    self.errors.add(:course_section_id,
-                    t("Section does not belong to course for this discussion topic"))
+    errors.add(:course_section_id,
+               t("Section does not belong to course for this discussion topic"))
   end
 
   def new_discussion_topic?
-    self.discussion_topic&.new_record?
+    discussion_topic&.new_record?
   end
 
   def set_discussion_topic_id
     # rails 5.2.1 tries to validate the visibility after saving the topic but before setting the topic_id :/
-    self.discussion_topic_id ||= self.discussion_topic&.id
+    self.discussion_topic_id ||= discussion_topic&.id
   end
 end

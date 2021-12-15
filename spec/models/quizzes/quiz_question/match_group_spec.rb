@@ -19,9 +19,9 @@
 #
 
 describe Quizzes::QuizQuestion::MatchGroup do
-  describe '#add' do
+  describe "#add" do
     let(:properties) do
-      { text: 'Arkansas', match_id: 177 }
+      { text: "Arkansas", match_id: 177 }
     end
 
     it "adds to matches" do

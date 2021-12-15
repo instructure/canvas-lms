@@ -23,7 +23,7 @@ module SIS
     class TermImporter < CSVBaseImporter
       def self.term_csv?(row)
         # This matcher works because a course has long_name/short_name
-        row.include?('term_id') && row.include?('name')
+        row.include?("term_id") && row.include?("name")
       end
 
       def self.identifying_fields
@@ -33,25 +33,24 @@ module SIS
       # expected columns
       # account_id,parent_account_id,name,status
       def process(csv, index = nil, count = nil)
-        count = SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
+        SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             start_date = nil
             end_date = nil
             begin
-              start_date = Time.zone.parse(row['start_date']) if row['start_date'].present?
-              end_date = Time.zone.parse(row['end_date']) if row['end_date'].present?
+              start_date = Time.zone.parse(row["start_date"]) if row["start_date"].present?
+              end_date = Time.zone.parse(row["end_date"]) if row["end_date"].present?
             rescue
-              SisBatch.add_error(csv, "Bad date format for term #{row['term_id']}", sis_batch: @batch, row: row['lineno'], row_info: row)
+              SisBatch.add_error(csv, "Bad date format for term #{row["term_id"]}", sis_batch: @batch, row: row["lineno"], row_info: row)
             end
 
             begin
-              importer.add_term(row['term_id'], row['name'], row['status'], start_date, end_date, row['integration_id'], row['date_override_enrollment_type'])
+              importer.add_term(row["term_id"], row["name"], row["status"], start_date, end_date, row["integration_id"], row["date_override_enrollment_type"])
             rescue ImportError => e
-              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
             end
           end
         end
-        count
       end
     end
   end

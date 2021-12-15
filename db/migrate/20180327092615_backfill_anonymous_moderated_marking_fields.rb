@@ -22,7 +22,7 @@ class BackfillAnonymousModeratedMarkingFields < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    DataFixup::BackfillNulls.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run(
+    DataFixup::BackfillNulls.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run(
       Assignment,
       {
         graders_anonymous_to_graders: false,

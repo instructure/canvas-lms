@@ -117,7 +117,7 @@ module BroadcastPolicies
     end
 
     def grade_updated?
-      submission.changed_in_state(:graded, :fields => [:score, :grade])
+      submission.changed_in_state(:graded, fields: [:score, :grade])
     end
 
     def graded_recently?

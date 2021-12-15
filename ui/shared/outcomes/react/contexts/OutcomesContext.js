@@ -31,12 +31,13 @@ export const getContext = isMobileView => {
   const canManage = ENV.PERMISSIONS?.manage_outcomes
   const canImport = ENV.PERMISSIONS?.import_outcomes
   const isAdmin = ENV.current_user_roles?.includes('admin')
-  const isStudent = ENV.current_user_roles?.includes('student')
+  const isStudent = ENV.current_user_is_student
   const globalRootId = ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID?.toString()
   const treeBrowserRootGroupId = ROOT_GROUP_ID
   const treeBrowserAccountGroupId = ACCOUNT_GROUP_ID
   const rootIds = [globalRootId, treeBrowserAccountGroupId, treeBrowserRootGroupId]
   const individualOutcomeRatingAndCalculationFF = ENV.INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION
+  const accountLevelMasteryScalesFF = ENV.ACCOUNT_LEVEL_MASTERY_SCALES
 
   return {
     env: {
@@ -53,7 +54,8 @@ export const getContext = isMobileView => {
       treeBrowserRootGroupId,
       treeBrowserAccountGroupId,
       rootIds,
-      individualOutcomeRatingAndCalculationFF
+      individualOutcomeRatingAndCalculationFF,
+      accountLevelMasteryScalesFF
     }
   }
 }

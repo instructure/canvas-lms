@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 describe PlannerNote do
   before :once do
     course_factory
@@ -37,11 +37,11 @@ describe PlannerNote do
   describe "::planner_note_workflow_state" do
     it "returns 'deleted' for deleted note" do
       @teacher_planner_note.destroy!
-      expect(@teacher_planner_note.workflow_state).to eq 'deleted'
+      expect(@teacher_planner_note.workflow_state).to eq "deleted"
     end
 
     it "returns 'active' for created note" do
-      expect(@student_planner_note.workflow_state).to eq 'active'
+      expect(@student_planner_note.workflow_state).to eq "active"
     end
   end
 
@@ -50,7 +50,7 @@ describe PlannerNote do
                                todo_date: 4.days.from_now,
                                title: "Student Test Assignment",
                                details: "Students Need Grading")
-    expect(note.workflow_state).to eq 'active'
+    expect(note.workflow_state).to eq "active"
   end
 
   describe ".before" do

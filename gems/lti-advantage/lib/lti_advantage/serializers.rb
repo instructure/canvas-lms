@@ -19,6 +19,6 @@
 
 module LtiAdvantage
   module Serializers
-    require_relative 'serializers/jwt_message_serializer'
+    require_relative "serializers/jwt_message_serializer"
   end
 end

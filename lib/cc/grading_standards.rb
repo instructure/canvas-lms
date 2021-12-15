@@ -20,28 +20,28 @@
 module CC
   module GradingStandards
     def add_referenced_grading_standards
-      @course.assignments.active.where('grading_standard_id IS NOT NULL').each do |assignment|
+      @course.assignments.active.where.not(grading_standard_id: nil).each do |assignment|
         next unless export_object?(assignment) ||
                     (assignment.quiz && export_object?(assignment.quiz)) ||
                     (assignment.discussion_topic && export_object?(assignment.discussion_topic))
 
         gs = assignment.grading_standard
-        add_item_to_export(gs) if gs && gs.context_type == 'Course' && gs.context_id == @course.id
+        add_item_to_export(gs) if gs && gs.context_type == "Course" && gs.context_id == @course.id
       end
     end
 
     def create_grading_standards(document = nil)
       add_referenced_grading_standards if for_course_copy
       standards_to_copy = (@course.grading_standards.to_a + [@course.grading_standard]).compact.uniq(&:id).select { |s| export_object?(s) }
-      return nil unless standards_to_copy.size > 0
+      return nil if standards_to_copy.empty?
 
       if document
         standards_file = nil
         rel_path = nil
       else
-        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), 'w')
+        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::GRADING_STANDARDS)
-        document = Builder::XmlMarkup.new(:target => standards_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: standards_file, indent: 2)
       end
 
       document.instruct!
@@ -52,14 +52,14 @@ module CC
       ) do |standards_node|
         standards_to_copy.each do |standard|
           migration_id = create_key(standard)
-          standards_node.gradingStandard(:identifier => migration_id, :version => standard.version) do |standard_node|
+          standards_node.gradingStandard(identifier: migration_id, version: standard.version) do |standard_node|
             standard_node.title standard.title unless standard.title.blank?
             standard_node.data standard.data.to_json
           end
         end
       end
 
-      standards_file.close if standards_file
+      standards_file&.close
       rel_path
     end
   end

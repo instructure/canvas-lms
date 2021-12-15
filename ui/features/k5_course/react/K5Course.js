@@ -68,11 +68,11 @@ import EmptyHome from './EmptyHome'
 import ObserverOptions, {
   ObserverListShape,
   shouldShowObserverOptions
-} from '@canvas/k5/react/ObserverOptions'
+} from '@canvas/observer-picker'
 import GroupsPage from '@canvas/k5/react/GroupsPage'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
+import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const HERO_ASPECT_RATIO = 5
 const HERO_STICKY_HEIGHT_PX = 64

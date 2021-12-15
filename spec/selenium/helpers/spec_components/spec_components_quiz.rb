@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'spec_components_assignable_module'
+require_relative "spec_components_assignable_module"
 
 module SpecComponents
   class Quiz
@@ -25,12 +25,12 @@ module SpecComponents
 
     def initialize(opts)
       course = opts[:course]
-      quiz_title = opts.fetch(:title, 'Test Quiz')
+      quiz_title = opts.fetch(:title, "Test Quiz")
       due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
 
       assignment = course.assignments.create(title: quiz_title)
-      assignment.workflow_state = 'published'
-      assignment.submission_types = 'online_quiz'
+      assignment.workflow_state = "published"
+      assignment.submission_types = "online_quiz"
       assignment.due_at = due_at
       assignment.save
 
@@ -50,7 +50,7 @@ module SpecComponents
 
     def submit_as(user)
       submission = @component_quiz.generate_submission user
-      submission.workflow_state = 'complete'
+      submission.workflow_state = "complete"
       submission.save!
     end
 

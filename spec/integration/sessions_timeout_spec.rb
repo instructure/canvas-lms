@@ -19,15 +19,15 @@
 #
 
 describe "Session Timeout" do
-  context " when sessions timeout is set to 30 minutes" do
+  context "when sessions timeout is set to 30 minutes" do
     before do
-      plugin_setting = PluginSetting.new(:name => "sessions", :settings => { "session_timeout" => "30" })
+      plugin_setting = PluginSetting.new(name: "sessions", settings: { "session_timeout" => "30" })
       plugin_setting.save!
     end
 
     context "when a user logs in" do
       before do
-        course_with_student(:active_all => true, :user => user_with_pseudonym(:active_user => true))
+        course_with_student(active_all: true, user: user_with_pseudonym(active_user: true))
       end
 
       it "times out after 40 minutes of inactivity" do

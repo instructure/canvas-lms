@@ -24,7 +24,6 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
-import natcompare from '@canvas/util/natcompare'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -377,38 +376,6 @@ export const saveSelectedContexts = selected_contexts =>
     method: 'POST',
     params: {selected_contexts}
   }).then(data => data.json)
-
-export const parseObserverList = users =>
-  users.map(u => ({
-    id: u.id,
-    name: u.name,
-    avatarUrl: u.avatar_url
-  }))
-
-export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentUser) => {
-  const users = enrollments
-    .filter(e => e.observed_user)
-    .reduce((acc, e) => {
-      if (!acc.some(user => user.id === e.observed_user.id)) {
-        acc.push({
-          id: e.observed_user.id,
-          name: e.observed_user.name,
-          sortableName: e.observed_user.sortable_name,
-          avatarUrl: e.observed_user.avatar_url
-        })
-      }
-      return acc
-    }, [])
-    .sort((a, b) => natcompare.strings(a.sortableName, b.sortableName))
-  if (!isOnlyObserver) {
-    users.unshift({
-      id: currentUser.id,
-      name: currentUser.display_name,
-      avatarUrl: currentUser.avatar_image_url
-    })
-  }
-  return users
-}
 
 export const dropCourse = url =>
   doFetchApi({

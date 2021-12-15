@@ -20,7 +20,7 @@
 
 module Types
   class ConversationParticipantType < ApplicationObjectType
-    graphql_name 'ConversationParticipant'
+    graphql_name "ConversationParticipant"
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false

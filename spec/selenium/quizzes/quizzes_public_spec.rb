@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
-require_relative '../helpers/public_courses_context'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
+require_relative "../helpers/public_courses_context"
 
 describe "quizzes for a public course" do
   include_context "in-process server selenium tests"
   include_context "public course as a logged out user"
   include QuizzesCommon
 
-  it "displays quizzes list", priority: "1", test_id: 270033 do
+  it "displays quizzes list", priority: "1" do
     course_quiz(:active)
-    @quiz.update(:title => "hey you should see me")
+    @quiz.update(title: "hey you should see me")
 
     get "/courses/#{public_course.id}/quizzes"
-    validate_selector_displayed('#assignment-quizzes')
-    expect(f('#assignment-quizzes')).to include_text(@quiz.title)
+    validate_selector_displayed("#assignment-quizzes")
+    expect(f("#assignment-quizzes")).to include_text(@quiz.title)
   end
 end

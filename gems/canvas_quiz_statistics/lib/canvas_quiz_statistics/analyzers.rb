@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'time' # https://github.com/rails/rails/pull/40859
-require 'active_support/core_ext'
+require "time" # https://github.com/rails/rails/pull/40859
+require "active_support/core_ext"
 
 module CanvasQuizStatistics::Analyzers
   class << self
@@ -46,17 +46,17 @@ module CanvasQuizStatistics::Analyzers
     end
   end
 
-  require 'canvas_quiz_statistics/analyzers/base'
-  require 'canvas_quiz_statistics/analyzers/concerns/has_answers'
-  require 'canvas_quiz_statistics/analyzers/essay'
-  require 'canvas_quiz_statistics/analyzers/fill_in_multiple_blanks'
-  require 'canvas_quiz_statistics/analyzers/multiple_answers'
-  require 'canvas_quiz_statistics/analyzers/multiple_choice'
-  require 'canvas_quiz_statistics/analyzers/multiple_dropdowns'
-  require 'canvas_quiz_statistics/analyzers/file_upload'
-  require 'canvas_quiz_statistics/analyzers/calculated'
-  require 'canvas_quiz_statistics/analyzers/matching'
-  require 'canvas_quiz_statistics/analyzers/numerical'
-  require 'canvas_quiz_statistics/analyzers/short_answer'
-  require 'canvas_quiz_statistics/analyzers/true_false'
+  require "canvas_quiz_statistics/analyzers/base"
+  require "canvas_quiz_statistics/analyzers/concerns/has_answers"
+  require "canvas_quiz_statistics/analyzers/essay"
+  require "canvas_quiz_statistics/analyzers/fill_in_multiple_blanks"
+  require "canvas_quiz_statistics/analyzers/multiple_answers"
+  require "canvas_quiz_statistics/analyzers/multiple_choice"
+  require "canvas_quiz_statistics/analyzers/multiple_dropdowns"
+  require "canvas_quiz_statistics/analyzers/file_upload"
+  require "canvas_quiz_statistics/analyzers/calculated"
+  require "canvas_quiz_statistics/analyzers/matching"
+  require "canvas_quiz_statistics/analyzers/numerical"
+  require "canvas_quiz_statistics/analyzers/short_answer"
+  require "canvas_quiz_statistics/analyzers/true_false"
 end

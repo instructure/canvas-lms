@@ -18,28 +18,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../conditional_release_spec_helper'
+require_relative "../../conditional_release_spec_helper"
 require_dependency "conditional_release/scoring_range"
 
 module ConditionalRelease
-  describe ScoringRange, :type => :model do
-    it_behaves_like 'a soft-deletable model'
+  describe ScoringRange, type: :model do
+    it_behaves_like "a soft-deletable model"
 
-    describe 'scoring range definition' do
-      it 'must have at least one bound' do
+    describe "scoring range definition" do
+      it "must have at least one bound" do
         range = build :scoring_range
         range.lower_bound = range.upper_bound = nil
         expect(range.valid?).to be false
       end
 
-      it 'must have lower bound less than upper' do
+      it "must have lower bound less than upper" do
         range = build :scoring_range
         range.lower_bound = 100
         range.upper_bound = 1
         expect(range.valid?).to be false
       end
 
-      it 'can have null bounds' do
+      it "can have null bounds" do
         range = build :scoring_range
         range.lower_bound = nil
         range.upper_bound = 100
@@ -49,7 +49,7 @@ module ConditionalRelease
         expect(range.valid?).to be true
       end
 
-      it 'must have non-negative bounds' do
+      it "must have non-negative bounds" do
         range = build :scoring_range
         range.lower_bound = -10
         expect(range.valid?).to be false
@@ -59,18 +59,18 @@ module ConditionalRelease
       end
     end
 
-    describe 'for_score' do
+    describe "for_score" do
       before do
         @rule = create :rule
         @range = create :scoring_range, rule: @rule
         create :assignment_set_association, scoring_range: @range
       end
 
-      it 'must return an empty relation when nothing matches' do
-        expect(ScoringRange.for_score(-10000).count).to eq 0
+      it "must return an empty relation when nothing matches" do
+        expect(ScoringRange.for_score(-10_000).count).to eq 0
       end
 
-      it 'must apply bounds when both assigned' do
+      it "must apply bounds when both assigned" do
         @range.upper_bound = 80
         @range.lower_bound = 40
         @range.save!
@@ -79,7 +79,7 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.for_score(30).count).to eq 0
       end
 
-      it 'must apply upper bound as > score' do
+      it "must apply upper bound as > score" do
         @range.upper_bound = 90
         @range.save!
         expect(@rule.scoring_ranges.for_score(90.001).count).to eq 0
@@ -87,7 +87,7 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.for_score(89.999).count).to eq 1
       end
 
-      it 'must apply lower bound as <= score' do
+      it "must apply lower bound as <= score" do
         @range.lower_bound = 40
         @range.save!
         expect(@rule.scoring_ranges.for_score(40.001).count).to eq 1
@@ -95,7 +95,7 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.for_score(39.999).count).to eq 0
       end
 
-      it 'must apply correctly when only upper bound' do
+      it "must apply correctly when only upper bound" do
         @range.upper_bound = 20
         @range.lower_bound = nil
         @range.save!
@@ -104,7 +104,7 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.for_score(30).count).to eq 0
       end
 
-      it 'must apply correctly when only lower bound' do
+      it "must apply correctly when only lower bound" do
         @range.lower_bound = 10
         @range.upper_bound = nil
         @range.save!
@@ -114,14 +114,14 @@ module ConditionalRelease
       end
     end
 
-    describe 'contains_score' do
+    describe "contains_score" do
       before do
         @rule = create :rule
         @range = create :scoring_range, rule: @rule
         create :assignment_set_association, scoring_range: @range
       end
 
-      it 'must properly evaluate a bound of 0' do
+      it "must properly evaluate a bound of 0" do
         @range.lower_bound = nil
         @range.upper_bound = 0
         @range.save!
@@ -133,7 +133,7 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.last.contains_score(0)).to be true
       end
 
-      it 'must properly evaluate bounds' do
+      it "must properly evaluate bounds" do
         @range.lower_bound = 1
         @range.upper_bound = 2
         @range.save!
@@ -142,14 +142,14 @@ module ConditionalRelease
       end
     end
 
-    describe '#assignment_sets' do
-      it 'builds a assignment_set if one does not exist' do
+    describe "#assignment_sets" do
+      it "builds a assignment_set if one does not exist" do
         range = create :scoring_range_with_assignments, assignment_set_count: 0
         expect(AssignmentSet.count).to eq 0
         expect(range.assignment_sets.length).to eq 1
       end
 
-      it 'returns existing assignment_sets' do
+      it "returns existing assignment_sets" do
         range = create :scoring_range_with_assignments, assignment_set_count: 2
         expect(range.assignment_sets.length).to eq 2
       end

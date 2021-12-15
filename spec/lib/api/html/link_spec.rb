@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 require_dependency "api/html/link"
 
 module Api
   module Html
     describe Link do
-      describe '#to_corrected_s' do
-        it 'returns the raw string if it isnt a link' do
+      describe "#to_corrected_s" do
+        it "returns the raw string if it isnt a link" do
           expect(Link.new("nonsense-data").to_corrected_s).to eq "nonsense-data"
         end
 
@@ -33,55 +33,55 @@ module Api
             allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: double(context_type: "User")))
           end
 
-          it 'returns the raw string for a user content link' do
+          it "returns the raw string for a user content link" do
             raw_link = "/users/1/files/1/download?verifier=123"
             expect(Link.new(raw_link).to_corrected_s).to eq raw_link
           end
 
-          it 'returns the raw string for a user content link even with a host' do
+          it "returns the raw string for a user content link even with a host" do
             raw_link = "http://something.instructure.com/files/1/download?verifier=123"
             expect(Link.new(raw_link).to_corrected_s).to eq raw_link
           end
         end
 
-        it 'strips out verifiers for Course links and scopes them to the course' do
+        it "strips out verifiers for Course links and scopes them to the course" do
           course_attachment = double(context_type: "Course", context_id: 1)
           allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
           raw_link = "/files/1/download?verifier=123"
           expect(Link.new(raw_link).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
 
-        it 'scopes to the context if url includes the host' do
+        it "scopes to the context if url includes the host" do
           course_attachment = double(context_type: "Course", context_id: 1)
           allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
-          host = 'account.instructure.com'
+          host = "account.instructure.com"
           port = 443
           raw_link = "https://#{host}/files/1/download?verifier=123"
           expect(Link.new(raw_link, host: host, port: port).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
 
-        it 'strips the current host from absolute urls' do
+        it "strips the current host from absolute urls" do
           course_attachment = double(context_type: "Course", context_id: 1)
           allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
-          host = 'account.instructure.com'
+          host = "account.instructure.com"
           port = 443
           raw_link = "https://#{host}/courses/1/files/1/download?"
           expect(Link.new(raw_link, host: host, port: port).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
 
-        it 'does not scope to the context if url includes a differnt host' do
+        it "does not scope to the context if url includes a differnt host" do
           course_attachment = double(context_type: "Course", context_id: 1)
           allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
-          host = 'account.instructure.com'
+          host = "account.instructure.com"
           port = 443
           raw_link = "https://#{host}/files/1/download"
-          expect(Link.new(raw_link, host: 'other-host', port: port).to_corrected_s).to eq raw_link
+          expect(Link.new(raw_link, host: "other-host", port: port).to_corrected_s).to eq raw_link
         end
 
-        it 'does not strip the current host if the ports do not match' do
+        it "does not strip the current host if the ports do not match" do
           course_attachment = double(context_type: "Course", context_id: 1)
           allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
-          host = 'localhost'
+          host = "localhost"
           port = 3000
           raw_link = "https://#{host}:8080/some/other/file"
           expect(Link.new(raw_link, host: host, port: port).to_corrected_s).to eq raw_link

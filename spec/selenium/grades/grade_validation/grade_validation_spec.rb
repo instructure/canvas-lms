@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/gradebook_page'
+require_relative "../../common"
+require_relative "../pages/gradebook_page"
 
-describe 'Gradebook frontend/backend calculators' do
-  include_context 'in-process server selenium tests'
+describe "Gradebook frontend/backend calculators" do
+  include_context "in-process server selenium tests"
 
   before :once do
     skip("Unskip in GRADE-1871")
@@ -44,7 +44,7 @@ describe 'Gradebook frontend/backend calculators' do
       grades = @unlucky_group[course_index]
 
       create_enrollments(course, student_data)
-      group = course.assignment_groups.create! name: 'assignments'
+      group = course.assignment_groups.create! name: "assignments"
       assignments = create_assignments(
         [course.id],
         20,
@@ -61,7 +61,7 @@ describe 'Gradebook frontend/backend calculators' do
             user_id: student_data.first.id,
             body: "hello",
             workflow_state: "graded",
-            submission_type: 'online_text_entry',
+            submission_type: "online_text_entry",
             grader_id: @teacher.id,
             grade: grades[index].to_s,
             score: grades[index],
@@ -80,7 +80,7 @@ describe 'Gradebook frontend/backend calculators' do
             user_id: student_data.second.id,
             body: "hello",
             workflow_state: "graded",
-            submission_type: 'online_text_entry',
+            submission_type: "online_text_entry",
             grader_id: @teacher.id,
             grade: random.to_s,
             score: random,

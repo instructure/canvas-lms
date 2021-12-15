@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe AdheresToPolicy::Policy, "set_policy" do
   it "takes a block" do
-    expect {
+    expect do
       Class.new do
         extend AdheresToPolicy::ClassMethods
         set_policy { 1 + 1 }
       end
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it "allows multiple calls" do
-    expect {
+    expect do
       Class.new do
         extend AdheresToPolicy::ClassMethods
 
@@ -39,7 +39,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
           set_policy { 1 + 1 }
         end
       end
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   context "available_rights" do
@@ -47,21 +47,21 @@ describe AdheresToPolicy::Policy, "set_policy" do
       example_class = Class.new do
         extend AdheresToPolicy::ClassMethods
 
-        set_policy {
+        set_policy do
           given { |_| true }
           can :read, nil
 
           given { |_| true }
           can :write, :read
-        }
+        end
       end
 
       expect(example_class.policy.available_rights.to_a.sort).to eq [:read, :write].sort
     end
   end
 
-  describe '#add_rights' do
-    it 'adds rights to parents' do
+  describe "#add_rights" do
+    it "adds rights to parents" do
       right = double
       condition = double
       parent = AdheresToPolicy::Policy.new(nil, nil)

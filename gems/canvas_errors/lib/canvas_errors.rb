@@ -29,8 +29,8 @@
 # wants to do with errors can be hooked into this path with the
 # .register! method.
 
-require 'inst-jobs'
-require 'canvas_errors/job_info'
+require "inst-jobs"
+require "canvas_errors/job_info"
 
 module CanvasErrors
   # register something to happen on every exception that occurs.
@@ -68,7 +68,7 @@ module CanvasErrors
   # to ":error" and (much like log levels), can trigger different
   # reporting outcomes in the callbacks. expected member of ERROR_LEVELS.
   # Registered callbacks can decide what to do about different levels.
-  ERROR_LEVELS = [:info, :warn, :error].freeze
+  ERROR_LEVELS = %i[info warn error].freeze
   def self.capture(exception, data = {}, level = :error)
     unless ERROR_LEVELS.include?(level)
       Rails.logger.warn("[ERRORS] error level #{level} is not supported, defaulting to :error")
@@ -83,7 +83,7 @@ module CanvasErrors
   # convenience method, use this if you want to apply the 'type' tag without
   # having to pass in a whole hash
   def self.capture_exception(type, exception, level = :error)
-    self.capture(exception, { tags: { type: type.to_s } }, level)
+    capture(exception, { tags: { type: type.to_s } }, level)
   end
 
   # This is really just for clearing out the registry during tests,
@@ -107,8 +107,8 @@ module CanvasErrors
   end
 
   def self.run_callbacks(exception, extra, level = :error)
-    registry.each_with_object({}) do |(key, callback), outputs|
-      outputs[key] = callback.call(exception, extra, level)
+    registry.transform_values do |callback|
+      callback.call(exception, extra, level)
     end
   end
   private_class_method :run_callbacks

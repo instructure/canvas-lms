@@ -51,11 +51,11 @@ module Services
         progress.start! unless progress.running?
         clone_url_executor.execute(attachment)
 
-        raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == 'errored'
+        raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == "errored"
 
         progress.complete! unless progress.failed?
-      rescue => error
-        mark_as_failure(error)
+      rescue => e
+        mark_as_failure(e)
       end
 
       def on_permanent_failure(error)
@@ -91,12 +91,12 @@ module Services
         homework_service.start!
         clone_url_executor.execute(attachment)
 
-        raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == 'errored'
+        raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == "errored"
 
         homework_service.submit(eula_agreement_timestamp, comment)
         homework_service.success!
-      rescue => error
-        mark_as_failure(error)
+      rescue => e
+        mark_as_failure(e)
       end
 
       def on_permanent_failure(error)
@@ -146,7 +146,7 @@ module Services
 
       if @attachment
         opts = {
-          submission_type: 'online_upload',
+          submission_type: "online_upload",
           submitted_at: @progress.created_at,
           attachments: [@attachment],
           eula_agreement_timestamp: eula_agreement_timestamp,
@@ -182,7 +182,7 @@ module Services
              "longer able to do so."
 
       message = OpenStruct.new(
-        from_name: 'notifications@instructure.com',
+        from_name: "notifications@instructure.com",
         subject: "Submission upload failed: #{assignment_name}",
         to: @progress.user.email,
         body: body
@@ -201,7 +201,7 @@ module Services
 
     def progress_success!(progress, attachment)
       progress.reload
-      progress.set_results('id' => attachment.id) if attachment
+      progress.set_results("id" => attachment.id) if attachment
       progress.complete!
     end
 

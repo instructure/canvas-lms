@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'event_stream/index_strategy/active_record'
-require 'event_stream/index_strategy/cassandra'
+require "event_stream/index_strategy/active_record"
+require "event_stream/index_strategy/cassandra"
 
 class EventStream::Index
   include EventStream::AttrConfig
 
   attr_reader :event_stream
 
-  attr_config :table, :type => String
-  attr_config :id_column, :type => String, :default => 'id'
-  attr_config :key_column, :type => String, :default => 'key'
-  attr_config :bucket_size, :type => Integer, :default => 1.week
-  attr_config :scrollback_limit, :type => Integer, :default => 52.weeks
-  attr_config :entry_proc, :type => Proc
-  attr_config :key_proc, :type => Proc, :default => nil
+  attr_config :table, type: String
+  attr_config :id_column, type: String, default: "id"
+  attr_config :key_column, type: String, default: "key"
+  attr_config :bucket_size, type: Integer, default: 1.week
+  attr_config :scrollback_limit, type: Integer, default: 52.weeks
+  attr_config :entry_proc, type: Proc
+  attr_config :key_proc, type: Proc, default: nil
   # it's expected that this proc will return an AR Scope from the
   # associated AR type.  If it doesn't, there could be problems...
   attr_config :ar_scope_proc, type: Proc, default: nil
@@ -43,19 +43,20 @@ class EventStream::Index
   end
 
   def find_with(args, options)
-    strategy = self.strategy_for(options[:strategy])
+    strategy = strategy_for(options[:strategy])
     strategy.find_with(args, options)
   end
 
   def find_ids_with(args, options)
-    strategy = self.strategy_for(options[:strategy])
+    strategy = strategy_for(options[:strategy])
     strategy.find_ids_with(args, options)
   end
 
   def strategy_for(strategy_name)
-    if strategy_name == :active_record
+    case strategy_name
+    when :active_record
       @_ar_decorator ||= EventStream::IndexStrategy::ActiveRecord.new(self)
-    elsif strategy_name == :cassandra
+    when :cassandra
       @_cass_decorator ||= EventStream::IndexStrategy::Cassandra.new(self)
     else
       raise "Unknown Indexing Strategy: #{strategy_name}"

@@ -22,13 +22,13 @@ class AddReplicaIdentityForFavorites < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Favorite', :root_account_id, 0
-    remove_index :favorites, name: 'index_favorites_on_root_account_id', if_exists: true
+    add_replica_identity "Favorite", :root_account_id, 0
+    remove_index :favorites, name: "index_favorites_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :favorites, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'Favorite'
+    remove_replica_identity "Favorite"
     change_column_null :favorites, :root_account_id, true
   end
 end

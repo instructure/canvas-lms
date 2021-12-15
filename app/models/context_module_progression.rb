@@ -23,7 +23,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
   belongs_to :context_module
   belongs_to :user
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   before_save :set_completed_at
   before_create :set_root_account_id
@@ -33,7 +33,7 @@ class ContextModuleProgression < ActiveRecord::Base
   serialize :requirements_met, Array
   serialize :incomplete_requirements, Array
 
-  validates_presence_of :user_id, :context_module_id
+  validates :user_id, :context_module_id, presence: true
 
   def completion_requirements
     context_module.try(:completion_requirements) || []
@@ -41,7 +41,7 @@ class ContextModuleProgression < ActiveRecord::Base
   private :completion_requirements
 
   def set_completed_at
-    if self.completed?
+    if completed?
       self.completed_at ||= Time.now
     else
       self.completed_at = nil
@@ -49,11 +49,11 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id = self.context_module.root_account_id
+    self.root_account_id = context_module.root_account_id
   end
 
   def finished_item?(item)
-    (self.requirements_met || []).any? { |r| r[:id] == item.id }
+    (requirements_met || []).any? { |r| r[:id] == item.id }
   end
 
   def collapse!(skip_save: false)
@@ -67,15 +67,15 @@ class ContextModuleProgression < ActiveRecord::Base
   def update_collapse_state(collapsed_target_state, skip_save: false)
     retry_count = 0
     begin
-      return if self.collapsed == collapsed_target_state
+      return if collapsed == collapsed_target_state
 
       self.collapsed = collapsed_target_state
-      self.save unless skip_save
+      save unless skip_save
     rescue ActiveRecord::StaleObjectError => e
       Canvas::Errors.capture_exception(:context_modules, e, :info)
       retry_count += 1
       if retry_count < 5
-        self.reload
+        reload
         retry
       else
         raise
@@ -87,7 +87,7 @@ class ContextModuleProgression < ActiveRecord::Base
   def uncomplete_requirement(id)
     requirement = requirements_met.find { |r| r[:id] == id }
     requirements_met.delete(requirement)
-    self.remove_incomplete_requirement(id)
+    remove_incomplete_requirement(id)
 
     mark_as_outdated
   end
@@ -110,11 +110,11 @@ class ContextModuleProgression < ActiveRecord::Base
       @orig_keys = sorted_action_keys
 
       self.view_requirements = []
-      self.actions_done.reject! { |r| r[:type] == 'min_score' }
+      self.actions_done.reject! { |r| r[:type] == "min_score" }
     end
 
     def sorted_action_keys
-      self.actions_done.map { |r| "#{r[:id]}_#{r[:type]}" }.sort
+      actions_done.map { |r| "#{r[:id]}_#{r[:type]}" }.sort
     end
 
     def increment_met_requirement_count!
@@ -122,7 +122,7 @@ class ContextModuleProgression < ActiveRecord::Base
     end
 
     def requirement_met?(req, include_type = true)
-      self.actions_done.any? { |r| r[:id] == req[:id] && (include_type ? r[:type] == req[:type] : true) }
+      actions_done.any? { |r| r[:id] == req[:id] && (include_type ? r[:type] == req[:type] : true) }
     end
 
     def check_action!(action, is_met)
@@ -135,15 +135,15 @@ class ContextModuleProgression < ActiveRecord::Base
 
     def add_done_action!(action)
       increment_met_requirement_count!
-      self.actions_done << action
+      actions_done << action
     end
 
     def add_view_requirement(req)
-      self.view_requirements << req
+      view_requirements << req
     end
 
     def check_view_requirements
-      self.view_requirements.each do |req|
+      view_requirements.each do |req|
         # should mark a must_view as true if a completed must_submit/min_score action already exists
         check_action!(req, requirement_met?(req, false))
       end
@@ -153,15 +153,15 @@ class ContextModuleProgression < ActiveRecord::Base
   def evaluate_requirements_met
     result = evaluate_uncompleted_requirements
 
-    count_needed = self.context_module.requirement_count.to_i
+    count_needed = context_module.requirement_count.to_i
     # if no requirement_count is specified, assume all are needed
-    if (count_needed && count_needed > 0 && result.met_requirement_count >= count_needed) || result.all_met?
-      self.workflow_state = 'completed'
-    elsif result.met_requirement_count >= 1 || self.incomplete_requirements.count >= 1 # submitting to a min_score requirement should move it to started
-      self.workflow_state = 'started'
-    else
-      self.workflow_state = 'unlocked'
-    end
+    self.workflow_state = if (count_needed && count_needed > 0 && result.met_requirement_count >= count_needed) || result.all_met?
+                            "completed"
+                          elsif result.met_requirement_count >= 1 || incomplete_requirements.count >= 1 # submitting to a min_score requirement should move it to started
+                            "started"
+                          else
+                            "unlocked"
+                          end
 
     if result.changed?
       self.requirements_met = result.actions_done
@@ -171,14 +171,14 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def evaluate_uncompleted_requirements
     tags_hash = nil
-    calc = CompletedRequirementCalculator.new(self.requirements_met || [])
+    calc = CompletedRequirementCalculator.new(requirements_met || [])
     self.incomplete_requirements = [] # start from a clean slate
     completion_requirements.each do |req|
       # for an observer/student user we don't want to filter based on the normal observer logic,
       # instead return vis for student enrollment only -> hence ignore_observer_logic below
 
       # create the hash inside the loop in case the completion_requirements is empty (performance)
-      tags_hash ||= context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).index_by(&:id)
+      tags_hash ||= context_module.content_tags_visible_to(user, is_teacher: false, ignore_observer_logic: true).index_by(&:id)
 
       tag = tags_hash[req[:id]]
       next unless tag
@@ -189,28 +189,28 @@ class ContextModuleProgression < ActiveRecord::Base
       end
 
       subs = get_submissions(tag) if tag.scoreable?
-      if subs && subs.any? { |sub| sub.respond_to?(:excused?) && sub.excused? }
+      if subs&.any? { |sub| sub.respond_to?(:excused?) && sub.excused? }
         calc.check_action!(req, true)
         next
       end
 
-      if req[:type] == 'must_view'
+      if req[:type] == "must_view"
         calc.add_view_requirement(req)
-      elsif %w(must_contribute must_mark_done).include? req[:type]
+      elsif %w[must_contribute must_mark_done].include? req[:type]
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
-      elsif req[:type] == 'must_submit'
-        req_met = !!(subs && subs.any? { |sub|
-          if sub.workflow_state == 'graded' && sub.attempt.nil?
+      elsif req[:type] == "must_submit"
+        req_met = !!(subs && subs.any? do |sub|
+          if sub.workflow_state == "graded" && sub.attempt.nil?
             # is a manual grade - doesn't count for submission
             false
-          elsif %w(submitted graded complete pending_review).include?(sub.workflow_state)
+          elsif %w[submitted graded complete pending_review].include?(sub.workflow_state)
             true
           end
-        })
+        end)
 
         calc.check_action!(req, req_met)
-      elsif req[:type] == 'min_score'
+      elsif req[:type] == "min_score"
         calc.check_action!(req, evaluate_score_requirement_met(req, subs))
       end
     end
@@ -245,17 +245,17 @@ class ContextModuleProgression < ActiveRecord::Base
   private :get_submission_score
 
   def remove_incomplete_requirement(requirement_id)
-    self.incomplete_requirements.delete_if { |r| r[:id] == requirement_id }
+    incomplete_requirements.delete_if { |r| r[:id] == requirement_id }
   end
 
   # hold onto the status of the incomplete min_score requirement
   def update_incomplete_requirement!(requirement, score)
     return unless requirement[:type] == "min_score"
 
-    incomplete_req = self.incomplete_requirements.detect { |r| r[:id] == requirement[:id] }
+    incomplete_req = incomplete_requirements.detect { |r| r[:id] == requirement[:id] }
     unless incomplete_req
       incomplete_req = requirement.dup
-      self.incomplete_requirements << incomplete_req
+      incomplete_requirements << incomplete_req
     end
     if incomplete_req[:score].nil?
       incomplete_req[:score] = score
@@ -272,7 +272,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
     if (unposted_sub = subs.detect { |sub| sub.is_a?(Submission) && !sub.posted? })
       # don't mark the progress as in-progress if they haven't submitted
-      self.update_incomplete_requirement!(requirement, nil) unless unposted_sub.unsubmitted?
+      update_incomplete_requirement!(requirement, nil) unless unposted_sub.unsubmitted?
       return
     end
 
@@ -283,7 +283,7 @@ class ContextModuleProgression < ActiveRecord::Base
         remove_incomplete_requirement(requirement[:id])
       else
         unless sub.is_a?(Submission) && sub.unsubmitted?
-          self.update_incomplete_requirement!(requirement, score) # hold onto the score if requirement not met
+          update_incomplete_requirement!(requirement, score) # hold onto the score if requirement not met
         end
       end
       requirement_met
@@ -296,16 +296,16 @@ class ContextModuleProgression < ActiveRecord::Base
     return nil unless requirement
 
     requirement_met = true
-    requirement_met = points && points >= requirement[:min_score].to_f && !(tag.assignment && tag.assignment.muted?) if requirement[:type] == 'min_score'
-    requirement_met = false if requirement[:type] == 'must_submit' # calculate later; requires the submission
+    requirement_met = points && points >= requirement[:min_score].to_f && !(tag.assignment && tag.assignment.muted?) if requirement[:type] == "min_score"
+    requirement_met = false if requirement[:type] == "must_submit" # calculate later; requires the submission
 
     if !requirement_met
-      self.requirements_met.delete(requirement)
-      self.mark_as_outdated
+      requirements_met.delete(requirement)
+      mark_as_outdated
       true
-    elsif !self.requirements_met.include?(requirement)
-      self.requirements_met.push(requirement)
-      self.mark_as_outdated
+    elsif !requirements_met.include?(requirement)
+      requirements_met.push(requirement)
+      mark_as_outdated
       true
     else
       false
@@ -315,13 +315,13 @@ class ContextModuleProgression < ActiveRecord::Base
   def update_requirement_met!(*args)
     retry_count = 0
     begin
-      if self.update_requirement_met(*args)
-        self.save!
+      if update_requirement_met(*args)
+        save!
         delay_if_production.evaluate!
       end
     rescue ActiveRecord::StaleObjectError
       # retry up to five times, otherwise return current (stale) data
-      self.reload
+      reload
       retry_count += 1
       if retry_count < 5
         retry
@@ -336,19 +336,19 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   def mark_as_outdated!
-    if self.new_record?
+    if new_record?
       mark_as_outdated
       GuardRail.activate(:primary) do
-        self.save!
+        save!
       end
     else
-      self.class.where(:id => self).update_all(:current => false)
-      self.touch_user
+      self.class.where(id: self).update_all(current: false)
+      touch_user
     end
   end
 
   def outdated?
-    if self.current && evaluated_at.present?
+    if current && evaluated_at.present?
       return true if evaluated_at < context_module.updated_at
 
       # context module not locked or still to be unlocked
@@ -365,7 +365,7 @@ class ContextModuleProgression < ActiveRecord::Base
     related_progressions = nil
     (context_module.active_prerequisites || []).all? do |pre|
       related_progressions ||= context_module.context.find_or_create_progressions_for_user(user).index_by(&:context_module_id)
-      if pre[:type] == 'context_module' && (progression = related_progressions[pre[:id]])
+      if pre[:type] == "context_module" && (progression = related_progressions[pre[:id]])
         progression.evaluate!(context_module)
         progression.completed?
       else
@@ -381,10 +381,10 @@ class ContextModuleProgression < ActiveRecord::Base
   def check_prerequisites
     return false if context_module.to_be_unlocked
 
-    if self.locked?
-      self.workflow_state = 'unlocked' if prerequisites_satisfied?
+    if locked? && prerequisites_satisfied?
+      self.workflow_state = "unlocked"
     end
-    return !self.locked?
+    !locked?
   end
   private :check_prerequisites
 
@@ -397,7 +397,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
     # for an observer/student combo user we don't want to filter based on the
     # normal observer logic, instead return vis for student enrollment only
-    context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).each do |tag|
+    context_module.content_tags_visible_to(user, is_teacher: false, ignore_observer_logic: true).each do |tag|
       self.current_position = tag.position if tag.position
       all_met = completion_requirements.select { |r| r[:id] == tag.id }.all? do |req|
         requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
@@ -416,11 +416,11 @@ class ContextModuleProgression < ActiveRecord::Base
       evaluate(as_prerequisite_for)
     rescue ActiveRecord::StaleObjectError
       # retry up to five times, otherwise return current (stale) data
-      self.reload
+      reload
       retry_count += 1
       retry if retry_count < 10
 
-      logger.error { "Failed to evaluate stale progression: #{self.inspect}" }
+      logger.error { "Failed to evaluate stale progression: #{inspect}" }
     end
 
     self
@@ -429,7 +429,7 @@ class ContextModuleProgression < ActiveRecord::Base
   # calculates and saves the progression state
   # raises a StaleObjectError if there is a conflict
   def evaluate(as_prerequisite_for = nil)
-    self.shard.activate do
+    shard.activate do
       return self unless outdated?
 
       # there is no valid progression state for unpublished modules
@@ -442,17 +442,17 @@ class ContextModuleProgression < ActiveRecord::Base
       if check_prerequisites
         evaluate_requirements_met
       end
-      completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
+      completion_changed = workflow_state_changed? && workflow_state_change.include?("completed")
 
       evaluate_current_position
 
       GuardRail.activate(:primary) do
-        self.save
+        save
       end
 
       if completion_changed
         trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
-        trigger_completion_events if self.completed?
+        trigger_completion_events if completed?
       end
 
       self
@@ -467,13 +467,13 @@ class ContextModuleProgression < ActiveRecord::Base
       # re-evaluating progressions that have requested our progression's evaluation can cause cyclic evaluation
       next false if dependent_module_to_skip && progression.context_module_id == dependent_module_to_skip.id
 
-      self.context_module.is_prerequisite_for?(progression.context_module)
+      context_module.is_prerequisite_for?(progression.context_module)
     end
 
     # invalidate all, then re-evaluate each
     GuardRail.activate(:primary) do
-      ContextModuleProgression.where(:id => progressions, :current => true).update_all(:current => false)
-      User.where(:id => progressions.map(&:user_id)).touch_all
+      ContextModuleProgression.where(id: progressions, current: true).update_all(current: false)
+      User.where(id: progressions.map(&:user_id)).touch_all
 
       progressions.each do |progression|
         progression.delay_if_production(n_strand: ["dependent_progression_reevaluation", context_module.global_context_id])
@@ -490,8 +490,8 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :trigger_completion_events
 
-  scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :for_modules, lambda { |mods| where(:context_module_id => mods) }
+  scope :for_user, ->(user) { where(user_id: user) }
+  scope :for_modules, ->(mods) { where(context_module_id: mods) }
 
   workflow do
     state :locked

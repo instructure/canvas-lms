@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'dynamic_settings'
-require 'rails'
+require "dynamic_settings"
+require "rails"
 
-Rails.env = 'test'
+Rails.env = "test"
 
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
-Rails.logger = Logger.new(STDOUT)
+Rails.logger = Logger.new($stdout)
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
   end
 
-  config.order = 'random'
+  config.order = "random"
 end

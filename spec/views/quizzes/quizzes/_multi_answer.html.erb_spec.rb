@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_multi_answer" do
   it "renders" do
@@ -28,13 +28,13 @@ describe "/quizzes/quizzes/_multi_answer" do
     answer = {
       id: 5,
       weight: 100,
-      text: 'answer_text'
+      text: "answer_text"
     }
     question = {
-      question_text: 'question text'
+      question_text: "question text"
     }
     question_type = OpenObject.new
-    render :partial => "quizzes/quizzes/multi_answer", :object => answer, :locals => { :question => question, :question_type => question_type, :user_answer => nil }
+    render partial: "quizzes/quizzes/multi_answer", object: answer, locals: { question: question, question_type: question_type, user_answer: nil }
     expect(response).not_to be_nil
   end
 end

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'page_objects/assignment_create_edit_page'
+require_relative "../common"
+require_relative "page_objects/assignment_create_edit_page"
 
 describe "moderated grading assignments" do
   include_context "in-process server selenium tests"
@@ -27,10 +27,10 @@ describe "moderated grading assignments" do
     Account.default.enable_feature!(:moderated_grading)
     @course = course_model
     @course.offer!
-    @assignment = @course.assignments.create!(submission_types: 'online_text_entry', title: 'Test Assignment')
+    @assignment = @course.assignments.create!(submission_types: "online_text_entry", title: "Test Assignment")
     @assignment.update_attribute :moderated_grading, true
     @assignment.update_attribute :grader_count, 2
-    @assignment.update_attribute :workflow_state, 'published'
+    @assignment.update_attribute :workflow_state, "published"
     @student = User.create!
     @course.enroll_student(@student)
     @user = User.create!
@@ -43,8 +43,8 @@ describe "moderated grading assignments" do
       Account.default.enable_feature!(:anonymous_marking)
       Account.default.enable_feature!(:moderated_grading)
       @moderated_assignment = @course.assignments.create!(
-        title: 'Moderated Assignment',
-        submission_types: 'online_text_entry',
+        title: "Moderated Assignment",
+        submission_types: "online_text_entry",
         points_possible: 10
       )
 
@@ -55,7 +55,7 @@ describe "moderated grading assignments" do
       @course.enroll_teacher(
         @teacher_two,
         section: @section2,
-        enrollment_state: 'active'
+        enrollment_state: "active"
       )
 
       # visit assignment edit page as first teacher
@@ -63,14 +63,14 @@ describe "moderated grading assignments" do
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
     end
 
-    it "allows user to select final moderator", priority: "1", test_id: 3482530 do
+    it "allows user to select final moderator", priority: "1" do
       AssignmentCreateEditPage.select_moderate_checkbox
       AssignmentCreateEditPage.select_grader_dropdown.click
 
       expect(AssignmentCreateEditPage.select_grader_dropdown).to include_text(@teacher_two.name)
     end
 
-    it "allows user to input number of graders", priority: "1", test_id: 3490818 do
+    it "allows user to input number of graders", priority: "1" do
       # default value for the input is 2, or if the class has <= 2 active instructors the default is 1
       AssignmentCreateEditPage.select_moderate_checkbox
       AssignmentCreateEditPage.add_number_of_graders(2)
@@ -89,18 +89,18 @@ describe "moderated grading assignments" do
       @teacher_two = user_factory(active_all: true)
       @course.enroll_teacher(
         @teacher_two,
-        enrollment_state: 'active'
+        enrollment_state: "active"
       )
       @teacher_three = user_factory(active_all: true)
       @course.enroll_teacher(
         @teacher_three,
-        enrollment_state: 'active'
+        enrollment_state: "active"
       )
 
       # assign a moderator (teacher 2)
       @moderated_assignment = @course.assignments.create!(
-        title: 'Moderated Assignment',
-        submission_types: 'online_text_entry',
+        title: "Moderated Assignment",
+        submission_types: "online_text_entry",
         grader_count: 2,
         final_grader: @teacher_two,
         moderated_grading: true,
@@ -114,7 +114,7 @@ describe "moderated grading assignments" do
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
-      it "allows assignment edits", priority: "1", test_id: 3488596 do
+      it "allows assignment edits", priority: "1" do
         expect(AssignmentCreateEditPage.assignment_save_button).to be_present
       end
     end
@@ -126,7 +126,7 @@ describe "moderated grading assignments" do
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
-      it "does not allow assignment edits", priority: "1", test_id: 3488597 do
+      it "does not allow assignment edits", priority: "1" do
         expect(AssignmentCreateEditPage.assignment_edit_permission_error_text).to be_present
       end
     end
@@ -139,7 +139,7 @@ describe "moderated grading assignments" do
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
-      it "allows admin to edit assignment", priority: "1", test_id: 3488598 do
+      it "allows admin to edit assignment", priority: "1" do
         expect(AssignmentCreateEditPage.assignment_save_button).to be_present
       end
     end

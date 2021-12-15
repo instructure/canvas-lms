@@ -35,7 +35,7 @@ module LuckySneaks
       if defined?(RedCloth)
         if lite_mode
           RedCloth.new(self, [:lite_mode]).to_html
-        elsif self.include?('<pre>')
+        elsif include?("<pre>")
           RedCloth.new(self).to_html.tr("\t", "")
         else
           RedCloth.new(self).to_html.tr("\t", "").gsub(/\n\n/, "")
@@ -67,7 +67,7 @@ module LuckySneaks
       name = /[\w:_-]+/
       value = /([A-Za-z0-9]+|('[^']*?'|"[^"]*?"))/
       attr = /(#{name}(\s*=\s*#{value})?)/
-      rx = /<[!\/?\[]?(#{name}|--)(\s+(#{attr}(\s+#{attr})*))?\s*([!\/?\]]+|--)?>/
+      rx = %r{<[!/?\[]?(#{name}|--)(\s+(#{attr}(\s+#{attr})*))?\s*([!/?\]]+|--)?>}
       leave_whitespace ? gsub(rx, "").strip : gsub(rx, "").gsub(/\s+/, " ").strip
     end
 
@@ -140,7 +140,7 @@ module LuckySneaks
         /(\s|^)\$(\d+)\.(\d+)(\s|$)/ => '\2 dollars \3 cents',
         /(\s|^)£(\d+)\.(\d+)(\s|$)/u => '\2 pounds \3 pence',
       }.each do |found, replaced|
-        replaced = " #{replaced} " unless replaced.include?('\\1')
+        replaced = " #{replaced} " unless replaced.include?("\\1")
         dummy.gsub!(found, replaced)
       end
       # Back to normal rules
@@ -154,12 +154,12 @@ module LuckySneaks
         /(\s|^)¥(\d*)(\s|$)/u => '\2 yen',
         /\s*\*\s*/ => "star",
         /\s*%\s*/ => "percent",
-        /\s*(\\|\/)\s*/ => "slash",
+        %r{\s*(\\|/)\s*} => "slash",
       }.each do |found, replaced|
-        replaced = " #{replaced} " unless replaced.include?('\\1')
+        replaced = " #{replaced} " unless replaced.include?("\\1")
         dummy.gsub!(found, replaced)
       end
-      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(/[.,:;()\[\]\/?!\^'"_]/, " ")
+      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(%r{[.,:;()\[\]/?!\^'"_]}, " ")
     end
 
     # Replace runs of whitespace in string. Defaults to a single space but any replacement
@@ -181,18 +181,18 @@ module LuckySneaks
 
     # Returns a copy of the string safe for use in file paths and URLs.
     def path_safe
-      gsub(/[^a-zA-Z0-9\-_]+/, '-')
+      gsub(/[^a-zA-Z0-9\-_]+/, "-")
     end
 
     module ClassMethods
       # Returns string of random characters with a length matching the specified limit. Excludes 0
       # to avoid confusion between 0 and O.
       def random(limit)
-        strong_alphanumerics = %w{
+        strong_alphanumerics = %w[
           a b c d e f g h i j k l m n o p q r s t u v w x y z
           A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
           1 2 3 4 5 6 7 8 9
-        }
+        ]
         Array.new(limit, "").collect { strong_alphanumerics[rand(61)] }.join
       end
     end

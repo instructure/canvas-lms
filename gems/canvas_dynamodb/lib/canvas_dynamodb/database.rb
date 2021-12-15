@@ -20,7 +20,7 @@
 module CanvasDynamoDB
   class Database
     DEFAULT_MIN_CAPACITY = 5
-    DEFAULT_MAX_CAPACITY = 10000
+    DEFAULT_MAX_CAPACITY = 10_000
 
     attr_reader :client, :fingerprint, :logger
 
@@ -35,10 +35,10 @@ module CanvasDynamoDB
       @client = client_opts[:client] || Aws::DynamoDB::Client.new(client_opts)
       @fingerprint = fingerprint
       @prefix = prefix
-      @logger = logger || Logger.new(STDOUT)
+      @logger = logger || Logger.new($stdout)
     end
 
-    %i(delete_item get_item put_item query scan update_item).each do |method|
+    %i[delete_item get_item put_item query scan update_item].each do |method|
       define_method(method) do |params|
         params = params.merge(
           table_name: prefixed_table_name(params[:table_name])
@@ -47,7 +47,7 @@ module CanvasDynamoDB
       end
     end
 
-    %i(batch_get_item batch_write_item).each do |method|
+    %i[batch_get_item batch_write_item].each do |method|
       define_method(method) do |params|
         request_items = {}
         params[:request_items].each_key do |table_name|

@@ -27,21 +27,21 @@ describe Mutations::CreateLearningOutcomeGroup do
   before :once do
     @admin = account_admin_user(account: @account)
     course_with_student
-    @parent_group = @course.learning_outcome_groups.create!(:title => 'Parent Outcome Group')
-    @global_parent_group = LearningOutcomeGroup.create(title: 'Global Parent Outcome Group')
+    @parent_group = @course.learning_outcome_groups.create!(title: "Parent Outcome Group")
+    @global_parent_group = LearningOutcomeGroup.create(title: "Global Parent Outcome Group")
   end
 
   let(:context) { { current_user: @admin } }
-  let(:title) { 'New Group Title' }
-  let(:description) { 'New Group Description' }
-  let(:vendor_guid) { 'A001' }
+  let(:title) { "New Group Title" }
+  let(:description) { "New Group Description" }
+  let(:vendor_guid) { "A001" }
 
   def mutation_str(**attrs)
     <<~GQL
       mutation {
         createLearningOutcomeGroup(
             input: {
-              #{gql_arguments('', attrs)}
+              #{gql_arguments("", attrs)}
             }
           ) {
           learningOutcomeGroup {
@@ -67,8 +67,8 @@ describe Mutations::CreateLearningOutcomeGroup do
     CanvasSchema.execute(mutation_str, context: context)
   end
 
-  context 'Mutation' do
-    context 'As user with manage_outcomes permisssion' do
+  context "Mutation" do
+    context "As user with manage_outcomes permisssion" do
       it "creates learning outcome group" do
         result = execute_query(
           mutation_str(
@@ -79,17 +79,17 @@ describe Mutations::CreateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
-        expect(result.dig('data', 'createLearningOutcomeGroup', 'errors')).to be_nil
-        data = result.dig('data', 'createLearningOutcomeGroup', 'learningOutcomeGroup')
-        expect(data['title']).to eq title
-        expect(data['description']).to eq description
-        expect(data['vendorGuid']).to eq vendor_guid
-        expect(data['parentOutcomeGroup']['_id']).to eq @parent_group.id.to_s
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "createLearningOutcomeGroup", "errors")).to be_nil
+        data = result.dig("data", "createLearningOutcomeGroup", "learningOutcomeGroup")
+        expect(data["title"]).to eq title
+        expect(data["description"]).to eq description
+        expect(data["vendorGuid"]).to eq vendor_guid
+        expect(data["parentOutcomeGroup"]["_id"]).to eq @parent_group.id.to_s
       end
     end
 
-    context 'As user with manage_global_outcomes permission' do
+    context "As user with manage_global_outcomes permission" do
       it "creates global learning outcome group" do
         result = execute_query(
           mutation_str(
@@ -100,27 +100,27 @@ describe Mutations::CreateLearningOutcomeGroup do
           ),
           { current_user: site_admin_user }
         )
-        expect(result.dig('errors')).to be_nil
-        expect(result.dig('data', 'createLearningOutcomeGroup', 'errors')).to be_nil
-        data = result.dig('data', 'createLearningOutcomeGroup', 'learningOutcomeGroup')
-        expect(data['title']).to eq title
-        expect(data['description']).to eq description
-        expect(data['vendorGuid']).to eq vendor_guid
-        expect(data['parentOutcomeGroup']['_id']).to eq @global_parent_group.id.to_s
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "createLearningOutcomeGroup", "errors")).to be_nil
+        data = result.dig("data", "createLearningOutcomeGroup", "learningOutcomeGroup")
+        expect(data["title"]).to eq title
+        expect(data["description"]).to eq description
+        expect(data["vendorGuid"]).to eq vendor_guid
+        expect(data["parentOutcomeGroup"]["_id"]).to eq @global_parent_group.id.to_s
       end
     end
   end
 
-  context 'Errors' do
+  context "Errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'createLearningOutcomeGroup', 'errors')
+      errors = result["errors"] || result.dig("data", "createLearningOutcomeGroup", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(message)
+      expect(errors[0]["message"]).to match(message)
     end
 
     it "requires parent outcome group to exist" do
-      result = execute_query(mutation_str(id: 99999, title: title), context)
-      expect_error(result, 'Group not found')
+      result = execute_query(mutation_str(id: 99_999, title: title), context)
+      expect_error(result, "Group not found")
     end
 
     it "requires title for new outcome group" do
@@ -133,7 +133,7 @@ describe Mutations::CreateLearningOutcomeGroup do
         mutation_str(id: @parent_group.id, title: title),
         { current_user: @teacher }
       )
-      expect_error(result, 'Insufficient permissions')
+      expect_error(result, "Insufficient permissions")
     end
 
     it "requires user to have manage_global_outcomes permission to create global learning outcome group" do
@@ -141,7 +141,7 @@ describe Mutations::CreateLearningOutcomeGroup do
         mutation_str(id: @global_parent_group.id, title: title),
         context
       )
-      expect_error(result, 'Insufficient permissions')
+      expect_error(result, "Insufficient permissions")
     end
   end
 end

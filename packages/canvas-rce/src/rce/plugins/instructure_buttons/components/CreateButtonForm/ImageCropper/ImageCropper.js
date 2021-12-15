@@ -26,6 +26,8 @@ const SHAPE_OPTIONS = [
   {id: 'square', label: formatMessage('Square')},
   {id: 'circle', label: formatMessage('Circle')},
   {id: 'triangle', label: formatMessage('Triangle')},
+  {id: 'diamond', label: formatMessage('Diamond')},
+  {id: 'pentagon', label: formatMessage('Pentagon')},
   {id: 'hexagon', label: formatMessage('Hexagon')},
   {id: 'octagon', label: formatMessage('Octagon')},
   {id: 'star', label: formatMessage('Star')}

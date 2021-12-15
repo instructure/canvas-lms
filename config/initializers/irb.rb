@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 if $0 == "irb"
-  class TeeLogger < Struct.new(:loggers)
+  TeeLogger = Struct.new(:loggers) do
     def method_missing(method, *args, &block)
       loggers.each do |logger|
         logger.send(method, *args, &block)

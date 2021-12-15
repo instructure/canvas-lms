@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::PageType do
-  let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:course) do
+    course_with_teacher(active_all: true)
+    @course
+  end
   let_once(:wiki) { course.create_wiki! has_no_front_page: false, title: "asdf" }
   let_once(:page) { wiki.front_page.tap(&:save!) }
   let(:page_type) { GraphQLTypeTester.new(page, current_user: @teacher) }
@@ -31,10 +34,10 @@ describe Types::PageType do
   end
 
   it "has modules" do
-    module1 = course.context_modules.create!(name: 'Module 1')
-    module2 = course.context_modules.create!(name: 'Module 2')
-    page.context_module_tags.create!(context_module: module1, context: course, tag_type: 'context_module')
-    page.context_module_tags.create!(context_module: module2, context: course, tag_type: 'context_module')
+    module1 = course.context_modules.create!(name: "Module 1")
+    module2 = course.context_modules.create!(name: "Module 2")
+    page.context_module_tags.create!(context_module: module1, context: course, tag_type: "context_module")
+    page.context_module_tags.create!(context_module: module2, context: course, tag_type: "context_module")
     expect(page_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
   end
 end

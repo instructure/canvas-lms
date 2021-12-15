@@ -22,7 +22,7 @@ require_relative "../helpers/graphql_type_tester"
 
 module GraphQLSpecHelper
   def gql_arguments(*args, **options)
-    (args + options.map { |k, v| "#{k.to_s.camelize(:lower)}: #{v.to_json}" }).join(', ')
+    (args + options.map { |k, v| "#{k.to_s.camelize(:lower)}: #{v.to_json}" }).join(", ")
   end
 end
 

@@ -64,11 +64,11 @@ lti_multiple_assignment_deep_linking:
   description: |-
     If enabled, allows multiple deep link support for assignments and modules.
   applies_to: RootAccount
-lti_deep_linking_module_index_menu:
+lti_deep_linking_module_index_menu_modal:
   state: hidden
   display_name: LTI Deep Linking for Module Index Menu
   description: |-
-    If enabled, allows deep linking from the module index.
+    If enabled, allows deep linking from the module index via a modal.
   applies_to: RootAccount
 lti_deep_linking_line_items:
   state: hidden

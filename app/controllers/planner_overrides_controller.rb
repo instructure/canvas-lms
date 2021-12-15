@@ -99,7 +99,7 @@ class PlannerOverridesController < ApplicationController
   # @returns [PlannerOverride]
   def index
     planner_overrides = Api.paginate(PlannerOverride.for_user(@current_user).active, self, api_v1_planner_overrides_url)
-    render :json => planner_overrides.map { |po| planner_override_json(po, @current_user, session) }
+    render json: planner_overrides.map { |po| planner_override_json(po, @current_user, session) }
   end
 
   # @API Show a planner override

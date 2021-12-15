@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe LinkedIn::Connection do
   describe ".config" do
     it "accepts any object with a call interface" do
       conf_class = Class.new do
         def call
-          { 'some' => 'config' }
+          { "some" => "config" }
         end
       end
 
       described_class.config = conf_class.new
-      expect(described_class.config['some']).to eq('config')
+      expect(described_class.config["some"]).to eq("config")
     end
 
     it "rejects uncallable configs" do
@@ -45,8 +45,8 @@ describe LinkedIn::Connection do
   context "with valid configuration" do
     before do
       config = {
-        'api_key' => 'key',
-        'secret_key' => 'secret'
+        "api_key" => "key",
+        "secret_key" => "secret"
       }
       LinkedIn::Connection.config = proc { config }
     end
@@ -58,9 +58,9 @@ describe LinkedIn::Connection do
                               "<last-name>doe</last-name>"\
                               "<public-profile-url>http://example.com/linkedin</public-profile-url>"\
                               "</html>"
-        mock_access_token = double()
+        mock_access_token = double
         expect(mock_access_token).to receive(:get)
-          .with('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)')
+          .with("/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)")
           .and_return(double(body: token_response_body))
 
         linkedin = LinkedIn::Connection.new(mock_access_token)
@@ -80,7 +80,7 @@ describe LinkedIn::Connection do
         access_token = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
         expect(OAuth::RequestToken).to receive(:new).with(consumer, token, secret).and_return(request_token)
-        expect(request_token).to receive(:get_access_token).with(:oauth_verifier => oauth_verifier).and_return(access_token)
+        expect(request_token).to receive(:get_access_token).with(oauth_verifier: oauth_verifier).and_return(access_token)
 
         linkedin = LinkedIn::Connection.from_request_token(token, secret, oauth_verifier)
         expect(linkedin.access_token).to eq(access_token)
@@ -92,7 +92,7 @@ describe LinkedIn::Connection do
         consumer = double
         oauth_callback = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
-        expect(consumer).to receive(:get_request_token).with(:oauth_callback => oauth_callback)
+        expect(consumer).to receive(:get_request_token).with(oauth_callback: oauth_callback)
 
         LinkedIn::Connection.request_token(oauth_callback)
       end
@@ -101,17 +101,17 @@ describe LinkedIn::Connection do
     describe ".config_check" do
       it "user the supplied parameters" do
         consumer = double(get_request_token: "present")
-        expect(OAuth::Consumer).to receive(:new).with('my_key', 'my_secret', {
-                                                        :site => "https://api.linkedin.com",
-                                                        :request_token_path => "/uas/oauth/requestToken",
-                                                        :access_token_path => "/uas/oauth/accessToken",
-                                                        :authorize_path => "/uas/oauth/authorize",
-                                                        :signature_method => "HMAC-SHA1"
+        expect(OAuth::Consumer).to receive(:new).with("my_key", "my_secret", {
+                                                        site: "https://api.linkedin.com",
+                                                        request_token_path: "/uas/oauth/requestToken",
+                                                        access_token_path: "/uas/oauth/accessToken",
+                                                        authorize_path: "/uas/oauth/authorize",
+                                                        signature_method: "HMAC-SHA1"
                                                       }).and_return(consumer)
 
         LinkedIn::Connection.config_check({
-                                            api_key: 'my_key',
-                                            secret_key: 'my_secret'
+                                            api_key: "my_key",
+                                            secret_key: "my_secret"
                                           })
       end
     end

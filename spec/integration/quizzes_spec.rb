@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 describe Quizzes::QuizzesController do
   def create_section_override(section, due_at)
-    override = assignment_override_model(:quiz => @quiz)
+    override = assignment_override_model(quiz: @quiz)
     override.set = section
     override.override_due_at(due_at)
     override.save!
@@ -29,9 +29,9 @@ describe Quizzes::QuizzesController do
 
   context "#show" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
-      assignment_model(:course => @course)
-      quiz_model(:course => @course, :assignment_id => @assignment.id)
+      course_with_teacher_logged_in(active_all: true)
+      assignment_model(course: @course)
+      quiz_model(course: @course, assignment_id: @assignment.id)
       @quiz.update_attribute :due_at, 5.days.from_now
       @cs1 = @course.default_section
       @cs2 = @course.course_sections.create!
@@ -57,7 +57,7 @@ describe Quizzes::QuizzesController do
         end
 
         it "shows an overridden due date for student" do
-          @course.enroll_user(user_factory, 'StudentEnrollment')
+          @course.enroll_user(user_factory, "StudentEnrollment")
           user_session(@user)
 
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -104,27 +104,27 @@ describe Quizzes::QuizzesController do
         @course.large_roster = false
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(response.body).to match(%r{SpeedGrader})
+        expect(response.body).to match(/SpeedGrader/)
       end
 
       it "does not link to SpeedGrader when large_roster" do
         @course.large_roster = true
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(response.body).not_to match(%r{SpeedGrader})
+        expect(response.body).not_to match(/SpeedGrader/)
       end
 
       it "does not link to SpeedGrader when moderated grader limit is reached" do
         allow_any_instance_of(Assignment).to receive(:can_view_speed_grader?).and_return(false)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(response.body).not_to match(%r{SpeedGrader})
+        expect(response.body).not_to match(/SpeedGrader/)
       end
     end
   end
 
   context "show_student" do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       course_quiz true
       post "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@student.id}"
 
@@ -153,26 +153,26 @@ describe Quizzes::QuizzesController do
   context "#history" do
     context "pending_review" do
       def mkquiz
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
-                                     { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
-        course_with_teacher_logged_in(:active_all => true, :course => @course)
+        quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 1, "question_type" => "essay_question" } },
+                                     { question_data: { :name => "question 2", :points_possible => 1, "question_type" => "essay_question" } }])
+        course_with_teacher_logged_in(active_all: true, course: @course)
       end
 
       def mksurvey
-        survey_with_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
-                                { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
-        course_with_teacher_logged_in(:active_all => true, :course => @course)
+        survey_with_submission([{ question_data: { :name => "question 1", :points_possible => 1, "question_type" => "essay_question" } },
+                                { question_data: { :name => "question 2", :points_possible => 1, "question_type" => "essay_question" } }])
+        course_with_teacher_logged_in(active_all: true, course: @course)
       end
 
       it "lists the questions needing review" do
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        expect(response.body).to match(%r{The following questions need review})
-        expect(response.body).not_to match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).to match(/The following questions need review/)
+        expect(response.body).not_to match(/The quiz has changed significantly since this submission was made/)
         doc = Nokogiri::HTML5(response.body)
-        needing_review = doc.at_css('#questions_needing_review')
+        needing_review = doc.at_css("#questions_needing_review")
         expect(needing_review).to be_present
-        expect(needing_review.children.css('li a').map(&:text)).to eq(@quiz.quiz_data.map { |qq| qq['name'] })
+        expect(needing_review.children.css("li a").map(&:text)).to eq(@quiz.quiz_data.map { |qq| qq["name"] })
       end
 
       it "displays message about the quiz changing significantly" do
@@ -182,20 +182,20 @@ describe Quizzes::QuizzesController do
         @quiz_submission.submission_data.each { |q| q[:correct] = "false" }
         @quiz_submission.save
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        expect(response.body).not_to match(%r{The following questions need review})
-        expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).not_to match(/The following questions need review/)
+        expect(response.body).to match(/The quiz has changed significantly since this submission was made/)
       end
 
       it "displays both messages" do
         allow_any_instance_of(Quizzes::Quiz).to receive(:changed_significantly_since?).and_return(true)
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        expect(response.body).to match(%r{The following questions need review})
-        expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).to match(/The following questions need review/)
+        expect(response.body).to match(/The quiz has changed significantly since this submission was made/)
         doc = Nokogiri::HTML5(response.body)
-        needing_review = doc.at_css('#questions_needing_review')
+        needing_review = doc.at_css("#questions_needing_review")
         expect(needing_review).to be_present
-        expect(needing_review.children.css('li a').map(&:text)).to eq(@quiz.quiz_data.map { |qq| qq['name'] })
+        expect(needing_review.children.css("li a").map(&:text)).to eq(@quiz.quiz_data.map { |qq| qq["name"] })
       end
 
       it "shoudn't show the user's name/email when it's an anonymous submission" do
@@ -205,7 +205,7 @@ describe Quizzes::QuizzesController do
         crazy_unlikely_to_be_matched_name = "1p3h5Yns[y>s^*:]zi^1|h,M"
         @student.name = crazy_unlikely_to_be_matched_name
         @student.sortable_name = crazy_unlikely_to_be_matched_name
-        pseudonym @student, :username => '1p3h5Ynsyszi1hM@1p3h5Ynsyszi1hM.com'
+        pseudonym @student, username: "1p3h5Ynsyszi1hM@1p3h5Ynsyszi1hM.com"
         @student.save!
         @student.reload
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"

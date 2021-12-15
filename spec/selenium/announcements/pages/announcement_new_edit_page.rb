@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class AnnouncementNewEdit
   class << self
@@ -26,11 +26,11 @@ class AnnouncementNewEdit
     def visit_new(context)
       context_type = context.is_a?(Course) ? "courses" : "groups"
       get("/#{context_type}/#{context.id}/discussion_topics/new?is_announcement=true")
-      wait_for_tiny(f('textarea[name=message]'))
+      wait_for_tiny(f("textarea[name=message]"))
     end
 
     def new_announcement_url
-      '/discussion_topics/new?is_announcement=true'
+      "/discussion_topics/new?is_announcement=true"
     end
 
     def individual_announcement_url(announcement)
@@ -48,44 +48,44 @@ class AnnouncementNewEdit
     end
 
     def submit_announcement_form
-      wait_for_new_page_load { submit_form('.form-actions') }
+      wait_for_new_page_load { submit_form(".form-actions") }
     end
 
-    # Note: This *appends* to the existing content in the text area
+    # NOTE: This *appends* to the existing content in the text area
     def add_message(message)
-      type_in_tiny('textarea[name=message]', message)
+      type_in_tiny("textarea[name=message]", message)
     end
 
     def add_title(title)
-      replace_content(f('input[name=title]'), title)
+      replace_content(f("input[name=title]"), title)
     end
 
     def section_error
-      f('#sections_autocomplete_root').text
+      f("#sections_autocomplete_root").text
     end
 
     def select_a_section(section_name)
       fj(section_autocomplete_css).click
-      if !section_name.empty?
+      if section_name.empty?
+        driver.action.send_keys(:backspace).perform
+      else
         set_value(fj(section_autocomplete_css), section_name)
         driver.action.send_keys(:enter).perform
-      else
-        driver.action.send_keys(:backspace).perform
       end
       wait_for_ajax_requests
     end
 
     def create_group_announcement(group, title, text)
       visit_new(group)
-      replace_content(f('input[name=title]'), title)
-      type_in_tiny('textarea[name=message]', text)
+      replace_content(f("input[name=title]"), title)
+      type_in_tiny("textarea[name=message]", text)
       submit_announcement_form
     end
 
     def edit_group_announcement(group, announcement, message)
       url_base = full_individual_announcement_url(group, announcement)
       get "#{url_base}/edit"
-      wait_for_tiny(f('textarea[name=message]'))
+      wait_for_tiny(f("textarea[name=message]"))
       # Note that add_message *appends* to existing
       add_message(message)
       submit_announcement_form

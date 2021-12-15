@@ -36,7 +36,7 @@ module Anonymity
     # continuously query the database
     def generate_id(existing_ids: [])
       loop do
-        short_id = self.generate_short_id
+        short_id = generate_short_id
         break short_id unless existing_ids.include?(short_id)
       end
     end

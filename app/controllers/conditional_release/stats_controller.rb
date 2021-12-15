@@ -23,7 +23,7 @@ module ConditionalRelease
 
     def students_per_range
       rule = get_rule
-      include_trend_data = Array.wrap(params[:include]).include? 'trends'
+      include_trend_data = Array.wrap(params[:include]).include? "trends"
       render json: Stats.students_per_range(rule, include_trend_data)
     end
 
@@ -31,7 +31,7 @@ module ConditionalRelease
       rule = get_rule
       student_id = params[:student_id]
       unless student_id.present?
-        return render :json => { :message => "student_id required" }, :status => :bad_request
+        return render json: { message: "student_id required" }, status: :bad_request
       end
 
       render json: Stats.student_details(rule, student_id)
@@ -40,7 +40,7 @@ module ConditionalRelease
     private
 
     def get_rule
-      @context.conditional_release_rules.active.where(:trigger_assignment_id => params[:trigger_assignment]).take!
+      @context.conditional_release_rules.active.where(trigger_assignment_id: params[:trigger_assignment]).take!
     end
 
     def require_course_grade_view_permissions
@@ -49,7 +49,7 @@ module ConditionalRelease
 
     def require_trigger_assignment
       unless params[:trigger_assignment].present?
-        return render :json => { :message => "trigger_assignment required" }, :status => :bad_request
+        render json: { message: "trigger_assignment required" }, status: :bad_request
       end
     end
   end

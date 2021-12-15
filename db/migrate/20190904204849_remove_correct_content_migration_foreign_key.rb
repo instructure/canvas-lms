@@ -20,10 +20,10 @@ class RemoveCorrectContentMigrationForeignKey < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    remove_foreign_key :content_migrations, :column => :attachment_id, if_exists: true
+    remove_foreign_key :content_migrations, column: :attachment_id, if_exists: true
   end
 
   def down
-    add_foreign_key :content_migrations, :attachments, :column => :attachment_id, :delay_validation => true, if_not_exists: true
+    add_foreign_key :content_migrations, :attachments, column: :attachment_id, delay_validation: true, if_not_exists: true
   end
 end

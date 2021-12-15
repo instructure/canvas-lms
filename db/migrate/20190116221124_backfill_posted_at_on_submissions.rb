@@ -22,7 +22,7 @@ class BackfillPostedAtOnSubmissions < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    Submission.find_ids_in_ranges(:batch_size => 500_000) do |start_at, end_at|
+    Submission.find_ids_in_ranges(batch_size: 500_000) do |start_at, end_at|
       DataFixup::BackfillPostedAtOnSubmissions.delay_if_production(priority: Delayed::LOW_PRIORITY,
                                                                    n_strand: ["DataFixup::BackfillPostedAtOnSubmissions", Shard.current.database_server.id]).run(start_at, end_at)
     end

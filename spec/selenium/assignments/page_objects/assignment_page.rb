@@ -26,7 +26,7 @@ class AssignmentPage
     end
 
     def assignment_page_body
-      f('body')
+      f("body")
     end
 
     def submission_detail_link
@@ -38,7 +38,7 @@ class AssignmentPage
     end
 
     def page_action_list
-      f('.page-action-list')
+      f(".page-action-list")
     end
 
     def assignment_content
@@ -50,16 +50,16 @@ class AssignmentPage
     end
 
     def title
-      f('.title')
+      f(".title")
     end
 
     def student_group_speedgrader_dropdown(group)
-      f('select').click
-      ff('option').find { |option| option.text == group.name }.click
+      f("select").click
+      ff("option").find { |option| option.text == group.name }.click
     end
 
     def speedgrader_link
-      f('a.icon-speed-grader')
+      f("a.icon-speed-grader")
     end
 
     def manage_assignment_button

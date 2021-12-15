@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'lti_advantage'
+require "lti_advantage"
 
 module Lti::Messages
   # Base class for all LTI Message "factory" classes.
@@ -36,7 +36,7 @@ module Lti::Messages
   # Canvas, please see the inline documentation of
   # app/models/lti/lti_advantage_adapter.rb.
   class JwtMessage
-    EXTENSION_PREFIX = 'https://www.instructure.com/'
+    EXTENSION_PREFIX = "https://www.instructure.com/"
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       @tool = tool
@@ -54,7 +54,7 @@ module Lti::Messages
     end
 
     def generate_post_payload_message(validate_launch: true)
-      raise 'Class can only be used once.' if @used
+      raise "Class can only be used once." if @used
 
       @used = true
 
@@ -89,9 +89,9 @@ module Lti::Messages
       @message.aud = @tool.developer_key.global_id.to_s
       @message.azp = @tool.developer_key.global_id.to_s
       @message.deployment_id = @tool.deployment_id
-      @message.exp = Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
+      @message.exp = Setting.get("lti.oauth2.access_token.exp", 1.hour).to_i.seconds.from_now.to_i
       @message.iat = Time.zone.now.to_i
-      @message.iss = Canvas::Security.config['lti_iss']
+      @message.iss = Canvas::Security.config["lti_iss"]
       @message.nonce = SecureRandom.uuid
       @message.sub = @user&.lookup_lti_id(@context) if include_sub_claim?
       @message.target_link_uri = target_link_uri
@@ -117,12 +117,12 @@ module Lti::Messages
     def add_tool_platform_claims!
       @message.tool_platform.guid = @context.root_account.lti_guid
       @message.tool_platform.name = @context.root_account.name
-      @message.tool_platform.version = 'cloud'
-      @message.tool_platform.product_family_code = 'canvas'
+      @message.tool_platform.version = "cloud"
+      @message.tool_platform.product_family_code = "canvas"
     end
 
     def add_launch_presentation_claims!
-      @message.launch_presentation.document_target = 'iframe'
+      @message.launch_presentation.document_target = "iframe"
       @message.launch_presentation.height = @tool.extension_setting(@opts[:resource_type], :selection_height)
       @message.launch_presentation.width = @tool.extension_setting(@opts[:resource_type], :selection_width)
       @message.launch_presentation.return_url = @return_url
@@ -136,7 +136,7 @@ module Lti::Messages
     end
 
     def add_roles_claims!
-      @message.roles = expand_variable('$com.instructure.User.allRoles').split ','
+      @message.roles = expand_variable("$com.instructure.User.allRoles").split ","
     end
 
     def add_custom_params_claims!
@@ -147,8 +147,8 @@ module Lti::Messages
       @message.name = @user&.name
       @message.given_name = @user&.first_name
       @message.family_name = @user&.last_name
-      @message.lis.person_sourcedid = expand_variable('$Person.sourcedId')
-      @message.lis.course_offering_sourcedid = expand_variable('$CourseSection.sourcedId')
+      @message.lis.person_sourcedid = expand_variable("$Person.sourcedId")
+      @message.lis.course_offering_sourcedid = expand_variable("$CourseSection.sourcedId")
     end
 
     def add_include_email_claims!
@@ -164,7 +164,7 @@ module Lti::Messages
     end
 
     def add_lti11_legacy_user_id!
-      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || ''
+      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || ""
     end
 
     def add_lti1p1_claims!
@@ -188,7 +188,7 @@ module Lti::Messages
     def add_names_and_roles_service_claims!
       @message.names_and_roles_service.context_memberships_url =
         @expander.controller.polymorphic_url([@context, :names_and_roles])
-      @message.names_and_roles_service.service_versions = ['2.0']
+      @message.names_and_roles_service.service_versions = ["2.0"]
     end
 
     def expand_variable(variable)
@@ -202,7 +202,7 @@ module Lti::Messages
       @_current_observee_list ||= @user.observer_enrollments.current
                                        .where(course_id: @context.id)
                                        .preload(:associated_user)
-                                       .map { |e| e.try(:associated_user).try(:lti_id) }.compact
+                                       .filter_map { |e| e.try(:associated_user).try(:lti_id) }
     end
 
     def custom_parameters
@@ -212,7 +212,7 @@ module Lti::Messages
     def unexpanded_custom_parameters
       @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
         key = k.dup
-        key.slice! 'custom_'
+        key.slice! "custom_"
         key
       end
     end

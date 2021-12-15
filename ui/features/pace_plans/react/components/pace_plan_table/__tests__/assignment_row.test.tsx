@@ -20,7 +20,13 @@ import React from 'react'
 import {act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import {BLACKOUT_DATES, PRIMARY_PLAN, STUDENT_PLAN} from '../../../__tests__/fixtures'
+import {
+  BLACKOUT_DATES,
+  PLAN_ITEM_1,
+  PLAN_ITEM_3,
+  PRIMARY_PLAN,
+  STUDENT_PLAN
+} from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
 import {AssignmentRow} from '../assignment_row'
@@ -52,7 +58,16 @@ afterEach(() => {
 describe('AssignmentRow', () => {
   it('renders the assignment title and icon of the module item', () => {
     const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
-    expect(getByText('Basic encryption/decryption')).toBeInTheDocument()
+    expect(getByText(defaultProps.pacePlanItem.assignment_title)).toBeInTheDocument()
+  })
+
+  it('renders the assignment title as a link to the assignment', () => {
+    const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
+
+    // Implementation detail bleeds in here; but the `TruncateText` means that the title isn't directly in the `a`
+    expect(
+      getByText(defaultProps.pacePlanItem.assignment_title)?.parentNode?.parentNode
+    ).toHaveAttribute('href', defaultProps.pacePlanItem.assignment_link)
   })
 
   it('renders an input that updates the duration for that module item', () => {
@@ -104,6 +119,32 @@ describe('AssignmentRow', () => {
       name: 'Duration for module Basic encryption/decryption'
     })
     expect(daysInput).toBeDisabled()
+  })
+
+  it('renders provided possible points, and pluralizes them correctly', () => {
+    const {getByText, rerender} = renderConnected(<AssignmentRow {...defaultProps} />)
+
+    expect(getByText('100 pts')).toBeInTheDocument()
+
+    rerender(<AssignmentRow {...defaultProps} pacePlanItem={PLAN_ITEM_3} />)
+    expect(getByText('1 pt')).toBeInTheDocument()
+  })
+
+  it('renders successfully when possible points are omitted', () => {
+    const {getByText, rerender} = renderConnected(
+      <AssignmentRow
+        {...defaultProps}
+        pacePlanItem={{...PLAN_ITEM_1, points_possible: undefined}}
+      />
+    )
+
+    expect(getByText(PLAN_ITEM_1.assignment_title)).toBeInTheDocument()
+
+    rerender(
+      <AssignmentRow {...defaultProps} pacePlanItem={{...PLAN_ITEM_1, points_possible: null}} />
+    )
+
+    expect(getByText(PLAN_ITEM_1.assignment_title)).toBeInTheDocument()
   })
 
   it('shows durations as read-only text when on student plans', () => {

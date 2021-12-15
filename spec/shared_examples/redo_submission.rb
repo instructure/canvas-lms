@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.shared_examples 'a submission redo_submission action' do |controller|
+RSpec.shared_examples "a submission redo_submission action" do |controller|
   before(:once) do
     course_with_student(active_all: true)
     @teacher = User.create!

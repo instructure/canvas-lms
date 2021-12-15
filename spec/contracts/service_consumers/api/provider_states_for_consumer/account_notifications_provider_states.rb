@@ -22,18 +22,18 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Account_Admin ID: 2 || Name: Admin1
     # Account ID: 2
     # Notification IDs: 1, 2, 3.
-    provider_state 'a user with many notifications' do
+    provider_state "a user with many notifications" do
       set_up do
         account_admin = Pact::Canvas.base_state.account_admins.first
         account = account_admin.account
         @notification1 = AccountNotification.create!(
-          account: account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
+          account: account, subject: "test subj1", message: "test msg", start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
         )
         @notification2 = AccountNotification.create!(
-          account: account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
+          account: account, subject: "test subj2", message: "test msg", start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
         )
         @notification3 = AccountNotification.create!(
-          account: account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
+          account: account, subject: "test subj3", message: "test msg", start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
         )
       end
     end

@@ -28,7 +28,7 @@ module CC::Importer::Standard
       conversion_dir = @package_root.item_path("temp_qti_conversions")
 
       resources_by_type("imsqti").each do |res|
-        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
         full_path = path ? get_full_path(path) : nil
         id = res[:migration_id]
 
@@ -38,24 +38,24 @@ module CC::Importer::Standard
           qti_node = res_node.elements.first
           path = "#{id}_qti.xml"
           full_path = get_full_path(path)
-          File.open(full_path, 'w') { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
+          File.open(full_path, "w") { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
         end
 
-        if File.exist?(full_path)
-          qti_converted_dir = File.join(conversion_dir, id)
-          if run_qti_converter(full_path, qti_converted_dir, id)
-            # get quizzes/questions
-            if (q_list = convert_questions(qti_converted_dir, id))
-              questions += q_list
-            end
-            if (quiz = convert_assessment(qti_converted_dir, id))
-              quizzes << quiz
-            end
-          end
+        next unless File.exist?(full_path)
+
+        qti_converted_dir = File.join(conversion_dir, id)
+        next unless run_qti_converter(full_path, qti_converted_dir, id)
+
+        # get quizzes/questions
+        if (q_list = convert_questions(qti_converted_dir, id))
+          questions += q_list
+        end
+        if (quiz = convert_assessment(qti_converted_dir, id))
+          quizzes << quiz
         end
       end
 
-      [{ :assessment_questions => questions }, { :assessments => quizzes }]
+      [{ assessment_questions: questions }, { assessments: quizzes }]
     end
 
     def run_qti_converter(qti_file, out_folder, resource_id)
@@ -67,7 +67,7 @@ module CC::Importer::Standard
       if $?.exitstatus == 0
         true
       else
-        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', :file_identifier => resource_id), "Output of QTI conversion tool: #{python_std_out.last(300)}")
+        add_warning(I18n.t("lib.cc.standard.failed_to_convert_qti", "Failed to import Assessment %{file_identifier}", file_identifier: resource_id), "Output of QTI conversion tool: #{python_std_out.last(300)}")
         false
       end
     end
@@ -76,7 +76,7 @@ module CC::Importer::Standard
       questions = nil
       begin
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
-        questions = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
+        questions = Qti.convert_questions(manifest_file, flavor: Qti::Flavors::COMMON_CARTRIDGE)
         ::Canvas::Migration::MigratorHelper.prepend_id_to_questions(questions, resource_id)
 
         # try to replace relative urls
@@ -84,14 +84,14 @@ module CC::Importer::Standard
           question[:question_text] = replace_urls(question[:question_text], resource_id) if question[:question_text]
           question[:answers].each do |ans|
             ans.each_pair do |key, val|
-              if key.to_s.end_with? "html"
-                ans[key] = replace_urls(val, resource_id) if ans[key]
+              if key.to_s.end_with?("html") && ans[key]
+                ans[key] = replace_urls(val, resource_id)
               end
             end
           end
         end
       rescue
-        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', :file_identifier => resource_id), $!)
+        add_warning(I18n.t("lib.cc.standard.failed_to_convert_qti", "Failed to import Assessment %{file_identifier}", file_identifier: resource_id), $!)
       end
       questions
     end
@@ -100,13 +100,13 @@ module CC::Importer::Standard
       quiz = nil
       begin
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
-        quizzes = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
+        quizzes = Qti.convert_assessments(manifest_file, flavor: Qti::Flavors::COMMON_CARTRIDGE)
         ::Canvas::Migration::MigratorHelper.prepend_id_to_assessments(quizzes, resource_id)
         if (quiz = quizzes.first)
           quiz[:migration_id] = resource_id
         end
       rescue
-        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', :file_identifier => resource_id), $!)
+        add_warning(I18n.t("lib.cc.standard.failed_to_convert_qti", "Failed to import Assessment %{file_identifier}", file_identifier: resource_id), $!)
       end
       quiz
     end

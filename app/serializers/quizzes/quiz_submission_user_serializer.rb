@@ -58,7 +58,7 @@ module Quizzes
     def filter(keys)
       keys.select do |key|
         case key
-        when :quiz_submission then sideloads.include?('quiz_submissions')
+        when :quiz_submission then sideloads.include?("quiz_submissions")
         else true
         end
       end

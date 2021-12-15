@@ -27,7 +27,7 @@ describe Loaders::AssetStringLoader do
 
   around do |example|
     @query_count = 0
-    subscription = ActiveSupport::Notifications.subscribe('sql.active_record') do
+    subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do
       @query_count += 1
     end
 
@@ -37,26 +37,26 @@ describe Loaders::AssetStringLoader do
   end
 
   it "batch loads" do
-    expect {
+    expect do
       GraphQL::Batch.batch do
-        Loaders::AssetStringLoader.load(@course1.asset_string).then { |course|
+        Loaders::AssetStringLoader.load(@course1.asset_string).then do |course|
           expect(course).to eq @course1
-        }
-        Loaders::AssetStringLoader.load(@course2.asset_string).then { |course|
+        end
+        Loaders::AssetStringLoader.load(@course2.asset_string).then do |course|
           expect(course).to eq @course2
-        }
-        Loaders::AssetStringLoader.load(@assignment.asset_string).then { |assignment|
+        end
+        Loaders::AssetStringLoader.load(@assignment.asset_string).then do |assignment|
           expect(assignment).to eq @assignment
-        }
+        end
       end
-    }.to change { @query_count }.by(2)
+    end.to change { @query_count }.by(2)
   end
 
   it "fulfills with nil if target is not found" do
     GraphQL::Batch.batch do
-      Loaders::AssetStringLoader.load("random_1").then { |target|
+      Loaders::AssetStringLoader.load("random_1").then do |target|
         expect(target).to eq nil
-      }
+      end
     end
   end
 end

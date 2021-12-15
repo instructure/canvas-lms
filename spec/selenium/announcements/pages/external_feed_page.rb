@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 class ExternalFeedPage
   class << self
@@ -24,7 +24,7 @@ class ExternalFeedPage
 
     # ---------------------- Controls ----------------------
     def rss_feed_link
-      f('#rss-feed-link')
+      f("#rss-feed-link")
     end
 
     def add_external_feed_expander
@@ -36,7 +36,7 @@ class ExternalFeedPage
     end
 
     def display_length_option(type)
-      input_id = f("input[type='radio'][name='verbosity-selection'][value='#{type}']").attribute('id')
+      input_id = f("input[type='radio'][name='verbosity-selection'][value='#{type}']").attribute("id")
       f("label[for='#{input_id}']")
     end
 
@@ -45,7 +45,7 @@ class ExternalFeedPage
     end
 
     def add_feed_button
-      f('#external-rss-feed__submit-button')
+      f("#external-rss-feed__submit-button")
     end
 
     def feed_list
@@ -53,7 +53,7 @@ class ExternalFeedPage
     end
 
     def external_feeds
-      ff('.announcements-tray-feed-row')
+      ff(".announcements-tray-feed-row")
     end
 
     def feed_name(name)
@@ -81,7 +81,7 @@ class ExternalFeedPage
     end
 
     def delete_first_feed
-      f('button', external_feeds[0]).click
+      f("button", external_feeds[0]).click
       wait_for_ajaximations
     end
   end

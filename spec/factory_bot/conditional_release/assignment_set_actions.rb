@@ -19,8 +19,8 @@
 #
 FactoryBot.define do
   factory :assignment_set_action, class: ConditionalRelease::AssignmentSetAction do
-    action { 'assign' }
-    source { 'grade_change' }
+    action { "assign" }
+    source { "grade_change" }
     student_id { generate(:user_id) }
     actor_id { generate(:user_id) }
     assignment_set

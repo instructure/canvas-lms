@@ -26,58 +26,58 @@ describe Types::RubricCriterionType do
   let(:rubric) { rubric_for_course }
   let!(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
 
-  it 'works' do
-    expect(rubric_type.resolve('criteria { _id }')).to eq(rubric.criteria.map { |c| c[:id].to_s })
+  it "works" do
+    expect(rubric_type.resolve("criteria { _id }")).to eq(rubric.criteria.map { |c| c[:id].to_s })
   end
 
-  describe 'works for the field' do
-    it 'criterion_use_range' do
+  describe "works for the field" do
+    it "criterion_use_range" do
       expect(
-        rubric_type.resolve('criteria { criterionUseRange }')
+        rubric_type.resolve("criteria { criterionUseRange }")
       ).to eq [false]
     end
 
-    it 'description' do
+    it "description" do
       expect(
-        rubric_type.resolve('criteria { description }')
+        rubric_type.resolve("criteria { description }")
       ).to eq rubric.criteria.pluck(:description)
     end
 
-    it 'ignore_for_scoring' do
+    it "ignore_for_scoring" do
       expect(
-        rubric_type.resolve('criteria { ignoreForScoring }')
+        rubric_type.resolve("criteria { ignoreForScoring }")
       ).to eq [false]
     end
 
-    it 'long_description' do
+    it "long_description" do
       expect(
-        rubric_type.resolve('criteria { longDescription }')
+        rubric_type.resolve("criteria { longDescription }")
       ).to eq rubric.criteria.pluck(:long_description)
     end
 
-    it 'mastery_points' do
+    it "mastery_points" do
       expect(
-        rubric_type.resolve('criteria { masteryPoints }')
+        rubric_type.resolve("criteria { masteryPoints }")
       ).to eq rubric.criteria.pluck(:master_points)
     end
 
-    it 'outcome' do
+    it "outcome" do
       rubric.criteria[0][:learning_outcome_id] = learning_outcome.id
       rubric.save!
       expect(
-        rubric_type.resolve('criteria { outcome { _id }}')
+        rubric_type.resolve("criteria { outcome { _id }}")
       ).to eq rubric.criteria.pluck(:learning_outcome_id).map(&:to_s)
     end
 
-    it 'points' do
+    it "points" do
       expect(
-        rubric_type.resolve('criteria { points }')
+        rubric_type.resolve("criteria { points }")
       ).to eq rubric.criteria.pluck(:points)
     end
 
-    it 'ratings' do
+    it "ratings" do
       expect(
-        rubric_type.resolve('criteria { ratings { _id }}')
+        rubric_type.resolve("criteria { ratings { _id }}")
       ).to eq(rubric.criteria.map { |c| c[:ratings].map { |r| r[:id].to_s } })
     end
   end

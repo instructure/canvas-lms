@@ -29,21 +29,21 @@ module Auditors::ActiveRecord
     ].freeze
 
     def self.precreate_tables
-      Setting.get('auditors_precreate_tables', 2).to_i
+      Setting.get("auditors_precreate_tables", 2).to_i
     end
 
     def self.process
       Shard.current.database_server.unguard do
         GuardRail.activate(:deploy) do
           AUDITOR_CLASSES.each do |auditor_cls|
-            log '*' * 80
-            log '-' * 80
+            log "*" * 80
+            log "-" * 80
             partman = CanvasPartman::PartitionManager.create(auditor_cls)
             partman.ensure_partitions(precreate_tables)
             Shard.current.database_server.unguard do
               partman.prune_partitions(retention_months)
             end
-            log '*' * 80
+            log "*" * 80
           end
           ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
         end

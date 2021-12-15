@@ -20,10 +20,10 @@
 
 class GradingStandardsController < ApplicationController
   JSON_METHODS =
-    [:display_name, :context_code, :assessed_assignment?, :context_name].freeze
+    %i[display_name context_code assessed_assignment? context_name].freeze
 
   before_action :require_context
-  add_crumb(proc { t '#crumbs.grading_standards', "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
+  add_crumb(proc { t "#crumbs.grading_standards", "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
   before_action { |c| c.active_tab = "grading_standards" }
 
   def index
@@ -43,11 +43,11 @@ class GradingStandardsController < ApplicationController
         client_env[:GRADING_PERIOD_SET_UPDATE_URL] = api_v1_account_grading_period_set_url(@context, "{{ id }}")
         client_env[:ENROLLMENT_TERMS_URL] = api_v1_enrollment_terms_url(@context.root_account)
         client_env[:DELETE_GRADING_PERIOD_URL] = api_v1_account_grading_period_destroy_url(@context, "{{ id }}")
-        view_path = 'account_index'
+        view_path = "account_index"
       else
         client_env[:GRADING_PERIODS_URL] = api_v1_course_grading_periods_url(@context)
         client_env[:GRADING_PERIODS_WEIGHTED] = @context.weighted_grading_periods?
-        view_path = 'course_index'
+        view_path = "course_index"
       end
 
       js_env(client_env)
@@ -117,6 +117,6 @@ class GradingStandardsController < ApplicationController
   def grading_standard_params
     return {} unless params[:grading_standard]
 
-    params[:grading_standard].permit(:title, :standard_data => strong_anything, :data => strong_anything)
+    params[:grading_standard].permit(:title, standard_data: strong_anything, data: strong_anything)
   end
 end

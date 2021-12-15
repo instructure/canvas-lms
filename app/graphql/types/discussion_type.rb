@@ -19,18 +19,18 @@
 #
 
 class DiscussionFilterType < Types::BaseEnum
-  graphql_name 'DiscussionFilterType'
-  description 'Search types that can be associated with discussions'
-  value 'all'
-  value 'unread'
-  value 'drafts'
-  value 'deleted'
+  graphql_name "DiscussionFilterType"
+  description "Search types that can be associated with discussions"
+  value "all"
+  value "unread"
+  value "drafts"
+  value "deleted"
 end
 
 class DiscussionSortOrderType < Types::BaseEnum
-  graphql_name 'DiscussionSortOrderType'
-  value 'asc', value: :asc
-  value 'desc', value: :desc
+  graphql_name "DiscussionSortOrderType"
+  value "asc", value: :asc
+  value "desc", value: :desc
 end
 
 module Types
@@ -53,6 +53,7 @@ module Types
     field :posted_at, Types::DateTimeType, null: true
     field :podcast_has_student_posts, Boolean, null: true
     field :discussion_type, String, null: true
+    field :anonymous_state, String, null: true
     field :position, Int, null: true
     field :allow_rating, Boolean, null: true
     field :only_graders_can_rate, Boolean, null: true
@@ -62,14 +63,7 @@ module Types
     field :require_initial_post, Boolean, null: true
 
     field :message, String, null: true
-    def message
-      object.message
-    end
-
-    field :locked_for_user, Boolean, null: false
-    def locked_for_user
-      object.locked_for?(current_user, check_policies: true)
-    end
+    delegate :message, to: :object
 
     field :available_for_user, Boolean, null: false
     def available_for_user
@@ -215,9 +209,7 @@ module Types
       argument :filter, DiscussionFilterType, required: false
     end
     def search_entry_count(**args)
-      get_entries(args).then do |entries|
-        entries.count
-      end
+      get_entries(args).then(&:count)
     end
 
     field :mentionable_users_connection, Types::MessageableUserType.connection_type, null: true do

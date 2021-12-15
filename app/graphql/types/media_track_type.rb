@@ -22,7 +22,7 @@ module Types
   class MediaTrackType < ApplicationObjectType
     implements Interfaces::LegacyIDInterface
 
-    graphql_name 'MediaTrack'
+    graphql_name "MediaTrack"
 
     field :kind, String, null: true
 

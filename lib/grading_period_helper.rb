@@ -22,7 +22,7 @@ module GradingPeriodHelper
     return false if periods.empty?
 
     if date.nil?
-      periods.sort_by(&:end_date).last.closed?
+      periods.max_by(&:end_date).closed?
     else
       periods.any? do |period|
         period.in_date_range?(date) && period.closed?

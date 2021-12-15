@@ -21,6 +21,6 @@ class EnableEportfolioReport < ActiveRecord::Migration[6.0]
   tag :postdeploy
 
   def up
-    DataFixup::AddNewDefaultReport.delay_if_production.run('eportfolio_report_csv')
+    DataFixup::AddNewDefaultReport.delay_if_production.run("eportfolio_report_csv")
   end
 end

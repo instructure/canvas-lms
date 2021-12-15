@@ -28,13 +28,13 @@ module CanvasPartmanTest::SchemaHelper
     end
 
     def drop_table(table_name, opts = {})
-      if self.table_exists?(table_name)
+      if table_exists?(table_name)
         # `drop_table` doesn't really accept any options, so cascade must be
         # done manually.
         #
         # see http://apidock.com/rails/ActiveRecord/ConnectionAdapters/SchemaStatements/drop_table
         if opts[:cascade]
-          ActiveRecord::Base.connection.execute <<-SQL
+          ActiveRecord::Base.connection.execute <<~SQL.squish
             DROP TABLE #{table_name}
             CASCADE
           SQL

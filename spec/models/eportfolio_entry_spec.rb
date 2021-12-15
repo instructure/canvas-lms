@@ -19,7 +19,7 @@
 #
 
 describe EportfolioEntry do
-  describe 'validation' do
+  describe "validation" do
     before(:once) do
       eportfolio_model
       @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
@@ -32,17 +32,17 @@ describe EportfolioEntry do
     it "validates the length of attributes" do
       @eportfolio_entry.name = @long_string
       @eportfolio_entry.slug = @long_string
-      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
+      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
     end
 
     it "validates the length of slug" do
       @eportfolio_entry.slug = @long_string
-      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
+      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
     end
 
     it "validates the length of name" do
       @eportfolio_entry.name = @long_string
-      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
   end
 
@@ -53,33 +53,33 @@ describe EportfolioEntry do
 
     it "accepts valid attachments" do
       eportfolio_model
-      attachment_model(:context => @user)
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'attachment', :attachment_id => @attachment.id } })
+      attachment_model(context: @user)
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "attachment", attachment_id: @attachment.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
-      expect(@eportfolio_entry.content[0][:section_type]).to eql('attachment')
+      expect(@eportfolio_entry.content[0][:section_type]).to eql("attachment")
       expect(@eportfolio_entry.content[0][:attachment_id]).to eql(@attachment.id)
     end
 
     it "does not accept invalid attachments" do
-      attachment_model(:context => User.create)
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'attachment', :attachment_id => @attachment.id } })
+      attachment_model(context: User.create)
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "attachment", attachment_id: @attachment.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'attachment' } })
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "attachment" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "accepts valid submissions" do
-      submission_model(:user => @user)
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'submission', :submission_id => @submission.id } })
+      submission_model(user: @user)
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "submission", submission_id: @submission.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
-      expect(@eportfolio_entry.content[0][:section_type]).to eql('submission')
+      expect(@eportfolio_entry.content[0][:section_type]).to eql("submission")
       expect(@eportfolio_entry.content[0][:submission_id]).to eql(@submission.id)
     end
 
@@ -87,23 +87,23 @@ describe EportfolioEntry do
       submission_model
       @bad_submission = @submission
       eportfolio_model
-      submission_model(:user => @user)
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'submission', :submission_id => @bad_submission.id } })
+      submission_model(user: @user)
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "submission", submission_id: @bad_submission.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'submission' } })
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "submission" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "accepts valid html content" do
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'html', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "html", content: "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
-      expect(@eportfolio_entry.content[0][:section_type]).to eql('html')
+      expect(@eportfolio_entry.content[0][:section_type]).to eql("html")
       expect(@eportfolio_entry.content[0][:content]).to match(/\#bob/)
       expect(@eportfolio_entry.content[0][:content]).to match(/link/)
       expect(@eportfolio_entry.content[0][:content]).not_to match(/alert/)
@@ -111,17 +111,17 @@ describe EportfolioEntry do
     end
 
     it "does not accept invalid html content" do
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'html' } })
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "html" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "accepts valid rich content" do
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'rich_text', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "rich_text", content: "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
-      expect(@eportfolio_entry.content[0][:section_type]).to eql('rich_text')
+      expect(@eportfolio_entry.content[0][:section_type]).to eql("rich_text")
       expect(@eportfolio_entry.content[0][:content]).to match(/\#bob/)
       expect(@eportfolio_entry.content[0][:content]).to match(/link/)
       expect(@eportfolio_entry.content[0][:content]).not_to match(/alert/)
@@ -129,7 +129,7 @@ describe EportfolioEntry do
     end
 
     it "does not accept invalid rich content" do
-      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'rich_text', :content => "<blink/>" } })
+      @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "rich_text", content: "<blink/>" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
@@ -156,8 +156,8 @@ describe EportfolioEntry do
 
       context "when the setting has a value" do
         before do
-          Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
-          Setting.set('eportfolio_content_spam_keywords', 'injurious,deleterious')
+          Setting.set("eportfolio_title_spam_keywords", "bad, verybad, worse")
+          Setting.set("eportfolio_content_spam_keywords", "injurious,deleterious")
         end
 
         it "marks the owning portfolio as possible spam when the title matches any title keywords" do
@@ -178,7 +178,7 @@ describe EportfolioEntry do
         end
 
         it "does not mark as spam when neither the title nor the content match their respective offending keywords" do
-          expect {
+          expect do
             entry.update!(name: "my injurious page")
             entry.parse_content(
               section_count: 1,
@@ -188,22 +188,22 @@ describe EportfolioEntry do
               }
             )
             entry.save!
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
 
         it "does not mark as spam if a spam_status already exists" do
           @eportfolio.update!(spam_status: "marked_as_safe")
 
-          expect {
+          expect do
             entry.update!(name: "actually a bad page")
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        expect {
+        expect do
           entry.update!(name: "actually a bad page")
-        }.not_to change { spam_status }
+        end.not_to change { spam_status }
       end
     end
   end

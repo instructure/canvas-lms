@@ -23,11 +23,11 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.indexes
-    %w(
+    %w[
       authentications_by_pseudonym
       authentications_by_account
       authentications_by_user
@@ -36,13 +36,15 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
       grade_changes_by_course
       grade_changes_by_root_account_student
       grade_changes_by_root_account_grader
-    )
+    ]
   end
 
   def self.up
-    compression_params = cassandra.db.use_cql3? ?
-        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
-        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+    compression_params = if cassandra.db.use_cql3?
+                           "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                         else
+                           "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                         end
 
     cassandra.execute %{
       CREATE TABLE authentications (
@@ -106,11 +108,11 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
 
   def self.down
     indexes.each do |index_name|
-      cassandra.execute %{DROP TABLE #{index_name};}
+      cassandra.execute %(DROP TABLE #{index_name};)
     end
 
-    cassandra.execute %{DROP TABLE authentications;}
-    cassandra.execute %{DROP TABLE courses;}
-    cassandra.execute %{DROP TABLE grade_changes;}
+    cassandra.execute %(DROP TABLE authentications;)
+    cassandra.execute %(DROP TABLE courses;)
+    cassandra.execute %(DROP TABLE grade_changes;)
   end
 end

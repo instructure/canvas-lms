@@ -41,7 +41,7 @@ module Utils
         return i18n_date(:short) if date.this_year? || style == :short
       end
 
-      return i18n_date(:medium)
+      i18n_date(:medium)
     end
 
     private
@@ -50,16 +50,16 @@ module Utils
       return nil if value_type == :none
 
       {
-        today: I18n.t('date.days.today', 'Today'),
-        tomorrow: I18n.t('date.days.tomorrow', 'Tomorrow'),
-        yesterday: I18n.t('date.days.yesterday', 'Yesterday'),
+        today: I18n.t("date.days.today", "Today"),
+        tomorrow: I18n.t("date.days.tomorrow", "Tomorrow"),
+        yesterday: I18n.t("date.days.yesterday", "Yesterday"),
         weekday: i18n_date(:weekday)
       }[value_type]
     end
 
     def i18n_date(format)
       # Use send to prevent i18nliner trying to parse this
-      I18n.l(raw_date, format: I18n.send(:t, "date.formats.#{format}#{with_weekday ? '_with_weekday' : ''}"))
+      I18n.l(raw_date, format: I18n.send(:t, "date.formats.#{format}#{with_weekday ? "_with_weekday" : ""}"))
     end
 
     def special_value_type

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module BlueprintCourseCommon
   # call this via change_blueprint_settings(course, content: false, points: false, due_dates: false, availability_dates: false)
@@ -125,21 +125,21 @@ module BlueprintCourseCommon
   ##### sidebar and associated modal helpers #####
   # open the blueprint sidebar
   def open_blueprint_sidebar
-    f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+    f(".blueprint__root .bcs__wrapper .bcs__trigger").click
   end
 
   # open the associations modal
   def open_associations
     open_blueprint_sidebar
-    f('#mcSidebarAsscBtn').click                              # open the associations modal
-    expect(f('.bcs__modal-content-wrapper')).to be_displayed  # the modal is open
+    f("#mcSidebarAsscBtn").click                              # open the associations modal
+    expect(f(".bcs__modal-content-wrapper")).to be_displayed  # the modal is open
   end
 
   # open the course list behind the toggle on the associations modal
   # and make sure the data has arrived
   # this turned out to be messier than one would think
   def open_courses_list
-    details_wrapper = f('.bca-course-details__wrapper')
+    details_wrapper = f(".bca-course-details__wrapper")
     wait_for_ajaximations
 
     # Clicking the button was not reliable.
@@ -152,16 +152,16 @@ module BlueprintCourseCommon
   end
 
   def term_options
-    INSTUI_Select_options('#termsFilter').map(&:text)
+    INSTUI_Select_options("#termsFilter").map(&:text)
   end
 
   def sub_account_options
-    INSTUI_Select_options('#subAccountsFilter').map(&:text)
+    INSTUI_Select_options("#subAccountsFilter").map(&:text)
   end
 
   # return the <tbody> holding the list of available courses
   def available_courses_table
-    f('.bca-table__content-wrapper tbody')
+    f(".bca-table__content-wrapper tbody")
   end
 
   # return the <tr>s holding with the current list of available courses
@@ -173,62 +173,62 @@ module BlueprintCourseCommon
 
   # return the <tbody> holding the current associations
   def current_associations_table
-    ff('.bca-associations-table table tbody')[0]
+    ff(".bca-associations-table table tbody")[0]
   end
 
   # return the <tr>s holding the list of associated courses
   def current_associations
     current_tbody = current_associations_table
-    current_courses = ff('tr', current_tbody)
+    current_courses = ff("tr", current_tbody)
     current_courses.shift # shift removes the row with the "current" sub-heading
     current_courses
   end
 
   # return the tbody holding the to be added courses
   def to_be_added_table
-    ff('.bca-associations-table table tbody')[1]
+    ff(".bca-associations-table table tbody")[1]
   end
 
   # return the <tr>s holding the current list of courses to be added as
   # children of the current master course
   def to_be_added
     to_be_tbody = to_be_added_table
-    to_be_courses = ff('tr', to_be_tbody)
+    to_be_courses = ff("tr", to_be_tbody)
     to_be_courses.shift # shift removes the row with the sub-heading
     to_be_courses
   end
 
   # return the Done/Save button (which is the last button on the page)
   def save_button
-    buttons = ff('span button')
+    buttons = ff("span button")
     buttons[buttons.length - 1] # last button on the page
   end
 
   # click the Save button and wait for it to complete
   def do_save
-    save_button().click
-    expect(f('#flashalert_message_holder')).to contain_css('div') # the alert saying the save completed
+    save_button.click
+    expect(f("#flashalert_message_holder")).to contain_css("div") # the alert saying the save completed
   end
 
   shared_context "blueprint courses files context" do
     def options_panel
-      f('.al-options')
+      f(".al-options")
     end
 
     def options_button
-      f('.al-trigger')
+      f(".al-trigger")
     end
 
     def files_page_header
-      f('.ef-header')
+      f(".ef-header")
     end
 
     def file_object
-      f('.ef-item-row .ef-date-created-col')
+      f(".ef-item-row .ef-date-created-col")
     end
 
     def lock_icon_container
-      f('.ef-directory .ef-item-row .lock-icon')
+      f(".ef-directory .ef-item-row .lock-icon")
     end
   end
 end

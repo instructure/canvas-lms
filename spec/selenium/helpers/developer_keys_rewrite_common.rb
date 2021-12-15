@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module DeveloperKeysRewriteCommon
   def click_inherited_tab
@@ -70,6 +70,6 @@ module DeveloperKeysRewriteCommon
 
   def wait_for_dev_key_modal_to_close
     app = f("#application") # prevent keep_trying_until from complaining about 'f'
-    keep_trying_until { expect(app.attribute('aria-hidden')).to be_falsey }
+    keep_trying_until { expect(app.attribute("aria-hidden")).to be_falsey }
   end
 end

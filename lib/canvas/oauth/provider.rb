@@ -19,7 +19,7 @@
 
 module Canvas::OAuth
   class Provider
-    OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
+    OAUTH2_OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
 
     attr_reader :client_id, :scopes, :purpose
 
@@ -52,9 +52,7 @@ module Canvas::OAuth
       self.class.is_oob?(redirect_uri) || key.redirect_domain_matches?(redirect_uri)
     end
 
-    def icon_url
-      key.icon_url
-    end
+    delegate :icon_url, to: :key
 
     def key
       return nil unless client_id_is_valid?
@@ -98,7 +96,7 @@ module Canvas::OAuth
     end
 
     def session_hash
-      { :client_id => key.id, :redirect_uri => redirect_uri, :scopes => scopes, :purpose => purpose }
+      { client_id: key.id, redirect_uri: redirect_uri, scopes: scopes, purpose: purpose }
     end
 
     def valid_scopes?
@@ -123,9 +121,9 @@ module Canvas::OAuth
     end
 
     def self.final_redirect_params(oauth_session, current_user, real_user = nil, options = {})
-      options = { :scopes => oauth_session&.dig(:scopes), :remember_access => options&.dig(:remember_access), :purpose => oauth_session&.dig(:purpose) }
+      options = { scopes: oauth_session&.dig(:scopes), remember_access: options&.dig(:remember_access), purpose: oauth_session&.dig(:purpose) }
       code = Canvas::OAuth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
-      redirect_params = { :code => code }
+      redirect_params = { code: code }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]
       redirect_params
     end
@@ -138,7 +136,7 @@ module Canvas::OAuth
       if is_oob?(redirect_uri)
         controller.oauth2_auth_url(opts)
       else
-        has_params = redirect_uri.include?('?')
+        has_params = redirect_uri.include?("?")
         redirect_uri + (has_params ? "&" : "?") + opts.to_query
       end
     end
@@ -146,7 +144,7 @@ module Canvas::OAuth
     private
 
     def default_app_name
-      I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')
+      I18n.t("pseudonym_sessions.default_app_name", "Third-Party Application")
     end
   end
 end

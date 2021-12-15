@@ -43,7 +43,7 @@ class DeveloperKeysController < ApplicationController
 
       format.json do
         @keys = Api.paginate(index_scope, self, account_developer_keys_url(@context))
-        render :json => developer_keys_json(
+        render json: developer_keys_json(
           @keys,
           @current_user,
           session,
@@ -59,9 +59,9 @@ class DeveloperKeysController < ApplicationController
     @key = DeveloperKey.new(developer_key_params)
     @key.account = @context if params[:account_id] && @context != Account.site_admin
     if @key.save
-      render :json => developer_key_json(@key, @current_user, session, account_context)
+      render json: developer_key_json(@key, @current_user, session, account_context)
     else
-      render :json => @key.errors, :status => :bad_request
+      render json: @key.errors, status: :bad_request
     end
   end
 
@@ -69,22 +69,22 @@ class DeveloperKeysController < ApplicationController
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
     @key.attributes = developer_key_params unless params[:developer_key].empty?
     if @key.save
-      render :json => developer_key_json(@key, @current_user, session, account_context)
+      render json: developer_key_json(@key, @current_user, session, account_context)
     else
-      render :json => @key.errors, :status => :bad_request
+      render json: @key.errors, status: :bad_request
     end
   end
 
   def destroy
     @key.destroy
-    render :json => developer_key_json(@key, @current_user, session, account_context)
+    render json: developer_key_json(@key, @current_user, session, account_context)
   end
 
   protected
 
   def set_navigation
-    set_active_tab 'developer_keys'
-    add_crumb t('#crumbs.developer_keys', "Developer Keys")
+    set_active_tab "developer_keys"
+    add_crumb t("#crumbs.developer_keys", "Developer Keys")
   end
 
   private
@@ -126,7 +126,7 @@ class DeveloperKeysController < ApplicationController
     end
 
     # failover to what require_site_admin_with_permission uses
-    return Account.site_admin
+    Account.site_admin
   end
 
   def context_is_domain_root_account?

@@ -32,12 +32,12 @@ class AddAssignmentGroupIdToScores < ActiveRecord::Migration[5.0]
               algorithm: :concurrently,
               name: :index_enrollment_scores
 
-    add_index :scores, %i(enrollment_id grading_period_id), unique: true,
+    add_index :scores, %i[enrollment_id grading_period_id], unique: true,
                                                             where: "grading_period_id IS NOT NULL",
                                                             algorithm: :concurrently,
                                                             name: :index_grading_period_scores
 
-    add_index :scores, %i(enrollment_id assignment_group_id), unique: true,
+    add_index :scores, %i[enrollment_id assignment_group_id], unique: true,
                                                               where: "assignment_group_id IS NOT NULL",
                                                               algorithm: :concurrently,
                                                               name: :index_assignment_group_scores

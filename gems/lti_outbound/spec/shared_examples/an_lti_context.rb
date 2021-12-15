@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples_for 'an LTI context' do
-  it_behaves_like 'it has a proc attribute setter and getter for', :name
-  it_behaves_like 'it has a proc attribute setter and getter for', :consumer_instance
-  it_behaves_like 'it has a proc attribute setter and getter for', :opaque_identifier
-  it_behaves_like 'it has a proc attribute setter and getter for', :id
-  it_behaves_like 'it has a proc attribute setter and getter for', :sis_source_id
+shared_examples_for "an LTI context" do
+  it_behaves_like "it has a proc attribute setter and getter for", :name
+  it_behaves_like "it has a proc attribute setter and getter for", :consumer_instance
+  it_behaves_like "it has a proc attribute setter and getter for", :opaque_identifier
+  it_behaves_like "it has a proc attribute setter and getter for", :id
+  it_behaves_like "it has a proc attribute setter and getter for", :sis_source_id
 end

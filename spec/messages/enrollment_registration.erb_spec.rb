@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'enrollment_registration' do
+describe "enrollment_registration" do
   before :once do
-    @root_account = Account.create(name: 'My Root Account')
-    @sub_account = Account.create(name: 'My Sub-account', parent_account: @root_account)
+    @root_account = Account.create(name: "My Root Account")
+    @sub_account = Account.create(name: "My Sub-account", parent_account: @root_account)
     @user1 = user_factory
-    course_with_student(:account => @sub_account, :user => @user1)
-    @user1.workflow_state = 'creation_pending'
+    course_with_student(account: @sub_account, user: @user1)
+    @user1.workflow_state = "creation_pending"
   end
 
   let(:asset) { @enrollment }
@@ -43,6 +43,6 @@ describe 'enrollment_registration' do
     expect(msg.html_body).not_to include "participate in a class at My Sub-account."
     expect(msg.html_body).not_to include "Update your notification settings"
     expect(msg.html_body).not_to include "Click here to view course page"
-    expect(@message.body).not_to include 'To change or turn off email notifications,'
+    expect(@message.body).not_to include "To change or turn off email notifications,"
   end
 end

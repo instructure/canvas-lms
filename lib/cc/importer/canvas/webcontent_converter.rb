@@ -26,12 +26,12 @@ module CC::Importer::Canvas
 
       @manifest.css("resource[type=#{WEBCONTENT}][href^=#{WEB_RESOURCES_FOLDER}]").each do |res|
         file = {}
-        file['migration_id'] = res['identifier']
-        file['path_name'] = res['href'].sub(WEB_RESOURCES_FOLDER + '/', '')
-        file['file_name'] = File.basename file['path_name']
-        file['type'] = 'FILE_TYPE'
+        file["migration_id"] = res["identifier"]
+        file["path_name"] = res["href"].sub(WEB_RESOURCES_FOLDER + "/", "")
+        file["file_name"] = File.basename file["path_name"]
+        file["type"] = "FILE_TYPE"
 
-        file_map[file['migration_id']] = file
+        file_map[file["migration_id"]] = file
       end
 
       convert_file_metadata(file_map)
@@ -45,49 +45,49 @@ module CC::Importer::Canvas
 
       doc = open_file_xml path
 
-      if (folders = doc.at_css('folders'))
+      if (folders = doc.at_css("folders"))
         @course[:hidden_folders] = []
         @course[:locked_folders] = []
-        folders.css('folder').each do |folder|
-          @course[:hidden_folders] << folder['path'] if get_bool_val(folder, 'hidden', false)
-          @course[:locked_folders] << folder['path'] if get_bool_val(folder, 'locked', false)
+        folders.css("folder").each do |folder|
+          @course[:hidden_folders] << folder["path"] if get_bool_val(folder, "hidden", false)
+          @course[:locked_folders] << folder["path"] if get_bool_val(folder, "locked", false)
         end
       end
 
-      if (files = doc.at_css('files'))
-        files.css('file').each do |file|
-          id = file['identifier']
-          if file_map[id]
-            file_map[id][:hidden] = true if get_bool_val(file, 'hidden', false)
-            file_map[id][:locked] = true if get_bool_val(file, 'locked', false)
+      if (files = doc.at_css("files"))
+        files.css("file").each do |file|
+          id = file["identifier"]
+          next unless file_map[id]
 
-            if (unlock_at = get_time_val(file, 'unlock_at'))
-              file_map[id][:unlock_at] = unlock_at
-            end
-            if (lock_at = get_time_val(file, 'lock_at'))
-              file_map[id][:lock_at] = lock_at
-            end
+          file_map[id][:hidden] = true if get_bool_val(file, "hidden", false)
+          file_map[id][:locked] = true if get_bool_val(file, "locked", false)
 
-            if (display_name = file.at_css("display_name"))
-              file_map[id][:display_name] = display_name.text
-            end
-            if (usage_rights = file.at_css("usage_rights"))
-              rights_hash = { :use_justification => usage_rights.attr('use_justification') }
-              if (legal_copyright = usage_rights.at_css('legal_copyright'))
-                rights_hash.merge!(:legal_copyright => legal_copyright.text)
-              end
-              if (license = usage_rights.at_css('license'))
-                rights_hash.merge!(:license => license.text)
-              end
-              file_map[id][:usage_rights] = rights_hash
-            end
+          if (unlock_at = get_time_val(file, "unlock_at"))
+            file_map[id][:unlock_at] = unlock_at
           end
+          if (lock_at = get_time_val(file, "lock_at"))
+            file_map[id][:lock_at] = lock_at
+          end
+
+          if (display_name = file.at_css("display_name"))
+            file_map[id][:display_name] = display_name.text
+          end
+          next unless (usage_rights = file.at_css("usage_rights"))
+
+          rights_hash = { use_justification: usage_rights.attr("use_justification") }
+          if (legal_copyright = usage_rights.at_css("legal_copyright"))
+            rights_hash[:legal_copyright] = legal_copyright.text
+          end
+          if (license = usage_rights.at_css("license"))
+            rights_hash[:license] = license.text
+          end
+          file_map[id][:usage_rights] = rights_hash
         end
       end
     end
 
     def package_course_files
-      zip_file = File.join(@base_export_dir, 'all_files.zip')
+      zip_file = File.join(@base_export_dir, "all_files.zip")
       make_export_dir
       path = get_full_path(WEB_RESOURCES_FOLDER)
       return if Dir.glob("#{path}/**/**", File::FNM_DOTMATCH).empty?
@@ -96,7 +96,7 @@ module CC::Importer::Canvas
         Dir.glob("#{path}/**/**", File::FNM_DOTMATCH).each do |file|
           next if File.directory?(file)
 
-          file_path = file.sub(path + '/', '')
+          file_path = file.sub(path + "/", "")
           zipfile.add(file_path, file)
         end
       end

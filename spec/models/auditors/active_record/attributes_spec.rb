@@ -28,16 +28,16 @@ describe Auditors::ActiveRecord::Attributes do
 
     it "transparently fetches values using parent interface" do
       model = @model_type.new
-      model['attr_one'] = 'parent_hash_one'
-      model['attr_two'] = 'parent_hash_two'
-      expect(model['attributes']['attr_one']).to eq("parent_hash_one")
-      expect(model['attributes'].fetch('attr_two')).to eq('parent_hash_two')
+      model["attr_one"] = "parent_hash_one"
+      model["attr_two"] = "parent_hash_two"
+      expect(model["attributes"]["attr_one"]).to eq("parent_hash_one")
+      expect(model["attributes"].fetch("attr_two")).to eq("parent_hash_two")
     end
 
     it "sets values through the attributes interface" do
       model = @model_type.new
-      model['attributes']['method_three'] = :four
-      expect(model['attributes'].fetch('method_three')).to eq(:four)
+      model["attributes"]["method_three"] = :four
+      expect(model["attributes"].fetch("method_three")).to eq(:four)
     end
   end
 end

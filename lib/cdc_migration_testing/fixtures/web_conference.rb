@@ -24,19 +24,19 @@ module CdcFixtures
     # bypassing the sequence, so it'll try to create with id 1 and fail.
     # just let it try twice
     PluginSetting.unique_constraint_retry do
-      ps = PluginSetting.where(name: 'adobe_connect').first_or_initialize
+      ps = PluginSetting.where(name: "adobe_connect").first_or_initialize
       ps.settings = {}
       ps.disabled = false
       ps.save! if ps.changed?
     end
 
     WebConference.new(
-      title: 'default',
-      conference_type: 'AdobeConnect',
+      title: "default",
+      conference_type: "AdobeConnect",
       context_id: 1,
-      context_type: 'Course',
+      context_type: "Course",
       user_id: 1,
-      root_account_id: 1,
+      root_account_id: 1
     )
   end
 end

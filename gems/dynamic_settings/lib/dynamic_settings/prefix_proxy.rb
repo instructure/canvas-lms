@@ -81,7 +81,7 @@ module DynamicSettings
     # @return [nil] When no value was found
     def fetch(key, ttl: @default_ttl, **kwargs)
       unknown_kwargs = kwargs.keys - [:failsafe]
-      raise ArgumentError, "unknown keyword(s): #{unknown_kwargs.map(&:inspect).join(', ')}" unless unknown_kwargs.empty?
+      raise ArgumentError, "unknown keyword(s): #{unknown_kwargs.map(&:inspect).join(", ")}" unless unknown_kwargs.empty?
 
       retry_count = 1
 
@@ -114,7 +114,7 @@ module DynamicSettings
         # are fully atomic, this is much less of a concern,
         # we could have one ttl again
         subtree_ttl = ttl * 2
-        cache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
+        cache.fetch(CACHE_KEY_PREFIX + tree_key + "/", expires_in: ttl) do
           values = kv_fetch(tree_key, recurse: true, stale: true)
           if values.nil?
             # no sense trying to populate the subkeys
@@ -212,10 +212,10 @@ module DynamicSettings
       opts = @data_center.present? && global ? { dc: @data_center } : {}
       value = kvs.map do |k, v|
         {
-          'KV' => {
-            'Verb' => "set",
-            'Key' => full_key(k, global: global),
-            'Value' => v,
+          "KV" => {
+            "Verb" => "set",
+            "Key" => full_key(k, global: global),
+            "Value" => v,
           }
         }
       end
@@ -239,12 +239,12 @@ module DynamicSettings
         error = e
       end
       timing = format("CONSUL (%.2fms)", ms)
-      status = 'OK'
+      status = "OK"
       unless error.nil?
-        status = error.is_a?(Diplomat::KeyNotFound) && error.message == full_key ? 'NOT_FOUND' : 'ERROR'
+        status = error.is_a?(Diplomat::KeyNotFound) && error.message == full_key ? "NOT_FOUND" : "ERROR"
       end
       DynamicSettings.logger.debug("  #{timing} get (#{full_key}) -> status:#{status}") if @query_logging
-      return nil if status == 'NOT_FOUND'
+      return nil if status == "NOT_FOUND"
       raise error if error
 
       result
@@ -258,7 +258,7 @@ module DynamicSettings
     def full_key(key, global: false)
       key_array = [tree, service, environment]
       if global
-        key_array.prepend('global')
+        key_array.prepend("global")
       else
         key_array << cluster
       end

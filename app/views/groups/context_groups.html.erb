@@ -35,7 +35,7 @@
   <div class="roster-tab tab-panel">
     <h2><%= @context.is_a?(Account) ? t('account_groups', 'Account Groups') : t('course_groups', 'Course Groups') %></h2>
     <p>
-    <%= t 'group_explanation', <<-TEXT
+    <%= t 'group_explanation', <<~TEXT
     Groups are a good place to collaborate on projects or to figure out schedules for study sessions
     and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
     files.  Groups can collaborate on documents, or even schedule web conferences.
@@ -59,7 +59,7 @@
     <%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
     <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
     <%= image_tag "warning.png", :alt => '' %>
-    <%= t :student_group_warning, <<-TEXT
+    <%= t :student_group_warning, <<~TEXT
     If your teacher has talked about putting you into
     groups as part of an assignment, this is not the way to make that happen.
     Groups you organize yourself can't be used for grading... you can still form

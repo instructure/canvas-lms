@@ -51,7 +51,7 @@ describe Quizzes::QuizSubmissionHistory do
       it "sorts attempts sequentially" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
-        expect(attempts.map { |attempt| attempt.number }).to eq [1, 2]
+        expect(attempts.map(&:number)).to eq [1, 2]
       end
     end
 

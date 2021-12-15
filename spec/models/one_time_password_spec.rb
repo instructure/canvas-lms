@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe OneTimePassword do
-  it 'automatically generates a random code' do
+  it "automatically generates a random code" do
     u = User.create!
     otp = u.one_time_passwords.create!
     expect(otp.code).to match(/\d{8}/)

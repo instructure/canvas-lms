@@ -24,7 +24,7 @@ module Api::V1
     include Api::V1::Submission
 
     def days_json(course, api_context)
-      day_hash = Hash.new { |hash, date| hash[date] = { :graders => {} } }
+      day_hash = Hash.new { |hash, date| hash[date] = { graders: {} } }
       submissions_set(course, api_context)
         .each_with_object(day_hash) { |submission, day| update_graders_hash(day[day_string_for(submission)][:graders], submission, api_context) }
         .each_value do |date_hash|
@@ -32,11 +32,11 @@ module Api::V1
           date_hash[:graders].each { |grader| compress(grader, :assignments) }
         end
 
-      day_hash.map { |date, hash| hash.merge(:date => date) }.sort_by { |a| a[:date] }.reverse
+      day_hash.map { |date, hash| hash.merge(date: date) }.sort_by { |a| a[:date] }.reverse
     end
 
     def json_for_date(date, course, api_context)
-      submissions_set(course, api_context, :date => date)
+      submissions_set(course, api_context, date: date)
         .each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }
         .each_value { |grader| compress(grader, :assignments) }
         .values
@@ -55,15 +55,14 @@ module Api::V1
       end
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
-      json = json.merge(
-        :grader => grader.name,
-        :assignment_name => assignment.title,
-        :user_name => student.name,
-        :current_grade => submission.grade,
-        :current_graded_at => submission.graded_at,
-        :current_grader => current_grader.name
+      json.merge(
+        grader: grader.name,
+        assignment_name: assignment.title,
+        user_name: student.name,
+        current_grade: submission.grade,
+        current_graded_at: submission.graded_at,
+        current_grader: current_grader.name
       )
-      json
     end
 
     def versions_json(course, versions, api_context, opts = {})
@@ -98,44 +97,43 @@ module Api::V1
 
     def submissions_for(course, api_context, date, grader_id, assignment_id)
       assignment = ::Assignment.find(assignment_id)
-      options = { :date => date, :assignment_id => assignment_id, :grader_id => grader_id }
+      options = { date: date, assignment_id: assignment_id, grader_id: grader_id }
       submissions = submissions_set(course, api_context, options)
 
       # load all versions for the given submissions and back-populate their
       # versionable associations
       submission_index = submissions.index_by(&:id)
-      versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order(:number)
+      versions = Version.where(versionable_type: "Submission", versionable_id: submissions).order(:number)
       versions.each { |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
-      versions = versions_json(course, versions, api_context, :assignment => assignment)
+      versions = versions_json(course, versions, api_context, assignment: assignment)
       versions_hash = versions.group_by { |version| version[:id] }
 
       # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, submission_versions)|
         prior = HashWithIndifferentAccess.new
         filtered_versions = submission_versions.each_with_object([]) do |version, new_array|
-          if version[:score]
-            if prior[:id].nil? || prior[:score] != version[:score]
-              if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?
-                PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = nil }
-              elsif prior[:score] != version[:score]
-                PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
-              end
-              NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
-              new_array << version
+          if version[:score] &&
+             (prior[:id].nil? || prior[:score] != version[:score])
+            if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?
+              PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = nil }
+            elsif prior[:score] != version[:score]
+              PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
             end
+            NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
+            new_array << version
           end
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :id))
         end.reverse
 
-        memo << { :submission_id => submission_id, :versions => filtered_versions }
+        memo << { submission_id: submission_id, versions: filtered_versions }
       end
     end
 
     def day_string_for(submission)
       graded_at = submission.graded_at
-      return '' if graded_at.nil?
+      return "" if graded_at.nil?
 
       graded_at.in_time_zone.to_date.as_json
     end
@@ -147,7 +145,7 @@ module Api::V1
         date = options[:date]
         collection = collection.where("graded_at<? AND graded_at>?", date.end_of_day, date.beginning_of_day)
       else
-        collection = collection.where("graded_at IS NOT NULL")
+        collection = collection.where.not(graded_at: nil)
       end
 
       if (assignment_id = options[:assignment_id])
@@ -155,12 +153,12 @@ module Api::V1
       end
 
       if (grader_id = options[:grader_id])
-        if grader_id.to_s == '0'
-          # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
-          collection = collection.where("submissions.grader_id<=0")
-        else
-          collection = collection.where(grader_id: grader_id)
-        end
+        collection = if grader_id.to_s == "0"
+                       # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
+                       collection.where("submissions.grader_id<=0")
+                     else
+                       collection.where(grader_id: grader_id)
+                     end
       end
 
       api_context.paginate(collection)
@@ -168,13 +166,13 @@ module Api::V1
 
     private
 
-    PREVIOUS_VERSION_ATTRS = [:grade, :graded_at, :grader]
-    NEW_ATTRS = [:grade, :graded_at, :grader, :score]
+    PREVIOUS_VERSION_ATTRS = %i[grade graded_at grader].freeze
+    NEW_ATTRS = %i[grade graded_at grader score].freeze
 
     DEFAULT_GRADER = Struct.new(:name, :id)
 
     def default_grader
-      @default_grader ||= DEFAULT_GRADER.new(I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission'), 0)
+      @default_grader ||= DEFAULT_GRADER.new(I18n.t("gradebooks.history.graded_on_submission", "Graded on submission"), 0)
     end
 
     def user_cache
@@ -188,9 +186,9 @@ module Api::V1
     def update_graders_hash(hash, submission, api_context)
       grader = submission.grader || default_grader
       hash[grader.id] ||= {
-        :name => grader.name,
-        :id => grader.id,
-        :assignments => {}
+        name: grader.name,
+        id: grader.id,
+        assignments: {}
       }
 
       hash[grader.id][:assignments][submission.assignment_id] ||= begin

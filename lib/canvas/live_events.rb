@@ -20,7 +20,7 @@
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     ctx = LiveEvents.get_context || {}
-    payload.compact! if ctx.dig(:compact_live_events)&.present?
+    payload.compact! if ctx[:compact_live_events]&.present?
 
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
@@ -51,14 +51,14 @@ module Canvas::LiveEvents
   end
 
   def self.conversation_created(conversation)
-    post_event_stringified('conversation_created', {
+    post_event_stringified("conversation_created", {
                              conversation_id: conversation.id,
                              updated_at: conversation.updated_at
                            })
   end
 
   def self.conversation_forwarded(conversation)
-    post_event_stringified('conversation_forwarded', {
+    post_event_stringified("conversation_forwarded", {
                              conversation_id: conversation.id,
                              updated_at: conversation.updated_at
                            },
@@ -78,15 +78,15 @@ module Canvas::LiveEvents
   end
 
   def self.course_created(course)
-    post_event_stringified('course_created', get_course_data(course))
+    post_event_stringified("course_created", get_course_data(course))
   end
 
   def self.course_updated(course)
-    post_event_stringified('course_updated', get_course_data(course))
+    post_event_stringified("course_updated", get_course_data(course))
   end
 
   def self.course_syllabus_updated(course, old_syllabus_body)
-    post_event_stringified('syllabus_updated', {
+    post_event_stringified("syllabus_updated", {
                              course_id: course.global_id,
                              syllabus_body: LiveEvents.truncate(course.syllabus_body),
                              old_syllabus_body: LiveEvents.truncate(old_syllabus_body)
@@ -94,7 +94,7 @@ module Canvas::LiveEvents
   end
 
   def self.conversation_message_created(conversation_message)
-    post_event_stringified('conversation_message_created', {
+    post_event_stringified("conversation_message_created", {
                              author_id: conversation_message.author_id,
                              conversation_id: conversation_message.conversation_id,
                              created_at: conversation_message.created_at,
@@ -103,14 +103,14 @@ module Canvas::LiveEvents
   end
 
   def self.discussion_entry_created(entry)
-    post_event_stringified('discussion_entry_created', get_discussion_entry_data(entry))
+    post_event_stringified("discussion_entry_created", get_discussion_entry_data(entry))
   end
 
   def self.discussion_entry_submitted(entry, assignment_id, submission_id)
     payload = get_discussion_entry_data(entry)
     payload[:assignment_id] = assignment_id unless assignment_id.nil?
     payload[:submission_id] = submission_id unless submission_id.nil?
-    post_event_stringified('discussion_entry_submitted', payload)
+    post_event_stringified("discussion_entry_submitted", payload)
   end
 
   def self.get_discussion_entry_data(entry)
@@ -127,11 +127,11 @@ module Canvas::LiveEvents
   end
 
   def self.discussion_topic_created(topic)
-    post_event_stringified('discussion_topic_created', get_discussion_topic_data(topic))
+    post_event_stringified("discussion_topic_created", get_discussion_topic_data(topic))
   end
 
   def self.discussion_topic_updated(topic)
-    post_event_stringified('discussion_topic_updated', get_discussion_topic_data(topic))
+    post_event_stringified("discussion_topic_updated", get_discussion_topic_data(topic))
   end
 
   def self.get_discussion_topic_data(topic)
@@ -150,7 +150,7 @@ module Canvas::LiveEvents
   end
 
   def self.account_notification_created(notification)
-    post_event_stringified('account_notification_created', {
+    post_event_stringified("account_notification_created", {
                              account_notification_id: notification.global_id,
                              subject: LiveEvents.truncate(notification.subject),
                              message: LiveEvents.truncate(notification.message),
@@ -173,11 +173,11 @@ module Canvas::LiveEvents
   end
 
   def self.group_membership_created(membership)
-    post_event_stringified('group_membership_created', get_group_membership_data(membership))
+    post_event_stringified("group_membership_created", get_group_membership_data(membership))
   end
 
   def self.group_membership_updated(membership)
-    post_event_stringified('group_membership_updated', get_group_membership_data(membership))
+    post_event_stringified("group_membership_updated", get_group_membership_data(membership))
   end
 
   def self.get_group_category_data(group_category)
@@ -191,11 +191,11 @@ module Canvas::LiveEvents
   end
 
   def self.group_category_updated(group_category)
-    post_event_stringified('group_category_updated', get_group_category_data(group_category))
+    post_event_stringified("group_category_updated", get_group_category_data(group_category))
   end
 
   def self.group_category_created(group_category)
-    post_event_stringified('group_category_created', get_group_category_data(group_category))
+    post_event_stringified("group_category_created", get_group_category_data(group_category))
   end
 
   def self.get_group_data(group)
@@ -214,11 +214,11 @@ module Canvas::LiveEvents
   end
 
   def self.group_created(group)
-    post_event_stringified('group_created', get_group_data(group))
+    post_event_stringified("group_created", get_group_data(group))
   end
 
   def self.group_updated(group)
-    post_event_stringified('group_updated', get_group_data(group))
+    post_event_stringified("group_updated", get_group_data(group))
   end
 
   def self.get_assignment_data(assignment)
@@ -245,37 +245,35 @@ module Canvas::LiveEvents
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
-    if actl
-      if (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
-        context: assignment.course,
-        vendor_code: actl.tool_vendor_code,
-        product_code: actl.tool_product_code,
-        resource_type_code: actl.tool_resource_type_code
-      ).first)
-        event[:associated_integration_id] = tool_proxy.guid
-        # TEMPORARY: to switch over from the old format to guid,
-        # send both formats until all subscriptions have been changed
-        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
-        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
-      end
+    if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
+      context: assignment.course,
+      vendor_code: actl.tool_vendor_code,
+      product_code: actl.tool_product_code,
+      resource_type_code: actl.tool_resource_type_code
+    ).first)
+      event[:associated_integration_id] = tool_proxy.guid
+      # TEMPORARY: to switch over from the old format to guid,
+      # send both formats until all subscriptions have been changed
+      old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join("_")
+      event[:associated_integration_ids] = [tool_proxy.guid, old_format]
     end
     event
   end
 
   def self.assignment_created(assignment)
-    post_event_stringified('assignment_created', get_assignment_data(assignment))
+    post_event_stringified("assignment_created", get_assignment_data(assignment))
   end
 
   def self.assignment_updated(assignment)
-    post_event_stringified('assignment_updated', get_assignment_data(assignment))
+    post_event_stringified("assignment_updated", get_assignment_data(assignment))
   end
 
   def self.assignment_group_created(assignment_group)
-    post_event_stringified('assignment_group_created', get_assignment_group_data(assignment_group))
+    post_event_stringified("assignment_group_created", get_assignment_group_data(assignment_group))
   end
 
   def self.assignment_group_updated(assignment_group)
-    post_event_stringified('assignment_group_updated', get_assignment_group_data(assignment_group))
+    post_event_stringified("assignment_group_updated", get_assignment_group_data(assignment_group))
   end
 
   def self.get_assignment_group_data(assignment_group)
@@ -294,7 +292,7 @@ module Canvas::LiveEvents
   end
 
   def self.assignments_bulk_updated(assignment_ids)
-    Assignment.where(:id => assignment_ids).each { |a| assignment_updated(a) }
+    Assignment.where(id: assignment_ids).each { |a| assignment_updated(a) }
   end
 
   def self.submissions_bulk_updated(submissions)
@@ -315,9 +313,9 @@ module Canvas::LiveEvents
     }
 
     case override.set_type
-    when 'CourseSection'
+    when "CourseSection"
       data_hash[:course_section_id] = override.set_id
-    when 'Group'
+    when "Group"
       data_hash[:group_id] = override.set_id
     end
 
@@ -325,11 +323,11 @@ module Canvas::LiveEvents
   end
 
   def self.assignment_override_created(override)
-    post_event_stringified('assignment_override_created', get_assignment_override_data(override))
+    post_event_stringified("assignment_override_created", get_assignment_override_data(override))
   end
 
   def self.assignment_override_updated(override)
-    post_event_stringified('assignment_override_updated', get_assignment_override_data(override))
+    post_event_stringified("assignment_override_updated", get_assignment_override_data(override))
   end
 
   def self.get_submission_data(submission)
@@ -355,19 +353,17 @@ module Canvas::LiveEvents
       workflow_state: submission.workflow_state,
     }
     actl = submission.assignment.assignment_configuration_tool_lookups.take
-    if actl
-      if (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
-        context: submission.course,
-        vendor_code: actl.tool_vendor_code,
-        product_code: actl.tool_product_code,
-        resource_type_code: actl.tool_resource_type_code
-      ).first)
-        event[:associated_integration_id] = tool_proxy.guid
-        # TEMPORARY: to switch over from the old format to guid,
-        # send both formats until all subscriptions have been changed
-        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
-        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
-      end
+    if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
+      context: submission.course,
+      vendor_code: actl.tool_vendor_code,
+      product_code: actl.tool_product_code,
+      resource_type_code: actl.tool_resource_type_code
+    ).first)
+      event[:associated_integration_id] = tool_proxy.guid
+      # TEMPORARY: to switch over from the old format to guid,
+      # send both formats until all subscriptions have been changed
+      old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join("_")
+      event[:associated_integration_ids] = [tool_proxy.guid, old_format]
     end
     event
   end
@@ -393,11 +389,11 @@ module Canvas::LiveEvents
   end
 
   def self.submission_created(submission)
-    submission_event('submission_created', submission)
+    submission_event("submission_created", submission)
   end
 
   def self.submission_updated(submission)
-    submission_event('submission_updated', submission)
+    submission_event("submission_updated", submission)
   end
 
   def self.submission_comment_created(comment)
@@ -406,14 +402,14 @@ module Canvas::LiveEvents
       submission_id: comment.submission_id,
       user_id: comment.author_id,
       created_at: comment.created_at,
-      attachment_ids: comment.attachment_ids.blank? ? [] : comment.attachment_ids.split(','),
+      attachment_ids: comment.attachment_ids.blank? ? [] : comment.attachment_ids.split(","),
       body: LiveEvents.truncate(comment.comment)
     }
-    post_event_stringified('submission_comment_created', payload)
+    post_event_stringified("submission_comment_created", payload)
   end
 
   def self.plagiarism_resubmit(submission)
-    submission_event('plagiarism_resubmit', submission)
+    submission_event("plagiarism_resubmit", submission)
   end
 
   def self.get_user_data(user)
@@ -431,11 +427,11 @@ module Canvas::LiveEvents
   end
 
   def self.user_created(user)
-    post_event_stringified('user_created', get_user_data(user))
+    post_event_stringified("user_created", get_user_data(user))
   end
 
   def self.user_updated(user)
-    post_event_stringified('user_updated', get_user_data(user))
+    post_event_stringified("user_updated", get_user_data(user))
   end
 
   def self.get_enrollment_data(enrollment)
@@ -456,11 +452,11 @@ module Canvas::LiveEvents
   end
 
   def self.enrollment_created(enrollment)
-    post_event_stringified('enrollment_created', get_enrollment_data(enrollment))
+    post_event_stringified("enrollment_created", get_enrollment_data(enrollment))
   end
 
   def self.enrollment_updated(enrollment)
-    post_event_stringified('enrollment_updated', get_enrollment_data(enrollment))
+    post_event_stringified("enrollment_updated", get_enrollment_data(enrollment))
   end
 
   def self.get_enrollment_state_data(enrollment_state)
@@ -477,15 +473,15 @@ module Canvas::LiveEvents
   end
 
   def self.enrollment_state_created(enrollment_state)
-    post_event_stringified('enrollment_state_created', get_enrollment_state_data(enrollment_state))
+    post_event_stringified("enrollment_state_created", get_enrollment_state_data(enrollment_state))
   end
 
   def self.enrollment_state_updated(enrollment_state)
-    post_event_stringified('enrollment_state_updated', get_enrollment_state_data(enrollment_state))
+    post_event_stringified("enrollment_state_updated", get_enrollment_state_data(enrollment_state))
   end
 
   def self.user_account_association_created(assoc)
-    post_event_stringified('user_account_association_created', {
+    post_event_stringified("user_account_association_created", {
                              user_id: assoc.global_user_id,
                              account_id: assoc.global_account_id,
                              account_uuid: assoc.account.uuid,
@@ -502,25 +498,25 @@ module Canvas::LiveEvents
     ctx[:user_account_id] = pseudonym.account.global_id
     ctx[:user_sis_id] = pseudonym.sis_user_id
     ctx[:session_id] = session[:session_id] if session[:session_id]
-    post_event_stringified('logged_in', {
+    post_event_stringified("logged_in", {
                              redirect_url: session[:return_to]
                            }, ctx)
   end
 
   def self.logged_out
-    post_event_stringified('logged_out', {})
+    post_event_stringified("logged_out", {})
   end
 
   def self.quiz_submitted(submission)
     # TODO: include score, for automatically graded portions?
-    post_event_stringified('quiz_submitted', {
+    post_event_stringified("quiz_submitted", {
                              submission_id: submission.global_id,
                              quiz_id: submission.global_quiz_id
                            })
   end
 
   def self.wiki_page_created(page)
-    post_event_stringified('wiki_page_created', {
+    post_event_stringified("wiki_page_created", {
                              wiki_page_id: page.global_id,
                              title: LiveEvents.truncate(page.title),
                              body: LiveEvents.truncate(page.body)
@@ -542,18 +538,18 @@ module Canvas::LiveEvents
       payload[:old_body] = LiveEvents.truncate(old_body)
     end
 
-    post_event_stringified('wiki_page_updated', payload)
+    post_event_stringified("wiki_page_updated", payload)
   end
 
   def self.wiki_page_deleted(page)
-    post_event_stringified('wiki_page_deleted', {
+    post_event_stringified("wiki_page_deleted", {
                              wiki_page_id: page.global_id,
                              title: LiveEvents.truncate(page.title)
                            })
   end
 
   def self.attachment_created(attachment)
-    post_event_stringified('attachment_created', get_attachment_data(attachment))
+    post_event_stringified("attachment_created", get_attachment_data(attachment))
   end
 
   def self.attachment_updated(attachment, old_display_name)
@@ -562,11 +558,11 @@ module Canvas::LiveEvents
       payload[:old_display_name] = LiveEvents.truncate(old_display_name)
     end
 
-    post_event_stringified('attachment_updated', payload)
+    post_event_stringified("attachment_updated", payload)
   end
 
   def self.attachment_deleted(attachment)
-    post_event_stringified('attachment_deleted', get_attachment_data(attachment))
+    post_event_stringified("attachment_deleted", get_attachment_data(attachment))
   end
 
   def self.grade_changed(submission, old_submission = nil, old_assignment = submission.assignment)
@@ -579,7 +575,7 @@ module Canvas::LiveEvents
       SisPseudonym.for(submission.user, submission.assignment.context, type: :trusted, require_sis: false)
     end
 
-    post_event_stringified('grade_change', {
+    post_event_stringified("grade_change", {
                              submission_id: submission.global_id,
                              assignment_id: submission.global_assignment_id,
                              assignment_name: submission.assignment.name,
@@ -616,7 +612,7 @@ module Canvas::LiveEvents
     end
 
     post_event_stringified(
-      'asset_accessed',
+      "asset_accessed",
       {
         asset_name: asset_obj.try(:name) || asset_obj.try(:title),
         asset_type: asset_obj.class.reflection_type_name,
@@ -631,13 +627,18 @@ module Canvas::LiveEvents
   end
 
   def self.quiz_export_complete(content_export)
-    payload = content_export.settings[:quizzes2]
-    post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
+    # when importing content export packages, migration_ids are obtained
+    # from content_migrations, a content_migration and content_export can share
+    # the same ID.
+    # The "content-export-" prefix prevents from saving the same migration_id on
+    # records that belong to different migrations
+    payload = (content_export.settings[:quizzes2] || {}).merge({ content_export_id: "content-export-#{content_export.global_id}" })
+    post_event_stringified("quiz_export_complete", payload, amended_context(content_export.context))
   end
 
   def self.content_migration_completed(content_migration)
     post_event_stringified(
-      'content_migration_completed',
+      "content_migration_completed",
       content_migration_data(content_migration),
       amended_context(content_migration.context)
     )
@@ -667,15 +668,15 @@ module Canvas::LiveEvents
   end
 
   def self.course_section_created(section)
-    post_event_stringified('course_section_created', get_course_section_data(section))
+    post_event_stringified("course_section_created", get_course_section_data(section))
   end
 
   def self.course_section_updated(section)
-    post_event_stringified('course_section_updated', get_course_section_data(section))
+    post_event_stringified("course_section_updated", get_course_section_data(section))
   end
 
   def self.quizzes_next_quiz_duplicated(payload)
-    post_event_stringified('quizzes_next_quiz_duplicated', payload)
+    post_event_stringified("quizzes_next_quiz_duplicated", payload)
   end
 
   def self.get_course_section_data(section)
@@ -701,11 +702,11 @@ module Canvas::LiveEvents
   end
 
   def self.module_created(context_module)
-    post_event_stringified('module_created', get_context_module_data(context_module))
+    post_event_stringified("module_created", get_context_module_data(context_module))
   end
 
   def self.module_updated(context_module)
-    post_event_stringified('module_updated', get_context_module_data(context_module))
+    post_event_stringified("module_updated", get_context_module_data(context_module))
   end
 
   def self.get_context_module_data(context_module)
@@ -720,11 +721,11 @@ module Canvas::LiveEvents
   end
 
   def self.module_item_created(context_module_item)
-    post_event_stringified('module_item_created', get_context_module_item_data(context_module_item))
+    post_event_stringified("module_item_created", get_context_module_item_data(context_module_item))
   end
 
   def self.module_item_updated(context_module_item)
-    post_event_stringified('module_item_updated', get_context_module_item_data(context_module_item))
+    post_event_stringified("module_item_updated", get_context_module_item_data(context_module_item))
   end
 
   def self.get_context_module_item_data(context_module_item)
@@ -739,7 +740,7 @@ module Canvas::LiveEvents
   end
 
   def self.course_completed(context_module_progression)
-    post_event_stringified('course_completed',
+    post_event_stringified("course_completed",
                            get_course_completed_data(
                              context_module_progression.context_module.course,
                              context_module_progression.user
@@ -747,7 +748,7 @@ module Canvas::LiveEvents
   end
 
   def self.course_progress(context_module_progression)
-    post_event_stringified('course_progress', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
+    post_event_stringified("course_progress", get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
   end
 
   def self.get_course_completed_data(course, user)
@@ -777,11 +778,11 @@ module Canvas::LiveEvents
   end
 
   def self.learning_outcome_result_updated(result)
-    post_event_stringified('learning_outcome_result_updated', get_learning_outcome_result_data(result).merge(updated_at: result.updated_at))
+    post_event_stringified("learning_outcome_result_updated", get_learning_outcome_result_data(result).merge(updated_at: result.updated_at))
   end
 
   def self.learning_outcome_result_created(result)
-    post_event_stringified('learning_outcome_result_created', get_learning_outcome_result_data(result))
+    post_event_stringified("learning_outcome_result_created", get_learning_outcome_result_data(result))
   end
 
   def self.get_learning_outcome_data(outcome)
@@ -802,11 +803,11 @@ module Canvas::LiveEvents
   end
 
   def self.learning_outcome_updated(outcome)
-    post_event_stringified('learning_outcome_updated', get_learning_outcome_data(outcome).merge(updated_at: outcome.updated_at))
+    post_event_stringified("learning_outcome_updated", get_learning_outcome_data(outcome).merge(updated_at: outcome.updated_at))
   end
 
   def self.learning_outcome_created(outcome)
-    post_event_stringified('learning_outcome_created', get_learning_outcome_data(outcome))
+    post_event_stringified("learning_outcome_created", get_learning_outcome_data(outcome))
   end
 
   def self.get_learning_outcome_group_data(group)
@@ -823,11 +824,11 @@ module Canvas::LiveEvents
   end
 
   def self.learning_outcome_group_updated(group)
-    post_event_stringified('learning_outcome_group_updated', get_learning_outcome_group_data(group).merge(updated_at: group.updated_at))
+    post_event_stringified("learning_outcome_group_updated", get_learning_outcome_group_data(group).merge(updated_at: group.updated_at))
   end
 
   def self.learning_outcome_group_created(group)
-    post_event_stringified('learning_outcome_group_created', get_learning_outcome_group_data(group))
+    post_event_stringified("learning_outcome_group_created", get_learning_outcome_group_data(group))
   end
 
   def self.get_learning_outcome_link_data(link)
@@ -842,11 +843,11 @@ module Canvas::LiveEvents
   end
 
   def self.learning_outcome_link_created(link)
-    post_event_stringified('learning_outcome_link_created', get_learning_outcome_link_data(link))
+    post_event_stringified("learning_outcome_link_created", get_learning_outcome_link_data(link))
   end
 
   def self.learning_outcome_link_updated(link)
-    post_event_stringified('learning_outcome_link_updated', get_learning_outcome_link_data(link).merge(updated_at: link.updated_at))
+    post_event_stringified("learning_outcome_link_updated", get_learning_outcome_link_data(link).merge(updated_at: link.updated_at))
   end
 
   def self.grade_override(score, old_score, enrollment, course)
@@ -862,7 +863,7 @@ module Canvas::LiveEvents
       old_override_score: old_score,
       updated_at: score.updated_at,
     }
-    post_event_stringified('grade_override', data, amended_context(course))
+    post_event_stringified("grade_override", data, amended_context(course))
   end
 
   def self.course_grade_change(score, old_score_values, enrollment)
@@ -881,7 +882,7 @@ module Canvas::LiveEvents
       unposted_final_score: score.unposted_final_score,
       old_unposted_final_score: old_score_values[:unposted_final_score]
     }
-    post_event_stringified('course_grade_change', data, amended_context(score.course))
+    post_event_stringified("course_grade_change", data, amended_context(score.course))
   end
 
   def self.sis_batch_payload(batch)
@@ -893,19 +894,19 @@ module Canvas::LiveEvents
   end
 
   def self.sis_batch_created(batch)
-    post_event_stringified('sis_batch_created', sis_batch_payload(batch))
+    post_event_stringified("sis_batch_created", sis_batch_payload(batch))
   end
 
   def self.sis_batch_updated(batch)
-    post_event_stringified('sis_batch_updated', sis_batch_payload(batch))
+    post_event_stringified("sis_batch_updated", sis_batch_payload(batch))
   end
 
   def self.outcome_proficiency_created(proficiency)
-    post_event_stringified('outcome_proficiency_created', get_outcome_proficiency_data(proficiency))
+    post_event_stringified("outcome_proficiency_created", get_outcome_proficiency_data(proficiency))
   end
 
   def self.outcome_proficiency_updated(proficiency)
-    post_event_stringified('outcome_proficiency_updated', get_outcome_proficiency_data(proficiency).merge(updated_at: proficiency.updated_at))
+    post_event_stringified("outcome_proficiency_updated", get_outcome_proficiency_data(proficiency).merge(updated_at: proficiency.updated_at))
   end
 
   def self.get_outcome_proficiency_data(proficiency)
@@ -933,11 +934,11 @@ module Canvas::LiveEvents
   end
 
   def self.outcome_calculation_method_created(method)
-    post_event_stringified('outcome_calculation_method_created', get_outcome_calculation_method_data(method))
+    post_event_stringified("outcome_calculation_method_created", get_outcome_calculation_method_data(method))
   end
 
   def self.outcome_calculation_method_updated(method)
-    post_event_stringified('outcome_calculation_method_updated', get_outcome_calculation_method_data(method).merge(updated_at: method.updated_at))
+    post_event_stringified("outcome_calculation_method_updated", get_outcome_calculation_method_data(method).merge(updated_at: method.updated_at))
   end
 
   def self.get_outcome_calculation_method_data(method)
@@ -952,11 +953,11 @@ module Canvas::LiveEvents
   end
 
   def self.outcome_friendly_description_created(description)
-    post_event_stringified('outcome_friendly_description_created', get_outcome_friendly_description_data(description))
+    post_event_stringified("outcome_friendly_description_created", get_outcome_friendly_description_data(description))
   end
 
   def self.outcome_friendly_description_updated(description)
-    post_event_stringified('outcome_friendly_description_updated', get_outcome_friendly_description_data(description).merge(updated_at: description.updated_at))
+    post_event_stringified("outcome_friendly_description_updated", get_outcome_friendly_description_data(description).merge(updated_at: description.updated_at))
   end
 
   def self.get_outcome_friendly_description_data(description)
@@ -969,5 +970,14 @@ module Canvas::LiveEvents
       learning_outcome_id: description.learning_outcome_id,
       root_account_id: description.root_account_id
     }
+  end
+
+  def self.heartbeat
+    data = {
+      environment: Canvas.environment,
+      region_code: Canvas.region_code || "not_configured",
+      region: Canvas.region || "not_configured"
+    }
+    post_event_stringified("heartbeat", data)
   end
 end

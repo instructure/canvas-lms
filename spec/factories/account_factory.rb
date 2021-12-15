@@ -27,7 +27,7 @@ module Factories
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
       DynamicSettings::FallbackProxy.new(
-        "app-host": ENV['RCE_HOST'] || "http://localhost:3001",
+        "app-host": ENV["RCE_HOST"] || "http://localhost:3001"
       )
     )
     allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
@@ -51,13 +51,13 @@ module Factories
 
   def provision_quizzes_next(account)
     # quizzes_next feature is turned on only if a root account is provisioned
-    account.root_account.settings[:provision] = { 'lti' => 'lti url' }
+    account.root_account.settings[:provision] = { "lti" => "lti url" }
     account.root_account.save!
   end
 
   def valid_account_attributes
     {
-      :name => "value for name"
+      name: "value for name"
     }
   end
 
@@ -90,14 +90,12 @@ module Factories
 
   def account_with_role_changes(opts = {})
     account = opts[:account] || Account.default
-    if opts[:role_changes]
-      opts[:role_changes].each_pair do |permission, enabled|
-        role = opts[:role] || admin_role
-        if (ro = account.role_overrides.where(:permission => permission.to_s, :role_id => role.id).first)
-          ro.update_attribute(:enabled, enabled)
-        else
-          account.role_overrides.create(:permission => permission.to_s, :enabled => enabled, :role => role)
-        end
+    opts[:role_changes]&.each_pair do |permission, enabled|
+      role = opts[:role] || admin_role
+      if (ro = account.role_overrides.where(permission: permission.to_s, role_id: role.id).first)
+        ro.update_attribute(:enabled, enabled)
+      else
+        account.role_overrides.create(permission: permission.to_s, enabled: enabled, role: role)
       end
     end
   end

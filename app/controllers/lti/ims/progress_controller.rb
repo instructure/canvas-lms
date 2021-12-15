@@ -110,7 +110,7 @@ module Lti::IMS
     def show
       # @current_user and session aren't present in LTI requests
       render json:
-               progress_json(progress, nil, nil).tap { |hash| hash['url'] = lti_progress_show_url }
+               progress_json(progress, nil, nil).tap { |hash| hash["url"] = lti_progress_show_url }
     end
 
     private
@@ -129,7 +129,7 @@ module Lti::IMS
 
     def verify_assignment_tool_association
       unless progress.context.is_a? Assignment
-        render_error 'Tool does not have permission to view a Progress not associated with an Assignment',
+        render_error "Tool does not have permission to view a Progress not associated with an Assignment",
                      :forbidden
       end
 

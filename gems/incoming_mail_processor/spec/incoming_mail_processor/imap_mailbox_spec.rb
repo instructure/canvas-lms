@@ -18,27 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe IncomingMailProcessor::ImapMailbox do
-  include_examples 'Mailbox'
+  include_examples "Mailbox"
 
   def default_config
     {
-      :server => "mail.example.com",
-      :username => "user",
-      :password => "password",
+      server: "mail.example.com",
+      username: "user",
+      password: "password",
     }
   end
 
   def mock_net_imap
-    @imap_mock = double()
+    @imap_mock = double
     IncomingMailProcessor::ImapMailbox::UsedImapMethods.each do |method_name|
       allow(@imap_mock).to receive(method_name)
     end
 
     expect(Net::IMAP).to receive(:new)
-      .with("mail.example.com", { :port => 993, :ssl => true })
+      .with("mail.example.com", { port: 993, ssl: true })
       .at_most(:once) # allow simple tests to not call #connect
       .and_return(@imap_mock)
   end
@@ -51,12 +51,12 @@ describe IncomingMailProcessor::ImapMailbox do
   describe "#initialize" do
     it "accepts existing mailman imap configuration" do
       @mailbox = IncomingMailProcessor::ImapMailbox.new({
-                                                          :server => "imap.server.com",
-                                                          :port => 1234,
-                                                          :ssl => "truthy-value",
-                                                          :filter => ["ALL"],
-                                                          :username => "user@server.com",
-                                                          :password => "secret-user-password",
+                                                          server: "imap.server.com",
+                                                          port: 1234,
+                                                          ssl: "truthy-value",
+                                                          filter: ["ALL"],
+                                                          username: "user@server.com",
+                                                          password: "secret-user-password",
                                                         })
 
       expect(@mailbox.server).to eql "imap.server.com"
@@ -68,13 +68,13 @@ describe IncomingMailProcessor::ImapMailbox do
     end
 
     it "accepts non-array filter" do
-      @mailbox = IncomingMailProcessor::ImapMailbox.new(:filter => "BLAH")
+      @mailbox = IncomingMailProcessor::ImapMailbox.new(filter: "BLAH")
       expect(@mailbox.filter).to eql ["BLAH"]
     end
 
     it "accepts folder parameter" do
       # this isn't necessary for gmail, but just in case
-      @mailbox = IncomingMailProcessor::ImapMailbox.new(:folder => "inbox")
+      @mailbox = IncomingMailProcessor::ImapMailbox.new(folder: "inbox")
       expect(@mailbox.folder).to eql "inbox"
     end
   end
@@ -86,13 +86,13 @@ describe IncomingMailProcessor::ImapMailbox do
     end
   end
 
-  describe '#unprocessed_message_count' do
-    it 'returns zero if there are no messages' do
+  describe "#unprocessed_message_count" do
+    it "returns zero if there are no messages" do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([])
       expect(@mailbox.unprocessed_message_count).to eql 0
     end
 
-    it 'returns the number of messages if there are any' do
+    it "returns the number of messages if there are any" do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([1, 2, 3, 58, 42])
       expect(@mailbox.unprocessed_message_count).to eql 5
     end
@@ -104,7 +104,7 @@ describe IncomingMailProcessor::ImapMailbox do
     end
 
     def mock_fetch_response(body)
-      result = double()
+      result = double
       expect(result).to receive(:attr).and_return({ "RFC822" => body })
       [result]
     end

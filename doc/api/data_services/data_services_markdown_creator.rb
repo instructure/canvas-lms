@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'erb'
+require "erb"
 
 class DataServicesMarkdownCreator
-  CALIPER_EVENT_TEMPLATE = File.read('doc/api/data_services/caliper_event_template.md.erb')
-  CALIPER_STRUCTURE_TEMPLATE = File.read('doc/api/data_services/caliper_structure_template.md.erb')
-  CANVAS_EVENT_TEMPLATE = File.read('doc/api/data_services/canvas_event_template.md.erb')
-  CANVAS_METADATA_TEMPLATE = File.read('doc/api/data_services/canvas_metadata_template.md.erb')
-  MARKDOWN_PATH = 'doc/api/data_services/md/dynamic'
+  CALIPER_EVENT_TEMPLATE = File.read("doc/api/data_services/caliper_event_template.md.erb")
+  CALIPER_STRUCTURE_TEMPLATE = File.read("doc/api/data_services/caliper_structure_template.md.erb")
+  CANVAS_EVENT_TEMPLATE = File.read("doc/api/data_services/canvas_event_template.md.erb")
+  CANVAS_METADATA_TEMPLATE = File.read("doc/api/data_services/canvas_metadata_template.md.erb")
+  MARKDOWN_PATH = "doc/api/data_services/md/dynamic"
 
   def self.run
     Dir.glob("#{MARKDOWN_PATH}/*.md").each { |file| File.delete(file) }
@@ -36,7 +36,7 @@ class DataServicesMarkdownCreator
       write_file(file_name, CANVAS_EVENT_TEMPLATE, content)
     end
 
-    write_file('canvas_event_metadata', CANVAS_METADATA_TEMPLATE, DataServicesCanvasLoader.metadata)
+    write_file("canvas_event_metadata", CANVAS_METADATA_TEMPLATE, DataServicesCanvasLoader.metadata)
 
     DataServicesCaliperLoader.data.each do |content|
       file_name = "caliper_#{content[:event_category]}"
@@ -44,13 +44,13 @@ class DataServicesMarkdownCreator
       write_file(file_name, CALIPER_EVENT_TEMPLATE, content)
     end
 
-    write_file('caliper_structure', CALIPER_STRUCTURE_TEMPLATE, DataServicesCaliperLoader.extensions)
+    write_file("caliper_structure", CALIPER_STRUCTURE_TEMPLATE, DataServicesCaliperLoader.extensions)
   end
 
   def self.write_file(file_name, template, content)
     erb_renderer = ERB.new(template)
 
-    File.open("#{MARKDOWN_PATH}/data_service_#{file_name}.md", 'wb') do |file|
+    File.open("#{MARKDOWN_PATH}/data_service_#{file_name}.md", "wb") do |file|
       file.write erb_renderer.result(binding)
     end
   end

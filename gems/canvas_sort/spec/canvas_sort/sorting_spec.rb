@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasSort do
   it "is less than any string" do
@@ -56,7 +56,7 @@ describe CanvasSort do
   end
 
   it "sorts with a few strings" do
-    expect([CanvasSort::Last, 'a', CanvasSort::First, 'b'].sort).to eq [CanvasSort::First, 'a', 'b', CanvasSort::Last]
+    expect([CanvasSort::Last, "a", CanvasSort::First, "b"].sort).to eq [CanvasSort::First, "a", "b", CanvasSort::Last]
   end
 
   it "sorts with a few numbers" do

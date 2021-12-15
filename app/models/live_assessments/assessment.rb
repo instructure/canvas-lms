@@ -21,37 +21,37 @@
 module LiveAssessments
   class Assessment < ActiveRecord::Base
     belongs_to :context, polymorphic: [:course]
-    has_many :submissions, class_name: 'LiveAssessments::Submission'
-    has_many :results, class_name: 'LiveAssessments::Result'
+    has_many :submissions, class_name: "LiveAssessments::Submission"
+    has_many :results, class_name: "LiveAssessments::Result"
 
-    has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
+    has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
 
-    validates_presence_of :context_id, :context_type, :key, :title
-    validates_length_of :title, maximum: maximum_string_length
-    validates_length_of :key, maximum: maximum_string_length
+    validates :context_id, :context_type, :key, :title, presence: true
+    validates :title, length: { maximum: maximum_string_length }
+    validates :key, length: { maximum: maximum_string_length }
 
-    scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+    scope :for_context, ->(context) { where(context_id: context, context_type: context.class.to_s) }
 
     set_policy do
       given do |user, session|
-        !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-          self.context.grants_right?(user, session, :manage_assignments)
+        !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          context.grants_right?(user, session, :manage_assignments)
       end
       can :create and can :update
 
       given do |user, session|
-        self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-          self.context.grants_right?(user, session, :manage_assignments_add)
+        context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          context.grants_right?(user, session, :manage_assignments_add)
       end
       can :create
 
       given do |user, session|
-        self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-          self.context.grants_right?(user, session, :manage_assignments_edit)
+        context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          context.grants_right?(user, session, :manage_assignments_edit)
       end
       can :update
 
-      given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }
+      given { |user, session| context.grants_right?(user, session, :view_all_grades) }
       can :read
     end
 

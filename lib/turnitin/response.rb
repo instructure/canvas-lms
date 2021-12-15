@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 module Turnitin
   class Response
-    SUCCESSFUL_RETURN_CODES = (1..99)
+    SUCCESSFUL_RETURN_CODES = (1..99).freeze
 
     def initialize(http_response)
       @http_response = http_response
@@ -30,7 +30,7 @@ module Turnitin
     end
 
     def assignment_id
-      extract_data_at('./assignmentid')
+      extract_data_at("./assignmentid")
     end
 
     def css(*args)
@@ -56,42 +56,42 @@ module Turnitin
     # users. So we're picking out the most common error messages we see, fixing
     # up the wording, and then using this to display public facing error messages.
     def public_error_message
-      return '' if success?
+      return "" if success?
 
       case return_code
       when 216
-        I18n.t('turnitin.error_216', "The student limit for this account has been reached. Please contact your account administrator.")
+        I18n.t("turnitin.error_216", "The student limit for this account has been reached. Please contact your account administrator.")
       when 217
-        I18n.t('turnitin.error_217', "The turnitin product for this account has expired. Please contact your sales agent to renew the turnitin product.")
+        I18n.t("turnitin.error_217", "The turnitin product for this account has expired. Please contact your sales agent to renew the turnitin product.")
       when 414
-        I18n.t('turnitin.error_414', "The originality report for this submission is not available yet.")
+        I18n.t("turnitin.error_414", "The originality report for this submission is not available yet.")
       when 415
-        I18n.t('turnitin.error_415', "The originality score for this submission is not available yet.")
+        I18n.t("turnitin.error_415", "The originality score for this submission is not available yet.")
       when 1007
-        I18n.t('turnitin.error_1007', "The uploaded file is too big.")
+        I18n.t("turnitin.error_1007", "The uploaded file is too big.")
       when 1009
-        I18n.t('turnitin.error_1009', "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)")
+        I18n.t("turnitin.error_1009", "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)")
       when 1013
-        I18n.t('turnitin.error_1013', "The student submission must be more than twenty words of text in order for it to be rated by turnitin.")
+        I18n.t("turnitin.error_1013", "The student submission must be more than twenty words of text in order for it to be rated by turnitin.")
       when 1023
-        I18n.t('turnitin.error_1023', "The PDF file could not be read. Please make sure that the file is not password protected.")
+        I18n.t("turnitin.error_1023", "The PDF file could not be read. Please make sure that the file is not password protected.")
       else
-        I18n.t('There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.')
+        I18n.t("There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.")
       end
     end
 
     # should be #object_id but, redefining that could have serious
     # consequences. So, we'll just not do that....
     def returned_object_id
-      extract_data_at('./objectID')
+      extract_data_at("./objectID")
     end
 
     def return_code
-      @return_code ||= extract_data_at('./rcode', -1).to_i
+      @return_code ||= extract_data_at("./rcode", -1).to_i
     end
 
     def return_message
-      extract_data_at('./rmessage')
+      extract_data_at("./rmessage")
     end
 
     def success?
@@ -107,7 +107,7 @@ module Turnitin
       Nokogiri::XML::Document.parse(http_response.body)
     end
 
-    def extract_data_at(xpath, default = '')
+    def extract_data_at(xpath, default = "")
       return default unless return_data_node.present?
 
       found_node = return_data_node.at_xpath(xpath)
@@ -115,7 +115,7 @@ module Turnitin
     end
 
     def return_data_node
-      @return_data_node ||= @document.at_xpath('/returndata')
+      @return_data_node ||= @document.at_xpath("/returndata")
     end
   end
 end

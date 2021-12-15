@@ -23,13 +23,13 @@ class AddReplicaIdentityForDeveloperKeys < ActiveRecord::Migration[5.2]
 
   def up
     until DeveloperKey.where(root_account_id: nil, account_id: nil).limit(1_000).update_all(root_account_id: Account.site_admin&.id) < 1_000; end
-    add_replica_identity 'DeveloperKey', :root_account_id, 0
-    remove_index :developer_keys, name: 'index_developer_keys_on_root_account_id', if_exists: true
+    add_replica_identity "DeveloperKey", :root_account_id, 0
+    remove_index :developer_keys, name: "index_developer_keys_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :developer_keys, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'DeveloperKey'
+    remove_replica_identity "DeveloperKey"
     change_column_null :developer_keys, :root_account_id, true
   end
 end

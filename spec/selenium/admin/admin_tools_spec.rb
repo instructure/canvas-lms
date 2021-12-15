@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/calendar2_common'
-require_relative '../../cassandra_spec_helper'
+require_relative "../common"
+require_relative "../helpers/calendar2_common"
+require_relative "../../cassandra_spec_helper"
 
 describe "admin_tools" do
   include_context "in-process server selenium tests"
@@ -49,17 +49,17 @@ describe "admin_tools" do
 
   def setup_users
     # Setup a student (@student)
-    course_with_student(:active_all => true, :account => @account, :user => user_with_pseudonym(:name => 'Student TestUser'))
-    user_with_pseudonym(:user => @student, :account => @account)
+    course_with_student(active_all: true, account: @account, user: user_with_pseudonym(name: "Student TestUser"))
+    user_with_pseudonym(user: @student, account: @account)
 
     setup_account_admin
   end
 
-  def setup_account_admin(permissions = { :view_notifications => true })
+  def setup_account_admin(permissions = { view_notifications: true })
     # Setup an account admin (@account_admin) and logged in.
-    account_admin_user_with_role_changes(:account => @account, :role_changes => permissions)
+    account_admin_user_with_role_changes(account: @account, role_changes: permissions)
     @account_admin = @admin
-    user_with_pseudonym(:user => @account_admin, :account => @account)
+    user_with_pseudonym(user: @account_admin, account: @account)
     user_session(@account_admin)
   end
 
@@ -81,14 +81,14 @@ describe "admin_tools" do
     event ||= @event
 
     perform_autocomplete_search("#course_id-autocompleteField", search_term)
-    f('#loggingCourse button[name=course_submit]').click
+    f("#loggingCourse button[name=course_submit]").click
     wait_for_ajaximations
 
-    cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+    cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
     expect(cols[3].text).to eq event_type
 
-    fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
-    expect(fj('.ui-dialog dl dd:first').text).to eq event.id
+    fj("#courseLoggingSearchResults table tbody tr:last td:last a").click
+    expect(fj(".ui-dialog dl dd:first").text).to eq event.id
   end
 
   before do
@@ -111,66 +111,66 @@ describe "admin_tools" do
         @account.settings[:admins_can_view_notifications] = false
         @account.save!
         site_admin_user
-        user_with_pseudonym(:user => @admin, :account => @account)
+        user_with_pseudonym(user: @admin, account: @account)
         user_session(@admin)
-        message_model(:user_id => @student.id, :body => 'this is my message', :root_account_id => @account.id)
+        message_model(user_id: @student.id, body: "this is my message", root_account_id: @account.id)
 
         load_admin_tools_page
         click_view_notifications_tab
         perform_user_search("#commMessagesSearchForm", @student.id)
-        f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+        f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
         wait_for_ajaximations
-        expect(f('#commMessagesSearchResults .message-body').text).to include('this is my message')
+        expect(f("#commMessagesSearchResults .message-body").text).to include("this is my message")
       end
     end
 
     context "as AccountAdmin" do
       context "with permissions" do
         it "performs search" do
-          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
+          message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
-          f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchResults .message-body').text).to include('foo bar')
+          expect(f("#commMessagesSearchResults .message-body").text).to include("foo bar")
         end
 
         it "displays nothing found" do
-          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
+          message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
-          set_value f('.userDateRangeSearchModal .dateEndSearchField'), 2.months.ago
-          f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+          set_value f(".userDateRangeSearchModal .dateEndSearchField"), 2.months.ago
+          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchResults .alert').text).to include('No messages found')
-          expect(f("#content")).not_to contain_css('#commMessagesSearchResults .message-body')
+          expect(f("#commMessagesSearchResults .alert").text).to include("No messages found")
+          expect(f("#content")).not_to contain_css("#commMessagesSearchResults .message-body")
         end
 
         it "displays valid search params used" do
-          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
+          message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           # Search with no dates
           perform_user_search("#commMessagesSearchForm", @student.id)
-          f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from the beginning to now.")
+          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from the beginning to now.")
           # Search with begin date and end date - should show time actually being used
           perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f('.userDateRangeSearchModal .dateStartSearchField'), 'Mar 3, 2001')
-          replace_and_proceed(f('.userDateRangeSearchModal .dateEndSearchField'), 'Mar 9, 2001')
-          f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+          replace_and_proceed(f(".userDateRangeSearchModal .dateStartSearchField"), "Mar 3, 2001")
+          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "Mar 9, 2001")
+          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
+          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f('.userDateRangeSearchModal .dateStartSearchField'), 'Mar 3, 2001 1:05p')
-          replace_and_proceed(f('.userDateRangeSearchModal .dateEndSearchField'), 'Mar 9, 2001 3p')
-          f('.userDateRangeSearchBtn').click
+          replace_and_proceed(f(".userDateRangeSearchModal .dateStartSearchField"), "Mar 3, 2001 1:05p")
+          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "Mar 9, 2001 3p")
+          f(".userDateRangeSearchBtn").click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
+          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
         it "displays an error when given invalid input data" do
@@ -178,9 +178,9 @@ describe "admin_tools" do
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
           # Search with invalid dates
-          set_value f('.userDateRangeSearchModal .dateStartSearchField'), 'couch'
-          set_value f('.userDateRangeSearchModal .dateEndSearchField'), 'pillow'
-          f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+          set_value f(".userDateRangeSearchModal .dateStartSearchField"), "couch"
+          set_value f(".userDateRangeSearchModal .dateEndSearchField"), "pillow"
+          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
           wait_for_ajaximations
           assert_error_box("[name='messages_start_time']")
           assert_error_box("[name='messages_end_time']")
@@ -192,16 +192,16 @@ describe "admin_tools" do
 
           load_admin_tools_page
           wait_for_ajaximations
-          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
+          expect(f("#adminToolsTabs")).not_to contain_css(".notifications")
         end
       end
 
       context "without permissions" do
         it "does not see tab" do
-          setup_account_admin({ :view_notifications => false })
+          setup_account_admin({ view_notifications: false })
           load_admin_tools_page
           wait_for_ajaximations
-          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
+          expect(f("#adminToolsTabs")).not_to contain_css(".notifications")
         end
       end
     end
@@ -214,13 +214,13 @@ describe "admin_tools" do
       load_admin_tools_page
       click_view_tab "logging"
 
-      select = fj('#loggingType')
+      select = fj("#loggingType")
       expect(select).not_to be_nil
       expect(select).to be_displayed
 
       change_log_type("Authentication")
 
-      loggingTypeView = fj('#loggingAuthentication')
+      loggingTypeView = fj("#loggingAuthentication")
       expect(loggingTypeView).not_to be_nil
       expect(loggingTypeView).to be_displayed
     end
@@ -231,13 +231,13 @@ describe "admin_tools" do
         load_admin_tools_page
         wait_for_ajaximations
 
-        tab = fj('#adminToolsTabs .logging > a')
+        tab = fj("#adminToolsTabs .logging > a")
         expect(tab).not_to be_nil
         expect(tab.text).to eq "Logging"
 
         click_view_tab "logging"
 
-        select = fj('#loggingType')
+        select = fj("#loggingType")
         expect(select).not_to be_nil
         expect(select).to be_displayed
 
@@ -258,7 +258,7 @@ describe "admin_tools" do
           )
           load_admin_tools_page
           wait_for_ajaximations
-          expect(f('#adminToolsTabs')).not_to contain_css('.logging')
+          expect(f("#adminToolsTabs")).not_to contain_css(".logging")
         end
 
         it "does not include login activity option for revoked permission" do
@@ -269,7 +269,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map! { |o| o.text }
+          options.map!(&:text)
           expect(options).not_to include("Login / Logout Activity")
         end
 
@@ -281,7 +281,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map! { |o| o.text }
+          options.map!(&:text)
           expect(options).not_to include("Grade Change Activity")
         end
 
@@ -293,7 +293,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map! { |o| o.text }
+          options.map!(&:text)
           expect(options).not_to include("Course Activity")
         end
       end
@@ -305,9 +305,9 @@ describe "admin_tools" do
 
     before do
       Timecop.freeze(8.seconds.ago) do
-        Auditors::Authentication.record(@student.pseudonyms.first, 'login')
+        Auditors::Authentication.record(@student.pseudonyms.first, "login")
       end
-      Auditors::Authentication.record(@student.pseudonyms.first, 'logout')
+      Auditors::Authentication.record(@student.pseudonyms.first, "logout")
       load_admin_tools_page
       click_view_tab "logging"
       change_log_type("Authentication")
@@ -315,19 +315,19 @@ describe "admin_tools" do
 
     it "shows log history" do
       perform_user_search("#authLoggingSearchForm", @student.id)
-      f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+      f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
       wait_for_ajaximations
-      expect(ff('#authLoggingSearchResults table tbody tr').length).to eq 2
-      cols = ffj('#authLoggingSearchResults table tbody tr:first td')
+      expect(ff("#authLoggingSearchResults table tbody tr").length).to eq 2
+      cols = ffj("#authLoggingSearchResults table tbody tr:first td")
       expect(cols.size).to eq 3
       expect(cols.last.text).to eq "LOGOUT"
     end
 
     it "searches by user name" do
-      perform_user_search("#authLoggingSearchForm", 'testuser')
-      f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
+      perform_user_search("#authLoggingSearchForm", "testuser")
+      f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
       wait_for_ajaximations
-      expect(ff('#authLoggingSearchResults table tbody tr').length).to eq 2
+      expect(ff("#authLoggingSearchResults table tbody tr").length).to eq 2
     end
   end
 
@@ -336,8 +336,8 @@ describe "admin_tools" do
 
     before do
       Timecop.freeze(8.seconds.ago) do
-        course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
-        @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
+        course_with_teacher(course: @course, user: user_with_pseudonym(name: "Teacher TestUser"))
+        @assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
       end
 
       Timecop.freeze(5.seconds.ago) do
@@ -357,11 +357,11 @@ describe "admin_tools" do
 
     it "searches by grader name and show history" do
       perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
-      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      f("#loggingGradeChange button[name=gradeChange_submit]").click
       wait_for_ajaximations
-      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
+      expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
 
-      cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:last td')
+      cols = ffj("#gradeChangeLoggingSearchResults table tbody tr:last td")
       expect(cols.size).to eq 9
 
       expect(cols[2].text).to eq "-"
@@ -375,48 +375,48 @@ describe "admin_tools" do
 
     it "displays 'y' if graded anonymously" do
       perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
-      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      f("#loggingGradeChange button[name=gradeChange_submit]").click
       wait_for_ajaximations
 
-      cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:first td')
+      cols = ffj("#gradeChangeLoggingSearchResults table tbody tr:first td")
       expect(cols[8].text).to eq "y"
     end
 
     it "searches by student name" do
       perform_autocomplete_search("#student_id-autocompleteField", @student.name)
-      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      f("#loggingGradeChange button[name=gradeChange_submit]").click
       wait_for_ajaximations
-      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
+      expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "searches by course id" do
       set_value f("#gradeChangeCourseSearch"), @course.id
-      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      f("#loggingGradeChange button[name=gradeChange_submit]").click
       wait_for_ajaximations
-      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
+      expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "searches by assignment id" do
       set_value f("#gradeChangeAssignmentSearch"), @assignment.id
-      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      f("#loggingGradeChange button[name=gradeChange_submit]").click
       wait_for_ajaximations
       scroll_page_to_bottom
-      expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
+      expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "fails gracefully with invalid ids" do
       set_value f("#gradeChangeAssignmentSearch"), "notarealid"
-      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      f("#loggingGradeChange button[name=gradeChange_submit]").click
       wait_for_ajaximations
-      expect(f('#gradeChangeLoggingSearchResults').text).to eq 'No items found'
+      expect(f("#gradeChangeLoggingSearchResults").text).to eq "No items found"
     end
   end
 
   context "Course Logging" do
-    it_should_behave_like "cassandra audit logs"
+    it_behaves_like "cassandra audit logs"
 
     before do
-      course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
+      course_with_teacher(course: @course, user: user_with_pseudonym(name: "Teacher TestUser"))
 
       load_admin_tools_page
       click_view_tab "logging"
@@ -437,11 +437,11 @@ describe "admin_tools" do
       @course.save
 
       perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      f('#loggingCourse button[name=course_submit]').click
+      f("#loggingCourse button[name=course_submit]").click
       wait_for_ajaximations
 
-      expect(ff('#courseLoggingSearchResults table tbody tr').length).to eq @events.length
-      cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+      expect(ff("#courseLoggingSearchResults table tbody tr").length).to eq @events.length
+      cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
       expect(cols.size).to eq 6
 
       expect(cols[2].text).to eq @teacher.name
@@ -455,17 +455,17 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       set_value f("#course_id-autocompleteField"), @course.id
-      f('#loggingCourse button[name=course_submit]').click
+      f("#loggingCourse button[name=course_submit]").click
       wait_for_ajaximations
-      cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+      cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
       expect(cols.size).to eq 6
     end
 
     it "fails gracefully with invalid ids" do
       set_value f("#course_id-autocompleteField"), "notarealid"
-      f('#loggingCourse button[name=course_submit]').click
+      f("#loggingCourse button[name=course_submit]").click
       wait_for_ajaximations
-      expect(f('#courseLoggingSearchResults ').text).to eq 'No items found'
+      expect(f("#courseLoggingSearchResults ").text).to eq "No items found"
     end
 
     it "finds courses in any workflow state" do
@@ -475,10 +475,10 @@ describe "admin_tools" do
       autocomplete_value = perform_autocomplete_search("#course_id-autocompleteField", @course.name)
       expect(autocomplete_value).not_to be_nil
 
-      f('#loggingCourse button[name=course_submit]').click
+      f("#loggingCourse button[name=course_submit]").click
       wait_for_ajaximations
 
-      cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+      cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
       expect(cols.size).to eq 6
     end
 
@@ -489,7 +489,7 @@ describe "admin_tools" do
       @event = Auditors::Course.record_created(@course, @teacher, course.changes)
 
       show_event_details("Created")
-      cols = ffj('.ui-dialog table:first tbody tr:first td')
+      cols = ffj(".ui-dialog table:first tbody tr:first td")
       expect(cols.size).to eq 2
       expect(cols[0].text).to eq "Name"
       expect(cols[1].text).to eq @course.name
@@ -501,11 +501,11 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       show_event_details("Updated", old_name)
-      items = ffj('.ui-dialog dl > dd')
+      items = ffj(".ui-dialog dl > dd")
       expect(items[4].text).to eq "Manual"
       expect(items[5].text).to eq "Updated"
 
-      cols = ffj('.ui-dialog table:first tbody tr:first td')
+      cols = ffj(".ui-dialog table:first tbody tr:first td")
       expect(cols.size).to eq 3
       expect(cols[0].text).to eq "Name"
       expect(cols[1].text).to eq old_name
@@ -520,7 +520,7 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
 
       show_event_details("Updated", old_name)
-      items = ffj('.ui-dialog dl > dd')
+      items = ffj(".ui-dialog dl > dd")
       expect(items[4].text).to eq "SIS"
       expect(items[5].text).to eq sis_batch.id.to_s
     end
@@ -555,7 +555,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied To", @course.name, @to_event)
-      expect(fj('.ui-dialog dl dd:last').text).to eq @copied_course.name
+      expect(fj(".ui-dialog dl dd:last").text).to eq @copied_course.name
     end
 
     it "shows copied_from event details" do
@@ -563,7 +563,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied From", @copied_course.name, @from_event)
-      expect(fj('.ui-dialog dl dd:last').text).to eq @course.name
+      expect(fj(".ui-dialog dl dd:last").text).to eq @course.name
     end
 
     it "shows reset_to event details" do
@@ -571,7 +571,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset To", @course.name, @to_event)
-      expect(fj('.ui-dialog dl dd:last').text).to eq @reset_course.name
+      expect(fj(".ui-dialog dl dd:last").text).to eq @reset_course.name
     end
 
     it "shows reset_from event details" do
@@ -579,7 +579,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset From", @reset_course.name, @from_event)
-      expect(fj('.ui-dialog dl dd:last').text).to eq @course.name
+      expect(fj(".ui-dialog dl dd:last").text).to eq @course.name
     end
   end
 
@@ -587,28 +587,28 @@ describe "admin_tools" do
     before do
       u1 = user_with_pseudonym
       u2 = user_with_pseudonym
-      u1.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
-        cc.workflow_state = 'active'
+      u1.communication_channels.create!(path: "one@example.com", path_type: "email") do |cc|
+        cc.workflow_state = "active"
         cc.bounce_count = 1
         cc.last_bounce_at = 2.days.ago
       end
-      u1.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
-        cc.workflow_state = 'active'
+      u1.communication_channels.create!(path: "two@example.com", path_type: "email") do |cc|
+        cc.workflow_state = "active"
         cc.bounce_count = 2
         cc.last_bounce_at = 4.days.ago
       end
-      u2.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
-        cc.workflow_state = 'active'
+      u2.communication_channels.create!(path: "three@example.com", path_type: "email") do |cc|
+        cc.workflow_state = "active"
         cc.bounce_count = 3
         cc.last_bounce_at = 6.days.ago
-        cc.last_bounce_details = { 'bouncedRecipients' => [{ 'diagnosticCode' => '550 what a luser' }] }
+        cc.last_bounce_details = { "bouncedRecipients" => [{ "diagnosticCode" => "550 what a luser" }] }
       end
       @user = @account_admin
     end
 
     it "does not appear if the user lacks permission" do
       load_admin_tools_page
-      expect(f('#adminToolsTabNav')).not_to contain_css('a[href="#bouncedEmailsPane"]')
+      expect(f("#adminToolsTabNav")).not_to contain_css('a[href="#bouncedEmailsPane"]')
     end
 
     it "performs searches" do
@@ -616,16 +616,16 @@ describe "admin_tools" do
       @account.save!
       load_admin_tools_page
       f('a[href="#bouncedEmailsPane"]').click
-      replace_content fj('label:contains("Address") input'), '*@example.com'
+      replace_content fj('label:contains("Address") input'), "*@example.com"
       replace_content fj('label:contains("Last bounced after") input'), 5.days.ago.iso8601
       replace_content fj('label:contains("Last bounced before") input'), 3.days.ago.iso8601
       fj('button:contains("Search")').click
       wait_for_ajaximations
-      data = ff('#bouncedEmailsPane table td').map(&:text)
-      expect(data).not_to include 'one@example.com'
-      expect(data).to include 'two@example.com'
-      expect(data).not_to include 'three@example.com'
-      csvLink = fj("#bouncedEmailsPane a:contains('Download these results as CSV')")['href']
+      data = ff("#bouncedEmailsPane table td").map(&:text)
+      expect(data).not_to include "one@example.com"
+      expect(data).to include "two@example.com"
+      expect(data).not_to include "three@example.com"
+      csvLink = fj("#bouncedEmailsPane a:contains('Download these results as CSV')")["href"]
       expect(csvLink).to include "/api/v1/accounts/#{@account.id}/bounced_communication_channels.csv?order=desc&pattern=*%40example.com"
     end
   end

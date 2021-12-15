@@ -25,19 +25,19 @@ class FilePreviewsController < ApplicationController
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.
   def show
-    @file = @context.attachments.not_deleted.find_by_id(params[:file_id])
+    @file = @context.attachments.not_deleted.find_by(id: params[:file_id])
     css_bundle :react_files
     unless @file
       @headers = false
       @show_left_side = false
-      return render template: 'shared/errors/404_message',
+      return render template: "shared/errors/404_message",
                     status: :not_found,
                     formats: [:html]
     end
     if read_allowed(@file, @current_user, session, params)
       unless download_allowed(@file, @current_user, session, params)
         @lock_info = @file.locked_for?(@current_user)
-        return render template: 'file_previews/lock_explanation', layout: false
+        return render template: "file_previews/lock_explanation", layout: false
       end
       # mark item seen for module progression purposes
       @file.context_module_action(@current_user, :read) if @current_user
@@ -51,22 +51,22 @@ class FilePreviewsController < ApplicationController
       # google docs
       elsif GoogleDocsPreview.previewable?(@domain_root_account, @file)
         url = GoogleDocsPreview.url_for(@file)
-        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: url }.to_query)
+        redirect_to("//docs.google.com/viewer?" + { embedded: true, url: url }.to_query)
       # images
-      elsif @file.content_type =~ %r{\Aimage/}
-        render template: 'file_previews/img_preview', layout: false
+      elsif @file.content_type&.start_with?("image/")
+        render template: "file_previews/img_preview", layout: false
       # media files
-      elsif @file.content_type =~ %r{\A(audio|video)/}
+      elsif %r{\A(audio|video)/}.match?(@file.content_type)
         js_env NEW_FILES_PREVIEW: 1
         js_bundle :file_preview
-        render template: 'file_previews/media_preview', layout: false
+        render template: "file_previews/media_preview", layout: false
       # html files
-      elsif @file.content_type == 'text/html'
+      elsif @file.content_type == "text/html"
         redirect_to context_url(@context, :context_file_preview_url, @file.id)
       # no preview available
       else
         @accessed_asset = nil # otherwise it will double-log when they download the file
-        render template: 'file_previews/no_preview', layout: false
+        render template: "file_previews/no_preview", layout: false
       end
     end
   end

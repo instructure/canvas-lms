@@ -44,18 +44,18 @@ class Quizzes::QuizQuestion::Base
 
   # override to change the name of the question type, defaults to the underscore-ized class name
   def self.question_type
-    self.name.demodulize.underscore
+    name.demodulize.underscore
   end
 
   def initialize(question_data)
     # currently all the attributes are synthesized from @question_data
     # since questions are stored in this format anyway, it prevents us from
     # having to do a bunch of translation to some other format
-    unless question_data.is_a? Quizzes::QuizQuestion::QuestionData
-      @question_data = Quizzes::QuizQuestion::QuestionData.new(question_data)
-    else
-      @question_data = question_data
-    end
+    @question_data = if question_data.is_a? Quizzes::QuizQuestion::QuestionData
+                       question_data
+                     else
+                       Quizzes::QuizQuestion::QuestionData.new(question_data)
+                     end
   end
 
   def question_id
@@ -118,7 +118,7 @@ class Quizzes::QuizQuestion::Base
   end
 
   def score_question(answer_data, user_answer = nil)
-    user_answer ||= Quizzes::QuizQuestion::UserAnswer.new(self.question_id, self.points_possible, answer_data)
+    user_answer ||= Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
     user_answer.total_parts = total_answer_parts
     correct_parts = correct_answer_parts(user_answer)
     if !correct_parts.nil?
@@ -148,21 +148,21 @@ class Quizzes::QuizQuestion::Base
       end
 
       answers.each do |answer|
-        if answer[:id] == response[:answer_id] || answer[:id] == answer_md5
-          found = true
-          answer[:responses] += 1
-          answer[:user_ids] << response[:user_id]
-        end
+        next unless answer[:id] == response[:answer_id] || answer[:id] == answer_md5
+
+        found = true
+        answer[:responses] += 1
+        answer[:user_ids] << response[:user_id]
       end
 
-      if !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
-        answers << {
-          :id => answer_md5,
-          :responses => 1,
-          :user_ids => [response[:user_id]],
-          :text => response[:text]
-        }
-      end
+      next unless !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
+
+      answers << {
+        id: answer_md5,
+        responses: 1,
+        user_ids: [response[:user_id]],
+        text: response[:text]
+      }
     end
     @question_data.answers = answers
     @question_data.to_hash

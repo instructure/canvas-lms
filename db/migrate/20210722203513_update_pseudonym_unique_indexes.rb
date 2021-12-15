@@ -24,7 +24,7 @@ class UpdatePseudonymUniqueIndexes < ActiveRecord::Migration[6.0]
   def up
     add_index :pseudonyms,
               "LOWER(unique_id), account_id, authentication_provider_id",
-              name: 'index_pseudonyms_unique_with_auth_provider',
+              name: "index_pseudonyms_unique_with_auth_provider",
               if_not_exists: true,
               algorithm: :concurrently,
               unique: true,
@@ -32,18 +32,18 @@ class UpdatePseudonymUniqueIndexes < ActiveRecord::Migration[6.0]
 
     add_index :pseudonyms,
               "LOWER(unique_id), account_id",
-              name: 'index_pseudonyms_unique_without_auth_provider',
+              name: "index_pseudonyms_unique_without_auth_provider",
               if_not_exists: true,
               algorithm: :concurrently,
               unique: true,
               where: "workflow_state IN ('active', 'suspended') AND authentication_provider_id IS NULL"
 
     remove_index :pseudonyms,
-                 name: 'index_pseudonyms_on_unique_id_and_account_id_and_authentication_provider_id',
+                 name: "index_pseudonyms_on_unique_id_and_account_id_and_authentication_provider_id",
                  algorithm: :concurrently,
                  if_exists: true
     remove_index :pseudonyms,
-                 name: 'index_pseudonyms_on_unique_id_and_account_id_no_authentication_provider_id',
+                 name: "index_pseudonyms_on_unique_id_and_account_id_no_authentication_provider_id",
                  algorithm: :concurrently,
                  if_exists: true
   end
@@ -53,11 +53,11 @@ class UpdatePseudonymUniqueIndexes < ActiveRecord::Migration[6.0]
     execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_no_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id) WHERE workflow_state='active' AND authentication_provider_id IS NULL"
 
     remove_index :pseudonyms,
-                 name: 'index_pseudonyms_unique_with_auth_provider',
+                 name: "index_pseudonyms_unique_with_auth_provider",
                  algorithm: :concurrently,
                  if_exists: true
     remove_index :pseudonyms,
-                 name: 'index_pseudonyms_unique_without_auth_provider',
+                 name: "index_pseudonyms_unique_without_auth_provider",
                  algorithm: :concurrently,
                  if_exists: true
   end

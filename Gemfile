@@ -15,14 +15,14 @@
 # versions of these gems to prevent regression, and the indentation serves to
 # alert us to the relationship between the gem and canvas-lms
 
-source 'https://rubygems.org/'
+source "https://rubygems.org/"
 
-Dir[File.join(File.dirname(__FILE__), 'gems/plugins/*/Gemfile.d/_before.rb')].each do |file|
+Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval
 end
 
-require File.expand_path('config/canvas_rails_switcher', __dir__)
+require File.expand_path("config/canvas_rails_switcher", __dir__)
 
-Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|
+Dir.glob(File.join(File.dirname(__FILE__), "Gemfile.d", "*.rb")).sort.each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval
 end

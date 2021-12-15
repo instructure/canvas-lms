@@ -31,7 +31,7 @@ module DataFixup::CleanupCrossShardDeveloperKeys
       ids = DeveloperKey.where(id: batch_min..batch_max)
                         .where("NOT EXISTS (?)", AccessToken.joins(:user)
           .where("access_tokens.developer_key_id=developer_keys.id")
-          .where.not(users: { workflow_state: 'deleted' })
+          .where.not(users: { workflow_state: "deleted" })
           .where("users.id < ?", Shard::IDS_PER_SHARD))
                         .where("account_id > ?", Shard::IDS_PER_SHARD)
                         .pluck(:id)

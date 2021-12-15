@@ -24,6 +24,6 @@ class AddLtiCodesToAssignmentConfigurationToolLookup < ActiveRecord::Migration[5
     add_column :assignment_configuration_tool_lookups, :tool_vendor_code, :string
     add_column :assignment_configuration_tool_lookups, :tool_resource_type_code, :string
     change_column_null :assignment_configuration_tool_lookups, :tool_id, true
-    add_index :assignment_configuration_tool_lookups, [:tool_product_code, :tool_vendor_code, :tool_resource_type_code], name: 'index_resource_codes_on_assignment_configuration_tool_lookups'
+    add_index :assignment_configuration_tool_lookups, %i[tool_product_code tool_vendor_code tool_resource_type_code], name: "index_resource_codes_on_assignment_configuration_tool_lookups"
   end
 end

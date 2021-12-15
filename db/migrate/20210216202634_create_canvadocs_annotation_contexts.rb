@@ -31,7 +31,7 @@ class CreateCanvadocsAnnotationContexts < ActiveRecord::Migration[5.2]
       t.timestamps
 
       t.index(
-        [:attachment_id, :submission_attempt, :submission_id],
+        %i[attachment_id submission_attempt submission_id],
         name: "index_attachment_attempt_submission",
         unique: true
       )

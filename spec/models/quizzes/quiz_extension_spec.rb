@@ -65,8 +65,8 @@ describe Quizzes::QuizExtension do
       course_factory
       @quiz = @course.quizzes.create!
 
-      @user1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
-      @user2 = user_with_pseudonym(active_all: true, name: 'Student2', username: 'student2@instructure.com')
+      @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+      @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
       @course.enroll_student(@user1)
       @course.enroll_student(@user2)
     end
@@ -95,11 +95,11 @@ describe Quizzes::QuizExtension do
       course_factory
       @quiz = @course.quizzes.create!
 
-      @user = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
+      @user = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
       @course.enroll_student(@user)
 
       manager = Quizzes::SubmissionManager.new(@quiz)
-      @qs = manager.find_or_create_submission(@user, nil, 'settings_only')
+      @qs = manager.find_or_create_submission(@user, nil, "settings_only")
     end
 
     it "extends a submission's extra attempts" do
@@ -153,11 +153,11 @@ describe Quizzes::QuizExtension do
 
     it "has reasonable limits on extendable attributes" do
       extension = Quizzes::QuizExtension.new(@qs,
-                                             extra_attempts: 99999999, extra_time: 99999999)
+                                             extra_attempts: 99_999_999, extra_time: 99_999_999)
 
       extension.extend_submission!
       expect(extension.extra_attempts).to eq 1000
-      expect(extension.extra_time).to eq 10080
+      expect(extension.extra_time).to eq 10_080
     end
 
     it "only allows numbers or bool for input" do

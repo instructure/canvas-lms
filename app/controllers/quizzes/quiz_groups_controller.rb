@@ -122,8 +122,8 @@ class Quizzes::QuizGroupsController < ApplicationController
 
       @group = @quiz.quiz_groups.build
       if update_api_quiz_group(@group, quiz_group_params)
-        render :json => quiz_groups_compound_json([@group], @context, @current_user, session),
-               :status => :created
+        render json: quiz_groups_compound_json([@group], @context, @current_user, session),
+               status: :created
       else
         render json: format_errors(@group), status: :unprocessable_entity
       end
@@ -154,9 +154,9 @@ class Quizzes::QuizGroupsController < ApplicationController
 
       quiz_group_params = params[:quiz_groups][0].permit(:name, :pick_count, :question_points)
       if update_api_quiz_group(@group, quiz_group_params)
-        render :json => quiz_groups_compound_json([@group], @context, @current_user, session)
+        render json: quiz_groups_compound_json([@group], @context, @current_user, session)
       else
-        render :json => format_errors(@group), :status => :unprocessable_entity
+        render json: format_errors(@group), status: :unprocessable_entity
       end
     end
   end
@@ -189,7 +189,7 @@ class Quizzes::QuizGroupsController < ApplicationController
   def reorder
     if authorized_action(@quiz, @current_user, :update)
       @group = @quiz.quiz_groups.find(params[:id])
-      Quizzes::QuizSortables.new(:group => @group, :order => params[:order]).reorder!
+      Quizzes::QuizSortables.new(group: @group, order: params[:order]).reorder!
 
       head :no_content
     end

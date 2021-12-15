@@ -19,7 +19,7 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, unsplash_wiki_url: 'https://github.com/instructure/canvas-lms/wiki/Canvas-Integration#unsplash')
+      <td colspan="2"><%= mt(:description, <<~TEXT, unsplash_wiki_url: 'https://github.com/instructure/canvas-lms/wiki/Canvas-Integration#unsplash')
 Please [follow the steps](%{unsplash_wiki_url}) to setup a new application on Unsplash.
 TEXT
       %></td>

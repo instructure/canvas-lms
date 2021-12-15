@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
-require_relative '../../cassandra_spec_helper'
+require_relative "../api_spec_helper"
+require_relative "../../cassandra_spec_helper"
 
 describe "AuthenticationAudit API", type: :request do
   context "not configured" do
     before do
       allow(CanvasCassandra::DatabaseBuilder).to receive(:configured?).and_call_original
-      allow(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
+      allow(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").and_return(false)
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end
 
     it "404s" do
-      raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
+      raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: "authentication_audit_api", action: "for_login", login_id: @pseudonym.id.to_s, format: "json")
       assert_status(404)
     end
   end
@@ -39,32 +39,32 @@ describe "AuthenticationAudit API", type: :request do
     include_examples "cassandra audit logs"
 
     before do
-      Setting.set('enable_page_views', 'cassandra')
+      Setting.set("enable_page_views", "cassandra")
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
+      allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
       @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
       @account = Account.default
-      @custom_role = custom_account_role('CustomAdmin', :account => @account)
-      @custom_sa_role = custom_account_role('CustomAdmin', :account => Account.site_admin)
+      @custom_role = custom_account_role("CustomAdmin", account: @account)
+      @custom_sa_role = custom_account_role("CustomAdmin", account: Account.site_admin)
       user_with_pseudonym(active_all: true)
 
       @page_view = PageView.new
       @page_view.user = @viewing_user
       @page_view.request_id = @request_id
-      @page_view.remote_ip = '10.10.10.10'
+      @page_view.remote_ip = "10.10.10.10"
       @page_view.created_at = Time.now
       @page_view.updated_at = Time.now
       @page_view.save!
 
-      @event = Auditors::Authentication.record(@pseudonym, 'login')
+      @event = Auditors::Authentication.record(@pseudonym, "login")
     end
 
     def fetch_for_context(context, options = {})
       type = context.class.to_s.downcase unless (type = options.delete(:type))
       id = context.id.to_s
 
-      arguments = { controller: 'authentication_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
+      arguments = { controller: "authentication_audit_api", action: "for_#{type}", "#{type}_id": id, format: "json" }
       query_string = []
 
       if (per_page = options.delete(:per_page))
@@ -83,14 +83,14 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       path = "/api/v1/audit/authentication/#{type.pluralize}/#{id}"
-      path += "?" + query_string.join('&') if query_string.present?
+      path += "?" + query_string.join("&") if query_string.present?
       api_call_as_user(@viewing_user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
     def expect_event_for_context(context, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+      expect(json["events"].map { |e| [e["id"], e["event_type"]] })
         .to include([event.id, event.event_type])
       json
     end
@@ -98,7 +98,7 @@ describe "AuthenticationAudit API", type: :request do
     def forbid_event_for_context(context, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+      expect(json["events"].map { |e| [e["id"], e["event_type"]] })
         .not_to include([event.id, event.event_type])
       json
     end
@@ -109,7 +109,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "has correct root keys" do
-        expect(@json.keys.sort).to eq %w{events linked links}
+        expect(@json.keys.sort).to eq %w[events linked links]
       end
 
       it "has a formatted links key" do
@@ -119,20 +119,20 @@ describe "AuthenticationAudit API", type: :request do
           "events.user" => nil,
           "events.page_view" => nil
         }
-        expect(@json['links']).to eq links
+        expect(@json["links"]).to eq links
       end
 
       it "has a formatted linked key" do
-        expect(@json['linked'].keys.sort).to eq %w{accounts logins page_views users}
-        expect(@json['linked']['accounts'].is_a?(Array)).to be_truthy
-        expect(@json['linked']['logins'].is_a?(Array)).to be_truthy
-        expect(@json['linked']['page_views'].is_a?(Array)).to be_truthy
-        expect(@json['linked']['users'].is_a?(Array)).to be_truthy
+        expect(@json["linked"].keys.sort).to eq %w[accounts logins page_views users]
+        expect(@json["linked"]["accounts"].is_a?(Array)).to be_truthy
+        expect(@json["linked"]["logins"].is_a?(Array)).to be_truthy
+        expect(@json["linked"]["page_views"].is_a?(Array)).to be_truthy
+        expect(@json["linked"]["users"].is_a?(Array)).to be_truthy
       end
 
       describe "events collection" do
         before do
-          @json = @json['events']
+          @json = @json["events"]
         end
 
         it "is formatted as an array of AuthenticationEvent objects" do
@@ -152,7 +152,7 @@ describe "AuthenticationAudit API", type: :request do
 
       describe "logins collection" do
         before do
-          @json = @json['linked']['logins']
+          @json = @json["linked"]["logins"]
         end
 
         it "is formatted as an array of Pseudonym objects" do
@@ -173,7 +173,7 @@ describe "AuthenticationAudit API", type: :request do
 
       describe "accounts collection" do
         before do
-          @json = @json['linked']['accounts']
+          @json = @json["linked"]["accounts"]
         end
 
         it "is formatted as an array of Account objects" do
@@ -183,7 +183,7 @@ describe "AuthenticationAudit API", type: :request do
             "name" => @account.name,
             "parent_account_id" => nil,
             "root_account_id" => nil,
-            "workflow_state" => 'active',
+            "workflow_state" => "active",
             "default_time_zone" => @account.default_time_zone.tzinfo.name,
             "default_storage_quota_mb" => @account.default_storage_quota_mb,
             "default_user_storage_quota_mb" => @account.default_user_storage_quota_mb,
@@ -194,7 +194,7 @@ describe "AuthenticationAudit API", type: :request do
 
       describe "users collection" do
         before do
-          @json = @json['linked']['users']
+          @json = @json["linked"]["users"]
         end
 
         it "is formatted as an array of User objects" do
@@ -214,7 +214,7 @@ describe "AuthenticationAudit API", type: :request do
 
       describe "page_views collection" do
         before do
-          @json = @json['linked']['page_views']
+          @json = @json["linked"]["page_views"]
         end
 
         it "is formatted as an array of page_view objects" do
@@ -225,7 +225,7 @@ describe "AuthenticationAudit API", type: :request do
 
     context "nominal cases" do
       it "includes events at login endpoint" do
-        expect_event_for_context(@pseudonym, @event, type: 'login')
+        expect_event_for_context(@pseudonym, @event, type: "login")
       end
 
       it "includes events at account endpoint" do
@@ -244,7 +244,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "does not include cross-account events at login endpoint" do
-        forbid_event_for_context(@pseudonym, @event, type: 'login')
+        forbid_event_for_context(@pseudonym, @event, type: "login")
       end
 
       it "does not include cross-account events at account endpoint" do
@@ -262,7 +262,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "does not include cross-user events at login endpoint" do
-        forbid_event_for_context(@pseudonym, @event, type: 'login')
+        forbid_event_for_context(@pseudonym, @event, type: "login")
       end
 
       it "includes cross-user events at account endpoint" do
@@ -278,23 +278,23 @@ describe "AuthenticationAudit API", type: :request do
       before do
         @event2 = @pseudonym.shard.activate do
           record = Auditors::Authentication::Record.new(
-            'id' => SecureRandom.uuid,
-            'created_at' => 1.day.ago,
-            'pseudonym' => @pseudonym,
-            'event_type' => 'logout'
+            "id" => SecureRandom.uuid,
+            "created_at" => 1.day.ago,
+            "pseudonym" => @pseudonym,
+            "event_type" => "logout"
           )
           Auditors::Authentication::Stream.insert(record)
         end
       end
 
       it "recognizes :start_time for logins" do
-        expect_event_for_context(@pseudonym, @event, start_time: 12.hours.ago, type: 'login')
-        forbid_event_for_context(@pseudonym, @event2, start_time: 12.hours.ago, type: 'login')
+        expect_event_for_context(@pseudonym, @event, start_time: 12.hours.ago, type: "login")
+        forbid_event_for_context(@pseudonym, @event2, start_time: 12.hours.ago, type: "login")
       end
 
       it "recognizes :newest for logins" do
-        expect_event_for_context(@pseudonym, @event2, end_time: 12.hours.ago, type: 'login')
-        forbid_event_for_context(@pseudonym, @event, end_time: 12.hours.ago, type: 'login')
+        expect_event_for_context(@pseudonym, @event2, end_time: 12.hours.ago, type: "login")
+        forbid_event_for_context(@pseudonym, @event, end_time: 12.hours.ago, type: "login")
       end
 
       it "recognizes :start_time for accounts" do
@@ -321,7 +321,7 @@ describe "AuthenticationAudit API", type: :request do
     context "deleted entities" do
       it "404s for inactive logins" do
         @pseudonym.destroy
-        fetch_for_context(@pseudonym, expected_status: 404, type: 'login')
+        fetch_for_context(@pseudonym, expected_status: 404, type: "login")
       end
 
       it "404s for inactive accounts" do
@@ -343,18 +343,18 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "does not allow other account models" do
-        new_root_account = Account.create!(name: 'New Account')
+        new_root_account = Account.create!(name: "New Account")
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @user, @pseudonym, @viewing_user = @user, @pseudonym, user_with_pseudonym(account: new_root_account)
 
-        fetch_for_context(@pseudonym, expected_status: 401, type: 'login')
+        fetch_for_context(@pseudonym, expected_status: 401, type: "login")
         fetch_for_context(@account, expected_status: 401)
         fetch_for_context(@user, expected_status: 401)
       end
 
       context "no permission on account" do
         it "does not authorize the login endpoint" do
-          fetch_for_context(@pseudonym, expected_status: 401, type: 'login')
+          fetch_for_context(@pseudonym, expected_status: 401, type: "login")
         end
 
         it "does not authorize the account endpoint" do
@@ -369,14 +369,14 @@ describe "AuthenticationAudit API", type: :request do
       context "with :view_statistics permission on account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => @account, :user => @viewing_user,
-            :role => @custom_role,
-            :role_changes => { :view_statistics => true }
+            account: @account, user: @viewing_user,
+            role: @custom_role,
+            role_changes: { view_statistics: true }
           )
         end
 
         it "authorizes the login endpoint" do
-          fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
+          fetch_for_context(@pseudonym, expected_status: 200, type: "login")
         end
 
         it "authorizes the account endpoint" do
@@ -391,14 +391,14 @@ describe "AuthenticationAudit API", type: :request do
       context "with :manage_user_logins permission on account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => @account, :user => @viewing_user,
-            :role => @custom_role,
-            :role_changes => { :manage_user_logins => true }
+            account: @account, user: @viewing_user,
+            role: @custom_role,
+            role_changes: { manage_user_logins: true }
           )
         end
 
         it "authorizes the login endpoint" do
-          fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
+          fetch_for_context(@pseudonym, expected_status: 200, type: "login")
         end
 
         it "authorizes the account endpoint" do
@@ -413,14 +413,14 @@ describe "AuthenticationAudit API", type: :request do
       context "with :view_statistics permission on site admin account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => Account.site_admin, :user => @viewing_user,
-            :role => @custom_sa_role,
-            :role_changes => { :view_statistics => true }
+            account: Account.site_admin, user: @viewing_user,
+            role: @custom_sa_role,
+            role_changes: { view_statistics: true }
           )
         end
 
         it "authorizes the login endpoint" do
-          fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
+          fetch_for_context(@pseudonym, expected_status: 200, type: "login")
         end
 
         it "authorizes the account endpoint" do
@@ -435,14 +435,14 @@ describe "AuthenticationAudit API", type: :request do
       context "with :manage_user_logins permission on site admin account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => Account.site_admin, :user => @viewing_user,
-            :role => @custom_sa_role,
-            :role_changes => { :manage_user_logins => true }
+            account: Account.site_admin, user: @viewing_user,
+            role: @custom_sa_role,
+            role_changes: { manage_user_logins: true }
           )
         end
 
         it "authorizes the login endpoint" do
-          fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
+          fetch_for_context(@pseudonym, expected_status: 200, type: "login")
         end
 
         it "authorizes the account endpoint" do
@@ -458,11 +458,11 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @account = account_model
           user_with_pseudonym(user: @user, account: @account, active_all: true)
-          custom_role = custom_account_role('CustomAdmin', :account => @account)
+          custom_role = custom_account_role("CustomAdmin", account: @account)
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => @account, :user => @viewing_user,
-            :role => custom_role,
-            :role_changes => { :manage_user_logins => true }
+            account: @account, user: @viewing_user,
+            role: custom_role,
+            role_changes: { manage_user_logins: true }
           )
         end
 
@@ -475,9 +475,9 @@ describe "AuthenticationAudit API", type: :request do
         context "with permission on the site admin account" do
           before do
             @user, _ = @user, account_admin_user_with_role_changes(
-              :account => Account.site_admin, :user => @viewing_user,
-              :role => @custom_sa_role,
-              :role_changes => { :manage_user_logins => true }
+              account: Account.site_admin, user: @viewing_user,
+              role: @custom_sa_role,
+              role_changes: { manage_user_logins: true }
             )
           end
 
@@ -505,7 +505,7 @@ describe "AuthenticationAudit API", type: :request do
         @shard2.activate do
           @account = account_model
           user_with_pseudonym(user: @user, account: @account, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, 'logout')
+          @event2 = Auditors::Authentication.record(@pseudonym, "logout")
         end
       end
 
@@ -518,11 +518,11 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, @viewing_user = @user, @shard2.activate { user_model }
           @user, _ = @user, @shard2.activate do
-            custom_role = custom_account_role("CustomAdmin", :account => @account)
+            custom_role = custom_account_role("CustomAdmin", account: @account)
             account_admin_user_with_role_changes(
-              :account => @account, :user => @viewing_user,
-              :role => custom_role,
-              :role_changes => { :manage_user_logins => true }
+              account: @account, user: @viewing_user,
+              role: custom_role,
+              role_changes: { manage_user_logins: true }
             )
           end
         end
@@ -540,17 +540,17 @@ describe "AuthenticationAudit API", type: :request do
     describe "pagination" do
       before do
         # 3 events total
-        Auditors::Authentication.record(@pseudonym, 'logout')
-        Auditors::Authentication.record(@pseudonym, 'login')
-        @json = fetch_for_context(@user, :per_page => 2)
+        Auditors::Authentication.record(@pseudonym, "logout")
+        Auditors::Authentication.record(@pseudonym, "login")
+        @json = fetch_for_context(@user, per_page: 2)
       end
 
       it "only returns one page of results" do
-        expect(@json['events'].size).to eq 2
+        expect(@json["events"].size).to eq 2
       end
 
       it "has pagination headers" do
-        expect(response.headers['Link']).to match(/rel="next"/)
+        expect(response.headers["Link"]).to match(/rel="next"/)
       end
     end
   end

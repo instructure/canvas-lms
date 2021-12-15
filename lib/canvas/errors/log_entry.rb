@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../errors'
+require_relative "../errors"
 module Canvas
   class Errors
     # Class for formatting any error captured
@@ -33,7 +33,7 @@ module Canvas
       # on a condition and write a message if a surprising
       # thing happens
       def self.write(exception, data, level = :error)
-        msg = self.new(exception, data).message
+        msg = new(exception, data).message
         Rails.logger.send(level, msg)
       end
 
@@ -67,8 +67,8 @@ module Canvas
         entry << "\n#{e.class}"
         begin
           entry << " (#{e.message}):" if e.respond_to?(:message)
-        rescue StandardError => new_err
-          entry << "\n***[WARNING]: Unable to extract error message due to #{new_err}"
+        rescue => e
+          entry << "\n***[WARNING]: Unable to extract error message due to #{e}"
         end
         entry << "\n"
         entry << e.annoted_source_code.to_s if e.respond_to?(:annoted_source_code)

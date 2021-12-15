@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "master courses - child courses - external tool locking" do
   include_context "in-process server selenium tests"
@@ -26,7 +26,7 @@ describe "master courses - child courses - external tool locking" do
     @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     attributes = { name: "new tool", consumer_key: "key",
-                   shared_secret: "secret", custom_fields: { 'a' => '1', 'b' => '2' }, url: "http://www.example.com" }
+                   shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com" }
     @original_tool = @copy_from.context_external_tools.create!(attributes)
     @tag = @template.create_content_tag_for!(@original_tool)
 
@@ -47,16 +47,16 @@ describe "master courses - child courses - external tool locking" do
 
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-blueprint-lock')
+    expect(f(".master-course-cell")).to contain_css(".icon-blueprint-lock")
 
-    expect(f('.ExternalToolsTableRow')).not_to contain_css('.al-trigger')
+    expect(f(".ExternalToolsTableRow")).not_to contain_css(".al-trigger")
   end
 
   it "shows the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-blueprint')
+    expect(f(".master-course-cell")).to contain_css(".icon-blueprint")
 
-    expect(f('.ExternalToolsTableRow')).to contain_css('.al-trigger')
+    expect(f(".ExternalToolsTableRow")).to contain_css(".al-trigger")
   end
 end

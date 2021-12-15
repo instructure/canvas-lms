@@ -19,13 +19,66 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {ImageSection} from '../ImageSection'
+import fetchMock from 'fetch-mock'
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
     useStoreProps: () => ({
       images: {
         Course: {
-          files: [],
+          files: [
+            {
+              id: 722,
+              filename: 'grid.png',
+              thumbnail_url:
+                'http://canvas.docker/images/thumbnails/722/E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
+              display_name: 'image_one.png',
+              href: 'http://canvas.docker/courses/21/files/722?wrap=1',
+              download_url: 'http://canvas.docker/files/722/download?download_frd=1',
+              content_type: 'image/png',
+              published: true,
+              hidden_to_user: true,
+              locked_for_user: false,
+              unlock_at: null,
+              lock_at: null,
+              date: '2021-11-03T19:21:27Z',
+              uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
+            },
+            {
+              id: 716,
+              filename: '1635371359_565__0266554465.jpeg',
+              thumbnail_url:
+                'http://canvas.docker/images/thumbnails/716/9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
+              display_name: 'image_two.jpg',
+              href: 'http://canvas.docker/courses/21/files/716?wrap=1',
+              download_url: 'http://canvas.docker/files/716/download?download_frd=1',
+              content_type: 'image/jpeg',
+              published: true,
+              hidden_to_user: false,
+              locked_for_user: false,
+              unlock_at: null,
+              lock_at: null,
+              date: '2021-10-27T21:49:19Z',
+              uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
+            },
+            {
+              id: 715,
+              filename: '1635371358_548__h3zmqPb-6dw.jpg',
+              thumbnail_url:
+                'http://canvas.docker/images/thumbnails/715/rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
+              display_name: 'image_three.jpg',
+              href: 'http://canvas.docker/courses/21/files/715?wrap=1',
+              download_url: 'http://canvas.docker/files/715/download?download_frd=1',
+              content_type: 'image/jpeg',
+              published: true,
+              hidden_to_user: false,
+              locked_for_user: false,
+              unlock_at: null,
+              lock_at: null,
+              date: '2021-10-27T21:49:18Z',
+              uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
+            }
+          ],
           bookmark: 'bookmark',
           isLoading: false,
           hasMore: false
@@ -41,8 +94,6 @@ jest.mock('../../../../../shared/StoreContext', () => {
 describe('ImageSection', () => {
   const defaultProps = {editor: {}}
   const subject = overrides => render(<ImageSection {...{...defaultProps, ...overrides}} />)
-
-  it.todo('renders an image preview')
 
   it('renders the image mode selector', () => {
     const {getByText} = subject()
@@ -62,12 +113,14 @@ describe('ImageSection', () => {
   })
 
   describe('when the "course images" mode is selected', () => {
-    let getByTestId, getByText
+    let getByTestId, getByText, getByTitle
 
     beforeEach(() => {
       const rendered = subject()
+
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
+      getByTitle = rendered.getByTitle
 
       fireEvent.click(getByText('Add Image'))
       fireEvent.click(getByText('Course Images'))
@@ -75,6 +128,42 @@ describe('ImageSection', () => {
 
     it('renders the course images component', () => {
       expect(getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+    })
+
+    describe('and an image is clicked', () => {
+      const flushPromises = () => new Promise(setImmediate)
+
+      beforeEach(() => {
+        fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})
+
+        Object.defineProperty(global, 'FileReader', {
+          writable: true,
+          value: jest.fn().mockImplementation(() => ({
+            readAsDataURL: function () {
+              this.onloadend()
+            },
+            result: 'data:image/png;base64,asdfasdfjksdf=='
+          }))
+        })
+
+        // Click the first image
+        fireEvent.click(getByTitle('Click to embed image_one.png'))
+      })
+
+      afterEach(() => {
+        fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
+      })
+
+      it('sets the image name', () => {
+        expect(getByText('grid.png')).toBeInTheDocument()
+      })
+
+      it('updates the image preview', async () => {
+        await flushPromises()
+        expect(getByTestId('selected-image-preview')).toHaveStyle(
+          'backgroundImage: url(data:image/png;base64,asdfasdfjksdf==)'
+        )
+      })
     })
   })
 })

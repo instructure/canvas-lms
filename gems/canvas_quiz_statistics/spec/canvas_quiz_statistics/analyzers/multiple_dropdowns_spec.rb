@@ -17,75 +17,75 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
-  let(:question_data) { QuestionHelpers.fixture('multiple_dropdowns_question') }
-
   subject { described_class.new(question_data) }
 
-  it 'does not blow up when no responses are provided' do
+  let(:question_data) { QuestionHelpers.fixture("multiple_dropdowns_question") }
+
+  it "does not blow up when no responses are provided" do
     expect { subject.run([]) }.to_not raise_error
   end
 
-  describe '[:answer_sets]' do
-    describe '[][:answers][:responses]' do
-      it 'counts those who filled in a correct answer' do
+  describe "[:answer_sets]" do
+    describe "[][:answers][:responses]" do
+      it "counts those who filled in a correct answer" do
         stats = subject.run([
                               {
-                                answer_id_for_organ: '3208'
+                                answer_id_for_organ: "3208"
                               }
                             ])
 
-        answer_set = stats[:answer_sets].detect { |as| as[:text] == 'organ' }
-        answer = answer_set[:answers].detect { |a| a[:id] == '3208' }
+        answer_set = stats[:answer_sets].detect { |as| as[:text] == "organ" }
+        answer = answer_set[:answers].detect { |a| a[:id] == "3208" }
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'stringifies ids' do
+      it "stringifies ids" do
         stats = subject.run([
                               {
                                 answer_id_for_organ: 3208
                               }
                             ])
 
-        answer_set = stats[:answer_sets].detect { |as| as[:text] == 'organ' }
-        answer = answer_set[:answers].detect { |a| a[:id] == '3208' }
+        answer_set = stats[:answer_sets].detect { |as| as[:text] == "organ" }
+        answer = answer_set[:answers].detect { |a| a[:id] == "3208" }
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'counts those who filled in an unknown answer' do
+      it "counts those who filled in an unknown answer" do
         stats = subject.run([
                               {
-                                answer_id_for_organ: '1234'
+                                answer_id_for_organ: "1234"
                               }
                             ])
 
-        answer_set = stats[:answer_sets].detect { |as| as[:text] == 'organ' }
+        answer_set = stats[:answer_sets].detect { |as| as[:text] == "organ" }
         answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
         expect(answer).to be_present
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'counts those who did not fill in any answer' do
+      it "counts those who did not fill in any answer" do
         stats = subject.run([
                               {
                                 answer_id_for_organ: nil
                               }
                             ])
 
-        answer_set = stats[:answer_sets].detect { |as| as[:text] == 'organ' }
+        answer_set = stats[:answer_sets].detect { |as| as[:text] == "organ" }
         answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
         expect(answer).to be_present
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'does not generate the unknown or missing answers unless needed' do
+      it "does not generate the unknown or missing answers unless needed" do
         stats = subject.run([
                               { answer_id_for_organ: "3208" }
                             ])
 
-        stats[:answer_sets].detect { |as| as[:text] == 'organ' }.tap do |answer_set|
+        stats[:answer_sets].detect { |as| as[:text] == "organ" }.tap do |answer_set|
           unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
           missing_answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
@@ -93,7 +93,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
           expect(missing_answer).not_to be_present
         end
 
-        stats[:answer_sets].detect { |as| as[:text] == 'color' }.tap do |answer_set|
+        stats[:answer_sets].detect { |as| as[:text] == "color" }.tap do |answer_set|
           unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
           missing_answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
@@ -105,8 +105,8 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
     end
   end
 
-  describe '[:correct]' do
-    it 'counts all fully correct responses' do
+  describe "[:correct]" do
+    it "counts all fully correct responses" do
       stats = subject.run([
                             { correct: "true" },
                             { correct: true }
@@ -116,8 +116,8 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
     end
   end
 
-  describe '[:partial]' do
-    it 'counts all partially correct responses' do
+  describe "[:partial]" do
+    it "counts all partially correct responses" do
       stats = subject.run([
                             { correct: "true" },
                             { correct: "partial" }
@@ -127,8 +127,8 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
     end
   end
 
-  describe '[:incorrect]' do
-    it 'counts all incorrect responses' do
+  describe "[:incorrect]" do
+    it "counts all incorrect responses" do
       stats = subject.run([
                             { correct: nil },
                             { correct: false }
@@ -138,24 +138,24 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
     end
   end
 
-  describe '[:responses]' do
-    it 'counts all students who have filled any blank' do
+  describe "[:responses]" do
+    it "counts all students who have filled any blank" do
       stats = subject.run([
                             {
-                              answer_id_for_organ: '3208'
+                              answer_id_for_organ: "3208"
                             }
                           ])
 
       expect(stats[:responses]).to eq(1)
     end
 
-    it 'does not count students who didnt' do
+    it "does not count students who didnt" do
       expect(subject.run([{}])[:responses]).to eq(0)
     end
   end
 
-  describe '[:answered]' do
-    it 'counts students who have filled every blank' do
+  describe "[:answered]" do
+    it "counts students who have filled every blank" do
       stats = subject.run([
                             {
                               answer_id_for_organ: "3208",
@@ -166,21 +166,21 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
       expect(stats[:answered]).to eq(1)
     end
 
-    it 'counts students who have filled every blank, even if incorrectly' do
+    it "counts students who have filled every blank, even if incorrectly" do
       stats = subject.run([
                             {
-                              answer_id_for_organ: '8331',
-                              answer_id_for_color: '1638'
+                              answer_id_for_organ: "8331",
+                              answer_id_for_color: "1638"
                             }
                           ])
 
       expect(stats[:answered]).to eq(1)
     end
 
-    it 'does not count a student who has left any blank' do
+    it "does not count a student who has left any blank" do
       stats = subject.run([
                             {
-                              answer_for_color: '1381'
+                              answer_for_color: "1381"
                             }
                           ])
 

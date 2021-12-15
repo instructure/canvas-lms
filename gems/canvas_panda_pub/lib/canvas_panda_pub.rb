@@ -18,38 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'canvas_http'
+require "canvas_http"
 
 module CanvasPandaPub
   class << self
     attr_accessor :logger, :cache, :on_work_unit_end
-
-    def plugin_settings=(settings)
-      @plugin_settings = settings
-    end
+    attr_writer :plugin_settings, :max_queue_size, :process_interval
 
     def plugin_settings
       @plugin_settings.call
-    end
-
-    def max_queue_size=(size)
-      @max_queue_size = size
     end
 
     def max_queue_size
       @max_queue_size.call
     end
 
-    def process_interval=(interval)
-      @process_interval = interval
-    end
-
     def process_interval
       @process_interval.call
     end
 
-    require 'canvas_panda_pub/async_worker'
-    require 'canvas_panda_pub/client'
+    require "canvas_panda_pub/async_worker"
+    require "canvas_panda_pub/client"
 
     # Returns true if PandaPub is currently enabled.
 

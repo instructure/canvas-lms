@@ -30,7 +30,7 @@ module TimeZoneHelper
         @time_zone_attributes_module = Module.new
         include(@time_zone_attributes_module)
       end
-      @time_zone_attributes_module.class_eval <<-CODE, __FILE__, __LINE__ + 1
+      @time_zone_attributes_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{attr}
           value = super
           value ||= self.class.time_zone_attribute_defaults[#{attr.inspect}] or return
@@ -43,7 +43,7 @@ module TimeZoneHelper
           end
           super(value.try(:name))
         end
-      CODE
+      RUBY
     end
   end
 
@@ -54,7 +54,7 @@ module TimeZoneHelper
   def self.rails_preferred_zone(zone)
     return nil unless zone
 
-    @reverse_map ||= Hash[ActiveSupport::TimeZone.all.map do |z|
+    @reverse_map ||= ActiveSupport::TimeZone.all.filter_map do |z|
       # Rails allows several aliases that map to the same IANA zone; on the reverse
       # mapping, exclude the aliases so that America/Lima doesn't come back as Quito
       next if ["International Date Line West", "Guadalajara", "Quito",
@@ -64,7 +64,7 @@ module TimeZoneHelper
                "Wellington"].include?(z.name)
 
       [z.tzinfo.name, z]
-    end.compact]
+    end.to_h
     @reverse_map[zone.name] || zone
   end
 

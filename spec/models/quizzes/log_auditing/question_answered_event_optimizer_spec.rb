@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
-  describe '#run!' do
+  describe "#run!" do
     def build_event(answers)
       Quizzes::QuizSubmissionEvent.new.tap do |event|
         event.answers = answers.as_json
@@ -29,37 +29,37 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
       subject.run!(event.answers, predecessors)
     end
 
-    it 'is a noop if there are no previous events' do
-      event = build_event [{ quiz_question_id: 1, answer: '11' }]
+    it "is a noop if there are no previous events" do
+      event = build_event [{ quiz_question_id: 1, answer: "11" }]
 
       expect(run(event, [])).to eq false
     end
 
-    it 'includes newly recorded answers' do
-      event1 = build_event [{ quiz_question_id: '1', answer: '11' }]
-      event2 = build_event [{ quiz_question_id: '2', answer: '21' }]
+    it "includes newly recorded answers" do
+      event1 = build_event [{ quiz_question_id: "1", answer: "11" }]
+      event2 = build_event [{ quiz_question_id: "2", answer: "21" }]
 
       expect(run(event2, [event1])).to eq false
       expect(event2.answers.length).to eq 1
     end
 
-    it 'includes answers that have changed' do
-      event1 = build_event [{ quiz_question_id: '1', answer: '11' }]
-      event2 = build_event [{ quiz_question_id: '1', answer: '12' }]
+    it "includes answers that have changed" do
+      event1 = build_event [{ quiz_question_id: "1", answer: "11" }]
+      event2 = build_event [{ quiz_question_id: "1", answer: "12" }]
 
       expect(run(event2, [event1])).to eq false
       expect(event2.answers.length).to eq 1
     end
 
-    it 'does not include answers otherwise' do
+    it "does not include answers otherwise" do
       event1 = build_event [
-        { quiz_question_id: '1', answer: '11' },
-        { quiz_question_id: '2', answer: '21' }
+        { quiz_question_id: "1", answer: "11" },
+        { quiz_question_id: "2", answer: "21" }
       ]
 
       event2 = build_event [
-        { quiz_question_id: '1', answer: '11' },
-        { quiz_question_id: '2', answer: '21' }
+        { quiz_question_id: "1", answer: "11" },
+        { quiz_question_id: "2", answer: "21" }
       ]
 
       expect(event2.answers.length).to eq 2

@@ -435,6 +435,35 @@ describe('CommentsTrayBody', () => {
     )
   })
 
+  it('does not mark submission comments as read for observers', async () => {
+    jest.useFakeTimers()
+    window.ENV.current_user_roles = ['user', 'observer']
+
+    const props = await mockAssignmentAndSubmission({
+      Submission: {unreadCommentCount: 1}
+    })
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [{read: false}]
+      }
+    }
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
+
+    const mockMutation = jest.fn()
+    apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
+
+    render(
+      mockContext(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>
+      )
+    )
+
+    act(() => jest.runAllTimers())
+    expect(mockMutation).not.toHaveBeenCalled()
+  })
+
   it('renders an error when submission comments fail to be marked as read', async () => {
     jest.useFakeTimers()
 

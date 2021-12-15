@@ -33,8 +33,8 @@ module Stats
       enumerable.each { |item| self << item }
     end
 
-    def each
-      @items.each { |i| yield i }
+    def each(&block)
+      @items.each(&block)
     end
 
     def <<(item)
@@ -44,23 +44,27 @@ module Stats
       @items << item
       if @max.nil? || @min.nil?
         @max = @min = item
-      else
-        if item > @max
-          @max = item
-        elsif item < @min
-          @min = item
-        end
+      elsif item > @max
+        @max = item
+      elsif item < @min
+        @min = item
       end
       @sum += item
       @sum_of_squares += item**2
     end
     alias_method :push, :<<
 
-    def size; @items.size; end
+    def size
+      @items.size
+    end
     alias_method :count, :size
-    def empty?; @items.size == 0; end
+    def empty?
+      @items.empty?
+    end
 
-    def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
+    def mean
+      @items.empty? ? nil : (sum.to_f / @items.size)
+    end
     alias_method :avg, :mean
 
     # population variance
@@ -73,14 +77,16 @@ module Stats
     alias_method :variance, :var
 
     # population standard deviation
-    def stddev; @items.empty? ? nil : Math::sqrt(variance); end
+    def stddev
+      @items.empty? ? nil : Math.sqrt(variance)
+    end
     alias_method :standard_deviation, :stddev
 
     def quartiles
       # returns the 1st quartile, 2nd quartile (median),
       # and 3rd quartile for the data
 
-      # note that methodology for determining quartiles
+      # NOTE: methodology for determining quartiles
       # is not universally agreed upon (oddly enough)
       # this method picks medians and gets
       # results that are universally agreed upon.
@@ -90,7 +96,7 @@ module Stats
       # this one is very good
       # method is summarized well here:
       # http://www.stat.yale.edu/Courses/1997-98/101/numsum.htm
-      if @items.length == 0
+      if @items.empty?
         return [nil, nil, nil]
       end
 
@@ -136,15 +142,15 @@ module Stats
       # need floats for the math to work
       bin_width = Float(bin_width)
       bin_base = Float(bin_base)
-      ret_val = { :bin_width => bin_width, :bin_base => bin_base }
+      ret_val = { bin_width: bin_width, bin_base: bin_base }
       bins = {}
       @items.each do |i|
         bin = (((i - bin_base) / bin_width).floor * bin_width) + bin_base
-        if bins.has_key?(bin)
-          bins[bin] = bins[bin] + 1
-        else
-          bins[bin] = 1
-        end
+        bins[bin] = if bins.key?(bin)
+                      bins[bin] + 1
+                    else
+                      1
+                    end
       end
       ret_val[:data] = bins
       ret_val

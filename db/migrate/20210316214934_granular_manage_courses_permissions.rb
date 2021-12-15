@@ -22,20 +22,20 @@ class GranularManageCoursesPermissions < ActiveRecord::Migration[6.0]
 
   def change
     DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
-      base_role_type: 'AccountAdmin'
+      base_role_type: "AccountAdmin"
     )
     DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
-      base_role_type: 'AccountMembership'
+      base_role_type: "AccountMembership"
     )
     DataFixup::AddRoleOverridesForNewPermission.run(
       :change_course_state,
       :manage_courses_delete,
-      base_role_type: 'TeacherEnrollment'
+      base_role_type: "TeacherEnrollment"
     )
     DataFixup::AddRoleOverridesForNewPermission.run(
       :change_course_state,
       :manage_courses_delete,
-      base_role_type: 'DesignerEnrollment'
+      base_role_type: "DesignerEnrollment"
     )
     DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd.run
     DataFixup::AddRoleOverridesForNewPermission.run(:manage_courses, :manage_courses_admin)

@@ -18,25 +18,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe "Assessment Question import from hash" do
   SYSTEMS.each do |system|
     QUESTIONS.each do |q|
-      if import_data_exists? [system, 'quiz'], q[0]
-        it "imports #{q[0]} questions for #{system}" do
-          test_question_import(q[0], system)
-        end
+      next unless import_data_exists? [system, "quiz"], q[0]
+
+      it "imports #{q[0]} questions for #{system}" do
+        test_question_import(q[0], system)
       end
     end
   end
 
   it "only imports assessment question once" do
     context = get_import_context
-    data = get_import_data '', 'single_question'
-    data = { 'assessment_questions' => { 'assessment_questions' => data } }
+    data = get_import_data "", "single_question"
+    data = { "assessment_questions" => { "assessment_questions" => data } }
 
-    migration = ContentMigration.create!(:context => context)
+    migration = ContentMigration.create!(context: context)
     expect(context.assessment_questions.count).to eq 0
 
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
@@ -48,14 +48,14 @@ describe "Assessment Question import from hash" do
 
   it "updates assessment question on re-import" do
     context = get_import_context
-    data = get_import_data '', 'single_question'
-    data = { 'assessment_questions' => { 'assessment_questions' => data } }
+    data = get_import_data "", "single_question"
+    data = { "assessment_questions" => { "assessment_questions" => data } }
 
-    migration = ContentMigration.create!(:context => context)
+    migration = ContentMigration.create!(context: context)
     expect(context.assessment_questions.count).to eq 0
 
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
-    data['assessment_questions']['assessment_questions'].first['question_name'] = "Bee2"
+    data["assessment_questions"]["assessment_questions"].first["question_name"] = "Bee2"
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
     expect(context.assessment_question_banks.count).to eq 1
@@ -64,10 +64,10 @@ describe "Assessment Question import from hash" do
   end
 
   it "uses the question bank settings" do
-    q = get_import_data 'cengage', 'question'
-    context = get_import_context('cengage')
-    data = { 'assessment_questions' => { 'assessment_questions' => [q] } }
-    migration = ContentMigration.create!(:context => context)
+    q = get_import_data "cengage", "question"
+    context = get_import_context("cengage")
+    data = { "assessment_questions" => { "assessment_questions" => [q] } }
+    migration = ContentMigration.create!(context: context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: q[:question_bank_name]).first
@@ -77,9 +77,9 @@ describe "Assessment Question import from hash" do
 
   it "uses the specified question group" do
     context = course_model
-    data = get_import_data [], 'question_group'
-    q_hash = data['assessment_questions']['assessment_questions'].first
-    migration = ContentMigration.create!(:context => context)
+    data = get_import_data [], "question_group"
+    q_hash = data["assessment_questions"]["assessment_questions"].first
+    migration = ContentMigration.create!(context: context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
     q = AssessmentQuestion.where(migration_id: q_hash[:migration_id]).first
@@ -91,9 +91,9 @@ describe "Assessment Question import from hash" do
 
   it "uses the default question group if none specified" do
     context = course_model
-    data = get_import_data [], 'question_group'
-    q_hash = data['assessment_questions']['assessment_questions'].last
-    migration = ContentMigration.create!(:context => context)
+    data = get_import_data [], "question_group"
+    q_hash = data["assessment_questions"]["assessment_questions"].last
+    migration = ContentMigration.create!(context: context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
     q = AssessmentQuestion.where(migration_id: q_hash[:migration_id]).first
@@ -105,9 +105,9 @@ describe "Assessment Question import from hash" do
 
   it "uses the correct question bank" do
     context = course_model
-    migration = ContentMigration.create!(:context => context)
+    migration = ContentMigration.create!(context: context)
     migration.question_bank_name = "test question bank"
-    data = get_import_data [], 'question_group'
+    data = get_import_data [], "question_group"
 
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
@@ -115,31 +115,31 @@ describe "Assessment Question import from hash" do
     expect(context.assessment_question_banks.count).to eql(3)
     expect(context.assessment_questions.count).to eql(4)
 
-    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: 'Group1').first
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: "Group1").first
     expect(bank.assessment_questions.count).to eql(1)
-    expect(bank.assessment_questions.first.migration_id).to eql('1')
+    expect(bank.assessment_questions.first.migration_id).to eql("1")
 
-    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: 'Assmnt1').first
+    bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: "Assmnt1").first
     expect(bank.assessment_questions.count).to eql(2)
-    expect(['2', '3'].member?(bank.assessment_questions.first.migration_id)).not_to be_nil
-    expect(['2', '3'].member?(bank.assessment_questions.last.migration_id)).not_to be_nil
+    expect(["2", "3"].member?(bank.assessment_questions.first.migration_id)).not_to be_nil
+    expect(["2", "3"].member?(bank.assessment_questions.last.migration_id)).not_to be_nil
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: "test question bank").first
     expect(bank.assessment_questions.count).to eql(1)
-    expect(bank.assessment_questions.first.migration_id).to eql('4')
+    expect(bank.assessment_questions.first.migration_id).to eql("4")
   end
 
   it "allows question groups to point to question banks" do
-    question = get_import_data 'cengage', 'question'
-    context = get_import_context('cengage')
-    data = { 'assessment_questions' => { 'assessment_questions' => [question] } }
-    migration = ContentMigration.create!(:context => context)
+    question = get_import_data "cengage", "question"
+    context = get_import_context("cengage")
+    data = { "assessment_questions" => { "assessment_questions" => [question] } }
+    migration = ContentMigration.create!(context: context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: question[:question_bank_name]).first
-    question_data = { :aq_data => {}, :qq_ids => {} }
+    question_data = { aq_data: {}, qq_ids: {} }
     question_data[:aq_data][question[:migration_id]] = context.assessment_questions.where(migration_id: question[:migration_id]).first
 
-    quiz = get_import_data 'cengage', 'quiz'
+    quiz = get_import_data "cengage", "quiz"
     Importers::QuizImporter.import_from_migration(quiz, context, migration, question_data)
     quiz = context.quizzes.where(migration_id: quiz[:migration_id]).first
 
@@ -147,10 +147,10 @@ describe "Assessment Question import from hash" do
     expect(group.assessment_question_bank_id).to eq bank.id
   end
 
-  it 'sets root_account_id correctly' do
+  it "sets root_account_id correctly" do
     context = course_model
-    data = get_import_data [], 'question_group'
-    migration = ContentMigration.create!(:context => context)
+    data = get_import_data [], "question_group"
+    migration = ContentMigration.create!(context: context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
     bank = AssessmentQuestionBank.where(
@@ -165,10 +165,10 @@ describe "Assessment Question import from hash" do
 end
 
 def test_question_import(hash_name, system)
-  q = get_import_data [system, 'quiz'], hash_name
+  q = get_import_data [system, "quiz"], hash_name
   context = get_import_context(system)
-  data = { 'assessment_questions' => { 'assessment_questions' => [q] } }
-  migration = ContentMigration.create!(:context => context)
+  data = { "assessment_questions" => { "assessment_questions" => [q] } }
+  migration = ContentMigration.create!(context: context)
   Importers::AssessmentQuestionImporter.process_migration(data, migration)
   expect(context.assessment_questions.count).to eq 1
 

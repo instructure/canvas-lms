@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'course_copy_helper'
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy outcomes" do
@@ -35,14 +35,14 @@ describe ContentMigration do
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
-      lo.workflow_state = 'active'
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo.workflow_state = "active"
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
       log.add_outcome(lo)
 
       @cm.copy_options = {
-        :all_learning_outcomes => "1"
+        all_learning_outcomes: "1"
       }
       @cm.save!
 
@@ -58,15 +58,15 @@ describe ContentMigration do
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
-      lo.workflow_state = 'active'
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo.workflow_state = "active"
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
       default.add_outcome(lo)
 
-      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'question_type' => 'essay_question' })
+      bank = @copy_from.assessment_question_banks.create!(title: "bank")
+      bank.assessment_questions.create!(question_data: { "name" => "test question", "question_type" => "essay_question" })
 
-      lo.align(bank, @copy_from, { :mastery_type => 'points', :mastery_score => 50.0 })
+      lo.align(bank, @copy_from, { mastery_type: "points", mastery_score: 50.0 })
 
       run_course_copy
 
@@ -79,7 +79,7 @@ describe ContentMigration do
       expect(new_alignment.content).to eq new_bank
       expect(new_alignment.context).to eq @copy_to
 
-      expect(new_alignment.tag).to eq 'points_mastery'
+      expect(new_alignment.tag).to eq "points_mastery"
       expect(new_alignment.mastery_score).to eq 50.0
     end
 
@@ -181,7 +181,7 @@ describe ContentMigration do
       account = @copy_from.account
       a_group = account.root_outcome_group
 
-      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      root_group = LearningOutcomeGroup.create!(title: "contextless group")
 
       lo = create_outcome(nil, root_group)
 
@@ -205,18 +205,18 @@ describe ContentMigration do
       lo = create_outcome(account, a_group)
 
       root = @copy_from.root_outcome_group
-      log = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      log = @copy_from.learning_outcome_groups.create!(title: "some group")
       root.adopt_outcome_group(log)
       log.add_outcome(lo)
 
-      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'question_type' => 'essay_question' })
+      bank = @copy_from.assessment_question_banks.create!(title: "bank")
+      bank.assessment_questions.create!(question_data: { "name" => "test question", "question_type" => "essay_question" })
 
-      lo.align(bank, @copy_from, { :mastery_type => 'points', :mastery_score => 50.0 })
+      lo.align(bank, @copy_from, { mastery_type: "points", mastery_score: 50.0 })
 
       run_course_copy
 
-      to_log = @copy_to.learning_outcome_groups.where(:migration_id => mig_id(log)).first
+      to_log = @copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first
       expect(to_log.child_outcome_links.where(content_id: lo.id).first).not_to be_nil
 
       to_root = @copy_to.root_outcome_group
@@ -235,6 +235,7 @@ describe ContentMigration do
                "migration_id" => "id1072dcf40e801c6468d9eaa5774e56d" }
 
       @cm.outcome_to_id_map = {}
+      @cm.copied_external_outcome_map = {}
       Importers::LearningOutcomeImporter.import_from_migration(hash, @cm)
 
       expect(@cm.warnings).to eq ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
@@ -280,7 +281,7 @@ describe ContentMigration do
     end
 
     it "links rubric (and assignments) to outcomes" do
-      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      root_group = LearningOutcomeGroup.create!(title: "contextless group")
 
       lo = create_outcome(nil, root_group)
       lo2 = create_outcome(@copy_from)
@@ -289,29 +290,29 @@ describe ContentMigration do
       from_root.add_outcome(lo)
       from_root.add_outcome(lo2)
 
-      rub = Rubric.new(:context => @copy_from)
+      rub = Rubric.new(context: @copy_from)
       rub.data = [
         {
-          :points => 3,
-          :description => "Outcome row",
-          :id => 1,
-          :ratings => [{ :points => 3, :description => "Rockin'", :criterion_id => 1, :id => 2 }],
-          :learning_outcome_id => lo.id
+          points: 3,
+          description: "Outcome row",
+          id: 1,
+          ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }],
+          learning_outcome_id: lo.id
         },
         {
-          :points => 3,
-          :description => "Outcome row 2",
-          :id => 2,
-          :ratings => [{ :points => 3, :description => "lame'", :criterion_id => 2, :id => 3 }],
-          :ignore_for_scoring => true,
-          :learning_outcome_id => lo2.id
+          points: 3,
+          description: "Outcome row 2",
+          id: 2,
+          ratings: [{ points: 3, description: "lame'", criterion_id: 2, id: 3 }],
+          ignore_for_scoring: true,
+          learning_outcome_id: lo2.id
         }
       ]
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
 
-      from_assign = @copy_from.assignments.create!(:title => "some assignment")
-      rub.associate_with(from_assign, @copy_from, :purpose => "grading")
+      from_assign = @copy_from.assignments.create!(title: "some assignment")
+      rub.associate_with(from_assign, @copy_from, purpose: "grading")
 
       run_course_copy
 
@@ -326,9 +327,42 @@ describe ContentMigration do
       expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
     end
 
+    it "links copied account outcomes to rubrics in a cross-account copy" do
+      sub1 = Account.default.sub_accounts.create!(name: "A")
+      @copy_from.account = sub1
+      @copy_from.save!
+
+      lo = create_outcome(sub1)
+      rub = Rubric.new(context: @copy_from)
+      rub.data = [
+        {
+          points: 3,
+          description: "foo",
+          id: 1,
+          ratings: [{ points: 3, description: "Expeeds Excitations", criterion_id: 1, id: 2 }],
+          learning_outcome_id: lo.id
+        }
+      ]
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+
+      sub2 = Account.default.sub_accounts.create!(name: "B")
+      @copy_to.account = sub2
+      @copy_to.save!
+
+      warnings = [%(The external Learning Outcome couldn't be found for "#{lo.short_description}", creating a copy.)]
+      run_course_copy(warnings)
+
+      rub_to = @copy_to.rubrics.find_by(migration_id: mig_id(rub))
+      loa = rub_to.learning_outcome_alignments.take
+      lo_to = loa.learning_outcome
+      expect(lo_to.short_description).to eq lo.short_description
+      expect(lo_to.context).to eq @copy_to
+    end
+
     it "still associates rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
-      @assoc.summary_data = { :saved_comments => { "309_6312" => ["what the comment", "hey"] } }
+      @assoc.summary_data = { saved_comments: { "309_6312" => ["what the comment", "hey"] } }
       @assoc.save!
 
       run_course_copy
@@ -336,10 +370,10 @@ describe ContentMigration do
       rub = @copy_to.rubrics.where(migration_id: mig_id(@rubric)).first
       expect(rub).not_to be_nil
 
-      [:description, :id, :points].each do |k|
+      %i[description id points].each do |k|
         expect(rub.data.first[k]).to eq @rubric.data.first[k]
       end
-      [:criterion_id, :description, :id, :points].each do |k|
+      %i[criterion_id description id points].each do |k|
         rub.data.first[:ratings].each_with_index do |criterion, i|
           expect(criterion[k]).to eq @rubric.data.first[:ratings][i][k]
         end
@@ -355,7 +389,7 @@ describe ContentMigration do
     it "copies rubrics associated with assignments when rubric isn't selected" do
       create_rubric_asmnt
       @cm.copy_options = {
-        :assignments => { mig_id(@assignment) => "1" },
+        assignments: { mig_id(@assignment) => "1" },
       }
       @cm.save!
       run_course_copy
@@ -378,8 +412,8 @@ describe ContentMigration do
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
-      lo.workflow_state = 'active'
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo.workflow_state = "active"
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
       log.add_outcome(lo)
@@ -396,13 +430,13 @@ describe ContentMigration do
 
     it "still works when copying the same outcome twice" do
       default = @copy_from.root_outcome_group
-      log1 = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      log1 = @copy_from.learning_outcome_groups.create!(title: "some group")
       default.adopt_outcome_group(log1)
-      log2 = @copy_from.learning_outcome_groups.create!(:title => "some other group")
+      log2 = @copy_from.learning_outcome_groups.create!(title: "some other group")
       default.adopt_outcome_group(log2)
 
-      lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "outcome1", :workflow_state => "active")
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "outcome1", workflow_state: "active")
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
       log1.add_outcome(lo)

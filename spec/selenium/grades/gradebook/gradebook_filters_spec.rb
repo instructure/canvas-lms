@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../../helpers/groups_common'
-require_relative '../pages/gradebook_page'
-require_relative '../setup/gradebook_setup'
+require_relative "../../helpers/gradebook_common"
+require_relative "../../helpers/groups_common"
+require_relative "../pages/gradebook_page"
+require_relative "../setup/gradebook_setup"
 
-require_relative '../pages/gradebook_cells_page'
+require_relative "../pages/gradebook_cells_page"
 
 describe "Filter" do
   include_context "in-process server selenium tests"
@@ -34,9 +34,9 @@ describe "Filter" do
     before(:once) do
       course_with_teacher(active_all: true)
       @modules = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
-      group = @course.assignment_groups.create! name: 'assignments'
+      group = @course.assignment_groups.create! name: "assignments"
       @assignments = Array.new(2) { |i| @course.assignments.create! assignment_group: group, title: "Assign#{i}" }
-      2.times { |i| @modules[i].add_item type: 'assignment', id: @assignments[i].id }
+      2.times { |i| @modules[i].add_item type: "assignment", id: @assignments[i].id }
     end
 
     before do
@@ -44,7 +44,7 @@ describe "Filter" do
       user_session(@teacher)
     end
 
-    it "allows showing only one module", test_id: 3253290, priority: "1" do
+    it "allows showing only one module", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.module_dropdown_item_click(@modules[0].name)
 
@@ -57,7 +57,7 @@ describe "Filter" do
     before(:once) do
       course_with_teacher(active_all: true)
       course_with_student(course: @course)
-      create_grading_periods('Fall Term', Time.zone.now)
+      create_grading_periods("Fall Term", Time.zone.now)
       associate_course_to_term("Fall Term")
     end
 
@@ -66,7 +66,7 @@ describe "Filter" do
       show_grading_periods_filter(@teacher)
     end
 
-    it "allows showing only one grading period", test_id: 3253292, priority: "1" do
+    it "allows showing only one grading period", priority: "1" do
       assign1 = @course.assignments.create! title: "Assign1", due_at: 1.week.from_now
       assign2 = @course.assignments.create! title: "Assign2", due_at: 1.week.ago
 
@@ -91,20 +91,20 @@ describe "Filter" do
 
       Gradebook.visit(@course)
 
-      meta_cells = find_slick_cells(0, f('.grid-canvas'))
+      meta_cells = find_slick_cells(0, f(".grid-canvas"))
       expect(meta_cells[0]).to include_text @course.default_section.display_name
       expect(meta_cells[0]).to include_text @other_section.display_name
 
       Gradebook.select_section(@course.default_section)
-      meta_cells = find_slick_cells(0, f('.grid-canvas'))
+      meta_cells = find_slick_cells(0, f(".grid-canvas"))
       expect(meta_cells[0]).to include_text @student_name_1
 
       Gradebook.select_section(@other_section)
-      meta_cells = find_slick_cells(0, f('.grid-canvas'))
+      meta_cells = find_slick_cells(0, f(".grid-canvas"))
       expect(meta_cells[0]).to include_text @student_name_1
     end
 
-    it "allows showing only a certain section", priority: "1", test_id: 3253291 do
+    it "allows showing only a certain section", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.select_section("All Sections")
 
@@ -115,7 +115,7 @@ describe "Filter" do
       Gradebook.select_section(@other_section)
       expect(Gradebook.section_dropdown).to have_value(@other_section.name)
 
-      expect(Gradebook::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
+      expect(Gradebook::Cells.get_grade(@student_2, @first_assignment)).to eq "1"
     end
   end
 
@@ -144,7 +144,7 @@ describe "Filter" do
       Gradebook.select_student_group(group2)
       expect(Gradebook.student_group_dropdown).to have_value(group2.name)
 
-      expect(Gradebook::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
+      expect(Gradebook::Cells.get_grade(@student_2, @first_assignment)).to eq "1"
     end
   end
 end

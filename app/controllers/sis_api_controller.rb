@@ -311,13 +311,13 @@ class SisApiController < ApplicationController
   before_action :require_published_course, only: [:sis_assignments]
 
   GRADE_EXPORT_NOT_ENABLED_ERROR = {
-    code: 'not_enabled',
-    error: 'A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled'
+    code: "not_enabled",
+    error: "A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled"
   }.freeze
 
   COURSE_NOT_PUBLISHED_ERROR = {
-    code: 'unpublished_course',
-    error: 'Grade data is not available for non-published courses'
+    code: "unpublished_course",
+    error: "Grade data is not available for non-published courses"
   }.freeze
 
   # @API Retrieve assignments enabled for grade export to SIS
@@ -368,12 +368,13 @@ class SisApiController < ApplicationController
       elsif params[:course_id]
         api_find(Course, params[:course_id])
       else
-        fail ActiveRecord::RecordNotFound, 'unknown context type'
+        raise ActiveRecord::RecordNotFound, "unknown context type"
       end
   end
 
   def published_course_ids
-    if context.is_a?(Account)
+    case context
+    when Account
       course_scope = Course.published.where(account_id: [context.id] + Account.sub_account_ids_recursive(context.id))
       if (starts_before = CanvasTime.try_parse(params[:starts_before]))
         course_scope = course_scope.where("
@@ -390,31 +391,29 @@ class SisApiController < ApplicationController
         course_scope = course_scope.joins(:enrollment_term)
       end
       course_scope
-    elsif context.is_a?(Course)
+    when Course
       [context.id]
     end
   end
 
   def include_student_overrides?
-    params[:include].to_a.include?('student_overrides')
+    params[:include].to_a.include?("student_overrides")
   end
 
   def published_assignments
     assignments = Assignment.published
                             .where(post_to_sis: true)
-                            .where(context_type: 'Course', context_id: published_course_ids)
+                            .where(context_type: "Course", context_id: published_course_ids)
                             .preload(:assignment_group)
                             .preload(context: { active_course_sections: [:nonxlist_course] })
 
     if include_student_overrides?
-      assignments = assignments.preload(
+      assignments.preload(
         active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]]
       )
     else
-      assignments = assignments.preload(:active_assignment_overrides)
+      assignments.preload(:active_assignment_overrides)
     end
-
-    assignments
   end
 
   def paginated_assignments

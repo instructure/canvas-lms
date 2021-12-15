@@ -22,13 +22,13 @@ class AddReplicaIdentityForCourseAccountAssociations < ActiveRecord::Migration[6
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'CourseAccountAssociation', :root_account_id, 0
+    add_replica_identity "CourseAccountAssociation", :root_account_id, 0
     remove_index :course_account_associations, column: :root_account_id, if_exists: true
   end
 
   def down
     add_index :course_account_associations, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'CourseAccountAssociation'
+    remove_replica_identity "CourseAccountAssociation"
     change_column_null :course_account_associations, :root_account_id, true
   end
 end

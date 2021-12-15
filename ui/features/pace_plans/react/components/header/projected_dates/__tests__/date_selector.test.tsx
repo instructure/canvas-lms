@@ -99,7 +99,7 @@ describe('PacePlansDateSelector', () => {
       const {getByText} = render(<PacePlanDateSelector {...defaultProps} pacePlan={pacePlan} />)
 
       expect(
-        getByText('The start date for the pace plan must be after the end date.')
+        getByText('The start date for the pace plan must be before the end date.')
       ).toBeInTheDocument()
     })
 

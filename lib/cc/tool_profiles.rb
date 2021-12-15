@@ -25,19 +25,19 @@ module CC
         tool_proxy.define_singleton_method(:asset_string) do
           "tool_profile_#{id}"
         end
-        next unless export_object?(tool_proxy, 'tool_profiles')
+        next unless export_object?(tool_proxy, "tool_profiles")
 
         migration_id = create_key(tool_proxy)
 
         file_name = "#{migration_id}.json"
         file_path = File.join(@export_dir, file_name)
-        file = File.new(file_path, 'w')
+        file = File.new(file_path, "w")
 
         data = serialize_tool_proxy(tool_proxy)
         file.write(data.to_json)
         file.close
 
-        @resources.resource(identifier: migration_id, type: 'tool_profile') do |res|
+        @resources.resource(identifier: migration_id, type: "tool_profile") do |res|
           res.file(href: file_name)
         end
       end
@@ -45,9 +45,9 @@ module CC
 
     def serialize_tool_proxy(tool_proxy)
       {
-        "tool_profile" => tool_proxy.raw_data['tool_profile'],
+        "tool_profile" => tool_proxy.raw_data["tool_profile"],
         "meta" => {
-          "registration_url" => tool_proxy.registration_url || ''
+          "registration_url" => tool_proxy.registration_url || ""
         }
       }
     end

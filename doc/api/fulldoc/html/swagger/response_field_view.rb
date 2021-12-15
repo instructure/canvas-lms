@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'canvas_api/deprecatable'
-require 'hash_view'
+require_relative "canvas_api/deprecatable"
+require "hash_view"
 
 class ResponseFieldView < HashView
   include CanvasAPI::Deprecatable
@@ -29,7 +29,7 @@ class ResponseFieldView < HashView
   def initialize(tag)
     super()
     line = tag.text
-    @deprecated = tag.tag_name == 'deprecated_response_field'
+    @deprecated = tag.tag_name == "deprecated_response_field"
     @deprecated_date_key = :NOTICE
     @effective_date_key = :EFFECTIVE
     @tag_declaration_line = line

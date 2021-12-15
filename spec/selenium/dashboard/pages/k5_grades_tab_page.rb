@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/color_common'
+require_relative "../../common"
+require_relative "../../helpers/color_common"
 
 module K5GradesTabPageObject
   include ColorCommon
@@ -177,9 +177,7 @@ module K5GradesTabPageObject
 
   #------------------------------Retrieve Text----------------------#
 
-  def grades_total_text
-    grades_total.text
-  end
+  delegate :text, to: :grades_total, prefix: true
 
   #----------------------------Element Management---------------------#
 end

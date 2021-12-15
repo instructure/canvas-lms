@@ -36,6 +36,12 @@ describe('PreviewIcon()', () => {
     expect(getByTestId('preview-icon')).toHaveStyle('height: 25px')
   })
 
+  it('does not render a spinner', () => {
+    const {queryByText} = subject(props)
+
+    expect(queryByText('Loading preview')).not.toBeInTheDocument()
+  })
+
   describe('when an image data URL is provided', () => {
     beforeEach(() => {
       props = {
@@ -92,6 +98,20 @@ describe('PreviewIcon()', () => {
       expect(getByTestId('preview-icon')).toHaveStyle(
         'background: linear-gradient(135deg, rgb(255, 255, 255) 50%, rgb(255, 0, 0) 50%, rgb(255, 0, 0) 53%, rgb(255, 255, 255) 53%)'
       )
+    })
+  })
+
+  describe('when "loading" is true', () => {
+    beforeEach(() => {
+      props = {
+        loading: true
+      }
+    })
+
+    it('renders a spinner', () => {
+      const {getByText} = subject(props)
+
+      expect(getByText('Loading preview')).toBeInTheDocument()
     })
   })
 })

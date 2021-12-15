@@ -21,7 +21,7 @@ module AddressBook
   # implementation of AddressBook interface backed by MessageableUser
   class MessageableUser < AddressBook::Base
     def known_users(users, options = {})
-      options = { :strict_checks => true }.merge(options)
+      options = { strict_checks: true }.merge(options)
       if options[:context]
         user_ids = users.map { |user| Shard.global_id_for(user) }.to_set
         asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
@@ -128,14 +128,14 @@ module AddressBook
       # still load _all_, not just those missing from in process cache, on
       # rails cache miss, to be consistent with the cache key (and to let the
       # cache key stay consistent across calls e.g. from the same conversation)
-      key = users.map { |user| Shard.global_id_for(user) }.join(',')
-      loaded = Rails.cache.fetch([@sender, 'address_book_preload', key].cache_key) do
+      key = users.map { |user| Shard.global_id_for(user) }.join(",")
+      loaded = Rails.cache.fetch([@sender, "address_book_preload", key].cache_key) do
         @sender.load_messageable_users(users, strict_checks: false)
       end
 
       # but then prefer in-process cache over rails cache. if they differ, we
       # can pretty much guarantee the in-process cache is fresher.
-      newly_loaded = loaded.select { |user| !cached?(user) }
+      newly_loaded = loaded.reject { |user| cached?(user) }
       newly_loaded.each { |user| @cache.store(user, user.common_courses, user.common_groups) }
     end
   end

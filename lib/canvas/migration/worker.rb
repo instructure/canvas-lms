@@ -19,11 +19,11 @@
 #
 
 module Canvas::Migration::Worker
-  class Base < Struct.new(:migration_id)
+  Base = Struct.new(:migration_id) do
     def on_permanent_failure(error)
       if migration_id
         cm = ContentMigration.where(id: migration_id).first
-        cm.fail_with_error!(error) if cm
+        cm&.fail_with_error!(error)
       end
     end
   end
@@ -59,7 +59,7 @@ module Canvas::Migration::Worker
         Dir["#{folder}/**/**"].each do |file|
           next if File.basename(file) == file_name
 
-          file_path = file.sub(folder + '/', '')
+          file_path = file.sub(folder + "/", "")
           zipfile.add(file_path, file)
         end
       end
@@ -81,9 +81,9 @@ module Canvas::Migration::Worker
   end
 
   def self.clear_exported_data(folder)
-    config = ConfigFile.load('external_migration')
-    if !config || !config[:keep_after_complete]
-      FileUtils::rm_rf(folder) if File.exist?(folder)
+    config = ConfigFile.load("external_migration")
+    if (!config || !config[:keep_after_complete]) && File.exist?(folder)
+      FileUtils.rm_rf(folder)
     end
   rescue
     Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
@@ -92,11 +92,11 @@ module Canvas::Migration::Worker
   def self.download_attachment(cm, url)
     att = Attachment.new
     att.context = cm
-    att.file_state = 'deleted'
-    att.workflow_state = 'unattached'
-    att.clone_url(url, false, true, :quota_context => cm.context)
+    att.file_state = "deleted"
+    att.workflow_state = "unattached"
+    att.clone_url(url, false, true, quota_context: cm.context)
 
-    if att.file_state == 'errored'
+    if att.file_state == "errored"
       raise Canvas::Migration::Error, att.upload_error_message
     end
 

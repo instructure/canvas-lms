@@ -37,8 +37,8 @@ module Lti
         response_type
         scope
       ].freeze
-      OPTIONAL_PARAMS = ['state'].freeze
-      SCOPE = 'openid'
+      OPTIONAL_PARAMS = ["state"].freeze
+      SCOPE = "openid"
 
       skip_before_action :load_user, only: :authorize_redirect
       skip_before_action :verify_authenticity_token, only: :authorize_redirect
@@ -77,8 +77,8 @@ module Lti
         validate_launch_eligibility!
 
         render(
-          'lti/ims/authentication/authorize.html.erb',
-          layout: 'borderless_lti',
+          "lti/ims/authentication/authorize.html.erb",
+          layout: "borderless_lti",
           locals: {
             redirect_uri: redirect_uri,
             parameters: @oidc_error || id_token
@@ -91,8 +91,8 @@ module Lti
       def validate_client_id!
         binding_context = context.respond_to?(:account) ? context.account : context
 
-        unless developer_key.usable? && developer_key.account_binding_for(binding_context)&.workflow_state == 'on'
-          set_oidc_error!('unauthorized_client', 'Client not authorized in requested context')
+        unless developer_key.usable? && developer_key.account_binding_for(binding_context)&.workflow_state == "on"
+          set_oidc_error!("unauthorized_client", "Client not authorized in requested context")
         end
       end
 
@@ -100,16 +100,16 @@ module Lti
         return if public_course? && @current_user.blank?
 
         if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context: context) != oidc_params[:login_hint]
-          set_oidc_error!('login_required', 'Must have an active user session')
+          set_oidc_error!("login_required", "Must have an active user session")
         end
       end
 
       def validate_oidc_params!
         missing_params = REQUIRED_PARAMS - oidc_params.keys
         if missing_params.present?
-          set_oidc_error!('invalid_request_object', "The following parameters are missing: #{missing_params.join(',')}")
+          set_oidc_error!("invalid_request_object", "The following parameters are missing: #{missing_params.join(",")}")
         end
-        set_oidc_error!('invalid_request_object', "The 'scope' must be '#{SCOPE}'") if oidc_params[:scope] != SCOPE
+        set_oidc_error!("invalid_request_object", "The 'scope' must be '#{SCOPE}'") if oidc_params[:scope] != SCOPE
       end
 
       def validate_launch_eligibility!
@@ -118,7 +118,7 @@ module Lti
         id_token
       rescue InvalidLaunch => e
         Canvas::Errors.capture_exception(:lti, e, :info)
-        set_oidc_error!('launch_no_longer_valid', "The launch has either expired or already been consumed")
+        set_oidc_error!("launch_no_longer_valid", "The launch has either expired or already been consumed")
       end
 
       def set_oidc_error!(error, error_description)
@@ -135,17 +135,17 @@ module Lti
       end
 
       def verifier
-        decoded_jwt['verifier']
+        decoded_jwt["verifier"]
       end
 
       def canvas_domain
-        decoded_jwt['canvas_domain']
+        decoded_jwt["canvas_domain"]
       end
 
       def context
         @context ||= begin
-          model = decoded_jwt['context_type'].constantize
-          model.find(decoded_jwt['context_id'])
+          model = decoded_jwt["context_type"].constantize
+          model.find(decoded_jwt["context_id"])
         end
       end
 
@@ -166,7 +166,7 @@ module Lti
 
       def authorize_redirect_url
         url = URI.parse(lti_1_3_authorization_url(params: oidc_params))
-        parts = canvas_domain.split(':')
+        parts = canvas_domain.split(":")
         url.host = parts.first
         url.port = parts.last if parts.size > 1
         url.to_s
@@ -178,11 +178,11 @@ module Lti
 
       def redirect_uri
         @redirect_uri ||= begin
-          requested_redirect_base, requested_query_string = oidc_params[:redirect_uri].split('?')
+          requested_redirect_base, requested_query_string = oidc_params[:redirect_uri].split("?")
           is_valid = developer_key.redirect_uris.any? do |uri|
-            if uri.include? '?'
+            if uri.include? "?"
               # Verify the required query params are present
-              required_params = CGI.parse(uri.split('?').last).to_a
+              required_params = CGI.parse(uri.split("?").last).to_a
               requested_params = CGI.parse(requested_query_string).to_a
               (required_params - requested_params).empty?
             else
@@ -190,7 +190,7 @@ module Lti
             end
           end
 
-          reject! 'Invalid redirect_uri' unless is_valid
+          reject! "Invalid redirect_uri" unless is_valid
 
           oidc_params[:redirect_uri]
         end
@@ -205,7 +205,7 @@ module Lti
       rescue JSON::JWT::InvalidFormat,
              Canvas::Security::InvalidToken,
              Canvas::Security::TokenExpired
-        reject! 'Invalid lti_message_hint'
+        reject! "Invalid lti_message_hint"
       end
     end
   end

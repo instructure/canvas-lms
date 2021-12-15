@@ -26,18 +26,18 @@ module LtiProviderStateHelper
 
   def self.jwk
     {
-      "kty" => 'RSA',
-      "e" => 'test',
-      "n" => 'test',
-      "kid" => 'test',
-      "alg" => 'RS256',
-      "use" => 'test',
-      "iss" => 'test',
-      "aud" => 'http://example.org/login/oauth2/token',
-      "sub" => 'test',
+      "kty" => "RSA",
+      "e" => "test",
+      "n" => "test",
+      "kid" => "test",
+      "alg" => "RS256",
+      "use" => "test",
+      "iss" => "test",
+      "aud" => "http://example.org/login/oauth2/token",
+      "sub" => "test",
       "exp" => (Time.zone.now + 10.minutes).to_i,
       "iat" => Time.zone.now.to_i,
-      "jti" => 'test',
+      "jti" => "test",
     }
   end
 
@@ -45,7 +45,7 @@ module LtiProviderStateHelper
     account = Pact::Canvas.base_state.account
     developer_key = account.developer_keys.create!(
       public_jwk: jwk,
-      public_jwk_url: 'example.org',
+      public_jwk_url: "example.org",
       scopes: [
         "https://canvas.instructure.com/lti/public_jwk/scope/update",
         "https://canvas.instructure.com/lti/data_services/scope/create",
@@ -58,7 +58,7 @@ module LtiProviderStateHelper
       ]
     )
     enable_developer_key_account_binding!(developer_key)
-    developer_key.developer_key_account_bindings.first.workflow_state = 'on'
+    developer_key.developer_key_account_bindings.first.workflow_state = "on"
     developer_key.developer_key_account_bindings.first.save!
 
     developer_key
@@ -106,14 +106,14 @@ module LtiProviderStateHelper
         canvas_high_contrast_enabled: "$Canvas.user.prefersHighContrast"
       }
     }
-    tool_config = Lti::ToolConfiguration.create!(developer_key: developer_key, settings: configuration, privacy_level: 'public')
+    tool_config = Lti::ToolConfiguration.create!(developer_key: developer_key, settings: configuration, privacy_level: "public")
     external_tool = tool_config.new_external_tool(developer_key.account)
     external_tool.save!
   end
 end
 
 Pact.provider_states_for PactConfig::Consumers::ALL do
-  provider_state 'an account with an LTI developer key' do
+  provider_state "an account with an LTI developer key" do
     set_up do
       account = Pact::Canvas.base_state.account
       LtiProviderStateHelper.set_lti_context_id(account)
@@ -129,7 +129,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
     end
   end
 
-  provider_state 'a course with live events' do
+  provider_state "a course with live events" do
     set_up do
       jwk = LtiProviderStateHelper.jwk
       developer_key = LtiProviderStateHelper.developer_key(jwk)
@@ -147,7 +147,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       # The jwt_signing_key file is the same one used to sign the JWTs in the contract
       # tests in the live-events-lti repo. Make that key be the one that Canvas uses
       # to decode JWTs.
-      lti_tool_key = OpenSSL::PKey::RSA.new(File.read('../../jwt_signing_key'))
+      lti_tool_key = OpenSSL::PKey::RSA.new(File.read("../../jwt_signing_key"))
       allow(CanvasSecurity).to receive(:encryption_keys).and_return([lti_tool_key])
 
       # The JWT in the contracts will be expired; tell Canvas to accept it anyway.
@@ -165,13 +165,13 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
         }
       )
       allow(Canvas::DynamicSettings).to receive(:find)
-        .with('live-events-subscription-service', any_args).and_return({
-                                                                         'app-host' => ENV.fetch('SUBSCRIPTION_SERVICE_HOST', 'http://les.docker:80')
+        .with("live-events-subscription-service", any_args).and_return({
+                                                                         "app-host" => ENV.fetch("SUBSCRIPTION_SERVICE_HOST", "http://les.docker:80")
                                                                        })
 
       # Always set ignore_expiration to true when calling the decode_jwt method.
       CanvasSecurity.class_eval do
-        @old_decode_jwt = self.method(:decode_jwt)
+        @old_decode_jwt = method(:decode_jwt)
 
         def self.decode_jwt(body, keys = [])
           @old_decode_jwt.call(body, keys, ignore_expiration: true)

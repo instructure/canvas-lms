@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/student_planner_page'
-require_relative '../../announcements/pages/announcement_index_page'
+require_relative "../../common"
+require_relative "../pages/student_planner_page"
+require_relative "../../announcements/pages/announcement_index_page"
 
 describe "dashboard" do
   include_context "in-process server selenium tests"
@@ -27,14 +27,14 @@ describe "dashboard" do
 
   context "as a student with announcements on dashboard" do
     before :once do
-      course_with_teacher(active_all: true, new_user: true, user_name: 'Teacher First', course_name: 'Dashboard Course')
+      course_with_teacher(active_all: true, new_user: true, user_name: "Teacher First", course_name: "Dashboard Course")
 
       @section1 = @course.course_sections.first
-      @section2 = @course.course_sections.create!(:name => 'Section 2')
+      @section2 = @course.course_sections.create!(name: "Section 2")
 
-      @student1 = User.create!(name: 'Student One')
+      @student1 = User.create!(name: "Student One")
       @course.enroll_student(@student1, section: @section1).accept!
-      @student2 = User.create!(name: 'Student Two')
+      @student2 = User.create!(name: "Student Two")
       @course.enroll_student(@student2, section: @section2).accept!
     end
 
@@ -50,7 +50,7 @@ describe "dashboard" do
                                                      course_sections: [@section2])
 
       user_session(@student1)
-      get '/'
+      get "/"
     end
 
     it "displays notification on todo list sidebar and course dashcard", :xbrowser do
@@ -70,18 +70,18 @@ describe "dashboard" do
       expect(todo_sidebar_container).to contain_jqcss("span:contains('Nothing for now')")
     end
 
-    it "can dismiss notification from recent activity feed", priority: "1", test_id: 215577 do
+    it "can dismiss notification from recent activity feed", priority: "1" do
       go_to_recent_activity_view
       recent_activity_show_more_link.click
       recent_activity_close_announcement(@announcement1.title).click
 
-      expect(course_page_recent_activity).not_to contain_css('.stream-announcement')
+      expect(course_page_recent_activity).not_to contain_css(".stream-announcement")
     end
 
     it "displays notification in feed only for specific student section" do
       # student2 is in section2
       user_session(@student2)
-      get '/'
+      get "/"
       go_to_recent_activity_view
       # section1 announcement1 is not visible
       expect(recent_activity_dashboard_activity).not_to contain_jqcss("a:contains('#{@announcement1.title}')")
@@ -90,17 +90,17 @@ describe "dashboard" do
 
   context "as a student with announcements on course home page" do
     before :once do
-      course_with_teacher(active_all: true, new_user: true, user_name: 'Teacher First', course_name: 'Dashboard Course')
+      course_with_teacher(active_all: true, new_user: true, user_name: "Teacher First", course_name: "Dashboard Course")
 
       @section1 = @course.course_sections.first
-      @section2 = @course.course_sections.create!(:name => 'Section 2')
+      @section2 = @course.course_sections.create!(name: "Section 2")
 
-      @student1 = User.create!(name: 'Student One')
+      @student1 = User.create!(name: "Student One")
       @course.enroll_student(@student1, section: @section1).accept!
-      @student2 = User.create!(name: 'Student Two')
+      @student2 = User.create!(name: "Student Two")
       @course.enroll_student(@student2, section: @section2).accept!
 
-      @course.default_view = 'feed'
+      @course.default_view = "feed"
       @course.save!
     end
 
@@ -128,7 +128,7 @@ describe "dashboard" do
       # announcement shows in recent activity
       expect(course_page_recent_activity).to contain_jqcss("a:contains('#{@announcement1.title}')")
       # unread icon is displayed
-      expect(course_page_recent_activity).to contain_css('div.unread')
+      expect(course_page_recent_activity).to contain_css("div.unread")
     end
 
     it "can dismiss notification from todo list sidebar" do
@@ -136,17 +136,17 @@ describe "dashboard" do
       expect(todo_sidebar_container).to contain_jqcss("span:contains('Nothing for now')")
     end
 
-    it "can dismiss notification from recent activity feed", priority: "1", test_id: 215578 do
+    it "can dismiss notification from recent activity feed", priority: "1" do
       recent_activity_show_more_link.click
       recent_activity_close_announcement(@announcement1.title).click
 
-      expect(course_page_recent_activity).not_to contain_css('.stream-announcement')
+      expect(course_page_recent_activity).not_to contain_css(".stream-announcement")
     end
 
     it "displays notification in feed only for specific student section" do
       # student is in section2
       user_session(@student2)
-      get '/'
+      get "/"
       # section1 announcement1 is not visible
       expect(recent_activity_dashboard_activity).not_to contain_jqcss("a:contains('#{@announcement1.title}')")
     end
@@ -154,13 +154,13 @@ describe "dashboard" do
 
   context "as a teacher with announcements" do
     before :once do
-      course_with_teacher(active_all: true, new_user: true, user_name: 'Teacher First', course_name: 'Dashboard Course')
+      course_with_teacher(active_all: true, new_user: true, user_name: "Teacher First", course_name: "Dashboard Course")
       @section1 = @course.course_sections.first
 
-      @student1 = User.create!(name: 'Student One')
+      @student1 = User.create!(name: "Student One")
       @course.enroll_student(@student1, section: @section1).accept!
 
-      @course.default_view = 'feed'
+      @course.default_view = "feed"
       @course.save!
     end
 
@@ -172,7 +172,7 @@ describe "dashboard" do
       user_session(@teacher)
     end
 
-    it "can delete an announcement", priority: "1", test_id: 215579 do
+    it "can delete an announcement", priority: "1" do
       AnnouncementIndex.visit_announcements(@course.id)
       AnnouncementIndex.announcement_options_menu(@announcement1.title).click
       AnnouncementIndex.delete_announcement_option.click

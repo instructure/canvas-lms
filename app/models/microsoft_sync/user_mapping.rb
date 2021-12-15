@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'microsoft_sync'
+require_dependency "microsoft_sync"
 
 #
 # See MicrosoftSync::Group for more info on Microsoft sync. This model is
@@ -37,11 +37,11 @@ require_dependency 'microsoft_sync'
 # as a "ULUV" or User Lookup Value.
 #
 class MicrosoftSync::UserMapping < ActiveRecord::Base
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :user
-  validates_presence_of :root_account
-  validates_presence_of :user_id
-  validates_uniqueness_of :user_id, scope: :root_account
+  validates :root_account, presence: true
+  validates :user_id, presence: true
+  validates :user_id, uniqueness: { scope: :root_account }
   MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
 
   DEPENDED_ON_ACCOUNT_SETTINGS = %i[
@@ -53,30 +53,30 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   class AccountSettingsChanged < MicrosoftSync::Errors::GracefulCancelError
     def self.public_message
-      I18n.t 'The account-wide sync settings were changed while syncing. ' \
-             'Please attempt the sync again.'
+      I18n.t "The account-wide sync settings were changed while syncing. " \
+             "Please attempt the sync again."
     end
   end
 
   # Get the IDs of users enrolled in a course which do not have UserMappings
   # for the Course's root account. Works in batches, yielding arrays of user ids.
-  def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
+  def self.find_enrolled_user_ids_without_mappings(course:, batch_size:)
     user_ids = GuardRail.activate(:secondary) do
       Enrollment
         .microsoft_sync_relevant
         .where(course_id: course.id)
-        .joins(%{
+        .joins(<<~SQL.squish)
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
-        })
-        .where('mappings.id IS NULL')
+        SQL
+        .where(mappings: { id: nil })
         .select(:user_id).distinct.limit(MAX_ENROLLMENT_MEMBERS)
         .pluck(:user_id)
     end
 
     user_ids.in_groups_of(batch_size) do |batch|
-      blk.call(batch.compact)
+      yield(batch.compact)
     end
   end
 
@@ -131,23 +131,23 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     Enrollment
       .microsoft_sync_relevant
       .where(course_id: course.id)
-      .joins(%{
+      .joins(<<~SQL.squish)
         JOIN #{quoted_table_name} AS mappings
         ON mappings.user_id=enrollments.user_id
         AND mappings.root_account_id=#{course.root_account_id.to_i}
-      })
-      .select(:id, :type, 'mappings.aad_id as aad_id')
+      SQL
+      .select(:id, :type, "mappings.aad_id as aad_id")
   end
 
   def self.delete_old_user_mappings_later(account, batch_size = 1000)
     Rails.logger.info("Triggering Microsoft Sync User Mappings hard delete for account #{account.global_id}")
     # We only need one job deleting UserMappings, so we can drop all other jobs
     # for the same root account that try to start up.
-    self.delay_if_production(singleton: "microsoft_sync_delete_old_user_mappings_account_#{account.global_id}")
-        .delete_user_mappings_for_account(account, batch_size)
+    delay_if_production(singleton: "microsoft_sync_delete_old_user_mappings_account_#{account.global_id}")
+      .delete_user_mappings_for_account(account, batch_size)
   end
 
   def self.delete_user_mappings_for_account(account, batch_size)
-    while self.where(root_account: account).limit(batch_size).delete_all > 0; end
+    while where(root_account: account).limit(batch_size).delete_all > 0; end
   end
 end

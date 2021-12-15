@@ -29,7 +29,7 @@ class CreateUserPreferenceValues < ActiveRecord::Migration[5.2]
     end
 
     add_foreign_key :user_preference_values, :users
-    add_index :user_preference_values, [:user_id, :key, :sub_key], :unique => true, :name => "index_user_preference_values_on_keys"
+    add_index :user_preference_values, %i[user_id key sub_key], unique: true, name: "index_user_preference_values_on_keys"
   end
 
   def down

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe CanvasConnect::MeetingArchive do
-  subject { CanvasConnect::MeetingArchive.retrieve(38230, mock_client.new).first }
+  subject { CanvasConnect::MeetingArchive.retrieve(38_230, mock_client.new).first }
 
   let(:mock_client) do
     Class.new do
@@ -49,30 +49,30 @@ describe CanvasConnect::MeetingArchive do
   end
 
   it "returns the correct number" do
-    expect(CanvasConnect::MeetingArchive.retrieve(38230, mock_client.new).count).to eq 2
+    expect(CanvasConnect::MeetingArchive.retrieve(38_230, mock_client.new).count).to eq 2
   end
 
   it "returns the name" do
-    expect(subject.name).to eq 'Test Recording'
+    expect(subject.name).to eq "Test Recording"
   end
 
   it "returns the url_path" do
-    expect(subject.url_path).to eq '/p3u8rj0rvuj/'
+    expect(subject.url_path).to eq "/p3u8rj0rvuj/"
   end
 
   it "returns the date_begin" do
-    expect(subject.date_begin).to eq '2013-09-05T12:13:03.387-06:00'
+    expect(subject.date_begin).to eq "2013-09-05T12:13:03.387-06:00"
   end
 
   it "returns the date end" do
-    expect(subject.date_end).to eq '2013-09-05T12:13:28.970-06:00'
+    expect(subject.date_end).to eq "2013-09-05T12:13:28.970-06:00"
   end
 
   it "returns the date created" do
-    expect(subject.date_created).to eq '2013-09-05T12:13:03.387-06:00'
+    expect(subject.date_created).to eq "2013-09-05T12:13:03.387-06:00"
   end
 
   it "returns the date modified" do
-    expect(subject.date_modified).to eq '2013-09-05T12:13:29.727-06:00'
+    expect(subject.date_modified).to eq "2013-09-05T12:13:29.727-06:00"
   end
 end

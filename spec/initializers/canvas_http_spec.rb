@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
-require_relative '../../config/initializers/canvas_http'
+require_relative "../spec_helper"
+require_relative "../../config/initializers/canvas_http"
 
 describe "CanvasHttp Configuration" do
   after do
@@ -29,7 +29,7 @@ describe "CanvasHttp Configuration" do
     CanvasHttp::CircuitBreaker.redis = -> { Canvas.redis }
     CanvasHttp::CircuitBreaker.threshold = ->(_) { 0 }
     CanvasHttp::CircuitBreaker.interval = ->(_) { 1 }
-    Setting.set('http_blocked_ip_ranges', '')
+    Setting.set("http_blocked_ip_ranges", "")
     allow(CanvasHttp).to receive(:connection_for_uri).and_raise(Net::OpenTimeout)
     begin
       CanvasHttp.get("some.url.com")

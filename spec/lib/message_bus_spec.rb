@@ -60,7 +60,7 @@ describe MessageBus do
     consumer.acknowledge(msg)
     # normally you would process the message before acknowledging it
     # but we're trying to keep the external state as clean as possible in the tests.
-    expect(JSON.parse(msg.data)['test_key']).to eq("test_val")
+    expect(JSON.parse(msg.data)["test_key"]).to eq("test_val")
   end
 
   it "can send a single message resiliant to timeout" do
@@ -80,7 +80,7 @@ describe MessageBus do
     consumer.acknowledge(msg)
     # normally you would process the message before acknowledging it
     # but we're trying to keep the external state as clean as possible in the tests.
-    expect(JSON.parse(msg.data)['test_my_key']).to eq("test_my_val")
+    expect(JSON.parse(msg.data)["test_my_key"]).to eq("test_my_val")
   end
 
   it "only parses the YAML one time as long as it doesn't change" do
@@ -90,7 +90,7 @@ describe MessageBus do
     5.times { original_config = MessageBus.config }
     # force the config to change, so we get a second yaml parse
     yaml = "NOT_THE_ORIGINAL: config"
-    allow(DynamicSettings).to receive(:find).and_return({ 'pulsar.yml' => yaml })
+    allow(DynamicSettings).to receive(:find).and_return({ "pulsar.yml" => yaml })
     other_config = nil
     5.times { other_config = MessageBus.config }
     # make sure that the contents change when the dynamic settings change

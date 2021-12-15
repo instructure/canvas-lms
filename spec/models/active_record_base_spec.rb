@@ -35,51 +35,47 @@ describe ActiveRecord::Base do
     it "works" do
       start_times = [
         Time.zone.now,
-        Time.zone.now.advance(:days => -1),
-        Time.zone.now.advance(:days => -2),
-        Time.zone.now.advance(:days => -3)
+        Time.zone.now.advance(days: -1),
+        Time.zone.now.advance(days: -2),
+        Time.zone.now.advance(days: -3)
       ]
       create_courses(account, start_times)
 
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
-        start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }
-      ]
+      expect(account.courses.count_by_date(column: :start_at)).to eql start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
     end
 
     it "justs do the last 20 days by default" do
       start_times = [
         Time.zone.now,
-        Time.zone.now.advance(:days => -19),
-        Time.zone.now.advance(:days => -20),
-        Time.zone.now.advance(:days => 1)
+        Time.zone.now.advance(days: -19),
+        Time.zone.now.advance(days: -20),
+        Time.zone.now.advance(days: 1)
       ]
       create_courses(account, start_times)
 
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
-        start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }
-      ]
+      expect(account.courses.count_by_date(column: :start_at)).to eql start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
     end
   end
 
   describe "in batches" do
     before :once do
-      @c1 = course_factory(:name => 'course1', :active_course => true)
-      @c2 = course_factory(:name => 'course2', :active_course => true)
-      @u1 = user_factory(name: 'userC', active_user: true)
-      @u2 = user_factory(name: 'userB', active_user: true)
-      @u3 = user_factory(name: 'userA', active_user: true)
-      @e1 = @c1.enroll_student(@u1, :enrollment_state => 'active')
-      @e2 = @c1.enroll_student(@u2, :enrollment_state => 'active')
-      @e3 = @c1.enroll_student(@u3, :enrollment_state => 'active')
-      @e4 = @c2.enroll_student(@u1, :enrollment_state => 'active')
-      @e5 = @c2.enroll_student(@u2, :enrollment_state => 'active')
-      @e6 = @c2.enroll_student(@u3, :enrollment_state => 'active')
+      @c1 = course_factory(name: "course1", active_course: true)
+      @c2 = course_factory(name: "course2", active_course: true)
+      @u1 = user_factory(name: "userC", active_user: true)
+      @u2 = user_factory(name: "userB", active_user: true)
+      @u3 = user_factory(name: "userA", active_user: true)
+      @e1 = @c1.enroll_student(@u1, enrollment_state: "active")
+      @e2 = @c1.enroll_student(@u2, enrollment_state: "active")
+      @e3 = @c1.enroll_student(@u3, enrollment_state: "active")
+      @e4 = @c2.enroll_student(@u1, enrollment_state: "active")
+      @e5 = @c2.enroll_student(@u2, enrollment_state: "active")
+      @e6 = @c2.enroll_student(@u3, enrollment_state: "active")
     end
 
     shared_examples_for "batches" do
@@ -204,23 +200,23 @@ describe ActiveRecord::Base do
 
   context "rank helpers" do
     it "generates appropriate rank sql" do
-      expect(ActiveRecord::Base.rank_sql(['a', ['b', 'c'], ['d']], 'foo'))
+      expect(ActiveRecord::Base.rank_sql(["a", ["b", "c"], ["d"]], "foo"))
         .to eql "CASE WHEN foo IN ('a') THEN 0 WHEN foo IN ('b', 'c') THEN 1 WHEN foo IN ('d') THEN 2 ELSE 3 END"
     end
 
     it "generates appropriate rank hashes" do
-      hash = ActiveRecord::Base.rank_hash(['a', ['b', 'c'], ['d']])
-      expect(hash).to eq({ 'a' => 1, 'b' => 2, 'c' => 2, 'd' => 3 })
-      expect(hash['e']).to eql 4
+      hash = ActiveRecord::Base.rank_hash(["a", ["b", "c"], ["d"]])
+      expect(hash).to eq({ "a" => 1, "b" => 2, "c" => 2, "d" => 3 })
+      expect(hash["e"]).to eql 4
     end
   end
 
   it "has a valid GROUP BY clause when group_by is used correctly" do
     conn = ActiveRecord::Base.connection
-    expect {
-      User.find_by_sql "SELECT id, name FROM #{User.quoted_table_name} GROUP BY #{conn.group_by('id', 'name')}"
-      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM #{User.quoted_table_name}) u GROUP BY #{conn.group_by('id', 'name')}"
-    }.not_to raise_error
+    expect do
+      User.find_by_sql "SELECT id, name FROM #{User.quoted_table_name} GROUP BY #{conn.group_by("id", "name")}"
+      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM #{User.quoted_table_name}) u GROUP BY #{conn.group_by("id", "name")}"
+    end.not_to raise_error
   end
 
   context "unique_constraint_retry" do
@@ -238,42 +234,44 @@ describe ActiveRecord::Base do
     end
 
     it "runs twice if it gets a RecordNotUnique" do
-      Submission.create!(:user => @user, :assignment => @assignment)
+      Submission.create!(user: @user, assignment: @assignment)
       tries = 0
-      expect {
+      # we don't catch the error the second time
+      expect do
         User.unique_constraint_retry do
           tries += 1
           User.create!
-          Submission.create!(:user => @user, :assignment => @assignment)
+          Submission.create!(user: @user, assignment: @assignment)
         end
-      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the second time
+      end.to raise_error(ActiveRecord::RecordNotUnique)
       expect(Submission.count).to eql 1
       expect(tries).to eql 2
       expect(User.count).to eql @orig_user_count
     end
 
     it "runs additional times if specified" do
-      Submission.create!(:user => @user, :assignment => @assignment)
+      Submission.create!(user: @user, assignment: @assignment)
       tries = 0
-      expect {
+      # we don't catch the error the last time
+      expect do
         User.unique_constraint_retry(2) do
           tries += 1
-          Submission.create!(:user => @user, :assignment => @assignment)
+          Submission.create!(user: @user, assignment: @assignment)
         end
-      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the last time
+      end.to raise_error(ActiveRecord::RecordNotUnique)
       expect(tries).to eql 3
       expect(Submission.count).to eql 1
     end
 
     it "does not cause outer transactions to roll back if the second attempt succeeds" do
-      Submission.create!(:user => @user, :assignment => @assignment)
+      Submission.create!(user: @user, assignment: @assignment)
       tries = 0
       User.transaction do
         User.create!
         User.unique_constraint_retry do
           tries += 1
           User.create!
-          Submission.create!(:user => @user, :assignment => @assignment) if tries == 1
+          Submission.create!(user: @user, assignment: @assignment) if tries == 1
         end
         User.create!
       end
@@ -283,23 +281,23 @@ describe ActiveRecord::Base do
 
     it "does not eat other ActiveRecord::StatementInvalid exceptions" do
       tries = 0
-      expect {
-        User.unique_constraint_retry {
+      expect do
+        User.unique_constraint_retry do
           tries += 1
           User.connection.execute "this is not valid sql"
-        }
-      }.to raise_error(ActiveRecord::StatementInvalid)
+        end
+      end.to raise_error(ActiveRecord::StatementInvalid)
       expect(tries).to eql 1
     end
 
     it "does not eat any other exceptions" do
       tries = 0
-      expect {
-        User.unique_constraint_retry {
+      expect do
+        User.unique_constraint_retry do
           tries += 1
           raise "oh crap"
-        }
-      }.to raise_error("oh crap")
+        end
+      end.to raise_error("oh crap")
       expect(tries).to eql 1
     end
   end
@@ -354,8 +352,8 @@ describe ActiveRecord::Base do
     it "works" do
       now = Time.now.utc
       User.bulk_insert [
-        { :name => "bulk_insert_1", :workflow_state => "registered", created_at: now, updated_at: now },
-        { :name => "bulk_insert_2", :workflow_state => "registered", created_at: now, updated_at: now }
+        { name: "bulk_insert_1", workflow_state: "registered", created_at: now, updated_at: now },
+        { name: "bulk_insert_2", workflow_state: "registered", created_at: now, updated_at: now }
       ]
       names = User.order(:name).pluck(:name)
       expect(names).to be_include("bulk_insert_1")
@@ -363,8 +361,8 @@ describe ActiveRecord::Base do
     end
 
     it "handles arrays" do
-      arr1 = ['1, 2', 3, 'string with "quotes"', "another 'string'", "a fancy strîng"]
-      arr2 = ['4', '5;', nil, "string with \t tab and \n newline and slash \\"]
+      arr1 = ["1, 2", 3, 'string with "quotes"', "another 'string'", "a fancy strîng"]
+      arr2 = ["4", "5;", nil, "string with \t tab and \n newline and slash \\"]
       now = Time.now.utc
       DeveloperKey.bulk_insert [
         { name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1, root_account_id: Account.default.id, created_at: now, updated_at: now },
@@ -379,9 +377,9 @@ describe ActiveRecord::Base do
       expect { Course.bulk_insert [] }.to change(Course, :count).by(0)
     end
 
-    it 'works through bulk insert objects' do
+    it "works through bulk insert objects" do
       now = Time.zone.now
-      users = [User.new(name: 'bulk_insert_1', workflow_state: 'registered', preferences: { accepted_terms: now }, created_at: now, updated_at: now)]
+      users = [User.new(name: "bulk_insert_1", workflow_state: "registered", preferences: { accepted_terms: now }, created_at: now, updated_at: now)]
       User.bulk_insert_objects users
       names = User.order(:name).pluck(:name, :preferences)
       expect(names.first.last[:accepted_terms]).not_to be_nil
@@ -390,11 +388,11 @@ describe ActiveRecord::Base do
 
   context "distinct_values" do
     before :once do
-      User.create()
-      User.create()
-      User.create(:locale => "en")
-      User.create(:locale => "en")
-      User.create(:locale => "es")
+      User.create
+      User.create
+      User.create(locale: "en")
+      User.create(locale: "en")
+      User.create(locale: "es")
     end
 
     it "returns distinct values" do
@@ -409,9 +407,9 @@ describe ActiveRecord::Base do
   context "find_ids_in_batches" do
     it "returns ids from the table in batches of specified size" do
       ids = []
-      5.times { ids << User.create!().id }
+      5.times { ids << User.create!.id }
       batches = []
-      User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
+      User.where(id: ids).find_ids_in_batches(batch_size: 2) do |found_ids|
         batches << found_ids
       end
       expect(batches).to eq [ids[0, 2], ids[2, 2], ids[4, 1]]
@@ -421,12 +419,12 @@ describe ActiveRecord::Base do
   describe "find_ids_in_ranges" do
     before :once do
       @ids = []
-      10.times { @ids << User.create!().id }
+      10.times { @ids << User.create!.id }
     end
 
     it "returns ids from the table in ranges" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[0], @ids[3]],
@@ -445,7 +443,7 @@ describe ActiveRecord::Base do
 
     it "accepts an option to start searching at a given id" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :start_at => @ids[3]) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4, start_at: @ids[3]) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[3], @ids[6]], [@ids[7], @ids[9]]]
@@ -453,7 +451,7 @@ describe ActiveRecord::Base do
 
     it "accepts an option to end at a given id" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :end_at => @ids[5]) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4, end_at: @ids[5]) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[0], @ids[3]], [@ids[4], @ids[5]]]
@@ -461,7 +459,7 @@ describe ActiveRecord::Base do
 
     it "accepts both options to start and end at given ids" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :start_at => @ids[2], :end_at => @ids[7]) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4, start_at: @ids[2], end_at: @ids[7]) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[2], @ids[5]], [@ids[6], @ids[7]]]
@@ -474,13 +472,13 @@ describe ActiveRecord::Base do
     end
 
     it "fails with dot in nested column name" do
-      expect {
-        User.where(:name => { "users.id" => @user }).first
-      }.to raise_error(TypeError)
+      expect do
+        User.where(name: { "users.id" => @user }).first
+      end.to raise_error(TypeError)
     end
 
     it "does not fail with a dot in column name only" do
-      expect(User.where('users.id' => @user).first).not_to be_nil
+      expect(User.where("users.id" => @user).first).not_to be_nil
     end
   end
 
@@ -488,85 +486,85 @@ describe ActiveRecord::Base do
     it "enforces type restrictions" do
       u = User.create!
       expect(ActiveRecord::Base.find_by_asset_string(u.asset_string)).to eq u
-      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ['User'])).to eq u
-      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ['Course'])).to eq nil
+      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ["User"])).to eq u
+      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ["Course"])).to eq nil
     end
   end
 
   describe "update_all/delete_all with_joins" do
     before :once do
-      @u1 = User.create!(:name => 'a')
-      @u2 = User.create!(:name => 'b')
-      @p1 = @u1.pseudonyms.create!(:unique_id => 'pa', :account => Account.default)
-      @p1_2 = @u1.pseudonyms.create!(:unique_id => 'pa2', :account => Account.default)
-      @p2 = @u2.pseudonyms.create!(:unique_id => 'pb', :account => Account.default)
+      @u1 = User.create!(name: "a")
+      @u2 = User.create!(name: "b")
+      @p1 = @u1.pseudonyms.create!(unique_id: "pa", account: Account.default)
+      @p1_2 = @u1.pseudonyms.create!(unique_id: "pa2", account: Account.default)
+      @p2 = @u2.pseudonyms.create!(unique_id: "pb", account: Account.default)
       @p1_2.destroy
     end
 
     before do
-      skip "Postgres only" unless ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      skip "Postgres only" unless ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
     end
 
     it "does an update all with a join" do
-      expect(Pseudonym.joins(:user).active.where(:users => { :name => 'a' }).update_all(:unique_id => 'pa3')).to eq 1
-      expect(@p1.reload.unique_id).to eq 'pa3'
-      expect(@p1_2.reload.unique_id).to eq 'pa2'
-      expect(@p2.reload.unique_id).to eq 'pb'
+      expect(Pseudonym.joins(:user).active.where(users: { name: "a" }).update_all(unique_id: "pa3")).to eq 1
+      expect(@p1.reload.unique_id).to eq "pa3"
+      expect(@p1_2.reload.unique_id).to eq "pa2"
+      expect(@p2.reload.unique_id).to eq "pb"
     end
 
     it "does an update all with a join with join conditions spanning multiple lines" do
       scope = Pseudonym.active.joins("INNER JOIN #{User.quoted_table_name} ON
         pseudonyms.user_id=users.id AND
         users.name='a'")
-      expect(scope.update_all(:unique_id => 'pa3')).to eq 1
-      expect(@p1.reload.unique_id).to eq 'pa3'
-      expect(@p1_2.reload.unique_id).to eq 'pa2'
-      expect(@p2.reload.unique_id).to eq 'pb'
+      expect(scope.update_all(unique_id: "pa3")).to eq 1
+      expect(@p1.reload.unique_id).to eq "pa3"
+      expect(@p1_2.reload.unique_id).to eq "pa2"
+      expect(@p2.reload.unique_id).to eq "pb"
     end
 
     it "does a delete all with a join" do
-      expect(Pseudonym.joins(:user).active.where(:users => { :name => 'a' }).delete_all).to eq 1
+      expect(Pseudonym.joins(:user).active.where(users: { name: "a" }).delete_all).to eq 1
       expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(@u1.reload).not_to be_deleted
-      expect(@p1_2.reload.unique_id).to eq 'pa2'
-      expect(@p2.reload.unique_id).to eq 'pb'
+      expect(@p1_2.reload.unique_id).to eq "pa2"
+      expect(@p2.reload.unique_id).to eq "pb"
     end
 
     # in rails 4, the where conditions use bind values for association scopes
     it "does an update all with a join on associations" do
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'b' }).update_all(:unique_id => 'pa3')
-      expect(@p1.reload.unique_id).to_not eq 'pa3'
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'a' }).update_all(:unique_id => 'pa3')
-      expect(@p1.reload.unique_id).to eq 'pa3'
-      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      @u1.pseudonyms.joins(:user).active.where(users: { name: "b" }).update_all(unique_id: "pa3")
+      expect(@p1.reload.unique_id).to_not eq "pa3"
+      @u1.pseudonyms.joins(:user).active.where(users: { name: "a" }).update_all(unique_id: "pa3")
+      expect(@p1.reload.unique_id).to eq "pa3"
+      expect(@p1_2.reload.unique_id).to eq "pa2"
     end
 
     it "does a delete all with a join on associations" do
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'b' }).delete_all
+      @u1.pseudonyms.joins(:user).active.where(users: { name: "b" }).delete_all
       expect(@u1.reload).not_to be_deleted
-      expect(@p1.reload.unique_id).to eq 'pa'
-      expect(@p1_2.reload.unique_id).to eq 'pa2'
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'a' }).delete_all
+      expect(@p1.reload.unique_id).to eq "pa"
+      expect(@p1_2.reload.unique_id).to eq "pa2"
+      @u1.pseudonyms.joins(:user).active.where(users: { name: "a" }).delete_all
       expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(@u1.reload).not_to be_deleted
-      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      expect(@p1_2.reload.unique_id).to eq "pa2"
     end
   end
 
   describe "delete_all with_limit" do
     it "works" do
       u = User.create!
-      p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
-      p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
+      p1 = u.pseudonyms.create!(unique_id: "a", account: Account.default)
+      p2 = u.pseudonyms.create!(unique_id: "b", account: Account.default)
       u.pseudonyms.reorder("unique_id DESC").limit(1).delete_all
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
-      u1 = User.create!(name: 'a')
-      u2 = User.create!(name: 'a')
-      User.from(<<-SQL)
+      u1 = User.create!(name: "a")
+      u2 = User.create!(name: "a")
+      User.from(<<~SQL.squish)
         (WITH duplicates AS (
           SELECT users.*,
               ROW_NUMBER() OVER(PARTITION BY users.name
@@ -585,9 +583,9 @@ describe ActiveRecord::Base do
 
     it "does offset too" do
       u = User.create!
-      p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
-      p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
-      p3 = u.pseudonyms.create!(unique_id: 'c', account: Account.default)
+      p1 = u.pseudonyms.create!(unique_id: "a", account: Account.default)
+      p2 = u.pseudonyms.create!(unique_id: "b", account: Account.default)
+      p3 = u.pseudonyms.create!(unique_id: "c", account: Account.default)
       u.pseudonyms.reorder("unique_id DESC").limit(1).offset(1).delete_all
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -630,50 +628,50 @@ describe ActiveRecord::Base do
       allow(User.connection).to receive(:readonly?).and_return(false)
     end
 
-    let_once(:u) { User.create!(name: 'abcdefg') }
+    let_once(:u) { User.create!(name: "abcdefg") }
 
     it "just does a bare update, instead of an ordered select and then update" do
       # only the reload
       expect(User.connection).to receive(:exec_query).once.and_call_original
-      expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'bob')).to eq 1
-      expect(u.reload.name).to eq 'bob'
+      expect(User.where(name: "abcdefg").in_batches.update_all(name: "bob")).to eq 1
+      expect(u.reload.name).to eq "bob"
     end
 
     it "does multi-stage if the updated column isn't mentioned in the where clause" do
       expect(User.connection).to receive(:exec_query).twice.and_call_original
-      expect(User.in_batches.update_all(name: 'bob')).to eq 1
-      expect(u.reload.name).to eq 'bob'
+      expect(User.in_batches.update_all(name: "bob")).to eq 1
+      expect(u.reload.name).to eq "bob"
     end
 
     it "does multi-stage if the updated column isn't mentioned in the where clause (that does exist)" do
       expect(User.connection).to receive(:exec_query).twice.and_call_original
-      expect(User.where(id: u.id).in_batches.update_all(name: 'bob')).to eq 1
-      expect(u.reload.name).to eq 'bob'
+      expect(User.where(id: u.id).in_batches.update_all(name: "bob")).to eq 1
+      expect(u.reload.name).to eq "bob"
     end
 
     it "does multi-stage if the updated column is being assigned to the same value as the condition" do
       expect(User.connection).to receive(:exec_query).twice.and_call_original
-      expect(User.where(name: 'abcdefg').in_batches.update_all(name: 'abcdefg')).to eq 1
-      expect(u.reload.name).to eq 'abcdefg'
+      expect(User.where(name: "abcdefg").in_batches.update_all(name: "abcdefg")).to eq 1
+      expect(u.reload.name).to eq "abcdefg"
     end
 
     it "does a bare update for an array condition non-matching value" do
       expect(User.connection).to receive(:exec_query).and_call_original
-      expect(User.where(name: ['abcdefg', 'hijklmn']).in_batches.update_all(name: 'bob')).to eq 1
-      expect(u.reload.name).to eq 'bob'
+      expect(User.where(name: ["abcdefg", "hijklmn"]).in_batches.update_all(name: "bob")).to eq 1
+      expect(u.reload.name).to eq "bob"
     end
 
     it "does a bare update for a negated array condition non-matching value" do
       expect(User.connection).to receive(:exec_query).and_call_original
-      expect(User.where.not(name: ['bob', 'hijklmn']).in_batches.update_all(name: 'bob')).to eq 1
-      expect(u.reload.name).to eq 'bob'
+      expect(User.where.not(name: ["bob", "hijklmn"]).in_batches.update_all(name: "bob")).to eq 1
+      expect(u.reload.name).to eq "bob"
     end
 
     it "does multi-stage for an array condition matching value" do
       expect(User.connection).to receive(:exec_query).twice.and_call_original
-      expect(User.where(name: ['abcdefg', 'hijklmn']).in_batches.update_all(name: 'abcdefg')).to eq 1
+      expect(User.where(name: ["abcdefg", "hijklmn"]).in_batches.update_all(name: "abcdefg")).to eq 1
       allow(User.connection).to receive(:exec_query).and_call_original
-      expect(u.reload.name).to eq 'abcdefg'
+      expect(u.reload.name).to eq "abcdefg"
     end
 
     it "does a bare update for a comparison condition non-matching value" do
@@ -720,14 +718,14 @@ describe ActiveRecord::Base do
 
   describe "add_index" do
     it "raises an error on too long of name" do
-      name = 'some_really_long_name_' * 10
+      name = "some_really_long_name_" * 10
       expect { User.connection.add_index :users, [:id], name: name }.to raise_error(/Index name .+ is too long/)
     end
   end
 
   describe "nested conditions" do
     it "does not barf if the condition has a question mark" do
-      expect(User.joins(:enrollments).where(enrollments: { workflow_state: 'a?c' }).first).to be_nil
+      expect(User.joins(:enrollments).where(enrollments: { workflow_state: "a?c" }).first).to be_nil
     end
   end
 
@@ -735,10 +733,10 @@ describe ActiveRecord::Base do
     before :once do
       @u1 = User.create!
       User.where(id: @u1).update_all(name: nil)
-      @u2 = User.create!(name: 'a')
+      @u2 = User.create!(name: "a")
       @u3 = User.create!
       User.where(id: @u3).update_all(name: nil)
-      @u4 = User.create!(name: 'b')
+      @u4 = User.create!(name: "b")
 
       @us = [@u1, @u2, @u3, @u4]
     end
@@ -779,13 +777,13 @@ describe ActiveRecord::Base do
           true
         end
       end
-      mock_account.where(name: 'callbacks something').create!
+      mock_account.where(name: "callbacks something").create!
     end
   end
 
   describe "not_recently_touched" do
     it "works with joins" do
-      Setting.set('touch_personal_space', '1')
+      Setting.set("touch_personal_space", "1")
       group_model
       expect(@group.users.not_recently_touched.to_a).to be_empty
     end
@@ -796,17 +794,17 @@ describe ActiveRecord::Base do
       # no error
       sql = StreamItem.joins(:discussion_topic).to_sql
       # and the sql
-      expect(sql).to include('asset_type')
-      expect(sql).to include('DiscussionTopic')
+      expect(sql).to include("asset_type")
+      expect(sql).to include("DiscussionTopic")
     end
 
     it "validates the type field" do
       si = StreamItem.new
-      si.asset_type = 'Submission'
+      si.asset_type = "Submission"
       si.data = {}
       expect(si.valid?).to eq true
 
-      si.context_type = 'User'
+      si.context_type = "User"
       expect(si.valid?).to eq false
     end
 
@@ -822,7 +820,7 @@ describe ActiveRecord::Base do
       si = StreamItem.new
       dt = DiscussionTopic.new
       si.discussion_topic = dt
-      expect(si.asset_type).to eq 'DiscussionTopic'
+      expect(si.asset_type).to eq "DiscussionTopic"
       expect(si.asset_id).to eq dt.id
       expect(si.asset.object_id).to eq si.discussion_topic.object_id
     end
@@ -844,40 +842,40 @@ describe ActiveRecord::Base do
     end
 
     it "prefixes specific associations" do
-      expect(AssessmentRequest.reflections.keys).to be_include('assessor_asset_submission')
+      expect(AssessmentRequest.reflections.keys).to be_include("assessor_asset_submission")
     end
 
     it "prefixes specific associations with an explicit name" do
-      expect(LearningOutcomeResult.reflections.keys).to be_include('association_assignment')
+      expect(LearningOutcomeResult.reflections.keys).to be_include("association_assignment")
     end
 
     it "passes the correct foreign key down to specific associations" do
-      expect(LearningOutcomeResult.reflections['association_assignment'].foreign_key).to eq :association_id
+      expect(LearningOutcomeResult.reflections["association_assignment"].foreign_key).to eq :association_id
     end
 
     it "handles class resolution that doesn't match the association name" do
-      expect(Attachment.reflections['quiz'].klass).to eq Quizzes::Quiz
+      expect(Attachment.reflections["quiz"].klass).to eq Quizzes::Quiz
     end
 
     it "doesn't validate the type field for non-exhaustive associations" do
       u = User.create!
       v = Version.new
       v.versionable = u
-      expect(v.versionable_type).to eq 'User'
+      expect(v.versionable_type).to eq "User"
       expect(v).to be_valid
     end
   end
 
   describe "temp_record" do
     it "does not reload the base association for normal invertible associations" do
-      c = Course.create!(:name => "some name")
-      Course.where(:id => c).update_all(:name => "sadness")
+      c = Course.create!(name: "some name")
+      Course.where(id: c).update_all(name: "sadness")
       expect(c.enrollments.temp_record.course.name).to eq c.name
     end
 
     it "does not reload the base association for polymorphic associations" do
-      c = Course.create!(:name => "some name")
-      Course.where(:id => c).update_all(:name => "sadness")
+      c = Course.create!(name: "some name")
+      Course.where(id: c).update_all(name: "sadness")
       expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end
@@ -886,13 +884,13 @@ end
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   # create a private pool, with the same config as the regular pool, but ensure
   # max_runtime is set
-  let(:spec) {
+  let(:spec) do
     ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
-      'spec',
+      "spec",
       ActiveRecord::Base.connection_pool.spec.config.merge(max_runtime: 30),
-      'postgresql_connection'
+      "postgresql_connection"
     )
-  }
+  end
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
 
   it "doesn't evict a normal cycle" do
@@ -904,23 +902,23 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections on checkout" do
-    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+    allow(Process).to receive(:clock_gettime).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    allow(Process).to receive(:clock_gettime).and_return(60)
     conn2 = pool.connection
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
-    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+    allow(Process).to receive(:clock_gettime).and_return(0)
 
     conn1 = pool.connection
     expect(conn1.runtime).to eq 0
 
-    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    allow(Process).to receive(:clock_gettime).and_return(60)
 
     expect(conn1.runtime).to eq 60
     pool.checkin(conn1)
@@ -929,12 +927,12 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections if you call flush" do
-    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+    allow(Process).to receive(:clock_gettime).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    allow(Process).to receive(:clock_gettime).and_return(60)
 
     pool.flush
 

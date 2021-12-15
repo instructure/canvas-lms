@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/context_modules_common'
+require_relative "../helpers/context_modules_common"
 
 describe "master courses - child courses - module item locking" do
   include_context "in-process server selenium tests"
@@ -56,11 +56,11 @@ describe "master courses - child courses - module item locking" do
       get "/courses/#{@copy_to.id}/modules"
 
       # objects inherited from master show the lock
-      expect(f("#context_module_item_#{@locked_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
-      expect(f("#context_module_item_#{@unlocked_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
+      expect(f("#context_module_item_#{@locked_tag.id} .lock-icon")).to contain_css(".icon-blueprint-lock")
+      expect(f("#context_module_item_#{@unlocked_tag.id} .lock-icon")).to contain_css(".icon-blueprint")
       # objects aded to the child do not
-      expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint-lock')
-      expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint')
+      expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css(".icon-blueprint-lock")
+      expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css(".icon-blueprint")
     end
 
     it "disables the title edit input for locked items" do
@@ -91,16 +91,16 @@ describe "master courses - child courses - module item locking" do
 
       f("#context_module_#{@mod.id} .add_module_item_link").click
       wait_for_ajaximations
-      click_option('#add_module_item_select', "Quiz")
-      click_option('#quizs_select .module_item_select', title)
-      f('.add_item_button.ui-button').click
+      click_option("#add_module_item_select", "Quiz")
+      click_option("#quizs_select .module_item_select", title)
+      f(".add_item_button.ui-button").click
 
       wait_for_ajaximations
       new_tag = ContentTag.last
       expect(new_tag.content).to eq quiz_copy
 
       # does another fetch to get restrictions for the new tag
-      expect(f("#context_module_item_#{new_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
+      expect(f("#context_module_item_#{new_tag.id} .lock-icon")).to contain_css(".icon-blueprint-lock")
     end
   end
 
@@ -116,13 +116,13 @@ describe "master courses - child courses - module item locking" do
       @page_tag = @template.create_content_tag_for!(@page, restrictions: { all: true })
 
       @topic = @course.discussion_topics.create!(title: "topic blah", message: "bloo")
-      # note the lack of a content tag
+      # NOTE: the lack of a content tag
 
       @mod = @course.context_modules.create!(name: "modle")
       @assmt_mod_tag = @mod.add_item(id: @assmt.id, type: "assignment")
       @page_mod_tag  = @mod.add_item(id: @page.id, type: "wiki_page")
       @topic_mod_tag = @mod.add_item(id: @topic.id, type: "discussion_topic")
-      @header_tag = @mod.add_item(:type => 'context_module_sub_header', :title => 'header')
+      @header_tag = @mod.add_item(type: "context_module_sub_header", title: "header")
     end
 
     before do
@@ -132,11 +132,11 @@ describe "master courses - child courses - module item locking" do
     it "shows all the icons on the modules index" do
       get "/courses/#{@course.id}/modules"
 
-      expect(f("#context_module_item_#{@assmt_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
-      expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
+      expect(f("#context_module_item_#{@assmt_mod_tag.id} .lock-icon")).to contain_css(".icon-blueprint")
+      expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css(".icon-blueprint-lock")
       # should still have icon even without tag
-      expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
-      expect(f("#context_module_item_#{@header_tag.id}")).to_not contain_css('.icon-blueprint')
+      expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css(".icon-blueprint")
+      expect(f("#context_module_item_#{@header_tag.id}")).to_not contain_css(".icon-blueprint")
     end
   end
 end

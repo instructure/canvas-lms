@@ -22,13 +22,13 @@ class AddReplicaIdentityForWebConferenceParticipants < ActiveRecord::Migration[5
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'WebConferenceParticipant', :root_account_id, 0
-    remove_index :web_conference_participants, name: 'index_web_conference_participants_on_root_account_id', if_exists: true
+    add_replica_identity "WebConferenceParticipant", :root_account_id, 0
+    remove_index :web_conference_participants, name: "index_web_conference_participants_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :web_conference_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'WebConferenceParticipant'
+    remove_replica_identity "WebConferenceParticipant"
     change_column_null :web_conference_participants, :root_account_id, true
   end
 end

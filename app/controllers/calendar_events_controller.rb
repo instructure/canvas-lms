@@ -24,33 +24,33 @@ class CalendarEventsController < ApplicationController
   before_action :require_context
   before_action :rce_js_env, only: [:new, :edit]
 
-  add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events") }, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
+  add_crumb(proc { t(:"#crumbs.calendar_events", "Calendar Events") }, only: %i[show new edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
 
   def show
     @event = @context.calendar_events.find(params[:id])
     add_crumb(@event.title, named_context_url(@context, :context_calendar_event_url, @event))
     if @event.deleted?
-      flash[:notice] = t 'notices.deleted', "This event has been deleted"
+      flash[:notice] = t "notices.deleted", "This event has been deleted"
       redirect_to calendar_url_for(@context)
       return
     end
     if authorized_action(@event, @current_user, :read)
       # If param specifies to open event on calendar, redirect to view
-      if params[:calendar] == '1' || @context.is_a?(CourseSection)
-        return redirect_to calendar_url_for(@event.effective_context, :event => @event)
+      if params[:calendar] == "1" || @context.is_a?(CourseSection)
+        return redirect_to calendar_url_for(@event.effective_context, event: @event)
       end
 
       log_asset_access(@event, "calendar", "calendar")
       respond_to do |format|
         format.html
-        format.json { render :json => @event.as_json(:permissions => { :user => @current_user, :session => session }) }
+        format.json { render json: @event.as_json(permissions: { user: @current_user, session: session }) }
       end
     end
   end
 
   def new
     @event = @context.calendar_events.temp_record
-    add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
+    add_crumb(t("crumbs.new", "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
     @event.assign_attributes(permit_params(params, [:title, :start_at, :end_at, :location_name, :location_address, web_conference: strong_anything]))
     add_conference_types_to_js_env([@context])
     authorized_action(@event, @current_user, :create) && authorize_user_for_conference(@current_user, @event.web_conference)
@@ -63,12 +63,12 @@ class CalendarEventsController < ApplicationController
       respond_to do |format|
         @event.updating_user = @current_user
         if @event.save
-          flash[:notice] = t 'notices.created', "Event was successfully created."
+          flash[:notice] = t "notices.created", "Event was successfully created."
           format.html { redirect_to calendar_url_for(@context) }
-          format.json { render :json => @event.as_json(:permissions => { :user => @current_user, :session => session }), :status => :created }
+          format.json { render json: @event.as_json(permissions: { user: @current_user, session: session }), status: :created }
         else
           format.html { render :new }
-          format.json { render :json => @event.errors, :status => :bad_request }
+          format.json { render json: @event.errors, status: :bad_request }
         end
       end
     end
@@ -98,13 +98,13 @@ class CalendarEventsController < ApplicationController
 
         @event.updating_user = @current_user
         if @event.update(params_for_update)
-          log_asset_access(@event, "calendar", "calendar", 'participate')
-          flash[:notice] = t 'notices.updated', "Event was successfully updated."
+          log_asset_access(@event, "calendar", "calendar", "participate")
+          flash[:notice] = t "notices.updated", "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }
-          format.json { render :json => @event.as_json(:permissions => { :user => @current_user, :session => session }), :status => :ok }
+          format.json { render json: @event.as_json(permissions: { user: @current_user, session: session }), status: :ok }
         else
           format.html { render :edit }
-          format.json { render :json => @event.errors, :status => :bad_request }
+          format.json { render json: @event.errors, status: :bad_request }
         end
       end
     end
@@ -117,7 +117,7 @@ class CalendarEventsController < ApplicationController
       @event.destroy
       respond_to do |format|
         format.html { redirect_to calendar_url_for(@context) }
-        format.json { render :json => @event, :status => :ok }
+        format.json { render json: @event, status: :ok }
       end
     end
   end
@@ -125,9 +125,10 @@ class CalendarEventsController < ApplicationController
   protected
 
   def feature_context
-    if @context.is_a?(User)
+    case @context
+    when User
       @domain_root_account
-    elsif @context.is_a?(Group)
+    when Group
       @context.context
     else
       @context
@@ -137,7 +138,7 @@ class CalendarEventsController < ApplicationController
   def calendar_event_params
     permit_params(
       params.require(:calendar_event),
-      CalendarEvent.permitted_attributes + [:child_event_data => strong_anything, web_conference: strong_anything]
+      CalendarEvent.permitted_attributes + [child_event_data: strong_anything, web_conference: strong_anything]
     )
   end
 

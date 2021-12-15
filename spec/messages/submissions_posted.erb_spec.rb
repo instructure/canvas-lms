@@ -62,7 +62,7 @@ describe "submissions_posted" do
     end
 
     context "when posted for everyone in sections" do
-      let_once(:message_options) { { data: { graded_only: false, section_names: ["sec1", "sec2", "sec3"] } } }
+      let_once(:message_options) { { data: { graded_only: false, section_names: %w[sec1 sec2 sec3] } } }
 
       it "includes a message body" do
         message = generate_message(notification_name, path_type, asset, message_options)
@@ -92,7 +92,7 @@ describe "submissions_posted" do
     end
 
     context "when posted for graded only in sections" do
-      let_once(:message_options) { { data: { graded_only: true, section_names: ["sec1", "sec2", "sec3"] } } }
+      let_once(:message_options) { { data: { graded_only: true, section_names: %w[sec1 sec2 sec3] } } }
 
       it "includes a message body" do
         message = generate_message(notification_name, path_type, asset, message_options)
@@ -132,7 +132,7 @@ describe "submissions_posted" do
     end
 
     context "when posted for everyone in sections" do
-      let_once(:message_options) { { data: { graded_only: false, section_names: ["sec1", "sec2", "sec3"] } } }
+      let_once(:message_options) { { data: { graded_only: false, section_names: %w[sec1 sec2 sec3] } } }
 
       it "includes a message body" do
         message = generate_message(notification_name, path_type, asset, message_options)
@@ -151,7 +151,7 @@ describe "submissions_posted" do
     end
 
     context "when posted for graded only in sections" do
-      let_once(:message_options) { { data: { graded_only: true, section_names: ["sec1", "sec2", "sec3"] } } }
+      let_once(:message_options) { { data: { graded_only: true, section_names: %w[sec1 sec2 sec3] } } }
 
       it "includes a message body" do
         message = generate_message(notification_name, path_type, asset, message_options)
@@ -174,7 +174,7 @@ describe "submissions_posted" do
     end
 
     context "when posted for everyone in sections" do
-      let_once(:message_options) { { data: { graded_only: false, section_names: ["sec1", "sec2", "sec3"] } } }
+      let_once(:message_options) { { data: { graded_only: false, section_names: %w[sec1 sec2 sec3] } } }
 
       it "includes a message subject" do
         message = generate_message(notification_name, path_type, asset, message_options)
@@ -193,7 +193,7 @@ describe "submissions_posted" do
     end
 
     context "when posted for graded only in sections" do
-      let_once(:message_options) { { data: { graded_only: true, section_names: ["sec1", "sec2", "sec3"] } } }
+      let_once(:message_options) { { data: { graded_only: true, section_names: %w[sec1 sec2 sec3] } } }
 
       it "includes a message subject" do
         message = generate_message(notification_name, path_type, asset, message_options)

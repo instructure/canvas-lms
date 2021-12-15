@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "terms/_term.html.erb" do
   describe "sis_source_id edit box" do
     before do
       @account = Account.default
-      @term = @account.enrollment_terms.create(:name => "test term")
+      @term = @account.enrollment_terms.create(name: "test term")
       @term.sis_source_id = "sis_this_fool"
 
       assign(:context, @account)
@@ -37,15 +37,15 @@ describe "terms/_term.html.erb" do
       admin = account_admin_user
       view_context(@account, admin)
       assign(:current_user, admin)
-      render :partial => "terms/term.html.erb", :locals => { :term => @term }
+      render partial: "terms/term.html.erb", locals: { term: @term }
       expect(response).to have_tag("input#enrollment_term_sis_source_id_#{@term.id}")
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false })
+      admin = account_admin_user_with_role_changes(role_changes: { "manage_sis" => false })
       view_context(@account, admin)
       assign(:current_user, admin)
-      render :partial => "terms/term.html.erb", :locals => { :term => @term }
+      render partial: "terms/term.html.erb", locals: { term: @term }
       expect(response).not_to have_tag("input#enrollment_term_sis_source_id_#{@term.id}")
       expect(response).to have_tag("span.sis_source_id", @term.sis_source_id)
     end

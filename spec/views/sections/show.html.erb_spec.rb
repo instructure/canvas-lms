@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "sections/show.html.erb" do
   describe "sis_source_id edit box" do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @section = @course.course_sections.first
       @section.sis_source_id = "section_sissy_id"
       assign(:context, @course)
@@ -32,7 +32,7 @@ describe "sections/show.html.erb" do
       assign(:student_enrollments_count, 1)
       assign(:pending_enrollments_count, 1)
       assign(:completed_enrollments_count, 1)
-      assign(:permission_classes, 'manage-permissions')
+      assign(:permission_classes, "manage-permissions")
     end
 
     it "does not show to teacher" do
@@ -44,7 +44,7 @@ describe "sections/show.html.erb" do
     end
 
     it "shows to sis admin" do
-      admin = account_admin_user(:account => @course.root_account)
+      admin = account_admin_user(account: @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -52,7 +52,7 @@ describe "sections/show.html.erb" do
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { 'manage_sis' => false })
+      admin = account_admin_user_with_role_changes(account: @course.root_account, role_changes: { "manage_sis" => false })
       view_context(@course, admin)
       assign(:current_user, admin)
       render

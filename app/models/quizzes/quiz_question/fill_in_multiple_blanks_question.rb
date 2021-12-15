@@ -24,7 +24,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
   end
 
   def variables
-    @variables ||= @question_data.answers.map { |a| a[:blank_id] }.uniq
+    @variables ||= @question_data.answers.pluck(:blank_id).uniq
   end
 
   def matching_answer?(answer, variable, downcased_response)
@@ -62,8 +62,8 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
 
     return nil if total_answers == 0
 
-    return chosen_answers.count do |variable, answer|
-      answer ||= { :id => nil, :text => nil, :weight => 0 }
+    chosen_answers.count do |variable, answer|
+      answer ||= { id: nil, text: nil, weight: 0 }
       user_answer.answer_details["answer_for_#{variable}".to_sym] = answer_text(answer)
       user_answer.answer_details["answer_id_for_#{variable}".to_sym] = answer[:id]
       answer && answer[:weight] == 100 && !variables.empty?
@@ -72,34 +72,34 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = { :multiple_responses => true }
+    stats = { multiple_responses: true }
 
     answer_keys = {}
     answers = []
     @question_data.answers.each do |answer|
-      unless answer_keys[answer[:blank_id]]
-        answers << {
-          :id => answer[:blank_id],
-          :text => answer[:blank_id],
-          :blank_id => answer[:blank_id],
-          :answer_matches => [],
-          :responses => 0,
-          :user_ids => []
-        }
-        answer_keys[answer[:blank_id]] = answers.length - 1
-      end
+      next if answer_keys[answer[:blank_id]]
+
+      answers << {
+        id: answer[:blank_id],
+        text: answer[:blank_id],
+        blank_id: answer[:blank_id],
+        answer_matches: [],
+        responses: 0,
+        user_ids: []
+      }
+      answer_keys[answer[:blank_id]] = answers.length - 1
     end
     answers.each do |found_answer|
-      @question_data.answers.select { |a|
+      @question_data.answers.select do |a|
         a[:blank_id] == found_answer[:blank_id]
-      }.each do |sub_answer|
+      end.each do |sub_answer|
         correct = sub_answer[:weight] == 100
         match = {
-          :responses => 0,
-          :text => sub_answer[:text],
-          :user_ids => [],
-          :id => @question_data.is_type?(:fill_in_multiple_blanks) ? found_answer[:blank_id] : sub_answer[:id],
-          :correct => correct
+          responses: 0,
+          text: sub_answer[:text],
+          user_ids: [],
+          id: @question_data.is_type?(:fill_in_multiple_blanks) ? found_answer[:blank_id] : sub_answer[:id],
+          correct: correct
         }
         found_answer[:answer_matches] << match
       end
@@ -115,23 +115,21 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
           end
           answer[:responses] += 1 if response[:correct]
           answer[:answer_matches].each do |right|
-            if response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
-              found = true
-              right[:responses] += 1
-              right[:user_ids] << response[:user_id]
-            end
+            next unless response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
+
+            found = true
+            right[:responses] += 1
+            right[:user_ids] << response[:user_id]
           end
-          if !found
-            if answer_md5
-              match = {
-                :id => answer_md5,
-                :responses => 1,
-                :user_ids => [response[:user_id]],
-                :text => response["answer_for_#{answer[:blank_id]}".to_sym]
-              }
-              answer[:answer_matches] << match
-            end
-          end
+          next unless !found && answer_md5
+
+          match = {
+            id: answer_md5,
+            responses: 1,
+            user_ids: [response[:user_id]],
+            text: response["answer_for_#{answer[:blank_id]}".to_sym]
+          }
+          answer[:answer_matches] << match
         end
       end
     end

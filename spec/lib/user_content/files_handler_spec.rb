@@ -23,18 +23,18 @@ describe UserContent::FilesHandler do
   let(:in_app) { false }
   let(:course) { course_factory(active_all: true) }
   let(:attachment) do
-    attachment_with_context(course, { filename: 'test.mp4', content_type: 'video' })
+    attachment_with_context(course, { filename: "test.mp4", content_type: "video" })
   end
   let(:match_url) do
-    [attachment.context_type.tableize, attachment.context_id, 'files', attachment.id, match_part].join('/')
+    [attachment.context_type.tableize, attachment.context_id, "files", attachment.id, match_part].join("/")
   end
-  let(:match_part) { 'download?wrap=1' }
+  let(:match_part) { "download?wrap=1" }
   let(:uri_match) do
     UserContent::FilesHandler::UriMatch.new(
       OpenStruct.new(
         {
           url: match_url,
-          type: 'files',
+          type: "files",
           obj_class: Attachment,
           obj_id: attachment.id,
           rest: "/#{match_part}"
@@ -50,63 +50,63 @@ describe UserContent::FilesHandler do
       ).url
     end
 
-    describe '#url' do
-      it 'includes context class' do
+    describe "#url" do
+      it "includes context class" do
         expect(processed_url).to match(/#{attachment.context_type.tableize}/)
       end
 
-      it 'includes wrap=1' do
-        query_string = processed_url.split('?')[1]
-        expect(Rack::Utils.parse_nested_query(query_string)['wrap']).to eq '1'
+      it "includes wrap=1" do
+        query_string = processed_url.split("?")[1]
+        expect(Rack::Utils.parse_nested_query(query_string)["wrap"]).to eq "1"
       end
 
-      it 'includes verifier query param' do
-        query_string = processed_url.split('?')[1]
-        expect(Rack::Utils.parse_nested_query(query_string)).to have_key('verifier')
+      it "includes verifier query param" do
+        query_string = processed_url.split("?")[1]
+        expect(Rack::Utils.parse_nested_query(query_string)).to have_key("verifier")
       end
 
-      context 'is in_app' do
+      context "is in_app" do
         let(:in_app) { true }
 
-        it 'does not include verifier' do
-          query_string = processed_url.split('?')[1]
-          expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key('verifier')
+        it "does not include verifier" do
+          query_string = processed_url.split("?")[1]
+          expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("verifier")
         end
       end
 
-      context 'and match is a preview' do
-        let(:match_part) { 'preview' }
+      context "and match is a preview" do
+        let(:match_part) { "preview" }
 
-        it 'is a preview url' do
+        it "is a preview url" do
           expect(processed_url).to match(%r{files/(\d)+/preview})
         end
 
-        it 'does not include wrap param' do
-          query_string = processed_url.split('?')[1]
-          expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key('wrap')
+        it "does not include wrap param" do
+          query_string = processed_url.split("?")[1]
+          expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("wrap")
         end
       end
 
-      context 'when download_frd=1' do
-        let(:match_part) { '?download_frd=1' }
+      context "when download_frd=1" do
+        let(:match_part) { "?download_frd=1" }
 
-        it 'includes /download in the url' do
+        it "includes /download in the url" do
           expect(processed_url).to match(%r{files/(\d)+/download})
         end
       end
 
-      context 'when no download_frd' do
-        let(:match_part) { '?wrap=1' }
+      context "when no download_frd" do
+        let(:match_part) { "?wrap=1" }
 
-        it 'omits /download in the url' do
+        it "omits /download in the url" do
           expect(processed_url).to match(%r{files/(\d)+(\?|$)})
         end
       end
 
-      context 'when attachment does not support relative paths' do
+      context "when attachment does not support relative paths" do
         let(:attachment) { attachment_with_context(submission_model) }
 
-        it 'does not include context name' do
+        it "does not include context name" do
           expect(processed_url).not_to match(/#{attachment.context_type.tableize}/)
         end
       end
@@ -131,37 +131,37 @@ describe UserContent::FilesHandler do
     end
     let(:preloaded_attachments) { {} }
 
-    describe '#processed_url' do
-      it 'delegates to ProcessedUrl' do
+    describe "#processed_url" do
+      it "delegates to ProcessedUrl" do
         expect(processed_url).to match(/#{attachment.context_type.tableize}/)
       end
 
-      context 'user does not have download rights' do
+      context "user does not have download rights" do
         let(:current_user) { user_factory }
 
-        it 'returns match_url with preview=1' do
+        it "returns match_url with preview=1" do
           expect(processed_url).to eq "/#{match_url}&no_preview=1"
         end
 
-        context 'but attachment is public' do
+        context "but attachment is public" do
           let(:is_public) { true }
 
-          it 'delegates to ProcessedUrl' do
+          it "delegates to ProcessedUrl" do
             expect(processed_url).to match(/#{attachment.context_type.tableize}/)
           end
 
-          context 'and file is locked' do
+          context "and file is locked" do
             let(:attachment) do
-              attachment_with_context(course, { filename: 'test.jpg', content_type: 'image/jpeg' })
+              attachment_with_context(course, { filename: "test.jpg", content_type: "image/jpeg" })
             end
 
-            it 'returns match_url with hidden=1' do
+            it "returns match_url with hidden=1" do
               attachment.locked = true
               attachment.save
               expect(processed_url).to eq "/#{match_url}&hidden=1"
             end
 
-            it 'returns match_url with hidden=1 if within a locked time window' do
+            it "returns match_url with hidden=1 if within a locked time window" do
               attachment.unlock_at = 1.hour.from_now
               attachment.save
               expect(processed_url).to eq "/#{match_url}&hidden=1"
@@ -171,7 +171,7 @@ describe UserContent::FilesHandler do
       end
     end
 
-    context 'user cannot access attachment' do
+    context "user cannot access attachment" do
       let(:subject) do
         UserContent::FilesHandler.new(
           match: uri_match,
@@ -185,11 +185,11 @@ describe UserContent::FilesHandler do
 
       before { allow(subject).to receive(:user_can_access_attachment?).and_return false }
 
-      context 'url contains invalid uri' do
+      context "url contains invalid uri" do
         # single quotes will make it valid uri, so keep this in double quotes
         let(:match_part) { "download?foo=505720\u00A0" }
 
-        it 'handles escape characters' do
+        it "handles escape characters" do
           expect(subject.processed_url).to match(/#{attachment.context_type.tableize}/)
         end
       end

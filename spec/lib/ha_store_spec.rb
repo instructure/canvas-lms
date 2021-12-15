@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper.rb"
+require_relative "../spec_helper"
 
 describe ActiveSupport::Cache::HaStore do
   before do
     skip unless Canvas.redis_enabled?
   end
 
-  let(:store) { ActiveSupport::Cache::HaStore.new(url: Canvas.redis.id, expires_in: 5.minutes.to_i, race_condition_ttl: 7.days.to_i, consul_event: 'invalidate') }
+  let(:store) { ActiveSupport::Cache::HaStore.new(url: Canvas.redis.id, expires_in: 5.minutes.to_i, race_condition_ttl: 7.days.to_i, consul_event: "invalidate") }
 
   describe "#delete" do
     it "triggers a consul event when configured" do
       # will get called twice; once with rails52: prefix, once without
       expect(Diplomat::Event).to receive(:fire).with("invalidate", match(/mykey$/), nil, nil, nil, nil).twice
-      store.delete('mykey')
+      store.delete("mykey")
     end
   end
 
@@ -66,7 +66,7 @@ describe ActiveSupport::Cache::HaStore do
       consul_event_id = SecureRandom.uuid
 
       Bundler.with_clean_env do
-        payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64('FLUSHDB') }].to_json
+        payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64("FLUSHDB") }].to_json
 
         `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
         expect($?).to be_success

@@ -49,7 +49,7 @@ module Twitter
     end
 
     def body
-      truncated_body = HtmlTextHelper.strip_and_truncate(message.body, :max_length => (139 - url.length))
+      truncated_body = HtmlTextHelper.strip_and_truncate(message.body, max_length: (139 - url.length))
       "#{truncated_body} #{url}"
     end
   end

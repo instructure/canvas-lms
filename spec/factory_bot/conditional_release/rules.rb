@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 FactoryBot.define do
-  sequence(:user_id)    { |n| 10000 + n }
+  sequence(:user_id)    { |n| 10_000 + n }
 
   factory :rule, class: ConditionalRelease::Rule do
     root_account_id { Account.default.id }
-    course :factory => :course
+    course factory: :course
 
     before(:create) do |rule, _evaluator|
       rule.trigger_assignment ||= rule.course.assignments.create!

@@ -20,7 +20,7 @@
 
 module Types
   class TurnitinDataType < ApplicationObjectType
-    graphql_name 'TurnitinData'
+    graphql_name "TurnitinData"
 
     field :target, Types::TurnitinContextType, null: false
     field :status, String, null: true

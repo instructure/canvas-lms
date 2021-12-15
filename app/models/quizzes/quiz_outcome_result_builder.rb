@@ -24,7 +24,7 @@ module Quizzes
     end
 
     def build_outcome_results(questions, alignments)
-      return unless ['complete', 'graded'].include?(@qs.workflow_state)
+      return unless ["complete", "graded"].include?(@qs.workflow_state)
 
       create_quiz_outcome_results(questions, alignments)
       questions.each do |question|
@@ -61,7 +61,7 @@ module Quizzes
       question_result = quiz_result.learning_outcome_question_results.for_associated_asset(question).first_or_initialize
 
       # do not create a result if no points are possible.
-      if cached_question['points_possible'] == 0
+      if cached_question["points_possible"] == 0
         # destroy any existing results that might be persisted if points possible were not always 0
         question_result.destroy if question_result.persisted?
         return
@@ -72,7 +72,7 @@ module Quizzes
 
       # mastery
       question_result.score = cached_answer[:points]
-      question_result.possible = cached_question['points_possible']
+      question_result.possible = cached_question["points_possible"]
       question_result.calculate_percent!
       question_result.mastery = determine_mastery(question_result, alignment)
 
@@ -121,8 +121,7 @@ module Quizzes
         end
 
         result.possible = cached_questions_and_answers.map(&:first)
-                                                      .map { |h| h['points_possible'] }
-                                                      .inject(:+)
+                                                      .sum { |h| h["points_possible"] }
 
         # do not create a result if no points are possible.
         if result.possible == 0
@@ -132,8 +131,7 @@ module Quizzes
         end
 
         result.score = cached_questions_and_answers.map(&:last)
-                                                   .map { |h| h[:points] }
-                                                   .inject(:+)
+                                                   .sum { |h| h[:points] }
 
         result.calculate_percent!
         result.mastery = determine_mastery(result, alignment)

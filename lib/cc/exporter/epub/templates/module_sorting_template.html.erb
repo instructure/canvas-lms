@@ -24,7 +24,7 @@
     <% if content[:locked] %>
       <% if content[:time_lock]%>
         <p>
-          <%= I18n.t(<<-TEXT, datetime: friendly_date(Time.at(content[:unlock_at]).to_s))
+          <%= I18n.t(<<~TEXT, datetime: friendly_date(Time.at(content[:unlock_at]).to_s))
             This module is locked until %{datetime}
           TEXT
           %>
@@ -32,7 +32,7 @@
       <% end %>
       <% if content[:prerequisites].present? %>
         <p>
-          <%= I18n.t(<<-TEXT, prerequisites: display_prerequisites(content[:prerequisites]))
+          <%= I18n.t(<<~TEXT, prerequisites: display_prerequisites(content[:prerequisites]))
             This module is locked until completing all of the requirements for the following modules: %{prerequisites}
           TEXT
           %>

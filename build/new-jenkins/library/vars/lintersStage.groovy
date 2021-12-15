@@ -90,6 +90,7 @@ def webpackStage(stages) {
 def featureFlagStage(stages, buildConfig) {
   { ->
     extendedStage('Linters - feature-flag')
+      .hooks(buildSummaryReportHooks.call())
       .nodeRequirements(container: 'feature-flag')
       .obeysAllowStages(false)
       .required(filesChangedStage.hasFeatureFlagFiles(buildConfig))
@@ -136,6 +137,7 @@ def queueTestStage() {
   { opts, stages ->
     extendedStage("Linters - ${opts.name}")
       .envVars(opts.containsKey('envVars') ? opts.envVars : [])
+      .hooks(buildSummaryReportHooks.call())
       .nodeRequirements(container: opts.name)
       .required(opts.containsKey('required') ? opts.required : true)
       .queue(stages) {

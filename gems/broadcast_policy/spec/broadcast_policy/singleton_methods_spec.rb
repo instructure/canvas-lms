@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe BroadcastPolicy::SingletonMethods do
   subject do
@@ -29,7 +29,7 @@ describe BroadcastPolicy::SingletonMethods do
     it "creates a policy list" do
       subject.set_broadcast_policy do
         dispatch :foo
-        to       { ['test@example.com'] }
+        to       { ["test@example.com"] }
         whenever { true }
       end
 
@@ -39,13 +39,13 @@ describe BroadcastPolicy::SingletonMethods do
     it "appends to an existing policy list" do
       subject.set_broadcast_policy do
         dispatch :foo
-        to       { ['test@example.com'] }
+        to       { ["test@example.com"] }
         whenever { true }
       end
 
       subject.set_broadcast_policy do
         dispatch :bar
-        to       { ['test@example.com'] }
+        to       { ["test@example.com"] }
         whenever { true }
       end
 
@@ -57,18 +57,18 @@ describe BroadcastPolicy::SingletonMethods do
     it "overwrites an inherited policy list" do
       subject.set_broadcast_policy do
         dispatch :foo
-        to       { ['test@example.com'] }
+        to       { ["test@example.com"] }
         whenever { true }
       end
 
       subject.set_broadcast_policy! do
         dispatch :bar
-        to       { ['test@example.com'] }
+        to       { ["test@example.com"] }
         whenever { true }
       end
 
       expect(subject.broadcast_policy_list.notifications.length).to eq(1)
-      expect(subject.broadcast_policy_list.notifications[0].dispatch).to eq('Bar')
+      expect(subject.broadcast_policy_list.notifications[0].dispatch).to eq("Bar")
     end
   end
 end

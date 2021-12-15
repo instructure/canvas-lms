@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'saml2'
+require "saml2"
 
 class AuthenticationProvider::SAML::MetadataRefresher
   class << self
@@ -48,7 +48,7 @@ class AuthenticationProvider::SAML::MetadataRefresher
       end
 
       headers = {}
-      headers['If-None-Match'] = etag if etag
+      headers["If-None-Match"] = etag if etag
       CanvasHttp.get(endpoint, headers) do |response|
         if response.is_a?(Net::HTTPNotModified)
           return false
@@ -57,8 +57,8 @@ class AuthenticationProvider::SAML::MetadataRefresher
         # raise on non-success
         response.value
         # store new data
-        if Canvas.redis_enabled? && response['ETag']
-          Canvas.redis.set("saml_#{provider_key}_etag", response['ETag'])
+        if Canvas.redis_enabled? && response["ETag"]
+          Canvas.redis.set("saml_#{provider_key}_etag", response["ETag"])
         end
         return response.body
       end

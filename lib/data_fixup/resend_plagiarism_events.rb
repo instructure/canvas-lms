@@ -36,10 +36,10 @@ module DataFixup
   # submitted in the time range will have events
   # retriggered.
   class ResendPlagiarismEvents
-    EVENT_NAME = 'plagiarism_resubmit'
+    EVENT_NAME = "plagiarism_resubmit"
 
     def self.run(start_time: 3.months.ago, end_time: Time.zone.now, only_errors: false)
-      limit, = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
+      limit, = Setting.get("trigger_plagiarism_resubmit", "100,180").split(",").map(&:to_i)
 
       # We're going to create all of the jobs that need to run with some far future run date
       # (so we know what they all are and we won't run them all at once and overwhelm our partners) and
@@ -57,7 +57,7 @@ module DataFixup
     end
 
     def self.resend_scope(start_time, end_time, limit: nil, only_errors: false)
-      raise 'start_time must be less than end_time' unless start_time < end_time
+      raise "start_time must be less than end_time" unless start_time < end_time
 
       # this is a limit and order on the subquery scope so the union over the whole submissions table doesn't take forever
       submission_scope = all_configured_submissions(start_time, end_time).select(:id).order(submitted_at: :desc)
@@ -76,7 +76,7 @@ module DataFixup
                     AND attachment_associations.attachment_id = ors.attachment_id")
       .where("ors.id IS NULL OR ors.workflow_state = 'pending'").to_sql})
       UNION
-      (#{scope.where(submission_type: 'online_text_entry')
+      (#{scope.where(submission_type: "online_text_entry")
       .joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
             AS ors ON submissions.id = ors.submission_id
                   AND submissions.submitted_at = ors.submission_time
@@ -92,7 +92,7 @@ module DataFixup
                     AND attachment_associations.attachment_id = ors.attachment_id
                     AND ors.workflow_state = 'error'").to_sql})
       UNION
-      (#{scope.where(submission_type: 'online_text_entry')
+      (#{scope.where(submission_type: "online_text_entry")
         .joins("INNER JOIN #{OriginalityReport.quoted_table_name}
                 AS ors ON submissions.id = ors.submission_id
                       AND submissions.submitted_at = ors.submission_time
@@ -108,9 +108,9 @@ module DataFixup
     end
 
     def self.schedule_next_job
-      _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
+      _, wait_time = Setting.get("trigger_plagiarism_resubmit", "100,180").split(",").map(&:to_i)
       Delayed::Job.where(strand: "plagiarism_event_resend", locked_at: nil)
-                  .order(:id).first&.update_attributes(run_at: wait_time.seconds.from_now)
+                  .order(:id).first&.update(run_at: wait_time.seconds.from_now)
     end
 
     # Retriggers the plagiarism resubmit event for the given
@@ -145,8 +145,8 @@ module DataFixup
       context[:user_login] = submission.user.pseudonyms&.first&.unique_id || submission.user.name
       context[:user_account_id] = submission.user.pseudonyms&.first&.global_account_id || submission.user.global_id
       context[:hostname] = submission.course.root_account.domain
-      context[:context_role] = 'StudentEnrollment'
-      context[:producer] = 'canvas'
+      context[:context_role] = "StudentEnrollment"
+      context[:producer] = "canvas"
       context
     end
     private_class_method :context_for_event

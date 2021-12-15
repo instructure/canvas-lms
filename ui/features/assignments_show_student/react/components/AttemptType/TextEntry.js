@@ -92,7 +92,9 @@ export default class TextEntry extends React.Component {
 
     if (this.props.submission.attempt !== prevProps.submission.attempt) {
       const body = this.getDraftBody()
-      this._tinyeditor.setContent(body)
+      if (body !== this._tinyeditor.getContent()) {
+        this._tinyeditor.setContent(body)
+      }
       this._lastSavedContent = body
 
       if (this.props.focusOnInit) {

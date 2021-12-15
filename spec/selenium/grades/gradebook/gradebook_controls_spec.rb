@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../pages/gradebook_page'
-require_relative '../setup/gradebook_setup'
+require_relative "../pages/gradebook_page"
+require_relative "../setup/gradebook_setup"
 
-describe 'Gradebook Controls' do
+describe "Gradebook Controls" do
   include_context "in-process server selenium tests"
   include GradebookSetup
 
@@ -32,30 +32,30 @@ describe 'Gradebook Controls' do
     user_session(@teacher)
   end
 
-  context 'using Gradebook dropdown' do
-    it 'navigates to Individual View', test_id: 3253264, priority: '1' do
+  context "using Gradebook dropdown" do
+    it "navigates to Individual View", priority: "1" do
       Gradebook.visit(@course)
       expect_new_page_load { Gradebook.gradebook_dropdown_item_click("Individual View") }
-      expect(f('h1')).to include_text("Gradebook: Individual View")
+      expect(f("h1")).to include_text("Gradebook: Individual View")
     end
 
-    it "navigates to Gradebook History", priority: "2", test_id: 3253265 do
+    it "navigates to Gradebook History", priority: "2" do
       Gradebook.visit(@course)
       expect_new_page_load { Gradebook.gradebook_dropdown_item_click("Gradebook History") }
       expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
     end
 
-    it "navigates to Learning Mastery", priority: "1", test_id: 3253266 do
-      Account.default.set_feature_flag!('outcome_gradebook', 'on')
+    it "navigates to Learning Mastery", priority: "1" do
+      Account.default.set_feature_flag!("outcome_gradebook", "on")
       Gradebook.visit(@course)
       Gradebook.gradebook_dropdown_item_click("Learning Mastery")
       expect(fj('button:contains("Learning Mastery")')).to be_displayed
     end
   end
 
-  context 'using View dropdown' do
-    it 'shows Grading Period dropdown', test_id: 3253277, priority: '1' do
-      create_grading_periods('Fall Term')
+  context "using View dropdown" do
+    it "shows Grading Period dropdown", priority: "1" do
+      create_grading_periods("Fall Term")
       associate_course_to_term("Fall Term")
 
       Gradebook.visit(@course)
@@ -65,7 +65,7 @@ describe 'Gradebook Controls' do
       expect(f(Gradebook.grading_period_dropdown_selector)).to be_displayed
     end
 
-    it 'shows Module dropdown', test_id: 3253275, priority: '1' do
+    it "shows Module dropdown", priority: "1" do
       @mods = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
 
       Gradebook.visit(@course)
@@ -76,8 +76,8 @@ describe 'Gradebook Controls' do
       expect(Gradebook.module_dropdown).to be_displayed
     end
 
-    it 'shows Section dropdown', test_id: 3253276, priority: '1' do
-      @section1 = @course.course_sections.create!(name: 'Section One')
+    it "shows Section dropdown", priority: "1" do
+      @section1 = @course.course_sections.create!(name: "Section One")
 
       Gradebook.visit(@course)
       Gradebook.select_view_dropdown
@@ -87,7 +87,7 @@ describe 'Gradebook Controls' do
       expect(Gradebook.section_dropdown).to be_displayed
     end
 
-    it 'hides unpublished assignments', test_id: 3253282, priority: '1' do
+    it "hides unpublished assignments", priority: "1" do
       assign = @course.assignments.create! title: "I am unpublished"
       assign.unpublish
 
@@ -95,12 +95,12 @@ describe 'Gradebook Controls' do
       Gradebook.select_view_dropdown
       Gradebook.select_show_unpublished_assignments
 
-      expect(Gradebook.content_selector).not_to contain_css('.assignment-name')
+      expect(Gradebook.content_selector).not_to contain_css(".assignment-name")
     end
   end
 
-  context 'using Actions dropdown' do
-    it 'navigates to upload page', test_id: 3265129, priority: '1' do
+  context "using Actions dropdown" do
+    it "navigates to upload page", priority: "1" do
       Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
       Gradebook.open_action_menu
@@ -110,8 +110,8 @@ describe 'Gradebook Controls' do
     end
   end
 
-  context 'using enhanced filter actions' do
-    it 'navigates to upload page', test_id: 3265130, priority: '1' do
+  context "using enhanced filter actions" do
+    it "navigates to upload page", priority: "1" do
       Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
       Gradebook.select_import

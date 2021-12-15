@@ -20,12 +20,12 @@
 
 describe BounceNotificationProcessor do
   before(:once) do
-    bounce_queue_log = File.read(File.dirname(__FILE__) + '/../fixtures/bounces.json')
+    bounce_queue_log = File.read(File.dirname(__FILE__) + "/../fixtures/bounces.json")
     @all_bounce_messages_json = JSON.parse(bounce_queue_log)
-    @soft_bounce_messages_json = @all_bounce_messages_json.select { |m| m['Message'].include?('Transient') }
-    @hard_bounce_messages_json = @all_bounce_messages_json.select { |m| m['Message'].include?('Permanent') }
+    @soft_bounce_messages_json = @all_bounce_messages_json.select { |m| m["Message"].include?("Transient") }
+    @hard_bounce_messages_json = @all_bounce_messages_json.select { |m| m["Message"].include?("Permanent") }
     @bounce_count = @all_bounce_messages_json.count do |notification|
-      JSON.parse(notification['Message'])['notificationType'] == 'Bounce'
+      JSON.parse(notification["Message"])["notificationType"] == "Bounce"
     end
   end
 
@@ -37,12 +37,12 @@ describe BounceNotificationProcessor do
 
   describe ".process" do
     it "calls process n times from #process" do
-      Setting.set('bounce_processors_for_region_us-east-1', '3')
+      Setting.set("bounce_processors_for_region_us-east-1", "3")
       allow(BounceNotificationProcessor).to receive(:config).and_return(
         {
-          region: 'us-east-1',
-          access_key: 'key',
-          secret_access_key: 'secret'
+          region: "us-east-1",
+          access_key: "key",
+          secret_access_key: "secret"
         }
       )
       queue = double
@@ -58,9 +58,9 @@ describe BounceNotificationProcessor do
       bnp = BounceNotificationProcessor.new
       allow(BounceNotificationProcessor).to receive(:config).and_return(
         {
-          region: 'us-east-1',
-          access_key: 'key',
-          secret_access_key: 'secret'
+          region: "us-east-1",
+          access_key: "key",
+          secret_access_key: "secret"
         }
       )
       queue = double
@@ -77,8 +77,8 @@ describe BounceNotificationProcessor do
     it "flags addresses with hard bounces" do
       bnp = BounceNotificationProcessor.new
       allow(BounceNotificationProcessor).to receive(:config).and_return({
-                                                                          access_key: 'key',
-                                                                          secret_access_key: 'secret'
+                                                                          access_key: "key",
+                                                                          secret_access_key: "secret"
                                                                         })
       queue = double
       expectation = receive(:poll)
@@ -89,20 +89,20 @@ describe BounceNotificationProcessor do
       allow(bnp).to receive(:bounce_queue).and_return(queue)
 
       expect(CommunicationChannel).to receive(:bounce_for_path)
-        .with(include(path: 'hard@example.edu',
-                      timestamp: '2014-08-22T12:25:46.786Z',
+        .with(include(path: "hard@example.edu",
+                      timestamp: "2014-08-22T12:25:46.786Z",
                       permanent_bounce: true,
                       suppression_bounce: false))
         .exactly(4).times
       expect(CommunicationChannel).to receive(:bounce_for_path)
-        .with(include(path: 'suppressed@example.edu',
-                      timestamp: '2014-08-22T12:18:58.044Z',
+        .with(include(path: "suppressed@example.edu",
+                      timestamp: "2014-08-22T12:18:58.044Z",
                       permanent_bounce: true,
                       suppression_bounce: true))
         .exactly(3).times
       expect(CommunicationChannel).to receive(:bounce_for_path)
-        .with(include(path: 'soft@example.edu',
-                      timestamp: '2014-08-22T13:24:31.000Z',
+        .with(include(path: "soft@example.edu",
+                      timestamp: "2014-08-22T13:24:31.000Z",
                       permanent_bounce: false,
                       suppression_bounce: false))
         .exactly(:once)
@@ -110,11 +110,11 @@ describe BounceNotificationProcessor do
       bnp.process
     end
 
-    it 'pings statsd' do
+    it "pings statsd" do
       bnp = BounceNotificationProcessor.new
       allow(BounceNotificationProcessor).to receive(:config).and_return({
-                                                                          access_key: 'key',
-                                                                          secret_access_key: 'secret'
+                                                                          access_key: "key",
+                                                                          secret_access_key: "secret"
                                                                         })
       queue = double
       expectation = receive(:poll)
@@ -127,13 +127,13 @@ describe BounceNotificationProcessor do
       allow(InstStatsd::Statsd).to receive(:increment)
       bnp.process
       expect(InstStatsd::Statsd).to have_received(:increment)
-        .with('bounce_notification_processor.processed.transient').once
+        .with("bounce_notification_processor.processed.transient").once
       expect(InstStatsd::Statsd).to have_received(:increment)
-        .with('bounce_notification_processor.processed.no_bounce').twice
+        .with("bounce_notification_processor.processed.no_bounce").twice
       expect(InstStatsd::Statsd).to have_received(:increment)
-        .with('bounce_notification_processor.processed.suppression').exactly(3).times
+        .with("bounce_notification_processor.processed.suppression").exactly(3).times
       expect(InstStatsd::Statsd).to have_received(:increment)
-        .with('bounce_notification_processor.processed.permanent').exactly(4).times
+        .with("bounce_notification_processor.processed.permanent").exactly(4).times
     end
   end
 end

@@ -28,8 +28,8 @@ class CreateMicrosoftSyncUserMappings < ActiveRecord::Migration[6.0]
       t.references :user, limit: 8, null: false, foreign_key: true, index: false
       t.string :aad_id
       t.timestamps
-      t.index [:user_id, :root_account_id], unique: true, name: 'index_microsoft_sync_user_mappings_ra_id_user_id'
-      t.index [:root_account_id, :id], unique: true, name: 'index_microsoft_sync_user_mappings_replica_identity'
+      t.index [:user_id, :root_account_id], unique: true, name: "index_microsoft_sync_user_mappings_ra_id_user_id"
+      t.index [:root_account_id, :id], unique: true, name: "index_microsoft_sync_user_mappings_replica_identity"
     end
 
     set_replica_identity(:microsoft_sync_user_mappings, :index_microsoft_sync_user_mappings_replica_identity)

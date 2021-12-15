@@ -17,27 +17,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class AssignmentImporter < Importer
     # Used to avoid adding duplicate line items when doing a re-import
-    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag]
+    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag].freeze
 
     self.item_class = Assignment
 
     def self.process_migration(data, migration)
-      assignments = data['assignments'] ? data['assignments'] : []
+      assignments = data["assignments"] || []
 
       create_assignments(assignments, migration)
 
-      migration_ids = assignments.map { |m| m['assignment_id'] }.compact
+      migration_ids = assignments.filter_map { |m| m["assignment_id"] }
       conn = Assignment.connection
       cases = []
       max = migration.context.assignments.pluck(:position).compact.max || 0
-      assignments.each_with_index { |m, idx| cases << " WHEN migration_id=#{conn.quote(m['assignment_id'])} THEN #{max + idx + 1} " if m['assignment_id'] }
+      assignments.each_with_index { |m, idx| cases << " WHEN migration_id=#{conn.quote(m["assignment_id"])} THEN #{max + idx + 1} " if m["assignment_id"] }
       unless cases.empty?
-        conn.execute("UPDATE #{Assignment.quoted_table_name} SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map { |id| conn.quote(id) }.join(',')})")
+        conn.execute("UPDATE #{Assignment.quoted_table_name} SET position=CASE #{cases.join(" ")} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map { |id| conn.quote(id) }.join(",")})")
       end
     end
 
@@ -48,20 +48,20 @@ module Importers
       AssignmentGroup.suspend_callbacks(:update_student_grades) do
         Assignment.suspend_callbacks(:update_submissions_later) do
           assignments.each do |assign|
-            if migration.import_object?("assignments", assign['migration_id'])
-              begin
-                assignment_records << import_from_migration(assign, context, migration, nil, nil)
-              rescue
-                migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
-              end
+            next unless migration.import_object?("assignments", assign["migration_id"])
+
+            begin
+              assignment_records << import_from_migration(assign, context, migration, nil, nil)
+            rescue
+              migration.add_import_warning(t("#migration.assignment_type", "Assignment"), assign[:title], $!)
             end
           end
         end
       end
 
       if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
-        context.assignments.active.where.not(:migration_id => nil)
-               .where(:assignment_group_id => context.assignment_group_no_drop_assignments.values).each do |item|
+        context.assignments.active.where.not(migration_id: nil)
+               .where(assignment_group_id: context.assignment_group_no_drop_assignments.values).each do |item|
           if (group = context.assignment_group_no_drop_assignments[item.migration_id])
             AssignmentGroup.add_never_drop_assignment(group, item)
           end
@@ -76,10 +76,10 @@ module Importers
     def self.create_tool_settings(tool_setting_hash, tool_proxy, assignment)
       return if tool_proxy.blank? || tool_setting_hash.blank?
 
-      ts_vendor_code = tool_setting_hash.dig('vendor_code')
-      ts_product_code = tool_setting_hash.dig('product_code')
-      ts_custom = tool_setting_hash.dig('custom')
-      ts_custom_params = tool_setting_hash.dig('custom_parameters')
+      ts_vendor_code = tool_setting_hash["vendor_code"]
+      ts_product_code = tool_setting_hash["product_code"]
+      ts_custom = tool_setting_hash["custom"]
+      ts_custom_params = tool_setting_hash["custom_parameters"]
 
       return unless tool_proxy.product_family.vendor_code == ts_vendor_code &&
                     tool_proxy.product_family.product_code == ts_product_code
@@ -119,17 +119,17 @@ module Importers
       new_record = item.new_record?
 
       item.title = hash[:title]
-      item.title = I18n.t('untitled assignment') if item.title.blank?
+      item.title = I18n.t("untitled assignment") if item.title.blank?
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
-        if item.can_unpublish?
-          item.workflow_state = (hash[:workflow_state] || 'published')
-        else
-          item.workflow_state = 'published'
-        end
+        item.workflow_state = if item.can_unpublish?
+                                (hash[:workflow_state] || "published")
+                              else
+                                "published"
+                              end
       end
       if hash[:instructions_in_html] == false
-        self.extend TextHelper
+        extend TextHelper
       end
 
       description = ""
@@ -148,19 +148,19 @@ module Importers
         item.copied = true
         item.copying = true
       end
-      if !hash[:submission_types].blank?
+      if hash[:submission_types].present?
         item.submission_types = hash[:submission_types]
-      elsif ['discussion_topic'].include?(hash[:submission_format])
+      elsif ["discussion_topic"].include?(hash[:submission_format])
         item.submission_types = "discussion_topic"
-      elsif ['online_upload', 'textwithattachments'].include?(hash[:submission_format])
+      elsif ["online_upload", "textwithattachments"].include?(hash[:submission_format])
         item.submission_types = "online_upload,online_text_entry"
-      elsif ['online_text_entry'].include?(hash[:submission_format])
+      elsif ["online_text_entry"].include?(hash[:submission_format])
         item.submission_types = "online_text_entry"
-      elsif ['webpage'].include?(hash[:submission_format])
+      elsif ["webpage"].include?(hash[:submission_format])
         item.submission_types = "online_upload"
-      elsif ['online_quiz'].include?(hash[:submission_format])
+      elsif ["online_quiz"].include?(hash[:submission_format])
         item.submission_types = "online_quiz"
-      elsif ['external_tool'].include?(hash[:submission_format])
+      elsif ["external_tool"].include?(hash[:submission_format])
         item.submission_types = "external_tool"
       end
       case item.submission_types
@@ -178,15 +178,16 @@ module Importers
       elsif (grading = hash[:grading])
         hash[:due_at] ||= grading[:due_at] || grading[:due_date]
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-        if grading[:grade_type] =~ /numeric|points/i
+        case grading[:grade_type]
+        when /numeric|points/i
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 10
-        elsif grading[:grade_type] =~ /alphanumeric|letter_grade/i
+        when /alphanumeric|letter_grade/i
           item.grading_type = "letter_grade"
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 100
-        elsif grading[:grade_type] == 'rubric'
+        when "rubric"
           hash[:rubric_migration_id] ||= grading[:rubric_id]
-        elsif grading[:grade_type] == 'not_graded'
-          item.submission_types = 'not_graded'
+        when "not_graded"
+          item.submission_types = "not_graded"
         end
       end
       if hash[:assignment_group_migration_id]
@@ -202,7 +203,7 @@ module Importers
 
       if !new_record && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
         # is a date-restricted master course item - clear their old overrides because we're mean
-        item.assignment_overrides.where.not(:set_type => AssignmentOverride::SET_TYPE_NOOP).destroy_all
+        item.assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP).destroy_all
       end
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
@@ -216,7 +217,7 @@ module Importers
         rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
         rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
         if rubric
-          assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
+          assoc = rubric.associate_with(item, context, purpose: "grading", skip_updating_points_possible: true)
           assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
           assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
           assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
@@ -255,10 +256,10 @@ module Importers
           override.save!
           added_overrides = true
           migration.add_imported_item(override,
-                                      key: [item.migration_id, override.set_type, override.set_id].join('/'))
+                                      key: [item.migration_id, override.set_type, override.set_id].join("/"))
         end
         can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
-        if hash.has_key?(:only_visible_to_overrides) && can_restrict
+        if hash.key?(:only_visible_to_overrides) && can_restrict
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
@@ -271,7 +272,7 @@ module Importers
         if gs
           item.grading_standard = gs if gs
         else
-          migration.add_warning(t('errors.import.grading_standard_not_found', %{The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.}, :title => hash[:title]))
+          migration.add_warning(t("errors.import.grading_standard_not_found", %(The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.), title: hash[:title]))
         end
       end
       if quiz
@@ -283,52 +284,52 @@ module Importers
           q.assignment = item
           q.generate_quiz_data
           q.published_at = Time.now
-          q.workflow_state = 'available'
+          q.workflow_state = "available"
           q.save
         end
-        item.submission_types = 'online_quiz'
+        item.submission_types = "online_quiz"
         item.saved_by = :quiz
       end
 
-      hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
-      [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
-        if hash.has_key?(key) && (master_migration || hash[key].present?)
+      hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
+      %i[due_at lock_at unlock_at peer_reviews_due_at].each do |key|
+        if hash.key?(key) && (master_migration || hash[key].present?)
           item.send "#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
         end
       end
 
       if hash[:has_group_category]
-        item.group_category = context.group_categories.active.where(:name => hash[:group_category]).first
-        item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
+        item.group_category = context.group_categories.active.where(name: hash[:group_category]).first
+        item.group_category ||= context.group_categories.active.where(name: t("Project Groups")).first_or_create
       end
 
-      if hash.has_key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
+      if hash.key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
         item.moderated_grading = hash[:moderated_grading]
       end
-      if hash.has_key?(:anonymous_grading) && context.feature_enabled?(:anonymous_marking)
+      if hash.key?(:anonymous_grading) && context.feature_enabled?(:anonymous_marking)
         item.anonymous_grading = hash[:anonymous_grading]
       end
 
-      [:peer_reviews,
-       :automatic_peer_reviews, :anonymous_peer_reviews,
-       :grade_group_students_individually, :allowed_extensions,
-       :position, :peer_review_count,
-       :omit_from_final_grade, :intra_group_peer_reviews,
-       :grader_count, :grader_comments_visible_to_graders,
-       :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-       :anonymous_instructor_annotations].each do |prop|
+      %i[peer_reviews
+         automatic_peer_reviews anonymous_peer_reviews
+         grade_group_students_individually allowed_extensions
+         position peer_review_count
+         omit_from_final_grade intra_group_peer_reviews
+         grader_count grader_comments_visible_to_graders
+         graders_anonymous_to_graders grader_names_visible_to_final_grader
+         anonymous_instructor_annotations].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
       # Only set post_to_sis if this is a new assignment or if the content is locked
       if new_record || item.editing_restricted?(:any)
-        if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
+        if hash[:post_to_sis] && item.grading_type != "not_graded" && AssignmentUtil.due_date_required_for_account?(context) &&
            (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
           # check if it's going to fail the weird post_to_sis validation requiring due dates
           # either because the date is already nil or we're going to remove it later
           migration.add_warning(
             t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
-              :assignment_name => item.title)
+              assignment_name: item.title)
           )
         elsif !hash[:post_to_sis].nil?
           item.post_to_sis = hash[:post_to_sis]
@@ -374,7 +375,7 @@ module Importers
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
       item.skip_schedule_peer_reviews = nil
-      item.lti_resource_link_lookup_uuid = hash['resource_link_lookup_uuid']
+      item.lti_resource_link_lookup_uuid = hash["resource_link_lookup_uuid"]
 
       create_lti_13_models(hash, context, migration, item)
 
@@ -387,7 +388,7 @@ module Importers
           tool_vendor_code: vendor_code,
           tool_product_code: product_code,
           tool_resource_type_code: resource_type_code,
-          tool_type: 'Lti::MessageHandler',
+          tool_type: "Lti::MessageHandler",
           context_type: context.class.name
         )
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
@@ -401,7 +402,7 @@ module Importers
                                 ))
         else
           item.lti_context_id ||= SecureRandom.uuid
-          create_tool_settings(hash['tool_setting'], active_proxies.first, item)
+          create_tool_settings(hash["tool_setting"], active_proxies.first, item)
         end
       end
 
@@ -423,7 +424,7 @@ module Importers
       primary_line_item = nil
       previously_existing_line_items = item.line_items.pluck(*LINE_ITEMS_EQUIVALENCY_FIELDS)
 
-      if item.submission_types == 'external_tool' && (hash[:external_tool_url] || hash[:external_tool_id] || hash[:external_tool_migration_id])
+      if item.submission_types == "external_tool" && (hash[:external_tool_url] || hash[:external_tool_id] || hash[:external_tool_migration_id])
         current_tag = item.external_tool_tag
         needs_new_tag = !current_tag ||
                         (hash[:external_tool_url] && current_tag.url != hash[:external_tool_url]) ||
@@ -432,7 +433,7 @@ module Importers
 
         if needs_new_tag
           tag = current_tag || item.build_external_tool_tag
-          tag.update(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+          tag.update(url: hash[:external_tool_url], new_tab: hash[:external_tool_new_tab])
           if hash[:external_tool_id] && migration && !migration.cross_institution?
             tool_id = hash[:external_tool_id].to_i
 
@@ -458,12 +459,12 @@ module Importers
           if hash[:external_tool_data_json]
             tag.external_data = JSON.parse(hash[:external_tool_data_json])
           end
-          tag.content_type = 'ContextExternalTool'
-          if !tag.save
+          tag.content_type = "ContextExternalTool"
+          unless tag.save
             if tag.errors["url"]
-              migration.add_warning(t('errors.import.external_tool_url',
+              migration.add_warning(t("errors.import.external_tool_url",
                                       "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
-                                      :assignment_name => item.title))
+                                      assignment_name: item.title))
             end
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end

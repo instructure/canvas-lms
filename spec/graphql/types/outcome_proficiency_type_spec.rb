@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Types::OutcomeProficiencyType do
@@ -30,16 +30,16 @@ describe Types::OutcomeProficiencyType do
   let(:account) { @course.root_account }
   let(:account_type) { GraphQLTypeTester.new(account, current_user: @teacher) }
 
-  it 'works' do
+  it "works" do
     expect(
-      account_type.resolve('outcomeProficiency { _id }')
+      account_type.resolve("outcomeProficiency { _id }")
     ).to eq @outcome_proficiency.id.to_s
   end
 
-  describe 'works for the field' do
-    it 'proficiencyRatingsConnection' do
+  describe "works for the field" do
+    it "proficiencyRatingsConnection" do
       expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }').sort
+        account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }").sort
       ).to eq @outcome_proficiency.outcome_proficiency_ratings.map(&:id).map(&:to_s)
     end
   end

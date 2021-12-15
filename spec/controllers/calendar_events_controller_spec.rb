@@ -23,8 +23,8 @@ describe CalendarEventsController do
     allow(WebConference).to receive(:plugins).and_return(
       [
         web_conference_plugin_mock(
-          'big_blue_button',
-          { domain: 'bbb.instructure.com', secret_dec: 'secret' }
+          "big_blue_button",
+          { domain: "bbb.instructure.com", secret_dec: "secret" }
         )
       ]
     )
@@ -33,7 +33,7 @@ describe CalendarEventsController do
   let_once(:teacher_enrollment) { course_with_teacher(active_all: true) }
   let_once(:course) { teacher_enrollment.course }
   let_once(:student_enrollment) { student_in_course(course: course) }
-  let_once(:course_event) { course.calendar_events.create(title: 'some assignment') }
+  let_once(:course_event) { course.calendar_events.create(title: "some assignment") }
   let_once(:other_teacher_enrollment) { course_with_teacher(active_all: true) }
 
   before do
@@ -45,7 +45,7 @@ describe CalendarEventsController do
   end
 
   let(:conference_params) do
-    { conference_type: 'BigBlueButton', title: 'a conference', user: teacher_enrollment.user }
+    { conference_type: "BigBlueButton", title: "a conference", user: teacher_enrollment.user }
   end
   let(:other_teacher_conference) do
     other_teacher_enrollment.course.web_conferences.create!(
@@ -54,15 +54,15 @@ describe CalendarEventsController do
     )
   end
 
-  shared_examples 'accepts web_conference' do
-    it 'accepts a new conference' do
+  shared_examples "accepts web_conference" do
+    it "accepts a new conference" do
       user_session(@teacher)
       make_request.call(conference_params)
       expect(response.status).to be < 400
       expect(get_event.call.web_conference).not_to be nil
     end
 
-    it 'accepts an existing conference' do
+    it "accepts an existing conference" do
       user_session(@teacher)
       conference = @course.web_conferences.create!(conference_params)
       make_request.call(id: conference.id, **conference_params)
@@ -78,67 +78,67 @@ describe CalendarEventsController do
   end
 
   describe "GET 'show'" do
-    it 'requires authorization' do
-      get 'show', params: { course_id: @course.id, id: @event.id }
+    it "requires authorization" do
+      get "show", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    it 'assigns variables' do
+    it "assigns variables" do
       user_session(@student)
-      get 'show', params: { course_id: @course.id, id: @event.id }, format: :json
+      get "show", params: { course_id: @course.id, id: @event.id }, format: :json
 
       # response.should be_successful
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event]).to eql(@event)
     end
 
-    it 'renders show page' do
+    it "renders show page" do
       user_session(@student)
-      get 'show', params: { course_id: @course.id, id: @event.id }
+      get "show", params: { course_id: @course.id, id: @event.id }
       expect(assigns[:event]).not_to be_nil
 
       # make sure that the show.html.erb template is rendered
-      expect(response).to render_template('calendar_events/show')
+      expect(response).to render_template("calendar_events/show")
     end
 
-    it 'redirects for course section events' do
+    it "redirects for course section events" do
       section = @course.default_section
-      section_event = section.calendar_events.create!(title: 'Sub event')
+      section_event = section.calendar_events.create!(title: "Sub event")
       user_session(@student)
-      get 'show', params: { course_section_id: section.id, id: section_event.id }
+      get "show", params: { course_section_id: section.id, id: section_event.id }
       expect(response).to be_redirect
     end
   end
 
   describe "GET 'new'" do
-    it 'requires authorization' do
-      get 'new', params: { course_id: @course.id }
+    it "requires authorization" do
+      get "new", params: { course_id: @course.id }
       assert_unauthorized
     end
 
-    it 'does not allow students to create' do
+    it "does not allow students to create" do
       user_session(@student)
-      get 'new', params: { course_id: @course.id }
+      get "new", params: { course_id: @course.id }
       assert_unauthorized
     end
 
     it "doesn't create an event" do
       initial_count = @course.calendar_events.count
       user_session(@teacher)
-      get 'new', params: { course_id: @course.id }
+      get "new", params: { course_id: @course.id }
       expect(@course.reload.calendar_events.count).to eq initial_count
     end
 
-    context 'with web conferences' do
-      it 'includes conference environment' do
+    context "with web conferences" do
+      it "includes conference environment" do
         user_session(@teacher)
-        get 'new', params: { course_id: @course.id }
+        get "new", params: { course_id: @course.id }
         expect(@controller.js_env.dig(:conferences, :conference_types).length).to eq 1
       end
 
-      include_examples 'accepts web_conference' do
+      include_examples "accepts web_conference" do
         let(:make_request) do
-          ->(params) { get 'new', params: { course_id: @course.id, web_conference: params } }
+          ->(params) { get "new", params: { course_id: @course.id, web_conference: params } }
         end
         let(:get_event) { -> { @controller.instance_variable_get(:@event) } }
       end
@@ -146,33 +146,33 @@ describe CalendarEventsController do
   end
 
   describe "POST 'create'" do
-    it 'requires authorization' do
-      post 'create', params: { course_id: @course.id, calendar_event: { title: 'some event' } }
+    it "requires authorization" do
+      post "create", params: { course_id: @course.id, calendar_event: { title: "some event" } }
       assert_unauthorized
     end
 
-    it 'does not allow students to create' do
+    it "does not allow students to create" do
       user_session(@student)
-      post 'create', params: { course_id: @course.id, calendar_event: { title: 'some event' } }
+      post "create", params: { course_id: @course.id, calendar_event: { title: "some event" } }
       assert_unauthorized
     end
 
-    it 'creates a new event' do
+    it "creates a new event" do
       user_session(@teacher)
-      post 'create', params: { course_id: @course.id, calendar_event: { title: 'some event' } }
+      post "create", params: { course_id: @course.id, calendar_event: { title: "some event" } }
       expect(response).to be_redirect
       expect(assigns[:event]).not_to be_nil
-      expect(assigns[:event].title).to eql('some event')
+      expect(assigns[:event].title).to eql("some event")
     end
 
-    include_examples 'accepts web_conference' do
+    include_examples "accepts web_conference" do
       let(:make_request) do
-        ->(params) do
-          post 'create',
+        lambda do |params|
+          post "create",
                params: {
                  course_id: @course.id,
                  calendar_event: {
-                   title: 'some event',
+                   title: "some event",
                    web_conference: params
                  }
                }
@@ -183,32 +183,32 @@ describe CalendarEventsController do
   end
 
   describe "GET 'edit'" do
-    it 'requires authorization' do
-      get 'edit', params: { course_id: @course.id, id: @event.id }
+    it "requires authorization" do
+      get "edit", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    it 'does not allow students to update' do
+    it "does not allow students to update" do
       user_session(@student)
-      get 'edit', params: { course_id: @course.id, id: @event.id }
+      get "edit", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    include_examples 'accepts web_conference' do
+    include_examples "accepts web_conference" do
       let(:make_request) do
-        ->(params) do
-          get 'edit', params: { course_id: @course.id, id: @event.id, web_conference: params }
+        lambda do |params|
+          get "edit", params: { course_id: @course.id, id: @event.id, web_conference: params }
         end
       end
       let(:get_event) { -> { @event.reload } }
     end
 
-    it 'allows editing of event assigned to section' do
+    it "allows editing of event assigned to section" do
       course_with_teacher
-      section = add_section('Section 01', course: @course)
-      section_event = section.calendar_events.create(title: 'some assignment')
+      section = add_section("Section 01", course: @course)
+      section_event = section.calendar_events.create(title: "some assignment")
       user_session(@teacher)
-      get 'edit', params: { course_id: @course.id, id: section_event.id }
+      get "edit", params: { course_id: @course.id, id: section_event.id }
       assert_status(200)
     end
 
@@ -236,53 +236,53 @@ describe CalendarEventsController do
   end
 
   describe "PUT 'update'" do
-    it 'requires authorization' do
-      put 'update', params: { course_id: @course.id, id: @event.id }
+    it "requires authorization" do
+      put "update", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    it 'does not allow students to update' do
+    it "does not allow students to update" do
       user_session(@student)
-      put 'update', params: { course_id: @course.id, id: @event.id }
+      put "update", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    it 'updates the event' do
+    it "updates the event" do
       user_session(@teacher)
-      put 'update',
+      put "update",
           params: {
             course_id: @course.id,
             id: @event.id,
             calendar_event: {
-              title: 'new title'
+              title: "new title"
             }
           }
       expect(response).to be_redirect
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event]).to eql(@event)
-      expect(assigns[:event].title).to eql('new title')
+      expect(assigns[:event].title).to eql("new title")
     end
 
-    it 'allows updating of event assigned to section' do
+    it "allows updating of event assigned to section" do
       course_with_teacher
-      section = add_section('Section 01', course: @course)
-      section_event = section.calendar_events.create(title: 'some assignment')
+      section = add_section("Section 01", course: @course)
+      section_event = section.calendar_events.create(title: "some assignment")
       user_session(@teacher)
-      put 'update',
+      put "update",
           params: {
             course_id: @course.id,
             id: section_event.id,
             calendar_event: {
-              title: 'new title'
+              title: "new title"
             }
           }
       assert_status(302)
     end
 
-    include_examples 'accepts web_conference' do
+    include_examples "accepts web_conference" do
       let(:make_request) do
-        ->(params) do
-          put 'update',
+        lambda do |params|
+          put "update",
               params: {
                 course_id: @course.id,
                 id: @event.id,
@@ -297,20 +297,20 @@ describe CalendarEventsController do
   end
 
   describe "DELETE 'destroy'" do
-    it 'requires authorization' do
-      delete 'destroy', params: { course_id: @course.id, id: @event.id }
+    it "requires authorization" do
+      delete "destroy", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    it 'does not allow students to delete' do
+    it "does not allow students to delete" do
       user_session(@student)
-      delete 'destroy', params: { course_id: @course.id, id: @event.id }
+      delete "destroy", params: { course_id: @course.id, id: @event.id }
       assert_unauthorized
     end
 
-    it 'deletes the event' do
+    it "deletes the event" do
       user_session(@teacher)
-      delete 'destroy', params: { course_id: @course.id, id: @event.id }
+      delete "destroy", params: { course_id: @course.id, id: @event.id }
       expect(response).to be_redirect
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event]).to eql(@event)

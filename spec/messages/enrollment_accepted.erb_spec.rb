@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'enrollment_accepted' do
+describe "enrollment_accepted" do
   before :once do
     course_with_student(active_all: true)
     user_model

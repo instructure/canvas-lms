@@ -59,10 +59,10 @@ module Services
 
       def create(jwt_body, subscription)
         options = {
-          headers: headers(jwt_body, { 'Content-Type' => 'application/json' }),
+          headers: headers(jwt_body, { "Content-Type" => "application/json" }),
           body: subscription.to_json
         }
-        request(:post, '/api/subscriptions', options)
+        request(:post, "/api/subscriptions", options)
       end
 
       def show(jwt_body, subscription_id)
@@ -72,10 +72,10 @@ module Services
 
       def update(jwt_body, subscription)
         options = {
-          headers: headers(jwt_body, { 'Content-Type' => 'application/json' }),
+          headers: headers(jwt_body, { "Content-Type" => "application/json" }),
           body: subscription.to_json
         }
-        request(:put, "/api/subscriptions/#{subscription['Id']}", options)
+        request(:put, "/api/subscriptions/#{subscription["Id"]}", options)
       end
 
       def destroy(jwt_body, subscription_id)
@@ -85,7 +85,7 @@ module Services
 
       def index(jwt_body, opts = {}, query: {})
         options = { headers: headers(jwt_body, opts), query: query }
-        request(:get, '/api/root_account_subscriptions', options)
+        request(:get, "/api/root_account_subscriptions", options)
       end
 
       def event_types_index(jwt_body, message_type, opts = {})
@@ -97,13 +97,13 @@ module Services
 
       def request(method, endpoint, options = {})
         Canvas.timeout_protection("live-events-subscription-service-session", raise_on_timeout: true) do
-          HTTParty.send(method, "#{settings['app-host']}#{endpoint}", options.merge(timeout: 10))
+          HTTParty.send(method, "#{settings["app-host"]}#{endpoint}", options.merge(timeout: 10))
         end
       end
 
       def headers(jwt_body, headers = {})
         token = CanvasSecurity::ServicesJwt.generate(jwt_body, symmetric: true)
-        headers['Authorization'] = "Bearer #{token}"
+        headers["Authorization"] = "Bearer #{token}"
         headers
       end
 

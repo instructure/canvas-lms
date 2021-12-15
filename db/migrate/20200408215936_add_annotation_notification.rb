@@ -24,21 +24,21 @@ class AddAnnotationNotification < ActiveRecord::Migration[5.2]
   def up
     if Shard.current.default? && !::Rails.env.test?
       Canvas::MessageHelper.create_notification({
-                                                  name: 'Annotation Notification',
+                                                  name: "Annotation Notification",
                                                   delay_for: 0,
-                                                  category: 'Submission Comment'
+                                                  category: "Submission Comment"
                                                 })
       Canvas::MessageHelper.create_notification({
-                                                  name: 'Annotation Teacher Notification',
+                                                  name: "Annotation Teacher Notification",
                                                   delay_for: 0,
-                                                  category: 'Submission Comment'
+                                                  category: "Submission Comment"
                                                 })
     end
   end
 
   def down
     if Shard.current.default?
-      Notification.where(name: ['Annotation Notification', 'Annotation Teacher Notification']).delete_all
+      Notification.where(name: ["Annotation Notification", "Annotation Teacher Notification"]).delete_all
     end
   end
 end

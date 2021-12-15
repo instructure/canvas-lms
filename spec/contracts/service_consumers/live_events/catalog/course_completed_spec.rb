@@ -18,31 +18,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../live_events_pact_helper'
+require_relative "../live_events_pact_helper"
 
-RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
-  describe 'course_completed' do
+RSpec.describe "Canvas LMS Live Events", :pact_live_events do
+  describe "course_completed" do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
-        event_name: 'course_completed', event_subscriber: PactConfig::LiveEventConsumers::CATALOG
+        event_name: "course_completed", event_subscriber: PactConfig::LiveEventConsumers::CATALOG
       )
     end
 
-    it 'keeps the contract' do
+    it "keeps the contract" do
       live_event.emit_with do
         course_model
         assignment_model(course: @course)
         student_in_course(active_all: true, course: @course)
-        @user.update(email: 'user@example.com')
+        @user.update(email: "user@example.com")
         context_module = @course.context_modules.create!
-        tag = context_module.add_item({ id: @assignment.id, type: 'assignment' })
-        context_module.completion_requirements = { tag.id => { type: 'must_submit' } }
+        tag = context_module.add_item({ id: @assignment.id, type: "assignment" })
+        context_module.completion_requirements = { tag.id => { type: "must_submit" } }
         context_module.update(requirement_count: 1)
         context_module_progression =
           context_module.context_module_progressions.create!(
             user_id: @user.id,
-            workflow_state: 'completed',
-            requirements_met: [{ id: tag.id, type: 'must_submit' }]
+            workflow_state: "completed",
+            requirements_met: [{ id: tag.id, type: "must_submit" }]
           )
         Canvas::LiveEvents.course_completed(context_module_progression)
       end

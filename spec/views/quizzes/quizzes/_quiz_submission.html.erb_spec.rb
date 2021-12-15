@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../spec_helper'
-require_relative '../../views_helper'
+require_relative "../../../spec_helper"
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_quiz_submission" do
   before do
@@ -37,31 +37,31 @@ describe "/quizzes/quizzes/_quiz_submission" do
     end
 
     it "renders" do
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
 
     it "sets the IS_SURVEY value in the js env" do
-      render :partial => "quizzes/quizzes/quiz_submission"
-      expect(controller.js_env.key?(:IS_SURVEY)).to eq(true)
+      render partial: "quizzes/quizzes/quiz_submission"
+      expect(controller.js_env).to have_key(:IS_SURVEY)
     end
   end
 
   context "quiz results are not visible to the student" do
     it "renders" do
       quiz = @course.quizzes.create!
-      quiz.hide_results = 'always'
+      quiz.hide_results = "always"
       quiz.save!
 
       assign(:quiz, quiz)
       sub = assign(:submission, quiz.generate_submission(@user))
       Quizzes::SubmissionGrader.new(sub).grade_submission
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
   end
 
-  context 'as a teacher' do
+  context "as a teacher" do
     it "renders Respondus lockdown submission for soft concluded course" do
       course_with_student course: @course, active_all: true
       course_with_teacher course: @course, active_all: true
@@ -77,7 +77,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
       assign(:quiz, quiz)
       sub = assign(:submission, quiz.generate_submission(@student))
       Quizzes::SubmissionGrader.new(sub).grade_submission
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
   end

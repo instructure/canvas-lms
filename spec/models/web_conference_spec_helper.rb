@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-shared_examples_for 'WebConference' do
+shared_examples_for "WebConference" do
   describe "WebConference interface" do
     it { is_expected.to respond_to :initiate_conference }
     it { is_expected.to respond_to :conference_status }

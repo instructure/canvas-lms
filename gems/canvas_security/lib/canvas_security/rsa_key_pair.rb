@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'openssl'
+require "openssl"
+
+require "active_support/core_ext/module/delegation"
 
 module CanvasSecurity
   class RSAKeyPair < JWKKeyPair
-    KTY = 'RSA'
-    ALG = 'RS256'
+    KTY = "RSA"
+    ALG = "RS256"
     SIZE = 2048
-    def initialize(use: 'sig')
+    def initialize(use: "sig")
       super()
       @alg = ALG
       @use = use
       @private_key = OpenSSL::PKey::RSA.new SIZE
     end
 
-    def public_key
-      private_key.public_key
-    end
+    delegate :public_key, to: :private_key
   end
 end

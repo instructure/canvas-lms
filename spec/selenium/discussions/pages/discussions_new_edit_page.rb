@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class DiscussionNewEdit
   class << self
@@ -29,7 +29,7 @@ class DiscussionNewEdit
     end
 
     def new_discussion_url
-      '/discussion_topics/new'
+      "/discussion_topics/new"
     end
 
     def individual_discussion_url(discussion)
@@ -42,36 +42,36 @@ class DiscussionNewEdit
     end
 
     def submit_discussion_form
-      submit_form('.form-actions')
+      submit_form(".form-actions")
     end
 
     def add_message(message)
-      type_in_tiny('textarea[name=message]', message)
+      type_in_tiny("textarea[name=message]", message)
     end
 
     def add_title(title)
-      replace_content(f('input[name=title]'), title)
+      replace_content(f("input[name=title]"), title)
     end
 
     def section_error
-      f('#sections_autocomplete_root').text
+      f("#sections_autocomplete_root").text
     end
 
     def section_disabled_item
-      f('#disabled_sections_autocomplete')
+      f("#disabled_sections_autocomplete")
     end
 
     def graded_checkbox
-      f('#use_for_grading')
+      f("#use_for_grading")
     end
 
     def select_a_section(section_name)
       fj(section_autocomplete_css).click
-      if !section_name.empty?
+      if section_name.empty?
+        driver.action.send_keys(:backspace).perform
+      else
         set_value(fj(section_autocomplete_css), section_name)
         driver.action.send_keys(:enter).perform
-      else
-        driver.action.send_keys(:backspace).perform
       end
       wait_for_ajax_requests
     end

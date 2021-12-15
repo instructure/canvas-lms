@@ -127,7 +127,7 @@ describe MasterCourses::MasterTemplate do
       expect(@template.content_tag_for(@assignment).id).to eq old_tag_id
 
       # should still create a tag even if it's not found in the index
-      @page = @course.wiki_pages.create!(:title => "title")
+      @page = @course.wiki_pages.create!(title: "title")
       page_tag = @template.content_tag_for(@page)
       expect(page_tag.reload.content).to eq @page
     end
@@ -157,26 +157,26 @@ describe MasterCourses::MasterTemplate do
     end
 
     it "keeps content tag restrictions up to date" do
-      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
-      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
+      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, use_default_restrictions: true)
+      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, use_default_restrictions: false)
       old_default = tag2.restrictions
 
-      new_default = { :content => true, :points => true }
+      new_default = { content: true, points: true }
       @template.update_attribute(:default_restrictions, new_default)
       expect(tag1.reload.restrictions).to eq new_default
       expect(tag2.reload.restrictions).to eq old_default
     end
 
     it "keeps tags up to date when default restrictions are set by object type" do
-      topic_tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
-      topic_tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
-      assmt_tag1 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => true)
-      assmt_tag2 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => false)
+      topic_tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, use_default_restrictions: true)
+      topic_tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, use_default_restrictions: false)
+      assmt_tag1 = @template.create_content_tag_for!(@course.assignments.create!, use_default_restrictions: true)
+      assmt_tag2 = @template.create_content_tag_for!(@course.assignments.create!, use_default_restrictions: false)
 
-      assmt_restricts = { :content => true, :points => true }
-      topic_restricts = { :content => true }
+      assmt_restricts = { content: true, points: true }
+      topic_restricts = { content: true }
       @template.update_attribute(:default_restrictions_by_type,
-                                 { 'Assignment' => assmt_restricts, 'DiscussionTopic' => topic_restricts })
+                                 { "Assignment" => assmt_restricts, "DiscussionTopic" => topic_restricts })
 
       expect(topic_tag1.reload.restrictions).to be_blank # shouldn't have updated yet because it's not configured to use per-object defaults
       expect(assmt_tag1.reload.restrictions).to be_blank
@@ -196,30 +196,30 @@ describe MasterCourses::MasterTemplate do
     end
 
     it "touches content when tightening default_restrictions" do
-      @template.update_attribute(:default_restrictions, { :content => true, :points => true })
+      @template.update_attribute(:default_restrictions, { content: true, points: true })
       old_time = 1.minute.ago
       Timecop.freeze(old_time) do
         @quiz1 = @course.quizzes.create!
         @quiz2 = @course.quizzes.create!
-        @template.create_content_tag_for!(@quiz1, :use_default_restrictions => true)
-        @template.create_content_tag_for!(@quiz2, :use_default_restrictions => false)
+        @template.create_content_tag_for!(@quiz1, use_default_restrictions: true)
+        @template.create_content_tag_for!(@quiz2, use_default_restrictions: false)
       end
-      @template.update_attribute(:default_restrictions, { :content => true })
+      @template.update_attribute(:default_restrictions, { content: true })
       # shouldn't need to update
       expect(@quiz1.reload.updated_at.to_i).to eq old_time.to_i
 
-      @template.update_attribute(:default_restrictions, { :content => true, :due_dates => true })
+      @template.update_attribute(:default_restrictions, { content: true, due_dates: true })
       # now should update
       expect(@quiz1.reload.updated_at.to_i).to_not eq old_time.to_i
       expect(@quiz2.reload.updated_at.to_i).to eq old_time.to_i # has custom restrictions
     end
 
     it "touches content when tightening default_restrictions_by_type" do
-      @template.update(:use_default_restrictions_by_type => true,
-                       :default_restrictions_by_type => {
-                         'Assignment' => { :content => true, :points => true },
-                         'DiscussionTopic' => { :content => true },
-                         'Quizzes::Quiz' => { :content => true }
+      @template.update(use_default_restrictions_by_type: true,
+                       default_restrictions_by_type: {
+                         "Assignment" => { content: true, points: true },
+                         "DiscussionTopic" => { content: true },
+                         "Quizzes::Quiz" => { content: true }
                        })
 
       old_time = 1.minute.ago
@@ -228,13 +228,13 @@ describe MasterCourses::MasterTemplate do
         @topic = @course.discussion_topics.create!
         @quiz = @course.quizzes.create!
         [@assmt, @topic, @quiz].each do |obj|
-          @template.create_content_tag_for!(obj, :use_default_restrictions => true)
+          @template.create_content_tag_for!(obj, use_default_restrictions: true)
         end
       end
-      @template.update(:default_restrictions_by_type => {
-                         'Assignment' => { :content => true }, # lessened restrictions
-                         'DiscussionTopic' => { :content => true, :points => true },
-                         'Quizzes::Quiz' => { :content => true, :due_dates => true }
+      @template.update(default_restrictions_by_type: {
+                         "Assignment" => { content: true }, # lessened restrictions
+                         "DiscussionTopic" => { content: true, points: true },
+                         "Quizzes::Quiz" => { content: true, due_dates: true }
                        })
       expect(@assmt.reload.updated_at.to_i).to eq old_time.to_i
       expect(@topic.reload.updated_at.to_i).to_not eq old_time.to_i
@@ -264,7 +264,7 @@ describe MasterCourses::MasterTemplate do
     it "requires child courses to belong to the same root account" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
       new_root_account = Account.create!
-      new_course = course_factory(:account => new_root_account)
+      new_course = course_factory(account: new_root_account)
       expect { template.add_child_course!(new_course) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
@@ -290,9 +290,9 @@ describe MasterCourses::MasterTemplate do
 
       time1 = 2.days.ago
       time2 = 1.day.ago
-      t1.master_migrations.create!(:imports_completed_at => time1, :workflow_state => 'completed')
-      t1.master_migrations.create!(:imports_completed_at => time2, :workflow_state => 'completed')
-      t2.master_migrations.create!(:imports_completed_at => time1, :workflow_state => 'completed')
+      t1.master_migrations.create!(imports_completed_at: time1, workflow_state: "completed")
+      t1.master_migrations.create!(imports_completed_at: time2, workflow_state: "completed")
+      t2.master_migrations.create!(imports_completed_at: time1, workflow_state: "completed")
 
       MasterCourses::MasterTemplate.preload_index_data([t1, t2, t3])
 
@@ -309,7 +309,7 @@ describe MasterCourses::MasterTemplate do
     it "does not count deleted courses" do
       t = MasterCourses::MasterTemplate.set_as_master_course(@course)
       t.add_child_course!(Course.create!)
-      t.add_child_course!(Course.create!(:workflow_state => 'deleted'))
+      t.add_child_course!(Course.create!(workflow_state: "deleted"))
 
       MasterCourses::MasterTemplate.preload_index_data([t])
 

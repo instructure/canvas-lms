@@ -25,10 +25,10 @@ module Api::V1::TodoItem
 
   def todo_item_json(assignment_or_quiz, user, session, todo_type)
     context_data(assignment_or_quiz).merge({
-                                             :context_name => assignment_or_quiz&.context&.name,
-                                             :type => todo_type,
-                                             :ignore => api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, :permanent => '0'),
-                                             :ignore_permanently => api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, :permanent => '1'),
+                                             context_name: assignment_or_quiz&.context&.name,
+                                             type: todo_type,
+                                             ignore: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "0"),
+                                             ignore_permanently: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "1"),
                                            }).tap do |hash|
       if assignment_or_quiz.is_a?(Quizzes::Quiz)
         quiz = assignment_or_quiz
@@ -36,13 +36,15 @@ module Api::V1::TodoItem
         hash[:html_url] = course_quiz_url(quiz.context_id, quiz.id)
       else
         assignment = assignment_or_quiz
-        hash[:assignment] = assignment_json(assignment, user, session, :include_all_dates => true)
-        hash[:html_url] = todo_type == 'grading' ?
-          speed_grader_course_gradebook_url(assignment.context_id, :assignment_id => assignment.id) :
-          "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
+        hash[:assignment] = assignment_json(assignment, user, session, include_all_dates: true)
+        hash[:html_url] = if todo_type == "grading"
+                            speed_grader_course_gradebook_url(assignment.context_id, assignment_id: assignment.id)
+                          else
+                            "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
+                          end
 
-        if todo_type == 'grading'
-          hash['needs_grading_count'] = Assignments::NeedsGradingCountQuery.new(assignment, user).count
+        if todo_type == "grading"
+          hash["needs_grading_count"] = Assignments::NeedsGradingCountQuery.new(assignment, user).count
         end
       end
     end

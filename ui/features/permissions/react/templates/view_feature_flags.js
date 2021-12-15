@@ -22,15 +22,15 @@ import {generateActionTemplates} from '../generateActionTemplates'
 export const template = generateActionTemplates(
   [
     {
-      title: I18n.t('Feature Previews (Account Settings)'),
-      description: I18n.t('Allows user to view Feature Previews in Account Settings.')
+      title: I18n.t('Feature Options (Account Settings)'),
+      description: I18n.t('Allows user to view Feature Options in Account Settings.')
     }
   ],
   [
     {
-      title: I18n.t('Feature Previews (Account Settings)'),
+      title: I18n.t('Feature Options (Account Settings)'),
       description: I18n.t(
-        'To manage Feature Previews for an account, Feature Previews - enable / disable must also be enabled.'
+        'To manage Feature Options for an account, Feature Options - enable / disable must also be enabled.'
       )
     }
   ],

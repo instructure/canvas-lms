@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'canvas_time'
-require 'timecop'
+require "canvas_time"
+require "timecop"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
 
-  config.order = 'random'
-  Time.zone = 'UTC'
+  config.order = "random"
+  Time.zone = "UTC"
 end

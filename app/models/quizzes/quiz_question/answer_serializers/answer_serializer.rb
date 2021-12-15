@@ -53,7 +53,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     end
 
     def self.question_type
-      self.name.demodulize.underscore
+      name.demodulize.underscore
     end
 
     # Prevent the serializer from locating which question data to use for doing
@@ -65,7 +65,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     # Also, don't use this unless you really know what you're doing.
     def override_question_data(question_data)
       @frozen_question_data = question_data
-      @question_key = ['question', question_data[:id]].join('_')
+      @question_key = ["question", question_data[:id]].join("_")
     end
 
     protected
@@ -74,7 +74,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #
     # This varies between question types, so some serializers will override this.
     def question_key
-      @question_key ||= ['question', self.question.id].join('_')
+      @question_key ||= ["question", question.id].join("_")
     end
 
     # Locate the question data that is usable by *students* when they take the
@@ -93,8 +93,8 @@ module Quizzes::QuizQuestion::AnswerSerializers
     # @return [Hash] The question data.
     def frozen_question_data
       @frozen_question_data ||= begin
-        question_id = self.question.id
-        quiz = self.question.quiz
+        question_id = question.id
+        quiz = question.quiz
         quiz_data = quiz.quiz_data || quiz.stored_questions
         quiz_data.detect { |question| question[:id].to_i == question_id } ||
           self.question.question_data

@@ -32,7 +32,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
       user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids], course_id: quiz.context).distinct.pluck(:user_id)
       attempts_query = attempts_query.where(user_id: user_ids)
     end
-    @attempts = attempts_query.map { |qs| qs.submitted_attempts.first }.compact
+    @attempts = attempts_query.filter_map { |qs| qs.submitted_attempts.first }
     @options = options
     @options[:buckets] ||= [
       [:top, 0.73],
@@ -115,7 +115,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
       size = items.size
 
       if size > 1 && variance != 0
-        variance_sum = items.map(&:variance).sum
+        variance_sum = items.sum(&:variance)
         size / (size - 1.0) * (1 - (variance_sum / variance))
       else
         nil

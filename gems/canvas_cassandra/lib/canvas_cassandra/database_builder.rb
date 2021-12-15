@@ -24,9 +24,9 @@ module CanvasCassandra
     def self.configured?(config_name, environment = ::Rails.env)
       raise ArgumentError, "config name required" if config_name.blank?
 
-      config = ConfigFile.load('cassandra', environment)
-      config = config && config[config_name]
-      config && config['servers'] && config['keyspace']
+      config = ConfigFile.load("cassandra", environment)
+      config &&= config[config_name]
+      config && config["servers"] && config["keyspace"]
     end
 
     # If for a migration or a support week one has reason to override the settings that would come from cassandra.yml,
@@ -39,25 +39,25 @@ module CanvasCassandra
       environment = Rails.env if environment == :current
       key = [config_name, environment]
       @connections.fetch(key) do
-        config = ConfigFile.load('cassandra', environment).dup
-        config = config && config[config_name]
+        config = ConfigFile.load("cassandra", environment).dup
+        config &&= config[config_name]
         unless config
           @connections[key] = nil
           return nil
         end
         config = config.merge(override_options) if override_options
-        servers = Array(config['servers'])
+        servers = Array(config["servers"])
         raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
 
-        keyspace = config['keyspace']
+        keyspace = config["keyspace"]
         raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
 
-        opts = { :keyspace => keyspace, :cql_version => '3.0.0' }
-        opts[:retries] = config['retries'] if config['retries']
-        opts[:connect_timeout] = config['connect_timeout'] if config['connect_timeout']
-        opts[:timeout] = config['timeout'] if config['timeout']
+        opts = { keyspace: keyspace, cql_version: "3.0.0" }
+        opts[:retries] = config["retries"] if config["retries"]
+        opts[:connect_timeout] = config["connect_timeout"] if config["connect_timeout"]
+        opts[:timeout] = config["timeout"] if config["timeout"]
         fingerprint = "#{config_name}:#{environment}"
-        Bundler.require 'cassandra'
+        Bundler.require "cassandra"
         begin
           @connections[key] = CanvasCassandra::Database.new(fingerprint, servers, opts, logger)
         rescue => e
@@ -72,7 +72,7 @@ module CanvasCassandra
     end
 
     def self.configs
-      ConfigFile.load('cassandra') || {}
+      ConfigFile.load("cassandra") || {}
     end
 
     def self.reset_connections!
@@ -84,10 +84,10 @@ module CanvasCassandra
     end
 
     def self.read_consistency_setting(database_name = nil)
-      setting_key = 'event_stream.read_consistency'
+      setting_key = "event_stream.read_consistency"
       setting_value = settings_store.get("#{setting_key}.#{database_name}", nil) || settings_store.get(setting_key, nil)
 
-      setting_value if setting_value.present?
+      setting_value.presence
     end
 
     def self.settings_store

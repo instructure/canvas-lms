@@ -41,7 +41,7 @@
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
 
-  TRACK_SETTABLE_ATTRIBUTES = [:kind, :locale, :content].freeze
+  TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
 
   # @API List media tracks for a Media Object
   #
@@ -65,14 +65,14 @@ class MediaTracksController < ApplicationController
     media_tracks = []
     @media_object.media_tracks.where(user_id: @current_user.id).each do |t|
       track = {
-        :id => t.id,
-        :locale => t.locale,
-        :kind => t.kind,
-        :media_object_id => t.media_object_id,
-        :user_id => t.user_id
+        id: t.id,
+        locale: t.locale,
+        kind: t.kind,
+        media_object_id: t.media_object_id,
+        user_id: t.user_id
       }
       if params[:include].present?
-        whitelist = ["content", "webvtt_content", "updated_at", "created_at"]
+        whitelist = %w[content webvtt_content updated_at created_at]
         params[:include].each do |field|
           track[field] = t[field] if whitelist.include? field
         end
@@ -80,7 +80,7 @@ class MediaTracksController < ApplicationController
       media_tracks << track
     end
 
-    render :json => media_tracks
+    render json: media_tracks
   end
 
   # @{not an}API Create a media track
@@ -114,7 +114,7 @@ class MediaTracksController < ApplicationController
       track = @media_object.media_tracks.where(user_id: @current_user.id, locale: params[:locale]).first_or_initialize
       track.update! params.permit(*TRACK_SETTABLE_ATTRIBUTES)
       exclude = params[:exclude] || []
-      render :json => media_object_api_json(@media_object, @current_user, session, exclude)
+      render json: media_object_api_json(@media_object, @current_user, session, exclude)
     end
   end
 
@@ -129,8 +129,8 @@ class MediaTracksController < ApplicationController
   def show
     @media_track = MediaTrack.find params[:id]
     @media_track.validate! # in case this somehow got saved to the database in the xss-vulnerable TTML format
-    if stale? :etag => @media_track, :last_modified => @media_track.updated_at.utc
-      render :plain => @media_track.webvtt_content
+    if stale? etag: @media_track, last_modified: @media_track.updated_at.utc
+      render plain: @media_track.webvtt_content
     end
   end
 
@@ -148,9 +148,9 @@ class MediaTracksController < ApplicationController
     if authorized_action(@media_object, @current_user, :delete_captions)
       @track = @media_object.media_tracks.find(params[:media_track_id])
       if @track.destroy
-        render :json => media_object_api_json(@media_object, @current_user, session)
+        render json: media_object_api_json(@media_object, @current_user, session)
       else
-        render :json => @track.errors, :status => :bad_request
+        render json: @track.errors, status: :bad_request
       end
     end
   end
@@ -185,7 +185,7 @@ class MediaTracksController < ApplicationController
       old_track_locales = @media_object.media_tracks.where(user_id: @current_user.id).pluck(:locale)
 
       # delete the tracks that don't exist in the new set
-      removed_track_locales = old_track_locales - new_tracks.pluck('locale')
+      removed_track_locales = old_track_locales - new_tracks.pluck("locale")
       removed_tracks = @media_object.media_tracks.where(user_id: @current_user.id, locale: removed_track_locales)
       removed_tracks.destroy_all
 
@@ -194,12 +194,12 @@ class MediaTracksController < ApplicationController
         # if the new track coming from the client has no content, it hasn't been updated. Leave it alone.
         next if t["content"].blank?
 
-        track = @media_object.media_tracks.where(user_id: @current_user.id, locale: t['locale']).first_or_initialize
+        track = @media_object.media_tracks.where(user_id: @current_user.id, locale: t["locale"]).first_or_initialize
         track.update! ActionController::Parameters.new(t).permit(*TRACK_SETTABLE_ATTRIBUTES)
       end
       index
     else
-      return render_unauthorized_action
+      render_unauthorized_action
     end
   end
 end

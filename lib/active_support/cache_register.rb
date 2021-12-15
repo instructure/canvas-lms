@@ -43,20 +43,20 @@ module ActiveSupport
           end
 
           if batch_object && !opts[:force] &&
-             defined?(::ActiveSupport::Cache::RedisCacheStore) && self.is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
+             defined?(::ActiveSupport::Cache::RedisCacheStore) && is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
              batched_keys.all? { |type| batch_object.class.valid_cache_key_type?(type) }
             fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
+          elsif skip_cache_if_disabled
+            yield # use for new caches that we're not already using updated_at+touch for
           else
-            if skip_cache_if_disabled # use for new caches that we're not already using updated_at+touch for
-              yield
-            else
-              if batch_object # just fall back to the usual after appending to the key if needed
-                key += (Canvas::CacheRegister.enabled? ?
-                "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join('/')}" :
-                "/#{batch_object.cache_key}")
-              end
-              fetch(key, opts, &block)
+            if batch_object # just fall back to the usual after appending to the key if needed
+              key += (if Canvas::CacheRegister.enabled?
+                        "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join("/")}"
+                      else
+                        "/#{batch_object.cache_key}"
+                      end)
             end
+            fetch(key, opts, &block)
           end
         end
 
@@ -81,7 +81,7 @@ module ActiveSupport
             # get the entry (if it exists) as well as the full frd cache_key used (after batching in the register keys)
             # in case we need to write to it
             frd_key, cached_entry = Canvas::CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
-            cached_entry = Marshal.load(cached_entry) if cached_entry
+            cached_entry = Marshal.load(cached_entry) if cached_entry # rubocop:disable Security/MarshalLoad
 
             entry = handle_expired_entry(cached_entry, frd_key, options)
             if payload
@@ -93,7 +93,7 @@ module ActiveSupport
           if entry
             get_entry_value(entry, name, options)
           else
-            result = instrument(:generate, name, options) { block.call }
+            result = instrument(:generate, name, options, &block)
             instrument(:write, name, options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script

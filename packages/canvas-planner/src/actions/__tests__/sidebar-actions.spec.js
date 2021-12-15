@@ -28,7 +28,7 @@ jest.mock('../../utilities/apiUtils')
 transformApiToInternalItem.mockImplementation(item => `transformed-${item.uniqueId}`)
 
 // unmock findNextLink
-findNextLink.mockImplementation(require.requireActual('../../utilities/apiUtils').findNextLink)
+findNextLink.mockImplementation(jest.requireActual('../../utilities/apiUtils').findNextLink)
 
 beforeEach(() => {
   moxios.install()
@@ -83,10 +83,7 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith(expect.objectContaining(expected))
     const action = fakeDispatch.mock.calls[0][0]
     expect(action.payload.firstMoment.toISOString()).toBe(
-      today
-        .clone()
-        .add(-2, 'weeks')
-        .toISOString()
+      today.clone().add(-2, 'weeks').toISOString()
     )
   })
 

@@ -17,32 +17,32 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module CourseWikiPage
   #------------------------------ Selectors -----------------------------
   def publish_btn_selector
-    '.btn-publish'
+    ".btn-publish"
   end
 
   def published_btn_selector
-    '.btn-published'
+    ".btn-published"
   end
 
   def edit_btn_selector
-    '.edit-wiki'
+    ".edit-wiki"
   end
 
   def more_options_btn_selector
-    '.al-trigger'
+    ".al-trigger"
   end
 
   def delete_page_menu_item_selector
-    '.delete_page'
+    ".delete_page"
   end
 
   def delete_pages_btn_selector
-    '.delete_pages'
+    ".delete_pages"
   end
 
   #------------------------------ Elements ------------------------------
@@ -55,11 +55,11 @@ module CourseWikiPage
   end
 
   def published_status_published
-    f('.published-status.published')
+    f(".published-status.published")
   end
 
   def wiki_page_show
-    f('#wiki_page_show')
+    f("#wiki_page_show")
   end
 
   def more_options_btn
@@ -67,11 +67,11 @@ module CourseWikiPage
   end
 
   def wiki_page_more_options_menu_open
-    f('.ui-menu.ui-state-open')
+    f(".ui-menu.ui-state-open")
   end
 
   def wiki_page_body
-    f('body')
+    f("body")
   end
 
   def wiki_page_settings_button
@@ -103,11 +103,11 @@ module CourseWikiPage
   end
 
   def edit_page_title_input
-    f('input#title')
+    f("input#title")
   end
 
   def tiny_mce_input
-    f('#tinymce')
+    f("#tinymce")
   end
 
   def course_home_nav_menu

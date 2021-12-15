@@ -19,9 +19,9 @@
 #
 
 class Mutations::UpdateDiscussionTopic < Mutations::BaseMutation
-  graphql_name 'UpdateDiscussionTopic'
+  graphql_name "UpdateDiscussionTopic"
 
-  argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionTopic')
+  argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :published, Boolean, required: false
   argument :locked, Boolean, required: false
 
@@ -42,6 +42,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::BaseMutation
       discussion_topic: discussion_topic
     }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

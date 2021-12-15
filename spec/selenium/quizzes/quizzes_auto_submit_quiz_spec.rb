@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
-describe 'taking a quiz' do
-  include_context 'in-process server selenium tests'
+describe "taking a quiz" do
+  include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  context 'as a student' do
+  context "as a student" do
     before(:once) do
       course_with_teacher(active_all: 1)
       course_with_student(course: @course, active_all: 1)
@@ -39,13 +39,13 @@ describe 'taking a quiz' do
     end
 
     def verify_times_up_dialog
-      expect(fj('#times_up_dialog:visible', timeout: 10)).to include_text 'Time\'s Up!'
+      expect(fj("#times_up_dialog:visible", timeout: 10)).to include_text "Time's Up!"
     end
 
-    context 'when the quiz has a lock date', custom_timeout: 45 do
+    context "when the quiz has a lock date", custom_timeout: 45 do
       let(:quiz) { quiz_create(course: @course) }
 
-      it 'automatically submits the quiz once the quiz is locked, and does not mark it "late"', priority: "1", test_id: 209407 do
+      it 'automatically submits the quiz once the quiz is locked, and does not mark it "late"', priority: "1" do
         auto_submit_quiz(quiz)
 
         verify_quiz_is_locked

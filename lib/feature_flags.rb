@@ -66,11 +66,11 @@ module FeatureFlags
   end
 
   def reset_feature!(feature)
-    self.feature_flags.where(feature: feature.to_s).destroy_all
+    feature_flags.where(feature: feature.to_s).destroy_all
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag3', self.class.name, self.global_id, feature.to_s].cache_key
+    ["feature_flag3", self.class.name, global_id, feature.to_s].cache_key
   end
 
   def feature_analytics_cache_key(feature, result)
@@ -84,13 +84,13 @@ module FeatureFlags
   # return the feature flag for the given feature that is defined on this object, if any.
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature, skip_cache: false)
-    return nil unless self.id
+    return nil unless id
 
-    self.shard.activate do
-      if self.feature_flags.loaded?
-        self.feature_flags.detect { |ff| ff.feature == feature.to_s }
+    shard.activate do
+      if feature_flags.loaded?
+        feature_flags.detect { |ff| ff.feature == feature.to_s }
       elsif skip_cache
-        self.feature_flags.where(feature: feature.to_s).first
+        feature_flags.where(feature: feature.to_s).first
       else
         result = RequestCache.cache("feature_flag", self, feature) do
           feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
@@ -118,9 +118,9 @@ module FeatureFlags
       return chain.reverse.map(&:global_id)
     end
 
-    RequestCache.cache('feature_flag_account_ids', self) do
+    RequestCache.cache("feature_flag_account_ids", self) do
       shard.activate do
-        Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
+        Rails.cache.fetch(["feature_flag_account_ids", self].cache_key) do
           chain = account_chain(include_site_admin: true).dup
           chain.shift if is_a?(Account)
           chain.reverse.map(&:global_id)
@@ -140,8 +140,8 @@ module FeatureFlags
     return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
     return return_flag(feature_def, hide_inherited_enabled) unless feature_def.can_override? || feature_def.hidden?
 
-    is_root_account = self.is_a?(Account) && self.root_account?
-    is_site_admin = self.is_a?(Account) && self.site_admin?
+    is_root_account = is_a?(Account) && root_account?
+    is_site_admin = is_a?(Account) && site_admin?
 
     # inherit the feature definition as a default unless it's a hidden feature
     retval = feature_def.clone_for_cache unless feature_def.hidden? && !is_site_admin && !override_hidden
@@ -158,7 +158,7 @@ module FeatureFlags
 
       account = Account.new
       account.id = id
-      account.shard = Shard.shard_for(id, self.shard)
+      account.shard = Shard.shard_for(id, shard)
       account.readonly!
       account
     end
@@ -176,17 +176,15 @@ module FeatureFlags
     # if this feature requires root account opt-in, reject a default or site admin flag
     # if the context is beneath a root account
     if retval && (retval.state == Feature::STATE_DEFAULT_OFF || retval.hidden?) && feature_def.root_opt_in && !is_site_admin &&
-       (retval.default? || (retval.context_type == 'Account' && retval.context_id == Account.site_admin.id))
+       (retval.default? || (retval.context_type == "Account" && retval.context_id == Account.site_admin.id))
       if is_root_account
         # create a virtual feature flag in corresponding default state state
-        retval = self.feature_flags.temp_record feature: feature, state: 'off' unless retval.hidden?
-      else
+        retval = feature_flags.temp_record feature: feature, state: "off" unless retval.hidden?
+      elsif inherited_only
         # the feature doesn't exist beneath the root account until the root account opts in
-        if inherited_only
-          return nil
-        else
-          return @feature_flag_cache[feature] = nil
-        end
+        return nil
+      else
+        return @feature_flag_cache[feature] = nil
       end
     end
 
@@ -199,7 +197,7 @@ module FeatureFlags
 
     unless hide_inherited_enabled && retval.enabled? && !retval.can_override? && (
       # Hide feature flag configs if they belong to a different context
-      (!retval.default? && (retval.context_type != self.class.name || retval.context_id != self.id)) ||
+      (!retval.default? && (retval.context_type != self.class.name || retval.context_id != id)) ||
       # Hide flags that are forced on in config as well
       retval.default?
     )

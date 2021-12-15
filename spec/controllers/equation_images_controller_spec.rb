@@ -18,50 +18,50 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe EquationImagesController do
-  describe '#show' do
-    it 'expects escaped latex' do
-      latex = '44%5Cprod%5Cleft%283%5Ccdot3%5Cright%29%5Ctheta'
+  describe "#show" do
+    it "expects escaped latex" do
+      latex = "44%5Cprod%5Cleft%283%5Ccdot3%5Cright%29%5Ctheta"
       get :show, params: { id: latex }
       expect(assigns(:latex)).to eq latex
     end
 
-    it 'handles unescaped latex' do
+    it "handles unescaped latex" do
       latex = '44\prod\left(3\cdot3\right)\theta'
-      escaped = '44%5Cprod%5Cleft(3%5Ccdot3%5Cright)%5Ctheta'
+      escaped = "44%5Cprod%5Cleft(3%5Ccdot3%5Cright)%5Ctheta"
       get :show, params: { id: latex }
       expect(assigns(:latex)).to eq escaped
     end
 
-    it 'encodes `+` signs properly' do
-      latex = '5%5E5%5C%3A+%5C%3A%5Csqrt%7B9%7D'
+    it "encodes `+` signs properly" do
+      latex = "5%5E5%5C%3A+%5C%3A%5Csqrt%7B9%7D"
       get :show, params: { id: latex }
       expect(assigns(:latex)).to match(/%2B/)
     end
 
-    it 'redirects image requests to codecogs' do
-      get 'show', params: { id: 'foo' }
-      expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo')
+    it "redirects image requests to codecogs" do
+      get "show", params: { id: "foo" }
+      expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo")
     end
 
-    it 'includes scale param if present' do
+    it "includes scale param if present" do
       Account.site_admin.enable_feature!(:scale_equation_images)
-      get 'show', params: { id: 'foo', scale: 2 }
-      expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo&scale=2')
+      get "show", params: { id: "foo", scale: 2 }
+      expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo&scale=2")
     end
 
-    it 'omits scale param if feature is off present' do
+    it "omits scale param if feature is off present" do
       Account.site_admin.disable_feature!(:scale_equation_images)
-      get 'show', params: { id: 'foo', scale: 2 }
-      expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo')
+      get "show", params: { id: "foo", scale: 2 }
+      expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo")
     end
 
-    context 'when using MathMan' do
-      let(:service_url) { 'http://get.mml.com' }
+    context "when using MathMan" do
+      let(:service_url) { "http://get.mml.com" }
 
       before { allow(MathMan).to receive_messages(url_for: service_url, use_for_svg?: true) }
 
-      it 'redirects to service_url' do
-        get :show, params: { id: '5' }
+      it "redirects to service_url" do
+        get :show, params: { id: "5" }
         expect(response).to redirect_to(/#{service_url}/)
       end
     end

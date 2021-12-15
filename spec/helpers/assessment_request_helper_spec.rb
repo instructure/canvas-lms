@@ -22,7 +22,7 @@ describe AssessmentRequestHelper do
   include AssessmentRequestHelper
   include ApplicationHelper
 
-  describe 'submission_author_name_for' do
+  describe "submission_author_name_for" do
     def rubric_association_params_for_assignment(assign)
       HashWithIndifferentAccess.new({
                                       hide_score_total: "0",
@@ -46,7 +46,7 @@ describe AssessmentRequestHelper do
       @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
       @rubric_assessment = RubricAssessment.create!({
                                                       artifact: @submission,
-                                                      assessment_type: 'peer_review',
+                                                      assessment_type: "peer_review",
                                                       assessor: @student2,
                                                       rubric: @rubric,
                                                       user: @student1,
@@ -56,24 +56,24 @@ describe AssessmentRequestHelper do
                                                       asset: @submission, assessor_asset: submission2, assessor: @student2)
     end
 
-    it 'returns assessment user name' do
+    it "returns assessment user name" do
       @current_user = @student1
       expect(submission_author_name_for(@assessment_request)).to eq(@student1.short_name)
     end
 
-    it 'returns assessment user name for assessor when anonymous reviews are disabled' do
+    it "returns assessment user name for assessor when anonymous reviews are disabled" do
       @current_user = @student2
       expect(submission_author_name_for(@assessment_request)).to eq(@student1.short_name)
     end
 
-    it 'returns assessment user name when anonymous reviews are enabled and user has permission' do
+    it "returns assessment user name when anonymous reviews are enabled and user has permission" do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @assessment_request.reload
       @current_user = @student1
       expect(submission_author_name_for(@assessment_request)).to eq(@student1.short_name)
     end
 
-    it 'returns anonymous user when anonymous peer reviews are enabled' do
+    it "returns anonymous user when anonymous peer reviews are enabled" do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @assessment_request.reload
       @current_user = @student2

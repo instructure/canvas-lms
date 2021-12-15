@@ -26,9 +26,9 @@ module CC
         meta_file = nil
         rel_path = nil
       else
-        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), 'w')
+        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MODULE_META)
-        document = Builder::XmlMarkup.new(:target => meta_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: meta_file, indent: 2)
       end
 
       module_id_map = {}
@@ -47,7 +47,7 @@ module CC
           unless export_object?(cm)
             # if the whole module isn't selected, check to see if a specific item is selected, and make sure that item gets exported
             cm.content_tags.not_deleted.each do |ct|
-              if export_object?(ct) && !['ContextModuleSubHeader', 'ExternalUrl'].member?(ct.content_type) && ct.content
+              if export_object?(ct) && !["ContextModuleSubHeader", "ExternalUrl"].member?(ct.content_type) && ct.content
                 add_item_to_export(ct.content)
               end
             end
@@ -56,19 +56,19 @@ module CC
 
           add_exported_asset(cm)
 
-          mods_node.module(:identifier => mod_migration_id) do |m_node|
+          mods_node.module(identifier: mod_migration_id) do |m_node|
             m_node.title cm.name
             m_node.workflow_state cm.workflow_state
             m_node.position cm.position
-            m_node.unlock_at CCHelper::ims_datetime(cm.unlock_at) if cm.unlock_at
+            m_node.unlock_at CCHelper.ims_datetime(cm.unlock_at) if cm.unlock_at
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             m_node.requirement_count cm.requirement_count if cm.requirement_count
             m_node.locked cm.locked_for?(@user).present?
 
-            if cm.prerequisites && !cm.prerequisites.empty?
+            if cm.prerequisites.present?
               m_node.prerequisites do |pre_reqs|
                 cm.prerequisites.each do |pre_req|
-                  pre_reqs.prerequisite(:type => pre_req[:type]) do |pr|
+                  pre_reqs.prerequisite(type: pre_req[:type]) do |pr|
                     pr.title pre_req[:name]
                     pr.identifierref module_id_map[pre_req[:id]]
                   end
@@ -81,24 +81,24 @@ module CC
               cm.content_tags.not_deleted.each do |ct|
                 ct_migration_id = create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
-                items_node.item(:identifier => ct_migration_id) do |item_node|
-                  unless ['ContextModuleSubHeader', 'ExternalUrl'].member? ct.content_type
+                items_node.item(identifier: ct_migration_id) do |item_node|
+                  unless ["ContextModuleSubHeader", "ExternalUrl"].member? ct.content_type
                     add_item_to_export(ct.content)
                   end
                   item_node.content_type ct.content_type
                   item_node.workflow_state ct.workflow_state
                   item_node.title ct.title
-                  item_node.identifierref create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
+                  item_node.identifierref create_key(ct.content_or_self) unless ct.content_type == "ContextModuleSubHeader"
                   if ct.content_type == "ContextExternalTool"
                     item_node.url ct.url
                     if ct.content && ct.content.context != @course
                       item_node.global_identifierref ct.content.id
                     end
-                    if ct.associated_asset.class == Lti::ResourceLink
+                    if ct.associated_asset.instance_of?(Lti::ResourceLink)
                       item_node.lti_resource_link_lookup_uuid ct.associated_asset.lookup_uuid
                     end
                   end
-                  item_node.url ct.url if ct.content_type == 'ExternalUrl'
+                  item_node.url ct.url if ct.content_type == "ExternalUrl"
                   item_node.position ct.position
                   item_node.new_tab ct.new_tab
                   item_node.indent ct.indent
@@ -106,10 +106,10 @@ module CC
               end
             end
 
-            if cm.completion_requirements && !cm.completion_requirements.empty?
+            if cm.completion_requirements.present?
               m_node.completionRequirements do |crs_node|
                 cm.completion_requirements.each do |c_req|
-                  crs_node.completionRequirement(:type => c_req[:type]) do |cr_node|
+                  crs_node.completionRequirement(type: c_req[:type]) do |cr_node|
                     cr_node.min_score c_req[:min_score] unless c_req[:min_score].blank?
                     cr_node.identifierref ct_id_map[c_req[:id]]
                   end
@@ -119,7 +119,7 @@ module CC
           end
         end
       end
-      meta_file.close if meta_file
+      meta_file&.close
       rel_path
     end
   end

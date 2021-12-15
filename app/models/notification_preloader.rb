@@ -25,8 +25,8 @@ module NotificationPreloader
   end
 
   def preload_notification
-    if self.notification_id
-      self.notification = Notification.find(self.notification_id)
+    if notification_id
+      self.notification = Notification.find(notification_id)
     end
   end
 end

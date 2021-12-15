@@ -53,15 +53,15 @@ module Canvas::Migration
 
           if overview_file_path
             file = File.new(overview_file_path)
-            Canvas::Migration::Worker::upload_overview_file(file, cm)
+            Canvas::Migration::Worker.upload_overview_file(file, cm)
           end
           if export_folder_path
-            Canvas::Migration::Worker::upload_exported_data(export_folder_path, cm)
-            Canvas::Migration::Worker::clear_exported_data(export_folder_path)
+            Canvas::Migration::Worker.upload_exported_data(export_folder_path, cm)
+            Canvas::Migration::Worker.clear_exported_data(export_folder_path)
           end
           cm.update_conversion_progress(100)
 
-          cm.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }.merge(cm.migration_settings[:migration_ids_to_import] || {})
+          cm.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }.merge(cm.migration_settings[:migration_ids_to_import] || {})
           if (path = converter.course[:files_import_root_path])
             cm.migration_settings[:files_import_root_path] = path
           end
@@ -71,14 +71,14 @@ module Canvas::Migration
           cm.save
           cm.update_import_progress(100)
         rescue => e
-          cm.fail_with_error!(e) if cm
+          cm&.fail_with_error!(e)
         end
       end
 
       def self.enqueue(content_migration)
         Delayed::Job.enqueue(new(content_migration.id),
-                             :priority => Delayed::LOW_PRIORITY,
-                             :max_attempts => 1)
+                             priority: Delayed::LOW_PRIORITY,
+                             max_attempts: 1)
       end
     end
   end

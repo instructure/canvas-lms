@@ -22,7 +22,7 @@ class SwitchToPg12CollationIndexes < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def self.runnable?
-    connection.postgresql_version >= 120000
+    connection.postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
   end
 
   def up
@@ -35,11 +35,11 @@ class SwitchToPg12CollationIndexes < ActiveRecord::Migration[5.2]
       rename_index :attachments, :index_attachments_on_folder_id_and_file_state_and_display_name, :index_attachments_on_fi_and_fs_and_dn_temp
     end
 
-    add_index :users, "#{User.best_unicode_collation_key('sortable_name')}, id",
+    add_index :users, "#{User.best_unicode_collation_key("sortable_name")}, id",
               algorithm: :concurrently, name: :index_users_on_sortable_name, if_not_exists: true
 
-    add_index :attachments, "folder_id, file_state, #{Attachment.best_unicode_collation_key('display_name')}",
+    add_index :attachments, "folder_id, file_state, #{Attachment.best_unicode_collation_key("display_name")}",
               algorithm: :concurrently, name: :index_attachments_on_folder_id_and_file_state_and_display_name,
-              where: 'folder_id IS NOT NULL', if_not_exists: true
+              where: "folder_id IS NOT NULL", if_not_exists: true
   end
 end

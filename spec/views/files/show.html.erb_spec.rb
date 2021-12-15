@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/files/index" do
   it "renders" do
     course_with_student
     view_context
-    assign(:attachment, @course.attachments.create!(:uploaded_data => default_uploaded_data))
+    assign(:attachment, @course.attachments.create!(uploaded_data: default_uploaded_data))
     render "files/show"
     expect(response).not_to be_nil
   end
@@ -32,7 +32,7 @@ describe "/files/index" do
   it "displays a message that the file is locked if user is a student and the file is locked/unpublished" do
     course_with_student
     view_context
-    attachment = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+    attachment = @course.attachments.create!(uploaded_data: default_uploaded_data)
     attachment.locked = true
     attachment.save!
     assign(:attachment, attachment)

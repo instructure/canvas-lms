@@ -46,7 +46,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
       else
         render json: { error: err_msg }
       end
-    rescue StandardError => e
+    rescue => e
       render json: { error: "#{err_msg}: #{e.message}" }
     end
   end
@@ -88,7 +88,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
   #   example:  A833C528-901A-11DF-A622-0C319DFF4B22
   ##
   def valid_guid(guid)
-    unless guid =~ /[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}/i
+    unless /[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}/i.match?(guid)
       raise "GUID is invalid: #{guid}"
     end
   end
@@ -140,6 +140,6 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
       raise "invalid description value: #{rating[:description]}"
     end
 
-    { :description => rating[:description], :points => parse_int(rating[:points]) }
+    { description: rating[:description], points: parse_int(rating[:points]) }
   end
 end

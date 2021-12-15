@@ -21,18 +21,18 @@
 module Lti
   class ToolSetting < ActiveRecord::Base
     belongs_to :tool_proxy
-    belongs_to :context, polymorphic: [:course, :account, :attachment_association]
+    belongs_to :context, polymorphic: %i[course account attachment_association]
 
-    validates_presence_of :context, if: :has_resource_link_id?
+    validates :context, presence: { if: :has_resource_link_id? }
 
     serialize :custom
     serialize :custom_parameters
 
     class << self
       def custom_settings(tool_proxy_id, context, resource_link_id)
-        tool_settings = ToolSetting.where('tool_proxy_id = ? and ((context_type = ? and context_id =?) OR context_id IS NULL) and (resource_link_id = ? OR resource_link_id IS NULL)',
+        tool_settings = ToolSetting.where("tool_proxy_id = ? and ((context_type = ? and context_id =?) OR context_id IS NULL) and (resource_link_id = ? OR resource_link_id IS NULL)",
                                           tool_proxy_id, context.class.to_s, context.id, resource_link_id)
-                                   .order('context_id NULLS FIRST, resource_link_id NULLS FIRST').pluck(:custom).compact
+                                   .order("context_id NULLS FIRST, resource_link_id NULLS FIRST").pluck(:custom).compact
         (tool_settings.present? && tool_settings.inject { |custom, h| custom.merge(h) }) || {}
       end
     end

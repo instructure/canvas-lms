@@ -44,7 +44,7 @@ module SIS
         raise ImportError, "No sis_id given for a group category" if sis_id.blank?
         raise ImportError, "No name given for group category #{sis_id}" if category_name.blank?
         raise ImportError, "No status given for group category #{sis_id}" if status.blank?
-        raise ImportError, "Improper status \"#{status}\" for group category #{sis_id}, skipping" unless status =~ /\A(active|deleted)/i
+        raise ImportError, "Improper status \"#{status}\" for group category #{sis_id}, skipping" unless /\A(active|deleted)/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         if course_id && account_id
@@ -68,8 +68,8 @@ module SIS
 
         gc = @root_account.all_group_categories.where(sis_source_id: sis_id).take
 
-        if gc && gc.groups.active.exists?
-          raise ImportError, "Cannot move group category #{sis_id} because it has groups in it." unless context.id == gc.context_id && context.class.base_class.name == gc.context_type
+        if gc && gc.groups.active.exists? && !(context.id == gc.context_id && context.class.base_class.name == gc.context_type)
+          raise ImportError, "Cannot move group category #{sis_id} because it has groups in it."
         end
 
         gc ||= context.group_categories.new
@@ -106,7 +106,7 @@ module SIS
                                     created_at: Time.zone.now,
                                     updated_at: Time.zone.now,
                                     batch_mode_delete: false,
-                                    workflow_state: 'active')
+                                    workflow_state: "active")
       end
 
       def should_build_roll_back_data?(group_category)
@@ -117,16 +117,16 @@ module SIS
 
       def old_status(group_category)
         if group_category.id_before_last_save.nil?
-          'non-existent'
+          "non-existent"
         elsif group_category.deleted_at_before_last_save.nil?
-          group_category.deleted_at.nil? ? nil : 'active'
+          group_category.deleted_at.nil? ? nil : "active"
         elsif !group_category.deleted_at_before_last_save.nil?
-          'deleted'
+          "deleted"
         end
       end
 
       def current_status(group_category)
-        group_category.deleted_at.nil? ? 'active' : 'deleted'
+        group_category.deleted_at.nil? ? "active" : "deleted"
       end
     end
   end

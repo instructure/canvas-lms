@@ -75,7 +75,7 @@ class MediaObjectsController < ApplicationController
 
   before_action :load_media_object, only: %i[show iframe_media_player]
   before_action :require_user, only: %i[index update_media_object]
-  protect_from_forgery :only => %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
+  protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
   # @{not an}API Show Media Object Details
   # This isn't an API because it needs to work for non-logged in users (video in public course)
@@ -146,10 +146,10 @@ class MediaObjectsController < ApplicationController
       url = api_v1_media_objects_url
     end
 
-    order_dir = params[:order] == 'desc' ? 'desc' : 'asc'
-    order_by = params[:sort] || 'title'
-    if order_by == 'title'
-      order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)')
+    order_dir = params[:order] == "desc" ? "desc" : "asc"
+    order_by = params[:sort] || "title"
+    if order_by == "title"
+      order_by = MediaObject.best_unicode_collation_key("COALESCE(user_entered_title, title)")
     end
     scope = scope.order(order_by => order_dir)
     scope = MediaObject.search_by_attribute(scope, :title, params[:search_term])
@@ -180,12 +180,12 @@ class MediaObjectsController < ApplicationController
 
       if params[:user_entered_title].blank?
         return(
-          render json: { message: 'The user_entered_title parameter must have a value' },
+          render json: { message: "The user_entered_title parameter must have a value" },
                  status: :bad_request
         )
       end
 
-      self.extend TextHelper
+      extend TextHelper
       @media_object.user_entered_title =
         CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
       @media_object.save!
@@ -198,7 +198,7 @@ class MediaObjectsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
-        self.extend TextHelper
+        extend TextHelper
 
         # The MediaObject will be created on the current shard,
         # not the @context's shard.
@@ -208,14 +208,14 @@ class MediaObjectsController < ApplicationController
           context: @context
         ).first_or_initialize
 
-        @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
+        @media_object.title = CanvasTextHelper.truncate_text(params[:title], max_length: 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
-        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
+        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255) if params[:user_entered_title].present?
         @media_object.save
       end
-      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
+      render json: @media_object.as_json.merge(embedded_iframe_url: media_object_iframe_url(@media_object.media_id))
       # render :json => media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
     end
   end
@@ -226,18 +226,18 @@ class MediaObjectsController < ApplicationController
     @show_right_side = false
     @media_object = MediaObject.by_media_id(params[:id]).first
     js_env(MEDIA_OBJECT_ID: params[:id],
-           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : 'video')
+           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video")
     render
   end
 
   def media_object_redirect
     mo = MediaObject.by_media_id(params[:id]).first
-    mo.viewed! if mo
+    mo&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
-      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
+      render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 
@@ -254,12 +254,12 @@ class MediaObjectsController < ApplicationController
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
-                                                            :width => width,
-                                                            :height => height,
-                                                            :type => type),
-                  :status => 301
+                                                            width: width,
+                                                            height: height,
+                                                            type: type),
+                  status: :moved_permanently
     else
-      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
+      render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 
@@ -270,8 +270,8 @@ class MediaObjectsController < ApplicationController
     js_env media_object: media_object_api_json(@media_object, @current_user, session) if @media_object
     js_bundle :media_player_iframe_content
     css_bundle :media_player
-    render html: "<div id='player_container'>#{I18n.t('Loading...')}</div>".html_safe,
-           layout: 'layouts/bare'
+    render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,
+           layout: "layouts/bare"
   end
 
   private
@@ -287,7 +287,7 @@ class MediaObjectsController < ApplicationController
       raise ActiveRecord::RecordNotFound, "invalid media_object_id" unless @media_object
 
       @media_object.delay(singleton: "retrieve_media_details:#{@media_object.media_id}").retrieve_details
-      increment_request_cost(Setting.get('missed_media_additional_request_cost', '200').to_i)
+      increment_request_cost(Setting.get("missed_media_additional_request_cost", "200").to_i)
     end
 
     @media_object.viewed!

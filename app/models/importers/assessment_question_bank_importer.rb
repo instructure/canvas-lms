@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class AssessmentQuestionBankImporter < Importer
@@ -41,16 +41,16 @@ module Importers
           bank[:count] += 1
           bank[:title] ||= q[:question_bank_name]
           q[:question_bank_name] ||= bank[:title]
-          bank[:migration_id] ||= CC::CCHelper.create_key(bank[:title], 'assessment_question_bank') if bank[:title]
+          bank[:migration_id] ||= CC::CCHelper.create_key(bank[:title], "assessment_question_bank") if bank[:title]
         elsif !q[:question_bank_migration_id] && q[:question_bank_name] && (bank = banks.detect { |b| b[:title] == q[:question_bank_name] })
           # should not be reaching this point on standard canvas imports
           bank[:count] += 1
           q[:question_bank_migration_id] = bank[:migration_id]
         else
-          bank = { :count => 1 }
+          bank = { count: 1 }
           bank[:title] = q[:question_bank_name] if q[:question_bank_name]
           bank[:migration_id] = q[:question_bank_migration_id] if q[:question_bank_migration_id]
-          bank[:migration_id] ||= CC::CCHelper.create_key(bank[:title], 'assessment_question_bank') if bank[:title]
+          bank[:migration_id] ||= CC::CCHelper.create_key(bank[:title], "assessment_question_bank") if bank[:title]
           bank[:for_quiz] = true if q[:is_quiz_question_bank]
           q[:question_bank_migration_id] ||= bank[:migration_id]
           banks << bank

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'active_model'
+require "active_model"
 
 module LtiAdvantage
   class TypeValidator < ActiveModel::Validator
     def validate(record)
       record.instance_variables.each do |v|
         value = record.instance_variable_get(v)
-        attr = v.to_s[1..-1].to_sym
+        attr = v.to_s[1..].to_sym
 
         # verify the value is of the correct type
         validate_type(attr, value, record)
@@ -26,7 +26,7 @@ module LtiAdvantage
       if expected_type.is_a? Array
         return if expected_type.any? { |t| valid_value?(t, value) }
 
-        record.errors.add(attr, "#{attr} must be an instance of one of #{expected_type.join(', ')}")
+        record.errors.add(attr, "#{attr} must be an instance of one of #{expected_type.join(", ")}")
       else
         return if valid_value?(expected_type, value)
 

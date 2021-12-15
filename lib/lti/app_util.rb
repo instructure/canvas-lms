@@ -21,24 +21,22 @@
 module Lti
   module AppUtil
     TOOL_DISPLAY_TEMPLATES = {
-      'borderless' => { template: 'lti/unframed_launch', layout: 'borderless_lti' }.freeze,
-      'full_width' => { template: 'lti/full_width_launch' }.freeze,
-      'in_context' => { template: 'lti/framed_launch' }.freeze,
-      'in_nav_context' => { template: 'lti/full_width_in_context' }.freeze,
-      'default' => { template: 'lti/framed_launch' }.freeze,
-      'full_width_in_context' => { template: 'lti/full_width_in_context' }.freeze,
+      "borderless" => { template: "lti/unframed_launch", layout: "borderless_lti" }.freeze,
+      "full_width" => { template: "lti/full_width_launch" }.freeze,
+      "in_context" => { template: "lti/framed_launch" }.freeze,
+      "in_nav_context" => { template: "lti/full_width_in_context" }.freeze,
+      "default" => { template: "lti/framed_launch" }.freeze,
+      "full_width_in_context" => { template: "lti/full_width_in_context" }.freeze,
     }.freeze
-    BLACKLIST_WILDCARD = '*' # to set up 'deny all' rules
+    BLACKLIST_WILDCARD = "*" # to set up 'deny all' rules
 
     def self.display_template(display_type = nil, display_override: nil)
       unless TOOL_DISPLAY_TEMPLATES.key?(display_type)
-        display_type = 'default'
+        display_type = "default"
       end
 
-      if display_override
-        if TOOL_DISPLAY_TEMPLATES.include?(display_override)
-          display_type = display_override
-        end
+      if display_override && TOOL_DISPLAY_TEMPLATES.include?(display_override)
+        display_type = display_override
       end
 
       TOOL_DISPLAY_TEMPLATES[display_type].dup

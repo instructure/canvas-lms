@@ -17,29 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module CourseWikiIndexPage
   #------------------------------ Selectors -----------------------------
   def new_page_btn_selector
-    '.btn.new_page'
+    ".btn.new_page"
   end
 
   def edit_menu_item_selector
-    '.edit-menu-item'
+    ".edit-menu-item"
   end
 
   def delete_menu_item_selctor
-    '.delete-menu-item'
+    ".delete-menu-item"
   end
 
   def duplicate_wiki_page_menu_item_selector
-    '.duplicate-wiki-page'
+    ".duplicate-wiki-page"
   end
 
   #------------------------------ Elements ------------------------------
   def page_index_content_container
-    f('#content')
+    f("#content")
   end
 
   def page_index_new_page_btn
@@ -59,7 +59,7 @@ module CourseWikiIndexPage
   end
 
   def page_index_more_options_menu_open
-    f('.ui-menu.ui-state-open')
+    f(".ui-menu.ui-state-open")
   end
 
   def page_index_duplicate_wiki_page_menu_item
@@ -79,11 +79,11 @@ module CourseWikiIndexPage
   end
 
   def wiki_index_loading_spinner
-    f('div.loading')
+    f("div.loading")
   end
 
   def add_new_page_button
-    f('a.btn.new_page')
+    f("a.btn.new_page")
   end
 
   #------------------------------ Actions ------------------------------

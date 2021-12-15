@@ -238,6 +238,9 @@ th:
     default_term_name: เทอมเริ่มต้น
     errors: 
       invalid_discovery_url: "URL การเรียนรู้ไม่ถูกต้อง"
+    feedback_coach: ถามกลุ่ม
+    feedback_coach_sub: "รับความช่วยเหลือจากผู้เชี่ยวชาญของ Canvas"
+    feedback_feature_request_sub: "มีข้อเสนอในการปรับปรุง Canvas หรือไม่"
     manually_created_courses: บทเรียนที่จัดทำด้วยตัวเอง
     root_account_cant_have_sis_id: "SIS ID ไม่สามารถกำหนดได้ในบัญชีราก"
     sis_id_in_use: "SIS ID \"%{sis_id}\" ถูกใช้งานอยู่"
@@ -253,6 +256,7 @@ th:
     tab_permissions: สิทธิ์อนุญาต
     tab_plugins: ปลั๊กอิน
     tab_question_banks: แถวคำถาม
+    tab_root_accounts: บัญชีราก
     tab_rubrics: เกณฑ์การให้คะแนน
     tab_settings: ค่าปรับตั้ง
     tab_sis_import: "การนำเข้า SIS"
@@ -261,15 +265,22 @@ th:
     tab_terms: เทอม
   account_97b34646: บัญชี
   account_account_b6b3746b: "บัญชี: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: ผู้ดูแลระบบบัญชีสามารถจัดทำบทเรียนได้ทุกเมื่อ
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: ระดับความเชี่ยวชาญตามผลลัพธ์ในระดับบัญชีและบทเรียน
   account_and_subaccount_40c6430: บัญชีและบัญชีย่อย
+  account_creation_still_in_progress_ac0e0a18: กำลังจัดทำบัญชีผู้ใช้
+  account_domain_78f43049: โดเมนบัญชีผู้ใช้
+  account_domain_lookups_f9d1147e: การค้นหาโดเมนบัญชีผู้ใช้
   account_groups_2f301732: กลุ่มบัญชีผู้ใช้
   account_id_2c3b4f15: "ID บัญชี"
   account_id_73966078: account_id
+  account_id_f6e26867: "ID บัญชี"
   account_level_notification_preferences_require_an__66467cd7: "ค่าการแจ้งข้อมูลระดับบัญชีจะต้องใช้ account_id เพื่ออัพเดต"
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: "การแจ้งข้อมูลระดับบัญชีมีผลกับบทเรียนทั้งหมด การแจ้งข้อมูลสำหรับแต่ละบทเรียนสามารถแก้ไขได้ในแต่ละบทเรียนและจะเป็นการบอกล้างการแจ้งข้อมูลเหล่านี้"
   account_level_settings_manage_4fca6f8e: "ค่าปรับตั้งระดับบัญชี - จัดการ"
   account_name_7f63a13: ชื่อบัญชี
+  account_name_analytics_62bf60ae: "ข้อมูลวิเคราะห์ของ %{account.name}"
+  account_name_bff54ed5: ชื่อบัญชี
   account_navigation_80bbefd4: การสืบค้นบัญชี
   account_navigation_menu_10c05bf9: เมนูการสืบค้นบัญชี
   account_notification: 
@@ -717,10 +728,10 @@ th:
       custom_reports: 
         end: 
           parameters: 
-            header: สถานะการลงทะเบียน
+            header: "สิ้นสุดเมื่อ:"
         start: 
           parameters: 
-            header: สถานะการลงทะเบียน
+            header: "เริ่มเมื่อ:"
     default_account_quotas_not_updated: ไม่ได้อัพเดตโควต้าบัญชีเริ่มต้น
     default_account_quotas_updated: อัพเดตโควต้าบัญชีเริ่มต้นแล้ว
     devry_u: 
@@ -1029,7 +1040,12 @@ th:
       about_google_docs_tooltip: "เกี่ยวกับ Google Docs Previews"
       account_admins_title: ผู้ดูแลระบบบัญชี
       account_quotas: 
-        update: อัพเดตกิจกรรม
+        file_quota: โควต้าไฟล์
+        gigabytes: กิกะไบต์
+        media_quota: โควต้าสื่อ
+        site_admin_quotas: โควต้าผู้ดูแลไซต์
+        student_quota: โควต้าผู้เรียน
+        update: อัพเดต
       account_settings_title: ค่าทางบัญชี
       add_admin_title: เพิ่มผู้ดูแลระบบบัญชี
       add_ip_filter_link: ตัวกรอง
@@ -1801,6 +1817,7 @@ th:
       GraphQL ที่ดำเนินการทั้งหมดเมื่อเร็ว ๆ นี้
   allows_aligning_outcomes_to_non_scoring_content_537ce399: อนุญาตการประสานผลลัพธ์กับเนื้อหาที่ไม่มีการให้คะแนน
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "อนุญาตลิงค์ความช่วยเหลือให้กำกับเป็น นำเสนอ หรือ ใหม่ และจัดแสดงลิงค์ความช่วยเหลือที่นำเสนอไว้อย่างชัดเจนในเมนูความช่วยเหลือ"
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: อนุญาตให้ผู้สอนปรับใช้คะแนนกับผลงานจัดส่งที่ไม่ได้ให้เกรดในภาพรวม
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: อนุญาตผลการเรียนรู้ให้เป็นแบบเลือกได้ขณะโอนย้ายเนื้อหาบทเรียน
   allows_modifying_notification_settings_for_any_cou_5004ac71: สามารถแก้ไขค่าการแจ้งข้อมูลสำหรับบทเรียนจากภายในเพจค่าปรับตั้งการแจ้งข้อมูลระดับบัญชีผู้ใช้
   allows_setting_account_course_level_mastery_scales_1939e0fd: "อนุญาตให้กำหนดคะแนนความเชี่ยวชาญระดับบัญชีและบทเรียนและวิธีการคำนวณ โดยแทนที่คะแนนตามเกณฑ์และวิธีการคำนวณตามผลลัพธ์"
@@ -2312,6 +2329,7 @@ th:
   anonymous_submission_assignment_title_896654de: "ผลงานจัดส่งแบบไม่เปิดเผยตัว: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "ความเห็นสำหรับผลงานจัดส่งแบบไม่เปิดเผยตัว: ผู้เรียน (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "ความเห็นสำหรับผลงานจัดส่งแบบไม่เปิดเผยตัว: ผู้เรียน (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "หัวข้อนี้จะต้องเปิดใช้เครื่องหมายกำกับคุณสมบัติ การปรับรูปแบบการพูดคุย/ประกาศ (Discussions / Announcements Redesign) ไว้"
   anonymous_turned_off_8118a0b: ปิดการปกปิดตัวตน
   anonymous_turned_on_fe56f997: เปิดการปกปิดตัวตน
   anonymous_user: ผู้ใช้ที่ไม่เปิดเผยตัว
@@ -2402,6 +2420,7 @@ th:
   apply_date_range_selection_cc4351ed: ปรับใช้การเลือกช่วงวันที่
   apply_filter_7e4f6113: ปรับใช้ตัวกรอง
   apply_filters_note_clicking_this_button_will_cause_753f04: "ปรับใช้ตัวกรอง หมายเหตุ: การคลิกที่ปุ่มนี้จะทำให้เพจโหลดใหม่"
+  apply_score_to_ungraded_afd025d0: ปรับใช้คะแนนกับที่ไม่ได้ให้เกรด
   apply_settings_10409ad9: ปรับใช้ค่าปรับตั้ง
   apply_theme_7af08387: ปรับใช้ธีม
   applying_new_styles_to_subaccounts_e8aeeef2: กำลังปรับใช้รูปแบบใหม่สำหรับบัญชีย่อย
@@ -4347,7 +4366,7 @@ th:
         etherpad: |-
             EtherPad เป็นโปรเจคต์สาธารณะที่ช่วยให้คุณสามารถตั้งค่าเอกสารแชร์ได้อย่างรวดเร็ว  การทำงานรวดเร็วจนคุณสามารถดูได้ว่าใครกำลังพิมพ์อะไรอยู่ "รายการแปะ"ไม่มีการป้องกันด้วยรหัสผ่าน ดังนั้นทุกคนที่มีลิงค์เข้าถึงจะสามารถแก้ไขได้ EtherPad ดีกว่า Google Doc หากคุณต้องการไม่เปิดเผยตัวบุคคลและ/หรือต้องการให้บุคคลที่ไม่มีบัญชี Google สามารถมีส่วนร่วม  
               
-            **คำเตือน**: ทำความคุ้นเคยกับ [นโยบายการลบข้อมูลของ EtherPad] ให้ดี (%{etherpad_deletion_policy_url}) เพื่อให้แน่ใจว่างานของคุณจะถูกเก็บรักษาไว้
+            **คำเตือน**: ทำความคุ้นเคยกับ [นโยบายการลบข้อมูลของ EtherPad ให้ดี](%{etherpad_deletion_policy_url}) เพื่อให้แน่ใจว่างานของคุณจะถูกเก็บรักษาไว้
         google_docs: |-
             Google Doc เป็นตัวเลือกที่ดีสำหรับประสานความร่วมมือสำหรับโครงการเป็นกลุ่ม  ซึ่งจะมีลักษณะคล้าย ๆ Microsoft Word ที่ช่วยให้คุณสามารถทำงานกับคนอื่น ๆ ในไฟล์เดียวกันและพร้อม ๆ กันโดยไม่ต้องส่งอีเมลโต้ตอบ  
               
@@ -4952,7 +4971,7 @@ th:
         default_select_folder: เลือกโฟลเดอร์
         upload_to: อัพโหลดไปยัง
       import_quizzes_next_view: 
-        import_new_quizzes: นำเข้าเนื้อหาการประเมินเป็นแบบทดสอบใหม่
+        import_new_quizzes: นำเข้าเนื้อหาการประเมินเป็น*แบบทดสอบใหม่*
         import_new_quizzes_help_text: "แบบทดสอบใหม่คือเอนจินการประเมินสำหรับ Canvas%{p_p}ตรวจสอบรายละเอียดเพิ่มเติมโดยติดต่อผู้ดูแลระบบของคุณหรือเข้าไปที่"
         import_quizzesNext_help_label: นำเข้าการประเมินเป็นไอคอนความช่วยเหลือใหม่สำหรับแบบทดสอบ
         import_quizzesNext_help_title: แบบทดสอบใหม่
@@ -5753,6 +5772,7 @@ th:
       file_meta: ไม่สามารถส่งออกเมต้าดาต้าของไฟล์
       files: ไม่สามารถส่งออกไฟล์บางส่วน
       grading_standards: ไม่สามารถส่งออกมาตรฐานการให้เกรด
+      late_policy: ไม่สามารถส่งออกนโยบายล่าช้า
       learning_outcomes: ไม่สามารถส่งออกผลลัพธ์ในการเรียนรู้
       lti_links: ไม่สามารถส่งออกส่วนกำหนดค่าเครื่องมือจากภายนอกบางส่วน
       media_file: ไฟล์สื่อไม่สามารถส่งออกได้
@@ -6368,6 +6388,7 @@ th:
   create_account_263ec6: จัดทำบัญชีผู้ใช้
   create_an_ba36d171: จัดทำ
   create_announcements_above_1c36202b: จัดทำประกาศด้านบน
+  create_anonymous_discussion_topics_d573e88e: จัดทำหัวข้อการพูดคุยแบบไม่เปิดเผยตัว
   create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "จัดทำการประเมินพร้อมแบบทดสอบใหม่และโอนย้ายแบบทดสอบ Canvas ที่มีอยู่"
   create_assignment_68532ceb: จัดทำภารกิจ
   create_course_9a69b32c: จัดทำบทเรียน
@@ -7226,6 +7247,7 @@ th:
             แบบมีการเชื่อมโยงต่อเนื่องเหมาะสำหรับการติดตามหรือการพูดคุยในระยะยาว
             เพื่อให้จัดเก็บได้อย่างเป็นระบบ ในขณะที่การพูดคุยแบบมีเป้าหมายเฉพาะจะเหมาะที่สุดสำหรับการแลกเปลี่ยนระยะสั้น
   discussions_announcements_redesign_901c5528: การปรับรูปแบบการพูดคุย/ประกาศ
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "การปรับรูปแบบการพูดคุย/ประกาศ - การไม่เปิดเผยตัว"
   discussions_create_94dff604: "การพูดคุย - จัดทำ"
   discussions_index_menu_42591bc9: เมนูดัชนีการพูดคุย
   discussions_menu_f18eb4a2: เมนูการพูดคุย
@@ -7554,7 +7576,7 @@ th:
       formatting: "กำลังกำหนดรูปแบบ กดลงเพื่อเลือก"
       rte_help: "พื้นที่ Rich Text กด ALT+F8 เพื่อขอความช่วยเหลือ"
   editor_button_6647db9c: ปุ่มโปรแกรมแก้ไข
-  either_course_or_student_c42bb055: "“บทเรียน” หรือ “ผู้เรียน” อย่างหนึ่งอย่างใด'"
+  either_course_or_student_c42bb055: "“บทเรียน” หรือ “ผู้เรียน” อย่างหนึ่งอย่างใด"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "ต้องระบุ ID กลุ่มหรือ ID ผลลัพธ์"
   either_the_url_or_domain_should_be_set_c29cf8c1: "ต้องระบุ url หรือโดเมน"
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "คุณอาจเป็นผู้ใช้ใหม่หรือ*เงื่อนไขการใช้งาน*เปลี่ยนแปลงนับตั้งแต่คุณตอบรับครั้งล่าสุด กรุณาตอบรับ*เงื่อนไขการใช้งาน*ก่อนดำเนินการต่อ"
@@ -8233,6 +8255,7 @@ th:
   failed_to_load_announcements_429c16fc: ไม่สามารถโหลดประกาศได้
   failed_to_load_apps_db37e651: ไม่สามารถโหลดแอพ
   failed_to_load_assignments_in_important_dates_ce3b4227: ไม่สามารถโหลดภารกิจในวันที่ที่สำคัญ
+  failed_to_load_conversation_messages_9b4546fc: ไม่สามารถโหลดข้อความการพูดคุย
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "ไม่สามารถโหลดบทเรียนได้ รีเฟรชเพจเพื่อลองใหม่อีกครั้ง"
   failed_to_load_csp_information_try_refreshing_the__4a056997: "ไม่สามารถโหลดข้อมูล CSP ลองรีเฟรชหน้าเพจ"
   failed_to_load_events_in_important_dates_2195b227: ไม่สามารถโหลดกิจกรรมในวันที่ที่สำคัญ
@@ -8288,7 +8311,8 @@ th:
   feature_options_account_settings_294a39f8: "ตัวเลือกคุณสมบัติ (ค่าปรับตั้งทางบัญชี)"
   feature_options_enable_disable_7e748054: "ตัวเลือกคุณสมบัติ - เปิดใช้งาน / ปิดใช้งาน"
   feature_options_view_a170e80c: "ตัวเลือกคุณสมบัติ - ดู"
-  feature_preview_5e1216a0: แสดงตัวอย่างคุณสมบัติ
+  feature_preview_5e1216a0: "แสดงตัวอย่างคุณสมบัติ (Feature Preview)"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "แสดงตัวอย่างคุณสมบัติ (Feature preview) - การเลือกใช้จะครอบคลุมทั้งข้อมูลอัพเดตต่อเนื่องนอกกำหนดเวลาการเผยแพร่ตามปกติ"
   feature_previews_2700a397: แสดงตัวอย่างคุณสมบัติ
   feature_previews_account_settings_274440bc: "แสดงตัวอย่างคุณสมบัติ (ค่าปรับตั้งทางบัญชี)"
   feature_previews_enable_disable_707af910: "แสดงตัวอย่างคุณสมบัติ - เปิดใช้งาน / ปิดใช้งาน"
@@ -8551,6 +8575,7 @@ th:
   full_name_14c958f7: "ชื่อ:"
   full_name_23fdfb6d: ชื่อนามสกุล
   full_name_is_required_8efbdc84: ต้องระบุชื่อนามสกุล
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Full (แบบเต็ม): ชื่อผู้เรียนและภาพโพรไฟล์จะถูกซ่อนไว้"
   future_5416ea92: อนาคต
   future_terms_7fba2ae6: เทอมในอนาคต
   galician_7e4508b5: กาลิเซีย
@@ -9309,6 +9334,7 @@ th:
   grouptitle_was_successfully_updated_658f725e: "\"%{groupTitle}\" อัพเดตเสร็จสิ้น"
   guatemala_502_ae25c68f: "กัวเตมาลา (+502)"
   haitian_creole_7eb4195b: ครีโอลเฮติ
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "ถูกเลือกอัตโนมัติตามตำแหน่งของส่วนทำรายการใน Canvas ของบัญชีผู้ใช้ ในบางกรณีอาจเป็นพื้นที่อื่น"
   has_similarity_score_d5f332b4: มีคะแนนความใกล้เคียง
   has_syllabus_body_6f250277: has_syllabus_body
   have_not_been_graded_df2a5fd2: ยังไม่ได้ให้เกรด
@@ -9645,6 +9671,7 @@ th:
   if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "หากเปิดใช้งาน บทเรียน - จัดการ ไว้ แต่ บทเรียนพิมพ์เขียว - เพิ่ม / แก้ไข / เชื่อมโยง / ลบ ไม่ได้เปิดใช้งานไว้ ผู้ใช้ยังสามารถซิงค์บทเรียนพิมพ์เขียวและดูประวัติการซิงค์ได้"
   if_courses_manage_update_and_courses_undelete_are__670ab844: "หาก บทเรียน - จัดการ / อัพเดต และ บทเรียน - เลิกลบ ถูกเปิดใช้งานไว้ด้วย ผู้ใช้ระดับบัญชีผู้ใช้จะสามารถกู้คืนบทเรียนที่ถูกลบได้จากเครื่องมือสำหรับผู้ดูแลระบบ"
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "หากปิดใช้งานไว้ ผู้ใช้จะยังสามารถเข้าไปยังค่าปรับตั้งบทเรียนได้"
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "หากเปิดใช้งานไว้ จะสามารถเชื่อมโยงกับดัชนีหน่วยการเรียนแบบซับซ้อนได้ผ่านทางโมดัล"
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "หากเปิดใช้งานไว้ จะสามารถเชื่อมโยงกับดัชนีหน่วยการเรียนแบบซับซ้อนได้"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "หากเปิดใช้งานไว้ สามารถระบุคะแนนผลลัพธ์สำหรับเกณฑ์การให้คะแนนได้มากกว่าจำนวนสูงสุดที่เป็นไปได้"
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "หากเปิดใช้งานไว้ จะรองรับลิงค์แบบซับซ้อนสำหรับภารกิจและหน่วยการเรียนหลาย ๆ ส่วน"
@@ -9861,7 +9888,7 @@ th:
   include_quoted_reply_in_message_d0c8af8a: รวมการตอบกลับที่อ้างถึงในข้อความ
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       รวมคะแนนเมื่อแจ้งเตือนเกี่ยวกับเกรด
-                หากอีเมลของคุณไม่ใช่อีเมลของสถาบัน ข้อมูลที่อ่อนไหวอาจถูกส่งไปภายนอกสถาบันได้
+      หากอีเมลของคุณไม่ใช่อีเมลของสถาบัน ข้อมูลที่อ่อนไหวอาจถูกส่งไปภายนอกสถาบันได้
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "รวม Datadog RUM JS Agent ใน HEAD ของเอกสาร"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: รวมเกรดของภารกิจนี้เมื่อซิงค์กับระบบสารสนเทศสำหรับผู้เรียนในสถานศึกษาของคุณ
   include_unpublished_assignments_83ebbaec: รวมภารกิจที่เลิกเผยแพร่แล้ว
@@ -10029,6 +10056,8 @@ th:
                                     กรุณาติดต่อ #canvas-sre ใน Slack
   invalid_restrictions_316cd740: ข้อจำกัดไม่ถูกต้อง
   invalid_score_3d247da7: คะแนนไม่ถูกต้อง
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "ชื่อผู้ใช้ sftp ไม่ถูกต้อง เราไม่สามารถระบุชื่อผู้ใช้ที่จะใช้ได้เนื่องจากไม่มีโดเมนที่ลงท้ายด้วย .instructure\n\
+      \x20                             กรุณาติดต่อใน #canvas-sre ใน Slack   "
   invalid_sis_sync_status_b68db497: "สถานะซิงค์ SIS ไม่ถูกต้อง"
   invalid_state_parameter_7a5aa108: พารามิเตอร์สถานะไม่ถูกต้อง
   invalid_submission_file_type_cda6742a: ประเภทไฟล์จัดส่งไม่ถูกต้อง
@@ -10549,6 +10578,7 @@ th:
   loading_comment_library_3131e5c6: กำลังโหลดไลบรารี่ความเห็น
   loading_comments_32366acf: กำลังโหลดความเห็น
   loading_compose_modal_f6da0e8b: กำลังโหลดโหมดการเขียนเนื้อหา
+  loading_conversation_messages_71e9050e: กำลังโหลดข้อความสนทนา
   loading_courses_409a3641: กำลังโหลดบทเรียน
   loading_courses_bd1bffe: กำลังโหลดบทเรียน...
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -10559,6 +10589,7 @@ th:
   loading_discussions_8ed5fcd7: กำลังโหลดการพูดคุย
   loading_external_tool_d839042c: กำลังโหลดเครื่องมือจากภายนอก
   loading_f99d93d4: "...กำลังโหลด"
+  loading_feature_options_82e07ee4: กำลังโหลดตัวเลือกคุณสมบัติการใช้งาน
   loading_features_d26820f6: กำลังโหลดคุณสมบัติ
   loading_folders_d8b5869e: กำลังโหลดโฟลเดอร์
   loading_grades_446fc226: กำลังโหลดเกรด...
@@ -11651,8 +11682,7 @@ th:
         body: |-
             สวัสดี %{user}
             
-            %{course} บทเรียนของคุณในเครือข่าย Canvas เริ่มต้นเมื่อสองวันก่อน และเราพบว่าคุณยังไม่ได้ทำการล็อกอิน  เราแค่ต้องการส่งการแจ้งเตือนครั้งสุดท้ายให้กับคุณเผื่อคุณลืม
-            
+            %{course} บทเรียนของคุณในเครือข่าย Canvas เริ่มต้นเมื่อสองวันก่อน และเราพบว่าคุณยังไม่ได้ทำการล็อกอิน เราแค่ต้องการส่งการแจ้งเตือนครั้งสุดท้ายให้กับคุณเผื่อคุณลืม
             
             ล็อกอินโดยไปที่ %{site} จากนั้นกรอกชื่อผู้ใช้และรหัสผ่านของคุณ หากคุณยังไม่ได้กำหนดรหัสผ่าน คุณสามารถกำหนดได้ที่นี่: %{password_url}
             
@@ -11700,7 +11730,6 @@ th:
             คุณสามารถเตรียมพร้อมได้อย่างไรบ้าง
             
             หากคุณยังไม่ได้จัดทำโพรไฟล์เครือข่าย Canvas ของคุณ คุณสามารถล็อกอินและตั้งค่าได้ที่ Canvas.net โพรไฟล์ของคุณช่วยให้บุคคลอื่น ๆ ในบทเรียนทราบว่าคุณเป็นใคร นอกจากนี้คุณยังสามารถตั้งค่าปรับแต่งในการแจ้งเตือนของคุณ
-            
             
             ท้ายสุดนี้คุณยังสามารถพิจารณาข้อมูลที่กำหนดและคำแนะนำต่าง ๆ สำหรับบทเรียนของคุณที่นี่: %{url}
             
@@ -12582,6 +12611,7 @@ th:
   mfa_required_ca66e177: "ต้องมี MFA"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "การส่งออกเกรด MGP"
+  miami_utilization_report_9c927880: "รายงานการใช้งานของ Miami"
   mic_a7f3d311: ไมค์
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 รองรับสมาชิกสูงสุด %{max} รายในทีม"
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 รองรับผู้ดูแลสูงสุด %{max} รายในทีม"
@@ -12729,6 +12759,8 @@ th:
   modules_c4325335: หน่วยการเรียน
   modules_group_menu_4aae0d5f: เมนูกลุ่มหน่วยการเรียน
   modules_index_menu_c8748e7c: เมนูดัชนีหน่วยการเรียน
+  modules_index_menu_modal_79123a19: "เมนูดัชนีหน่วยการเรียน (โมดัล)"
+  modules_index_menu_tray_3f9975d9: "เมนูดัชนีหน่วยการเรียน (เทรย์)"
   modules_settings_a7066f13: ค่าปรับตั้งหน่วยการเรียน
   modules_tutorial_tray_d58ac3cb: ถาดข้อมูลแนะนำหน่วยการเรียน
   month_s_5c17590e: เดือน
@@ -13022,7 +13054,7 @@ th:
       ผลิตภัณฑ์จากพันธมิตรควรเปิดใช้งานคุณสมบัตินี้เพื่อให้การยืนยัน
       ข้อมูลภารกิจมีประสิทธิภาพมากขึ้น ขณะเปิดใช้งาน คุณสมบัตินี้จะแสดงค่าปรับตั้งการผสานการทำงาน SIS ใหม่
       สำหรับการซิงค์ SIS (การส่งต่อเกรดระดับภารกิจ) ในค่าปรับตั้ง
-      ทางบัญชี การแสดงตัวอย่างคุณสมบัติ โพสต์ไปยัง SIS ถูกผสานเข้ากับค่าปรับตั้ง
+      ทางบัญชี ตัวเลือก โพสต์ไปยัง SIS ถูกผสานเข้ากับค่าปรับตั้ง
       ใหม่นี้แล้วและจะถูกเปิดใช้งานเป็นค่าเริ่มต้น
   new_slack_api_key_453d04d: "คีย์ Slack API ใหม่"
   new_topic_for_course_3d98222a: "หัวข้อใหม่สำหรับ %{course}"
@@ -13268,7 +13300,7 @@ th:
     blueprint_description: |-
         *ผู้สอนและผู้ดูแลระบบเท่านั้น:*
         
-                เนื้อหาถูกซิงค์จากบทเรียนพิมพ์เขียวไปยังบทเรียนที่เชื่อมโยงไว้
+        เนื้อหาถูกซิงค์จากบทเรียนพิมพ์เขียวไปยังบทเรียนที่เชื่อมโยงไว้
     blueprint_display: ซิงค์พิมพ์เขียว
     calendar_description: รายการใหม่และที่มีการแก้ไขในปฏิทินบทเรียนของคุณ
     calendar_display: ปฏิทิน
@@ -13303,7 +13335,7 @@ th:
     content_link_error_description: |-
         *ผู้สอนและผู้ดูแลระบบเท่านั้น:*
         
-                ตำแหน่งและเนื้อหาของลิงค์ที่ล้มเหลวที่ผู้เรียนมีการโต้ตอบ
+        ตำแหน่งและเนื้อหาของลิงค์ที่ล้มเหลวที่ผู้เรียนมีการโต้ตอบ
     content_link_error_display: ข้อผิดพลาดในการเชื่อมโยงเนื้อหา
     conversation_created_description: คุณจัดทำการพูดคุยไว้
     conversation_created_display: การพูดคุยถูกจัดทำโดยฉัน
@@ -13312,9 +13344,9 @@ th:
     course_content_description: |-
         การเปลี่ยนแปลงไปยังเนื้อหาบทเรียน: 
         
-                * เนื้อหาเพจ
-                * เนื้อหาแบบทดสอบ
-                * เนื้อหาภารกิจ
+        * เนื้อหาเพจ
+        * เนื้อหาแบบทดสอบ
+        * เนื้อหาภารกิจ
     course_content_display: เนื้อหาบทเรียน
     discussion_description: หัวข้อการพูดคุยใหม่ในบทเรียนของคุณ
     discussion_display: หัวข้อใหม่
@@ -13327,29 +13359,29 @@ th:
     grading_description: |-
         ได้แก่ 
         
-                * กรอก/แก้ไขเกรดภารกิจ/ผลงานจัดส่งแล้ว
-                * แก้ไขน้ำหนักเกรดแล้ว
+        * กรอก/แก้ไขเกรดภารกิจ/ผลงานจัดส่งแล้ว
+        * แก้ไขน้ำหนักเกรดแล้ว
     grading_display: การให้เกรด
     grading_policies_description: การแก้ไขนโยบายการให้เกรดสำหรับบทเรียน
     grading_policies_display: นโยบายการให้เกรด
     invitation_description: |-
         คำเชิญสำหรับ: 
         
-                * การประชุมทางเว็บ
-                * กลุ่ม
-                * ความร่วมมือ
-                * ความคิดเห็นจากผู้เกี่ยวข้องและการแจ้งเตือน
+        * การประชุมทางเว็บ
+        * กลุ่ม
+        * ความร่วมมือ
+        * ความคิดเห็นจากผู้เกี่ยวข้องและการแจ้งเตือน
     invitation_display: คำเชิญ
     late_grading_description: |-
         *ผู้สอนและผู้ดูแลระบบเท่านั้น:*
         
-                ผลงานจัดส่งล่าช้าสำหรับภารกิจ
+        ผลงานจัดส่งล่าช้าสำหรับภารกิจ
     late_grading_display: การให้เกรดล่าช้า
     membership_update_description: |-
         *เฉพาะผู้ดูแลระบบ: เปิดใช้งานส่วนการลงทะเบียนที่รอดำเนินการแล้ว*
         
-                * การลงทะเบียนของกลุ่ม
-                * ตอบรับ/ปฏิเสธแล้ว
+        * การลงทะเบียนของกลุ่ม
+        * ตอบรับ/ปฏิเสธแล้ว
     membership_update_display: อัพเดตสมาชิกภาพ
     missing_description_description: "สำหรับการแจ้งเตือนของ %{category}"
     missing_display_display: "สำหรับการแจ้งเตือนของ %{category}"
@@ -13434,19 +13466,19 @@ th:
     other_description: |-
         *ผู้สอนและผู้ดูแลระบบเท่านั้น:*
         
-                * การลงทะเบียนบทเรียน
-                * จัดทำรายงานแล้ว
-                * การส่งออกเนื้อหา
-                * รายงานการโอนย้าย
-                * ผู้ใช้บัญชีใหม่
-                * กลุ่มผู้เรียนใหม่
+        * การลงทะเบียนบทเรียน
+        * จัดทำรายงานแล้ว
+        * การส่งออกเนื้อหา
+        * รายงานการโอนย้าย
+        * ผู้ใช้บัญชีใหม่
+        * กลุ่มผู้เรียนใหม่
     other_display: การแจ้งข้อมูลเพื่อการบริหารจัดการ
     recording_ready_display: พร้อมบันทึก
     reminder_display: แจ้งเตือน
     student_appointment_description: |-
         *ผู้สอนและผู้ดูแลระบบเท่านั้น:*
         
-                การรับนัดหมายของผู้เรียน
+        การรับนัดหมายของผู้เรียน
     student_appointment_display: การรับนัดหมายของผู้เรียน
     submission_comment_description: ความเห็นสำหรับการจัดส่งภารกิจ
     submission_comment_display: ความเห็นผลงานจัดส่ง
@@ -13571,6 +13603,7 @@ th:
   observing_observee_d31d5fa2: "กำลังสังเกตการณ์: %{observee}"
   of_students_5d1af0d2: "# ผู้เรียน"
   off_5385ef3f: ปิด
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Off (ปิด): ชื่อผู้เรียนและภาพโพรไฟล์จะจัดแสดงให้แก่สมาชิกคนอื่น ๆ ในบทเรียนนี้"
   offensive_abusive_c41dcb08: "ก้าวร้าว หยาบคาย"
   offline_score_8d7b4779: "คะแนนออฟไลน์:"
   ok_c47544a2: ตกลง
@@ -13647,6 +13680,7 @@ th:
   open_the_grade_detail_tray_cea682a5: เปิดถาดรายละเอียดเกรด
   open_this_keyboard_shortcuts_dialog_9658b83a: เปิดกล่องโต้ตอบชอร์ตคัทแป้นพิมพ์นี้
   open_title_in_a_new_window_b29fed77: "เปิด %{title} ในหน้าต่างใหม่"
+  open_to_do_items_in_a_new_tab_120ea5f4: เปิดรายการสิ่งที่ต้องทำในแท็บใหม่
   openid_connect_initiation_url_d9037d30: "Url การเริ่มทำงานของ * OpenID"
   opens_in_new_window_b4b99243: เปิดในหน้าต่างใหม่
   option_1_dea39f90: "ตัวเลือกที่ 1"
@@ -14077,6 +14111,7 @@ th:
   please_provide_a_pairing_code_530d1e9d: กรุณาระบุรหัสเข้าคู่
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "กรุณาระบุโดเมน tenant ที่ถูกต้อง ตรวจสอบค่าปรับตั้ง Azure Active Directory ของคุณเพื่อทำการค้นหา"
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "กรุณาติดต่อใน Slack ที่ #canvas-sre หากยังเกิดปัญหานี้อยู่"
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "กรุณาติดต่อ Slack ได้ที่ #canvas-sre พื้นที่ที่จัดเก็บส่วนทำรายการ Canvas ของลูกค้านี้ไม่รองรับ SFTP"
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "กรุณาติดต่อใน Slack ที่ #canvas-sre เพื่อจัดทำ SFTP สำหรับบัญชีนี้"
   please_select_a_group_set_for_this_assignment_e1da63d3: กรุณาเลือกชุดกลุ่มสำหรับภารกิจนี้
   please_select_a_reason_for_reporting_this_reply_51719e8d: กรุณาเลือกสาเหตุที่แจ้งเหตุเกี่ยวกับการตอบกลับนี้
@@ -15949,7 +15984,7 @@ th:
           time_elapsed: เวลาที่ผ่านไป
           time_running: นับเวลาต่อเนื่อง
         links: 
-          hide_time_running: ซ่อน
+          hide_time_running: ซ่อนเวลา
           keep_editing_quiz: แก้ไขแบบทดสอบนี้ต่อไป
           keep_editing_survey: แก้ไขแบบสอบถามนี้ต่อไป
     rubric: 
@@ -15998,7 +16033,7 @@ th:
       errors: 
         connection_lost: "การเชื่อมต่อกับ %{host} ขาดหาย  กรุณาตรวจสอบว่าคุณเชื่อมต่ออินเทอร์เน็ตอยู่ก่อนดำเนินการต่อ"
         only_numerical_values: ยอมรับเฉพาะค่าตัวเลข
-      hide_time_link: ซ่อน
+      hide_time_link: ซ่อนเวลา
       hours_count: 
         one: "1 ชั่วโมง"
         other: "%{count} ชั่วโมง"
@@ -16027,7 +16062,7 @@ th:
       seconds_count: 
         one: "1 วินาที"
         other: "%{count} วินาที"
-      show_time_link: แสดง
+      show_time_link: แสดงเวลา
       titles: 
         come_back_later: คุณกำกับคำถามนี้ไว้เพื่อกลับมาในภายหลัง
         times_up: หมดเวลา!
@@ -17380,6 +17415,7 @@ th:
                                     สี่ชั่วโมงเพื่อให้คีย์นี้เริ่มใช้งานได้
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "คีย์ SFTP  ไม่ถูกต้อง กรุณาตรวจสอบว่ากำหนดรูปแบบได้ถูกต้อง"
   sftp_key_removed_from_user_42318725: "คีย์ SFTP ถูกลบจากผู้ใช้"
+  sftp_region_invalid_216caa40: "พื้นที่ SFTP ไม่ถูกต้อง"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       ผู้ใช้ SFTP มีอยู่แล้วหรือถูกปิดใช้งาน
                                     กรุณาติดต่อใน #canvas-sre ใน Slack
@@ -19252,6 +19288,7 @@ th:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "ePortfolio นี้ถูกระบุว่าเป็นข้อมูลขยะ ปัจจุบันจะแสดงเฉพาะกับผู้ดูแลระบบและผู้จัดทำเท่านั้น หากแน่ใจว่าไม่ใช่ข้อมูลขยะ คุณสามารถกำกับว่าเป็นข้อมูลที่ปลอดภัย"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: คุณสมบัตินี้จะส่งผลต่อข้อมูลในปัจจุบันสำหรับบทเรียนทั้งหมดในบัญชีผู้ใช้
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: คุณสมบัตินี้จะส่งผลต่อข้อมูลในปัจจุบันสำหรับบัญชีทั้งหมด
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "คุณสมบัตินี้ช่วยให้ให้ผู้สอนสามารถจัดทำส่วนการพูดคุยแบบไม่เปิดเผยตัว และผู้สอนสามารถเปิดใช้งานค่าปรับตั้งระดับบทเรียนสำหรับผู้เรียนในการจัดทำส่วนการพูดคุยแบบไม่เปิดเผยตัว"
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: คุณสมบัตินี้ไม่สามารถเปิดใช้งานได้ขณะที่ระบบตรวจจับอัตโนมัติของตัวคั่นฟิลด์ถูกเปิดใช้งาน
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: คุณสมบัตินี้ไม่สามารถเปิดใช้งานได้ขณะที่ใช้อัฒภาคเป็นตัวคั่นฟิลด์
   this_feature_flag_enables_discussions_reporting_in_ad613bb9: |-
@@ -19372,7 +19409,6 @@ th:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       รายงานนี้จะแสดงกิจกรรมทั้งหมดจากผู้ใช้ที่ลงทะเบียนในบทเรียนทั้งหมด
         ในเทอมที่ระบุ ไฟล์ csv ที่ได้จะมีหนึ่งแถวต่อหนึ่งกิจกรรมของผู้เรียน
-        
         และจะมีหัวเรื่องต่อไปนี้: id กลุ่มย่อย, sis id กลุ่มย่อย,
         ชื่อกลุ่มย่อย, id บทเรียน, sis id บทเรียน, ชื่อบทเรียน, id เทอม, sis id เทอม,
         ชื่อเทอม, id ผู้ใช้, sis id ผู้ใช้, ชื่อผู้ใช้, ประเภทเนื้อหา, เนื้อหา, เวลาที่เปิดดู,
@@ -19403,6 +19439,7 @@ th:
   this_user_has_been_deleted_8caa45be: ผู้ใช้นี้ถูกลบแล้ว
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "ผู้ใช้นี้มีหลายบทบาทในบทเรียน การแก้ไขบทบาทจะเป็นการเขียนทับการลงทะเบียนในปัจจุบันทั้งหมดของคนเหล่านี้"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: ผู้ใช้นี้ปัจจุบันไม่สามารถเข้าไปยังบทเรียนได้
+  this_user_will_be_created_in_3b2a2b52: "ผู้ใช้นี้จะถูกจัดทำใน:"
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       กรณีเช่นนี้กำลังเกิดขึ้นอยู่แล้วสำหรับภาพที่เกี่ยวข้องแต่ไม่ใช่คำตอบ
       ทำให้เกิดข้อผิดพลาดของ CORS ขณะที่จัดทำแบบทดสอบในหนึ่งโดเมนและ
@@ -20804,6 +20841,7 @@ th:
   view_description_b6d8e52b: ดูรายละเอียด
   view_due_items_due_today_for_course_coursename_129e433: "ดู %{due} รายการที่มีกำหนดในวันนี้สำหรับบทเรียน %{courseName}"
   view_faculty_journals_ad0e8c8f: ดูบันทึกสำหรับวิชา
+  view_feature_options_at_an_account_level_a84cedbe: ดูตัวเลือกคุณสมบัติการทำงานในระดับบัญชีผู้ใช้
   view_feature_settings_at_an_account_level_ec7f5e10: ดูค่าปรับตั้งคุณสมบัติการทำงานระดับบัญชีผู้ใช้
   view_feedback_b88c99c: ดูข้อเสนอแนะ
   view_feedback_f2feabca: ดูข้อเสนอแนะ
@@ -20972,6 +21010,7 @@ th:
       ขณะเปิดใช้งาน หมายเหตุกำกับนี้จะแสดงปุ่ม “เข้าร่วม” ที่กิจกรรมในปฏิทินของ Canvas
        ในกำหนดการของผู้เรียน
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "หากเปิดใช้งานไว้ หมายเหตุกำกับนี้จะแสดงเครื่องมือเลือกผู้เรียนสำหรับผู้สังเกตการณ์ในแผงข้อมูล"
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "ขณะเปิดใช้งาน ค่าปรับตั้งนี้จะเปิดรายการสิ่งที่ต้องดำเนินการสำหรับผู้สอนอัตโนมัติในแท็บใหม่"
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "เมื่อเปิดใช้งาน จะเป็นการเปิดใช้งานฟังก์ชั่น “@mention” ในการพูดคุยของบทเรียน"
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "ขณะซ่อนเกรดสำหรับภารกิจที่ไม่เปิดเผยตัว เกรดจะถูกซ่อนไว้จากทุกคนในบทเรียน ค่าไม่เปิดเผยตัวตนจะถูกนำมาใช้ใหม่"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "เมื่อมีคนเข้ามาในบทเรียน นี่จะเป็นเพจที่คุณพบ  คุณสามารถตั้งค่าให้แสดงสตรีมกิจกรรม รายการหน่วยการเรียนในบทเรียน หลักสูตรหรือเพจกำหนดเองที่คุณจัดทำขึ้นเอง  ค่าเริ่มต้นคือสตรีมกิจกรรมของบทเรียน"
@@ -21023,7 +21062,7 @@ th:
       labels: 
         front_page: "%{frontPageText}"
       menu: 
-        use_front_page: ใช้เป็นหน้าแรก
+        use_front_page: "ใช้เป็น %{frontPageText}"
       published_indicator: เผยแพร่แล้ว
       toolbar_menu: 
         settings: ค่าปรับตั้ง

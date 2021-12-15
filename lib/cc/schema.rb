@@ -20,18 +20,17 @@
 module CC
   class Schema
     XSD_DIRECTORY = "lib/cc/xsd"
-    REGEX = /\.xsd$/
+    REGEX = /\.xsd$/.freeze
 
     def self.for_version(version)
       return nil unless whitelist.include?(version)
 
-      Rails.root + "#{XSD_DIRECTORY}/#{version}.xsd"
+      Rails.root.join("#{XSD_DIRECTORY}/#{version}.xsd")
     end
 
     def self.whitelist
-      @whitelist ||= Dir.entries(XSD_DIRECTORY).inject([]) do |memo, entry|
-        memo << entry.gsub(REGEX, '') if entry =~ REGEX
-        memo
+      @whitelist ||= Dir.entries(XSD_DIRECTORY).each_with_object([]) do |entry, memo|
+        memo << entry.gsub(REGEX, "") if REGEX.match?(entry)
       end
     end
   end

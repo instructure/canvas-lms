@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'English'
+require "English"
 
 module Exporters
   class Quizzes2Exporter
-    GROUP_NAME = 'Migrated Quizzes'
+    GROUP_NAME = "Migrated Quizzes"
 
     attr_accessor :course, :quiz
 
-    delegate :add_error, :to => :@content_export, :allow_nil => true
+    delegate :add_error, to: :@content_export, allow_nil: true
 
     def initialize(content_export)
       @content_export = content_export
@@ -72,7 +72,7 @@ module Exporters
 
       @_assignment_group = course.assignment_groups.find_or_create_by(
         name: GROUP_NAME,
-        workflow_state: 'available'
+        workflow_state: "available"
       )
     end
 
@@ -94,7 +94,7 @@ module Exporters
         unlock_at: quiz.unlock_at,
         lock_at: quiz.lock_at,
         assignment_group: assignment_group(failed_assignment),
-        workflow_state: new_quizzes_page_enabled? ? 'migrating' : 'unpublished',
+        workflow_state: new_quizzes_page_enabled? ? "migrating" : "unpublished",
         duplication_started_at: Time.zone.now,
         migrate_from_id: @quiz.id
       }

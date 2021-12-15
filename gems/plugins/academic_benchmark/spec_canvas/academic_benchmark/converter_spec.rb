@@ -91,8 +91,12 @@ describe AcademicBenchmark::Converter do
              "type" => "standards" } } } }
   end
 
+  subject(:converter) do
+    AcademicBenchmark::Converter.new(converter_settings)
+  end
+
   let(:raw_authority) do
-    raw_standard.dig('attributes', 'document', 'publication', 'authorities', 0)
+    raw_standard.dig("attributes", "document", "publication", "authorities", 0)
   end
   let(:authority_instance) do
     AcademicBenchmarks::Standards::Authority.from_hash(raw_authority)
@@ -109,10 +113,10 @@ describe AcademicBenchmark::Converter do
   let(:migration_settings) do
     {
       authority: @authority_guid,
-      converter_class: 'AcademicBenchmark::Converter',
+      converter_class: "AcademicBenchmark::Converter",
       document: @document_guid,
       import_immediately: true,
-      migration_type: 'academic_benchmark_importer',
+      migration_type: "academic_benchmark_importer",
       no_archive_file: true,
       skip_import_notification: true,
       skip_job_progress: true
@@ -132,8 +136,8 @@ describe AcademicBenchmark::Converter do
                                user_id: content_migration.user_id,
                                migration_options: { points_possible: 10,
                                                     mastery_points: 6,
-                                                    ratings: [{ :description => "Awesome", :points => 10 },
-                                                              { :description => "Not awesome", :points => 0 }] }
+                                                    ratings: [{ description: "Awesome", points: 10 },
+                                                              { description: "Not awesome", points: 0 }] }
                              })
   end
 
@@ -147,101 +151,97 @@ describe AcademicBenchmark::Converter do
     @user = admin_user
   end
 
-  subject(:converter) do
-    AcademicBenchmark::Converter.new(converter_settings)
-  end
-
-  describe '#export' do
-    context 'when content_migration settings are missing' do
+  describe "#export" do
+    context "when content_migration settings are missing" do
       before do
         allow(converter).to receive(:content_migration).and_return(nil)
       end
 
-      it 'raises error missing content_migration settings' do
+      it "raises error missing content_migration settings" do
         expect { converter.export }.to raise_error(Canvas::Migration::Error,
                                                    "Missing required content_migration settings")
       end
     end
 
-    context 'when user does not have rights to :manage_global_outcomes' do
+    context "when user does not have rights to :manage_global_outcomes" do
       before do
         @user = regular_user
       end
 
-      it 'raises error cannot manage global outcomes' do
+      it "raises error cannot manage global outcomes" do
         expect { converter.export }.to raise_error(Canvas::Migration::Error,
                                                    "User isn't allowed to edit global outcomes")
       end
     end
 
-    context 'when an authority guid is provided' do
+    context "when an authority guid is provided" do
       before do
-        @authority_guid = raw_authority['guid']
+        @authority_guid = raw_authority["guid"]
       end
 
-      it 'sets course outcomes based on authority guid data' do
+      it "sets course outcomes based on authority guid data" do
         expect(course = converter.export).to be_truthy
         expect(course["learning_outcomes"].count).to eql 1
         authority = course["learning_outcomes"].first
-        expect(authority['type']).to eql "learning_outcome_group"
-        expect(authority['title']).to eql "Alabama State Department of Education"
+        expect(authority["type"]).to eql "learning_outcome_group"
+        expect(authority["title"]).to eql "Alabama State Department of Education"
         expect(authority["outcomes"].count).to eql 1
         publication = authority["outcomes"].first
-        expect(publication['type']).to eql "learning_outcome_group"
-        expect(publication['title']).to eql "Course of Study"
+        expect(publication["type"]).to eql "learning_outcome_group"
+        expect(publication["title"]).to eql "Course of Study"
         expect(publication["outcomes"].count).to eq 1
         group1 = publication["outcomes"].first
-        expect(group1['type']).to eql "learning_outcome_group"
-        expect(group1['title']).to eql "Social Studies (2010)"
+        expect(group1["type"]).to eql "learning_outcome_group"
+        expect(group1["title"]).to eql "Social Studies (2010)"
         expect(group1["outcomes"].count).to eq 1
         group11 = group1["outcomes"].first
-        expect(group11['type']).to eql "learning_outcome_group"
-        expect(group11['title']).to eql "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution"
+        expect(group11["type"]).to eql "learning_outcome_group"
+        expect(group11["title"]).to eql "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution"
         expect(group11["outcomes"].count).to eq 1
         group111 = group11["outcomes"].first
-        expect(group111['type']).to eql "learning_outcome_group"
-        expect(group111['title']).to eql "SOC.5.8 - Identify major events of the American Revolution, "
+        expect(group111["type"]).to eql "learning_outcome_group"
+        expect(group111["title"]).to eql "SOC.5.8 - Identify major events of the American Revolution, "
         expect(group111["outcomes"].count).to eq 1
         outcome = group111["outcomes"].first
-        expect(outcome['type']).to eql "learning_outcome"
-        expect(outcome['title']).to eql "SOC.5.8.5"
-        expect(outcome['mastery_points']).to eql 6
-        expect(outcome['points_possible']).to eql 10
-        expect(outcome['ratings'].length).to eql 2
+        expect(outcome["type"]).to eql "learning_outcome"
+        expect(outcome["title"]).to eql "SOC.5.8.5"
+        expect(outcome["mastery_points"]).to eql 6
+        expect(outcome["points_possible"]).to eql 10
+        expect(outcome["ratings"].length).to eql 2
       end
 
-      context 'document without adoption year' do
+      context "document without adoption year" do
         let(:standard_instance) do
           dup_hash = raw_standard.dup
-          dup_hash['attributes']['document']['adopt_year'] = ""
+          dup_hash["attributes"]["document"]["adopt_year"] = ""
           AcademicBenchmarks::Standards::Standard.new(dup_hash)
         end
 
         let(:standard_instance2) do
           dup_hash = raw_standard2.dup
-          dup_hash['attributes']['document']['adopt_year'] = ""
+          dup_hash["attributes"]["document"]["adopt_year"] = ""
           AcademicBenchmarks::Standards::Standard.new(dup_hash)
         end
 
-        it 'does not append adoption year' do
+        it "does not append adoption year" do
           expect(course = converter.export).to be_truthy
           expect(course["learning_outcomes"].count).to eql 1
           authority = course["learning_outcomes"].first
           expect(authority["outcomes"].count).to eql 1
           publication = authority["outcomes"][0]
           expect(publication["outcomes"].count).to eq 1
-          expect(publication["outcomes"][0]['title']).to eq 'Social Studies'
+          expect(publication["outcomes"][0]["title"]).to eq "Social Studies"
         end
       end
 
-      context 'clarification standards' do
+      context "clarification standards" do
         let(:standard_instance2) do
           dup_hash = raw_standard2.dup
-          dup_hash['attributes']['utilizations'] = [{ "type" => "clarification" }]
+          dup_hash["attributes"]["utilizations"] = [{ "type" => "clarification" }]
           AcademicBenchmarks::Standards::Standard.new(dup_hash)
         end
 
-        it 'appends the description to the parent standard and treats the parent as an outcome' do
+        it "appends the description to the parent standard and treats the parent as an outcome" do
           expect(course = converter.export).to be_truthy
           authority = course["learning_outcomes"].first
           publication = authority["outcomes"].first

@@ -30,8 +30,8 @@ module Canvas::Plugins::Validators::SessionsValidator
 
       timeout = settings[key].to_f.minutes
       if timeout.to_i < 20.minutes.to_i
-        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.login_expiration_minimum',
-                                                'Session expiration must be 20 minutes or greater'))
+        plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.login_expiration_minimum",
+                                                "Session expiration must be 20 minutes or greater"))
       end
       result[key] = timeout.to_i / 60
     end

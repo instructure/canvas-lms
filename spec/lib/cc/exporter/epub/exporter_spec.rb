@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../cc_spec_helper'
+require_relative "../../cc_spec_helper"
 
 describe "Exporter" do
   include CC::Exporter::Epub
@@ -33,13 +33,13 @@ describe "Exporter" do
 
     @attachment = Attachment.create({
                                       context: course_factory,
-                                      filename: 'exportable-test-file',
+                                      filename: "exportable-test-file",
                                       uploaded_data: File.open(cartridge_path)
                                     })
 
     @attachment_without_modules = Attachment.create({
                                                       context: course_factory,
-                                                      filename: 'exportable-test-file',
+                                                      filename: "exportable-test-file",
                                                       uploaded_data: File.open(cartridge_without_modules_path)
                                                     })
   end
@@ -51,7 +51,7 @@ describe "Exporter" do
 
     it "sorts content by module" do
       expect(exporter.base_template).to eq "../templates/module_sorting_template.html.erb"
-      expect(exporter.templates.keys[0..4]).to eq([:title, :files, :toc, :syllabus, :announcements])
+      expect(exporter.templates.keys[0..4]).to eq(%i[title files toc syllabus announcements])
     end
 
     it "does not contain content type keys" do
@@ -64,19 +64,19 @@ describe "Exporter" do
     it "contains a syllabus for assignments and quizzes in modules" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:syllabus)).to be_truthy
+      expect(exporter.templates).to have_key(:syllabus)
     end
 
     it "contains a section for announcements" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:announcements)).to be_truthy
+      expect(exporter.templates).to have_key(:announcements)
     end
 
     it "contains a table of contents for items in modules" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:toc)).to be_truthy
+      expect(exporter.templates).to have_key(:toc)
     end
   end
 
@@ -86,7 +86,7 @@ describe "Exporter" do
     end
 
     it "falls back to sorting by content type" do
-      expect(exporter.templates.key?(:modules)).to be_falsey
+      expect(exporter.templates).not_to have_key(:modules)
     end
   end
 
@@ -100,25 +100,25 @@ describe "Exporter" do
     end
 
     it "does not contain a top-level templates key for module content" do
-      expect(exporter.templates.key?(:modules)).to be_falsey
+      expect(exporter.templates).not_to have_key(:modules)
     end
 
     it "contains a syllabus entry for all assignments and quizzes" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:syllabus)).to be_truthy
+      expect(exporter.templates).to have_key(:syllabus)
     end
 
     it "contains a section for announcements" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:announcements)).to be_truthy
+      expect(exporter.templates).to have_key(:announcements)
     end
 
     it "contains a table of contents for all items" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:toc)).to be_truthy
+      expect(exporter.templates).to have_key(:toc)
     end
   end
 end

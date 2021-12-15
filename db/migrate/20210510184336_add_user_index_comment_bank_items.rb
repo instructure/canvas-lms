@@ -32,7 +32,7 @@ class AddUserIndexCommentBankItems < ActiveRecord::Migration[6.0]
     add_index :comment_bank_items,
               :user_id,
               algorithm: :concurrently,
-              name: 'index_active_comment_bank_items_on_user',
+              name: "index_active_comment_bank_items_on_user",
               where: "workflow_state <> 'deleted'",
               if_not_exists: true
 

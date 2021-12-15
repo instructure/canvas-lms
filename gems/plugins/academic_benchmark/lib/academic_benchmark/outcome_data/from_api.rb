@@ -24,7 +24,7 @@ module AcademicBenchmark
         super(options.merge(AcademicBenchmark.config))
         unless partner_id.present? && partner_key.present?
           raise Canvas::Migration::Error,
-                'partner_id & partner_key are required'
+                "partner_id & partner_key are required"
         end
       end
       delegate :authority, :publication, :partner_id, :partner_key, to: :@options

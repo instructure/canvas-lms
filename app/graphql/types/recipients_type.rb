@@ -20,7 +20,7 @@
 
 module Types
   class RecipientsType < ApplicationObjectType
-    graphql_name 'Recipients'
+    graphql_name "Recipients"
 
     field :contexts_connection, Types::MessageableContextType.connection_type, null: true
     field :users_connection, Types::MessageableUserType.connection_type, null: true

@@ -16,7 +16,7 @@ For API resources, such as the API Change Log for additions, changes, deprecatio
 API Terms of Service
 ------
 
-Please carefully review <a href="https://www.canvaslms.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
+Please carefully review <a href="https://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
 
 Schema
 ------

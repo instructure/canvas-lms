@@ -22,7 +22,7 @@ class InvalidateBuiltInRoleCaches < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    if Account.root_accounts.non_shadow.count > 1 && Role.where(:workflow_state => "built_in", :root_account_id => nil).exists?
+    if Account.root_accounts.non_shadow.count > 1 && Role.where(workflow_state: "built_in", root_account_id: nil).exists?
       # otherwise we didn't bother changing role ids so there's nothing that needs to be cleared
       [[AccountUser, :account_users], [Enrollment, :enrollments]].each do |klass, cache_type|
         klass.find_ids_in_ranges(batch_size: 500_000) do |start_at, end_at|
@@ -41,8 +41,5 @@ class InvalidateBuiltInRoleCaches < ActiveRecord::Migration[5.2]
                               singleton: "clear_downstream_role_caches:#{Account.site_admin&.global_id}")
         &.clear_downstream_caches(:role_overrides)
     end
-  end
-
-  def down
   end
 end

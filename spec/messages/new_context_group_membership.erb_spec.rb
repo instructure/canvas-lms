@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_context_group_membership' do
+describe "new_context_group_membership" do
   before :once do
-    course_model(:reusable => true)
-    group = @course.groups.create!(:name => "some group")
+    course_model(reusable: true)
+    group = @course.groups.create!(name: "some group")
     user_model
     @membership = group.add_user(@user)
   end

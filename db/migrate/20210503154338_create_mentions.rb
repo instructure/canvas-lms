@@ -28,11 +28,11 @@ class CreateMentions < ActiveRecord::Migration[6.0]
         t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
         t.string :workflow_state, default: "active", null: false, limit: 255
         t.timestamps
-        t.index [:root_account_id, :id], unique: true, name: 'index_mentions_replica_identity'
+        t.index [:root_account_id, :id], unique: true, name: "index_mentions_replica_identity"
       end
     end
 
-    add_index :mentions, [:root_account_id, :id], name: 'index_mentions_replica_identity', algorithm: :concurrently, unique: true, if_not_exists: true
+    add_index :mentions, [:root_account_id, :id], name: "index_mentions_replica_identity", algorithm: :concurrently, unique: true, if_not_exists: true
     set_replica_identity(:mentions, :index_mentions_replica_identity)
   end
 

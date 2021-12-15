@@ -36,7 +36,7 @@ module CalendarConferencesHelper
     elsif conference_params[:title].present?
       context.web_conferences.build(valid_params).tap do |conf|
         conf.user = @current_user
-        conf.settings[:default_return_url] = named_context_url(context, :context_url, :include_host => true)
+        conf.settings[:default_return_url] = named_context_url(context, :context_url, include_host: true)
       end
     end
   end
@@ -65,7 +65,7 @@ module CalendarConferencesHelper
       end
     end.uniq
     # add contexts at end to preserve object comparison above
-    conference_types.each { |t| t['contexts'] = type_to_contexts_map[t] }
+    conference_types.each { |t| t["contexts"] = type_to_contexts_map[t] }
 
     js_env(
       conferences: {

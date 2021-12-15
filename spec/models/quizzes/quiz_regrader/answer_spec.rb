@@ -17,25 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support'
+require "active_support"
 
 describe Quizzes::QuizRegrader::Answer do
   let(:points) { 15 }
 
   let(:question) do
-    double(:id => 1, :question_data => { :id => 1,
-                                         :regrade_option => 'full_credit',
-                                         :points_possible => points },
-           :quiz_group => nil)
+    double(id: 1, question_data: { id: 1,
+                                   regrade_option: "full_credit",
+                                   points_possible: points },
+           quiz_group: nil)
   end
 
   let(:question_regrade) do
-    double(:quiz_question => question,
-           :regrade_option => "full_credit")
+    double(quiz_question: question,
+           regrade_option: "full_credit")
   end
 
   let(:answer) do
-    { :question_id => 1, :points => points, :text => "" }
+    { question_id: 1, points: points, text: "" }
   end
 
   let(:wrapper) do
@@ -76,9 +76,9 @@ describe Quizzes::QuizRegrader::Answer do
     sent_params = {}
     expect(Quizzes::SubmissionGrader).to receive(:score_question).at_least(:once) do |*args|
       sent_params, sent_answer_data = args
-      if question.question_data[:question_type] == 'multiple_answers_question'
+      if question.question_data[:question_type] == "multiple_answers_question"
         answer.each do |k, v|
-          next unless k.to_s.include?('answer')
+          next unless k.to_s.include?("answer")
 
           key = "question_#{question.id}_#{k}"
           expect(sent_answer_data[key]).to eq v
@@ -87,141 +87,141 @@ describe Quizzes::QuizRegrader::Answer do
         expect(sent_answer_data).to eq answer.merge("question_#{question.id}" => answer[:text])
       end
 
-      sent_params.merge(:points => points, :correct => correct)
+      sent_params.merge(points: points, correct: correct)
     end
   end
 
   describe "#initialize" do
-    it 'saves a reference to the passed answer hash' do
+    it "saves a reference to the passed answer hash" do
       expect(wrapper.answer).to eq answer
     end
 
-    it 'saves a reference to the passed question hash' do
+    it "saves a reference to the passed question hash" do
       expect(wrapper.question).to eq question
     end
 
-    it 'raises an error if the question has an unrecognized regrade_option' do
-      question_regrade = double(:quiz_question => question,
-                                :regrade_option => "be_a_jerk")
+    it "raises an error if the question has an unrecognized regrade_option" do
+      question_regrade = double(quiz_question: question,
+                                regrade_option: "be_a_jerk")
 
       expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to raise_error("Regrade option not valid!")
     end
 
-    it 'does not raise an error if question has recognized regrade_option' do
+    it "does not raise an error if question has recognized regrade_option" do
       Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS.each do |regrade_option|
-        question_regrade = double(:quiz_question => question,
-                                  :regrade_option => regrade_option)
+        question_regrade = double(quiz_question: question,
+                                  regrade_option: regrade_option)
         expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to_not raise_error
       end
     end
   end
 
-  describe '#regrade!' do
-    context 'full_credit regrade option' do
-      it 'returns the points possible for the question if the answer was not correct before' do
+  describe "#regrade!" do
+    context "full_credit regrade option" do
+      it "returns the points possible for the question if the answer was not correct before" do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
         answer[:points] = 0
         expect(wrapper.regrade!).to eq points
-        assert_answer_has_regrade_option!('full_credit')
+        assert_answer_has_regrade_option!("full_credit")
       end
 
-      it 'returns 0 if answer was previously correct' do
+      it "returns 0 if answer was previously correct" do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
         expect(wrapper.regrade!).to eq 0
-        assert_answer_has_regrade_option!('full_credit')
+        assert_answer_has_regrade_option!("full_credit")
       end
     end
 
-    context 'current_and_previous_correct regrade option' do
-      before { wrapper.regrade_option = 'current_and_previous_correct' }
+    context "current_and_previous_correct regrade option" do
+      before { wrapper.regrade_option = "current_and_previous_correct" }
 
-      it 'returns 0 if previously correct' do
+      it "returns 0 if previously correct" do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
         expect(wrapper.regrade!).to eq 0
-        assert_answer_has_regrade_option!('current_and_previous_correct')
+        assert_answer_has_regrade_option!("current_and_previous_correct")
       end
 
-      it 'returns points possible if previously wrong but now correct' do
+      it "returns points possible if previously wrong but now correct" do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
 
         expect(wrapper.regrade!).to eq points
-        assert_answer_has_regrade_option!('current_and_previous_correct')
+        assert_answer_has_regrade_option!("current_and_previous_correct")
       end
 
-      it 'returns points possible - previous score if previously partial correct' do
+      it "returns points possible - previous score if previously partial correct" do
         mark_original_answer_as!(:partial)
         previous_score = answer[:points]
         score_question_as!(:correct)
         expect(wrapper.regrade!).to eq points - previous_score
-        assert_answer_has_regrade_option!('current_and_previous_correct')
+        assert_answer_has_regrade_option!("current_and_previous_correct")
       end
 
-      it 'returns 0 if previously wrong and wrong now' do
+      it "returns 0 if previously wrong and wrong now" do
         mark_original_answer_as!(:wrong)
         score_question_as!(:wrong)
         expect(wrapper.regrade!).to eq 0
-        assert_answer_has_regrade_option!('current_and_previous_correct')
+        assert_answer_has_regrade_option!("current_and_previous_correct")
       end
     end
 
-    context 'current_correct_only regrade option' do
-      before { wrapper.regrade_option = 'current_correct_only' }
+    context "current_correct_only regrade option" do
+      before { wrapper.regrade_option = "current_correct_only" }
 
-      it 'returns points_possible - points if previously wrong but now correct' do
+      it "returns points_possible - points if previously wrong but now correct" do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
         expect(wrapper.regrade!).to eq points
-        assert_answer_has_regrade_option!('current_correct_only')
+        assert_answer_has_regrade_option!("current_correct_only")
       end
 
-      it 'returns 0 if previously correct and correct after regrading' do
+      it "returns 0 if previously correct and correct after regrading" do
         mark_original_answer_as!(:correct)
         score_question_as!(:correct)
         expect(wrapper.regrade!).to eq 0
-        assert_answer_has_regrade_option!('current_correct_only')
+        assert_answer_has_regrade_option!("current_correct_only")
       end
 
-      it 'returns difference if previously partial and partial after regrading' do
+      it "returns difference if previously partial and partial after regrading" do
         mark_original_answer_as!(:partial)
         score_question_as!(:partial)
         expect(wrapper.regrade!).to eq 5
-        assert_answer_has_regrade_option!('current_correct_only')
+        assert_answer_has_regrade_option!("current_correct_only")
       end
 
-      it 'returns -points if prev correct but wrong after regrading' do
+      it "returns -points if prev correct but wrong after regrading" do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
         expect(wrapper.regrade!).to eq(-points)
-        assert_answer_has_regrade_option!('current_correct_only')
+        assert_answer_has_regrade_option!("current_correct_only")
       end
 
-      it 'works with multiple_answer_questions' do
-        question.question_data.merge!(:question_type => 'multiple_answers_question')
-        answer.merge!(:answer_1 => "0", :answer_2 => "1")
+      it "works with multiple_answer_questions" do
+        question.question_data[:question_type] = "multiple_answers_question"
+        answer.merge!(answer_1: "0", answer_2: "1")
         mark_original_answer_as!(:correct)
         score_question_as!(:correct)
         expect(wrapper.regrade!).to eq 0
-        assert_answer_has_regrade_option!('current_correct_only')
+        assert_answer_has_regrade_option!("current_correct_only")
       end
     end
 
-    context 'no_regrade option' do
-      before { wrapper.regrade_option = 'no_regrade' }
+    context "no_regrade option" do
+      before { wrapper.regrade_option = "no_regrade" }
 
-      it 'returns 0 when regrading' do
+      it "returns 0 when regrading" do
         mark_original_answer_as!(:correct)
         expect(wrapper.regrade!).to eq 0
       end
     end
 
-    context 'disabled option' do
-      before { wrapper.regrade_option = 'disabled' }
+    context "disabled option" do
+      before { wrapper.regrade_option = "disabled" }
 
-      it 'returns 0 when regrading' do
+      it "returns 0 when regrading" do
         mark_original_answer_as!(:correct)
         expect(wrapper.regrade!).to eq 0
       end

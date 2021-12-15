@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream::Backend::ActiveRecord do
   let(:ar_type) do
@@ -53,7 +53,7 @@ describe EventStream::Backend::ActiveRecord do
         end
 
         def name
-          'shard_name'
+          "shard_name"
         end
 
         def active?
@@ -71,9 +71,9 @@ describe EventStream::Backend::ActiveRecord do
       active_record_type ar_cls
       add_index :optional_index do
         table :items_by_optional_index
-        entry_proc lambda { |record| [record.field, record.id] if record.id > 0 }
-        key_proc lambda { |i1, i2| [i1, i2] }
-        ar_scope_proc lambda { |_v1, _v2| ar_cls.where({ key: :val }) }
+        entry_proc ->(record) { [record.field, record.id] if record.id > 0 }
+        key_proc ->(i1, i2) { [i1, i2] }
+        ar_scope_proc ->(_v1, _v2) { ar_cls.where({ key: :val }) }
       end
     end
     s.raise_on_error = true
@@ -102,11 +102,11 @@ describe EventStream::Backend::ActiveRecord do
     end
 
     it "uses shard as fingerprint" do
-      expect(backend.database_fingerprint).to eq('shard_name')
+      expect(backend.database_fingerprint).to eq("shard_name")
     end
 
     it "uses shard as name" do
-      expect(backend.database_name).to eq('shard_name')
+      expect(backend.database_name).to eq("shard_name")
     end
   end
 end

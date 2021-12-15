@@ -24,8 +24,8 @@ describe DataFixup::ClearOldUserRootAccountIds do
     user_model
     user_model(root_account_ids: [a.id])
     user_model(root_account_ids: [a.id])
-    expect {
+    expect do
       described_class.run
-    }.to change { User.pluck(:root_account_ids).uniq }.from([[], [a.id]]).to([[]])
+    end.to change { User.pluck(:root_account_ids).uniq }.from([[], [a.id]]).to([[]])
   end
 end

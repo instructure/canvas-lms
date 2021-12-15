@@ -26,14 +26,14 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 begin
-  require '../../spec/coverage_tool.rb'
+  require "../../spec/coverage_tool"
   CoverageTool.start("canvas")
 rescue LoadError => e
   puts "Error: #{e}"
 end
 
 require "rails"
-Rails.env = 'test'
+Rails.env = "test"
 
 require "canvas_cassandra"
 require "yaml"
@@ -47,7 +47,7 @@ RSpec.configure do |config|
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
   #     --seed 1234
-  config.order = 'random'
+  config.order = "random"
 
   config.expect_with :rspec do |c|
     c.syntax = :expect

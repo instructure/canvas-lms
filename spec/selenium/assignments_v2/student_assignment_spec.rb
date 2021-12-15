@@ -17,41 +17,41 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative './page_objects/student_assignment_page_v2'
-require_relative '../common'
-require_relative '../rcs/pages/rce_next_page'
+require_relative "./page_objects/student_assignment_page_v2"
+require_relative "../common"
+require_relative "../rcs/pages/rce_next_page"
 
-describe 'as a student' do
+describe "as a student" do
   include RCENextPage
   include_context "in-process server selenium tests"
 
-  context 'on assignments 2 page' do
+  context "on assignments 2 page" do
     before(:once) do
       Account.default.enable_feature!(:assignments_2_student)
-      @course = course_factory(name: 'course', active_course: true)
-      @student = student_in_course(name: 'Student', course: @course, enrollment_state: :active).user
-      @teacher = teacher_in_course(name: 'teacher', course: @course, enrollment_state: :active).user
+      @course = course_factory(name: "course", active_course: true)
+      @student = student_in_course(name: "Student", course: @course, enrollment_state: :active).user
+      @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
 
-    context 'assignment details' do
+    context "assignment details" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'assignment',
+          name: "assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_text_entry'
+          submission_types: "online_text_entry"
         )
         rubric_model(
-          title: 'rubric',
+          title: "rubric",
           data: [{
             description: "Some criterion",
             points: 5,
-            id: 'crit1',
-            ratings: [{ description: "Good", points: 5, id: 'rat1', criterion_id: 'crit1' }]
+            id: "crit1",
+            ratings: [{ description: "Good", points: 5, id: "rat1", criterion_id: "crit1" }]
           }],
-          description: 'new rubric description'
+          description: "new rubric description"
         )
-        @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
+        @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: false)
       end
 
       before do
@@ -60,45 +60,45 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it 'shows submission workflow tracker status as Inprogress with no submission' do
+      it "shows submission workflow tracker status as Inprogress with no submission" do
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
       end
 
-      it 'shows assignment title' do
+      it "shows assignment title" do
         expect(StudentAssignmentPageV2.assignment_title(@assignment.title)).to_not be_nil
       end
 
-      it 'shows details toggle' do
+      it "shows details toggle" do
         expect(StudentAssignmentPageV2.details_toggle).to be_displayed
       end
 
-      it 'shows rubric toggle' do
+      it "shows rubric toggle" do
         expect(StudentAssignmentPageV2.rubric_toggle).to be_displayed
       end
 
-      it 'shows missing pill when assignment is late with no submission' do
+      it "shows missing pill when assignment is late with no submission" do
         expect(StudentAssignmentPageV2.missing_pill).to be_displayed
       end
 
-      it 'shows assignment due date' do
+      it "shows assignment due date" do
         expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
       end
 
-      it 'shows how many points possible the assignment is worth' do
+      it "shows how many points possible the assignment is worth" do
         expect(StudentAssignmentPageV2.points_possible_css(@assignment.points_possible)).to_not be_nil
       end
     end
 
-    context 'submitted assignments' do
+    context "submitted assignments" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'assignment',
+          name: "assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_upload'
+          submission_types: "online_upload"
         )
-        @file_attachment = attachment_model(content_type: 'application/pdf', context: @student)
-        @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@file_attachment])
+        @file_attachment = attachment_model(content_type: "application/pdf", context: @student)
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@file_attachment])
       end
 
       before do
@@ -107,34 +107,34 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it 'shows late pill when assignment is late with at least one submission' do
+      it "shows late pill when assignment is late with at least one submission" do
         expect(StudentAssignmentPageV2.late_pill).to be_displayed
       end
 
-      it 'changes the submit assignment button to try again button after the first submission is made' do
+      it "changes the submit assignment button to try again button after the first submission is made" do
         expect(StudentAssignmentPageV2.try_again_button).to be_displayed
       end
 
-      it 'shows submission workflow tracker status as submitted after the student submits' do
+      it "shows submission workflow tracker status as submitted after the student submits" do
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("SUBMITTED")
       end
 
-      it 'shows the file name of the submitted file and an option to download' do
+      it "shows the file name of the submitted file and an option to download" do
         expect(StudentAssignmentPageV2.attempt_tab).to include_text(@file_attachment.filename)
         expect(StudentAssignmentPageV2.attempt_tab).to include_text("Download")
       end
     end
 
-    context 'graded assignments' do
+    context "graded assignments" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'assignment',
+          name: "assignment",
           due_at: 5.days.from_now,
           points_possible: 10,
-          submission_types: 'online_text_entry'
+          submission_types: "online_text_entry"
         )
         @assignment.submit_homework(@student, { body: "blah" })
-        @assignment.grade_student(@student, grade: '4', grader: @teacher)
+        @assignment.grade_student(@student, grade: "4", grader: @teacher)
       end
 
       before do
@@ -143,17 +143,17 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it 'shows submission workflow tracker status as review feedback after the student is graded' do
+      it "shows submission workflow tracker status as review feedback after the student is graded" do
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
       end
 
-      it 'shows Cancel Attempt X button when a subsequent submission is in progress but not submitted' do
+      it "shows Cancel Attempt X button when a subsequent submission is in progress but not submitted" do
         StudentAssignmentPageV2.try_again_button.click
 
         expect(StudentAssignmentPageV2.cancel_attempt_button).to be_displayed
       end
 
-      it 'cancels attempt when Cancel Attempt button is selected during subsequent attempt' do
+      it "cancels attempt when Cancel Attempt button is selected during subsequent attempt" do
         StudentAssignmentPageV2.try_again_button.click
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
         StudentAssignmentPageV2.cancel_attempt_button.click
@@ -162,13 +162,13 @@ describe 'as a student' do
       end
     end
 
-    context 'text assignments' do
+    context "text assignments" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'text assignment',
+          name: "text assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_text_entry'
+          submission_types: "online_text_entry"
         )
       end
 
@@ -178,22 +178,22 @@ describe 'as a student' do
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
       end
 
-      it 'can be submitted', custom_timeout: 30 do
+      it "can be submitted", custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
         StudentAssignmentPageV2.submit_button_enabled
         StudentAssignmentPageV2.submit_assignment
 
-        expect(f('body')).to include_text("Hello")
+        expect(f("body")).to include_text("Hello")
       end
 
-      it 'is able to be saved as a draft', custom_timeout: 30 do
+      it "is able to be saved as a draft", custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
         in_frame tiny_rce_ifr_id do
-          expect(f('body')).to include_text("Hello")
+          expect(f("body")).to include_text("Hello")
         end
 
         expect(StudentAssignmentPageV2.footer).to include_text("Draft Saved")
@@ -201,18 +201,18 @@ describe 'as a student' do
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
         in_frame tiny_rce_ifr_id do
-          expect(f('body')).to include_text("Hello")
+          expect(f("body")).to include_text("Hello")
         end
       end
     end
 
-    context 'url assignments' do
+    context "url assignments" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'text assignment',
+          name: "text assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_url'
+          submission_types: "online_url"
         )
       end
 
@@ -222,7 +222,7 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it 'can to be submitted' do
+      it "can to be submitted" do
         url_text = "www.google.com"
         StudentAssignmentPageV2.create_url_draft(url_text)
         StudentAssignmentPageV2.submit_assignment
@@ -230,7 +230,7 @@ describe 'as a student' do
         expect(StudentAssignmentPageV2.url_submission_link).to include_text(url_text)
       end
 
-      it 'can be saved as a draft' do
+      it "can be saved as a draft" do
         url_text = "www.google.com"
         StudentAssignmentPageV2.create_url_draft(url_text)
 
@@ -239,19 +239,19 @@ describe 'as a student' do
         StudentAssignmentPageV2.submit_button
 
         refresh_page
-        expect(StudentAssignmentPageV2.url_text_box.attribute('value')).to include(url_text)
+        expect(StudentAssignmentPageV2.url_text_box.attribute("value")).to include(url_text)
       end
     end
 
     context "moduleSequenceFooter" do
       before do
-        @assignment = @course.assignments.create!(submission_types: 'online_upload')
+        @assignment = @course.assignments.create!(submission_types: "online_upload")
 
         # add items to module
         @module = @course.context_modules.create!(name: "My Module")
-        @item_before = @module.add_item(type: 'assignment', id: @course.assignments.create!(title: 'assignment BEFORE this one').id)
-        @module.add_item(type: 'assignment', id: @assignment.id)
-        @item_after = @module.add_item(type: 'assignment', id: @course.assignments.create!(title: 'assignment AFTER this one').id)
+        @item_before = @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment BEFORE this one").id)
+        @module.add_item(type: "assignment", id: @assignment.id)
+        @item_after = @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment AFTER this one").id)
 
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
@@ -264,13 +264,13 @@ describe 'as a student' do
       end
     end
 
-    context 'media assignments' do
+    context "media assignments" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'media assignment',
+          name: "media assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'media_recording'
+          submission_types: "media_recording"
         )
       end
 
@@ -289,13 +289,13 @@ describe 'as a student' do
       end
     end
 
-    context 'file upload assignments' do
+    context "file upload assignments" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'file upload assignment',
+          name: "file upload assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_upload'
+          submission_types: "online_upload"
         )
       end
 
@@ -325,17 +325,17 @@ describe 'as a student' do
       end
     end
 
-    context 'mark as done' do
+    context "mark as done" do
       before(:once) do
         @assignment = @course.assignments.create!(
-          name: 'mark as done assignment',
+          name: "mark as done assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'on_paper'
+          submission_types: "on_paper"
         )
-        @module = @course.context_modules.create!(name: 'Module 1')
-        @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
-        @module.completion_requirements = { @tag.id => { type: 'must_mark_done' } }
+        @module = @course.context_modules.create!(name: "Module 1")
+        @tag = @module.add_item({ id: @assignment.id, type: "assignment" })
+        @module.completion_requirements = { @tag.id => { type: "must_mark_done" } }
         @module.save!
       end
 
@@ -346,18 +346,18 @@ describe 'as a student' do
       end
 
       it "allows student to select and deselct mark as done button in the assignment footer" do
-        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text('Mark as done')
+        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text("Mark as done")
         StudentAssignmentPageV2.mark_as_done_toggle.click
-        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text('Done')
+        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text("Done")
         StudentAssignmentPageV2.mark_as_done_toggle.click
-        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text('Mark as done')
+        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text("Mark as done")
       end
     end
 
-    context 'turnitin' do
+    context "turnitin" do
       before(:once) do
         @turnitin_assignment = @course.assignments.create!(
-          submission_types: 'online_url',
+          submission_types: "online_url",
           turnitin_enabled: true
         )
       end

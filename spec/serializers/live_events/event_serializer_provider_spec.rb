@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe LiveEvents::EventSerializerProvider do
-  describe '#serialize' do
+  describe "#serialize" do
     subject { LiveEvents::EventSerializerProvider.serialize(asset) }
 
     let(:course) { course_model }
 
-    context 'when asset is a ContextExternalTool' do
-      let(:opts) { { domain: 'test.com' } }
+    context "when asset is a ContextExternalTool" do
+      let(:opts) { { domain: "test.com" } }
       let(:asset) { external_tool_model(context: course, opts: opts) }
 
-      it 'serializes the asset' do
+      it "serializes the asset" do
         expect(subject).to include(
           domain: asset.domain,
           asset_name: asset.name,
@@ -36,10 +36,10 @@ RSpec.describe LiveEvents::EventSerializerProvider do
       end
     end
 
-    context 'when asset is an Attachment' do
+    context "when asset is an Attachment" do
       let(:asset) { attachment_model }
 
-      it 'serializes the asset' do
+      it "serializes the asset" do
         expect(subject).to include(
           filename: asset.filename,
           display_name: asset.display_name
@@ -47,7 +47,7 @@ RSpec.describe LiveEvents::EventSerializerProvider do
       end
     end
 
-    context 'when asset class does not have a serializer' do
+    context "when asset class does not have a serializer" do
       let(:asset) { "'String' has no serializer" }
 
       it { is_expected.to eq({}) }

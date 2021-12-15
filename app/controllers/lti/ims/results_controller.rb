@@ -64,7 +64,7 @@ module Lti::IMS
     before_action :verify_line_item_in_context
     before_action :verify_result_in_line_item, only: %i[show]
 
-    MIME_TYPE = 'application/vnd.ims.lis.v2.resultcontainer+json'
+    MIME_TYPE = "application/vnd.ims.lis.v2.resultcontainer+json"
 
     # @API Show a collection of Results
     #

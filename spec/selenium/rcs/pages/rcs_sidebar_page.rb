@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module RCSSidebarPage
   # ---------------------- Controls ----------------------
@@ -50,23 +50,23 @@ module RCSSidebarPage
   end
 
   def new_page_link
-    f('#rcs-LinkToNewPage-btn-link')
+    f("#rcs-LinkToNewPage-btn-link")
   end
 
   def new_page_name_input
-    f('#new-page-name-input')
+    f("#new-page-name-input")
   end
 
   def new_page_submit_button
-    f('#rcs-LinkToNewPage-submit')
+    f("#rcs-LinkToNewPage-submit")
   end
 
   def wiki_body_anchor
-    f('#tinymce p a')
+    f("#tinymce p a")
   end
 
   def wiki_body_image
-    f('#tinymce p img')
+    f("#tinymce p img")
   end
 
   def sidebar_link(title)
@@ -90,15 +90,15 @@ module RCSSidebarPage
   end
 
   def sidebar
-    f('#right-side')
+    f("#right-side")
   end
 
   def sidebar_tabs
-    f('#editor_tabs')
+    f("#editor_tabs")
   end
 
   def sidebar_files
-    ff('#right-side li')
+    ff("#right-side li")
   end
 
   def sidebar_images
@@ -106,7 +106,7 @@ module RCSSidebarPage
   end
 
   def sidebar_image_tag
-    f('#right-side a img')
+    f("#right-side a img")
   end
 
   def close_button

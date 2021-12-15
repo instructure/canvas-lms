@@ -21,16 +21,16 @@ class CreateObserverAlerts < ActiveRecord::Migration[5.1]
   tag :predeploy
   def change
     create_table :observer_alerts do |t|
-      t.belongs_to :user_observation_link, :null => false, :foreign_key => { to_table: 'user_observers' }
-      t.belongs_to :observer_alert_threshold, :null => false, :foreign_key => true
+      t.belongs_to :user_observation_link, null: false, foreign_key: { to_table: "user_observers" }
+      t.belongs_to :observer_alert_threshold, null: false, foreign_key: true
 
-      t.belongs_to :context, :polymorphic => true
+      t.belongs_to :context, polymorphic: true
 
-      t.string :alert_type, :null => false
-      t.string :workflow_state, :default => 'unread', :null => false, :index => true
-      t.timestamp :action_date, :null => false
+      t.string :alert_type, null: false
+      t.string :workflow_state, default: "unread", null: false, index: true
+      t.timestamp :action_date, null: false
       t.string :html_url
-      t.string :title, :null => false
+      t.string :title, null: false
 
       t.timestamps
     end

@@ -29,24 +29,24 @@ module Lti
     before_action :user_in_context, only: :show
     before_action :tool_in_context, only: :group_index
 
-    USER_SERVICE = 'vnd.Canvas.User'
-    GROUP_INDEX_SERVICE = 'vnd.Canvas.GroupIndex'
+    USER_SERVICE = "vnd.Canvas.User"
+    GROUP_INDEX_SERVICE = "vnd.Canvas.GroupIndex"
     SERVICE_DEFINITIONS = [
       {
         id: USER_SERVICE,
-        endpoint: 'api/lti/users/{user_id}',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/users/{user_id}",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze,
       {
         id: GROUP_INDEX_SERVICE,
-        endpoint: 'api/lti/groups/{group_id}/users',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/groups/{group_id}/users",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze
     ].freeze
 
-    USER_INCLUDES = %w(email lti_id).freeze
+    USER_INCLUDES = %w[email lti_id].freeze
 
     def lti2_service_name
       USER_SERVICE
@@ -100,8 +100,8 @@ module Lti
                                   .joins(course: :assignments)
                                   .where(assignments: { id: tool_proxy_assignments })
                                   .where.not(
-                                    courses: { workflow_state: 'deleted' },
-                                    assignments: { workflow_state: 'deleted' }
+                                    courses: { workflow_state: "deleted" },
+                                    assignments: { workflow_state: "deleted" }
                                   )
                                   .exists?
       render_unauthorized_action unless user_visible_to_proxy

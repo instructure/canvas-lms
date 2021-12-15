@@ -22,18 +22,18 @@ require_dependency "lti/membership_service/course_group_collator"
 
 module Lti::MembershipService
   describe CourseGroupCollator do
-    context 'course with lots of groups' do
+    context "course with lots of groups" do
       before(:once) do
         course_with_teacher
-        @group_category = @course.group_categories.create!(name: 'Membership')
+        @group_category = @course.group_categories.create!(name: "Membership")
 
         (0..100).each do |n|
           @course.groups.create!(name: "Group #{n}", group_category: @group_category)
         end
       end
 
-      describe '#initialize' do
-        it 'sets sane defaults when no options are set' do
+      describe "#initialize" do
+        it "sets sane defaults when no options are set" do
           collator = CourseGroupCollator.new(@course)
 
           # expect(collator.role).to eq(::IMS::LIS::ContextType::URNs::Group)
@@ -41,7 +41,7 @@ module Lti::MembershipService
           expect(collator.page).to eq(1)
         end
 
-        it 'handles negative values for :page option' do
+        it "handles negative values for :page option" do
           opts = {
             page: -1
           }
@@ -50,7 +50,7 @@ module Lti::MembershipService
           expect(collator.page).to eq(1)
         end
 
-        it 'handles negative values for :per_page option' do
+        it "handles negative values for :per_page option" do
           opts = {
             per_page: -1
           }
@@ -59,7 +59,7 @@ module Lti::MembershipService
           expect(collator.per_page).to eq(Api.per_page)
         end
 
-        it 'handles values for :per_page option that exceed per page max' do
+        it "handles values for :per_page option that exceed per page max" do
           opts = {
             per_page: Api.max_per_page + 1
           }
@@ -68,7 +68,7 @@ module Lti::MembershipService
           expect(collator.per_page).to eq(Api.max_per_page)
         end
 
-        it 'generates a list of ::IMS::LTI::Models::Membership objects' do
+        it "generates a list of ::IMS::LTI::Models::Membership objects" do
           collator = CourseGroupCollator.new(@course)
           @teacher.reload
           memberships = collator.memberships
@@ -82,17 +82,17 @@ module Lti::MembershipService
         end
       end
 
-      describe '#context' do
-        it 'returns a course for the context' do
+      describe "#context" do
+        it "returns a course for the context" do
           collator = CourseGroupCollator.new(@course)
 
           expect(collator.context).to eq(@course)
         end
       end
 
-      context 'pagination' do
-        describe '#memberships' do
-          it 'returns the number of memberships specified by the per_page params' do
+      context "pagination" do
+        describe "#memberships" do
+          it "returns the number of memberships specified by the per_page params" do
             allow(Api).to receive(:per_page).and_return(1)
 
             collator = CourseGroupCollator.new(@course, per_page: 1, page: 1)
@@ -103,13 +103,13 @@ module Lti::MembershipService
           end
         end
 
-        describe '#next_page?' do
-          it 'returns true when there is an additional page of results' do
+        describe "#next_page?" do
+          it "returns true when there is an additional page of results" do
             collator = CourseGroupCollator.new(@course, page: 1)
             expect(collator.next_page?).to eq(true)
           end
 
-          it 'returns false when there are no more pages' do
+          it "returns false when there are no more pages" do
             collator = CourseGroupCollator.new(@course, page: 11)
             collator.memberships
             expect(collator.next_page?).to eq(false)

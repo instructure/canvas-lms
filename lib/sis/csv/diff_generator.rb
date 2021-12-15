@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'tempfile'
-require 'zip'
+require "tempfile"
+require "zip"
 
 module SIS
   module CSV
@@ -48,10 +48,10 @@ module SIS
             zip.add(csv[:file], csv[:fullpath])
           end
         end
-        { :file_io => File.open(output_path, 'rb'), :row_count => row_count }
+        { file_io: File.open(output_path, "rb"), row_count: row_count }
       end
 
-      VALID_ENROLLMENT_DROP_STATUS = %w(deleted inactive completed deleted_last_completed).freeze
+      VALID_ENROLLMENT_DROP_STATUS = %w[deleted inactive completed deleted_last_completed].freeze
 
       def generate_csvs(previous_csvs, current_csvs)
         generated = []
@@ -73,7 +73,7 @@ module SIS
 
           begin
             status = @batch.options && @batch.options[:diffing_drop_status].presence
-            status = 'deleted' unless import_type == :enrollment && VALID_ENROLLMENT_DROP_STATUS.include?(status)
+            status = "deleted" unless import_type == :enrollment && VALID_ENROLLMENT_DROP_STATUS.include?(status)
             diff = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath], status)
             io = diff[:file_io]
             generated << {
@@ -93,14 +93,14 @@ module SIS
       protected
 
       def class_for_importer(import_type)
-        SIS::CSV.const_get(import_type.to_s.camelcase + 'Importer')
+        SIS::CSV.const_get(import_type.to_s.camelcase + "Importer")
       end
 
-      def generate_diff(importer, previous_input, current_input, status = 'deleted')
+      def generate_diff(importer, previous_input, current_input, status = "deleted")
         previous_csv = ::CSV.open(previous_input, **CSVBaseImporter::PARSE_ARGS)
         current_csv = ::CSV.open(current_input, **CSVBaseImporter::PARSE_ARGS)
         diff = CsvDiff::Diff.new(importer.identifying_fields)
-        diff.generate(previous_csv, current_csv, deletes: ->(row) { row['status'] = status }, return_count: true)
+        diff.generate(previous_csv, current_csv, deletes: ->(row) { row["status"] = status }, return_count: true)
       end
 
       def add_warning(csv, message, failure: false)

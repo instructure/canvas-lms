@@ -22,6 +22,6 @@ class ChangeDefaultValueForPayload < ActiveRecord::Migration[5.1]
   tag :predeploy
 
   def change
-    change_column_default :anonymous_or_moderation_events, :payload, from: '{}', to: {}
+    change_column_default :anonymous_or_moderation_events, :payload, from: "{}", to: {}
   end
 end

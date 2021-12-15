@@ -19,7 +19,7 @@
 
 require_relative "../../common"
 require_relative "../../helpers/assignments_common"
-require_relative '../../helpers/gradebook_common'
+require_relative "../../helpers/gradebook_common"
 require_relative "../pages/speedgrader_page"
 
 describe "speed grader" do
@@ -30,21 +30,21 @@ describe "speed grader" do
   before(:once) do
     Account.site_admin.enable_feature!(:edit_submission_status_from_speedgrader)
 
-    course_with_teacher(name: 'Teacher1', active_user: true, active_enrollment: true, active_course: true).user
-    student_in_course(name: 'Student1', active_all: true).user
+    course_with_teacher(name: "Teacher1", active_user: true, active_enrollment: true, active_course: true).user
+    student_in_course(name: "Student1", active_all: true).user
 
     create_course_late_policy
     @assignment = @course.assignments.create!(
-      name: 'foo',
+      name: "foo",
       points_possible: 10,
-      submission_types: 'online_url',
+      submission_types: "online_url",
       due_at: 1.day.ago
     )
   end
 
   context "status menu" do
     it "loads with none status and appropriately handles transition to late status" do
-      @assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.days.ago)
+      @assignment.submit_homework(@student, body: "Attempt 1", submitted_at: 2.days.ago)
       @assignment.grade_student(@student, grade: 8, grader: @teacher)
 
       user_session(@teacher)
@@ -52,10 +52,10 @@ describe "speed grader" do
 
       expect(Speedgrader.status_menu_btn).to be_displayed
       Speedgrader.status_menu_btn.click
-      expect(Speedgrader.status_menu_option('None').attribute("aria-checked")).to eq "true"
+      expect(Speedgrader.status_menu_option("None").attribute("aria-checked")).to eq "true"
 
-      Speedgrader.status_menu_option('Late').click
-      expect(Speedgrader.submission_status_pill('late')).to be_displayed
+      Speedgrader.status_menu_option("Late").click
+      expect(Speedgrader.submission_status_pill("late")).to be_displayed
       expect(Speedgrader.time_late_input).to be_displayed
 
       replace_content(Speedgrader.time_late_input, 1, tab_out: true)
@@ -71,9 +71,9 @@ describe "speed grader" do
 
       expect(Speedgrader.status_menu_btn).to be_displayed
       Speedgrader.status_menu_btn.click
-      expect(Speedgrader.status_menu_option('Missing').attribute("aria-checked")).to eq "true"
+      expect(Speedgrader.status_menu_option("Missing").attribute("aria-checked")).to eq "true"
 
-      Speedgrader.status_menu_option('Excused').click
+      Speedgrader.status_menu_option("Excused").click
       expect(Speedgrader.grade_value).to eq "EX"
       submission = Submission.find_by(user_id: @student.id)
       expect(submission.excused).to eq true

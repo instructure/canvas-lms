@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/wiki_and_tiny_common'
-require_relative '../rcs/pages/rce_next_page'
+require_relative "../helpers/wiki_and_tiny_common"
+require_relative "../rcs/pages/rce_next_page"
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
   include_context "in-process server selenium tests"
@@ -41,7 +41,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
-      expect(f('#unauthorized_message')).to include_text(expected_error)
+      expect(f("#unauthorized_message")).to include_text(expected_error)
     end
 
     it "does not allow students to edit if marked for only teachers can edit" do
@@ -54,7 +54,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
-      expect(f("#content")).not_to contain_css('a.edit-wiki')
+      expect(f("#content")).not_to contain_css("a.edit-wiki")
     end
 
     it "allows students to edit wiki if any option but teachers is selected" do
@@ -67,7 +67,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
-      expect(f('a.edit-wiki')).to be_displayed
+      expect(f("a.edit-wiki")).to be_displayed
 
       # vars for 2nd wiki page with different permissions
       title2 = "test_page2"
@@ -78,7 +78,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages/#{title2}"
       wait_for_ajax_requests
 
-      expect(f('a.edit-wiki')).to be_displayed
+      expect(f("a.edit-wiki")).to be_displayed
     end
 
     it "allows students to create new pages if enabled" do
@@ -87,11 +87,11 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       get "/courses/#{@course.id}/pages"
       wait_for_ajax_requests
-      f('.new_page').click
-      wait_for_tiny(f('#wiki_page_body'))
+      f(".new_page").click
+      wait_for_tiny(f("#wiki_page_body"))
       f("#title").send_keys("new page")
 
-      expect_new_page_load { f('form.edit-form button.submit').click }
+      expect_new_page_load { f("form.edit-form button.submit").click }
       new_page = @course.wiki_pages.last
       expect(new_page).to be_published
     end
@@ -99,9 +99,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     it "does not allow students to add links to new pages" do
       skip("With new RCE you CAN select pages in this scenario")
       create_wiki_page("test_page", false, "public")
-      title = 'test_page'
+      title = "test_page"
       unpublished = false
-      edit_roles = 'public'
+      edit_roles = "public"
 
       create_wiki_page(title, unpublished, edit_roles)
 
@@ -114,15 +114,15 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       click_pages_accordion
       click_course_item_link(title)
 
-      expect(f("#content")).not_to contain_css('#rcs-LinkToNewPage-btn-link')
+      expect(f("#content")).not_to contain_css("#rcs-LinkToNewPage-btn-link")
     end
 
     it "allows students to add links to pages if they can create them" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
-      title = 'test_page'
+      title = "test_page"
       unpublished = false
-      edit_roles = 'public'
+      edit_roles = "public"
 
       create_wiki_page(title, unpublished, edit_roles)
       get "/courses/#{@course.id}/pages/somenewpage/edit" # page that doesn't exist
@@ -135,7 +135,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       click_pages_accordion
       click_course_item_link(title)
 
-      expect_new_page_load { f('form.edit-form button.submit').click }
+      expect_new_page_load { f("form.edit-form button.submit").click }
       new_page = @course.wiki_pages.last
       expect(new_page).to be_published
     end

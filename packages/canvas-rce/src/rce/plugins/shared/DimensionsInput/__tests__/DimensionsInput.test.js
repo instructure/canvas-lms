@@ -22,7 +22,8 @@ import {render} from '@testing-library/react'
 import DimensionsInput, {useDimensionsState} from '..'
 import DimensionsInputDriver from './DimensionsInputDriver'
 
-const NAN_ERROR = 'Width and height must be numbers'
+const W_AND_H_NAN_ERROR = 'Width and height must be numbers'
+const PERCENTAGE_NAN_ERROR = 'Percentage must be a number'
 const ASPECT_MESSAGE = 'Aspect ratio will be preserved'
 
 describe('RCE > Plugins > Shared > DimensionsInput', () => {
@@ -40,13 +41,16 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
     initialState = {
       appliedHeight: 300,
       appliedWidth: 150,
+      appliedPercentage: 70,
+      usePercentageUnits: false,
       naturalHeight: 200,
       naturalWidth: 100
     }
 
     props = {
       minWidth: 30,
-      minHeight: 60
+      minHeight: 60,
+      minPercentage: 10
     }
   })
 
@@ -56,25 +60,65 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
   })
 
   function SpecComponent() {
-    const {minHeight, minWidth} = props
-    dimensionsState = useDimensionsState(initialState, {minHeight, minWidth})
+    const {minHeight, minWidth, minPercentage} = props
+    dimensionsState = useDimensionsState(initialState, {minHeight, minWidth, minPercentage})
 
     return <DimensionsInput dimensionsState={dimensionsState} {...props} />
   }
 
   function renderComponent() {
     component = render(<SpecComponent />, {container: $container})
-    dimensions = new DimensionsInputDriver($container.firstChild)
+    dimensions = new DimensionsInputDriver($container)
   }
 
   function buildMinDimensionsError() {
     return `Must be at least ${props.minWidth} x ${props.minHeight}px`
   }
 
+  function buildMinPercentageError() {
+    return `Must be at least ${props.minPercentage}%`
+  }
+
+  describe('"Pixels" radio button', () => {
+    beforeEach(() => {
+      initialState.usePercentageUnits = false
+      renderComponent()
+    })
+
+    it('is selected', () => {
+      expect(dimensions.pixelsRadioButton.checked).toEqual(true)
+    })
+
+    it('is not selected', () => {
+      expect(dimensions.percentageRadioButton.checked).toEqual(false)
+    })
+  })
+
+  describe('"Percentage" radio button', () => {
+    beforeEach(() => {
+      initialState.usePercentageUnits = true
+      renderComponent()
+    })
+
+    it('is selected', () => {
+      expect(dimensions.percentageRadioButton.checked).toEqual(true)
+    })
+
+    it('is not selected', () => {
+      expect(dimensions.pixelsRadioButton.checked).toEqual(false)
+    })
+  })
+
   describe('"Width" field', () => {
     it('is present', () => {
       renderComponent()
       expect(dimensions.width).not.toBeNull()
+    })
+
+    it('is not present', () => {
+      initialState.usePercentageUnits = true
+      renderComponent()
+      expect(dimensions.width).toBeNull()
     })
 
     describe('when a width has been applied to the element', () => {
@@ -228,7 +272,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
         })
 
         it('displays a validation error with the field', () => {
-          expect(dimensions.messageTexts).toEqual([NAN_ERROR])
+          expect(dimensions.messageTexts).toEqual([W_AND_H_NAN_ERROR])
         })
       })
 
@@ -545,6 +589,12 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
       expect(dimensions.height).not.toBeNull()
     })
 
+    it('is not present', () => {
+      initialState.usePercentageUnits = true
+      renderComponent()
+      expect(dimensions.height).toBeNull()
+    })
+
     describe('when a height has been applied to the element', () => {
       it('uses the applied height as the field value', () => {
         renderComponent()
@@ -696,7 +746,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
         })
 
         it('displays a validation error with the field', () => {
-          expect(dimensions.messageTexts).toEqual([NAN_ERROR])
+          expect(dimensions.messageTexts).toEqual([W_AND_H_NAN_ERROR])
         })
       })
 
@@ -1007,6 +1057,345 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
 
         it('sets the dimensions state height to NaN', () => {
           expect(dimensionsState.height).toBeNaN()
+        })
+      })
+    })
+  })
+
+  describe('"Percentage" field', () => {
+    beforeEach(() => {
+      initialState.usePercentageUnits = true
+    })
+
+    it('is present', () => {
+      renderComponent()
+      expect(dimensions.percentage).not.toBeNull()
+    })
+
+    it('is not present', () => {
+      initialState.usePercentageUnits = false
+      renderComponent()
+      expect(dimensions.percentage).toBeNull()
+    })
+
+    describe('when the value changes', () => {
+      beforeEach(renderComponent)
+
+      it('updates the value in the field', () => {
+        dimensions.percentage.setValue('95')
+        expect(dimensions.percentage.value).toEqual('95')
+      })
+
+      describe('when the value includes whitespace', () => {
+        it('preserves the whitespace in the field', () => {
+          dimensions.percentage.setValue('  120  ')
+          expect(dimensions.percentage.value).toEqual('  120  ')
+        })
+
+        it('ignores whitespace in the dimensions state height', () => {
+          dimensions.percentage.setValue('  50  ')
+          expect(dimensionsState.percentage).toEqual(50)
+        })
+      })
+
+      describe('when the value is a decimal number', () => {
+        it('preserves the decimal value in the field', () => {
+          dimensions.percentage.setValue('19.51')
+          expect(dimensions.percentage.value).toEqual('19.51')
+        })
+
+        it('sets the dimensions state height with the rounded integer', () => {
+          dimensions.percentage.setValue('19.51')
+          expect(dimensionsState.percentage).toEqual(20)
+        })
+      })
+
+      describe('when the value is cleared', () => {
+        beforeEach(() => {
+          dimensions.percentage.setValue('')
+        })
+
+        it('sets the dimensions state percentage to null', () => {
+          expect(dimensionsState.percentage).toBeNull()
+        })
+
+        it('sets the dimensions state as invalid', () => {
+          expect(dimensionsState.isValid).toEqual(false)
+        })
+      })
+
+      describe('when the value is not a number', () => {
+        beforeEach(() => {
+          dimensions.percentage.setValue('twelve')
+        })
+
+        it('preserves the invalid value in the field', () => {
+          expect(dimensions.percentage.value).toEqual('twelve')
+        })
+
+        it('sets the dimensions state percentage to NaN', () => {
+          expect(dimensionsState.percentage).toBeNaN()
+        })
+      })
+
+      describe('when the value is not a finite number', () => {
+        beforeEach(() => {
+          dimensions.percentage.setValue('Infinity')
+        })
+
+        it('preserves the value in the field', () => {
+          expect(dimensions.percentage.value).toEqual('Infinity')
+        })
+
+        it('sets the dimensions state height to NaN', () => {
+          expect(dimensionsState.percentage).toBeNaN()
+        })
+
+        it('sets the dimensions state as invalid', () => {
+          expect(dimensionsState.isValid).toEqual(false)
+        })
+
+        it('displays a validation error with the field', () => {
+          expect(dimensions.messageTexts).toEqual([PERCENTAGE_NAN_ERROR])
+        })
+      })
+
+      describe('when the value is less than the minimum', () => {
+        beforeEach(() => {
+          dimensions.percentage.setValue(props.minPercentage)
+          dimensions.percentage.setValue(props.minPercentage - 1)
+        })
+
+        it('displays a validation error with the field', () => {
+          expect(dimensions.messageTexts).toEqual([buildMinPercentageError()])
+        })
+
+        it('sets the dimensions state as invalid', () => {
+          expect(dimensionsState.isValid).toEqual(false)
+        })
+      })
+
+      describe('when the value becomes valid', () => {
+        beforeEach(() => {
+          dimensions.percentage.setValue(props.minPercentage - 1)
+          dimensions.percentage.setValue(props.minPercentage)
+        })
+
+        it('removes the validation error from the field', () => {
+          expect(dimensions.messageTexts).toEqual([ASPECT_MESSAGE])
+        })
+
+        it('sets the dimensions state as valid', () => {
+          expect(dimensionsState.isValid).toEqual(true)
+        })
+      })
+
+      describe('when the value remains invalid', () => {
+        beforeEach(() => {
+          dimensions.percentage.setValue('')
+          dimensions.percentage.setValue(1)
+        })
+
+        it('displays a validation error with the field', () => {
+          expect(dimensions.messageTexts).toEqual([buildMinPercentageError()])
+        })
+
+        it('sets the dimensions state as invalid', () => {
+          expect(dimensionsState.isValid).toEqual(false)
+        })
+      })
+    })
+
+    describe('when decremented', () => {
+      describe('when a percentage has been applied to the element', () => {
+        beforeEach(() => {
+          renderComponent()
+          dimensions.percentage.decrement()
+        })
+
+        it('decrements the applied percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual(`${initialState.appliedPercentage - 1}`)
+        })
+
+        it('decrements the applied percentage for the dimensions state percentage', () => {
+          expect(dimensionsState.percentage).toEqual(initialState.appliedPercentage - 1)
+        })
+      })
+
+      describe('when no percentage has been applied to the element', () => {
+        beforeEach(() => {
+          initialState.appliedPercentage = null
+          renderComponent()
+          dimensions.percentage.decrement()
+        })
+
+        it('decrements the full percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual('99')
+        })
+
+        it('decrements the full percentage for the dimensions state percentage', () => {
+          expect(dimensionsState.percentage).toEqual(99)
+        })
+      })
+
+      describe('when the applied percentage is less than the minimum percentage', () => {
+        beforeEach(() => {
+          initialState.appliedPercentage = props.minPercentage - 1
+          renderComponent()
+          dimensions.percentage.decrement()
+        })
+
+        it('uses the minimum percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual(`${props.minPercentage}`)
+        })
+
+        it('uses the minimum percentage for the dimensions state percentage', () => {
+          expect(dimensionsState.percentage).toEqual(props.minPercentage)
+        })
+
+        it('removes the validation error from the field', () => {
+          expect(dimensions.messageTexts).toEqual([ASPECT_MESSAGE])
+        })
+
+        it('sets the dimensions state as valid', () => {
+          expect(dimensionsState.isValid).toEqual(true)
+        })
+      })
+
+      describe('when the value had been cleared', () => {
+        beforeEach(() => {
+          renderComponent()
+          dimensions.percentage.setValue('')
+          dimensions.percentage.decrement()
+        })
+
+        it('decrements the initial percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual(`${initialState.appliedPercentage - 1}`)
+        })
+
+        it('decrements the initial percentage for the dimensions state percentage', () => {
+          expect(dimensionsState.percentage).toEqual(initialState.appliedPercentage - 1)
+        })
+
+        it('removes the validation error from the field', () => {
+          expect(dimensions.messageTexts).toEqual([ASPECT_MESSAGE])
+        })
+
+        it('sets the dimensions state as valid', () => {
+          expect(dimensionsState.isValid).toEqual(true)
+        })
+      })
+
+      describe('when the value is not a number', () => {
+        beforeEach(() => {
+          renderComponent()
+          dimensions.percentage.setValue('twelve')
+          dimensions.percentage.decrement()
+        })
+
+        it('preserves the invalid value in the field', () => {
+          expect(dimensions.percentage.value).toEqual('twelve')
+        })
+
+        it('sets the dimensions state percentage to NaN', () => {
+          expect(dimensionsState.percentage).toBeNaN()
+        })
+      })
+    })
+
+    describe('when incremented', () => {
+      describe('when a percentage has been applied to the element', () => {
+        beforeEach(() => {
+          renderComponent()
+          dimensions.percentage.increment()
+        })
+
+        it('increments the applied height for the field value', () => {
+          expect(dimensions.percentage.value).toEqual(`${initialState.appliedPercentage + 1}`)
+        })
+
+        it('increments the applied height for the dimensions state height', () => {
+          expect(dimensionsState.percentage).toEqual(initialState.appliedPercentage + 1)
+        })
+      })
+
+      describe('when no percentage has been applied to the element', () => {
+        beforeEach(() => {
+          initialState.appliedPercentage = null
+          renderComponent()
+          dimensions.percentage.increment()
+        })
+
+        it('increments the full percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual('101')
+        })
+
+        it('increments the full percentage for the dimensions state percentage', () => {
+          expect(dimensionsState.percentage).toEqual(101)
+        })
+      })
+
+      describe('when the applied percentage is less than the minimum percentage', () => {
+        beforeEach(() => {
+          initialState.appliedPercentage = props.minPercentage - 2
+          renderComponent()
+          dimensions.percentage.increment()
+        })
+
+        it('uses the minimum percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual(`${props.minPercentage}`)
+        })
+
+        it('uses the minimum percentage for the dimensions state percentage', () => {
+          expect(dimensionsState.percentage).toEqual(props.minPercentage)
+        })
+
+        it('removes the validation error from the field', () => {
+          expect(dimensions.messageTexts).toEqual([ASPECT_MESSAGE])
+        })
+
+        it('sets the dimensions state as valid', () => {
+          expect(dimensionsState.isValid).toEqual(true)
+        })
+      })
+
+      describe('when the value had been cleared', () => {
+        beforeEach(() => {
+          renderComponent()
+          dimensions.percentage.setValue('')
+          dimensions.percentage.increment()
+        })
+
+        it('increments the initial percentage for the field value', () => {
+          expect(dimensions.percentage.value).toEqual(`${initialState.appliedPercentage + 1}`)
+        })
+
+        it('increments the initial percentage for the dimensions state height', () => {
+          expect(dimensionsState.percentage).toEqual(initialState.appliedPercentage + 1)
+        })
+
+        it('removes the validation error from the field', () => {
+          expect(dimensions.messageTexts).toEqual([ASPECT_MESSAGE])
+        })
+
+        it('sets the dimensions state as valid', () => {
+          expect(dimensionsState.isValid).toEqual(true)
+        })
+      })
+
+      describe('when the value is not a number', () => {
+        beforeEach(() => {
+          renderComponent()
+          dimensions.percentage.setValue('twelve')
+          dimensions.percentage.increment()
+        })
+
+        it('preserves the invalid value in the field', () => {
+          expect(dimensions.percentage.value).toEqual('twelve')
+        })
+
+        it('sets the dimensions state percentage to NaN', () => {
+          expect(dimensionsState.percentage).toBeNaN()
         })
       })
     })

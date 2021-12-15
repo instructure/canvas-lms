@@ -21,17 +21,17 @@ describe Quizzes::QuizStatisticsService do
   let_once(:course) { Course.new.tap { |course| course.id = 1 } }
   let_once :quiz do
     Quizzes::Quiz.new.tap do |quiz|
-      quiz.workflow_state = 'available'
+      quiz.workflow_state = "available"
       quiz.context = course
     end
   end
 
   subject { Quizzes::QuizStatisticsService.new quiz }
 
-  describe '#generate_aggregate_statistics' do
+  describe "#generate_aggregate_statistics" do
     let :student_analysis do
       quiz.quiz_statistics.build({
-                                   report_type: 'student_analysis',
+                                   report_type: "student_analysis",
                                    includes_all_versions: true,
                                    anonymous: false
                                  })
@@ -39,7 +39,7 @@ describe Quizzes::QuizStatisticsService do
 
     let :item_analysis do
       quiz.quiz_statistics.build({
-                                   report_type: 'item_analysis',
+                                   report_type: "item_analysis",
                                    includes_all_versions: true,
                                    anonymous: false
                                  })
@@ -51,28 +51,28 @@ describe Quizzes::QuizStatisticsService do
       end
     end
 
-    it 'generates for all quiz versions' do
+    it "generates for all quiz versions" do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
-      expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
+      expect(quiz).to receive(:current_statistics_for).with("student_analysis", {
                                                               includes_all_versions: true,
                                                               includes_sis_ids: true
                                                             }).and_return(student_analysis)
 
-      expect(quiz).to receive(:current_statistics_for).with('item_analysis').and_return(item_analysis)
+      expect(quiz).to receive(:current_statistics_for).with("item_analysis").and_return(item_analysis)
 
       subject.generate_aggregate_statistics(true)
     end
 
-    it 'generates for the latest quiz version' do
+    it "generates for the latest quiz version" do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
-      expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
+      expect(quiz).to receive(:current_statistics_for).with("student_analysis", {
                                                               includes_all_versions: false,
                                                               includes_sis_ids: true
                                                             }).and_return(student_analysis)
 
-      expect(quiz).to receive(:current_statistics_for).with('item_analysis').and_return(item_analysis)
+      expect(quiz).to receive(:current_statistics_for).with("item_analysis").and_return(item_analysis)
 
       subject.generate_aggregate_statistics(false)
     end

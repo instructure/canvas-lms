@@ -31,7 +31,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_dependency "utils/datetime_range_presenter"
 
 module Utils
@@ -42,7 +42,7 @@ module Utils
     end
 
     describe "#as_string" do
-      it 'can display a single datetime if theres no range' do
+      it "can display a single datetime if theres no range" do
         datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
         presenter = DatetimeRangePresenter.new(datetime)
         expect(presenter.as_string).to eq("Jan 1 at 12pm")
@@ -73,7 +73,7 @@ module Utils
         expect(presenter.as_string).to eq("Jan 1 by 12pm")
       end
 
-      it 'handles ranges' do
+      it "handles ranges" do
         datetime = Time.zone.parse("#{Time.now.year}-01-01 12:00:00")
         end_datetime = datetime + 2.days
         presenter = DatetimeRangePresenter.new(datetime, end_datetime)

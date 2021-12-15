@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class StudentInteractionsReport
   class << self
     include SeleniumDependencies
 
     def report
-      f('.report')
+      f(".report")
     end
 
     def current_score(student_name)
-      ff('td', student_row_number(student_name))[2].text
+      ff("td", student_row_number(student_name))[2].text
     end
 
     def student_row_number(student_name)

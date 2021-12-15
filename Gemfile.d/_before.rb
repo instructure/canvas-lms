@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 2.2.17', '<= 2.2.30'
+gem "bundler", ">= 2.2.17", "<= 2.2.30"
 
-if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
-   Gem::Version.new(Gem::VERSION) < Gem::Version.new('2.6.9')
+if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new("1.14.0") &&
+   Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.6.9")
   raise "Please run `gem update --system` to bring RubyGems to 2.6.9 or newer for use with Bundler 1.14 or newer."
 end
 
-if RUBY_ENGINE == 'truffleruby'
-  warn "TruffleRuby support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
+if RUBY_ENGINE == "truffleruby"
+  warn "TruffleRuby support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
-  warn "Ruby 3.0+ support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
+  warn "Ruby 3.0+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 end
-ruby '>= 2.7.0', '< 3.1'
+ruby ">= 2.7.0", "< 3.1"
 
 # force a different lockfile for next rails
 unless CANVAS_RAILS6_0

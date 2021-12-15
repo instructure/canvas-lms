@@ -22,13 +22,13 @@ describe "MustViewModuleProgressor" do
   def create_item(item_type)
     case item_type
     when :page
-      @course.wiki_pages.create!(title: 'some page')
+      @course.wiki_pages.create!(title: "some page")
     when :assignment
-      @course.assignments.create!(title: 'some assignment')
+      @course.assignments.create!(title: "some assignment")
     when :discussion
-      @course.discussion_topics.create!(title: 'some discussion')
+      @course.discussion_topics.create!(title: "some discussion")
     when :attachment
-      @course.attachments.create!(uploaded_data: stub_png_data('my-pic.png'))
+      @course.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
     else
       raise "unrecognized item type: #{item_type}"
     end
@@ -36,44 +36,44 @@ describe "MustViewModuleProgressor" do
 
   def item_type_of(item)
     case item
-    when WikiPage then 'page'
-    when Assignment then 'assignment'
-    when DiscussionTopic then 'discussion'
-    when Attachment then 'attachment'
+    when WikiPage then "page"
+    when Assignment then "assignment"
+    when DiscussionTopic then "discussion"
+    when Attachment then "attachment"
     else raise "unknown item type: #{item.class}"
     end
   end
 
-  def add_module_item(mod, item, requirement_type = 'must_view')
+  def add_module_item(mod, item, requirement_type = "must_view")
     item_tag = mod.add_item(id: item.id, type: item_type_of(item))
     mod.completion_requirements = mod.completion_requirements + [{ id: item_tag.id, type: requirement_type.to_s }]
     mod.save!
     item_tag
   end
 
-  def module_with_item_return_all(item_type, requirement_type = 'must_view')
-    mod = @course.context_modules.create!(name: 'some module')
+  def module_with_item_return_all(item_type, requirement_type = "must_view")
+    mod = @course.context_modules.create!(name: "some module")
     item = create_item(item_type)
     item_tag = add_module_item(mod, item, requirement_type)
     [mod, item, item_tag]
   end
 
-  def module_with_item(item_type, requirement_type = 'must_view')
+  def module_with_item(item_type, requirement_type = "must_view")
     module_with_item_return_all(item_type, requirement_type).first
   end
 
-  def sequential_module_progression_fixture(assignment_requirement_type: 'must_view')
-    mod = @course.context_modules.create!(name: 'some module')
+  def sequential_module_progression_fixture(assignment_requirement_type: "must_view")
+    mod = @course.context_modules.create!(name: "some module")
     initial_page = @course.wiki_pages.create!(title: "initial page")
-    initial_page_tag = mod.add_item(id: initial_page.id, type: 'page')
+    initial_page_tag = mod.add_item(id: initial_page.id, type: "page")
     assignment = @course.assignments.create!(title: "some assignment")
-    assignment_tag = mod.add_item(id: assignment.id, type: 'assignment')
+    assignment_tag = mod.add_item(id: assignment.id, type: "assignment")
     final_page = @course.wiki_pages.create!(title: "some page")
-    final_page_tag = mod.add_item(id: final_page.id, type: 'page')
+    final_page_tag = mod.add_item(id: final_page.id, type: "page")
     mod.completion_requirements = {
-      initial_page_tag.id => { type: 'must_view' },
+      initial_page_tag.id => { type: "must_view" },
       assignment_tag.id => { type: assignment_requirement_type },
-      final_page_tag.id => { type: 'must_view' },
+      final_page_tag.id => { type: "must_view" },
     }
     mod.require_sequential_progress = true
     mod.save!
@@ -92,7 +92,7 @@ describe "MustViewModuleProgressor" do
 
     # needed to get updated info as progress is made
     it "calls evaluate_for on modules" do
-      @course.context_modules.create!(name: 'some module')
+      @course.context_modules.create!(name: "some module")
       expect_any_instance_of(ContextModule).to receive(:evaluate_for)
       progressor = MustViewModuleProgressor.new(@student, @course)
       progressor.make_progress
@@ -100,7 +100,7 @@ describe "MustViewModuleProgressor" do
 
     it "marks several must_view requirements in random access module as viewed" do
       mod, _, first_page_tag = module_with_item_return_all(:page)
-      add_module_item(mod, create_item(:assignment), 'must_submit')
+      add_module_item(mod, create_item(:assignment), "must_submit")
       second_page_tag = add_module_item(mod, create_item(:page))
 
       progression = mod.find_or_create_progression(@student)
@@ -112,8 +112,8 @@ describe "MustViewModuleProgressor" do
 
       actual = progression.requirements_met.sort_by { |req| req[:id] }
       expected = [
-        { id: first_page_tag.id, type: 'must_view' },
-        { id: second_page_tag.id, type: 'must_view' },
+        { id: first_page_tag.id, type: "must_view" },
+        { id: second_page_tag.id, type: "must_view" },
       ].sort_by { |ex| ex[:id] }
       expect(actual).to eq(expected)
     end
@@ -124,7 +124,7 @@ describe "MustViewModuleProgressor" do
         module_with_item(:page),
       ]
 
-      mods[1].prerequisites = [{ id: mods[0].id, name: mods[0].name, type: 'context_module' }]
+      mods[1].prerequisites = [{ id: mods[0].id, name: mods[0].name, type: "context_module" }]
       mods[1].save!
 
       progressor = MustViewModuleProgressor.new(@student, @course)
@@ -133,7 +133,7 @@ describe "MustViewModuleProgressor" do
       @course.context_modules.each do |mod|
         progression = mod.find_or_create_progression(@student)
         tag = mod.content_tags.first
-        expect(progression.requirements_met).to eq([{ id: tag.id, type: 'must_view' }])
+        expect(progression.requirements_met).to eq([{ id: tag.id, type: "must_view" }])
       end
     end
 
@@ -141,10 +141,10 @@ describe "MustViewModuleProgressor" do
       mods = (1..2).map do |i|
         @course.context_modules.create!(name: "module #{i}")
       end
-      add_module_item(mods[0], create_item(:assignment), 'must_submit')
+      add_module_item(mods[0], create_item(:assignment), "must_submit")
       add_module_item(mods[1], create_item(:page))
 
-      mods[1].prerequisites = [{ id: mods[0].id, name: mods[0].name, type: 'context_module' }]
+      mods[1].prerequisites = [{ id: mods[0].id, name: mods[0].name, type: "context_module" }]
       mods[1].save!
 
       progressor = MustViewModuleProgressor.new(@student, @course)
@@ -156,7 +156,7 @@ describe "MustViewModuleProgressor" do
 
     it "is blocked by sequential progress" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: "must_contribute"
       )
       mod = sequence[:mod]
       progressor = MustViewModuleProgressor.new(@student, @course)
@@ -164,7 +164,7 @@ describe "MustViewModuleProgressor" do
 
       progression = mod.reload.find_or_create_progression(@student)
       expect(progression.requirements_met).to eq([
-                                                   { id: sequence[:initial_page][:tag].id, type: 'must_view' }
+                                                   { id: sequence[:initial_page][:tag].id, type: "must_view" }
                                                  ])
     end
 
@@ -181,7 +181,7 @@ describe "MustViewModuleProgressor" do
 
     it "can follow sequential progress through already completed non-must-view items" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: "must_contribute"
       )
       mod = sequence[:mod]
       mod.update_for(@student, :contributed, sequence[:assignment][:tag])
@@ -247,7 +247,7 @@ describe "MustViewModuleProgressor" do
 
     it "proceeds through unpublished assignments for sequential modules" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: "must_contribute"
       )
       mod = sequence[:mod]
 
@@ -260,8 +260,8 @@ describe "MustViewModuleProgressor" do
       progression = mod.reload.find_or_create_progression(@student)
       reqs = progression.requirements_met.sort_by { |req| req[:id] }
       expected = [
-        { id: sequence[:initial_page][:tag].id, type: 'must_view' },
-        { id: sequence[:final_page][:tag].id, type: 'must_view' },
+        { id: sequence[:initial_page][:tag].id, type: "must_view" },
+        { id: sequence[:final_page][:tag].id, type: "must_view" },
       ].sort_by { |ex| ex[:id] }
       expect(reqs).to eq expected
     end
@@ -269,7 +269,7 @@ describe "MustViewModuleProgressor" do
     # items can be unpublished separately from their content
     it "proceeds through modules with unpublished content tags" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: "must_contribute"
       )
       mod = sequence[:mod]
 
@@ -284,12 +284,12 @@ describe "MustViewModuleProgressor" do
     end
 
     it "proceeds through modules with unpublished assignments" do
-      first_mod, assignment = module_with_item_return_all(:assignment, 'must_contribute')
+      first_mod, assignment = module_with_item_return_all(:assignment, "must_contribute")
       first_page = create_item(:page)
       first_page_tag = add_module_item(first_mod, first_page)
 
       second_mod, _, second_page_tag = module_with_item_return_all(:page)
-      second_mod.prerequisites = [{ id: first_mod.id, name: first_mod.name, type: 'context_module' }]
+      second_mod.prerequisites = [{ id: first_mod.id, name: first_mod.name, type: "context_module" }]
       second_mod.save!
 
       assignment.unpublish!
@@ -299,10 +299,10 @@ describe "MustViewModuleProgressor" do
       progressor.make_progress
 
       first_progression = first_mod.find_or_create_progression(@student)
-      expect(first_progression.requirements_met).to eq([{ id: first_page_tag.id, type: 'must_view' }])
+      expect(first_progression.requirements_met).to eq([{ id: first_page_tag.id, type: "must_view" }])
 
       second_progression = second_mod.find_or_create_progression(@student)
-      expect(second_progression.requirements_met).to eq([{ id: second_page_tag.id, type: 'must_view' }])
+      expect(second_progression.requirements_met).to eq([{ id: second_page_tag.id, type: "must_view" }])
     end
 
     it "triggers completion events" do
@@ -318,7 +318,7 @@ describe "MustViewModuleProgressor" do
       second_student = @student
 
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: "must_contribute"
       )
       mod = sequence[:mod]
       assignment = sequence[:assignment][:item]
@@ -352,7 +352,7 @@ describe "MustViewModuleProgressor" do
     it "does not progress items in locked modules" do
       first_mod = module_with_item(:page)
       second_mod = module_with_item(:page)
-      second_mod.prerequisites = [{ id: first_mod.id, name: first_mod.name, type: 'context_module' }]
+      second_mod.prerequisites = [{ id: first_mod.id, name: first_mod.name, type: "context_module" }]
       second_mod.save!
 
       first_mod.unlock_at = Time.now.utc + 2.days
@@ -369,15 +369,15 @@ describe "MustViewModuleProgressor" do
     end
   end
 
-  describe '#current_progress' do
+  describe "#current_progress" do
     before :once do
       course_with_student(active_all: true)
-      @module, @assignment = module_with_item_return_all(:assignment, 'must_contribute')
+      @module, @assignment = module_with_item_return_all(:assignment, "must_contribute")
     end
 
     it "exports module status into a hash" do
       progress = MustViewModuleProgressor.new(@student, @course).current_progress
-      expect(progress[@module.id][:status]).to eq 'unlocked'
+      expect(progress[@module.id][:status]).to eq "unlocked"
       expect(progress[@module.id][:items].keys.length).to eq 1
     end
 
@@ -390,16 +390,16 @@ describe "MustViewModuleProgressor" do
     it "does not create progressions for non-enrolled admins and allow view if appropriate" do
       account_admin_user
       progress = MustViewModuleProgressor.new(@admin, @course).current_progress
-      expect(progress[@module.id][:status]).to eq 'unlocked'
+      expect(progress[@module.id][:status]).to eq "unlocked"
       expect(ContextModuleProgression.where(user: @admin, context_module: @module).count).to eq 0
     end
 
     it "does not create progressions for non-enrolled non-admins" do
       course_factory(is_public: true, active_all: true)
       user_factory(active_all: true)
-      modul = module_with_item(:assignment, 'must_contribute')
+      modul = module_with_item(:assignment, "must_contribute")
       progress = MustViewModuleProgressor.new(@user, @course).current_progress
-      expect(progress[modul.id][:status]).to eq 'unlocked'
+      expect(progress[modul.id][:status]).to eq "unlocked"
       expect(ContextModuleProgression.where(user: @user, context_module: modul).count).to eq 0
     end
   end

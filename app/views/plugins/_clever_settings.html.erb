@@ -19,7 +19,7 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
     <table style="width: 600px;" class="formtable">
       <tr>
-        <td colspan="2"><%= mt(<<-TEXT, clever_url: "http://apps.clever.com/signup", callback_url: clever_callback_url)
+        <td colspan="2"><%= mt(<<~TEXT, clever_url: "http://apps.clever.com/signup", callback_url: clever_callback_url)
 You will need to [register an application on Clever](%{clever_url}).
 You should configure %{callback_url} as the redirect URL.
 After you create your app, make a note of the Client ID and Client Secret, and enter them here.

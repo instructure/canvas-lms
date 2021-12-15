@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/gradebooks/grade_summary" do
   it "renders" do
     course_with_student
     view_context
-    @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(title: "some assignment")
     assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
@@ -34,11 +34,11 @@ describe "/gradebooks/grade_summary" do
     course_with_student
     @course.hide_final_grades = true
     view_context
-    @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(title: "some assignment")
     assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
-    page = Nokogiri('<document>' + response.body + '</document>')
+    page = Nokogiri("<document>" + response.body + "</document>")
     expect(page.css(".final_grade").length).to eq 0
   end
 
@@ -48,7 +48,7 @@ describe "/gradebooks/grade_summary" do
     @student = @user
     @user = @teacher
     view_context
-    @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(title: "some assignment")
     presenter = assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     expect(presenter.student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"
@@ -61,15 +61,15 @@ describe "/gradebooks/grade_summary" do
     course_with_teacher
     student_in_course(active_all: true)
     view_context
-    a = @course.assignments.create!(:title => 'some assignment', :submission_types => ['online_text_entry'])
-    sub = a.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
-    sub.add_comment :author => @teacher, :media_comment_id => '0_abcdefgh', :media_comment_type => 'audio'
-    sub.add_comment :author => @teacher, :media_comment_id => '0_ijklmnop', :media_comment_type => 'video'
+    a = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"])
+    sub = a.submit_homework @student, submission_type: "online_text_entry", body: "o hai"
+    sub.add_comment author: @teacher, media_comment_id: "0_abcdefgh", media_comment_type: "audio"
+    sub.add_comment author: @teacher, media_comment_id: "0_ijklmnop", media_comment_type: "video"
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
     doc = Nokogiri::HTML5.fragment response.body
-    expect(doc.at_css('.audio_comment ~ span.media_comment_id').text).to eql '0_abcdefgh'
-    expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
+    expect(doc.at_css(".audio_comment ~ span.media_comment_id").text).to eql "0_abcdefgh"
+    expect(doc.at_css(".video_comment ~ span.media_comment_id").text).to eql "0_ijklmnop"
   end
 
   it "shows media comments with text included" do
@@ -77,23 +77,23 @@ describe "/gradebooks/grade_summary" do
     course_with_teacher
     student_in_course(active_all: true)
     view_context
-    a = @course.assignments.create!(title: 'some assignment', submission_types: ['online_text_entry'])
+    a = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"])
     sub = a.submit_homework(@student, submission_type: "online_text_entry", body: "o hai")
-    sub.add_comment(author: @teacher, media_comment_id: '0_ijklmnop', media_comment_type: 'video',
+    sub.add_comment(author: @teacher, media_comment_id: "0_ijklmnop", media_comment_type: "video",
                     comment: "hello")
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render("gradebooks/grade_summary")
     doc = Nokogiri::HTML5.fragment response.body
-    expect(doc.at_css('.comment_media > span:first-child').text).to eql 'hello'
-    expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
+    expect(doc.at_css(".comment_media > span:first-child").text).to eql "hello"
+    expect(doc.at_css(".video_comment ~ span.media_comment_id").text).to eql "0_ijklmnop"
   end
 
   it "shows a disabled message for grade stats for the test student" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @student = @course.student_view_student
     @user = @teacher
     view_context
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 10)
+    a = @course.assignments.create!(title: "some assignment", points_possible: 10)
     a.grade_student(@student, grade: "10", grader: @teacher)
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
@@ -106,9 +106,9 @@ describe "/gradebooks/grade_summary" do
       course_with_teacher
       student_in_course(active_all: true)
 
-      @assignment = @course.assignments.create!(title: 'Moderated Assignment', anonymous_grading: true)
+      @assignment = @course.assignments.create!(title: "Moderated Assignment", anonymous_grading: true)
       @assignment.ensure_post_policy(post_manually: true)
-      @assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
+      @assignment.submit_homework @student, submission_type: "online_text_entry", body: "o hai"
       @assignment.grade_student(@student, score: 10, grader: @teacher)
 
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
@@ -126,7 +126,7 @@ describe "/gradebooks/grade_summary" do
       it "is hidden for a non-submitting student" do
         view_context
         new_student = User.create!
-        @course.enroll_student(new_student, enrollment_state: 'active')
+        @course.enroll_student(new_student, enrollment_state: "active")
         assign(:presenter, GradeSummaryPresenter.new(@course, new_student, @student.id))
         user_session(new_student)
         render "gradebooks/grade_summary"
@@ -164,8 +164,8 @@ describe "/gradebooks/grade_summary" do
     let(:site_admin) { site_admin_user }
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
     let(:student) { student_in_course(course: course, active_all: true).user }
-    let(:attachment) { attachment_model(context: student, content_type: 'text/plain') }
-    let(:state) { 'acceptable' }
+    let(:attachment) { attachment_model(context: student, content_type: "text/plain") }
+    let(:state) { "acceptable" }
 
     before do
       assign(:context, course)
@@ -174,9 +174,9 @@ describe "/gradebooks/grade_summary" do
 
     context "when there is no turnitin_data" do
       context "when an assignment is not anonymous" do
-        let(:assignment) { course.assignments.create!(submission_types: 'online_upload') }
+        let(:assignment) { course.assignments.create!(submission_types: "online_upload") }
 
-        before { assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment]) }
+        before { assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment]) }
 
         context "when viewed by the submitting student" do
           let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
@@ -211,10 +211,10 @@ describe "/gradebooks/grade_summary" do
         }
       end
 
-      let(:assignment) { course.assignments.create!(submission_types: 'online_upload') }
+      let(:assignment) { course.assignments.create!(submission_types: "online_upload") }
 
       before do
-        submission = assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment])
+        submission = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
         submission.update_attribute :turnitin_data, turnitin_data
       end
 
@@ -275,12 +275,12 @@ describe "/gradebooks/grade_summary" do
 
     context "when an assignment is anonymous" do
       let(:assignment) do
-        course.assignments.create!(title: 'hi', submission_types: 'online_upload', anonymous_grading: true)
+        course.assignments.create!(title: "hi", submission_types: "online_upload", anonymous_grading: true)
       end
 
       before do
         assignment.ensure_post_policy(post_manually: true)
-        assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello')
+        assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
         assignment.grade_student(student, score: 10, grader: teacher)
       end
 
@@ -316,7 +316,7 @@ describe "/gradebooks/grade_summary" do
         context "when the submission has an associated originality report" do
           before do
             assignment.submission_for_student(student).originality_reports.create!(
-              workflow_state: 'scored',
+              workflow_state: "scored",
               originality_score: 88
             )
           end
@@ -369,7 +369,7 @@ describe "/gradebooks/grade_summary" do
 
         it "always shows plagiarism info when the submission has an originality report" do
           assignment.submission_for_student(student).originality_reports.create!(
-            workflow_state: 'scored',
+            workflow_state: "scored",
             originality_score: 88
           )
 
@@ -395,7 +395,7 @@ describe "/gradebooks/grade_summary" do
         assign(:current_user, teacher)
       end
 
-      let(:assignment) { course.assignments.create!(submission_types: 'online_upload') }
+      let(:assignment) { course.assignments.create!(submission_types: "online_upload") }
       let(:submission) { assignment.submission_for_student(student) }
       let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
       let(:icon_css_query) { "i.icon-empty" }
@@ -431,7 +431,7 @@ describe "/gradebooks/grade_summary" do
 
       it "displays an updated plagiarism indicator when the assignment has an originality report" do
         submission.originality_reports.create!(
-          workflow_state: 'scored',
+          workflow_state: "scored",
           originality_score: 80
         )
 
@@ -445,7 +445,7 @@ describe "/gradebooks/grade_summary" do
     let_once(:course) { Course.create! }
     let_once(:student) { course.enroll_student(User.create!, active_all: true).user }
     let_once(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
-    let_once(:assignment) { course.assignments.create!(title: 'hi') }
+    let_once(:assignment) { course.assignments.create!(title: "hi") }
     let_once(:submission) { assignment.submissions.find_by!(user: student) }
 
     before(:once) do

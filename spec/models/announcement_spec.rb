@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe Announcement do
   it "creates a new instance given valid attributes" do
@@ -28,7 +28,7 @@ describe Announcement do
 
   describe "locking" do
     it "locks if its course has the lock_all_announcements setting" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
 
       @course.lock_all_announcements = true
       @course.save!
@@ -42,7 +42,7 @@ describe Announcement do
     end
 
     it "does not lock if its course does not have the lock_all_announcements setting" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
 
       announcement = @course.announcements.create!(valid_announcement_attributes)
 
@@ -54,8 +54,8 @@ describe Announcement do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
-      announcement = course.announcements.build(valid_announcement_attributes.merge(:delayed_post_at => Time.now + 1.week))
-      announcement.workflow_state = 'post_delayed'
+      announcement = course.announcements.build(valid_announcement_attributes.merge(delayed_post_at: Time.now + 1.week))
+      announcement.workflow_state = "post_delayed"
       announcement.save!
 
       expect(announcement).to be_post_delayed
@@ -65,16 +65,16 @@ describe Announcement do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
-      expect {
+      expect do
         course.announcements.create!(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
-      }.to change(Delayed::Job, :count).by(1)
+      end.to change(Delayed::Job, :count).by(1)
     end
 
     it "unlocks the attachment when the job runs" do
-      course_factory(:active_all => true)
+      course_factory(active_all: true)
       att = attachment_model(context: @course)
       announcement = @course.announcements.create!(valid_announcement_attributes
-        .merge(:delayed_post_at => Time.now + 1.week, :workflow_state => 'post_delayed', :attachment => att))
+        .merge(delayed_post_at: Time.now + 1.week, workflow_state: "post_delayed", attachment: att))
       att.reload
       expect(att).to be_locked
 
@@ -89,16 +89,16 @@ describe Announcement do
   context "section specific announcements" do
     before(:once) do
       course_with_teacher(active_course: true)
-      @section = @course.course_sections.create!(name: 'test section')
+      @section = @course.course_sections.create!(name: "test section")
 
-      @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+      @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       @announcement.is_section_specific = true
       @announcement.course_sections = [@section]
       @announcement.save!
 
       @student1, @student2 = create_users(2, return_type: :record)
-      @course.enroll_student(@student1, :enrollment_state => 'active')
-      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @course.enroll_student(@student1, enrollment_state: "active")
+      @course.enroll_student(@student2, enrollment_state: "active")
       student_in_section(@section, user: @student1)
     end
 
@@ -118,51 +118,51 @@ describe Announcement do
 
   context "permissions" do
     it "does not allow announcements on a course" do
-      course_with_student(:active_user => 1)
+      course_with_student(active_user: 1)
       expect(Announcement.context_allows_user_to_create?(@course, @user, {})).to be_falsey
     end
 
     it "does not allow announcements creation by students on a group" do
       course_with_student
-      group_with_user(is_public: true, :active_user => 1, :context => @course)
+      group_with_user(is_public: true, active_user: 1, context: @course)
       expect(Announcement.context_allows_user_to_create?(@group, @student, {})).to be_falsey
     end
 
     it "allows announcements creation by teacher on a group" do
-      course_with_teacher(:active_all => true)
-      group_with_user(is_public: true, :active_user => 1, :context => @course)
+      course_with_teacher(active_all: true)
+      group_with_user(is_public: true, active_user: 1, context: @course)
       expect(Announcement.context_allows_user_to_create?(@group, @teacher, {})).to be_truthy
     end
 
-    it 'allows announcements to be viewed without :read_forum' do
+    it "allows announcements to be viewed without :read_forum" do
       course_with_student(active_all: true)
-      @course.account.role_overrides.create!(permission: 'read_forum', role: student_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "read_forum", role: student_role, enabled: false)
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(true)
     end
 
-    it 'does not allow announcements to be viewed without :read_announcements' do
+    it "does not allow announcements to be viewed without :read_announcements" do
       course_with_student(active_all: true)
-      @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "read_announcements", role: student_role, enabled: false)
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(false)
     end
 
-    it 'does not allow announcements to be viewed without :read_announcements (even with moderate_forum)' do
+    it "does not allow announcements to be viewed without :read_announcements (even with moderate_forum)" do
       course_with_teacher(active_all: true)
-      @course.account.role_overrides.create!(permission: 'read_announcements', role: teacher_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "read_announcements", role: teacher_role, enabled: false)
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(false)
     end
 
-    it 'does allows announcements to be viewed only if visible_for? is true' do
+    it "does allows announcements to be viewed only if visible_for? is true" do
       course_with_student(active_all: true)
       a = @course.announcements.create!(valid_announcement_attributes)
       allow(a).to receive(:visible_for?).and_return true
       expect(a.grants_right?(@user, :read)).to be(true)
     end
 
-    it 'does not allow announcements to be viewed if visible_for? is false' do
+    it "does not allow announcements to be viewed if visible_for? is false" do
       course_with_student(active_all: true)
       a = @course.announcements.create!(valid_announcement_attributes)
       allow(a).to receive(:visible_for?).and_return false
@@ -186,28 +186,28 @@ describe Announcement do
         @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
         @a.save!
         dom = Nokogiri(@a.message)
-        expect(dom.css('object').length).to eql(1)
-        expect(dom.css('object')[0]['data']).to eql("http://www.youtuube.com/test")
-        expect(dom.css('object')[0]['othertag']).to eql(nil)
+        expect(dom.css("object").length).to eql(1)
+        expect(dom.css("object")[0]["data"]).to eql("http://www.youtuube.com/test")
+        expect(dom.css("object")[0]["othertag"]).to eql(nil)
       end
     end
 
     it "broadcasts to students and observers" do
-      course_with_student(:active_all => true)
-      course_with_observer(:course => @course, :active_all => true)
+      course_with_student(active_all: true)
+      course_with_observer(course: @course, active_all: true)
 
       notification_name = "New Announcement"
-      n = Notification.create(:name => notification_name, :category => "TestImmediately")
-      n2 = Notification.create(:name => "Announcement Created By You", :category => "TestImmediately")
+      n = Notification.create(name: notification_name, category: "TestImmediately")
+      n2 = Notification.create(name: "Announcement Created By You", category: "TestImmediately")
 
       channel = communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
 
-      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @observer.communication_channel, :frequency => "immediately")
-      NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
+      NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
+      NotificationPolicy.create(notification: n, communication_channel: @observer.communication_channel, frequency: "immediately")
+      NotificationPolicy.create(notification: n2, communication_channel: channel, frequency: "immediately")
 
       @context = @course
-      announcement_model(:user => @teacher)
+      announcement_model(user: @teacher)
 
       to_users = @a.messages_sent[notification_name].map(&:user)
       expect(to_users).to include(@student)
@@ -216,31 +216,31 @@ describe Announcement do
     end
 
     it "does not broadcast if read_announcements is diabled" do
-      Account.default.role_overrides.create!(:role => student_role, :permission => 'read_announcements', :enabled => false)
-      course_with_student(:active_all => true)
+      Account.default.role_overrides.create!(role: student_role, permission: "read_announcements", enabled: false)
+      course_with_student(active_all: true)
       notification_name = "New Announcement"
-      n = Notification.create(:name => notification_name, :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      n = Notification.create(name: notification_name, category: "TestImmediately")
+      NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
 
       @context = @course
-      announcement_model(:user => @teacher)
+      announcement_model(user: @teacher)
 
       expect(@a.messages_sent[notification_name]).to be_blank
     end
 
     it "does not broadcast if student's section is soft-concluded" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       section2 = @course.course_sections.create!
-      other_student = user_factory(:active_all => true)
-      @course.enroll_student(other_student, :section => section2, :enrollment_state => 'active')
-      section2.update(:start_at => 2.months.ago, :end_at => 1.month.ago, :restrict_enrollments_to_section_dates => true)
+      other_student = user_factory(active_all: true)
+      @course.enroll_student(other_student, section: section2, enrollment_state: "active")
+      section2.update(start_at: 2.months.ago, end_at: 1.month.ago, restrict_enrollments_to_section_dates: true)
 
       notification_name = "New Announcement"
-      n = Notification.create(:name => notification_name, :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      n = Notification.create(name: notification_name, category: "TestImmediately")
+      NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
 
       @context = @course
-      announcement_model(:user => @teacher)
+      announcement_model(user: @teacher)
       to_users = @a.messages_sent[notification_name].map(&:user)
       expect(to_users).to include(@student)
       expect(to_users).to_not include(other_student)

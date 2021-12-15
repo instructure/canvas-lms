@@ -23,6 +23,6 @@ module Api::V1::Favorite
   include Api::V1::User
 
   def favorite_json(favorite, current_user, session)
-    api_json(favorite, current_user, session, :only => %w(context_id context_type))
+    api_json(favorite, current_user, session, only: %w[context_id context_type])
   end
 end

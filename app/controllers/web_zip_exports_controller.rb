@@ -101,7 +101,7 @@ class WebZipExportsController < ApplicationController
 
   def check_feature_enabled
     unless course_allow_web_export_download?
-      render status: 404, template: 'shared/errors/404_message'
+      render status: :not_found, template: "shared/errors/404_message"
       false
     end
   end

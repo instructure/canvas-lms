@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'webmock/rspec'
+require "webmock/rspec"
 
 describe ImmersiveReaderController do
   around do |example|
@@ -27,36 +27,36 @@ describe ImmersiveReaderController do
     WebMock.enable_net_connect!
   end
 
-  it 'requires a user be logged in' do
-    get 'authenticate'
+  it "requires a user be logged in" do
+    get "authenticate"
     assert_unauthorized
   end
 
-  it 'requires the plugin be configured' do
+  it "requires the plugin be configured" do
     user_model
     user_session(@user)
-    get 'authenticate'
+    get "authenticate"
     assert_status(404)
   end
 
-  it 'authenticates with cognitive services' do
+  it "authenticates with cognitive services" do
     user_model
     user_session(@user)
-    stub_request(:post, 'https://login.windows.net')
+    stub_request(:post, "https://login.windows.net")
     allow(controller).to receive(:ir_config).and_return(
       {
-        ir_tenant_id: 'faketenantid',
-        ir_client_id: 'fakeclientid',
-        ir_client_secret: 'fakesecret',
-        ir_subdomain: 'fakesub'
+        ir_tenant_id: "faketenantid",
+        ir_client_id: "fakeclientid",
+        ir_client_secret: "fakesecret",
+        ir_subdomain: "fakesub"
       }
     )
-    get 'authenticate'
-    expect(WebMock).to have_requested(:post, 'https://login.windows.net/faketenantid/oauth2/token')
+    get "authenticate"
+    expect(WebMock).to have_requested(:post, "https://login.windows.net/faketenantid/oauth2/token")
       .with(
         body:
-          'grant_type=client_credentials&client_id=fakeclientid&client_secret=fakesecret&resource=https%3A%2F%2Fcognitiveservices.azure.com%2F',
-        headers: { 'Content-Type' => 'application/x-www-form-urlencoded' }
+          "grant_type=client_credentials&client_id=fakeclientid&client_secret=fakesecret&resource=https%3A%2F%2Fcognitiveservices.azure.com%2F",
+        headers: { "Content-Type" => "application/x-www-form-urlencoded" }
       )
       .once
   end

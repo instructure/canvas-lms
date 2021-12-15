@@ -30,7 +30,7 @@ module MicrosoftSync::GraphService::SpecHelper
     # Return an array of just the URLs in @stubbed_urls for
     # searching through them more easily.
     def stubbed_url_array
-      @stubbed_urls.map { |item| item[:url] }
+      @stubbed_urls.pluck(:url)
     end
 
     def stub_request(method, url, response, variables, request_params = {})
@@ -72,19 +72,19 @@ module MicrosoftSync::GraphService::SpecHelper
 
         request_stub[:requests].each_with_index do |request, index|
           response = responses[index]
-          unless validates_with_schema?(request, response, variables)
-            @errors << {
-              body: response.body,
-              url: request.uri.path,
-            }
-          end
+          next if validates_with_schema?(request, response, variables)
+
+          @errors << {
+            body: response.body,
+            url: request.uri.path,
+          }
         end
       end
     end
 
     def validates_with_schema?(request, response, request_substitution_values = [])
       method = request.method
-      path = request.uri.path.sub('/v1.0', '') << '$'
+      path = request.uri.path.sub("/v1.0", "") << "$"
       request_substitution_values.each do |value|
         # Make a regular expression, replacing all substitution values with
         # [^/]+, meaning "any characters besides a forward slash."
@@ -93,27 +93,27 @@ module MicrosoftSync::GraphService::SpecHelper
         # path: "teams/myteamid"
         # request_substitution_values: ["myteamid"]
         # resulting regex: %r(/teams/{[^/]+}), matches MS openapi doc's "/teams/{team_id}"
-        path = path.sub(value, '{[^/]+}')
+        path = path.sub(value, "{[^/]+}")
       end
 
       path_regex = Regexp.new(path)
-      all_schema_paths = @openapi_schema['paths'].keys
+      all_schema_paths = @openapi_schema["paths"].keys
       schema_path = all_schema_paths.grep(path_regex).first
       schema = @openapi_schema.dig(*schema_dig_keys(schema_path, method, response))
 
-      JSON::Validator.validate({ components: @openapi_schema['components'] }.merge(schema), JSON.parse(response.body))
+      JSON::Validator.validate({ components: @openapi_schema["components"] }.merge(schema), JSON.parse(response.body))
     end
 
     def schema_dig_keys(schema_path, method, response)
       [
-        'paths',
+        "paths",
         schema_path,
         method.to_s,
-        'responses',
+        "responses",
         response.status.first.to_s,
-        'content',
-        response.headers['Content-Type'],
-        'schema',
+        "content",
+        response.headers["Content-Type"],
+        "schema",
       ]
     end
   end

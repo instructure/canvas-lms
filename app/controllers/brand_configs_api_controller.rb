@@ -30,7 +30,7 @@ class BrandConfigsApiController < ApplicationController
   #
   #   curl 'https://<canvas>/api/v1/brand_variables'
   def show
-    headers['Access-Control-Allow-Origin'] = '*'
-    redirect_to active_brand_config_url('json')
+    headers["Access-Control-Allow-Origin"] = "*"
+    redirect_to active_brand_config_url("json")
   end
 end

@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../live_events_pact_helper'
+require_relative "../live_events_pact_helper"
 
-RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
-  describe 'learning_outcome_created' do
+RSpec.describe "Canvas LMS Live Events", :pact_live_events do
+  describe "learning_outcome_created" do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
-        event_name: 'learning_outcome_created',
+        event_name: "learning_outcome_created",
         event_subscriber: PactConfig::LiveEventConsumers::OUTCOMES
       )
     end
 
-    it 'keeps the contract' do
+    it "keeps the contract" do
       live_event.emit_with do
         # Our contract tests only capture the latest live event that's emitted,
         #  so creating a duplicate using the factory model is easiest

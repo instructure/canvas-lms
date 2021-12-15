@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
-require_relative '../views_helper'
-require_relative '../../selenium/helpers/groups_common'
+require_relative "../../spec_helper"
+require_relative "../views_helper"
+require_relative "../../selenium/helpers/groups_common"
 
 describe "/gradebooks/speed_grader" do
   include GroupsCommon
@@ -54,147 +54,147 @@ describe "/gradebooks/speed_grader" do
   end
 
   it "renders without error" do
-    expect {
-      render template: 'gradebooks/speed_grader', locals: locals
-    }.not_to raise_error
+    expect do
+      render template: "gradebooks/speed_grader", locals: locals
+    end.not_to raise_error
   end
 
   it "includes a mount pount for submission comments" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<div id="speed_grader_submission_comments_download_mount_point"></div>'
   end
 
   it "includes a mount pount for comment textarea" do
     assign(:can_comment_on_submission, true)
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<div id="speed_grader_comment_textarea_mount_point"></div>'
   end
 
   it "includes a mount pount for speed grader settings" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<span id="speed_grader_settings_mount_point"></span>'
   end
 
   it "includes a mount point for hide assignment grades tray" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<div id="hide-assignment-grades-tray"></div>'
   end
 
   it "includes a mount point for post assignment grades tray" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<div id="post-assignment-grades-tray"></div>'
   end
 
   it "includes a mount point for editing submission status when feature flag is enabled" do
     Account.site_admin.enable_feature!(:edit_submission_status_from_speedgrader)
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<div id="speed_grader_edit_status_mount_point"></div>'
     expect(rendered).to include '<div id="speed_grader_edit_status_secondary_mount_point"></div>'
   end
 
   it "does not include a mount point for editing submission status when feature flag is disabled" do
     Account.site_admin.disable_feature!(:edit_submission_status_from_speedgrader)
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to_not include '<div id="speed_grader_edit_status_mount_point"></div>'
     expect(rendered).to_not include '<div id="speed_grader_edit_status_secondary_mount_point"></div>'
   end
 
   it "includes a link back to the gradebook (gradebook by default)" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include "a href=\"http://test.host/courses/#{@course.id}/gradebook\""
   end
 
-  it 'includes the comment auto-save message' do
-    render template: 'gradebooks/speed_grader', locals: locals
+  it "includes the comment auto-save message" do
+    render template: "gradebooks/speed_grader", locals: locals
 
-    expect(rendered).to include 'Your comment was auto-saved as a draft.'
+    expect(rendered).to include "Your comment was auto-saved as a draft."
   end
 
-  it 'includes the link to publish' do
-    render template: 'gradebooks/speed_grader', locals: locals
+  it "includes the link to publish" do
+    render template: "gradebooks/speed_grader", locals: locals
 
     expect(rendered).to match(/button.+?class=.+?submit_comment_button/)
   end
 
-  it 'renders the plagiarism resubmit button if the assignment has a plagiarism tool' do
+  it "renders the plagiarism resubmit button if the assignment has a plagiarism tool" do
     allow_any_instance_of(Assignment).to receive(:assignment_configuration_tool_lookup_ids) { [1] }
-    render template: 'gradebooks/speed_grader', locals: locals
+    render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include "<div id='plagiarism_platform_info_container'>"
   end
 
-  describe 'submission comments form' do
-    it 'is rendered when @can_comment_on_submission is true' do
+  describe "submission comments form" do
+    it "is rendered when @can_comment_on_submission is true" do
       assign(:can_comment_on_submission, true)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: "gradebooks/speed_grader", locals: locals
 
       expect(rendered).to match(/form id="add_a_comment"/)
     end
 
-    it 'is not rendered when @can_comment_on_submission is false' do
+    it "is not rendered when @can_comment_on_submission is false" do
       assign(:can_comment_on_submission, false)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: "gradebooks/speed_grader", locals: locals
 
       expect(rendered).not_to match(/form id="add_a_comment"/)
     end
   end
 
-  describe 'reassignment wrapper' do
-    it 'is rendered when @can_comment_on_submission and @can_reassign_submissions are true' do
+  describe "reassignment wrapper" do
+    it "is rendered when @can_comment_on_submission and @can_reassign_submissions are true" do
       assign(:can_comment_on_submission, true)
       assign(:can_reassign_submissions, true)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: "gradebooks/speed_grader", locals: locals
       expect(rendered).to include "<div id=\"reassign_assignment_wrapper\""
     end
   end
 
-  context 'when group assignment' do
+  context "when group assignment" do
     before do
       assign(:can_comment_on_submission, true)
     end
 
-    it 'shows radio buttons if individually graded' do
-      render template: 'gradebooks/speed_grader', locals: locals
+    it "shows radio buttons if individually graded" do
+      render template: "gradebooks/speed_grader", locals: locals
       html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 2
-      expect(html.css('#submission_group_comment').size).to be 1
+      expect(html.css("#submission_group_comment").size).to be 1
     end
 
-    it 'renders hidden checkbox if group graded' do
+    it "renders hidden checkbox if group graded" do
       @assignment.grade_group_students_individually = false
       @assignment.save!
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: "gradebooks/speed_grader", locals: locals
       html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 0
-      checkbox = html.css('#submission_group_comment')
-      expect(checkbox.attr('checked')).not_to be_nil
-      expect(checkbox.attr('style').value).to include('display:none')
+      checkbox = html.css("#submission_group_comment")
+      expect(checkbox.attr("checked")).not_to be_nil
+      expect(checkbox.attr("style").value).to include("display:none")
     end
   end
 
-  context 'grading box' do
+  context "grading box" do
     let(:html) do
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: "gradebooks/speed_grader", locals: locals
       Nokogiri::HTML5.fragment(response.body)
     end
 
-    it 'renders the possible points for a points-based assignment' do
-      @assignment.update!(grading_type: 'points', points_possible: 999)
-      expect(html.at_css('#grading-box-points-possible').text).to include('out of 999')
+    it "renders the possible points for a points-based assignment" do
+      @assignment.update!(grading_type: "points", points_possible: 999)
+      expect(html.at_css("#grading-box-points-possible").text).to include("out of 999")
     end
 
-    it 'renders rounded possible points for a non-GPA-scale-based assignment' do
-      @assignment.update!(grading_type: 'percent', points_possible: 999)
-      expect(html.at_css('#grading-box-points-possible').text).to include('/ 999')
+    it "renders rounded possible points for a non-GPA-scale-based assignment" do
+      @assignment.update!(grading_type: "percent", points_possible: 999)
+      expect(html.at_css("#grading-box-points-possible").text).to include("/ 999")
     end
 
-    it 'renders a placeholder for the submission score for a non-points and non-GPA-scale-based assignment' do
-      @assignment.update!(grading_type: 'percent', points_possible: 999)
-      expect(html.at_css('#grading-box-points-possible .score')).to be_present
+    it "renders a placeholder for the submission score for a non-points and non-GPA-scale-based assignment" do
+      @assignment.update!(grading_type: "percent", points_possible: 999)
+      expect(html.at_css("#grading-box-points-possible .score")).to be_present
     end
 
-    it 'does not render a placeholder for the submission score for a GPA-scale-based assignment' do
-      @assignment.update!(grading_type: 'gpa_scale', points_possible: 999)
-      expect(html.at_css('#grading-box-points-possible .score')).not_to be_present
+    it "does not render a placeholder for the submission score for a GPA-scale-based assignment" do
+      @assignment.update!(grading_type: "gpa_scale", points_possible: 999)
+      expect(html.at_css("#grading-box-points-possible .score")).not_to be_present
     end
   end
 

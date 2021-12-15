@@ -4,7 +4,7 @@ class UpdateAssignmentStudentVisibilitiesViewSubmissionsJoin < ActiveRecord::Mig
   tag :postdeploy
 
   def up
-    self.connection.execute %(CREATE OR REPLACE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+    connection.execute %(CREATE OR REPLACE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
     SELECT DISTINCT a.id as assignment_id,
       e.user_id as user_id,
       c.id as course_id
@@ -65,7 +65,7 @@ class UpdateAssignmentStudentVisibilitiesViewSubmissionsJoin < ActiveRecord::Mig
     # Updates the previously created view to add the
     # workflow_state = 'active' condition to the
     # AssignmentOverrideStudent's JOIN
-    self.connection.execute %(CREATE OR REPLACE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+    connection.execute %(CREATE OR REPLACE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
     SELECT DISTINCT a.id as assignment_id,
       e.user_id as user_id,
       c.id as course_id

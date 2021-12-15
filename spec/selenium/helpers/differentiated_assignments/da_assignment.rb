@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_components/spec_components_assignment'
-require_relative 'da_wrappable'
+require_relative "../spec_components/spec_components_assignment"
+require_relative "da_wrappable"
 
 module DifferentiatedAssignments
   class Assignment < SpecComponents::Assignment
@@ -26,7 +26,7 @@ module DifferentiatedAssignments
 
     def initialize(assignees)
       initialize_assignees(assignees)
-      super(course: DifferentiatedAssignments.the_course, title: "Assignment for #{self.assignees_list}")
+      super(course: DifferentiatedAssignments.the_course, title: "Assignment for #{assignees_list}")
     end
   end
 end

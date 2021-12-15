@@ -17,7 +17,7 @@
 %>
 
 <% unless AuthenticationProvider::Apple.globally_configured? %>
-  <p><%= mt(<<-TEXT, apple_url: "https://developer.apple.com/account/resources/identifiers/list/serviceId", callback_url: oauth2_login_callback_url)
+  <p><%= mt(<<~TEXT, apple_url: "https://developer.apple.com/account/resources/identifiers/list/serviceId", callback_url: oauth2_login_callback_url)
 You will need to create a Service ID [Apple Developer Console](%{apple_url}).
 Enable Sign in with Apple, and add %{callback_url} as a return URL. Enter the Identifier here.
          TEXT

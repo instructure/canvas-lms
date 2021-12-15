@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'canvas_security'
+require "canvas_security"
 
 module Canvas
   # temporary shim rather than replacing all callsites at once

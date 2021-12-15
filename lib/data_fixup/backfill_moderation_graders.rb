@@ -27,7 +27,7 @@ module DataFixup::BackfillModerationGraders
 
     # Find all provisional graders for this batch of assignments
     graders = ModeratedGrading::ProvisionalGrade.joins(:submission)
-                                                .where("submissions.assignment_id IN (?)", assignments.select(:id))
+                                                .where(submissions: { assignment_id: assignments.select(:id) })
                                                 .pluck(Arel.sql("distinct submissions.assignment_id, moderated_grading_provisional_grades.scorer_id"))
     created_at = Time.zone.now
 
@@ -60,17 +60,17 @@ module DataFixup::BackfillModerationGraders
       courses.map! do |course_id|
         vals = [
           Course.connection.quote(course_id),
-          Course.connection.quote('Course'),
-          Course.connection.quote('moderated_grading'),
-          Course.connection.quote('on'),
+          Course.connection.quote("Course"),
+          Course.connection.quote("moderated_grading"),
+          Course.connection.quote("on"),
           Course.connection.quote(created_at),
           Course.connection.quote(created_at)
         ]
-        "(#{vals.join(',')})"
+        "(#{vals.join(",")})"
       end
-      ActiveRecord::Base.connection.exec_insert <<~SQL
+      ActiveRecord::Base.connection.exec_insert <<~SQL.squish
         INSERT INTO #{FeatureFlag.quoted_table_name}
-          (context_id, context_type, feature, state, created_at, updated_at) VALUES #{courses.join(',')}
+          (context_id, context_type, feature, state, created_at, updated_at) VALUES #{courses.join(",")}
           ON CONFLICT (context_id, context_type, feature) DO UPDATE SET
             state = excluded.state,
             updated_at = excluded.updated_at

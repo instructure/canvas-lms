@@ -82,9 +82,10 @@ module Types
           "This object specifies what students this override applies to",
           null: true
     def set
-      if override.set_type == "ADHOC"
+      case override.set_type
+      when "ADHOC"
         override
-      elsif override.set_type == 'Noop'
+      when "Noop"
         Noop.new(override.set_id)
       else
         load_association(:set)

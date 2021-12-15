@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
-describe 'Anonymous Provisional Grades API', type: :request do
-  it_behaves_like 'a provisional grades status action', :anonymous_provisional_grades
+describe "Anonymous Provisional Grades API", type: :request do
+  it_behaves_like "a provisional grades status action", :anonymous_provisional_grades
 
-  describe 'status' do
+  describe "status" do
     before(:once) do
       course_with_teacher(active_all: true)
       @course.account.enable_service(:avatars)
       ta_in_course(active_all: true)
       @student = student_in_course(active_all: true).user
       @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
-      @submission = @assignment.submit_homework(@student, body: 'EHLO')
+      @submission = @assignment.submit_homework(@student, body: "EHLO")
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_provisional_grades/status"
       @params = {
         controller: :anonymous_provisional_grades,
@@ -42,10 +42,10 @@ describe 'Anonymous Provisional Grades API', type: :request do
       }
     end
 
-    it 'requires authorization' do
+    it "requires authorization" do
       json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 401 })
-      expect(json['status']).to eq 'unauthorized'
-      expect(json.fetch('errors')).to include({ 'message' => 'user not authorized to perform that action' })
+      expect(json["status"]).to eq "unauthorized"
+      expect(json.fetch("errors")).to include({ "message" => "user not authorized to perform that action" })
     end
   end
 end

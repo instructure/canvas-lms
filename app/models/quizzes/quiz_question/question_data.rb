@@ -103,9 +103,9 @@ class Quizzes::QuizQuestion::QuestionData
   private
 
   def question_types
-    @question_types ||= %w(calculated essay file_upload fill_in_multiple_blanks matching
+    @question_types ||= %w[calculated essay file_upload fill_in_multiple_blanks matching
                            multiple_answers multiple_choice multiple_dropdowns numerical
-                           short_answer text_only unknown ).map(&:to_sym)
+                           short_answer text_only unknown ].map(&:to_sym)
   end
 
   def set_defaults

@@ -22,13 +22,13 @@ class AddReplicaIdentityForWebConferences < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'WebConference', :root_account_id, 0
-    remove_index :web_conferences, name: 'index_web_conferences_on_root_account_id', if_exists: true
+    add_replica_identity "WebConference", :root_account_id, 0
+    remove_index :web_conferences, name: "index_web_conferences_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :web_conferences, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'WebConference'
+    remove_replica_identity "WebConference"
     change_column_null :web_conferences, :root_account_id, true
   end
 end

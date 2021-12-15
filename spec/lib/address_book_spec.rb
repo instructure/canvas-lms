@@ -48,10 +48,10 @@ describe AddressBook do
 
   describe "partition_recipients" do
     it "splits individuals from contexts" do
-      recipients = ['123', 'course_456']
+      recipients = ["123", "course_456"]
       individuals, contexts = AddressBook.partition_recipients(recipients)
       expect(individuals).to eql([123])
-      expect(contexts).to eql(['course_456'])
+      expect(contexts).to eql(["course_456"])
     end
   end
 
@@ -64,8 +64,8 @@ describe AddressBook do
     end
 
     it "restricts to available users" do
-      recipient = user_model(workflow_state: 'available') # available
-      other = user_model(workflow_state: 'deleted') # unavailable
+      recipient = user_model(workflow_state: "available") # available
+      other = user_model(workflow_state: "deleted") # unavailable
       available = AddressBook.available([recipient, other])
       expect(available.map(&:id)).to eql([recipient.id])
     end

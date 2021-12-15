@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper.rb'
+require "spec_helper"
 
-RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
+RSpec.shared_context "shared_tii_lti", shared_context: :metadata do
   before do
-    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
-    allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
   end
 
   let(:lti_student) { user_model }
@@ -32,14 +32,14 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
       name: "bob",
       consumer_key: "bob",
       shared_secret: "bob",
-      tool_id: 'some_tool',
-      privacy_level: 'public'
+      tool_id: "some_tool",
+      privacy_level: "public"
     )
     tool.url = "http://www.example.com/basic_lti"
     tool.resource_selection = {
-      :url => "http://#{HostUrl.default_host}/selection_test",
-      :selection_width => 400,
-      :selection_height => 400
+      url: "http://#{HostUrl.default_host}/selection_test",
+      selection_width: 400,
+      selection_height: 400
     }
     tool.save!
     tool
@@ -48,38 +48,38 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
   let(:lti_assignment) do
     assignment = assignment_model(course: lti_course)
     tag = assignment.build_external_tool_tag(url: tool.url)
-    tag.content_type = 'ContextExternalTool'
+    tag.content_type = "ContextExternalTool"
     tag.content_id = tool.id
     tag.save!
     assignment
   end
 
   let(:attachment) do
-    Attachment.create! uploaded_data: StringIO.new('blah'),
+    Attachment.create! uploaded_data: StringIO.new("blah"),
                        context: lti_course,
-                       filename: 'blah.txt'
+                       filename: "blah.txt"
   end
 
   let(:tii_client) do
-    tii_mock = double('tii_client')
+    tii_mock = double("tii_client")
     allow(tii_mock).to receive(:original_submission).and_yield(response_mock)
     tii_mock
   end
-  let(:filename) { 'my/new/filename.txt' }
+  let(:filename) { "my/new/filename.txt" }
   let(:response_mock) do
-    r_mock = double('response')
+    r_mock = double("response")
     allow(r_mock).to receive(:headers)
       .and_return({
-                    'content-disposition' => "attachment; filename=#{filename}",
-                    'content-type' => 'plain/text'
+                    "content-disposition" => "attachment; filename=#{filename}",
+                    "content-type" => "plain/text"
                   })
-    allow(r_mock).to receive(:body).and_return('abcdef')
+    allow(r_mock).to receive(:body).and_return("abcdef")
     r_mock
   end
 
   let(:outcome_response_json) do
     {
-      "paperid" => 200505101,
+      "paperid" => 200_505_101,
       "outcomes_tool_placement_url" => "https://turnitin.example.com/api/lti/1p0/outcome_tool_data/201?lang=en_us",
       "lis_result_sourcedid" => Lti::LtiOutboundAdapter.new(
         tool,

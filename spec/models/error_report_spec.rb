@@ -25,13 +25,13 @@ describe ErrorReport do
                 255.chr +
                 "llo"
       data = { extra: { message: message } }
-      expect { described_class.log_exception_from_canvas_errors('my error', data) }
+      expect { described_class.log_exception_from_canvas_errors("my error", data) }
         .to_not raise_error
     end
 
     it "uses an empty hash as a default for errors with no extra data" do
       data = { tags: { a: "b" } }
-      expect { described_class.log_exception_from_canvas_errors('my error', data) }
+      expect { described_class.log_exception_from_canvas_errors("my error", data) }
         .to_not raise_error
     end
 
@@ -43,7 +43,7 @@ describe ErrorReport do
 
     it "ignores category 404" do
       count = ErrorReport.count
-      ErrorReport.log_error('404', {})
+      ErrorReport.log_error("404", {})
       expect(ErrorReport.count).to eq(count)
     end
 
@@ -69,14 +69,14 @@ describe ErrorReport do
 
   it "returns categories" do
     expect(ErrorReport.categories).to eq []
-    ErrorReport.create! { |r| r.category = 'bob' }
-    expect(ErrorReport.categories).to eq ['bob']
-    ErrorReport.create! { |r| r.category = 'bob' }
-    expect(ErrorReport.categories).to eq ['bob']
-    ErrorReport.create! { |r| r.category = 'george' }
-    expect(ErrorReport.categories).to eq ['bob', 'george']
-    ErrorReport.create! { |r| r.category = 'fred' }
-    expect(ErrorReport.categories).to eq ['bob', 'fred', 'george']
+    ErrorReport.create! { |r| r.category = "bob" }
+    expect(ErrorReport.categories).to eq ["bob"]
+    ErrorReport.create! { |r| r.category = "bob" }
+    expect(ErrorReport.categories).to eq ["bob"]
+    ErrorReport.create! { |r| r.category = "george" }
+    expect(ErrorReport.categories).to eq ["bob", "george"]
+    ErrorReport.create! { |r| r.category = "fred" }
+    expect(ErrorReport.categories).to eq %w[bob fred george]
   end
 
   it "filters the url when it is assigned" do
@@ -87,14 +87,14 @@ describe ErrorReport do
 
   it "filters params" do
     mock_attrs = {
-      :env => {
+      env: {
         "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
         "REQUEST_URI" => "https://www.instructure.example.com?access_token=abcdef&pseudonym[password]=zzz",
       },
-      :remote_ip => "",
-      :path_parameters => { :api_key => "1" },
-      :query_parameters => { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
-      :request_parameters => { "client_secret" => "xoxo" }
+      remote_ip: "",
+      path_parameters: { api_key: "1" },
+      query_parameters: { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
+      request_parameters: { "client_secret" => "xoxo" }
     }
     mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
     req = double(mock_attrs)
@@ -105,7 +105,7 @@ describe ErrorReport do
     expected_uri = "https://www.instructure.example.com?"\
                    "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
     expect(report.data["REQUEST_URI"]).to eq(expected_uri)
-    expect(report.data["path_parameters"]).to eq({ :api_key => "[FILTERED]" }.inspect)
+    expect(report.data["path_parameters"]).to eq({ api_key: "[FILTERED]" }.inspect)
     q_params = { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }
     expect(report.data["query_parameters"]).to eq(q_params.inspect)
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
@@ -120,7 +120,7 @@ describe ErrorReport do
 
   it "truncates absurdly long messages" do
     report = described_class.new
-    long_message = (0...100000).map { 'a' }.join
+    long_message = (0...100_000).map { "a" }.join
     report.assign_data(message: long_message)
     expect(report.message.length).to eq long_message.length
     report.save!

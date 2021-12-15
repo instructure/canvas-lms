@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/submission_versions" do
   it "renders" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     course_quiz
 
     view_context

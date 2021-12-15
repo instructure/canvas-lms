@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'bundler'
+require "bundler"
 Bundler.setup
-require 'action_controller'
+require "action_controller"
 
 # load the routes
 if CanvasRails::Application.routes_reloader.paths.empty?
-  require 'lib/api_route_set'
+  require "lib/api_route_set"
   # we need this for a route constraint
-  require 'lib/lti/re_reg_constraint'
+  require "lib/lti/re_reg_constraint"
 
   routes_files = CanvasRails::Application.paths["config/routes.rb"].existent +
                  CanvasRails::Application.railties.map do |railtie|
@@ -81,7 +81,7 @@ module YARD::Templates::Helpers
       when :root, :module, :constant
         false
       when :method, :class
-        !object.tags("API").empty? && (ENV['INCLUDE_INTERNAL'] || object.tags('internal').empty?)
+        !object.tags("API").empty? && (ENV["INCLUDE_INTERNAL"] || object.tags("internal").empty?)
       else
         if object.parent.nil?
           false

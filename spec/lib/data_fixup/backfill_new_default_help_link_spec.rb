@@ -21,23 +21,23 @@
 describe DataFixup::BackfillNewDefaultHelpLink do
   let(:new_default_link) do
     {
-      :available_to => ['student'],
-      :text => -> { I18n.t('#help_dialog.stuff', 'Stuff') },
-      :subtext => -> { I18n.t('#help_dialog.things', 'Things') },
-      :url => '#teacher_feedback',
-      :type => 'default',
-      :id => :covid
+      available_to: ["student"],
+      text: -> { I18n.t("#help_dialog.stuff", "Stuff") },
+      subtext: -> { I18n.t("#help_dialog.things", "Things") },
+      url: "#teacher_feedback",
+      type: "default",
+      id: :covid
     }.freeze
   end
 
   let(:existing_default_link) do
     {
-      :available_to => ['student'],
-      :text => -> { I18n.t('#help_dialog.hi', 'Hi') },
-      :subtext => -> { I18n.t('#help_dialog.hello', 'Hello') },
-      :url => '#teacher_feedback',
-      :type => 'default',
-      :id => :hi_and_hello
+      available_to: ["student"],
+      text: -> { I18n.t("#help_dialog.hi", "Hi") },
+      subtext: -> { I18n.t("#help_dialog.hello", "Hello") },
+      url: "#teacher_feedback",
+      type: "default",
+      id: :hi_and_hello
     }.freeze
   end
 
@@ -102,7 +102,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
 
     it "adds the help link to custom_help_links" do
       DataFixup::BackfillNewDefaultHelpLink.run(:covid)
-      expect(@account.reload.settings[:custom_help_links].map { |hl| hl[:id] }).to match_array([existing_default_link[:id], new_default_link[:id]])
+      expect(@account.reload.settings[:custom_help_links].pluck(:id)).to match_array([existing_default_link[:id], new_default_link[:id]])
     end
   end
 end

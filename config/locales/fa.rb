@@ -5,7 +5,7 @@
     number: {
       nth: {
         ordinals: lambda do |_key, _options|
-          'م'
+          "م"
         end,
 
         ordinalized: lambda do |_key, options|

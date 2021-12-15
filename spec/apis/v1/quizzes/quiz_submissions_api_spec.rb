@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
+require_relative "../../api_spec_helper"
 
-shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
-  it 'requires the LDB' do
+shared_examples_for "Quiz Submissions API Restricted Endpoints" do
+  it "requires the LDB" do
     @quiz.require_lockdown_browser = true
     @quiz.save
 
@@ -72,9 +72,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_index(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions.json"
-    params = { :controller => 'quizzes/quiz_submissions_api', :action => 'index', :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api", action: "index", format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -84,11 +84,11 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_submission(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission.json"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'submission',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "submission",
+               format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -98,12 +98,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_show(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}.json"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'show',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "show",
+               format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -113,11 +113,11 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_create(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'create',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "create",
+               format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
     if raw
       raw_api_call(:post, url, params, data)
     else
@@ -127,12 +127,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_complete(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/complete"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'complete',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "complete",
+               format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     data = {
       validation_token: @quiz_submission.validation_token
     }.merge(data)
@@ -146,12 +146,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_update(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'update',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "update",
+               format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     if raw
       raw_api_call(:put, url, params, data)
     else
@@ -161,12 +161,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_time(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/time"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'time',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "time",
+               format: "json",
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -175,202 +175,202 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   before :once do
-    course_with_teacher :active_all => true
+    course_with_teacher active_all: true
 
-    @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
+    @quiz = Quizzes::Quiz.create!(title: "quiz", context: @course)
     @quiz.published_at = Time.now
-    @quiz.workflow_state = 'available'
+    @quiz.workflow_state = "available"
     @quiz.save!
   end
 
-  describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions [INDEX]' do
-    it 'returns an empty list' do
+  describe "GET /courses/:course_id/quizzes/:quiz_id/submissions [INDEX]" do
+    it "returns an empty list" do
       json = qs_api_index
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].size).to eq 0
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].size).to eq 0
     end
 
-    it 'returns an empty list for a student' do
+    it "returns an empty list for a student" do
       enroll_student
 
       @user = @student
 
       json = qs_api_index
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].size).to eq 0
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].size).to eq 0
     end
 
-    it 'lists quiz submissions' do
+    it "lists quiz submissions" do
       enroll_student_and_submit
 
       json = qs_api_index
-      expect(json['quiz_submissions'].size).to eq 1
+      expect(json["quiz_submissions"].size).to eq 1
       # checking for the new field added in JSON response as part of fix CNVS-19664
-      expect(json['quiz_submissions'].first["overdue_and_needs_submission"]).to eq false
+      expect(json["quiz_submissions"].first["overdue_and_needs_submission"]).to eq false
     end
 
-    it 'is accessible by the owner student' do
+    it "is accessible by the owner student" do
       enroll_student_and_submit
 
       json = qs_api_index
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
     end
 
-    it 'shows multiple attempts of the same quiz' do
+    it "shows multiple attempts of the same quiz" do
       enroll_student_and_submit
       make_second_attempt
 
       @user = @student
 
       json = qs_api_index
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 2
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 2
     end
 
-    it 'shows in progress attempt only when applicable' do
+    it "shows in progress attempt only when applicable" do
       enroll_student
       @quiz_submission = @quiz.generate_submission(@student)
       json = qs_api_index
 
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
-      expect(json['quiz_submissions'].first['started_at']).to be_truthy
-      expect(json['quiz_submissions'].first['workflow_state']).to eq 'untaken'
-      expect(json['quiz_submissions'].first['finished_at']).to eq nil
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
+      expect(json["quiz_submissions"].first["started_at"]).to be_truthy
+      expect(json["quiz_submissions"].first["workflow_state"]).to eq "untaken"
+      expect(json["quiz_submissions"].first["finished_at"]).to eq nil
     end
 
-    it 'shows most recent attemps of quiz to teacher' do
+    it "shows most recent attemps of quiz to teacher" do
       enroll_student_and_submit
       make_second_attempt
 
       json = qs_api_index
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
-      expect(json['quiz_submissions'].first["attempt"]).to eq 2
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
+      expect(json["quiz_submissions"].first["attempt"]).to eq 2
     end
 
-    it 'restricts access to itself' do
+    it "restricts access to itself" do
       student_in_course
       qs_api_index(true)
       assert_status(401)
     end
 
-    it 'includes submissions' do
+    it "includes submissions" do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ['submission'] })
-      expect(json).to have_key 'submissions'
+      json = qs_api_index(false, { include: ["submission"] })
+      expect(json).to have_key "submissions"
     end
 
-    it 'includes submission grading_status' do
+    it "includes submission grading_status" do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ['submission', 'grading_status'] })
-      expect(json.fetch('submissions')).to all have_key 'grading_status'
+      json = qs_api_index(false, { include: ["submission", "grading_status"] })
+      expect(json.fetch("submissions")).to all have_key "grading_status"
     end
 
-    it 'includes submission submission_status' do
+    it "includes submission submission_status" do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ['submission', 'submission_status'] })
-      expect(json.fetch('submissions')).to all have_key 'submission_status'
+      json = qs_api_index(false, { include: ["submission", "submission_status"] })
+      expect(json.fetch("submissions")).to all have_key "submission_status"
     end
   end
 
-  describe 'GET /courses/:course_id/quizzes/:quiz_id/submission' do
-    context 'as a student' do
-      context 'without a submission' do
+  describe "GET /courses/:course_id/quizzes/:quiz_id/submission" do
+    context "as a student" do
+      context "without a submission" do
         before do
           enroll_student
           @user = @student
         end
 
-        it 'is empty' do
+        it "is empty" do
           json = qs_api_submission
-          expect(json.key?('quiz_submissions')).to be_truthy
-          expect(json['quiz_submissions'].size).to eq 0
+          expect(json).to have_key("quiz_submissions")
+          expect(json["quiz_submissions"].size).to eq 0
         end
       end
 
-      context 'with a submission' do
+      context "with a submission" do
         before do
           enroll_student_and_submit
           @user = @student
         end
 
-        it 'returns the submission' do
+        it "returns the submission" do
           json = qs_api_submission
-          expect(json.key?('quiz_submissions')).to be_truthy
-          expect(json['quiz_submissions'].length).to eq 1
+          expect(json).to have_key("quiz_submissions")
+          expect(json["quiz_submissions"].length).to eq 1
 
-          json_quiz_submission = json['quiz_submissions'].first
-          expect(json_quiz_submission['id']).to eq @quiz_submission.id
+          json_quiz_submission = json["quiz_submissions"].first
+          expect(json_quiz_submission["id"]).to eq @quiz_submission.id
         end
 
-        context 'with multiple attempts' do
+        context "with multiple attempts" do
           before do
             make_second_attempt
           end
 
-          it 'returns the submission' do
+          it "returns the submission" do
             json = qs_api_submission
-            expect(json.key?('quiz_submissions')).to be_truthy
-            expect(json['quiz_submissions'].length).to eq 1
+            expect(json).to have_key("quiz_submissions")
+            expect(json["quiz_submissions"].length).to eq 1
 
-            json_quiz_submission = json['quiz_submissions'].first
-            expect(json_quiz_submission['id']).to eq @quiz_submission.id
-            expect(json_quiz_submission['attempt']).to eq 2
+            json_quiz_submission = json["quiz_submissions"].first
+            expect(json_quiz_submission["id"]).to eq @quiz_submission.id
+            expect(json_quiz_submission["attempt"]).to eq 2
           end
         end
       end
     end
 
-    context 'as a teacher' do
-      context 'when a student has a submission' do
+    context "as a teacher" do
+      context "when a student has a submission" do
         before do
           enroll_student_and_submit
         end
 
-        it 'does not include the student submission' do
+        it "does not include the student submission" do
           json = qs_api_submission
-          expect(json.key?('quiz_submissions')).to be_truthy
-          expect(json['quiz_submissions'].size).to eq 0
+          expect(json).to have_key("quiz_submissions")
+          expect(json["quiz_submissions"].size).to eq 0
         end
       end
     end
   end
 
-  describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions/:id [SHOW]' do
+  describe "GET /courses/:course_id/quizzes/:quiz_id/submissions/:id [SHOW]" do
     before :once do
       enroll_student_and_submit
     end
 
-    it 'grants access to its student' do
+    it "grants access to its student" do
       @user = @student
       json = qs_api_show
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
     end
 
     it 'is accessible implicitly to its own student as "self"' do
       @user = @student
-      allow(@quiz_submission).to receive(:id).and_return 'self'
+      allow(@quiz_submission).to receive(:id).and_return "self"
 
       json = qs_api_show
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
     end
 
-    it 'denies access by other students' do
+    it "denies access by other students" do
       student_in_course
       qs_api_show(true)
       assert_status(401)
     end
 
-    context 'Output' do
-      it 'includes the allowed quiz submission output fields' do
+    context "Output" do
+      it "includes the allowed quiz submission output fields" do
         json = qs_api_show
-        expect(json.key?('quiz_submissions')).to be_truthy
+        expect(json).to have_key("quiz_submissions")
 
-        qs_json = json['quiz_submissions'][0].with_indifferent_access
+        qs_json = json["quiz_submissions"][0].with_indifferent_access
 
         output_fields = [] +
                         Api::V1::QuizSubmission::QUIZ_SUBMISSION_JSON_FIELDS +
@@ -382,129 +382,129 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         end
       end
 
-      it 'includes time spent' do
+      it "includes time spent" do
         @quiz_submission.started_at = Time.now
         @quiz_submission.finished_at = @quiz_submission.started_at + 5.minutes
         @quiz_submission.save!
 
         json = qs_api_show
-        expect(json.key?('quiz_submissions')).to be_truthy
-        expect(json['quiz_submissions'][0]['time_spent']).to eq 5.minutes
+        expect(json).to have_key("quiz_submissions")
+        expect(json["quiz_submissions"][0]["time_spent"]).to eq 5.minutes
       end
 
-      it 'includes html_url' do
+      it "includes html_url" do
         json = qs_api_show
-        expect(json.key?('quiz_submissions')).to be_truthy
+        expect(json).to have_key("quiz_submissions")
 
-        qs_json = json['quiz_submissions'][0]
-        expect(qs_json['html_url']).to eq course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
+        qs_json = json["quiz_submissions"][0]
+        expect(qs_json["html_url"]).to eq course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
       end
 
-      it 'includes results_url only when completed or needs_grading' do
+      it "includes results_url only when completed or needs_grading" do
         json = qs_api_show
-        expect(json['quiz_submissions'][0].key?('result_url')).to be_truthy
+        expect(json["quiz_submissions"][0]).to have_key("result_url")
         expected_url = course_quiz_history_url(
           @course, @quiz,
           quiz_submission_id: @quiz_submission.id, version: @quiz_submission.version_number
         )
-        expect(json['quiz_submissions'][0]['result_url']).to eq expected_url
+        expect(json["quiz_submissions"][0]["result_url"]).to eq expected_url
 
-        @quiz_submission.update_attribute :workflow_state, 'in_progress'
+        @quiz_submission.update_attribute :workflow_state, "in_progress"
         json = qs_api_show
-        expect(json['quiz_submissions'][0].key?('result_url')).to be_falsey
+        expect(json["quiz_submissions"][0]).not_to have_key("result_url")
       end
     end
 
-    context 'Links' do
-      it 'includes its linked user' do
+    context "Links" do
+      it "includes its linked user" do
         json = qs_api_show(false, {
-                             :include => ['user']
+                             include: ["user"]
                            })
 
-        expect(json.key?('users')).to be_truthy
-        expect(json['quiz_submissions'].size).to eq 1
-        expect(json['users'].size).to eq 1
-        expect(json['users'][0]['id']).to eq json['quiz_submissions'][0]['user_id']
+        expect(json).to have_key("users")
+        expect(json["quiz_submissions"].size).to eq 1
+        expect(json["users"].size).to eq 1
+        expect(json["users"][0]["id"]).to eq json["quiz_submissions"][0]["user_id"]
       end
 
-      it 'includes its linked quiz' do
+      it "includes its linked quiz" do
         json = qs_api_show(false, {
-                             :include => ['quiz']
+                             include: ["quiz"]
                            })
 
-        expect(json.key?('quizzes')).to be_truthy
-        expect(json['quiz_submissions'].size).to eq 1
-        expect(json['quizzes'].size).to eq 1
-        expect(json['quizzes'][0]['id']).to eq json['quiz_submissions'][0]['quiz_id']
+        expect(json).to have_key("quizzes")
+        expect(json["quiz_submissions"].size).to eq 1
+        expect(json["quizzes"].size).to eq 1
+        expect(json["quizzes"][0]["id"]).to eq json["quiz_submissions"][0]["quiz_id"]
       end
 
-      it 'includes its linked submission' do
+      it "includes its linked submission" do
         json = qs_api_show(false, {
-                             :include => ['submission']
+                             include: ["submission"]
                            })
 
-        expect(json.key?('submissions')).to be_truthy
-        expect(json['quiz_submissions'].size).to eq 1
-        expect(json['submissions'].size).to eq 1
-        expect(json['submissions'][0]['id']).to eq json['quiz_submissions'][0]['submission_id']
+        expect(json).to have_key("submissions")
+        expect(json["quiz_submissions"].size).to eq 1
+        expect(json["submissions"].size).to eq 1
+        expect(json["submissions"][0]["id"]).to eq json["quiz_submissions"][0]["submission_id"]
       end
 
-      it 'includes its linked user, quiz, and submission' do
+      it "includes its linked user, quiz, and submission" do
         json = qs_api_show(false, {
-                             :include => ['user', 'quiz', 'submission']
+                             include: %w[user quiz submission]
                            })
 
-        expect(json.key?('users')).to be_truthy
-        expect(json.key?('quizzes')).to be_truthy
-        expect(json.key?('submissions')).to be_truthy
+        expect(json).to have_key("users")
+        expect(json).to have_key("quizzes")
+        expect(json).to have_key("submissions")
       end
     end
 
-    context 'JSON-API compliance' do
-      it 'conforms to the JSON-API spec when returning the object' do
+    context "JSON-API compliance" do
+      it "conforms to the JSON-API spec when returning the object" do
         json = qs_api_show(false)
-        assert_jsonapi_compliance(json, 'quiz_submissions')
+        assert_jsonapi_compliance(json, "quiz_submissions")
       end
 
-      it 'conforms to the JSON-API spec when returning linked objects' do
-        includes = ['user', 'quiz', 'submission']
+      it "conforms to the JSON-API spec when returning linked objects" do
+        includes = %w[user quiz submission]
 
         json = qs_api_show(false, {
-                             :include => includes
+                             include: includes
                            })
 
-        assert_jsonapi_compliance(json, 'quiz_submissions', includes)
+        assert_jsonapi_compliance(json, "quiz_submissions", includes)
       end
     end
   end
 
-  describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions [create]' do
-    context 'as a teacher' do
-      it 'creates a preview quiz submission' do
+  describe "POST /courses/:course_id/quizzes/:quiz_id/submissions [create]" do
+    context "as a teacher" do
+      it "creates a preview quiz submission" do
         json = qs_api_create false, { preview: true }
-        expect(Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id']).preview?).to be_truthy
+        expect(Quizzes::QuizSubmission.find(json["quiz_submissions"][0]["id"]).preview?).to be_truthy
       end
     end
 
-    context 'as a student' do
+    context "as a student" do
       before :once do
         enroll_student
         @user = @student
       end
 
-      it 'creates a quiz submission' do
+      it "creates a quiz submission" do
         json = qs_api_create
-        expect(json.key?('quiz_submissions')).to be_truthy
-        expect(json['quiz_submissions'].length).to eq 1
-        expect(json['quiz_submissions'][0]['workflow_state']).to eq 'untaken'
+        expect(json).to have_key("quiz_submissions")
+        expect(json["quiz_submissions"].length).to eq 1
+        expect(json["quiz_submissions"][0]["workflow_state"]).to eq "untaken"
       end
 
-      it 'allows the creation of multiple, subsequent QSes' do
+      it "allows the creation of multiple, subsequent QSes" do
         @quiz.allowed_attempts = -1
         @quiz.save
 
         json = qs_api_create
-        qs = Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id'])
+        qs = Quizzes::QuizSubmission.find(json["quiz_submissions"][0]["id"])
         qs.mark_completed
         qs.reload
         expect(qs).to be_complete
@@ -514,22 +514,22 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         expect(qs).to be_untaken
       end
 
-      context 'access validations' do
-        include_examples 'Quiz Submissions API Restricted Endpoints'
+      context "access validations" do
+        include_examples "Quiz Submissions API Restricted Endpoints"
 
         before do
           @request_proxy = method(:qs_api_create)
         end
 
-        it 'rejects creating a QS when one already exists' do
+        it "rejects creating a QS when one already exists" do
           qs_api_create
           qs_api_create(true)
           expect(response.status.to_i).to eq 409
         end
 
-        it 'respects the number of allowed attempts' do
+        it "respects the number of allowed attempts" do
           json = qs_api_create
-          qs = Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id'])
+          qs = Quizzes::QuizSubmission.find(json["quiz_submissions"][0]["id"])
           qs.mark_completed
           qs.save!
 
@@ -546,31 +546,31 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
             {
               question_data:
               {
-                name: 'question',
-                points_possible: 1,
-                question_type: 'multiple_choice_question',
-                'answers' =>
+                :name => "question",
+                :points_possible => 1,
+                :question_type => "multiple_choice_question",
+                "answers" =>
                   [
-                    { 'answer_text' => '1', 'weight' => '100' },
-                    { 'answer_text' => '2' },
-                    { 'answer_text' => '3' },
-                    { 'answer_text' => '4' }
+                    { "answer_text" => "1", "weight" => "100" },
+                    { "answer_text" => "2" },
+                    { "answer_text" => "3" },
+                    { "answer_text" => "4" }
                   ]
               }
             }
           )
           @quiz.published_at = Time.zone.now
-          @quiz.workflow_state = 'available'
+          @quiz.workflow_state = "available"
           @quiz.save!
-          @pre_module = @course.context_modules.create!(:name => 'pre_module')
+          @pre_module = @course.context_modules.create!(name: "pre_module")
           # No meaning in this URL
-          @tag = @pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
+          @tag = @pre_module.add_item(type: "external_url", url: "http://example.com", title: "example")
           @tag.publish! if @tag.unpublished?
-          @pre_module.completion_requirements = { @tag.id => { :type => 'must_view' } }
+          @pre_module.completion_requirements = { @tag.id => { type: "must_view" } }
           @pre_module.save!
 
-          locked_module = @course.context_modules.create!(name: 'locked_module', require_sequential_progress: true)
-          locked_module.add_item(:id => @quiz.id, :type => 'quiz')
+          locked_module = @course.context_modules.create!(name: "locked_module", require_sequential_progress: true)
+          locked_module.add_item(id: @quiz.id, type: "quiz")
           locked_module.prerequisites = "module_#{@pre_module.id}"
           locked_module.save!
         end
@@ -587,9 +587,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                             quiz_id: @quiz.id.to_s
                           },
                           {},
-                          { 'Accept' => 'application/vnd.api+json' },
+                          { "Accept" => "application/vnd.api+json" },
                           { expected_status: 400 })
-          expect(json['status']).to eq "bad_request"
+          expect(json["status"]).to eq "bad_request"
         end
 
         it "allows access to quiz once module is completed" do
@@ -606,14 +606,14 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                             quiz_id: @quiz.id.to_s
                           },
                           {},
-                          { 'Accept' => 'application/vnd.api+json' })
-          expect(json['quiz_submissions'][0]['user_id']).to eq @student.id
+                          { "Accept" => "application/vnd.api+json" })
+          expect(json["quiz_submissions"][0]["user_id"]).to eq @student.id
         end
       end
     end
   end
 
-  describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/complete [complete]' do
+  describe "POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/complete [complete]" do
     before :once do
       enroll_student
 
@@ -621,24 +621,24 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       # @quiz_submission.submission_data = { "question_1" => "1658" }
     end
 
-    it 'completes a quiz submission' do
+    it "completes a quiz submission" do
       json = qs_api_complete false, {
         attempt: 1
       }
 
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
-      expect(json['quiz_submissions'][0]['workflow_state']).to eq 'complete'
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
+      expect(json["quiz_submissions"][0]["workflow_state"]).to eq "complete"
     end
 
-    context 'access validations' do
-      include_examples 'Quiz Submissions API Restricted Endpoints'
+    context "access validations" do
+      include_examples "Quiz Submissions API Restricted Endpoints"
 
       before do
         @request_proxy = method(:qs_api_complete)
       end
 
-      it 'rejects completing an already complete QS' do
+      it "rejects completing an already complete QS" do
         @quiz_submission.mark_completed
         Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
@@ -650,25 +650,25 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         expect(response.body).to match(/already complete/)
       end
 
-      it 'requires the attempt index' do
+      it "requires the attempt index" do
         qs_api_complete true
 
         assert_status(400)
         expect(response.body).to match(/invalid attempt/)
       end
 
-      it 'requires the current attempt index' do
+      it "requires the current attempt index" do
         qs_api_complete true, {
-          attempt: 123123123
+          attempt: 123_123_123
         }
 
         assert_status(400)
         expect(response.body).to match(/attempt.*can not be modified/)
       end
 
-      it 'requires a valid validation token' do
+      it "requires a valid validation token" do
         qs_api_complete true, {
-          validation_token: 'aaaooeeeee'
+          validation_token: "aaaooeeeee"
         }
 
         assert_status(403)
@@ -677,7 +677,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  describe 'PUT /courses/:course_id/quizzes/:quiz_id/submissions/:id [update]' do
+  describe "PUT /courses/:course_id/quizzes/:quiz_id/submissions/:id [update]" do
     before :once do
       # We're gonna test with 2 questions to make sure there are no side effects
       # when we modify a single question
@@ -699,7 +699,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @original_score = @quiz_submission.score # should be 95
     end
 
-    it 'fudges points' do
+    it "fudges points" do
       json = qs_api_update false, {
         quiz_submissions: [{
           attempt: @quiz_submission.attempt,
@@ -707,13 +707,13 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         }]
       }
 
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
-      expect(json['quiz_submissions'][0]['fudge_points']).to eq 2.5
-      expect(json['quiz_submissions'][0]['score']).to eq 97.5
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
+      expect(json["quiz_submissions"][0]["fudge_points"]).to eq 2.5
+      expect(json["quiz_submissions"][0]["score"]).to eq 97.5
     end
 
-    it 'modifies a question score' do
+    it "modifies a question score" do
       json = qs_api_update false, {
         quiz_submissions: [{
           attempt: @quiz_submission.attempt,
@@ -725,28 +725,28 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         }]
       }
 
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
-      expect(json['quiz_submissions'][0]['score']).to eq 55
+      expect(json).to have_key("quiz_submissions")
+      expect(json["quiz_submissions"].length).to eq 1
+      expect(json["quiz_submissions"][0]["score"]).to eq 55
     end
 
-    it 'sets a comment' do
+    it "sets a comment" do
       qs_api_update false, {
         quiz_submissions: [{
           attempt: @quiz_submission.attempt,
           questions: {
             @qq2.id.to_s => {
-              comment: 'Aaaaaughibbrgubugbugrguburgle'
+              comment: "Aaaaaughibbrgubugbugrguburgle"
             }
           }
         }]
       }
 
       @quiz_submission.reload
-      expect(@quiz_submission.submission_data[1]['more_comments']).to eq 'Aaaaaughibbrgubugbugrguburgle'
+      expect(@quiz_submission.submission_data[1]["more_comments"]).to eq "Aaaaaughibbrgubugbugrguburgle"
 
       # make sure no score is affected
-      expect(@quiz_submission.submission_data[1]['points']).to eq 45
+      expect(@quiz_submission.submission_data[1]["points"]).to eq 45
       expect(@quiz_submission.score).to eq @original_score
     end
   end
@@ -763,7 +763,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.update_attribute(:end_at, now + 1.hour)
-      Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => now - 1.hour)
+      Quizzes::QuizSubmission.where(id: @quiz_submission).update_all(updated_at: now - 1.hour)
     end
 
     it "gives times for the quiz" do

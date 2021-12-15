@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'alert' do
+describe "alert" do
   before :once do
     course_with_student
     @alert = @course.alerts.create!(recipients: [:student],
                                     criteria: [
-                                      criterion_type: 'Interaction',
+                                      criterion_type: "Interaction",
                                       threshold: 7
                                     ])
     @enrollment = @course.enrollments.first

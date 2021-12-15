@@ -23,7 +23,7 @@ describe Eportfolio do
     describe "spam_status" do
       before(:once) do
         @user = User.create!
-        @eportfolio = Eportfolio.new(user: @user, name: 'an eportfolio')
+        @eportfolio = Eportfolio.new(user: @user, name: "an eportfolio")
       end
 
       it "is valid when spam_status is nil" do
@@ -32,22 +32,22 @@ describe Eportfolio do
       end
 
       it "is valid when spam_status is 'marked_as_spam'" do
-        @eportfolio.spam_status = 'marked_as_spam'
+        @eportfolio.spam_status = "marked_as_spam"
         expect(@eportfolio).to be_valid
       end
 
       it "is valid when spam_status is 'marked_as_safe'" do
-        @eportfolio.spam_status = 'marked_as_safe'
+        @eportfolio.spam_status = "marked_as_safe"
         expect(@eportfolio).to be_valid
       end
 
       it "is valid when spam_status is 'flagged_as_possible_spam'" do
-        @eportfolio.spam_status = 'flagged_as_possible_spam'
+        @eportfolio.spam_status = "flagged_as_possible_spam"
         expect(@eportfolio).to be_valid
       end
 
       it "is invalid when spam_status is not nil, 'marked_as_spam', 'marked_as_safe', or 'flagged_as_possible_spam'" do
-        @eportfolio.spam_status = 'a_new_status'
+        @eportfolio.spam_status = "a_new_status"
         expect(@eportfolio).to be_invalid
       end
     end
@@ -57,7 +57,7 @@ describe Eportfolio do
     before(:once) do
       @student = User.create!
       @student.account_users.create!(account: Account.default, role: student_role)
-      @eportfolio = Eportfolio.create!(user: @student, name: 'an eportfolio')
+      @eportfolio = Eportfolio.create!(user: @student, name: "an eportfolio")
     end
 
     describe ":update" do
@@ -80,12 +80,12 @@ describe Eportfolio do
       end
 
       it "cannot update if the eportfolio is flagged as possible spam" do
-        @eportfolio.update!(spam_status: 'flagged_as_possible_spam')
+        @eportfolio.update!(spam_status: "flagged_as_possible_spam")
         expect(@eportfolio.grants_right?(@student, :update)).to be false
       end
 
       it "cannot update if the eportfolio is marked as spam" do
-        @eportfolio.update!(spam_status: 'marked_as_spam')
+        @eportfolio.update!(spam_status: "marked_as_spam")
         expect(@eportfolio.grants_right?(@student, :update)).to be false
       end
 
@@ -114,12 +114,12 @@ describe Eportfolio do
       end
 
       it "cannot manage if the eportfolio is flagged as possible spam" do
-        @eportfolio.update!(spam_status: 'flagged_as_possible_spam')
+        @eportfolio.update!(spam_status: "flagged_as_possible_spam")
         expect(@eportfolio.grants_right?(@student, :manage)).to be false
       end
 
       it "cannot manage if the eportfolio is marked as spam" do
-        @eportfolio.update!(spam_status: 'marked_as_spam')
+        @eportfolio.update!(spam_status: "marked_as_spam")
         expect(@eportfolio.grants_right?(@student, :manage)).to be false
       end
 
@@ -139,7 +139,7 @@ describe Eportfolio do
       end
 
       it "cannot moderate if the user is the author" do
-        eportfolio = Eportfolio.create!(user: @admin, name: 'admin eportfolio')
+        eportfolio = Eportfolio.create!(user: @admin, name: "admin eportfolio")
         expect(eportfolio.grants_right?(@admin, :moderate)).to be false
       end
 
@@ -161,7 +161,7 @@ describe Eportfolio do
 
       context "when the eportfolio is spam" do
         before(:once) do
-          @eportfolio.update!(spam_status: 'marked_as_spam')
+          @eportfolio.update!(spam_status: "marked_as_spam")
         end
 
         it "cannot read if the eportfolio is not active" do
@@ -194,17 +194,17 @@ describe Eportfolio do
       end
 
       it "cannot create if the user has another eportfolio flagged as possible spam" do
-        @eportfolio.update!(spam_status: 'flagged_as_possible_spam')
+        @eportfolio.update!(spam_status: "flagged_as_possible_spam")
         expect(Eportfolio.new.grants_right?(@student, :create)).to be false
       end
 
       it "cannot create if the user has another eportfolio marked as spam" do
-        @eportfolio.update!(spam_status: 'marked_as_spam')
+        @eportfolio.update!(spam_status: "marked_as_spam")
         expect(Eportfolio.new.grants_right?(@student, :create)).to be false
       end
 
       it "can create if the user has another eportfolio marked as safe" do
-        @eportfolio.update!(spam_status: 'marked_as_safe')
+        @eportfolio.update!(spam_status: "marked_as_safe")
         expect(Eportfolio.new.grants_right?(@student, :create)).to be true
       end
 
@@ -233,7 +233,7 @@ describe Eportfolio do
   describe "#flagged_as_possible_spam?" do
     before(:once) do
       @student = User.create!
-      @eportfolio = Eportfolio.new(user: @student, name: 'an eportfolio')
+      @eportfolio = Eportfolio.new(user: @student, name: "an eportfolio")
     end
 
     it "returns true if flagged as possible spam" do
@@ -254,7 +254,7 @@ describe Eportfolio do
   describe "#spam?" do
     before(:once) do
       @student = User.create!
-      @eportfolio = Eportfolio.new(user: @student, name: 'an eportfolio')
+      @eportfolio = Eportfolio.new(user: @student, name: "an eportfolio")
     end
 
     it "returns true if marked as spam" do
@@ -289,7 +289,7 @@ describe Eportfolio do
     end
 
     it "creates an entry in the first category if one doesn't exist" do
-      @category = @portfolio.eportfolio_categories.create!(:name => "Hi")
+      @category = @portfolio.eportfolio_categories.create!(name: "Hi")
       expect(@category.eportfolio_entries).to be_empty
       @portfolio.ensure_defaults
       expect(@category.reload.eportfolio_entries).not_to be_empty
@@ -304,7 +304,7 @@ describe Eportfolio do
 
       context "when the setting has a value" do
         before do
-          Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+          Setting.set("eportfolio_title_spam_keywords", "bad, verybad, worse")
         end
 
         it "marks as possible spam when the title matches one or more keywords" do
@@ -313,24 +313,24 @@ describe Eportfolio do
         end
 
         it "does not mark as spam when the title matches no keywords" do
-          expect {
+          expect do
             eportfolio.update!(name: "my great and notbad page")
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
 
         it "does not mark as spam if a spam_status already exists" do
           eportfolio.update!(spam_status: "marked_as_safe")
 
-          expect {
+          expect do
             eportfolio.update!(name: "actually a bad page")
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        expect {
+        expect do
           eportfolio.update!(name: "actually a bad page")
-        }.not_to change { spam_status }
+        end.not_to change { spam_status }
       end
     end
   end

@@ -29,23 +29,23 @@ module Lti
 
     DEFAULT_TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9"
 
-    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.instructure.webhooks.root_account.all'
+    WEBHOOK_GRANT_ALL_CAPABILITY = "vnd.instructure.webhooks.root_account.all"
     WEBHOOK_SUBSCRIPTION_CAPABILITIES = {
       all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
-      quiz_submitted: %w(vnd.instructure.webhooks.root_account.quiz_submitted
-                         vnd.instructure.webhooks.assignment.quiz_submitted).freeze,
-      grade_change: %w(vnd.instructure.webhooks.root_account.grade_change).freeze,
-      attachment_created: %w(vnd.instructure.webhooks.root_account.attachment_created
-                             vnd.instructure.webhooks.assignment.attachment_created).freeze,
-      submission_created: %w(vnd.instructure.webhooks.root_account.submission_created
-                             vnd.instructure.webhooks.assignment.submission_created).freeze,
-      plagiarism_resubmit: %w(vnd.instructure.webhooks.root_account.plagiarism_resubmit
-                              vnd.instructure.webhooks.assignment.plagiarism_resubmit).freeze,
-      submission_updated: %w(vnd.instructure.webhooks.root_account.submission_updated
-                             vnd.instructure.webhooks.assignment.submission_updated).freeze,
+      quiz_submitted: %w[vnd.instructure.webhooks.root_account.quiz_submitted
+                         vnd.instructure.webhooks.assignment.quiz_submitted].freeze,
+      grade_change: %w[vnd.instructure.webhooks.root_account.grade_change].freeze,
+      attachment_created: %w[vnd.instructure.webhooks.root_account.attachment_created
+                             vnd.instructure.webhooks.assignment.attachment_created].freeze,
+      submission_created: %w[vnd.instructure.webhooks.root_account.submission_created
+                             vnd.instructure.webhooks.assignment.submission_created].freeze,
+      plagiarism_resubmit: %w[vnd.instructure.webhooks.root_account.plagiarism_resubmit
+                              vnd.instructure.webhooks.assignment.plagiarism_resubmit].freeze,
+      submission_updated: %w[vnd.instructure.webhooks.root_account.submission_updated
+                             vnd.instructure.webhooks.assignment.submission_updated].freeze,
     }.freeze
 
-    DEFAULT_CAPABILITIES = %w(
+    DEFAULT_CAPABILITIES = %w[
       basic-lti-launch-request
       ToolProxyRegistrationRequest
       Canvas.placements.accountNavigation
@@ -57,12 +57,12 @@ module Lti
       Canvas.placements.postGrades
       Security.splitSecret
       Context.sourcedId
-    ).concat(
+    ].concat(
       Lti::VariableExpander.expansion_keys
     ).freeze
 
     RESTRICTED_CAPABILITIES = [
-      'Canvas.placements.similarityDetection',
+      "Canvas.placements.similarityDetection",
       "#{Lti::OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE}.url",
       *WEBHOOK_SUBSCRIPTION_CAPABILITIES.values.flatten
     ].freeze

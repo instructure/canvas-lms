@@ -69,7 +69,7 @@ module Lti
       include Concerns::GradebookServices
 
       before_action :prepare_line_item_for_ags!, only: :create
-      before_action :verify_line_item_in_context, only: %i(show update destroy)
+      before_action :verify_line_item_in_context, only: %i[show update destroy]
       before_action :verify_valid_resource_link, only: :create
 
       ACTION_SCOPE_MATCHERS = {
@@ -80,8 +80,8 @@ module Lti
         index: any_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE, TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE)
       }.with_indifferent_access.freeze
 
-      MIME_TYPE = 'application/vnd.ims.lis.v2.lineitem+json'
-      CONTAINER_MIME_TYPE = 'application/vnd.ims.lis.v2.lineitemcontainer+json'
+      MIME_TYPE = "application/vnd.ims.lis.v2.lineitem+json"
+      CONTAINER_MIME_TYPE = "application/vnd.ims.lis.v2.lineitemcontainer+json"
 
       rescue_from ActionController::BadRequest do |e|
         unless Rails.env.production?
@@ -177,6 +177,9 @@ module Lti
       #
       # @returns LineItem
       def show
+        # the LineItem workflow_state still "active" even if the assignment is deleted
+        head :not_found and return if line_item.assignment.deleted?
+
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
                content_type: MIME_TYPE
       end
@@ -221,7 +224,7 @@ module Lti
       private
 
       def line_item_params
-        @_line_item_params ||= params.permit(%i(resourceId resourceLinkId scoreMaximum label tag),
+        @_line_item_params ||= params.permit(%i[resourceId resourceLinkId scoreMaximum label tag],
                                              Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => [:type, :external_tool_url]).transform_keys do |k|
           k.to_s.underscore
         end.except(:resource_link_id)

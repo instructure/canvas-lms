@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'google_drive'
-require 'byebug'
-require 'timecop'
-require 'webmock/rspec'
+require "google_drive"
+require "byebug"
+require "timecop"
+require "webmock/rspec"
 
-DRIVE_FIXTURES_PATH = File.dirname(__FILE__) + '/fixtures/google_drive/'
+DRIVE_FIXTURES_PATH = File.dirname(__FILE__) + "/fixtures/google_drive/"
 
 def load_fixture(filename)
   File.read(DRIVE_FIXTURES_PATH + filename)
@@ -33,7 +33,7 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.color = true
 
-  config.order = 'random'
+  config.order = "random"
 
   config.before do
     WebMock.disable_net_connect!(allow_localhost: true)

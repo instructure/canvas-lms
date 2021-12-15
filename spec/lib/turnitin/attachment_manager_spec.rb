@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'turnitin_spec_helper'
-require 'turnitin_api'
+require_relative "turnitin_spec_helper"
+require "turnitin_api"
 module Turnitin
   describe AttachmentManager do
     include_context "shared_tii_lti"
@@ -26,42 +26,42 @@ module Turnitin
       allow(TiiClient).to receive(:new).with(lti_student, lti_assignment, tool, outcome_response_json).and_return(tii_client)
     end
 
-    describe '.create_attachment' do
-      it 'creates an attachment' do
+    describe ".create_attachment" do
+      it "creates an attachment" do
         expect do
           subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
         end.to change { lti_assignment.attachments.count }.by(1)
       end
 
-      it 'uses the filename from the tii client and replaces forward slashes with dashes' do
+      it "uses the filename from the tii client and replaces forward slashes with dashes" do
         subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
         expect(lti_assignment.attachments.first.display_name).to eq "my-new-filename.txt"
       end
 
-      it 'assigns the correct user' do
+      it "assigns the correct user" do
         subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
         expect(lti_assignment.attachments.first.user).to eq lti_student
       end
     end
 
-    describe '.update_attachment' do
+    describe ".update_attachment" do
       let(:submission) do
         sub = lti_assignment.submit_homework(
           lti_student,
           attachments: [attachment],
-          submission_type: 'online_upload',
+          submission_type: "online_upload"
         )
         sub.turnitin_data = { attachment.asset_string => { outcome_response: outcome_response_json } }
         sub.save!
         sub
       end
 
-      it 'updates the submission' do
+      it "updates the submission" do
         updated_attachment = Turnitin::AttachmentManager.update_attachment(submission, attachment)
         expect(updated_attachment.display_name).to eq "my-new-filename.txt"
       end
 
-      it 'works when there is only a url in the content_tag' do
+      it "works when there is only a url in the content_tag" do
         tag = lti_assignment.external_tool_tag
         tag.content_id = nil
         tag.save!

@@ -19,7 +19,6 @@
 import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 
-import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import {Responsive} from '@instructure/ui-responsive'
@@ -31,7 +30,7 @@ import Body from './components/body'
 import Footer from './components/footer'
 import Header from './components/header/header'
 import {ResponsiveSizes, StoreState} from './types'
-import {getErrorMessage, getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
+import {getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_app'
@@ -39,9 +38,9 @@ import {getSummarizedChanges} from './reducers/pace_plans'
 import {pacePlanActions} from './actions/pace_plans'
 import {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
+import Errors from './components/errors'
 
 interface StoreProps {
-  readonly errorMessage: string
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
   readonly unpublishedChanges: SummarizedChange[]
@@ -59,7 +58,6 @@ type ResponsiveComponentProps = ComponentProps & {
 }
 
 export const App: React.FC<ResponsiveComponentProps> = ({
-  errorMessage,
   loadingMessage,
   setResponsiveSize,
   showLoadingOverlay,
@@ -78,16 +76,6 @@ export const App: React.FC<ResponsiveComponentProps> = ({
     setResponsiveSize(responsiveSize)
   }, [responsiveSize, setResponsiveSize])
 
-  const renderErrorAlert = () => {
-    if (errorMessage) {
-      return (
-        <Alert variant="error" closeButtonLabel="Close" margin="small">
-          {errorMessage}
-        </Alert>
-      )
-    }
-  }
-
   return (
     <View>
       <Overlay open={showLoadingOverlay} transition="fade" label={loadingMessage}>
@@ -97,7 +85,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
       </Overlay>
       <Flex as="div" direction="column" margin="small">
         <View>
-          {renderErrorAlert()}
+          <Errors />
           <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
         </View>
         <Body />
@@ -138,7 +126,6 @@ export const ResponsiveApp: React.FC<ComponentProps> = props => (
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    errorMessage: getErrorMessage(state),
     loadingMessage: getLoadingMessage(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
     unpublishedChanges: getSummarizedChanges(state)

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::CreateDiscussionEntryDraft do
   before(:once) do
@@ -27,7 +27,7 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
     discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
   end
 
-  let(:root) { @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic) }
+  let(:root) { @topic.discussion_entries.create!(message: "root entry", user: @teacher, discussion_topic: @topic) }
   let(:parent) { @topic.discussion_entries.create!(message: "parent_entry", parent_id: root.id, user: @teacher) }
   let(:sub) { @topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id, user: @teacher) }
 
@@ -74,82 +74,82 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
     result.to_h.with_indifferent_access
   end
 
-  it 'creates a discussion entry draft' do
-    result = run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey')
-    expect(result['errors']).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'errors')).to be nil
+  it "creates a discussion entry draft" do
+    result = run_mutation(discussion_topic_id: @topic.id, message: "Howdy Hey")
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createDiscussionEntryDraft", "errors")).to be nil
 
     draft = @topic.discussion_entry_drafts.last
-    expect(draft.message).to eq 'Howdy Hey'
+    expect(draft.message).to eq "Howdy Hey"
   end
 
-  it 'updates an existing discussion entry draft' do
-    draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: 'hello').first
-    result = run_mutation(discussion_topic_id: @topic.id, message: 'hello entry')
-    expect(result['errors']).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'discussionEntryDraft', '_id')).to eq draft_id.to_s
-    expect(DiscussionEntryDraft.find(draft_id).message).to eq 'hello entry'
+  it "updates an existing discussion entry draft" do
+    draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "hello").first
+    result = run_mutation(discussion_topic_id: @topic.id, message: "hello entry")
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createDiscussionEntryDraft", "discussionEntryDraft", "_id")).to eq draft_id.to_s
+    expect(DiscussionEntryDraft.find(draft_id).message).to eq "hello entry"
   end
 
-  it 'allows creating for an entry' do
+  it "allows creating for an entry" do
     result = run_mutation(discussion_topic_id: @topic.id,
-                          message: 'edit in progress for entry',
+                          message: "edit in progress for entry",
                           discussion_entry_id: root.id)
-    expect(result['errors']).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'errors')).to be nil
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createDiscussionEntryDraft", "errors")).to be nil
 
     draft = @topic.discussion_entry_drafts.last
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'discussionEntryDraft', '_id')).to eq draft.id.to_s
-    expect(draft.message).to eq 'edit in progress for entry'
+    expect(result.dig("data", "createDiscussionEntryDraft", "discussionEntryDraft", "_id")).to eq draft.id.to_s
+    expect(draft.message).to eq "edit in progress for entry"
     expect(draft.discussion_entry_id).to eq root.id
   end
 
-  it 'sets root_entry_id' do
-    result = run_mutation(discussion_topic_id: @topic.id, message: 'threaded reply', parent_entry_id: parent.id)
-    expect(result['errors']).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'errors')).to be nil
+  it "sets root_entry_id" do
+    result = run_mutation(discussion_topic_id: @topic.id, message: "threaded reply", parent_entry_id: parent.id)
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createDiscussionEntryDraft", "errors")).to be nil
 
     draft = @topic.discussion_entry_drafts.last
     expect(draft.root_entry_id).to eq root.id
   end
 
-  it 'updates existing root_entry draft on new parent_entry' do
-    draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: 'hello', parent: parent).first
-    result = run_mutation(discussion_topic_id: @topic.id, message: 'threaded reply', parent_entry_id: sub.id)
-    expect(result['errors']).to be nil
-    expect(result.dig('data', 'createDiscussionEntryDraft', 'errors')).to be nil
+  it "updates existing root_entry draft on new parent_entry" do
+    draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "hello", parent: parent).first
+    result = run_mutation(discussion_topic_id: @topic.id, message: "threaded reply", parent_entry_id: sub.id)
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createDiscussionEntryDraft", "errors")).to be nil
 
     first_draft = DiscussionEntryDraft.find(draft_id)
     expect(first_draft.reload.parent_id).to eq sub.id
     expect(first_draft.root_entry_id).to eq parent.root_entry_id
-    expect(first_draft.message).to eq 'threaded reply'
+    expect(first_draft.message).to eq "threaded reply"
   end
 
-  context 'errors' do
-    it 'if given a bad discussion topic id' do
-      result = run_mutation(discussion_topic_id: @topic.id + 1337, message: 'this should fail')
-      expect(result.dig('data', 'createDiscussionEntryDraft')).to be nil
-      expect(result.dig('errors', 0, 'message')).to eq 'not found'
+  context "errors" do
+    it "if given a bad discussion topic id" do
+      result = run_mutation(discussion_topic_id: @topic.id + 1337, message: "this should fail")
+      expect(result.dig("data", "createDiscussionEntryDraft")).to be nil
+      expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
-    it 'if the user does not have permission to read' do
+    it "if the user does not have permission to read" do
       user = user_model
-      result = run_mutation({ discussion_topic_id: @topic.id, message: 'this should fail' }, user)
-      expect(result.dig('data', 'createDiscussionEntryDraft')).to be nil
-      expect(result.dig('errors', 0, 'message')).to eq 'not found'
+      result = run_mutation({ discussion_topic_id: @topic.id, message: "this should fail" }, user)
+      expect(result.dig("data", "createDiscussionEntryDraft")).to be nil
+      expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
-    it 'if given a bad attachment id' do
-      result = run_mutation(discussion_topic_id: @topic.id, message: 'this should fail', file_id: 1337)
-      expect(result.dig('data', 'createDiscussionEntryDraft')).to be nil
-      expect(result.dig('errors', 0, 'message')).to eq 'not found'
+    it "if given a bad attachment id" do
+      result = run_mutation(discussion_topic_id: @topic.id, message: "this should fail", file_id: 1337)
+      expect(result.dig("data", "createDiscussionEntryDraft")).to be nil
+      expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
-    it 'if the user does not own the attachment' do
+    it "if the user does not own the attachment" do
       attachment = attachment_with_context(user_model)
-      result = run_mutation(discussion_topic_id: @topic.id, message: 'this should fail', file_id: attachment.id)
-      expect(result.dig('data', 'createDiscussionEntryDraft')).to be nil
-      expect(result.dig('errors', 0, 'message')).to eq 'not found'
+      result = run_mutation(discussion_topic_id: @topic.id, message: "this should fail", file_id: attachment.id)
+      expect(result.dig("data", "createDiscussionEntryDraft")).to be nil
+      expect(result.dig("errors", 0, "message")).to eq "not found"
     end
   end
 end

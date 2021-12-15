@@ -17,24 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'adheres_to_policy'
+require "adheres_to_policy"
 
 ActiveRecord::Base.singleton_class.include(AdheresToPolicy::ClassMethods)
 
 AdheresToPolicy.configure do |config|
-  config.blacklist = -> {
-    Setting.get('permissions_cache_blacklist', '').split(',').map(&:strip)
-  }
+  config.blacklist = lambda do
+    Setting.get("permissions_cache_blacklist", "").split(",").map(&:strip)
+  end
 
-  config.cache_related_permissions = -> {
-    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_related', 'true'))
-  }
+  config.cache_related_permissions = lambda do
+    Canvas::Plugin.value_to_boolean(Setting.get("permissions_cache_related", "true"))
+  end
 
-  config.cache_intermediate_permissions = -> {
-    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_intermediate', 'true'))
-  }
+  config.cache_intermediate_permissions = lambda do
+    Canvas::Plugin.value_to_boolean(Setting.get("permissions_cache_intermediate", "true"))
+  end
 
-  config.cache_permissions = -> {
-    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_enabled', 'true'))
-  }
+  config.cache_permissions = lambda do
+    Canvas::Plugin.value_to_boolean(Setting.get("permissions_cache_enabled", "true"))
+  end
 end

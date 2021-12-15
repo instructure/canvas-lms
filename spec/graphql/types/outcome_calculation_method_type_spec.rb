@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Types::OutcomeCalculationMethodType do
@@ -30,34 +30,34 @@ describe Types::OutcomeCalculationMethodType do
   let(:account) { @course.root_account }
   let(:account_type) { GraphQLTypeTester.new(account, current_user: @teacher) }
 
-  it 'works' do
+  it "works" do
     expect(
-      account_type.resolve('outcomeCalculationMethod { _id }')
+      account_type.resolve("outcomeCalculationMethod { _id }")
     ).to eq account.outcome_calculation_method.id.to_s
   end
 
-  describe 'works for the field' do
-    it 'calculation_method' do
+  describe "works for the field" do
+    it "calculation_method" do
       expect(
-        account_type.resolve('outcomeCalculationMethod { calculationMethod }')
+        account_type.resolve("outcomeCalculationMethod { calculationMethod }")
       ).to eq account.outcome_calculation_method.calculation_method
     end
 
-    it 'calculation_int' do
+    it "calculation_int" do
       expect(
-        account_type.resolve('outcomeCalculationMethod { calculationInt }')
+        account_type.resolve("outcomeCalculationMethod { calculationInt }")
       ).to eq account.outcome_calculation_method.calculation_int
     end
 
-    it 'context_type' do
+    it "context_type" do
       expect(
-        account_type.resolve('outcomeCalculationMethod { contextType }')
+        account_type.resolve("outcomeCalculationMethod { contextType }")
       ).to eq account.outcome_calculation_method.context_type
     end
 
-    it 'context_id' do
+    it "context_id" do
       expect(
-        account_type.resolve('outcomeCalculationMethod { contextId }')
+        account_type.resolve("outcomeCalculationMethod { contextId }")
       ).to eq account.outcome_calculation_method.context_id.to_s
     end
   end

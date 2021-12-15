@@ -44,13 +44,13 @@ module DataFixup::MoveFeatureFlagsToSettings
     return if account.settings.dig(setting_name, :locked)
 
     account.sub_accounts.find_in_batches do |sub_accounts|
-      ActiveRecord::Associations::Preloader.new.preload(sub_accounts, :feature_flags, FeatureFlag.where(:feature => feature_flag_name))
+      ActiveRecord::Associations::Preloader.new.preload(sub_accounts, :feature_flags, FeatureFlag.where(feature: feature_flag_name))
       sub_accounts.each do |sub_account|
         migrate_ff_overrides_to_inherited_recurse(sub_account, feature_flag_name, setting_name)
       end
     end
     account.courses.find_in_batches do |courses|
-      ActiveRecord::Associations::Preloader.new.preload(courses, :feature_flags, FeatureFlag.where(:feature => feature_flag_name))
+      ActiveRecord::Associations::Preloader.new.preload(courses, :feature_flags, FeatureFlag.where(feature: feature_flag_name))
       courses.each do |course|
         figure_setting_from_override(course, feature_flag_name, setting_name, inherited: false)
       end
@@ -59,9 +59,11 @@ module DataFixup::MoveFeatureFlagsToSettings
   private_class_method :migrate_ff_overrides_to_inherited_recurse
 
   def self.figure_setting_from_override(context, feature_flag_name, setting_name, inherited:)
-    override = context.feature_flags.loaded? ?
-      context.feature_flags.detect { |ff| ff.feature == feature_flag_name.to_s } :
-      context.feature_flags.where(:feature => feature_flag_name.to_s).take
+    override = if context.feature_flags.loaded?
+                 context.feature_flags.detect { |ff| ff.feature == feature_flag_name.to_s }
+               else
+                 context.feature_flags.where(feature: feature_flag_name.to_s).take
+               end
     override_value = nil
     if override
       case override.state
@@ -79,7 +81,7 @@ module DataFixup::MoveFeatureFlagsToSettings
 
     unless override_value.nil?
       if context.is_a?(Account)
-        context.settings[setting_name] = inherited ? { :locked => true, :value => override_value } : override_value
+        context.settings[setting_name] = inherited ? { locked: true, value: override_value } : override_value
       else
         context.settings_frd[setting_name] = override_value
       end

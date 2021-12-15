@@ -21,15 +21,15 @@ module InstFS
   class << self
     def enabled?
       # true if plugin is enabled AND all settings values are set
-      Canvas::Plugin.find('inst_fs').enabled? && !!app_host && !!jwt_secret
+      Canvas::Plugin.find("inst_fs").enabled? && !!app_host && !!jwt_secret
     end
 
     def check_migration_rate?
-      rand < Canvas::Plugin.find('inst_fs').settings[:migration_rate].to_f / 100.0
+      rand < Canvas::Plugin.find("inst_fs").settings[:migration_rate].to_f / 100.0
     end
 
     def service_worker_enabled?
-      Canvas::Plugin.value_to_boolean(Canvas::Plugin.find('inst_fs').settings[:service_worker])
+      Canvas::Plugin.value_to_boolean(Canvas::Plugin.find("inst_fs").settings[:service_worker])
     end
 
     def migrate_attachment?(attachment)
@@ -43,7 +43,7 @@ module InstFS
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
-        %Q(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
+        %(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
       end
     end
 
@@ -56,12 +56,12 @@ module InstFS
     end
 
     def bearer_token(options)
-      expires_in = options[:expires_in] || Setting.get('instfs.session_token.expiration_minutes', '5').to_i.minutes
+      expires_in = options[:expires_in] || Setting.get("instfs.session_token.expiration_minutes", "5").to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s
       }
-      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
+      Canvas::Security.create_jwt(claims, expires_in.from_now, jwt_secret, :HS512)
     end
 
     def authenticated_url(attachment, options = {})
@@ -148,7 +148,7 @@ module InstFS
       end
 
       {
-        file_param: target_url ? nil : 'file',
+        file_param: target_url ? nil : "file",
         progress: progress_json,
         upload_url: upload_url(token),
         upload_params: upload_params
@@ -177,7 +177,7 @@ module InstFS
       rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
       end
-      if response.class == Net::HTTPCreated
+      if response.code.to_i == 201
         json_response = JSON.parse(response.body)
         return json_response["instfs_uuid"] if json_response.key?("instfs_uuid")
 
@@ -204,8 +204,8 @@ module InstFS
       # `attachment.bucket.url`
       s3_client = attachment.bucket.client
       s3_url = s3_client.config.endpoint.dup
-      if s3_client.config.region == 'us-east-1' &&
-         s3_client.config.s3_us_east_1_regional_endpoint == 'legacy'
+      if s3_client.config.region == "us-east-1" &&
+         s3_client.config.s3_us_east_1_regional_endpoint == "legacy"
         s3_url.host = Aws::S3::Plugins::IADRegionalEndpoint.legacy_host(s3_url.host)
       end
 
@@ -233,7 +233,7 @@ module InstFS
       }.to_json
 
       response = CanvasHttp.post(export_references_url, body: body, content_type: "application/json")
-      raise InstFS::ExportReferenceError, "received code \"#{response.code}\" from service, with message \"#{response.body}\"" unless response.class == Net::HTTPOK
+      raise InstFS::ExportReferenceError, "received code \"#{response.code}\" from service, with message \"#{response.body}\"" unless response.code.to_i == 200
 
       json_response = JSON.parse(response.body)
       well_formed =
@@ -253,7 +253,7 @@ module InstFS
       url = "#{app_host}/files/#{instfs_uuid}/duplicate?token=#{token}"
 
       response = CanvasHttp.post(url)
-      if response.class == Net::HTTPCreated
+      if response.code.to_i == 201
         json_response = JSON.parse(response.body)
         return json_response["id"] if json_response.key?("id")
 
@@ -267,7 +267,7 @@ module InstFS
       url = "#{app_host}/files/#{instfs_uuid}?token=#{token}"
 
       response = CanvasHttp.delete(url)
-      unless response.class == Net::HTTPOK
+      unless response.code.to_i == 200
         raise InstFS::DeletionError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
       end
 
@@ -329,7 +329,7 @@ module InstFS
     # `expires_at` can be either a Time or an ActiveSupport::Duration
     def service_jwt(claims, expires_at)
       expires_at = expires_at.from_now if expires_at.respond_to?(:from_now)
-      Canvas::Security.create_jwt(claims, expires_at, self.jwt_secret, :HS512)
+      Canvas::Security.create_jwt(claims, expires_at, jwt_secret, :HS512)
     end
 
     # floor_to rounds `number` down to a multiple of the chosen step.
@@ -367,12 +367,12 @@ module InstFS
     end
 
     def access_jwt(resource, options = {})
-      expires_in = options[:expires_in] || Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
-      if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
-        iat = consistent_iat(resource, expires_in)
-      else
-        iat = Time.now.utc.to_i
-      end
+      expires_in = options[:expires_in] || Setting.get("instfs.access_jwt.expiration_hours", "24").to_i.hours
+      iat = if (expires_in >= 1.hour.to_i) && Setting.get("instfs.access_jwt.use_consistent_iat", "true") == "true"
+              consistent_iat(resource, expires_in)
+            else
+              Time.now.utc.to_i
+            end
 
       claims = {
         iat: iat,
@@ -391,7 +391,7 @@ module InstFS
     end
 
     def upload_jwt(user:, acting_as:, access_token:, root_account:, capture_url:, capture_params:)
-      expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
+      expires_in = Setting.get("instfs.upload_jwt.expiration_minutes", "10").to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
@@ -407,7 +407,7 @@ module InstFS
     end
 
     def direct_upload_jwt
-      expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
+      expires_in = Setting.get("instfs.upload_jwt.expiration_minutes", "10").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: nil,
@@ -417,34 +417,34 @@ module InstFS
     end
 
     def session_jwt(user, host)
-      expires_in = Setting.get('instfs.session_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.session_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
                     host: host,
-                    resource: '/session/ensure'
+                    resource: "/session/ensure"
                   }, expires_in)
     end
 
     def logout_jwt(user)
-      expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.logout_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
-                    resource: '/session'
+                    resource: "/session"
                   }, expires_in)
     end
 
     def export_references_jwt
-      expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.logout_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
-                    resource: '/references'
+                    resource: "/references"
                   }, expires_in)
     end
 
     def duplicate_file_jwt(instfs_uuid)
-      expires_in = Setting.get('instfs.duplicate_file_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.duplicate_file_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}/duplicate"
@@ -452,7 +452,7 @@ module InstFS
     end
 
     def delete_file_jwt(instfs_uuid)
-      expires_in = Setting.get('instfs.delete_file_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.delete_file_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}"
@@ -465,13 +465,13 @@ module InstFS
         query = (uri.query_values || {}).with_indifferent_access
         # We only want to redirect once, if the redirect param is present then we already redirected.
         # In which case we don't send the original_url param again
-        if !Canvas::Plugin.value_to_boolean(query[:redirect])
+        if Canvas::Plugin.value_to_boolean(query[:redirect])
+          nil
+        else
           query[:redirect] = true
           query[:no_cache] = true
           uri.query_values = query
-          return uri.to_s
-        else
-          return nil
+          uri.to_s
         end
       end
     end
@@ -484,18 +484,18 @@ module InstFS
         claims[:legacy_api_developer_key_id] = access_token.global_developer_key_id.to_s
         claims[:legacy_api_root_account_id] = root_account.global_id.to_s
       else
-        # TODO: long term solution for updated API consumers goes here
+        nil # TODO: long term solution for updated API consumers goes here
       end
     end
 
     def whitelisted_access_token?(access_token)
       if access_token.nil?
         false
-      elsif Setting.get('instfs.whitelist_all_developer_keys', 'false') == 'true'
+      elsif Setting.get("instfs.whitelist_all_developer_keys", "false") == "true"
         true
       else
-        whitelist = Setting.get('instfs.whitelisted_developer_key_global_ids', '')
-        whitelist = whitelist.split(',').map(&:to_i)
+        whitelist = Setting.get("instfs.whitelisted_developer_key_global_ids", "")
+        whitelist = whitelist.split(",").map(&:to_i)
         whitelist.include?(access_token.global_developer_key_id)
       end
     end

@@ -20,9 +20,9 @@
 
 module Types
   class NotificationPreferencesContextType < Types::BaseEnum
-    graphql_name 'NotificationPreferencesContextType'
-    description 'Context types that can be associated with notification preferences'
-    value 'Course'
-    value 'Account'
+    graphql_name "NotificationPreferencesContextType"
+    description "Context types that can be associated with notification preferences"
+    value "Course"
+    value "Account"
   end
 end

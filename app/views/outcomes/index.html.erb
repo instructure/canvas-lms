@@ -28,7 +28,7 @@
     css_bundle :improved_outcomes_management
   end
 %>
-<% if @domain_root_account.feature_enabled?(:account_level_mastery_scales) %>
+<% if (@domain_root_account.feature_enabled?(:account_level_mastery_scales) || @domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation)) %>
   <%
     js_bundle :outcome_management
     css_bundle :proficiency_table

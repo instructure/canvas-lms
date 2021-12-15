@@ -52,68 +52,68 @@ describe Mutations::UpdateCommentBankItem do
   end
 
   it "updates a comment bank item" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{@comment.id}
       comment: "updated comment!"
-    QUERY
+    GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateCommentBankItem', 'errors')).to be_nil
-    result = result.dig('data', 'updateCommentBankItem', 'commentBankItem')
-    expect(result.dig('courseId')).to eq @course.id.to_s
-    expect(result.dig('userId')).to eq @admin.id.to_s
-    expect(result.dig('comment')).to eq "updated comment!"
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateCommentBankItem", "errors")).to be_nil
+    result = result.dig("data", "updateCommentBankItem", "commentBankItem")
+    expect(result["courseId"]).to eq @course.id.to_s
+    expect(result["userId"]).to eq @admin.id.to_s
+    expect(result["comment"]).to eq "updated comment!"
   end
 
   it "allows relay id for comment bank item id" do
-    query = <<~QUERY
-      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem').call(@comment.id.to_s)},
+    query = <<~GQL
+      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func("CommentBankItem").call(@comment.id.to_s)},
       comment: "updated comment!"
-    QUERY
-    comment = execute_with_input(query).dig('data', 'updateCommentBankItem', 'commentBankItem', 'comment')
+    GQL
+    comment = execute_with_input(query).dig("data", "updateCommentBankItem", "commentBankItem", "comment")
     expect(comment).to eq "updated comment!"
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateCommentBankItem', 'errors')
+      errors = result["errors"] || result.dig("data", "updateCommentBankItem", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "invalid id" do
-      query = <<~QUERY
+      query = <<~GQL
         id: 0,
         comment: "comment"
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'Record not found')
+      expect_error(result, "Record not found")
     end
 
     it "blank comment field" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment.id},
         comment: ""
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, "is too short")
     end
 
     it "missing comment field" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment.id}
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'Argument \'comment\' on InputObject \'UpdateCommentBankItemInput\' is required.')
+      expect_error(result, "Argument 'comment' on InputObject 'UpdateCommentBankItemInput' is required.")
     end
 
     it "invalid permissions" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment.id},
         comment: "comment"
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @student)
-      expect_error(result, 'not found')
+      expect_error(result, "not found")
     end
   end
 end

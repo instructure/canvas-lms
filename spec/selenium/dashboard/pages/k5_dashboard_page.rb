@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/color_common'
+require_relative "../../common"
+require_relative "../../helpers/color_common"
 
 module K5DashboardPageObject
   include ColorCommon
@@ -82,7 +82,7 @@ module K5DashboardPageObject
   end
 
   def course_dashboard_title_selector
-    'h1'
+    "h1"
   end
 
   def course_homeroom_option_selector(option_text)
@@ -130,7 +130,7 @@ module K5DashboardPageObject
   end
 
   def enable_homeroom_checkbox_selector
-    '#course_homeroom_course'
+    "#course_homeroom_course"
   end
 
   def front_page_info_selector
@@ -138,7 +138,7 @@ module K5DashboardPageObject
   end
 
   def grades_tab_selector
-    '#tab-tab-grades'
+    "#tab-tab-grades"
   end
 
   def group_management_button_selector(button_type)
@@ -154,7 +154,7 @@ module K5DashboardPageObject
   end
 
   def home_tab_selector
-    '#tab-tab-home'
+    "#tab-tab-home"
   end
 
   def homeroom_course_title_selector(title)
@@ -166,7 +166,7 @@ module K5DashboardPageObject
   end
 
   def homeroom_tab_selector
-    '#tab-tab-homeroom'
+    "#tab-tab-homeroom"
   end
 
   def items_due_selector(subject_title)
@@ -206,7 +206,7 @@ module K5DashboardPageObject
   end
 
   def modules_tab_selector
-    '#tab-tab-modules'
+    "#tab-tab-modules"
   end
 
   def navigation_item_selector
@@ -274,7 +274,7 @@ module K5DashboardPageObject
   end
 
   def resources_tab_selector
-    '#tab-tab-resources'
+    "#tab-tab-resources"
   end
 
   def selected_color_input_selector
@@ -282,7 +282,7 @@ module K5DashboardPageObject
   end
 
   def schedule_tab_selector
-    '#tab-tab-schedule'
+    "#tab-tab-schedule"
   end
 
   def student_view_button_selector
@@ -298,7 +298,7 @@ module K5DashboardPageObject
   end
 
   def welcome_title_selector
-    'h1'
+    "h1"
   end
 
   #------------------------- Elements --------------------------
@@ -332,7 +332,7 @@ module K5DashboardPageObject
   end
 
   def assignments_link
-    fln('Assignments')
+    fln("Assignments")
   end
 
   def assignment_page_title

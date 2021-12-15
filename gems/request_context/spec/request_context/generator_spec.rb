@@ -17,41 +17,41 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-require 'dynamic_settings'
-require 'timecop'
+require "spec_helper"
+require "dynamic_settings"
+require "timecop"
 
 describe "RequestContext::Generator" do
   let(:env) { {} }
-  let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
-  let(:context) { double('Course', class: 'Course', id: 15) }
+  let(:request) { double("Rack::Request", path_parameters: { controller: "users", action: "index" }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
+  let(:context) { double("Course", class: "Course", id: 15) }
 
   it "generates the X-Canvas-Meta response header" do
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.add_meta_header("a2", "test2")
       RequestContext::Generator.add_meta_header("a3", "")
       [200, {}, []]
-    }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;a2=test2;"
+    end).call(env)
+    expect(headers["X-Canvas-Meta"]).to eq "a1=test1;a2=test2;"
   end
 
   it "adds request data to X-Canvas-Meta" do
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, nil)
       [200, {}, []]
-    }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;"
+    end).call(env)
+    expect(headers["X-Canvas-Meta"]).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;"
   end
 
   it "adds request and context data to X-Canvas-Meta" do
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, context)
       [200, {}, []]
-    }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;t=Course;i=15;"
+    end).call(env)
+    expect(headers["X-Canvas-Meta"]).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;t=Course;i=15;"
   end
 
   it "adds page view data to X-Canvas-Meta" do
@@ -77,13 +77,13 @@ describe "RequestContext::Generator" do
       end
     end
     pv = fake_pv_class.new({ seconds: 5.0, created_at: DateTime.now, participated: false })
-    _, headers, _ = RequestContext::Generator.new(->(_env) {
+    _, headers, _ = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_page_view_meta(pv)
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     f = pv.created_at.try(:utc).try(:iso8601, 2)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5.0;p=f;f=#{f};"
+    expect(headers["X-Canvas-Meta"]).to eq "a1=test1;x=5.0;p=f;f=#{f};"
   end
 
   it "generates a request_id and store it in Thread.current" do
@@ -94,43 +94,43 @@ describe "RequestContext::Generator" do
 
   it "adds the request_id to X-Request-Context-Id" do
     Thread.current[:context] = nil
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       [200, {}, []]
-    }).call(env)
-    expect(headers['X-Request-Context-Id']).to be_present
+    end).call(env)
+    expect(headers["X-Request-Context-Id"]).to be_present
   end
 
   it "finds the session_id in a cookie and store it in Thread.current" do
     Thread.current[:context] = nil
-    env['action_dispatch.cookies'] = { log_session_id: 'abc' }
+    env["action_dispatch.cookies"] = { log_session_id: "abc" }
     RequestContext::Generator.new(->(_env) { [200, {}, []] }).call(env)
-    expect(Thread.current[:context][:session_id]).to eq 'abc'
+    expect(Thread.current[:context][:session_id]).to eq "abc"
   end
 
   it "finds the session_id from the rack session and add it to X-Session-Id" do
     Thread.current[:context] = nil
-    env['rack.session.options'] = { id: 'abc' }
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    env["rack.session.options"] = { id: "abc" }
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       [200, {}, []]
-    }).call(env)
-    expect(headers['X-Session-Id']).to eq 'abc'
+    end).call(env)
+    expect(headers["X-Session-Id"]).to eq "abc"
   end
 
   it "calculates the 'queued' time if header is passed" do
     Timecop.freeze do
       Thread.current[:context] = nil
-      env['HTTP_X_REQUEST_START'] = "t=#{(1.minute.ago.to_f * 1000000).to_i}"
-      _, headers, = RequestContext::Generator.new(->(_env) {
+      env["HTTP_X_REQUEST_START"] = "t=#{(1.minute.ago.to_f * 1_000_000).to_i}"
+      _, headers, = RequestContext::Generator.new(lambda do |_env|
         [200, {}, []]
-      }).call(env)
+      end).call(env)
       q = headers["X-Canvas-Meta"].match(/q=(\d+)/)[1].to_f
-      expect(q / 1000000).to eq 60.0
+      expect(q / 1_000_000).to eq 60.0
     end
   end
 
   context "when request provides an override context id" do
-    let(:shared_secret) { 'sup3rs3cr3t!!' }
-    let(:remote_request_context_id) { '1234-5678-9012-3456-7890-1234-5678' }
+    let(:shared_secret) { "sup3rs3cr3t!!" }
+    let(:remote_request_context_id) { "1234-5678-9012-3456-7890-1234-5678" }
 
     let(:remote_signature) do
       CanvasSecurity.sign_hmac_sha512(remote_request_context_id, shared_secret)
@@ -146,13 +146,13 @@ describe "RequestContext::Generator" do
         config: {
           canvas: {
             canvas: {
-              'signing-secret' => shared_secret
+              "signing-secret" => shared_secret
             }
           }
         }
       }
-      env['HTTP_X_REQUEST_CONTEXT_ID'] = CanvasSecurity.base64_encode(remote_request_context_id)
-      env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = CanvasSecurity.base64_encode(remote_signature)
+      env["HTTP_X_REQUEST_CONTEXT_ID"] = CanvasSecurity.base64_encode(remote_request_context_id)
+      env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = CanvasSecurity.base64_encode(remote_signature)
     end
 
     after { DynamicSettings.fallback_data = {} }
@@ -165,28 +165,28 @@ describe "RequestContext::Generator" do
     it "uses a provided request context id if another service submits one that is correctly signed" do
       headers = run_middleware
       expect(Thread.current[:context][:request_id]).to eq(remote_request_context_id)
-      expect(headers['X-Request-Context-Id']).to eq(remote_request_context_id)
+      expect(headers["X-Request-Context-Id"]).to eq(remote_request_context_id)
     end
 
     it "won't accept an override without a signature" do
-      env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = nil
+      env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = nil
       headers = run_middleware
       expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
-      expect(headers['X-Request-Context-Id']).to eq(Thread.current[:context][:request_id])
+      expect(headers["X-Request-Context-Id"]).to eq(Thread.current[:context][:request_id])
     end
 
     it "rejects a wrong signature" do
-      env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = "nonsense"
+      env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = "nonsense"
       headers = run_middleware
       expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
-      expect(headers['X-Request-Context-Id']).to eq(Thread.current[:context][:request_id])
+      expect(headers["X-Request-Context-Id"]).to eq(Thread.current[:context][:request_id])
     end
 
     it "rejects a tampered ID" do
-      env['HTTP_X_REQUEST_CONTEXT_ID'] = "I-changed-it"
+      env["HTTP_X_REQUEST_CONTEXT_ID"] = "I-changed-it"
       headers = run_middleware
       expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
-      expect(headers['X-Request-Context-Id']).to eq(Thread.current[:context][:request_id])
+      expect(headers["X-Request-Context-Id"]).to eq(Thread.current[:context][:request_id])
     end
 
     describe "when the request path allows setting a context ID without a signature" do
@@ -194,14 +194,14 @@ describe "RequestContext::Generator" do
 
       after { RequestContext::Generator.reset_unsigned_request_context_paths }
 
-      let(:test_path) { '/super/trustworthy/path' }
+      let(:test_path) { "/super/trustworthy/path" }
 
       it "does not require a signature for override" do
-        env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = nil
-        env['PATH_INFO'] = test_path
+        env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = nil
+        env["PATH_INFO"] = test_path
         headers = run_middleware
         expect(Thread.current[:context][:request_id]).to eq(remote_request_context_id)
-        expect(headers['X-Request-Context-Id']).to eq(remote_request_context_id)
+        expect(headers["X-Request-Context-Id"]).to eq(remote_request_context_id)
       end
     end
   end

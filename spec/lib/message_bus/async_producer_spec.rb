@@ -39,7 +39,7 @@ describe MessageBus::AsyncProducer do
     it "re-raises errors correctly if they're not rescuable" do
       producer = ::MessageBus::AsyncProducer.new(start_thread: false)
       allow(MessageBus).to receive(:producer_for).and_raise(::Pulsar::Error::AlreadyClosed)
-      expect { producer.send(:produce_message, 'a', 'b', 'c') }.to raise_error(::Pulsar::Error::AlreadyClosed)
+      expect { producer.send(:produce_message, "a", "b", "c") }.to raise_error(::Pulsar::Error::AlreadyClosed)
     end
 
     it "sends error reports to contextual shard" do
@@ -47,7 +47,7 @@ describe MessageBus::AsyncProducer do
         prior_err_count = ErrorReport.count
         prior_err2_count = @shard2.activate { ErrorReport.count }
         producer = ::MessageBus::AsyncProducer.new(start_thread: false)
-        @shard2.activate { producer.push('a', 'b', 'c') } # will write shard2 as shard id
+        @shard2.activate { producer.push("a", "b", "c") } # will write shard2 as shard id
         allow(producer).to receive(:produce_message).and_raise(VerySpecialAsycnMbTestError)
         expect(producer.queue_depth).to eq(1)
         expect { producer.send(:process_one_queue_item) }.to_not raise_error
@@ -134,9 +134,9 @@ describe MessageBus::AsyncProducer do
       # we want to go from a clean slate every time
       ActiveRecord::Base.connection_pool.current_pool.lock_thread = false
       @shard2.activate do
-        producer.push(namespace, 'some-topic-12345', { key: "msg1" }.to_json)
-        producer.push(namespace, 'some-topic-12345', { key: "msg2" }.to_json)
-        producer.push(namespace, 'some-topic-12345', { key: "msg3" }.to_json)
+        producer.push(namespace, "some-topic-12345", { key: "msg1" }.to_json)
+        producer.push(namespace, "some-topic-12345", { key: "msg2" }.to_json)
+        producer.push(namespace, "some-topic-12345", { key: "msg3" }.to_json)
       end
       # at this point the producer has some messages in it's queue but
       # has not done anything to spark a connection.

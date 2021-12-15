@@ -38,6 +38,8 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
         isDecorativeImage: false,
         naturalHeight: 200,
         naturalWidth: 100,
+        appliedPercentage: 100,
+        usePercentageUnits: false,
         url: 'https://www.fillmurray.com/200/100'
       },
       onRequestClose: jest.fn(),
@@ -303,6 +305,17 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
           tray.$doneButton.click()
           const [{appliedHeight}] = props.onSave.mock.calls[0]
           expect(appliedHeight).toEqual(400)
+        })
+
+        it.skip('includes the width and height to be applied', async () => {
+          props.appliedPercentage = 95
+          props.usePercentageUnits = false
+          renderComponent()
+          await tray.setSize('Large')
+          tray.$doneButton.click()
+          const [{appliedWidth, appliedHeight}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(50)
+          expect(appliedHeight).toEqual(50)
         })
       })
     })

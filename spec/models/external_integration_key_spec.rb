@@ -20,8 +20,8 @@
 
 describe ExternalIntegrationKey do
   before(:once) do
-    ExternalIntegrationKey.key_type :external_key0, label: 'External Key 0', rights: proc { true }
-    ExternalIntegrationKey.key_type :external_key1, label: proc { 'External Key 1' }, rights: { write: false }
+    ExternalIntegrationKey.key_type :external_key0, label: "External Key 0", rights: proc { true }
+    ExternalIntegrationKey.key_type :external_key1, label: proc { "External Key 1" }, rights: { write: false }
     ExternalIntegrationKey.key_type :external_key2, rights: { read: true, write: proc { false } }
     ExternalIntegrationKey.key_type :external_key3
   end
@@ -31,7 +31,7 @@ describe ExternalIntegrationKey do
   let!(:external_integration_key) do
     account.external_integration_keys.create!(
       key_type: key_type,
-      key_value: '42',
+      key_value: "42"
     )
   end
 
@@ -55,8 +55,8 @@ describe ExternalIntegrationKey do
 
   context "label_for" do
     it "returns the correct label" do
-      expect(ExternalIntegrationKey.label_for(:external_key0)).to eq 'External Key 0'
-      expect(ExternalIntegrationKey.label_for(:external_key1)).to eq 'External Key 1'
+      expect(ExternalIntegrationKey.label_for(:external_key0)).to eq "External Key 0"
+      expect(ExternalIntegrationKey.label_for(:external_key1)).to eq "External Key 1"
       expect(ExternalIntegrationKey.label_for(:external_key2)).to be_nil
       expect(ExternalIntegrationKey.label_for(:external_key3)).to be_nil
     end
@@ -66,16 +66,16 @@ describe ExternalIntegrationKey do
     it "returns scoped external integration keys of a type" do
       eik = ExternalIntegrationKey.new
       eik.context = account
-      eik.key_type = 'external_key2'
-      eik.key_value = '12345a'
+      eik.key_type = "external_key2"
+      eik.key_value = "12345a"
       eik.save!
       eik2 = ExternalIntegrationKey.new
       eik2.context = account
-      eik2.key_type = 'external_key3'
-      eik2.key_value = '12345b'
+      eik2.key_type = "external_key3"
+      eik2.key_value = "12345b"
       eik2.save!
-      expect(ExternalIntegrationKey.of_type('external_key3').count).to eq 1
-      expect(ExternalIntegrationKey.of_type('external_key3').first.id).to eq eik2.id
+      expect(ExternalIntegrationKey.of_type("external_key3").count).to eq 1
+      expect(ExternalIntegrationKey.of_type("external_key3").first.id).to eq eik2.id
     end
   end
 
@@ -118,9 +118,9 @@ describe ExternalIntegrationKey do
     account = Account.new
     eik = account.external_integration_keys.build(key_type: key_type)
 
-    expect {
-      eik.key_value = '42'
-    }.to change {
+    expect do
+      eik.key_value = "42"
+    end.to change {
       account.valid?
     }.from(false).to(true)
   end

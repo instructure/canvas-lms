@@ -78,7 +78,7 @@ class AdminsController < ApplicationController
 
     require_role
     admin = @context.account_users.where(user_id: user.id, role_id: @role.id).first_or_initialize
-    admin.workflow_state = 'active'
+    admin.workflow_state = "active"
 
     return unless authorized_action(admin, @current_user, :create)
 
@@ -94,10 +94,10 @@ class AdminsController < ApplicationController
           end
         end
       else
-        return render :json => admin.errors, :status => :bad_request
+        return render json: admin.errors, status: :bad_request
       end
     end
-    render :json => admin_json(admin, @current_user, session)
+    render json: admin_json(admin, @current_user, session)
   end
 
   # @API Remove account admin
@@ -119,7 +119,7 @@ class AdminsController < ApplicationController
     admin = @context.account_users.where(user_id: user, role_id: @role.id).first!
     if authorized_action(admin, @current_user, :destroy)
       admin.destroy
-      render :json => admin_json(admin, @current_user, session)
+      render json: admin_json(admin, @current_user, session)
     end
   end
 
@@ -138,7 +138,7 @@ class AdminsController < ApplicationController
       scope = scope.where(user_id: user_ids) if user_ids
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
-      render :json => admins.collect { |admin| admin_json(admin, @current_user, session) }
+      render json: admins.collect { |admin| admin_json(admin, @current_user, session) }
     end
   end
 

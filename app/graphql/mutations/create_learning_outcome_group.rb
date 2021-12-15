@@ -19,9 +19,9 @@
 #
 
 class Mutations::CreateLearningOutcomeGroup < Mutations::BaseMutation
-  graphql_name 'CreateLearningOutcomeGroup'
+  graphql_name "CreateLearningOutcomeGroup"
 
-  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
+  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
   argument :title, String, required: true
   argument :description, String, required: false
   argument :vendor_guid, String, required: false

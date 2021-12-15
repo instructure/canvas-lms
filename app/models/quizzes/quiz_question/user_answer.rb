@@ -19,12 +19,12 @@
 #
 
 # Stores the scoring information for a user's answer to a quiz question
-class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possible, :total_parts, :correct_parts, :incorrect_parts, :answer_id, :undefined, :answer_details, :incorrect_dock)
+Quizzes::QuizQuestion::UserAnswer = Struct.new(:question_id, :points_possible, :total_parts, :correct_parts, :incorrect_parts, :answer_id, :undefined, :answer_details, :incorrect_dock) do
   def initialize(question_id, points_possible, answer_data)
     super(question_id, points_possible, 1, 0, 0)
     @points = 0.0
     @answer_data = answer_data
-    self.answer_details = { :text => answer_text || "" }
+    self.answer_details = { text: answer_text || "" }
   end
 
   def [](k)
@@ -42,11 +42,11 @@ class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possi
 
     score = (correct_parts.to_f / total_parts) * points_possible
     if incorrect_parts > 0
-      if incorrect_dock
-        score -= incorrect_dock * incorrect_parts
-      else
-        score -= (incorrect_parts.to_f / total_parts) * points_possible
-      end
+      score -= if incorrect_dock
+                 incorrect_dock * incorrect_parts
+               else
+                 (incorrect_parts.to_f / total_parts) * points_possible
+               end
       score = 0.0 if score < 0
     end
     score
@@ -79,4 +79,4 @@ class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possi
   end
 end
 
-(Dir[Rails.root + "app/models/quizzes/quiz_question/*_answer.rb"] - [__FILE__]).each { |f| require_dependency f }
+(Dir[Rails.root.join("app/models/quizzes/quiz_question/*_answer.rb")] - [__FILE__]).each { |f| require_dependency f }

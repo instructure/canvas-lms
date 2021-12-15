@@ -42,10 +42,18 @@ describe('buildShape()', () => {
     `)
   })
 
-  it('builds a triangle', () => {
-    expect(buildShapeMask({shape: 'triangle'})).toMatchInlineSnapshot(`
+  it('builds a diamond', () => {
+    expect(buildShapeMask({shape: 'diamond'})).toMatchInlineSnapshot(`
       <path
-        d="M175 0L350 350H0L175 0Z"
+        d="M175 0L350 175L175 350L0 175L175 0Z"
+      />
+    `)
+  })
+
+  it('builds a pentagon', () => {
+    expect(buildShapeMask({shape: 'pentagon'})).toMatchInlineSnapshot(`
+      <path
+        d="M175 0L350 136.71L295.15999999999997 350H54.84L0 136.71L175 0L175 0Z"
       />
     `)
   })
@@ -69,7 +77,7 @@ describe('buildShape()', () => {
   it('builds a star', () => {
     expect(buildShapeMask({shape: 'star'})).toMatchInlineSnapshot(`
       <path
-        d="M175 0L215.01 136.71H350L237.27 211.47L295.15999999999997 350L175 257.04L54.84 350L112.72999999999999 211.47L0 136.71H134.99L175 0L175 0Z"
+        d="M175 0L215.01 136.71H350L237.27 211.47L295.15999999999997 350L175 257.04L54.84 350L112.72999999999999 211.47L0 136.71H134.99L175 0Z"
       />
     `)
   })

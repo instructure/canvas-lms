@@ -24,7 +24,7 @@ describe AssignmentOverride do
   end
 
   it "soft-deletes" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
@@ -33,14 +33,14 @@ describe AssignmentOverride do
     @override_student.reload
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
     expect(@override).to be_deleted
-    expect(AssignmentOverrideStudent.where(:id => @override_student).first).not_to be_nil
+    expect(AssignmentOverrideStudent.where(id: @override_student).first).not_to be_nil
     expect(@override_student).to be_deleted
   end
 
-  it 'allows deletes to invalid objects' do
+  it "allows deletes to invalid objects" do
     override = assignment_override_model(course: @course)
     # make it invalid
-    AssignmentOverride.where(id: override).update_all(set_type: 'potato')
+    AssignmentOverride.where(id: override).update_all(set_type: "potato")
     expect(override.reload).to be_invalid
     override.destroy
     expect { override.destroy }.not_to raise_error
@@ -49,18 +49,18 @@ describe AssignmentOverride do
   it "defaults set_type to adhoc" do
     @override = AssignmentOverride.new
     @override.valid? # trigger bookkeeping
-    expect(@override.set_type).to eq 'ADHOC'
+    expect(@override.set_type).to eq "ADHOC"
   end
 
   it "allows reading set_id and set when set_type is adhoc" do
     @override = AssignmentOverride.new
-    @override.set_type = 'ADHOC'
+    @override.set_type = "ADHOC"
     expect(@override.set_id).to be_nil
     expect(@override.set).to eq []
   end
 
   it "returns the students as the set when set_type is adhoc" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
 
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
@@ -72,13 +72,13 @@ describe AssignmentOverride do
 
   it "allows reading set_id when set_type is noop" do
     @override = AssignmentOverride.new
-    @override.set_type = 'Noop'
+    @override.set_type = "Noop"
     expect(@override.set_id).to be_nil
     expect(@override.set).to eq nil
   end
 
   it "removes adhoc associations when an adhoc override is deleted" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
@@ -90,7 +90,7 @@ describe AssignmentOverride do
   end
 
   it "allows reusing students from a deleted adhoc override" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
@@ -98,7 +98,7 @@ describe AssignmentOverride do
     @override.destroy
     expect(@override_student.reload).to be_deleted
 
-    @override2 = assignment_override_model(:assignment => @assignment)
+    @override2 = assignment_override_model(assignment: @assignment)
     @override_student2 = @override2.assignment_override_students.build
     @override_student2.user = @student
 
@@ -110,7 +110,7 @@ describe AssignmentOverride do
     expect(@override2.set).to eq [@student]
   end
 
-  context '#mastery_paths?' do
+  context "#mastery_paths?" do
     let(:override) do
       described_class.new({
                             set_type: AssignmentOverride::SET_TYPE_NOOP,
@@ -128,12 +128,12 @@ describe AssignmentOverride do
     end
 
     it "returns false when it is not a noop override" do
-      override.set_type = 'EvilType'
+      override.set_type = "EvilType"
       expect(override.mastery_paths?).to eq false
     end
   end
 
-  describe 'versioning' do
+  describe "versioning" do
     before :once do
       @override = assignment_override_model
     end
@@ -168,7 +168,7 @@ describe AssignmentOverride do
 
   describe "active scope" do
     before :once do
-      @overrides = 5.times.map { assignment_override_model }
+      @overrides = Array.new(5) { assignment_override_model }
     end
 
     it "includes active overrides" do
@@ -191,9 +191,9 @@ describe AssignmentOverride do
     end
 
     it "propagates student errors" do
-      student = student_in_course(course: @override.assignment.context, name: 'Johnny Manziel').user
-      @override.assignment_override_students.create(user: student, workflow_state: 'active')
-      @override.assignment_override_students.build(user: student, workflow_state: 'active')
+      student = student_in_course(course: @override.assignment.context, name: "Johnny Manziel").user
+      @override.assignment_override_students.create(user: student, workflow_state: "active")
+      @override.assignment_override_students.build(user: student, workflow_state: "active")
       expect(@override).not_to be_valid
       expect(@override.errors[:assignment_override_students].first.type).to eq :taken
     end
@@ -227,7 +227,7 @@ describe AssignmentOverride do
     end
 
     it "accepts noop with arbitrary set_id" do
-      @override.set_type = 'Noop'
+      @override.set_type = "Noop"
       @override.set_id = 9000
       expect(@override).to be_valid
       expect(@override.set_id).to eq 9000
@@ -235,14 +235,14 @@ describe AssignmentOverride do
 
     it "rejects an empty set_id with a non-adhoc set_type" do
       @override.set = nil
-      @override.set_type = 'CourseSection'
+      @override.set_type = "CourseSection"
       @override.set_id = nil
       expect(@override).not_to be_valid
     end
 
     it "rejects an invalid set_id with a non-adhoc set_type" do
       @override.set = nil
-      @override.set_type = 'CourseSection'
+      @override.set_type = "CourseSection"
       @override.set_id = invalid_id_for_model(CourseSection)
       expect(@override).not_to be_valid
     end
@@ -258,7 +258,7 @@ describe AssignmentOverride do
     it "does not reject sections in different course than assignment when deleted" do
       @other_course = course_model
       @override.set = @other_course.default_section
-      @override.workflow_state = 'deleted'
+      @override.workflow_state = "deleted"
       expect(@override).to be_valid
     end
 
@@ -275,7 +275,7 @@ describe AssignmentOverride do
       @assignment.group_category = group_category
       @category = group_category(name: "bar")
       @override.set = @category.groups.create!(context: @assignment.context)
-      @override.workflow_state = 'deleted'
+      @override.workflow_state = "deleted"
       expect(@override).to be_valid
     end
 
@@ -325,9 +325,9 @@ describe AssignmentOverride do
 
     it "forces title to the name of the section" do
       @section = @course.default_section
-      @section.name = 'Section Test Value'
+      @section.name = "Section Test Value"
       @override.set = @section
-      @override.title = 'Other Value'
+      @override.title = "Other Value"
       @override.valid? # trigger bookkeeping
       expect(@override.title).to eq @section.name
     end
@@ -335,34 +335,34 @@ describe AssignmentOverride do
     it "defaults title to the name of the group" do
       @assignment.group_category = group_category
       @group = @assignment.group_category.groups.create!(context: @assignment.context)
-      @group.name = 'Group Test Value'
+      @group.name = "Group Test Value"
       @override.set = @group
-      @override.title = 'Other Value'
+      @override.title = "Other Value"
       @override.valid? # trigger bookkeeping
       expect(@override.title).to eq @group.name
     end
 
     it "is not changed for adhoc sets if there are no students" do
-      @override.title = 'Other Value'
+      @override.title = "Other Value"
       @override.valid? # trigger bookkeeping
-      expect(@override.title).to eq 'Other Value'
+      expect(@override.title).to eq "Other Value"
     end
 
     it "is not changed for noop" do
-      @override.set_type = 'Noop'
-      @override.title = 'Literally Anything'
+      @override.set_type = "Noop"
+      @override.title = "Literally Anything"
       @override.valid? # trigger bookkeeping
-      expect(@override.title).to eq 'Literally Anything'
+      expect(@override.title).to eq "Literally Anything"
     end
 
     it "sets ADHOC's title to reflect students (with few)" do
       @override.title = nil
       @override.set_type = "ADHOC"
       override_student = @override.assignment_override_students.build
-      override_student.user = student_in_course(course: @override.assignment.context, name: 'Edgar Jones').user
+      override_student.user = student_in_course(course: @override.assignment.context, name: "Edgar Jones").user
       override_student.save!
       @override.valid? # trigger bookkeeping
-      expect(@override.title).to eq '1 student'
+      expect(@override.title).to eq "1 student"
     end
 
     it "sets ADHOC's name to reflect students (with many)" do
@@ -374,7 +374,7 @@ describe AssignmentOverride do
         override_student.save!
       end
       @override.valid? # trigger bookkeeping
-      expect(@override.title).to eq '4 students'
+      expect(@override.title).to eq "4 students"
     end
   end
 
@@ -385,11 +385,11 @@ describe AssignmentOverride do
     end
 
     it "returns 'No Students' when passed in nil" do
-      expect(@assignment_override.title_from_students(nil)).to eql('No Students')
+      expect(@assignment_override.title_from_students(nil)).to eql("No Students")
     end
 
     it "returns 'No Students' when pass in an empty array" do
-      expect(@assignment_override.title_from_students([])).to eql('No Students')
+      expect(@assignment_override.title_from_students([])).to eql("No Students")
     end
 
     it "calls AssignmentOverride.title_from_student_count when called with a non-empty array" do
@@ -401,11 +401,11 @@ describe AssignmentOverride do
 
   describe ".title_from_student_count" do
     it "returns '1 student' when passed in 1" do
-      expect(AssignmentOverride.title_from_student_count(1)).to eql('1 student')
+      expect(AssignmentOverride.title_from_student_count(1)).to eql("1 student")
     end
 
     it "returns '42 students' when passed in 42" do
-      expect(AssignmentOverride.title_from_student_count(42)).to eql('42 students')
+      expect(AssignmentOverride.title_from_student_count(42)).to eql("42 students")
     end
   end
 
@@ -413,7 +413,7 @@ describe AssignmentOverride do
     describe "#{field} overrides" do
       before :once do
         @assignment = assignment_model(field.to_sym => value1)
-        @override = assignment_override_model(:assignment => @assignment)
+        @override = assignment_override_model(assignment: @assignment)
       end
 
       it "sets the override when a override_#{field} is called" do
@@ -449,92 +449,92 @@ describe AssignmentOverride do
     end
 
     it "interprets 11:59pm as all day with no prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: "Alaska")
       expect(@override.all_day).to eq true
     end
 
     it "interprets 11:59pm as all day with same-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.day
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: "Alaska") + 1.day
+      @override.due_at = fancy_midnight(zone: "Alaska")
       expect(@override.all_day).to eq true
     end
 
     it "interprets 11:59pm as all day with other-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Baghdad')
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: "Baghdad")
+      @override.due_at = fancy_midnight(zone: "Alaska")
       expect(@override.all_day).to eq true
     end
 
     it "interprets 11:59pm as all day with non-all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
+      @override.due_at = fancy_midnight(zone: "Alaska")
       expect(@override.all_day).to eq true
     end
 
     it "does not interpret non-11:59pm as all day no prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @override.due_at = fancy_midnight(zone: "Alaska").in_time_zone("Baghdad")
       expect(@override.all_day).to eq false
     end
 
     it "does not interpret non-11:59pm as all day with same-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @override.due_at = fancy_midnight(zone: "Alaska")
+      @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
       expect(@override.all_day).to eq false
     end
 
     it "does not interpret non-11:59pm as all day with other-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Baghdad')
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @override.due_at = fancy_midnight(zone: "Baghdad")
+      @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
       expect(@override.all_day).to eq false
     end
 
     it "does not interpret non-11:59pm as all day with non-all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
+      @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
+      @override.due_at = fancy_midnight(zone: "Alaska") + 2.hours
       expect(@override.all_day).to eq false
     end
 
     it "preserves all-day when only changing time zone" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
-      @override.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @override.due_at = fancy_midnight(zone: "Alaska")
+      @override.due_at = fancy_midnight(zone: "Alaska").in_time_zone("Baghdad")
       expect(@override.all_day).to eq true
     end
 
     it "preserves non-all-day when only changing time zone" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: "Alaska").in_time_zone("Baghdad")
+      @override.due_at = fancy_midnight(zone: "Alaska")
       expect(@override.all_day).to eq false
     end
 
     it "determines date from due_at's timezone" do
-      @override.due_at = Date.today.in_time_zone('Baghdad') + 1.hour # 01:00:00 AST +03:00 today
+      @override.due_at = Date.today.in_time_zone("Baghdad") + 1.hour # 01:00:00 AST +03:00 today
       expect(@override.all_day_date).to eq Date.today
 
-      @override.due_at = @override.due_at.in_time_zone('Alaska') - 2.hours # 12:00:00 AKDT -08:00 previous day
+      @override.due_at = @override.due_at.in_time_zone("Alaska") - 2.hours # 12:00:00 AKDT -08:00 previous day
       expect(@override.all_day_date).to eq Date.today - 1.day
     end
 
     it "preserves all-day date when only changing time zone" do
-      @override.due_at = Date.today.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
-      @override.due_at = @override.due_at.in_time_zone('Alaska') # 13:00:00 AKDT -08:00 previous day
+      @override.due_at = Date.today.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
+      @override.due_at = @override.due_at.in_time_zone("Alaska") # 13:00:00 AKDT -08:00 previous day
       expect(@override.all_day_date).to eq Date.today
     end
 
     it "preserves non-all-day date when only changing time zone" do
       Timecop.freeze(Time.utc(2013, 3, 10, 0, 0)) do
-        @override.due_at = Date.today.in_time_zone('Alaska') - 11.hours # 13:00:00 AKDT -08:00 previous day
-        @override.due_at = @override.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
+        @override.due_at = Date.today.in_time_zone("Alaska") - 11.hours # 13:00:00 AKDT -08:00 previous day
+        @override.due_at = @override.due_at.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
         expect(@override.all_day_date).to eq Date.today - 1.day
       end
     end
 
     it "sets the date to 11:59 PM of the same day when the date is 12:00 am" do
-      @override.due_at = Date.today.in_time_zone('Alaska').midnight
-      expect(@override.due_at).to eq Date.today.in_time_zone('Alaska').end_of_day
+      @override.due_at = Date.today.in_time_zone("Alaska").midnight
+      expect(@override.due_at).to eq Date.today.in_time_zone("Alaska").end_of_day
     end
 
     it "sets the date to the date given when date is not 12:00 AM" do
-      expected_time = Date.today.in_time_zone('Alaska') - 11.hours
+      expected_time = Date.today.in_time_zone("Alaska") - 11.hours
       @override.unlock_at = expected_time
       expect(@override.unlock_at).to eq expected_time
     end
@@ -546,12 +546,12 @@ describe AssignmentOverride do
     end
 
     it "sets the date to 11:59 PM of the same day when the date is 12:00 AM" do
-      @override.lock_at = Date.today.in_time_zone('Alaska').midnight
-      expect(@override.lock_at).to eq Date.today.in_time_zone('Alaska').end_of_day
+      @override.lock_at = Date.today.in_time_zone("Alaska").midnight
+      expect(@override.lock_at).to eq Date.today.in_time_zone("Alaska").end_of_day
     end
 
     it "sets the date to the date given when date is not 12:00 AM" do
-      expected_time = Date.today.in_time_zone('Alaska') - 11.hours
+      expected_time = Date.today.in_time_zone("Alaska") - 11.hours
       @override.lock_at = expected_time
       expect(@override.lock_at).to eq expected_time
       @override.lock_at = nil
@@ -559,12 +559,12 @@ describe AssignmentOverride do
     end
   end
 
-  describe '#availability_expired?' do
-    let(:override) { assignment_override_model }
-
+  describe "#availability_expired?" do
     subject { override.availability_expired? }
 
-    context 'without an overridden lock_at' do
+    let(:override) { assignment_override_model }
+
+    context "without an overridden lock_at" do
       before do
         override.lock_at_overridden = false
       end
@@ -572,12 +572,12 @@ describe AssignmentOverride do
       it { is_expected.to be(false) }
     end
 
-    context 'with an overridden lock_at' do
+    context "with an overridden lock_at" do
       before do
         override.lock_at_overridden = true
       end
 
-      context 'never locks' do
+      context "never locks" do
         before do
           override.lock_at = nil
         end
@@ -585,7 +585,7 @@ describe AssignmentOverride do
         it { is_expected.to be(false) }
       end
 
-      context 'not yet locked' do
+      context "not yet locked" do
         before do
           override.lock_at = 10.minutes.from_now
         end
@@ -593,7 +593,7 @@ describe AssignmentOverride do
         it { is_expected.to be(false) }
       end
 
-      context 'already locked' do
+      context "already locked" do
         before do
           override.lock_at = 10.minutes.ago
         end
@@ -651,8 +651,8 @@ describe AssignmentOverride do
     end
   end
 
-  describe '#update_grading_period_grades with no grading periods' do
-    it 'does not update grades when due_at changes' do
+  describe "#update_grading_period_grades with no grading periods" do
+    it "does not update grades when due_at changes" do
       assignment_model
       expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
       override = AssignmentOverride.new
@@ -662,20 +662,20 @@ describe AssignmentOverride do
     end
   end
 
-  describe '#update_grading_period_grades' do
+  describe "#update_grading_period_grades" do
     before :once do
-      @override = AssignmentOverride.new(set_type: 'ADHOC', due_at_overridden: true)
+      @override = AssignmentOverride.new(set_type: "ADHOC", due_at_overridden: true)
       student_in_course
       @assignment = assignment_model(course: @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term
       @grading_period_group.grading_periods.create!(
-        title: 'GP1',
+        title: "GP1",
         start_date: 9.months.ago,
         end_date: 5.months.ago
       )
       @grading_period_group.grading_periods.create!(
-        title: 'GP2',
+        title: "GP2",
         start_date: 4.months.ago,
         end_date: 2.months.from_now
       )
@@ -686,20 +686,20 @@ describe AssignmentOverride do
       @override.assignment_override_students.create(user: @student)
     end
 
-    it 'does not update grades if there are no students on this override' do
+    it "does not update grades if there are no students on this override" do
       @override.assignment_override_students.clear
       expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
       @override.due_at = 6.months.ago
       @override.save!
     end
 
-    it 'updates grades when due_at changes to a grading period' do
+    it "updates grades when due_at changes to a grading period" do
       expect_any_instance_of(Course).to receive(:recompute_student_scores).twice
       @override.due_at = 6.months.ago
       @override.save!
     end
 
-    it 'updates grades twice when due_at changes to another grading period' do
+    it "updates grades twice when due_at changes to another grading period" do
       @override.due_at = 1.month.ago
       @override.save!
       expect_any_instance_of(Course).to receive(:recompute_student_scores).twice
@@ -707,7 +707,7 @@ describe AssignmentOverride do
       @override.save!
     end
 
-    it 'does not update grades if grading period did not change' do
+    it "does not update grades if grading period did not change" do
       @override.due_at = 1.month.ago
       @override.save!
       expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
@@ -726,7 +726,7 @@ describe AssignmentOverride do
     it "triggers when applicable override is created" do
       expect(DueDateCacher).to receive(:recompute).with(@assignment)
       new_override = @assignment.assignment_overrides.build
-      new_override.title = 'New Override'
+      new_override.title = "New Override"
       new_override.override_due_at(3.days.from_now)
       new_override.save!
     end
@@ -758,7 +758,7 @@ describe AssignmentOverride do
       @override.destroy
 
       expect(DueDateCacher).to receive(:recompute).with(@assignment)
-      @override.workflow_state = 'active'
+      @override.workflow_state = "active"
       @override.save
     end
 
@@ -780,7 +780,7 @@ describe AssignmentOverride do
       @override.destroy
 
       expect(DueDateCacher).to receive(:recompute)
-      @override.workflow_state = 'active'
+      @override.workflow_state = "active"
       @override.save
     end
 
@@ -860,7 +860,7 @@ describe AssignmentOverride do
     end
 
     it "destroys itself if the set is empty" do
-      allow(@override).to receive(:set_type).and_return 'ADHOC'
+      allow(@override).to receive(:set_type).and_return "ADHOC"
       allow(@override).to receive(:set).and_return []
       expect(@override).to receive(:destroy).once
 
@@ -874,15 +874,15 @@ describe AssignmentOverride do
     end
 
     it "returns empty set for noop" do
-      @override = assignment_override_model(:course => @course)
-      @override.set_type = 'Noop'
+      @override = assignment_override_model(course: @course)
+      @override.set_type = "Noop"
 
       expect(@override.applies_to_students).to eq []
     end
 
     it "returns the right students for ADHOC" do
-      @override = assignment_override_model(:course => @course)
-      @override.set_type = 'ADHOC'
+      @override = assignment_override_model(course: @course)
+      @override.set_type = "ADHOC"
 
       expect(@override.applies_to_students).to eq []
 
@@ -894,13 +894,13 @@ describe AssignmentOverride do
     end
 
     it "returns the right students for a section" do
-      @override = assignment_override_model(:course => @course)
+      @override = assignment_override_model(course: @course)
       @override.set = @course.default_section
       @override.save!
 
       expect(@override.applies_to_students).to eq []
 
-      @course.enroll_student(@student, :enrollment_state => 'active', :section => @override.set)
+      @course.enroll_student(@student, enrollment_state: "active", section: @override.set)
 
       expect(@override.applies_to_students).to eq [@student]
     end
@@ -940,7 +940,7 @@ describe AssignmentOverride do
     end
   end
 
-  describe '.visible_students_only' do
+  describe ".visible_students_only" do
     specs_require_sharding
 
     it "references tables correctly for an out of shard query" do
@@ -958,28 +958,32 @@ describe AssignmentOverride do
     end
   end
 
-  describe '.visible_enrollments_for' do
+  describe ".visible_enrollments_for basic cases" do
+    subject(:visible_enrollments) do
+      AssignmentOverride.visible_enrollments_for(@overrides, @student)
+    end
+
     before do
       @override = assignment_override_model
       @overrides = [@override]
     end
 
-    subject(:visible_enrollments) do
-      AssignmentOverride.visible_enrollments_for(@overrides, @student)
-    end
-
-    it 'returns empty if provided an empty collection' do
+    it "returns empty if provided an empty collection" do
       @overrides = []
       expect(visible_enrollments).to be_empty
     end
 
-    it 'returns empty if not provided a user' do
+    it "returns empty if not provided a user" do
       @student = nil
       expect(visible_enrollments).to be_empty
     end
   end
 
-  describe '.visible_enrollments_for' do
+  describe ".visible_enrollments_for" do
+    subject(:visible_enrollments) do
+      AssignmentOverride.visible_enrollments_for([override], @student)
+    end
+
     before do
       @options = {}
     end
@@ -988,11 +992,7 @@ describe AssignmentOverride do
       assignment_override_model(@options)
     end
 
-    subject(:visible_enrollments) do
-      AssignmentOverride.visible_enrollments_for([override], @student)
-    end
-
-    context 'when associated with an assignment' do
+    context "when associated with an assignment" do
       before do
         assignment_model
         @options = {
@@ -1000,13 +1000,13 @@ describe AssignmentOverride do
         }
       end
 
-      it 'delegates to the course' do
+      it "delegates to the course" do
         expect_any_instantiation_of(@assignment.context).to receive(:enrollments_visible_to).with(@student)
         subject
       end
     end
 
-    context 'when associated with a quiz' do
+    context "when associated with a quiz" do
       before do
         quiz_model
         @options = {
@@ -1014,48 +1014,48 @@ describe AssignmentOverride do
         }
       end
 
-      it 'delegates to UserSearch' do
+      it "delegates to UserSearch" do
         expect_any_instantiation_of(@quiz.context).to receive(:enrollments_visible_to).with(@student)
         subject
       end
     end
   end
 
-  describe 'update_due_date_smart_alerts' do
-    it 'creates a ScheduledSmartAlert on save with due date' do
+  describe "update_due_date_smart_alerts" do
+    it "creates a ScheduledSmartAlert on save with due date" do
       override = assignment_override_model(course: @course)
       expect(ScheduledSmartAlert).to receive(:upsert)
 
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
     end
 
-    it 'deletes the ScheduledSmartAlert if the due date is removed' do
+    it "deletes the ScheduledSmartAlert if the due date is removed" do
       override = assignment_override_model(course: @course)
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
-      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.update!(due_at: nil)
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
 
-    it 'deletes the ScheduledSmartAlert if the due date is changed to the past' do
+    it "deletes the ScheduledSmartAlert if the due date is changed to the past" do
       override = assignment_override_model(course: @course)
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
-      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.update!(due_at: 1.day.ago)
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
 
-    it 'deletes associated ScheduledSmartAlerts when the override is deleted' do
+    it "deletes associated ScheduledSmartAlerts when the override is deleted" do
       override = assignment_override_model(course: @course)
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
-      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.destroy
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
   end
 
-  describe 'create' do
-    it 'sets the root_account_id using assignment' do
+  describe "create" do
+    it "sets the root_account_id using assignment" do
       override = assignment_override_model(course: @course)
       expect(override.root_account_id).to eq @assignment.root_account_id
     end

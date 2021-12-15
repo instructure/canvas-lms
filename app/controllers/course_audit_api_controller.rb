@@ -224,6 +224,6 @@ class CourseAuditApiController < AuditorApiController
 
   def render_events(events, route)
     events = Api.paginate(events, self, route)
-    render :json => course_events_compound_json(events, @current_user, session)
+    render json: course_events_compound_json(events, @current_user, session)
   end
 end

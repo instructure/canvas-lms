@@ -29,12 +29,12 @@ module Api::V1::DiscussionTopics
   include HtmlTextHelper
 
   # Public: DiscussionTopic fields to serialize.
-  ALLOWED_TOPIC_FIELDS = %w{
+  ALLOWED_TOPIC_FIELDS = %w[
     id title assignment_id delayed_post_at lock_at created_at
     last_reply_at posted_at root_topic_id podcast_has_student_posts
     discussion_type position allow_rating only_graders_can_rate sort_by_rating
-    is_section_specific
-  }.freeze
+    is_section_specific anonymous_state
+  ].freeze
 
   # Public: DiscussionTopic methods to serialize.
   ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count].freeze
@@ -46,11 +46,11 @@ module Api::V1::DiscussionTopics
   # The ids of the root topics are always included.
   def get_root_topic_data(topics, fields)
     root_topic_ids = topics.pluck(:root_topic_id).reject(&:blank?).uniq
-    return {} unless root_topic_ids && root_topic_ids.length > 0
+    return {} unless root_topic_ids.present?
 
     fields_with_id = fields.unshift(:id)
     root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
-    root_topics_array.map { |root_topic| [root_topic.id, root_topic] }.to_h
+    root_topics_array.index_by(&:id)
   end
 
   # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
@@ -70,13 +70,11 @@ module Api::V1::DiscussionTopics
     if opts[:include_sections_user_count] && context
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
-    ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment, :root_topic, :context])
-    topics.inject([]) do |result, topic|
+    ActiveRecord::Associations::Preloader.new.preload(topics, %i[user attachment root_topic context])
+    topics.each_with_object([]) do |topic, result|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)
       end
-
-      result
     end
   end
 
@@ -104,11 +102,11 @@ module Api::V1::DiscussionTopics
       include_root_topic_data: false,
       root_topic_fields: [],
       include_overrides: false,
-      assignment_opts: {},
+      assignment_opts: {}
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
-    permissions = opts[:skip_permissions] ? [] : [:attach, :update, :reply, :delete]
+    permissions = opts[:skip_permissions] ? [] : %i[attach update reply delete]
     json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, permissions)
 
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
@@ -118,7 +116,7 @@ module Api::V1::DiscussionTopics
     end
 
     if opts[:include_assignment] && topic.assignment
-      excludes = opts[:exclude_assignment_description] ? ['description'] : []
+      excludes = opts[:exclude_assignment_description] ? ["description"] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
                                           { include_discussion_topic: false, override_dates: opts[:override_dates],
                                             include_all_dates: opts[:include_all_dates],
@@ -131,13 +129,13 @@ module Api::V1::DiscussionTopics
 
     if opts[:include_sections] && topic.is_section_specific
       section_includes = []
-      section_includes.push('user_count') if opts[:include_sections_user_count]
+      section_includes.push("user_count") if opts[:include_sections_user_count]
       json[:sections] = sections_json(topic.course_sections, user, session, section_includes)
     end
 
     json[:todo_date] = topic.todo_date
 
-    if opts[:root_topic_fields] && opts[:root_topic_fields].length > 0
+    if opts[:root_topic_fields].present?
       # If this is called from discussion_topics_api_json then we already
       # have the topics, so don't get them again.
       root_topics ||= get_root_topic_data([topic], opts[:root_topic_fields])
@@ -163,7 +161,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user, opts = {})
     attachment_opts = {}
-    attachment_opts[:include] = ['usage_rights'] if opts[:include_usage_rights]
+    attachment_opts[:include] = ["usage_rights"] if opts[:include_usage_rights]
     attachments = topic.attachment ? [attachment_json(topic.attachment, user, {}, attachment_opts)] : []
     html_url    = named_context_url(context, :context_discussion_topic_url,
                                     topic, include_host: true)
@@ -181,7 +179,7 @@ module Api::V1::DiscussionTopics
                attachments: attachments, published: topic.published?,
                can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
                locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
-               author: user_display_json(topic.user, topic.context),
+               author: topic.anonymous? ? nil : user_display_json(topic.user, topic.context),
                html_url: html_url, url: html_url, pinned: !!topic.pinned,
                group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
 
@@ -189,18 +187,18 @@ module Api::V1::DiscussionTopics
     fields[:topic_children] = child_topic_data.map(&:first)
     fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id: id, group_id: group_id } }
 
-    fields.merge!({ context_code: topic.context_code }) if opts[:include_context_code]
+    fields[:context_code] = topic.context_code if opts[:include_context_code]
 
-    locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
+    locked_json(fields, topic, user, "topic", check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
     unless opts[:exclude_messages]
       fields[:message] =
         if !can_view
-          lock_explanation(fields[:lock_info], 'topic', context)
+          lock_explanation(fields[:lock_info], "topic", context)
         elsif opts[:plain_messages]
           topic.message # used for searching by body on index
         elsif opts[:text_only]
-          html_to_text(topic.message, :preserve_links => true)
+          html_to_text(topic.message, preserve_links: true)
         else
           api_user_content(topic.message, context)
         end
@@ -226,7 +224,7 @@ module Api::V1::DiscussionTopics
   #   Recognized fields: user_name, subentries.
   #
   # Returns an array of hashes ready to be serialized.
-  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries, :display_user])
+  def discussion_entry_api_json(entries, context, user, session, includes = %i[user_name subentries display_user])
     entries.map do |entry|
       serialize_entry(entry, user, context, session, includes)
     end
@@ -242,11 +240,11 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def serialize_entry(entry, user, context, session, includes)
-    allowed_fields  = %w{id created_at updated_at parent_id rating_count rating_sum}
+    allowed_fields  = %w[id created_at updated_at parent_id rating_count rating_sum]
     allowed_methods = []
-    allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
-    allowed_fields << 'user_id'   if !entry.deleted?
-    allowed_methods << 'user_name' if !entry.deleted? && includes.include?(:user_name)
+    allowed_fields << "editor_id" if entry.deleted? || entry.editor_id
+    allowed_fields << "user_id"   unless entry.deleted?
+    allowed_methods << "user_name" if !entry.deleted? && includes.include?(:user_name)
 
     json = api_json(entry, user, session, only: allowed_fields, methods: allowed_methods)
 
@@ -276,7 +274,10 @@ module Api::V1::DiscussionTopics
     return {} unless entry.attachment
 
     url_options = {}
-    url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
+    if !respond_to?(:request) && respond_to?(:use_placeholder_host?) && use_placeholder_host?
+      url_options[:host] = Api::PLACEHOLDER_HOST
+      url_options[:protocol] = Api::PLACEHOLDER_PROTOCOL
+    end
     json = { attachment: attachment_json(entry.attachment, user, url_options) }
     json[:attachments] = [json[:attachment]]
 

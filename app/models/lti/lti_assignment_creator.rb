@@ -20,10 +20,10 @@
 module Lti
   class LtiAssignmentCreator
     SUBMISSION_TYPES_MAP = {
-      'online_upload' => 'file',
-      'online_url' => 'url',
-      'external_tool' => ['url', 'text'].freeze,
-      'basic_lti_launch' => 'url'
+      "online_upload" => "file",
+      "online_url" => "url",
+      "external_tool" => ["url", "text"].freeze,
+      "basic_lti_launch" => "url"
     }.freeze
 
     def initialize(assignment, source_id = nil)

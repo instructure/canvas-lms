@@ -73,10 +73,10 @@ class AnonymousOrModerationEvent < ApplicationRecord
   belongs_to :context_external_tool, optional: true
 
   validates :assignment_id, presence: true
-  validates :submission_id, presence: true, if: ->(event) {
+  validates :submission_id, presence: true, if: lambda { |event|
     SUBMISSION_ID_REQUIRED_EVENT_TYPES.include?(event.event_type)
   }
-  validates :submission_id, absence: true, unless: ->(event) {
+  validates :submission_id, absence: true, unless: lambda { |event|
     SUBMISSION_ID_REQUIRED_EVENT_TYPES.include?(event.event_type)
   }
   validates :event_type, presence: true
@@ -93,7 +93,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
     validates :canvadoc_id, absence: true
   end
 
-  with_options if: ->(e) { e.event_type&.start_with?('docviewer') } do
+  with_options if: ->(e) { e.event_type&.start_with?("docviewer") } do
     validates :canvadoc_id, presence: true
     validates :submission_id, presence: true
     validate :payload_annotation_body_present
@@ -111,7 +111,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   end
 
   def self.events_for_submission(assignment_id:, submission_id:)
-    self.where(assignment_id: assignment_id, submission_id: [nil, submission_id]).order(:created_at)
+    where(assignment_id: assignment_id, submission_id: [nil, submission_id]).order(:created_at)
   end
 
   EVENT_TYPES.each do |event_type|

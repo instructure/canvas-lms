@@ -26,7 +26,7 @@ module Factories
   def valid_custom_data_attributes
     {
       user: user_model,
-      namespace: 'value for namespace'
+      namespace: "value for namespace"
     }
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-sqs'
+require "aws-sdk-sqs"
 
 module Services
   class NotificationService
@@ -40,15 +40,15 @@ module Services
       private
 
       QUEUE_NAME_KEYS = {
-        priority: 'notification_service_priority_queue_name',
-        default: 'notification_service_queue_name'
+        priority: "notification_service_priority_queue_name",
+        default: "notification_service_queue_name"
       }.freeze
 
       def notification_sqs
         return nil if config.blank?
 
         @notification_sqs ||= begin
-          conf = Canvas::AWS.validate_v2_config(config, 'notification_service.yml')
+          conf = Canvas::AWS.validate_v2_config(config, "notification_service.yml")
           sqs = Aws::SQS::Client.new(conf.except(*QUEUE_NAME_KEYS.values))
           @queue_urls = {}
           QUEUE_NAME_KEYS.each do |key, queue_name_key|
@@ -69,7 +69,7 @@ module Services
       end
 
       def config
-        ConfigFile.load('notification_service').dup || {}
+        ConfigFile.load("notification_service").dup || {}
       end
     end
   end

@@ -26,7 +26,7 @@ class OAuthProxyController < ApplicationController
 
     begin
       json = Canvas::Security.decode_jwt(params[:state])
-      url = URI.parse(json['redirect_uri'])
+      url = URI.parse(json["redirect_uri"])
       filtered_params = params.permit(:state, :code)
       url.query = url.query.blank? ? filtered_params.to_h.to_query : "#{url.query}&#{filtered_params.to_h.to_query}"
       redirect_to url.to_s

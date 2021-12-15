@@ -70,7 +70,7 @@ module ModelCache
     def add_to_caches
       return unless (cache = ModelCache[self.class.name.underscore.pluralize.to_sym])
 
-      cache.keys.each do |key|
+      cache.each_key do |key|
         cache[key][send(key)] = self
       end
     end
@@ -78,7 +78,7 @@ module ModelCache
     def update_in_caches
       return unless (cache = ModelCache[self.class.name.underscore.pluralize.to_sym])
 
-      cache.keys.each do |key|
+      cache.each_key do |key|
         if saved_change_to_attribute?(key)
           cache[key][send(key)] = self
           cache[key].delete(attribute_before_last_save(key))
@@ -88,7 +88,9 @@ module ModelCache
   end
 
   def self.with_cache(lookups)
-    @cache = lookups.inject({}) { |h, (k, v)| h[k] = prepare_lookups(v); h }
+    @cache = lookups.transform_values do |v|
+      prepare_lookups(v)
+    end
     yield
   ensure
     @cache = nil
@@ -108,9 +110,8 @@ module ModelCache
     return records if records.is_a?(Hash)
     return {} if records.empty?
 
-    keys[records.first.class.name].inject({}) do |h, k|
-      h[k] = records.index_by(&k)
-      h
+    keys[records.first.class.name].index_with do |k|
+      records.index_by(&k)
     end
   end
 
@@ -128,7 +129,7 @@ module ModelCache
     expected_args = options[:key_method] ? 0 : 1
     maybe_reset = "cache[#{key_value}] = #{orig_method} if args.size > #{expected_args}"
 
-    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<-CODE, __FILE__, __LINE__ + 1)
+    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<~RUBY, __FILE__, __LINE__ + 1)
       def #{method}(*args)
         if cache = ModelCache[#{options[:cache_name].inspect}] and cache = cache[#{options[:key_lookup].inspect}]
           #{maybe_reset}
@@ -138,7 +139,7 @@ module ModelCache
         end
       end
       #{alias_method}
-    CODE
+    RUBY
   end
 
   def self.included(klass)

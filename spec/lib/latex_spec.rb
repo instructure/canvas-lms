@@ -19,9 +19,9 @@
 #
 
 describe Latex do
-  describe '.to_math_ml' do
-    it 'is blank if latex: is blank or nil' do
-      expect(Latex.to_math_ml(latex: '')).to be_blank
+  describe ".to_math_ml" do
+    it "is blank if latex: is blank or nil" do
+      expect(Latex.to_math_ml(latex: "")).to be_blank
       expect(Latex.to_math_ml(latex: nil)).to be_blank
     end
   end

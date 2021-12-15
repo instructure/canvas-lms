@@ -117,7 +117,7 @@ class UsageRightsController < ApplicationController
       usage_rights_params = params.require(:usage_rights).permit(:use_justification, :legal_copyright, :license)
       usage_rights = @context.usage_rights.where(usage_rights_params).first
       usage_rights ||= @context.usage_rights.create(usage_rights_params)
-      return render json: usage_rights.errors, status: :bad_request unless usage_rights && usage_rights.valid?
+      return render json: usage_rights.errors, status: :bad_request unless usage_rights&.valid?
 
       assign_usage_rights(usage_rights)
     end
@@ -168,14 +168,12 @@ class UsageRightsController < ApplicationController
     file_ids = folders.flat_map { |folder| enumerate_contents(folder) }
     file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
     update_attrs = { usage_rights_id: usage_rights&.id }
-    update_attrs.merge!(locked: false) if usage_rights.present? && value_to_boolean(params[:publish])
+    update_attrs[:locked] = false if usage_rights.present? && value_to_boolean(params[:publish])
 
     count = @context.attachments.not_deleted.where(id: file_ids).update_all(update_attrs)
     result = usage_rights ? usage_rights_json(usage_rights, @current_user) : {}
-    result.merge!({
-                    message: I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count),
-                    file_ids: file_ids
-                  })
-    return render json: result
+    result[:message] = I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count)
+    result[:file_ids] = file_ids
+    render json: result
   end
 end

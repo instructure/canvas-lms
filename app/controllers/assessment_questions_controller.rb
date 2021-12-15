@@ -32,7 +32,7 @@ class AssessmentQuestionsController < ApplicationController
       if @question.with_versioning(&:save)
         render json: question_json(@question, @current_user, session, [:assessment_question])
       else
-        render :json => @question.errors, :status => :bad_request
+        render json: @question.errors, status: :bad_request
       end
     end
   end
@@ -46,7 +46,7 @@ class AssessmentQuestionsController < ApplicationController
       if @question.with_versioning { @question.update(assessment_question_params) }
         render json: question_json(@question, @current_user, session, [:assessment_question])
       else
-        render :json => @question.errors, :status => :bad_request
+        render json: @question.errors, status: :bad_request
       end
     end
   end
@@ -55,7 +55,7 @@ class AssessmentQuestionsController < ApplicationController
     @question = @bank.assessment_questions.find(params[:id])
     if authorized_action(@question, @current_user, :delete)
       @question.destroy
-      render :json => @question
+      render json: @question
     end
   end
 
@@ -66,6 +66,6 @@ class AssessmentQuestionsController < ApplicationController
   end
 
   def assessment_question_params
-    params.require(:assessment_question).permit(:name, :form_question_data => strong_anything)
+    params.require(:assessment_question).permit(:name, form_question_data: strong_anything)
   end
 end

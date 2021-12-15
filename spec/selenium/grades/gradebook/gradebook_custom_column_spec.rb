@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - custom columns" do
   include_context "in-process server selenium tests"
@@ -33,7 +33,7 @@ describe "Gradebook - custom columns" do
     @course.custom_gradebook_columns.create! opts
   end
 
-  it "shows custom columns", priority: "2", test_id: 164225 do
+  it "shows custom columns", priority: "2" do
     hidden = custom_column title: "hidden", hidden: true
     col = custom_column
     col.update_order([col.id, hidden.id])
@@ -50,23 +50,23 @@ describe "Gradebook - custom columns" do
     expect(Gradebook.slick_custom_column_cell_selector.count { |c| c.text == "123456" }).to eq 1
   end
 
-  it "lets you show and hide the teacher notes column", priority: "1", test_id: 3253279 do
+  it "lets you show and hide the teacher notes column", priority: "1" do
     Gradebook.visit(@course)
     # create the notes column
     Gradebook.select_view_dropdown
     Gradebook.select_notes_option
-    expect(Gradebook.content_selector).to contain_css('.custom_column')
+    expect(Gradebook.content_selector).to contain_css(".custom_column")
 
     # hide the notes column
     driver.action.send_keys(:escape).perform
     Gradebook.select_view_dropdown
     Gradebook.select_notes_option
-    expect(Gradebook.content_selector).not_to contain_css('.custom_column')
+    expect(Gradebook.content_selector).not_to contain_css(".custom_column")
 
     # show the notes column
     driver.action.send_keys(:escape).perform
     Gradebook.select_view_dropdown
     Gradebook.select_notes_option
-    expect(Gradebook.content_selector).to contain_css('.custom_column')
+    expect(Gradebook.content_selector).to contain_css(".custom_column")
   end
 end

@@ -23,7 +23,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_override
   belongs_to :user
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
 
   before_create :set_root_account_id
   after_save :destroy_override_if_needed
@@ -33,13 +33,13 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   before_validation :default_values
   before_validation :clean_up_assignment_if_override_student_orphaned
 
-  validates_presence_of :assignment_override, :user
-  validates_uniqueness_of :user_id, scope: [:assignment_id, :quiz_id],
-                                    conditions: -> { where.not(workflow_state: 'deleted') },
-                                    message: 'already belongs to an assignment override'
+  validates :assignment_override, :user, presence: true
+  validates :user_id, uniqueness: { scope: [:assignment_id, :quiz_id],
+                                    conditions: -> { where.not(workflow_state: "deleted") },
+                                    message: "already belongs to an assignment override" }
 
   validate :assignment_override, if: :active? do |record|
-    if record.assignment_override && record.assignment_override.set_type != 'ADHOC'
+    if record.assignment_override && record.assignment_override.set_type != "ADHOC"
       record.errors.add :assignment_override, "is not adhoc"
     end
   end
@@ -91,13 +91,16 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
     valid_student_ids = Enrollment
                         .where(course_id: assignment.context_id)
-                        .where.not(workflow_state: %w{completed inactive deleted})
+                        .where.not(workflow_state: %w[completed inactive deleted])
                         .pluck(:user_id)
 
     AssignmentOverrideStudent
       .where(assignment: assignment)
       .where.not(user_id: valid_student_ids)
-      .each { |aos| aos.assignment_override.skip_broadcasts = true; aos.destroy }
+      .each do |aos|
+      aos.assignment_override.skip_broadcasts = true
+      aos.destroy
+    end
   end
 
   attr_writer :no_enrollment
@@ -126,7 +129,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       assignment.clear_cache_key(:availability)
       DueDateCacher.recompute_users_for_course(user_id, assignment.context, [assignment])
     end
-    self.quiz.clear_cache_key(:availability) if self.quiz
+    quiz&.clear_cache_key(:availability)
   end
 
   def set_root_account_id

@@ -12,6 +12,6 @@ class ChangeFailedJobsHandlerToText < ActiveRecord::Migration[5.1]
   end
 
   def down
-    change_column :failed_jobs, :handler, :string, :limit => 500.kilobytes
+    change_column :failed_jobs, :handler, :string, limit: 500.kilobytes
   end
 end

@@ -30,7 +30,7 @@ class CommunicationChannel
       @account, @pattern, @path_type, @with_invalid_paths = account, pattern, path_type, with_invalid_paths
       @after = Time.zone.parse(after) if after
       @before = Time.zone.parse(before) if before
-      @order = order&.downcase == 'desc' ? :desc : :asc
+      @order = order&.downcase == "desc" ? :desc : :asc
     end
 
     def matching_channels(for_report: false)
@@ -40,7 +40,7 @@ class CommunicationChannel
       ccs = ccs.limit([(REPORT_LIMIT if for_report), self.class.bulk_limit].compact.min)
 
       ccs = filter(ccs)
-      ccs = ccs.path_like(pattern.tr('*', '%')) if pattern
+      ccs = ccs.path_like(pattern.tr("*", "%")) if pattern
       ccs = ccs.where(path_type: path_type) if path_type
       ccs = ccs.where("path_type != 'email' or lower(path) LIKE '%_@%_.%_'") unless @with_invalid_paths
 
@@ -55,11 +55,11 @@ class CommunicationChannel
 
     def column_headers
       [
-        I18n.t('User ID'),
-        I18n.t('Name'),
-        I18n.t('Communication channel ID'),
-        I18n.t('Type'),
-        I18n.t('Path')
+        I18n.t("User ID"),
+        I18n.t("Name"),
+        I18n.t("Communication channel ID"),
+        I18n.t("Type"),
+        I18n.t("Path")
       ] + self.class.report_columns.keys
     end
 
@@ -104,15 +104,15 @@ class CommunicationChannel
 
       def self.report_columns
         {
-          I18n.t('Date of most recent bounce') => :last_bounce_at,
-          I18n.t('Bounce reason') => :last_bounce_summary
+          I18n.t("Date of most recent bounce") => :last_bounce_at,
+          I18n.t("Bounce reason") => :last_bounce_summary
         }
       end
 
       def filter(ccs)
-        ccs = ccs.where('bounce_count > 0').order(last_bounce_at: order)
-        ccs = ccs.where('last_bounce_at < ?', before) if before
-        ccs = ccs.where('last_bounce_at > ?', after) if after
+        ccs = ccs.where("bounce_count > 0").order(last_bounce_at: order)
+        ccs = ccs.where("last_bounce_at < ?", before) if before
+        ccs = ccs.where("last_bounce_at > ?", after) if after
         ccs
       end
 
@@ -133,19 +133,19 @@ class CommunicationChannel
 
       def self.report_columns
         {
-          I18n.t('Created at') => :created_at
+          I18n.t("Created at") => :created_at
         }
       end
 
       def filter(ccs)
-        ccs = ccs.where(workflow_state: 'unconfirmed').order(created_at: order)
-        ccs = ccs.where('created_at < ?', before) if before
-        ccs = ccs.where('created_at > ?', after) if after
+        ccs = ccs.where(workflow_state: "unconfirmed").order(created_at: order)
+        ccs = ccs.where("created_at < ?", before) if before
+        ccs = ccs.where("created_at > ?", after) if after
         ccs
       end
 
       def perform!
-        { confirmed_count: matching_channels.update_all(workflow_state: 'active') }
+        { confirmed_count: matching_channels.update_all(workflow_state: "active") }
       end
     end
   end

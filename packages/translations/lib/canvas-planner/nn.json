@@ -272,6 +272,9 @@
   },
   "view_next_week_7f61f755": { "message": "Vis neste veke" },
   "view_previous_week_6f83849f": { "message": "Vis førre veke" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Navigasjon for ukestimeplan"
+  },
   "yesterday_at_date_1aa6d18e": { "message": "I går på { date }" },
   "yesterday_c6bd6abf": { "message": "I går" },
   "you_have_media_feedback_f5f9aba8": { "message": "Du har tilbakemelding. " },

@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 shared_context "blueprint course settings context" do
   def blueprint_settings_options
-    f('.blueprint_setting_options')
+    f(".blueprint_setting_options")
   end
 
   def content_checkbox_state
@@ -47,7 +47,7 @@ describe "course settings/blueprint" do
 
   before :once do
     account_admin_user
-    course_factory :active_all => true
+    course_factory active_all: true
   end
 
   describe "as admin" do
@@ -55,9 +55,9 @@ describe "course settings/blueprint" do
       user_session @admin
     end
 
-    it "enables blueprint course and set default restrictions", priority: "1", test_id: 3166299 do
+    it "enables blueprint course and set default restrictions", priority: "1" do
       get "/courses/#{@course.id}/settings"
-      f('.bcs_check-box').find_element(:xpath, "../div").click
+      f(".bcs_check-box").find_element(:xpath, "../div").click
       wait_for_animations
       expect(blueprint_settings_options).to be_displayed
 
@@ -65,7 +65,7 @@ describe "course settings/blueprint" do
       expect(points_checkbox_state).to eq false
       expect(due_dates_checkbox_state).to eq false
       expect(availability_dates_checkbox_state).to eq false
-      expect_new_page_load { submit_form('#course_form') }
+      expect_new_page_load { submit_form("#course_form") }
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
         { content: true, points: false, due_dates: false, availability_dates: false }
       )
@@ -77,7 +77,7 @@ describe "course settings/blueprint" do
       template.save
       get "/courses/#{@course.id}/settings"
 
-      expect_new_page_load { submit_form('#course_form') }
+      expect_new_page_load { submit_form("#course_form") }
 
       expect(blueprint_settings_options).to be_displayed
 
@@ -105,9 +105,9 @@ describe "course settings/blueprint" do
       expect(due_dates_checkbox_state).to eq true
       expect(availability_dates_checkbox_state).to eq false
 
-      f('.bcs_check-box').find_element(:xpath, "../div").click
+      f(".bcs_check-box").find_element(:xpath, "../div").click
       wait_for_animations
-      expect_new_page_load { submit_form('#course_form') }
+      expect_new_page_load { submit_form("#course_form") }
       expect(template.reload).to be_deleted
     end
 
@@ -116,8 +116,8 @@ describe "course settings/blueprint" do
 
       get "/courses/#{@course.id}/settings"
 
-      expect(f('.bcs_radio_input-group')).to be_displayed
-      ff('.bcs_radio_input-group')[1].click
+      expect(f(".bcs_radio_input-group")).to be_displayed
+      ff(".bcs_radio_input-group")[1].click
 
       fj(".bcs__object-tab:contains('Assignments') .bcs_tab_indicator-icon button").click
       fj(".bcs__object-tab:contains('Assignments') .bcs_check_box-group label:contains('Content')").click
@@ -126,7 +126,7 @@ describe "course settings/blueprint" do
       fj(".bcs__object-tab:contains('Quizzes') .bcs_tab_indicator-icon button").click
       fj(".bcs__object-tab:contains('Quizzes') .bcs_check_box-group label:contains('Due Dates')").click
 
-      expect_new_page_load { submit_form('#course_form') }
+      expect_new_page_load { submit_form("#course_form") }
 
       template.reload
       expect(template.use_default_restrictions_by_type).to be_truthy
@@ -146,13 +146,13 @@ describe "course settings/blueprint" do
 
     it "shows No instead of a checkbox for normal courses" do
       get "/courses/#{@course.id}/settings"
-      expect(f('#course_blueprint')).to include_text 'No'
+      expect(f("#course_blueprint")).to include_text "No"
     end
 
     it "shows Yes instead of a checkbox for blueprint courses" do
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       get "/courses/#{@course.id}/settings"
-      expect(f('#course_blueprint')).to include_text 'Yes'
+      expect(f("#course_blueprint")).to include_text "Yes"
     end
   end
 end

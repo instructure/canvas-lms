@@ -120,7 +120,7 @@
 #
 class ContextModulesApiController < ApplicationController
   before_action :require_context
-  before_action :find_student, :only => [:index, :show]
+  before_action :find_student, only: [:index, :show]
   include Api::V1::ContextModule
 
   # @API List modules
@@ -159,29 +159,27 @@ class ContextModulesApiController < ApplicationController
       scope = @context.modules_visible_to(@student || @current_user)
 
       includes = Array(params[:include])
-      scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
+      scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?("items")
       modules = Api.paginate(scope, self, route)
 
-      ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content) if includes.include?("items")
 
-      if @student
-        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
-      else
-        modules_and_progressions = modules.map { |m| [m, nil] }
-      end
+      modules_and_progressions = if @student
+                                   modules.map { |m| [m, m.evaluate_for(@student)] }
+                                 else
+                                   modules.map { |m| [m, nil] }
+                                 end
       opts = {}
-      if includes.include?('items') && params[:search_term].present?
+      if includes.include?("items") && params[:search_term].present?
         SearchTermHelper.validate_search_term(params[:search_term])
         opts[:search_term] = params[:search_term]
       end
 
-      if includes.include?('items')
-        if @context.user_has_been_observer?(@student || @current_user)
-          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user))
-        end
+      if includes.include?("items") && @context.user_has_been_observer?(@student || @current_user)
+        opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
       end
 
-      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }.compact
+      render json: modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end
   end
 
@@ -214,17 +212,17 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
-      ActiveRecord::Associations::Preloader.new.preload(mod, content_tags: :content) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new.preload(mod, content_tags: :content) if includes.include?("items")
       prog = @student ? mod.evaluate_for(@student) : nil
-      render :json => module_json(mod, @student || @current_user, session, prog, includes)
+      render json: module_json(mod, @student || @current_user, session, prog, includes)
     end
   end
 
   def duplicate
     if authorized_action(@context, @current_user, :manage_content)
       old_module = @context.modules_visible_to(@current_user).find(params[:module_id])
-      return render json: { error: 'unable to find module to duplicate' }, status: :bad_request unless old_module
-      return render json: { error: 'cannot duplicate this module' }, status: :bad_request unless old_module.can_be_duplicated?
+      return render json: { error: "unable to find module to duplicate" }, status: :bad_request unless old_module
+      return render json: { error: "cannot duplicate this module" }, status: :bad_request unless old_module.can_be_duplicated?
 
       new_module = old_module.duplicate
       new_module.save!
@@ -232,16 +230,16 @@ class ContextModulesApiController < ApplicationController
       if new_module
         result_json = new_module.as_json(include: :content_tags, methods: :workflow_state)
         attachment_tags = new_module.content_tags.select do |content_tag|
-          content_tag.content_type == 'Attachment'
+          content_tag.content_type == "Attachment"
         end
-        result_json['ENV_UPDATE'] = attachment_tags.map do |attachment_tag|
-          { :id => attachment_tag.id.to_s,
-            :content_id => attachment_tag.content_id,
-            :content_details => content_details(attachment_tag, @current_user, :for_admin => true) }
+        result_json["ENV_UPDATE"] = attachment_tags.map do |attachment_tag|
+          { id: attachment_tag.id.to_s,
+            content_id: attachment_tag.content_id,
+            content_details: content_details(attachment_tag, @current_user, for_admin: true) }
         end
-        render :json => result_json
+        render json: result_json
       else
-        render :json => { error: 'cannot save new module' }, status: :bad_request
+        render json: { error: "cannot save new module" }, status: :bad_request
       end
     end
   end
@@ -273,31 +271,31 @@ class ContextModulesApiController < ApplicationController
   def batch_update
     if authorized_action(@context, @current_user, :manage_content)
       event = params[:event]
-      return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless event.present?
-      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(publish unpublish delete).include? event
-      return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
+      return render(json: { message: "need to specify event" }, status: :bad_request) unless event.present?
+      return render(json: { message: "invalid event" }, status: :bad_request) unless %w[publish unpublish delete].include? event
+      return render(json: { message: "must specify module_ids[]" }, status: :bad_request) unless params[:module_ids].present?
 
       module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))
       modules = @context.context_modules.not_deleted.where(id: module_ids)
-      return render(:json => { :message => 'no modules found' }, :status => :not_found) if modules.empty?
+      return render(json: { message: "no modules found" }, status: :not_found) if modules.empty?
 
       completed_ids = []
       modules.each do |mod|
         case event
-        when 'publish'
+        when "publish"
           unless mod.active?
             mod.publish
             mod.publish_items!
           end
-        when 'unpublish'
+        when "unpublish"
           mod.unpublish unless mod.unpublished?
-        when 'delete'
+        when "delete"
           mod.destroy
         end
         completed_ids << mod.id
       end
 
-      render :json => { :completed => completed_ids }
+      render json: { completed: completed_ids }
     end
   end
 
@@ -339,22 +337,22 @@ class ContextModulesApiController < ApplicationController
   # @returns Module
   def create
     if authorized_action(@context.context_modules.temp_record, @current_user, :create)
-      return render :json => { :message => "missing module parameter" }, :status => :bad_request unless params[:module]
-      return render :json => { :message => "missing module name" }, :status => :bad_request unless params[:module][:name].present?
+      return render json: { message: "missing module parameter" }, status: :bad_request unless params[:module]
+      return render json: { message: "missing module name" }, status: :bad_request unless params[:module][:name].present?
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       @module = @context.context_modules.build(module_parameters)
 
       if (ids = params[:module][:prerequisite_module_ids])
-        @module.prerequisites = ids.map { |id| "module_#{id}" }.join(',')
+        @module.prerequisites = ids.map { |id| "module_#{id}" }.join(",")
       end
-      @module.workflow_state = 'unpublished'
+      @module.workflow_state = "unpublished"
 
       if @module.save && set_position
-        render :json => module_json(@module, @current_user, session, nil)
+        render json: module_json(@module, @current_user, session, nil)
       else
-        render :json => @module.errors, :status => :bad_request
+        render json: @module.errors, status: :bad_request
       end
     end
   end
@@ -401,19 +399,19 @@ class ContextModulesApiController < ApplicationController
   def update
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
-      return render :json => { :message => "missing module parameter" }, :status => :bad_request unless params[:module]
+      return render json: { message: "missing module parameter" }, status: :bad_request unless params[:module]
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       if (ids = params[:module][:prerequisite_module_ids])
-        if ids.blank?
-          module_parameters[:prerequisites] = []
-        else
-          module_parameters[:prerequisites] = ids.map { |id| "module_#{id}" }.join(',')
-        end
+        module_parameters[:prerequisites] = if ids.blank?
+                                              []
+                                            else
+                                              ids.map { |id| "module_#{id}" }.join(",")
+                                            end
       end
 
-      if params[:module].has_key?(:published)
+      if params[:module].key?(:published)
         if value_to_boolean(params[:module][:published])
           @module.publish
           @module.publish_items!
@@ -426,11 +424,11 @@ class ContextModulesApiController < ApplicationController
 
       if @module.update(module_parameters) && set_position
         json = module_json(@module, @current_user, session, nil)
-        json['relock_warning'] = true if relock_warning || @module.relock_warning?
-        json['publish_warning'] = publish_warning.present?
-        render :json => json
+        json["relock_warning"] = true if relock_warning || @module.relock_warning?
+        json["publish_warning"] = publish_warning.present?
+        render json: json
       else
-        render :json => @module.errors, :status => :bad_request
+        render json: @module.errors, status: :bad_request
       end
     end
   end
@@ -450,7 +448,7 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :delete)
       @module.destroy
-      render :json => module_json(@module, @current_user, session, nil)
+      render json: module_json(@module, @current_user, session, nil)
     end
   end
 
@@ -473,7 +471,7 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
       @module.relock_progressions
-      render :json => module_json(@module, @current_user, session, nil)
+      render json: module_json(@module, @current_user, session, nil)
     end
   end
 
@@ -483,14 +481,14 @@ class ContextModulesApiController < ApplicationController
     if @module.insert_at(params[:module][:position].to_i)
       # see ContextModulesController#reorder
       @context.touch
-      @context.context_modules.not_deleted.each { |m| m.save_without_touching_context }
+      @context.context_modules.not_deleted.each(&:save_without_touching_context)
       @context.touch
 
       @module.reload
-      return true
+      true
     else
       @module.errors.add(:position, t(:invalid_position, "Invalid position"))
-      return false
+      false
     end
   end
 
@@ -503,7 +501,7 @@ class ContextModulesApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      return true
+      true
     end
   end
   protected :find_student

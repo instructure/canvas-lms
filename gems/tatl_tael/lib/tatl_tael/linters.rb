@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'yaml'
+require "yaml"
 
 module TatlTael
   module Linters
@@ -8,7 +8,7 @@ module TatlTael
       class << self
         def inherited(subclass)
           super
-          Linters.linters << subclass unless subclass.name&.include?('SimpleLinter')
+          Linters.linters << subclass unless subclass.name&.include?("SimpleLinter")
         end
       end
 
@@ -53,7 +53,7 @@ module TatlTael
         # example linter_class.to_s: "TatlTael::Linters::Simple::CoffeeSpecsLinter"
         # example resulting base_config_key: "Simple/CoffeeSpecsLinter"
         base_config_key = linter_class.to_s
-                                      .sub(self.to_s, "") # rm "TatlTael::Linters"
+                                      .sub(to_s, "") # rm "TatlTael::Linters"
                                       .sub("::", "")
                                       .gsub("::", "/")
         underscore_and_symbolize_keys(config[base_config_key])

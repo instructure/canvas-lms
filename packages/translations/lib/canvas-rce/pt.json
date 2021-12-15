@@ -158,8 +158,8 @@
   "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
     "message": "Arraste a alça. Use as setas para cima e para baixo para redimensionar"
   },
-  "due_multiple_dates_cc0ee3f5": { "message": "Vencimento: Várias datas" },
-  "due_when_7eed10c6": { "message": "Vencimento: { when }" },
+  "due_multiple_dates_cc0ee3f5": { "message": "Data limite: Várias datas" },
+  "due_when_7eed10c6": { "message": "Data limite: { when }" },
   "edit_c5fbea07": { "message": "Editar" },
   "edit_equation_f5279959": { "message": "Editar Equação" },
   "edit_existing_button_icon_3d0277bd": {

@@ -18,21 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class CalendarEventImporter < Importer
     self.item_class = CalendarEvent
 
     def self.process_migration(data, migration)
-      events = data['calendar_events'] ? data['calendar_events'] : []
+      events = data["calendar_events"] || []
       events.each do |event|
-        if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
-          begin
-            import_from_migration(event, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
-          end
+        next unless migration.import_object?("calendar_events", event["migration_id"]) || migration.import_object?("events", event["migration_id"])
+
+        begin
+          import_from_migration(event, migration.context, migration)
+        rescue
+          migration.add_import_warning(t("#migration.calendar_event_type", "Calendar Event"), event[:title], $!)
         end
       end
     end
@@ -47,7 +47,7 @@ module Importers
       item.mark_as_importing!(migration)
 
       item.migration_id = hash[:migration_id]
-      item.workflow_state = 'active' if item.deleted?
+      item.workflow_state = "active" if item.deleted?
       item.title = hash[:title] || hash[:name]
 
       item.description = migration.convert_html(hash[:description] || "", :calendar_event, hash[:migration_id], :description)
@@ -71,14 +71,14 @@ module Importers
     # no idea what 'area' or 'media_collection' attachment types are, so we're ignoring them
     def self.import_migration_attachment_suffix(hash, context)
       suffix_method_name = "#{hash[:attachment_type]}_attachment_description"
-      suffix = self.send(suffix_method_name, hash, context) if self.respond_to?(suffix_method_name)
+      suffix = send(suffix_method_name, hash, context) if respond_to?(suffix_method_name)
       suffix || ""
     end
 
     def self.external_url_attachment_description(hash, _context)
       return unless (url = hash[:attachment_value])
 
-      import_migration_attachment_link(url, ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link")))
+      import_migration_attachment_link(url, ERB::Util.h(t("#calendar_event.see_related_link", "See Related Link")))
     end
 
     def self.assignment_attachment_description(hash, context)
@@ -86,7 +86,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, assignment),
-        ERB::Util.h(t('#calendar_event.see_assignment', "See %{assignment_name}", :assignment_name => assignment.title))
+        ERB::Util.h(t("#calendar_event.see_assignment", "See %{assignment_name}", assignment_name: assignment.title))
       )
     end
 
@@ -95,7 +95,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, quiz),
-        ERB::Util.h(t('#calendar_event.see_quiz', "See %{quiz_name}", :quiz_name => quiz.title))
+        ERB::Util.h(t("#calendar_event.see_quiz", "See %{quiz_name}", quiz_name: quiz.title))
       )
     end
 
@@ -104,18 +104,18 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, file),
-        ERB::Util.h(t('#calendar_event.see_file', "See %{file_name}", :file_name => file.display_name))
+        ERB::Util.h(t("#calendar_event.see_file", "See %{file_name}", file_name: file.display_name))
       )
     end
 
     def self.web_link_attachment_description(hash, context)
       link = context.external_url_hash[hash[:attachment_value]]
-      link ||= context.full_migration_hash['web_link_categories'].map { |c| c['links'] }.flatten.select { |l| l['link_id'] == hash[:attachment_value] } rescue nil
+      link ||= context.full_migration_hash["web_link_categories"].map { |c| c["links"] }.flatten.select { |l| l["link_id"] == hash[:attachment_value] } rescue nil
       return unless link
 
       import_migration_attachment_link(
-        link['url'],
-        link['name'] || ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link"))
+        link["url"],
+        link["name"] || ERB::Util.h(t("#calendar_event.see_related_link", "See Related Link"))
       )
     end
 
@@ -124,7 +124,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, topic),
-        ERB::Util.h(t('#calendar_event.see_discussion_topic', "See %{discussion_topic_name}", :discussion_topic_name => topic.title))
+        ERB::Util.h(t("#calendar_event.see_discussion_topic", "See %{discussion_topic_name}", discussion_topic_name: topic.title))
       )
     end
 

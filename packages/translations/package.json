@@ -14,7 +14,7 @@
     "lint": "prettier bin/**/*.js lib/**/*.json --write"
   },
   "devDependencies": {
-    "jest": "^24",
+    "jest": "^26",
     "jest-environment-jsdom-fourteen": "^0.1.0",
     "prettier": "^2"
   }

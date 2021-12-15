@@ -24,7 +24,7 @@
 class AssetUserAccess < ActiveRecord::Base
   extend RootAccountResolver
 
-  belongs_to :context, polymorphic: [:account, :course, :group, :user], polymorphic_prefix: true
+  belongs_to :context, polymorphic: %i[account course group user], polymorphic_prefix: true
   belongs_to :user
   has_many :page_views
 
@@ -33,13 +33,13 @@ class AssetUserAccess < ActiveRecord::Base
   before_save :infer_root_account_id
   resolves_root_account through: ->(instance) { instance.infer_root_account_id }
 
-  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
-  scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :participations, -> { where(:action_level => 'participate') }
-  scope :most_recent, -> { order('updated_at DESC') }
+  scope :for_context, ->(context) { where(context_id: context, context_type: context.class.to_s) }
+  scope :for_user, ->(user) { where(user_id: user) }
+  scope :participations, -> { where(action_level: "participate") }
+  scope :most_recent, -> { order("updated_at DESC") }
 
   def infer_root_account_id(asset_for_root_account_id = nil)
-    self.root_account_id ||= if context_type != 'User'
+    self.root_account_id ||= if context_type != "User"
                                context&.resolved_root_account_id || 0
                              elsif asset_for_root_account_id.is_a?(User)
                                # Unfillable. Point to the dummy root account with id=0.
@@ -53,7 +53,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def category
-    self.asset_category
+    asset_category
   end
 
   def infer_defaults
@@ -78,26 +78,26 @@ class AssetUserAccess < ActiveRecord::Base
   def asset_display_name
     return nil unless asset
 
-    if self.asset.respond_to?(:title) && !self.asset.title.nil?
+    if asset.respond_to?(:title) && !asset.title.nil?
       asset.title
-    elsif self.asset.is_a? Enrollment
+    elsif asset.is_a? Enrollment
       asset.user.name
-    elsif self.asset.respond_to?(:name) && !self.asset.name.nil?
+    elsif asset.respond_to?(:name) && !asset.name.nil?
       asset.name
     else
-      self.asset_code
+      asset_code
     end
   end
 
   def context_code
-    "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    "#{context_type.underscore}_#{context_id}" rescue nil
   end
 
   def readable_name(include_group_name: true)
-    if self.asset_code&.include?(':')
-      split = self.asset_code.split(/:/)
+    if asset_code&.include?(":")
+      split = asset_code.split(":")
 
-      if split[1].match(/course_\d+/)
+      if split[1].match?(/course_\d+/)
         case split[0]
         when "announcements"
           t("Course Announcements")
@@ -134,42 +134,42 @@ class AssetUserAccess < ActiveRecord::Base
         else
           "Course #{split[0].titleize}"
         end
-      elsif (match = split[1].match(/group_(\d+)/)) && (group = Group.where(:id => match[1]).first)
+      elsif (match = split[1].match(/group_(\d+)/)) && (group = Group.where(id: match[1]).first)
         case split[0]
         when "announcements"
-          include_group_name ? t("%{group_name} - Group Announcements", :group_name => group.name) : t('Group Announcements')
+          include_group_name ? t("%{group_name} - Group Announcements", group_name: group.name) : t("Group Announcements")
         when "calendar_feed"
-          include_group_name ? t("%{group_name} - Group Calendar", :group_name => group.name) : t('Group Calendar')
+          include_group_name ? t("%{group_name} - Group Calendar", group_name: group.name) : t("Group Calendar")
         when "collaborations"
-          include_group_name ? t("%{group_name} - Group Collaborations", :group_name => group.name) : t('Group Collaborations')
+          include_group_name ? t("%{group_name} - Group Collaborations", group_name: group.name) : t("Group Collaborations")
         when "conferences"
-          include_group_name ? t("%{group_name} - Group Conferences", :group_name => group.name) : t('Group Conferences')
+          include_group_name ? t("%{group_name} - Group Conferences", group_name: group.name) : t("Group Conferences")
         when "files"
-          include_group_name ? t("%{group_name} - Group Files", :group_name => group.name) : t('Group Files')
+          include_group_name ? t("%{group_name} - Group Files", group_name: group.name) : t("Group Files")
         when "home"
-          include_group_name ? t("%{group_name} - Group Home", :group_name => group.name) : t('Group Home')
+          include_group_name ? t("%{group_name} - Group Home", group_name: group.name) : t("Group Home")
         when "pages"
-          include_group_name ? t("%{group_name} - Group Pages", :group_name => group.name) : t('Group Pages')
+          include_group_name ? t("%{group_name} - Group Pages", group_name: group.name) : t("Group Pages")
         when "roster"
-          include_group_name ? t("%{group_name} - Group People", :group_name => group.name) : t('Group People')
+          include_group_name ? t("%{group_name} - Group People", group_name: group.name) : t("Group People")
         when "topics"
-          include_group_name ? t("%{group_name} - Group Discussions", :group_name => group.name) : t('Group Discussions')
+          include_group_name ? t("%{group_name} - Group Discussions", group_name: group.name) : t("Group Discussions")
         else
           "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
         end
-      elsif split[1].match(/user_\d+/)
+      elsif split[1].match?(/user_\d+/)
         case split[0]
         when "files"
-          t('User Files')
+          t("User Files")
         else
-          self.display_name
+          display_name
         end
       else
-        self.display_name
+        display_name
       end
     else
-      re = Regexp.new("#{self.asset_code} - ")
-      self.display_name.nil? ? "" : self.display_name.gsub(re, "")
+      re = Regexp.new("#{asset_code} - ")
+      display_name.nil? ? "" : display_name.gsub(re, "")
     end
   end
 
@@ -179,19 +179,19 @@ class AssetUserAccess < ActiveRecord::Base
 
       asset_code, = self.asset_code.split(":").reverse
       @asset = Context.find_asset_by_asset_string(asset_code, context)
-      @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(:id => match[1]).first
+      @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(id: match[1]).first
     end
     @asset
   end
 
   def asset_class_name
-    name = self.asset.class.name.underscore if self.asset
+    name = asset.class.name.underscore if asset
     name = "Quiz" if name == "Quizzes::Quiz"
     name
   end
 
   def self.get_correct_context(context, accessed_asset)
-    if accessed_asset[:category] == "files" && accessed_asset[:code]&.starts_with?('attachment')
+    if accessed_asset[:category] == "files" && accessed_asset[:code]&.starts_with?("attachment")
       attachment_id = accessed_asset[:code].match(/\A\w+_(\d+)\z/)[1]
       asset = accessed_asset[:asset_for_root_account_id]
       return asset.context if asset.is_a?(Attachment) && asset.id == attachment_id
@@ -209,14 +209,14 @@ class AssetUserAccess < ActiveRecord::Base
   def self.log(user, context, accessed_asset)
     return unless user && accessed_asset[:code]
 
-    correct_context = self.get_correct_context(context, accessed_asset)
+    correct_context = get_correct_context(context, accessed_asset)
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
 
     GuardRail.activate(:secondary) do
       @access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code],
                                       context: correct_context).first_or_initialize
     end
-    accessed_asset[:level] ||= 'view'
+    accessed_asset[:level] ||= "view"
     @access.log correct_context, accessed_asset
   end
 
@@ -232,7 +232,7 @@ class AssetUserAccess < ActiveRecord::Base
     infer_defaults
     infer_root_account_id(accessed[:asset_for_root_account_id])
 
-    if self.class.use_log_compaction_for_views? && self.eligible_for_log_path?
+    if self.class.use_log_compaction_for_views? && eligible_for_log_path?
       # Since this is JUST a view bump, we'll write it to the
       # view log and let periodic jobs compact them later
       # (this is intentionally trading off more latency for less I/O pressure)
@@ -248,33 +248,33 @@ class AssetUserAccess < ActiveRecord::Base
     # view count updates happen a LOT though, so if the setting is
     # configured such that we're allowed to use the log path, check
     # if this set of changes is "just" a view update.
-    change_hash = self.changes_to_save
-    updated_key_set = self.changes_to_save.keys.to_set
-    return false unless updated_key_set.include?('view_score')
-    return false unless (updated_key_set - Set.new(['updated_at', 'last_access', 'view_score'])).empty?
+    change_hash = changes_to_save
+    updated_key_set = changes_to_save.keys.to_set
+    return false unless updated_key_set.include?("view_score")
+    return false unless (updated_key_set - Set.new(%w[updated_at last_access view_score])).empty?
 
     # ASSUMPTION: All view_score updates are a single increment.
     # If this is violated, rather than failing to capture, we should accept the
     # write through the row update for now (by returning false from here).
-    view_delta = change_hash['view_score'].compact
+    view_delta = change_hash["view_score"].compact
     # ^array with old and new value, which CAN be null, hence compact
-    return false if view_delta.size < 1
+    return false if view_delta.empty?
     return (view_delta[0] - 1.0).abs < Float::EPSILON if view_delta.size == 1
 
     (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end
 
   def log_action(level)
-    increment(:view_score) if %w{view participate}.include?(level)
-    increment(:participate_score) if %w{participate submit}.include?(level)
+    increment(:view_score) if %w[view participate].include?(level)
+    increment(:participate_score) if %w[participate submit].include?(level)
 
-    if self.action_level != 'participate'
-      self.action_level = (level == 'submit') ? 'participate' : level
+    if action_level != "participate"
+      self.action_level = (level == "submit") ? "participate" : level
     end
   end
 
   def self.use_log_compaction_for_views?
-    self.view_counting_method.to_s == "log"
+    view_counting_method.to_s == "log"
   end
 
   def self.view_counting_method
@@ -291,8 +291,8 @@ class AssetUserAccess < ActiveRecord::Base
   def corrected_view_score
     deductible_points = 0
 
-    if 'quizzes' == self.asset_group_code
-      deductible_points = self.participate_score || 0
+    if self.asset_group_code == "quizzes"
+      deductible_points = participate_score || 0
     end
 
     self.view_score ||= 0
@@ -301,24 +301,24 @@ class AssetUserAccess < ActiveRecord::Base
 
   # Includes both the icon name and the associated screenreader label for the icon
   ICON_MAP = {
-    announcements: ["icon-announcement", t('Announcement')].freeze,
-    assignments: ["icon-assignment", t('Assignment')].freeze,
-    calendar: ["icon-calendar-month", t('Calendar')].freeze,
-    collaborations: ["icon-document", t('Collaboration')].freeze,
-    conferences: ["icon-group", t('Conference')].freeze,
-    external_tools: ["icon-link", t('App')].freeze,
-    files: ["icon-download", t('File')].freeze,
-    grades: ["icon-gradebook", t('Grades')].freeze,
-    home: ["icon-home", t('Home')].freeze,
-    inbox: ["icon-message", t('Inbox')].freeze,
-    modules: ["icon-module", t('Module')].freeze,
-    outcomes: ["icon-outcomes", t('Outcome')].freeze,
-    pages: ["icon-document", t('Page')].freeze,
-    quizzes: ["icon-quiz", t('Quiz')].freeze,
-    roster: ["icon-user", t('People')].freeze,
-    syllabus: ["icon-syllabus", t('Syllabus')].freeze,
-    topics: ["icon-discussion", t('Discussion')].freeze,
-    wiki: ["icon-document", t('Page')].freeze
+    announcements: ["icon-announcement", t("Announcement")].freeze,
+    assignments: ["icon-assignment", t("Assignment")].freeze,
+    calendar: ["icon-calendar-month", t("Calendar")].freeze,
+    collaborations: ["icon-document", t("Collaboration")].freeze,
+    conferences: ["icon-group", t("Conference")].freeze,
+    external_tools: ["icon-link", t("App")].freeze,
+    files: ["icon-download", t("File")].freeze,
+    grades: ["icon-gradebook", t("Grades")].freeze,
+    home: ["icon-home", t("Home")].freeze,
+    inbox: ["icon-message", t("Inbox")].freeze,
+    modules: ["icon-module", t("Module")].freeze,
+    outcomes: ["icon-outcomes", t("Outcome")].freeze,
+    pages: ["icon-document", t("Page")].freeze,
+    quizzes: ["icon-quiz", t("Quiz")].freeze,
+    roster: ["icon-user", t("People")].freeze,
+    syllabus: ["icon-syllabus", t("Syllabus")].freeze,
+    topics: ["icon-discussion", t("Discussion")].freeze,
+    wiki: ["icon-document", t("Page")].freeze
   }.freeze
 
   def icon
@@ -332,7 +332,7 @@ class AssetUserAccess < ActiveRecord::Base
   private
 
   def increment(attribute)
-    incremented_value = (self.send(attribute) || 0) + 1
-    self.send("#{attribute}=", incremented_value)
+    incremented_value = (send(attribute) || 0) + 1
+    send("#{attribute}=", incremented_value)
   end
 end

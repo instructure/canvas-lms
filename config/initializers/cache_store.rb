@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 last_cache_config = {}
-load_cache_config = -> do
+load_cache_config = lambda do
   cache_map = {}
 
   searched = Set.new
   clusters_to_search = Switchman::DatabaseServer.all.map(&:id)
-  while !clusters_to_search.empty?
+  until clusters_to_search.empty?
     cluster = clusters_to_search.shift
     next if searched.include?(cluster)
 
@@ -45,11 +45,11 @@ load_cache_config = -> do
     last_cluster_cache_config = last_cache_config[cluster]
     last_cache_config[cluster] = config
 
-    if last_cluster_cache_config != config
-      cache_map[cluster] = Canvas.lookup_cache_store(config, cluster)
-    else
-      cache_map[cluster] = Switchman.config[:cache_map][cluster]
-    end
+    cache_map[cluster] = if last_cluster_cache_config == config
+                           Switchman.config[:cache_map][cluster]
+                         else
+                           Canvas.lookup_cache_store(config, cluster)
+                         end
   end
 
   # resolve links

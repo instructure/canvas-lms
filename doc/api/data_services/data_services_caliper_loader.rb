@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class DataServicesCaliperLoader
-  JSON_BASE_PATH = 'doc/api/data_services/json/caliper'
+  JSON_BASE_PATH = "doc/api/data_services/json/caliper"
 
   def self.data
     @@data ||= DataServicesEventsLoader.new(JSON_BASE_PATH).data
@@ -26,8 +26,8 @@ class DataServicesCaliperLoader
 
   def self.extensions
     @@extensions ||= {
-      'extensions' => JSON.parse(File.read("#{JSON_BASE_PATH}/extensions.json")),
-      'actor_extensions' => JSON.parse(File.read("#{JSON_BASE_PATH}/actor_extensions.json"))
+      "extensions" => JSON.parse(File.read("#{JSON_BASE_PATH}/extensions.json")),
+      "actor_extensions" => JSON.parse(File.read("#{JSON_BASE_PATH}/actor_extensions.json"))
     }
   end
 end

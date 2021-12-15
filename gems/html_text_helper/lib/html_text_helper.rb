@@ -31,18 +31,18 @@
 # Copied from http://pastie.textmate.org/342485,
 # based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
 
-require 'nokogiri'
-require 'cgi'
-require 'active_support'
-require 'time' # https://github.com/rails/rails/pull/40859
-require 'active_support/core_ext'
-require 'sanitize'
-require 'canvas_text_helper'
+require "nokogiri"
+require "cgi"
+require "active_support"
+require "time" # https://github.com/rails/rails/pull/40859
+require "active_support/core_ext"
+require "sanitize"
+require "canvas_text_helper"
 
 module HtmlTextHelper
   def self.strip_tags(text)
     text ||= ""
-    text.gsub(/<\/?[^<>\n]*>?/, "").gsub(/&#\d+;/) { |m| puts m; m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
+    text.gsub(%r{</?[^<>\n]*>?}, "").gsub(/&#\d+;/) { |m| m[2..].to_i.chr(text.encoding) rescue "" }.gsub(/&\w+;/, "")
   end
 
   def strip_tags(text)
@@ -55,11 +55,11 @@ module HtmlTextHelper
   # This is still a pretty basic implementation, I'm sure we'll find ways to
   # tweak and improve it as time goes on.
   def html_to_text(html_str, opts = {})
-    return '' if html_str.blank?
+    return "" if html_str.blank?
 
     doc = Nokogiri::HTML.fragment(html_str)
     text = html_node_to_text(doc, opts)
-    text.squeeze!(' ')
+    text.squeeze!(" ")
     text.gsub!(/\r\n?/, "\n")
     text.gsub!(/\n +/, "\n")
     text.gsub!(/ +\n/, "\n")
@@ -73,17 +73,17 @@ module HtmlTextHelper
   def html_node_to_text(node, opts = {})
     if node.text?
       text = node.text
-      text.gsub!(/\s+/, ' ') unless opts[:pre]
+      text.gsub!(/\s+/, " ") unless opts[:pre]
       return text
     end
 
     text = case node.name
-           when 'link', 'script'
-             ''
-           when 'pre'
+           when "link", "script"
+             ""
+           when "pre"
              node.children.map { |c| html_node_to_text(c, opts.merge(pre: true)) }.join
-           when 'img'
-             src = node['src']
+           when "img"
+             src = node["src"]
              if src
                if opts[:preserve_links]
                  node.to_html
@@ -93,18 +93,18 @@ module HtmlTextHelper
                  rescue URI::Error
                    # do nothing, let src pass through as is
                  end
-                 node['alt'] ? "[#{node['alt']}] (#{src})" : src
+                 node["alt"] ? "[#{node["alt"]}] (#{src})" : src
                end
              else
-               ''
+               ""
              end
-           when 'br'
+           when "br"
              "\n"
            else
              subtext = node.children.map { |c| html_node_to_text(c, opts) }.join
              case node.name
-             when 'a'
-               href = node['href']
+             when "a"
+               href = node["href"]
                if href
                  if opts[:preserve_links]
                    node.to_html
@@ -119,13 +119,13 @@ module HtmlTextHelper
                else
                  subtext
                end
-             when 'h1'
-               banner(subtext, char: '*', line_width: opts[:line_width])
-             when 'h2'
-               banner(subtext, char: '-', line_width: opts[:line_width])
+             when "h1"
+               banner(subtext, char: "*", line_width: opts[:line_width])
+             when "h2"
+               banner(subtext, char: "-", line_width: opts[:line_width])
              when /h[3-6]/
-               banner(subtext, char: '-', underline: true, line_width: opts[:line_width])
-             when 'li'
+               banner(subtext, char: "-", underline: true, line_width: opts[:line_width])
+             when "li"
                "* #{subtext}"
              else
                subtext
@@ -143,12 +143,12 @@ module HtmlTextHelper
   def banner(text, opts = {})
     return text if text.empty?
 
-    char = opts.fetch(:char, '*')
+    char = opts.fetch(:char, "*")
     text_width = text.lines.map { |l| l.strip.length }.max
     text_width = [text_width, opts[:line_width]].min if opts[:line_width]
     line = char * text_width
 
-    (opts[:underline] ? '' : line + "\n") + text + "\n" + line
+    (opts[:underline] ? "" : line + "\n") + text + "\n" + line
   end
 
   # as seen in ActionView::Helpers::TextHelper
@@ -171,9 +171,9 @@ module HtmlTextHelper
   #                 permits.
   # Returns an HTML string.
   def html_to_simple_html(html, options = {})
-    return '' if html.blank?
+    return "" if html.blank?
 
-    base_url = options.fetch(:base_url, '')
+    base_url = options.fetch(:base_url, "")
     config = Sanitize::Config::BASIC
     if options[:tags] || options[:attributes]
       elements = config[:elements] + (options[:tags] || [])
@@ -187,7 +187,7 @@ module HtmlTextHelper
         given_attributes = options[:attributes][element] || []
         final_attributes[element] = basic_attributes | given_attributes
       end
-      output = Sanitize.clean(html, :elements => elements, :attributes => final_attributes)
+      output = Sanitize.clean(html, elements: elements, attributes: final_attributes)
     else
       output = Sanitize.clean(html, config)
     end
@@ -202,21 +202,21 @@ module HtmlTextHelper
   # Returns a string.
   def append_base_url(subject, base)
     output = Nokogiri::HTML5.fragment(subject)
-    tags = output.css('*[href]')
+    tags = output.css("*[href]")
 
     tags.each do |tag|
-      url = tag.attributes['href'].value
-      next if url.match(/^https?|mailto|ftp/)
+      url = tag.attributes["href"].value
+      next if url.match?(/^https?|mailto|ftp/)
 
       url.sub!("/", "") if url.start_with?("/") && base.end_with?("/")
-      tag.attributes['href'].value = "#{base}#{url}"
+      tag.attributes["href"].value = "#{base}#{url}"
     end
 
     output.to_s
   end
 
   def quote_clump(quote_lines)
-    txt = "<div class='quoted_text_holder'><a href='#' class='show_quoted_text_link'>#{HtmlTextHelper.escape_html(I18n.t('lib.text_helper.quoted_text_toggle', "show quoted text"))}</a><div class='quoted_text' style='display: none;'>"
+    txt = "<div class='quoted_text_holder'><a href='#' class='show_quoted_text_link'>#{HtmlTextHelper.escape_html(I18n.t("lib.text_helper.quoted_text_toggle", "show quoted text"))}</a><div class='quoted_text' style='display: none;'>"
     txt += quote_lines.join("\n")
     txt += "</div></div>"
     txt
@@ -249,23 +249,23 @@ module HtmlTextHelper
     ) | (
       #{AUTO_LINKIFY_PLACEHOLDER}
     )
-  }xi
+  }xi.freeze
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
-  def format_message(message, opts = { :url => nil, :notification_id => nil })
-    return '' unless message
+  def format_message(message, opts = { url: nil, notification_id: nil })
+    return "" unless message
 
     # insert placeholders for the links we're going to generate, before we go and escape all the html
     links = []
     placeholder_blocks = []
-    message ||= ''
+    message ||= ""
     message = message.gsub(AUTO_LINKIFY_REGEX) do |match|
       placeholder_blocks << if match == AUTO_LINKIFY_PLACEHOLDER
                               AUTO_LINKIFY_PLACEHOLDER
                             else
                               s = $1
                               link = s
-                              link = "http://#{link}" if link[0, 3] == 'www'
+                              link = "http://#{link}" if link[0, 3] == "www"
                               link = add_notification_to_link(link, opts[:notification_id]) if opts[:notification_id]
                               link = link.gsub("'", "%27")
                               links << link
@@ -287,15 +287,15 @@ module HtmlTextHelper
     quote_block = []
     message.split("\n").each do |line|
       # check for lines starting with '>'
-      if /^(&gt;|>)/ =~ line
+      if /^(&gt;|>)/.match?(line)
         quote_block << line
       else
-        processed_lines << quote_clump(quote_block) if !quote_block.empty?
+        processed_lines << quote_clump(quote_block) unless quote_block.empty?
         quote_block = []
         processed_lines << line
       end
     end
-    processed_lines << quote_clump(quote_block) if !quote_block.empty?
+    processed_lines << quote_clump(quote_block) unless quote_block.empty?
     message = processed_lines.join("\n")
     links.unshift opts[:url] if opts[:url]
     links.unshift message.html_safe
@@ -304,23 +304,23 @@ module HtmlTextHelper
   def add_notification_to_link(url, notification_id)
     parts = url.to_s.split("#", 2)
     link = parts[0]
-    link += link.include?('?') ? "&" : "?"
+    link += link.include?("?") ? "&" : "?"
     link += "clear_notification_id=#{notification_id}"
     link += parts[1] if parts[1]
     link
   rescue
-    return ""
+    ""
   end
 
   def self.escape_html(text)
-    CGI::escapeHTML text
+    CGI.escapeHTML text
   end
 
   def self.unescape_html(text)
-    CGI::unescapeHTML text
+    CGI.unescapeHTML text
   end
 
   def self.strip_and_truncate(text, options = {})
-    CanvasTextHelper::truncate_text(strip_tags(text), options)
+    CanvasTextHelper.truncate_text(strip_tags(text), options)
   end
 end

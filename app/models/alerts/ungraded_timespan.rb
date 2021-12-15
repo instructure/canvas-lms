@@ -24,7 +24,7 @@ module Alerts
       @today = Time.now.beginning_of_day
       ungraded_timespans = course.submissions
                                  .group("submissions.user_id")
-                                 .where(:user_id => student_ids)
+                                 .where(user_id: student_ids)
                                  .where(Submission.needs_grading_conditions)
                                  .except(:order)
                                  .minimum(:submitted_at)

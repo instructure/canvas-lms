@@ -79,88 +79,88 @@ Rails.configuration.after_initialize do
     expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
     expire_after ||= 1.day
 
-    Delayed::Periodic.cron 'ActiveRecord::SessionStore::Session.delete_all', '*/5 * * * *' do
+    Delayed::Periodic.cron "ActiveRecord::SessionStore::Session.delete_all", "*/5 * * * *" do
       callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
       Shard.with_each_shard(exception: callback) do
-        ActiveRecord::SessionStore::Session.where('updated_at < ?', expire_after.seconds.ago).delete_all
+        ActiveRecord::SessionStore::Session.where("updated_at < ?", expire_after.seconds.ago).delete_all
       end
     end
   end
 
   persistence_token_expire_after = (ConfigFile.load("session_store") || {})[:expire_remember_me_after]
   persistence_token_expire_after ||= 1.month
-  Delayed::Periodic.cron 'SessionPersistenceToken.delete_all', '35 11 * * *' do
+  Delayed::Periodic.cron "SessionPersistenceToken.delete_all", "35 11 * * *" do
     with_each_shard_by_database(SessionPersistenceToken, :delete_expired, persistence_token_expire_after, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'ExternalFeedAggregator.process', '*/30 * * * *' do
+  Delayed::Periodic.cron "ExternalFeedAggregator.process", "*/30 * * * *" do
     with_each_shard_by_database(ExternalFeedAggregator, :process)
   end
 
-  Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
+  Delayed::Periodic.cron "SummaryMessageConsolidator.process", "*/15 * * * *" do
     with_each_shard_by_database(SummaryMessageConsolidator, :process)
   end
 
-  Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/10 * * * *' do
-    if Canvas::Crocodoc.config && !Canvas::Plugin.value_to_boolean(Canvas::Crocodoc.config['disable_polling'])
+  Delayed::Periodic.cron "CrocodocDocument.update_process_states", "*/10 * * * *" do
+    if Canvas::Crocodoc.config && !Canvas::Plugin.value_to_boolean(Canvas::Crocodoc.config["disable_polling"])
       with_each_shard_by_database(CrocodocDocument, :update_process_states)
     end
   end
 
-  Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * 0' do
+  Delayed::Periodic.cron "Reporting::CountsReport.process", "0 11 * * 0" do
     with_each_shard_by_database(Reporting::CountsReport, :process_shard)
   end
 
-  Delayed::Periodic.cron 'Account.update_all_update_account_associations', '0 10 * * 0' do
+  Delayed::Periodic.cron "Account.update_all_update_account_associations", "0 10 * * 0" do
     with_each_shard_by_database(Account, :update_all_update_account_associations)
   end
 
-  Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 */6 * * *' do
+  Delayed::Periodic.cron "StreamItem.destroy_stream_items", "45 */6 * * *" do
     with_each_shard_by_database(StreamItem, :destroy_stream_items_using_setting)
   end
 
-  Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
+  Delayed::Periodic.cron "IncomingMailProcessor::IncomingMessageProcessor#process", "*/1 * * * *" do
     DatabaseServer.send_in_each_region(
       IncomingMailProcessor::IncomingMessageProcessor,
       :queue_processors,
       { run_current_region_asynchronously: true,
-        singleton: 'IncomingMailProcessor::IncomingMessageProcessor.queue_processors' }
+        singleton: "IncomingMailProcessor::IncomingMessageProcessor.queue_processors" }
     )
   end
 
-  Delayed::Periodic.cron 'IncomingMailProcessor::Instrumentation#process', '*/5 * * * *' do
+  Delayed::Periodic.cron "IncomingMailProcessor::Instrumentation#process", "*/5 * * * *" do
     IncomingMailProcessor::Instrumentation.process
   end
 
-  Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '2-59/5 * * * *' do
-    cutoff = Setting.get('error_reports_retain_for', 3.months.to_s).to_i
+  Delayed::Periodic.cron "ErrorReport.destroy_error_reports", "2-59/5 * * * *" do
+    cutoff = Setting.get("error_reports_retain_for", 3.months.to_s).to_i
     if cutoff > 0
       with_each_shard_by_database(ErrorReport, :destroy_error_reports, cutoff.seconds.ago)
     end
   end
 
   # Process at 5:30 am local time
-  Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 5 * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Alerts::DelayedAlertSender.process", "30 5 * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Alerts::DelayedAlertSender, :process, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Attachment.do_notifications", "*/10 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Attachment, :do_notifications)
   end
 
-  Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
+  Delayed::Periodic.cron "Ignore.cleanup", "45 23 * * *" do
     with_each_shard_by_database(Ignore, :cleanup, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'DelayedMessageScrubber.scrub_all', '0 1 * * *' do
+  Delayed::Periodic.cron "DelayedMessageScrubber.scrub_all", "0 1 * * *" do
     with_each_shard_by_database(DelayedMessageScrubber, :scrub, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'ConversationBatchScrubber.scrub_all', '0 2 * * *' do
+  Delayed::Periodic.cron "ConversationBatchScrubber.scrub_all", "0 2 * * *" do
     with_each_shard_by_database(ConversationBatchScrubber, :scrub, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
+  Delayed::Periodic.cron "BounceNotificationProcessor.process", "*/5 * * * *" do
     DatabaseServer.send_in_each_region(
       BounceNotificationProcessor,
       :process,
@@ -168,38 +168,38 @@ Rails.configuration.after_initialize do
     )
   end
 
-  Delayed::Periodic.cron 'NotificationFailureProcessor.process', '*/5 * * * *' do
+  Delayed::Periodic.cron "NotificationFailureProcessor.process", "*/5 * * * *" do
     DatabaseServer.send_in_each_region(
       NotificationFailureProcessor,
       :process,
       { run_current_region_asynchronously: true,
-        singleton: 'NotificationFailureProcessor.process' }
+        singleton: "NotificationFailureProcessor.process" }
     )
   end
 
-  Delayed::Periodic.cron 'Auditors::ActiveRecord::Partitioner', '0 0 * * *' do
+  Delayed::Periodic.cron "Auditors::ActiveRecord::Partitioner", "0 0 * * *" do
     with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
+  Delayed::Periodic.cron "Quizzes::QuizSubmissionEventPartitioner.process", "0 0 * * *" do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'SimplyVersioned::Partitioner.process', '0 0 * * *' do
+  Delayed::Periodic.cron "SimplyVersioned::Partitioner.process", "0 0 * * *" do
     with_each_shard_by_database(SimplyVersioned::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'Messages::Partitioner.process', '0 0 * * *' do
+  Delayed::Periodic.cron "Messages::Partitioner.process", "0 0 * * *" do
     with_each_shard_by_database(Messages::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   if AuthenticationProvider::SAML.enabled?
-    Delayed::Periodic.cron 'AuthenticationProvider::SAML::MetadataRefresher.refresh_providers', '15 0 * * *' do
+    Delayed::Periodic.cron "AuthenticationProvider::SAML::MetadataRefresher.refresh_providers", "15 0 * * *" do
       with_each_shard_by_database(AuthenticationProvider::SAML::MetadataRefresher, :refresh_providers, local_offset: true)
     end
 
     AuthenticationProvider::SAML::Federation.descendants.each do |federation|
-      Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
+      Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", "45 0 * * *" do
         DatabaseServer.send_in_each_region(federation,
                                            :refresh_providers,
                                            singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
@@ -207,63 +207,63 @@ Rails.configuration.after_initialize do
     end
   end
 
-  Delayed::Periodic.cron 'SisBatchError.cleanup_old_errors', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "SisBatchError.cleanup_old_errors", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(SisBatchError, :cleanup_old_errors)
   end
 
-  Delayed::Periodic.cron 'AccountReport.delete_old_rows_and_runners', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "AccountReport.delete_old_rows_and_runners", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(AccountReport, :delete_old_rows_and_runners)
   end
 
-  Delayed::Periodic.cron 'SisBatchRollBackData.cleanup_expired_data', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "SisBatchRollBackData.cleanup_expired_data", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(SisBatchRollBackData, :cleanup_expired_data)
   end
 
-  Delayed::Periodic.cron 'EnrollmentState.recalculate_expired_states', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "EnrollmentState.recalculate_expired_states", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(EnrollmentState, :recalculate_expired_states)
   end
 
-  Delayed::Periodic.cron 'MissingPolicyApplicator.apply_missing_deductions', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "MissingPolicyApplicator.apply_missing_deductions", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(MissingPolicyApplicator, :apply_missing_deductions)
   end
 
-  Delayed::Periodic.cron 'Assignment.clean_up_duplicating_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_duplicating_assignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
   end
 
-  Delayed::Periodic.cron 'Assignment.clean_up_importing_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_importing_assignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_importing_assignments)
   end
 
-  Delayed::Periodic.cron 'Assignment.clean_up_migrating_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_migrating_assignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_migrating_assignments)
   end
 
-  Delayed::Periodic.cron 'ObserverAlert.clean_up_old_alerts', '0 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "ObserverAlert.clean_up_old_alerts", "0 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(ObserverAlert, :clean_up_old_alerts)
   end
 
-  Delayed::Periodic.cron 'ObserverAlert.create_assignment_missing_alerts', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "ObserverAlert.create_assignment_missing_alerts", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(ObserverAlert, :create_assignment_missing_alerts)
   end
 
-  Delayed::Periodic.cron 'Lti::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Lti::KeyStorage.rotate_keys", "0 0 1 * *", priority: Delayed::LOW_PRIORITY do
     Lti::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'Canvas::OAuth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Canvas::OAuth::KeyStorage.rotate_keys", "0 0 1 * *", priority: Delayed::LOW_PRIORITY do
     Canvas::OAuth::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys", "0 0 1 * *", priority: Delayed::LOW_PRIORITY do
     CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'Purgatory.expire_old_purgatories', '0 0 * * *', priority: Delayed::LOWER_PRIORITY do
+  Delayed::Periodic.cron "Purgatory.expire_old_purgatories", "0 0 * * *", priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Purgatory, :expire_old_purgatories, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'Feature.remove_obsolete_flags', '0 8 * * 0', priority: Delayed::LOWER_PRIORITY do
+  Delayed::Periodic.cron "Feature.remove_obsolete_flags", "0 8 * * 0", priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Feature, :remove_obsolete_flags)
   end
 
@@ -271,29 +271,38 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Assignment, :disable_post_to_sis_if_grading_period_closed)
   end
 
-  Delayed::Periodic.cron 'ScheduledSmartAlert.queue_current_jobs', '5 * * * *' do
+  Delayed::Periodic.cron "ScheduledSmartAlert.queue_current_jobs", "5 * * * *" do
     with_each_shard_by_database(ScheduledSmartAlert, :queue_current_jobs)
   end
 
-  Delayed::Periodic.cron 'Course.sync_with_homeroom', '5 0 * * *' do
+  Delayed::Periodic.cron "Course.sync_with_homeroom", "5 0 * * *" do
     with_each_shard_by_database(Course, :sync_with_homeroom)
   end
 
   # the default is hourly, and we picked a weird minute just to avoid
   # synchronizing with other periodic jobs.
-  Delayed::Periodic.cron 'AssetUserAccessLog.compact', '42 * * * *' do
+  Delayed::Periodic.cron "AssetUserAccessLog.compact", "42 * * * *" do
     # using jitter should help spread out multiple shards on the same cluster doing these
     # write-heavy updates so that they don't all hit at the same time and run immediately back to back.
     with_each_shard_by_database(AssetUserAccessLog, :compact, jitter: 15.minutes)
   end
 
   if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore) && MultiCache.cache.options[:consul_event] && InstStatsd.settings.present?
-    Delayed::Periodic.cron 'HaStore.validate_consul_event', '5 * * * *' do
+    Delayed::Periodic.cron "HaStore.validate_consul_event", "5 * * * *" do
       DatabaseServer.send_in_each_region(MultiCache, :validate_consul_event,
                                          {
                                            run_current_region_asynchronously: true,
-                                           singleton: 'HaStore.validate_consul_event'
+                                           singleton: "HaStore.validate_consul_event"
                                          })
     end
+  end
+
+  Delayed::Periodic.cron "Canvas::LiveEvents#heartbeat", "*/1 * * * *" do
+    DatabaseServer.send_in_each_region(
+      Canvas::LiveEvents,
+      :heartbeat,
+      { run_current_region_asynchronously: true,
+        singleton: "Canvas::LiveEvents#heartbeat" }
+    )
   end
 end

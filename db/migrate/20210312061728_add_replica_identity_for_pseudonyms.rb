@@ -22,12 +22,12 @@ class AddReplicaIdentityForPseudonyms < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Pseudonym', :account_id, 0
-    remove_index :pseudonyms, name: 'index_pseudonyms_on_account_id', if_exists: true
+    add_replica_identity "Pseudonym", :account_id, 0
+    remove_index :pseudonyms, name: "index_pseudonyms_on_account_id", if_exists: true
   end
 
   def down
     add_index :pseudonyms, :account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'Pseudonym'
+    remove_replica_identity "Pseudonym"
   end
 end

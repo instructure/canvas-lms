@@ -26,7 +26,7 @@ module BroadcastPolicy
     end
 
     def populate(&block)
-      self.instance_eval(&block)
+      instance_eval(&block)
       @current_notification = nil
     end
 
@@ -51,22 +51,22 @@ module BroadcastPolicy
     protected :current_notification
 
     def to(&block)
-      self.current_notification.to = block
+      current_notification.to = block
     end
 
     def whenever(&block)
-      self.current_notification.whenever = block
+      current_notification.whenever = block
     end
 
     def data(&block)
-      self.current_notification.data = block
+      current_notification.data = block
     end
 
     # filter_asset_by_recipient is a way for the asset (ie assignment, announcement)
     # to filter users out that do not apply to the notification like when a due
     # date is different for a specific user when using variable due dates.
     def filter_asset_by_recipient(&block)
-      self.current_notification.recipient_filter = block
+      current_notification.recipient_filter = block
     end
 
     def find_policy_for(notification)

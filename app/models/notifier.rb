@@ -25,10 +25,10 @@ class Notifier
     # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
 
     messages ||= DelayedNotification.new(
-      :asset => record,
-      :notification => messages,
-      :recipient_keys => recipient_keys,
-      :data => data
+      asset: record,
+      notification: messages,
+      recipient_keys: recipient_keys,
+      data: data
     )
 
     if Rails.env.test?

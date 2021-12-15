@@ -21,7 +21,7 @@ PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
     # User ID: 2 || Name: Admin1
     # Event ID: 1
-    provider_state 'a user with a calendar event' do
+    provider_state "a user with a calendar event" do
       set_up do
         @user = Pact::Canvas.base_state.account_admins.first
         @event = @user.calendar_events.create!
@@ -31,7 +31,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Student ID: 2 || Name: Student1
     # Teacher ID: 4 || Name: Teacher1
     # Event ID: 1
-    provider_state 'a user with a robust calendar event' do
+    provider_state "a user with a robust calendar event" do
       set_up do
         @course = Pact::Canvas.base_state.course
         @student = Pact::Canvas.base_state.students.first
@@ -49,10 +49,10 @@ PactConfig::Consumers::ALL.each do |consumer|
         )
         @ag.publish!
         @event = @ag.appointments.first
-        @event.update!(all_day: true, all_day_date: '2015-09-22', description: "", location_name: "", location_address: "")
+        @event.update!(all_day: true, all_day_date: "2015-09-22", description: "", location_name: "", location_address: "")
         @student1 = @student
         cat = @course.group_categories.create(name: "foo")
-        g = cat.groups.create(:context => @course)
+        g = cat.groups.create(context: @course)
         g.users << @student
         @event.reserve_for(@student1, @student1)
         course_with_student(course: @course, active_all: true)
@@ -63,7 +63,7 @@ PactConfig::Consumers::ALL.each do |consumer|
 
     # User ID: 2 || Name: Admin1
     # Event ID: 1, 2, 3, 4.
-    provider_state 'a user with many calendar events' do
+    provider_state "a user with many calendar events" do
       set_up do
         @user = Pact::Canvas.base_state.account_admins.first
         @event0 = @user.calendar_events.create!

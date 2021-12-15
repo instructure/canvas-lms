@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 class GroupAndMembershipImporter < ActiveRecord::Base
   include Canvas::SoftDeletable
@@ -45,7 +45,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     progress.start
     csv = begin
       file = attachment.open
-      { fullpath: file.path, :file => attachment.display_name, attachment: attachment }
+      { fullpath: file.path, file: attachment.display_name, attachment: attachment }
     end
     validate_file(csv)
     return unless progress.reload.running?
@@ -63,8 +63,8 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     create_groups_and_members(csv_contents)
     progress.complete
     progress.save!
-    self.workflow_state = 'completed'
-    self.save!
+    self.workflow_state = "completed"
+    save!
   end
 
   workflow do
@@ -76,13 +76,13 @@ class GroupAndMembershipImporter < ActiveRecord::Base
 
   def validate_file(csv)
     fail_import(I18n.t("Unable to read file")) unless File.file?(csv[:fullpath])
-    fail_import(I18n.t("Only CSV files are supported.")) unless File.extname(csv[:fullpath]).casecmp('.csv').zero?
+    fail_import(I18n.t("Only CSV files are supported.")) unless File.extname(csv[:fullpath]).casecmp(".csv").zero?
     fail_import(I18n.t("Invalid UTF-8")) unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
   end
 
   def fail_import(error)
-    self.workflow_state = 'failed'
-    self.save!
+    self.workflow_state = "failed"
+    save!
     progress.message = error
     progress.save!
     progress.fail
@@ -113,11 +113,11 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def user_from_row(row)
-    user_id = row['canvas_user_id']
-    user_sis_id = row['user_id']
-    login_id = row['login_id']
+    user_id = row["canvas_user_id"]
+    user_sis_id = row["user_id"]
+    login_id = row["login_id"]
     user = nil
-    user_scope = group_category.context.students.where.not(enrollments: { type: 'StudentViewEnrollment' })
+    user_scope = group_category.context.students.where.not(enrollments: { type: "StudentViewEnrollment" })
     user = user_scope.where(id: user_id).take if user_id
     pseudonym_scope = Pseudonym.active.where(account_id: group_category.root_account_id)
     user ||= user_scope.where(id: pseudonym_scope.where(sis_user_id: user_sis_id).limit(1).select(:user_id)).take if user_sis_id
@@ -126,9 +126,9 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def group_from_row(row)
-    group_id = row['canvas_group_id']
-    group_sis_id = row['group_id']
-    group_name = row['group_name']
+    group_id = row["canvas_group_id"]
+    group_sis_id = row["group_id"]
+    group_name = row["group_name"]
     key = group_key(group_id, group_sis_id, group_name)
     return unless key
 
@@ -145,13 +145,13 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def restore_group(group)
-    group.workflow_state = 'available'
+    group.workflow_state = "available"
     group.save!
   end
 
   def create_new_group(name)
-    InstStatsd::Statsd.increment('groups.auto_create',
-                                 tags: { split_type: 'csv',
+    InstStatsd::Statsd.increment("groups.auto_create",
+                                 tags: { split_type: "csv",
                                          root_account_id: group_category.root_account&.global_id,
                                          root_account_name: group_category.root_account&.name })
     group_category.groups.create!(name: name, context: group_category.context)

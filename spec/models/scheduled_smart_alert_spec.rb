@@ -18,25 +18,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'ScheduledSmartAlert' do
-  context 'due_date_reminder alert' do
+describe "ScheduledSmartAlert" do
+  context "due_date_reminder alert" do
     before(:once) do
       assignment_model({ due_at: 3.days.from_now })
       @override = create_section_override_for_assignment(@a, { due_at: 1.day.from_now })
     end
 
-    it 'correctly calculates the runnable scope' do
+    it "correctly calculates the runnable scope" do
       offset = 12
       Timecop.freeze(13.hours.from_now) do
         runnable = ScheduledSmartAlert.runnable(offset, @c.account.id)
         # AssignmentOverride was due in 24 hours, is now within the offset window
-        expect(runnable).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: @override.id))
+        expect(runnable).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: @override.id))
         # Assignment was due in 72 hours, is not yet within the offset window
-        expect(runnable).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: @a.id))
+        expect(runnable).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: @a.id))
       end
     end
 
-    it 'upserts instead of creating duplicate records when the due date is changed' do
+    it "upserts instead of creating duplicate records when the due date is changed" do
       starting_number_of_records = ScheduledSmartAlert.all.length
       @a.due_at = 3.days.from_now
       @a.save!

@@ -47,6 +47,7 @@ describe LiveEventsObserver do
       @user.save!
     end
   end
+
   describe "syllabus" do
     it "doesn't post for no changes" do
       course_model
@@ -75,16 +76,16 @@ describe LiveEventsObserver do
     end
 
     it "posts update events for title" do
-      wiki_page_model(title: 'old title')
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, 'old title', nil)
-      @page.title = 'new title'
+      wiki_page_model(title: "old title")
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, "old title", nil)
+      @page.title = "new title"
       @page.save
     end
 
     it "posts update events for body" do
-      wiki_page_model(body: 'old body')
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, 'old body')
-      @page.body = 'new body'
+      wiki_page_model(body: "old body")
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, "old body")
+      @page.body = "new body"
       @page.save
     end
 
@@ -153,7 +154,7 @@ describe LiveEventsObserver do
       course_model
       expect(Canvas::LiveEvents).to receive(:discussion_entry_created).once
       discussion_topic_model(context: @course)
-      @topic.discussion_entries.create!(:message => 'entry')
+      @topic.discussion_entries.create!(message: "entry")
     end
   end
 
@@ -209,7 +210,7 @@ describe LiveEventsObserver do
 
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:assignment_updated).once
-      assignment_model(:title => "original")
+      assignment_model(title: "original")
       @assignment.title = "new title"
       @assignment.save
     end
@@ -223,7 +224,7 @@ describe LiveEventsObserver do
 
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:assignment_override_updated).once
-      assignment_override_model(:title => "original")
+      assignment_override_model(title: "original")
       @override.title = "new title"
       @override.save
     end
@@ -237,14 +238,14 @@ describe LiveEventsObserver do
 
     it "does not post a create event when a submission is first created in an unsubmitted state" do
       expect(Canvas::LiveEvents).to_not receive(:submission_created)
-      Submission.create!(assignment: assignment_model, user: user_model, workflow_state: 'unsubmitted', submitted_at: Time.zone.now)
+      Submission.create!(assignment: assignment_model, user: user_model, workflow_state: "unsubmitted", submitted_at: Time.zone.now)
     end
 
     it "posts a create event when a submission is first created in an submitted state" do
       expect(Canvas::LiveEvents).to receive(:submission_created).once
       Submission.create!(
-        assignment: assignment_model, user: user_model, workflow_state: 'submitted',
-        submitted_at: Time.zone.now, submission_type: 'online_url'
+        assignment: assignment_model, user: user_model, workflow_state: "submitted",
+        submitted_at: Time.zone.now, submission_type: "online_url"
       )
     end
 
@@ -291,7 +292,7 @@ describe LiveEventsObserver do
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:enrollment_updated).once
       course_with_student
-      @enrollment.workflow_state = 'rejected'
+      @enrollment.workflow_state = "rejected"
       @enrollment.save
     end
   end
@@ -313,7 +314,7 @@ describe LiveEventsObserver do
   describe "user_account_association" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:user_account_association_created).once
-      user_with_pseudonym(account: Account.default, username: 'bobbo', active_all: true)
+      user_with_pseudonym(account: Account.default, username: "bobbo", active_all: true)
     end
   end
 
@@ -331,17 +332,17 @@ describe LiveEventsObserver do
       enable_quizzes_next(course)
 
       Account.default.context_external_tools.create!(
-        name: 'Quizzes.Next',
-        consumer_key: 'test_key',
-        shared_secret: 'test_secret',
-        tool_id: 'Quizzes 2',
-        url: 'http://example.com/launch'
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
       )
-      quiz = course.quizzes.create!(:title => 'quiz1')
+      quiz = course.quizzes.create!(title: "quiz1")
       ce = course.content_exports.create!(
-        :export_type => ContentExport::QUIZZES2,
-        :selected_content => quiz.id,
-        :user => user_model
+        export_type: ContentExport::QUIZZES2,
+        selected_content: quiz.id,
+        user: user_model
       )
       ce.export(synchronous: true)
     end
@@ -357,7 +358,7 @@ describe LiveEventsObserver do
       course.enable_feature!(:quizzes_next)
       # do quizzes next provision
       # quizzes_next is available to users only after quizzes next provisioning
-      course.root_account.settings[:provision] = { 'lti' => 'lti url' }
+      course.root_account.settings[:provision] = { "lti" => "lti url" }
       course.root_account.save!
     end
   end
@@ -371,12 +372,12 @@ describe LiveEventsObserver do
       @cm = ContentMigration.create!(
         context: @course,
         user: @teacher,
-        workflow_state: 'importing',
+        workflow_state: "importing",
         migration_settings: {
           import_quizzes_next: true
         }
       )
-      @cm.workflow_state = 'imported'
+      @cm.workflow_state = "imported"
       @cm.save!
     end
   end
@@ -429,18 +430,18 @@ describe LiveEventsObserver do
       it "posts update events if module and course are complete" do
         expect(Canvas::LiveEvents).to receive(:course_completed).with(any_args)
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(true)
-        context_module_progression.update_attribute(:workflow_state, 'completed')
+        context_module_progression.update_attribute(:workflow_state, "completed")
       end
 
       it "does not post update events if module is not complete" do
         expect(Canvas::LiveEvents).not_to receive(:course_completed).with(any_args)
-        context_module_progression.update_attribute(:workflow_state, 'in_progress')
+        context_module_progression.update_attribute(:workflow_state, "in_progress")
       end
 
       it "does not post update events if course is not complete" do
         expect(Canvas::LiveEvents).not_to receive(:course_completed).with(any_args)
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(false)
-        context_module_progression.update_attribute(:workflow_state, 'completed')
+        context_module_progression.update_attribute(:workflow_state, "completed")
       end
     end
 
@@ -473,7 +474,7 @@ describe LiveEventsObserver do
     it "posts update events" do
       outcome = outcome_model
       expect(Canvas::LiveEvents).to receive(:learning_outcome_updated).with(outcome)
-      outcome.update_attribute(:short_description, 'this is new')
+      outcome.update_attribute(:short_description, "this is new")
     end
   end
 
@@ -491,7 +492,7 @@ describe LiveEventsObserver do
     it "posts update events" do
       group = outcome_group_model
       expect(Canvas::LiveEvents).to receive(:learning_outcome_group_updated).with(group)
-      group.update_attribute(:description, 'this is new')
+      group.update_attribute(:description, "this is new")
     end
   end
 
@@ -525,7 +526,7 @@ describe LiveEventsObserver do
     it "posts updated events when ratings are changed" do
       proficiency = outcome_proficiency_model(account_model)
       expect(Canvas::LiveEvents).to receive(:outcome_proficiency_updated).once
-      rating = OutcomeProficiencyRating.new(description: 'new_rating', points: 5, mastery: true, color: 'ff0000')
+      rating = OutcomeProficiencyRating.new(description: "new_rating", points: 5, mastery: true, color: "ff0000")
       proficiency.outcome_proficiency_ratings = [rating]
       proficiency.save!
     end
@@ -559,7 +560,7 @@ describe LiveEventsObserver do
     it "posts updated events when friendly description is changed" do
       friendly_description = outcome_friendly_description_model(account_model)
       expect(Canvas::LiveEvents).to receive(:outcome_friendly_description_updated).once
-      friendly_description.description = 'A new friendly description'
+      friendly_description.description = "A new friendly description"
       friendly_description.save!
     end
 

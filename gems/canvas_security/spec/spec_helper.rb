@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'byebug'
-require 'canvas_security'
-require 'rails'
-Rails.env = 'test'
-Time.zone = 'UTC'
+require "byebug"
+require "canvas_security"
+require "rails"
+Rails.env = "test"
+Time.zone = "UTC"
 
 # Right now Canvas injects the Setting class as the store.
 # It would be great to pull that one out to something we can
@@ -46,19 +46,19 @@ class MemorySettings
 end
 CanvasSecurity.settings_store = MemorySettings.new
 
-require 'canvas_security/spec/jwt_env'
+require "canvas_security/spec/jwt_env"
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
   end
 
-  config.order = 'random'
+  config.order = "random"
 
   config.before do
     # load config from local spec/fixtures/config/redis.yml
     # so that we have something for ConfigFile to parse.
-    target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))
+    target_location = Pathname.new(File.join(File.dirname(__FILE__), "fixtures"))
     allow(Rails).to receive(:root).and_return(target_location)
   end
 end

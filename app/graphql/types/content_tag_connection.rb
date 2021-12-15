@@ -19,7 +19,7 @@
 #
 module Types
   class ContentTagContentType < Types::BaseUnion
-    description 'Content of a Content Tag'
+    description "Content of a Content Tag"
     possible_types Types::LearningOutcomeType
   end
 
@@ -52,9 +52,9 @@ module Types
     private
 
     def learning_outcome_link?
-      object.tag_type == 'learning_outcome_association' &&
-        object.associated_asset_type == 'LearningOutcomeGroup' &&
-        object.content_type == 'LearningOutcome'
+      object.tag_type == "learning_outcome_association" &&
+        object.associated_asset_type == "LearningOutcomeGroup" &&
+        object.content_type == "LearningOutcome"
     end
 
     def can_manage_context_outcomes

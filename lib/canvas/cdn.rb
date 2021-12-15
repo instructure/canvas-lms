@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'canvas/cdn/s3_uploader'
-require_dependency 'config_file'
+require_dependency "canvas/cdn/s3_uploader"
+require_dependency "config_file"
 
 module Canvas
   module Cdn
@@ -27,14 +27,14 @@ module Canvas
         @config ||= begin
           config = ActiveSupport::OrderedOptions.new
           config.enabled = false
-          yml = ConfigFile.load('canvas_cdn')
+          yml = ConfigFile.load("canvas_cdn")
           config.merge!(yml.symbolize_keys) if yml
           config
         end
       end
 
       def should_be_in_bucket?(source)
-        source.start_with?('/dist/brandable_css') || Canvas::Cdn::RevManifest.include?(source)
+        source.start_with?("/dist/brandable_css") || Canvas::Cdn::RevManifest.include?(source)
       end
 
       def asset_host_for(source)

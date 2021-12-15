@@ -19,7 +19,7 @@
 
 module UntaintCacheEntries
   def value
-    @value.untaint if @value
+    @value&.untaint
     super
   end
 end
@@ -30,7 +30,7 @@ ActiveSupport::Cache::Entry.prepend(UntaintCacheEntries)
 module AddSQLToLogLines
   def sql(event)
     name = event.payload[:name]
-    if name != 'SCHEMA'
+    if name != "SCHEMA"
       event.payload[:name] = "SQL #{name}"
     end
     super

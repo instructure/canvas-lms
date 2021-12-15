@@ -67,13 +67,13 @@ module Lti
     skip_before_action :load_user
     before_action :authorized_lti2_tool, :tool_proxy_related_to_assignment?, :user_related_to_assignment?
 
-    ASSIGNMENT_SERVICE = 'vnd.Canvas.Assignment'
+    ASSIGNMENT_SERVICE = "vnd.Canvas.Assignment"
     SERVICE_DEFINITIONS = [
       {
         id: ASSIGNMENT_SERVICE,
-        endpoint: 'api/lti/assignments/{assignment_id}',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/assignments/{assignment_id}",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze
     ].freeze
 
@@ -96,14 +96,14 @@ module Lti
 
     def assignment_json(assignment_instance)
       {
-        'id' => assignment_instance.id,
-        'name' => assignment_instance.name,
-        'description' => assignment_instance.description,
-        'due_at' => assignment_instance.due_at,
-        'points_possible' => assignment_instance.points_possible,
-        'lti_id' => assignment_instance.lti_context_id,
-        'lti_course_id' => Lti::Asset.opaque_identifier_for(assignment_instance.context),
-        'course_id' => assignment_instance.context.global_id
+        "id" => assignment_instance.id,
+        "name" => assignment_instance.name,
+        "description" => assignment_instance.description,
+        "due_at" => assignment_instance.due_at,
+        "points_possible" => assignment_instance.points_possible,
+        "lti_id" => assignment_instance.lti_context_id,
+        "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment_instance.context),
+        "course_id" => assignment_instance.context.global_id
       }
     end
 
@@ -126,13 +126,11 @@ module Lti
     end
 
     def user_related_to_assignment?
-      if user
-        render_unauthorized_action if assignment.context.students.find_by_id(user).blank?
-      end
+      render_unauthorized_action if user && assignment.context.students.find_by(id: user).blank?
     end
 
     def tool_proxy_related_to_assignment?
-      configuration = AssignmentConfigurationToolLookup.find_by_assignment_id(assignment)
+      configuration = AssignmentConfigurationToolLookup.find_by(assignment_id: assignment)
       if configuration
         codes = {
           vendor_code: configuration.tool_vendor_code,

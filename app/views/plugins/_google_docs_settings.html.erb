@@ -19,7 +19,7 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :google_url => 'https://www.google.com/accounts/ManageDomains')
+      <td colspan="2"><%= mt(:description, <<~TEXT, :google_url => 'https://www.google.com/accounts/ManageDomains')
 You will need to [register your domain with Google](%{google_url}).
 Make a note of your "OAuth Consumer Key" and "OAuth Consumer Secret" values.
 TEXT

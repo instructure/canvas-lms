@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_quiz_right_side" do
   it "renders" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
-    render :partial => "quizzes/quizzes/quiz_right_side"
+    render partial: "quizzes/quizzes/quiz_right_side"
     expect(response).not_to be_nil
   end
 

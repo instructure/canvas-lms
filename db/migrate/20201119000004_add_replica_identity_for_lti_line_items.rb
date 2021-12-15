@@ -22,13 +22,13 @@ class AddReplicaIdentityForLtiLineItems < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Lti::LineItem', :root_account_id, 0
-    remove_index :lti_line_items, name: 'index_lti_line_items_on_root_account_id', if_exists: true
+    add_replica_identity "Lti::LineItem", :root_account_id, 0
+    remove_index :lti_line_items, name: "index_lti_line_items_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :lti_line_items, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'Lti::LineItem'
+    remove_replica_identity "Lti::LineItem"
     change_column_null :lti_line_items, :root_account_id, true
   end
 end

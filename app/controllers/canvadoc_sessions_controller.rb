@@ -51,11 +51,20 @@ class CanvadocSessionsController < ApplicationController
       return render json: { error: "No annotations associated with that submission_attempt" }, status: :bad_request
     end
 
-    return render_unauthorized_action unless annotation_context.grants_right?(@current_user, :read)
+    # Check whether the user can view annotations
+    enable_annotations = annotation_context.grants_right?(@current_user, :read)
+    # Allow observers to continue with annotations disabled (viewing draft) while others are unauthorized
+    return render_unauthorized_action unless enable_annotations || submission.observer?(@current_user)
 
     render json: {
       annotation_context_launch_id: annotation_context.launch_id,
-      canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission, true)
+      canvadocs_session_url: canvadocs_session_url(
+        @current_user,
+        annotation_context,
+        submission,
+        true,
+        enable_annotations
+      )
     }
   end
 
@@ -71,7 +80,7 @@ class CanvadocSessionsController < ApplicationController
     if attachment.canvadocable?
       opts = {
         preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-        enable_annotations: blob['enable_annotations'],
+        enable_annotations: blob["enable_annotations"],
         use_cloudfront: Account.site_admin.feature_enabled?(:use_cloudfront_for_docviewer)
       }
 
@@ -88,7 +97,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:enrollment_type] = blob["enrollment_type"]
         opts[:disable_annotation_notifications] = blob["disable_annotation_notifications"] || false
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
-        return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+        return render(plain: "unauthorized", status: :unauthorized) if opts[:enrollment_type].blank?
 
         assignment = submission.assignment
         # If we're doing annotations, DocViewer needs additional information to send notifications
@@ -131,20 +140,20 @@ class CanvadocSessionsController < ApplicationController
 
       redirect_to url
     else
-      render :plain => "Not found", :status => :not_found
+      render plain: "Not found", status: :not_found
     end
   rescue HmacHelper::Error => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
-    render :plain => 'unauthorized', :status => :unauthorized
+    render plain: "unauthorized", status: :unauthorized
   rescue Timeout::Error, Canvadocs::BadGateway, Canvadocs::ServerError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :warn)
-    render :plain => "Service is currently unavailable. Try again later.",
-           :status => :service_unavailable
+    render plain: "Service is currently unavailable. Try again later.",
+           status: :service_unavailable
   rescue Canvadocs::BadRequest => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
-    render :plain => 'Canvadocs Bad Request', :status => :bad_request
+    render plain: "Canvadocs Bad Request", status: :bad_request
   rescue Canvadocs::HttpError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :error)
-    render :plain => 'Unknown Canvadocs Error', :status => :service_unavailable
+    render plain: "Unknown Canvadocs Error", status: :service_unavailable
   end
 end

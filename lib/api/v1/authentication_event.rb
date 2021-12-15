@@ -26,17 +26,17 @@ module Api::V1::AuthenticationEvent
 
   def authentication_event_json(event, _user, _session)
     links = {
-      :login => Shard.relative_id_for(event.pseudonym_id, Shard.current, Shard.current),
-      :account => Shard.relative_id_for(event.account_id, Shard.current, Shard.current),
-      :user => Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
-      :page_view => event.request_id && PageView.find_by_id(event.request_id).try(:id)
+      login: Shard.relative_id_for(event.pseudonym_id, Shard.current, Shard.current),
+      account: Shard.relative_id_for(event.account_id, Shard.current, Shard.current),
+      user: Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
+      page_view: event.request_id && PageView.find_by(id: event.request_id).try(:id)
     }
 
     {
-      :id => event.id,
-      :created_at => event.created_at.in_time_zone,
-      :event_type => event.event_type,
-      :links => links
+      id: event.id,
+      created_at: event.created_at.in_time_zone,
+      event_type: event.event_type,
+      links: links
     }
   end
 
@@ -68,21 +68,21 @@ module Api::V1::AuthenticationEvent
   def linked_json(events, user, session)
     pseudonyms = []
     accounts = []
-    pseudonym_ids = events.map { |event| event.pseudonym_id }.uniq.compact
+    pseudonym_ids = events.map(&:pseudonym_id).uniq.compact
     Shard.partition_by_shard(pseudonym_ids) do |shard_pseudonym_ids|
-      shard_pseudonyms = Pseudonym.where(:id => shard_pseudonym_ids).to_a
-      account_ids = shard_pseudonyms.map { |pseudonym| pseudonym.account_id }.uniq
-      accounts.concat Account.where(:id => account_ids).to_a
+      shard_pseudonyms = Pseudonym.where(id: shard_pseudonym_ids).to_a
+      account_ids = shard_pseudonyms.map(&:account_id).uniq
+      accounts.concat Account.where(id: account_ids).to_a
       pseudonyms.concat shard_pseudonyms
     end
 
-    user_ids = events.map { |event| event.user_id }.uniq.compact
+    user_ids = events.map(&:user_id).uniq.compact
     users = Shard.partition_by_shard(user_ids) do |shard_user_ids|
-      User.where(:id => shard_user_ids).to_a
+      User.where(id: shard_user_ids).to_a
     end
 
-    page_view_ids = events.map { |event| event.request_id }.compact
-    page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
+    page_view_ids = events.filter_map(&:request_id)
+    page_views = PageView.find_all_by_id(page_view_ids) unless page_view_ids.empty?
     page_views ||= []
 
     {

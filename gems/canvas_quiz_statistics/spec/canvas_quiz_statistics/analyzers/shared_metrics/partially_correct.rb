@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples '[:partially_correct]' do
-  it 'counts all partially correct responses' do
+shared_examples "[:partially_correct]" do
+  it "counts all partially correct responses" do
     stats = subject.run([
                           { correct: "true" },
                           { correct: "partial" }

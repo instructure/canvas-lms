@@ -21,7 +21,7 @@ module Canvas::OAuth
   CUSTOM_CLAIM_KEY = "canvas.instructure.com"
 
   class ClientCredentialsProvider < Provider
-    def initialize(client_id, host, scopes = nil, protocol = 'http://')
+    def initialize(client_id, host, scopes = nil, protocol = "http://")
       super(client_id, nil, scopes || [])
       @expected_aud = Rails.application.routes.url_helpers.oauth2_token_url(
         host: host,
@@ -33,24 +33,24 @@ module Canvas::OAuth
       claims, scopes, ttl = generate_claims
       {
         access_token: key.issue_token(claims),
-        token_type: 'Bearer',
+        token_type: "Bearer",
         expires_in: ttl.seconds,
         scope: scopes
       }
     end
 
     def valid?
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     def error_message
-      raise 'Abstract Method'
+      raise "Abstract Method"
     end
 
     private
 
     def allowed_scopes
-      @allowed_scopes ||= @scopes.join(' ')
+      @allowed_scopes ||= @scopes.join(" ")
     end
 
     def generate_claims
@@ -58,7 +58,7 @@ module Canvas::OAuth
       timestamp = Time.zone.now.to_i
       ttl = Setting.get("oauth2_jwt_exp_in_seconds", 1.hour.to_s).to_i
       claims = {
-        iss: Canvas::Security.config['lti_iss'],
+        iss: Canvas::Security.config["lti_iss"],
         sub: @client_id,
         aud: @expected_aud,
         iat: timestamp,
@@ -71,12 +71,12 @@ module Canvas::OAuth
         # account id
         claims[CUSTOM_CLAIM_KEY] = { "account_uuid" => key.account.uuid }
       end
-      return claims, scopes, ttl
+      [claims, scopes, ttl]
     end
   end
 
   class AsymmetricClientCredentialsProvider < ClientCredentialsProvider
-    def initialize(jwt, host, scopes = nil, protocol = 'http://')
+    def initialize(jwt, host, scopes = nil, protocol = "http://")
       super(JSON::JWT.decode(jwt, :skip_verification)[:sub], host, scopes, protocol)
       @errors = []
       if key.nil? || (key.public_jwk.nil? && key.public_jwk_url.nil?)
@@ -93,7 +93,7 @@ module Canvas::OAuth
     end
 
     def error_message
-      return 'JWS signature invalid.' if @invalid_key
+      return "JWS signature invalid." if @invalid_key
       return "JWK Error: #{errors.first.message}" if errors.present?
 
       validator.error_message
@@ -147,7 +147,7 @@ module Canvas::OAuth
   # warning: make sure whatever calls this is behind a require_site_admin
   # check, or anyone can get an access token for any tool
   class SiteAdminClientCredentialsProvider < ClientCredentialsProvider
-    def initialize(client_id, host, scopes, user, protocol = 'https://')
+    def initialize(client_id, host, scopes, user, protocol = "https://")
       @user = user
       super(client_id, host, scopes, protocol)
     end
@@ -157,19 +157,19 @@ module Canvas::OAuth
     end
 
     def error_message
-      ''
+      ""
     end
 
     def generate_token
       claims, scopes, ttl = generate_claims
 
       claims[CUSTOM_CLAIM_KEY] ||= {}
-      claims[CUSTOM_CLAIM_KEY]['token_generated_for'] = "site_admin"
-      claims[CUSTOM_CLAIM_KEY]['token_generated_by'] = @user.global_id
+      claims[CUSTOM_CLAIM_KEY]["token_generated_for"] = "site_admin"
+      claims[CUSTOM_CLAIM_KEY]["token_generated_by"] = @user.global_id
 
       {
         access_token: key.issue_token(claims),
-        token_type: 'Bearer',
+        token_type: "Bearer",
         expires_in: ttl.seconds,
         scope: scopes
       }

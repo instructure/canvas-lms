@@ -22,7 +22,7 @@
     number: {
       nth: {
         ordinals: lambda do |_key, _options|
-          'ที่'
+          "ที่"
         end,
 
         ordinalized: lambda do |_key, options|

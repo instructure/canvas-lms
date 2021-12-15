@@ -25,8 +25,8 @@ class TimedCache
   end
 
   def clear(force = false)
-    if force || @cached_at < @timeout.call()
-      @block.call()
+    if force || @cached_at < @timeout.call
+      @block.call
       @cached_at = Time.now
       true
     else

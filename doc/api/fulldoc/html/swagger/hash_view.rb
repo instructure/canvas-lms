@@ -26,6 +26,6 @@ class HashView
   protected
 
   def format(str)
-    str.to_s.dup.force_encoding('UTF-8') if str
+    str.to_s.dup.force_encoding("UTF-8") if str
   end
 end

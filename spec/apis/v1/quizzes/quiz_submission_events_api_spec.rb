@@ -18,22 +18,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
-require_relative '../../../models/quizzes/quiz_statistics/item_analysis/common'
+require_relative "../../api_spec_helper"
+require_relative "../../../models/quizzes/quiz_statistics/item_analysis/common"
 
 describe Quizzes::QuizSubmissionEventsApiController, type: :request do
-  require_relative '../../../quiz_spec_helper'
+  require_relative "../../../quiz_spec_helper"
 
-  describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [create]' do
+  describe "POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [create]" do
     def api_create(options = {}, data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/events"
-      params = { controller: 'quizzes/quiz_submission_events_api',
-                 action: 'create',
-                 format: 'json',
+      params = { controller: "quizzes/quiz_submission_events_api",
+                 action: "create",
+                 format: "json",
                  course_id: @course.id.to_s,
                  quiz_id: @quiz.id.to_s,
                  id: @quiz_submission.id.to_s }
-      headers = { 'Accept' => 'application/vnd.api+json' }
+      headers = { "Accept" => "application/vnd.api+json" }
 
       if options[:raw]
         raw_api_call(:post, url, params, data, headers)
@@ -53,16 +53,16 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
     }]
 
     before :once do
-      course_with_teacher :active_all => true
+      course_with_teacher active_all: true
 
-      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T},
-                                   :user => @user,
-                                   :course => @course
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T],
+                                   user: @user,
+                                   course: @course
 
       @user = @teacher
     end
 
-    it 'denies unauthorized access' do
+    it "denies unauthorized access" do
       student_in_course
       @user = @teacher
       @quiz_submission = @quiz.quiz_submissions.last
@@ -76,21 +76,21 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       expect(api_create({ raw: true }, { "quiz_submission_events" => events_data })).to eq 204
     end
 
-    it 'stores the passed values into the DB table' do
+    it "stores the passed values into the DB table" do
       scope = Quizzes::QuizSubmissionEvent
 
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
 
-      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 0
+      expect(scope.where(event_type: ["question_answered", "question_flagged"]).count).to eq 0
       api_create({ raw: true }, { "quiz_submission_events" => events_data })
-      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 2
+      expect(scope.where(event_type: ["question_answered", "question_flagged"]).count).to eq 2
 
-      scope.where(event_type: 'question_answered').first.tap do |event|
-        expect(event.event_type).to eq('question_answered')
+      scope.where(event_type: "question_answered").first.tap do |event|
+        expect(event.event_type).to eq("question_answered")
         expect(event.event_data.as_json).to eq({
-          question_id: '1',
-          answer: '1'
+          question_id: "1",
+          answer: "1"
         }.as_json)
       end
     end
@@ -101,33 +101,33 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
 
-      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 0
+      expect(scope.where(event_type: ["question_answered", "question_flagged"]).count).to eq 0
       api_create({ raw: true }, { "quiz_submission_events" => events_data })
-      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 2
+      expect(scope.where(event_type: ["question_answered", "question_flagged"]).count).to eq 2
 
-      scope.where(event_type: 'question_answered').first.tap do |event|
+      scope.where(event_type: "question_answered").first.tap do |event|
         expect(event.client_timestamp == events_data.first["client_timestamp"]).to be_truthy
         expect(event.created_at != events_data.first["client_timestamp"]).to be_truthy
         expect(event.created_at).to be_within(100).of(Time.zone.now)
       end
     end
 
-    it 'does not succeed when the QS is `settings_only`' do
+    it "does not succeed when the QS is `settings_only`" do
       student_in_course
-      @quiz_submission = @quiz.quiz_submissions.create!(user: @user, workflow_state: 'settings_only')
-      expect(api_create({ raw: true }, { 'quiz_submission_events' => events_data })).to eq 404
+      @quiz_submission = @quiz.quiz_submissions.create!(user: @user, workflow_state: "settings_only")
+      expect(api_create({ raw: true }, { "quiz_submission_events" => events_data })).to eq 404
     end
 
-    context 'for an ungraded quiz in a public course' do
+    context "for an ungraded quiz in a public course" do
       before do
         @course.is_public = true
         @course.is_public_to_auth_users = true
         @course.save!
-        @quiz.quiz_type = 'practice_quiz'
+        @quiz.quiz_type = "practice_quiz"
         @quiz.save!
       end
 
-      it 'responds with no_content success' do
+      it "responds with no_content success" do
         student_in_course
         @user = @teacher
         @quiz_submission = @quiz.quiz_submissions.last
@@ -137,16 +137,16 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
     end
   end
 
-  describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [index]' do
+  describe "GET /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [index]" do
     def api_index(data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/events"
-      params = { controller: 'quizzes/quiz_submission_events_api',
-                 action: 'index',
-                 format: 'json',
+      params = { controller: "quizzes/quiz_submission_events_api",
+                 action: "index",
+                 format: "json",
                  course_id: @course.id.to_s,
                  quiz_id: @quiz.id.to_s,
                  id: @quiz_submission.id.to_s }
-      headers = { 'Accept' => 'application/vnd.api+json' }
+      headers = { "Accept" => "application/vnd.api+json" }
 
       if data.delete(:raw)
         raw_api_call(:get, url, params, data, headers)
@@ -160,29 +160,29 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @quiz = course_factory(active_all: true).quizzes.create!
     end
 
-    context 'as the student who took the quiz' do
+    context "as the student who took the quiz" do
       before :once do
         student_in_course(course: @course)
       end
 
-      it 'does not let me in' do
+      it "does not let me in" do
         @quiz_submission = @quiz.generate_submission(@student)
         api_index({ raw: true })
         assert_status(401)
       end
     end
 
-    context 'as the teacher' do
+    context "as the teacher" do
       before(:once) do
         teacher_in_course(course: @course)
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it 'lets me in' do
-        expect(api_index()).to have_key('quiz_submission_events')
+      it "lets me in" do
+        expect(api_index).to have_key("quiz_submission_events")
       end
 
-      context 'with a specific attempt' do
+      context "with a specific attempt" do
         before(:once) do
           student_in_course(course: @course)
           @quiz_submission = @quiz.generate_submission(@student)
@@ -191,45 +191,45 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
           @quiz_submission.attempt = 2
           @quiz_submission.with_versioning(true, &:save!)
 
-          @quiz_submission.events.create!({ event_type: 'a', attempt: 1 })
-          @quiz_submission.events.create!({ event_type: 'b', attempt: 2 })
+          @quiz_submission.events.create!({ event_type: "a", attempt: 1 })
+          @quiz_submission.events.create!({ event_type: "b", attempt: 2 })
           teacher_in_course(course: @course)
         end
 
-        it 'works' do
-          api_index({ attempt: 1 })['quiz_submission_events'].tap do |events|
+        it "works" do
+          api_index({ attempt: 1 })["quiz_submission_events"].tap do |events|
             expect(events.count).to eq(2)
-            expect(events[0]['event_type']).to eq('submission_created')
-            expect(events[1]['event_type']).to eq('a')
+            expect(events[0]["event_type"]).to eq("submission_created")
+            expect(events[1]["event_type"]).to eq("a")
           end
 
-          api_index({ attempt: 2 })['quiz_submission_events'].tap do |events|
+          api_index({ attempt: 2 })["quiz_submission_events"].tap do |events|
             expect(events.count).to eq(1)
-            expect(events[0]['event_type']).to eq('b')
+            expect(events[0]["event_type"]).to eq("b")
           end
         end
       end
 
-      context 'with the latest attempt' do
+      context "with the latest attempt" do
         before(:once) do
           @quiz_submission = @quiz.generate_submission(@student)
           @quiz_submission.events.create!({
-                                            event_type: 'something',
-                                            event_data: ['test'],
+                                            event_type: "something",
+                                            event_data: ["test"],
                                             attempt: 1
                                           })
         end
 
-        describe 'JSON-API compliance' do
-          it 'conforms to the JSON-API spec when returning the object' do
+        describe "JSON-API compliance" do
+          it "conforms to the JSON-API spec when returning the object" do
             json = api_index
-            assert_jsonapi_compliance(json, 'quiz_submission_events')
+            assert_jsonapi_compliance(json, "quiz_submission_events")
           end
         end
       end
     end
 
-    context 'as someone else' do
+    context "as someone else" do
       before(:once) do
         student_in_course(course: @course)
         user_factory(active_all: true)
@@ -237,7 +237,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it 'does not let me in' do
+      it "does not let me in" do
         api_index(raw: true)
         assert_status(401)
       end

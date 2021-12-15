@@ -22,8 +22,8 @@ class OutcomesController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::Role
 
-  before_action :require_context, :except => [:build_outcomes]
-  add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
+  before_action :require_context, except: [:build_outcomes]
+  add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, except: [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
   before_action :rce_js_env, only: [:show, :index]
 
@@ -55,14 +55,13 @@ class OutcomesController < ApplicationController
         manage_proficiency_calculations:
           @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
       },
-      OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
-      INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION:
-        @domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation)
+      OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description)
     )
 
     set_tutorial_js_env
     mastery_scales_js_env
     proficiency_roles_js_env
+    individual_outcome_rating_and_calculation_js_env
   end
 
   def show
@@ -79,19 +78,19 @@ class OutcomesController < ApplicationController
 
     codes = [@context].map(&:asset_string)
     if @context.is_a?(Account)
-      if @context == @outcome.context
-        codes = "all"
-      else
-        codes = @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
-      end
+      codes = if @context == @outcome.context
+                "all"
+              else
+                @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
+              end
     end
     @alignments = @outcome.alignments.active.for_context(@context)
     add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
-    @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
+    @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort]).paginate(page: params[:page], per_page: 10)
 
     js_env({
-             :PERMISSIONS => {
-               :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
+             PERMISSIONS: {
+               manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes)
              }
            })
   end
@@ -101,9 +100,9 @@ class OutcomesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
 
     @outcome.tie_to(@context)
-    render :json => @outcome.as_json(
-      :methods => :artifacts_count_for_tied_context,
-      :user_content => %w(description)
+    render json: @outcome.as_json(
+      methods: :artifacts_count_for_tied_context,
+      user_content: %w[description]
     )
   end
 
@@ -113,38 +112,39 @@ class OutcomesController < ApplicationController
 
     codes = [@context].map(&:asset_string)
     if @context.is_a?(Account)
-      if @context == @outcome.context
-        codes = "all"
-      else
-        codes = @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
-      end
+      codes = if @context == @outcome.context
+                "all"
+              else
+                @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
+              end
     end
     @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort])
-    render :json => Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
+    render json: Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
   end
 
   def user_outcome_results
     user_id = params[:user_id]
-    if @context.is_a?(User)
-      @user = @context
-    elsif @context.is_a?(Course)
-      @user = @context.users.find(user_id)
-    else
-      @user = @context.all_users.find_by!(id: user_id)
-    end
+    @user = case @context
+            when User
+              @context
+            when Course
+              @context.users.find(user_id)
+            else
+              @context.all_users.find_by!(id: user_id)
+            end
 
     return unless authorized_action(@context, @current_user, :manage)
 
-    if @user == @context
-      @outcomes = LearningOutcome.has_result_for(@user).active
-    else
-      @outcomes = @context.available_outcomes
-    end
+    @outcomes = if @user == @context
+                  LearningOutcome.has_result_for(@user).active
+                else
+                  @context.available_outcomes
+                end
     @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) # .for_context_codes(@codes)
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
 
     @google_analytics_page_title = t("Outcomes for Student")
-    @page_title = t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name
+    @page_title = t :outcomes_for, "Outcomes for %{user_name}", user_name: @user.name
 
     css_bundle :learning_outcomes
     js_bundle :rubric_assessment
@@ -161,7 +161,7 @@ class OutcomesController < ApplicationController
     if params[:unused]
       @outcomes -= @current_outcomes
     end
-    render :json => @outcomes.map { |o| o.as_json(methods: :cached_context_short_name) }
+    render json: @outcomes.map { |o| o.as_json(methods: :cached_context_short_name) }
   end
 
   # as in, add existing outcome from another context to this context
@@ -181,7 +181,7 @@ class OutcomesController < ApplicationController
     else
       @group.add_outcome(@outcome)
     end
-    render :json => @outcome.as_json(:methods => :cached_context_short_name, :permissions => { :user => @current_user, :session => session })
+    render json: @outcome.as_json(methods: :cached_context_short_name, permissions: { user: @current_user, session: session })
   end
 
   def align
@@ -190,8 +190,8 @@ class OutcomesController < ApplicationController
     @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
     @asset = @context.find_asset(params[:asset_string])
     mastery_type = @asset.is_a?(Assignment) ? "points" : "none"
-    @alignment = @outcome.align(@asset, @context, :mastery_type => mastery_type) if @asset
-    render :json => @alignment.as_json(:include => :learning_outcome)
+    @alignment = @outcome.align(@asset, @context, mastery_type: mastery_type) if @asset
+    render json: @alignment.as_json(include: :learning_outcome)
   end
 
   def alignment_redirect
@@ -207,7 +207,7 @@ class OutcomesController < ApplicationController
 
     @outcome = @context.available_outcome(params[:outcome_id].to_i)
     @outcome.remove_alignment(params[:id], @context)
-    render :json => @alignment.as_json(:include => :learning_outcome)
+    render json: @alignment.as_json(include: :learning_outcome)
   end
 
   def outcome_result
@@ -227,12 +227,12 @@ class OutcomesController < ApplicationController
     elsif @result.artifact.is_a?(Quizzes::QuizSubmission) && @result.associated_asset
       @submission = @result.artifact
       @asset = @result.associated_asset
-      if @submission.attempt <= @result.attempt
-        @submission_version = @submission
-      else
-        @submission_version = @submission.submitted_attempts.detect { |s| s.attempt >= @result.attempt }
-      end
-      if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == 'AssessmentQuestionBank'
+      @submission_version = if @submission.attempt <= @result.attempt
+                              @submission
+                            else
+                              @submission.submitted_attempts.detect { |s| s.attempt >= @result.attempt }
+                            end
+      if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == "AssessmentQuestionBank"
         # anchor to first question in aligned bank
         question_bank_id = @result.alignment.content_id
         first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id)
@@ -241,18 +241,18 @@ class OutcomesController < ApplicationController
                                                       .order(:position).first
         anchor = first_aligned_question ? "question_#{first_aligned_question.id}" : nil
       elsif @asset.is_a? AssessmentQuestion
-        question = @submission.quiz_data.detect { |q| q['assessment_question_id'] == @asset.data[:id] }
-        question_id = (question && question['id']) || @asset.data[:id]
+        question = @submission.quiz_data.detect { |q| q["assessment_question_id"] == @asset.data[:id] }
+        question_id = (question && question["id"]) || @asset.data[:id]
         anchor = "question_#{question_id}"
       end
       redirect_to named_context_url(
         @result.context, :context_quiz_history_url, @submission.quiz_id,
-        :quiz_submission_id => @submission.id,
-        :version => @submission_version.version_number,
-        :anchor => anchor
+        quiz_submission_id: @submission.id,
+        version: @submission_version.version_number,
+        anchor: anchor
       )
     else
-      flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || 'nil'}"
+      flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || "nil"}"
       redirect_to named_context_url(@context, :context_outcome_url, @outcome.id)
     end
   end
@@ -271,11 +271,11 @@ class OutcomesController < ApplicationController
         @outcome_group.add_outcome(@outcome)
         flash[:notice] = t :successful_outcome_creation, "Outcome successfully created!"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-        format.json { render :json => @outcome }
+        format.json { render json: @outcome }
       else
         flash[:error] = t :failed_outcome_creation, "Outcome creation failed"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-        format.json { render :json => @outcome.errors, :status => :bad_request }
+        format.json { render json: @outcome.errors, status: :bad_request }
       end
     end
   end
@@ -289,11 +289,11 @@ class OutcomesController < ApplicationController
       if @outcome.update(learning_outcome_params)
         flash[:notice] = t :successful_outcome_update, "Outcome successfully updated!"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-        format.json { render :json => @outcome }
+        format.json { render json: @outcome }
       else
         flash[:error] = t :failed_outcome_update, "Outcome update failed"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-        format.json { render :json => @outcome.errors, :statue => :bad_request }
+        format.json { render json: @outcome.errors, statue: :bad_request }
       end
     end
   end
@@ -309,14 +309,14 @@ class OutcomesController < ApplicationController
       if params[:id].present? && (@outcome = @context.created_learning_outcomes.where(id: params[:id]).first)
         @outcome.destroy
         flash[:notice] = t :successful_outcome_delete, "Outcome successfully deleted"
-        format.json { render :json => @outcome }
+        format.json { render json: @outcome }
       elsif params[:id].present? && (@link = @context.learning_outcome_links.where(id: params[:id]).first)
         @link.destroy
         flash[:notice] = t :successful_outcome_removal, "Outcome successfully removed"
-        format.json { render :json => @link.learning_outcome }
+        format.json { render json: @link.learning_outcome }
       else
         flash[:notice] = t :missing_outcome, "Couldn't find that learning outcome"
-        format.json { render :json => { :errors => { :base => t(:missing_outcome, "Couldn't find that learning outcome") } }, :status => :bad_request }
+        format.json { render json: { errors: { base: t(:missing_outcome, "Couldn't find that learning outcome") } }, status: :bad_request }
       end
       format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
     end
@@ -333,13 +333,17 @@ class OutcomesController < ApplicationController
   def proficiency_roles_js_env
     if @context.is_a?(Account) && @context.root_account.feature_enabled?(:account_level_mastery_scales)
       proficiency_calculation_roles = []
-      @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
-        proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
-      end if @context.grants_right? @current_user, :manage_proficiency_calculations
+      if @context.grants_right? @current_user, :manage_proficiency_calculations
+        @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
+          proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+        end
+      end
       proficiency_scales_roles = []
-      @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
-        proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
-      end if @context.grants_right? @current_user, :manage_proficiency_scales
+      if @context.grants_right? @current_user, :manage_proficiency_scales
+        @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
+          proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+        end
+      end
       js_env(
         PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
         PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles

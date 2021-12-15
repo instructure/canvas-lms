@@ -23,15 +23,17 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'page_views'
+    "page_views"
   end
 
   def self.up
-    compression_params = cassandra.db.use_cql3? ?
-        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
-        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+    compression_params = if cassandra.db.use_cql3?
+                           "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                         else
+                           "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                         end
 
-    cassandra.execute %{
+    cassandra.execute <<~SQL.squish
       CREATE TABLE page_views (
         request_id            text PRIMARY KEY,
         session_id            text,
@@ -57,17 +59,19 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         real_user_id          bigint,
         http_method           text,
         remote_ip             text
-      ) #{compression_params}}
+      ) #{compression_params}
+    SQL
 
-    cassandra.execute %{
+    cassandra.execute <<~SQL.squish
       CREATE TABLE page_views_history_by_context (
         context_and_time_bucket text,
         ordered_id text,
         request_id text,
         PRIMARY KEY (context_and_time_bucket, ordered_id)
-      ) #{compression_params}}
+      ) #{compression_params}
+    SQL
 
-    cassandra.execute %{
+    cassandra.execute <<~SQL.squish
       CREATE TABLE page_views_migration_metadata_per_account (
         shard_id         text,
         account_id       bigint,
@@ -75,18 +79,18 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         last_request_id  text,
         PRIMARY KEY      (shard_id, account_id)
       )
-    }
+    SQL
   end
 
   def self.down
-    cassandra.execute %{
+    cassandra.execute <<~SQL.squish
       DROP TABLE page_views_history_by_context;
-    }
-    cassandra.execute %{
+    SQL
+    cassandra.execute <<~SQL.squish
       DROP TABLE page_views;
-    }
-    cassandra.execute %{
+    SQL
+    cassandra.execute <<~SQL.squish
       DROP TABLE page_views_migration_metadata_per_account;
-    }
+    SQL
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'answer_parser_spec_helper'
+require_relative "answer_parser_spec_helper"
 
 describe Quizzes::QuizQuestion::AnswerParsers::Numerical do
   context "#parse" do
@@ -43,7 +43,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Numerical do
       ]
     end
 
-    let(:question_params) { Hash.new }
+    let(:question_params) { {} }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::Numerical }
 
     include_examples "All answer parsers"

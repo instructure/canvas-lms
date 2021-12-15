@@ -36,7 +36,7 @@ module Auditors::ActiveRecord
     end
 
     def update_from_event_stream!(record)
-      db_rec = find_by!(uuid: record.attributes['id'])
+      db_rec = find_by!(uuid: record.attributes["id"])
       db_rec.update!(ar_attributes_from_event_stream(record))
     end
   end

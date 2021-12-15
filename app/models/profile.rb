@@ -19,18 +19,18 @@
 
 class Profile < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course], exhaustive: false
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   serialize :data
 
-  validates_presence_of :root_account
-  validates_presence_of :context
-  validates_length_of :title, :within => 0..255
-  validates_length_of :path, :within => 0..255
-  validates_format_of :path, :with => /\A[a-z0-9-]+\z/
-  validates_uniqueness_of :path, :scope => :root_account_id
-  validates_uniqueness_of :context_id, :scope => :context_type
-  validates_inclusion_of :visibility, :in => %w{public unlisted private}
+  validates :root_account, presence: true
+  validates :context, presence: true
+  validates :title, length: { within: 0..255 }
+  validates :path, length: { within: 0..255 }
+  validates :path, format: { with: /\A[a-z0-9-]+\z/ }
+  validates :path, uniqueness: { scope: :root_account_id }
+  validates :context_id, uniqueness: { scope: :context_type }
+  validates :visibility, inclusion: { in: %w[public unlisted private] }
 
   def title=(title)
     write_attribute(:title, title)
@@ -40,7 +40,7 @@ class Profile < ActiveRecord::Base
   def infer_path
     return nil unless title
 
-    path = base_path = title.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A-+|-+\z/, '')
+    path = base_path = title.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-+|-+\z/, "")
     count = 0
     while (profile = Profile.where(root_account_id: root_account_id, path: path).first)
       break if profile.id == id
@@ -60,25 +60,24 @@ class Profile < ActiveRecord::Base
 
   def self.data(field, options = {})
     options[:type] ||= :string
-    define_method(field) {
-      data.has_key?(field) ? data[field] : data[field] = options[:default]
-    }
-    define_method("#{field}=") { |value|
+    define_method(field) do
+      data.key?(field) ? data[field] : data[field] = options[:default]
+    end
+    define_method("#{field}=") do |value|
       data_before_type_cast[field] = value
       data[field] = sanitize_data(value, options)
-    }
-    define_method("#{field}_before_type_cast") {
+    end
+    define_method("#{field}_before_type_cast") do
       data_before_type_cast[field]
-    }
+    end
   end
 
   def sanitize_data(value, options)
     return nil unless value.present?
 
     case options[:type]
-    when :decimal,
-           :float; value.to_f
-    when :int; value.to_i
+    when :decimal, :float then value.to_f
+    when :int then value.to_i
     else value
     end
   end
@@ -86,7 +85,7 @@ class Profile < ActiveRecord::Base
   # some tricks to make it behave like STI with a type column
   def self.inherited(klass)
     super
-    context_type = klass.name.sub(/Profile\z/, '')
+    context_type = klass.name.delete_suffix("Profile")
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
   end
 

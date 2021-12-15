@@ -24,7 +24,7 @@ module Auditors::ActiveRecord
     end
 
     def [](key)
-      if key.to_s == 'attributes'
+      if key.to_s == "attributes"
         self
       else
         # this works because we expect this module to be included

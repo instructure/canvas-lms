@@ -22,13 +22,13 @@ class AddReplicaIdentityForDiscussionTopics < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'DiscussionTopic', :root_account_id, 0
-    remove_index :discussion_topics, name: 'index_discussion_topics_on_root_account_id', if_exists: true
+    add_replica_identity "DiscussionTopic", :root_account_id, 0
+    remove_index :discussion_topics, name: "index_discussion_topics_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :discussion_topics, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'DiscussionTopic'
+    remove_replica_identity "DiscussionTopic"
     change_column_null :discussion_topics, :root_account_id, true
   end
 end

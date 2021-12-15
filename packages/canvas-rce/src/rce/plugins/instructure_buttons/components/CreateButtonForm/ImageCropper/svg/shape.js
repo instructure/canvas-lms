@@ -28,6 +28,10 @@ export function buildShapeMask({shape}) {
       return buildCircle()
     case 'triangle':
       return buildTriangle()
+    case 'diamond':
+      return buildDiamond()
+    case 'pentagon':
+      return buildPentagon()
     case 'hexagon':
       return buildHexagon()
     case 'octagon':
@@ -66,6 +70,26 @@ function buildTriangle() {
   })
 }
 
+function buildDiamond() {
+  return createSvgElement('path', {
+    d: `M${SHAPE_CONTAINER_LENGTH / 2} 0L${SHAPE_CONTAINER_LENGTH} ${SHAPE_CONTAINER_LENGTH / 2}L${
+      SHAPE_CONTAINER_LENGTH / 2
+    } ${SHAPE_CONTAINER_LENGTH}L0 ${SHAPE_CONTAINER_LENGTH / 2}L${SHAPE_CONTAINER_LENGTH / 2} 0Z`
+  })
+}
+
+function buildPentagon() {
+  const half = round(SHAPE_CONTAINER_LENGTH / 2, 2)
+  const alpha = round(0.3906 * SHAPE_CONTAINER_LENGTH, 2)
+  const beta = round(0.3433 * SHAPE_CONTAINER_LENGTH, 2)
+
+  return createSvgElement('path', {
+    d: `M${half} 0L${SHAPE_CONTAINER_LENGTH} ${alpha}L${half + beta} ${SHAPE_CONTAINER_LENGTH}H${
+      half - beta
+    }L0 ${alpha}L${half} 0L${half} 0Z`
+  })
+}
+
 function buildHexagon() {
   const leg = round(0.2895 * SHAPE_CONTAINER_LENGTH, 2)
   return createSvgElement('path', {
@@ -101,6 +125,6 @@ function buildStar() {
       half + zeta
     } ${SHAPE_CONTAINER_LENGTH}L${half} ${eta}L${half - zeta} ${SHAPE_CONTAINER_LENGTH}L${
       half - gamma
-    } ${delta}L0 ${beta}H${half - alpha}L${half} 0L${half} 0Z`
+    } ${delta}L0 ${beta}H${half - alpha}L${half} 0Z`
   })
 }

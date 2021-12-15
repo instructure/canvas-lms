@@ -21,19 +21,19 @@ module Filters::Polling
   protected
 
   def require_course
-    id = params.has_key?(:course_id) ? params[:course_id] : params[:id]
+    id = params.key?(:course_id) ? params[:course_id] : params[:id]
     unless (@course = Course.find(id))
-      raise ActiveRecord::RecordNotFound.new('Course not found')
+      raise ActiveRecord::RecordNotFound, "Course not found"
     end
 
     @course
   end
 
   def require_poll
-    id = params.has_key?(:poll_id) ? params[:poll_id] : params[:id]
+    id = params.key?(:poll_id) ? params[:poll_id] : params[:id]
 
     unless (@poll = Polling::Poll.find(id))
-      raise ActiveRecord::RecordNotFound.new('Poll not found')
+      raise ActiveRecord::RecordNotFound, "Poll not found"
     end
 
     @poll
@@ -43,7 +43,7 @@ module Filters::Polling
     id = params[:poll_session_id]
 
     unless (@poll_session = @poll.poll_sessions.find(id))
-      raise ActiveRecord::RecordNotFound.new('Poll session not found')
+      raise ActiveRecord::RecordNotFound, "Poll session not found"
     end
 
     @poll_session

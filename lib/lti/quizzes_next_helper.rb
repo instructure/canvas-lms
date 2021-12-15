@@ -29,11 +29,11 @@ module Lti
 
     def unavailable_for_students?(context, current_user, tool)
       return false unless quizzes_next_tool?(tool)
-      return false unless current_user.roles(context.root_account).exclude?('admin')
+      return false unless current_user.roles(context.root_account).exclude?("admin")
 
       current_user_enrollment = context.enrollments.where(user: current_user)
       current_user_enrollment
-        .where(type: ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'])
+        .where(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
         .active_by_date.union(current_user_enrollment.of_admin_type).none?
     end
 

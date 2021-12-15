@@ -25,20 +25,20 @@
 # CANVAS_RAILS6_0=0 env var, creating an empty RAILS5_2 file in the canvas config dir,
 # or setting `private/canvas/rails6.0` to `false` in a locally accessible consul
 unless defined?(CANVAS_RAILS6_0)
-  if ENV['CANVAS_RAILS6_1']
-    CANVAS_RAILS6_0 = ENV['CANVAS_RAILS6_1'] != '1'
-  elsif File.exist?(File.expand_path("../RAILS6_1", __FILE__))
+  if ENV["CANVAS_RAILS6_1"]
+    CANVAS_RAILS6_0 = ENV["CANVAS_RAILS6_1"] != "1"
+  elsif File.exist?(File.expand_path("RAILS6_1", __dir__))
     CANVAS_RAILS6_0 = false
   else
     begin
       # have to do the consul communication without any gems, because
       # we're in the context of loading the gemfile
-      require 'base64'
-      require 'json'
-      require 'net/http'
-      require 'yaml'
+      require "base64"
+      require "json"
+      require "net/http"
+      require "yaml"
 
-      environment = YAML.load(File.read(File.expand_path("../consul.yml", __FILE__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
+      environment = YAML.safe_load(File.read(File.expand_path("consul.yml", __dir__))).dig(ENV["RAILS_ENV"] || "development", "environment")
 
       keys = [
         ["private/canvas", environment, $canvas_cluster, "rails6.1"].compact.join("/"),
@@ -54,7 +54,7 @@ unless defined?(CANVAS_RAILS6_0)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS6_0 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'false')
+      CANVAS_RAILS6_0 = !(result && Base64.decode64(JSON.parse(result.body).first["Value"]) == "false")
     rescue
       CANVAS_RAILS6_0 = true
     end

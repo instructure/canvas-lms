@@ -48,25 +48,25 @@ module SectionTabHelper
   end
 
   def nav_name
-    if active_path?('/courses')
-      I18n.t('Courses Navigation Menu')
-    elsif active_path?('/profile')
-      I18n.t('Account Navigation Menu')
-    elsif active_path?('/accounts')
-      I18n.t('Admin Navigation Menu')
-    elsif active_path?('/groups')
-      I18n.t('Groups Navigation Menu')
+    if active_path?("/courses")
+      I18n.t("Courses Navigation Menu")
+    elsif active_path?("/profile")
+      I18n.t("Account Navigation Menu")
+    elsif active_path?("/accounts")
+      I18n.t("Admin Navigation Menu")
+    elsif active_path?("/groups")
+      I18n.t("Groups Navigation Menu")
     else
-      I18n.t('Context Navigation Menu')
+      I18n.t("Context Navigation Menu")
     end
   end
 
   def section_tabs
     @section_tabs ||=
       if @context && available_section_tabs.any?
-        content_tag(:nav, { role: 'navigation', 'aria-label': nav_name }) do
+        content_tag(:nav, { role: "navigation", "aria-label": nav_name }) do
           concat(
-            content_tag(:ul, id: 'section-tabs') do
+            content_tag(:ul, id: "section-tabs") do
               available_section_tabs.map { |tab| section_tab_tag(tab, @context, get_active_tab) }
             end
           )
@@ -110,11 +110,11 @@ module SectionTabHelper
             precalculated_permissions: @precalculated_permissions
           }
         ).select { |tab| tab_has_required_attributes?(tab) }.reject do |tab|
-          if tab_is?(tab, 'TAB_COLLABORATIONS')
+          if tab_is?(tab, "TAB_COLLABORATIONS")
             new_collaborations_enabled || !Collaboration.any_collaborations_configured?(@context)
-          elsif tab_is?(tab, 'TAB_COLLABORATIONS_NEW')
+          elsif tab_is?(tab, "TAB_COLLABORATIONS_NEW")
             !new_collaborations_enabled
-          elsif tab_is?(tab, 'TAB_CONFERENCES')
+          elsif tab_is?(tab, "TAB_CONFERENCES")
             !WebConference.config(context: @context)
           elsif quiz_lti_tab?(tab)
             !new_quizzes_navigation_placements_enabled?(context)
@@ -131,11 +131,11 @@ module SectionTabHelper
         current_user,
         domain_root_account,
         Lti::NavigationCache.new(domain_root_account),
-        'section_tabs_hash',
+        "section_tabs_hash",
         I18n.locale
       ]
-      if context.is_a?(Course)
-        k << 'homeroom_course' if context.elementary_homeroom_course?
+      if context.is_a?(Course) && context.elementary_homeroom_course?
+        k << "homeroom_course"
       end
 
       k.cache_key
@@ -150,7 +150,7 @@ module SectionTabHelper
     end
 
     def quiz_lti_tab?(tab)
-      if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] && tab[:args][1]
+      if tab[:id].is_a?(String) && tab[:id].start_with?("context_external_tool_") && tab[:args] && tab[:args][1]
         return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
       end
 
@@ -169,16 +169,16 @@ module SectionTabHelper
     end
 
     def a_classes
-      [@tab.css_class.downcase.replace_whitespace('-')].tap do |a|
-        a << 'active' if @tab.active?(@active_tab)
+      [@tab.css_class.downcase.replace_whitespace("-")].tap do |a|
+        a << "active" if @tab.active?(@active_tab)
       end
     end
 
     def a_title
       if @tab.hide?
-        I18n.t('Disabled. Not visible to students')
+        I18n.t("Disabled. Not visible to students")
       elsif @tab.unused?
-        I18n.t('No content. Not visible to students')
+        I18n.t("No content. Not visible to students")
       end
     end
 
@@ -186,26 +186,26 @@ module SectionTabHelper
       return unless @tab.hide? || @tab.unused?
 
       if @tab.hide?
-        I18n.t('%{label}. Disabled. Not visible to students', { label: @tab.label })
+        I18n.t("%{label}. Disabled. Not visible to students", { label: @tab.label })
       else
-        I18n.t('%{label}. No content. Not visible to students', { label: @tab.label })
+        I18n.t("%{label}. No content. Not visible to students", { label: @tab.label })
       end
     end
 
     def a_aria_current_page
-      'page' if @tab.active?(@active_tab)
+      "page" if @tab.active?(@active_tab)
     end
 
     def a_attributes
       {
         href: @tab.path,
         title: a_title,
-        'aria-label': a_aria_label,
-        'aria-current': a_aria_current_page,
+        "aria-label": a_aria_label,
+        "aria-current": a_aria_current_page,
         class: a_classes
       }.tap do |h|
         h[:target] = @tab.target if @tab.target?
-        h['data-tooltip'] = '' if @tab.hide? || @tab.unused?
+        h["data-tooltip"] = "" if @tab.hide? || @tab.unused?
       end
     end
 
@@ -217,7 +217,7 @@ module SectionTabHelper
     end
 
     def li_classes
-      %w[section].tap { |a| a << 'section-hidden' if @tab.hide? || @tab.unused? }
+      %w[section].tap { |a| a << "section-hidden" if @tab.hide? || @tab.unused? }
     end
 
     def indicate_hidden

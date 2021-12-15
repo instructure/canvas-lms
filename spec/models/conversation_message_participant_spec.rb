@@ -37,12 +37,12 @@ describe ConversationMessageParticipant do
       it "ignores soft deletes" do
         @teacher.conversations.first.remove_messages(@msg)
         expect(ConversationMessageParticipant.all.count).to eql 3
-        expect(ConversationMessageParticipant.all.map(&:workflow_state).sort).to eql ['active', 'active', 'deleted']
-        expect(ConversationMessageParticipant.active.map(&:workflow_state)).to eql ['active', 'active']
+        expect(ConversationMessageParticipant.all.map(&:workflow_state).sort).to eql %w[active active deleted]
+        expect(ConversationMessageParticipant.active.map(&:workflow_state)).to eql ["active", "active"]
       end
 
       it "includes nil workflow_state" do
-        ConversationMessageParticipant.update_all(:workflow_state => nil)
+        ConversationMessageParticipant.update_all(workflow_state: nil)
         expect(ConversationMessageParticipant.active.map(&:workflow_state).sort).to eql [nil, nil, nil]
       end
     end
@@ -51,7 +51,7 @@ describe ConversationMessageParticipant do
       it "only includes soft deletes" do
         @teacher.conversations.first.remove_messages(@msg)
         expect(ConversationMessageParticipant.all.count).to eql 3
-        expect(ConversationMessageParticipant.deleted.map(&:workflow_state)).to eql ['deleted']
+        expect(ConversationMessageParticipant.deleted.map(&:workflow_state)).to eql ["deleted"]
       end
     end
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module AssetSignature
-  DELIMITER = '-'
+  DELIMITER = "-"
 
   class << self
     def generate(asset)

@@ -30,6 +30,6 @@ class CreateScheduledSmartAlerts < ActiveRecord::Migration[5.2]
       t.timestamps
     end
     add_index :scheduled_smart_alerts, :due_at
-    add_index :scheduled_smart_alerts, [:context_type, :context_id, :alert_type, :root_account_id], :name => 'index_unique_scheduled_smart_alert'
+    add_index :scheduled_smart_alerts, %i[context_type context_id alert_type root_account_id], name: "index_unique_scheduled_smart_alert"
   end
 end

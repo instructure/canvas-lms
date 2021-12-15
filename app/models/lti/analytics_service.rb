@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'duration'
-require 'net/http'
-require 'securerandom'
+require "duration"
+require "net/http"
+require "securerandom"
 
 module Lti
   class AnalyticsService
-    class Token < Struct.new(:tool, :user, :course, :timestamp, :nonce)
+    Token = Struct.new(:tool, :user, :course, :timestamp, :nonce) do
       def self.create(tool, user, course)
         Token.new(tool, user, course, Time.now, SecureRandom.hex(8))
       end
 
       def serialize
         key = tool.shard.settings[:encryption_key]
-        payload = [tool.id, user.id, course.id, timestamp.to_i, nonce].join('-')
+        payload = [tool.id, user.id, course.id, timestamp.to_i, nonce].join("-")
         "#{payload}-#{Canvas::Security.hmac_sha1(payload, key)}"
       end
 
       def self.parse_and_validate(serialized_token)
-        parts = serialized_token.split('-')
+        parts = serialized_token.split("-")
         tool = ContextExternalTool.find(parts[0].to_i)
         key = tool.shard.settings[:encryption_key]
-        unless parts.size == 6 && Canvas::Security.hmac_sha1(parts[0..-2].join('-'), key) == parts[-1]
+        unless parts.size == 6 && Canvas::Security.hmac_sha1(parts[0..-2].join("-"), key) == parts[-1]
           raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid analytics service token"
         end
 
@@ -63,19 +63,19 @@ module Lti
 
       if seconds
 
-        course.all_enrollments.where(:user_id => user)
-              .update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
+        course.all_enrollments.where(user_id: user)
+              .update_all(["total_activity_time = COALESCE(total_activity_time, 0) + ?", seconds])
       end
 
       AssetUserAccess.log(user, course, code: tool.asset_string, group_code: "external_tools", category: "external_tools")
 
       if PageView.page_views_enabled?
-        PageView.new(user: user, context: course, account: course.account).tap { |p|
+        PageView.new(user: user, context: course, account: course.account).tap do |p|
           p.request_id = SecureRandom.uuid
           p.url = opts[:url]
           # TODO: override 10m cap?
           p.interaction_seconds = seconds
-        }.save
+        end.save
       end
     end
   end

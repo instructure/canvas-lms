@@ -269,7 +269,7 @@
 
 </div>
 <div id="confirm_email_channel" style="display: none;" class="dialog" role="dialog">
-  <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <div style="text-align: center;"><%= t(<<~TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     We emailed a confirmation link to %{email_address}. Click the link in that
     email to finish registering. Make sure to check your spam box in case it
     got filtered.
@@ -288,7 +288,7 @@
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
   <div id='sms_confirmation_instructions' style="text-align: center;">
-  <%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <%= t(<<~TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     To activate this communication channel, enter the four-character confirmation code sent to %{sms_number}.
     TEXT
   %>

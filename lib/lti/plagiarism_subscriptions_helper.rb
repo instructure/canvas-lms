@@ -24,12 +24,12 @@ module Lti
     class PlagiarismSubscriptionError < StandardError
     end
 
-    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'
-    EVENT_TYPES = %w(submission_created
+    SUBMISSION_EVENT_ID = "vnd.Canvas.SubmissionEvent"
+    EVENT_TYPES = %w[submission_created
                      plagiarism_resubmit
                      submission_updated
                      assignment_updated
-                     assignment_created).freeze
+                     assignment_created].freeze
 
     def initialize(tool_proxy)
       @tool_proxy = tool_proxy
@@ -43,9 +43,9 @@ module Lti
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
         raise PlagiarismSubscriptionError, error_message unless result.ok?
 
-        result.parsed_response['Id']
+        result.parsed_response["Id"]
       else
-        raise PlagiarismSubscriptionError, I18n.t('Live events subscriptions service is not configured')
+        raise PlagiarismSubscriptionError, I18n.t("Live events subscriptions service is not configured")
       end
     end
 
@@ -53,7 +53,7 @@ module Lti
       {
         SystemEventTypes: EVENT_TYPES,
         UserEventTypes: EVENT_TYPES,
-        ContextType: 'root_account',
+        ContextType: "root_account",
         ContextId: tool_proxy.context.root_account.uuid,
         Format: format,
         TransportType: transport_type,
@@ -73,24 +73,24 @@ module Lti
 
     def error_message
       if submission_event_service.blank?
-        I18n.t('Plagiarism review tool is missing submission event service')
+        I18n.t("Plagiarism review tool is missing submission event service")
       elsif submission_event_service.endpoint.blank?
-        I18n.t('Plagiarism review tool submission event service is missing endpoint')
+        I18n.t("Plagiarism review tool submission event service is missing endpoint")
       else
-        I18n.t('Plagiarism review tool error')
+        I18n.t("Plagiarism review tool error")
       end
     end
 
     def submission_event_service
-      @_submission_event_service ||= tool_proxy.find_service(SUBMISSION_EVENT_ID, 'POST')
+      @_submission_event_service ||= tool_proxy.find_service(SUBMISSION_EVENT_ID, "POST")
     end
 
     def format
-      'live-event'
+      "live-event"
     end
 
     def transport_type
-      'https'
+      "https"
     end
 
     def transport_metadata

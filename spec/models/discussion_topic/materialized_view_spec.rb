@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe DiscussionTopic::MaterializedView do
   def recursively_slice_with_replies(list, slice_targets)
-    slice_targets.append('replies') unless slice_targets.include? 'replies'
+    slice_targets.append("replies") unless slice_targets.include? "replies"
     list.map do |l|
       l = l.slice(*slice_targets)
-      l['replies'] = recursively_slice_with_replies(l['replies'] || [], slice_targets)
+      l["replies"] = recursively_slice_with_replies(l["replies"] || [], slice_targets)
       l
     end
   end
@@ -49,7 +49,7 @@ describe DiscussionTopic::MaterializedView do
     it "returns the view if it exists but is out of date" do
       @view.update_materialized_view(synchronous: true)
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_present
-      reply = @topic.reply_from(:user => @user, :text => "new message!")
+      reply = @topic.reply_from(user: @user, text: "new message!")
       Delayed::Job.find_available(100).each(&:destroy)
       json, _participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
@@ -88,50 +88,50 @@ describe DiscussionTopic::MaterializedView do
     expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:id).sort
     json = JSON.parse(structure)
     expect(json.size).to eq 2
-    expect(json.map { |e| e['id'] }).to eq [@root1.id.to_s, @root2.id.to_s]
-    expect(json.map { |e| e['parent_id'] }).to eq [nil, nil]
-    deleted = json[0]['replies'][0]
-    expect(deleted['deleted']).to eq true
-    expect(deleted['user_id']).to be_nil
-    expect(deleted['message']).to be_nil
-    expect(json[0]['replies'][1]['replies'][0]['attachment']['url']).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+    expect(json.map { |e| e["id"] }).to eq [@root1.id.to_s, @root2.id.to_s]
+    expect(json.map { |e| e["parent_id"] }).to eq [nil, nil]
+    deleted = json[0]["replies"][0]
+    expect(deleted["deleted"]).to eq true
+    expect(deleted["user_id"]).to be_nil
+    expect(deleted["message"]).to be_nil
+    expect(json[0]["replies"][1]["replies"][0]["attachment"]["url"]).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     # verify the api_user_content functionality in a non-request context
-    html_message = json[0]['replies'][1]['message']
+    html_message = json[0]["replies"][1]["message"]
     html = Nokogiri::HTML5.fragment(html_message)
-    expect(html.at_css('a')['href']).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-    expect(html.at_css('video')['src']).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+    expect(html.at_css("a")["href"]).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+    expect(html.at_css("video")["src"]).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
     # the deleted entry will be marked deleted and have no summary
-    simple_json = recursively_slice_with_replies(json, ['id'])
+    simple_json = recursively_slice_with_replies(json, ["id"])
     expect(simple_json).to eq [
       {
-        'id' => @root1.id.to_s,
-        'replies' => [
-          { 'id' => @reply1.id.to_s, 'replies' => [{ 'id' => @reply_reply2.id.to_s, 'replies' => [] }], },
-          { 'id' => @reply2.id.to_s, 'replies' => [{ 'id' => @reply_reply1.id.to_s, 'replies' => [] }], },
+        "id" => @root1.id.to_s,
+        "replies" => [
+          { "id" => @reply1.id.to_s, "replies" => [{ "id" => @reply_reply2.id.to_s, "replies" => [] }], },
+          { "id" => @reply2.id.to_s, "replies" => [{ "id" => @reply_reply1.id.to_s, "replies" => [] }], },
         ],
       },
       {
-        'id' => @root2.id.to_s,
-        'replies' => [
-          { 'id' => @reply3.id.to_s, 'replies' => [], },
+        "id" => @root2.id.to_s,
+        "replies" => [
+          { "id" => @reply3.id.to_s, "replies" => [], },
         ],
       },
     ]
   end
 
   it "works with media track tags" do
-    obj = @course.media_objects.create! media_id: '0_deadbeef'
-    track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
+    obj = @course.media_objects.create! media_id: "0_deadbeef"
+    track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!"
 
-    @topic.reply_from(:user => @student, :html => '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>')
+    @topic.reply_from(user: @student, html: '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>')
 
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view(synchronous: true)
     structure, _participant_ids, _entry_ids = @topic.materialized_view
     entry_json = JSON.parse(structure).last
-    html = Nokogiri::HTML5.fragment(entry_json['message'])
-    expect(html.at_css('video track')['src']).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"
+    html = Nokogiri::HTML5.fragment(entry_json["message"])
+    expect(html.at_css("video track")["src"]).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"
   end
 
   context "sharding" do
@@ -143,38 +143,38 @@ describe DiscussionTopic::MaterializedView do
       expect(participant_ids.sort).to eq [@student.local_id, @teacher.local_id].sort
       expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:local_id).sort
       json = JSON.parse(structure)
-      simple_json = recursively_slice_with_replies(json, ['id', 'user_id'])
+      simple_json = recursively_slice_with_replies(json, ["id", "user_id"])
       expect(simple_json).to eq [
         {
-          'id' => @root1.local_id.to_s,
-          'user_id' => @student.local_id.to_s,
-          'replies' => [
+          "id" => @root1.local_id.to_s,
+          "user_id" => @student.local_id.to_s,
+          "replies" => [
             {
-              'id' => @reply1.local_id.to_s,
-              'replies' => [{
-                'id' => @reply_reply2.local_id.to_s,
-                'user_id' => @student.local_id.to_s,
-                'replies' => []
+              "id" => @reply1.local_id.to_s,
+              "replies" => [{
+                "id" => @reply_reply2.local_id.to_s,
+                "user_id" => @student.local_id.to_s,
+                "replies" => []
               }]
             },
             {
-              'id' => @reply2.local_id.to_s,
-              'user_id' => @teacher.local_id.to_s,
-              'replies' => [{
-                'id' => @reply_reply1.local_id.to_s,
-                'user_id' => @student.local_id.to_s,
-                'replies' => []
+              "id" => @reply2.local_id.to_s,
+              "user_id" => @teacher.local_id.to_s,
+              "replies" => [{
+                "id" => @reply_reply1.local_id.to_s,
+                "user_id" => @student.local_id.to_s,
+                "replies" => []
               }]
             },
           ],
         },
         {
-          'id' => @root2.local_id.to_s,
-          'user_id' => @student.local_id.to_s,
-          'replies' => [{
-            'id' => @reply3.local_id.to_s,
-            'user_id' => @student.local_id.to_s,
-            'replies' => []
+          "id" => @root2.local_id.to_s,
+          "user_id" => @student.local_id.to_s,
+          "replies" => [{
+            "id" => @reply3.local_id.to_s,
+            "user_id" => @student.local_id.to_s,
+            "replies" => []
           }],
         },
       ]
@@ -187,38 +187,38 @@ describe DiscussionTopic::MaterializedView do
         expect(participant_ids.sort).to eq [@student.global_id, @teacher.global_id].sort
         expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:global_id).sort
         json = JSON.parse(structure)
-        simple_json = recursively_slice_with_replies(json, ['id', 'user_id'])
+        simple_json = recursively_slice_with_replies(json, ["id", "user_id"])
         expect(simple_json).to eq [
           {
-            'id' => @root1.global_id.to_s,
-            'user_id' => @student.global_id.to_s,
-            'replies' => [
+            "id" => @root1.global_id.to_s,
+            "user_id" => @student.global_id.to_s,
+            "replies" => [
               {
-                'id' => @reply1.global_id.to_s,
-                'replies' => [{
-                  'id' => @reply_reply2.global_id.to_s,
-                  'user_id' => @student.global_id.to_s,
-                  'replies' => []
+                "id" => @reply1.global_id.to_s,
+                "replies" => [{
+                  "id" => @reply_reply2.global_id.to_s,
+                  "user_id" => @student.global_id.to_s,
+                  "replies" => []
                 }]
               },
               {
-                'id' => @reply2.global_id.to_s,
-                'user_id' => @teacher.global_id.to_s,
-                'replies' => [{
-                  'id' => @reply_reply1.global_id.to_s,
-                  'user_id' => @student.global_id.to_s,
-                  'replies' => []
+                "id" => @reply2.global_id.to_s,
+                "user_id" => @teacher.global_id.to_s,
+                "replies" => [{
+                  "id" => @reply_reply1.global_id.to_s,
+                  "user_id" => @student.global_id.to_s,
+                  "replies" => []
                 }]
               },
             ],
           },
           {
-            'id' => @root2.global_id.to_s,
-            'user_id' => @student.global_id.to_s,
-            'replies' => [{
-              'id' => @reply3.global_id.to_s,
-              'user_id' => @student.global_id.to_s,
-              'replies' => []
+            "id" => @root2.global_id.to_s,
+            "user_id" => @student.global_id.to_s,
+            "replies" => [{
+              "id" => @reply3.global_id.to_s,
+              "user_id" => @student.global_id.to_s,
+              "replies" => []
             }],
           },
         ]

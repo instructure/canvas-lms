@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative 'post_grades_tray_page'
-require_relative 'hide_grades_tray_page'
+require_relative "../../common"
+require_relative "post_grades_tray_page"
+require_relative "hide_grades_tray_page"
 
 module Gradebook
   extend SeleniumDependencies
 
   # Student Headings
-  STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'
+  STUDENT_COLUMN_MENU_SELECTOR = ".container_0 .Gradebook__ColumnHeaderAction"
 
   # Gradebook Menu
   GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'
-  INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'
-  GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'
-  LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'
+  INDIVIDUAL_VIEW_ITEM_SELECTOR = "individual-gradebook"
+  GRADE_HISTORY_ITEM_SELECTOR = "gradebook-history"
+  LEARING_MASTERY_ITEM_SELECTOR = "learning-mastery"
 
   # Action Menu
   ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'
@@ -41,7 +41,7 @@ module Gradebook
   MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'
 
   def self.gradebook_settings_cog
-    f('#gradebook-settings-button')
+    f("#gradebook-settings-button")
   end
 
   def self.notes_option
@@ -53,7 +53,7 @@ module Gradebook
   end
 
   def self.grid
-    f('#gradebook_grid .container_1')
+    f("#gradebook_grid .container_1")
   end
 
   # assignment header column elements
@@ -74,7 +74,7 @@ module Gradebook
   end
 
   def self.assignment_header_cell_label_element(title)
-    select_assignment_header_cell_element(title).find('.assignment-name')
+    select_assignment_header_cell_element(title).find(".assignment-name")
   end
 
   def self.assignment_menu_selector(menu_text)
@@ -107,7 +107,7 @@ module Gradebook
   end
 
   def self.student_names
-    ff('.student-name')
+    ff(".student-name")
   end
 
   def self.student_column_cell_element(x, y)
@@ -119,7 +119,7 @@ module Gradebook
   end
 
   def self.menu_container(container_id)
-    selector = '[role=menu]'
+    selector = "[role=menu]"
     selector += "[aria-labelledby=#{container_id}]" if container_id
 
     f(selector)
@@ -134,7 +134,7 @@ module Gradebook
   end
 
   def self.gradebook_dropdown_menu
-    fj(GRADEBOOK_MENU_SELECTOR + ':visible')
+    fj(GRADEBOOK_MENU_SELECTOR + ":visible")
   end
 
   def self.grade_input(cell)
@@ -170,7 +170,7 @@ module Gradebook
   end
 
   def self.total_cell_warning_icon
-    ff('.gradebook-cell .icon-warning')
+    ff(".gradebook-cell .icon-warning")
   end
 
   def self.gradebook_history
@@ -182,11 +182,11 @@ module Gradebook
   end
 
   def self.gradebook_settings_button
-    f('#gradebook-settings-button')
+    f("#gradebook-settings-button")
   end
 
   def self.filters_element
-    fj('li:contains(Filters) button')
+    fj("li:contains(Filters) button")
   end
 
   def self.show_grading_period_filter_element
@@ -210,11 +210,11 @@ module Gradebook
   end
 
   def self.body
-    f('body')
+    f("body")
   end
 
   def self.submission_tray_selector
-    '.SubmissionTray__Container'
+    ".SubmissionTray__Container"
   end
 
   def self.submission_tray
@@ -230,15 +230,15 @@ module Gradebook
   end
 
   def self.grades_uploaded_data
-    f('#gradebook_upload_uploaded_data')
+    f("#gradebook_upload_uploaded_data")
   end
 
   def self.grades_new_upload
-    f('#new_gradebook_upload')
+    f("#new_gradebook_upload")
   end
 
   def self.loading_spinner
-    f('#spinner')
+    f("#spinner")
   end
 
   def self.post_grades_option
@@ -269,7 +269,7 @@ module Gradebook
   def self.select_total_column_option(menu_item_id = nil, already_open: false)
     unless already_open
       total_grade_column_header = f("#gradebook_grid .slick-header-column[id*='total_grade']")
-      total_grade_column_header.find_element(:css, '.Gradebook__ColumnHeaderAction').click
+      total_grade_column_header.find_element(:css, ".Gradebook__ColumnHeaderAction").click
     end
 
     if menu_item_id
@@ -278,9 +278,9 @@ module Gradebook
   end
 
   def self.open_assignment_options(cell_index)
-    assignment_cell = ff('#gradebook_grid .container_1 .slick-header-column')[cell_index]
+    assignment_cell = ff("#gradebook_grid .container_1 .slick-header-column")[cell_index]
     driver.action.move_to(assignment_cell).perform
-    trigger = assignment_cell.find_element(:css, '.Gradebook__ColumnHeaderAction')
+    trigger = assignment_cell.find_element(:css, ".Gradebook__ColumnHeaderAction")
     trigger.click
   end
 
@@ -291,11 +291,11 @@ module Gradebook
   end
 
   def self.gradebook_cell(x = 0, y = 0)
-    grading_cell(x, y).find_element(:css, '.gradebook-cell')
+    grading_cell(x, y).find_element(:css, ".gradebook-cell")
   end
 
   def self.gradebook_cell_percentage(x = 0, y = 0)
-    gradebook_cell(x, y).find_element(:css, '.percentage')
+    gradebook_cell(x, y).find_element(:css, ".percentage")
   end
 
   def self.student_cell(y = 0)
@@ -304,7 +304,7 @@ module Gradebook
   end
 
   def self.student_grades_link(student_cell)
-    student_cell.find_element(:css, '.student-grades-link')
+    student_cell.find_element(:css, ".student-grades-link")
   end
 
   def self.notes_cell(y = 0)
@@ -318,7 +318,7 @@ module Gradebook
 
   def self.select_section(section = nil)
     section = section.name if section.is_a?(CourseSection)
-    section ||= ''
+    section ||= ""
     section_dropdown.click
     filter_menu_item(section).click
     wait_for_ajaximations
@@ -338,24 +338,24 @@ module Gradebook
   end
 
   def self.show_notes
-    view_menu = open_gradebook_menu('View')
-    select_gradebook_menu_option('Notes', container: view_menu, role: 'menuitemcheckbox')
+    view_menu = open_gradebook_menu("View")
+    select_gradebook_menu_option("Notes", container: view_menu, role: "menuitemcheckbox")
     driver.action.send_keys(:escape).perform
   end
 
   def self.add_notes
     notes_cell(0).click
-    driver.action.send_keys('B').perform
+    driver.action.send_keys("B").perform
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
 
     notes_cell(1).click
-    driver.action.send_keys('A').perform
+    driver.action.send_keys("A").perform
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
 
     notes_cell(2).click
-    driver.action.send_keys('C').perform
+    driver.action.send_keys("C").perform
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
   end
@@ -413,11 +413,11 @@ module Gradebook
   # Semantic Methods for Gradebook Menus
 
   def self.open_gradebook_menu(name)
-    trigger = f('button', gradebook_menu(name))
+    trigger = f("button", gradebook_menu(name))
     trigger.click
 
     # return the finder of the popover menu for use elsewhere if needed
-    menu_container(trigger.attribute('id'))
+    menu_container(trigger.attribute("id"))
   end
 
   def self.view_options_menu_selector
@@ -429,11 +429,11 @@ module Gradebook
     trigger.click
 
     # return the finder of the popover menu for use elsewhere if needed
-    menu_container(trigger.attribute('id'))
+    menu_container(trigger.attribute("id"))
   end
 
   def self.open_view_menu_and_arrange_by_menu
-    view_menu = open_gradebook_menu('View')
+    view_menu = open_gradebook_menu("View")
     hover(view_menu_item("Arrange By"))
     view_menu
   end
@@ -460,15 +460,15 @@ module Gradebook
     slick_custom_col_cell
   end
 
-  def self.select_gradebook_menu_option(name, container: nil, role: 'menuitemradio')
+  def self.select_gradebook_menu_option(name, container: nil, role: "menuitemradio")
     gradebook_menu_option(name, container: container, role: role).click
   end
 
-  def self.gradebook_menu_options(container, role = 'menuitemradio')
+  def self.gradebook_menu_options(container, role = "menuitemradio")
     ff("[role*=#{role}]", container)
   end
 
-  def self.gradebook_menu_option(name = nil, container: nil, role: 'menuitemradio')
+  def self.gradebook_menu_option(name = nil, container: nil, role: "menuitemradio")
     menu_item_name = name
     menu_container = container
 
@@ -482,10 +482,10 @@ module Gradebook
   end
 
   def self.gradebook_menu_group(name, container: nil)
-    menu_group = ff('[id*=MenuItemGroup]', container).find { |el| el.text.strip =~ /#{name}/ }
+    menu_group = ff("[id*=MenuItemGroup]", container).find { |el| el.text.strip =~ /#{name}/ }
     return unless menu_group
 
-    menu_group_id = menu_group.attribute('id')
+    menu_group_id = menu_group.attribute("id")
     f("[role=group][aria-labelledby=#{menu_group_id}]")
   end
 
@@ -507,7 +507,7 @@ module Gradebook
 
   def self.popover_menu_item_checked?(menu_item_name)
     menu_item = view_arrange_by_submenu_item(menu_item_name)
-    menu_item.attribute('aria-checked')
+    menu_item.attribute("aria-checked")
   end
 
   def self.total_cell_warning_icon_select
@@ -515,7 +515,7 @@ module Gradebook
   end
 
   def self.open_display_dialog
-    select_total_column_option('grade-display-switcher')
+    select_total_column_option("grade-display-switcher")
   end
 
   def self.close_display_dialog
@@ -524,14 +524,14 @@ module Gradebook
 
   def self.toggle_grade_display
     open_display_dialog
-    dialog = fj('.ui-dialog:visible')
-    submit_dialog(dialog, '.ui-button')
+    dialog = fj(".ui-dialog:visible")
+    submit_dialog(dialog, ".ui-button")
   end
 
   def self.close_dialog_and_dont_show_again
-    dialog = fj('.ui-dialog:visible')
+    dialog = fj(".ui-dialog:visible")
     fj("#hide_warning").click
-    submit_dialog(dialog, '.ui-button')
+    submit_dialog(dialog, ".ui-button")
   end
 
   def self.content_selector
@@ -543,7 +543,7 @@ module Gradebook
   end
 
   def self.grading_period_dropdown_selector
-    '#grading-periods-filter-container input'
+    "#grading-periods-filter-container input"
   end
 
   def self.grading_period_dropdown
@@ -551,15 +551,15 @@ module Gradebook
   end
 
   def self.section_dropdown
-    f('#sections-filter-container input')
+    f("#sections-filter-container input")
   end
 
   def self.module_dropdown
-    f('#modules-filter-container input')
+    f("#modules-filter-container input")
   end
 
   def self.student_group_dropdown
-    f('#student-group-filter-container input')
+    f("#student-group-filter-container input")
   end
 
   def self.filter_menu_item(menu_item_name)
@@ -570,11 +570,12 @@ module Gradebook
   def self.gradebook_dropdown_item_click(menu_item_name)
     gradebook_menu_element.click
 
-    if menu_item_name == "Individual View"
+    case menu_item_name
+    when "Individual View"
       menu_item(INDIVIDUAL_VIEW_ITEM_SELECTOR).click
-    elsif menu_item_name == "Learning Mastery"
+    when "Learning Mastery"
       menu_item(LEARING_MASTERY_ITEM_SELECTOR).click
-    elsif menu_item_name == "Gradebook History"
+    when "Gradebook History"
       menu_item(GRADE_HISTORY_ITEM_SELECTOR).click
     end
   end
@@ -589,9 +590,9 @@ module Gradebook
   end
 
   def self.scores_scraped
-    class_names = ff('.total-cell.total_grade').map { |grade| fxpath('..', grade).attribute("class") }
-    user_ids = class_names.map { |name| name.match('student_([0-9]+)')[1] }
-    total_grades = ff('.total-cell.total_grade .grades').map { |grade| grade.text.split("%")[0] }
+    class_names = ff(".total-cell.total_grade").map { |grade| fxpath("..", grade).attribute("class") }
+    user_ids = class_names.map { |name| name.match("student_([0-9]+)")[1] }
+    total_grades = ff(".total-cell.total_grade .grades").map { |grade| grade.text.split("%")[0] }
     total_grades.map.with_index { |grade, index| { user_id: user_ids[index].to_i, score: grade.to_f } }
   end
 
@@ -613,13 +614,14 @@ module Gradebook
 
   def self.click_student_menu_sort_by(menu_option)
     student_column_menu.click
-    hover(student_header_menu_main_element('Sort by'))
+    hover(student_header_menu_main_element("Sort by"))
     wait_for_ajaximations
 
-    if menu_option == "A-Z"
-      student_header_submenu_item_element('A–Z').click
-    elsif menu_option == "Z-A"
-      student_header_submenu_item_element('Z–A').click
+    case menu_option
+    when "A-Z"
+      student_header_submenu_item_element("A–Z").click
+    when "Z-A"
+      student_header_submenu_item_element("Z–A").click
     end
   end
 
@@ -627,12 +629,13 @@ module Gradebook
     student_column_menu.click
     hover(student_header_menu_main_element("Display as"))
 
-    if menu_option == "First,Last"
-      student_header_submenu_item_element('First, Last Name').click
-    elsif menu_option == "Last,First"
-      student_header_submenu_item_element('Last, First Name').click
-    elsif menu_option == "Anonymous"
-      student_header_submenu_item_element('Anonymous').click
+    case menu_option
+    when "First,Last"
+      student_header_submenu_item_element("First, Last Name").click
+    when "Last,First"
+      student_header_submenu_item_element("Last, First Name").click
+    when "Anonymous"
+      student_header_submenu_item_element("Anonymous").click
     end
   end
 
@@ -640,14 +643,15 @@ module Gradebook
     student_column_menu.click
     hover(student_header_menu_main_element("Secondary info"))
 
-    if menu_option == "Section"
-      student_header_submenu_item_element('Section').click
-    elsif menu_option == "SIS"
-      student_header_submenu_item_element('SIS ID').click
-    elsif menu_option == "Login"
-      student_header_submenu_item_element('Login ID').click
-    elsif menu_option == "None"
-      student_header_submenu_item_element('None').click
+    case menu_option
+    when "Section"
+      student_header_submenu_item_element("Section").click
+    when "SIS"
+      student_header_submenu_item_element("SIS ID").click
+    when "Login"
+      student_header_submenu_item_element("Login ID").click
+    when "None"
+      student_header_submenu_item_element("None").click
     end
   end
 
@@ -671,7 +675,7 @@ module Gradebook
   end
 
   def self.assignment_names
-    ff('.assignment-name')
+    ff(".assignment-name")
   end
 
   def self.fetch_assignment_names
@@ -679,23 +683,24 @@ module Gradebook
   end
 
   def self.assignment_header_menu_trigger_element(assignment_name)
-    assignment_header_cell_element(assignment_name).find_element(:css, '.Gradebook__ColumnHeaderAction button')
+    assignment_header_cell_element(assignment_name).find_element(:css, ".Gradebook__ColumnHeaderAction button")
   end
 
   def self.assignment_header_menu_item_selector(item)
     menu_item_id = ""
 
-    if item =~ /curve(-?\s?grade)?/i
-      menu_item_id = 'curve-grades'
-    elsif item =~ /set(-?\s?default-?\s?grade)?/i
-      menu_item_id = 'set-default-grade'
+    case item
+    when /curve(-?\s?grade)?/i
+      menu_item_id = "curve-grades"
+    when /set(-?\s?default-?\s?grade)?/i
+      menu_item_id = "set-default-grade"
     end
 
     assignment_header_menu_item_element(menu_item_id)
   end
 
   def self.close_open_dialog
-    fj('.ui-dialog-titlebar-close:visible').click
+    fj(".ui-dialog-titlebar-close:visible").click
   end
 
   def self.select_filters
@@ -703,11 +708,12 @@ module Gradebook
   end
 
   def self.select_view_filter(filter)
-    if filter == "Grading Periods"
+    case filter
+    when "Grading Periods"
       show_grading_period_filter_element.click
-    elsif filter == "Modules"
+    when "Modules"
       show_module_filter_element.click
-    elsif filter == "Sections"
+    when "Sections"
       show_section_filter_element.click
     end
   end
@@ -728,14 +734,15 @@ module Gradebook
     assignment_header_menu_element(assignment_id).click
     menu_item_id = ""
 
-    if menuitem =~ /(message(-?\s?student)?)/i
-      menu_item_id = 'message-students-who'
-    elsif menuitem =~ /(curve(-?\s?grade)?)/i
-      menu_item_id = 'curve-grades'
-    elsif menuitem =~ /(set(-?\s?default-?\s?grade)?)/i
-      menu_item_id = 'set-default-grade'
-    elsif menuitem =~ /(download(-?\s?submission)?)/i
-      menu_item_id = 'download-submissions'
+    case menuitem
+    when /(message(-?\s?student)?)/i
+      menu_item_id = "message-students-who"
+    when /(curve(-?\s?grade)?)/i
+      menu_item_id = "curve-grades"
+    when /(set(-?\s?default-?\s?grade)?)/i
+      menu_item_id = "set-default-grade"
+    when /(download(-?\s?submission)?)/i
+      menu_item_id = "download-submissions"
 
     end
     assignment_header_menu_item_element(menu_item_id).click
@@ -747,16 +754,17 @@ module Gradebook
 
     sort_by_item = ""
 
-    if sort_type =~ /(low[\s\-]to[\s\-]high)/i
-      sort_by_item = 'Grade - Low to High'
-    elsif sort_type =~ /(high[\s\-]to[\s\-]low)/i
-      sort_by_item = 'Grade - High to Low'
-    elsif sort_type =~ /(missing)/i
-      sort_by_item = 'Missing'
-    elsif sort_type =~ /(late)/i
-      sort_by_item = 'Late'
-    elsif sort_type =~ /(unposted)/i
-      sort_by_item = 'Unposted'
+    case sort_type
+    when /(low[\s\-]to[\s\-]high)/i
+      sort_by_item = "Grade - Low to High"
+    when /(high[\s\-]to[\s\-]low)/i
+      sort_by_item = "Grade - High to Low"
+    when /(missing)/i
+      sort_by_item = "Missing"
+    when /(late)/i
+      sort_by_item = "Late"
+    when /(unposted)/i
+      sort_by_item = "Unposted"
     end
     assignment_header_popover_sub_item_element(sort_by_item).click
     driver.action.send_keys(:escape).perform
@@ -771,7 +779,7 @@ module Gradebook
   def self.enter_grade_as_popover_menu_item_checked?(grade_type)
     hover(assignment_header_popover_menu_element("Enter Grades as"))
     menu_item = assignment_header_popover_sub_item_element(grade_type)
-    menu_item.attribute('aria-checked')
+    menu_item.attribute("aria-checked")
   end
 
   def self.select_assignment_header_cell_element(name)
@@ -788,34 +796,37 @@ module Gradebook
 
   def self.click_assignment_group_header_options(group_name, sort_type)
     assignment_group_header_options_element(group_name).click
-    hover(student_header_menu_main_element('Sort by'))
+    hover(student_header_menu_main_element("Sort by"))
 
-    if sort_type == 'Grade - High to Low'
-      student_header_submenu_item_element('Grade - High to Low').click
-    elsif sort_type == 'Grade - Low to High'
-      student_header_submenu_item_element('Grade - Low to High').click
+    case sort_type
+    when "Grade - High to Low"
+      student_header_submenu_item_element("Grade - High to Low").click
+    when "Grade - Low to High"
+      student_header_submenu_item_element("Grade - Low to High").click
     end
   end
 
   def self.click_total_header_sort_by(sort_type)
     select_total_column_option
-    hover(student_header_menu_main_element('Sort by'))
+    hover(student_header_menu_main_element("Sort by"))
 
-    if sort_type == 'Grade - High to Low'
-      student_header_submenu_item_element('Grade - High to Low').click
-    elsif sort_type == 'Grade - Low to High'
-      student_header_submenu_item_element('Grade - Low to High').click
+    case sort_type
+    when "Grade - High to Low"
+      student_header_submenu_item_element("Grade - High to Low").click
+    when "Grade - Low to High"
+      student_header_submenu_item_element("Grade - Low to High").click
     end
   end
 
   def self.click_total_header_menu_option(main_menu)
     select_total_column_option
-    if main_menu == "Move to Front"
-      total_header_options_menu_item_element('Move to Front').click
-    elsif main_menu == "Move to End"
-      total_header_options_menu_item_element('Move to End').click
-    elsif main_menu == "Display as Points"
-      total_header_options_menu_item_element('Display as Points').click
+    case main_menu
+    when "Move to Front"
+      total_header_options_menu_item_element("Move to Front").click
+    when "Move to End"
+      total_header_options_menu_item_element("Move to End").click
+    when "Display as Points"
+      total_header_options_menu_item_element("Display as Points").click
     end
   end
 

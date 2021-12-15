@@ -34,7 +34,7 @@ module SupportHelpers
         run_fixer(SupportHelpers::Crocodoc::SubmissionFixer,
                   params[:assignment_id].to_i, params[:user_id].to_i)
       else
-        render plain: "Missing either assignment and/or user id parameters", status: 400
+        render plain: "Missing either assignment and/or user id parameters", status: :bad_request
       end
     end
   end

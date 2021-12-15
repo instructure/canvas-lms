@@ -26,7 +26,7 @@ class FileInContext
     end
 
     def destroy_queued_files
-      if @queued_files && !@queued_files.empty?
+      if @queued_files.present?
         Attachment.delay_if_production.destroy_files(@queued_files.map(&:id))
         @queued_files.clear
       end
@@ -37,16 +37,16 @@ class FileInContext
         @queued_files ||= []
         @queued_files += files
       else
-        files.each { |f| f.destroy }
+        files.each(&:destroy)
       end
     end
 
     def attach(context, filename, display_name: nil, folder: nil, explicit_filename: nil, allow_rename: false, md5: nil, migration_id: nil)
       display_name ||= File.split(filename).last
       if md5 && folder && !allow_rename
-        scope = context.attachments.where(:display_name => display_name, :folder => folder, :md5 => md5).not_deleted
+        scope = context.attachments.where(display_name: display_name, folder: folder, md5: md5).not_deleted
         if migration_id
-          scope = scope.where(:migration_id => [migration_id, nil]) # either find a previous copy or an unassociated match
+          scope = scope.where(migration_id: [migration_id, nil]) # either find a previous copy or an unassociated match
         end
         existing_att = scope.take
 
@@ -62,18 +62,18 @@ class FileInContext
 
       uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
-      @attachment = Attachment.new(:context => context, :display_name => display_name, :folder => folder)
+      @attachment = Attachment.new(context: context, display_name: display_name, folder: folder)
       Attachments::Storage.store_for_attachment(@attachment, uploaded_data)
       @attachment.filename = explicit_filename if explicit_filename
       @attachment.migration_id = migration_id
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 
-      destroy_files(@attachment.handle_duplicates(allow_rename ? :rename : :overwrite, :caller_will_destroy => true))
+      destroy_files(@attachment.handle_duplicates(allow_rename ? :rename : :overwrite, caller_will_destroy: true))
 
       @attachment
     ensure
-      uploaded_data.close if uploaded_data
+      uploaded_data&.close
     end
   end
 end

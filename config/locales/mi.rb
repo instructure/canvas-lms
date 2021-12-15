@@ -6,7 +6,7 @@
     number: {
       nth: {
         ordinals: lambda do |_key, _options|
-          ''
+          ""
         end,
 
         ordinalized: lambda do |_key, options|

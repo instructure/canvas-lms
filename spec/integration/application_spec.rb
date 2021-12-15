@@ -23,10 +23,10 @@ describe "site-wide" do
     consider_all_requests_local(false, &example)
   end
 
-  let(:x_canvas_meta) { 'X-Canvas-Meta' }
-  let(:x_canvas_user_id) { 'X-Canvas-User-Id' }
-  let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
-  let(:content_security_policy) { 'Content-Security-Policy' }
+  let(:x_canvas_meta) { "X-Canvas-Meta" }
+  let(:x_canvas_user_id) { "X-Canvas-User-Id" }
+  let(:x_canvas_real_user_id) { "X-Canvas-Real-User-Id" }
+  let(:content_security_policy) { "Content-Security-Policy" }
 
   it "renders 404 when user isn't logged in" do
     get "/dashbo"
@@ -35,14 +35,14 @@ describe "site-wide" do
 
   it "sets no-cache headers for html requests" do
     get "/login"
-    expect(response['Pragma']).to match(/no-cache/)
-    expect(response['Cache-Control']).to match(/no-store/)
+    expect(response["Pragma"]).to match(/no-cache/)
+    expect(response["Cache-Control"]).to match(/no-store/)
   end
 
   it "does not set no-cache headers for API/xhr requests" do
     get "/api/v1/courses"
-    expect(response['Pragma']).to be_nil
-    expect(response['Cache-Control']).not_to match(/no-store/)
+    expect(response["Pragma"]).to be_nil
+    expect(response["Cache-Control"]).not_to match(/no-store/)
   end
 
   it "sets the content-security-policy http header" do
@@ -53,7 +53,7 @@ describe "site-wide" do
 
   it "does not set content-security-policy when on a files domain" do
     user_session user_factory(active_all: true)
-    attachment_model(:context => @user)
+    attachment_model(context: @user)
     expect_any_instance_of(FilesController).to receive(:files_domain?).and_return(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
     expect(response[content_security_policy]).to be_nil
@@ -77,7 +77,7 @@ describe "site-wide" do
     it "sets action information in API requests" do
       course_with_teacher_logged_in
       get "/api/v1/courses/#{@course.id}"
-      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
+      expect(response[x_canvas_meta]).to match(/o=courses;n=show;/)
     end
 
     it "sets controller#action information in API requests on 500" do
@@ -86,16 +86,16 @@ describe "site-wide" do
       get "/api/v1/courses"
 
       assert_status(500)
-      expect(response[x_canvas_meta]).to match(%r{o=courses;n=index;})
+      expect(response[x_canvas_meta]).to match(/o=courses;n=index;/)
     end
 
     it "sets page view information in user requests" do
       course_with_teacher_logged_in
-      Setting.set('enable_page_views', 'db')
+      Setting.set("enable_page_views", "db")
       get "/courses/#{@course.id}"
-      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
-      expect(response[x_canvas_meta]).to match(%r{t=Course;})
-      expect(response[x_canvas_meta]).to match(%r{x=5.0;})
+      expect(response[x_canvas_meta]).to match(/o=courses;n=show;/)
+      expect(response[x_canvas_meta]).to match(/t=Course;/)
+      expect(response[x_canvas_meta]).to match(/x=5.0;/)
     end
   end
 
@@ -104,11 +104,11 @@ describe "site-wide" do
       course_with_teacher
 
       student_in_course
-      user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
+      user_with_pseudonym user: @student, username: "student@example.com", password: "password"
       @student_pseudonym = @pseudonym
 
-      account_admin_user :account => Account.site_admin
-      user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
+      account_admin_user account: Account.site_admin
+      user_with_pseudonym user: @admin, username: "admin@example.com", password: "password"
     end
 
     it "does not set the logged in user headers when no one is logged in" do
@@ -136,28 +136,28 @@ describe "site-wide" do
   context "breadcrumbs" do
     it "is absent for error pages" do
       get "/apagethatdoesnotexist"
-      expect(response.body).not_to match(%r{id="breadcrumbs"})
+      expect(response.body).not_to match(/id="breadcrumbs"/)
     end
 
     it "is absent for error pages with user info" do
       course_with_teacher
       get "/users/#{@user.id}/files/apagethatdoesnotexist"
-      expect(response.body.to_s).not_to match(%r{id="breadcrumbs"})
+      expect(response.body.to_s).not_to match(/id="breadcrumbs"/)
     end
   end
 
   context "policy cache" do
     it "clears the in-process policy cache between requests" do
       expect(AdheresToPolicy::Cache).to receive(:clear).with(no_args).once
-      get '/'
+      get "/"
     end
   end
 
   it "uses the real user's timezone and locale setting when masquerading as a fake student" do
     @fake_user = course_factory(active_all: true).student_view_student
 
-    user_with_pseudonym(:active_all => true)
-    account_admin_user(:user => @user)
+    user_with_pseudonym(active_all: true)
+    account_admin_user(user: @user)
     @user.time_zone = "Hawaii"
     @user.locale = "es"
     @user.save!
@@ -173,13 +173,13 @@ describe "site-wide" do
   end
 
   it "uses the masqueree's timezone and locale setting when masquerading" do
-    @other_user = user_with_pseudonym(:active_all => true)
+    @other_user = user_with_pseudonym(active_all: true)
     @other_user.time_zone = "Hawaii"
     @other_user.locale = "es"
     @other_user.save!
 
-    user_with_pseudonym(:active_all => true)
-    account_admin_user(:user => @user)
+    user_with_pseudonym(active_all: true)
+    account_admin_user(user: @user)
     user_session(@user)
 
     post "/users/#{@other_user.id}/masquerade"
@@ -195,10 +195,10 @@ describe "site-wide" do
       enable_forgery_protection do
         course_with_teacher
         student_in_course
-        user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
+        user_with_pseudonym(user: @student, username: "student@example.com", password: "password")
 
-        account_admin_user(:account => Account.site_admin)
-        user_with_pseudonym(:user => @admin, :username => 'admin@example.com', :password => 'password')
+        account_admin_user(account: Account.site_admin)
+        user_with_pseudonym(user: @admin, username: "admin@example.com", password: "password")
 
         user_session(@admin, @admin.pseudonyms.first)
         post "/users/#{@student.id}/masquerade"
@@ -218,12 +218,12 @@ describe "site-wide" do
   context "stringifying ids" do
     it "stringifies ids when objects are passed to render" do
       course_with_teacher_logged_in
-      user_with_pseudonym :username => 'blah'
+      user_with_pseudonym username: "blah"
       post "/courses/#{@course.id}/user_lists.json",
-           params: { :user_list => ['blah'], :search_type => 'unique_id', :v2 => true },
-           headers: { 'Accept' => 'application/json+canvas-string-ids' }
+           params: { user_list: ["blah"], search_type: "unique_id", v2: true },
+           headers: { "Accept" => "application/json+canvas-string-ids" }
       json = JSON.parse response.body
-      expect(json['users'][0]['user_id']).to be_a String
+      expect(json["users"][0]["user_id"]).to be_a String
     end
   end
 end

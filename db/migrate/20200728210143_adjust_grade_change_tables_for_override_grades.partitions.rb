@@ -36,7 +36,7 @@ class AdjustGradeChangeTablesForOverrideGrades < CanvasPartman::Migration
     with_each_partition do |partition|
       unless connection.foreign_key_exists?(partition, column: :grading_period_id)
         foreign_key = connection.send(:foreign_key_name, partition, column: :grading_period_id)
-        execute("ALTER TABLE #{connection.quote_table_name(partition)} ADD CONSTRAINT #{foreign_key} FOREIGN KEY (grading_period_id) REFERENCES #{connection.quote_table_name('grading_periods')} (id)")
+        execute("ALTER TABLE #{connection.quote_table_name(partition)} ADD CONSTRAINT #{foreign_key} FOREIGN KEY (grading_period_id) REFERENCES #{connection.quote_table_name("grading_periods")} (id)")
       end
     end
   end

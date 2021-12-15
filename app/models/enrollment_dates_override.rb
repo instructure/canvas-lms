@@ -25,8 +25,8 @@ class EnrollmentDatesOverride < ActiveRecord::Base
   after_save :update_courses_and_states_if_necessary
 
   def update_courses_and_states_if_necessary
-    if self.saved_changes?
-      self.enrollment_term.update_courses_and_states_later(self.enrollment_type)
+    if saved_changes?
+      enrollment_term.update_courses_and_states_later(enrollment_type)
     end
   end
 end

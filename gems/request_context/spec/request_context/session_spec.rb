@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 describe "RequestContext::Session" do
   it "finds the session_id from the rack session and add it a cookie" do
@@ -31,10 +31,10 @@ describe "RequestContext::Session" do
       end
     end
     Rails.application = app_class.new
-    env = { 'rack.session.options' => { id: 'abc' } }
-    RequestContext::Session.new(->(_env) {
+    env = { "rack.session.options" => { id: "abc" } }
+    RequestContext::Session.new(lambda do |_env|
       [200, {}, []]
-    }).call(env)
-    expect(env['action_dispatch.cookies']['log_session_id']).to eq 'abc'
+    end).call(env)
+    expect(env["action_dispatch.cookies"]["log_session_id"]).to eq "abc"
   end
 end

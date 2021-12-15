@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'lti2_spec_helper'
+require "lti2_spec_helper"
 
 describe AssignmentConfigurationToolLookup do
-  include_context 'lti2_spec_helper'
+  include_context "lti2_spec_helper"
 
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
   let(:test_id) { SecureRandom.uuid }
-  let(:stub_response) { double(code: 200, parsed_response: { 'Id' => test_id }, ok?: true) }
+  let(:stub_response) { double(code: 200, parsed_response: { "Id" => test_id }, ok?: true) }
   let(:assignment) { assignment_model(course: course) }
 
   before do
@@ -35,17 +35,17 @@ describe AssignmentConfigurationToolLookup do
     tool_proxy.save!
   end
 
-  describe '#lti_tool' do
-    it 'returns the tool associated by id if present (for backwards compatibility and future LTI 1)' do
+  describe "#lti_tool" do
+    it "returns the tool associated by id if present (for backwards compatibility and future LTI 1)" do
       lookup = assignment.assignment_configuration_tool_lookups.create!(
-        context_type: 'Account',
+        context_type: "Account",
         tool_id: message_handler.id,
-        tool_type: 'Lti::MessageHandler'
+        tool_type: "Lti::MessageHandler"
       )
       expect(lookup.lti_tool).to eq message_handler
     end
 
-    it 'returns the message handler associated by lti codes' do
+    it "returns the message handler associated by lti codes" do
       assignment.tool_settings_tool = message_handler
       assignment.save!
       lookup = assignment.assignment_configuration_tool_lookups.last
@@ -53,7 +53,7 @@ describe AssignmentConfigurationToolLookup do
     end
   end
 
-  describe '#resource_codes' do
+  describe "#resource_codes" do
     let(:expected_hash) do
       {
         product_code: product_family.product_code,
@@ -62,15 +62,15 @@ describe AssignmentConfigurationToolLookup do
       }
     end
 
-    it 'returns the resource codes when the tool is not set but the codes are' do
+    it "returns the resource codes when the tool is not set but the codes are" do
       lookup = AssignmentConfigurationToolLookup.create!(assignment: assignment, tool: message_handler)
       expect(lookup.resource_codes).to eq expected_hash
     end
 
-    it 'returns the resource codes when only the tool_id is set' do
+    it "returns the resource codes when only the tool_id is set" do
       lookup = AssignmentConfigurationToolLookup.create!(
         assignment: assignment,
-        tool_type: 'Lti::MessageHandler',
+        tool_type: "Lti::MessageHandler",
         tool_product_code: product_family.product_code,
         tool_vendor_code: product_family.vendor_code,
         tool_resource_type_code: resource_handler.resource_type_code
@@ -78,23 +78,23 @@ describe AssignmentConfigurationToolLookup do
       expect(lookup.resource_codes).to eq expected_hash
     end
 
-    it 'returns an empty hash when the tool is not a message handler' do
-      tool = course.context_external_tools.create!(name: "a", url: "http://www.test.com", consumer_key: '12345', shared_secret: 'secret')
+    it "returns an empty hash when the tool is not a message handler" do
+      tool = course.context_external_tools.create!(name: "a", url: "http://www.test.com", consumer_key: "12345", shared_secret: "secret")
       lookup = AssignmentConfigurationToolLookup.create(assignment: assignment, tool: tool)
       expect(lookup.resource_codes).to eq({})
     end
   end
 
-  describe '#configured_assignments' do
+  describe "#configured_assignments" do
     let(:assignment) do
-      a = course.assignments.new(title: 'Test Assignment')
-      a.workflow_state = 'published'
+      a = course.assignments.new(title: "Test Assignment")
+      a.workflow_state = "published"
       a.tool_settings_tool = message_handler
       a.save!
       a
     end
-    let(:root_account) { Account.create!(name: 'root account') }
-    let(:account) { Account.create!(name: 'account', root_account: root_account) }
+    let(:root_account) { Account.create!(name: "root account") }
+    let(:account) { Account.create!(name: "account", root_account: root_account) }
     let(:course) { Course.create!(account: account) }
 
     before do
@@ -103,22 +103,22 @@ describe AssignmentConfigurationToolLookup do
       assignment
     end
 
-    it 'finds configured assignments when installed in an account' do
+    it "finds configured assignments when installed in an account" do
       tool_proxy.update!(context: account)
       expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
     end
 
-    it 'finds configured assignments when installed in a root acocunt' do
+    it "finds configured assignments when installed in a root acocunt" do
       tool_proxy.update!(context: root_account)
       expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
     end
 
-    it 'finds configured assignments when installed in a course' do
+    it "finds configured assignments when installed in a course" do
       tool_proxy.update!(context: course)
       expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
     end
 
-    it 'handles multiple configured assignments' do
+    it "handles multiple configured assignments" do
       second_assignment = assignment.dup
       second_assignment.tool_settings_tool = message_handler
       second_assignment.lti_context_id = SecureRandom.uuid
@@ -128,11 +128,11 @@ describe AssignmentConfigurationToolLookup do
     end
   end
 
-  describe '#webhook_info' do
-    it 'shows the correct info' do
+  describe "#webhook_info" do
+    it "shows the correct info" do
       lookup = AssignmentConfigurationToolLookup.create!(
         assignment: assignment,
-        tool_type: 'Lti::MessageHandler',
+        tool_type: "Lti::MessageHandler",
         tool_product_code: product_family.product_code,
         tool_vendor_code: product_family.vendor_code,
         tool_resource_type_code: resource_handler.resource_type_code

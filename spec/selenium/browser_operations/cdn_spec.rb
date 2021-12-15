@@ -24,21 +24,21 @@
 # By putting them in spec/selenium, our build server will run them with the rest
 # of the browser specs, after it has compiled assets.
 
-require_relative '../common'
+require_relative "../common"
 
-RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/ # 10 chars of an MD5
+RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/.freeze # 10 chars of an MD5
 
-describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
+describe "Stuff related to how we load stuff from CDN and use brandable_css" do
   include_context "in-process server selenium tests"
 
   describe BrandableCSS do
-    describe 'cache_for' do
-      it 'finds the right fingerprints for normal bundles, plugins & handlebars' do
+    describe "cache_for" do
+      it "finds the right fingerprints for normal bundles, plugins & handlebars" do
         sample_bundles = {
-          'bundles/common' => false,
-          '../../gems/plugins/analytics/app/stylesheets/analytics' => false, # to test that it works with plugins
-          'jst/tinymce/EquationEditorView' => false, # to test that it works with handlebars-loaded css
-          'jst/messageStudentsDialog' => true
+          "bundles/common" => false,
+          "../../gems/plugins/analytics/app/stylesheets/analytics" => false, # to test that it works with plugins
+          "jst/tinymce/EquationEditorView" => false, # to test that it works with handlebars-loaded css
+          "jst/messageStudentsDialog" => true
         }
         sample_bundles.each do |bundle_name, includes_no_variables|
           fingerprints = BrandableCSS.variants.map do |variant|
@@ -48,13 +48,13 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
             data
           end
 
-          expect(fingerprints.length).to eq(8), 'We have 8 variants'
-          msg = 'make sure the combined results match the result of all_fingerprints_for'
+          expect(fingerprints.length).to eq(8), "We have 8 variants"
+          msg = "make sure the combined results match the result of all_fingerprints_for"
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
           next unless includes_no_variables
 
           msg = "all variants should output the same css if a bundle doesn't pull in the variables file"
-          unique_fingerprints = fingerprints.map { |f| f[:combinedChecksum] }.uniq
+          unique_fingerprints = fingerprints.pluck(:combinedChecksum).uniq
           expect(unique_fingerprints.length).to eq(1), msg
         end
       end
@@ -67,11 +67,11 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   end
 
   def check_css(bundle_name)
-    variant = 'new_styles_normal_contrast'
+    variant = "new_styles_normal_contrast"
     fingerprint = BrandableCSS.cache_for(bundle_name, variant)[:combinedChecksum]
     expect(fingerprint).to match(RE_SHORT_MD5)
     url = "#{app_url}/dist/brandable_css/#{variant}/#{bundle_name}-#{fingerprint}.css"
-    assert_tag('link', 'href', url)
+    assert_tag("link", "href", url)
   end
 
   def check_asset(tag, asset_path, skip_rev = false)
@@ -79,23 +79,23 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
       asset_path = Canvas::Cdn::RevManifest.url_for(asset_path)
       expect(asset_path).to be_present
     end
-    attribute = (tag == 'link') ? 'href' : 'src'
+    attribute = (tag == "link") ? "href" : "src"
     url = "#{app_url}#{asset_path}"
     assert_tag(tag, attribute, url)
   end
 
-  it 'has the right urls for script tag and stylesheets on the login page' do
+  it "has the right urls for script tag and stylesheets on the login page" do
     expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(app_url)
-    get '/login/canvas'
+    get "/login/canvas"
 
-    ['bundles/common', 'bundles/login'].each { |bundle| check_css(bundle) }
-    ['images/favicon-yellow.ico', 'images/apple-touch-icon.png'].each { |i| check_asset('link', i) }
-    optimized_js_flag = ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-    js_base_url = optimized_js_flag ? '/dist/webpack-production' : '/dist/webpack-dev'
+    ["bundles/common", "bundles/login"].each { |bundle| check_css(bundle) }
+    ["images/favicon-yellow.ico", "images/apple-touch-icon.png"].each { |i| check_asset("link", i) }
+    optimized_js_flag = ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
+    js_base_url = optimized_js_flag ? "/dist/webpack-production" : "/dist/webpack-dev"
 
-    check_asset('script', '/timezone/Etc/UTC.js')
-    check_asset('script', '/timezone/en_US.js')
-    Canvas::Cdn::RevManifest.all_webpack_chunks_for('main').each { |c| check_asset('script', "#{js_base_url}/#{c}", true) }
-    Canvas::Cdn::RevManifest.all_webpack_chunks_for('login').each { |c| check_asset('link', "#{js_base_url}/#{c}", true) }
+    check_asset("script", "/timezone/Etc/UTC.js")
+    check_asset("script", "/timezone/en_US.js")
+    Canvas::Cdn::RevManifest.all_webpack_chunks_for("main").each { |c| check_asset("script", "#{js_base_url}/#{c}", true) }
+    Canvas::Cdn::RevManifest.all_webpack_chunks_for("login").each { |c| check_asset("link", "#{js_base_url}/#{c}", true) }
   end
 end

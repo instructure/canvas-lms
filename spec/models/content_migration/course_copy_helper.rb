@@ -19,18 +19,18 @@
 
 shared_context "course copy" do
   before :once do
-    course_with_teacher(:course_name => "from course", :active_all => true)
+    course_with_teacher(course_name: "from course", active_all: true)
     @copy_from = @course
 
-    course_with_teacher(:user => @user, :course_name => "tocourse", :course_code => "tocourse")
+    course_with_teacher(user: @user, course_name: "tocourse", course_code: "tocourse")
     @copy_to = @course
 
     @cm = ContentMigration.new(
-      :context => @copy_to,
-      :user => @user,
-      :source_course => @copy_from,
-      :migration_type => 'course_copy_importer',
-      :copy_options => { :everything => "1" }
+      context: @copy_to,
+      user: @user,
+      source_course: @copy_from,
+      migration_type: "course_copy_importer",
+      copy_options: { everything: "1" }
     )
     @cm.migration_settings[:import_immediately] = true
     @cm.save!
@@ -46,7 +46,7 @@ shared_context "course copy" do
       expect("#{er.message} - #{er.backtrace}").to eq ""
     end
     expect(@cm.warnings).to match_array warnings
-    expect(@cm.workflow_state).to eq 'imported'
+    expect(@cm.workflow_state).to eq "imported"
     @copy_to.reload
   end
 
@@ -62,12 +62,12 @@ shared_context "course copy" do
 
   def run_import(export_attachment_id)
     @cm.set_default_settings
-    @cm.migration_type = 'canvas_cartridge_importer'
+    @cm.migration_type = "canvas_cartridge_importer"
     worker = CC::Importer::CCWorker.new
     @cm.attachment_id = export_attachment_id
     @cm.skip_job_progress = true
     worker.perform(@cm)
-    expect(@cm.workflow_state).to eq 'imported'
+    expect(@cm.workflow_state).to eq "imported"
     @copy_to.reload
   end
 
@@ -92,7 +92,7 @@ shared_context "course copy" do
     lo = LearningOutcome.new
     lo.context = context
     lo.short_description = "haha_#{rand(10_000)}"
-    lo.data = { :rubric_criterion => { :mastery_points => 3, :ratings => [{ :description => "Exceeds Expectations", :points => 5 }], :description => "First outcome", :points_possible => 5 } }
+    lo.data = { rubric_criterion: { mastery_points: 3, ratings: [{ description: "Exceeds Expectations", points: 5 }], description: "First outcome", points_possible: 5 } }
     lo.save!
     if group
       group.add_outcome(lo)
@@ -107,11 +107,11 @@ shared_context "course copy" do
     rubric_context ||= @copy_from
     @rubric = rubric_context.rubrics.new
     @rubric.title = "Rubric"
-    @rubric.data = [{ :ratings => [{ :criterion_id => "309_6312", :points => 5.5, :description => "Full Marks", :id => "blank", :long_description => "" }, { :criterion_id => "309_6312", :points => 0, :description => "No Marks", :id => "blank_2", :long_description => "" }], :points => 5.5, :description => "Description of criterion", :id => "309_6312", :long_description => "" }]
+    @rubric.data = [{ ratings: [{ criterion_id: "309_6312", points: 5.5, description: "Full Marks", id: "blank", long_description: "" }, { criterion_id: "309_6312", points: 0, description: "No Marks", id: "blank_2", long_description: "" }], points: 5.5, description: "Description of criterion", id: "309_6312", long_description: "" }]
     @rubric.save!
 
-    @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
-    @assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+    @assignment = @copy_from.assignments.create!(title: "some assignment", points_possible: 12)
+    @assoc = @rubric.associate_with(@assignment, @copy_from, purpose: "grading", use_for_grading: true)
     @assoc.hide_score_total = true
     @assoc.use_for_grading = true
     @assoc.save!

@@ -43,7 +43,7 @@ module RspecMockAnyInstantiation
     end
 
     def instantiate(record, column_types = {}, &block)
-      if (obj = @@any_instantiation[[base_class, record['id'].to_i]])
+      if (obj = @@any_instantiation[[base_class, record["id"].to_i]])
         obj
       else
         super
@@ -51,7 +51,7 @@ module RspecMockAnyInstantiation
     end
 
     def instantiate_instance_of(klass, record, column_types = {}, &block)
-      if (obj = @@any_instantiation[[klass, record['id'].to_i]])
+      if (obj = @@any_instantiation[[klass, record["id"].to_i]])
         obj
       else
         super
@@ -66,7 +66,7 @@ module RspecMockAnyInstantiation
 
   def expect_any_instantiation_of(ar_object)
     ActiveRecord::Base.add_any_instantiation(ar_object)
-    expect(ar_object)
+    expect(ar_object) # rubocop:disable RSpec/VoidExpect we return the expectation object to the caller
   end
 end
 ActiveRecord::Base.singleton_class.prepend(RspecMockAnyInstantiation::ClassMethods)

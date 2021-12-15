@@ -6,7 +6,7 @@ ja:
   1_item_scores_examplescores_9736236: "1- 項目スコア：%{exampleScores}"
   1_user_found_76399771: "1 人のユーザが見つかりました。"
   1st_reviewer_3c1d0119: 1番目の評価者
-  25th_75th_ile_406a67bf: "25パーセンタイル-75 %iタイル"
+  25th_75th_ile_406a67bf: 25パーセンタイル-75パーセンタイル
   25th_75th_percentile_aa4c11f2: 25パーセンタイル-75パーセンタイル
   2_final_score_7b0fd15e: "2- 最終スコア"
   2_final_score_exampleresult_922edf9c: "2- 最終スコア：%{exampleResult}"
@@ -315,6 +315,7 @@ ja:
     turnitin_pledge: この課題提出物は私自身のものであり、オリジナルの研究結果です
   account_97b34646: アカウント
   account_account_b6b3746b: "アカウント：%{account}"
+  account_administrators_can_always_create_courses_926dc0cb: アカウント管理者は常にコースを作成可能
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: アカウントおよびコースレベルの成果の達成度スケール
   account_and_course_level_outcome_proficiencies_1cfa260: アカウントおよびコースレベルの成果の熟達度
   account_and_subaccount_40c6430: アカウントとサブアカウント
@@ -427,6 +428,7 @@ ja:
       login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
       unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
   account_course_and_user_search_22bf297a: アカウントコースとユーザーの検索
+  account_creation_still_in_progress_ac0e0a18: アカウント作成はまだ進行中
   account_domain_78f43049: "アカウント ドメイン"
   account_domain_lookups_f9d1147e: "アカウント ドメイン ルックアップ"
   account_groups_2f301732: アカウントグループ
@@ -981,10 +983,10 @@ ja:
       custom_reports: 
         end: 
           parameters: 
-            header: 登録状態
+            header: "終了日:"
         start: 
           parameters: 
-            header: 登録状態
+            header: "開始日:"
     default_account_quotas_not_updated: "デフォルトのアカウント クォータは更新されませんでした"
     default_account_quotas_updated: "デフォルトのアカウント クォータが更新されました"
     devry: 
@@ -1201,7 +1203,7 @@ ja:
       account_reports: 
         pearson: 
           outcome: 
-            text: "コース Sis ID"
+            text: "コース Sis ＩＤ"
     proserve_all_versions_submissions_csv_parameters: 
       account_reports: 
         proserv: 
@@ -1347,7 +1349,7 @@ ja:
         media_quota: "メディア クォータ"
         site_admin_quotas: サイト管理者のクォータ
         student_quota: 受講生のクォータ
-        update: イベントの更新
+        update: 更新
       account_roles: "アカウントの役割:"
       account_settings_title: アカウント設定
       add_a_custom_help_link: "カスタム ヘルプ リンクを追加する"
@@ -1530,7 +1532,7 @@ ja:
       open_registration_delegated_warning_tooltip: "外部 ID プロバイダーが有効です"
       open_report_description: レポートの説明を開く
       page_header_title: アカウント設定
-      page_title: 共有コンテンツ
+      page_title: アカウント設定
       quiz_ip_filters_delete: クイズIPフィルターを削除
       quiz_ip_filters_help_message: |-
           クイズ IP フィルタは、クイズへのアクセスを、指定の IP 範囲内にあるコンピュータに制限するための一手段です。
@@ -1737,7 +1739,7 @@ ja:
       account_reports: 
         pearson: 
           outcome: 
-            text: "コース Sis ID"
+            text: "コース Sis ＩＤ"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1825,7 +1827,7 @@ ja:
       account_reports: 
         pearson: 
           outcome: 
-            text: "コース Sis ID"
+            text: "コース Sis ＩＤ"
     wssu: 
       user_access: 
         parameters: 
@@ -2337,6 +2339,7 @@ ja:
       ディスカッションの返信を作成
       タイムスタンプに従って並べ替えることができます。ルートレベルの応答のデフォルトの順序は、新しいものから古いもの順になります。
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 講師が未採点の提出物に一括してスコアを適用できるようにします。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: コースコンテンツの移行時に学習結果を選択できるようにします
   allows_modifying_notification_settings_for_any_cou_5004ac71: アカウントレベルの通知設定ページ内で、任意のコースの通知設定を変更することができます。
   allows_setting_account_course_level_mastery_scales_1939e0fd: アカウントおよびコースレベルの達成度スケールと計算方法を設定し、結果ごとの基準の評価と計算方法を置き換えできるようにします
@@ -3171,9 +3174,9 @@ ja:
   and_more_not_shown_here_7842765e: "...そして、ここに掲載されていないものがさらに"
   ange_name: "Angel コンバータ"
   angel: 
-    file_copy_fail: "フォルダ 「%{base_path}」 をコピーできませんでした\""
-    file_copy_fail_message: "デイレクトリをパス 「%{path}」 に名前を変更できませんでした\""
-    file_import_fail: "ファイル 「%{file_path}」 をインポートできませんでした\""
+    file_copy_fail: "フォルダ 「%{base_path}」 をコピーできませんでした"
+    file_copy_fail_message: "デイレクトリをパス 「%{path}」 に名前を変更できませんでした"
+    file_import_fail: "ファイル 「%{file_path}」 をインポートできませんでした"
   angel_display: "ANGEL 学習"
   angel_file_description: "Angel から .zip 形式でエクスポート"
   annotated_document_submission_d9ff236a: 注釈付きドキュメントの提出
@@ -3275,6 +3278,7 @@ ja:
   anonymous_submission_assignment_title_896654de: "匿名での提出：%{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "匿名での提出コメント：受講生 (%{id}) %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "匿名での提出コメント：受講生 (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: このトピックを表示するには、「ディスカッション/通知の再デザイン」機能のフラグがオンになっていなければなりません。
   anonymous_turned_off_8118a0b: 匿名がオフになりました。
   anonymous_turned_on_fe56f997: 匿名がオンになりました。
   anonymous_user: 匿名のユーザー
@@ -3374,6 +3378,7 @@ ja:
   apply_date_range_selection_cc4351ed: 日付範囲選択を適用する
   apply_filter_7e4f6113: フィルターを適用する
   apply_filters_note_clicking_this_button_will_cause_753f04: フィルターを適用する。注：このボタンをクリックすると、ページが再読み込みされます。
+  apply_score_to_ungraded_afd025d0: 未採点の提出物にスコアを適用する
   apply_settings_10409ad9: 設定を適用する
   apply_theme_7af08387: テーマを適用
   applying_new_styles_to_subaccounts_e8aeeef2: サブアカウントに新しいスタイルを適用
@@ -6692,7 +6697,7 @@ ja:
         default_select_folder: フォルダの選択
         upload_to: アップロード先
       import_quizzes_next_view: 
-        import_new_quizzes: 評価コンテンツを新クイズとしてインポートする
+        import_new_quizzes: 評価コンテンツを*新クイズ*としてインポートする
         import_new_quizzes_help_text: "新しいクイズは Canvas の新しい評価エンジンです。%{p_p}詳しくは、システム管理者にお問い合わせいただくか、こちらをご覧ください："
         import_quizzesNext_help_label: 評価を新クイズヘルプアイコンとしてインポートする
         import_quizzesNext_help_text: "Quizzes.Next は Canvas の新しい評価エンジンです。%{p_p}詳しくは、システム管理者にお問い合わせいただくか、こちらをご覧ください："
@@ -7765,6 +7770,7 @@ ja:
       file_meta: ファイルのメタデータをエクスポートできませんでした
       files: 一部のファイルをエクスポートできませんでした
       grading_standards: 採点基準をエクスポートできませんでした
+      late_policy: 遅延ポリシーのエクスポートに失敗しました
       learning_outcomes: 学習成果をエクスポートできませんでした
       lti_links: 一部の外部ツール構成をエクスポートできませんでした
       media_file: "メディア ファイルのエクスポートに失敗しました"
@@ -8650,6 +8656,7 @@ ja:
   create_an_ba36d171: （）を作成
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: 採点対象と非採点対象の両方のオンラインクイズとサーベイを作成し、管理します。
   create_announcements_above_1c36202b: 上記のアナウンスメントを作成する
+  create_anonymous_discussion_topics_d573e88e: 匿名のディスカッショントピックを作成する
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       採点対象の課題として、またはアイデアや情報を共有するためのフォ
                 ーラムとして、必要なだけディスカッショントピックを作成します。
@@ -9878,6 +9885,7 @@ ja:
             考察は、掘り下げた、または長期に及ぶ考察を整理しておくために最適で、
             焦点を絞った考察は、短期間の意見交換に最適です。
   discussions_announcements_redesign_901c5528: ディスカッション/通知の再デザイン
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "ディスカッション/通知の再デザイン調査 - 匿名"
   discussions_create_94dff604: "ディスカッション - 作成"
   discussions_index_menu_42591bc9: ディスカッションインデックスメニュー
   discussions_menu_f18eb4a2: ディスカッションメニュー
@@ -10301,7 +10309,7 @@ ja:
       formatting: 書式設定、押して選択
       rte_help: リッチテキストエリア。ヘルプへは、ALT+F8を押してください
   editor_button_6647db9c: エディタのボタン
-  either_course_or_student_c42bb055: 「コース」または「受講生」のいずれか'
+  either_course_or_student_c42bb055: 「コース」または「受講生」のいずれか
   either_groupid_or_outcomeid_values_are_required_1ea29e33: groupIdまたはoutcomeIdのいずれかの値が必要です
   either_the_url_or_domain_should_be_set_c29cf8c1: "URL またはドメインのどちらか一方を設定する必要があります。"
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: あなたは新しいユーザーであるか、最後に同意して以降、*利用規約*が変更されています。続行する前に*利用規約*に同意してください。
@@ -11005,10 +11013,10 @@ ja:
   example_final_score_a92b30b9: "最終スコアの例]]"
   example_https_example_com_config_xml_be5f36ac: "例: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "例: https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "例：「https://schoolofrock.catalog.instructure.com」\""
-  example_https_schoolofrock_edu_d4326f03: "例：「https://schoolofrock.edu」\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "例：「https://schoolofrock.catalog.instructure.com」"
+  example_https_schoolofrock_edu_d4326f03: "例：「https://schoolofrock.edu」"
   example_item_scores_6726c689: アイテムのスコアの例
-  example_school_of_rock_41f32c31: 例：「ロックスクール」"
+  example_school_of_rock_41f32c31: 例：「ロックスクール」
   exceeds_expectations_5910fc3a: 期待値を超えている
   exceeds_mastery_1f995dce: 熟達を上回る
   excelsior_student_activity_tracking_7a1ba44d: 優秀な受講生アクティビティの追跡
@@ -11264,6 +11272,7 @@ ja:
   failed_to_load_apps_db37e651: アプリを読み込めませんでした。
   failed_to_load_apps_for_name_fc6ce1c: "%{name}にアプリを読み込めませんでした。"
   failed_to_load_assignments_in_important_dates_ce3b4227: 重要な日付の課題の読み込みに失敗しました。
+  failed_to_load_conversation_messages_9b4546fc: 会話メッセージの読み込みに失敗しました。
   failed_to_load_course_navigation_for_name_aded3650: "%{name}のコースナビゲーションを読み込めませんでした。"
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: コースを読み込めませんでした。ページを更新して再試行してください。
   failed_to_load_csp_information_try_refreshing_the__4a056997: CSP情報を読み込めませんでした。ページを更新してみてください。
@@ -11345,6 +11354,7 @@ ja:
   feature_options_enable_disable_7e748054: "機能オプション - 有効/無効"
   feature_options_view_a170e80c: "機能オプション - 表示"
   feature_preview_5e1216a0: 機能プレビュー
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "機能のプレビュー - この機能を選択すると、通常のリリーススケジュール以外の継続的なアップデートが含まれます。"
   feature_previews_2700a397: 機能プレビュー
   feature_previews_account_settings_274440bc: 機能プレビュー(アカウント設定)
   feature_previews_enable_disable_707af910: "機能プレビュー - 有効 / 無効"
@@ -11711,6 +11721,7 @@ ja:
   full_name_23fdfb6d: "フル ネーム"
   full_name_83cf5453: "フル ネーム"
   full_name_is_required_8efbdc84: フルネームは必須項目です
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "全部: 生徒の名前とプロフィール写真は非表示になります。"
   future_5416ea92: 今後
   future_terms_7fba2ae6: 未来の用語
   galician_7e4508b5: ガリシア語
@@ -13229,6 +13240,7 @@ ja:
   handlebars_helpers: 
     time: 
       event: "%{date} おいて%{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "は、このアカウントの Canvas インスタンスが存在する地域に基づいて自動的に選択されています。場合によっては、異なる地域となることもあります。"
   has_similarity_score_d5f332b4: 類似スコアあり
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Turnitin スコアがあります"
@@ -13634,6 +13646,7 @@ ja:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: 無効にしても、ユーザーは引き続きコース設定にアクセスできます。ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、個々のコースの内容を管理することはできません。コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
   if_disabled_user_will_still_have_access_to_course__fbf32c87: 無効にしても、ユーザーは引き続きコース設定にアクセスできます。
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "有効にすると、LTI 1.3およびLTI Advantage へのアクセスが有効になります。"
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: 有効にすると、モジュールインデックスからモーダル経由でのディープリンクが可能になります。
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: 有効にすると、モジュールインデックスからのディープリンクが可能になります。
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 有効にすると、結果の最大可能スコア以上が規定で許可されます。
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: 有効な場合、課題やモジュールに複数のディープリンクサポートを許可します。
@@ -13992,8 +14005,8 @@ ja:
   include_scores_when_alerting_about_grade_changes_623ec201: 成績変更に関するアラートには、スコアを記載してください。
   include_scores_when_alerting_about_grades_89728ae1: 成績に関する通知をする場合は、スコアを含むようにしてください。
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
-      成績に関するアラートには、スコアを記載してください。
-                使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
+      成績についてアラートするときにスコアを含めます。
+      あなたのメールが教育機関のメールでない場合、機密性の高いコンテンツが教育機関外に送信されることになります。
   include_speedgrader_in_assignment_header_menu_69cd8656: 課題ヘッダメニューにSpeedGraderを含める
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "ドキュメントの HEAD に Datadog RUM JS エージェントを含めます。"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
@@ -14089,7 +14102,7 @@ ja:
   instructor_is_working_on_grades_135388d2: インストラクタが採点中です
   instructor_messages_a4c28674: インストラクターのメッセージ
   instructor_name_36bc0f39: 講師名
-  instructor_sis_id_899dd697: "講師 Sis ID"
+  instructor_sis_id_899dd697: "講師 Sis ＩＤ"
   instructors_4b491a07: 講師
   instructors_cdd595d0: 講師
   instructure: 
@@ -14256,6 +14269,8 @@ ja:
                                     Slack内の#canvas-sre までお問い合わせください。
   invalid_restrictions_316cd740: 無効な制限
   invalid_score_3d247da7: 無効なスコア
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "無効なsftpユーザー名です。in .instructureで終わるドメインがないため、使用するユーザー名を決定できませんでした。\n\
+      \x20                             #Slack 内の canvas-sre にお問い合わせください。   "
   invalid_sis_sync_status_b68db497: SISの同期ステータスが無効です
   invalid_state_parameter_7a5aa108: 無効な状態パラメータ
   invalid_submission_file_type_cda6742a: 送信ファイルの種類が無効
@@ -14845,6 +14860,7 @@ ja:
   loading_comment_library_3131e5c6: コメントライブラリを読み込み中
   loading_comments_32366acf: コメントを読み込む
   loading_compose_modal_f6da0e8b: 作成モーダルの読み込み中
+  loading_conversation_messages_71e9050e: 会話メッセージの読み込み
   loading_courses_409a3641: コース読み込み中
   loading_courses_bd1bffe: コースの読み込み中...
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -14855,6 +14871,7 @@ ja:
   loading_discussions_8ed5fcd7: ディスカッションを読み込み中
   loading_external_tool_d839042c: 外部ツールを読み込み中
   loading_f99d93d4: "...読込み中"
+  loading_feature_options_82e07ee4: 機能オプションの読み込み
   loading_features_d26820f6: 機能を読み込んでいます
   loading_folders_d8b5869e: フォルダを読み込み中...
   loading_graders_f6a76142: 採点者の読み込み
@@ -16197,7 +16214,6 @@ ja:
             
             %{course}さん、Canvas Network のあなたのコースが2，3日前に開始しましたが、あなたはまだログインしていないようです。忘れている場合を想定して、最後にいちどリマインダを送っています。
             
-            
             ログインするには、%{site}に進んでユーザ名とパスワードを入力してください。まだパスワードを設定していない場合は、ここで設定できます：%{password_url}
             
             もし、都合が合わずにこのコースを受講できない場合は、%{site}次のサイトでコースカタログを閲覧して、他のコースを探してみてください。常に新しいコースが追加されています！
@@ -16244,7 +16260,6 @@ ja:
             何か準備のためにできることはありますか？
             
             まだ Canvas Network のプロフィールを作成がまだなら、Canvas.net にログインして設定してください。プロフィールを用意しておくと、コースに参加している他の人があなたについて知るのに役立ちます。そこでは、通知の設定を行うこともできます。
-            
             
             最後に、あなたのコースに必要な教材や説明書をここで確認することができます。%{url}
             
@@ -17276,6 +17291,7 @@ ja:
   mfa_required_ca66e177: MFAは必須
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP 成績のエクスポート"
+  miami_utilization_report_9c927880: "Miami Utilization のレポート"
   mic_a7f3d311: マイク
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 では、チームに最大%{max}名のメンバーが許可されます。"
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365では、チーム内に最大%{max}名の所有者が許可されます。"
@@ -17560,6 +17576,8 @@ ja:
   modules_group_menu_4aae0d5f: モジュールグループメニュー
   modules_home_page_568c6bb9: モジュールホームページ
   modules_index_menu_c8748e7c: モジュールインデックスメニュー
+  modules_index_menu_modal_79123a19: モジュールインデックスメニュー（モーダル）
+  modules_index_menu_tray_3f9975d9: モジュールインデックスメニュー（トレイ）
   modules_item_controller: 
     max_score_complete: "*スコア* 以内のスコアです"
     max_score_incomplete: "スコアは *スコア* 以内にしてください"
@@ -17927,8 +17945,8 @@ ja:
       ているお客様は、割り当てデータ検証ワークフローを強化するよう、
       機能を有効にしてください。この機能を有効にすると、アカウント
       設定内にSIS Sync用の新しいSIS統合設定が表示されます
-      （課題レベルグレードパスバック）。SISへの投稿機能プレビューがこの新しい
-      設定に組み入れられ、デフォルトで有効になります。
+      （課題レベルグレードパスバック）。SISへの投稿機能オプショ
+      ンがこの新しい設定に組み入れられ、デフォルトで有効になります。
   new_slack_api_key_453d04d: "新しい Slack Api キー"
   new_topic_for_course_3d98222a: "%{course} の新しいトピック:"
   new_typography_4eaeca26: 新しいタイポグラフィー
@@ -18209,7 +18227,7 @@ ja:
     blueprint_description: |-
         *インストラクターと管理者のみ：*
         
-              コンテンツが青写真コースから関連コースに同期されました
+        コンテンツが青写真コースから関連コースに同期されました
     blueprint_display: 青写真同期
     calendar_description: "コース カレンダーの新しいアイテムおよび変更されたアイテム"
     calendar_display: カレンダー
@@ -18244,7 +18262,7 @@ ja:
     content_link_error_description: |-
         *講師と管理者のみ：*
         
-                受講生がやりとりしたに失敗したリンクの場所とコンテンツ
+        受講生がやりとりしたに失敗したリンクの場所とコンテンツ
     content_link_error_display: コンテンツリンクエラー
     conversation_created_description: 会話を作成しました
     conversation_created_display: 自分が作成した会話
@@ -18253,9 +18271,9 @@ ja:
     course_content_description: |-
         コース内容に変更：
         
-              * ページの内容
-              * クイズの内容
-              * 課題の内容
+        * ページの内容
+        * クイズの内容
+        * 課題の内容
     course_content_display: コースの内容
     discussion_description: コースの新しいディスカッショントピック
     discussion_display: 新規トピック
@@ -18268,8 +18286,8 @@ ja:
     grading_description: |-
         以下を含みます：
         
-              * 課題/提出物の成績入力済み/変更済み
-              * 成績の重み付けが変更されました
+        * 課題/提出物の成績入力済み/変更済み
+        * 成績の重み付けが変更されました
     grading_display: 採点
     grading_notify_include_grade: 成績変更に関するアラートには、スコアを記載してください。
     grading_policies_description: コースの採点方針の変更
@@ -18277,21 +18295,21 @@ ja:
     invitation_description: |-
         ～への招待：
         
-              * ウェブ会議
-              * グループ
-              * コラボレーション
-              * ピアレビュー＆リマインダ
+        * ウェブ会議
+        * グループ
+        * コラボレーション
+        * ピアレビュー＆リマインダ
     invitation_display: 招待
     late_grading_description: |-
         *インストラクタおよび管理者のみ:*
         
-              課題提出遅延
+        課題提出遅延
     late_grading_display: 遅延採点
     membership_update_description: |-
         *管理者のみ: 保留中登録のアクティブ化*
         
-              * グループ登録
-              * 受諾/拒否
+        * グループ登録
+        * 受諾/拒否
     membership_update_display: メンバーシップの更新
     missing_description_description: "%{category} のお知らせに対して"
     missing_display_display: "%{category} のお知らせに対して"
@@ -18376,19 +18394,19 @@ ja:
     other_description: |-
         *インストラクタおよび管理者のみ:*
         
-              * コース登録
-              * レポート生成
-              * コンテンツのエクスポート
-              * 移行レポート
-              * 新規アカウント ユーザ
-              * 新規受講生グループ
+        * コース登録
+        * レポート生成
+        * コンテンツのエクスポート
+        * 移行レポート
+        * 新規アカウント ユーザ
+        * 新規受講生グループ
     other_display: 管理のお知らせ
     recording_ready_display: 録音準備ができました
     reminder_display: 事前通知
     student_appointment_description: |-
         *インストラクタおよび管理者のみ:*
         
-              受講生の予定のサインアップ
+        受講生の予定のサインアップ
     student_appointment_display: 受講生の予定のサインアップ
     submission_comment_description: 課題提出物のコメント
     submission_comment_display: 提出コメント
@@ -18582,6 +18600,7 @@ ja:
   of_students_5d1af0d2: 受講生数
   off_5385ef3f: オフ
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "オフ - このサブアカウントにはポリシーは適用されません"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "オフ: 生徒の名前とプロフィール写真がこのコースの他のメンバーに表示されます"
   offensive_abusive_c41dcb08: 攻撃的、罵倒的
   offline_score_8d7b4779: オフラインスコア：
   offline_web_export_dca67174: オフラインウェブエクスポート
@@ -18691,6 +18710,7 @@ ja:
   open_this_keyboard_shortcuts_dialog_9658b83a: このキーボードショートカットダイアログを開く
   open_title_in_a_new_window_b29fed77: "%{title} を新しいウィンドウで表示"
   open_to_comments_23d5585e: コメントを受け付ける
+  open_to_do_items_in_a_new_tab_120ea5f4: "新しいタブでTo Do アイテムを開く"
   openid_connect_initiation_url_d9037d30: "* OpenID 接続開始 Url"
   opens_in_new_window_b4b99243: 新しいウィンドウで開きます
   option_1_dea39f90: オプション1
@@ -19256,6 +19276,7 @@ ja:
   please_provide_a_pairing_code_530d1e9d: ペアリングコードを記入してください。
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "有効なメールアドレスを提供してください。Azure Active Directoryの設定を確認すると見つけかります。"
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "これが解決されない場合は、Slack の #canvas-sre にご連絡ください。"
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "#canvas-sre の Slack にお問い合わせください。このお客様の Canvas インスタンスがある地域は、SFTP をサポートしていません。"
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "このアカウントに SFTP を作成するにはは、Slack の #canvas-sre にご連絡ください。"
   please_select_a_group_set_for_this_assignment_e1da63d3: "この課題に対するグループ セットを選択してください"
   please_select_a_reason_for_reporting_this_reply_51719e8d: この返信を報告する理由を選択してください
@@ -21684,7 +21705,7 @@ ja:
           time_elapsed: 経過時間
           time_running: 経過時間
         links: 
-          hide_time_running: 非表示
+          hide_time_running: 時間を非表示にする
           keep_editing_quiz: このクイズの編集を続行
           keep_editing_survey: このサーベイの編集を続行
     retrieving_filters: フィルタを取得しています...
@@ -21743,7 +21764,7 @@ ja:
       errors: 
         connection_lost: "%{host} への接続が失われました。続行する前に、インターネットに接続していることを確認してください。"
         only_numerical_values: 数値のみで入力してください
-      hide_time_link: 非表示
+      hide_time_link: 時間を非表示にする
       hours_count: 
         one: "%{count} 時間"
         other: "%{count} 時間"
@@ -21774,7 +21795,7 @@ ja:
       seconds_count: 
         one: "%{count} 秒"
         other: "%{count} 秒"
-      show_time_link: 表示
+      show_time_link: 時間を表示する
       titles: 
         come_back_later: この問題に、後で戻ってくるためのマークを付けました
         times_up: 制限時間になりました!
@@ -23412,8 +23433,12 @@ ja:
   settings_for_title_label_e103bdd6: "～の設定%{title_label}"
   settings_tutorial_tray_6f37761b: セッティングのチュートリアルトレイ
   setup_checklist_eb8b00b8: 設定チェックリスト
+  sftp_key_added_to_user_it_can_take_up_to_four_hour_8791e3c3: |-
+      ユーザに SFTP キーが追加されました。このキーが使えるようになるまで、最大
+                                    4時間かかることがあります。
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: SFTPキーが無効です。正しくフォーマットされていることを確認してください。
   sftp_key_removed_from_user_42318725: SFTPキーがユーザから削除されました。
+  sftp_region_invalid_216caa40: "SFTP の地域が無効です"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       SFTPユーザはすでに存在しますが無効です。
                                     Slack内の #canvas-sre までお問い合わせください。
@@ -25952,6 +25977,7 @@ ja:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "この ePortfolio は、スパムとして識別されています。現在、管理者と作成者にのみ表示されています。このコンテンツがスパムではない確信がある場合は、「安全」としてマークできます。"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: この機能は、アカウント内のすべてのコースの既存データに影響します。
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: この機能は、アカウント全体の既存のデータに影響します。
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: この機能では、教師が匿名のディスカッションを作成したり、コースレベルの設定で教師が学生が匿名のディスカッションを作成できるようにすることができます。
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: この機能では、教師が単一項目を1つのコースから別のコースに簡単にコピーでき、またそれらの項目をコースにインポートすることもできるように、単一項目コンテンツを他のユーザーと共有することができます。
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: この機能を有効にしたサブアカウントまたはコースが少なくとも1つ存在するため、この機能を無効にすることができません。
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: フィールドセパレータの自動検出が有効な場合、この機能を有効にすることはできません
@@ -26148,7 +26174,6 @@ ja:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       このレポートは、全コースまたは
         指定された期間の全コースに登録されたユーザのすべてのアクティビティを表示します。結果の csv ファイルは、受講生の
-        
         アクティビティごとに1行となり、以下を持ちます：ヘッダー、セクション id、セクション sis id、
         セクション名、コース id、コース sis id、コース名、期間 id、期間 sis id、
         期間名、ユーザ id、ユーザ sis id、ユーザ名、コンテンツタイプ、コンテンツ、コンテンツ閲覧回数、
@@ -26191,6 +26216,7 @@ ja:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: このユーザーは、このコースにアクセスすることはできません。
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: 「このユーザーは、このコースにアクセスすることはできません」
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: このユーザーは、匿名がオフの間に操作を実行しました
+  this_user_will_be_created_in_3b2a2b52: このユーザが作成されます。
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: 成績表のこのバージョンは、2020年1月18日以前に更新された成績表に置き換えられています。
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       これは質問の画像ですでに発生していましたが、
@@ -27557,7 +27583,7 @@ ja:
   uri_redirect_uri_d4aad2b9: "URI:%{redirect_uri}"
   url_22a5f3b8: URL
   url_8c4ff7d2: Url
-  url_cc9398ca: "URL:"
+  url_cc9398ca: URL：
   url_is_required_4689ed84: URLが必要です
   url_preview_5d1f4a4e: "URL のプレビュー"
   url_submission_f76327e3: "URL 提出"
@@ -28138,7 +28164,7 @@ ja:
   users_manage_login_details_9462b30f: "ユーザー - ログインの詳細を管理する"
   users_manage_observers_126f03a3: "ユーザー - オブザーバーを管理する"
   users_manage_students_in_courses_d6168815: "ユーザー - コースで受講生を管理する"
-  users_matching_search_term_c604db9e: "「%{search_term}」と一致するユーザ\""
+  users_matching_search_term_c604db9e: "「%{search_term}」と一致するユーザ"
   users_moderate_content_36d6eed7: "ユーザー - 中程度のコンテンツ"
   users_observers_e0e66c52: "ユーザー - オブザーバー"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: スクリーンリーダーのユーザーは、これらのキーボードショートカットを使用するために、バーチャルカーソルをオフにすることが必要になる可能性があります
@@ -28203,6 +28229,7 @@ ja:
   view_description_b6d8e52b: 説明を表示
   view_due_items_due_today_for_course_coursename_129e433: "コース%{courseName}の今日が期限の%{due}項目の表示"
   view_faculty_journals_ad0e8c8f: 講師日誌を表示する
+  view_feature_options_at_an_account_level_a84cedbe: アカウントレベルでの機能オプションの表示
   view_feature_settings_at_an_account_level_ec7f5e10: 機能設定をアカウントレベルで表示する
   view_feedback_b88c99c: フィードバックを見る
   view_feedback_f2feabca: フィードバックの表示
@@ -28404,6 +28431,7 @@ ja:
       このフラグを有効にすると、受講生プランナーのCanvas calendar eventsに
       「参加」ボタンが表示されます
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: このフラグを有効にすると、ダッシュボードにオブザーバー用の受講生ピッカーが表示されます。
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: この設定を有効にすると、教師のToDoアイテムが自動的に新しいタブで開かれます。
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: 有効にすると、コースディスカッションで「@mention」（言及）機能がオンになります。
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: 匿名の課題の成績を非表示にすると、成績は、コースの人すべてに非表示になります。匿名は再適用されます。
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "メンバーがコースにアクセスすると、このページが表示されます。アクティビティ ストリーム、コース モジュールのリスト、要綱、その他のカスタム ページを表示するように設定できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。"

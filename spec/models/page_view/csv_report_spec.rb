@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe PageView::CSVReport do
   let(:pagination_stub) do
@@ -44,7 +44,7 @@ describe PageView::CSVReport do
     end
 
     it "accumulates until it has enough" do
-      Setting.set('page_views_csv_export_rows', 2)
+      Setting.set("page_views_csv_export_rows", 2)
       pv1 = page_view_model
 
       report = PageView::CSVReport.new(@user)
@@ -54,7 +54,7 @@ describe PageView::CSVReport do
     end
 
     it "returns the exact amount" do
-      Setting.set('page_views_csv_export_rows', 3)
+      Setting.set("page_views_csv_export_rows", 3)
       pv1 = page_view_model
       pv2 = page_view_model
 
@@ -73,7 +73,7 @@ describe PageView::CSVReport do
       csv = PageView::CSVReport.new(@user).generate
       rows = CSV.parse(csv, headers: true)
       expect(rows.length).to eq 2
-      expect(rows.map { |x| x['request_id'] }.sort).to eq [pv1.id, pv2.id].sort
+      expect(rows.map { |x| x["request_id"] }.sort).to eq [pv1.id, pv2.id].sort
     end
   end
 end

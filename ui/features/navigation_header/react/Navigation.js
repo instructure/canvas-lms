@@ -28,7 +28,7 @@ import UnreadCounts from './UnreadCounts'
 import preventDefault from 'prevent-default'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import tourPubSub from '@canvas/tour-pubsub'
-import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
+import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))

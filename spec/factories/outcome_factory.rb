@@ -25,7 +25,7 @@ module Factories
       outcome_group = opts.delete(:outcome_group) || LearningOutcomeGroup.find_or_create_root(nil, true)
       @outcome = LearningOutcome.new(valid_outcome_attributes.merge(opts))
     else
-      context = opts.delete(:context) || @context || course_model(:reusable => true)
+      context = opts.delete(:context) || @context || course_model(reusable: true)
       outcome_context = opts.delete(:outcome_context) || context
       outcome_group = opts.delete(:outcome_group) || context.root_outcome_group
       @outcome = outcome_context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
@@ -39,17 +39,17 @@ module Factories
 
   def valid_outcome_attributes
     {
-      :title => 'first new outcome',
-      :description => '<p>new outcome</p>'
+      title: "first new outcome",
+      description: "<p>new outcome</p>"
     }
   end
 
   def valid_outcome_data
     {
-      :mastery_points => 3,
-      :ratings => [
-        { :points => 3, :description => "Rockin" },
-        { :points => 0, :description => "Lame" }
+      mastery_points: 3,
+      ratings: [
+        { points: 3, description: "Rockin" },
+        { points: 0, description: "Lame" }
       ]
     }
   end
@@ -69,8 +69,8 @@ module Factories
 
   def valid_outcome_group_attributes
     {
-      :title => 'new outcome group',
-      :description => '<p>outcome group description</p>'
+      title: "new outcome group",
+      description: "<p>outcome group description</p>"
     }
   end
 
@@ -79,9 +79,9 @@ module Factories
     @outcome_group ||= context.root_outcome_group
     @outcome = opts[:outcome] || outcome_model(context: context,
                                                outcome_context: opts[:outcome_context] || context,
-                                               title: 'new outcome',
-                                               description: '<p>This is <b>awesome</b>.</p>',
-                                               calculation_method: 'highest')
+                                               title: "new outcome",
+                                               description: "<p>This is <b>awesome</b>.</p>",
+                                               calculation_method: "highest")
     [opts[:outcome_context], context].compact.uniq.each do |ctxt|
       root = ctxt.root_outcome_group
       root.add_outcome(@outcome)
@@ -89,42 +89,42 @@ module Factories
     end
 
     rubric_params = {
-      :title => opts[:title] || 'My Rubric',
-      :hide_score_total => false,
-      :criteria => {
+      title: opts[:title] || "My Rubric",
+      hide_score_total: false,
+      criteria: {
         "0" => {
-          :points => 3,
-          :mastery_points => opts[:mastery_points] || 0,
-          :description => "Outcome row",
-          :long_description => @outcome.description,
-          :ratings => {
+          points: 3,
+          mastery_points: opts[:mastery_points] || 0,
+          description: "Outcome row",
+          long_description: @outcome.description,
+          ratings: {
             "0" => {
-              :points => 3,
-              :description => "Rockin'",
+              points: 3,
+              description: "Rockin'",
             },
             "1" => {
-              :points => 0,
-              :description => "Lame",
+              points: 0,
+              description: "Lame",
             }
           },
-          :learning_outcome_id => @outcome.id
+          learning_outcome_id: @outcome.id
         },
         "1" => {
-          :points => 5,
-          :description => "no outcome row",
-          :long_description => 'non outcome criterion',
-          :ratings => {
+          points: 5,
+          description: "no outcome row",
+          long_description: "non outcome criterion",
+          ratings: {
             "0" => {
-              :points => 5,
-              :description => "Amazing",
+              points: 5,
+              description: "Amazing",
             },
             "1" => {
-              :points => 3,
-              :description => "not too bad",
+              points: 3,
+              description: "not too bad",
             },
             "2" => {
-              :points => 0,
-              :description => "no bueno",
+              points: 0,
+              description: "no bueno",
             }
           }
         }

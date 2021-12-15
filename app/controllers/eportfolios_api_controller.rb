@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
-require 'securerandom'
+require "atom"
+require "securerandom"
 
 # @API ePortfolios
 #
@@ -142,7 +142,7 @@ class EportfoliosApiController < ApplicationController
 
     params[:include] ||= []
     scope = user.eportfolios
-    if user == @current_user || params[:include].exclude?('deleted')
+    if user == @current_user || params[:include].exclude?("deleted")
       scope = scope.active
     end
 
@@ -174,7 +174,7 @@ class EportfoliosApiController < ApplicationController
     if portfolio.destroy
       render json: eportfolio_json(portfolio, @current_user, session)
     else
-      render json: { error: 'There was an error destroying the ePortfolio' }, status: :bad_request
+      render json: { error: "There was an error destroying the ePortfolio" }, status: :bad_request
     end
   end
 
@@ -234,7 +234,7 @@ class EportfoliosApiController < ApplicationController
     elsif user.eportfolios.active.update_all(spam_status: params[:spam_status], updated_at: Time.now.utc)
       render json: :success
     else
-      render json: { error: 'There was an error bulk updating the spam status' }, status: :bad_request
+      render json: { error: "There was an error bulk updating the spam status" }, status: :bad_request
     end
   end
 
@@ -251,7 +251,7 @@ class EportfoliosApiController < ApplicationController
     if portfolio.restore
       render json: eportfolio_json(portfolio, @current_user, session)
     else
-      render json: { error: 'There was an error restoring the ePortfolio' }, status: :bad_request
+      render json: { error: "There was an error restoring the ePortfolio" }, status: :bad_request
     end
   end
 end

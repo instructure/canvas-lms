@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative 'gradebook_grade_detail_tray_page'
+require_relative "../../common"
+require_relative "gradebook_grade_detail_tray_page"
 
 module Gradebook
   class Cells
@@ -64,7 +64,7 @@ module Gradebook
       end
 
       def grade_tray_button_selector
-        '.Grid__GradeCell__Options button'
+        ".Grid__GradeCell__Options button"
       end
 
       def grade_tray_button
@@ -86,11 +86,11 @@ module Gradebook
       end
 
       def select_scheme_grade(student, assignment, grade)
-        select_grade_from_menu(student, assignment, grade, 'GradingScheme')
+        select_grade_from_menu(student, assignment, grade, "GradingScheme")
       end
 
       def select_complete_incomplete_grade(student, assignment, grade)
-        select_grade_from_menu(student, assignment, grade, 'CompleteIncomplete')
+        select_grade_from_menu(student, assignment, grade, "CompleteIncomplete")
       end
 
       def select_grade_from_menu(student, assignment, grade, menu_selector)
@@ -99,7 +99,7 @@ module Gradebook
         button = grading_cell_menu_button(student, assignment, menu_selector: menu_selector)
         button.click
 
-        grade_item = ff("ul[aria-labelledby='#{button.attribute('id')}'] li").detect do |element|
+        grade_item = ff("ul[aria-labelledby='#{button.attribute("id")}'] li").detect do |element|
           element.text.chomp == grade # find exact grade match "B+" != "B"
         end
         grade_item.click

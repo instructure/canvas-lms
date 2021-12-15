@@ -17,25 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_context 'name_bookmarker_base_shared_examples' do
+RSpec.shared_context "name_bookmarker_base_shared_examples" do
   let(:account) { account_model }
 
-  shared_examples_for 'a bookmarker for models with names' do
-    let(:model_base_scope) { raise 'to be implemented by examples' }
-    let(:model_factory_proc) { raise 'to be implemented by examples' }
-    let(:model_name_proc) { lambda { |model| model.name } }
+  shared_examples_for "a bookmarker for models with names" do
+    let(:model_base_scope) { raise "to be implemented by examples" }
+    let(:model_factory_proc) { raise "to be implemented by examples" }
+    let(:model_name_proc) { ->(model) { model.name } }
 
     {
-      simple_lowercase: ['aaa', 'bbb', 'ccc'],
-      simple_alphanumeric: ['Model0', 'Model1', 'Model2'],
-      all_equal: ['Abc', 'Abc', 'Abc'],
-      spaces: [' Abc', 'A bc', 'Abc '],
-      casing: ['abc', 'Abc', 'ABC'],
-      diacritics: ['a', 'á', 'ä'],
-      diacritic_casing: ['Á', 'Á', 'á', 'á'],
-      natural_numbers: ['100', '101', '11', '12'],
-      letter_plus_natural_numbers: ['a 100', 'a 101', 'a 11', 'a 12'],
-      hanzi: ['我', '很', '好']
+      simple_lowercase: %w[aaa bbb ccc],
+      simple_alphanumeric: %w[Model0 Model1 Model2],
+      all_equal: %w[Abc Abc Abc],
+      spaces: [" Abc", "A bc", "Abc "],
+      casing: %w[abc Abc ABC],
+      diacritics: %w[a á ä],
+      diacritic_casing: %w[Á Á á á],
+      natural_numbers: %w[100 101 11 12],
+      letter_plus_natural_numbers: ["a 100", "a 101", "a 11", "a 12"],
+      hanzi: %w[我 很 好]
     }.each do |test_name, model_names|
       context "test set #{test_name}" do
         let!(:models) do
@@ -51,7 +51,7 @@ RSpec.shared_context 'name_bookmarker_base_shared_examples' do
           expect((first_page + next_page).sort).to eq(models.sort)
         end
 
-        it 'orders bookmarks in Ruby the same way as the items returned from the database' do
+        it "orders bookmarks in Ruby the same way as the items returned from the database" do
           pager = double(current_bookmark: nil, include_bookmark: false)
           from_db = described_class.restrict_scope(model_base_scope, pager).to_a
           bookmark_order = models.sort_by { |model| described_class.bookmark_for(model) }
@@ -63,54 +63,54 @@ RSpec.shared_context 'name_bookmarker_base_shared_examples' do
       end
     end
 
-    describe '.bookmark_for' do
-      let(:model) { model_factory_proc[account, 'ABc'] }
+    describe ".bookmark_for" do
+      let(:model) { model_factory_proc[account, "ABc"] }
 
-      shared_examples_for 'a bookmark that bases the first value on some form of the name' do
+      shared_examples_for "a bookmark that bases the first value on some form of the name" do
         before do
           allow(BookmarkedCollection).to \
-            receive(:best_unicode_collation_key).with('?')
+            receive(:best_unicode_collation_key).with("?")
                                                 .and_return(Arel.sql(best_unicode_collation_key_for_questionmark))
         end
 
-        it 'uses the expected value in the first key in the bookmark' do
+        it "uses the expected value in the first key in the bookmark" do
           expect(described_class.bookmark_for(model)).to eq(
-            [bookmark_expected_first_value, model.id, 'ABc']
+            [bookmark_expected_first_value, model.id, "ABc"]
           )
         end
       end
 
-      context 'when the database uses as-is collation (e.g. non-postgres)' do
-        it_behaves_like 'a bookmark that bases the first value on some form of the name' do
-          let(:best_unicode_collation_key_for_questionmark) { '?' }
-          let(:bookmark_expected_first_value) { 'ABc' }
+      context "when the database uses as-is collation (e.g. non-postgres)" do
+        it_behaves_like "a bookmark that bases the first value on some form of the name" do
+          let(:best_unicode_collation_key_for_questionmark) { "?" }
+          let(:bookmark_expected_first_value) { "ABc" }
         end
       end
 
-      context 'when the database uses lower-case bytea' do
-        it_behaves_like 'a bookmark that bases the first value on some form of the name' do
+      context "when the database uses lower-case bytea" do
+        it_behaves_like "a bookmark that bases the first value on some form of the name" do
           let(:best_unicode_collation_key_for_questionmark) do
             "CAST(LOWER(replace(?, '\\', '\\\\')) AS bytea)"
           end
-          let(:bookmark_expected_first_value) { 'abc' }
+          let(:bookmark_expected_first_value) { "abc" }
         end
       end
 
-      context 'when the database uses public.collkey collation' do
-        it_behaves_like 'a bookmark that bases the first value on some form of the name' do
+      context "when the database uses public.collkey collation" do
+        it_behaves_like "a bookmark that bases the first value on some form of the name" do
           let(:best_unicode_collation_key_for_questionmark) do
             "public.collkey(?, 'root', false, 3, true)"
           end
-          let(:bookmark_expected_first_value) { Canvas::ICU.collation_key('ABc') }
+          let(:bookmark_expected_first_value) { Canvas::ICU.collation_key("ABc") }
         end
       end
 
-      context 'when the database uses COLLATE collation' do
-        it_behaves_like 'a bookmark that bases the first value on some form of the name' do
+      context "when the database uses COLLATE collation" do
+        it_behaves_like "a bookmark that bases the first value on some form of the name" do
           let(:best_unicode_collation_key_for_questionmark) do
             '(? COLLATE "public"."und-u-kn-true")'
           end
-          let(:bookmark_expected_first_value) { Canvas::ICU.collation_key('ABc') }
+          let(:bookmark_expected_first_value) { Canvas::ICU.collation_key("ABc") }
         end
       end
     end

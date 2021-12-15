@@ -22,13 +22,13 @@ class AddReplicaIdentityForEnrollmentStates < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'EnrollmentState', :root_account_id, 0
+    add_replica_identity "EnrollmentState", :root_account_id, 0
     remove_index :enrollment_states, column: :root_account_id, if_exists: true
   end
 
   def down
     add_index :enrollment_states, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'EnrollmentState'
+    remove_replica_identity "EnrollmentState"
     change_column_null :enrollment_states, :root_account_id, true
   end
 end

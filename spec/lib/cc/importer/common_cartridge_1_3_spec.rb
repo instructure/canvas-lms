@@ -17,34 +17,34 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../cc_spec_helper'
+require_relative "../cc_spec_helper"
 
-require 'tmpdir'
+require "tmpdir"
 
 describe "Standard Common Cartridge importing" do
-  context 'in a cartridge' do
+  context "in a cartridge" do
     before(:once) do
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/asmnt_example.zip")
       unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+      converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
       converter.export
       @course_data = converter.course.with_indifferent_access
-      @course_data['all_files_export'] ||= {}
-      @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+      @course_data["all_files_export"] ||= {}
+      @course_data["all_files_export"]["file_path"] = @course_data["all_files_zip"]
 
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
     it "imports assignments" do
       expect(@course.assignments.count).to eq 1
       a = @course.assignments.first
-      expect(a.title).to eq 'Cool Assignment'
+      expect(a.title).to eq "Cool Assignment"
       expect(a.points_possible).to eq 11
       att = @course.attachments.where(migration_id: "extensionresource1").first
-      expect(a.description.gsub("\n", '')).to eq "You should turn this in for points.<ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
+      expect(a.description.delete("\n")).to eq "You should turn this in for points.<ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
       a.submission_types = "online_upload,online_text_entry,online_url"
     end
 
@@ -55,17 +55,17 @@ describe "Standard Common Cartridge importing" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/#{filename}")
     unzipped_file_path = create_temp_dir!
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi',
-                                                      :base_download_dir => unzipped_file_path, :content_migration => @migration)
+    @migration = ContentMigration.create(context: @course)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi",
+                                                      base_download_dir: unzipped_file_path, content_migration: @migration)
     converter.convert
     @course_data = converter.course.with_indifferent_access
 
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
-  context 'in a flat file' do
+  context "in a flat file" do
     before(:once) do
       import_from_file("flat_imsmanifest.xml")
     end
@@ -73,7 +73,7 @@ describe "Standard Common Cartridge importing" do
     it "imports assignments" do
       expect(@course.assignments.count).to eq 1
       a = @course.assignments.first
-      expect(a.title).to eq 'Cool Assignment'
+      expect(a.title).to eq "Cool Assignment"
     end
 
     it "imports links into the module" do
@@ -96,43 +96,43 @@ describe "Standard Common Cartridge importing" do
       m = @course.context_modules.first
 
       # assignment
-      expect(m.content_tags[0].content.workflow_state).to eq 'unpublished'
+      expect(m.content_tags[0].content.workflow_state).to eq "unpublished"
       # discussion
-      expect(m.content_tags[1].content.workflow_state).to eq 'unpublished'
+      expect(m.content_tags[1].content.workflow_state).to eq "unpublished"
       # weblink
-      expect(m.content_tags[2].workflow_state).to eq 'unpublished'
+      expect(m.content_tags[2].workflow_state).to eq "unpublished"
       # lti launch
-      expect(m.content_tags[3].workflow_state).to eq 'unpublished'
+      expect(m.content_tags[3].workflow_state).to eq "unpublished"
     end
 
     it "marks teacher role webcontent as locked and hidden" do
-      att = @course.attachments.where(migration_id: 'Resource5').first
+      att = @course.attachments.where(migration_id: "Resource5").first
       expect(att.locked?).to eq true
     end
   end
 
-  context 'variant support' do
+  context "variant support" do
     before(:once) do
       import_from_file("flat_imsmanifest_with_variants.xml")
     end
 
     it "imports supported variant" do
-      expect(@course.assignments.where(migration_id: 'Resource1')).to be_exists
+      expect(@course.assignments.where(migration_id: "Resource1")).to be_exists
       expect(@course.assignments.count).to eq 1
     end
 
     it "ignores non-preferred variant" do
-      expect(@course.discussion_topics.where(migration_id: 'Resource2')).not_to be_exists
-      expect(@course.discussion_topics.where(migration_id: 'Resource10')).not_to be_exists
+      expect(@course.discussion_topics.where(migration_id: "Resource2")).not_to be_exists
+      expect(@course.discussion_topics.where(migration_id: "Resource10")).not_to be_exists
       expect(@course.discussion_topics.count).to eq 2
     end
 
     it "references preferred variant in module" do
       m = @course.context_modules.first
-      expect(m.content_tags[0].content.migration_id).to eq 'Resource1'
-      expect(m.content_tags[1].content.migration_id).to eq 'Resource3' # also tests "should follow variant chain to end"
+      expect(m.content_tags[0].content.migration_id).to eq "Resource1"
+      expect(m.content_tags[1].content.migration_id).to eq "Resource3" # also tests "should follow variant chain to end"
       expect(m.content_tags[2].url).to eq "https://example.com/3" # also tests "should ignore not-supported preferred variant"
-      expect(m.content_tags[3].content.migration_id).to eq 'Resource8'
+      expect(m.content_tags[3].content.migration_id).to eq "Resource8"
     end
 
     it "does not loop on circular references" do
@@ -150,21 +150,21 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
-  context 'flat manifest with qti' do
+  context "flat manifest with qti" do
     before(:once) do
       skip unless Qti.qti_enabled?
 
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_inline_qti.zip")
       unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+      converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
       converter.export
       @course_data = converter.course.with_indifferent_access
-      @course_data['all_files_export'] ||= {}
-      @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+      @course_data["all_files_export"] ||= {}
+      @course_data["all_files_export"]["file_path"] = @course_data["all_files_zip"]
 
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 

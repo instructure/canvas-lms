@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/collaborations/index" do
   before do
@@ -28,15 +28,15 @@ describe "/collaborations/index" do
   end
 
   it "renders" do
-    render 'collaborations/index'
+    render "collaborations/index"
     expect(response).not_to be_nil
   end
 
   it "provides labels for accessibility devices i.e. screen readers" do
-    render :partial => "collaborations/forms"
+    render partial: "collaborations/forms"
     expect(response).not_to be_nil
-    expect(response).to have_tag("label[for=collaboration_title]", :text => "Document name:")
-    expect(response).to have_tag("label[for=collaboration_description]", :text => "Description:")
-    expect(response).to have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
+    expect(response).to have_tag("label[for=collaboration_title]", text: "Document name:")
+    expect(response).to have_tag("label[for=collaboration_description]", text: "Description:")
+    expect(response).to have_tag("label[for=collaboration_collaboration_type]", text: "Collaborate using:")
   end
 end

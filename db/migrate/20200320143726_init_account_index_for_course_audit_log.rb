@@ -22,7 +22,7 @@ class InitAccountIndexForCourseAuditLog < ActiveRecord::Migration[5.2]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.up

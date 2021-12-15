@@ -23,7 +23,7 @@ describe DynamicSettings do
   before do
     @cached_config = DynamicSettings.config
     @cached_fallback_data = DynamicSettings.fallback_data
-    fake_conf_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))
+    fake_conf_location = Pathname.new(File.join(File.dirname(__FILE__), "fixtures"))
     allow(Rails).to receive(:root).and_return(fake_conf_location)
   end
 
@@ -38,15 +38,15 @@ describe DynamicSettings do
     DynamicSettings.reset_cache!
   end
 
-  let(:parent_key) { 'rich-content-service' }
+  let(:parent_key) { "rich-content-service" }
   let(:kv_client) { DynamicSettings.kv_client }
   let(:valid_config) do
     {
-      'host' => 'consul',
-      'port' => 8500,
-      'ssl' => true,
-      'acl_token' => 'some-long-string',
-      'environment' => 'rspec',
+      "host" => "consul",
+      "port" => 8500,
+      "ssl" => true,
+      "acl_token" => "some-long-string",
+      "environment" => "rspec",
     }
   end
 
@@ -56,11 +56,11 @@ describe DynamicSettings do
       expect(Diplomat.configuration.url.to_s).to eq("https://consul:8500")
     end
 
-    it 'must pass through timeout settings to the underlying library' do
+    it "must pass through timeout settings to the underlying library" do
       DynamicSettings.config = valid_config.merge({
-                                                    'connect_timeout' => 1,
-                                                    'send_timeout' => 2,
-                                                    'receive_timeout' => 3,
+                                                    "connect_timeout" => 1,
+                                                    "send_timeout" => 2,
+                                                    "receive_timeout" => 3,
                                                   })
 
       options = Diplomat.configuration.options
@@ -69,39 +69,39 @@ describe DynamicSettings do
       expect(options[:request][:read_timeout]).to eq 3
     end
 
-    it 'must capture the environment name when supplied' do
+    it "must capture the environment name when supplied" do
       DynamicSettings.config = valid_config.merge({
-                                                    'environment' => 'foobar'
+                                                    "environment" => "foobar"
                                                   })
 
-      expect(DynamicSettings.environment).to eq 'foobar'
+      expect(DynamicSettings.environment).to eq "foobar"
     end
   end
 
-  describe '.fallback_data =' do
-    it 'must provide indifferent access on resulting proxy' do
-      DynamicSettings.fallback_data = { foo: 'bar' }
+  describe ".fallback_data =" do
+    it "must provide indifferent access on resulting proxy" do
+      DynamicSettings.fallback_data = { foo: "bar" }
       proxy = DynamicSettings.root_fallback_proxy
-      expect(proxy['foo']).to eq 'bar'
-      expect(proxy[:foo]).to eq 'bar'
+      expect(proxy["foo"]).to eq "bar"
+      expect(proxy[:foo]).to eq "bar"
     end
 
-    it 'must clear the fallback when passed nil' do
-      DynamicSettings.fallback_data = { foo: 'bar' }
+    it "must clear the fallback when passed nil" do
+      DynamicSettings.fallback_data = { foo: "bar" }
       DynamicSettings.fallback_data = nil
       proxy = DynamicSettings.root_fallback_proxy
-      expect(proxy['foo']).to be_nil
+      expect(proxy["foo"]).to be_nil
     end
   end
 
-  describe '.find' do
+  describe ".find" do
     context "when consul is configured" do
       before do
         DynamicSettings.config = valid_config
       end
 
-      it 'must return a PrefixProxy when consul is configured' do
-        proxy = DynamicSettings.find('foo')
+      it "must return a PrefixProxy when consul is configured" do
+        proxy = DynamicSettings.find("foo")
         expect(proxy).to be_a(DynamicSettings::PrefixProxy)
       end
     end
@@ -110,11 +110,11 @@ describe DynamicSettings do
       let(:data) do
         {
           config: {
-            canvas: { foo: { bar: 'baz' } },
-            frobozz: { some: { thing: 'magic' } }
+            canvas: { foo: { bar: "baz" } },
+            frobozz: { some: { thing: "magic" } }
           },
           private: {
-            canvas: { zab: { rab: 'oof' } }
+            canvas: { zab: { rab: "oof" } }
           }
         }
       end
@@ -128,41 +128,41 @@ describe DynamicSettings do
         DynamicSettings.fallback_data = nil
       end
 
-      it 'must return an empty FallbackProxy when fallback data is also unconfigured' do
+      it "must return an empty FallbackProxy when fallback data is also unconfigured" do
         DynamicSettings.fallback_data = nil
-        expect(DynamicSettings.find('foo')).to be_a(DynamicSettings::FallbackProxy)
-        expect(DynamicSettings.find('foo')['bar']).to eq nil
+        expect(DynamicSettings.find("foo")).to be_a(DynamicSettings::FallbackProxy)
+        expect(DynamicSettings.find("foo")["bar"]).to eq nil
       end
 
-      it 'must return a FallbackProxy with configured fallback data' do
-        proxy = DynamicSettings.find('foo', tree: 'config', service: 'canvas')
+      it "must return a FallbackProxy with configured fallback data" do
+        proxy = DynamicSettings.find("foo", tree: "config", service: "canvas")
         expect(proxy).to be_a(DynamicSettings::FallbackProxy)
-        expect(proxy[:bar]).to eq 'baz'
+        expect(proxy[:bar]).to eq "baz"
       end
 
-      it 'must default the the config tree' do
-        proxy = DynamicSettings.find('foo', service: 'canvas')
-        expect(proxy['bar']).to eq 'baz'
+      it "must default the the config tree" do
+        proxy = DynamicSettings.find("foo", service: "canvas")
+        expect(proxy["bar"]).to eq "baz"
       end
 
-      it 'must handle an alternate tree' do
-        proxy = DynamicSettings.find('zab', tree: 'private', service: 'canvas')
-        expect(proxy['rab']).to eq 'oof'
+      it "must handle an alternate tree" do
+        proxy = DynamicSettings.find("zab", tree: "private", service: "canvas")
+        expect(proxy["rab"]).to eq "oof"
       end
 
-      it 'must default to the canvas service' do
-        proxy = DynamicSettings.find('foo', tree: 'config')
-        expect(proxy['bar']).to eq 'baz'
+      it "must default to the canvas service" do
+        proxy = DynamicSettings.find("foo", tree: "config")
+        expect(proxy["bar"]).to eq "baz"
       end
 
-      it 'must accept an alternate service' do
-        proxy = DynamicSettings.find('some', tree: 'config', service: 'frobozz')
-        expect(proxy['thing']).to eq 'magic'
+      it "must accept an alternate service" do
+        proxy = DynamicSettings.find("some", tree: "config", service: "frobozz")
+        expect(proxy["thing"]).to eq "magic"
       end
 
-      it 'must ignore a nil prefix' do
-        proxy = DynamicSettings.find(tree: 'config', service: 'canvas')
-        expect(proxy.for_prefix('foo')['bar']).to eq 'baz'
+      it "must ignore a nil prefix" do
+        proxy = DynamicSettings.find(tree: "config", service: "canvas")
+        expect(proxy.for_prefix("foo")["bar"]).to eq "baz"
       end
     end
   end

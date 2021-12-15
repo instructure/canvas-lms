@@ -33,6 +33,6 @@ class GradebookCSV < ActiveRecord::Base
   end
 
   def failed?
-    progress.workflow_state == 'failed'
+    progress.workflow_state == "failed"
   end
 end

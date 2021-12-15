@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module PacePlansCommonPageObject
   def admin_setup
     feature_setup
     teacher_setup
-    account_admin_user(:account => @account)
+    account_admin_user(account: @account)
   end
 
   def create_assignment(course, assignment_title, description, points_possible, publish_status)
@@ -31,30 +31,30 @@ module PacePlansCommonPageObject
       title: assignment_title,
       description: description,
       points_possible: points_possible,
-      submission_types: 'online_text_entry',
+      submission_types: "online_text_entry",
       workflow_state: publish_status
     )
   end
 
-  def create_course_module(module_title, workflow_state = 'active')
-    @course.context_modules.create!(:name => module_title, :workflow_state => workflow_state)
+  def create_course_module(module_title, workflow_state = "active")
+    @course.context_modules.create!(name: module_title, workflow_state: workflow_state)
   end
 
   def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
     course.assignments.create!(
       title: assignment_title,
-      grading_type: 'points',
+      grading_type: "points",
       points_possible: points_possible,
       due_at: assignment_due_at,
-      submission_types: 'online_text_entry'
+      submission_types: "online_text_entry"
     )
   end
 
-  def create_graded_discussion(course, discussion_title, workflow_state = 'active')
+  def create_graded_discussion(course, discussion_title, workflow_state = "active")
     assignment = course.assignments.create!(name: discussion_title)
     course.discussion_topics.create!(user: @teacher,
                                      title: discussion_title,
-                                     message: 'Discussion topic message',
+                                     message: "Discussion topic message",
                                      assignment: assignment,
                                      workflow_state: workflow_state)
   end
@@ -74,15 +74,15 @@ module PacePlansCommonPageObject
     quiz.save!
     quiz.quiz_questions.create!(
       question_data: {
-        name: 'Quiz Questions',
-        question_type: 'fill_in_multiple_blanks_question',
-        question_text: '[color1]',
-        answers: [{ text: 'one', id: 1 }, { text: 'two', id: 2 }, { text: 'three', id: 3 }],
+        name: "Quiz Questions",
+        question_type: "fill_in_multiple_blanks_question",
+        question_text: "[color1]",
+        answers: [{ text: "one", id: 1 }, { text: "two", id: 2 }, { text: "three", id: 3 }],
         points_possible: 1
       }
     )
     quiz.generate_quiz_data
-    quiz.workflow_state = 'available'
+    quiz.workflow_state = "available"
     quiz.save
     quiz.reload
     quiz
@@ -91,8 +91,8 @@ module PacePlansCommonPageObject
   def create_published_pace_plan(module_title, assignment_title)
     pace_plan_model(course: @course)
     pace_plan_module = create_course_module(module_title)
-    pace_plan_assignment = create_assignment(@course, assignment_title, 'Assignment 1', 10, 'published')
-    pace_plan_module.add_item(:id => pace_plan_assignment.id, :type => 'assignment')
+    pace_plan_assignment = create_assignment(@course, assignment_title, "Assignment 1", 10, "published")
+    pace_plan_module.add_item(id: pace_plan_assignment.id, type: "assignment")
     @pace_plan.pace_plan_module_items.create! module_item: @course.context_module_tags[0], duration: 2
     @pace_plan
   end
@@ -118,7 +118,7 @@ module PacePlansCommonPageObject
       active_course: 1,
       active_enrollment: 1,
       course_name: @course_name,
-      name: 'PacePlan Teacher'
+      name: "PacePlan Teacher"
     )
   end
 end

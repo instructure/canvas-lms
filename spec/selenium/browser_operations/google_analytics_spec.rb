@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "google analytics" do
   include_context "in-process server selenium tests"
@@ -29,29 +29,29 @@ describe "google analytics" do
   end
 
   it "includes tracking script if google_analytics_key is configured" do
-    Setting.set('google_analytics_key', 'testing123')
+    Setting.set("google_analytics_key", "testing123")
     get "/"
     wait_for_ajaximations
     expect(f('script[src$="google-analytics.com/analytics.js"]')).not_to be_nil
   end
 
-  context 'with GA enabled' do
+  context "with GA enabled" do
     before do
-      Setting.set('google_analytics_key', 'testing123')
+      Setting.set("google_analytics_key", "testing123")
     end
 
     let(:dimensions) do
       {
-        admin: { key: 'dimension2', default: '00' },
-        enrollments: { key: 'dimension1', default: '000' },
-        masquerading: { key: 'dimension3', default: '0' },
-        org_type: { key: 'dimension4', default: nil }
+        admin: { key: "dimension2", default: "00" },
+        enrollments: { key: "dimension1", default: "000" },
+        masquerading: { key: "dimension3", default: "0" },
+        org_type: { key: "dimension4", default: nil }
       }
     end
 
     let(:ga_script) do
-      driver.execute_script('return arguments[0].innerText',
-                            fj('head script:contains(window.ga)'))
+      driver.execute_script("return arguments[0].innerText",
+                            fj("head script:contains(window.ga)"))
     end
 
     def expect_dimensions_to_include(expected_values)
@@ -66,7 +66,7 @@ describe "google analytics" do
 
     def start_with
       yield if block_given?
-      get '/'
+      get "/"
       wait_for_ajaximations
     end
 
@@ -79,25 +79,25 @@ describe "google analytics" do
     it "includes student status as a dimension" do
       start_with { course_with_student_logged_in }
 
-      expect_dimensions_to_include(enrollments: '100')
+      expect_dimensions_to_include(enrollments: "100")
     end
 
     it "includes teacher status as a dimension" do
       start_with { course_with_teacher_logged_in }
 
-      expect_dimensions_to_include(enrollments: '010')
+      expect_dimensions_to_include(enrollments: "010")
     end
 
     it "includes observer status as a dimension" do
       start_with { course_with_observer_logged_in }
 
-      expect_dimensions_to_include(enrollments: '001')
+      expect_dimensions_to_include(enrollments: "001")
     end
 
     it "includes admin status as a dimension" do
       start_with { admin_logged_in }
 
-      expect_dimensions_to_include(admin: '11')
+      expect_dimensions_to_include(admin: "11")
     end
 
     it "includes masquerading status as a dimension" do
@@ -116,9 +116,9 @@ describe "google analytics" do
       end
 
       expect_dimensions_to_include(
-        admin: '00',
-        enrollments: '100',
-        masquerading: '1',
+        admin: "00",
+        enrollments: "100",
+        masquerading: "1"
       )
     end
 
@@ -139,12 +139,12 @@ describe "google analytics" do
     it "reports the org type as a dimension" do
       start_with do
         Account.default.external_integration_keys.create!(
-          key_type: 'salesforce_org_type',
-          key_value: 'K12'
+          key_type: "salesforce_org_type",
+          key_value: "K12"
         )
       end
 
-      expect_dimensions_to_include(org_type: 'K12')
+      expect_dimensions_to_include(org_type: "K12")
     end
   end
 end

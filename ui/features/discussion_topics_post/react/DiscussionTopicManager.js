@@ -25,7 +25,7 @@ import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/Di
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {getOptimisticResponse} from './utils'
-import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
+import {HIGHLIGHT_TIMEOUT, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -112,8 +112,8 @@ const DiscussionTopicManager = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const variables = {
     discussionID: props.discussionTopicId,
-    perPage: PER_PAGE,
-    page: searchTerm ? btoa(searchPageNumber * PER_PAGE) : btoa(pageNumber * PER_PAGE),
+    perPage: ENV.per_page,
+    page: searchTerm ? btoa(searchPageNumber * ENV.per_page) : btoa(pageNumber * ENV.per_page),
     searchTerm,
     rootEntries: !searchTerm && filter === 'all',
     filter,

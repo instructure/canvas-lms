@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe LtiOutbound::LTITool do
-  it_behaves_like 'it has a proc attribute setter and getter for', :consumer_key
-  it_behaves_like 'it has a proc attribute setter and getter for', :privacy_level
-  it_behaves_like 'it has a proc attribute setter and getter for', :name
-  it_behaves_like 'it has a proc attribute setter and getter for', :shared_secret
+  it_behaves_like "it has a proc attribute setter and getter for", :consumer_key
+  it_behaves_like "it has a proc attribute setter and getter for", :privacy_level
+  it_behaves_like "it has a proc attribute setter and getter for", :name
+  it_behaves_like "it has a proc attribute setter and getter for", :shared_secret
 
-  describe '#include_name?' do
-    it 'returns true IFF the privacy level is public or name only' do
+  describe "#include_name?" do
+    it "returns true IFF the privacy level is public or name only" do
       subject.privacy_level = :something
       expect(subject.include_name?).to eq false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
@@ -41,8 +41,8 @@ describe LtiOutbound::LTITool do
     end
   end
 
-  describe '#include_email?' do
-    it 'returns true IFF the privacy level is public or email only' do
+  describe "#include_email?" do
+    it "returns true IFF the privacy level is public or email only" do
       subject.privacy_level = :something
       expect(subject.include_email?).to eq false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
@@ -56,8 +56,8 @@ describe LtiOutbound::LTITool do
     end
   end
 
-  describe '#public?' do
-    it 'returns true IFF the privacy level is public' do
+  describe "#public?" do
+    it "returns true IFF the privacy level is public" do
       subject.privacy_level = :something
       expect(subject.public?).to eq false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
@@ -71,93 +71,93 @@ describe LtiOutbound::LTITool do
     end
   end
 
-  describe '#settings' do
-    it 'attribute setter, but returns {} instead of nil' do
+  describe "#settings" do
+    it "attribute setter, but returns {} instead of nil" do
       expect(subject.settings).to eq({})
       subject.settings = 10
       expect(subject.settings).to eq 10
     end
   end
 
-  describe '#set_custom_fields' do
-    it 'does not change the given input hash if the settings custom fields are empty' do
-      hash = { :a => :b }
+  describe "#set_custom_fields" do
+    it "does not change the given input hash if the settings custom fields are empty" do
+      hash = { a: :b }
 
       subject.settings = {}
       subject.set_custom_fields(hash, nil)
-      expect(hash).to eq({ :a => :b })
+      expect(hash).to eq({ a: :b })
 
-      subject.settings = { :custom_fields => {} }
+      subject.settings = { custom_fields: {} }
       subject.set_custom_fields(hash, nil)
-      expect(hash).to eq({ :a => :b })
+      expect(hash).to eq({ a: :b })
     end
 
-    it 'merges fields from the settings custom fields into the given hash prefixing them with custom_' do
-      hash = { :a => :b }
-      subject.settings = { :custom_fields => { :d => :e } }
+    it "merges fields from the settings custom fields into the given hash prefixing them with custom_" do
+      hash = { a: :b }
+      subject.settings = { custom_fields: { d: :e } }
 
       subject.set_custom_fields(hash, nil)
-      expect(hash).to eq({ :a => :b, 'custom_d' => :e })
+      expect(hash).to eq({ :a => :b, "custom_d" => :e })
     end
 
-    it 'replaces non-word characters from custom field keys' do
-      hash = { :a => :b }
-      subject.settings = { :custom_fields => { :'%$#@d()' => :e } }
+    it "replaces non-word characters from custom field keys" do
+      hash = { a: :b }
+      subject.settings = { custom_fields: { '%$#@d()': :e } }
 
       subject.set_custom_fields(hash, nil)
-      expect(hash).to eq({ :a => :b, 'custom_____d__' => :e })
+      expect(hash).to eq({ :a => :b, "custom_____d__" => :e })
     end
 
-    it 'merges fields from the applicable resource type too' do
-      hash = { :a => :b }
-      subject.settings = { :given_resource_type => { :custom_fields => { :'%$#@d()' => :e } } }
+    it "merges fields from the applicable resource type too" do
+      hash = { a: :b }
+      subject.settings = { given_resource_type: { custom_fields: { '%$#@d()': :e } } }
 
-      subject.set_custom_fields(hash, 'given_resource_type')
-      expect(hash).to eq({ :a => :b, 'custom_____d__' => :e })
+      subject.set_custom_fields(hash, "given_resource_type")
+      expect(hash).to eq({ :a => :b, "custom_____d__" => :e })
     end
   end
 
-  describe '#format_lti_params' do
-    it 'ignores the key if the prefix matches' do
-      lti_params = { 'custom_my_param' => 123 }
-      expect(subject.format_lti_params('custom', lti_params)).to eq lti_params
+  describe "#format_lti_params" do
+    it "ignores the key if the prefix matches" do
+      lti_params = { "custom_my_param" => 123 }
+      expect(subject.format_lti_params("custom", lti_params)).to eq lti_params
     end
 
     it 'replaces whitespace with "_"' do
-      lti_params = { 'custom_my param' => 123 }
-      expect(subject.format_lti_params('custom', lti_params).keys).to eq ['custom_my_param']
+      lti_params = { "custom_my param" => 123 }
+      expect(subject.format_lti_params("custom", lti_params).keys).to eq ["custom_my_param"]
     end
 
-    it 'adds the prefix if not present' do
-      lti_params = { 'my_param' => 123 }
-      expect(subject.format_lti_params('custom', lti_params)).to eq({ 'custom_my_param' => 123 })
+    it "adds the prefix if not present" do
+      lti_params = { "my_param" => 123 }
+      expect(subject.format_lti_params("custom", lti_params)).to eq({ "custom_my_param" => 123 })
     end
   end
 
-  describe '#selection_width' do
-    it 'returns selection width from settings for a resource type' do
-      subject.settings = { editor_button: { :selection_width => 100 } }
-      expect(subject.selection_width('editor_button')).to eq 100
+  describe "#selection_width" do
+    it "returns selection width from settings for a resource type" do
+      subject.settings = { editor_button: { selection_width: 100 } }
+      expect(subject.selection_width("editor_button")).to eq 100
     end
 
-    it 'returns a default value if type is present in setting, but no selection width' do
+    it "returns a default value if type is present in setting, but no selection width" do
       subject.settings = { editor_button: {} }
-      expect(subject.selection_width('editor_button')).to eq 800
+      expect(subject.selection_width("editor_button")).to eq 800
     end
 
-    it 'returns a default value if none set' do
-      expect(subject.selection_width('editor_button')).to eq 800
+    it "returns a default value if none set" do
+      expect(subject.selection_width("editor_button")).to eq 800
     end
   end
 
-  describe '#selection_height' do
-    it 'returns selection height from settings for a resource type' do
-      subject.settings = { editor_button: { :selection_height => 100 } }
-      expect(subject.selection_height('editor_button')).to eq 100
+  describe "#selection_height" do
+    it "returns selection height from settings for a resource type" do
+      subject.settings = { editor_button: { selection_height: 100 } }
+      expect(subject.selection_height("editor_button")).to eq 100
     end
 
-    it 'returns a default value if none set' do
-      expect(subject.selection_height('editor_button')).to eq 400
+    it "returns a default value if none set" do
+      expect(subject.selection_height("editor_button")).to eq 400
     end
   end
 end

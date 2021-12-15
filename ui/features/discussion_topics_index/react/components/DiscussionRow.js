@@ -111,6 +111,7 @@ const dropTarget = {
 export class DiscussionRow extends Component {
   static propTypes = {
     canPublish: bool.isRequired,
+    canReadAsAdmin: bool.isRequired,
     cleanDiscussionFocus: func.isRequired,
     connectDragPreview: func,
     connectDragSource: func,
@@ -265,6 +266,20 @@ export class DiscussionRow extends Component {
   }
 
   getAvailabilityString = () => {
+    if (
+      this.props.discussion.anonymous_state === 'full_anonymity' &&
+      !process.env.discussion_anonymity_enabled
+    ) {
+      return (
+        <Text size="small">
+          {this.props.canReadAsAdmin
+            ? I18n.t(
+                'Enable Discussions/Announcements Redesign to view anonymous discussion content'
+              )
+            : I18n.t('Unavailable')}
+        </Text>
+      )
+    }
     const assignment = this.props.discussion.assignment
 
     const availabilityBegin =
@@ -640,6 +655,10 @@ export class DiscussionRow extends Component {
           href={linkUrl}
           ref={refFn}
           data-testid={`discussion-link-${this.props.discussion.id}`}
+          disabled={
+            this.props.discussion.anonymous_state === 'full_anonymity' &&
+            !process.env.discussion_anonymity_enabled
+          }
         >
           {this.props.discussion.read_state !== 'read' && (
             <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
@@ -857,6 +876,7 @@ const mapState = (state, ownProps) => {
     discussion.permissions.update
   const propsFromState = {
     canPublish: state.permissions.publish,
+    canReadAsAdmin: state.permissions.read_as_admin,
     contextType: state.contextType,
     discussionTopicMenuTools: state.discussionTopicMenuTools,
     displayDeleteMenuItem:

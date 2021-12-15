@@ -75,7 +75,7 @@ module Polling
     #   }
     #
     def index
-      @polls = @current_user.polls.order('created_at DESC')
+      @polls = @current_user.polls.order("created_at DESC")
       json, meta = paginate_for(@polls)
 
       render json: serialize_jsonapi(json, meta)
@@ -171,13 +171,13 @@ module Polling
       meta = {}
       json = if accepts_jsonapi?
                polls, meta = Api.jsonapi_paginate(polls, self, api_v1_polls_url)
-               meta[:primaryCollection] = 'polls'
+               meta[:primaryCollection] = "polls"
                polls
              else
                Api.paginate(polls, self, api_v1_polls_url)
              end
 
-      return json, meta
+      [json, meta]
     end
 
     def serialize_jsonapi(polls, meta = {})

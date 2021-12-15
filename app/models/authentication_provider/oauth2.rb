@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth2'
-require 'canvas/core_ext/oauth2'
+require "oauth2"
+require "canvas/core_ext/oauth2"
 
 class OAuthValidationError < RuntimeError
 end

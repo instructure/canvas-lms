@@ -22,7 +22,7 @@ module ContentExportApiHelper
   def create_content_export_from_api(params, context, current_user)
     export = context.content_exports.build
     export.user = current_user
-    export.workflow_state = 'created'
+    export.workflow_state = "created"
     export.settings[:skip_notifications] = true if value_to_boolean(params[:skip_notifications])
 
     # ZipExporter accepts unhashed asset strings, to avoid having to instantiate all the files and folders
@@ -34,18 +34,18 @@ module ContentExportApiHelper
     end
 
     case params[:export_type]
-    when 'qti'
+    when "qti"
       export.export_type = ContentExport::QTI
       export.selected_content = selected_content || { all_quizzes: true }
-    when 'zip'
+    when "zip"
       export.export_type = ContentExport::ZIP
       export.selected_content = selected_content || { all_attachments: true }
-    when 'quizzes2'
+    when "quizzes2"
       if params[:quiz_id].nil? || params[:quiz_id] !~ Api::ID_REGEX
-        return render json: { message: 'quiz_id required and must be a valid ID' },
+        return render json: { message: "quiz_id required and must be a valid ID" },
                       status: :bad_request
       elsif !context.quizzes.exists?(params[:quiz_id])
-        return render json: { message: 'Quiz could not be found' }, status: :bad_request
+        return render json: { message: "Quiz could not be found" }, status: :bad_request
       else
         export.export_type = ContentExport::QUIZZES2
         # we pass the quiz_id of the quiz we want to clone here

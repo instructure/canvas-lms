@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-require 'aws-sdk-kinesis'
+require "spec_helper"
+require "aws-sdk-kinesis"
 
 describe LiveEvents::Client do
   def stub_config
     allow(LiveEvents::Client).to receive(:config).and_return({
-                                                               'kinesis_stream_name' => 'stream',
-                                                               'aws_access_key_id' => 'access_key',
-                                                               'aws_secret_access_key_dec' => 'secret_key',
-                                                               'aws_region' => 'us-east-1'
+                                                               "kinesis_stream_name" => "stream",
+                                                               "aws_access_key_id" => "access_key",
+                                                               "aws_secret_access_key_dec" => "secret_key",
+                                                               "aws_region" => "us-east-1"
                                                              })
   end
 
@@ -35,7 +35,7 @@ describe LiveEvents::Client do
     Class.new do
       attr_accessor :data, :stream, :stream_name
 
-      def initialize(stream_name = 'stream')
+      def initialize(stream_name = "stream")
         @stream_name = stream_name
       end
 
@@ -46,7 +46,7 @@ describe LiveEvents::Client do
     end
   end
 
-  let(:test_stream_name) { 'my_stream' }
+  let(:test_stream_name) { "my_stream" }
   let(:fclient) { fake_stream_client_class.new(test_stream_name) }
 
   def prep_client_and_worker
@@ -88,20 +88,20 @@ describe LiveEvents::Client do
                                             "aws_endpoint" => "example.com:6543/"
                                           })
 
-      expect(res.key?(:endpoint)).to eq false
+      expect(res).not_to have_key(:endpoint)
     end
 
     it "loads custom creds" do
-      LiveEvents.aws_credentials = ->(settings) {
-        settings['value_to_return']
-      }
+      LiveEvents.aws_credentials = lambda do |settings|
+        settings["value_to_return"]
+      end
 
       res = LiveEvents::Client.aws_config({
-                                            'custom_aws_credentials' => 'true',
-                                            'value_to_return' => 'a_value'
+                                            "custom_aws_credentials" => "true",
+                                            "value_to_return" => "a_value"
                                           })
 
-      expect(res[:credentials]).to eq('a_value')
+      expect(res[:credentials]).to eq("a_value")
     end
   end
 
@@ -112,40 +112,40 @@ describe LiveEvents::Client do
 
     let(:settings) do
       {
-        'aws_region' => 'us-east-1',
-        'kinesis_stream_name' => 'abc',
+        "aws_region" => "us-east-1",
+        "kinesis_stream_name" => "abc",
       }
     end
 
-    context 'when custom_aws_crendentials is present' do
-      let(:settings) { super().merge('custom_aws_credentials' => true) }
+    context "when custom_aws_crendentials is present" do
+      let(:settings) { super().merge("custom_aws_credentials" => true) }
 
       it { is_expected.to eq(settings) }
     end
 
-    context 'when no custom_aws_credentials or aws access key are given' do
-      let(:settings) { super().merge('aws_secret_access_key_dec' => 'foo') }
+    context "when no custom_aws_credentials or aws access key are given" do
+      let(:settings) { super().merge("aws_secret_access_key_dec" => "foo") }
 
       it { is_expected.to be_nil }
     end
 
-    context 'when no custom_aws_credentials or aws secret key are given' do
-      let(:settings) { super().merge('aws_access_key_id' => 'bar') }
+    context "when no custom_aws_credentials or aws secret key are given" do
+      let(:settings) { super().merge("aws_access_key_id" => "bar") }
 
       it { is_expected.to be_nil }
     end
 
     if defined?(Rails)
-      context 'when running in prod even with no custom_aws_credentials or aws access/secret key' do
+      context "when running in prod even with no custom_aws_credentials or aws access/secret key" do
         before { allow(Rails.env).to receive(:production?).and_return(true) }
 
         it { is_expected.to eq(settings) }
       end
     end
 
-    context 'when aws access and secret key are given' do
+    context "when aws access and secret key are given" do
       let(:settings) do
-        super().merge('aws_secret_access_key_dec' => 'foo', 'aws_access_key_id' => 'bar')
+        super().merge("aws_secret_access_key_dec" => "foo", "aws_access_key_id" => "bar")
       end
 
       it { is_expected.to eq(settings) }
@@ -160,12 +160,12 @@ describe LiveEvents::Client do
     it "calls put_records on the kinesis stream" do
       now = Time.now
 
-      @client.post_event('event', {}, now, {}, "123")
+      @client.post_event("event", {}, now, {}, "123")
       LiveEvents.worker.stop!
       expect_put_records([{
                            data: {
                              "attributes" => {
-                               "event_name" => 'event',
+                               "event_name" => "event",
                                "event_time" => now.utc.iso8601(3)
                              },
                              "body" => {}
@@ -177,47 +177,47 @@ describe LiveEvents::Client do
     it "includes attributes when supplied via ctx" do
       now = Time.now
 
-      @client.post_event('event', {}, now, { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent' }, 'pkey')
+      @client.post_event("event", {}, now, { user_id: 123, real_user_id: 321, login: "loginname", user_agent: "agent" }, "pkey")
       LiveEvents.worker.stop!
       expect_put_records([{
                            data: {
                              "attributes" => {
-                               "event_name" => 'event',
+                               "event_name" => "event",
                                "event_time" => now.utc.iso8601(3),
                                "user_id" => 123,
                                "real_user_id" => 321,
-                               "login" => 'loginname',
-                               "user_agent" => 'agent'
+                               "login" => "loginname",
+                               "user_agent" => "agent"
                              },
                              "body" => {}
                            },
-                           partition_key: 'pkey'
+                           partition_key: "pkey"
                          }])
     end
 
     it "does not send blacklisted conxted attributes" do
       now = Time.now
       @client.post_event(
-        'event',
+        "event",
         {},
         now,
-        { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent', compact_live_events: true },
-        'pkey'
+        { user_id: 123, real_user_id: 321, login: "loginname", user_agent: "agent", compact_live_events: true },
+        "pkey"
       )
       LiveEvents.worker.stop!
       expect_put_records([{
                            data: {
                              "attributes" => {
-                               "event_name" => 'event',
+                               "event_name" => "event",
                                "event_time" => now.utc.iso8601(3),
                                "user_id" => 123,
                                "real_user_id" => 321,
-                               "login" => 'loginname',
-                               "user_agent" => 'agent'
+                               "login" => "loginname",
+                               "user_agent" => "agent"
                              },
                              "body" => {}
                            },
-                           partition_key: 'pkey'
+                           partition_key: "pkey"
                          }])
     end
   end
@@ -233,22 +233,22 @@ describe LiveEvents::Client do
       now = Time.now
 
       LiveEvents.post_event(
-        event_name: 'event',
+        event_name: "event",
         payload: {},
         time: now,
-        partition_key: 'pkey'
+        partition_key: "pkey"
       )
       LiveEvents.worker.stop!
       expect_put_records([{
                            data: {
                              "attributes" => {
-                               "event_name" => 'event',
+                               "event_name" => "event",
                                "event_time" => now.utc.iso8601(3),
                                "user_id" => 123
                              },
                              "body" => {}
                            },
-                           partition_key: 'pkey'
+                           partition_key: "pkey"
                          }])
     end
 
@@ -256,13 +256,13 @@ describe LiveEvents::Client do
       LiveEvents.set_context({ user_id: 123 })
       LiveEvents.clear_context!
 
-      now = Time.now # rubocop:disable Rails/SmartTimeZone
+      now = Time.now
 
       LiveEvents.post_event(
-        event_name: 'event',
+        event_name: "event",
         payload: {},
         time: now,
-        partition_key: 'pkey'
+        partition_key: "pkey"
       )
       LiveEvents.worker.stop!
       expect_put_records(
@@ -270,40 +270,40 @@ describe LiveEvents::Client do
           {
             data: {
               "attributes" => {
-                "event_name" => 'event',
+                "event_name" => "event",
                 "event_time" => now.utc.iso8601(3)
               },
               "body" => {}
             },
-            partition_key: 'pkey'
+            partition_key: "pkey"
           }
         ]
       )
     end
 
     context do
-      let(:test_stream_name) { 'custom_stream_name' }
+      let(:test_stream_name) { "custom_stream_name" }
 
       it "uses custom stream client when defined" do
-        now = Time.now # rubocop:disable Rails/SmartTimeZone
+        now = Time.now
 
         LiveEvents.post_event(
-          event_name: 'event',
+          event_name: "event",
           payload: {},
           time: now,
-          partition_key: 'pkey'
+          partition_key: "pkey"
         )
         LiveEvents.worker.stop!
         expect_put_records(
           [{
             data: {
               "attributes" => {
-                "event_name" => 'event',
+                "event_name" => "event",
                 "event_time" => now.utc.iso8601(3)
               },
               "body" => {}
             },
-            partition_key: 'pkey'
+            partition_key: "pkey"
           }],
           fclient
         )

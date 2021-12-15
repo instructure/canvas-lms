@@ -27,12 +27,12 @@ module ConditionalRelease
       def begin_export(course, opts)
         assignment_ids = nil
         if opts[:selective]
-          assignment_ids = opts[:exported_assets].map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }.compact
+          assignment_ids = opts[:exported_assets].filter_map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }
           return unless assignment_ids.any?
         end
 
         # just pretend like we started an export even if we're not actually hitting a service anymore
-        return { :native => true, :course => course, :assignment_ids => assignment_ids }
+        { native: true, course: course, assignment_ids: assignment_ids }
       end
 
       def export_completed?(export_data)
@@ -44,23 +44,23 @@ module ConditionalRelease
       end
 
       def generate_native_export(course, assignment_ids)
-        data = { 'native' => true }
+        data = { "native" => true }
         rules_scope = course.conditional_release_rules.active.order(:id).preload(ConditionalRelease::Rule.preload_associations)
-        rules_scope = rules_scope.where(:trigger_assignment_id => assignment_ids) if assignment_ids
+        rules_scope = rules_scope.where(trigger_assignment_id: assignment_ids) if assignment_ids
         rules = rules_scope.to_a
         return unless rules.any? # nothing needs to be saved
 
-        data['rules'] = rules.map do |rule|
+        data["rules"] = rules.map do |rule|
           {
-            'trigger_assignment_id' => { '$canvas_assignment_id' => rule.trigger_assignment_id }, # this tells canvas to translate this id on re-import
-            'scoring_ranges' => rule.scoring_ranges.map do |range|
+            "trigger_assignment_id" => { "$canvas_assignment_id" => rule.trigger_assignment_id }, # this tells canvas to translate this id on re-import
+            "scoring_ranges" => rule.scoring_ranges.map do |range|
               {
-                'lower_bound' => range.lower_bound,
-                'upper_bound' => range.upper_bound,
-                'assignment_sets' => range.assignment_sets.map do |set|
+                "lower_bound" => range.lower_bound,
+                "upper_bound" => range.upper_bound,
+                "assignment_sets" => range.assignment_sets.map do |set|
                   {
-                    'assignment_set_associations' => set.assignment_set_associations.map do |assoc|
-                      { '$canvas_assignment_id' => assoc.assignment_id }
+                    "assignment_set_associations" => set.assignment_set_associations.map do |assoc|
+                      { "$canvas_assignment_id" => assoc.assignment_id }
                     end
                   }
                 end
@@ -73,30 +73,28 @@ module ConditionalRelease
 
       def send_imported_content(course, _cm, imported_content)
         all_successful = true
-        is_native = imported_content['native']
-        imported_content['rules']&.each do |rule_hash|
-          trigger_key = is_native ? 'trigger_assignment_id' : 'trigger_assignment'
+        is_native = imported_content["native"]
+        imported_content["rules"]&.each do |rule_hash|
+          trigger_key = is_native ? "trigger_assignment_id" : "trigger_assignment"
           trigger_id = rule_hash[trigger_key]["$canvas_assignment_id"]
           next unless valid_id?(trigger_id)
 
-          rule = course.conditional_release_rules.active.where(:trigger_assignment_id => trigger_id).first
-          if rule
-            # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
-            # if it becomes an issue, someday we could make these first-class migration objects (and even include some blueprint logic)
-            # but today is not that day
-            rule.scoring_ranges.destroy_all
-          end
-          rule ||= course.conditional_release_rules.new(:trigger_assignment_id => trigger_id)
+          rule = course.conditional_release_rules.active.where(trigger_assignment_id: trigger_id).first
+          # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
+          # if it becomes an issue, someday we could make these first-class migration objects (and even include some blueprint logic)
+          # but today is not that day
+          rule&.scoring_ranges&.destroy_all
+          rule ||= course.conditional_release_rules.new(trigger_assignment_id: trigger_id)
 
-          ranges = rule_hash['scoring_ranges'].map do |range_hash|
+          ranges = rule_hash["scoring_ranges"].map do |range_hash|
             range_hash["assignment_sets_attributes"] = range_hash.delete("assignment_sets").map do |set_hash|
               associations = []
-              association_key = is_native ? 'assignment_set_associations' : 'assignments'
+              association_key = is_native ? "assignment_set_associations" : "assignments"
               set_hash.delete(association_key).each do |assoc_hash|
                 assignment_id = assoc_hash["$canvas_assignment_id"]
                 next unless valid_id?(assignment_id)
 
-                associations << { :assignment_id => assignment_id }
+                associations << { assignment_id: assignment_id }
               end
               set_hash["assignment_set_associations_attributes"] = associations
               set_hash
@@ -106,7 +104,7 @@ module ConditionalRelease
           all_successful = false unless rule.update(scoring_ranges_attributes: ranges)
         end
         if all_successful
-          { :native => true }
+          { native: true }
         else
           raise "not all rules were able to be saved"
         end

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 describe "master courses - course picker" do
   include_context "in-process server selenium tests"
@@ -36,28 +36,28 @@ describe "master courses - course picker" do
 
     # create some courses
     c = Course.create!(
-      :account => Account.default, :name => "AlphaDog", :course_code => "CCC1", :sis_source_id => "SIS_A1",
-      :enrollment_term_id => term1.id
+      account: Account.default, name: "AlphaDog", course_code: "CCC1", sis_source_id: "SIS_A1",
+      enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => Account.default, :name => "AlphaMale", :course_code => "CCC2", :sis_source_id => "SIS_A2",
-      :enrollment_term_id => term1.id
+      account: Account.default, name: "AlphaMale", course_code: "CCC2", sis_source_id: "SIS_A2",
+      enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => Account.default, :name => "Alphabet", :course_code => "CCC3", :sis_source_id => "SIS_A3",
-      :enrollment_term_id => term1.id
+      account: Account.default, name: "Alphabet", course_code: "CCC3", sis_source_id: "SIS_A3",
+      enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => Account.default, :name => "BetaCarotine", :course_code => "DDD4", :sis_source_id => "SIS_B4",
-      :enrollment_term_id => term1.id
+      account: Account.default, name: "BetaCarotine", course_code: "DDD4", sis_source_id: "SIS_B4",
+      enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => sub_account1, :name => "BetaGetOuttaHere", :course_code => "DDD5", :sis_source_id => "SIS_B5",
-      :enrollment_term_id => term2.id
+      account: sub_account1, name: "BetaGetOuttaHere", course_code: "DDD5", sis_source_id: "SIS_B5",
+      enrollment_term_id: term2.id
     )
     c.offer!
     account_admin_user(active_all: true)
@@ -68,13 +68,13 @@ describe "master courses - course picker" do
   end
 
   let(:course_search_input) { '.bca-course-filter input[type="search"]' }
-  let(:filter_output) { '.bca-course-details__wrapper' }
-  let(:loading) { '.bca-course-picker__loading' }
-  let(:term_filter) { '#termsFilter' }
-  let(:sub_account_filter) { '#subAccountsFilter' }
+  let(:filter_output) { ".bca-course-details__wrapper" }
+  let(:loading) { ".bca-course-picker__loading" }
+  let(:term_filter) { "#termsFilter" }
+  let(:sub_account_filter) { "#subAccountsFilter" }
 
-  def wait_for_spinner
-    wait_for_transient_element(loading) { yield }
+  def wait_for_spinner(&block)
+    wait_for_transient_element(loading, &block)
   end
 
   # enter search term into the filter text box and wait for the response
@@ -91,48 +91,48 @@ describe "master courses - course picker" do
     available_courses
   end
 
-  it "shows all courses by default", priority: "1", test_id: "3077485" do
+  it "shows all courses by default", priority: "1" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
     expect(available_courses_table).to be_displayed
-    expect(available_courses().length).to eq(5)
+    expect(available_courses.length).to eq(5)
   end
 
-  it "filters the course list by name", priority: "1", test_id: "3265699" do
-    matches = test_filter('Alpha')
+  it "filters the course list by name", priority: "1" do
+    matches = test_filter("Alpha")
     expect(matches.length).to eq(3)
   end
 
-  it "filters the course list by short name", priority: "1", test_id: "3265700" do
-    matches = test_filter('CCC')
+  it "filters the course list by short name", priority: "1" do
+    matches = test_filter("CCC")
     expect(matches.length).to eq(3)
   end
 
-  it "filters the course list by SIS ID", priority: "1", test_id: "3265701" do
-    matches = test_filter('SIS_B')
+  it "filters the course list by SIS ID", priority: "1" do
+    matches = test_filter("SIS_B")
     expect(matches.length).to eq(2)
   end
 
-  it "course search doesn't work with nicknames", priority: "2", test_id: 3178857 do
-    @user.set_preference(:course_nicknames, @course.id, 'nickname')
-    matches = test_filter('nickname')
+  it "course search doesn't work with nicknames", priority: "2" do
+    @user.set_preference(:course_nicknames, @course.id, "nickname")
+    matches = test_filter("nickname")
     expect(matches.length).to eq(0)
   end
 
-  it "filters the course list by term", priority: "1", test_id: "3075534" do
+  it "filters the course list by term", priority: "1" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
-    wait_for_spinner { click_INSTUI_Select_option(term_filter, 'fall term') }
-    expect(available_courses().length).to eq(4)
+    wait_for_spinner { click_INSTUI_Select_option(term_filter, "fall term") }
+    expect(available_courses.length).to eq(4)
   end
 
-  it "filters the course list by sub-account", priority: "1", test_id: "3279950" do
+  it "filters the course list by sub-account", priority: "1" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
-    wait_for_spinner { click_INSTUI_Select_option(sub_account_filter, 'sub-account 1') }
-    expect(available_courses().length).to eq(1)
+    wait_for_spinner { click_INSTUI_Select_option(sub_account_filter, "sub-account 1") }
+    expect(available_courses.length).to eq(1)
   end
 end

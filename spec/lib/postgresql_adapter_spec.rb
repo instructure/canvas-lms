@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'irb'
+require "irb"
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
-  it 'aborts a query when interrupted' do
+  it "aborts a query when interrupted" do
     aborted = false
     thread = Thread.new do
       User.connection.transaction(requires_new: true) do
