@@ -25,7 +25,7 @@ import {InlineList} from '@instructure/ui-list'
 import {responsiveQuerySizes} from '../../utils'
 import {Responsive} from '@instructure/ui-responsive'
 
-const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment']
+const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
 
 export function RolePillContainer({...props}) {
   const baseRolesToDisplay = sortDiscussionRoles(props.discussionRoles)
@@ -73,6 +73,9 @@ function roleName(baseRole) {
     },
     get TaEnrollment() {
       return I18n.t('TA')
+    },
+    get DesignerEnrollment() {
+      return I18n.t('Designer')
     },
     get Author() {
       return I18n.t('Author')
