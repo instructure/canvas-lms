@@ -29,6 +29,8 @@ import {
   CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 
+import {uniq, flattenDeep} from 'lodash'
+
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
   {
     request: {
@@ -105,6 +107,180 @@ const buildGroup = (_id, title) => {
     _id,
     title
   }
+}
+
+// builds a treebrowser group structure
+// groupsStruct should be an object with the keys as
+// group id, and value as array of children
+// example
+// {groupsStruct: {
+//   100: [101, 102],
+//   101: [103],
+// }}
+// this will mock request when you click on group 100 in treebrowser to
+// load group 101 and 102 as children
+// and if you click on 101, it'll load 103, and so on
+
+// Dont put the same group as child of more than one group, like
+// {groupsStruct: {
+//   100: [101, 102],
+//   101: [102],
+// }}
+// Note that 102 is appearing as children of 100 and 101. Please don't do that
+
+// This method will also mock requests for leaves groups. In the example above,
+// Request for 102 and 103 won't break (it'll return a response without any children)
+
+// for detailsStructure, should be an object with the key as group id and
+// value as array of children outcome ids
+
+// In this case, you can mock the same outcome to be child of multipe groups. Example
+// detailsStructure: {
+//   100: [1, 2, 3],
+//   200: [1, 2, 3],
+//   300: [1, 2, 3],
+//   400: [1],
+//   401: [2],
+//   402: [3],
+// }
+// Note outcome 1 is children of 400, but outcome 1 should appear in their parent as well.
+// folder structure could be 100 -> 200 -> 300 -> 400, 401, 402 (4xx are sibilings)
+// so if you click on 300, you should expect all outcomes for all children
+
+// note, this doesn't handle load more query for detailsStructure yet
+// if you specify a group in groupsStructure and dont specify a children for it.
+// it'll mock the group detail too without any outcome
+
+// contextId, and contextType are the variables for find outcome group DETAIL query
+// outcomesGroupContextId, and outcomesGroupContextType are the context for the outcomes in response
+// default to contextId and contextType
+
+// importedOutcomes, array of imported outcomes ids. If an outcome id is present there, it'll be used
+// in group detail outcomes isImported field. the field is default to false. You can easily
+// passes what outcomes are supposed to be returned as imported
+
+// groupOutcomesNotImportedCount, object, key as group id, value as integer. Used to represent
+// notImportedOutcomesCount field of a group in detail query. Default field value is null.
+// You may want to set this to a positive integer to identify what groups can be imported via find
+// outcome modal
+
+// findOutcomesTargetGroupId the variable targetGroupId of find outcomes modal query
+
+export const treeGroupMocks = ({
+  groupsStruct,
+  detailsStructure,
+  contextId,
+  contextType,
+  findOutcomesTargetGroupId = null,
+  groupOutcomesNotImportedCount = [],
+  importedOutcomes = [],
+  outcomesGroupContextId = contextId,
+  outcomesGroupContextType = contextType
+}) => {
+  const toString = arg => arg.toString()
+
+  const groupIds = Object.keys(groupsStruct)
+  const stringImportedOutcomes = importedOutcomes.map(toString)
+  const allGroupIds = uniq(
+    flattenDeep([
+      Object.keys(groupsStruct).map(toString),
+      Object.values(groupsStruct).flat().map(toString)
+    ])
+  )
+  const parents = groupIds.reduce((acc, gid) => {
+    ;(groupsStruct[gid] || []).forEach(cid => (acc[cid] = gid))
+    return acc
+  }, {})
+
+  const treeBrowserMocks = allGroupIds.map(gid => {
+    const childGroups = groupsStruct[gid] || []
+    const parentOutcomeGroupId = parents[gid]
+    const parentOutcomeGroupTitle = parentOutcomeGroupId && `Group ${parentOutcomeGroupId}`
+
+    return {
+      request: {
+        query: CHILD_GROUPS_QUERY,
+        variables: {
+          id: toString(gid),
+          type: 'LearningOutcomeGroup'
+        }
+      },
+      result: {
+        data: {
+          context: {
+            __typename: 'LearningOutcomeGroup',
+            _id: toString(gid),
+            title: `Group ${gid}`,
+            parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
+            childGroups: {
+              __typename: 'LearningOutcomeGroupConnection',
+              nodes: childGroups.map(cid => ({
+                __typename: 'LearningOutcomeGroup',
+                _id: toString(cid),
+                title: `Group ${cid}`
+              }))
+            }
+          }
+        }
+      }
+    }
+  })
+
+  const findModalGroupDetailsMocks = allGroupIds.map(gid => {
+    const childrenOutcomes = (detailsStructure[gid] || []).map(toString)
+
+    return {
+      request: {
+        query: FIND_GROUP_OUTCOMES,
+        variables: {
+          id: gid,
+          outcomeIsImported: true,
+          outcomesContextId: contextId,
+          outcomesContextType: contextType,
+          targetGroupId: findOutcomesTargetGroupId
+        }
+      },
+      result: {
+        data: {
+          group: {
+            _id: gid,
+            title: `Group ${gid}`,
+            contextType: outcomesGroupContextType,
+            contextId: outcomesGroupContextId,
+            outcomesCount: childrenOutcomes.length,
+            notImportedOutcomesCount: groupOutcomesNotImportedCount[gid] || null,
+            outcomes: {
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'Mw',
+                __typename: 'PageInfo'
+              },
+              edges: childrenOutcomes.map(oid => ({
+                _id: oid,
+                node: {
+                  _id: oid,
+                  description: `Description for Outcome ${oid}`,
+                  isImported: stringImportedOutcomes.includes(oid),
+                  title: `Outcome ${oid}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: oid,
+                    description: `Outcome ${oid} - friendly description`,
+                    __typename: 'FriendlyDescription'
+                  }
+                },
+                __typename: 'ContentTag'
+              })),
+              __typename: 'ContentTagConnection'
+            },
+            __typename: 'LearningOutcomeGroup'
+          }
+        }
+      }
+    }
+  })
+
+  return [treeBrowserMocks, findModalGroupDetailsMocks].flat()
 }
 
 export const groupMocks = ({
