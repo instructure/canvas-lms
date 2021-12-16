@@ -46,21 +46,7 @@ module CC
         non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
         FileUtils.mkdir_p non_cc_folder
 
-        @course.assessment_question_banks.active.each do |bank|
-          next unless export_object?(bank)
-
-          begin
-            generate_question_bank(bank)
-          rescue
-            title = if bank
-                      bank.title
-                    else
-                      I18n.t("unknown_question_bank", "Unknown question bank")
-                    end
-
-            add_error(I18n.t("course_exports.errors.question_bank", "The question bank \"%{title}\" failed to export", title: title), $!)
-          end
-        end
+        assessment_question_bank_ids = []
 
         scope = @course.quizzes.active
         # @user is nil if it's kicked off by the system, like a course template
@@ -80,12 +66,15 @@ module CC
             next
           end
 
+          assessment_question_bank_ids.push(*quiz.assessment_question_bank_ids) if new_quizzes_bank_migration_enabled?
           begin
             generate_quiz(quiz)
           rescue
             add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: title), $!)
           end
         end
+
+        generate_banks(assessment_question_bank_ids)
       end
 
       def generate_quiz(quiz, for_cc = true)
@@ -148,14 +137,42 @@ module CC
         non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
         FileUtils.mkdir_p non_cc_folder
 
+        assessment_question_bank_ids = []
+
         @course.quizzes.active.each do |quiz|
           next unless export_object?(quiz)
 
+          assessment_question_bank_ids.push(*quiz.assessment_question_bank_ids) if new_quizzes_bank_migration_enabled?
           begin
             generate_quiz(quiz, false)
           rescue
             title = quiz.title rescue I18n.t("unknown_quiz", "Unknown quiz")
             add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: title), $!)
+          end
+        end
+
+        generate_banks(assessment_question_bank_ids) if new_quizzes_bank_migration_enabled?
+      end
+
+      def generate_banks(quiz_bank_ids)
+        # quiz_bank_ids should be ids pulled from quizzes in the course
+
+        bank_ids = quiz_bank_ids.concat(@course.assessment_question_banks.active).uniq
+        banks = AssessmentQuestionBank.where(id: bank_ids)
+
+        banks.each do |bank|
+          next unless export_object?(bank)
+
+          begin
+            generate_question_bank(bank)
+          rescue
+            title = if bank
+                      bank.title
+                    else
+                      I18n.t("unknown_question_bank", "Unknown question bank")
+                    end
+
+            add_error(I18n.t("course_exports.errors.question_bank", "The question bank \"%{title}\" failed to export", title: title), $!)
           end
         end
       end
@@ -299,6 +316,7 @@ module CC
           ) do |bank_node|
             bank_node.qtimetadata do |meta_node|
               meta_field(meta_node, "bank_title", bank.title)
+              meta_field(meta_node, "bank_type", bank.context_type) if new_quizzes_bank_migration_enabled?
             end # meta_node
 
             bank.assessment_questions.active.each do |aq|
@@ -355,6 +373,7 @@ module CC
                   sel_node.sourcebank_ref create_key(bank)
                 elsif (bank = AssessmentQuestionBank.where(id: group[:assessment_question_bank_id]).first)
                   sel_node.sourcebank_ref bank.id
+                  sel_node.sourcebank_export_id create_key(bank)
                   is_external = true
                 end
               end
@@ -375,6 +394,10 @@ module CC
             end
           end
         end # section node
+      end
+
+      def new_quizzes_bank_migration_enabled?
+        NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(@course)
       end
     end
   end

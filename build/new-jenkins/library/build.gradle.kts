@@ -33,10 +33,6 @@ tasks.withType<Test> {
   }
 }
 
-val log4jVersion = "2.11.2"
-val slf4jVersion = "1.7.26"
-val declarativePluginsVersion = "1.3.9"
-
 dependencies {
   testImplementation("org.assertj:assertj-core:3.4.1")
   testImplementation("com.lesfurets:jenkins-pipeline-unit:1.8")

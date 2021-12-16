@@ -124,7 +124,7 @@ describe('ExternalToolPlacementList', () => {
     beforeAll(() => {
       oldEnv = window.ENV
       window.ENV = {
-        PERMISSIONS: {create_tool_manually: true},
+        PERMISSIONS: {create_tool_manually: true, edit_tool_manually: true},
         CONTEXT_BASE_URL: '/accounts/1'
       }
       store.togglePlacements.mockImplementation(({onSuccess}) => onSuccess())

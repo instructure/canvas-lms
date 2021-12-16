@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable react/no-this-in-sfc */
 import I18n from 'i18n!react_files'
 import React from 'react'
 import createReactClass from 'create-react-class'
@@ -32,11 +33,11 @@ import preventDefault from 'prevent-default'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
-FolderChild.isFolder = function() {
+FolderChild.isFolder = function () {
   return this.props.model instanceof Folder
 }
 
-FolderChild.renderItemCog = function(canManage) {
+FolderChild.renderItemCog = function (canManage) {
   if (!this.props.model.isNew() || this.props.model.get('locked_for_user')) {
     return (
       <ItemCog
@@ -56,7 +57,7 @@ FolderChild.renderItemCog = function(canManage) {
     )
   }
 }
-FolderChild.renderPublishCloud = function(canManage) {
+FolderChild.renderPublishCloud = function (canManage) {
   if (!this.props.model.isNew()) {
     return (
       <PublishCloud
@@ -68,7 +69,7 @@ FolderChild.renderPublishCloud = function(canManage) {
     )
   }
 }
-FolderChild.renderMasterCourseIcon = function(canManage) {
+FolderChild.renderMasterCourseIcon = function (canManage) {
   // never show if not involved in blueprint courses
   if (
     !(
@@ -97,7 +98,7 @@ FolderChild.renderMasterCourseIcon = function(canManage) {
   )
 }
 
-FolderChild.renderEditingState = function() {
+FolderChild.renderEditingState = function () {
   if (this.state.editing) {
     return (
       <form className="ef-edit-name-form" onSubmit={preventDefault(this.saveNameEdit)}>
@@ -182,7 +183,7 @@ FolderChild.renderEditingState = function() {
   }
 }
 
-FolderChild.renderUsageRightsIndicator = function() {
+FolderChild.renderUsageRightsIndicator = function () {
   if (this.props.usageRightsRequiredForContext) {
     return (
       <div className="ef-usage-rights-col" role="gridcell">
@@ -198,7 +199,7 @@ FolderChild.renderUsageRightsIndicator = function() {
   }
 }
 
-FolderChild.render = function() {
+FolderChild.render = function () {
   const user = this.props.model.get('user') || {}
   const selectCheckboxLabel = I18n.t('Select %{itemName}', {
     itemName: this.props.model.displayName()
@@ -217,21 +218,24 @@ FolderChild.render = function() {
 
   return (
     <div {...this.getAttributesForRootNode()}>
-      <label className={keyboardCheckboxClass}>
-        <input
-          type="checkbox"
-          onFocus={() => {
-            this.setState({hideKeyboardCheck: false})
-          }}
-          onBlur={() => {
-            this.setState({hideKeyboardCheck: true})
-          }}
-          className={keyboardCheckboxClass}
-          checked={this.props.isSelected}
-          onChange={() => {}}
-        />
-        <span className={keyboardLabelClass}>{selectCheckboxLabel}</span>
-      </label>
+      <div className="ef-select-col" role="gridcell">
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        <label className={keyboardCheckboxClass}>
+          <input
+            type="checkbox"
+            onFocus={() => {
+              this.setState({hideKeyboardCheck: false})
+            }}
+            onBlur={() => {
+              this.setState({hideKeyboardCheck: true})
+            }}
+            className={keyboardCheckboxClass}
+            checked={this.props.isSelected}
+            onChange={() => {}}
+          />
+          <span className={keyboardLabelClass}>{selectCheckboxLabel}</span>
+        </label>
+      </div>
 
       <div className="ef-name-col" role="rowheader">
         {this.renderEditingState()}

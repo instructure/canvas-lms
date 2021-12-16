@@ -50,6 +50,12 @@ const uploadMediaTranslations = {
     SUBMIT_TEXT: 'Submit',
     UPLOADING_ERROR: 'Upload Error',
     UPLOAD_MEDIA_LABEL: 'Upload Media'
+  },
+  SelectStrings: {
+    USE_ARROWS: 'Use arrow keys to navigate options.',
+    LIST_COLLAPSED: 'List collapsed.',
+    LIST_EXPANDED: 'List expanded.',
+    OPTION_SELECTED: '{option} selected.'
   }
 }
 
@@ -119,7 +125,6 @@ describe('UploadMedia: ComputerPanel', () => {
     // (that would be the version in canvas-media), and if you do select a video file
     // from "Upload Document", it works.
     // see also packages/canvas-rce/src/rce/plugins/shared/Upload/__tests__/ComputerPanel.test.js
-    // eslint-disable-next-line jest/no-disabled-tests
     it.skip('Renders a video player preview if afile type is a video', async () => {
       const aFile = new File(['foo'], 'foo.mp4', {
         type: 'video/mp4'
@@ -181,6 +186,65 @@ describe('UploadMedia: ComputerPanel', () => {
       })
       expect(setHasUploadedFile).toHaveBeenCalledWith(false)
       expect(setFile).toHaveBeenCalledWith(null)
+    })
+  })
+  describe('shows closed captions panel', () => {
+    it('when uploading videos', async () => {
+      HTMLElement.prototype.scrollIntoView = jest.fn()
+      const aFile = new File(['foo'], 'foo.mov', {
+        type: 'video/quicktime'
+      })
+      const setFile = file =>
+        rerender(
+          createPanel({
+            setFile,
+            theFile: file,
+            hasUploadedFile: true
+          })
+        )
+      const {rerender, getByLabelText, getByTestId, getByRole} = renderPanel({setFile})
+      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+      fireEvent.change(dropZone, {
+        target: {
+          files: [aFile]
+        }
+      })
+      const ccCheckbox = getByRole('checkbox', {name: /Add CC\/Subtitles/})
+      expect(ccCheckbox).not.toBeNull()
+      fireEvent.click(ccCheckbox)
+      await waitFor(() => {
+        const ccPanel = getByTestId('ClosedCaptionPanel')
+        expect(ccPanel).not.toBeNull()
+      })
+    })
+
+    it('when uploading audios', async () => {
+      HTMLElement.prototype.scrollIntoView = jest.fn()
+      const aFile = new File(['foo'], 'foo.mp3', {
+        type: 'audio/mp3'
+      })
+      const setFile = file =>
+        rerender(
+          createPanel({
+            setFile,
+            theFile: file,
+            hasUploadedFile: true
+          })
+        )
+      const {rerender, getByLabelText, getByTestId, getByRole} = renderPanel({setFile})
+      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+      fireEvent.change(dropZone, {
+        target: {
+          files: [aFile]
+        }
+      })
+      const ccCheckbox = getByRole('checkbox', {name: /Add CC\/Subtitles/})
+      expect(ccCheckbox).not.toBeNull()
+      fireEvent.click(ccCheckbox)
+      await waitFor(() => {
+        const ccPanel = getByTestId('ClosedCaptionPanel')
+        expect(ccPanel).not.toBeNull()
+      })
     })
   })
 })

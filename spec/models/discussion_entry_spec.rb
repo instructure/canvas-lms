@@ -20,6 +20,7 @@
 
 describe DiscussionEntry do
   let(:topic) { discussion_topic_model }
+  let(:anonymous_topic) { discussion_topic_model(anonymous_state: "fully_anonymous") }
 
   describe "callback lifecycle" do
     before(:once) do
@@ -846,6 +847,24 @@ describe DiscussionEntry do
           expect(entry.grants_right?(user, :delete)).to eq false
         end
       end
+    end
+  end
+
+  describe "author_name" do
+    let(:user) { user_model(name: "John Doe") }
+    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
+    let(:anon_entry) { anonymous_topic.discussion_entries.create!(message: "Hello!", user: user) }
+
+    it "returns author name" do
+      expect(entry.author_name).to eq "John Doe"
+    end
+
+    it "returns anonymous author name" do
+      expect(anon_entry.author_name).to match(/Anonymous (.*)/)
+    end
+
+    it "returns You as anonymous author name" do
+      expect(anon_entry.author_name(user)).to eq "You"
     end
   end
 end

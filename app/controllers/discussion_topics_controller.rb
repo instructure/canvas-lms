@@ -402,8 +402,18 @@ class DiscussionTopicsController < ApplicationController
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
         end
 
+        feature_flags_url = case @context
+                            when Course
+                              context_url(@context, :context_settings_url, anchor: "tab-features")
+                            when Group
+                              (@context.context&.is_a? Course) || (@context.context&.is_a? Account) ? context_url(@context.context, :context_settings_url, anchor: "tab-features") : nil
+                            else
+                              nil
+                            end
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+          FEATURE_FLAGS_URL: feature_flags_url,
           totalDiscussions: scope.count,
           permissions: {
             create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
@@ -581,7 +591,8 @@ class DiscussionTopicsController < ApplicationController
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity),
-      allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics
+      allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
+      context_is_not_group: !@context.is_a?(Group)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -654,7 +665,12 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @topic.anonymous? && !@context.feature_enabled?(:react_discussions_post)
-      flash[:info] = I18n.t :anonymous_topic_notice, "That topic requires the Discussions / Announcements Redesign feature flag turned on"
+      message = if @context.grants_right?(@current_user, session, :read_as_admin)
+                  I18n.t(:anonymous_topic_notice_teacher, "Anonymous topics cannot be accessed without Discussions/Announcements Redesign feature preview enabled.")
+                else
+                  I18n.t(:anonymous_topic_notice_student, "Anonymous topics are not available at this time.")
+                end
+      flash[:info] = message
       redirect_to named_context_url(@context, :context_discussion_topics_url)
       return
     end
@@ -731,6 +747,7 @@ class DiscussionTopicsController < ApplicationController
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
+               discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:discussion_anonymity),
                inline_grading_enabled: Account.site_admin.feature_enabled?(:discussions_inline_grading),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
@@ -1226,10 +1243,17 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic_runner(is_new:)
     @errors = {}
+
+    anonymous_discussions_disabled = !(Account.site_admin.feature_enabled?(:discussion_anonymity) && @context.feature_enabled?(:react_discussions_post))
+    if is_new && anonymous_discussions_disabled
+      params[:anonymous_state] = nil
+    end
+
+    # only full_anonymity and partial_anonymity can be stored. the rest will be nil'ed out
     if is_new &&
-       params.include?(:anonymous_state) &&
-       (!Account.site_admin.feature_enabled?(:discussion_anonymity) ||
-        !Account.site_admin.feature_enabled?(:react_discussions_post))
+       !params[:anonymous_state].nil? &&
+       !(params[:anonymous_state] == "full_anonymity" || params[:anonymous_state] == "partial_anonymity")
+
       params[:anonymous_state] = nil
     end
 
@@ -1239,6 +1263,17 @@ class DiscussionTopicsController < ApplicationController
        !@context.grants_right?(@current_user, session, :manage)
       @errors[:anonymous_state] = t(:error_anonymous_state_unauthorized_create,
                                     "You are not able to create an anonymous discussion")
+    end
+
+    if is_new && params[:anonymous_state]
+      if params[:group_category_id]
+        @errors[:anonymous_state] = t(:error_anonymous_state_groups_create,
+                                      "Group discussions cannot be anonymous.")
+      end
+      if params[:assignment]
+        @errors[:anonymous_state] = t(:error_graded_anonymous,
+                                      "Anonymous discussions cannot be graded")
+      end
     end
 
     model_type = if value_to_boolean(params[:is_announcement]) &&

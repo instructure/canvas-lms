@@ -798,6 +798,49 @@ describe ContentMigration do
   context "importing to NQ with the new_quizzes_bank_migrations FF enabled" do
     before do
       allow_any_instance_of(ContentMigration).to receive(:quizzes_next_banks_migration?).and_return(true)
+      allow_any_instance_of(ContentMigration).to receive(:quizzes_next_migration?).and_return(true)
+      allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_bank_migrations_enabled?).and_return(true)
+    end
+
+    it "creates a quiz migration alert for the user and course" do
+      expect do
+        cm = @cm
+        cm.migration_type = "qti_converter"
+        cm.migration_settings["import_immediately"] = true
+        cm.save!
+
+        package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
+        attachment = Attachment.create!(context: cm, uploaded_data: File.open(package_path, "rb"), filename: "file.zip")
+        cm.attachment = attachment
+        cm.save!
+
+        cm.queue_migration
+        run_jobs
+      end.to change { QuizMigrationAlert.count }
+        .from(0).to(1)
+        .and change { @teacher.quiz_migration_alerts.count }
+        .from(0).to(1)
+    end
+
+    context "when the same migration is queued multiple times" do
+      it "does not produce multiple quiz migration alerts" do
+        expect do
+          cm = @cm
+          cm.migration_type = "qti_converter"
+          cm.migration_settings["import_immediately"] = true
+          cm.save!
+
+          package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
+          attachment = Attachment.create!(context: cm, uploaded_data: File.open(package_path, "rb"), filename: "file.zip")
+          cm.attachment = attachment
+          cm.save!
+
+          2.times do
+            cm.queue_migration
+            run_jobs
+          end
+        end.to change { QuizMigrationAlert.count }.from(0).to(1)
+      end
     end
 
     it "imports assignments from a qti zip file without creating assessment_question_banks" do
@@ -843,6 +886,25 @@ describe ContentMigration do
       expect(@course.quiz_questions.count).to eq 0
 
       expect(@course.assignments.count).to eq 1
+    end
+  end
+
+  context "when importing to NQ with the new_quizzes_bank_migrations FF turned off" do
+    it "does not produce quiz migration alerts" do
+      expect do
+        cm = @cm
+        cm.migration_type = "qti_converter"
+        cm.migration_settings["import_immediately"] = true
+        cm.save!
+
+        package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
+        attachment = Attachment.create!(context: cm, uploaded_data: File.open(package_path, "rb"), filename: "file.zip")
+        cm.attachment = attachment
+        cm.save!
+
+        cm.queue_migration
+        run_jobs
+      end.to not_change { QuizMigrationAlert.count }
     end
   end
 

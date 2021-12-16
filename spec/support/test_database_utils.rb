@@ -19,6 +19,21 @@
 
 module TestDatabaseUtils
   class << self
+    def check_migrations!
+      if ENV["SKIP_MIGRATION_CHECK"] != "1"
+        migrations = ActiveRecord::Base.connection.migration_context.migrations
+        skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
+
+        # total migration - all run migrations - all skipped migrations
+        needs_migration =
+          ActiveRecord::Base.connection.migration_context.migrations.collect(&:version).size -
+          ActiveRecord::Base.connection.migration_context.get_all_versions.size -
+          skipped_migrations.size
+
+        raise ActiveRecord::PendingMigrationError if needs_migration > 0
+      end
+    end
+
     def reset_database!
       return unless truncate_all_tables? || randomize_sequences?
 
@@ -37,7 +52,7 @@ module TestDatabaseUtils
       Shard.default(reload: true)
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV["RSPECQ_ENABLED"] == "1"
+      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1"
     end
 
     # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the
@@ -90,7 +105,7 @@ module TestDatabaseUtils
 
     def truncate_all_tables!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "truncating all tables..." unless ENV["RSPECQ_ENABLED"] == "1"
+      puts "truncating all tables..." unless ENV["SUPPRESS_OUTPUT"] == "1"
       each_connection do |connection|
         table_names = get_table_names(connection)
         next if table_names.empty?
@@ -117,7 +132,7 @@ module TestDatabaseUtils
 
     def randomize_sequences!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "randomizing db sequences..." unless ENV["RSPECQ_ENABLED"] == "1"
+      puts "randomizing db sequences..." unless ENV["SUPPRESS_OUTPUT"] == "1"
       seed = ::RSpec.configuration.seed
       i = 0
       each_connection do |connection|

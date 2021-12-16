@@ -359,6 +359,17 @@ export default class EditView extends ValidatedFormView
         @$externalToolsUrl.val(data['item[url]'])
         @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
 
+        # a content item with an assignment_id means that an assignment was already
+        # created on the backend. redirect to that assignment so that user can make
+        # any desired changes, without having to populate this model with extra
+        # data not found in this content item
+        if (data['item[assignment_id]'])
+          message = I18n.t("Loading assignment details from external app")
+          $.flashMessage(message)
+          $.screenReaderFlashMessageExclusive(message)
+          [context_type, context_id] = ENV.context_asset_string.split("_")
+          window.location.href = "/#{context_type}s/#{context_id}/assignments/#{data['item[assignment_id]']}/edit"
+
   toggleRestrictFileUploads: =>
     @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
 

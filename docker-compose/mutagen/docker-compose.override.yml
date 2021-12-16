@@ -6,7 +6,7 @@ services:
       context: .
     volumes:
       - code:/usr/src/app
-      - bundler:/home/docker/.bundler/
+      - bundle:/home/docker/.bundle/
       - canvas-docker-gems:/home/docker/.gem/
       - yarn-cache:/home/docker/.cache/yarn
     environment: &BASE-ENV
@@ -40,7 +40,7 @@ services:
 
 volumes:
   code: {}
-  bundler: {}
+  bundle: {}
   canvas-docker-gems: {}
   pg_data: {}
   yarn-cache: {}
@@ -103,3 +103,4 @@ x-mutagen:
           - "/.vscode"
           - "/tags"
           - "/tags.*"
+          - "/vendor/bundle/"

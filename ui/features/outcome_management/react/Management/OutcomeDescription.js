@@ -24,9 +24,11 @@ import {View} from '@instructure/ui-view'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
 
 const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
-  const {friendlyDescriptionFF, isStudent} = useCanvasContext()
+  const {friendlyDescriptionFF, isStudent, individualOutcomeRatingAndCalculationFF} =
+    useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
   let fullDescription = description
   let truncatedDescription = stripHtmlTags(fullDescription || '')
@@ -41,7 +43,7 @@ const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
     !isStudent &&
     truncatedDescription !== friendlyDescription
 
-  if (!description && !friendlyDescription) return null
+  if (!description && !friendlyDescription && !individualOutcomeRatingAndCalculationFF) return null
 
   return (
     <View>
@@ -97,6 +99,10 @@ const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
         <View as="div" padding="0 small 0 0" data-testid="description-expanded">
           <Text wrap="break-word">{fullDescription}</Text>
         </View>
+      )}
+
+      {!truncated && individualOutcomeRatingAndCalculationFF && (
+        <ProficiencyCalculation individualOutcome="display" canManage={false} />
       )}
     </View>
   )

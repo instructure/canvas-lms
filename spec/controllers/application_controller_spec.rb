@@ -2186,24 +2186,40 @@ RSpec.describe ApplicationController do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
 
-    it "puts false in ENV when disabled at site_admin" do
-      Account.site_admin.disable_feature!(:new_math_equation_handling)
-      expect(@controller.use_new_math_equation_handling?).to be_falsey
-      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
-    end
-
-    it "puts false in ENV when enabled at site_admin but disabled at the root account" do
-      Account.site_admin.enable_feature!(:new_math_equation_handling)
-      root_account.disable_feature!(:new_math_equation_handling)
-      expect(@controller.use_new_math_equation_handling?).to be_falsey
-      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
-    end
-
-    it "puts true in ENV when enabled at site_admin and the root account" do
-      Account.site_admin.enable_feature!(:new_math_equation_handling)
-      root_account.enable_feature!(:new_math_equation_handling)
+    it "sets new_math_equation_handling to true" do
       expect(@controller.use_new_math_equation_handling?).to be_truthy
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
+    end
+
+    context "with the quizzes#edit action" do
+      before do
+        allow(controller).to receive(:params).and_return(
+          {
+            controller: "quizzes/quizzes",
+            action: "edit"
+          }
+        )
+      end
+
+      it "sets new_math_equation_handling to false" do
+        expect(@controller.use_new_math_equation_handling?).to be_falsey
+        expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+      end
+    end
+
+    context "with the question_banks controller" do
+      before do
+        allow(controller).to receive(:params).and_return(
+          {
+            controller: "question_banks"
+          }
+        )
+      end
+
+      it "sets new_math_equation_handling to false" do
+        expect(@controller.use_new_math_equation_handling?).to be_falsey
+        expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+      end
     end
   end
 
@@ -2366,6 +2382,61 @@ RSpec.describe ApplicationController do
         @shard2.activate do
           expect(@controller.send(:k5_user?)).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "should_show_migration_limitation_message helper" do
+    context "for teachers" do
+      before :once do
+        course_with_teacher active_all: true
+      end
+
+      before do
+        user_session @teacher
+        controller.instance_variable_set(:@context, @course)
+        controller.instance_variable_set(:@current_user, @user)
+      end
+
+      context "when the teacher has a quiz migration alert" do
+        before do
+          @quiz_migration_alert =
+            QuizMigrationAlert.create!(user_id: @teacher.id, course_id: @course.id, migration_id: "10000000000040")
+        end
+
+        it "returns true" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:should_show_migration_limitation_message)).to eq(true)
+        end
+      end
+
+      context "when the teacher doesn't have a quiz migration alert" do
+        it "returns false" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
+        end
+      end
+    end
+
+    context "for students" do
+      before :once do
+        course_with_student active_all: true
+      end
+
+      before do
+        user_session @student
+        controller.instance_variable_set(:@context, @course)
+        controller.instance_variable_set(:@current_user, @user)
+        @quiz_migration_alert =
+          QuizMigrationAlert.create!(user_id: @student.id, course_id: @course.id, migration_id: "10000000000040")
+      end
+
+      it "returns false" do
+        controller.params[:controller] = "courses"
+        controller.params[:action] = "show"
+        expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
       end
     end
   end

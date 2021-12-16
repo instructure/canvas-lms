@@ -28,6 +28,7 @@ class ContentExport < ActiveRecord::Base
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_one :sent_content_share
   has_many :received_content_shares
+  has_many :quiz_migration_alerts, as: :migration, inverse_of: :migration, dependent: :destroy
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
@@ -38,6 +39,7 @@ class ContentExport < ActiveRecord::Base
 
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
 
+  before_save :assign_quiz_migration_limitation_alert
   before_create :set_global_identifiers
 
   # export types
@@ -284,7 +286,17 @@ class ContentExport < ActiveRecord::Base
     end
 
     begin
-      update(export_type: QTI)
+      if new_quizzes_bank_migration_enabled?
+        selected_content = self.selected_content || {}
+        selected_content["all_#{AssessmentQuestionBank.table_name}"] = true
+
+        update(
+          export_type: QTI,
+          selected_content: selected_content
+        )
+      else
+        update(export_type: QTI)
+      end
       @cc_exporter = CC::CCExporter.new(self)
 
       if @cc_exporter.export
@@ -321,8 +333,9 @@ class ContentExport < ActiveRecord::Base
           selected_content: {
             quizzes: {
               create_key(@quiz_exporter.quiz) => true
-            }
-          }
+            },
+            "all_#{AssessmentQuestionBank.table_name}": new_quizzes_bank_migration_enabled? || nil
+          }.compact
         )
         settings[:quizzes2] = @quiz_exporter.build_assignment_payload
         @cc_exporter = CC::CCExporter.new(self)
@@ -569,6 +582,13 @@ class ContentExport < ActiveRecord::Base
     created_at < ContentExport.expire_days.days.ago
   end
 
+  def assign_quiz_migration_limitation_alert
+    if workflow_state_changed? && exported? && quizzes_next? && context.is_a?(Course) &&
+       NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
+      context.create_or_update_quiz_migration_alert(user_id, self)
+    end
+  end
+
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
   scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
@@ -599,5 +619,9 @@ class ContentExport < ActiveRecord::Base
 
   def is_set?(option)
     Canvas::Plugin.value_to_boolean option
+  end
+
+  def new_quizzes_bank_migration_enabled?
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
   end
 end
