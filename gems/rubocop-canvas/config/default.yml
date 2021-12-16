@@ -32,6 +32,11 @@ Migration/Execute:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/ChangeColumn:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/PrimaryKey:
   Enabled: true
   Include:
