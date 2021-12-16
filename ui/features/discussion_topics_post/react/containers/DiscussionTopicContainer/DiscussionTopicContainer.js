@@ -487,6 +487,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         >
                           {expandedReply && (
                             <DiscussionEdit
+                              discussionAnonymousState={props.discussionTopic.anonymousState}
                               show={expandedReply}
                               onSubmit={text => {
                                 if (createDiscussionEntry) {
