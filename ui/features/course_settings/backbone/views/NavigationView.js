@@ -44,7 +44,7 @@ export default class NavigationView extends Backbone.View {
     $(e.currentTarget)
       .attr('class', '')
       .attr('class', 'icon-plus enable_nav_item_link')
-      .text(I18n.t('Enable'))
+      .text('Enable')
     return $targetItem.find('a.al-trigger').focus()
   }
 
@@ -54,7 +54,7 @@ export default class NavigationView extends Backbone.View {
     $(e.currentTarget)
       .attr('class', '')
       .attr('class', 'icon-x disable_nav_item_link')
-      .text(I18n.t('Disable'))
+      .text('Disable')
     return $targetItem.find('a.al-trigger').focus()
   }
 
@@ -87,23 +87,16 @@ export default class NavigationView extends Backbone.View {
     return renderTray(this.moveTrayProps, document.getElementById('not_right_side'))
   }
 
-  resetReadState(e) {
-    $('.drag_and_drop_warning').removeClass('read')
-  }
-
   focusKeyboardHelp(e) {
-    if (!$('.drag_and_drop_warning').hasClass('read')) {
-      $('.drag_and_drop_warning').removeClass('screenreader-only')
-    }
+    $('.drag_and_drop_warning').removeClass('screenreader-only')
   }
 
   hideKeyboardHelp(e) {
-    $('.drag_and_drop_warning').addClass('screenreader-only read')
+    $('.drag_and_drop_warning').addClass('screenreader-only')
   }
 
   afterRender() {
-    $('#navigation_tab').on('blur', this.resetReadState)
-    $('#tab-navigation').on('keyup', this.focusKeyboardHelp)
+    $('#navigation_tab').on('blur', this.focusKeyboardHelp)
     $('.drag_and_drop_warning').on('blur', this.hideKeyboardHelp)
   }
 }

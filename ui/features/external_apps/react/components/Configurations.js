@@ -29,14 +29,7 @@ export default class Configurations extends React.Component {
     env: PropTypes.object.isRequired
   }
 
-  // legacy all-encompassing permission
   canAddEdit = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.create_tool_manually
-
-  canAdd = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.add_tool_manually
-
-  canEdit = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.edit_tool_manually
-
-  canDelete = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.delete_tool_manually
 
   focusHeader = () => {
     this.headerRef.focus()
@@ -62,16 +55,10 @@ export default class Configurations extends React.Component {
     return (
       <div className="Configurations">
         <Header ref={this.setHeaderRef}>
-          {this.canAdd() && <AddExternalToolButton />}
+          {this.canAddEdit() && <AddExternalToolButton />}
           {appCenterLink()}
         </Header>
-        <ExternalToolsTable
-          canAdd={this.canAdd()}
-          canEdit={this.canEdit()}
-          canDelete={this.canDelete()}
-          canAddEdit={this.canAddEdit()}
-          setFocusAbove={this.focusHeader}
-        />
+        <ExternalToolsTable canAddEdit={this.canAddEdit()} setFocusAbove={this.focusHeader} />
       </div>
     )
   }

@@ -383,12 +383,6 @@
     "details_a6f427c3": {
         "message": "详细信息："
     },
-    "diamond_b8dfe7ae": {
-        "message": "菱形"
-    },
-    "dimension_type_55c83e4e": {
-        "message": "维度类型"
-    },
     "dimensions_45ddb7b7": {
         "message": "尺寸"
     },
@@ -559,9 +553,6 @@
     },
     "feedback_6dcc1991": {
         "message": "反馈"
-    },
-    "file_name_8fd421ff": {
-        "message": "文件名称"
     },
     "file_url_c12b64be": {
         "message": "文件URL"
@@ -848,9 +839,6 @@
     "multi_color_image_63d7372f": {
         "message": "彩色图像"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "必须至少达到 { percentage }%"
-    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "必须至少为 { width } x { height }px"
     },
@@ -986,17 +974,8 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "{ itemTitle }同行评审"
     },
-    "pentagon_17d82ea3": {
-        "message": "五角形"
-    },
     "people_b4ebb13c": {
         "message": "人员"
-    },
-    "percentage_34ab7c2c": {
-        "message": "百分数"
-    },
-    "pixels_52ece7d1": {
-        "message": "像素"
     },
     "points_bceb5005": {
         "message": "分值"

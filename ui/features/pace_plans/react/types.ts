@@ -56,7 +56,6 @@ export interface PacePlanItem {
   readonly module_item_id: string
   readonly module_item_type: string
   readonly published: boolean
-  compressed_due_date?: string
 }
 
 export interface Module {
@@ -84,7 +83,6 @@ export interface PacePlan {
   readonly context_type: PlanContextTypes
   readonly context_id: string
   readonly published_at?: string
-  readonly compressed_due_dates: PacePlanItemDueDates | undefined
 }
 
 export interface Progress {

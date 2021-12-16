@@ -142,8 +142,6 @@
   "describe_the_image_e65d2e32": { "message": "(Descriu la imatge)" },
   "describe_the_video_2fe8f46a": { "message": "(Descriu el vídeo)" },
   "details_98a31b68": { "message": "Detalls" },
-  "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Tipus de dimensió" },
   "dimensions_45ddb7b7": { "message": "Mides" },
   "directionality_26ae9e08": { "message": "Direccionalitat" },
   "discussions_a5f96392": { "message": "Debats" },
@@ -288,9 +286,6 @@
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Mòduls" },
   "multi_color_image_63d7372f": { "message": "Imatge multicolor" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Ha de ser un { percentage }% com a mínim"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Ha de ser de { width } × { height }píxels com a mínim"
   },
@@ -333,10 +328,7 @@
   },
   "pages_e5414c2c": { "message": "Pàgines" },
   "paragraph_5e5ad8eb": { "message": "Paràgraf" },
-  "pentagon_17d82ea3": { "message": "Pentàgon" },
   "people_b4ebb13c": { "message": "Persones" },
-  "percentage_34ab7c2c": { "message": "Percentatge" },
-  "pixels_52ece7d1": { "message": "Píxels" },
   "posted_when_a578f5ab": { "message": "Publicat: { when }" },
   "preformatted_d0670862": { "message": "Amb format previ" },
   "pretty_html_editor_28748756": {

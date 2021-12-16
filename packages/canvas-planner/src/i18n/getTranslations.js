@@ -21,23 +21,8 @@ export default function getTranslations(locale) {
     return Promise.resolve(null)
   }
 
-  // Most, but not all, of our translation files use _ where the locale uses -
-  // (e.g. locale es-ES maps to es_ES.json but en-GB-x-ukhe is the locale and filename)
-  // Let's try the _ version first. If that fails, then try the vanilla locale-based name.
-  const transFileName2 = `${locale.replace(/-/g, '_')}.json`
-  const promise = new Promise((resolve, reject) => {
-    import(
-      /* webpackChunkName: "[request]" */ `@instructure/translations/lib/canvas-planner/${transFileName2}`
-    )
-      .then(translations => resolve(translations))
-      .catch(_err => {
-        const transFileName = `${locale}.json`
-        import(
-          /* webpackChunkName: "[request]" */ `@instructure/translations/lib/canvas-planner/${transFileName}`
-        )
-          .then(translations => resolve(translations))
-          .catch(err => reject(err))
-      })
-  })
-  return promise
+  const transFileName = `${locale}.json`
+  return import(
+    /* webpackChunkName: "[request]" */ `@instructure/translations/lib/canvas-planner/${transFileName}`
+  )
 }

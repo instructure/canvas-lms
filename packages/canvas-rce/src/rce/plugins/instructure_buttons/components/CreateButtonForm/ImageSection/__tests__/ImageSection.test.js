@@ -92,14 +92,8 @@ jest.mock('../../../../../shared/StoreContext', () => {
 })
 
 describe('ImageSection', () => {
-  const defaultProps = {
-    editor: {},
-    onChange: jest.fn()
-  }
-
+  const defaultProps = {editor: {}}
   const subject = overrides => render(<ImageSection {...{...defaultProps, ...overrides}} />)
-
-  afterEach(() => jest.clearAllMocks())
 
   it('renders the image mode selector', () => {
     const {getByText} = subject()
@@ -169,22 +163,6 @@ describe('ImageSection', () => {
         expect(getByTestId('selected-image-preview')).toHaveStyle(
           'backgroundImage: url(data:image/png;base64,asdfasdfjksdf==)'
         )
-      })
-
-      it('dispatches an action to update parent state image', async () => {
-        await flushPromises()
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          "type": "SetEncodedImage",
-          "payload": "data:image/png;base64,asdfasdfjksdf=="
-        })
-      })
-
-      it('dispatches an action to update parent state image type', async () => {
-        await flushPromises()
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          "type": "SetEncodedImageType",
-          "payload": "Course"
-        })
       })
     })
   })

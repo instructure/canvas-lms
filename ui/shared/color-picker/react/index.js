@@ -32,7 +32,6 @@ import {isRTL} from '@canvas/i18n/rtlHelper'
 import '@canvas/rails-flash-notifications'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
-import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 export const PREDEFINED_COLORS = [
   {
@@ -320,16 +319,11 @@ const ColorPicker = createReactClass({
 
   warnIfInvalid() {
     if (!this.isValidHex(this.state.currentColor)) {
-      showFlashAlert({
-        message: I18n.t(
-          "'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.",
-          {
-            chosenColor: this.state.currentColor
-          }
-        ),
-        type: 'warning',
-        srOnly: true
-      })
+      $.screenReaderFlashMessage(
+        I18n.t("'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.", {
+          chosenColor: this.state.currentColor
+        })
+      )
     }
   },
 
@@ -353,7 +347,7 @@ const ColorPicker = createReactClass({
 
     const handleFailure = () => {
       doneSaving()
-      showFlashError(I18n.t("Could not save '%{chosenColor}'", {chosenColor: color}))()
+      $.flashError(I18n.t("Could not save '%{chosenColor}'", {chosenColor: color}))
     }
 
     if (this.isValidHex(color)) {
@@ -373,12 +367,9 @@ const ColorPicker = createReactClass({
         }
       })
     } else {
-      showFlashAlert({
-        message: I18n.t("'%{chosenColor}' is not a valid color.", {
-          chosenColor: this.state.currentColor
-        }),
-        type: 'warning'
-      })
+      $.flashWarning(
+        I18n.t("'%{chosenColor}' is not a valid color.", {chosenColor: this.state.currentColor})
+      )
     }
   },
 

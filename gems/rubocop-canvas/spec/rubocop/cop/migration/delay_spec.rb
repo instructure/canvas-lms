@@ -31,7 +31,7 @@ describe RuboCop::Cop::Migration::Delay do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/if_production/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it "disallows delay in predeploys" do
@@ -46,6 +46,6 @@ describe RuboCop::Cop::Migration::Delay do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/predeploy/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 end

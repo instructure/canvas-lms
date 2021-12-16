@@ -32,7 +32,6 @@ import I18n from 'i18n!gradebook'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 import UserSettings from '@canvas/user-settings'
 import Spinner from 'spin.js'
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
@@ -85,7 +84,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
-import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
@@ -886,10 +884,6 @@ class Gradebook extends React.Component {
       student.cssClass = `student_${student.id}`
       this.updateStudentRow(student)
     })
-    AssignmentOverrideHelper.setStudentDisplayNames([
-      ...Object.values(this.students),
-      ...Object.values(this.studentViewStudents)
-    ])
     this.gridReady.then(() => {
       return this.setupGrading(students)
     })
@@ -2441,7 +2435,7 @@ class Gradebook extends React.Component {
         label: I18n.t('Student Names'),
         customMatcher: this.studentSearchMatcher,
         onChange: this.onFilterToStudents,
-        options: students.map(student => ({id: student.id, text: student.displayName})),
+        options: students.map(student => ({id: student.id, text: student.name})),
         placeholder: I18n.t('Search Students')
       }
 
@@ -4559,35 +4553,6 @@ class Gradebook extends React.Component {
     return !!(
       this.courseFeatures.allowViewUngradedAsZero && this.gridDisplaySettings.viewUngradedAsZero
     )
-  }
-
-  allowApplyScoreToUngraded() {
-    return this.options.allow_apply_score_to_ungraded
-  }
-
-  onApplyScoreToUngradedRequested(assignmentGroup) {
-    const mountPoint = this.props.applyScoreToUngradedModalNode
-    if (!this.allowApplyScoreToUngraded() || mountPoint == null) {
-      return null
-    }
-
-    const close = () => {
-      ReactDOM.unmountComponentAtNode(mountPoint)
-    }
-
-    const onApply = args => {
-      // TODO: actually apply the scores
-      close()
-    }
-
-    const props = {
-      assignmentGroup,
-      onApply,
-      onClose: close,
-      open: true
-    }
-
-    renderComponent(ApplyScoreToUngradedModal, mountPoint, props)
   }
 
   destroy() {

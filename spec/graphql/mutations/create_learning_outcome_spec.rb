@@ -48,15 +48,6 @@ describe Mutations::CreateLearningOutcome do
             vendorGuid
             contextType
             contextId
-            calculationMethod
-            calculationInt
-            rubricCriterion {
-              masteryPoints
-              ratings {
-                description
-                points
-              }
-            }
           }
           errors {
             attribute
@@ -69,56 +60,12 @@ describe Mutations::CreateLearningOutcome do
     CanvasSchema.execute(mutation_command, context: context)
   end
 
-  def variables(args = {})
-    <<~YAML
-      groupId: #{args[:group_id] || @course_group.id},
-      title: "#{args[:title] || "Spec Learning Outcome via Mutation"}"
-    YAML
-  end
-
-  def default_rating_variables
-    {
-      calculation_method: "n_mastery",
-      calculation_int: 3,
-      rubric_criterion: {
-        mastery_points: 2,
-        ratings: [
-          {
-            description: "GraphQL Exceeds Expectations",
-            points: 3
-          },
-          {
-            description: "GraphQL Expectations",
-            points: 2
-          },
-          {
-            description: "GraphQL Does Not Meet Expectations",
-            points: 1
-          }
-        ]
-      }
-    }
-  end
-
-  def rating_variables(args = {})
-    args.merge!(default_rating_variables)
-
-    <<~GQL
-      calculationMethod: "#{args[:calculation_method]}",
-      calculationInt: #{args[:calculation_int]},
-      rubricCriterion: {
-        masteryPoints: #{args[:rubric_criterion][:mastery_points]}
-        ratings: #{
-          args[:rubric_criterion][:ratings]
-            .to_json
-            .gsub(/"([a-z]+)":/, '\1:')
-        }
-      }
-    GQL
-  end
-
   it "creates a learning outcome" do
-    result = execute_with_input(variables)
+    query = <<~GQL
+      groupId: #{@course_group.id}
+      title: "Spec Learning Outcome via Mutation"
+    GQL
+    result = execute_with_input(query)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "createLearningOutcome", "errors")).to be_nil
     result = result.dig("data", "createLearningOutcome", "learningOutcome")
@@ -134,34 +81,6 @@ describe Mutations::CreateLearningOutcome do
     expect(record.vendor_guid).to be_nil
     expect(record.display_name).to be_nil
     expect(record.context).to eq @course
-  end
-
-  it "creates a learning outcome with mastery scale" do
-    @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-    @course.root_account.disable_feature!(:account_level_mastery_scales)
-
-    calculation_method = default_rating_variables[:calculation_method]
-    calculation_int = default_rating_variables[:calculation_int]
-    rubric_criterion = default_rating_variables[:rubric_criterion]
-
-    result = execute_with_input "#{variables},#{rating_variables}"
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "createLearningOutcome", "errors")).to be_nil
-
-    result = result.dig("data", "createLearningOutcome", "learningOutcome")
-    result_record = LearningOutcome.find(result["_id"])
-
-    expect(result["calculationMethod"]).to eq calculation_method
-    expect(result["calculationInt"]).to eq calculation_int
-    expect(result["rubricCriterion"]["masteryPoints"]).to eq rubric_criterion[:mastery_points]
-    expect(result["rubricCriterion"]["ratings"].count).to eq rubric_criterion[:ratings].count
-    expect(result["rubricCriterion"]["ratings"][0]["description"]).to eq rubric_criterion[:ratings][0][:description]
-
-    expect(result_record.calculation_method).to eq calculation_method
-    expect(result_record.calculation_int).to eq calculation_int
-    expect(result_record.mastery_points).to eq rubric_criterion[:mastery_points]
-    expect(result_record.rubric_criterion[:ratings].count).to eq rubric_criterion[:ratings].count
-    expect(result_record.rubric_criterion[:ratings][0][:description]).to eq rubric_criterion[:ratings][0][:description]
   end
 
   it "creates a global outcome" do
@@ -223,22 +142,6 @@ describe Mutations::CreateLearningOutcome do
       GQL
       result = execute_with_input(query)
       expect_error(result, "Argument 'groupId' on InputObject 'CreateLearningOutcomeInput' is required.")
-    end
-
-    it "raises error when data includes individual ratings with IORC FF disabled" do
-      @course.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
-      @course.root_account.disable_feature!(:account_level_mastery_scales)
-
-      result = execute_with_input "#{variables},#{rating_variables}"
-      expect_error(result, "individual ratings data input with invidual_outcome_rating_and_calculation FF disabled")
-    end
-
-    it "raises error when data includes individual ratings with both IORC and ALMS FFs enabled" do
-      @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-      @course.root_account.enable_feature!(:account_level_mastery_scales)
-
-      result = execute_with_input "#{variables},#{rating_variables}"
-      expect_error(result, "individual ratings data input with acount_level_mastery_scale FF enabled")
     end
 
     it "non-global outcomes require manage_outcome permission" do

@@ -26,6 +26,8 @@ import {Button} from '@instructure/ui-buttons'
 export default class Lti2ReregistrationUpdateModal extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
+    closeHandler: PropTypes.func,
+    canAddEdit: PropTypes.bool.isRequired,
     returnFocus: PropTypes.func.isRequired
   }
 

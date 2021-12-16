@@ -405,23 +405,26 @@ class UsersController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     search_term = params[:search_term].presence
+    page_opts = {}
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
                                              {
                                                order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
                                                enrollment_type: params[:enrollment_type]
                                              })
+      page_opts[:total_entries] = nil # doesn't calculate a total count
     else
       users = UserSearch.scope_for(@context, @current_user,
                                    { order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
                                      enrollment_type: params[:enrollment_type] })
       users = users.with_last_login if params[:sort] == "last_login"
     end
+    page_opts[:total_entries] = nil unless @context.root_account.allow_last_page_on_users?
 
     includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
     GuardRail.activate(:secondary) do
-      users = Api.paginate(users, self, api_v1_account_users_url, { total_entries: nil })
+      users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
       user_json_preloads(users, includes.include?("email"))
       User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?("last_login") && params[:sort] != "last_login"
       render json: users.map { |u| user_json(u, @current_user, session, includes) }
@@ -1609,7 +1612,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
+  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1623,10 +1626,6 @@ class UsersController < ApplicationController
   #
   # @argument collapse_global_nav [Boolean]
   #   If true, the user's page loads with the global navigation collapsed
-  #
-  # @argument collapse_course_nav [Boolean]
-  #   If true, the user's course pages will load with the course navigation
-  #   collapsed.
   #
   # @argument hide_dashcard_color_overlays [Boolean]
   #   If true, images on course cards will be presented without being tinted

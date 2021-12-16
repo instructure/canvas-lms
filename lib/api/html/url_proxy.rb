@@ -135,7 +135,7 @@ module Api
             # made absolute with the canvas hostname prepended
             if !url.host && url_str[0] == "/"[0]
               # transpose IDs in the URL
-              if context.shard != target_shard && (args = recognize_path(url_str)) && args[:controller] != "equation_images"
+              if context.shard != target_shard && (args = recognize_path(url_str))
                 transpose_ids(args)
                 args[:host] = host
                 args[:protocol] = protocol

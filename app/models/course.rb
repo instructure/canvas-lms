@@ -1769,12 +1769,6 @@ class Course < ActiveRecord::Base
         grants_right?(user, :change_course_state)
     end
     can :delete
-
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        grants_right?(user, :lti_add_edit)
-    end
-    can :create_tool_manually
     ##################### End legacy permission block ##########################
 
     given { |user| account_membership_allows(user) }
@@ -1808,6 +1802,9 @@ class Course < ActiveRecord::Base
     # because students can't see prior enrollments)
     given { |user| grants_all_rights?(user, :read_roster, :read_as_admin) }
     can :read_prior_roster
+
+    given { |user| grants_right?(user, :lti_add_edit) }
+    can :create_tool_manually
   end
 
   def allows_gradebook_uploads?

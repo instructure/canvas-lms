@@ -32,9 +32,6 @@ import splitAssetString from '@canvas/util/splitAssetString'
 
 export default class ExternalToolsTable extends React.Component {
   static propTypes = {
-    canAdd: PropTypes.bool.isRequired,
-    canEdit: PropTypes.bool.isRequired,
-    canDelete: PropTypes.bool.isRequired,
     canAddEdit: PropTypes.bool.isRequired,
     setFocusAbove: PropTypes.func.isRequired
   }
@@ -97,9 +94,6 @@ export default class ExternalToolsTable extends React.Component {
           key={tool.app_id}
           ref={this.setToolRowRef(tool)}
           tool={tool}
-          canAdd={this.props.canAdd}
-          canEdit={this.props.canEdit}
-          canDelete={this.props.canDelete}
           canAddEdit={this.props.canAddEdit}
           setFocusAbove={this.setFocusAbove(t)}
           favoriteCount={rceFavCount}
@@ -116,7 +110,7 @@ export default class ExternalToolsTable extends React.Component {
     const show_lti_favorite_toggles =
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
-      (this.props.canAdd || this.props.canEdit || this.props.canDelete || this.props.canAddEdit)
+      this.props.canAddEdit
 
     return (
       <div className="ExternalToolsTable">

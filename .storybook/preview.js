@@ -7,7 +7,9 @@ import '@instructure/canvas-high-contrast-theme'
 import '@instructure/canvas-theme'
 
 window.ENV = window.ENV || {
-  FEATURES: {},
+  FEATURES: {
+    rce_auto_save: true
+  },
   // the RCE won't load w/o these yet
   context_asset_string: 'course_1',
   current_user_id: 2

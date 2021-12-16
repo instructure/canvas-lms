@@ -21,8 +21,7 @@ import {
   getSpeedGraderUrl,
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
-  isTopicAuthor,
-  getDisplayName
+  isTopicAuthor
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
@@ -63,7 +62,6 @@ export const DiscussionThreadContainer = props => {
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
-  const [reportingError, setReportingError] = useState(false)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -155,10 +153,7 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setReportModalIsLoading(false)
-      setReportingError(true)
-      setTimeout(() => {
-        setReportingError(false)
-      }, 3000)
+      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
     }
   })
 
@@ -201,7 +196,7 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry._id}`}
-        authorName={getDisplayName(props.discussionEntry)}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         hasDraftEntry={!!findDraftMessage()}
         onClick={() => {
@@ -228,7 +223,7 @@ export const DiscussionThreadContainer = props => {
         key={`like-${props.discussionEntry._id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
-        authorName={getDisplayName(props.discussionEntry)}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -389,7 +384,6 @@ export const DiscussionThreadContainer = props => {
                       ) : null
                     }
                     author={props.discussionEntry.author}
-                    anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={onUpdate}
@@ -447,7 +441,6 @@ export const DiscussionThreadContainer = props => {
                     }}
                     showReportModal={showReportModal}
                     isLoading={reportModalIsLoading}
-                    errorSubmitting={reportingError}
                   />
                 </Flex.Item>
               </Flex>

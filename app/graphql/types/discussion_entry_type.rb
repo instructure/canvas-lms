@@ -61,44 +61,9 @@ module Types
       end
     end
 
-    field :author, Types::UserType, null: true do
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
-      argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
-    end
-    def author(course_id: nil, role_types: nil, built_in_only: true)
-      load_association(:discussion_topic).then do |topic|
-        if topic.anonymous? && !course_id
-          nil
-        else
-          load_association(:user).then do |user|
-            if !topic.anonymous? || !user
-              user
-            else
-              Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
-                if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment")
-                  user
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-
-    field :anonymous_author, Types::AnonymousUserType, null: true
-    def anonymous_author
-      load_association(:discussion_topic).then do |topic|
-        if topic.anonymous?
-          Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
-            {
-              id: participant.id.to_s(36),
-              short_name: object.user_id == current_user.id ? "current_user" : participant.id.to_s(36),
-              avatar_url: nil
-            }
-          end
-        end
-      end
+    field :author, Types::UserType, null: false
+    def author
+      load_association(:user)
     end
 
     field :deleted, Boolean, null: true
@@ -106,29 +71,9 @@ module Types
       object.deleted?
     end
 
-    field :editor, Types::UserType, null: true do
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
-      argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
-    end
-    def editor(course_id: nil, role_types: nil, built_in_only: true)
-      load_association(:discussion_topic).then do |topic|
-        if topic.anonymous? && !course_id
-          nil
-        else
-          load_association(:editor).then do |user|
-            if !topic.anonymous? || !user
-              user
-            else
-              Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
-                if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment")
-                  user
-                end
-              end
-            end
-          end
-        end
-      end
+    field :editor, Types::UserType, null: true
+    def editor
+      load_association(:editor)
     end
 
     field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true

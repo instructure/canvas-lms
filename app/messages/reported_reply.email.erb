@@ -6,7 +6,7 @@
   <%= t :subject, "Reported reply in %{discussion_topic}, %{course}", discussion_topic: asset.discussion_topic.title, course: asset.context.name %>
 <% end %>
 
-<%= t :body, "Reported as %{report_type}: %{user}, %{course}", report_type: data[:report_type], user: asset.author_name, course: asset.context.name %>
+<%= t :body, "Reported as %{report_type}: %{user}, %{course}", report_type: data[:report_type], user: asset.user.short_name, course: asset.context.name %>
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 

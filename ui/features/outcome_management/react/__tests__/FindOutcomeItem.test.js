@@ -43,20 +43,12 @@ describe('FindOutcomeItem', () => {
     ...props
   })
 
-  const render = (
-    children,
-    {
-      friendlyDescriptionFF = true,
-      individualOutcomeRatingAndCalculationFF = false,
-      renderer = rtlRender
-    } = {}
-  ) => {
+  const render = (children, {friendlyDescriptionFF = true, renderer = rtlRender} = {}) => {
     return renderer(
       <OutcomesContext.Provider
         value={{
           env: {
-            friendlyDescriptionFF,
-            individualOutcomeRatingAndCalculationFF
+            friendlyDescriptionFF
           }
         }}
       >
@@ -163,6 +155,11 @@ describe('FindOutcomeItem', () => {
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
+  it('displays disabled caret button if no description', () => {
+    const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />)
+    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
+  })
+
   it('calls onImportHandler if Add button is clicked', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />, {
       contextType: 'Course'
@@ -193,23 +190,5 @@ describe('FindOutcomeItem', () => {
 
     fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByText('test friendly description')).not.toBeInTheDocument()
-  })
-
-  describe('individual outcome rating and calculation FF', () => {
-    describe('when feature flag enabled', () => {
-      it('enables caret button even if no description', () => {
-        const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />, {
-          individualOutcomeRatingAndCalculationFF: true
-        })
-        expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
-      })
-    })
-
-    describe('when feature flag disabled', () => {
-      it('disables caret button if no description', () => {
-        const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />)
-        expect(queryByTestId('icon-arrow-right').closest('button')).toBeDisabled()
-      })
-    })
   })
 })

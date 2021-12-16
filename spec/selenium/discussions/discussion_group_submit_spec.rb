@@ -39,20 +39,6 @@ describe "discussion assignments" do
     user_session(@teacher)
   end
 
-  context "when discussion anonymity is allowed" do
-    before :once do
-      Account.site_admin.enable_feature! :discussion_anonymity
-      @course.enable_feature! :react_discussions_post
-    end
-
-    context "for discussions getting created within a group's context" do
-      it "does not show anonymity options" do
-        get "/groups/#{@g1.id}/discussion_topics/new"
-        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
-      end
-    end
-  end
-
   context "create group discussion" do
     before do
       get "/courses/#{@course.id}/discussion_topics/new"

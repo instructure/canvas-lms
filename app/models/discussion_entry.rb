@@ -639,20 +639,4 @@ class DiscussionEntry < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id ||= discussion_topic.root_account_id
   end
-
-  def author_name(current_user = nil)
-    current_user ||= self.current_user
-
-    if discussion_topic.anonymous?
-      discussion_topic_participant = DiscussionTopicParticipant.find_by(discussion_topic_id: discussion_topic_id, user_id: user.id)
-
-      if discussion_topic_participant.user == current_user
-        t("You")
-      else
-        t("Anonymous") + " " + discussion_topic_participant&.id.to_s(36)
-      end
-    else
-      user.short_name
-    end
-  end
 end

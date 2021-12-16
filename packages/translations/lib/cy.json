@@ -383,12 +383,6 @@
     "details_a6f427c3": {
         "message": "Manylion:"
     },
-    "diamond_b8dfe7ae": {
-        "message": "Diemwnt"
-    },
-    "dimension_type_55c83e4e": {
-        "message": "Math o ddimensiwn"
-    },
     "dimensions_45ddb7b7": {
         "message": "Dimensiynau"
     },
@@ -559,9 +553,6 @@
     },
     "feedback_6dcc1991": {
         "message": "Adborth"
-    },
-    "file_name_8fd421ff": {
-        "message": "Enw’r Ffeil"
     },
     "file_url_c12b64be": {
         "message": "URL Ffeil"
@@ -848,9 +839,6 @@
     "multi_color_image_63d7372f": {
         "message": "Delwedd mwy nag un lliw"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Yn gorfod bod yn { percentage }% o leiaf"
-    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Yn gorfod bod o leiaf { width } x { height }px"
     },
@@ -986,17 +974,8 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Adolygiadau gan Gyd-fyfyrwyr ar gyfer { itemTitle }"
     },
-    "pentagon_17d82ea3": {
-        "message": "Pentagon"
-    },
     "people_b4ebb13c": {
         "message": "Pobl"
-    },
-    "percentage_34ab7c2c": {
-        "message": "Canran"
-    },
-    "pixels_52ece7d1": {
-        "message": "Picseli"
     },
     "points_bceb5005": {
         "message": "pwynt"

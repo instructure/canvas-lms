@@ -25,7 +25,6 @@ import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 import {waitFor} from '@testing-library/dom'
-import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -237,25 +236,6 @@ describe('IsolatedParent', () => {
           expect(onSuccessStub).toHaveBeenCalledWith('You have reported this reply.', false)
         })
       })
-    })
-  })
-
-  describe('anonymous author', () => {
-    beforeAll(() => {
-      window.ENV.discussion_anonymity_enabled = true
-    })
-
-    afterAll(() => {
-      window.ENV.discussion_anonymity_enabled = false
-    })
-
-    it('renders name', () => {
-      const props = defaultProps({
-        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()}
-      })
-      const container = setup(props)
-      expect(container.queryByText('Sorry, Something Broke')).toBeNull()
-      expect(container.getByText('Anonymous 1')).toBeInTheDocument()
     })
   })
 })

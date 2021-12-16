@@ -60,7 +60,7 @@ SelectContentDialog.deepLinkingListener = event => {
     event.data.messageType === 'LtiDeepLinkingResponse'
   ) {
     if (event.data.content_items.length > 1) {
-      return processMultipleContentItems(event)
+      processMultipleContentItems(event)
         .then(result => {
           const $dialog = $('#resource_selection_dialog')
           $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
@@ -85,7 +85,7 @@ SelectContentDialog.deepLinkingListener = event => {
           $dialog.dialog('close')
         })
     } else if (event.data.content_items.length === 1) {
-      return processSingleContentItem(event)
+      processSingleContentItem(event)
         .then(result => {
           const $dialog = $('#resource_selection_dialog')
           $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
@@ -109,20 +109,16 @@ SelectContentDialog.deepLinkingListener = event => {
           $dialog.dialog('close')
         })
     } else if (event.data.content_items.length === 0) {
-      SelectContentDialog.closeAll()
+      const $selectContextContentDialog = $('#select_context_content_dialog')
+      const $resourceSelectionDialog = $('#resource_selection_dialog')
+
+      $resourceSelectionDialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+      $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+
+      $resourceSelectionDialog.dialog('close')
+      $selectContextContentDialog.dialog('close')
     }
   }
-}
-
-SelectContentDialog.closeAll = function () {
-  const $selectContextContentDialog = $('#select_context_content_dialog')
-  const $resourceSelectionDialog = $('#resource_selection_dialog')
-
-  $resourceSelectionDialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
-  $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
-
-  $resourceSelectionDialog.dialog('close')
-  $selectContextContentDialog.dialog('close')
 }
 
 SelectContentDialog.attachDeepLinkingListner = function () {
@@ -156,15 +152,6 @@ SelectContentDialog.handleContentItemResult = function (result, tool) {
   $('#external_tool_create_title').val(result.title || tool.name)
   $('#external_tool_create_custom_params').val(JSON.stringify(result.custom))
   $('#context_external_tools_select .domain_message').hide()
-
-  // content item with an assignment_id means that an assignment was already
-  // created on the backend, so close this dialog without giving the user
-  // any chance to make changes that would be discarded
-  if (result.assignment_id) {
-    $('#external_tool_create_assignment_id').val(result.assignment_id)
-    $('#select_context_content_dialog .add_item_button').click()
-    SelectContentDialog.closeAll()
-  }
 }
 
 SelectContentDialog.Events = {
@@ -377,8 +364,7 @@ SelectContentDialog.extractContextExternalToolItemData = function () {
     'item[indent]': $('#content_tag_indent').val(),
     'item[url]': $('#external_tool_create_url').val(),
     'item[title]': $('#external_tool_create_title').val(),
-    'item[custom_params]': $('#external_tool_create_custom_params').val(),
-    'item[assignment_id]': $('#external_tool_create_assignment_id').val()
+    'item[custom_params]': $('#external_tool_create_custom_params').val()
   }
 }
 
@@ -386,7 +372,6 @@ SelectContentDialog.resetExternalToolFields = function () {
   $('#external_tool_create_url').val('')
   $('#external_tool_create_title').val('')
   $('#external_tool_create_custom_params').val('')
-  $('#external_tool_create_assignment_id').val('')
 }
 
 $(document).ready(function () {

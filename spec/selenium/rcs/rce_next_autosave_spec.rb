@@ -42,6 +42,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     before do
       Setting.set("rce_auto_save_max_age_ms", 1.hour.to_i * 1_000)
       course_with_teacher_logged_in
+      Account.default.enable_feature!(:rce_auto_save)
       stub_rcs_config
     end
 
@@ -220,6 +221,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     before do
       Setting.set("rce_auto_save_max_age_ms", 1.hour.to_i * 1_000)
       account_with_admin_logged_in
+      Account.default.enable_feature!(:rce_auto_save)
       stub_rcs_config
     end
 

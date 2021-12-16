@@ -17,7 +17,7 @@
  */
 
 import {useState, useEffect, useReducer} from 'react'
-import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
+import {DEFAULT_SETTINGS} from '../svg/constants'
 
 const TYPE = 'image/svg+xml'
 
@@ -28,7 +28,10 @@ export const statuses = {
 }
 
 export function useSvgSettings(editor, editing) {
-  const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
+  const [settings, dispatch] = useReducer(
+    (state, changes) => ({...state, ...changes}),
+    DEFAULT_SETTINGS
+  )
   const [status, setStatus] = useState(statuses.IDLE)
 
   useEffect(() => {

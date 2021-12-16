@@ -26,21 +26,23 @@ import LockManager from '@canvas/blueprint-courses/react/components/LockManager/
 import '@canvas/module-sequence-footer'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
-$('body').addClass('show')
+const lockManager = new LockManager()
+lockManager.init({itemType: 'wiki_page', page: 'show'})
 
-ready(() => {
-  const lockManager = new LockManager()
-  lockManager.init({itemType: 'wiki_page', page: 'show'})
-
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
+$(() =>
+  $('#content').on('click', '#mark-as-done-checkbox', function() {
     MarkAsDone.toggle(this)
   })
+)
 
-  const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
-    revision: ENV.WIKI_PAGE_REVISION,
-    contextAssetString: ENV.context_asset_string
-  })
+$('body').addClass('show')
 
+const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
+  revision: ENV.WIKI_PAGE_REVISION,
+  contextAssetString: ENV.context_asset_string
+})
+
+ready(() => {
   const wikiPageView = new WikiPageView({
     el: '#wiki_page_show',
     model: wikiPage,

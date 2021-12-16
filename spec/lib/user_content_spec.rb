@@ -192,7 +192,7 @@ describe UserContent do
       string = "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/></li>"\
                "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
                "<li><img class='nothing_special'></li></ul></div>"
-      html = UserContent.escape(string, nil, false)
+      html = UserContent.escape(string)
       expected = "<div><ul>\n"\
                  "<li>\n"\
                  "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
@@ -210,7 +210,7 @@ describe UserContent do
                "<span class=\"hidden-readable\"><math>3</math></span>text node<span class=\"hidden-readable\"><math>4</math></span>"\
                "</div>"
 
-      html = UserContent.escape(string, nil, false)
+      html = UserContent.escape(string)
       expected = "<div>\n"\
                  "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>text node"\
                  "</div>"

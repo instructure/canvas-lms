@@ -55,6 +55,14 @@ module Lti::IMS::Concerns
       content_items.filter { |item| item[:type] == "ltiResourceLink" }
     end
 
+    def create_lti_resource_links
+      lti_resource_links.each do |content_item|
+        resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom])
+
+        content_item[:lookup_uuid] = resource_link&.lookup_uuid
+      end
+    end
+
     class DeepLinkingJwt
       include ActiveModel::Validations
 

@@ -37,18 +37,13 @@ import DiscussionTopicKeyboardShortcutModal from './react/DiscussionTopicKeyboar
 import ready from '@instructure/ready'
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
-if (ENV.STUDENT_CONTEXT_CARDS_ENABLED)
-  import('@canvas/context-cards/react/StudentContextCardTrigger')
+if (ENV.STUDENT_CONTEXT_CARDS_ENABLED) import('@canvas/context-cards/react/StudentContextCardTrigger')
 
 if (ENV.MASTER_COURSE_DATA) {
-  import('@canvas/blueprint-courses/react/components/LockManager/index').then(
-    ({default: LockManager}) => {
-      ready(() => {
-        const lockManager = new LockManager()
-        lockManager.init({itemType: 'discussion_topic', page: 'show'})
-      })
-    }
-  )
+  import('@canvas/blueprint-courses/react/components/LockManager/index').then(({default: LockManager}) => {
+    const lockManager = new LockManager()
+    lockManager.init({itemType: 'discussion_topic', page: 'show'})
+  })
 }
 
 const descendants = 5

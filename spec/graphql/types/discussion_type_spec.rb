@@ -246,65 +246,6 @@ RSpec.shared_examples "DiscussionType" do
     end
   end
 
-  context "anonymous discussions" do
-    before do
-      @anon_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
-                                                 message: "anonymous discussion",
-                                                 anonymous_state: "fully_anonymous",
-                                                 context: @course,
-                                                 user: @teacher,
-                                                 editor: @teacher)
-      @anon_discussion_type = GraphQLTypeTester.new(
-        @anon_discussion,
-        current_user: @teacher
-      )
-
-      course_with_student(course: @course)
-      @anon_student_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
-                                                         message: "anonymous discussion",
-                                                         anonymous_state: "fully_anonymous",
-                                                         context: @course,
-                                                         user: @student,
-                                                         editor: @student)
-      @anon_student_discussion_type = GraphQLTypeTester.new(
-        @anon_student_discussion,
-        current_user: @teacher
-      )
-    end
-
-    it "author is nil" do
-      expect(@anon_discussion_type.resolve("author { shortName }")).to eq nil
-    end
-
-    it "editor is nil" do
-      expect(@anon_discussion_type.resolve("editor { shortName }")).to eq nil
-    end
-
-    it "anonymous_author is not nil" do
-      expect(@anon_discussion_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
-    end
-
-    it "mentionableUsersConnection is nil" do
-      expect(@anon_discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq nil
-    end
-
-    it "returns the teacher author if a course id is provided" do
-      expect(@anon_discussion_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
-    end
-
-    it "returns the teacher editor if a course id is provided" do
-      expect(@anon_discussion_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
-    end
-
-    it "does not return the student author if a course id is provided" do
-      expect(@anon_student_discussion_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
-    end
-
-    it "does not return the student editor if a course id is provided" do
-      expect(@anon_student_discussion_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
-    end
-  end
-
   context "allows filtering discussion entries by workflow_state" do
     before do
       @de = discussion.discussion_entries.create!(message: "find me", user: @teacher)
