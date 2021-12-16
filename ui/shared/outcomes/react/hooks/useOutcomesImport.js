@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import {useState, useCallback, useEffect} from 'react'
 import I18n from 'i18n!FindOutcomesModal'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {IMPORT_OUTCOMES} from '@canvas/outcomes/graphql/Management'
@@ -28,6 +28,20 @@ export const IMPORT_NOT_STARTED = 'IMPORT_NOT_STARTED'
 export const IMPORT_PENDING = 'IMPORT_PENDING'
 export const IMPORT_COMPLETED = 'IMPORT_COMPLETED'
 export const IMPORT_FAILED = 'IMPORT_FAILED'
+
+const getLocalStorageActiveImports = () => {
+  try {
+    // if, for some reason, we have a bad activeImports data inside (like null string)
+    // we won't break
+    return JSON.parse(localStorage.activeImports || '[]') || []
+  } catch (error) {
+    return []
+  }
+}
+
+const storeActiveImportsInLocalStorage = activeImports => {
+  localStorage.activeImports = JSON.stringify(activeImports)
+}
 
 const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval = 5000) => {
   const [importGroupsStatus, setImportGroupsStatus] = useState({})
@@ -108,9 +122,26 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         showFlashError(err, isGroup)
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
       }
+
+      const activeImports = getLocalStorageActiveImports()
+      storeActiveImportsInLocalStorage(
+        activeImports.filter(
+          imp => !(imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId)
+        )
+      )
     },
     [groupPollingInterval, outcomePollingInterval, isCourse, setStatus]
   )
+
+  useEffect(() => {
+    getLocalStorageActiveImports().forEach(
+      ({progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle}) => {
+        setStatus(outcomeOrGroupId, IMPORT_PENDING, isGroup)
+        trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle)
+      }
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const importOutcomes = useCallback(
     async ({
@@ -145,6 +176,18 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         const importErrors = importResult.data?.importOutcomes?.errors
         if (importErrors !== null) throw new Error(importErrors?.[0]?.message)
 
+        const newTrackedImport = {
+          outcomeOrGroupId,
+          isGroup,
+          groupTitle,
+          targetGroupTitle,
+          progress
+        }
+
+        const activeImports = getLocalStorageActiveImports()
+        activeImports.push(newTrackedImport)
+        storeActiveImportsInLocalStorage(activeImports)
+        setStatus(outcomeOrGroupId, IMPORT_PENDING, isGroup)
         trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle)
         setHasAddedOutcomes(true)
       } catch (err) {
@@ -152,14 +195,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
       }
     },
-    [
-      importOutcomesMutation,
-      setStatus,
-      trackProgress,
-      targetContextId,
-      targetContextType,
-      setHasAddedOutcomes
-    ]
+    [targetContextId, targetContextType, setStatus, importOutcomesMutation, trackProgress]
   )
 
   const clearGroupsStatus = () => setImportGroupsStatus({})
