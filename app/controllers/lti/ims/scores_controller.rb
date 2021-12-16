@@ -119,7 +119,7 @@ module Lti::IMS
     #   Possible values are NotReady, Failed, Pending, PendingManual, FullyGraded.
     #
     # @argument timestamp [Required, String]
-    #   Date and time when the score was modified in the tool. Should use subsecond precision.
+    #   Date and time when the score was modified in the tool. Should use ISO8601-formatted date with subsecond precision.
     #   Returns a 400 if the timestamp is earlier than the updated_at time of the Result.
     #
     # @argument scoreGiven [Number]
@@ -138,7 +138,7 @@ module Lti::IMS
     #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
     #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, online_upload, or online_url. Defaults to external_tool. Ignored if content_items are provided.
     #   submission_data [String] submission data (URL or body text)
-    #   submitted_at [String] Date and time that the submission was originally created. Should use subsecond precision. This should match the data and time that the original submission happened in Canvas.
+    #   submitted_at [String] Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. This should match the data and time that the original submission happened in Canvas.
     #   content_items [Array] Files that should be included with the submission. Each item should contain `type: file`, a url pointing to the file, a title, and a progress url that Canvas can report to. If present, submission_type will be online_upload.
     #
     # @returns resultUrl [String]
@@ -260,7 +260,7 @@ module Lti::IMS
 
     def verify_valid_submitted_at
       submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at_date = submitted_at.present? ? (Time.zone.iso8601(submitted_at) rescue nil) : nil
+      submitted_at_date = parse_timestamp(submitted_at)
       future_buffer = Setting.get("ags_submitted_at_future_buffer", 1.minute.to_s).to_i.seconds
 
       if submitted_at.present? && submitted_at_date.nil?
@@ -412,7 +412,7 @@ module Lti::IMS
     end
 
     def timestamp
-      @_timestamp = Time.zone.iso8601(params[:timestamp]) rescue nil
+      @_timestamp = parse_timestamp(params[:timestamp])
     end
 
     def result_url
@@ -439,7 +439,7 @@ module Lti::IMS
 
     def submitted_at
       submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at.present? ? (Time.zone.iso8601(submitted_at) rescue nil) : nil
+      parse_timestamp(submitted_at)
     end
 
     def file_content_items
@@ -448,6 +448,14 @@ module Lti::IMS
 
     def has_content_items?
       file_content_items.any?
+    end
+
+    def parse_timestamp(t)
+      return nil unless t.present?
+
+      parsed = Time.zone.iso8601(t) rescue nil
+      parsed ||= (Time.zone.parse(t) rescue nil) if Setting.get("enforce_iso8601_for_lti_scores", "false") == "false"
+      parsed
     end
   end
 end
