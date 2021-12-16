@@ -431,4 +431,20 @@ describe CourseLinkValidator do
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :deleted
     end
   end
+
+  describe "#valid_route?" do
+    before :once do
+      course_model
+      @course_link_validator = CourseLinkValidator.new(@course)
+    end
+
+    it "returns true for valid routes" do
+      expect(@course_link_validator.valid_route?("/")).to be_truthy
+      expect(@course_link_validator.valid_route?("/courses/")).to be_truthy
+    end
+
+    it "returns true for a valid public file" do
+      expect(@course_link_validator.valid_route?("/favicon.ico")).to be_truthy
+    end
+  end
 end
