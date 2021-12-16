@@ -29,16 +29,14 @@ const defaultProps = ({
   onCancel = jest.fn(),
   onSubmit = jest.fn(),
   updateDraft = jest.fn(),
-  draftSaved = false,
-  discussionAnonymousState = null
+  draftSaved = false
 } = {}) => ({
   show,
   value,
   draftSaved,
   updateDraft,
   onCancel,
-  onSubmit,
-  discussionAnonymousState
+  onSubmit
 })
 
 describe('DiscussionEdit', () => {
@@ -58,13 +56,6 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps())
       const container = getByTestId('DiscussionEdit-container')
       expect(container.style.display).toBe('')
-    })
-
-    it('should render anonymous response selector when topic is anonymous', () => {
-      ENV.current_user = {display_name: 'Ronald Weasley'}
-      ENV.current_user_roles = ['student']
-      const container = setup(defaultProps({discussionAnonymousState: 'full_anonymity'}))
-      expect(container.queryByTestId('anonymous-response-selector')).toBeTruthy()
     })
   })
 

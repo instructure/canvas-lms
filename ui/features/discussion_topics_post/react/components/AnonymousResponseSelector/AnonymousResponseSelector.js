@@ -26,7 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Select} from '@instructure/ui-select'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import propTypes from 'prop-types'
+import {string} from 'prop-types'
 
 export const AnonymousResponseSelector = props => {
   const [selectedOption, setSelectedOption] = useState(
@@ -101,7 +101,7 @@ export const AnonymousResponseSelector = props => {
   }
 
   return (
-    <Flex data-testid="anonymous-response-selector">
+    <Flex>
       {selectedOption === 'Anonymous' ? (
         <AnonymousAvatar seedString={CURRENT_USER} />
       ) : (
@@ -113,8 +113,6 @@ export const AnonymousResponseSelector = props => {
 }
 
 AnonymousResponseSelector.propTypes = {
-  username: propTypes.string,
-  discussionAnonymousState: propTypes.string
+  username: string,
+  discussionAnonymousState: string || null
 }
-
-export default AnonymousResponseSelector

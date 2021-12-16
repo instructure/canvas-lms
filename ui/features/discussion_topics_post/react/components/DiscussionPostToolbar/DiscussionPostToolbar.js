@@ -219,7 +219,7 @@ export const DiscussionPostToolbar = props => {
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
+            {props.discussionAnonymousState && (
               <Flex.Item align="end">
                 <AnonymousAvatar seedString={CURRENT_USER} />
               </Flex.Item>

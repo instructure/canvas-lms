@@ -143,7 +143,6 @@ describe('DiscussionPostToolbar', () => {
   describe('Anonymous Indicator Avatar', () => {
     describe('discussion is anonymous', () => {
       it('should render discussionAnonymousState is not null', () => {
-        ENV.current_user_roles = ['student']
         const container = setup({
           discussionAnonymousState: 'full_anonymity'
         })
@@ -153,7 +152,6 @@ describe('DiscussionPostToolbar', () => {
 
     describe('discussion is not anonymous', () => {
       it('should render discussionAnonymousState is null', () => {
-        ENV.current_user_roles = ['student']
         const container = setup({
           discussionAnonymousState: null
         })

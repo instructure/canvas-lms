@@ -463,7 +463,6 @@ export const DiscussionThreadContainer = props => {
                 margin="none none x-small none"
               >
                 <DiscussionEdit
-                  discussionAnonymousState={props.discussionTopic.anonymousState}
                   onSubmit={text => {
                     onReplySubmit(text)
                   }}
