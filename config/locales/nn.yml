@@ -8554,7 +8554,7 @@ nn:
   embed_828fac4a: "Sett inn"
   embed_video_code_703e10f2: "Sett inn videokode"
   embedded_images_598ff8da: embedded_images
-  embry_riddle_student_activity_tracking_8020dd95: "Embry Riddel sporing av studentaktivitet"
+  embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle sporing av studentaktivitet"
   empty_stub_for_testing_only_37aad38: "Tom stubb (berre for testing)"
   enable_6f5d1328: Aktiver
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Gjer mogleg å endre sluttresultat for eit heilt emne utan å endre resultat for einskilde oppgåver. "
@@ -21447,7 +21447,7 @@ nn:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "ID-en som blir brukt for å vise den spesifikke syklusen for førespurnad/respons som feilrapporten oppstod i"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressa ein privilegert brukar kan bruke til å opptre som rapporteringsbrukaren på same sida, for å prøve å gjenskape problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressa til sida brukaren var på då feilen blei rapportert"
-  the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "brukar_id(ane) eil administrator(ane) som lager innleveringar"
+  the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "brukar_id(ane) til administrator(ane) som lager innleveringar"
   the_user_id_to_report_on_b1de2577: "ID for brukaren rapporten er for"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Brukaren må vere påmeld som faglærar i emna dei vil kryssliste."
   the_user_to_report_on_820dea8a: "Brukaren som rapporten gjeld for"
