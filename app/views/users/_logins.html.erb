@@ -34,8 +34,8 @@
     <table class="ic-Table">
       <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
-        <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
-          <td class='sso-icon'>
+        <tr class="login<%= ' blank' unless pseudonym %>" <%= raw %Q(style="display: none") unless pseudonym %>>
+          <td class="sso-icon" <%= raw %Q(data-pseudonym-id="#{pseudonym.id}") if pseudonym %>>
             <% if lookup_context.template_exists?("shared/svg/_svg_icon_#{pseudonym.try(:authentication_provider).try(:auth_type)}.svg") %>
               <%= render(partial: "shared/svg/svg_icon_#{pseudonym.authentication_provider.auth_type}.svg") %>
               <span class="screenreader-only">
