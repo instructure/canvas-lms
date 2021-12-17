@@ -2158,6 +2158,7 @@ nn:
       Gir ein brukar løyve til å sjå nylege kunngjeringar på forsida til emnet.
   allows_user_to_access_the_attendance_tool_72ef0b68: "Gir ein brukar løyve til å bruke oppmøteverktøyet."
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Gir ein brukar løyve til å sjå sidemenyen for Blueprint-emne. Gir ein brukar løyve til å administrere innhald i Blueprint-emne i emneinnstillingar. Gir ein brukar løyve til å fjerne eit tilknytta emne. Gir ein brukar løyve til å redigere innstillingar som låser individuelle oppgåver, sider og diskusjonar i Blueprint-emne. "
+  allows_user_to_access_the_chat_tool_48d5f5c4: "Gir brukarar løyve til å bruke chat-verktøyet."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Gir ein brukar løyve til å sjå fanen for filer i innhaldsveljaren. "
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: "Gir ein brukar løyve til å se navigasjonsfana i emneinnstillingar. Gir ein brukar løyve til å se knappane studentvising (teststudent), kopier dette emnet, tilbakestill emneinnhald og slett emne for godt. Gir ein brukar løyve til å endre emnebilde, -namn, emnekode, tidssone, underkonto, semester, samt gjere andre val i emnedetaljarfana."
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Gir ein brukar løyve til å gjenopprette emne i administrasjonsverktøyet"
@@ -2233,6 +2234,7 @@ nn:
       Gir ein brukar løyve til å opprette, endre og slette emnegrupper.
       Gir ein brukar løyve til å opprette, endre og slette emnegrupper som er oppretta av studentar.
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Gir ein brukar løyve til å opprette, endre og slette vurderingsskjema i eit emne via lenka for vurderingsskjema. "
+  allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: "Gir ein brukar løyve til å opprette, endre og slette læringsmål og læringsmålgrupper på emnenivå."
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Gir ein brukar løyve til å opprette, endre og slette vurderingsskjema."
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
       Gir ein brukar løyve til å opprette, importere, endre og slette læringsmål og læringsmålgrupper på
@@ -2253,6 +2255,7 @@ nn:
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: "Gir ein brukar løyve til å endre låseinnstillingane på oversiktssidene til oppgåver og quizer i eit  Blueprint-masteremne."
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Gir ein brukar løyve til å endre låseinnstillingane på diskusjonsoversikta i eit Blueprint-masteremne."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Gir ein brukar løyve til å endre låseinnstillingane for filer i eit Blueprint-masteremne. "
+  allows_user_to_edit_conferences_61eb62e0: "Gir brukar løyve til å redigere konferansar."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Gir ein brukar løyve til å endre konfigurasjonar for eksterne appar som er lagt til manuelt. "
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Gir ein brukar løyve til å endre vurderingar og legge til kommentarar i SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Gir ein brukar løyve til å endre vurderingar i vurderingsoversikta. Gir ein brukar løyve til å sjå vurderingshistorikken. Gir ein brukar løyve til å sjå vurderingsoversikta for meistringslæring (dersom den er aktivert). "
@@ -2269,7 +2272,9 @@ nn:
       Gir ein brukar løyve til å legge til tilknytte emne.
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Gir ein brukar løyve til å generere ein paringskode på vegner av ein student som kan delast med ein observatør. "
   allows_user_to_generate_login_logout_activity_repo_bba62f2: "Gir ein brukar løyve til å generere ein rapport i administrasjonsverktøy om inn-/utloggingsaktivitet."
+  allows_user_to_import_account_learning_outcomes_f6f6d0b9: "Gir ein brukar løyve til å importere ein konto sine læringsmål"
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Gir ein brukar løyve til å importere innhald ved å bruke emneimportverktøyet."
+  allows_user_to_import_course_learning_outcomes_2ca3f18f: "Gir ein brukar løyve til å importere emnets læringsmål"
   allows_user_to_import_learning_outcomes_17fce84a: "Gir ein brukar løyve til å importere læringsmål."
   allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "Gir ein brukar løyve til å importere læringsmål til vurderingsskjema."
   allows_user_to_import_resources_from_commons_into__255ad23: |-
@@ -2309,6 +2314,7 @@ nn:
       Gir ein brukar løyve til å sende ei melding til "Alle i [emnegruppe]".
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Gir ein brukar løyve til å sende melding til \"Alle i [emnenamn]\" eller til \"Alle i [emnegruppe]\"."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Gir brukar løyve til å sende meldingar til individuelle emnemedlem."
+  allows_user_to_set_outcome_mastery_scales_at_the_a_2a01ea09: "Gir ein brukar løyve til å setje læringsmål for meistringsskalaar på konto- og emnenivå."
   allows_user_to_set_outcome_mastery_scales_at_the_c_fc85f708: "Gir ein brukar løyve til å setje læringsmål for meistringsskalaar på emnenivå."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Gir ein brukar løyve til å dele ein quiz til Commons."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Gir ein brukar løyve til å sjå SIS-ID-ane til emna."
@@ -2346,6 +2352,7 @@ nn:
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Gir brukar løyve til å sjå analysedata for emne gjennom emnedashbordet. Gir brukar løyve til å sjå analysedata for student."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gir ein brukar løyve til å sjå analysedata for emne og studentar frå forsida til eit emne eller frå Personoversikta."
   allows_user_to_view_course_sis_id_3a1818a5: "Gir ein brukar løyve til å sjå SIS-ID for emne."
+  allows_user_to_view_course_status_choose_home_page_21bf32a8: "Gir brukar løyve til sjå emnestatus, velje heimeside, og sjekkliste for enmeoppsett-knappar på heimesida."
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
       Gir ein brukar løyve til å sjå knappane Emnestatus, Vel  emneforside og Sjekkliste
       for emneoppsett på emneforsida.
@@ -11175,6 +11182,7 @@ nn:
   how_do_i_change_the_course_home_page_326cee50: "Korleis kan eg endre forsida i emnet mitt? "
   how_do_i_conclude_a_conference_689d60dc: "Korsleis avsluttar eg ein konferanse?"
   how_do_i_contact_my_instructor_184e35ed: "Korleis tar eg kontakt med faglærar?"
+  how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: "Korleis kopierer eg eit Canvas emne til eit nytt emneskal?"
   how_do_i_create_a_conference_in_a_course_69affbf4: "Korleis kan eg opprette ein konferanse i eit emne?"
   how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Korleis kan eg som faglærar sette opp ein diskusjon? "
   how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: "Korleis kan eg som faglærar setje opp eit Google Drive-samarbeid?"
@@ -15519,6 +15527,7 @@ nn:
     account_group_description: "Læringsmålgruppe på kontonivå."
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Læringsmål \"%{guid}\" er allereie importert"
   outcome_imports_c496a81f: "Import av læringsmål"
+  outcome_mastery_scales_8c3a814d: Meistringsresultat
   outcome_mastery_scales_add_edit_171551c: "Skala for meistringsresultat - legg til / rediger"
   outcome_path_mastery_points: "%{path} meistringspoeng"
   outcome_path_result: "%{path} resultat"
@@ -18697,8 +18706,8 @@ nn:
       manage_interaction_alerts: "Administrer varsel"
       manage_links: "Administrer roller og klareringslenker"
       manage_outcomes: "Administrer læringsmål"
-      manage_proficiency_calculations: "Rediger utrekning av ferdighetsnivåresultat"
-      manage_proficiency_scales: "Rediger skala for meistringsresultat"
+      manage_proficiency_calculations: "Rediger av utrekning av ferdighetsnivåresultat"
+      manage_proficiency_scales: "Rediger skala for læringsmål for meistringsskalaar"
       manage_role_overrides: "Administrer løyve"
       manage_rubrics: "Opprett og rediger vurderingsskjema"
       manage_sections: "Administrer (opprett/rediger/slett) emneseksjonar"
