@@ -20,6 +20,7 @@ import normalizeLocale from './rce/normalizeLocale'
 import {renderIntoDiv as render} from './rce/root'
 import {headerFor, originFromHost} from './sidebar/sources/api'
 import getTranslations from './getTranslations'
+import defaultTinymceConfig from './defaultTinymceConfig'
 
 if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
   try {
@@ -36,6 +37,8 @@ if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
     console.warn(`could not find canvas-rce language: ${process.env.BUILD_LOCALE}`)
   }
 }
+
+export const defaultConfiguration = defaultTinymceConfig
 
 export function renderIntoDiv(editorEl, props, cb) {
   const language = normalizeLocale(props.language)
