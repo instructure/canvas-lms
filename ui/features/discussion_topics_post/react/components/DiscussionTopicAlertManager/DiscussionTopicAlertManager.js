@@ -118,9 +118,14 @@ export const DiscussionTopicAlertManager = props => {
           applicableAlerts.push(
             <Alert key="anon-conversation" variant="info" margin="0 0 x-small">
               <Text data-testid="anon-conversation" size={responsiveProps?.alert?.textSize}>
-                {I18n.t(
-                  'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
-                )}
+                {/* teachers, tas and designers are assigned the teacher roles in current_user_roles */}
+                {ENV.current_user_roles?.includes('teacher')
+                  ? I18n.t(
+                      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
+                    )
+                  : I18n.t(
+                      'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
+                    )}
               </Text>
             </Alert>
           )

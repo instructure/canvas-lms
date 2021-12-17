@@ -181,7 +181,7 @@ describe "discussions" do
             expect_new_page_load { submit_form(".form-actions") }
             expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
             expect(f("span[data-testid='anon-conversation']").text).to(
-              eq("This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.")
+              eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.")
             )
             expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
           end
