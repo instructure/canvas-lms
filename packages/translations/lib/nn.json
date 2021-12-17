@@ -146,6 +146,12 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Opptak av lyd og bilde støttast ikkje: bruk ein annan nettlesar."
     },
+    "audio_options_feb58e2c": {
+        "message": "Lydalternativ"
+    },
+    "audio_options_tray_33a90711": {
+        "message": "Menyalternativ for lyd"
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Audiospelar for { title }"
     },
@@ -989,6 +995,9 @@
     "percentage_34ab7c2c": {
         "message": "Prosenttal"
     },
+    "percentage_must_be_a_number_8033c341": {
+        "message": "Prosent må være eit tal"
+    },
     "pixels_52ece7d1": {
         "message": "Pixlar"
     },
@@ -1114,6 +1123,9 @@
     },
     "show_all_ae37d610": {
         "message": "Vis alt"
+    },
+    "show_audio_options_b489926b": {
+        "message": "Vis lydalternativ"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Vis sett inn-alternativ"
