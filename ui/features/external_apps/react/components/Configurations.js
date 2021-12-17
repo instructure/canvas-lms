@@ -62,7 +62,7 @@ export default class Configurations extends React.Component {
     return (
       <div className="Configurations">
         <Header ref={this.setHeaderRef}>
-          {this.canAdd() && <AddExternalToolButton />}
+          {(this.canAddEdit || this.canAdd()) && <AddExternalToolButton />}
           {appCenterLink()}
         </Header>
         <ExternalToolsTable
