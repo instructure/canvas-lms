@@ -301,6 +301,10 @@ module K5DashboardPageObject
     "h1"
   end
 
+  def observer_picker_container_selector
+    "#dashboard-observer-picker"
+  end
+
   #------------------------- Elements --------------------------
 
   def account_name_element

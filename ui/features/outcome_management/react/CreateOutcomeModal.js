@@ -41,9 +41,18 @@ import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from './shared/OutcomesRceField'
+import ProficiencyCalculation, {
+  defaultProficiencyCalculation
+} from './MasteryCalculation/ProficiencyCalculation'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
-  const {contextType, contextId, friendlyDescriptionFF, isMobileView} = useCanvasContext()
+  const {
+    contextType,
+    contextId,
+    friendlyDescriptionFF,
+    isMobileView,
+    individualOutcomeRatingAndCalculationFF
+  } = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
@@ -55,9 +64,12 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     collection: 'OutcomeManagementPanel',
     initialGroupId: starterGroupId
   })
-
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
+  const [proficiencyCalculation, setProficiencyCalculation] = useState(
+    defaultProficiencyCalculation
+  )
+  const [proficiencyCalculationError, setProficiencyCalculationError] = useState(false)
 
   useEffect(() => {
     if (rootId && collections[rootId] && !selectedGroup) {
@@ -93,19 +105,28 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     !invalidTitle &&
     !invalidDisplayName &&
     selectedGroup &&
-    friendlyDescriptionMessages.length === 0
+    friendlyDescriptionMessages.length === 0 &&
+    (individualOutcomeRatingAndCalculationFF ? !proficiencyCalculationError : true)
+
+  const updateProficiencyCalculation = (calculationMethodKey, calculationInt) =>
+    setProficiencyCalculation({calculationMethod: calculationMethodKey, calculationInt})
 
   const onCreateOutcomeHandler = () => {
     ;(async () => {
       try {
+        const input = {
+          groupId: selectedGroup.id,
+          title,
+          displayName,
+          description
+        }
+        if (individualOutcomeRatingAndCalculationFF) {
+          input.calculationMethod = proficiencyCalculation.calculationMethod
+          input.calculationInt = proficiencyCalculation.calculationInt
+        }
         const createLearningOutcomeResult = await createLearningOutcome({
           variables: {
-            input: {
-              groupId: selectedGroup.id,
-              title,
-              displayName,
-              description
-            }
+            input
           }
         })
 
@@ -218,6 +239,17 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 label={I18n.t('Friendly description (for parent/student display)')}
                 onChange={friendlyDescriptionChangeHandler}
                 messages={friendlyDescriptionMessages}
+              />
+            </View>
+          )}
+          {individualOutcomeRatingAndCalculationFF && (
+            <View as="div" minHeight="14rem">
+              <hr style={{margin: '1rem 0 0'}} />
+              <ProficiencyCalculation
+                update={updateProficiencyCalculation}
+                setError={setProficiencyCalculationError}
+                individualOutcome="edit"
+                canManage
               />
             </View>
           )}
