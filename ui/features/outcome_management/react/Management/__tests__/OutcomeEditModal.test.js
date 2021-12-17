@@ -24,7 +24,7 @@ import OutcomeEditModal from '../OutcomeEditModal'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
-  updateOutcomeMocks,
+  updateLearningOutcomeMocks,
   setFriendlyDescriptionOutcomeMock
 } from '@canvas/outcomes/mocks/Management'
 
@@ -65,7 +65,8 @@ describe('OutcomeEditModal', () => {
     env = {
       contextType: 'Account',
       contextId: '1',
-      friendlyDescriptionFF: true
+      friendlyDescriptionFF: true,
+      individualOutcomeRatingAndCalculationFF: false
     },
     mockOverrides = []
   } = {}) => {
@@ -74,7 +75,7 @@ describe('OutcomeEditModal', () => {
         failResponse,
         failMutation
       }),
-      ...updateOutcomeMocks({description: outcome.description}),
+      ...updateLearningOutcomeMocks({description: outcome.description}),
       ...mockOverrides
     ]
 
@@ -174,7 +175,11 @@ describe('OutcomeEditModal', () => {
 
   describe('updates the outcome', () => {
     it('displays flash confirmation with proper message if update request succeeds', async () => {
-      const mocks = updateOutcomeMocks({description: 'Updated description'})
+      const mocks = updateLearningOutcomeMocks({
+        title: 'Updated name',
+        description: 'Updated description',
+        displayName: 'Updated friendly name'
+      })
       const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
         mockOverrides: mocks
       })
@@ -183,6 +188,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: 'Updated description'}
       })
+      fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
@@ -193,8 +199,12 @@ describe('OutcomeEditModal', () => {
     })
 
     it('displays flash confirmation message when removing existing description if update request succeeds', async () => {
-      const mocks = updateOutcomeMocks({description: '', title: 'Outcome'})
-      const {getByText, getByDisplayValue} = renderWithProvider({
+      const mocks = updateLearningOutcomeMocks({
+        description: '',
+        title: 'Outcome',
+        displayName: 'Updated friendly name'
+      })
+      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
         mockOverrides: mocks,
         overrides: {outcome: {...outcome, _id: '3'}}
       })
@@ -202,6 +212,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: null}
       })
+      fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
@@ -276,16 +287,87 @@ describe('OutcomeEditModal', () => {
     })
 
     it('does not call friendly description mutation when updating outcome', async () => {
-      const {getByText, getByLabelText} = renderWithProvider({
+      const mocks = updateLearningOutcomeMocks({
+        description: 'Updated description',
+        displayName: 'Updated friendly name'
+      })
+      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+        mockOverrides: mocks,
         env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
         // mock setFriendlyDescription mutation to throw an error
         failResponse: true
       })
+      await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
+      fireEvent.change(getByDisplayValue('Outcome description'), {
+        target: {value: 'Updated description'}
+      })
+      fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
-      // if setFriendlyDescription mutation is called the expectation below will fail
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: '"Updated name" was successfully updated.',
+        type: 'success'
+      })
+    })
+  })
+
+  describe('with Individual Outcome Proficiency and Calculation Feature Flag enabled', () => {
+    it('displays calculation method selection form if outcome is created in same context', async () => {
+      const {getByLabelText} = renderWithProvider({
+        env: {
+          contextType: 'Account',
+          contextId: '1',
+          individualOutcomeRatingAndCalculationFF: true
+        }
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByLabelText('Calculation Method')).toBeInTheDocument()
+    })
+
+    it('displays read only calculation method if outcome is created in different context', async () => {
+      const {getByTestId} = renderWithProvider({
+        env: {
+          contextType: 'Course',
+          contextId: '2',
+          individualOutcomeRatingAndCalculationFF: true
+        }
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByTestId('read-only-calculation-method')).toBeInTheDocument()
+    })
+
+    it('updates outcome and its calculation method', async () => {
+      const mocks = updateLearningOutcomeMocks({
+        description: 'Updated description',
+        displayName: 'Updated friendly outcome name',
+        calculationMethod: 'latest',
+        calculationInt: null,
+        individualCalculation: true
+      })
+      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+        env: {
+          contextType: 'Account',
+          contextId: '1',
+          individualOutcomeRatingAndCalculationFF: true
+        },
+        mockOverrides: mocks
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
+      fireEvent.change(getByLabelText('Friendly Name'), {
+        target: {value: 'Updated friendly outcome name'}
+      })
+      fireEvent.change(getByDisplayValue('Outcome description'), {
+        target: {value: 'Updated description'}
+      })
+      const method = getByDisplayValue('Decaying Average')
+      fireEvent.click(method)
+      const newMethod = getByText('Most Recent Score')
+      fireEvent.click(newMethod)
+      fireEvent.click(getByText('Save'))
+      await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',
         type: 'success'
