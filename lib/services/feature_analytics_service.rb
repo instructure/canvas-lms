@@ -23,7 +23,7 @@ require "aws-sdk-sqs"
 module Services
   class FeatureAnalyticsService
     def self.persist_feature_evaluation(message)
-      Canvas.timeout_protection("feature_analytics_queue", raise_on_timeout: false) do
+      Canvas.timeout_protection("feature_analytics_queue", raise_on_timeout: true) do
         client.send_message({ queue_url: config["queue_url"], message_body: message.to_json })
       end
     end

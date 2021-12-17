@@ -40,8 +40,6 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Opptak av lyd og bilde støttast ikkje: bruk ein annan nettlesar."
   },
-  "audio_options_feb58e2c": { "message": "Lydalternativ" },
-  "audio_options_tray_33a90711": { "message": "Menyalternativ for lyd" },
   "audio_player_for_title_20cc70d": { "message": "Audiospelar for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-lagra innhald finst. Vil du laste inn auto-lagra innhald i staden for?"
@@ -306,9 +304,6 @@
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personar" },
   "percentage_34ab7c2c": { "message": "Prosenttal" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Prosent må være eit tal"
-  },
   "pixels_52ece7d1": { "message": "Pixlar" },
   "posted_when_a578f5ab": { "message": "Posta: { when }" },
   "preformatted_d0670862": { "message": "Førehandsformatert" },
@@ -346,7 +341,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Bruk Shift-O for å opne den pene HTML-editoren."
   },
-  "show_audio_options_b489926b": { "message": "Vis lydalternativ" },
   "show_embed_options_ef8d7ef": { "message": "Vis sett inn-alternativ" },
   "show_image_options_1e2ecc6b": { "message": "Vis alternativ for bilde" },
   "show_link_options_545338fd": { "message": "Vis lenkealternativ" },

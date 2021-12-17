@@ -7904,13 +7904,6 @@ describe Submission do
       expect(submission.word_count).to eq nil
     end
 
-    it "returns nil if it's a quiz submission" do
-      submission.update(submission_type: "online_quiz", body: "test submission")
-      expect(submission.submission_type).to eq "online_quiz"
-      expect(submission.body).not_to eq nil
-      expect(submission.word_count).to eq nil
-    end
-
     it "returns 0 if the body is empty" do
       submission.update(body: "")
       expect(submission.word_count).to eq 0
