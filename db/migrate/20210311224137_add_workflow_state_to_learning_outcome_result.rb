@@ -23,14 +23,7 @@ class AddWorkflowStateToLearningOutcomeResult < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    if connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
-      add_column :learning_outcome_results, :workflow_state, :string, default: "active", null: false, if_not_exists: true
-    else
-      add_column :learning_outcome_results, :workflow_state, :string, if_not_exists: true
-      change_column_default :learning_outcome_results, :workflow_state, "active"
-      DataFixup::BackfillNulls.run(LearningOutcomeResult, :workflow_state, default_value: "active")
-      change_column_null :learning_outcome_results, :workflow_state, false
-    end
+    add_column :learning_outcome_results, :workflow_state, :string, default: "active", null: false, if_not_exists: true
   end
 
   def down
