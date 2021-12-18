@@ -192,6 +192,7 @@ const TreeBrowser = ({
       showRootCollection={showRootCollection}
       variant="indent"
       defaultExpanded={defaultExpandedIds}
+      sortOrder={(a, b) => a.name.localeCompare(b.name)}
     />
   )
 }
