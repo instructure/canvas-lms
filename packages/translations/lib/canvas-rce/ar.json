@@ -42,6 +42,8 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "تسجيل الصوت والفيديو غير مدعوم، يرجى استخدام مستعرض مختلف."
   },
+  "audio_options_feb58e2c": { "message": "خيارات الصوت" },
+  "audio_options_tray_33a90711": { "message": "علبة خيارات الصوت" },
   "audio_player_for_title_20cc70d": { "message": "مشغل الصوت لـ { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
@@ -257,6 +259,7 @@
   "loading_failed_e6a9d8ef": { "message": "فشل التحميل." },
   "loading_folders_d8b5869e": { "message": "جارٍ تحميل المجلدات" },
   "loading_please_wait_d276220a": { "message": "جارٍ التحميل، يرجى الانتظار" },
+  "loading_preview_9f077aa1": { "message": "جارٍ تحميل المعاينة" },
   "locked_762f138b": { "message": "مؤمّن" },
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
@@ -310,6 +313,9 @@
   "pentagon_17d82ea3": { "message": "خماسي" },
   "people_b4ebb13c": { "message": "أشخاص" },
   "percentage_34ab7c2c": { "message": "نسبة مئوية" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "يجب أن تكون النسبة المئوية رقمًا"
+  },
   "pixels_52ece7d1": { "message": "بكسل" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
@@ -347,6 +353,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
   },
+  "show_audio_options_b489926b": { "message": "إظهار خيارات الصوت" },
   "show_embed_options_ef8d7ef": { "message": "إظهار خيارات التضمين" },
   "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },

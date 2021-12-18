@@ -146,6 +146,12 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Enregistrement audio et vidéo non pris en charge; veuillez utiliser un autre navigateur."
     },
+    "audio_options_feb58e2c": {
+        "message": "Options audio"
+    },
+    "audio_options_tray_33a90711": {
+        "message": "Plateau des Options Audio"
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Lecteur audio pour { title }"
     },
@@ -812,6 +818,9 @@
     "loading_please_wait_d276220a": {
         "message": "Chargement en cours, veuillez patienter..."
     },
+    "loading_preview_9f077aa1": {
+        "message": "Chargement de l’aperçu"
+    },
     "location_3b6ff307": {
         "message": "Emplacement :"
     },
@@ -995,6 +1004,9 @@
     "percentage_34ab7c2c": {
         "message": "Pourcentage"
     },
+    "percentage_must_be_a_number_8033c341": {
+        "message": "Le pourcentage doit être un chiffre"
+    },
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
@@ -1120,6 +1132,9 @@
     },
     "show_all_ae37d610": {
         "message": "Tout afficher"
+    },
+    "show_audio_options_b489926b": {
+        "message": "Afficher les options audio"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Afficher les options intégrées"
