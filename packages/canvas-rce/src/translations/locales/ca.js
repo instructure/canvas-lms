@@ -63,6 +63,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "La funció d’enregistrament d’àudio i vídeo no és compatible; utilitzeu un altre navegador."
   },
+  "audio_options_feb58e2c": { "message": "Opcions de so" },
+  "audio_options_tray_33a90711": { "message": "Safata d''opcions de so" },
   "audio_player_for_title_20cc70d": {
     "message": "Reproductor de so per a { title }"
   },
@@ -163,6 +165,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Descriu la imatge)" },
   "describe_the_video_2fe8f46a": { "message": "(Descriu el vídeo)" },
   "details_98a31b68": { "message": "Detalls" },
+  "diamond_b8dfe7ae": { "message": "Diamant" },
+  "dimension_type_55c83e4e": { "message": "Tipus de dimensió" },
   "dimensions_45ddb7b7": { "message": "Mides" },
   "directionality_26ae9e08": { "message": "Direccionalitat" },
   "discussions_a5f96392": { "message": "Debats" },
@@ -300,6 +304,9 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "No s''ha pogut carregar." },
   "loading_folders_d8b5869e": { "message": "S''estan carregant les carpetes" },
   "loading_please_wait_d276220a": { "message": "S''està carregant, espereu" },
+  "loading_preview_9f077aa1": {
+    "message": "S’està carregant la visualització prèvia"
+  },
   "locked_762f138b": { "message": "Bloquejat" },
   "media_af190855": { "message": "Element multimèdia" },
   "medium_5a8e9ead": { "message": "Mitjà" },
@@ -307,6 +314,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Mòduls" },
   "multi_color_image_63d7372f": { "message": "Imatge multicolor" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Ha de ser un { percentage }% com a mínim"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Ha de ser de { width } × { height }píxels com a mínim"
   },
@@ -349,7 +359,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Pàgines" },
   "paragraph_5e5ad8eb": { "message": "Paràgraf" },
+  "pentagon_17d82ea3": { "message": "Pentàgon" },
   "people_b4ebb13c": { "message": "Persones" },
+  "percentage_34ab7c2c": { "message": "Percentatge" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "El percentatge ha de ser un número."
+  },
+  "pixels_52ece7d1": { "message": "Píxels" },
   "posted_when_a578f5ab": { "message": "Publicat: { when }" },
   "preformatted_d0670862": { "message": "Amb format previ" },
   "pretty_html_editor_28748756": {
@@ -396,6 +412,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Premeu Maj+O per obrir l''editor de dades HTML processades."
   },
+  "show_audio_options_b489926b": { "message": "Mostra les opcions de so" },
   "show_embed_options_ef8d7ef": { "message": "Mostra les opcions integrades" },
   "show_image_options_1e2ecc6b": { "message": "Mostra les opcions d''imatge" },
   "show_link_options_545338fd": { "message": "Mostra les opcions d''enllaç" },

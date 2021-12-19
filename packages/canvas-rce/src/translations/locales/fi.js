@@ -63,6 +63,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Ääni- ja videonauhoituksia ei tueta, valitse eri selain."
   },
+  "audio_options_feb58e2c": { "message": "Äänivalinnat" },
+  "audio_options_tray_33a90711": { "message": "Ääniasetusten ilmoitusalue" },
   "audio_player_for_title_20cc70d": {
     "message": "Äänisoitin kohteelle { title }"
   },
@@ -161,6 +163,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Kuvaa kuva)" },
   "describe_the_video_2fe8f46a": { "message": "(Kuvaa video)" },
   "details_98a31b68": { "message": "Lisätiedot" },
+  "diamond_b8dfe7ae": { "message": "Diamond" },
+  "dimension_type_55c83e4e": { "message": "Ulottuvuuden tyyppi" },
   "dimensions_45ddb7b7": { "message": "Mitat" },
   "directionality_26ae9e08": { "message": "Suuntaisuus" },
   "discussions_a5f96392": { "message": "Keskustelut" },
@@ -294,6 +298,7 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Lataus epäonnistui." },
   "loading_folders_d8b5869e": { "message": "Ladataan kansioita" },
   "loading_please_wait_d276220a": { "message": "Ladataan, odota" },
+  "loading_preview_9f077aa1": { "message": "Esikatselua ladataan" },
   "locked_762f138b": { "message": "Lukittu" },
   "media_af190855": { "message": "Tietoväline" },
   "medium_5a8e9ead": { "message": "Tietoväline" },
@@ -301,6 +306,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Muut asiat" },
   "modules_c4325335": { "message": "Moduulit" },
   "multi_color_image_63d7372f": { "message": "Monivärinen kuva" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Täytyy olla vähintään { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Täytyy olla vähintään { width } x { height }px."
   },
@@ -341,7 +349,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Sivut" },
   "paragraph_5e5ad8eb": { "message": "Kappale" },
+  "pentagon_17d82ea3": { "message": "Viisikulmio" },
   "people_b4ebb13c": { "message": "Henkilöt" },
+  "percentage_34ab7c2c": { "message": "Prosenttimäärä" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Prosenttiosuuden täytyy olla numero"
+  },
+  "pixels_52ece7d1": { "message": "Pikselit" },
   "posted_when_a578f5ab": { "message": "Lähetetty: { when }" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
   "pretty_html_editor_28748756": { "message": "Pretty-tekstieditori" },
@@ -380,6 +394,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O avaa Pretty-tekstieditorin."
   },
+  "show_audio_options_b489926b": { "message": "Näytä ääniasetukset" },
   "show_embed_options_ef8d7ef": { "message": "Näytä upotusasetukset" },
   "show_image_options_1e2ecc6b": { "message": "Näytä kuva-asetukset" },
   "show_link_options_545338fd": { "message": "Näytä linkin asetukset" },
