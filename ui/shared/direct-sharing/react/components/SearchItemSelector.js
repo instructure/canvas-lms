@@ -22,8 +22,7 @@ import {func, string, object} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
-
-const MINIMUM_SEARCH_LENGTH = 2
+import {MINIMUM_SEARCH_LENGTH, isSearchableTerm} from '../effects/useManagedCourseSearchApi'
 
 SearchItemSelector.propTypes = {
   onItemSelected: func, // expects each item to have the 'name' property
@@ -39,10 +38,6 @@ SearchItemSelector.defaultProps = {
   itemSearchFunction: () => {},
   renderLabel: '',
   additionalParams: {}
-}
-
-function isSearchableTerm(value) {
-  return value.length >= MINIMUM_SEARCH_LENGTH
 }
 
 export default function SearchItemSelector({
