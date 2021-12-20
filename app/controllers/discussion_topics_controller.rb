@@ -764,7 +764,7 @@ class DiscussionTopicsController < ApplicationController
              })
 
       js_bundle :discussion_topics_post
-      css_bundle :discussions_index
+      css_bundle :discussions_index, :learning_outcomes
       render html: "", layout: true
       return
     end
