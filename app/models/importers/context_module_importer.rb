@@ -303,6 +303,9 @@ module Importers
                                            id: external_tool_id,
                                            lti_resource_link_lookup_uuid: hash[:lti_resource_link_lookup_uuid]
                                          }, existing_item, position: context_module.migration_position)
+          if hash[:link_settings_json]
+            item.link_settings = JSON.parse(hash[:link_settings_json])
+          end
           if item.associated_asset && item.associated_asset_id.nil?
             migration.add_warning(
               t(
