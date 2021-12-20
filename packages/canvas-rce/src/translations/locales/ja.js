@@ -61,8 +61,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "音声および動画の記録はサポートされていません。他のブラウザを使用してください。"
   },
-  "audio_options_feb58e2c": { "message": "オーディオオプション" },
-  "audio_options_tray_33a90711": { "message": "オーディオオプショントレイ" },
   "audio_player_for_title_20cc70d": {
     "message": "{ title }のオーディオプレーヤー"
   },
@@ -161,8 +159,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(画像の説明)" },
   "describe_the_video_2fe8f46a": { "message": "（ビデオを説明する）" },
   "details_98a31b68": { "message": "詳細" },
-  "diamond_b8dfe7ae": { "message": "ダイヤモンド" },
-  "dimension_type_55c83e4e": { "message": "サイズタイプ" },
   "dimensions_45ddb7b7": { "message": "寸法" },
   "directionality_26ae9e08": { "message": "方向性" },
   "discussions_a5f96392": { "message": "ディスカッション" },
@@ -296,7 +292,6 @@ const locale = {
   "loading_please_wait_d276220a": {
     "message": "読み込み中 - しばらくお待ちください"
   },
-  "loading_preview_9f077aa1": { "message": "プレビュー読み込み中" },
   "locked_762f138b": { "message": "ロックされています" },
   "media_af190855": { "message": "メディア" },
   "medium_5a8e9ead": { "message": "中" },
@@ -304,9 +299,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "その他" },
   "modules_c4325335": { "message": "モジュール" },
   "multi_color_image_63d7372f": { "message": "マルチカラー画像" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "{ percentage }%以上でなければなりません"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "少なくとも { width } x { height }px でなければなりません"
   },
@@ -349,13 +341,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "ページ" },
   "paragraph_5e5ad8eb": { "message": "段落" },
-  "pentagon_17d82ea3": { "message": "ペンタゴン" },
   "people_b4ebb13c": { "message": "メンバー" },
-  "percentage_34ab7c2c": { "message": "割合" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "パーセンテージは数字でなければなりません"
-  },
-  "pixels_52ece7d1": { "message": "ピクセル" },
   "posted_when_a578f5ab": { "message": "投稿済み:{ when }" },
   "preformatted_d0670862": { "message": "フォーマット済み" },
   "pretty_html_editor_28748756": { "message": "Pretty HTML エディタ" },
@@ -393,9 +379,6 @@ const locale = {
   "selected_274ce24f": { "message": "選択されました" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-Oでpretty HTMLエディタを開きます。"
-  },
-  "show_audio_options_b489926b": {
-    "message": "オーディオオプションを表示する"
   },
   "show_embed_options_ef8d7ef": { "message": "埋め込みオプションを表示する" },
   "show_image_options_1e2ecc6b": { "message": "画像オプションを表示" },

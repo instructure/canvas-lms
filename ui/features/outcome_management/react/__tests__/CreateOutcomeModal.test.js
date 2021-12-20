@@ -50,7 +50,6 @@ describe('CreateOutcomeModal', () => {
       contextType = 'Account',
       contextId = '1',
       friendlyDescriptionFF = true,
-      individualOutcomeRatingAndCalculationFF = false,
       mocks = accountMocks({childGroupsCount: 0}),
       isMobileView = false,
       renderer = rtlRender
@@ -58,15 +57,7 @@ describe('CreateOutcomeModal', () => {
   ) => {
     return renderer(
       <OutcomesContext.Provider
-        value={{
-          env: {
-            contextType,
-            contextId,
-            friendlyDescriptionFF,
-            individualOutcomeRatingAndCalculationFF,
-            isMobileView
-          }
-        }}
+        value={{env: {contextType, contextId, friendlyDescriptionFF, isMobileView}}}
       >
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
@@ -459,65 +450,6 @@ describe('CreateOutcomeModal', () => {
               message: '"Outcome 123" was successfully created.',
               type: 'success'
             })
-          })
-        })
-      })
-      describe('Invidiual Outcome Proficiency and Calculation Feature Flag', () => {
-        describe('when feature flag enabled', () => {
-          it('displays Calculation Method selection form', async () => {
-            const {getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
-            })
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(getByLabelText('Calculation Method')).toBeInTheDocument()
-          })
-
-          it('creates outcome with calculation method', async () => {
-            const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-            const {getByText, getByLabelText, getByDisplayValue} = render(
-              <CreateOutcomeModal {...defaultProps()} />,
-              {
-                individualOutcomeRatingAndCalculationFF: true,
-                mocks: [
-                  ...smallOutcomeTree(),
-                  setFriendlyDescriptionOutcomeMock({
-                    inputDescription: 'Friendly Description value'
-                  }),
-                  createLearningOutcomeMock({
-                    title: 'Outcome 123',
-                    displayName: 'Display name',
-                    description: '',
-                    groupId: '1',
-                    calculationMethod: 'n_mastery',
-                    calculationInt: 5,
-                    individualCalculation: true
-                  })
-                ]
-              }
-            )
-            await act(async () => jest.runOnlyPendingTimers())
-            fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
-            fireEvent.change(getByLabelText('Friendly Name'), {
-              target: {value: 'Display name'}
-            })
-            fireEvent.click(getByDisplayValue('Decaying Average'))
-            fireEvent.click(getByText('n Number of Times'))
-            fireEvent.click(getByText('Create'))
-            await act(async () => jest.runOnlyPendingTimers())
-            await waitFor(() => {
-              expect(showFlashAlertSpy).toHaveBeenCalledWith({
-                message: '"Outcome 123" was successfully created.',
-                type: 'success'
-              })
-            })
-          })
-        })
-
-        describe('when feature flag disabled', () => {
-          it('does not display Calculation Method selection form', async () => {
-            const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(queryByLabelText('Calculation Method')).not.toBeInTheDocument()
           })
         })
       })

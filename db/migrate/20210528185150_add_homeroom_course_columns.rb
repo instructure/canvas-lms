@@ -22,9 +22,20 @@ class AddHomeroomCourseColumns < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_column :courses, :homeroom_course, :boolean, if_not_exists: true, default: false, null: false
-    add_column :courses, :sync_enrollments_from_homeroom, :boolean, if_not_exists: true, default: false, null: false
+    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
+    defaults = new_pg ? { default: false, null: false } : {}
+
+    add_column :courses, :homeroom_course, :boolean, if_not_exists: true, **defaults
+    add_column :courses, :sync_enrollments_from_homeroom, :boolean, if_not_exists: true, **defaults
     add_reference :courses, :homeroom_course, if_not_exists: true, index: false, foreign_key: { to_table: :courses }
+
+    unless new_pg
+      change_column_default :courses, :homeroom_course, false
+      change_column_default :courses, :sync_enrollments_from_homeroom, false
+      DataFixup::BackfillNulls.run(Course, [:homeroom_course, :sync_enrollments_from_homeroom], default_value: false)
+      change_column_null :courses, :homeroom_course, false
+      change_column_null :courses, :sync_enrollments_from_homeroom, false
+    end
 
     add_index :courses, :homeroom_course, where: "homeroom_course", algorithm: :concurrently, if_not_exists: true
     add_index :courses, :sync_enrollments_from_homeroom, where: "sync_enrollments_from_homeroom", algorithm: :concurrently, if_not_exists: true

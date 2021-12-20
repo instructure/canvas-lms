@@ -22,7 +22,15 @@ class AddIncludeReplyPreviewToDiscussionEntry < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_column :discussion_entries, :include_reply_preview, :boolean, if_not_exists: true, default: false, null: false
+    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
+    defaults = new_pg ? { default: false, null: false } : {}
+    add_column :discussion_entries, :include_reply_preview, :boolean, if_not_exists: true, **defaults
+
+    unless new_pg
+      change_column_default :discussion_entries, :include_reply_preview, false
+      DataFixup::BackfillNulls.run(DiscussionEntry, [:include_reply_preview], default_value: false)
+      change_column_null :discussion_entries, :include_reply_preview, false
+    end
   end
 
   def down
