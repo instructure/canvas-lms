@@ -63,6 +63,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "تسجيل الصوت والفيديو غير مدعوم، يرجى استخدام مستعرض مختلف."
   },
+  "audio_options_feb58e2c": { "message": "خيارات الصوت" },
+  "audio_options_tray_33a90711": { "message": "علبة خيارات الصوت" },
   "audio_player_for_title_20cc70d": { "message": "مشغل الصوت لـ { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
@@ -149,6 +151,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(وصف الصورة)" },
   "describe_the_video_2fe8f46a": { "message": "(وصف الفيديو)" },
   "details_98a31b68": { "message": "التفاصيل" },
+  "diamond_b8dfe7ae": { "message": "معيّن" },
+  "dimension_type_55c83e4e": { "message": "نوع البعد" },
   "dimensions_45ddb7b7": { "message": "الأبعاد" },
   "directionality_26ae9e08": { "message": "الاتجاهية" },
   "discussions_a5f96392": { "message": "النقاشات" },
@@ -276,6 +280,7 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "فشل التحميل." },
   "loading_folders_d8b5869e": { "message": "جارٍ تحميل المجلدات" },
   "loading_please_wait_d276220a": { "message": "جارٍ التحميل، يرجى الانتظار" },
+  "loading_preview_9f077aa1": { "message": "جارٍ تحميل المعاينة" },
   "locked_762f138b": { "message": "مؤمّن" },
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
@@ -283,6 +288,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "يجب أن يكون { percentage }% على الأقل"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
   },
@@ -323,7 +331,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "الصفحات" },
   "paragraph_5e5ad8eb": { "message": "الفقرة" },
+  "pentagon_17d82ea3": { "message": "خماسي" },
   "people_b4ebb13c": { "message": "أشخاص" },
+  "percentage_34ab7c2c": { "message": "نسبة مئوية" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "يجب أن تكون النسبة المئوية رقمًا"
+  },
+  "pixels_52ece7d1": { "message": "بكسل" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
   "pretty_html_editor_28748756": { "message": "محرر HTML الأنيق" },
@@ -360,6 +374,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
   },
+  "show_audio_options_b489926b": { "message": "إظهار خيارات الصوت" },
   "show_embed_options_ef8d7ef": { "message": "إظهار خيارات التضمين" },
   "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
