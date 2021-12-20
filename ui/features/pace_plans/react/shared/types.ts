@@ -36,6 +36,7 @@ export interface Course {
   readonly name: string
   readonly start_at: string
   readonly end_at: string
+  readonly created_at: string
 }
 
 /* Redux action types */

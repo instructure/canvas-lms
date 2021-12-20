@@ -58,6 +58,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Anrejistreman odyo ak videyo a pa konpatib, tanpri, itilize lòt navigatè."
   },
+  "audio_options_feb58e2c": { "message": "Opsyon Odyo" },
+  "audio_options_tray_33a90711": { "message": "Plato Opsyon Odyo" },
   "audio_player_for_title_20cc70d": { "message": "Lektè odyo pou { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Anrejistreman otomatik kontni egziste. Èske w t ap pefere chaje kontni ki te anrejistre otomatikman yo pito?"
@@ -144,6 +146,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Dekri imaj la)" },
   "describe_the_video_2fe8f46a": { "message": "(Dekri videyo a)" },
   "details_98a31b68": { "message": "Detay" },
+  "diamond_b8dfe7ae": { "message": "Dyaman" },
+  "dimension_type_55c83e4e": { "message": "Tip Dimansyon" },
   "dimensions_45ddb7b7": { "message": "Dimansyon" },
   "directionality_26ae9e08": { "message": "Direksyonalite" },
   "discussions_a5f96392": { "message": "Diskisyon" },
@@ -267,6 +271,7 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Chajman echwe." },
   "loading_folders_d8b5869e": { "message": "Chajman dosye" },
   "loading_please_wait_d276220a": { "message": "Chajman, tanpri tann" },
+  "loading_preview_9f077aa1": { "message": "Chajman apèsi" },
   "locked_762f138b": { "message": "Bloke" },
   "media_af190855": { "message": "Medya" },
   "medium_5a8e9ead": { "message": "Mwayen" },
@@ -274,6 +279,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Divès" },
   "modules_c4325335": { "message": "Modil" },
   "multi_color_image_63d7372f": { "message": "Imaj Miltikolò" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Dwe omwen { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Dwe omwen { width } x { height }px"
   },
@@ -316,7 +324,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Paj" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
+  "pentagon_17d82ea3": { "message": "Pentagòn" },
   "people_b4ebb13c": { "message": "Moun" },
+  "percentage_34ab7c2c": { "message": "Pousantaj" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Pousantaj la dwe se yon chif"
+  },
+  "pixels_52ece7d1": { "message": "Piksèl" },
   "posted_when_a578f5ab": { "message": "Poste: { when }" },
   "preformatted_d0670862": { "message": "Prefòmate" },
   "pretty_html_editor_28748756": { "message": "Bèl editè HTML" },
@@ -355,6 +369,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O pou ka ouvri bèl editè html la."
   },
+  "show_audio_options_b489926b": { "message": "Afiche opsyon odyo" },
   "show_embed_options_ef8d7ef": { "message": "Afiche opsyon entegrasyon" },
   "show_image_options_1e2ecc6b": { "message": "Afiche opsyon imaj" },
   "show_link_options_545338fd": { "message": "Afiche opsyon lyen" },

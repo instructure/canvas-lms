@@ -105,7 +105,8 @@ QUnit.module('isMathInElement, with new_math_equation_handling on', {
   beforeEach: () => {
     window.ENV = {
       FEATURES: {
-        new_math_equation_handling: true
+        new_math_equation_handling: true,
+        inline_math_everywhere: true
       }
     }
   }
@@ -126,18 +127,18 @@ test('returns true if there is a .math_equation_latex element', () => {
   equal(mathml.isMathInElement(mathElem), true)
 })
 
-test('returns false if there is block-delmited math', () => {
+test('returns true if there is block-delmited math', () => {
   const mathElem = document.createElement('span')
   mathElem.innerHTML = '$$y = mx + b$$'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathInElement(mathElem), false)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns true if there is inline-delmited math', () => {
   const mathElem = document.createElement('span')
   mathElem.innerHTML = '\\(ax^2 + by + c = 0\\)'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathInElement(mathElem), false)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 QUnit.module('isMathInElement, including inline LaTex', {

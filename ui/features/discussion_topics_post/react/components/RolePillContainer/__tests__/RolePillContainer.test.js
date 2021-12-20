@@ -22,7 +22,7 @@ import {RolePillContainer} from '../RolePillContainer'
 import {responsiveQuerySizes} from '../../../utils'
 
 jest.mock('../../../utils')
-const discussionRoles = ['Author', 'TaEnrollment', 'TeacherEnrollment']
+const discussionRoles = ['Author', 'TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']
 
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
@@ -85,6 +85,14 @@ describe('RolePillContainer', () => {
       expect(queryByText('Author')).toBeFalsy()
       expect(queryByText('Ta')).toBeFalsy()
     })
+
+    it('Only Designer Role is Displayed', () => {
+      const {queryByText} = setup({discussionRoles: ['DesignerEnrollment']})
+      expect(queryByText('Designer')).toBeTruthy()
+      expect(queryByText('Author')).toBeFalsy()
+      expect(queryByText('Teacher')).toBeFalsy()
+      expect(queryByText('Ta')).toBeFalsy()
+    })
   })
 
   describe('Will not break if given non-default values', () => {
@@ -111,11 +119,12 @@ describe('RolePillContainer', () => {
 
     it('Pill will render multiple roles correctly on mobile', () => {
       const {queryByTestId} = setup({
-        discussionRoles: ['TeacherEnrollment', 'TaEnrollment', 'Author']
+        discussionRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'Author']
       })
       expect(
         queryByTestId('mobile-Teacher') &&
           queryByTestId('mobile-TA') &&
+          queryByTestId('mobile-Designer') &&
           queryByTestId('mobile-Author')
       ).toBeTruthy()
     })
