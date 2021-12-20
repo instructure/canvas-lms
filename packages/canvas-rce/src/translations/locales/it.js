@@ -61,6 +61,10 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Registrazione audio e video non supportata; usa un altro browser."
   },
+  "audio_options_feb58e2c": { "message": "Opzioni audio" },
+  "audio_options_tray_33a90711": {
+    "message": "Area di notifica opzioni audio"
+  },
   "audio_player_for_title_20cc70d": {
     "message": "Riproduttore audio di { title }"
   },
@@ -165,6 +169,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Descrivi l’immagine)" },
   "describe_the_video_2fe8f46a": { "message": "(Descrivi il video)" },
   "details_98a31b68": { "message": "Dettagli" },
+  "diamond_b8dfe7ae": { "message": "Rombo" },
+  "dimension_type_55c83e4e": { "message": "Tipo di dimensione" },
   "dimensions_45ddb7b7": { "message": "Dimensioni" },
   "directionality_26ae9e08": { "message": "Direzionalità" },
   "discussions_a5f96392": { "message": "Discussioni" },
@@ -302,6 +308,7 @@ const locale = {
   "loading_please_wait_d276220a": {
     "message": "Caricamento in corso, attendere"
   },
+  "loading_preview_9f077aa1": { "message": "Caricamento dell’anteprima" },
   "locked_762f138b": { "message": "Bloccato" },
   "media_af190855": { "message": "Elementi multimediali" },
   "medium_5a8e9ead": { "message": "Medio" },
@@ -309,6 +316,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Varie" },
   "modules_c4325335": { "message": "Moduli" },
   "multi_color_image_63d7372f": { "message": "Immagine multicolore" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Deve essere almeno { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Deve essere almeno { width } x { height }px"
   },
@@ -351,7 +361,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Pagine" },
   "paragraph_5e5ad8eb": { "message": "Paragrafo" },
+  "pentagon_17d82ea3": { "message": "Pentagono" },
   "people_b4ebb13c": { "message": "Persone" },
+  "percentage_34ab7c2c": { "message": "Percentuale" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "La percentuale dev’essere un numero"
+  },
+  "pixels_52ece7d1": { "message": "Pixel" },
   "posted_when_a578f5ab": { "message": "Postato: { when }" },
   "preformatted_d0670862": { "message": "Preformattato" },
   "pretty_html_editor_28748756": { "message": "Editor HTML sicuro" },
@@ -390,6 +406,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Maiusc+O per aprire l’editor html sicuro."
   },
+  "show_audio_options_b489926b": { "message": "Mostra opzioni audio" },
   "show_embed_options_ef8d7ef": { "message": "Mostra opzioni Incorpora" },
   "show_image_options_1e2ecc6b": { "message": "Mostra opzioni immagine" },
   "show_link_options_545338fd": { "message": "Mostra opzioni link" },

@@ -22,21 +22,12 @@ class AddCourseTemplateColumns < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
-    defaults = new_pg ? { default: false, null: false } : {}
-
-    add_column :courses, :template, :boolean, if_not_exists: true, **defaults
+    add_column :courses, :template, :boolean, if_not_exists: true, default: false, null: false
     add_index :courses, :root_account_id, where: "template", algorithm: :concurrently, if_not_exists: true
     add_reference :accounts, :course_template,
                   if_not_exists: true,
                   index: { where: "course_template_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true },
                   foreign_key: { to_table: :courses }
-
-    unless new_pg
-      change_column_default :courses, :template, false
-      DataFixup::BackfillNulls.run(Course, :template, default_value: false)
-      change_column_null :courses, :template, false
-    end
   end
 
   def down

@@ -63,6 +63,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Enregistrement audio et vidéo non pris en charge, veuillez utiliser un autre navigateur."
   },
+  "audio_options_feb58e2c": { "message": "Options audio" },
+  "audio_options_tray_33a90711": { "message": "Tiroir des options audio" },
   "audio_player_for_title_20cc70d": {
     "message": "Lecteur audio pour { title }"
   },
@@ -165,6 +167,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Décrire l’image)" },
   "describe_the_video_2fe8f46a": { "message": "(Décrivez la vidéo)" },
   "details_98a31b68": { "message": "Détails" },
+  "diamond_b8dfe7ae": { "message": "Diamant" },
+  "dimension_type_55c83e4e": { "message": "Type de dimension" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_26ae9e08": { "message": "Direction" },
   "discussions_a5f96392": { "message": "Discussions" },
@@ -304,6 +308,7 @@ const locale = {
   "loading_please_wait_d276220a": {
     "message": "Chargement en cours, veuillez patienter"
   },
+  "loading_preview_9f077aa1": { "message": "Chargement de l’aperçu" },
   "locked_762f138b": { "message": "Verrouillé" },
   "media_af190855": { "message": "Média" },
   "medium_5a8e9ead": { "message": "Moyen" },
@@ -311,6 +316,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Divers" },
   "modules_c4325335": { "message": "Modules" },
   "multi_color_image_63d7372f": { "message": "Image multicolore" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Doit être au moins égal à { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Doit faire au moins { width } x { height } px"
   },
@@ -353,7 +361,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Pages" },
   "paragraph_5e5ad8eb": { "message": "Paragraphe" },
+  "pentagon_17d82ea3": { "message": "Pentagone" },
   "people_b4ebb13c": { "message": "Personnes" },
+  "percentage_34ab7c2c": { "message": "Pourcentage" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Le pourcentage doit être un nombre"
+  },
+  "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Posté : { when }" },
   "preformatted_d0670862": { "message": "Préformaté" },
   "pretty_html_editor_28748756": { "message": "Éditeur HTML embelli" },
@@ -396,6 +410,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Maj+O pour ouvrir l''éditeur HTML embelli"
   },
+  "show_audio_options_b489926b": { "message": "Afficher les options audio" },
   "show_embed_options_ef8d7ef": {
     "message": "Afficher les options d''intégration"
   },

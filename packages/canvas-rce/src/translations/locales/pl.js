@@ -61,6 +61,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Nagrywanie dźwięku i wideo nie jest obsługiwane; użyj innej przeglądarki."
   },
+  "audio_options_feb58e2c": { "message": "Opcje audio" },
+  "audio_options_tray_33a90711": { "message": "Panel opcji audio" },
   "audio_player_for_title_20cc70d": {
     "message": "Odtwarzacz audio dla { title }"
   },
@@ -159,6 +161,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(opisz obraz)" },
   "describe_the_video_2fe8f46a": { "message": "(opisz wideo)" },
   "details_98a31b68": { "message": "Szczegóły" },
+  "diamond_b8dfe7ae": { "message": "Diament" },
+  "dimension_type_55c83e4e": { "message": "Typ wymiaru" },
   "dimensions_45ddb7b7": { "message": "Wymiary" },
   "directionality_26ae9e08": { "message": "Kierunkowość" },
   "discussions_a5f96392": { "message": "Dyskusje" },
@@ -288,6 +292,7 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Niepowodzenie wczytywania." },
   "loading_folders_d8b5869e": { "message": "Wczytywanie folderów" },
   "loading_please_wait_d276220a": { "message": "Ładowanie, proszę czekać" },
+  "loading_preview_9f077aa1": { "message": "Wczytywanie podglądu" },
   "locked_762f138b": { "message": "Zablokowany" },
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Średni" },
@@ -295,6 +300,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Różne" },
   "modules_c4325335": { "message": "Moduły" },
   "multi_color_image_63d7372f": { "message": "Obraz wielokolorowy" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Wymagane co najmniej { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Wymagane co najmniej { width } x { height } px"
   },
@@ -337,7 +345,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Strony" },
   "paragraph_5e5ad8eb": { "message": "Akapit" },
+  "pentagon_17d82ea3": { "message": "Pięciokąt" },
   "people_b4ebb13c": { "message": "Ludzie" },
+  "percentage_34ab7c2c": { "message": "Wartość procentowa" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Odsetek musi być liczbą"
+  },
+  "pixels_52ece7d1": { "message": "Piksele" },
   "posted_when_a578f5ab": { "message": "Opublikował(a): { when }" },
   "preformatted_d0670862": { "message": "Wstępnie formatowane" },
   "pretty_html_editor_28748756": { "message": "Ulepszony edytor HTML" },
@@ -380,6 +394,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Naciśnij Shift-O, aby otworzyć ulepszony edytor HTML."
   },
+  "show_audio_options_b489926b": { "message": "Pokaż opcje audio" },
   "show_embed_options_ef8d7ef": { "message": "Pokaż opcje osadzania" },
   "show_image_options_1e2ecc6b": { "message": "Pokaż opcje obrazów" },
   "show_link_options_545338fd": { "message": "Pokaż opcje łącza" },

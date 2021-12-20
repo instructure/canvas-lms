@@ -2620,10 +2620,23 @@ describe UsersController do
         course_with_student_logged_in(active_all: true)
       end
 
+      shared_examples_for "observer list" do
+        it "sets ENV.OBSERVER_LIST with self and observed users" do
+          get "user_dashboard"
+
+          observers = assigns[:js_env][:OBSERVER_LIST]
+          expect(observers.length).to be(1)
+          expect(observers[0][:name]).to eq(@student.name)
+          expect(observers[0][:id]).to eq(@student.id)
+        end
+      end
+
       context "disabled" do
         before(:once) do
           toggle_k5_setting(@account, false)
         end
+
+        it_behaves_like "observer list"
 
         it "only returns classic dashboard bundles" do
           get "user_dashboard"
@@ -2641,6 +2654,8 @@ describe UsersController do
           toggle_k5_setting(@account, true)
         end
 
+        it_behaves_like "observer list"
+
         it "returns K-5 dashboard bundles" do
           @current_user = @user
           get "user_dashboard"
@@ -2650,15 +2665,6 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).to include :k5_dashboard
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy
-        end
-
-        it "sets ENV.OBSERVER_LIST with self and observed users" do
-          get "user_dashboard"
-
-          observers = assigns[:js_env][:OBSERVER_LIST]
-          expect(observers.length).to be(1)
-          expect(observers[0][:name]).to eq(@student.name)
-          expect(observers[0][:id]).to eq(@student.id)
         end
 
         context "ENV.INITIAL_NUM_K5_CARDS" do

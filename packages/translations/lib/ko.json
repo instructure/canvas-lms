@@ -20,6 +20,9 @@
     "apps_54d24a47": {
         "message": "앱"
     },
+    "arrows_464a3e54": {
+        "message": "화살표"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "비율을 유지"
     },
@@ -31,6 +34,9 @@
     },
     "attributes_963ba262": {
         "message": "속성"
+    },
+    "basic_554cdc0a": {
+        "message": "기본"
     },
     "calendar_a8563bb2": {
         "message": "달력:"
@@ -89,6 +95,9 @@
     "delete_a6efa79d": {
         "message": "삭제"
     },
+    "delimiters_4db4840d": {
+        "message": "구분자"
+    },
     "details_98a31b68": {
         "message": "세부 정보"
     },
@@ -139,6 +148,9 @@
     },
     "grades_a61eba0a": {
         "message": "평점"
+    },
+    "greek_65c5b3f7": {
+        "message": "그리스 문자"
     },
     "group_files_82e5dcdb": {
         "message": "그룹 파일"
@@ -215,6 +227,9 @@
     "media_af190855": {
         "message": "미디어"
     },
+    "misc_3b692ea7": {
+        "message": "기타"
+    },
     "modules_c4325335": {
         "message": "모듈"
     },
@@ -238,6 +253,9 @@
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "현재 없음"
+    },
+    "operators_a2ef9a93": {
+        "message": "연산자"
     },
     "options_3ab0ea65": {
         "message": "옵션"
@@ -274,6 +292,9 @@
     },
     "record_7c9448b": {
         "message": "녹음/녹화"
+    },
+    "relationships_6602af70": {
+        "message": "관계"
     },
     "save_11a80ec3": {
         "message": "저장"
