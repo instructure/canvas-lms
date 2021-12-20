@@ -20,11 +20,6 @@ import axios from '@canvas/axios'
 import I18n from 'i18n!gradebookGradebookApi'
 import {underscore} from 'convert-case'
 
-function applyScoreToUngradedSubmissions(courseId, params) {
-  const url = `/api/v1/courses/${courseId}/apply_score_to_ungraded_submissions`
-  return axios.put(url, underscore(params))
-}
-
 function createTeacherNotesColumn(courseId) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
   const data = {
@@ -58,7 +53,6 @@ function updateColumnOrder(courseId, columnOrder) {
 }
 
 export default {
-  applyScoreToUngradedSubmissions,
   createTeacherNotesColumn,
   saveUserSettings,
   updateColumnOrder,

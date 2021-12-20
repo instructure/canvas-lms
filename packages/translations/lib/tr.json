@@ -77,9 +77,6 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Bu planlayıcı öğesini silmek istediğinize emin misiniz?"
     },
-    "arrows_464a3e54": {
-        "message": "Oklar"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Genişleme oranı korumalıdır"
     },
@@ -127,9 +124,6 @@
     },
     "available_folders_694d0436": {
         "message": "Mevcut klasörler"
-    },
-    "basic_554cdc0a": {
-        "message": "Temel"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -251,9 +245,6 @@
     "delete_a6efa79d": {
         "message": "Sil"
     },
-    "delimiters_4db4840d": {
-        "message": "Ayıraçlar"
-    },
     "details_98a31b68": {
         "message": "Ayrıntılar"
     },
@@ -361,9 +352,6 @@
     },
     "grades_a61eba0a": {
         "message": "Notlar"
-    },
-    "greek_65c5b3f7": {
-        "message": "Yunan"
     },
     "group_files_82e5dcdb": {
         "message": "Grup dosyaları"
@@ -488,9 +476,6 @@
     "media_af190855": {
         "message": "Medya"
     },
-    "misc_3b692ea7": {
-        "message": "Çeşitli"
-    },
     "missing_1a256b3b": {
         "message": "Eksik"
     },
@@ -529,9 +514,6 @@
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Şimdilik bir şey yok"
-    },
-    "operators_a2ef9a93": {
-        "message": "Operatörler"
     },
     "optional_add_course_ef0d70fc": {
         "message": "Tercihen: Kurs Ekle"
@@ -583,9 +565,6 @@
     },
     "record_7c9448b": {
         "message": "Kayıt"
-    },
-    "relationships_6602af70": {
-        "message": "İlişkiler"
     },
     "rich_content_editor_2708ef21": {
         "message": "Zengin İçerik Editörü"

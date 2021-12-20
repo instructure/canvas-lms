@@ -270,18 +270,6 @@ RSpec.shared_examples "DiscussionType" do
         @anon_student_discussion,
         current_user: @teacher
       )
-
-      course_with_designer(course: @course)
-      @anon_designer_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
-                                                          message: "anonymous discussion",
-                                                          anonymous_state: "fully_anonymous",
-                                                          context: @course,
-                                                          user: @designer,
-                                                          editor: @designer)
-      @anon_designer_discussion_type = GraphQLTypeTester.new(
-        @anon_designer_discussion,
-        current_user: @teacher
-      )
     end
 
     it "author is nil" do
@@ -306,14 +294,6 @@ RSpec.shared_examples "DiscussionType" do
 
     it "returns the teacher editor if a course id is provided" do
       expect(@anon_discussion_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
-    end
-
-    it "returns the designer author if a course id is provided" do
-      expect(@anon_designer_discussion_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
-    end
-
-    it "returns the designer editor if a course id is provided" do
-      expect(@anon_designer_discussion_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
     end
 
     it "does not return the student author if a course id is provided" do

@@ -23,6 +23,11 @@ class AddIndexToSubmissionsGradedAt < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def change
-    add_index :submissions, :graded_at, algorithm: :concurrently, using: :brin
+    # brin indexes are only available on Postgres versions 9.5+
+    if connection.send(:postgresql_version) >= 9_05_00 # rubocop:disable Style/NumericLiterals
+      add_index :submissions, :graded_at, algorithm: :concurrently, using: :brin
+    else
+      add_index :submissions, :graded_at, algorithm: :concurrently
+    end
   end
 end

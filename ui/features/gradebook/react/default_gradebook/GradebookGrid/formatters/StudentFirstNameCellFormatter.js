@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!gradebook'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
+import htmlEscape from 'html-escape'
 import {getEnrollmentLabel, renderCell} from './StudentCellFormatter.utils'
 
 export default class StudentFirstNameCellFormatter {
@@ -34,7 +35,7 @@ export default class StudentFirstNameCellFormatter {
 
     const options = {
       courseId: this.options.courseId,
-      displayName: student.first_name || I18n.t('<No first name>'),
+      displayName: student.first_name,
       enrollmentLabel: getEnrollmentLabel(student),
       studentId: student.id,
       url: `${student.enrollments[0].grades.html_url}#tab-assignments`

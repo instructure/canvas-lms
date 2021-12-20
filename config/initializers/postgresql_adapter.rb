@@ -293,6 +293,8 @@ module PostgreSQLAdapterExtensions
   end
 
   def icu_collations
+    return [] if postgresql_version < 12_00_00 # rubocop:disable Style/NumericLiterals
+
     @collations ||= select_rows <<~SQL.squish, "SCHEMA"
       SELECT nspname, collname
       FROM pg_collation
@@ -305,6 +307,8 @@ module PostgreSQLAdapterExtensions
   end
 
   def create_icu_collations
+    return if postgresql_version < 12_00_00 # rubocop:disable Style/NumericLiterals
+
     original_locale = I18n.locale
 
     collation = "und-u-kn-true"

@@ -19,13 +19,9 @@
 
 require_relative "../common"
 require_relative "../helpers/notifications_common"
-require_relative "./pages/k5_dashboard_page"
-require_relative "./pages/dashboard_page"
 
 describe "dashboard" do
   include NotificationsCommon
-  include K5DashboardPageObject
-  include DashboardPage
   include_context "in-process server selenium tests"
 
   shared_examples_for "load events list" do
@@ -457,57 +453,6 @@ describe "dashboard" do
         get "/"
         f("#start_new_course").click
         expect(fj('h2:contains("Create Course")')).to be_displayed
-      end
-    end
-  end
-
-  context "as an observer" do
-    before :once do
-      @course1 = course_factory(active_all: true, course_name: "Course 1")
-      @course2 = course_factory(active_all: true, course_name: "Course 2")
-      @student1 = user_factory(active_all: true, name: "Student 1")
-      @student2 = user_factory(active_all: true, name: "Student 2")
-      @observer = user_factory(active_all: true)
-      @course1.enroll_student(@student1, enrollment_state: :active)
-      @course2.enroll_student(@student2, enrollment_state: :active)
-      @course1.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student1.id })
-      @course2.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student2.id })
-    end
-
-    before do
-      user_session(@observer)
-      driver.manage.delete_cookie("#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}")
-    end
-
-    context "with observer_picker flag off" do
-      it "loads all student cards with no picker" do
-        get "/"
-        expect(card_container).to include_text("Course 1")
-        expect(card_container).to include_text("Course 2")
-        expect(dashboard_container).not_to contain_css(observer_picker_container_selector)
-      end
-    end
-
-    context "with observer_picker flag on" do
-      before :once do
-        Account.site_admin.enable_feature!(:observer_picker)
-      end
-
-      it "loads only the first student's cards and shows them in the picker" do
-        get "/"
-        expect(card_container).to include_text("Course 1")
-        expect(card_container).not_to include_text("Course 2")
-        expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Student 1")
-      end
-
-      it "loads the second student's cards when selected in the picker" do
-        get "/"
-        expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Student 1")
-        click_observed_student_option("Student 2")
-        wait_for_ajaximations
-        expect(card_container).to include_text("Course 2")
-        expect(card_container).not_to include_text("Course 1")
-        expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Student 2")
       end
     end
   end

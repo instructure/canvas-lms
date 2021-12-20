@@ -364,7 +364,7 @@
     "check:js": "tsc --checkJs -p tsconfig.json",
     "check:ts": "tsc -p tsconfig.json",
     "check:ts:watch": "tsc --watch -p tsconfig.json",
-    "lint:browser-code": "es-check es10 ./public/dist/**/*.js",
+    "lint:browser-code": "es-check es9 ./public/dist/**/*.js",
     "lint:staged": "lint-staged",
     "lint:js:coffeescripts": "echo 'STOP CALLING ME IM NO LONGER NEEDED'",
     "lint:js:jsx": "eslint ui --ext '.js,.ts,.tsx'",

@@ -40,8 +40,6 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Hljóð- og myndupptaka ekki studd; vinsamlegast notaðu annan vafra."
   },
-  "audio_options_feb58e2c": { "message": "Hljóðvalkostir" },
-  "audio_options_tray_33a90711": { "message": "Hljóðvalkostabakki" },
   "audio_player_for_title_20cc70d": {
     "message": "Hljóðspilari fyrir { title }"
   },
@@ -265,7 +263,6 @@
   "loading_failed_e6a9d8ef": { "message": "Hleðsla mistókst." },
   "loading_folders_d8b5869e": { "message": "Hleð möppum" },
   "loading_please_wait_d276220a": { "message": "Hleður, augnablik" },
-  "loading_preview_9f077aa1": { "message": "Hlaða forskoðun" },
   "locked_762f138b": { "message": "Læst" },
   "media_af190855": { "message": "Miðill" },
   "medium_5a8e9ead": { "message": "Meðal" },
@@ -319,9 +316,6 @@
   "pentagon_17d82ea3": { "message": "fimmhyrningur" },
   "people_b4ebb13c": { "message": "Fólk" },
   "percentage_34ab7c2c": { "message": "Hlutfall" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Prósenta verður að vera tala"
-  },
   "pixels_52ece7d1": { "message": "Punktar" },
   "posted_when_a578f5ab": { "message": "Birt: { when }" },
   "preformatted_d0670862": { "message": "Forsniðnir" },
@@ -359,7 +353,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O til að opna pretty html ritilinn."
   },
-  "show_audio_options_b489926b": { "message": "Sýna hljóðvalkosti" },
   "show_embed_options_ef8d7ef": { "message": "Sýna innfelli valkosti" },
   "show_image_options_1e2ecc6b": { "message": "Sýna valkosti myndar" },
   "show_link_options_545338fd": { "message": "Sýna tengla valkosti" },

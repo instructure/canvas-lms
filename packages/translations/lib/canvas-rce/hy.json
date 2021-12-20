@@ -5,13 +5,11 @@
   "announcements_a4b8ed4a": { "message": "Հայտարարություններ" },
   "apply_781a2546": { "message": "Կիրառել" },
   "apps_54d24a47": { "message": "Հավելվածներ" },
-  "arrows_464a3e54": { "message": "Սլաքներ" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Կողմերի հարաբերակցությունը պահպանվելու է"
   },
   "assignments_1e02582c": { "message": "Հանձնարարություններ" },
   "attributes_963ba262": { "message": "Հատկանիշեր" },
-  "basic_554cdc0a": { "message": "Հիմնական" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001թ. Acme Inc." },
   "cancel_caeb1e68": { "message": "Չեղյալ համարել" },
   "choose_usage_rights_33683854": {
@@ -41,7 +39,6 @@
     "message": "\"Creative Commons\" լիցենզիա"
   },
   "decrease_indent_de6343ab": { "message": "Նվազեցնել ներսի տողագլուխը" },
-  "delimiters_4db4840d": { "message": "Բաժանիչներ" },
   "details_98a31b68": { "message": "Մանրամասներ" },
   "dimensions_45ddb7b7": { "message": "Չափերը" },
   "discussions_a5f96392": { "message": "Քննարկումներ" },
@@ -56,7 +53,6 @@
   "format_4247a9c5": { "message": "Ֆորմատ" },
   "generating_preview_45b53be0": { "message": "Կարծիքը գեներացվում է ..." },
   "grades_a61eba0a": { "message": "Գնահատականներ" },
-  "greek_65c5b3f7": { "message": "Հունարեն" },
   "group_files_82e5dcdb": { "message": "Խմբի ֆայլեր" },
   "group_navigation_99f191a": { "message": "Խմբի նավարկում" },
   "home_351838cd": { "message": "Սկիզբ" },
@@ -87,7 +83,6 @@
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "locked_762f138b": { "message": "Արգելափակված է" },
   "media_af190855": { "message": "Մուլտիմեդիա" },
-  "misc_3b692ea7": { "message": "Այլ" },
   "modules_c4325335": { "message": "Մոդուլներ" },
   "my_files_2f621040": { "message": "Իմ ֆայլերը" },
   "name_1aed4a1b": { "message": "Անուն" },
@@ -97,7 +92,6 @@
   },
   "no_results_940393cf": { "message": "No results." },
   "none_3b5e34d2": { "message": "Ոչինչ չկա" },
-  "operators_a2ef9a93": { "message": "Օպերատորներ" },
   "options_3ab0ea65": { "message": "Պարամետրեր" },
   "pages_e5414c2c": { "message": "Էջեր" },
   "people_b4ebb13c": { "message": "Մարդիկ" },
@@ -106,7 +100,6 @@
   "published_c944a23d": { "message": "հրապարակված" },
   "quizzes_7e598f57": { "message": "Թեստեր" },
   "record_7c9448b": { "message": "Գրառում" },
-  "relationships_6602af70": { "message": "Հարաբերություններ" },
   "rich_content_editor_2708ef21": { "message": "Ֆորմատավորված տեքստի խմբագիր" },
   "save_11a80ec3": { "message": "Պահպանել" },
   "search_280d00bd": { "message": "Որոնել" },

@@ -59,8 +59,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "不支援音訊和視訊錄製；請使用不同的瀏覽器。"
   },
-  "audio_options_feb58e2c": { "message": "音訊選項" },
-  "audio_options_tray_33a90711": { "message": "音訊選項收集箱" },
   "audio_player_for_title_20cc70d": { "message": "{ title } 的音訊播放器" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "自動儲存內容已存在。是否要改為載入自動儲存的內容？"
@@ -141,8 +139,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "（描述影像）" },
   "describe_the_video_2fe8f46a": { "message": "（描述影片）" },
   "details_98a31b68": { "message": "詳細資料" },
-  "diamond_b8dfe7ae": { "message": "鑽石形" },
-  "dimension_type_55c83e4e": { "message": "尺寸類型" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
   "discussions_a5f96392": { "message": "討論區" },
@@ -254,7 +250,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "載入失敗。" },
   "loading_folders_d8b5869e": { "message": "正在載入資料夾" },
   "loading_please_wait_d276220a": { "message": "正在載入，請稍候" },
-  "loading_preview_9f077aa1": { "message": "載入預覽" },
   "locked_762f138b": { "message": "已鎖定" },
   "media_af190855": { "message": "媒體" },
   "medium_5a8e9ead": { "message": "中" },
@@ -262,9 +257,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "雜項" },
   "modules_c4325335": { "message": "單元" },
   "multi_color_image_63d7372f": { "message": "多色圖像" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "必須至少 { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "必須至少為 { width } x { height } px"
   },
@@ -303,11 +295,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "頁面" },
   "paragraph_5e5ad8eb": { "message": "段落" },
-  "pentagon_17d82ea3": { "message": "五角形" },
   "people_b4ebb13c": { "message": "成員" },
-  "percentage_34ab7c2c": { "message": "百分比" },
-  "percentage_must_be_a_number_8033c341": { "message": "百分比必須是數字" },
-  "pixels_52ece7d1": { "message": "像素" },
   "posted_when_a578f5ab": { "message": "已公佈：{ when }" },
   "preformatted_d0670862": { "message": "已預先格式化" },
   "pretty_html_editor_28748756": { "message": "美觀 HTML 編輯器" },
@@ -342,7 +330,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "按 Shift-O 開啟美觀 HTML 編輯器。"
   },
-  "show_audio_options_b489926b": { "message": "顯示音訊選項" },
   "show_embed_options_ef8d7ef": { "message": "顯示嵌入選項" },
   "show_image_options_1e2ecc6b": { "message": "顯示影像選項" },
   "show_link_options_545338fd": { "message": "顯示連結選項" },

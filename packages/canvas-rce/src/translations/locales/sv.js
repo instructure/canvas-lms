@@ -61,8 +61,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Ljud- och videoinspelning stöds inte. Använd en annan webbläsare."
   },
-  "audio_options_feb58e2c": { "message": "Ljudalternativ" },
-  "audio_options_tray_33a90711": { "message": "Fack för ljudalternativ" },
   "audio_player_for_title_20cc70d": { "message": "Ljudspelare för { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Automatiskt sparat innehåll finns. Vill du läsa in det automatiskt sparade innehållet istället?"
@@ -159,8 +157,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Beskriv bilden)" },
   "describe_the_video_2fe8f46a": { "message": "(Beskriv videon)" },
   "details_98a31b68": { "message": "Detaljer" },
-  "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Dimensionstyp" },
   "dimensions_45ddb7b7": { "message": "Dimensioner" },
   "directionality_26ae9e08": { "message": "Textens riktning" },
   "discussions_a5f96392": { "message": "Diskussioner" },
@@ -296,7 +292,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Det gick inte att läsa in." },
   "loading_folders_d8b5869e": { "message": "Läser in mappar" },
   "loading_please_wait_d276220a": { "message": "Läser in, vänta" },
-  "loading_preview_9f077aa1": { "message": "Förhandsgranskning av inläsning" },
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
@@ -304,9 +299,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Blandat" },
   "modules_c4325335": { "message": "Moduler" },
   "multi_color_image_63d7372f": { "message": "Flerfärgsbild" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Måste vara minst { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Måste vara minst { width } x { height }pixlar"
   },
@@ -349,13 +341,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Sidor" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
-  "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personer" },
-  "percentage_34ab7c2c": { "message": "Procent" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Procenttalet måste vara ett tal"
-  },
-  "pixels_52ece7d1": { "message": "Pixlar" },
   "posted_when_a578f5ab": { "message": "Publicerad: { when }" },
   "preformatted_d0670862": { "message": "Förformaterad" },
   "pretty_html_editor_28748756": { "message": "Nätt HTML-redigerare" },
@@ -396,7 +382,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Tryck på Skift+O för att öppna den nätta HTML-redigeraren."
   },
-  "show_audio_options_b489926b": { "message": "Visa ljudalternativ" },
   "show_embed_options_ef8d7ef": { "message": "Visa inbäddningsalternativ" },
   "show_image_options_1e2ecc6b": { "message": "Visa bildalternativ" },
   "show_link_options_545338fd": { "message": "Visa länkalternativ" },

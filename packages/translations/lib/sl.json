@@ -146,12 +146,6 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Snemanje zvoka in videoposnetkov ni podprto; uporabite drug brskalnik."
     },
-    "audio_options_feb58e2c": {
-        "message": "Možnosti zvoka"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "Trak z možnostmi zvoka"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Predvajalnik zvoka za { title }"
     },
@@ -818,9 +812,6 @@
     "loading_please_wait_d276220a": {
         "message": "Nalaganje, počakajte"
     },
-    "loading_preview_9f077aa1": {
-        "message": "Nalagam predogled"
-    },
     "location_3b6ff307": {
         "message": "Mesto:"
     },
@@ -1004,9 +995,6 @@
     "percentage_34ab7c2c": {
         "message": "Odstotek"
     },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "Odstotek mora biti številka"
-    },
     "pixels_52ece7d1": {
         "message": "Slikovne pike"
     },
@@ -1132,9 +1120,6 @@
     },
     "show_all_ae37d610": {
         "message": "Prikaži vse"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Prikaži možnosti zvoka"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Prikaži možnosti vdelave"

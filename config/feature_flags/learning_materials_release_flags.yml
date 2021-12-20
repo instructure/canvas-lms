@@ -18,8 +18,3 @@ rce_a11y_checker_notifications:
     Show accessibility checker notifications while editing.
   applies_to: Course
   root_opt_in: true
-new_equation_editor:
-  state: hidden
-  display_name: RCE's new and improved equation editor dialog
-  description: Includes the equation editor in the @instructure/canvas-rce package
-  applies_to: SiteAdmin
