@@ -35,8 +35,17 @@ function setupManagedCoursesResponse() {
   return response
 }
 
+const defaultEnv = {
+  current_user_roles: ['user', 'teacher']
+}
+
 describe('useManagedCourseSearchApi', () => {
+  beforeEach(() => {
+    global.ENV = defaultEnv
+  })
+
   afterEach(() => {
+    global.ENV = {}
     fetchMock.restore()
   })
 
@@ -79,17 +88,32 @@ describe('useManagedCourseSearchApi', () => {
     )
   })
 
-  it('does not make network request if search term is not included', async () => {
-    setupManagedCoursesResponse()
-    renderHook(useManagedCourseSearchApi)
-    await fetchMock.flush(true)
-    expect(fetchMock.calls().length).toBe(0)
+  describe('when user is a teacher', () => {
+    it('maks network request when search term is not included', async () => {
+      setupManagedCoursesResponse()
+      renderHook(useManagedCourseSearchApi)
+      await fetchMock.flush(true)
+      expect(fetchMock.calls().length).toBe(1)
+    })
   })
 
-  it('does not make network request if search term is only one character', async () => {
-    setupManagedCoursesResponse()
-    renderHook(() => useManagedCourseSearchApi({params: {term: 'a'}}))
-    await fetchMock.flush(true)
-    expect(fetchMock.calls().length).toBe(0)
+  describe('when user is an admin', () => {
+    beforeEach(() => {
+      global.ENV.current_user_roles.push('admin')
+    })
+
+    it('does not make network request if search term is not included', async () => {
+      setupManagedCoursesResponse()
+      renderHook(useManagedCourseSearchApi)
+      await fetchMock.flush(true)
+      expect(fetchMock.calls().length).toBe(0)
+    })
+
+    it('does not make network request if search term is only one character', async () => {
+      setupManagedCoursesResponse()
+      renderHook(() => useManagedCourseSearchApi({params: {term: 'a'}}))
+      await fetchMock.flush(true)
+      expect(fetchMock.calls().length).toBe(0)
+    })
   })
 })
