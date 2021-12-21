@@ -41,6 +41,7 @@ describe('useSvgSettings()', () => {
         color: null,
         encodedImage: '',
         encodedImageType: '',
+        encodedImageName: '',
         outlineColor: null,
         outlineSize: 'none',
         text: '',
@@ -79,6 +80,7 @@ describe('useSvgSettings()', () => {
           color: null,
           encodedImage: '',
           encodedImageType: '',
+          encodedImageName: '',
           outlineColor: null,
           outlineSize: 'none',
           text: '',
@@ -142,24 +144,23 @@ describe('useSvgSettings()', () => {
         return result.current[0]
       })
 
-      expect(result.current[0]).toEqual(
-        {
-          name: 'Test Image',
-          alt: 'a test image',
-          shape: 'triangle',
-          size: 'large',
-          color: '#FF2717',
-          encodedImage: '',
-          encodedImageType: '',
-          outlineColor: '#06A3B7',
-          outlineSize: 'small',
-          text: 'Some Text',
-          textSize: 'medium',
-          textColor: '#009606',
-          textBackgroundColor: '#06A3B7',
-          textPosition: 'middle'
-        }
-      )
+      expect(result.current[0]).toEqual({
+        name: 'Test Image',
+        alt: 'a test image',
+        shape: 'triangle',
+        size: 'large',
+        color: '#FF2717',
+        encodedImage: '',
+        encodedImageType: '',
+        encodedImageName: '',
+        outlineColor: '#06A3B7',
+        outlineSize: 'small',
+        text: 'Some Text',
+        textSize: 'medium',
+        textColor: '#009606',
+        textBackgroundColor: '#06A3B7',
+        textPosition: 'middle'
+      })
     })
 
     it('sets the status to "loading"', () => {
@@ -197,6 +198,7 @@ describe('useSvgSettings()', () => {
           color: null,
           encodedImage: '',
           encodedImageType: '',
+          encodedImageName: '',
           outlineColor: null,
           outlineSize: 'none',
           text: '',
@@ -221,6 +223,7 @@ describe('useSvgSettings()', () => {
           color: null,
           encodedImage: '',
           encodedImageType: '',
+          encodedImageName: '',
           outlineColor: null,
           outlineSize: 'none',
           text: '',

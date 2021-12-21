@@ -75,7 +75,7 @@ describe('<CreateButtonForm />', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"course"}
+                {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"course","encodedImageName":""}
               </metadata>
               <svg
                 fill="none"
