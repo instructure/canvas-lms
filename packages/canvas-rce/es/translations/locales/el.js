@@ -36,6 +36,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "Εφαρμογές"
   },
+  "arrows_464a3e54": {
+    "message": "Βέλη"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Ο λόγος του μήκους της εικόνας προς το ύψος της θα διατηρηθεί"
   },
@@ -44,6 +47,9 @@ const locale = {
   },
   "attributes_963ba262": {
     "message": "Πεδία"
+  },
+  "basic_554cdc0a": {
+    "message": "Βασική"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -96,6 +102,9 @@ const locale = {
   "decrease_indent_de6343ab": {
     "message": "Μείωση Εσοχής Κειμένου"
   },
+  "delimiters_4db4840d": {
+    "message": "Οριοθέτες"
+  },
   "details_98a31b68": {
     "message": "Λεπτομέρειες"
   },
@@ -137,6 +146,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "Βαθμοί"
+  },
+  "greek_65c5b3f7": {
+    "message": "Ελληνικά"
   },
   "group_files_82e5dcdb": {
     "message": "Αρχεία ομάδας"
@@ -210,6 +222,9 @@ const locale = {
   "media_af190855": {
     "message": "Δεδομένα"
   },
+  "misc_3b692ea7": {
+    "message": "Διάφορα"
+  },
   "modules_c4325335": {
     "message": "Ενότητες"
   },
@@ -230,6 +245,9 @@ const locale = {
   },
   "none_3b5e34d2": {
     "message": "Κανένα"
+  },
+  "operators_a2ef9a93": {
+    "message": "Χειριστές"
   },
   "options_3ab0ea65": {
     "message": "Επιλογές"
@@ -254,6 +272,9 @@ const locale = {
   },
   "record_7c9448b": {
     "message": "Ηχογράφηση"
+  },
+  "relationships_6602af70": {
+    "message": "Σχέσεις"
   },
   "rich_content_editor_2708ef21": {
     "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"

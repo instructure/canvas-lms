@@ -39,6 +39,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "אפליקציות"
   },
+  "arrows_464a3e54": {
+    "message": "חצים"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "יחס הממדים יישמר"
   },
@@ -47,6 +50,9 @@ const locale = {
   },
   "attributes_963ba262": {
     "message": "מאפיינים"
+  },
+  "basic_554cdc0a": {
+    "message": "בסיסי"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -102,6 +108,9 @@ const locale = {
   "decrease_indent_de6343ab": {
     "message": "הצרת עימוד"
   },
+  "delimiters_4db4840d": {
+    "message": "מפסקים"
+  },
   "details_98a31b68": {
     "message": "פרטים"
   },
@@ -143,6 +152,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "הערכות"
+  },
+  "greek_65c5b3f7": {
+    "message": "יוונית"
   },
   "group_files_82e5dcdb": {
     "message": "קבצי קבוצה"
@@ -219,6 +231,9 @@ const locale = {
   "media_af190855": {
     "message": "מדיה"
   },
+  "misc_3b692ea7": {
+    "message": "אחר"
+  },
   "modules_c4325335": {
     "message": "מודולים"
   },
@@ -243,6 +258,9 @@ const locale = {
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "פתיחת חלון דיאלוג של מקשי קיצור"
   },
+  "operators_a2ef9a93": {
+    "message": "מפעילים"
+  },
   "options_3ab0ea65": {
     "message": "אפשרויות"
   },
@@ -266,6 +284,9 @@ const locale = {
   },
   "record_7c9448b": {
     "message": "הקלטה"
+  },
+  "relationships_6602af70": {
+    "message": "יחסים"
   },
   "rich_content_editor_2708ef21": {
     "message": "עורך תוכן עשיר"

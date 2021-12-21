@@ -60,6 +60,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "Застосунки"
   },
+  "arrows_464a3e54": {
+    "message": "Стрілки"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Співвідношення сторін збережеться"
   },
@@ -68,6 +71,9 @@ const locale = {
   },
   "attributes_963ba262": {
     "message": "Атрибути"
+  },
+  "basic_554cdc0a": {
+    "message": "Базовий"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -138,6 +144,9 @@ const locale = {
   "decrease_indent_de6343ab": {
     "message": "Зменшити відступ"
   },
+  "delimiters_4db4840d": {
+    "message": "Розділювачі"
+  },
   "details_98a31b68": {
     "message": "Подробиці"
   },
@@ -188,6 +197,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "Оцінки"
+  },
+  "greek_65c5b3f7": {
+    "message": "Грецький"
   },
   "group_files_82e5dcdb": {
     "message": "Файли групи"
@@ -264,6 +276,9 @@ const locale = {
   "media_af190855": {
     "message": "Носій інформації"
   },
+  "misc_3b692ea7": {
+    "message": "Різне"
+  },
   "modules_c4325335": {
     "message": "Розділи"
   },
@@ -290,6 +305,9 @@ const locale = {
   },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Вікрити діалогове вікно гарячих клавіш"
+  },
+  "operators_a2ef9a93": {
+    "message": "Оператори"
   },
   "options_3ab0ea65": {
     "message": "Параметри"
@@ -320,6 +338,9 @@ const locale = {
   },
   "record_upload_media_5fdce166": {
     "message": "Запис/завантаження медіа"
+  },
+  "relationships_6602af70": {
+    "message": "Зв''язки"
   },
   "rich_content_editor_2708ef21": {
     "message": "Редактор збагаченого контенту"

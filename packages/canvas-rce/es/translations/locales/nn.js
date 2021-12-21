@@ -87,6 +87,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "Appar"
   },
+  "arrows_464a3e54": {
+    "message": "Piler"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Storleiksforhold vil bli behalden"
   },
@@ -113,6 +116,9 @@ const locale = {
   },
   "available_folders_694d0436": {
     "message": "Tilgjengelege mapper"
+  },
+  "basic_554cdc0a": {
+    "message": "Standard"
   },
   "below_81d4dceb": {
     "message": "Nedanfor"
@@ -275,6 +281,9 @@ const locale = {
   },
   "default_numerical_ordered_list_48dd3548": {
     "message": "standard numerisk ordna liste"
+  },
+  "delimiters_4db4840d": {
+    "message": "Skiljeteikn"
   },
   "describe_the_image_e65d2e32": {
     "message": "(Skildre bildet)"
@@ -441,6 +450,9 @@ const locale = {
   "grades_a61eba0a": {
     "message": "Vurderingar"
   },
+  "greek_65c5b3f7": {
+    "message": "Gresk"
+  },
   "group_documents_8bfd6ae6": {
     "message": "Grupper dokument"
   },
@@ -594,6 +606,9 @@ const locale = {
   "middle_27dc1d5": {
     "message": "Midtpunkt"
   },
+  "misc_3b692ea7": {
+    "message": "Diverse"
+  },
   "miscellaneous_e9818229": {
     "message": "Diverse"
   },
@@ -647,6 +662,9 @@ const locale = {
   },
   "open_title_application_fd624fc5": {
     "message": "Opne { title } applikasjon"
+  },
+  "operators_a2ef9a93": {
+    "message": "Operatør"
   },
   "options_3ab0ea65": {
     "message": "Alternativ"
@@ -722,6 +740,9 @@ const locale = {
   },
   "record_upload_media_5fdce166": {
     "message": "Ta opp / last opp media"
+  },
+  "relationships_6602af70": {
+    "message": "Relasjon"
   },
   "remove_link_d1f2f4d0": {
     "message": "Fjern lenke"

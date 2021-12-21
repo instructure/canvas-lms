@@ -36,6 +36,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "앱"
   },
+  "arrows_464a3e54": {
+    "message": "화살표"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "비율을 유지"
   },
@@ -44,6 +47,9 @@ const locale = {
   },
   "attributes_963ba262": {
     "message": "속성"
+  },
+  "basic_554cdc0a": {
+    "message": "기본"
   },
   "cancel_caeb1e68": {
     "message": "취소"
@@ -77,6 +83,9 @@ const locale = {
   },
   "decrease_indent_de6343ab": {
     "message": "들여쓰기 축소"
+  },
+  "delimiters_4db4840d": {
+    "message": "구분자"
   },
   "details_98a31b68": {
     "message": "세부 정보"
@@ -116,6 +125,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "평점"
+  },
+  "greek_65c5b3f7": {
+    "message": "그리스 문자"
   },
   "group_files_82e5dcdb": {
     "message": "그룹 파일"
@@ -180,6 +192,9 @@ const locale = {
   "media_af190855": {
     "message": "미디어"
   },
+  "misc_3b692ea7": {
+    "message": "기타"
+  },
   "modules_c4325335": {
     "message": "모듈"
   },
@@ -197,6 +212,9 @@ const locale = {
   },
   "none_3b5e34d2": {
     "message": "없음"
+  },
+  "operators_a2ef9a93": {
+    "message": "연산자"
   },
   "options_3ab0ea65": {
     "message": "옵션"
@@ -218,6 +236,9 @@ const locale = {
   },
   "record_7c9448b": {
     "message": "녹음/녹화"
+  },
+  "relationships_6602af70": {
+    "message": "관계"
   },
   "save_11a80ec3": {
     "message": "저장"

@@ -36,6 +36,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "Հավելվածներ"
   },
+  "arrows_464a3e54": {
+    "message": "Սլաքներ"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Կողմերի հարաբերակցությունը պահպանվելու է"
   },
@@ -44,6 +47,9 @@ const locale = {
   },
   "attributes_963ba262": {
     "message": "Հատկանիշեր"
+  },
+  "basic_554cdc0a": {
+    "message": "Հիմնական"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001թ. Acme Inc."
@@ -96,6 +102,9 @@ const locale = {
   "decrease_indent_de6343ab": {
     "message": "Նվազեցնել ներսի տողագլուխը"
   },
+  "delimiters_4db4840d": {
+    "message": "Բաժանիչներ"
+  },
   "details_98a31b68": {
     "message": "Մանրամասներ"
   },
@@ -137,6 +146,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "Գնահատականներ"
+  },
+  "greek_65c5b3f7": {
+    "message": "Հունարեն"
   },
   "group_files_82e5dcdb": {
     "message": "Խմբի ֆայլեր"
@@ -210,6 +222,9 @@ const locale = {
   "media_af190855": {
     "message": "Մուլտիմեդիա"
   },
+  "misc_3b692ea7": {
+    "message": "Այլ"
+  },
   "modules_c4325335": {
     "message": "Մոդուլներ"
   },
@@ -230,6 +245,9 @@ const locale = {
   },
   "none_3b5e34d2": {
     "message": "Ոչինչ չկա"
+  },
+  "operators_a2ef9a93": {
+    "message": "Օպերատորներ"
   },
   "options_3ab0ea65": {
     "message": "Պարամետրեր"
@@ -254,6 +272,9 @@ const locale = {
   },
   "record_7c9448b": {
     "message": "Գրառում"
+  },
+  "relationships_6602af70": {
+    "message": "Հարաբերություններ"
   },
   "rich_content_editor_2708ef21": {
     "message": "Ֆորմատավորված տեքստի խմբագիր"
