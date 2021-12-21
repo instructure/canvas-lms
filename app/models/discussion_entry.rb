@@ -26,7 +26,7 @@ class DiscussionEntry < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
 
-  attr_readonly :discussion_topic_id, :user_id, :parent_id
+  attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
   has_many :legacy_subentries, -> { where("legacy=true") }, class_name: "DiscussionEntry", foreign_key: "parent_id"
   has_many :root_discussion_replies, -> { where("legacy=false OR legacy=true AND parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
