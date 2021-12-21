@@ -65,6 +65,9 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Ви впевнені, що хочете видалити цей елемент планувальника?"
     },
+    "arrows_464a3e54": {
+        "message": "Стрілки"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Співвідношення сторін збережеться"
     },
@@ -106,6 +109,9 @@
     },
     "attributes_963ba262": {
         "message": "Атрибути"
+    },
+    "basic_554cdc0a": {
+        "message": "Базовий"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Початок вашої історії завдань"
@@ -227,6 +233,9 @@
     "delete_a6efa79d": {
         "message": "Видалити"
     },
+    "delimiters_4db4840d": {
+        "message": "Розділювачі"
+    },
     "details_98a31b68": {
         "message": "Подробиці"
     },
@@ -344,6 +353,9 @@
     "grades_loaded_5056277c": {
         "message": "Оцінки завантажені"
     },
+    "greek_65c5b3f7": {
+        "message": "Грецький"
+    },
     "group_files_82e5dcdb": {
         "message": "Файли групи"
     },
@@ -458,6 +470,9 @@
     "media_af190855": {
         "message": "Носій інформації"
     },
+    "misc_3b692ea7": {
+        "message": "Різне"
+    },
     "missing_1a256b3b": {
         "message": "Відсутній"
     },
@@ -542,6 +557,9 @@
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Вікрити діалогове вікно гарячих клавіш"
     },
+    "operators_a2ef9a93": {
+        "message": "Оператори"
+    },
     "optional_add_course_ef0d70fc": {
         "message": "Опціонально: Додати курс"
     },
@@ -598,6 +616,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Запис/завантаження медіа"
+    },
+    "relationships_6602af70": {
+        "message": "Зв''язки"
     },
     "reminder_date_4564d12d": {
         "message": "Нагадування: { date }"

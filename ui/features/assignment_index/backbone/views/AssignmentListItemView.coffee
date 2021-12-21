@@ -124,15 +124,20 @@ export default class AssignmentListItemView extends Backbone.View
       })
       @editAssignmentView = new CreateAssignmentView(model: @model)
 
-      if @isGraded() && @model.postToSISEnabled() && @model.published()
-        @sisButtonView = new SisButtonView
+    @initializeSisButton()
+
+    @dateDueColumnView       = new DateDueColumnView(model: @model)
+    @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
+
+  initializeSisButton: ->
+    if @canManage() && @isGraded() && @model.postToSISEnabled() && @model.published()
+      @sisButtonView = new SisButtonView
           model: @model
           sisName: @model.postToSISName()
           dueDateRequired: @model.dueDateRequiredForAccount()
           maxNameLengthRequired: @model.maxNameLengthRequiredForAccount()
-
-    @dateDueColumnView       = new DateDueColumnView(model: @model)
-    @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
+    else
+      @sisButtonView.remove() if @sisButtonView
 
   # Public: Called when move menu item is selected
   #
@@ -167,12 +172,12 @@ export default class AssignmentListItemView extends Backbone.View
     @toggleHidden(@model, @model.get('hidden'))
     @publishIconView.remove()         if @publishIconView
     @lockIconView.remove()            if @lockIconView
-    @sisButtonView.remove()           if @sisButtonView
     @editAssignmentView.remove()      if @editAssignmentView
     @dateDueColumnView.remove()       if @dateDueColumnView
     @dateAvailableColumnView.remove() if @dateAvailableColumnView
 
     super
+    @initializeSisButton()
     # reset the model's view property; it got overwritten by child views
     @model.view = this if @model
 
