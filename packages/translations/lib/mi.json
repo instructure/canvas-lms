@@ -146,12 +146,6 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Orooro me te tāhopu ataata kaore i te tautokotia tēnā koa whakamahia he pūtirotiro rerekē."
     },
-    "audio_options_feb58e2c": {
-        "message": "Ororongo Kōwhiringa"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "Ororongo Kōwhiringa Paepae"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Kaitākaro ororongo mō { title }"
     },
@@ -389,12 +383,6 @@
     "details_a6f427c3": {
         "message": "Ngā taipitopito:"
     },
-    "diamond_b8dfe7ae": {
-        "message": "Taimana"
-    },
-    "dimension_type_55c83e4e": {
-        "message": "Inenga momo"
-    },
     "dimensions_45ddb7b7": {
         "message": "Ngā āhuatanga"
     },
@@ -565,9 +553,6 @@
     },
     "feedback_6dcc1991": {
         "message": "Urupare"
-    },
-    "file_name_8fd421ff": {
-        "message": "Ingoa kōnae"
     },
     "file_url_c12b64be": {
         "message": "Kōnae URL"
@@ -818,9 +803,6 @@
     "loading_please_wait_d276220a": {
         "message": "E Uta ana, tēnā koa tatari"
     },
-    "loading_preview_9f077aa1": {
-        "message": "Uta ana arokite"
-    },
     "location_3b6ff307": {
         "message": "Wāhi:"
     },
@@ -856,9 +838,6 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Whakapakoko nui ngā Tae"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Me iti ake i te { percentage }%"
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Me kia i te iti rawa { width } x { height }px"
@@ -995,20 +974,8 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Arotake a te hoa mō { itemTitle }"
     },
-    "pentagon_17d82ea3": {
-        "message": "Tapaono"
-    },
     "people_b4ebb13c": {
         "message": "Tāngata"
-    },
-    "percentage_34ab7c2c": {
-        "message": "Ōrau"
-    },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "Pai hēneti me nama anake"
-    },
-    "pixels_52ece7d1": {
-        "message": "Ngā Pika"
     },
     "points_bceb5005": {
         "message": "ngā koinga"
@@ -1132,9 +1099,6 @@
     },
     "show_all_ae37d610": {
         "message": "Whakātu katoa"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Whakaatutia ororongo kōwhiringa"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Whakātu whakauru kōwhiri"

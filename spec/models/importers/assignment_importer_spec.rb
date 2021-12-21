@@ -350,18 +350,6 @@ describe "Importing assignments" do
         expect { subject }.to change { assignment.line_items.first&.resource_link.present? }.from(false).to true
       end
 
-      context "when assignment content tag has link_settings" do
-        let(:link_settings) { { selection_width: 456, selection_height: 789 } }
-        let(:assignment_hash) do
-          super().merge({ external_tool_link_settings_json: link_settings.to_json })
-        end
-
-        it "copies to new tag" do
-          subject
-          expect(assignment.external_tool_tag.link_settings).to eq link_settings.stringify_keys
-        end
-      end
-
       describe "line item creation" do
         let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
         let(:course) { Course.create! }

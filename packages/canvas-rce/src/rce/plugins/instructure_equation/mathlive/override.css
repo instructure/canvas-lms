@@ -1,4 +1,0 @@
-.ML__popover {
-  /* Override this so it shows up on top of dialogs */
-  z-index: 20000 !important;
-}

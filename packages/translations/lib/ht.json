@@ -146,12 +146,6 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Anrejistreman odyo ak videyo a pa konpatib, tanpri, itilize lòt navigatè."
     },
-    "audio_options_feb58e2c": {
-        "message": "Opsyon Odyo"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "Plato Opsyon Odyo"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Lektè odyo pou { title }"
     },
@@ -818,9 +812,6 @@
     "loading_please_wait_d276220a": {
         "message": "Chajman, tanpri tann"
     },
-    "loading_preview_9f077aa1": {
-        "message": "Chajman apèsi"
-    },
     "location_3b6ff307": {
         "message": "Anplasman:"
     },
@@ -1004,9 +995,6 @@
     "percentage_34ab7c2c": {
         "message": "Pousantaj"
     },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "Pousantaj la dwe se yon chif"
-    },
     "pixels_52ece7d1": {
         "message": "Piksèl"
     },
@@ -1132,9 +1120,6 @@
     },
     "show_all_ae37d610": {
         "message": "Afiche Tout"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Afiche opsyon odyo"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Afiche opsyon entegrasyon"

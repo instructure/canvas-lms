@@ -42,7 +42,7 @@ describe "reported_reply" do
     end
 
     it "renders anonymous user if discussion is anonymous" do
-      @topic.anonymous_state = "full_anonymity"
+      @topic.anonymous_state = "fully_anonymous"
       @topic.save!
 
       msg = generate_message(notification_name, path_type, asset)

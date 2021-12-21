@@ -3325,7 +3325,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "duplicate carries anonymous_state over" do
       @user = @teacher
-      discussion_topic_model(context: @course, title: "Section Specific Topic", user: @teacher, anonymous_state: "full_anonymity")
+      discussion_topic_model(context: @course, title: "Section Specific Topic", user: @teacher, anonymous_state: "fully_anonymous")
       @topic.save!
 
       json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",

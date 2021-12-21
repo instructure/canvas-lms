@@ -215,8 +215,6 @@ export const CREATE_LEARNING_OUTCOME = gql`
         title
         displayName
         description
-        calculationMethod
-        calculationInt
       }
       errors {
         attribute

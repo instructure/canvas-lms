@@ -23,7 +23,7 @@ const locale = {
   "access_the_pretty_html_editor_37168efe": {
     "message": "Få adgang til det pæne HTML-redigeringsværktøj"
   },
-  "accessibility_checker_b3af1f6c": { "message": "Tilgængelighedskontrol" },
+  "accessibility_checker_b3af1f6c": { "message": "Tilgægelighedskontrol" },
   "add_8523c19b": { "message": "Tilføj" },
   "add_another_f4e50d57": { "message": "Tilføj en mere" },
   "add_cc_subtitles_55f0394e": { "message": "Tilføj undertekster" },
@@ -61,8 +61,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Lyd- og videooptagelse understøttes ikke, brug en anden browser."
   },
-  "audio_options_feb58e2c": { "message": "Lydindstillinger" },
-  "audio_options_tray_33a90711": { "message": "Skuffe til lydindstillinger" },
   "audio_player_for_title_20cc70d": {
     "message": "Audioafspiller til { title }"
   },
@@ -157,8 +155,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Beskriv billedet)" },
   "describe_the_video_2fe8f46a": { "message": "(Beskriv videoen)" },
   "details_98a31b68": { "message": "Nærmere oplysninger" },
-  "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Dimensionstype" },
   "dimensions_45ddb7b7": { "message": "Dimensioner" },
   "directionality_26ae9e08": { "message": "Retningsbestemthed" },
   "discussions_a5f96392": { "message": "Diskussioner" },
@@ -298,9 +294,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Forløb" },
   "multi_color_image_63d7372f": { "message": "Billede i flere farver" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Skal være mindst { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Skal være mindst { width } x { height } px"
   },
@@ -341,13 +334,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
-  "pentagon_17d82ea3": { "message": "Femkant" },
   "people_b4ebb13c": { "message": "Deltagere" },
-  "percentage_34ab7c2c": { "message": "Procentdel" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Procent skal være et tal"
-  },
-  "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Slået op: { when }" },
   "preformatted_d0670862": { "message": "Præformatteret" },
   "pretty_html_editor_28748756": { "message": "Pænt HTML-redigeringsværktøj" },
@@ -384,7 +371,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O for at åbne det pæne html-redigeringsværktøj."
   },
-  "show_audio_options_b489926b": { "message": "Vis lydindstillinger" },
   "show_embed_options_ef8d7ef": { "message": "Vis indlejringsindstillinger" },
   "show_image_options_1e2ecc6b": { "message": "Vis billedindstillinger" },
   "show_link_options_545338fd": { "message": "Vis linkindstillinger" },

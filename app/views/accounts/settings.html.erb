@@ -21,7 +21,6 @@
   provide :page_title, t(:page_title, "Account Settings")
 
   js_env(
-    :PRODUCTION => Rails.env.production?,
     :ACCOUNT => {
       'id' => @context.id,
       'site_admin' => @account.site_admin?,

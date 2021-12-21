@@ -20,7 +20,7 @@
 
 describe DiscussionEntry do
   let(:topic) { discussion_topic_model }
-  let(:anonymous_topic) { discussion_topic_model(anonymous_state: "full_anonymity") }
+  let(:anonymous_topic) { discussion_topic_model(anonymous_state: "fully_anonymous") }
 
   describe "callback lifecycle" do
     before(:once) do

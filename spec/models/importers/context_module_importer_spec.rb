@@ -201,30 +201,4 @@ describe "Importing modules" do
     expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3, 4])
     expect(mod.content_tags.pluck(:title)).to eq(%w[cats dogs pigs frogs])
   end
-
-  it "includes link_settings in lti module items" do
-    link_settings = { selection_height: 123, selection_width: 456 }
-    data = { migration_id: "1", title: "derp",
-             items: [{
-               migration_id: "mig1",
-               type: "linked_resource",
-               linked_resource_type: "contextexternaltool",
-               linked_resource_id: "1",
-               url: "http://exmpale.com/stuff",
-               link_settings_json: link_settings.to_json
-             }] }
-
-    course_model
-    tool1 = @course.context_external_tools.create!(name: "somethin", domain: "exmpale.com",
-                                                   shared_secret: "fake", consumer_key: "fake")
-
-    migration = ContentMigration.new
-    migration.add_external_tool_translation("1", tool1, {})
-
-    topic = Importers::ContextModuleImporter.import_from_migration(data, @course, migration)
-    topic.reload
-
-    tag = topic.content_tags.where(migration_id: "mig1").first
-    expect(tag.link_settings).to eq link_settings.stringify_keys
-  end
 end

@@ -384,6 +384,14 @@ slack_notifications:
   display_name: Slack Notifications
   description: The ability for users to receive notifications from slack
   applies_to: RootAccount
+strip_origin_from_quiz_answer_file_references:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: 'Classic Quizzes: Strip origin from Canvas file URLs in answers'
+  description: |-
+    This was already happening for images in the question, but not answers
+    causing CORS failures when a quiz is created in one domain and
+    taken in another (like a vanity domain).
 student_outcome_gradebook:
   type: setting
   state: allowed

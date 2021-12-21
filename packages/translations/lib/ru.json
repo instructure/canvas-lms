@@ -146,12 +146,6 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Аудио- и видеозапись не поддерживается; воспользуйтесь другим браузером."
     },
-    "audio_options_feb58e2c": {
-        "message": "Параметры звука"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "Панель настройки параметров звука"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Аудиоплеер для { title }"
     },
@@ -818,9 +812,6 @@
     "loading_please_wait_d276220a": {
         "message": "Выполняется загрузка, подождите..."
     },
-    "loading_preview_9f077aa1": {
-        "message": "Загрузка предпросмотра"
-    },
     "location_3b6ff307": {
         "message": "Местоположение:"
     },
@@ -1004,9 +995,6 @@
     "percentage_34ab7c2c": {
         "message": "Процент"
     },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "Процентное значение должно быть указано в виде числа"
-    },
     "pixels_52ece7d1": {
         "message": "Пиксели"
     },
@@ -1132,9 +1120,6 @@
     },
     "show_all_ae37d610": {
         "message": "Показать все"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Показать параметры звука"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Показать параметры вставки"

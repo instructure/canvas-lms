@@ -144,10 +144,12 @@ const mathml = {
         return true
       }
 
-      // look for latex the user may have entered w/o the equation editor by
-      // looking for mathjax's opening delimiters
-      if (/(?:\$\$|\\\()/.test(elem.textContent)) {
-        return true
+      if (ENV.FEATURES?.inline_math_everywhere) {
+        // look for latex the user may have entered w/o the equation editor by
+        // looking for mathjax's opening delimiters
+        if (/(?:\$\$|\\\()/.test(elem.textContent)) {
+          return true
+        }
       }
     }
     const mathElements = elem.getElementsByTagName('math')

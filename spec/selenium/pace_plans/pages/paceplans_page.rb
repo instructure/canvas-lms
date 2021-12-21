@@ -293,9 +293,6 @@ module PacePlansPageObject
 
   def add_required_end_date(required_end_date)
     formatted_date = required_end_date.strftime("%m/%d/%Y")
-    required_end_date_input[:value].size.times do
-      required_end_date_input.send_keys(:backspace)
-    end
     required_end_date_input.send_keys(formatted_date, :enter)
   end
 

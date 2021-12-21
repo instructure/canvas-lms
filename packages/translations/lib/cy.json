@@ -146,12 +146,6 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Does dim modd delio â recordio fideo a sain; defnyddiwch borwr gwahanol."
     },
-    "audio_options_feb58e2c": {
-        "message": "Opsiynau Sain"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "Ardal Opsiynau Sain"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Chwaraewr sain ar gyfer { title }"
     },
@@ -818,9 +812,6 @@
     "loading_please_wait_d276220a": {
         "message": "Wrthi’n llwytho, arhoswch funud"
     },
-    "loading_preview_9f077aa1": {
-        "message": "Wrthi’n llwytho rhagolwg"
-    },
     "location_3b6ff307": {
         "message": "Lleoliad:"
     },
@@ -1004,9 +995,6 @@
     "percentage_34ab7c2c": {
         "message": "Canran"
     },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "Mae canran yn gorfod bod yn rhif"
-    },
     "pixels_52ece7d1": {
         "message": "Picseli"
     },
@@ -1132,9 +1120,6 @@
     },
     "show_all_ae37d610": {
         "message": "Dangos y Cyfan"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Dangos opsiynau sain"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Dangos opsiynau plannu"

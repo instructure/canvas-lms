@@ -591,7 +591,6 @@ class DiscussionTopicsController < ApplicationController
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity),
-      PARTIAL_ANONYMITY: Account.site_admin.feature_enabled?(:partial_anonymity),
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group)
     }
@@ -764,7 +763,7 @@ class DiscussionTopicsController < ApplicationController
              })
 
       js_bundle :discussion_topics_post
-      css_bundle :discussions_index, :learning_outcomes
+      css_bundle :discussions_index
       render html: "", layout: true
       return
     end

@@ -28,9 +28,7 @@ export default {
 const Template = args => <RolePillContainer {...args} />
 
 export const Default = Template.bind({})
-Default.args = {
-  discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']
-}
+Default.args = {discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment']}
 
 export const SingleAuthorRole = Template.bind({})
 SingleAuthorRole.args = {discussionRoles: ['Author']}

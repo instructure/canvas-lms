@@ -18,7 +18,6 @@
 
 import {createSelector, createSelectorCreator, defaultMemoize} from 'reselect'
 import {deepEqual} from '@instructure/ui-utils'
-import moment from 'moment-timezone'
 
 import {Constants as PacePlanConstants, PacePlanAction} from '../actions/pace_plans'
 import pacePlanItemsReducer from './pace_plan_items'
@@ -49,7 +48,6 @@ const initialProgress = window.ENV.PACE_PLAN_PROGRESS
 
 export const initialState: PacePlansState = ({
   ...window.ENV.PACE_PLAN,
-  course: window.ENV.COURSE,
   originalPlan: window.ENV.PACE_PLAN,
   publishingProgress: initialProgress
 } || {}) as PacePlansState
@@ -360,15 +358,7 @@ export default (
       if (state.hard_end_dates) {
         return {...state, hard_end_dates: false, end_date: ''}
       } else {
-        let endDate = state.originalPlan.end_date
-        if (!endDate) {
-          if (state.course.end_at) {
-            endDate = state.course.end_at
-          } else {
-            endDate = moment(state.start_date).add(30, 'd').format('YYYY-MM-DD')
-          }
-        }
-        return {...state, hard_end_dates: true, end_date: endDate}
+        return {...state, hard_end_dates: true, end_date: state.originalPlan.end_date}
       }
 
     case PacePlanConstants.RESET_PLAN:

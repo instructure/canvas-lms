@@ -146,12 +146,6 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "不支援音訊和視訊錄製；請使用不同的瀏覽器。"
     },
-    "audio_options_feb58e2c": {
-        "message": "音訊選項"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "音訊選項收集箱"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "{ title } 的音訊播放器"
     },
@@ -818,9 +812,6 @@
     "loading_please_wait_d276220a": {
         "message": "正在載入，請稍候"
     },
-    "loading_preview_9f077aa1": {
-        "message": "載入預覽"
-    },
     "location_3b6ff307": {
         "message": "位置："
     },
@@ -1004,9 +995,6 @@
     "percentage_34ab7c2c": {
         "message": "百分比"
     },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "百分比必須是數字"
-    },
     "pixels_52ece7d1": {
         "message": "像素"
     },
@@ -1132,9 +1120,6 @@
     },
     "show_all_ae37d610": {
         "message": "全部顯示"
-    },
-    "show_audio_options_b489926b": {
-        "message": "顯示音訊選項"
     },
     "show_embed_options_ef8d7ef": {
         "message": "顯示嵌入選項"

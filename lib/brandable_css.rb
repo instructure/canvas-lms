@@ -132,7 +132,7 @@ module BrandableCSS
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
         expected_version = (pre_or_post == "predeploy") ? migration_version : (migration_version + 1)
-        raise BrandConfigWithOutCompileAssets if expected_version == 338_164_632_037_494_729
+        raise BrandConfigWithOutCompileAssets if expected_version == 85_663_486_644_871_658_581_990
         raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
       end
     end

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
+import tinymce from 'tinymce'
 import {defaultConfiguration} from '@instructure/canvas-rce'
 
 export default function sanitizeHtml(html) {
