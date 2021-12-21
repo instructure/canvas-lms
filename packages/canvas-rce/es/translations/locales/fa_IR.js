@@ -39,6 +39,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "برنامه ها"
   },
+  "arrows_464a3e54": {
+    "message": "پیکان ها"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "نسبت ابعاد حفظ خواهد شد"
   },
@@ -50,6 +53,9 @@ const locale = {
   },
   "available_folders_694d0436": {
     "message": "پوشه های موجود"
+  },
+  "basic_554cdc0a": {
+    "message": "اصلی"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -114,6 +120,9 @@ const locale = {
   "decrease_indent_de6343ab": {
     "message": "کاهش تورفتگی"
   },
+  "delimiters_4db4840d": {
+    "message": "جداکننده ها"
+  },
   "details_98a31b68": {
     "message": "اطلاعات"
   },
@@ -164,6 +173,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "نمره ها"
+  },
+  "greek_65c5b3f7": {
+    "message": "یونانی"
   },
   "group_files_82e5dcdb": {
     "message": "فایل های گروه"
@@ -240,6 +252,9 @@ const locale = {
   "media_af190855": {
     "message": "رسانه"
   },
+  "misc_3b692ea7": {
+    "message": "متفرقه"
+  },
   "modules_c4325335": {
     "message": "ماژول ها"
   },
@@ -267,6 +282,9 @@ const locale = {
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
   },
+  "operators_a2ef9a93": {
+    "message": "عملگرها"
+  },
   "options_3ab0ea65": {
     "message": "گزینه ها"
   },
@@ -293,6 +311,9 @@ const locale = {
   },
   "record_7c9448b": {
     "message": "ضبط کردن"
+  },
+  "relationships_6602af70": {
+    "message": "روابط"
   },
   "rich_content_editor_2708ef21": {
     "message": "ویرایشگر محتوای غنی"

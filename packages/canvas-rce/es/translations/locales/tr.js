@@ -72,6 +72,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "Uygulamalar"
   },
+  "arrows_464a3e54": {
+    "message": "Oklar"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Genişleme oranı korumalıdır"
   },
@@ -86,6 +89,9 @@ const locale = {
   },
   "available_folders_694d0436": {
     "message": "Mevcut klasörler"
+  },
+  "basic_554cdc0a": {
+    "message": "Temel"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -180,6 +186,9 @@ const locale = {
   "decrease_indent_de6343ab": {
     "message": "İçerden başlatma sınırını azalt"
   },
+  "delimiters_4db4840d": {
+    "message": "Ayıraçlar"
+  },
   "details_98a31b68": {
     "message": "Ayrıntılar"
   },
@@ -254,6 +263,9 @@ const locale = {
   },
   "grades_a61eba0a": {
     "message": "Notlar"
+  },
+  "greek_65c5b3f7": {
+    "message": "Yunan"
   },
   "group_files_82e5dcdb": {
     "message": "Grup dosyaları"
@@ -357,6 +369,9 @@ const locale = {
   "media_af190855": {
     "message": "Medya"
   },
+  "misc_3b692ea7": {
+    "message": "Çeşitli"
+  },
   "modules_c4325335": {
     "message": "Modüller"
   },
@@ -380,6 +395,9 @@ const locale = {
   },
   "none_3b5e34d2": {
     "message": "Yok"
+  },
+  "operators_a2ef9a93": {
+    "message": "Operatörler"
   },
   "options_3ab0ea65": {
     "message": "Seçenekler"
@@ -407,6 +425,9 @@ const locale = {
   },
   "record_7c9448b": {
     "message": "Kayıt"
+  },
+  "relationships_6602af70": {
+    "message": "İlişkiler"
   },
   "rich_content_editor_2708ef21": {
     "message": "Zengin İçerik Editörü"

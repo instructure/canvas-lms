@@ -75,6 +75,9 @@ const locale = {
   "apps_54d24a47": {
     "message": "Alkalmazások"
   },
+  "arrows_464a3e54": {
+    "message": "Nyilak"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Képarány megtartása"
   },
@@ -92,6 +95,9 @@ const locale = {
   },
   "available_folders_694d0436": {
     "message": "Elérhető mappák"
+  },
+  "basic_554cdc0a": {
+    "message": "Alap"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -209,6 +215,9 @@ const locale = {
   },
   "default_numerical_ordered_list_48dd3548": {
     "message": "alapértelmezett sorszámozott lista"
+  },
+  "delimiters_4db4840d": {
+    "message": "Elválasztó jelek"
   },
   "describe_the_image_e65d2e32": {
     "message": "(A kép leírása)"
@@ -363,6 +372,9 @@ const locale = {
   "grades_a61eba0a": {
     "message": "Értékelések"
   },
+  "greek_65c5b3f7": {
+    "message": "Görög"
+  },
   "group_documents_8bfd6ae6": {
     "message": "Csoport dokumentumok"
   },
@@ -498,6 +510,9 @@ const locale = {
   "medium_5a8e9ead": {
     "message": "Közepes"
   },
+  "misc_3b692ea7": {
+    "message": "Egyéb"
+  },
   "miscellaneous_e9818229": {
     "message": "Egyéb"
   },
@@ -542,6 +557,9 @@ const locale = {
   },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Nyissa meg a billentyűkombinációk párbeszédablakot"
+  },
+  "operators_a2ef9a93": {
+    "message": "Műveletek"
   },
   "options_3ab0ea65": {
     "message": "Beállítások"
@@ -599,6 +617,9 @@ const locale = {
   },
   "record_upload_media_5fdce166": {
     "message": "Médiafájl rögzítése/feltöltése"
+  },
+  "relationships_6602af70": {
+    "message": "Kapcsolatok"
   },
   "remove_link_d1f2f4d0": {
     "message": "Link eltávolítása"
