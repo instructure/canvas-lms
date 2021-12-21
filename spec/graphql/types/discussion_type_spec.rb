@@ -250,7 +250,7 @@ RSpec.shared_examples "DiscussionType" do
     before do
       @anon_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
                                                  message: "anonymous discussion",
-                                                 anonymous_state: "fully_anonymous",
+                                                 anonymous_state: "full_anonymity",
                                                  context: @course,
                                                  user: @teacher,
                                                  editor: @teacher)
@@ -262,7 +262,7 @@ RSpec.shared_examples "DiscussionType" do
       course_with_student(course: @course)
       @anon_student_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
                                                          message: "anonymous discussion",
-                                                         anonymous_state: "fully_anonymous",
+                                                         anonymous_state: "full_anonymity",
                                                          context: @course,
                                                          user: @student,
                                                          editor: @student)
@@ -274,12 +274,60 @@ RSpec.shared_examples "DiscussionType" do
       course_with_designer(course: @course)
       @anon_designer_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
                                                           message: "anonymous discussion",
-                                                          anonymous_state: "fully_anonymous",
+                                                          anonymous_state: "full_anonymity",
                                                           context: @course,
                                                           user: @designer,
                                                           editor: @designer)
       @anon_designer_discussion_type = GraphQLTypeTester.new(
         @anon_designer_discussion,
+        current_user: @teacher
+      )
+
+      @anon_teacher_discussion_with_anonymous_author = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                                               message: "anonymous discussion",
+                                                                               anonymous_state: "partial_anonymity",
+                                                                               context: @course,
+                                                                               user: @teacher,
+                                                                               editor: @teacher,
+                                                                               is_anonymous_author: true)
+      @anon_teacher_discussion_with_anonymous_author_type = GraphQLTypeTester.new(
+        @anon_teacher_discussion_with_anonymous_author,
+        current_user: @teacher
+      )
+
+      @anon_teacher_discussion_with_non_anonymous_author = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                                                   message: "anonymous discussion",
+                                                                                   anonymous_state: "partial_anonymity",
+                                                                                   context: @course,
+                                                                                   user: @teacher,
+                                                                                   editor: @teacher,
+                                                                                   is_anonymous_author: false)
+      @anon_teacher_discussion_with_non_anonymous_author_type = GraphQLTypeTester.new(
+        @anon_teacher_discussion_with_non_anonymous_author,
+        current_user: @teacher
+      )
+
+      @anon_student_discussion_with_anonymous_author = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                                               message: "anonymous discussion",
+                                                                               anonymous_state: "partial_anonymity",
+                                                                               context: @course,
+                                                                               user: @student,
+                                                                               editor: @student,
+                                                                               is_anonymous_author: true)
+      @anon_student_discussion_with_anonymous_author_type = GraphQLTypeTester.new(
+        @anon_student_discussion_with_anonymous_author,
+        current_user: @teacher
+      )
+
+      @anon_student_discussion_with_non_anonymous_author = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                                                   message: "anonymous discussion",
+                                                                                   anonymous_state: "partial_anonymity",
+                                                                                   context: @course,
+                                                                                   user: @student,
+                                                                                   editor: @student,
+                                                                                   is_anonymous_author: false)
+      @anon_student_discussion_with_non_anonymous_author_type = GraphQLTypeTester.new(
+        @anon_student_discussion_with_non_anonymous_author,
         current_user: @teacher
       )
     end
@@ -322,6 +370,44 @@ RSpec.shared_examples "DiscussionType" do
 
     it "does not return the student editor if a course id is provided" do
       expect(@anon_student_discussion_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
+    end
+
+    context "partial anonymity" do
+      context "when is_anonymous_author is true" do
+        it "returns teacher as author" do
+          expect(@anon_teacher_discussion_with_anonymous_author_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+        end
+
+        it "does not return as student author" do
+          expect(@anon_student_discussion_with_anonymous_author_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
+        end
+
+        it "does not return as student editor" do
+          expect(@anon_student_discussion_with_anonymous_author_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
+        end
+
+        it "returns student's anonymousAuthor" do
+          expect(@anon_student_discussion_with_anonymous_author_type.resolve("anonymousAuthor { shortName }")).to eq @anon_student_discussion_with_anonymous_author.discussion_topic_participants.where(user_id: @student.id).first.id.to_s(36)
+        end
+      end
+
+      context "when is_anonymous_author is false" do
+        it "returns teacher as author" do
+          expect(@anon_teacher_discussion_with_non_anonymous_author_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+        end
+
+        it "returns student as author" do
+          expect(@anon_student_discussion_with_non_anonymous_author_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
+        end
+
+        it "returns student as editor" do
+          expect(@anon_student_discussion_with_non_anonymous_author_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
+        end
+
+        it "does not return student's anonymousAuthor" do
+          expect(@anon_student_discussion_with_non_anonymous_author_type.resolve("anonymousAuthor { shortName }")).to eq nil
+        end
+      end
     end
   end
 

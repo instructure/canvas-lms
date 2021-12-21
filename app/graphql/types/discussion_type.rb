@@ -159,7 +159,7 @@ module Types
             user
           else
             Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
-              if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
+              if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (object.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                 user
               end
             end
@@ -170,7 +170,7 @@ module Types
 
     field :anonymous_author, Types::AnonymousUserType, null: true
     def anonymous_author
-      if object.anonymous?
+      if object.anonymous_state == "full_anonymity" || (object.anonymous_state == "partial_anonymity" && object.is_anonymous_author)
         Loaders::DiscussionTopicParticipantLoader.for(object.id).load(object.user_id).then do |participant|
           {
             id: participant.id.to_s(36),
@@ -197,7 +197,7 @@ module Types
             user
           else
             Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
-              if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
+              if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (object.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                 user
               end
             end
