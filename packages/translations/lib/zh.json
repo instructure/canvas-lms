@@ -146,6 +146,12 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "不支持音频和视频录制；请使用其他浏览器。"
     },
+    "audio_options_feb58e2c": {
+        "message": "音频选项"
+    },
+    "audio_options_tray_33a90711": {
+        "message": "音频选项托盘"
+    },
     "audio_player_for_title_20cc70d": {
         "message": "{ title }的音频播放器"
     },
@@ -812,6 +818,9 @@
     "loading_please_wait_d276220a": {
         "message": "正在加载，请稍候"
     },
+    "loading_preview_9f077aa1": {
+        "message": "加载预览"
+    },
     "location_3b6ff307": {
         "message": "位置："
     },
@@ -995,6 +1004,9 @@
     "percentage_34ab7c2c": {
         "message": "百分数"
     },
+    "percentage_must_be_a_number_8033c341": {
+        "message": "百分比必须是数字"
+    },
     "pixels_52ece7d1": {
         "message": "像素"
     },
@@ -1120,6 +1132,9 @@
     },
     "show_all_ae37d610": {
         "message": "显示全部"
+    },
+    "show_audio_options_b489926b": {
+        "message": "显示音频选项"
     },
     "show_embed_options_ef8d7ef": {
         "message": "显示嵌入选项"

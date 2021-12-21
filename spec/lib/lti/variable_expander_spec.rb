@@ -1432,6 +1432,102 @@ module Lti
         end
       end
 
+      context "when the assignment has external_tool as a submission_type" do
+        let(:course) { course_factory }
+
+        let(:developer_key) { DeveloperKey.create! }
+
+        let(:tool) do
+          ContextExternalTool.create!(
+            context: course,
+            tool_id: 1234,
+            name: "test tool",
+            consumer_key: "key",
+            shared_secret: "secret",
+            url: "https://www.tool.com/launch",
+            developer_key: developer_key,
+            settings: { use_1_3: true }
+          )
+        end
+
+        let(:right_now) { Time.zone.now }
+
+        let(:assignment) do
+          opts = {
+            course: course,
+            external_tool_tag_attributes: {
+              url: tool.url,
+              content_type: "ContextExternalTool",
+              content_id: tool.id
+            },
+            title: "Activity XYZ",
+            description: "This is a super fun activity",
+            submission_types: "external_tool",
+            points_possible: 8.5,
+            workflow_state: "published",
+            unlock_at: right_now,
+            due_at: right_now,
+            lock_at: right_now
+          }
+          assignment = assignment_model opts
+
+          line_item = assignment.line_items.first
+          line_item.update!(
+            {
+              resource_id: "abc",
+              tag: "def"
+            }
+          )
+
+          assignment
+        end
+
+        let(:variable_expander) do
+          VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            assignment: assignment
+          )
+        end
+
+        it "has substitution for $ResourceLink.id" do
+          exp_hash = { test: "$ResourceLink.id" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "abc"
+        end
+
+        it "has substitution for $ResourceLink.description" do
+          exp_hash = { test: "$ResourceLink.description" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "This is a super fun activity"
+        end
+
+        it "has substitution for $ResourceLink.title" do
+          exp_hash = { test: "$ResourceLink.title" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "Activity XYZ"
+        end
+
+        it "has substitution for $ResourceLink.available.startDateTime" do
+          exp_hash = { test: "$ResourceLink.available.startDateTime" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.iso8601(3)
+        end
+
+        it "has substitution for $ResourceLink.available.endDateTime" do
+          exp_hash = { test: "$ResourceLink.available.endDateTime" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.iso8601(3)
+        end
+
+        it "has substitution for $ResourceLink.submission.endDateTime" do
+          exp_hash = { test: "$ResourceLink.submission.endDateTime" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.iso8601(3)
+        end
+      end
+
       context "context is a course with an assignment" do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, tool: tool, collaboration: collaboration) }
 

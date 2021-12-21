@@ -1232,7 +1232,10 @@ export const createLearningOutcomeMock = ({
   displayName = 'display name',
   groupId = '1',
   failResponse = false,
-  failMutation = false
+  failMutation = false,
+  calculationMethod = 'decaying_average',
+  calculationInt = 65,
+  individualCalculation = false
 } = {}) => {
   const successfulResponse = {
     data: {
@@ -1242,6 +1245,8 @@ export const createLearningOutcomeMock = ({
           title,
           description,
           displayName,
+          calculationMethod,
+          calculationInt,
           __typename: 'LearningOutcome'
         },
         __typename: 'CreateLearningOutcomePayload',
@@ -1261,6 +1266,7 @@ export const createLearningOutcomeMock = ({
       }
     ]
   }
+
   const failedMutation = {
     data: {
       createLearningOutcome: {
@@ -1284,16 +1290,22 @@ export const createLearningOutcomeMock = ({
     result = failedMutation
   }
 
+  const input = {
+    groupId,
+    title,
+    description,
+    displayName
+  }
+  if (individualCalculation) {
+    input.calculationMethod = calculationMethod
+    input.calculationInt = calculationInt
+  }
+
   return {
     request: {
       query: CREATE_LEARNING_OUTCOME,
       variables: {
-        input: {
-          description,
-          title,
-          groupId,
-          displayName
-        }
+        input
       }
     },
     result

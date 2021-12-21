@@ -61,6 +61,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Lyd- og videoopptak støttes ikke, bruk en annen nettleser."
   },
+  "audio_options_feb58e2c": { "message": "Lydalternativer" },
+  "audio_options_tray_33a90711": { "message": "Brett for lydalternativer" },
   "audio_player_for_title_20cc70d": { "message": "Lydspiller for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Automatisk lagret innhold finnes. Ønsker du å laste det automatisk lagrede innholdet i stedet?"
@@ -153,6 +155,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Beskriv bildet)" },
   "describe_the_video_2fe8f46a": { "message": "(Beskriv videoen)" },
   "details_98a31b68": { "message": "Detaljer" },
+  "diamond_b8dfe7ae": { "message": "Diamant" },
+  "dimension_type_55c83e4e": { "message": "Dimensjonstype" },
   "dimensions_45ddb7b7": { "message": "Dimensjoner" },
   "directionality_26ae9e08": { "message": "Retning" },
   "discussions_a5f96392": { "message": "Diskusjoner" },
@@ -282,6 +286,7 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Lasting mislyktes." },
   "loading_folders_d8b5869e": { "message": "Laster mapper" },
   "loading_please_wait_d276220a": { "message": "Laster inn, vennligst vent" },
+  "loading_preview_9f077aa1": { "message": "Laster inn forhåndsvisning" },
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Medie" },
   "medium_5a8e9ead": { "message": "Medium" },
@@ -289,6 +294,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Moduler" },
   "multi_color_image_63d7372f": { "message": "Bilde i flere farger" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Må være minst { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Det må være minst { width } x { height }px"
   },
@@ -331,7 +339,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
+  "pentagon_17d82ea3": { "message": "Femkant" },
   "people_b4ebb13c": { "message": "Personer" },
+  "percentage_34ab7c2c": { "message": "Prosent" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Prosent må være et tall"
+  },
+  "pixels_52ece7d1": { "message": "Piksler" },
   "posted_when_a578f5ab": { "message": "Postet: { when }" },
   "preformatted_d0670862": { "message": "Forhåndsformattert" },
   "pretty_html_editor_28748756": { "message": "Elegante HTML-redigering" },
@@ -370,6 +384,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Skift-O for å åpne elegante html-redigering."
   },
+  "show_audio_options_b489926b": { "message": "Vis lydalternativer" },
   "show_embed_options_ef8d7ef": { "message": "Vis valg for å legge til" },
   "show_image_options_1e2ecc6b": { "message": "Vis bildemuligheter" },
   "show_link_options_545338fd": { "message": "Vis lenkevalg" },

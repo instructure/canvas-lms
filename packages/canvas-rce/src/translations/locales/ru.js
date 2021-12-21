@@ -61,6 +61,10 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Аудио- и видеозапись не поддерживается; воспользуйтесь другим браузером."
   },
+  "audio_options_feb58e2c": { "message": "Параметры звука" },
+  "audio_options_tray_33a90711": {
+    "message": "Панель настройки параметров звука"
+  },
   "audio_player_for_title_20cc70d": { "message": "Аудиоплеер для { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Существует сохраненное в автоматическом режиме содержимое. Вы хотите загрузить сохраненное в автоматическом режиме содержимое?"
@@ -163,6 +167,8 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Опишите изображение)" },
   "describe_the_video_2fe8f46a": { "message": "(опишите видео)" },
   "details_98a31b68": { "message": "Подробные сведения" },
+  "diamond_b8dfe7ae": { "message": "Ромб" },
+  "dimension_type_55c83e4e": { "message": "Тип измерения" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_26ae9e08": { "message": "Направленность" },
   "discussions_a5f96392": { "message": "Обсуждения" },
@@ -300,6 +306,7 @@ const locale = {
   "loading_please_wait_d276220a": {
     "message": "Выполняется загрузка, подождите..."
   },
+  "loading_preview_9f077aa1": { "message": "Загрузка предпросмотра" },
   "locked_762f138b": { "message": "Заблокировано" },
   "media_af190855": { "message": "Мультимедиа" },
   "medium_5a8e9ead": { "message": "Средний" },
@@ -307,6 +314,9 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Разное" },
   "modules_c4325335": { "message": "Модули" },
   "multi_color_image_63d7372f": { "message": "Многоцветное изображение" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Должен быть как минимум { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Должно быть как минимум { width } x { height }пикселов"
   },
@@ -349,7 +359,13 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Страницы" },
   "paragraph_5e5ad8eb": { "message": "Параграф" },
+  "pentagon_17d82ea3": { "message": "Пятиугольник" },
   "people_b4ebb13c": { "message": "Люди" },
+  "percentage_34ab7c2c": { "message": "Процент" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Процентное значение должно быть указано в виде числа"
+  },
+  "pixels_52ece7d1": { "message": "Пиксели" },
   "posted_when_a578f5ab": { "message": "Размещено: { when }" },
   "preformatted_d0670862": { "message": "Предварительно форматированный" },
   "pretty_html_editor_28748756": { "message": "Редактор Pretty HTML" },
@@ -394,6 +410,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Нажать Shift-O, чтобы открыть редактор Pretty HTML."
   },
+  "show_audio_options_b489926b": { "message": "Показать параметры звука" },
   "show_embed_options_ef8d7ef": { "message": "Показать параметры вставки" },
   "show_image_options_1e2ecc6b": { "message": "Показать варианты изображения" },
   "show_link_options_545338fd": { "message": "Показать параметры ссылки" },

@@ -78,7 +78,10 @@ export const handlers = [
       return res(
         ctx.data({
           legacyNode: Discussion.mock({
-            author: User.mock({courseRoles: ['TeacherEnrollment', 'TaEnrollment'], id: 'role-user'})
+            author: User.mock({
+              courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
+              id: 'role-user'
+            })
           })
         })
       )
