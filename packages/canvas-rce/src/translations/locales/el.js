@@ -26,13 +26,11 @@ const locale = {
   "announcements_a4b8ed4a": { "message": "Ανακοινώσεις" },
   "apply_781a2546": { "message": "Εφαρμογή" },
   "apps_54d24a47": { "message": "Εφαρμογές" },
-  "arrows_464a3e54": { "message": "Βέλη" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Ο λόγος του μήκους της εικόνας προς το ύψος της θα διατηρηθεί"
   },
   "assignments_1e02582c": { "message": "Εργασίες" },
   "attributes_963ba262": { "message": "Πεδία" },
-  "basic_554cdc0a": { "message": "Βασική" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Ακύρωση" },
   "choose_usage_rights_33683854": {
@@ -58,7 +56,6 @@ const locale = {
   "course_navigation_dd035109": { "message": "Πλοήγηση στο μάθημα" },
   "creative_commons_license_725584ae": { "message": "Άδεια Creative Commons:" },
   "decrease_indent_de6343ab": { "message": "Μείωση Εσοχής Κειμένου" },
-  "delimiters_4db4840d": { "message": "Οριοθέτες" },
   "details_98a31b68": { "message": "Λεπτομέρειες" },
   "dimensions_45ddb7b7": { "message": "Διαστάσεις" },
   "discussions_a5f96392": { "message": "Συζητήσεις" },
@@ -75,7 +72,6 @@ const locale = {
   "format_4247a9c5": { "message": "Τύπος" },
   "generating_preview_45b53be0": { "message": "Δημιουργία προεπισκόπησης..." },
   "grades_a61eba0a": { "message": "Βαθμοί" },
-  "greek_65c5b3f7": { "message": "Ελληνικά" },
   "group_files_82e5dcdb": { "message": "Αρχεία ομάδας" },
   "group_navigation_99f191a": { "message": "Πλοήγηση στην Ομάδα" },
   "home_351838cd": { "message": "Αρχική Σελίδα" },
@@ -110,7 +106,6 @@ const locale = {
   "loading_failed_b3524381": { "message": "Η Φόρτωση Απέτυχε" },
   "locked_762f138b": { "message": "Κλειδωμένο" },
   "media_af190855": { "message": "Δεδομένα" },
-  "misc_3b692ea7": { "message": "Διάφορα" },
   "modules_c4325335": { "message": "Ενότητες" },
   "my_files_2f621040": { "message": "Τα αρχεία μου" },
   "name_1aed4a1b": { "message": "Όνομα" },
@@ -120,7 +115,6 @@ const locale = {
   },
   "no_results_940393cf": { "message": "Δεν υπάρχουν Αποτελέσματα" },
   "none_3b5e34d2": { "message": "Κανένα" },
-  "operators_a2ef9a93": { "message": "Χειριστές" },
   "options_3ab0ea65": { "message": "Επιλογές" },
   "pages_e5414c2c": { "message": "Σελίδες" },
   "people_b4ebb13c": { "message": "Κοινό" },
@@ -129,7 +123,6 @@ const locale = {
   "published_c944a23d": { "message": "δημοσιευμένο/α" },
   "quizzes_7e598f57": { "message": "Κουίζ" },
   "record_7c9448b": { "message": "Ηχογράφηση" },
-  "relationships_6602af70": { "message": "Σχέσεις" },
   "rich_content_editor_2708ef21": {
     "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
   },

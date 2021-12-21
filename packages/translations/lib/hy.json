@@ -23,9 +23,6 @@
     "apps_54d24a47": {
         "message": "Հավելվածներ"
     },
-    "arrows_464a3e54": {
-        "message": "Սլաքներ"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Կողմերի հարաբերակցությունը պահպանվելու է"
     },
@@ -37,9 +34,6 @@
     },
     "attributes_963ba262": {
         "message": "Հատկանիշեր"
-    },
-    "basic_554cdc0a": {
-        "message": "Հիմնական"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001թ. Acme Inc."
@@ -116,9 +110,6 @@
     "delete_a6efa79d": {
         "message": "Ջնջել"
     },
-    "delimiters_4db4840d": {
-        "message": "Բաժանիչներ"
-    },
     "details_98a31b68": {
         "message": "Մանրամասներ"
     },
@@ -175,9 +166,6 @@
     },
     "grades_a61eba0a": {
         "message": "Գնահատականներ"
-    },
-    "greek_65c5b3f7": {
-        "message": "Հունարեն"
     },
     "group_files_82e5dcdb": {
         "message": "Խմբի ֆայլեր"
@@ -263,9 +251,6 @@
     "media_af190855": {
         "message": "Մուլտիմեդիա"
     },
-    "misc_3b692ea7": {
-        "message": "Այլ"
-    },
     "modules_c4325335": {
         "message": "Մոդուլներ"
     },
@@ -292,9 +277,6 @@
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Առայժմ ոչինչ"
-    },
-    "operators_a2ef9a93": {
-        "message": "Օպերատորներ"
     },
     "options_3ab0ea65": {
         "message": "Պարամետրեր"
@@ -331,9 +313,6 @@
     },
     "record_7c9448b": {
         "message": "Գրառում"
-    },
-    "relationships_6602af70": {
-        "message": "Հարաբերություններ"
     },
     "rich_content_editor_2708ef21": {
         "message": "Ֆորմատավորված տեքստի խմբագիր"

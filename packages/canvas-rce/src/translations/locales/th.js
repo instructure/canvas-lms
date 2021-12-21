@@ -61,8 +61,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "ไม่รองรับบันทึกเสียงและภาพ กรุณาใช้เบราเซอร์อื่น"
   },
-  "audio_options_feb58e2c": { "message": "ตัวเลือกเสียง" },
-  "audio_options_tray_33a90711": { "message": "ถาดตัวเลือกเสียง" },
   "audio_player_for_title_20cc70d": {
     "message": "เครื่องเล่นเสียงสำหรับ { title }"
   },
@@ -155,8 +153,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(ระบุรายละเอียดภาพ)" },
   "describe_the_video_2fe8f46a": { "message": "(ระบุรายละเอียดวิดีโอ)" },
   "details_98a31b68": { "message": "รายละเอียด" },
-  "diamond_b8dfe7ae": { "message": "เพชร" },
-  "dimension_type_55c83e4e": { "message": "ประเภทขนาด" },
   "dimensions_45ddb7b7": { "message": "ขนาด" },
   "directionality_26ae9e08": { "message": "ทิศทาง" },
   "discussions_a5f96392": { "message": "การพูดคุย" },
@@ -284,7 +280,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "โหลดล้มเหลว..." },
   "loading_folders_d8b5869e": { "message": "กำลังโหลดโฟลเดอร์" },
   "loading_please_wait_d276220a": { "message": "กำลังโหลด กรุณารอสักครู่" },
-  "loading_preview_9f077aa1": { "message": "กำลังโหลดตัวอย่าง" },
   "locked_762f138b": { "message": "ล็อคแล้ว" },
   "media_af190855": { "message": "มีเดีย" },
   "medium_5a8e9ead": { "message": "ปานกลาง" },
@@ -292,9 +287,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "เบ็ดเตล็ด" },
   "modules_c4325335": { "message": "หน่วยการเรียน" },
   "multi_color_image_63d7372f": { "message": "ภาพหลายสี" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "จะต้องเท่ากับอย่างน้อย { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "จะต้องเท่ากับอย่างน้อย { width } x { height }px"
   },
@@ -337,13 +329,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "เพจ" },
   "paragraph_5e5ad8eb": { "message": "ย่อหน้า" },
-  "pentagon_17d82ea3": { "message": "ห้าเหลี่ยม" },
   "people_b4ebb13c": { "message": "บุคคล" },
-  "percentage_34ab7c2c": { "message": "เปอร์เซ็นต์" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "เปอร์เซ็นต์จะต้องเป็นตัวเลข"
-  },
-  "pixels_52ece7d1": { "message": "พิกเซล" },
   "posted_when_a578f5ab": { "message": "โพสต์เมื่อ: { when }" },
   "preformatted_d0670862": { "message": "กำหนดรูปแบบไว้ล่วงหน้า" },
   "pretty_html_editor_28748756": { "message": "HTML Editor ที่สวยงาม" },
@@ -380,7 +366,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O เพื่อเปิด HTML Editor ที่สวยงาม"
   },
-  "show_audio_options_b489926b": { "message": "แสดงตัวเลือกเสียง" },
   "show_embed_options_ef8d7ef": { "message": "แสดงตัวเลือกในการผนวก" },
   "show_image_options_1e2ecc6b": { "message": "แสดงตัวเลือกสำหรับภาพ" },
   "show_link_options_545338fd": { "message": "แสดงตัวเลือกสำหรับลิงค์" },

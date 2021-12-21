@@ -60,8 +60,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Hljóð- og myndupptaka ekki studd; vinsamlegast notaðu annan vafra."
   },
-  "audio_options_feb58e2c": { "message": "Hljóðvalkostir" },
-  "audio_options_tray_33a90711": { "message": "Hljóðvalkostabakki" },
   "audio_player_for_title_20cc70d": {
     "message": "Hljóðspilari fyrir { title }"
   },
@@ -156,8 +154,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Lýstu myndinni)" },
   "describe_the_video_2fe8f46a": { "message": "(Lýsa myndbandinu)" },
   "details_98a31b68": { "message": "Upplýsingar" },
-  "diamond_b8dfe7ae": { "message": "Demantur" },
-  "dimension_type_55c83e4e": { "message": "Víddartegund" },
   "dimensions_45ddb7b7": { "message": "Mál" },
   "directionality_26ae9e08": { "message": "Lestrarátt" },
   "discussions_a5f96392": { "message": "Umræður" },
@@ -285,7 +281,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Hleðsla mistókst." },
   "loading_folders_d8b5869e": { "message": "Hleð möppum" },
   "loading_please_wait_d276220a": { "message": "Hleður, augnablik" },
-  "loading_preview_9f077aa1": { "message": "Hlaða forskoðun" },
   "locked_762f138b": { "message": "Læst" },
   "media_af190855": { "message": "Miðill" },
   "medium_5a8e9ead": { "message": "Meðal" },
@@ -293,9 +288,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Ýmislegt" },
   "modules_c4325335": { "message": "Námsefni" },
   "multi_color_image_63d7372f": { "message": "Fjöllita mynd" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Verður að vera að minnsta kosti { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Verður að vera að minnsta kosti { width } x { height }pt"
   },
@@ -336,13 +328,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Síður" },
   "paragraph_5e5ad8eb": { "message": "Málsgrein" },
-  "pentagon_17d82ea3": { "message": "fimmhyrningur" },
   "people_b4ebb13c": { "message": "Fólk" },
-  "percentage_34ab7c2c": { "message": "Hlutfall" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Prósenta verður að vera tala"
-  },
-  "pixels_52ece7d1": { "message": "Punktar" },
   "posted_when_a578f5ab": { "message": "Birt: { when }" },
   "preformatted_d0670862": { "message": "Forsniðnir" },
   "pretty_html_editor_28748756": { "message": "Pretty HTML ritlill" },
@@ -379,7 +365,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O til að opna pretty html ritilinn."
   },
-  "show_audio_options_b489926b": { "message": "Sýna hljóðvalkosti" },
   "show_embed_options_ef8d7ef": { "message": "Sýna innfelli valkosti" },
   "show_image_options_1e2ecc6b": { "message": "Sýna valkosti myndar" },
   "show_link_options_545338fd": { "message": "Sýna tengla valkosti" },

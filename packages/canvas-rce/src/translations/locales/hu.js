@@ -45,7 +45,6 @@ const locale = {
   "announcements_a4b8ed4a": { "message": "Hirdetmények" },
   "apply_781a2546": { "message": "Alkalmazás" },
   "apps_54d24a47": { "message": "Alkalmazások" },
-  "arrows_464a3e54": { "message": "Nyilak" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Képarány megtartása"
   },
@@ -58,7 +57,6 @@ const locale = {
     "message": "Van automatikusan mentett tartalom. Szeretné inkább azt betölteni?"
   },
   "available_folders_694d0436": { "message": "Elérhető mappák" },
-  "basic_554cdc0a": { "message": "Alap" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Mégse" },
   "choose_caption_file_9c45bc4e": { "message": "Feliratfájl választása" },
@@ -124,7 +122,6 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "alapértelmezett sorszámozott lista"
   },
-  "delimiters_4db4840d": { "message": "Elválasztó jelek" },
   "describe_the_image_e65d2e32": { "message": "(A kép leírása)" },
   "describe_the_video_2fe8f46a": { "message": "(A videó leírása)" },
   "details_98a31b68": { "message": "Részletek" },
@@ -200,7 +197,6 @@ const locale = {
     "message": "Ugrás a szerkesztő eszköztárhoz"
   },
   "grades_a61eba0a": { "message": "Értékelések" },
-  "greek_65c5b3f7": { "message": "Görög" },
   "group_documents_8bfd6ae6": { "message": "Csoport dokumentumok" },
   "group_files_4324f3df": { "message": "Csoportfájlok" },
   "group_files_82e5dcdb": { "message": "Csoportfájlok" },
@@ -252,7 +248,6 @@ const locale = {
   "locked_762f138b": { "message": "Zárolva" },
   "media_af190855": { "message": "Média" },
   "medium_5a8e9ead": { "message": "Közepes" },
-  "misc_3b692ea7": { "message": "Egyéb" },
   "miscellaneous_e9818229": { "message": "Egyéb" },
   "modules_c4325335": { "message": "Modulok" },
   "must_be_at_least_width_x_height_px_41dc825e": {
@@ -280,7 +275,6 @@ const locale = {
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Nyissa meg a billentyűkombinációk párbeszédablakot"
   },
-  "operators_a2ef9a93": { "message": "Műveletek" },
   "options_3ab0ea65": { "message": "Beállítások" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Rendezett és Rendezetlen Listák"
@@ -310,7 +304,6 @@ const locale = {
   "record_upload_media_5fdce166": {
     "message": "Médiafájl rögzítése/feltöltése"
   },
-  "relationships_6602af70": { "message": "Kapcsolatok" },
   "remove_link_d1f2f4d0": { "message": "Link eltávolítása" },
   "restore_auto_save_deccd84b": {
     "message": "Visszaállítás automatikus mentésből?"

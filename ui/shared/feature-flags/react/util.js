@@ -127,7 +127,7 @@ export function transitionMessage(flag, name) {
     message = flag.transitions[name].message
   }
 
-  if (ENV.ACCOUNT?.site_admin && ENV.PRODUCTION) {
+  if (ENV.ACCOUNT?.site_admin) {
     // It is relatively unlikely that there will ever be another message
     // But ensure it is displayed if it exists
     message = (

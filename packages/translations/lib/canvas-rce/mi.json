@@ -42,8 +42,6 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Orooro me te tāhopu ataata kaore i te tautokotia tēnā koa whakamahia he pūtirotiro rerekē."
   },
-  "audio_options_feb58e2c": { "message": "Ororongo Kōwhiringa" },
-  "audio_options_tray_33a90711": { "message": "Ororongo Kōwhiringa Paepae" },
   "audio_player_for_title_20cc70d": {
     "message": "Kaitākaro ororongo mō { title }"
   },
@@ -144,8 +142,6 @@
   "describe_the_image_e65d2e32": { "message": "(Whakāhuatia te āhua)" },
   "describe_the_video_2fe8f46a": { "message": "(Whakātu te ataata)" },
   "details_98a31b68": { "message": "Ngā taipitopito" },
-  "diamond_b8dfe7ae": { "message": "Taimana" },
-  "dimension_type_55c83e4e": { "message": "Inenga momo" },
   "dimensions_45ddb7b7": { "message": "Ngā āhuatanga" },
   "directionality_26ae9e08": { "message": "Hangai tōtika" },
   "discussions_a5f96392": { "message": "Ngā Kōrerorero" },
@@ -279,7 +275,6 @@
   "loading_failed_e6a9d8ef": { "message": "I hapa te utaina." },
   "loading_folders_d8b5869e": { "message": "E uta ana ngā kōpaki" },
   "loading_please_wait_d276220a": { "message": "E Uta ana, tēnā koa tatari" },
-  "loading_preview_9f077aa1": { "message": "Uta ana arokite" },
   "locked_762f138b": { "message": "Kua rakaina" },
   "media_af190855": { "message": "Pāpāho" },
   "medium_5a8e9ead": { "message": "Kauwaka" },
@@ -287,9 +282,6 @@
   "miscellaneous_e9818229": { "message": "Momo kē" },
   "modules_c4325335": { "message": "Kōwae" },
   "multi_color_image_63d7372f": { "message": "Whakapakoko nui ngā Tae" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Me iti ake i te { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Me kia i te iti rawa { width } x { height }px"
   },
@@ -330,13 +322,7 @@
   },
   "pages_e5414c2c": { "message": "Ngā Whārangi" },
   "paragraph_5e5ad8eb": { "message": "Parawae" },
-  "pentagon_17d82ea3": { "message": "Tapaono" },
   "people_b4ebb13c": { "message": "Tāngata" },
-  "percentage_34ab7c2c": { "message": "Ōrau" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Pai hēneti me nama anake"
-  },
-  "pixels_52ece7d1": { "message": "Ngā Pika" },
   "posted_when_a578f5ab": { "message": "I Whakairia: { when }" },
   "preformatted_d0670862": { "message": "Tuhinga o mua" },
   "pretty_html_editor_28748756": { "message": "Ataahua HTML Etita" },
@@ -372,9 +358,6 @@
   "selected_274ce24f": { "message": "Kua tīpakohia" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Neke O ki te huaki ataahua html etita."
-  },
-  "show_audio_options_b489926b": {
-    "message": "Whakaatutia ororongo kōwhiringa"
   },
   "show_embed_options_ef8d7ef": { "message": "Whakātu whakauru kōwhiri" },
   "show_image_options_1e2ecc6b": { "message": "Whakātu wāhanga āhua" },
