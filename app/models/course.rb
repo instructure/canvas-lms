@@ -1287,7 +1287,10 @@ class Course < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    DueDateCacher.recompute_course(self) if saved_change_to_enrollment_term_id?
+    if saved_change_to_enrollment_term_id?
+      recompute_student_scores
+      DueDateCacher.recompute_course(self)
+    end
   end
 
   def update_final_scores_on_weighting_scheme_change
