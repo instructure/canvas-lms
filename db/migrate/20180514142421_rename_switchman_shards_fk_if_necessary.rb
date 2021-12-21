@@ -4,11 +4,6 @@ class RenameSwitchmanShardsFkIfNecessary < ActiveRecord::Migration[5.1]
   tag :predeploy
 
   def up
-    if connection.send(:postgresql_version) >= 9_04_00 # rubocop:disable Style/NumericLiterals
-      alter_constraint(:switchman_shards, find_foreign_key(:switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id), new_name: "fk_rails_45bd80a9c8")
-    else
-      remove_foreign_key :switchman_shards, column: :delayed_jobs_shard_id, if_exists: true
-      add_foreign_key :switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id
-    end
+    alter_constraint(:switchman_shards, find_foreign_key(:switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id), new_name: "fk_rails_45bd80a9c8")
   end
 end

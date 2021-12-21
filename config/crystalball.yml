@@ -5,7 +5,7 @@ execution_map_path: './crystalball_map.yml'
 # examples_limit: 1
 #
 # Custom prediction builder class to use. Default: 'Crystalball::RSpec::StandardPredictionBuilder'
-prediction_builder_class_name: 'Crystalball::RSpec::StandardPredictionBuilder'
+prediction_builder_class_name: 'Crystalball::RSpec::CanvasPredictionBuilder'
 # #
 # Set of requires. Usually used to require custom predictor class file. Default: []
 requires:

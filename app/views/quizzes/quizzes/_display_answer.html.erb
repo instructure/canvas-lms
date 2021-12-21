@@ -51,7 +51,7 @@
   should_skip = (skip_if_correct && selected_answer && correct_answer) ||
     (hash_get(question, :question_type) == 'fill_in_multiple_blanks_question' &&
       answer.respond_to?(:[]) && answer['text'].blank? && answer['html'].blank?) ||
-    (hash_get(question, :question_type) == 'multiple_dropdowns_question' && !correct_answer && !selected_answer)
+    (hash_get(question, :question_type) == 'multiple_dropdowns_question' && !correct_answer && (selected_answer.nil? ? false : !selected_answer ))
 %>
 <% unless question && [ "short_answer_question", "fill_in_multiple_blanks_question" ].include?(question[:question_type]) && !show_correct_answers %>
   <% if false %>

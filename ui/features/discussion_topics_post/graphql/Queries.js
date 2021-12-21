@@ -34,7 +34,7 @@ export const DISCUSSION_QUERY = gql`
     $filter: DiscussionFilterType
     $sort: DiscussionSortOrderType
     $courseID: ID
-    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment", "DesignerEnrollment"]
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
@@ -111,7 +111,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     $last: Int
     $sort: DiscussionSortOrderType
     $courseID: ID
-    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment", "DesignerEnrollment"]
     $relativeEntryId: ID
     $includeRelativeEntry: Boolean
     $beforeRelativeEntry: Boolean

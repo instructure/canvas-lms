@@ -186,8 +186,7 @@ const getMenuConfigs = props => {
       icon: <IconWarningBorderlessSolid />,
       label: props.isReported ? I18n.t('Reported') : I18n.t('Report'),
       selectionCallback: props.onReport,
-      disabled: props.isReported,
-      color: 'warning'
+      disabled: props.isReported
     })
   }
   return options

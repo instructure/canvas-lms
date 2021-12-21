@@ -111,7 +111,7 @@ export default class SyllabusView extends Backbone.View {
     const relatedEvents = {}
     let lastDate = null
     let lastEvent = null
-    const dateCollator = function(memo, json) {
+    const dateCollator = function (memo, json) {
       let due_at, end_at, html_url, start_at, todo_at
       let related_id = json.related_id
       if (related_id == null) {
@@ -126,15 +126,15 @@ export default class SyllabusView extends Backbone.View {
       }
       const title = json.title
       if (json.start_at) {
-        start_at = $.fudgeDateForProfileTimezone(Date.parse(json.start_at))
+        start_at = $.fudgeDateForProfileTimezone(json.start_at)
       }
       if (json.end_at) {
-        end_at = $.fudgeDateForProfileTimezone(Date.parse(json.end_at))
+        end_at = $.fudgeDateForProfileTimezone(json.end_at)
       }
       if (json.type === 'assignment') {
         due_at = start_at
       } else if (json.type === 'wiki_page' || json.type === 'discussion_topic') {
-        todo_at = $.fudgeDateForProfileTimezone(Date.parse(json.todo_at))
+        todo_at = $.fudgeDateForProfileTimezone(json.todo_at)
       }
 
       let override = null
