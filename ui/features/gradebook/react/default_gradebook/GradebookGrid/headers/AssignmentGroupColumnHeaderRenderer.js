@@ -68,6 +68,7 @@ function getProps(column, gradebook, options) {
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
+    isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
     weightedGroups: gradebook.weightedGroups()
   }
 }
