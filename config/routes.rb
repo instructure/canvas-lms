@@ -2375,7 +2375,6 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :gradebooks) do
       put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
-      put "courses/:course_id/apply_score_to_ungraded_submissions", action: "apply_score_to_ungraded_submissions"
     end
 
     scope(controller: :pace_plans) do

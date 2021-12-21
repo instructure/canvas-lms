@@ -76,7 +76,7 @@ module Types
               user
             else
               Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
-                if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
+                if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment")
                   user
                 end
               end
@@ -121,7 +121,7 @@ module Types
               user
             else
               Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
-                if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
+                if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment")
                   user
                 end
               end

@@ -591,7 +591,6 @@ class DiscussionTopicsController < ApplicationController
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity),
-      PARTIAL_ANONYMITY: Account.site_admin.feature_enabled?(:partial_anonymity),
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group)
     }

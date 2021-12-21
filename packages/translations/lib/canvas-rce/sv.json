@@ -40,8 +40,6 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Ljud- och videoinspelning stöds inte. Använd en annan webbläsare."
   },
-  "audio_options_feb58e2c": { "message": "Ljudalternativ" },
-  "audio_options_tray_33a90711": { "message": "Fack för ljudalternativ" },
   "audio_player_for_title_20cc70d": { "message": "Ljudspelare för { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Automatiskt sparat innehåll finns. Vill du läsa in det automatiskt sparade innehållet istället?"
@@ -275,7 +273,6 @@
   "loading_failed_e6a9d8ef": { "message": "Det gick inte att läsa in." },
   "loading_folders_d8b5869e": { "message": "Läser in mappar" },
   "loading_please_wait_d276220a": { "message": "Läser in, vänta" },
-  "loading_preview_9f077aa1": { "message": "Förhandsgranskning av inläsning" },
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
@@ -331,9 +328,6 @@
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personer" },
   "percentage_34ab7c2c": { "message": "Procent" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Procenttalet måste vara ett tal"
-  },
   "pixels_52ece7d1": { "message": "Pixlar" },
   "posted_when_a578f5ab": { "message": "Publicerad: { when }" },
   "preformatted_d0670862": { "message": "Förformaterad" },
@@ -375,7 +369,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Tryck på Skift+O för att öppna den nätta HTML-redigeraren."
   },
-  "show_audio_options_b489926b": { "message": "Visa ljudalternativ" },
   "show_embed_options_ef8d7ef": { "message": "Visa inbäddningsalternativ" },
   "show_image_options_1e2ecc6b": { "message": "Visa bildalternativ" },
   "show_link_options_545338fd": { "message": "Visa länkalternativ" },

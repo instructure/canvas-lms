@@ -35,7 +35,6 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import BlackoutDates from './blackout_dates'
 import * as PacePlanApi from '../../../api/pace_plan_api'
 import {StoreState, PacePlan} from '../../../types'
-import {Course} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
 import {getExcludeWeekends, getPacePlan, getPlanPublishing} from '../../../reducers/pace_plans'
 import {pacePlanActions} from '../../../actions/pace_plans'
@@ -44,7 +43,6 @@ import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
 
 interface StoreProps {
-  readonly course: Course
   readonly courseId: string
   readonly excludeWeekends: boolean
   readonly pacePlan: PacePlan
@@ -182,6 +180,10 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
           disabled={this.props.planPublishing}
           onChange={() => {
             this.props.toggleHardEndDates()
+            // this has the dual affect of setting the plan's end_date
+            // when unchecked and setting a default value for when it
+            // gets checked
+            this.props.setEndDate(ENV.VALID_DATE_RANGE.end_at.date)
           }}
         />
       </View>
@@ -266,7 +268,6 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    course: getCourse(state),
     courseId: getCourse(state).id,
     excludeWeekends: getExcludeWeekends(state),
     pacePlan: getPacePlan(state),

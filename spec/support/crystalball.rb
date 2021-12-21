@@ -22,9 +22,6 @@ require "crystalball/rspec/prediction_builder"
 require "crystalball/rspec/filtering"
 require "crystalball/rspec/prediction_pruning"
 
-require "crystalball/predictor/strategy"
-require "crystalball/predictor/helpers/affected_example_groups_detector"
-
 module Crystalball
   module RSpec
     # Our custom RSpec runner to generate and save predictions to a file, i.e. "dry-run"
@@ -129,73 +126,6 @@ module Crystalball
         @configuration.output_stream = out if @configuration.output_stream == $stdout
         @options.configure(@configuration)
       end
-    end
-
-    class CanvasPredictionBuilder < Crystalball::RSpec::PredictionBuilder
-      def predictor
-        super do |p|
-          p.use Crystalball::Predictor::ModifiedSpecs.new
-          p.use Crystalball::Predictor::ModifiedExecutionPaths.new
-          p.use Crystalball::Predictor::NewFiles.new
-        end
-      end
-    end
-  end
-
-  class Predictor
-    # Queues a total re-run if any files are added. If no new files, don't add any predictions
-    # Possible git operation types for SourceDiff include: ['new', 'modified', 'moved', 'deleted]
-    class NewFiles
-      include Helpers::AffectedExampleGroupsDetector
-      include Strategy
-
-      # @param [Crystalball::SourceDiff] diff - the diff from which to predict
-      #   which specs should run
-      # @param [Crystalball::ExampleGroupMap] map - the map with the relations of
-      #   examples and used files
-      # @return [Array<String>] the spec paths associated with the changes
-      def call(diff, map)
-        super do
-          file_change_types = diff.map { |source_diff| [source_diff.relative_path, source_diff.type] }
-          # Create a map of git operations to files
-          # Hash["new"] = ["new_file1.rb", "new_file2.rb"]
-          # Hash["modified"] = ["modified_file1.rb", "modified_file2.rb"]
-          # etc...
-          new_files = file_change_types.each_with_object(Hash.new { |h, k| h[k] = [] }) do |arr, change_map|
-            change_path = arr[0]
-            change_type = arr[1]
-            change_map[change_type] << change_path
-          end
-          if new_files["new"].count.positive?
-            Crystalball.log :warn, "Crystalball detected new .git files: #{new_files["new"]}"
-            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
-            ["."]
-          else
-            []
-          end
-        end
-      end
-    end
-  end
-
-  # Override prediction mechanism based on NewFiles predictor. If we requeue an entire suite re-run
-  # ENV["CRYSTALBALL_TEST_SUITE_ROOT"] should point to the root of selenium specs or whatever is deemed
-  #  relevant for a "complete crystalball-predicted run"
-  class Predictor
-    # @return [Crystalball::Prediction] list of examples which may fail
-    def prediction
-      root_suite_path = ENV["CRYSTALBALL_TEST_SUITE_ROOT"] || "."
-      raw_prediction = raw_prediction(diff)
-      prediction_list = includes_root?(raw_prediction) ? [root_suite_path] : raw_prediction
-      Prediction.new(filter(prediction_list))
-    end
-
-    private
-
-    def includes_root?(prediction_list)
-      prediction_list.include?(".") ||
-        prediction_list.include?("./.") ||
-        prediction_list.include?(ENV["CRYSTALBALL_TEST_SUITE_ROOT"])
     end
   end
 end

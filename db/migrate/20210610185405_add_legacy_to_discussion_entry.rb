@@ -22,7 +22,16 @@ class AddLegacyToDiscussionEntry < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_column :discussion_entries, :legacy, :boolean, if_not_exists: true, default: true, null: false
+    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
+    defaults = new_pg ? { default: true, null: false } : {}
+    add_column :discussion_entries, :legacy, :boolean, if_not_exists: true, **defaults
+
+    unless new_pg
+      change_column_default :discussion_entries, :legacy, true
+      DataFixup::BackfillNulls.run(DiscussionEntry, [:legacy], default_value: true)
+      change_column_null :discussion_entries, :legacy, false
+    end
+
     add_index :discussion_entries, :legacy, where: "legacy", algorithm: :concurrently, if_not_exists: true
   end
 

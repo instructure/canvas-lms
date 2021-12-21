@@ -21,11 +21,24 @@ class AddImportantDatesColumns < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_column :assignments, :important_dates, :boolean, if_not_exists: true, default: false, null: false
-    add_column :calendar_events, :important_dates, :boolean, if_not_exists: true, default: false, null: false
+    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
+    defaults = new_pg ? { default: false, null: false } : {}
+
+    add_column :assignments, :important_dates, :boolean, if_not_exists: true, **defaults
+    add_column :calendar_events, :important_dates, :boolean, if_not_exists: true, **defaults
 
     add_index :assignments, :important_dates, where: "important_dates", algorithm: :concurrently, if_not_exists: true
     add_index :calendar_events, :important_dates, where: "important_dates", algorithm: :concurrently, if_not_exists: true
+
+    unless new_pg
+      change_column_default :assignments, :important_dates, false
+      DataFixup::BackfillNulls.run(Assignment, :important_dates, default_value: false)
+      change_column_null :assignments, :important_dates, false
+
+      change_column_default :calendar_events, :important_dates, false
+      DataFixup::BackfillNulls.run(CalendarEvent, :important_dates, default_value: false)
+      change_column_null :calendar_events, :important_dates, false
+    end
   end
 
   def down
