@@ -84,6 +84,7 @@ function getProps(column, gradebook, gridSupport, options) {
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
+    isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
     weightedGroups: gradebook.weightedGroups()
   }
 }

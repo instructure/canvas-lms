@@ -95,6 +95,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     grabFocus: bool,
     viewUngradedAsZero: bool.isRequired,
+    isRunningScoreToUngraded: bool,
     ...ColumnHeader.propTypes
   }
 
@@ -217,8 +218,13 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                     {this.props.onApplyScoreToUngraded && <Menu.Separator />}
 
                     {this.props.onApplyScoreToUngraded && (
-                      <Menu.Item onSelect={this.props.onApplyScoreToUngraded}>
-                        {I18n.t('Apply Score to Ungraded')}
+                      <Menu.Item
+                        disabled={this.props.isRunningScoreToUngraded}
+                        onSelect={this.props.onApplyScoreToUngraded}
+                      >
+                        {this.props.isRunningScoreToUngraded
+                          ? I18n.t('Applying Score to Ungraded')
+                          : I18n.t('Apply Score to Ungraded')}
                       </Menu.Item>
                     )}
                   </Menu>
