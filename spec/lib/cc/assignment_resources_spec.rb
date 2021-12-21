@@ -64,6 +64,24 @@ describe CC::AssignmentResources do
           assignment.primary_resource_link.lookup_uuid
         )
       end
+
+      it "does not set the link_settings" do
+        expect(subject.at("external_tool_link_settings_json")).to be_nil
+      end
+
+      context "when tag has link_settings" do
+        let(:link_settings) { { selection_width: 456, selection_height: 789 } }
+        let(:tag) do
+          t = super()
+          t.link_settings = link_settings
+          t.save!
+          t
+        end
+
+        it "sets the link_settings in json format" do
+          expect(subject.at("external_tool_link_settings_json").text).to eq link_settings.to_json
+        end
+      end
     end
   end
 end

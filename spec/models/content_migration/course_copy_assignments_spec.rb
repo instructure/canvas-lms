@@ -861,25 +861,7 @@ describe ContentMigration do
       end
     end
 
-    it "copies the thing" do
-      @t1 = factory_with_protected_attributes(@copy_from.context_external_tools,
-                                              url: "http://www.justanexamplenotarealwebsite.com/tool1", shared_secret: "test123",
-                                              consumer_key: "test123", name: "tool 1")
-      ext_data = {
-        "key" => "https://canvas.instructure.com/lti/mastery_connect_assessment"
-      }
-      a = assignment_model(
-        course: @copy_from,
-        title: "test1",
-        submission_types: "external_tool",
-        external_tool_tag_attributes: { content: @t1, url: @t1.url, external_data: ext_data.to_json }
-      )
-      run_course_copy
-      a_to = @copy_to.assignments.where(migration_id: mig_id(a)).first
-      expect(a_to.external_tool_tag.external_data).to eq ext_data
-    end
-
-    context "external tools" do
+    context "lti 2 external tools" do
       include_context "lti2_spec_helper"
 
       let(:assignment) { @copy_from.assignments.create!(name: "test assignment") }
@@ -945,16 +927,17 @@ describe ContentMigration do
 
       context "with one coupled and one coupled line item" do
         let(:tool) { external_tool_model(context: @course.root_account, opts: { use_1_3: true, developer_key: developer_key }) }
+        let(:tag) { ContentTag.new(content: tool, url: tool.url, context: assignment) }
         let(:assignment) do
           @copy_from.assignments.create!(
             name: "test assignment",
             submission_types: "external_tool",
-            points_possible: 10,
-            external_tool_tag: ContentTag.new(content: tool, url: tool.url)
+            points_possible: 10
           )
         end
 
         before do
+          assignment.update!(external_tool_tag: tag)
           Lti::LineItem.create_line_item! assignment, nil, tool, {
             tag: "tag2",
             resource_id: "resource_id2",
@@ -977,6 +960,38 @@ describe ContentMigration do
                  )).to eq([
                             ["tag2", "resource_id2", { "foo" => "bar" }, "abc", 123],
                           ])
+        end
+
+        context "when content tag has external_data" do
+          let(:ext_data) { { "key" => "https://canvas.instructure.com/lti/mastery_connect_assessment" } }
+          let(:tag) do
+            super().tap do |t|
+              t.external_data = ext_data
+              t.save!
+            end
+          end
+
+          it "copies external_data" do
+            run_course_copy
+            a_to = @copy_to.assignments.where(migration_id: mig_id(assignment)).first
+            expect(a_to.external_tool_tag.external_data).to eq ext_data
+          end
+        end
+
+        context "when content tag has link_settings" do
+          let(:link_settings) { { selection_height: 456, selection_width: 789 } }
+          let(:tag) do
+            super().tap do |t|
+              t.link_settings = link_settings
+              t.save!
+            end
+          end
+
+          it "copies link_settings" do
+            run_course_copy
+            a_to = @copy_to.assignments.where(migration_id: mig_id(assignment)).first
+            expect(a_to.external_tool_tag.link_settings).to eq link_settings.stringify_keys
+          end
         end
       end
 
