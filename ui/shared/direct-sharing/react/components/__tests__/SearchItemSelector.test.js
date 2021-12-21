@@ -18,7 +18,7 @@
 
 import React from 'react'
 import SearchItemSelector from '../SearchItemSelector'
-import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
+import useManagedCourseSearchApi, {isSearchableTerm} from '../../effects/useManagedCourseSearchApi'
 import {render, fireEvent, act} from '@testing-library/react'
 
 jest.mock('../../effects/useManagedCourseSearchApi')
@@ -37,6 +37,7 @@ describe('SearchItemSelector', () => {
   })
 
   beforeEach(() => {
+    isSearchableTerm.mockImplementation(() => true)
     jest.useFakeTimers()
   })
 
