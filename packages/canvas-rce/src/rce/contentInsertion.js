@@ -108,6 +108,34 @@ export function insertImage(editor, image) {
   return insertContent(editor, content)
 }
 
+export async function insertEquation(editor, latex, canvasUrl) {
+  const docSz =
+    parseFloat(
+      editor.dom.doc.defaultView.getComputedStyle(editor.dom.doc.body).getPropertyValue('font-size')
+    ) || 1
+
+  const sel = editor.selection.getNode()
+  const imgSz = sel
+    ? parseFloat(editor.dom.doc.defaultView.getComputedStyle(sel).getPropertyValue('font-size')) ||
+      1
+    : docSz
+  const scale = imgSz / docSz
+
+  let url = `/equation_images/${encodeURIComponent(encodeURIComponent(latex))}?scale=${scale}`
+  if (canvasUrl) {
+    url = canvasUrl + url
+  }
+
+  // if I simply create the html string, xsslint fails jenkins
+  const img = document.createElement('img')
+  img.setAttribute('alt', `LaTeX: ${latex}`)
+  img.setAttribute('title', latex)
+  img.setAttribute('class', 'equation_image')
+  img.setAttribute('data-equation-content', latex)
+  img.setAttribute('src', url)
+  return insertContent(editor, img.outerHTML)
+}
+
 /** * link insertion ** */
 
 // checks if there's an existing anchor containing the cursor
