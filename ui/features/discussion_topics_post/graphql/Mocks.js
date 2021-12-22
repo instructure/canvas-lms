@@ -326,7 +326,8 @@ export const createDiscussionEntryMock = ({
   message = '',
   replyFromEntryId = null,
   fileId = null,
-  includeReplyPreview = null
+  includeReplyPreview = null,
+  isAnonymousAuthor = null
 } = {}) => [
   {
     request: {
@@ -336,7 +337,8 @@ export const createDiscussionEntryMock = ({
         message,
         ...(replyFromEntryId !== null && {replyFromEntryId}),
         ...(fileId !== null && {fileId}),
-        ...(includeReplyPreview !== null && {includeReplyPreview})
+        ...(includeReplyPreview !== null && {includeReplyPreview}),
+        ...(isAnonymousAuthor !== null && {isAnonymousAuthor})
       }
     },
     result: {
