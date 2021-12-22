@@ -93,6 +93,8 @@ jest.mock('../../../../../shared/StoreContext', () => {
 
 describe('ImageSection', () => {
   const defaultProps = {
+    settings: {},
+    editing: false,
     editor: {},
     onChange: jest.fn()
   }
@@ -174,18 +176,70 @@ describe('ImageSection', () => {
       it('dispatches an action to update parent state image', async () => {
         await flushPromises()
         expect(defaultProps.onChange).toHaveBeenCalledWith({
-          "type": "SetEncodedImage",
-          "payload": "data:image/png;base64,asdfasdfjksdf=="
+          type: 'SetEncodedImage',
+          payload: 'data:image/png;base64,asdfasdfjksdf=='
         })
       })
 
       it('dispatches an action to update parent state image type', async () => {
         await flushPromises()
         expect(defaultProps.onChange).toHaveBeenCalledWith({
-          "type": "SetEncodedImageType",
-          "payload": "Course"
+          type: 'SetEncodedImageType',
+          payload: 'Course'
         })
       })
+
+      it('dispatches an action to update parent state image name', async () => {
+        await flushPromises()
+        expect(defaultProps.onChange).toHaveBeenCalledWith({
+          type: 'SetEncodedImageName',
+          payload: 'grid.png'
+        })
+      })
+    })
+  })
+
+  describe('when editing mode', () => {
+    it('sets the image name', async () => {
+      const {getByText, rerender} = subject({editing: true})
+      rerender(
+        <ImageSection
+          {...{
+            ...defaultProps,
+            ...{
+              settings: {
+                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
+                encodedImageType: 'Course',
+                encodedImageName: 'banana.jpg'
+              },
+              editing: true
+            }
+          }}
+        />
+      )
+      expect(getByText('banana.jpg')).toBeInTheDocument()
+    })
+
+    it('sets the image preview', async () => {
+      const {getByTestId, rerender} = subject({editing: true})
+      rerender(
+        <ImageSection
+          {...{
+            ...defaultProps,
+            ...{
+              settings: {
+                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
+                encodedImageType: 'Course',
+                encodedImageName: 'banana.jpg'
+              },
+              editing: true
+            }
+          }}
+        />
+      )
+      expect(getByTestId('selected-image-preview')).toHaveStyle(
+        'backgroundImage: url(data:image/jpg;base64,asdfasdfjksdf==)'
+      )
     })
   })
 })
