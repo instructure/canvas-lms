@@ -270,6 +270,10 @@ RSpec.shared_examples "DiscussionType" do
         @anon_student_discussion,
         current_user: @teacher
       )
+      @anon_discussion_as_student_type = GraphQLTypeTester.new(
+        @anon_student_discussion,
+        current_user: @student
+      )
 
       course_with_designer(course: @course)
       @anon_designer_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
@@ -407,6 +411,16 @@ RSpec.shared_examples "DiscussionType" do
         it "does not return student's anonymousAuthor" do
           expect(@anon_student_discussion_with_non_anonymous_author_type.resolve("anonymousAuthor { shortName }")).to eq nil
         end
+      end
+    end
+
+    context "can reply anonymously" do
+      it "returns false for teachers" do
+        expect(@anon_discussion_type.resolve("canReplyAnonymously(courseId: #{@course.id})")).to eq false
+      end
+
+      it "returns true for students" do
+        expect(@anon_discussion_as_student_type.resolve("canReplyAnonymously(courseId: #{@course.id})")).to eq true
       end
     end
   end
