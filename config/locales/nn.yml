@@ -15417,7 +15417,7 @@ nn:
   only_announcements_can_be_section_specific_1ff992a: "Berre kunngjeringar kan vere seksjonsspesifikke"
   only_available_to_students_with_link_107e2468: "Kun tilgjengeleg for studentar med lenke"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Berre tilgjengeleg for studentar med lenke. Ikkje synleg i studentmapper."
-  only_collect_grades_that_have_been_graded_since_th_96baed94: "Bare hent vurderingar som har blitt vurdert sidan start_at."
+  only_collect_grades_that_have_been_graded_since_th_96baed94: "Berre hent vurderingar som har blitt vurdert sidan start_at."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Berre kunngjeringar og diskusjonar kan vere seksjonsspesifikke"
   only_csv_files_are_supported_e1ad5270: "Kun CSV-filer er støtta."
   only_needed_if_enrollments_selected_ee620ce3: "Gjeld kun dersom påmeldingar er valt"
@@ -23205,7 +23205,7 @@ nn:
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Brukar den nye planleggaren og tilhøyrande funksjonalitet"
   validate: 
     is_required: "Dette feltet er obligatorisk"
-  validate_links_in_content_b1630fba: "Valider lenker i Innhald"
+  validate_links_in_content_b1630fba: "Valider lenker i emnet"
   validated_service_ticket_20d1fcec: "Validert sørvis-informasjon"
   validated_ticket_for_username_c6c7722f: "Validert informasjon for %{username}"
   validation_error_3b943100: Valideringsfeil
