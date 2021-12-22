@@ -32,7 +32,7 @@ import formatMessage from '../../../../format-message'
 import EquationEditorToolbar from '../EquationEditorToolbar'
 
 import {css} from 'aphrodite'
-import mathml from 'mathml'
+import mathml from './mathml'
 import styles from './styles'
 
 export default class EquationEditorModal extends Component {
@@ -41,6 +41,7 @@ export default class EquationEditorModal extends Component {
     label: PropTypes.string.isRequired,
     onModalDismiss: PropTypes.func.isRequired,
     onModalClose: PropTypes.func.isRequired,
+    onEquationSubmit: PropTypes.func.isRequired,
     title: PropTypes.node,
     mountNode: PropTypes.string
   }
@@ -175,24 +176,13 @@ export default class EquationEditorModal extends Component {
   }
 
   handleModalDone = () => {
-    const {editor, onModalDismiss} = this.props
+    const {onModalDismiss, onEquationSubmit} = this.props
     const output = this.state.advanced ? this.state.workingFormula : this.mathField.getValue()
 
     if (output) {
-      const code = this.buildImage(output)
-      editor.insertContent(code, {format: 'html'})
+      onEquationSubmit(output)
     }
     onModalDismiss()
-  }
-
-  buildImage(code) {
-    const img = document.createElement('img')
-    img.setAttribute('alt', `LaTeX: ${code}`)
-    img.setAttribute('class', 'equation_image')
-    img.setAttribute('data-equation-content', code)
-    const url = `/equation_images/${encodeURIComponent(encodeURIComponent(code))}`
-    img.setAttribute('src', url)
-    return img.outerHTML
   }
 
   setPreviewElementContent() {

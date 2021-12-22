@@ -19,9 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import formatMessage from '../../../format-message'
+import Bridge from '../../../bridge'
 
 export default function (ed, document, _trayProps) {
   return import('./EquationEditorModal').then(module => {
+    const rce = Bridge.activeEditor()
     const EquationEditorModal = module.default
     let container = document.querySelector('.canvas-rce-equation-container')
     if (!container) {
@@ -35,12 +37,17 @@ export default function (ed, document, _trayProps) {
       ed.focus(false)
     }
 
+    const handleSubmit = latex => {
+      rce.insertMathEquation(latex)
+    }
+
     ReactDOM.render(
       <EquationEditorModal
         editor={ed}
         label={formatMessage('Equation Editor')}
         onModalDismiss={handleDismiss}
         onModalClose={handleDismiss}
+        onEquationSubmit={handleSubmit}
       />,
       container
     )
