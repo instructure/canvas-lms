@@ -20,7 +20,7 @@ import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
 import {convertLatexToMathMl} from '../../mathlive'
-import mathml from 'mathml'
+import mathml from '../mathml'
 
 function defaultProps() {
   return {
@@ -43,7 +43,7 @@ jest.mock('../../mathlive', () => ({
   convertLatexToMathMl: jest.fn()
 }))
 
-jest.mock('mathml', () => ({
+jest.mock('../mathml', () => ({
   processNewMathInElem: jest.fn()
 }))
 
@@ -184,13 +184,11 @@ describe('EquationEditorModal', () => {
   })
 
   it('uses editor on modal submit', () => {
-    renderModal({editor})
+    renderModal({editor, onEquationSubmit: mockFn})
     const mathField = document.body.querySelector('math-field')
     mathField.setValue('hello')
     fireEvent.click(screen.getByText('Done'))
-    const html =
-      '<img alt="LaTeX: hello" class="equation_image" data-equation-content="hello" src="/equation_images/hello">'
-    expect(mockFn).toHaveBeenCalledWith(html, {format: 'html'})
+    expect(mockFn).toHaveBeenCalledWith('hello')
   })
 
   it('not uses editor on modal submit with empty value', () => {
@@ -202,14 +200,12 @@ describe('EquationEditorModal', () => {
   })
 
   it('uses editor on modal submit on advanced input', () => {
-    renderModal({editor})
+    renderModal({editor, onEquationSubmit: mockFn})
     fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
     const textarea = document.body.querySelector('textarea')
     fireEvent.change(textarea, {target: {value: 'hello'}})
     fireEvent.click(screen.getByText('Done'))
-    const html =
-      '<img alt="LaTeX: hello" class="equation_image" data-equation-content="hello" src="/equation_images/hello">'
-    expect(mockFn).toHaveBeenCalledWith(html, {format: 'html'})
+    expect(mockFn).toHaveBeenCalledWith('hello')
   })
 
   it('not uses editor on modal submit with empty value on advanced input', () => {
