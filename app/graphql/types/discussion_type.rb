@@ -230,6 +230,8 @@ module Types
       argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
     def can_reply_anonymously(course_id: nil)
+      return false if course_id.nil?
+
       Loaders::CourseRoleLoader.for(course_id: course_id, role_types: nil, built_in_only: nil).load(current_user).then do |roles|
         !(roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment"))
       end
