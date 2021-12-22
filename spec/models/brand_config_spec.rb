@@ -102,7 +102,7 @@ describe BrandConfig do
     end
 
     it "includes default variables not found in brand config" do
-      expect(@brand_variables["ic-link-color"]).to eq "#008EE2"
+      expect(@brand_variables["ic-link-color"]).to eq "#0374B5"
     end
   end
 
@@ -230,8 +230,10 @@ describe BrandConfig do
 
   it "expects md5 to be correct" do
     what_it_should_be_if_you_have_not_ran_gulp_rev = 338_164_632_037_494_729
-    what_it_should_be_if_you_have = 9_870_895_717_200_317_536_012
+    what_it_should_be_if_you_have = 5_142_524_871_566_800_521
     expect(BrandableCSS.migration_version).to eq(what_it_should_be_if_you_have_not_ran_gulp_rev).or eq(what_it_should_be_if_you_have)
+    # 12142021: previous version of 'what_it_should_be_if_you_have' variable is 839_184_435_922_331_766
+    # 12162021: previous version of 'what_it_should_be_if_you_have' variable is 9_870_895_717_200_317_536_012
     # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
     # you will need to update the migration that runs brand_configs and update these md5s that are
     # with and without running `rake canvas:compile_assets`

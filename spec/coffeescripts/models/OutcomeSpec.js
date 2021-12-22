@@ -50,28 +50,28 @@ QUnit.module('Course Outcomes', {
   }
 })
 
-test('isNative returns false for an outcome imported from the account level', function() {
+test('isNative returns false for an outcome imported from the account level', function () {
   const outcome = new Outcome(this.importedOutcome, {parse: true})
   equal(outcome.isNative(), false)
 })
 
-test('isNative returns true for an outcome created in the course', function() {
+test('isNative returns true for an outcome created in the course', function () {
   const outcome = new Outcome(this.courseOutcome, {parse: true})
   equal(outcome.isNative(), true)
 })
 
-test('CanManage returns true for an account outcome on the course level', function() {
+test('CanManage returns true for an account outcome on the course level', function () {
   const outcome = new Outcome(this.importedOutcome, {parse: true})
   equal(outcome.canManage(), true)
 })
 
-test('default calculation method settings not set if calculation_method exists', function() {
+test('default calculation method settings not set if calculation_method exists', function () {
   const spy = sandbox.spy(Outcome.prototype, 'setDefaultCalcSettings')
   new Outcome(this.importedOutcome, {parse: true})
   ok(!spy.called)
 })
 
-test('default calculation method settings set if calculation_method is null', function() {
+test('default calculation method settings set if calculation_method is null', function () {
   const spy = sandbox.spy(Outcome.prototype, 'setDefaultCalcSettings')
   new Outcome(this.courseOutcome, {parse: true})
   ok(spy.calledOnce)
@@ -97,7 +97,7 @@ QUnit.module('Account Outcomes', {
   }
 })
 
-test('isNative is true for an account level outcome when viewed on the account', function() {
+test('isNative is true for an account level outcome when viewed on the account', function () {
   const outcome = new Outcome(this.accountOutcome, {parse: true})
   equal(outcome.isNative(), true)
 })
@@ -122,7 +122,7 @@ QUnit.module('Global Outcomes in a course', {
   }
 })
 
-test('CanManage returns true for a global outcome on the course level', function() {
+test('CanManage returns true for a global outcome on the course level', function () {
   const outcome = new Outcome(this.globalOutcome, {parse: true})
   equal(outcome.canManage(), true)
 })
@@ -143,10 +143,10 @@ QUnit.module('With the account_level_mastery_scales FF enabled', {
     fakeENV.setup()
     this.ratings = [
       {description: 'Exceeds Mastery', points: 4.0, mastery: false, color: '127A1B'},
-      {description: 'Mastery', points: 3.0, mastery: true, color: '00AC18'},
+      {description: 'Mastery', points: 3.0, mastery: true, color: '0B874B'},
       {description: 'Near Mastery', points: 2.0, mastery: false, color: 'FAB901'},
       {description: 'Below Mastery', points: 1.0, mastery: false, color: 'FD5D10'},
-      {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'EE0612'}
+      {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'E0061F'}
     ]
     ENV.PERMISSIONS = {manage_outcomes: true}
     ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
@@ -160,14 +160,14 @@ QUnit.module('With the account_level_mastery_scales FF enabled', {
   }
 })
 
-test('it uses the ENV.MASTERY_SCALES ratings', function() {
+test('it uses the ENV.MASTERY_SCALES ratings', function () {
   const outcome = new Outcome(this.importedOutcome, {parse: true})
   equal(outcome.get('ratings'), this.ratings)
   equal(outcome.get('mastery_points'), 3)
   equal(outcome.get('points_possible'), 4)
 })
 
-test('ignores proficiency attributes during saving', function() {
+test('ignores proficiency attributes during saving', function () {
   const outcome = new Outcome(this.importedOutcome, {parse: true})
   sinon.stub(outcome, 'url').returns('fake-url')
   outcome.save({}, {})

@@ -41,7 +41,7 @@ test('shows beginning info alert and adds styles to iframe', () => {
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.before_external_content_info_alert').simulate('focus')
   equal(wrapper.state().beforeExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '-4px'})
 })
 
 test('shows ending info alert and adds styles to iframe', () => {
@@ -49,7 +49,7 @@ test('shows ending info alert and adds styles to iframe', () => {
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.after_external_content_info_alert').simulate('focus')
   equal(wrapper.state().afterExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '-4px'})
 })
 
 test('hides beginning info alert and adds styles to iframe', () => {
@@ -84,21 +84,12 @@ test('sets the iframe allowances', () => {
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
   ok(
-    wrapper
-      .find('.tool_launch')
-      .instance()
-      .getAttribute('allow'),
+    wrapper.find('.tool_launch').instance().getAttribute('allow'),
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
   )
 })
 
 test("sets the 'data-lti-launch' attribute on the iframe", () => {
   const wrapper = mount(<CollaborationsToolLaunch />)
-  equal(
-    wrapper
-      .find('.tool_launch')
-      .instance()
-      .getAttribute('data-lti-launch'),
-    'true'
-  )
+  equal(wrapper.find('.tool_launch').instance().getAttribute('data-lti-launch'), 'true')
 })
