@@ -1949,6 +1949,10 @@ class UsersController < ApplicationController
   #   token and instead pass the url here. Warning: For maximum compatibility,
   #   please use 128 px square images.
   #
+  # @argument user[avatar][state] [String]
+  #   The desired lock state of a user's avatar. Allowed values include:
+  #   ['none', 'submitted', 'approved', 'locked', 'reported', 're_reported']
+  #
   # @argument user[title] [String]
   #   Sets a title on the user profile. (See {api:ProfileController#settings Get user profile}.)
   #   Profiles must be enabled on the root account.
@@ -2025,6 +2029,18 @@ class UsersController < ApplicationController
       elsif (url = avatar.try(:[], :url))
         user_params[:avatar_image] = { url: url }
       end
+
+      managed_attributes << :avatar_state
+      if (state = avatar.try(:[], :state))
+        user_params[:avatar_state] = case state
+                                     when "none" then :none
+                                     when "submitted" then :submitted
+                                     when "approved" then :approved
+                                     when "locked" then :locked
+                                     when "reported" then :reported
+                                     when "re-reported" then :re_reported
+                                     end
+      end
     end
 
     if managed_attributes.empty? || !user_params.except(*managed_attributes).empty?
@@ -2035,7 +2051,7 @@ class UsersController < ApplicationController
     user_params = user_params.permit(*managed_attributes)
     new_email = user_params.delete(:email)
     # admins can update avatar images even if they are locked
-    admin_avatar_update = user_params[:avatar_image] &&
+    admin_avatar_update = (user_params[:avatar_image] || user_params[:avatar_state]) &&
                           @user.grants_right?(@current_user, :update_avatar) &&
                           @user.grants_right?(@current_user, :manage_user_details)
 
@@ -2081,7 +2097,13 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.update(user_params)
-        @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : "approved") if admin_avatar_update
+        if admin_avatar_update
+          @user.avatar_state = if (new_avatar_state = user_params.delete(:avatar_state))
+                                 new_avatar_state
+                               else
+                                 (old_avatar_state == :locked ? old_avatar_state : "approved")
+                               end
+        end
         @user.profile.save if @user.profile.changed?
         @user.save if admin_avatar_update || update_email
         # User.email= causes a reload to the user object. The saves need to
