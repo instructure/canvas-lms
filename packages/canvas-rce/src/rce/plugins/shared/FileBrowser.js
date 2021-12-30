@@ -22,7 +22,7 @@ import classnames from 'classnames'
 import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
-import RceApiSource from '../../../sidebar/sources/api'
+import RceApiSource from '../../../rcs/api'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
@@ -45,7 +45,7 @@ export default function RceFileBrowser(props) {
         host
       })
     )
-  }, [source])
+  }, [host, jwt, refreshToken, source])
 
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api.type

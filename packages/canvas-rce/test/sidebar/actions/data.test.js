@@ -18,7 +18,7 @@
 
 import assert from 'assert'
 import * as actions from '../../../src/sidebar/actions/data'
-import RceApiSource from '../../../src/sidebar/sources/api'
+import RceApiSource from '../../../src/rcs/api'
 import sinon from 'sinon'
 import {spiedStore} from './utils'
 

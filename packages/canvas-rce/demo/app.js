@@ -24,7 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import '@instructure/canvas-theme'
 
-import * as fakeSource from '../src/sidebar/sources/fake'
+import * as fakeSource from '../src/rcs/fake'
 
 import './test-plugin/plugin'
 
