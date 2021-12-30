@@ -18,9 +18,9 @@
 
 import assert from 'assert'
 import sinon from 'sinon'
-import RceApiSource, {headerFor, originFromHost} from '../../../src/sidebar/sources/api'
+import RceApiSource, {headerFor, originFromHost} from '../../src/rcs/api'
 import fetchMock from 'fetch-mock'
-import * as fileUrl from '../../../src/common/fileUrl'
+import * as fileUrl from '../../src/common/fileUrl'
 
 describe('sources/api', () => {
   const endpoint = 'wikiPages'

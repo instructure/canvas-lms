@@ -19,10 +19,10 @@
 import 'isomorphic-fetch'
 import {parse} from 'url'
 import {saveClosedCaptions} from '@instructure/canvas-media'
-import {downloadToWrap, fixupFileUrl} from '../../common/fileUrl'
-import formatMessage from '../../format-message'
-import alertHandler from '../../rce/alertHandler'
-import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '../../rce/plugins/shared/Upload/constants'
+import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
+import formatMessage from '../format-message'
+import alertHandler from '../rce/alertHandler'
+import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '../rce/plugins/shared/Upload/constants'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -238,14 +238,15 @@ class RceApiSource {
         origin: originFromHost(apiProps.host),
         headers: headerFor(apiProps.jwt)
       },
-      maxBytes || (RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER)
+      maxBytes || RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER
     ).catch(e => {
       console.error('Failed saving CC', e)
-      const errorMessage = e.name === 'FileSizeError'
-        ? formatMessage('Closed caption file must be less than {maxKb} kb', {
-            maxKb: e.maxBytes / 1000 // bytes to kb
-          })
-        : formatMessage('Uploading closed captions/subtitles failed.')
+      const errorMessage =
+        e.name === 'FileSizeError'
+          ? formatMessage('Closed caption file must be less than {maxKb} kb', {
+              maxKb: e.maxBytes / 1000 // bytes to kb
+            })
+          : formatMessage('Uploading closed captions/subtitles failed.')
 
       this.alertFunc({
         text: errorMessage,
