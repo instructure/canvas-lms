@@ -33,7 +33,7 @@ describe('Image dispatch shapes', () => {
     }
 
     it('returns a type of RECEIVE_IMAGES', () => {
-      const {type} = actions.receiveImages()
+      const {type} = actions.receiveImages({response, contextType})
       assert(type === actions.RECEIVE_IMAGES)
     })
 
@@ -45,7 +45,7 @@ describe('Image dispatch shapes', () => {
 
       it('includes files', () => {
         const {payload} = actions.receiveImages({response})
-        assert(payload.files === [])
+        assert.deepEqual(payload.files, [])
       })
 
       it('includes bookmark', () => {
