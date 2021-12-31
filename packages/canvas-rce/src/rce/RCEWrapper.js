@@ -34,7 +34,7 @@ import * as contentInsertion from './contentInsertion'
 import indicatorRegion from './indicatorRegion'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
-import {sanitizePlugins} from './sanitizeEditorOptions'
+import {sanitizePlugins} from './sanitizePlugins'
 import {getCanvasUrl} from './getCanvasUrl'
 
 import indicate from '../common/indicate'

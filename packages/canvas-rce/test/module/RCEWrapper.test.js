@@ -33,7 +33,6 @@ import RCEWrapper, {
 const textareaId = 'myUniqId'
 
 let React, fakeTinyMCE, editorCommandSpy, sd, editor
-let failedCount = 0
 
 // ====================
 //        HELPERS
@@ -105,7 +104,7 @@ describe('RCEWrapper', () => {
   //   SETUP & TEARDOWN
   // ====================
   before(() => {
-    sinon.stub(getCanvasUrl, 'getCanvasUrl').returns('http://canvas.docker')
+    sinon.stub(getCanvasUrl, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
   })
 
   beforeEach(() => {
@@ -204,15 +203,7 @@ describe('RCEWrapper', () => {
   })
 
   afterEach(function () {
-    if (this.currentTest.state === 'failed') {
-      ++failedCount
-    }
     document.body.innerHTML = ''
-  })
-
-  after(() => {
-    // I don't know why, but this this suite of tests stopped exiting
-    process.exit(failedCount ? 1 : 0)
   })
 
   // ====================
@@ -346,14 +337,11 @@ describe('RCEWrapper', () => {
       contentInsertion.insertLink.restore()
     })
 
-    it.skip('inserts math equations', async done => {
+    it('inserts math equations', async () => {
       const tex = 'y = x^2'
-      const dbl_encoded_tex = window.encodeURIComponent(window.encodeURIComponent(tex))
-      const img_html = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="http://canvas.docker/equation_images/${dbl_encoded_tex}?scale=1">`
-      sinon.stub(contentInsertion, 'insertContent')
+      sinon.stub(contentInsertion, 'insertEquation')
       await instance.insertMathEquation(tex)
-      assert.ok(contentInsertion.insertContent.calledWith(editor, img_html))
-      done()
+      sinon.assert.calledWith(contentInsertion.insertEquation, editor, tex, 'http://canvas.docker')
     })
 
     describe('checkReadyToGetCode', () => {
