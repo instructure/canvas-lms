@@ -306,7 +306,7 @@ describe('DiscussionFullPage', () => {
     it('renders the dates properly', async () => {
       const container = setup(getDiscussionQueryMock())
       expect(await container.findByText('Nov 23, 2020 6:40pm')).toBeInTheDocument()
-      expect(await container.findByText('Last reply Apr 5 7:41pm')).toBeInTheDocument()
+      expect(await container.findByText('Last reply Apr 5, 2021 7:41pm')).toBeInTheDocument()
     })
   })
 

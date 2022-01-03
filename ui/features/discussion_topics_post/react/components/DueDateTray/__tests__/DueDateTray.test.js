@@ -74,10 +74,10 @@ describe('DueDateTray', () => {
     it('displays tray and correctly formatted dates', () => {
       const {getByText} = setup()
       expect(getByText('Due Dates')).toBeInTheDocument()
-      expect(getByText('Mar 31 5:59am')).toBeInTheDocument()
+      expect(getByText('Mar 31, 2021 5:59am')).toBeInTheDocument()
       expect(getByText('assignment override 1')).toBeInTheDocument()
-      expect(getByText('Mar 24 6am')).toBeInTheDocument()
-      expect(getByText('Apr 4 5:59am')).toBeInTheDocument()
+      expect(getByText('Mar 24, 2021 6am')).toBeInTheDocument()
+      expect(getByText('Apr 4, 2021 5:59am')).toBeInTheDocument()
     })
 
     it('correct text is shown when a date is not set', () => {
@@ -159,10 +159,10 @@ describe('DueDateTray', () => {
 
     it('displays tray and correctly formatted dates', () => {
       const {getByText} = setup()
-      expect(getByText('Mar 31 5:59am')).toBeInTheDocument()
+      expect(getByText('Mar 31, 2021 5:59am')).toBeInTheDocument()
       expect(getByText('assignment override 1')).toBeInTheDocument()
-      expect(getByText('Mar 24 6am')).toBeInTheDocument()
-      expect(getByText('Apr 4 5:59am')).toBeInTheDocument()
+      expect(getByText('Mar 24, 2021 6am')).toBeInTheDocument()
+      expect(getByText('Apr 4, 2021 5:59am')).toBeInTheDocument()
     })
 
     it('correct text is shown when a date is not set', () => {
