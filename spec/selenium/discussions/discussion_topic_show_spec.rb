@@ -175,5 +175,21 @@ describe "Discussion Topic Show" do
 
       expect(fj("span.ui-dialog-title:contains('Find Outcomes')")).to be_present
     end
+
+    it "Able to reply to a group discussion" do
+      gc = @course.account.group_categories.create(name: "Group Category")
+      group = group_model(name: "Group", group_category: gc, context: @course.account)
+      group_membership_model(group: group, user: @teacher)
+      topic = discussion_topic_model(context: group, type: "Announcement")
+
+      get "/groups/#{group.id}/discussion_topics/#{topic.id}"
+
+      f("button[data-testid='discussion-topic-reply']").click
+      wait_for_ajaximations
+      type_in_tiny "textarea", "Test Reply"
+      fj("button:contains('Reply')").click
+      wait_for_ajaximations
+      expect(fj("p:contains('Test Reply')")).to be_present
+    end
   end
 end
