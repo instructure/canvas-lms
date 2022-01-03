@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import RceApiSource from '../sources/api'
+import RceApiSource from '../../rcs/api'
 
 // normalize contextType. e.g. accept either of 'course' or 'courses', but
 // only store 'course'
@@ -37,7 +37,7 @@ function normalizeContextType(contextType) {
 }
 
 /* eslint-disable prefer-const */
-export default function(props = {}) {
+export default function (props = {}) {
   let {
     source,
     jwt,

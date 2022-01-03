@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
-import {headerFor, originFromHost} from '../../../sidebar/sources/api'
+import {headerFor, originFromHost} from '../../../rcs/api'
 
 export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark) => {
   let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR

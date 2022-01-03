@@ -23,7 +23,7 @@ import {
   updateMediaObject,
   updateMediaObjectFailure,
   updateClosedCaptions
-} from '../../../src/sidebar/sources/fake'
+} from '../../../src/rcs/fake'
 import alertHandler from '../../../src/rce/alertHandler'
 
 const sortBy = {sort: 'alphabetical', order: 'asc'}

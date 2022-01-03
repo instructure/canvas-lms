@@ -18,7 +18,7 @@
 
 import assert from 'assert'
 import initialState from '../../../src/sidebar/store/initialState'
-import RceApiSource from '../../../src/sidebar/sources/api'
+import RceApiSource from '../../../src/rcs/api'
 
 describe('Sidebar initialState', () => {
   let source, apiSource
