@@ -89,8 +89,10 @@ describe('AssignmentSingleAvailabilityWindow', () => {
     it('should render', () => {
       const container = setup({assignmentOverrides: []})
       expect(container.getByText('Everyone')).toBeInTheDocument()
-      expect(container.getByText('Due Mar 31 5:59am')).toBeInTheDocument()
-      expect(container.getByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
+      expect(container.getByText('Due Mar 31, 2021 5:59am')).toBeInTheDocument()
+      expect(
+        container.getByText('Available from Mar 24, 2021 until Apr 4, 2021')
+      ).toBeInTheDocument()
     })
 
     it('should show participant list when sinlge override is defined with student list', () => {
@@ -126,7 +128,7 @@ describe('AssignmentSingleAvailabilityWindow', () => {
 
     it('should render', () => {
       const container = setup({assignmentOverrides: []})
-      expect(container.getByText('Due Mar 31')).toBeInTheDocument()
+      expect(container.getByText('Due Mar 31, 2021')).toBeInTheDocument()
     })
   })
 })
