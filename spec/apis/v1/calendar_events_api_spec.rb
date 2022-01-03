@@ -1102,6 +1102,30 @@ describe CalendarEventsApiController, type: :request do
       assert_status(400)
     end
 
+    it "doesn't die on unreasonable recurring event counts" do
+      start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+      end_at = Time.zone.now.utc.change(hour: 23)
+      api_call(
+        :post,
+        "/api/v1/calendar_events",
+        { controller: "calendar_events_api", action: "create", format: "json" },
+        {
+          calendar_event: {
+            context_code: @course.asset_string,
+            title: "ohai",
+            start_at: start_at.iso8601,
+            end_at: end_at.iso8601,
+            duplicate: {
+              count: "1_000_000",
+              interval: "1",
+              frequency: "weekly"
+            }
+          }
+        }
+      )
+      assert_status(400)
+    end
+
     it "processes html content in description on create" do
       should_process_incoming_user_content(@course) do |content|
         json = api_call(:post, "/api/v1/calendar_events",
