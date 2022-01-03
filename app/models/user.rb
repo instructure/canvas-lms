@@ -266,6 +266,8 @@ class User < ActiveRecord::Base
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
 
+  scope :has_created_account, -> { where("users.workflow_state NOT IN ('creation_pending', 'deleted')") }
+
   scope :has_current_student_enrollments, lambda {
     where("EXISTS (?)",
           Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
