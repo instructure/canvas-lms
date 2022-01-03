@@ -92,6 +92,11 @@ describe('DiscussionThreadContainer', () => {
     expect(container).toBeTruthy()
   })
 
+  it('renders an attachment if it exists', async () => {
+    const container = setup(defaultProps())
+    expect(await container.findByText('288777.jpeg')).toBeInTheDocument()
+  })
+
   it('should not render reply button if reply permission is false', () => {
     const {queryByTestId} = setup(
       defaultProps({

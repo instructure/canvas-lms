@@ -181,11 +181,13 @@ export const IsolatedViewContainer = props => {
     }
   }
 
-  const onUpdate = (discussionEntry, message) => {
+  const onUpdate = (discussionEntry, message, fileId) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: discussionEntry._id,
-        message
+        message,
+        fileId,
+        removeAttachment: !fileId
       }
     })
   }
@@ -194,26 +196,27 @@ export const IsolatedViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, replyId, includeReplyPreview) => {
+  const onReplySubmit = (message, fileId, includeReplyPreview, replyId) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         replyFromEntryId: replyId,
         message,
+        fileId,
         includeReplyPreview,
         courseID: ENV.course_id
       },
-      optimisticResponse: getOptimisticResponse(
+      optimisticResponse: getOptimisticResponse({
         message,
-        replyId,
-        props.discussionEntryId,
-        null,
-        buildQuotedReply(
+        parentId: replyId,
+        rootEntryId: props.discussionEntryId,
+        quotedEntry: buildQuotedReply(
           isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
           props.replyFromId
         ),
-        !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously
-      )
+        isAnonymous:
+          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously
+      })
     })
   }
 
@@ -432,8 +435,8 @@ export const IsolatedViewContainer = props => {
             >
               <DiscussionEdit
                 discussionAnonymousState={props.discussionTopic.anonymousState}
-                onSubmit={(text, includeReplyPreview) => {
-                  onReplySubmit(text, props.replyFromId, includeReplyPreview)
+                onSubmit={(message, includeReplyPreview, fileId) => {
+                  onReplySubmit(message, fileId, includeReplyPreview, props.replyFromId)
                   props.setRCEOpen(false)
                 }}
                 onCancel={() => props.setRCEOpen(false)}

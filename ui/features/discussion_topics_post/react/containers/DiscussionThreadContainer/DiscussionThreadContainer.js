@@ -274,11 +274,13 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  const onUpdate = newMesssage => {
+  const onUpdate = (message, _includeReplyPreview, fileId) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: props.discussionEntry._id,
-        message: newMesssage
+        message,
+        fileId,
+        removeAttachment: !fileId
       }
     })
   }
@@ -315,12 +317,13 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
-  const onReplySubmit = text => {
+  const onReplySubmit = (message, fileId) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
         replyFromEntryId: props.discussionEntry._id,
-        message: text,
+        fileId,
+        message,
         courseID: ENV.course_id
       }
     })
@@ -465,8 +468,8 @@ export const DiscussionThreadContainer = props => {
               >
                 <DiscussionEdit
                   discussionAnonymousState={props.discussionTopic.anonymousState}
-                  onSubmit={text => {
-                    onReplySubmit(text)
+                  onSubmit={(message, _includeReplyPreview, fileId) => {
+                    onReplySubmit(message, fileId)
                   }}
                   onCancel={() => setEditorExpanded(false)}
                 />
