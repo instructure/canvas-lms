@@ -26,9 +26,10 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
 export const AttachmentButton = props => {
+  const TRUNCATE_TO = 30
   return (
     <RemovableItem
-      onRemove={props.onDeleteItem.bind(null, props.attachment?.id)}
+      onRemove={props.onDeleteItem}
       screenReaderLabel={I18n.t('Remove Attachment')}
       childrenAriaLabel={I18n.t(`Replace filename.png button`)}
     >
@@ -37,7 +38,11 @@ export const AttachmentButton = props => {
         href={props.attachment?.url}
         isWithinText={false}
       >
-        <Text weight="bold">{props.attachment?.display_name}</Text>
+        <Text weight="bold">
+          {props.attachment?.displayName?.length > TRUNCATE_TO
+            ? props.attachment?.displayName?.slice(0, TRUNCATE_TO)?.concat('...')
+            : props.attachment?.displayName}
+        </Text>
       </Link>
     </RemovableItem>
   )

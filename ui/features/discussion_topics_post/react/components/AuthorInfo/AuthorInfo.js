@@ -57,6 +57,12 @@ export const AuthorInfo = props => {
           timestampTextSize: 'small',
           nameAndRoleDirection: 'row',
           badgeMarginLeft: '-24px'
+        },
+        mobile: {
+          authorNameTextSize: 'small',
+          timestampTextSize: 'x-small',
+          nameAndRoleDirection: 'column',
+          badgeMarginLeft: '-16px'
         }
       }}
       render={responsiveProps => (

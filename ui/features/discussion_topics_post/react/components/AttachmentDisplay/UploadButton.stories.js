@@ -17,15 +17,15 @@
  */
 import React from 'react'
 
-import {AttachButton} from './AttachButton'
+import {UploadButton} from './UploadButton'
 
 export default {
-  title: 'Examples/Discussion Posts/Components/AttachButton',
-  component: AttachButton,
+  title: 'Examples/Discussion Posts/Components/UploadButton',
+  component: UploadButton,
   argTypes: {}
 }
 
-const Template = args => <AttachButton {...args} />
+const Template = args => <UploadButton {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
