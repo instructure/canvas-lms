@@ -63,14 +63,17 @@ describe('sources/api', () => {
     it('creates a collection with a bookmark derived from props', () => {
       assert.strictEqual(
         collection.bookmark,
-        `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123`
+        `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123&search_term=panda`
       )
     })
 
     it('bookmark omits host if not in props', () => {
       const noHostProps = {...props, host: undefined}
       collection = apiSource.initializeCollection(endpoint, noHostProps)
-      assert.strictEqual(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
+      assert.strictEqual(
+        collection.bookmark,
+        '/api/wikiPages?contextType=group&contextId=123&search_term=panda'
+      )
     })
 
     it('creates a collection that is not initially loading', () => {
@@ -764,7 +767,8 @@ describe('sources/api', () => {
       return apiSource.fetchImages(props).then(page => {
         assert.deepEqual(page, {
           bookmark: 'mo.images',
-          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}]
+          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
+          searchString: 'panda'
         })
         fetchMock.restore()
       })

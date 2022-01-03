@@ -22,10 +22,6 @@ import wrapInitCb from '../../src/rce/wrapInitCb'
 
 let mirroredAttrs, edOpts, setAttrStub, fakeEditor, elStub, origInitCB
 
-class MockMutationObserver {
-  observer() {}
-}
-
 describe('wrapInitCb', () => {
   before(() => {
     mirroredAttrs = {
@@ -49,21 +45,13 @@ describe('wrapInitCb', () => {
   })
 
   it('tries to add attributes to el in cb', () => {
-    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver)
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts)
     newEdOpts.init_instance_callback(fakeEditor)
     assert.ok(setAttrStub.calledWith('foo', 'bar'))
   })
 
-  it('sets rich_text on el', () => {
-    elStub.dataset.rich_text = false
-    assert.ok(!elStub.dataset.rich_text)
-    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver)
-    newEdOpts.init_instance_callback(fakeEditor)
-    assert.ok(elStub.dataset.rich_text)
-  })
-
   it('still calls old cb', () => {
-    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver)
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts)
     newEdOpts.init_instance_callback(fakeEditor)
     assert.ok(origInitCB.calledWith(fakeEditor))
   })

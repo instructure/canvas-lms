@@ -108,7 +108,7 @@ export function insertImage(editor, image) {
   return insertContent(editor, content)
 }
 
-export async function insertEquation(editor, latex, canvasUrl) {
+export function insertEquation(editor, latex, canvasUrl) {
   const docSz =
     parseFloat(
       editor.dom.doc.defaultView.getComputedStyle(editor.dom.doc.body).getPropertyValue('font-size')
