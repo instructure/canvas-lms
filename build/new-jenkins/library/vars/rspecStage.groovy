@@ -153,7 +153,7 @@ def tearDownNode(prefix) {
     def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
     def splitPath = file.getPath().split('/').toList()
     def specTitle = splitPath.subList(6, splitPath.size() - 1).join('/')
-    def artifactsPath = "../artifact/${file.getPath()}"
+    def artifactsPath = "${currentBuild.getAbsoluteUrl()}artifact/${file.getPath()}"
 
     buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
 
@@ -186,6 +186,7 @@ def runRspecqSuite() {
                                        -e RSPECQ_UPDATE_TIMINGS \
                                        -e JOB_NAME \
                                        -e COVERAGE \
+                                       -e BUILD_NAME \
                                        -e BUILD_NUMBER canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
