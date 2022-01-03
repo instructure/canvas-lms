@@ -296,7 +296,7 @@ describe GradebooksHelper do
         title: "My Due Date Assignment",
         due_at: "2021-04-15T22:00:24Z"
       )
-      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15 at 10pm"
+      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15, 2021 at 10pm"
     end
 
     it "produces No due date message if no due date" do
@@ -322,7 +322,7 @@ describe GradebooksHelper do
         workflow_state: "active"
       )
       assignment.reload
-      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15 at 10pm"
+      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15, 2021 at 10pm"
     end
   end
 end

@@ -33,7 +33,7 @@ describe('MicrosoftSync', () => {
   const subject = overrides => render(<MicrosoftSync {...props(overrides)} />)
 
   it('displays the last sync time', () => {
-    expect(subject().getByText(/Mar 3/).textContent).toEqual(' Mar 30 at 8:44pm')
+    expect(subject().getByText(/Mar 3/).textContent).toEqual(' Mar 30, 2021 at 8:44pm')
   })
 
   it('displays the workflow state', () => {
