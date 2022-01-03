@@ -2221,6 +2221,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.saveSettings({
       colors,
       showUnpublishedAssignments,
+      showSeparateFirstLastNames,
       viewUngradedAsZero
     }).then(() => {
       // Make various updates to the grid depending on what changed.  These
