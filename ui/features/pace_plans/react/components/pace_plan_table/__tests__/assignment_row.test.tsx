@@ -158,4 +158,18 @@ describe('AssignmentRow', () => {
     ).not.toBeInTheDocument()
     expect(getByText('2')).toBeInTheDocument()
   })
+
+  describe('localized', () => {
+    const locale = ENV.LOCALE
+    beforeAll(() => {
+      ENV.LOCALE = 'en-GB'
+    })
+    afterAll(() => {
+      ENV.LOCALE = locale
+    })
+    it('localizes the projected dates', () => {
+      const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
+      expect(getByText('Wed, 1 Jan 2020')).toBeInTheDocument()
+    })
+  })
 })
