@@ -79,9 +79,9 @@ export function getInitialGridDisplaySettings(settings, colors): GridDisplaySett
       commentsUpdating: false,
       editedCommentId: null
     },
-    viewUngradedAsZero: settings.view_ungraded_as_zero === 'true',
-    showUnpublishedAssignments: false,
-    showSeparateFirstLastNames: false
+    showUnpublishedAssignments: settings.show_unpublished_assignments === 'true',
+    showSeparateFirstLastNames: settings.show_separate_first_last_names === 'true',
+    viewUngradedAsZero: settings.view_ungraded_as_zero === 'true'
   }
 }
 
