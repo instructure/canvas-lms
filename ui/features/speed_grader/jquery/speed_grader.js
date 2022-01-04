@@ -1191,8 +1191,8 @@ function updateSubmissionAndPageEffects(data) {
     .then(() => {
       refreshGrades(() => {
         EG.showSubmissionDetails()
-        styleSubmissionStatusPills(getLateMissingAndExcusedPills())
         if (availableMountPointForStatusMenu()) {
+          styleSubmissionStatusPills(getLateMissingAndExcusedPills())
           renderStatusMenu(statusMenuComponent(submission), availableMountPointForStatusMenu())
         }
       })
@@ -1404,6 +1404,10 @@ EG = {
       const {length: students} = jsonData.studentsWithSubmissions
       const newIndex = (this.currentIndex() + offset + students) % students
       this.goToStudent(jsonData.studentsWithSubmissions[newIndex][anonymizableId], HISTORY_PUSH)
+      const nextSubmission = jsonData.studentsWithSubmissions[newIndex].submission
+      if (nextSubmission.missing && nextSubmission.grader_id){
+        updateSubmissionAndPageEffects()
+      }
     }
 
     const doNotShowModalSetting = 'speedgrader.dont_show_unposted_comment_dialog.' + assignmentUrl
