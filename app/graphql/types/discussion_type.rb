@@ -226,13 +226,11 @@ module Types
       object.can_unpublish?
     end
 
-    field :can_reply_anonymously, Boolean, null: false do
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
-    end
-    def can_reply_anonymously(course_id: nil)
-      return false if course_id.nil?
+    field :can_reply_anonymously, Boolean, null: false
+    def can_reply_anonymously
+      return false unless object.context.is_a?(Course)
 
-      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: nil, built_in_only: nil).load(current_user).then do |roles|
+      Loaders::CourseRoleLoader.for(course_id: object.context.id, role_types: nil, built_in_only: nil).load(current_user).then do |roles|
         !(roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment"))
       end
     end
