@@ -211,7 +211,7 @@ export const IsolatedViewContainer = props => {
           isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
           props.replyFromId
         ),
-        props.discussionTopic.anonymousState != null
+        !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously
       )
     })
   }
