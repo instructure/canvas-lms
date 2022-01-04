@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2022 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,25 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas::OAuth
-  class InvalidScopeError < RequestError
-    def initialize(missing_scopes)
-      super("A requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner. "\
-            "The following scopes were requested, but not granted: #{missing_scopes.to_sentence(locale: :en)}")
-    end
+require_dependency "canvas/oauth/invalid_scope_error"
 
-    def to_render_data
-      {
-        status: 400,
-        json: {
-          error: :invalid_scope,
-          error_description: @message
-        }
-      }
-    end
-
-    def http_status
-      400
+describe Canvas::OAuth::InvalidScopeError do
+  it "never localizes 'and'" do
+    I18n.with_locale(:de) do
+      err = described_class.new(%w[foo bar waz])
+      desc = err.to_render_data.with_indifferent_access.dig("json", "error_description")
+      expect(desc).to include("foo, bar, and waz")
     end
   end
 end
