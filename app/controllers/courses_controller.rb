@@ -1207,7 +1207,7 @@ class CoursesController < ApplicationController
     reject!("Search term required") unless params[:search_term]
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
-    users_scope = User.shard(Shard.current).active.distinct
+    users_scope = User.shard(Shard.current).has_created_account.distinct
     union_scope = teacher_scope(name_scope(users_scope), @context.root_account_id)
                   .union(
                     teacher_scope(email_scope(users_scope), @context.root_account_id),
