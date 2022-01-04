@@ -103,6 +103,24 @@ describe "speed grader - grade display" do
     end
   end
 
+  context "remove_missing_status_when_graded enabled" do
+    before do
+      init_course_with_students(3)
+      create_assignments
+      Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
+      user_session(@teacher)
+    end
+
+    it "removes missing pill when teacher navigates away from student" do
+      Speedgrader.visit(@course.id, @a2.id)
+      Speedgrader.grade_input.send_keys(70)
+      Speedgrader.click_next_student_btn
+      Speedgrader.click_next_or_prev_student("prev")
+
+      expect(find_all_with_jquery(".submission-missing-pill:contains('missing')").length).to eq 0
+    end
+  end
+
   context "keyboard shortcuts" do
     let(:first_grade) { 5 }
     let(:last_grade) { 10 }
