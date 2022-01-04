@@ -20,7 +20,7 @@
 
 // This is a workaround for an InstUI v7 issue with the Menu component not being
 // properly themeable. This should be removed once we're on InstUI v8
-[data-position-content="pace-plan-menu"] [role="menu"] {
+[data-position-content='pace-plan-menu'] [role='menu'] {
   max-width: 20rem;
 }
 
@@ -39,7 +39,9 @@
   }
 
   // This supports table-based transitions
-  & th, td, [role="cell"] {
+  & th,
+  td,
+  [role='cell'] {
     overflow: hidden;
     transition: height 500ms ease, width 500ms ease, opacity 500ms ease;
     white-space: nowrap;
@@ -49,7 +51,7 @@
     }
   }
 
-  & [role="cell"] {
+  & [role='cell'] {
     // This allows the auto-generated stacked labels to play nice with the
     // assignment title cell, since that contains an icon + truncated text
     display: flex;
@@ -65,12 +67,14 @@
 
   // This supports table-based transitions
   &.actually-expanded {
-    & th, td, [role="cell"] {
+    & th,
+    td,
+    [role='cell'] {
       &:nth-child(3):not(:last-child) {
         opacity: 1;
       }
     }
-    & [role="cell"]:nth-child(3):not(:last-child) {
+    & [role='cell']:nth-child(3):not(:last-child) {
       height: 3.75rem;
       padding: 0.5rem 0.75rem;
     }
@@ -79,9 +83,6 @@
 
 #pace-plans-required-end-date-input > span {
   width: 100%;
-  & label > span {
-    margin-#{direction(left)}: 1.75rem;
-  }
 }
 
 .pace-plans-assignment-row-points-possible {
