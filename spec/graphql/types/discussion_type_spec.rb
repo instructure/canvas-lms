@@ -416,15 +416,11 @@ RSpec.shared_examples "DiscussionType" do
 
     context "can reply anonymously" do
       it "returns false for teachers" do
-        expect(@anon_discussion_type.resolve("canReplyAnonymously(courseId: #{@course.id})")).to eq false
+        expect(@anon_discussion_type.resolve("canReplyAnonymously")).to eq false
       end
 
       it "returns true for students" do
-        expect(@anon_discussion_as_student_type.resolve("canReplyAnonymously(courseId: #{@course.id})")).to eq true
-      end
-
-      it "returns false if course id is not present" do
-        expect(@anon_discussion_type.resolve("canReplyAnonymously")).to eq false
+        expect(@anon_discussion_as_student_type.resolve("canReplyAnonymously")).to eq true
       end
     end
   end
