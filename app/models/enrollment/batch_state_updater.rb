@@ -116,10 +116,10 @@ class Enrollment::BatchStateUpdater
 
       rollback = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: gms, updated_state: "deleted", batch_mode_delete: batch_mode)
       data.push(*rollback)
-      GroupMembership.where(id: gms).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
       leader_change_groups = Group.joins(:group_memberships).where(group_memberships: { id: gms }, leader_id: user_ids)
       leader_change_groups.update_all(leader_id: nil, updated_at: Time.zone.now)
       leader_change_groups.each(&:auto_reassign_leader)
+      GroupMembership.where(id: gms).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
       Group.joins(:group_memberships).where(group_memberships: { id: gms }).touch_all
     end
     data
