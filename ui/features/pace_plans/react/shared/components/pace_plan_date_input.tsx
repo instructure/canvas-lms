@@ -36,6 +36,7 @@ import I18n from 'i18n!pace_plan_date_input'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 
 export type PacePlansDateInputProps = {
+  id?: string
   dateValue?: string
   label: string | JSX.Element
   helpText?: string
@@ -74,6 +75,7 @@ const formatDate = date => tz.format(date, 'date.formats.long')
  * - Handles date changes and ensures the user doesn't manually enter a disabled date
  */
 const PacePlanDateInput = ({
+  id,
   dateValue,
   label,
   helpText,
@@ -176,9 +178,9 @@ const PacePlanDateInput = ({
 
   return (
     <>
-      <Flex direction="column">
+      <Flex direction="column" id={id}>
         <CanvasDateInput
-          dataTestid="pace-plan-start-date"
+          dataTestid="pace-plan-date"
           renderLabel={dateInputLabel}
           formatDate={formatDate}
           onSelectedDateChange={handleDateChange}
