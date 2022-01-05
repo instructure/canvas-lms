@@ -80,7 +80,7 @@ export const Module: React.FC<PassedProps> = props => {
         <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
           {I18n.t('Due Date')}
           {!isStudentPlan && props.isCompressing && (
-            <View as="span" margin="0 0 0 x-small">
+            <View data-testid="duedate-tooltip" as="span" margin="0 0 0 x-small">
               <Tooltip
                 renderTip={I18n.t(
                   'Due Dates are being compressed based on your start and end dates'
