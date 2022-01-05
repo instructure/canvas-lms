@@ -653,6 +653,10 @@ class Account < ActiveRecord::Base
     root_account_id.nil? || local_root_account_id.zero?
   end
 
+  def primary_settings_root_account?
+    root_account?
+  end
+
   def root_account
     return self if root_account?
 
@@ -1027,18 +1031,27 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def self.add_federated_parent_to_chain!(chain)
+    chain
+  end
+
   def self.add_site_admin_to_chain!(chain)
+    add_federated_parent_to_chain!(chain)
     chain << Account.site_admin unless chain.last.site_admin?
     chain
   end
 
-  def account_chain(include_site_admin: false)
+  def account_chain(include_site_admin: false, include_federated_parent: false)
     @account_chain ||= Account.account_chain(self).tap do |chain|
       # preload the root account and parent accounts that we also found here
       ra = chain.find(&:root_account?)
       chain.each { |a| a.root_account = ra if a.root_account_id == ra.id }
       chain.each_with_index { |a, idx| a.parent_account = chain[idx + 1] if a.parent_account_id == chain[idx + 1]&.id }
     end.freeze
+
+    if include_federated_parent
+      return @account_chain_with_federated_parent ||= Account.add_federated_parent_to_chain!(@account_chain.dup).freeze
+    end
 
     if include_site_admin
       return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
