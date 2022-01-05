@@ -591,6 +591,7 @@ class DiscussionTopicsController < ApplicationController
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity),
+      PARTIAL_ANONYMITY: Account.site_admin.feature_enabled?(:partial_anonymity),
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group)
     }
@@ -754,7 +755,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION: {
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
                  CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
-                 ATTACHMENTS_FOLDER_ID: @topic.for_assignment? ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id
+                 ATTACHMENTS_FOLDER_ID: (@topic.for_assignment? && !@current_user.nil?) ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id
                },
                apollo_caching: @current_user &&
                  Account.site_admin.feature_enabled?(:apollo_caching),
@@ -763,7 +764,7 @@ class DiscussionTopicsController < ApplicationController
              })
 
       js_bundle :discussion_topics_post
-      css_bundle :discussions_index
+      css_bundle :discussions_index, :learning_outcomes
       render html: "", layout: true
       return
     end

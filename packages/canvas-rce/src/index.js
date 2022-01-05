@@ -18,7 +18,7 @@
 
 import normalizeLocale from './rce/normalizeLocale'
 import {renderIntoDiv as render} from './rce/root'
-import {headerFor, originFromHost} from './sidebar/sources/api'
+import {headerFor, originFromHost} from './rcs/api'
 import getTranslations from './getTranslations'
 import defaultTinymceConfig from './defaultTinymceConfig'
 

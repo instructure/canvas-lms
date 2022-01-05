@@ -27,7 +27,7 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
 import formatMessage from '../../../../format-message'
 
-import RceApiSource from '../../../../sidebar/sources/api'
+import RceApiSource from '../../../../rcs/api'
 import ImageOptionsForm from '../ImageOptionsForm'
 import UsageRightsSelectBox from './UsageRightsSelectBox'
 import {View} from '@instructure/ui-view'

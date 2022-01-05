@@ -30,7 +30,8 @@ export const DEFAULT_SETTINGS = {
   textBackgroundColor: null,
   textPosition: 'middle',
   encodedImage: '',
-  encodedImageType: ''
+  encodedImageType: '',
+  encodedImageName: ''
 }
 
 export const DEFAULT_OPTIONS = {

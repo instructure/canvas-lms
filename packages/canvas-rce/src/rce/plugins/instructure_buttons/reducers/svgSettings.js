@@ -22,7 +22,8 @@ export const defaultState = DEFAULT_SETTINGS
 
 export const actions = {
   SET_ENCODED_IMAGE: 'SetEncodedImage',
-  SET_ENCODED_IMAGE_TYPE: 'SetEncodedImageType'
+  SET_ENCODED_IMAGE_TYPE: 'SetEncodedImageType',
+  SET_ENCODED_IMAGE_NAME: 'SetEncodedImageName'
 }
 
 export const svgSettings = (state, action) => {
@@ -31,6 +32,8 @@ export const svgSettings = (state, action) => {
       return {...state, encodedImage: action.payload}
     case actions.SET_ENCODED_IMAGE_TYPE:
       return {...state, encodedImageType: action.payload}
+    case actions.SET_ENCODED_IMAGE_NAME:
+      return {...state, encodedImageName: action.payload}
     default:
       return {...state, ...action}
   }

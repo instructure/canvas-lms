@@ -153,4 +153,34 @@ describe('TreeBrowser', () => {
     fireEvent.click(getByText('Leaf folder'))
     expect(onCollectionToggle).toHaveBeenCalledWith(expect.objectContaining({id: '101'}))
   })
+
+  it('Sort collections by name', () => {
+    collections = {
+      ...collections,
+      1: {
+        ...collections[1],
+        collections: ['100', '101', '102']
+      },
+      102: {
+        id: '102',
+        name: 'Art group',
+        descriptor: '0 Groups | 2 Outcomes',
+        collections: [],
+        outcomesCount: 0,
+        childGroupsCount: 0,
+        parentGroupId: '1'
+      }
+    }
+    const {baseElement} = render(<TreeBrowser {...defaultProps()} />)
+    const values = [].map.call(baseElement.querySelectorAll('button'), el => el.textContent)
+
+    expect(values).toStrictEqual([
+      // Note, the first group is Root account",
+      // because this is the parent. The children are sorted properly
+      'Root account folder2 Groups | 2 Outcomes',
+      'Art group0 Groups | 2 Outcomes',
+      'Folder with groups2 Groups | 2 Outcomes',
+      'Leaf folder0 Groups | 2 Outcomes'
+    ])
+  })
 })

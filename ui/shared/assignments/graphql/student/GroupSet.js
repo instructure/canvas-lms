@@ -18,6 +18,7 @@
 
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
+import {Group} from './Group'
 
 export const GroupSet = {
   fragment: gql`
@@ -25,7 +26,11 @@ export const GroupSet = {
       name
       id
       _id
+      currentGroup {
+        ...Group
+      }
     }
+    ${Group.fragment}
   `,
 
   shape: shape({

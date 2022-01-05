@@ -1966,6 +1966,11 @@ modules.initModuleManagement = function (duplicate) {
       if ($items.length > 0) {
         const $item = $items.shift()
         const opts = modules.sortable_module_options
+        const k5TabsContainer = $('#k5-course-header').closest('.ic-Dashboard-tabs').eq(0)
+        const k5ModulesContainer = $('#k5-modules-container')
+        if (k5TabsContainer.length > 0 && k5ModulesContainer.length > 0) {
+          opts.sort = event => onContainerOverlapped(event, k5ModulesContainer, k5TabsContainer)
+        }
         opts.update = modules.updateModuleItemPositions
         $item.sortable(opts)
         requestAnimationFrame(next)
@@ -1999,6 +2004,18 @@ modules.initModuleManagement = function (duplicate) {
 
     const view = initPublishButton($item.find('.publish-icon'), publishData)
     overrideModel(view.model, view)
+  }
+
+  var onContainerOverlapped = function (event, sortableContainer, overlappingElement) {
+    const sortableContainerStart = sortableContainer?.position().top
+    const overlappingElementEnd = overlappingElement?.position().top + overlappingElement.height()
+    const isOverlapped = sortableContainerStart < overlappingElementEnd
+    // if the sortable container is overlapped by another element, the scroll should move when
+    // the draggable item is getting closer to the overlapping element
+    if (isOverlapped && event.pageY < overlappingElementEnd + 30) {
+      const scrollTo = window.scrollY - event.clientY * 0.05
+      $('html, body').scrollTop(scrollTo)
+    }
   }
 
   var initPublishButton = function ($el, data) {

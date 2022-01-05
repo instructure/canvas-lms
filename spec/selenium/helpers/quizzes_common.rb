@@ -517,11 +517,12 @@ module QuizzesCommon
   def edit_first_question
     hover_first_question
     wait_for_animations
+    exceptions = [Selenium::WebDriver::Error::ElementNotInteractableError, Selenium::WebDriver::Error::ElementClickInterceptedError]
     begin
       # for some reason in flakey-spec-catcher this will fail 1/10 times
       #  have a backup plan
       f(".edit_question_link").click
-    rescue Selenium::WebDriver::Error::ElementNotInteractableError
+    rescue *exceptions
       # rubocop:disable Specs/NoExecuteScript
       driver.execute_script "document.querySelector('.edit_question_link').click()"
       # rubocop:enable Specs/NoExecuteScript

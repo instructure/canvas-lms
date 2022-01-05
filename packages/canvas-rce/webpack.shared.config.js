@@ -25,6 +25,10 @@ module.exports = {
         test: /\.js?$/,
         use: ['babel-loader'],
         exclude: /node_modules/
+      },
+      {
+        test: /\.(woff(2)?|otf|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        use: 'file-loader'
       }
     ],
     noParse: [

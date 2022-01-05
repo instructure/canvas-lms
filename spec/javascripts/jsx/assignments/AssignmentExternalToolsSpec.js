@@ -131,9 +131,11 @@ QUnit.module('AssignmentExternalTools', hooks => {
       />
     )
     const tool = toolDefinitions[0]
-    const correctUrl = `${'/courses/1/external_tools/retrieve?borderless=true&' +
+    const correctUrl = `${
+      '/courses/1/external_tools/retrieve?borderless=true&' +
       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
-      'placement=assignment_edit&assignment_id=1'}`
+      'placement=assignment_edit&assignment_id=1'
+    }`
     const computedUrl = wrapper.instance().getLaunch(tool)
     equal(computedUrl, correctUrl)
   })
@@ -149,7 +151,7 @@ QUnit.module('AssignmentExternalTools', hooks => {
     wrapper.setState({tools: toolDefinitions})
     wrapper.find('.before_external_content_info_alert').simulate('focus')
     equal(wrapper.state().beforeExternalContentAlertClass, '')
-    deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
+    deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '-4px'})
   })
 
   test('shows ending info alert and adds styles to iframe', () => {
@@ -163,7 +165,7 @@ QUnit.module('AssignmentExternalTools', hooks => {
     wrapper.setState({tools: toolDefinitions})
     wrapper.find('.after_external_content_info_alert').simulate('focus')
     equal(wrapper.state().afterExternalContentAlertClass, '')
-    deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
+    deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '-4px'})
   })
 
   test('hides beginning info alert and adds styles to iframe', () => {
@@ -231,9 +233,11 @@ QUnit.module('AssignmentExternalTools', hooks => {
       />
     )
     const tool = toolDefinitions[0]
-    const correctUrl = `${'/courses/1/external_tools/retrieve?borderless=true&' +
+    const correctUrl = `${
+      '/courses/1/external_tools/retrieve?borderless=true&' +
       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
-      'placement=assignment_view&assignment_id=1'}`
+      'placement=assignment_view&assignment_id=1'
+    }`
     const computedUrl = wrapper.instance().getLaunch(tool)
     equal(computedUrl, correctUrl)
   })

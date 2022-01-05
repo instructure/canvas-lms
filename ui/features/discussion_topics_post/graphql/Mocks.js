@@ -39,7 +39,7 @@ export const getDiscussionQueryMock = ({
   filter = 'all',
   page = 'MA==',
   perPage = 20,
-  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment'],
+  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   rootEntries = true,
   searchTerm = '',
   sort = 'desc',
@@ -95,7 +95,7 @@ export const getDiscussionQueryMock = ({
           }
           return Discussion.mock({
             author: User.mock({
-              courseRoles: ['TeacherEnrollment', 'TaEnrollment'],
+              courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
               id: 'role-user'
             })
           })
@@ -116,7 +116,7 @@ export const getDiscussionSubentriesQueryMock = ({
   includeRelativeEntry = null,
   last = null,
   relativeEntryId = null,
-  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment'],
+  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   sort = 'asc',
   shouldError = false
 } = {}) => [
@@ -326,7 +326,8 @@ export const createDiscussionEntryMock = ({
   message = '',
   replyFromEntryId = null,
   fileId = null,
-  includeReplyPreview = null
+  includeReplyPreview = null,
+  isAnonymousAuthor = null
 } = {}) => [
   {
     request: {
@@ -336,15 +337,16 @@ export const createDiscussionEntryMock = ({
         message,
         ...(replyFromEntryId !== null && {replyFromEntryId}),
         ...(fileId !== null && {fileId}),
-        ...(includeReplyPreview !== null && {includeReplyPreview})
+        ...(includeReplyPreview !== null && {includeReplyPreview}),
+        ...(isAnonymousAuthor !== null && {isAnonymousAuthor})
       }
     },
     result: {
       data: {
         createDiscussionEntry: {
           discussionEntry: DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-1337`),
-            _id: '1337',
+            id: btoa(`DiscussionEntry-1`),
+            _id: '1',
             message
           }),
           __typename: 'CreateDiscussionEntryPayload'

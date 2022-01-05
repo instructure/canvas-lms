@@ -97,8 +97,8 @@ describe('AssignmentDetails', () => {
     it('displays due date when there are no overrides', () => {
       const {queryByText} = setup()
       expect(queryByText('Everyone')).toBeTruthy()
-      expect(queryByText('Due Mar 31 5:59am')).toBeTruthy()
-      expect(queryByText('Available from Mar 24 until Apr 4')).toBeTruthy()
+      expect(queryByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
+      expect(queryByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
     })
 
     it('displays "Show due dates" button when there are overrides', () => {
@@ -111,7 +111,7 @@ describe('AssignmentDetails', () => {
       expect(queryByText('Show Due Dates (4)')).toBeTruthy()
       fireEvent.click(queryByText('Show Due Dates (4)'))
       expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
-      expect(await findByText('Sep 4 5:59am')).toBeTruthy()
+      expect(await findByText('Sep 4, 2021 5:59am')).toBeTruthy()
     })
 
     it('correct text is shown when a date is not set', async () => {

@@ -20,34 +20,26 @@ import assert from 'assert'
 import sinon from 'sinon'
 import normalizeProps from '../../src/rce/normalizeProps'
 
-class MockMutationObserver {
-  observer() {}
-}
-
 describe('Rce normalizeProps', () => {
-  let props,
-    tinymce = {}
+  let props
+  const tinymce = {}
   beforeEach(() => {
     props = {editorOptions: sinon.stub().returns({})}
   })
 
   it('calls editorOptions with provided tinymce', () => {
-    normalizeProps(props, tinymce, MockMutationObserver)
+    normalizeProps(props, tinymce)
     assert.ok(props.editorOptions.calledWith(tinymce))
   })
 
   it('sets tinymce as provided, even over prop', () => {
     const otherMCE = {}
-    const normalized = normalizeProps({...props, tinymce: otherMCE}, tinymce, MockMutationObserver)
+    const normalized = normalizeProps({...props, tinymce: otherMCE}, tinymce)
     assert.equal(normalized.tinymce, tinymce)
   })
 
   it('retains other props', () => {
-    const normalized = normalizeProps(
-      {...props, textareaId: 'textareaId'},
-      tinymce,
-      MockMutationObserver
-    )
+    const normalized = normalizeProps({...props, textareaId: 'textareaId'}, tinymce)
     assert.equal(normalized.textareaId, 'textareaId')
   })
 })

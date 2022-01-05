@@ -107,4 +107,20 @@ describe Types::QueryType do
       end
     end
   end
+
+  context "LearningOutcome" do
+    it "works" do
+      @course = Course.create! name: "TEST"
+      @admin = account_admin_user(account: @course.account)
+
+      outcome_with_rubric(context: @course)
+
+      expect(
+        CanvasSchema.execute(
+          "{ learningOutcome(id: #{@outcome.id}) { _id } }",
+          context: { current_user: @admin }
+        ).dig("data", "learningOutcome", "_id")
+      ).to eq @outcome.id.to_s
+    end
+  end
 end

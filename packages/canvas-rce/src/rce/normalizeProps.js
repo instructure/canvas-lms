@@ -18,9 +18,9 @@
 
 import wrapInitCb from './wrapInitCb'
 
-export default function (props, tinymce, MutationObserver) {
+export default function (props, tinymce) {
   const initialEditorOptions = props.editorOptions(tinymce)
-  const editorOptions = wrapInitCb(props.mirroredAttrs, initialEditorOptions, MutationObserver)
+  const editorOptions = wrapInitCb(props.mirroredAttrs, initialEditorOptions)
 
   return {
     // other props, including overrides

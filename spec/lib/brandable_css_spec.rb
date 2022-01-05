@@ -21,7 +21,7 @@
 describe BrandableCSS do
   describe "all_brand_variable_values" do
     it "returns defaults if called without a brand config" do
-      expect(BrandableCSS.all_brand_variable_values["ic-link-color"]).to eq "#008EE2"
+      expect(BrandableCSS.all_brand_variable_values["ic-link-color"]).to eq "#0374B5"
     end
 
     it "includes image_url asset path for default images" do
@@ -76,7 +76,7 @@ describe BrandableCSS do
       end
 
       it "includes default variables not found in brand config" do
-        expect(@brand_variables["ic-link-color"]).to eq "#008EE2"
+        expect(@brand_variables["ic-link-color"]).to eq "#0374B5"
       end
     end
   end
@@ -100,7 +100,7 @@ describe BrandableCSS do
   describe "default_json" do
     it "includes default variables not found in brand config" do
       brand_variables = JSON.parse(BrandableCSS.default("json"))
-      expect(brand_variables["ic-link-color"]).to eq "#008EE2"
+      expect(brand_variables["ic-link-color"]).to eq "#0374B5"
     end
 
     it "has high contrast overrides for link and brand-primary" do

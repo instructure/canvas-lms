@@ -99,11 +99,11 @@ class OutcomeProficiency < ApplicationRecord
 
   def self.default_ratings
     ratings = []
-    ratings << { description: I18n.t("Exceeds Mastery"), points: 4, mastery: false, color: "008EE2" }
-    ratings << { description: I18n.t("Mastery"), points: 3, mastery: true, color: "00AC18" }
+    ratings << { description: I18n.t("Exceeds Mastery"), points: 4, mastery: false, color: "0374B5" }
+    ratings << { description: I18n.t("Mastery"), points: 3, mastery: true, color: "0B874B" }
     ratings << { description: I18n.t("Near Mastery"), points: 2, mastery: false, color: "FAB901" }
     ratings << { description: I18n.t("Below Mastery"), points: 1, mastery: false, color: "D97900" }
-    ratings << { description: I18n.t("No Evidence"), points: 0, mastery: false, color: "EE0612" }
+    ratings << { description: I18n.t("No Evidence"), points: 0, mastery: false, color: "E0061F" }
     ratings
   end
 

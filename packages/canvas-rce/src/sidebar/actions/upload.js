@@ -17,7 +17,7 @@
  */
 
 import {saveMediaRecording} from '@instructure/canvas-media'
-import {headerFor, originFromHost} from '../sources/api'
+import {headerFor, originFromHost} from '../../rcs/api'
 import * as files from './files'
 import * as images from './images'
 import bridge from '../../bridge'

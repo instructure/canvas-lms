@@ -20,13 +20,13 @@
 # NOTE: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
-  gem "rails", "6.0.4.1"
+  gem "rails", "6.0.4.2"
     gem "tzinfo", "1.2.7"
   gem "switchman", "2.2.2"
     gem "guardrail", "2.0.1"
   gem "switchman-inst-jobs", "3.2.7"
 else
-  gem "rails", "6.1.4.1"
+  gem "rails", "6.1.4.2"
     gem "tzinfo", "2.0.4"
   gem "switchman", "3.0.5"
     gem "guardrail", "3.0.0"
