@@ -506,20 +506,19 @@ class CalendarEventsApiController < ApplicationController
       # Create duplicates if necessary
       events = []
       dup_options = get_duplicate_params(params[:calendar_event])
-      if dup_options[:count] > 0
-        events += create_event_and_duplicates(dup_options)
-      else
-        events = [@event]
-      end
-
-      return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
       if dup_options[:count] > RECURRING_EVENT_LIMIT
         return render json: {
           message: t("only a maximum of %{limit} events can be created",
                      limit: RECURRING_EVENT_LIMIT)
         }, status: :bad_request
+      elsif dup_options[:count] > 0
+        events += create_event_and_duplicates(dup_options)
+      else
+        events = [@event]
       end
+
+      return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
       CalendarEvent.transaction do
         error = events.detect { |event| !event.save }
