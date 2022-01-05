@@ -9372,6 +9372,46 @@ QUnit.module('Gradebook', () => {
       })
     })
 
+    QUnit.module('setting scrollable columns', contextHooks => {
+      contextHooks.beforeEach(() => {
+        createAndInitGradebook({final_grade_override_enabled: true})
+        gradebook.courseSettings.setAllowFinalGradeOverride(true)
+      })
+
+      test('does not throw an error if the assignment group definition is not yet loaded', () => {
+        gradebook.gridData.columns.definitions.assignment_group_2201 = undefined
+        let errorThrown = false
+        try {
+          gradebook.setVisibleGridColumns()
+        } catch {
+          errorThrown = true
+        }
+        notOk(errorThrown)
+      })
+
+      test('does not throw an error if the total grade definition is not yet loaded', () => {
+        gradebook.gridData.columns.definitions.total_grade = undefined
+        let errorThrown = false
+        try {
+          gradebook.setVisibleGridColumns()
+        } catch {
+          errorThrown = true
+        }
+        notOk(errorThrown)
+      })
+
+      test('does not throw an error if the total grade override definition is not yet loaded', () => {
+        gradebook.gridData.columns.definitions.total_grade_override = undefined
+        let errorThrown = false
+        try {
+          gradebook.setVisibleGridColumns()
+        } catch {
+          errorThrown = true
+        }
+        notOk(errorThrown)
+      })
+    })
+
     QUnit.module('when the "Total Grade Override" column is used', contextHooks => {
       contextHooks.beforeEach(() => {
         createAndInitGradebook({final_grade_override_enabled: true})

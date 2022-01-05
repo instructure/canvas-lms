@@ -22,6 +22,7 @@ import {intersection} from 'lodash'
 import tz from '@canvas/timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
@@ -164,11 +165,9 @@ class Gradebook extends React.Component {
       modules: [],
       assignmentGroups: [],
       sections: this.sections_enabled ? this.options.sections.map(htmlEscape) : [],
-      filters: [],
       isEssentialDataLoaded: false
     }
     this.gradebookSettingsModalButton = React.createRef()
-    this.onChangeFilters = this.onChangeFilters.bind(this)
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
     this.bindGridEvents = this.bindGridEvents.bind(this)
@@ -1269,7 +1268,7 @@ class Gradebook extends React.Component {
 
     const assignmentGroupIds = findAllAppliedFilterValuesOfType(
       'assignment-group',
-      this.state.filters
+      this.props.filters
     )
     return (
       assignmentGroupIds.length === 0 || assignmentGroupIds.includes(assignment.assignment_group_id)
@@ -1295,12 +1294,12 @@ class Gradebook extends React.Component {
       )
     }
 
-    const moduleIds = findAllAppliedFilterValuesOfType('module', this.state.filters)
+    const moduleIds = findAllAppliedFilterValuesOfType('module', this.props.filters)
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
   }
 
   filterAssignmentByStartDate(assignment) {
-    const date = findAllAppliedFilterValuesOfType('start-date', this.state.filters)[0]
+    const date = findAllAppliedFilterValuesOfType('start-date', this.props.filters)[0]
     if (!date) {
       return true
     }
@@ -1310,7 +1309,7 @@ class Gradebook extends React.Component {
   }
 
   filterAssignmentByEndDate(assignment) {
-    const date = findAllAppliedFilterValuesOfType('end-date', this.state.filters)[0]
+    const date = findAllAppliedFilterValuesOfType('end-date', this.props.filters)[0]
     if (!date) {
       return true
     }
@@ -2528,19 +2527,27 @@ class Gradebook extends React.Component {
     })
     if (!this.hideAggregateColumns()) {
       for (assignmentGroupId in this.assignmentGroups) {
-        scrollableColumns.push(
+        const column =
           this.gridData.columns.definitions[getAssignmentGroupColumnId(assignmentGroupId)]
-        )
+        if (column) {
+          scrollableColumns.push(column)
+        }
       }
       if (this.getColumnOrder().freezeTotalGrade) {
         if (!parentColumnIds.includes('total_grade')) {
           parentColumnIds.push('total_grade')
         }
       } else {
-        scrollableColumns.push(this.gridData.columns.definitions.total_grade)
+        const column = this.gridData.columns.definitions.total_grade
+        if (column) {
+          scrollableColumns.push(column)
+        }
       }
       if (this.courseSettings.allowFinalGradeOverride) {
-        scrollableColumns.push(this.gridData.columns.definitions.total_grade_override)
+        const column = this.gridData.columns.definitions.total_grade_override
+        if (column) {
+          scrollableColumns.push(column)
+        }
       }
     }
     if ((ref1 = this.gradebookColumnOrderSettings) != null ? ref1.sortType : undefined) {
@@ -4668,7 +4675,7 @@ class Gradebook extends React.Component {
     this.onShow()
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
       prevProps.isModulesLoading !== this.props.isModulesLoading &&
       !this.props.isModulesLoading
@@ -4676,10 +4683,10 @@ class Gradebook extends React.Component {
       this.updateContextModules(this.props.modules)
     }
 
-    if (prevState.filters !== this.state.filters) {
+    if (prevProps.filters !== this.props.filters) {
       this.updateColumns()
 
-      const sectionIds = findAllAppliedFilterValuesOfType('section', this.state.filters)
+      const sectionIds = findAllAppliedFilterValuesOfType('section', this.props.filters)
       if (sectionIds.length > 0) {
         this.updateCurrentSection(sectionIds[0])
       } else {
@@ -4688,13 +4695,22 @@ class Gradebook extends React.Component {
     }
   }
 
-  onChangeFilters(filters) {
-    this.setState({filters})
-  }
-
   render() {
     return (
       <>
+        <Portal node={this.props.flashMessageContainer}>
+          {this.props.flashAlerts.map(alert => (
+            <div key={alert.key} id={alert.key} className="Gradebook__FlashMessage">
+              {/* eslint-disable-next-line react/jsx-pascal-case */}
+              <FlashAlert.default
+                message={alert.message}
+                onClose={() => document.getElementById(alert.key).remove()}
+                timeout={5000}
+                variant={alert.variant}
+              />
+            </div>
+          ))}
+        </Portal>
         <Portal node={this.props.settingsModalButtonContainer}>
           <Button
             renderIcon={IconSettingsSolid}
@@ -4717,20 +4733,54 @@ class Gradebook extends React.Component {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
-        {this.options.enhanced_gradebook_filters && this.state.isEssentialDataLoaded && (
-          <Portal node={this.props.filterNavNode}>
-            <FilterNav
-              filters={this.state.filters}
-              onChange={this.onChangeFilters}
-              modules={this.state.modules}
-              assignmentGroups={this.state.assignmentGroups}
-              sections={this.state.sections}
-            />
-          </Portal>
-        )}
+        {this.options.enhanced_gradebook_filters &&
+          !this.props.isFiltersLoading &&
+          this.state.isEssentialDataLoaded && (
+            <Portal node={this.props.filterNavNode}>
+              <FilterNav
+                filters={this.props.filters}
+                onChange={this.props.onFiltersChange}
+                modules={this.state.modules}
+                assignmentGroups={this.state.assignmentGroups}
+                sections={this.state.sections}
+              />
+            </Portal>
+          )}
       </>
     )
   }
+}
+
+Gradebook.propTypes = {
+  filterNavNode: PropTypes.instanceOf(Element).isRequired,
+  filters: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      conditions: PropTypes.array.isRequired,
+      isApplied: PropTypes.bool.isRequired,
+      createdAt: PropTypes.string.isRequired
+    })
+  ),
+  flashAlerts: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+      variant: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  flashMessageContainer: PropTypes.instanceOf(Element).isRequired,
+  gridColorNode: PropTypes.instanceOf(Element).isRequired,
+  isFiltersLoading: PropTypes.bool.isRequired,
+  isModulesLoading: PropTypes.bool.isRequired,
+  modules: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  onFiltersChange: PropTypes.func.isRequired,
+  settingsModalButtonContainer: PropTypes.instanceOf(Element).isRequired
 }
 
 Gradebook.prototype.hasSections = $.Deferred()
