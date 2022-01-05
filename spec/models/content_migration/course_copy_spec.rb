@@ -872,5 +872,20 @@ describe ContentMigration do
       new_late_policy = @copy_to.late_policy
       expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
     end
+
+    it "does not copy over late policy if other settings won't be imported" do
+      @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
+      @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 10.0, late_submission_interval: "day")
+      @cm = ContentMigration.create!(
+        context: @copy_to,
+        user: @user,
+        source_course: @copy_from,
+        migration_type: "course_copy_importer",
+        copy_options: { everything: false }
+      )
+      run_course_copy
+      new_late_policy = @copy_to.late_policy
+      expect(new_late_policy.late_submission_deduction).to eq 10.0
+    end
   end
 end
