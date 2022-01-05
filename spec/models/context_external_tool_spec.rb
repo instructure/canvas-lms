@@ -455,11 +455,53 @@ describe ContextExternalTool do
     end
   end
 
-  describe "#hash_identity" do
+  describe "#calculate_identity_hash" do
     it "calculates an identity hash" do
       tool = external_tool_model
-      expect { tool.hash_identity }.not_to raise_error
-      expect(tool.hash_identity).to be_kind_of(String)
+      expect { tool.calculate_identity_hash }.not_to raise_error
+      expect(tool.calculate_identity_hash).to be_kind_of(String)
+    end
+
+    it "reordering settings creates the same identity_hash" do
+      tool1 = external_tool_model(context: @course, opts: { name: "t", consumer_key: "12345", shared_secret: "secret", url: "http://google.com/launch_url" })
+      tool1.update(settings: { selection_width: 100, selection_height: 100, icon_url: "http://www.example.com/favicon.ico" })
+
+      tool2 = external_tool_model(context: @course, opts: { name: "t", consumer_key: "12345", shared_secret: "secret", url: "http://google.com/launch_url" })
+      tool2.update(settings: { icon_url: "http://www.example.com/favicon.ico", selection_height: 100, selection_width: 100 })
+      expect(tool1.calculate_identity_hash).to eq tool2.calculate_identity_hash
+    end
+
+    it "changing the settings creates a different identity_hash" do
+      tool1 = external_tool_model(context: @course, opts: { name: "t", consumer_key: "12345", shared_secret: "secret", url: "http://google.com/launch_url" })
+      tool1.update(settings: { selection_width: 100, selection_height: 100, icon_url: "http://www.example.com/favicon.ico" })
+
+      tool2 = external_tool_model(context: @course, opts: { name: "t", consumer_key: "12345", shared_secret: "secret", url: "http://google.com/launch_url" })
+      tool2.update(settings: { selection_width: 100, selection_height: 100 })
+      expect(tool1.calculate_identity_hash).not_to eq tool2.calculate_identity_hash
+    end
+  end
+
+  describe "add_identity_hash" do
+    it "adds 'duplicate' as the identity_hash if another tool already exists with that hash" do
+      external_tool_model(context: @course)
+      tool2 = external_tool_model(context: @course)
+      expect(tool2.identity_hash).to eq "duplicate"
+    end
+
+    it "doesn't recalculate the identity field if none of the important fields have changed" do
+      tool = external_tool_model
+      ident_hash = tool.identity_hash
+      expect(tool).not_to receive(:calculate_identity_hash)
+      tool.update(updated_at: Time.zone.now)
+      expect(tool.identity_hash).to eq ident_hash
+    end
+
+    it "does recalculate the identity field if one of the important fields has changed" do
+      tool = external_tool_model
+      ident_hash = tool.identity_hash
+      expect(tool).to receive(:calculate_identity_hash)
+      tool.update(name: "differenter_name")
+      expect(tool.identity_hash).not_to eq ident_hash
     end
   end
 
