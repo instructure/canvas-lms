@@ -345,4 +345,24 @@ describe('IsolatedThreadsContainer', () => {
       expect(window.IntersectionObserver).toHaveBeenCalledTimes(2)
     })
   })
+
+  it('Go To Quoted Reply should work', () => {
+    const onOpenIsolatedView = jest.fn()
+    const props = defaultProps({
+      discussionEntryOverrides: {
+        rootEntryId: '50',
+        quotedEntry: {
+          ...DiscussionEntry.mock({_id: '100'}),
+          previewMessage: '<p>This is the quoted reply</p>'
+        }
+      },
+      overrides: {onOpenIsolatedView}
+    })
+    const {getByTestId, queryByText} = setup(props)
+
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    fireEvent.click(queryByText('Go To Quoted Reply'))
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', '50', false, '100')
+  })
 })

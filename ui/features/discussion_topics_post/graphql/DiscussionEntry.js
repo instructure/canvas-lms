@@ -59,6 +59,7 @@ export const DiscussionEntry = {
       isolatedEntryId
       parentId
       quotedEntry {
+        _id
         createdAt
         previewMessage
         author {

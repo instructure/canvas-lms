@@ -364,6 +364,18 @@ const IsolatedThreadContainer = props => {
                           )
                         }}
                         goToTopic={props.goToTopic}
+                        goToQuotedReply={
+                          props.discussionEntry.quotedEntry !== null
+                            ? () => {
+                                props.onOpenIsolatedView(
+                                  props.discussionEntry.rootEntryId,
+                                  props.discussionEntry.rootEntryId,
+                                  false,
+                                  props.discussionEntry.quotedEntry._id
+                                )
+                              }
+                            : null
+                        }
                         onReport={
                           ENV?.student_reporting_enabled &&
                           props.discussionTopic.permissions?.studentReporting

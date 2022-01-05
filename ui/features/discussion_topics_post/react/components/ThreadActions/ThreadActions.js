@@ -30,7 +30,8 @@ import {
   IconSpeedGraderLine,
   IconMarkAsReadSolid,
   IconMarkAsReadLine,
-  IconWarningBorderlessSolid
+  IconWarningBorderlessSolid,
+  IconReplyAll2Line
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -48,6 +49,7 @@ export const ThreadActions = props => {
       onToggleUnread: props.onToggleUnread,
       goToTopic: props.goToTopic,
       goToParent: props.goToParent,
+      goToQuotedReply: props.goToQuotedReply,
       onEdit: props.onEdit,
       onDelete: props.onDelete,
       onOpenInSpeedGrader: props.onOpenInSpeedGrader,
@@ -152,6 +154,14 @@ const getMenuConfigs = props => {
       selectionCallback: props.goToParent
     })
   }
+  if (props.goToQuotedReply) {
+    options.push({
+      key: 'toQuotedReply',
+      icon: <IconReplyAll2Line />,
+      label: I18n.t('Go To Quoted Reply'),
+      selectionCallback: props.goToQuotedReply
+    })
+  }
   if (props.onEdit) {
     options.push({
       key: 'edit',
@@ -228,6 +238,7 @@ ThreadActions.propTypes = {
   isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,
   goToParent: PropTypes.func,
+  goToQuotedReply: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
