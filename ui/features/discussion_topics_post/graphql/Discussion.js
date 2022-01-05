@@ -53,7 +53,7 @@ export const Discussion = {
       subscribed
       published
       canUnpublish
-      canReplyAnonymously(courseId: $courseID)
+      canReplyAnonymously
       lockAt
       availableForUser
       entryCounts {
