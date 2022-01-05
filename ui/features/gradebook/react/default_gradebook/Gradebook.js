@@ -1366,6 +1366,7 @@ class Gradebook extends React.Component {
       ref1 = studentSubmissionGroup.submissions
       for (k = 0, len1 = ref1.length; k < len1; k++) {
         submission = ref1[k]
+        submission.posted_at = tz.parse(submission.posted_at)
         ensureAssignmentVisibility(this.getAssignment(submission.assignment_id), submission)
         submissions.push(submission)
         this.updateSubmission(submission)
@@ -1412,6 +1413,7 @@ class Gradebook extends React.Component {
     const changedStudentIds = []
     for (let j = 0, len = submissions.length; j < len; j++) {
       const submission = submissions[j]
+      submission.posted_at = tz.parse(submission.posted_at)
       student = this.student(submission.user_id)
       if (!student) {
         // if the student isn't loaded, we don't need to update it
