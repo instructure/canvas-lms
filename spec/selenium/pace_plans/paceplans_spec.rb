@@ -132,13 +132,6 @@ describe "pace plan page" do
       expect(publish_status_exists?).to be_falsey
     end
 
-    it "has Publish and Cancel buttons initially disabled" do
-      visit_pace_plans_page
-
-      expect(publish_button).to be_disabled
-      expect(cancel_button).to be_disabled
-    end
-
     it "updates duration to make Publish and Cancel buttons enabled" do
       visit_pace_plans_page
 
