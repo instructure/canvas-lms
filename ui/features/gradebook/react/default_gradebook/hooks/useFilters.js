@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,40 +17,43 @@
  */
 
 import {useState, useEffect} from 'react'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import I18n from 'i18n!gradebook'
 
-const useModules = (dispatch, courseId, contextModulesPerPage, enabled = true) => {
-  const [loading, setLoading] = useState(true)
+const useFilters = (courseId, filtersEnabled) => {
+  const [loading, setLoading] = useState(filtersEnabled)
   const [errors, setErrors] = useState([])
   const [data, setData] = useState([])
 
   useEffect(() => {
-    const params = {per_page: contextModulesPerPage}
-    const url = `/api/v1/courses/${courseId}/modules`
-    if (enabled) {
-      setLoading(true)
-      dispatch
-        .getDepaginated(url, params)
-        .then(contextModules => {
-          setData(contextModules)
+    const path = `/api/v1/courses/${courseId}/gradebook_filters`
+    if (filtersEnabled) {
+      doFetchApi({path})
+        .then(response => {
+          const filters = response.json.map(({gradebook_filter: filter}) => ({
+            id: filter.id,
+            label: filter.name,
+            conditions: filter.payload.conditions || [],
+            isApplied: !!filter.payload.isApplied,
+            createdAt: filter.created_at
+          }))
+          setData(filters)
           setLoading(false)
         })
         .catch(() => {
           setErrors([
             {
-              key: 'modules-loading-error',
-              message: I18n.t('There was an error fetching modules.'),
+              key: 'filters-loading-error',
+              message: I18n.t('There was an error fetching gradebook filters.'),
               variant: 'error'
             }
           ])
           setLoading(false)
         })
-    } else {
-      setLoading(false)
     }
-  }, [enabled, contextModulesPerPage, dispatch, courseId])
+  }, [courseId, filtersEnabled])
 
-  return {loading, errors, data}
+  return {loading, errors, data, setData}
 }
 
-export default useModules
+export default useFilters
