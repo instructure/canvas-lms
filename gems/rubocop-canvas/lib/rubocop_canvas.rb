@@ -45,6 +45,7 @@ require "rubocop_canvas/cops/migration/add_foreign_key"
 require "rubocop_canvas/cops/migration/execute"
 require "rubocop_canvas/cops/migration/change_column"
 require "rubocop_canvas/cops/migration/rename_table"
+require "rubocop_canvas/cops/migration/add_index"
 ## specs
 require "rubocop_canvas/cops/specs/no_before_once_stubs"
 require "rubocop_canvas/cops/specs/no_disable_implicit_wait"
