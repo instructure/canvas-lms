@@ -60,4 +60,52 @@ describe ImmersiveReaderController do
       )
       .once
   end
+
+  context "when the token request fails" do
+    let_once(:user) { user_model }
+
+    let(:response_body) { { error_description: "Some error" }.to_json }
+
+    before do
+      stub_request(
+        :post,
+        "https://login.windows.net/faketenantid/oauth2/token"
+      ).to_return(
+        status: 401,
+        body: response_body,
+        headers: {}
+      )
+
+      user_session(user)
+
+      allow(controller).to receive(:ir_config).and_return(
+        {
+          ir_tenant_id: "faketenantid",
+          ir_client_id: "fakeclientid",
+          ir_client_secret: "fakesecret",
+          ir_subdomain: "fakesub"
+        }
+      )
+    end
+
+    shared_examples_for "contexts_with_a_captured_exception" do
+      it "captures the error" do
+        expect(Canvas::Errors).to receive(:capture_exception).with(
+          :immersive_reader,
+          instance_of(ImmersiveReaderController::ServiceError),
+          :warn
+        )
+
+        get "authenticate"
+      end
+    end
+
+    it_behaves_like "contexts_with_a_captured_exception"
+
+    context "and the response has an empty body" do
+      let(:response_body) { "" }
+
+      it_behaves_like "contexts_with_a_captured_exception"
+    end
+  end
 end

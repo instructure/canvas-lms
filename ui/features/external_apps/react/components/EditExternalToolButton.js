@@ -29,6 +29,7 @@ import Lti2Edit from './Lti2Edit'
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
+    canEdit: PropTypes.bool.isRequired,
     canAddEdit: PropTypes.bool.isRequired,
     returnFocus: PropTypes.func.isRequired
   }
@@ -37,6 +38,7 @@ export default class EditExternalToolButton extends React.Component {
     tool: this.props.tool,
     modalIsOpen: false
   }
+
   editButton = React.createRef()
 
   setContextExternalToolState = data => {
@@ -149,7 +151,7 @@ export default class EditExternalToolButton extends React.Component {
   }
 
   render() {
-    if (this.props.canAddEdit) {
+    if (this.props.canEdit || this.props.canAddEdit) {
       const editAriaLabel = I18n.t('Edit %{toolName} App', {toolName: this.state.tool.name})
 
       return (

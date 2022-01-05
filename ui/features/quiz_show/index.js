@@ -24,17 +24,18 @@ import '@canvas/message-students-dialog/jquery/message_students'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/module-sequence-footer'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
+import ready from '@instructure/ready'
 
-const lockManager = new LockManager()
-lockManager.init({itemType: 'quiz', page: 'show'})
+ready(() => {
+  const lockManager = new LockManager()
+  lockManager.init({itemType: 'quiz', page: 'show'})
 
-$(() => {
   inputMethods.setWidths()
-  $('.answer input[type=text]').each(function() {
+  $('.answer input[type=text]').each(function () {
     $(this).width(($(this).val().length || 11) * 9.5)
   })
 
-  $('.download_submissions_link').click(function(event) {
+  $('.download_submissions_link').click(function (event) {
     event.preventDefault()
     INST.downloadSubmissions($(this).attr('href'))
   })

@@ -2843,6 +2843,26 @@ describe CoursesController do
       expect(@course.default_wiki_editing_roles).to eq new_permissions
       expect(wiki_page.editing_roles).to eq new_permissions
     end
+
+    it "does not attempt to sync k5 homeroom to course if sync_enrollments_from_homeroom is falsey" do
+      teacher = @teacher
+      subject = @course
+      toggle_k5_setting(subject.account, true)
+      homeroom = course_factory(active_all: true, account: subject.account)
+      homeroom.enroll_teacher(teacher, enrollment_state: :active)
+      homeroom.homeroom_course = true
+      homeroom.restrict_enrollments_to_course_dates = true
+      homeroom.save!
+      subject.homeroom_course_id = homeroom.id
+      subject.save!
+
+      user_session(teacher)
+      put "update", params: { id: subject.id, course: { name: "something new", sync_enrollments_from_homeroom: "0", homeroom_course_id: homeroom.id } }
+      run_jobs
+
+      # if the sync job runs, we'll know because restrict_enrollments_to_course_dates will be synced as true
+      expect(subject.reload.restrict_enrollments_to_course_dates).to be_falsey
+    end
   end
 
   describe "POST 'unconclude'" do
@@ -3606,35 +3626,6 @@ describe CoursesController do
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
-    it "sets pagination total_pages/last page link if account setting enabled" do
-      user_session(teacher)
-      # need two pages or the first page will also be the last_page
-      student1
-      student2
-      account = course.root_account
-      account.settings[:allow_last_page_on_course_users] = true
-      account.save!
-
-      get "users", params: {
-        course_id: course.id,
-        format: "json",
-        enrollment_role: "StudentEnrollment",
-        per_page: 1
-      }
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
-
-      get "users", params: {
-        search_term: "us",
-        course_id: course.id,
-        format: "json",
-        enrollment_role: "StudentEnrollment",
-        per_page: 1
-      }
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
-    end
-
     it "only returns group_ids for active group memberships when requested" do
       user_session(teacher)
       get "users", params: {
@@ -4037,6 +4028,49 @@ describe CoursesController do
 
       get "show", params: { id: @course.id }
       expect(controller.visible_self_enrollment_option).to be_nil
+    end
+  end
+
+  describe "POST 'dismiss_migration_limitation_msg'" do
+    before do
+      course_with_teacher(name: "search teacher", active_all: true)
+      @quiz_migration_alert =
+        QuizMigrationAlert.create!(user_id: @teacher.id, course_id: @course.id, migration_id: "10000000000040")
+    end
+
+    context "when the current user has a quiz migration alert for the course" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "returns a successful response" do
+        post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        expect(response).to be_successful
+      end
+
+      it "destroys the quiz migration alert" do
+        expect do
+          post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        end.to change { @teacher.quiz_migration_alerts.count }.from(1).to(0)
+      end
+    end
+
+    context "when the current user does not have a quiz migration alert for the course" do
+      before do
+        other_user = user_model
+        user_session(other_user)
+      end
+
+      it "returns a not_found response" do
+        post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        expect(response).to be_not_found
+      end
+
+      it "does not destroy quiz migration alerts" do
+        expect do
+          post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        end.to not_change { QuizMigrationAlert.count }
+      end
     end
   end
 end

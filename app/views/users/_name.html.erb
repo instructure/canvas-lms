@@ -78,6 +78,11 @@
             <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
           <% end %>
 
+          <% if @user.grants_right?(@current_user, :manage_user_details) %>
+            <%= "|" unless first %><% first = false %>
+            <div style="display: inline;" id="suspend-reactivate-link"></div>
+          <% end %>
+
           <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
             <%= "|" unless first %><% first = false %>
             <% if @context && !@context.is_a?(Account) && !@context.is_a?(User) %>

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AnonymousUser} from './AnonymousUser'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {DiscussionEntryDraft} from './DiscussionEntryDraft'
@@ -38,13 +39,16 @@ export const DISCUSSION_QUERY = gql`
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
-        editor {
+        editor(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
-        author {
+        author(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        anonymousAuthor {
+          ...AnonymousUser
         }
         discussionEntriesConnection(
           after: $page
@@ -56,13 +60,16 @@ export const DISCUSSION_QUERY = gql`
         ) {
           nodes {
             ...DiscussionEntry
-            editor {
+            editor(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
-            author {
+            author(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            anonymousAuthor {
+              ...AnonymousUser
             }
           }
           pageInfo {
@@ -88,6 +95,7 @@ export const DISCUSSION_QUERY = gql`
     }
   }
   ${User.fragment}
+  ${AnonymousUser.fragment}
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
   ${DiscussionEntryDraft.fragment}
@@ -111,13 +119,16 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
         ...DiscussionEntry
-        editor {
+        editor(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
-        author {
+        author(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        anonymousAuthor {
+          ...AnonymousUser
         }
         discussionSubentriesConnection(
           after: $after
@@ -131,13 +142,16 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
         ) {
           nodes {
             ...DiscussionEntry
-            editor {
+            editor(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
-            author {
+            author(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            anonymousAuthor {
+              ...AnonymousUser
             }
           }
           pageInfo {
@@ -148,6 +162,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     }
   }
   ${User.fragment}
+  ${AnonymousUser.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
 `

@@ -24,13 +24,13 @@ if CANVAS_RAILS6_0
     gem "tzinfo", "1.2.7"
   gem "switchman", "2.2.2"
     gem "guardrail", "2.0.1"
-  gem "switchman-inst-jobs", "3.2.6"
+  gem "switchman-inst-jobs", "3.2.7"
 else
   gem "rails", "6.1.4.1"
     gem "tzinfo", "2.0.4"
   gem "switchman", "3.0.5"
     gem "guardrail", "3.0.0"
-  gem "switchman-inst-jobs", "4.0.2"
+  gem "switchman-inst-jobs", "4.0.3"
 end
   gem "irb", "1.3.5"
   gem "open4", "1.3.4", require: false
@@ -87,7 +87,7 @@ gem "inst_statsd", "2.2.0"
   gem "statsd-ruby", "1.4.0", require: false
   gem "aroi", "0.0.7", require: false
   gem "dogstatsd-ruby", "4.8.2"
-gem "inst-jobs", "3.0.5"
+gem "inst-jobs", "3.0.6"
   gem "fugit", "1.4.0", require: false
     gem "et-orbi", "1.2.4", require: false
 gem "inst-jobs-autoscaling", "2.1.1"
@@ -136,6 +136,7 @@ gem "simple_oauth", "0.3.1", require: false
 gem "twilio-ruby", "5.36.0", require: false
 gem "vault", "0.15.0", require: false
 gem "vericite_api", "1.5.3"
+gem "wcag_color_contrast", "0.1.0"
 gem "week_of_month", "1.2.5",
     github: "instructure/week-of-month", ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 gem "will_paginate", "3.3.0", require: false # required for folio-pagination

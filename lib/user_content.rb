@@ -25,7 +25,7 @@ module UserContent
   def self.escape(
     str,
     current_host = nil,
-    use_updated_math_rendering = Account.site_admin.feature_enabled?(:new_math_equation_handling)
+    use_updated_math_rendering = true
   )
     html = Nokogiri::HTML5.fragment(str)
     find_user_content(html) do |obj, uc|

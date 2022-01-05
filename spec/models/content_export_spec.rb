@@ -85,6 +85,46 @@ describe ContentExport do
       @course.root_account.save!
     end
 
+    describe "quiz migration alerts" do
+      context "new quizzes bank migrations is enabled" do
+        before do
+          @course.enable_feature!(:quizzes_next)
+          allow(@ce).to receive(:new_quizzes_bank_migration_enabled?).and_return(true)
+          allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_bank_migrations_enabled?).and_return(true)
+        end
+
+        it "creates a quiz migration alert for the user and course" do
+          expect do
+            @ce.export(synchronous: true)
+          end.to change { QuizMigrationAlert.count }
+            .from(0).to(1)
+            .and change { @user.quiz_migration_alerts.count }
+            .from(0).to(1)
+        end
+
+        it "does not crete multiple quiz migration alerts when 'export' runs multiple times" do
+          expect do
+            2.times do
+              @ce.export(synchronous: true)
+            end
+          end.to change { QuizMigrationAlert.count }
+            .from(0).to(1)
+            .and change { @user.quiz_migration_alerts.count }
+            .from(0).to(1)
+        end
+      end
+
+      context "new quizzes bank migrations is not enabled" do
+        before do
+          @course.enable_feature!(:quizzes_next)
+        end
+
+        it "does not produce quiz migration alerts" do
+          expect { @ce.export(synchronous: true) }.not_to change { QuizMigrationAlert.count }
+        end
+      end
+    end
+
     it "changes the workflow_state when :quizzes_next is enabled" do
       @course.enable_feature!(:quizzes_next)
       expect { @ce.export(synchronous: true) }.to change { @ce.workflow_state }
@@ -113,6 +153,19 @@ describe ContentExport do
       @course.enable_feature!(:quizzes_next)
       @ce.export(synchronous: true)
       expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
+    end
+
+    it "composes the payload with account banks flag if new_quizzes_bank_migration_enabled? returns true" do
+      @course.enable_feature!(:quizzes_next)
+      allow(@ce).to receive(:new_quizzes_bank_migration_enabled?).and_return(true)
+      @ce.export(synchronous: true)
+      expect(@ce.settings[:selected_content]["all_#{AssessmentQuestionBank.table_name}"]).to be true
+    end
+
+    it "composes the payload without account banks flag if new_quizzes_bank_migration_enabled? returns false" do
+      allow(@ce).to receive(:new_quizzes_bank_migration_enabled?).and_return(false)
+      @ce.export(synchronous: true)
+      expect(@ce.settings[:selected_content].class.to_s).to eq("Integer")
     end
 
     it "completes with export_type of 'quizzes2'" do

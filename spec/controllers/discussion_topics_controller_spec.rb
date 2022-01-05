@@ -269,6 +269,7 @@ describe DiscussionTopicsController do
       get "index", params: { course_id: @course.id }
       expect(assigns[:js_env][:student_reporting_enabled]).to be(true)
       expect(assigns[:js_env][:discussion_anonymity_enabled]).to be(true)
+      expect(assigns[:js_env][:FEATURE_FLAGS_URL]).to eq("/courses/#{@course.id}/settings#tab-features")
     end
   end
 
@@ -300,14 +301,26 @@ describe DiscussionTopicsController do
       expect(response.status).to equal(401)
     end
 
-    it "redirects full_anonymity discussions to index when react_discussions_post is turned off" do
+    it "redirects full_anonymity discussions to index when react_discussions_post is turned off(teacher)" do
       anon_topic = @course.discussion_topics.build(title: "some topic", anonymous_state: "full_anonymity")
       user_session(@teacher)
       anon_topic.save
       anon_topic.reload
       Account.site_admin.disable_feature! :react_discussions_post
       get("show", params: { course_id: @course.id, id: anon_topic.id })
-      expect(flash[:info]).to match(/Redesign feature flag turned on/)
+      expect(flash[:info]).to match(%r{Anonymous topics cannot be accessed without Discussions/Announcements Redesign feature preview enabled.})
+      expect(response).to be_redirect
+      expect(response.location).to eq course_discussion_topics_url @course
+    end
+
+    it "redirects full_anonymity discussions to index when react_discussions_post is turned off(student)" do
+      anon_topic = @course.discussion_topics.build(title: "some topic", anonymous_state: "full_anonymity")
+      user_session(@student)
+      anon_topic.save
+      anon_topic.reload
+      Account.site_admin.disable_feature! :react_discussions_post
+      get("show", params: { course_id: @course.id, id: anon_topic.id })
+      expect(flash[:info]).to match(/Anonymous topics are not available at this time./)
       expect(response).to be_redirect
       expect(response.location).to eq course_discussion_topics_url @course
     end
@@ -426,6 +439,26 @@ describe DiscussionTopicsController do
       before do
         course.enable_feature! :react_discussions_post
         user_session(user)
+      end
+
+      it "sets ATTACHMENTS_FOLDER_ID" do
+        subject
+
+        expect(discussion).not_to be_for_assignment
+        expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id
+      end
+
+      context "for_assignment" do
+        it "sets ATTACHMENTS_FOLDER_ID" do
+          discussion.assignment = course.assignments.build(submission_types: "discussion_topic", title: discussion.title)
+          discussion.assignment.infer_times
+          discussion.assignment.saved_by = :discussion_topic
+          discussion.save
+
+          subject
+          expect(discussion).to be_for_assignment
+          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq user.submissions_folder(discussion.course).id
+        end
       end
 
       context 'and "rce_mentions_in_discussions" enabled' do
@@ -1562,6 +1595,58 @@ describe DiscussionTopicsController do
         expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
+      end
+    end
+
+    describe "discussion anonymity" do
+      it "allows full_anonymity" do
+        Account.site_admin.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+        expect(DiscussionTopic.last).to be_anonymous
+      end
+
+      it "allows full_anonymity with course feature flag" do
+        @course.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+        expect(DiscussionTopic.last).to be_anonymous
+      end
+
+      it "allows partial_anonymity" do
+        Account.site_admin.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to eq "partial_anonymity"
+        expect(DiscussionTopic.last).to be_anonymous
+      end
+
+      it "nullifies anonymous_state when unaccounted for" do
+        Account.site_admin.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "thisisunaccountedfor" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to be_nil
+        expect(DiscussionTopic.last).not_to be_anonymous
+      end
+
+      it "nullifies anonymous_state when feature flag is OFF" do
+        Account.site_admin.disable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to be_nil
+        expect(DiscussionTopic.last).not_to be_anonymous
       end
     end
 

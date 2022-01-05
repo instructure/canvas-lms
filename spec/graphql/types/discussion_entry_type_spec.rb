@@ -62,6 +62,15 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
+  it "has an attachment" do
+    a = attachment_model
+    discussion_entry.attachment = a
+    discussion_entry.save!
+
+    expect(discussion_entry_type.resolve("attachment { _id }")).to eq discussion_entry.attachment.id.to_s
+    expect(discussion_entry_type.resolve("attachment { displayName }")).to eq discussion_entry.attachment.display_name
+  end
+
   it "queries the isolated entry id" do
     expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.parent_id.to_s
     sub_entry.update!(legacy: false)
@@ -83,6 +92,56 @@ describe Types::DiscussionEntryType do
       expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
       expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
       expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
+    end
+  end
+
+  context "anonymous discussions" do
+    before do
+      @anon_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                 message: "anonymous discussion",
+                                                 anonymous_state: "fully_anonymous",
+                                                 context: @course,
+                                                 user: @teacher)
+
+      @anon_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
+      @anon_discussion_entry_type = GraphQLTypeTester.new(@anon_discussion_entry, current_user: @teacher)
+
+      course_with_student(course: @course)
+      @anon_student_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Why, hello back to you!", user: @student, editor: @student)
+      @anon_student_discussion_entry_type = GraphQLTypeTester.new(@anon_student_discussion_entry, current_user: @teacher)
+    end
+
+    it "does not return the author" do
+      expect(@anon_discussion_entry_type.resolve("author { shortName }")).to eq nil
+    end
+
+    it "does not return the editor" do
+      expect(@anon_discussion_entry_type.resolve("editor { shortName }")).to eq nil
+    end
+
+    it "returns current_user for anonymousAuthor when the current user created the entry" do
+      expect(@anon_discussion_entry_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
+    end
+
+    it "returns anonymous short name for an anonymous author" do
+      student_in_course(active_all: true)
+      expect(GraphQLTypeTester.new(@anon_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to eq @anon_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.id.to_s(36)
+    end
+
+    it "returns the teacher author if a course id is provided" do
+      expect(@anon_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+    end
+
+    it "returns the teacher editor if a course id is provided" do
+      expect(@anon_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+    end
+
+    it "does not return the student author if a course id is provided" do
+      expect(@anon_student_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
+    end
+
+    it "does not return the student editor if a course id is provided" do
+      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
     end
   end
 
@@ -132,7 +191,7 @@ describe Types::DiscussionEntryType do
   it "allows querying for participant information" do
     expect(discussion_entry_type.resolve("entryParticipant { read }")).to eq true
     expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be_nil
-    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to be_nil
+    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to eq false
     expect(discussion_entry_type.resolve("entryParticipant { reportType }")).to be_nil
   end
 

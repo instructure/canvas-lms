@@ -383,6 +383,12 @@
     "details_a6f427c3": {
         "message": "Informacje szczegółowe:"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Diament"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Typ wymiaru"
+    },
     "dimensions_45ddb7b7": {
         "message": "Wymiary"
     },
@@ -553,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Informacje zwrotne"
+    },
+    "file_name_8fd421ff": {
+        "message": "Nazwa pliku"
     },
     "file_url_c12b64be": {
         "message": "Adres URL pliku"
@@ -839,6 +848,9 @@
     "multi_color_image_63d7372f": {
         "message": "Obraz wielokolorowy"
     },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Wymagane co najmniej { percentage }%"
+    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Wymagane co najmniej { width } x { height } px"
     },
@@ -974,8 +986,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Recenzja { itemTitle } innego uczestnika"
     },
+    "pentagon_17d82ea3": {
+        "message": "Pięciokąt"
+    },
     "people_b4ebb13c": {
         "message": "Ludzie"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Wartość procentowa"
+    },
+    "pixels_52ece7d1": {
+        "message": "Piksele"
     },
     "points_bceb5005": {
         "message": "punkty"

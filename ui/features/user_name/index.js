@@ -16,5 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ready from '@instructure/ready'
+import UserSuspendLink from './react/UserSuspendLink'
 import './jquery/index'
 import '@canvas/user-sortable-name'
+
+ready(() => {
+  const suspendPlaceholder = document.getElementById('suspend-reactivate-link')
+  if (suspendPlaceholder) ReactDOM.render(<UserSuspendLink />, suspendPlaceholder)
+})

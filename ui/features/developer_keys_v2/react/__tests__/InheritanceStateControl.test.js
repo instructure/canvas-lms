@@ -52,69 +52,107 @@ const getProps = (developerKey, store = false) => {
   }
 }
 
-it('uses the "off" state from the store', () => {
-  let key = sampleDeveloperKey({
-    developer_key_account_binding: {
-      'developer_key_id': '1',
-      'workflow_state': 'off',
-      'account_owns_binding': true,
-    }
+describe('InheritanceStateControl', () => {
+  let oldConfirmation = window.confirm
+
+  beforeEach(() => {
+    oldConfirmation = window.confirm
   })
-  const wrapper = mount(
-    <InheritanceStateControl
+
+  afterEach(() => {
+    window.confirm = oldConfirmation
+  })
+
+  it('uses the "off" state from the store', () => {
+    let key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        'developer_key_id': '1',
+        'workflow_state': 'off',
+        'account_owns_binding': true,
+      }
+    })
+    const wrapper = mount(
+      <InheritanceStateControl
+        {...getProps(key)}
+      />
+    )
+    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    expect(checkedBtn.value).toBe('off')
+  })
+  
+  it('uses the "on" state from the store', () => {
+    let key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        'developer_key_id': '1',
+        'workflow_state': 'on',
+        'account_owns_binding': true,
+      }
+    })
+    const wrapper = mount(
+      <InheritanceStateControl
+        {...getProps(key)}
+      />
+    )
+    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    expect(checkedBtn.value).toBe('on')
+  })
+  
+  it('renders "off" if "allow" is set as the workflow state for root account', () => {
+    const key = sampleDeveloperKey()
+    const wrapper = mount(
+      <InheritanceStateControl
       {...getProps(key)}
-    />
-  )
-  const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
-  expect(checkedBtn.value).toBe('off')
-})
-
-it('uses the "on" state from the store', () => {
-  let key = sampleDeveloperKey({
-    developer_key_account_binding: {
-      'developer_key_id': '1',
-      'workflow_state': 'on',
-      'account_owns_binding': true,
-    }
-  })
-  const wrapper = mount(
-    <InheritanceStateControl
-      {...getProps(key)}
-    />
-  )
-  const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
-  expect(checkedBtn.value).toBe('on')
-})
-
-it('renders "off" if "allow" is set as the workflow state for root account', () => {
-  const key = sampleDeveloperKey()
-  const wrapper = mount(
-    <InheritanceStateControl
-    {...getProps(key)}
-    />
-  )
-  const domNode = wrapper.find('input[checked=true]').getDOMNode()
-  expect(domNode.value).toBe('off')
-})
-
-it('updates the state when the RadioInput is clicked', () => {
-  const key = sampleDeveloperKey({
-    developer_key_account_binding: {
-      developer_key_id: '1',
-      workflow_state: 'on',
-      account_owns_binding: true
-    }
-  })
-  const store = storeCreator({
-    listDeveloperKeys: {
-      list: [key]
-    }
+      />
+    )
+    const domNode = wrapper.find('input[checked=true]').getDOMNode()
+    expect(domNode.value).toBe('off')
   })
 
-  render(<InheritanceStateControl {...getProps(key, store)} />)
-  const item = screen.getByText('Off')
-  fireEvent.click(item)
-  const updatedDevKey = store.getState()['listDeveloperKeys']['list'][0]
-  expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
-})
+  it('updates the state when the RadioInput is clicked', () => {
+    window.confirm = jest.fn(() => true)
 
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'on',
+        account_owns_binding: true
+      }
+    })
+    const store = storeCreator({
+      listDeveloperKeys: {
+        list: [key]
+      }
+    })
+
+    render(<InheritanceStateControl {...getProps(key, store)} />)
+    const item = screen.getByText('Off')
+    fireEvent.click(item)
+    const updatedDevKey = store.getState()['listDeveloperKeys']['list'][0]
+  
+    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+  })
+  
+  it('does nothing if cancel is clicked in the confirmation modal', () => {
+    window.confirm = jest.fn(() => false)
+  
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'on',
+        account_owns_binding: true
+      }
+    })
+    const store = storeCreator({
+      listDeveloperKeys: {
+        list: [key]
+      }
+    })
+  
+    render(<InheritanceStateControl {...getProps(key, store)} />)
+    const item = screen.getByText('Off')
+    fireEvent.click(item)
+    const devKeyFromStore = store.getState()['listDeveloperKeys']['list'][0]
+  
+    expect(devKeyFromStore.developer_key_account_binding.workflow_state).toBe('on')
+  })
+})

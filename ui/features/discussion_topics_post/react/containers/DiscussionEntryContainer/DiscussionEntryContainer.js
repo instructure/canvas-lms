@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
 import {CREATE_DISCUSSION_ENTRY_DRAFT} from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
@@ -65,7 +66,7 @@ export const DiscussionEntryContainer = props => {
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={props.editor ? props.editor.displayName : props.author.displayName}
+        deleterName={props.editor ? props.editor?.displayName : props.author?.displayName}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
@@ -73,6 +74,8 @@ export const DiscussionEntryContainer = props => {
       </DeletedPostMessage>
     )
   }
+
+  const hasAuthor = Boolean(props.author || props.anonymousAuthor)
 
   return (
     <Responsive
@@ -116,10 +119,11 @@ export const DiscussionEntryContainer = props => {
         <Flex direction="column">
           <Flex.Item shouldGrow shouldShrink overflowY="visible">
             <Flex direction={props.isTopic ? responsiveProps.direction : 'row'}>
-              {props.author && (
+              {hasAuthor && (
                 <Flex.Item shouldGrow shouldShrink padding={responsiveProps.authorInfo.padding}>
                   <AuthorInfo
                     author={props.author}
+                    anonymousAuthor={props.anonymousAuthor}
                     editor={props.editor}
                     isUnread={props.isUnread}
                     isForcedRead={props.isForcedRead}
@@ -134,10 +138,10 @@ export const DiscussionEntryContainer = props => {
               )}
               <Flex.Item
                 align={responsiveProps.postUtilities.align}
-                margin={props.author ? responsiveProps.postUtilities.margin : '0'}
+                margin={hasAuthor ? responsiveProps.postUtilities.margin : '0'}
                 overflowX="hidden"
                 overflowY="hidden"
-                shouldGrow={!props.author}
+                shouldGrow={!hasAuthor}
                 padding={responsiveProps.postUtilities.padding}
               >
                 {props.postUtilities}
@@ -146,7 +150,7 @@ export const DiscussionEntryContainer = props => {
           </Flex.Item>
           <Flex.Item
             padding={
-              props.author
+              hasAuthor
                 ? responsiveProps.postMessage.padding
                 : responsiveProps.postMessage.paddingNoAuthor
             }
@@ -156,6 +160,7 @@ export const DiscussionEntryContainer = props => {
           >
             {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
+              discussionAnonymousState={props.discussionTopic?.anonymousState}
               title={props.title}
               message={props.message}
               isEditing={props.isEditing}
@@ -193,6 +198,7 @@ DiscussionEntryContainer.propTypes = {
   isTopic: PropTypes.bool,
   postUtilities: PropTypes.node,
   author: User.shape,
+  anonymousAuthor: AnonymousUser.shape,
   children: PropTypes.node,
   title: PropTypes.string,
   discussionEntry: PropTypes.object,

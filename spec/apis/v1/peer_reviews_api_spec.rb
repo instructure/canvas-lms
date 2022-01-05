@@ -185,6 +185,7 @@ describe PeerReviewsApiController, type: :request do
                                       submission_id: @submission.id, section_id: @cs.id }
 
       @assessment_with_user = { "assessor" => { "id" => @student2.id,
+                                                "anonymous_id" => @student2.id.to_s(36),
                                                 "display_name" => "User",
                                                 "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
                                                 "pronouns" => nil,
@@ -194,6 +195,7 @@ describe PeerReviewsApiController, type: :request do
                                 "asset_type" => "Submission",
                                 "id" => @assessment_request.id,
                                 "user" => { "id" => @student1.id,
+                                            "anonymous_id" => @student1.id.to_s(36),
                                             "display_name" => "User",
                                             "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
                                             "pronouns" => nil,
@@ -230,6 +232,7 @@ describe PeerReviewsApiController, type: :request do
             "id" => comment.id,
             "author" => {
               "id" => @student2.id,
+              "anonymous_id" => @student2.id.to_s(36),
               "display_name" => @student2.name,
               "pronouns" => nil,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
@@ -358,6 +361,7 @@ describe PeerReviewsApiController, type: :request do
                                 "asset_type" => "Submission",
                                 "id" => @assessment_request.id,
                                 "user" => { "id" => @student1.id,
+                                            "anonymous_id" => @student1.id.to_s(36),
                                             "display_name" => "User",
                                             "pronouns" => nil,
                                             "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",

@@ -1132,6 +1132,7 @@ describe Course do
 
       it "grants create_tool_manually to the proper individuals" do
         course_with_teacher(active_all: true)
+        @course.root_account.disable_feature!(:granular_permissions_manage_lti)
         @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
@@ -1149,6 +1150,36 @@ describe Course do
         expect(@course.grants_right?(@ta, :create_tool_manually)).to be_truthy
         expect(@course.grants_right?(@designer, :create_tool_manually)).to be_truthy
         expect(@course.grants_right?(@student, :create_tool_manually)).to be_falsey
+      end
+
+      it "grants manage_lti_* to the proper individuals (granular permissions)" do
+        course_with_teacher(active_all: true)
+        @course.root_account.enable_feature!(:granular_permissions_manage_lti)
+        @teacher = user_factory(active_all: true)
+        @course.enroll_teacher(@teacher).accept!
+
+        @ta = user_factory(active_all: true)
+        @course.enroll_ta(@ta).accept!
+
+        @designer = user_factory(active_all: true)
+        @course.enroll_designer(@designer).accept!
+
+        @student = user_factory(active_all: true)
+        @course.enroll_student(@student).accept!
+
+        clear_permissions_cache
+        expect(@course.grants_right?(@teacher, :manage_lti_add)).to be_truthy
+        expect(@course.grants_right?(@ta, :manage_lti_add)).to be_truthy
+        expect(@course.grants_right?(@designer, :manage_lti_add)).to be_truthy
+        expect(@course.grants_right?(@student, :manage_lti_add)).to be_falsey
+        expect(@course.grants_right?(@teacher, :manage_lti_edit)).to be_truthy
+        expect(@course.grants_right?(@ta, :manage_lti_edit)).to be_truthy
+        expect(@course.grants_right?(@designer, :manage_lti_edit)).to be_truthy
+        expect(@course.grants_right?(@student, :manage_lti_edit)).to be_falsey
+        expect(@course.grants_right?(@teacher, :manage_lti_delete)).to be_truthy
+        expect(@course.grants_right?(@ta, :manage_lti_delete)).to be_truthy
+        expect(@course.grants_right?(@designer, :manage_lti_delete)).to be_truthy
+        expect(@course.grants_right?(@student, :manage_lti_delete)).to be_falsey
       end
 
       def make_date_completed
@@ -2668,7 +2699,7 @@ describe Course do
 
           it "returns the plugin names" do
             tabs = @course.tabs_available(@user)
-            expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba (Conferences)")
+            expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba")
           end
         end
 
@@ -6816,6 +6847,38 @@ describe Course do
     it "returns true when at least one not-deleted module exists" do
       @course.context_modules.create!
       expect(@course).to be_has_modules
+    end
+  end
+
+  describe "#create_or_update_quiz_migration_alert" do
+    before do
+      @course = Course.create!
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @content_migration = ContentMigration.create(context: @course)
+      @content_migration2 = ContentMigration.create(context: @course)
+    end
+
+    context "when there are not quiz migration alerts that belong to the provided user" do
+      it "creates a quiz migration alert" do
+        expect do
+          @course.create_or_update_quiz_migration_alert(@teacher.id, @content_migration)
+        end.to change { QuizMigrationAlert.count }.from(0).to(1)
+      end
+    end
+
+    context "when there are quiz migration alerts that belong to the provided user with a different migration_id" do
+      before do
+        @quiz_migration_alert =
+          QuizMigrationAlert.create(user_id: @teacher.id, course_id: @course.id, migration: @content_migration)
+      end
+
+      it "updates the migration_id on the quiz migration alert" do
+        expect do
+          @course.create_or_update_quiz_migration_alert(@teacher.id, @content_migration2)
+          @quiz_migration_alert.reload
+        end.to change { @quiz_migration_alert.migration }.from(@content_migration).to(@content_migration2)
+      end
     end
   end
 end

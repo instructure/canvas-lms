@@ -38,6 +38,22 @@ test('renders the correct section text', () => {
   expect(screenReaderNode.text()).toBe('sections name')
 })
 
+test('renders prefix text when passed in', () => {
+  const props = defaultProps()
+  props.prefix = 'Anonymous Discussion | '
+  const tree = mount(<SectionTooltip {...props} />)
+  const node = tree.find('Text')
+  expect(node.first().text()).toBe('Anonymous Discussion | 1 Sectionsections name')
+})
+
+test('uses textColor from props', () => {
+  const props = defaultProps()
+  props.textColor = 'secondary'
+  const tree = mount(<SectionTooltip {...props} />)
+  const node = tree.find('Text')
+  expect(node.first().props().color).toBe('secondary')
+})
+
 test('renders all sections if no sections are given', () => {
   const props = defaultProps()
   props.sections = null
