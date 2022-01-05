@@ -755,7 +755,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION: {
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
                  CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
-                 ATTACHMENTS_FOLDER_ID: @topic.for_assignment? ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id
+                 ATTACHMENTS_FOLDER_ID: (@topic.for_assignment? && !@current_user.nil?) ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id
                },
                apollo_caching: @current_user &&
                  Account.site_admin.feature_enabled?(:apollo_caching),
