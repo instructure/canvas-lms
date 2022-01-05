@@ -45,7 +45,7 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThre
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useCallback, useContext, useMemo, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -70,7 +70,7 @@ export const IsolatedViewContainer = props => {
     props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
 
-    props.setHighlightEntryId(newDiscussionEntry.id)
+    props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -379,6 +379,29 @@ export const IsolatedViewContainer = props => {
     }
   }, [entriesAreLoading])
 
+  const hasMoreOlderReplies =
+    isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection?.pageInfo
+      ?.hasPreviousPage
+
+  useEffect(() => {
+    if (
+      props.highlightEntryId &&
+      props.highlightEntryId !== props.discussionEntryId &&
+      !fetchingMoreOlderReplies
+    ) {
+      const isOnSubentries =
+        isolatedEntryOlderDirection.data.legacyNode?.discussionSubentriesConnection.nodes.some(
+          entry => entry._id === props.highlightEntryId
+        )
+
+      if (!isOnSubentries && hasMoreOlderReplies) {
+        setFetchingMoreOlderReplies(true)
+        fetchOlderEntries()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.highlightEntryId, props.discussionEntryId])
+
   const renderIsolatedView = () => {
     return (
       <>
@@ -460,10 +483,7 @@ export const IsolatedViewContainer = props => {
               }}
               goToTopic={props.goToTopic}
               highlightEntryId={props.highlightEntryId}
-              hasMoreOlderReplies={
-                isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                  ?.pageInfo?.hasPreviousPage
-              }
+              hasMoreOlderReplies={hasMoreOlderReplies}
               hasMoreNewerReplies={
                 isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
                   ?.pageInfo?.hasNextPage && !!props.relativeEntryId

@@ -345,8 +345,8 @@ export const createDiscussionEntryMock = ({
       data: {
         createDiscussionEntry: {
           discussionEntry: DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-1337`),
-            _id: '1337',
+            id: btoa(`DiscussionEntry-1`),
+            _id: '1',
             message
           }),
           __typename: 'CreateDiscussionEntryPayload'
