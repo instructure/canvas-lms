@@ -34,8 +34,7 @@ import * as contentInsertion from './contentInsertion'
 import indicatorRegion from './indicatorRegion'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
-import {sanitizePlugins} from './sanitizePlugins'
-import {getCanvasUrl} from './getCanvasUrl'
+import {sanitizePlugins} from './sanitizeEditorOptions'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -367,8 +366,6 @@ class RCEWrapper extends React.Component {
         // eslint-disable-next-line no-console
         console.error('Failed initializing a11y checker', err)
       })
-
-    this.canvasUrl = getCanvasUrl(this.props.trayProps);
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -598,9 +595,27 @@ class RCEWrapper extends React.Component {
   }
 
   insertMathEquation(tex) {
-    const editor = this.mceInstance()
-    return this.canvasUrl.then(domain =>
-      contentInsertion.insertEquation(editor, tex, domain));
+    const ed = this.mceInstance()
+    const docSz =
+      parseFloat(
+        ed.dom.doc.defaultView.getComputedStyle(ed.dom.doc.body).getPropertyValue('font-size')
+      ) || 1
+    const sel = ed.selection.getNode()
+    const imgSz = sel
+      ? parseFloat(ed.dom.doc.defaultView.getComputedStyle(sel).getPropertyValue('font-size')) || 1
+      : docSz
+    let scale = imgSz / docSz
+
+    const url = `/equation_images/${encodeURIComponent(encodeURIComponent(tex))}?scale=${scale}`
+
+    // if I simply create the html string, xsslint fails jenkins
+    const img = document.createElement('img')
+    img.setAttribute('alt', `LaTeX: ${tex}`)
+    img.setAttribute('title', tex)
+    img.setAttribute('class', 'equation_image')
+    img.setAttribute('data-equation-content', tex)
+    img.setAttribute('src', url)
+    this.insertCode(img.outerHTML)
   }
 
   removePlaceholders(name) {

@@ -265,13 +265,14 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links rce_buttons_and_icons important_dates feature_flag_filters k5_parent_support
+    cc_in_rce_video_tray featured_help_links
+    strip_origin_from_quiz_answer_file_references rce_buttons_and_icons important_dates feature_flag_filters k5_parent_support
     conferencing_in_planner remember_settings_tab word_count_in_speed_grader observer_picker lti_platform_storage
-    scale_equation_images new_equation_editor
+    scale_equation_images
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     responsive_awareness responsive_misc product_tours files_dnd usage_rights_discussion_topics
-    granular_permissions_manage_users create_course_subaccount_picker
+    inline_math_everywhere granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [

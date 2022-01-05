@@ -221,11 +221,7 @@ export const DiscussionPostToolbar = props => {
             </Flex.Item>
             {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
               <Flex.Item align="end">
-                <Tooltip renderTip={I18n.t('This is your anonymous avatar')}>
-                  <div>
-                    <AnonymousAvatar seedString={CURRENT_USER} />
-                  </div>
-                </Tooltip>
+                <AnonymousAvatar seedString={CURRENT_USER} />
               </Flex.Item>
             )}
           </Flex>

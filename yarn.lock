@@ -1249,14 +1249,6 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@cortex-js/compute-engine@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@cortex-js/compute-engine/-/compute-engine-0.4.2.tgz#2b1caf6cbfdaaf1b7126317be4a67d7a47c9c4af"
-  integrity sha512-ri6CHomyXvp9aWyu3ZibHzN4xNyyf/8n5YJyQWTqypwk8jPwxa+GNPd/hbJXOhwz+YDnrkp7dMqhdl31DAH+cg==
-  dependencies:
-    complex.js "^2.0.13"
-    decimal.js "^10.2.1"
-
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.3.tgz#90420f9f9c6d3987f176a19a7d8e764271a2f55d"
@@ -9018,11 +9010,6 @@ compare-versions@^3.4.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-3.6.0.tgz#1a5689913685e5a87637b8d3ffca75514ec41d62"
   integrity sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==
-
-complex.js@^2.0.13:
-  version "2.0.15"
-  resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.15.tgz#7add6848b4c1d12aa9262f7df925ebe7a51a7406"
-  integrity sha512-gDBvQU8IG139ZBQTSo2qvDFP+lANMGluM779csXOr6ny1NUtA3wkUnCFjlDNH/moAVfXtvClYt6G0zarFbtz5w==
 
 component-bind@1.0.0:
   version "1.0.0"
@@ -17698,13 +17685,6 @@ material-colors@^1.2.1:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
-
-mathlive@^0.69.8:
-  version "0.69.8"
-  resolved "https://registry.yarnpkg.com/mathlive/-/mathlive-0.69.8.tgz#4a7d9e5c255400b4aea477d0c7992764d3ff9fd9"
-  integrity sha512-/wVBBynB2gixG3mAOLgwt5ci/dqPVFwUlqEuOEfA+Cqr80hp9gL/qCqJcv/XTqcsqeTnLeP6knNlUPYyI70krA==
-  dependencies:
-    "@cortex-js/compute-engine" "^0.4.2"
 
 mathml-tag-names@^2.1.0:
   version "2.1.3"

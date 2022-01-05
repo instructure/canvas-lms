@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 
-import {buildImage} from '../../../../../rcs/fake'
+import {buildImage} from '../../../../../sidebar/sources/fake'
 import Images from '..'
 
 describe('RCE "Images" Plugin > Images', () => {

@@ -85,7 +85,7 @@ DeletedPostMessage.propTypes = {
   /**
    * Display name for the deleter of the message
    */
-  deleterName: PropTypes.string,
+  deleterName: PropTypes.string.isRequired,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a

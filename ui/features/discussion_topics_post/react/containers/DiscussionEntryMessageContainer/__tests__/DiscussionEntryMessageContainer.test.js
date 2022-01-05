@@ -48,8 +48,8 @@ describe('DiscussionEntryMessageContainer', () => {
     )
     expect(container.getByTestId('created-tooltip')).toBeTruthy()
     // one for the screenreader, the other for the tooltip
-    expect(container.getAllByText('Created Feb 8, 2021 8:35pm').length).toEqual(2)
-    expect(container.getByText('Edited by Eddy Tor Apr 13, 2021 4pm')).toBeInTheDocument()
+    expect(container.getAllByText('Created Feb 8 8:35pm').length).toEqual(2)
+    expect(container.getByText('Edited by Eddy Tor Apr 13 4pm')).toBeInTheDocument()
   })
 
   it('should display plain edited if author is editor', () => {
@@ -63,7 +63,7 @@ describe('DiscussionEntryMessageContainer', () => {
         }
       })
     )
-    expect(container.getByText('Edited Apr 13, 2021 4pm')).toBeInTheDocument()
+    expect(container.getByText('Edited Apr 13 4pm')).toBeInTheDocument()
   })
 
   it('should not display edit info when no editor', () => {
@@ -79,8 +79,8 @@ describe('DiscussionEntryMessageContainer', () => {
   it('displays deletion info if delete', () => {
     const {getByText} = setup(defaultProps({deleted: true}))
     expect(getByText('Deleted by Hank Mccoy')).toBeInTheDocument()
-    expect(getByText('Created Feb 8, 2021 8:35pm')).toBeInTheDocument()
-    expect(getByText('Deleted Apr 13, 2021 4pm')).toBeInTheDocument()
+    expect(getByText('Created Feb 8 8:35pm')).toBeInTheDocument()
+    expect(getByText('Deleted Apr 13 4pm')).toBeInTheDocument()
   })
 
   it('displays discussion entry message', () => {

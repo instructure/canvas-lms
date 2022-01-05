@@ -27,10 +27,10 @@ import ready from '@instructure/ready'
 
 ready(() => {
   const $toolForm = $('#tool_form')
-  
+
   const launchToolManually = function() {
-    const $button = $toolForm.find('button')  
-  
+    const $button = $toolForm.find('button')
+
     $toolForm.show()
 
     // Firefox remembers disabled state after page reloads
@@ -45,8 +45,8 @@ ready(() => {
       $(this)
         .find('.load_tab,.tab_loaded')
         .toggle()
-  })
-}
+    })
+  }
 
   const launchToolInNewTab = function() {
     $toolForm.attr('target', '_blank')
@@ -108,7 +108,7 @@ ready(() => {
   )
 
   $external_content_info_alerts.on('focus', function(e) {
-    $tool_content_wrapper.find('iframe').css('border', '2px solid #0374B5')
+    $tool_content_wrapper.find('iframe').css('border', '2px solid #008EE2')
     $(this).removeClass('screenreader-only-tool')
   })
 

@@ -20,7 +20,7 @@ import React from 'react'
 import {act, render, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 
 import Bridge from '../../../../bridge/Bridge'
-import * as fakeSource from '../../../../rcs/fake'
+import * as fakeSource from '../../../../sidebar/sources/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {

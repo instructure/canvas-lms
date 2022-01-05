@@ -30,7 +30,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import ColorPicker, {PREDEFINED_COLORS} from '@canvas/color-picker'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
-import requiredIf from '../shared/requiredIf'
 
 function formatColor(color) {
   if (color[0] !== '#') {
@@ -38,15 +37,16 @@ function formatColor(color) {
   }
   return color
 }
+
 class ProficiencyRating extends React.Component {
   static propTypes = {
-    color: requiredIf(({forOutcome}) => !forOutcome, PropTypes.string),
+    color: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
     disableDelete: PropTypes.bool.isRequired,
     focusField: PropTypes.oneOf(['description', 'points', 'mastery', 'trash']),
     mastery: PropTypes.bool.isRequired,
-    onColorChange: requiredIf(({forOutcome}) => !forOutcome, PropTypes.func),
+    onColorChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     onDescriptionChange: PropTypes.func.isRequired,
     onMasteryChange: PropTypes.func.isRequired,
@@ -55,8 +55,7 @@ class ProficiencyRating extends React.Component {
     pointsError: PropTypes.string,
     isMobileView: PropTypes.bool,
     position: PropTypes.number.isRequired,
-    canManage: PropTypes.bool,
-    forOutcome: PropTypes.bool
+    canManage: PropTypes.bool
   }
 
   static defaultProps = {
@@ -64,8 +63,7 @@ class ProficiencyRating extends React.Component {
     focusField: null,
     pointsError: null,
     canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
-    isMobileView: false,
-    forOutcome: false
+    isMobileView: false
   }
 
   constructor(props) {
@@ -360,7 +358,7 @@ class ProficiencyRating extends React.Component {
   errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
 
   render() {
-    const {isMobileView, canManage, forOutcome} = this.props
+    const {isMobileView, canManage} = this.props
     return (
       <Flex
         padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}
@@ -370,17 +368,13 @@ class ProficiencyRating extends React.Component {
         <Flex.Item textAlign="center" padding="0 medium 0 0" size={isMobileView ? '25%' : '15%'}>
           {this.renderMastery()}
         </Flex.Item>
-        <Flex.Item
-          padding="0 small 0 0"
-          size={isMobileView ? '75%' : forOutcome ? '65%' : '40%'}
-          align="start"
-        >
+        <Flex.Item padding="0 small 0 0" size={isMobileView ? '75%' : '40%'} align="start">
           {this.renderDescription()}
           {isMobileView && (
             <>
               {this.renderPointsInput()}
               <div className={`mobileRow ${canManage ? null : 'view-only'}`}>
-                {!forOutcome && this.renderColorPicker()}
+                {this.renderColorPicker()}
                 {canManage && this.renderDeleteButton()}
               </div>
             </>
@@ -388,10 +382,10 @@ class ProficiencyRating extends React.Component {
         </Flex.Item>
         {!isMobileView && (
           <>
-            <Flex.Item size={forOutcome ? '10%' : '15%'} padding="0 small 0 0" align="start">
+            <Flex.Item size="15%" padding="0 small 0 0" align="start">
               {this.renderPointsInput()}
             </Flex.Item>
-            {!forOutcome && <Flex.Item>{this.renderColorPicker()}</Flex.Item>}
+            <Flex.Item>{this.renderColorPicker()}</Flex.Item>
             {canManage && (
               <Flex.Item size="10%" padding="0 small 0 small">
                 {this.renderDeleteButton()}

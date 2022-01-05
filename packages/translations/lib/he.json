@@ -44,9 +44,6 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "האם אתם בטוחים שברצונכם למחוק את פריט המתכנן הזה?"
     },
-    "arrows_464a3e54": {
-        "message": "חצים"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "יחס הממדים יישמר"
     },
@@ -85,9 +82,6 @@
     },
     "attributes_963ba262": {
         "message": "מאפיינים"
-    },
-    "basic_554cdc0a": {
-        "message": "בסיסי"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "התחלת ההיסטוריה של המטלות לביצוע שלך"
@@ -193,9 +187,6 @@
     },
     "delete_a6efa79d": {
         "message": "ביטול"
-    },
-    "delimiters_4db4840d": {
-        "message": "מפסקים"
     },
     "details_98a31b68": {
         "message": "פרטים"
@@ -304,9 +295,6 @@
     },
     "grades_loaded_5056277c": {
         "message": "הציונים נטענו"
-    },
-    "greek_65c5b3f7": {
-        "message": "יוונית"
     },
     "group_files_82e5dcdb": {
         "message": "קבצי קבוצה"
@@ -422,9 +410,6 @@
     "media_af190855": {
         "message": "מדיה"
     },
-    "misc_3b692ea7": {
-        "message": "אחר"
-    },
     "missing_1a256b3b": {
         "message": "חסר"
     },
@@ -506,9 +491,6 @@
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "פתיחת חלון דיאלוג של מקשי קיצור"
     },
-    "operators_a2ef9a93": {
-        "message": "מפעילים"
-    },
     "optional_add_course_ef0d70fc": {
         "message": "אופציונלי: הוספת קורס"
     },
@@ -559,9 +541,6 @@
     },
     "record_7c9448b": {
         "message": "הקלטה"
-    },
-    "relationships_6602af70": {
-        "message": "יחסים"
     },
     "reminder_date_4564d12d": {
         "message": "תזכורת: { date }"

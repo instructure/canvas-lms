@@ -54,7 +54,6 @@ describe('contentInsertion', () => {
         isCollapsed: () => editor.selectionContent.length === 0
       },
       dom: {
-        doc: window.document,
         getParent: () => {
           return null
         },
@@ -164,11 +163,13 @@ describe('contentInsertion', () => {
 
       it('uses the anchor text', () => {
         contentInsertion.insertLink(editor, link)
-        expect(editor.content).toEqual('<a href="/some/path" title="Here Be Links">anchor text</a>')
+        expect(editor.content).toEqual(
+          '<a href="/some/path" title="Here Be Links">anchor text</a>'
+        )
       })
 
       describe('with "forceRename" set to "true"', () => {
-        beforeEach(() => (link.forceRename = true))
+        beforeEach(() => link.forceRename = true)
 
         it('uses the link "text"', () => {
           contentInsertion.insertLink(editor, link)
@@ -318,24 +319,6 @@ describe('contentInsertion', () => {
       expect(editor.content).toEqual(
         '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a>'
       )
-    })
-  })
-
-  describe('insertEquation', () => {
-    it('builds image html from LaTeX', () => {
-      const tex = 'y = x^2'
-      const dblEncodedTex = window.encodeURIComponent(window.encodeURIComponent(tex))
-      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="http://canvas.docker/equation_images/${dblEncodedTex}?scale=1">`
-      contentInsertion.insertEquation(editor, tex, 'http://canvas.docker')
-      expect(editor.content).toEqual(imgHtml)
-    })
-
-    it('uses relative URL if no base is provided', () => {
-      const tex = 'y = x^2'
-      const dblEncodedTex = window.encodeURIComponent(window.encodeURIComponent(tex))
-      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dblEncodedTex}?scale=1">`
-      contentInsertion.insertEquation(editor, tex)
-      expect(editor.content).toEqual(imgHtml)
     })
   })
 

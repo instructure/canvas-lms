@@ -52,7 +52,7 @@ describe('Reply Preview', () => {
 
   it('created at timestamp renders', () => {
     const container = setup(mockProps())
-    expect(container.getByText('Aug 10, 2021 6:10pm')).toBeTruthy()
+    expect(container.getByText('Aug 10 6:10pm')).toBeTruthy()
   })
 
   it('message renders', () => {

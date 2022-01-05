@@ -150,14 +150,5 @@ module Types
     def learning_outcome_group(id:)
       GraphQLNodeLoader.load("LearningOutcomeGroup", id, context)
     end
-
-    field :learning_outcome, Types::LearningOutcomeType, null: true do
-      description "LearningOutcome"
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
-    end
-    def learning_outcome(id:)
-      GraphQLNodeLoader.load("LearningOutcome", id, context)
-    end
   end
 end

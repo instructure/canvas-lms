@@ -26,7 +26,6 @@ export default {
   argTypes: {
     goToTopic: {action: 'goToTopic'},
     goToParent: {action: 'goToParent'},
-    goToQuotedReply: {action: 'goToQuotedReply'},
     onEdit: {action: 'onEdit'},
     onDelete: {action: 'onDelete'},
     onMarkAllAsUnread: {action: 'onMarkAsUnread'},

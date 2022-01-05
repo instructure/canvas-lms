@@ -61,8 +61,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Audio- en video-opname wordt niet ondersteund; gebruik een andere browser."
   },
-  "audio_options_feb58e2c": { "message": "Audio-opties" },
-  "audio_options_tray_33a90711": { "message": "Gebied met audio-opties" },
   "audio_player_for_title_20cc70d": {
     "message": "Audio-speler voor { title }"
   },
@@ -161,8 +159,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Beschrijf de afbeelding)" },
   "describe_the_video_2fe8f46a": { "message": "(beschrijf de video)" },
   "details_98a31b68": { "message": "Details" },
-  "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Afmetingstype" },
   "dimensions_45ddb7b7": { "message": "Afmetingen" },
   "directionality_26ae9e08": { "message": "richting" },
   "discussions_a5f96392": { "message": "Discussies" },
@@ -304,7 +300,6 @@ const locale = {
   "loading_please_wait_d276220a": {
     "message": "Bezig met laden, even wachten"
   },
-  "loading_preview_9f077aa1": { "message": "Voorbeeld laden" },
   "locked_762f138b": { "message": "Vergrendeld" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
@@ -312,9 +307,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Diversen" },
   "modules_c4325335": { "message": "Modules" },
   "multi_color_image_63d7372f": { "message": "Veelkleurige afbeelding" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Moet ten minste { percentage }% zijn"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Moet minstens { width } x { height }px zijn"
   },
@@ -357,13 +349,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Pagina''s" },
   "paragraph_5e5ad8eb": { "message": "Alinea" },
-  "pentagon_17d82ea3": { "message": "Vijfhoek" },
   "people_b4ebb13c": { "message": "Personen" },
-  "percentage_34ab7c2c": { "message": "Percentage" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Percentage moet een getal zijn"
-  },
-  "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Geplaatst: { when }" },
   "preformatted_d0670862": { "message": "Voorgeformatteerd" },
   "pretty_html_editor_28748756": { "message": "Pretty HTML-editor" },
@@ -402,7 +388,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O om de pretty HTML-editor te openen."
   },
-  "show_audio_options_b489926b": { "message": "Audio-opties weergeven" },
   "show_embed_options_ef8d7ef": { "message": "Ingesloten opties weergeven" },
   "show_image_options_1e2ecc6b": { "message": "Afbeeldingsopties weergeven" },
   "show_link_options_545338fd": { "message": "Linkopties weergeven" },

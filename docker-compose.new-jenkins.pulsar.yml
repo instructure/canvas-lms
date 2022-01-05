@@ -1,0 +1,20 @@
+# to use this add docker-compose/pulsar.yml
+# to your COMPOSE_FILE var in .env
+version: "2.3"
+
+services:
+  canvas:
+    depends_on:
+      - pulsar
+  pulsar:
+    image: starlord.inscloudgate.net/jenkins/pulsar:latest
+    command: bin/pulsar standalone
+    ports:
+      - "6650"
+      - "8080"
+  pulsar-admin:
+    image: starlord.inscloudgate.net/jenkins/pulsar:latest
+    volumes:
+      - ./docker-compose/pulsar:/pulsar/scripts
+    depends_on:
+      - pulsar

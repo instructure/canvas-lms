@@ -25,9 +25,6 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
-import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
-
-import Ratings from './Ratings'
 
 const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
   const {friendlyDescriptionFF, isStudent, individualOutcomeRatingAndCalculationFF} =
@@ -45,7 +42,6 @@ const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
     shouldShowFriendlyDescription &&
     !isStudent &&
     truncatedDescription !== friendlyDescription
-  const {ratings} = useRatings({initialRatings: defaultOutcomesManagementRatings})
 
   if (!description && !friendlyDescription && !individualOutcomeRatingAndCalculationFF) return null
 
@@ -106,10 +102,7 @@ const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
       )}
 
       {!truncated && individualOutcomeRatingAndCalculationFF && (
-        <>
-          <Ratings ratings={ratings} canManage={false} />
-          <ProficiencyCalculation individualOutcome="display" canManage={false} />
-        </>
+        <ProficiencyCalculation individualOutcome="display" canManage={false} />
       )}
     </View>
   )

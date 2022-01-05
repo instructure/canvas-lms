@@ -42,8 +42,6 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Snemanje zvoka in videoposnetkov ni podprto; uporabite drug brskalnik."
   },
-  "audio_options_feb58e2c": { "message": "Možnosti zvoka" },
-  "audio_options_tray_33a90711": { "message": "Trak z možnostmi zvoka" },
   "audio_player_for_title_20cc70d": {
     "message": "Predvajalnik zvoka za { title }"
   },
@@ -277,7 +275,6 @@
   "loading_failed_e6a9d8ef": { "message": "Nalaganje ni uspelo." },
   "loading_folders_d8b5869e": { "message": "Nalaganje map" },
   "loading_please_wait_d276220a": { "message": "Nalaganje, počakajte" },
-  "loading_preview_9f077aa1": { "message": "Nalagam predogled" },
   "locked_762f138b": { "message": "Zaklenjeno" },
   "media_af190855": { "message": "Mediji" },
   "medium_5a8e9ead": { "message": "Srednja" },
@@ -333,9 +330,6 @@
   "pentagon_17d82ea3": { "message": "Peterokotnik" },
   "people_b4ebb13c": { "message": "Sodelujoči" },
   "percentage_34ab7c2c": { "message": "Odstotek" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Odstotek mora biti številka"
-  },
   "pixels_52ece7d1": { "message": "Slikovne pike" },
   "posted_when_a578f5ab": { "message": "Objavljeno: { when }" },
   "preformatted_d0670862": { "message": "Predoblikovano" },
@@ -377,7 +371,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Urejevalnik Pretty HTML Editor odprete s pritiskom na tipki Shift+O"
   },
-  "show_audio_options_b489926b": { "message": "Prikaži možnosti zvoka" },
   "show_embed_options_ef8d7ef": { "message": "Prikaži možnosti vdelave" },
   "show_image_options_1e2ecc6b": { "message": "Prikaži možnosti slike" },
   "show_link_options_545338fd": { "message": "Prikaži povezave na slike" },

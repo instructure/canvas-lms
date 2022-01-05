@@ -64,7 +64,7 @@ const karmaConfig = {
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
   // - PhantomJS (has to be installed with `npm install karma-phantomjs-launcher`))
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-  browsers: ['ChromeHeadlessNoSandbox'], // docker friendly
+  browsers: ['ChromeWithoutBackground'],
 
   customLaunchers: {
     // Chrome will sometimes be in the background when specs are running,
@@ -129,12 +129,11 @@ if (process.env.COVERAGE === '1') {
       options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post',
-    exclude:
-      /(node_modules|spec|public\/javascripts\/(bower|canvas_quizzes|translations|vendor|custom_moment_locales|custom_timezone_locales))/
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|canvas_quizzes|translations|vendor|custom_moment_locales|custom_timezone_locales))/
   })
 }
 
-module.exports = function (config) {
+module.exports = function(config) {
   // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
   karmaConfig.logLevel = config.LOG_INFO
   config.set(karmaConfig)

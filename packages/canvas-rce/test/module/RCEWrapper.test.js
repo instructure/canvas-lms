@@ -21,8 +21,6 @@ import sinon from 'sinon'
 import Bridge from '../../src/bridge'
 import * as indicateModule from '../../src/common/indicate'
 import * as contentInsertion from '../../src/rce/contentInsertion'
-import * as getCanvasUrl from '../../src/rce/getCanvasUrl'
-
 import RCEWrapper, {
   mergeMenuItems,
   mergeMenu,
@@ -33,6 +31,7 @@ import RCEWrapper, {
 const textareaId = 'myUniqId'
 
 let React, fakeTinyMCE, editorCommandSpy, sd, editor
+let failedCount = 0
 
 // ====================
 //        HELPERS
@@ -103,9 +102,6 @@ describe('RCEWrapper', () => {
   // ====================
   //   SETUP & TEARDOWN
   // ====================
-  before(() => {
-    sinon.stub(getCanvasUrl, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
-  })
 
   beforeEach(() => {
     document.body.innerHTML = `
@@ -203,7 +199,16 @@ describe('RCEWrapper', () => {
   })
 
   afterEach(function () {
+    if (this.currentTest.state === 'failed') {
+      ++failedCount
+    }
     document.body.innerHTML = ''
+    sinon.reset()
+  })
+
+  after(() => {
+    // I don't know why, but this this suite of tests stopped exiting
+    process.exit(failedCount ? 1 : 0)
   })
 
   // ====================
@@ -337,11 +342,13 @@ describe('RCEWrapper', () => {
       contentInsertion.insertLink.restore()
     })
 
-    it('inserts math equations', async () => {
+    it('inserts math equations', () => {
       const tex = 'y = x^2'
-      sinon.stub(contentInsertion, 'insertEquation')
-      await instance.insertMathEquation(tex)
-      sinon.assert.calledWith(contentInsertion.insertEquation, editor, tex, 'http://canvas.docker')
+      const dbl_encoded_tex = window.encodeURIComponent(window.encodeURIComponent(tex))
+      const img_html = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dbl_encoded_tex}?scale=1">`
+      sinon.stub(contentInsertion, 'insertContent')
+      instance.insertMathEquation(tex)
+      assert.ok(contentInsertion.insertContent.calledWith(editor, img_html))
     })
 
     describe('checkReadyToGetCode', () => {

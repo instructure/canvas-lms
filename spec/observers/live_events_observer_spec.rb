@@ -108,37 +108,6 @@ describe LiveEventsObserver do
     end
   end
 
-  describe "attachment" do
-    let!(:attachment) { attachment_model }
-
-    {
-      display_name: "some_other_attachment_name_now",
-      lock_at: Time.zone.now + 10.days,
-      unlock_at: Time.zone.now + 10.days,
-    }.each do |key, val|
-      context "if #{key} changes" do
-        it "posts attachment_updated events" do
-          expect(Canvas::LiveEvents).to receive(:attachment_updated)
-          attachment.update(key => val)
-        end
-      end
-    end
-
-    context "if the attachment moves to a new folder" do
-      it "posts attachment_updated events" do
-        expect(Canvas::LiveEvents).to receive(:attachment_updated)
-        attachment.update(folder: folder_model)
-      end
-    end
-
-    context "if only the modified_at timestamp changes" do
-      it "does not post an attachment_updated event" do
-        expect(Canvas::LiveEvents).not_to receive(:attachment_updated)
-        attachment.touch
-      end
-    end
-  end
-
   describe "conversation" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:conversation_created).once

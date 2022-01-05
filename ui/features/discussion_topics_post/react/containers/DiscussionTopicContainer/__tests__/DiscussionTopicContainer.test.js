@@ -246,8 +246,8 @@ describe('DiscussionTopicContainer', () => {
         permissions: DiscussionPermissions.mock({readAsAdmin: false})
       })
     })
-    expect(await container.findByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
-    expect(await container.findByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
+    expect(await container.findByText('Due Mar 31 5:59am')).toBeTruthy()
+    expect(await container.findByText('Available from Mar 24 until Apr 4')).toBeTruthy()
   })
 
   it('Should not be able to see post menu if no permissions and initialPostRequiredForCurrentUser', () => {
@@ -449,8 +449,8 @@ describe('DiscussionTopicContainer', () => {
       discussionTopic: Discussion.mock({assignment: Assignment.mock({assignmentOverrides: null})})
     })
     expect(await container.findByText('Everyone')).toBeTruthy()
-    expect(await container.findByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
-    expect(await container.findByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
+    expect(await container.findByText('Due Mar 31 5:59am')).toBeTruthy()
+    expect(await container.findByText('Available from Mar 24 until Apr 4')).toBeTruthy()
   })
 
   it('Should find "Show Due Dates" link button', async () => {
@@ -478,8 +478,8 @@ describe('DiscussionTopicContainer', () => {
     props.discussionTopic.assignment.lockAt = null
     const container = setup(props)
     expect(await container.findByText('assignment override 3')).toBeTruthy()
-    expect(await container.findByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-    expect(await container.findByText('Available from Mar 21, 2021 until Sep 4, 2021')).toBeTruthy()
+    expect(await container.findByText('Due Apr 5 1:40pm')).toBeTruthy()
+    expect(await container.findByText('Available from Mar 21 until Sep 4')).toBeTruthy()
   })
 
   it('Should find no due date text for "assignment override 3"', async () => {
@@ -503,7 +503,7 @@ describe('DiscussionTopicContainer', () => {
 
     expect(container.getByText('assignment override 3')).toBeTruthy()
     expect(container.getByText('No Due Date')).toBeTruthy()
-    expect(container.getByText('Available from Mar 21, 2021 until Sep 4, 2021')).toBeTruthy()
+    expect(container.getByText('Available from Mar 21 until Sep 4')).toBeTruthy()
   })
 
   it('Should find no available date text for "assignment override 3"', async () => {
@@ -526,8 +526,8 @@ describe('DiscussionTopicContainer', () => {
     const container = setup(props)
 
     expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-    expect(container.getByText('Available until Sep 4, 2021')).toBeTruthy()
+    expect(container.getByText('Due Apr 5 1:40pm')).toBeTruthy()
+    expect(container.getByText('Available until Sep 4')).toBeTruthy()
   })
 
   it('Should find no until date text for "assignment override 3"', async () => {
@@ -550,8 +550,8 @@ describe('DiscussionTopicContainer', () => {
     const container = setup(props)
 
     expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-    expect(container.getByText('Available from Mar 21, 2021')).toBeTruthy()
+    expect(container.getByText('Due Apr 5 1:40pm')).toBeTruthy()
+    expect(container.getByText('Available from Mar 21')).toBeTruthy()
   })
 
   it('Should find no text after due date text for "assignment override 3"', async () => {
@@ -574,7 +574,7 @@ describe('DiscussionTopicContainer', () => {
     const container = setup(props)
 
     expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
+    expect(container.getByText('Due Apr 5 1:40pm')).toBeTruthy()
   })
 
   it('should show availability window for ungraded discussions', () => {
@@ -586,9 +586,7 @@ describe('DiscussionTopicContainer', () => {
       })
     })
 
-    expect(
-      container.getByText('Available from Mar 21, 2021 6am until Sep 4, 2021 5:59am')
-    ).toBeTruthy()
+    expect(container.getByText('Available from Mar 21 6am until Sep 4 5:59am')).toBeTruthy()
   })
 
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
@@ -631,7 +629,7 @@ describe('DiscussionTopicContainer', () => {
       })
     }
     const container = setup(props)
-    expect(container.getByText(`Edited by Eddy Tor Apr 22, 2021 6:41pm`)).toBeInTheDocument()
+    expect(container.getByText(`Edited by Eddy Tor Apr 22 6:41pm`)).toBeInTheDocument()
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
@@ -647,7 +645,7 @@ describe('DiscussionTopicContainer', () => {
       })
     }
     const container = setup(props)
-    expect(container.getByText(`Edited Apr 22, 2021 6:41pm`)).toBeInTheDocument()
+    expect(container.getByText(`Edited Apr 22 6:41pm`)).toBeInTheDocument()
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
@@ -693,7 +691,7 @@ describe('DiscussionTopicContainer', () => {
       const props = {discussionTopic: Discussion.mock()}
       const {getByText} = setup(props)
 
-      expect(getByText('Peer review for Morty Smith Due: Mar 31, 2021 5:59am')).toBeTruthy()
+      expect(getByText('Peer review for Morty Smith Due: Mar 31 5:59am')).toBeTruthy()
     })
 
     it('renders with out a due date', () => {
@@ -718,7 +716,7 @@ describe('DiscussionTopicContainer', () => {
       }
       const {queryByText} = setup(props)
 
-      expect(queryByText('eer review for Morty Smith Due: Mar 31, 2021 5:59am')).toBeNull()
+      expect(queryByText('eer review for Morty Smith Due: Mar 31 5:59am')).toBeNull()
     })
 
     describe('PodcastFeed Button', () => {

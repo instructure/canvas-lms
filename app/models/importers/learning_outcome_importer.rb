@@ -114,7 +114,7 @@ module Importers
         item.high_grade = hash[:high_grade]
         item.workflow_state = "active" if item.deleted?
         item.short_description = hash[:title]
-        item.description = migration.convert_html(hash[:description], :learning_outcome, hash[:migration_id], :description) if hash[:description]
+        item.description = hash[:description]
         assessed = item.assessed?
         unless assessed
           item.calculation_method = hash[:calculation_method] || item.calculation_method

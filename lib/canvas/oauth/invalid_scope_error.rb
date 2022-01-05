@@ -21,7 +21,7 @@ module Canvas::OAuth
   class InvalidScopeError < RequestError
     def initialize(missing_scopes)
       super("A requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner. "\
-            "The following scopes were requested, but not granted: #{missing_scopes.to_sentence(locale: :en)}")
+            "The following scopes were requested, but not granted: #{missing_scopes.to_sentence}")
     end
 
     def to_render_data

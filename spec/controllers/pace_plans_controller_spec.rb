@@ -392,51 +392,5 @@ describe PacePlansController, type: :controller do
       json_response = JSON.parse(response.body)
       expect(json_response.values).to eq(%w[2021-11-01 2021-11-06])
     end
-
-    it "returns the dates in the correct order" do
-      @mod3 = @course.context_modules.create! name: "M3"
-      2.times do |i|
-        assignment = @course.assignments.create! name: i, workflow_state: "published"
-        tag = @mod3.add_item id: assignment.id, type: "assignment"
-        @pace_plan.pace_plan_module_items.create! module_item: tag
-      end
-
-      pace_plan_module_items_attributes = [
-        {
-          id: @pace_plan.pace_plan_module_items[0].id,
-          module_item_id: @pace_plan.pace_plan_module_items[0].module_item_id,
-          duration: 8,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[1].id,
-          module_item_id: @pace_plan.pace_plan_module_items[1].module_item_id,
-          duration: 10,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[2].id,
-          module_item_id: @pace_plan.pace_plan_module_items[2].module_item_id,
-          duration: 5,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[3].id,
-          module_item_id: @pace_plan.pace_plan_module_items[3].module_item_id,
-          duration: 3,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[4].id,
-          module_item_id: @pace_plan.pace_plan_module_items[4].module_item_id,
-          duration: 2,
-        },
-      ]
-      pace_plan_params = @valid_params.merge(
-        start_date: "2021-11-01",
-        end_date: "2021-11-06",
-        pace_plan_module_items_attributes: pace_plan_module_items_attributes
-      )
-      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
-      expect(response).to be_successful
-      json_response = JSON.parse(response.body)
-      expect(json_response.keys).to eq(pace_plan_module_items_attributes.map { |i| i[:module_item_id].to_s })
-    end
   end
 end

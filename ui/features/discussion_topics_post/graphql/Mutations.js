@@ -134,7 +134,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $replyFromEntryId: ID
     $fileId: ID
     $includeReplyPreview: Boolean
-    $isAnonymousAuthor: Boolean
   ) {
     createDiscussionEntry(
       input: {
@@ -143,7 +142,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         parentEntryId: $replyFromEntryId
         fileId: $fileId
         includeReplyPreview: $includeReplyPreview
-        isAnonymousAuthor: $isAnonymousAuthor
       }
     ) {
       discussionEntry {

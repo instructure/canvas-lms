@@ -9,7 +9,7 @@
         "message": "Få adgang til det pæne HTML-redigeringsværktøj"
     },
     "accessibility_checker_b3af1f6c": {
-        "message": "Tilgængelighedskontrol"
+        "message": "Tilgægelighedskontrol"
     },
     "add_8523c19b": {
         "message": "Tilføj"
@@ -145,12 +145,6 @@
     },
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Lyd- og videooptagelse understøttes ikke, brug en anden browser."
-    },
-    "audio_options_feb58e2c": {
-        "message": "Lydindstillinger"
-    },
-    "audio_options_tray_33a90711": {
-        "message": "Skuffe til lydindstillinger"
     },
     "audio_player_for_title_20cc70d": {
         "message": "Audioafspiller til { title }"
@@ -818,9 +812,6 @@
     "loading_please_wait_d276220a": {
         "message": "Indlæser, vent venligst"
     },
-    "loading_preview_9f077aa1": {
-        "message": "Indlæser forhåndsvisning"
-    },
     "location_3b6ff307": {
         "message": "Sted:"
     },
@@ -1004,9 +995,6 @@
     "percentage_34ab7c2c": {
         "message": "Procentdel"
     },
-    "percentage_must_be_a_number_8033c341": {
-        "message": "Procent skal være et tal"
-    },
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
@@ -1132,9 +1120,6 @@
     },
     "show_all_ae37d610": {
         "message": "Vis alle"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydindstillinger"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Vis indlejringsindstillinger"

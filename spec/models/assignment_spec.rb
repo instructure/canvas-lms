@@ -1426,16 +1426,6 @@ describe Assignment do
       expect(new_assmt.points_possible).to eq 3
     end
 
-    it "sets peer_reviews_assigned to false" do
-      assignment = @course.assignments.create!(title: "buggy mcbugface", points_possible: 100)
-      assignment.update!(peer_reviews_assigned: true)
-
-      new_assignment = assignment.duplicate
-      new_assignment.save!
-
-      expect(new_assignment.peer_reviews_assigned).to be false
-    end
-
     context "with an assignment that can't be duplicated" do
       let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
 

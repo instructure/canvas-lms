@@ -61,8 +61,6 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Does dim modd delio â recordio fideo a sain; defnyddiwch borwr gwahanol."
   },
-  "audio_options_feb58e2c": { "message": "Opsiynau Sain" },
-  "audio_options_tray_33a90711": { "message": "Ardal Opsiynau Sain" },
   "audio_player_for_title_20cc70d": {
     "message": "Chwaraewr sain ar gyfer { title }"
   },
@@ -161,8 +159,6 @@ const locale = {
   "describe_the_image_e65d2e32": { "message": "(Disgrifio''r ddelwedd)" },
   "describe_the_video_2fe8f46a": { "message": "(Disgrifiwch y fideo)" },
   "details_98a31b68": { "message": "Manylion" },
-  "diamond_b8dfe7ae": { "message": "Diemwnt" },
-  "dimension_type_55c83e4e": { "message": "Math o ddimensiwn" },
   "dimensions_45ddb7b7": { "message": "Dimensiynau" },
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
   "discussions_a5f96392": { "message": "Trafodaethau" },
@@ -296,7 +292,6 @@ const locale = {
   "loading_please_wait_d276220a": {
     "message": "Wrthi’n llwytho, arhoswch funud"
   },
-  "loading_preview_9f077aa1": { "message": "Wrthi’n llwytho rhagolwg" },
   "locked_762f138b": { "message": "Wedi Cloi" },
   "media_af190855": { "message": "Cyfryngau" },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
@@ -304,9 +299,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Amrywiol" },
   "modules_c4325335": { "message": "Modiwlau" },
   "multi_color_image_63d7372f": { "message": "Delwedd mwy nag un lliw" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Yn gorfod bod yn { percentage }% o leiaf"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Yn gorfod bod o leiaf { width } x { height }px"
   },
@@ -347,13 +339,7 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Tudalennau" },
   "paragraph_5e5ad8eb": { "message": "Paragraff" },
-  "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Pobl" },
-  "percentage_34ab7c2c": { "message": "Canran" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Mae canran yn gorfod bod yn rhif"
-  },
-  "pixels_52ece7d1": { "message": "Picseli" },
   "posted_when_a578f5ab": { "message": "Wedi postio: { when }" },
   "preformatted_d0670862": { "message": "Wedi''i fformatio’n barod" },
   "pretty_html_editor_28748756": { "message": "Golygydd HTML Hardd" },
@@ -392,7 +378,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O i agor y golygydd html hardd."
   },
-  "show_audio_options_b489926b": { "message": "Dangos opsiynau sain" },
   "show_embed_options_ef8d7ef": { "message": "Dangos opsiynau plannu" },
   "show_image_options_1e2ecc6b": { "message": "Dangos opsiynau delwedd" },
   "show_link_options_545338fd": { "message": "Dangos opsiynau dolen" },

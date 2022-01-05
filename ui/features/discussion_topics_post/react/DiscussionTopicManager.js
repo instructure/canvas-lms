@@ -243,8 +243,7 @@ const DiscussionTopicManager = props => {
               null,
               null,
               null,
-              !!discussionTopicQuery.data.legacyNode.anonymousState &&
-                discussionTopicQuery.data.legacyNode.canReplyAnonymously
+              discussionTopicQuery.data.legacyNode.anonymousState != null
             )
           })
         }}

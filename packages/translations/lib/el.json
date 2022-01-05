@@ -23,9 +23,6 @@
     "apps_54d24a47": {
         "message": "Εφαρμογές"
     },
-    "arrows_464a3e54": {
-        "message": "Βέλη"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Ο λόγος του μήκους της εικόνας προς το ύψος της θα διατηρηθεί"
     },
@@ -37,9 +34,6 @@
     },
     "attributes_963ba262": {
         "message": "Πεδία"
-    },
-    "basic_554cdc0a": {
-        "message": "Βασική"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -116,9 +110,6 @@
     "delete_a6efa79d": {
         "message": "Διαγραφή"
     },
-    "delimiters_4db4840d": {
-        "message": "Οριοθέτες"
-    },
     "details_98a31b68": {
         "message": "Λεπτομέρειες"
     },
@@ -175,9 +166,6 @@
     },
     "grades_a61eba0a": {
         "message": "Βαθμοί"
-    },
-    "greek_65c5b3f7": {
-        "message": "Ελληνικά"
     },
     "group_files_82e5dcdb": {
         "message": "Αρχεία ομάδας"
@@ -269,9 +257,6 @@
     "media_af190855": {
         "message": "Δεδομένα"
     },
-    "misc_3b692ea7": {
-        "message": "Διάφορα"
-    },
     "missing_1a256b3b": {
         "message": "Απομένει"
     },
@@ -301,9 +286,6 @@
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Τίποτα για την ώρα"
-    },
-    "operators_a2ef9a93": {
-        "message": "Χειριστές"
     },
     "options_3ab0ea65": {
         "message": "Επιλογές"
@@ -343,9 +325,6 @@
     },
     "record_7c9448b": {
         "message": "Ηχογράφηση"
-    },
-    "relationships_6602af70": {
-        "message": "Σχέσεις"
     },
     "replies_4a8577c8": {
         "message": "Απαντήσεις"

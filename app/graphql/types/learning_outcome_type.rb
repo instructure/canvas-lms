@@ -62,31 +62,7 @@ module Types
     field :vendor_guid, String, null: true
     field :calculation_method, String, null: true
     field :calculation_int, Integer, null: true
-
-    field :calculation_method, String, null: true
-    def calculation_method
-      outcome.calculation_method if individual_outcome_rating_and_calculation_enabled?
-    end
-
-    field :calculation_int, Integer, null: true
-    def calculation_int
-      outcome.calculation_int if individual_outcome_rating_and_calculation_enabled?
-    end
-
-    field :mastery_points, Float, null: true
-    def mastery_points
-      outcome.mastery_points if individual_outcome_rating_and_calculation_enabled?
-    end
-
-    field :points_possible, Float, null: true
-    def points_possible
-      outcome.points_possible if individual_outcome_rating_and_calculation_enabled?
-    end
-
-    field :ratings, [Types::ProficiencyRatingType], null: true
-    def ratings
-      outcome.rubric_criterion[:ratings] if individual_outcome_rating_and_calculation_enabled?
-    end
+    field :rubric_criterion, Types::RubricCriterionType, null: true
 
     field :can_edit, Boolean, null: false
     def can_edit
@@ -128,12 +104,6 @@ module Types
 
     def outcome_context_promise
       Loaders::AssociationLoader.for(LearningOutcome, :context).load(outcome)
-    end
-
-    def individual_outcome_rating_and_calculation_enabled?
-      @individual_outcome_rating_and_calculation_enabled ||= domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation) &&
-                                                             domain_root_account.feature_enabled?(:improved_outcomes_management) &&
-                                                             !domain_root_account.feature_enabled?(:account_level_mastery_scales)
     end
   end
 end

@@ -1,3 +1,8 @@
+cc_in_rce_video_tray:
+  state: hidden
+  display_name: RCE Edit Closed Captions
+  description: Edit closed captions/subtitles to videos from the video options tray in the RCE
+  applies_to: SiteAdmin
 scale_equation_images:
   state: hidden
   display_name: 'Math: Scale equation images'

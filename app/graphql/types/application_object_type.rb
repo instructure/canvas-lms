@@ -50,10 +50,6 @@ module Types
       context[:current_user]
     end
 
-    def domain_root_account
-      context[:domain_root_account]
-    end
-
     def session
       context[:session]
     end

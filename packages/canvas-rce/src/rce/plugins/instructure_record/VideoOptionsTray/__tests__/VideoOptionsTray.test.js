@@ -27,6 +27,12 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   let tray
 
   beforeEach(() => {
+    window.ENV = {
+      FEATURES: {
+        cc_in_rce_video_tray: true
+      }
+    }
+
     props = {
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
@@ -152,6 +158,12 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       tray.$titleTextField.focus()
       tray.setTitleText('hello')
       expect(tray.$titleTextField).toBe(document.activeElement)
+    })
+
+    it('is not displayed when feature flag is false', () => {
+      window.ENV.FEATURES.cc_in_rce_video_tray = false
+      renderComponent()
+      expect(tray.$closedCaptionPanel).toBeNull()
     })
   })
 

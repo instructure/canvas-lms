@@ -99,15 +99,9 @@ describe Types::DiscussionEntryType do
     before do
       @anon_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
                                                  message: "anonymous discussion",
-                                                 anonymous_state: "full_anonymity",
+                                                 anonymous_state: "fully_anonymous",
                                                  context: @course,
                                                  user: @teacher)
-
-      @partially_anon_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
-                                                           message: "anonymous discussion",
-                                                           anonymous_state: "partial_anonymity",
-                                                           context: @course,
-                                                           user: @teacher)
 
       @anon_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
       @anon_discussion_entry_type = GraphQLTypeTester.new(@anon_discussion_entry, current_user: @teacher)
@@ -115,16 +109,6 @@ describe Types::DiscussionEntryType do
       course_with_student(course: @course)
       @anon_student_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Why, hello back to you!", user: @student, editor: @student)
       @anon_student_discussion_entry_type = GraphQLTypeTester.new(@anon_student_discussion_entry, current_user: @teacher)
-
-      course_with_designer(course: @course)
-      @anon_designer_discussion_entry = @anon_discussion.discussion_entries.create!(message: "I designed this course!", user: @designer, editor: @designer)
-      @anon_designer_discussion_entry_type = GraphQLTypeTester.new(@anon_designer_discussion_entry, current_user: @teacher)
-
-      @partial_anon_student_discussion_entry_exposed = @partially_anon_discussion.discussion_entries.create!(message: "Why, hello there!", user: @student, editor: @student, is_anonymous_author: false)
-      @partial_anon_student_discussion_entry_exposed_type = GraphQLTypeTester.new(@partial_anon_student_discussion_entry_exposed, current_user: @teacher)
-
-      @partial_anon_student_discussion_entry_not_exposed = @partially_anon_discussion.discussion_entries.create!(message: "Why, hello there!", user: @student, editor: @student, is_anonymous_author: true)
-      @partial_anon_student_discussion_entry_not_exposed_type = GraphQLTypeTester.new(@partial_anon_student_discussion_entry_not_exposed, current_user: @teacher)
     end
 
     it "does not return the author" do
@@ -152,50 +136,12 @@ describe Types::DiscussionEntryType do
       expect(@anon_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
     end
 
-    it "returns the designer author if a course id is provided" do
-      expect(@anon_designer_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
-    end
-
-    it "returns the designer editor if a course id is provided" do
-      expect(@anon_designer_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
-    end
-
     it "does not return the student author if a course id is provided" do
       expect(@anon_student_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
     end
 
     it "does not return the student editor if a course id is provided" do
       expect(@anon_student_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
-    end
-
-    context "partial anonymity" do
-      context "when is_anonymous_author is set to true" do
-        it "does not return author" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
-        end
-
-        it "does not return editor" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
-        end
-
-        it "returns anonymous_author" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("anonymousAuthor { shortName }")).to eq @partially_anon_discussion.discussion_topic_participants.where(user_id: @student.id).first.id.to_s(36)
-        end
-      end
-
-      context "when is_anonymous_author is set to false" do
-        it "returns author" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
-        end
-
-        it "returns editor" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
-        end
-
-        it "does not return anonymous_author" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("anonymousAuthor { shortName }")).to eq nil
-        end
-      end
     end
   end
 

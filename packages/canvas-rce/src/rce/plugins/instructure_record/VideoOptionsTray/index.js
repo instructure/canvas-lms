@@ -129,7 +129,8 @@ export default function VideoOptionsTray(props) {
   const saveDisabled =
     displayAs === 'embed' &&
     (titleText === '' || (videoSize === CUSTOM && !dimensionsState.isValid))
-
+  //  yes I know ENV shouldn't be used in the sub-package, but it's temporary
+  const cc_in_rce_video_tray = !!ENV?.FEATURES?.cc_in_rce_video_tray
   return (
     <StoreProvider {...trayProps}>
       {contentProps => (
@@ -145,7 +146,7 @@ export default function VideoOptionsTray(props) {
           shouldCloseOnDocumentClick
           shouldContainFocus
           shouldReturnFocus
-          size="regular"
+          size={cc_in_rce_video_tray ? 'regular' : undefined}
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium">
@@ -219,20 +220,22 @@ export default function VideoOptionsTray(props) {
                         </View>
                       )}
                     </Flex.Item>
-                    <Flex.Item padding="small">
-                      <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                        <ClosedCaptionPanel
-                          subtitles={subtitles.map(st => ({
-                            locale: st.locale,
-                            file: {name: st.language || st.locale} // this is an artifact of ClosedCaptionCreatorRow's inards
-                          }))}
-                          uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                          languages={Bridge.languages}
-                          updateSubtitles={handleUpdateSubtitles}
-                          liveRegion={getLiveRegion}
-                        />
-                      </FormFieldGroup>
-                    </Flex.Item>
+                    {cc_in_rce_video_tray && (
+                      <Flex.Item padding="small">
+                        <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
+                          <ClosedCaptionPanel
+                            subtitles={subtitles.map(st => ({
+                              locale: st.locale,
+                              file: {name: st.language || st.locale} // this is an artifact of ClosedCaptionCreatorRow's inards
+                            }))}
+                            uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                            languages={Bridge.languages}
+                            updateSubtitles={handleUpdateSubtitles}
+                            liveRegion={getLiveRegion}
+                          />
+                        </FormFieldGroup>
+                      </Flex.Item>
+                    )}
                   </Flex>
                 </Flex.Item>
                 <Flex.Item

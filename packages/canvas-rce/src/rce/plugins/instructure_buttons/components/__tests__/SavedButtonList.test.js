@@ -20,9 +20,10 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import sinon from 'sinon'
 
-import RceApiSource from '../../../../../rcs/api'
+import RceApiSource from '../../../../../sidebar/sources/api'
 
-import SavedButtonList, {rceToFile} from '../SavedButtonList'
+import SavedButtonList from '../SavedButtonList'
+import {rceToFile} from '../SavedButtonList'
 
 describe('RCE "Buttons and Icons" Plugin > SavedButtonList', () => {
   let defaultProps, fetchPageStub, globalFetchStub

@@ -59,20 +59,16 @@ export const DiscussionEntry = {
       isolatedEntryId
       parentId
       quotedEntry {
-        _id
         createdAt
         previewMessage
         author {
           shortName
-          id
         }
         anonymousAuthor {
           shortName
-          id
         }
         editor {
           shortName
-          id
         }
         deleted
       }
@@ -116,12 +112,7 @@ export const DiscussionEntry = {
       createdAt: string,
       previewMessage: string,
       author: shape({
-        shortName: string,
-        id: string
-      }),
-      anonymousAuthor: shape({
-        shortName: string,
-        id: string
+        shortName: string
       }),
       editor: shape({
         shortName: string

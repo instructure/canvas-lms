@@ -98,13 +98,7 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties button and icon uploads to store', () => {
-    testHandler(
-      'startButtonsAndIconsUpload',
-      upload,
-      'uploadToButtonsAndIconsFolder',
-      {},
-      undefined
-    )
+    testHandler('startButtonsAndIconsUpload', upload, 'uploadToButtonsAndIconsFolder', {})
   })
 
   it('ties media upload to store', () => {

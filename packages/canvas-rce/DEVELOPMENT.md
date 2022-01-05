@@ -64,7 +64,7 @@ going to any page with an RCE instance and typing `ENV.JWT` into the JavaScript 
 ### Adding New Plugins
 
 If you are creating a plugin that works with Canvas RCE , you should also put in the appropriate
-fake data which can be done in the [fake data store](./src/rcs/fake.js).
+fake data which can be done in the [fake data store](./src/sidebar/sources/fake.js).
 
 Custom plugins live under the plugins [directory](./src/rce/plugins/).
 

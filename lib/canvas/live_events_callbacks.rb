@@ -134,8 +134,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_override_updated(obj)
     when Attachment
       if attachment_eligible?(obj)
-        if %w[display_name lock_at unlock_at folder_id].any? { |field| changes[field] }
-          Canvas::LiveEvents.attachment_updated(obj, changes["display_name"]&.first)
+        if changes["display_name"]
+          Canvas::LiveEvents.attachment_updated(obj, changes["display_name"].first)
         elsif changes["file_state"] && obj.file_state == "deleted"
           # Attachments are often soft deleted rather than destroyed
           Canvas::LiveEvents.attachment_deleted(obj)

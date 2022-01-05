@@ -459,9 +459,6 @@ module Importers
           if hash[:external_tool_data_json]
             tag.external_data = JSON.parse(hash[:external_tool_data_json])
           end
-          if hash[:external_tool_link_settings_json]
-            tag.link_settings = JSON.parse(hash[:external_tool_link_settings_json])
-          end
           tag.content_type = "ContextExternalTool"
           unless tag.save
             if tag.errors["url"]

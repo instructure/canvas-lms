@@ -3829,18 +3829,6 @@ describe CoursesController do
       expect(json[0]).to include({ "name" => "search teacher" })
     end
 
-    it "does not include pending users" do
-      user_session(@teacher)
-      @search_context = @course
-      course_with_teacher(name: "pending user")
-      @user.update_attribute(:workflow_state, "creation_pending")
-      course_with_teacher(name: "not pending user", active_all: true)
-      get "content_share_users", params: { course_id: @search_context.id, search_term: "pending" }
-      json = json_parse(response.body)
-      expect(json.length).to be(1)
-      expect(json[0]).to include({ "name" => "not pending user" })
-    end
-
     context "sharding" do
       specs_require_sharding
 

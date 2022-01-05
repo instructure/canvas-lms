@@ -47,7 +47,7 @@ const COLORS = [
   '#F06291',
   '#111111',
   '#556572',
-  '#6B7780',
+  '#8B969E',
   '#FFFFFF',
   null
 ]
@@ -159,7 +159,10 @@ function ColorPreview({color, disabled, margin = 'xxx-small', onSelect}) {
           {color ? formatMessage('Color {color}', {color}) : formatMessage('None')}
         </ScreenReaderContent>
       )}
-      <PreviewIcon color={color} testId={`colorPreview-${color}`} />
+      <PreviewIcon
+        color={color}
+        testId={`colorPreview-${color}`}
+      />
     </BaseButton>
   )
 }

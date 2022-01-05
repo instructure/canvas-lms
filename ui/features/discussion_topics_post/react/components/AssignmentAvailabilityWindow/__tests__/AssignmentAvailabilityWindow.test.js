@@ -69,26 +69,24 @@ describe('AssignmentAvailabilityWindow', () => {
 
     it('should render availability window', () => {
       const container = setup(mockProps())
-      expect(
-        container.getByText('Available from Mar 24, 2021 until Apr 4, 2021')
-      ).toBeInTheDocument()
+      expect(container.getByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
     })
 
     it('should render availability window with time', () => {
       const container = setup(mockProps({showDateWithTime: true}))
       expect(
-        container.getByText('Available from Mar 24, 2021 6am until Apr 4, 2021 5:59am')
+        container.getByText('Available from Mar 24 6am until Apr 4 5:59am')
       ).toBeInTheDocument()
     })
 
     it('should render only from section', () => {
       const container = setup(mockProps({untilDate: ''}))
-      expect(container.getByText('Available from Mar 24, 2021')).toBeInTheDocument()
+      expect(container.getByText('Available from Mar 24')).toBeInTheDocument()
     })
 
     it('should render only until section', () => {
       const container = setup(mockProps({availableDate: ''}))
-      expect(container.getByText('Available until Apr 4, 2021')).toBeInTheDocument()
+      expect(container.getByText('Available until Apr 4')).toBeInTheDocument()
     })
   })
 
@@ -101,14 +99,12 @@ describe('AssignmentAvailabilityWindow', () => {
 
     it('should not render availability window', () => {
       const container = setup(mockProps())
-      expect(container.queryByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeNull()
+      expect(container.queryByText('Available from Mar 24 until Apr 4')).toBeNull()
     })
 
     it('should render availability window when showOnMobile is true', () => {
       const container = setup(mockProps({showOnMobile: true}))
-      expect(
-        container.queryByText('Available from Mar 24, 2021 until Apr 4, 2021')
-      ).toBeInTheDocument()
+      expect(container.queryByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
     })
   })
 })

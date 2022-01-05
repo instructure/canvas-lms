@@ -64,9 +64,7 @@ module Account::Settings
   # otherwise use the last explicitly set value
   def calculate_inherited_setting(setting)
     inherited_hash = { locked: false, value: self.class.account_settings_options[setting][:default] }
-    # If this account's root account isn't a primary settings root account,
-    # it must have a federated parent that is the primary settings root account
-    account_chain(include_federated_parent: !root_account.primary_settings_root_account?).reverse_each do |acc|
+    account_chain.reverse_each do |acc|
       current_hash = acc.settings[setting]
       next if current_hash.nil?
 

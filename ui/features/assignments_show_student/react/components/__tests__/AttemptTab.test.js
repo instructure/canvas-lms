@@ -689,51 +689,6 @@ describe('ContentTabs', () => {
       expect(calls[1][1]).toEqual({content_type: 'application/pdf', name: 'file2.pdf'})
     })
 
-    it('calls uploadFile with the URL pointing to the assignments api endpoint', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 2}
-      })
-      props.assignment.groupSet = null
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
-
-      const {container} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
-        </MockedProvider>
-      )
-
-      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
-      const {calls} = uploadFileModule.uploadFile.mock
-      expect(calls[0][0]).toEqual(
-        `/api/v1/courses/1/assignments/${props.assignment._id}/submissions/1/files`
-      )
-    })
-
-    it('calls uploadFile with the URL pointing to the groups api endpoint', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 2}
-      })
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
-
-      const {container} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
-        </MockedProvider>
-      )
-
-      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
-      const {calls} = uploadFileModule.uploadFile.mock
-      expect(calls[0][0]).toEqual(
-        `/api/v1/groups/${props.assignment.groupSet.currentGroup._id}/files`
-      )
-    })
-
     // Byproduct of how the dummy submissions are being handled. Check out ViewManager
     // for some context around this
     it('creates a submission draft for the current attempt when not on attempt 0', async () => {

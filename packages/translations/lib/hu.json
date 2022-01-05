@@ -80,9 +80,6 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Biztosan törölni szeretné ezt a tervezőbeli elemet?"
     },
-    "arrows_464a3e54": {
-        "message": "Nyilak"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Képarány megtartása"
     },
@@ -133,9 +130,6 @@
     },
     "available_folders_694d0436": {
         "message": "Elérhető mappák"
-    },
-    "basic_554cdc0a": {
-        "message": "Alap"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "A Tennivaló Listád Elkezdése"
@@ -304,9 +298,6 @@
     },
     "delete_a6efa79d": {
         "message": "Törlés"
-    },
-    "delimiters_4db4840d": {
-        "message": "Elválasztó jelek"
     },
     "describe_the_image_e65d2e32": {
         "message": "(A kép leírása)"
@@ -530,9 +521,6 @@
     "grades_loaded_5056277c": {
         "message": "Értékelések betöltve"
     },
-    "greek_65c5b3f7": {
-        "message": "Görög"
-    },
     "group_documents_8bfd6ae6": {
         "message": "Csoport dokumentumok"
     },
@@ -707,9 +695,6 @@
     "medium_5a8e9ead": {
         "message": "Közepes"
     },
-    "misc_3b692ea7": {
-        "message": "Egyéb"
-    },
     "miscellaneous_e9818229": {
         "message": "Egyéb"
     },
@@ -812,9 +797,6 @@
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Nyissa meg a billentyűkombinációk párbeszédablakot"
     },
-    "operators_a2ef9a93": {
-        "message": "Műveletek"
-    },
     "opportunities_popup_f6703842": {
         "message": "lehetőségek popup"
     },
@@ -901,9 +883,6 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Médiafájl rögzítése/feltöltése"
-    },
-    "relationships_6602af70": {
-        "message": "Kapcsolatok"
     },
     "reminder_date_4564d12d": {
         "message": "Emlékeztető: { date }"

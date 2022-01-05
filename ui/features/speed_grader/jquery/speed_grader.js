@@ -3321,10 +3321,7 @@ EG = {
       $grade
     )
 
-    const isInModeration = isModerated && !jsonData.grades_published_at
-    if (!isInModeration) {
-      updateSubmissionAndPageEffects()
-    }
+    updateSubmissionAndPageEffects()
 
     if (grade.toUpperCase() === 'EX') {
       formData['submission[excuse]'] = true

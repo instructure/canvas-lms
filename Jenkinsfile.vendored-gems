@@ -52,6 +52,62 @@ pipeline {
             extendedStage('Engines').obeysAllowStages(false).timeout(10).execute {
               sh 'build/new-jenkins/test-engines.sh'
             }
+
+            extendedStage('Pulsar').obeysAllowStages(false).timeout(10).execute {
+              withEnv([
+                  'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml:docker-compose.new-jenkins.pulsar.yml'
+              ]) {
+                int retries = 0
+                int retryLimit = 4
+                Boolean stillRunning = true
+                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/pulsar:latest'
+                // try to give the pulsar container a head start so that if we are retrying the
+                // admin script we aren't also rebooting the pulsar container itself each time.
+                sh 'docker-compose up -d pulsar'
+                while (stillRunning && retries < retryLimit) {
+                  try {
+                    // sometimes the pulsar container kills itself on boot
+                    // if it can't talk to it's own internal zookeeper.
+                    // We haven't found out WHY yet (working on it),
+                    // but we want the retry loop to be as fast as possible.
+                    // If the admin script exits, we'll completely kill
+                    // the container in the catch block and try again a limited
+                    // number of times.  The bootstrap script only contains
+                    // a very limited number of retries because the pulsar client has exponential backoff
+                    // baked in already so waiting many more times is just wasted time.
+
+                    sh '''
+                      docker-compose run pulsar-admin ./scripts/bootstrap.sh
+                      docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
+                    '''
+                    stillRunning = false
+                  /* groovylint-disable-next-line CatchException */
+                  } catch (Exception ex) {
+                    // want to be able to debug in build output what
+                    // made the pulsar container fail.
+                    sh 'docker-compose logs pulsar'
+
+                    // kinda hacky, but this will return a non-0 exit code if we did NOT find this string
+                    // which means we don't think we can retry, so just let it die.
+                    sh 'docker-compose logs pulsar | grep -E "zoo keeper disconnected|Failed to get Partitioned Metadata"'
+
+                    reportToSplunk('pulsar_retrying')
+                    sh '''
+                      docker-compose stop pulsar
+                      docker-compose rm -f pulsar
+                    '''
+                    retries += 1
+                    if (retries >= retryLimit) {
+                      sh '''
+                        echo \"*********PULSAR LOGS*********\"
+                        docker-compose logs pulsar
+                      '''
+                      reportToSplunk('pulsar_failed')
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

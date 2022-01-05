@@ -84,8 +84,8 @@ describe('AssignmentAvailabilityContainer', () => {
         assignmentOverrides: {nodes: []}
       })
       expect(queryByText('Everyone')).toBeTruthy()
-      expect(queryByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
-      expect(queryByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
+      expect(queryByText('Due Mar 31 5:59am')).toBeTruthy()
+      expect(queryByText('Available from Mar 24 until Apr 4')).toBeTruthy()
     })
 
     it('displays "Show due dates" button when there are overrides', () => {
@@ -102,7 +102,7 @@ describe('AssignmentAvailabilityContainer', () => {
       expect(queryByText('Show Due Dates (4)')).toBeTruthy()
       fireEvent.click(queryByText('Show Due Dates (4)'))
       expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
-      expect(await findByText('Sep 4, 2021 5:59am')).toBeTruthy()
+      expect(await findByText('Sep 4 5:59am')).toBeTruthy()
     })
 
     it('correct text is shown when a date is not set', async () => {
@@ -138,7 +138,7 @@ describe('AssignmentAvailabilityContainer', () => {
       const {getByText} = setup({
         assignmentOverrides: {nodes: []}
       })
-      expect(getByText('Due Mar 31, 2021')).toBeTruthy()
+      expect(getByText('Due Mar 31')).toBeTruthy()
     })
 
     it('displays no due date when there are no overrides and no due date', () => {
@@ -154,10 +154,10 @@ describe('AssignmentAvailabilityContainer', () => {
         assignmentOverrides: {nodes: []}
       })
 
-      expect(queryByText('Due Mar 31, 2021')).toBeInTheDocument()
-      const dueDateTrayButton = queryByText('Due Mar 31, 2021')
+      expect(queryByText('Due Mar 31')).toBeInTheDocument()
+      const dueDateTrayButton = queryByText('Due Mar 31')
       fireEvent.click(dueDateTrayButton)
-      expect(getByText('Due Mar 31, 2021')).toBeTruthy()
+      expect(getByText('Due Mar 31')).toBeTruthy()
       expect(getByTestId('assignment-override-row')).toBeTruthy()
     })
 
@@ -167,10 +167,10 @@ describe('AssignmentAvailabilityContainer', () => {
         isAdmin: false
       })
 
-      expect(queryByText('Due Mar 31, 2021')).toBeInTheDocument()
-      const dueDateTrayButton = queryByText('Due Mar 31, 2021')
+      expect(queryByText('Due Mar 31')).toBeInTheDocument()
+      const dueDateTrayButton = queryByText('Due Mar 31')
       fireEvent.click(dueDateTrayButton)
-      expect(getByText('Due Mar 31, 2021')).toBeTruthy()
+      expect(getByText('Due Mar 31')).toBeTruthy()
       expect(queryByTestId('due_date_tray_header_for')).toBeNull()
     })
   })

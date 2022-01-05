@@ -247,7 +247,7 @@ SelectContentDialog.Events = {
         $external_content_info_alerts.on('focus', function () {
           const iframeWidth = $iframe.outerWidth(true)
           const iframeHeight = $iframe.outerHeight(true)
-          $iframe.css('border', '2px solid #0374B5')
+          $iframe.css('border', '2px solid #008EE2')
           $(this).removeClass('screenreader-only')
           const alertHeight = $(this).outerHeight(true)
           $iframe

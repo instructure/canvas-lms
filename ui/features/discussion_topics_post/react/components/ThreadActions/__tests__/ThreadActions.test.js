@@ -31,7 +31,6 @@ const createProps = overrides => {
     ...defaultRequiredProps,
     goToParent: jest.fn(),
     goToTopic: jest.fn(),
-    goToQuotedReply: jest.fn(),
     onEdit: jest.fn(),
     onDelete: jest.fn(),
     onOpenInSpeedGrader: jest.fn(),
@@ -54,7 +53,6 @@ describe('ThreadActions', () => {
     expect(getByTestId('markAllAsRead')).toBeInTheDocument()
     expect(getByTestId('markAsUnread')).toBeInTheDocument()
     expect(getByTestId('toTopic')).toBeInTheDocument()
-    expect(getByTestId('toQuotedReply')).toBeInTheDocument()
     expect(getByTestId('edit')).toBeInTheDocument()
     expect(getByTestId('delete')).toBeInTheDocument()
     expect(getByTestId('inSpeedGrader')).toBeInTheDocument()
@@ -62,7 +60,6 @@ describe('ThreadActions', () => {
 
     expect(queryByText('Mark All as Read')).toBeTruthy()
     expect(queryByText('Go To Topic')).toBeTruthy()
-    expect(queryByText('Go To Quoted Reply')).toBeTruthy()
     expect(queryByText('Edit')).toBeTruthy()
     expect(queryByText('Delete')).toBeTruthy()
     expect(queryByText('Open in SpeedGrader')).toBeTruthy()
@@ -78,7 +75,6 @@ describe('ThreadActions', () => {
 
     expect(queryByText('Mark All as Read')).toBeFalsy()
     expect(queryByText('Go To Topic')).toBeFalsy()
-    expect(queryByText('Go To Quoted Reply')).toBeFalsy()
     expect(queryByText('Edit')).toBeFalsy()
     expect(queryByText('Delete')).toBeFalsy()
     expect(queryByText('Open in SpeedGrader')).toBeFalsy()

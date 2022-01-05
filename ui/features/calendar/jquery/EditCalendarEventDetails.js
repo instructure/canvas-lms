@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!calendar'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
 import React from 'react'
@@ -317,10 +316,6 @@ export default class EditCalendarEventDetails {
     return coupleTimeFields($start, $end, $date)
   }
 
-  screenReaderMessageCallback = msg => {
-    return () => $.screenReaderFlashMessageExclusive(msg, true)
-  }
-
   formSubmit = jsEvent => {
     jsEvent.preventDefault()
 
@@ -378,11 +373,7 @@ export default class EditCalendarEventDetails {
         }
       }
       const newEvent = commonEventFactory(objectData, this.event.possibleContexts())
-      newEvent.save(
-        params,
-        this.screenReaderMessageCallback(I18n.t('The event was successfully created')),
-        this.screenReaderMessageCallback(I18n.t('Event creation failed'))
-      )
+      newEvent.save(params)
     } else {
       this.event.title = params['calendar_event[title]']
       // event unfudges/unwraps values when sending to server (so wrap here)
@@ -398,11 +389,7 @@ export default class EditCalendarEventDetails {
         this.event.contextInfo = this.contextInfoForCode(data.context_code)
         params['calendar_event[context_code]'] = data.context_code
       }
-      this.event.save(
-        params,
-        this.screenReaderMessageCallback(I18n.t('The event was successfully updated')),
-        this.screenReaderMessageCallback(I18n.t('Event update failed'))
-      )
+      this.event.save(params)
     }
 
     return this.closeCB()

@@ -156,10 +156,8 @@ test('it builds the correct Launch URL for LTI 1 tools', () => {
     <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   const tool = toolDefinitions[0]
-  const correctUrl = `${
-    '/courses/1/external_tools/retrieve?borderless=true&' +
-    'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&secure_params='
-  }${secureParams}`
+  const correctUrl = `${'/courses/1/external_tools/retrieve?borderless=true&' +
+    'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&secure_params='}${secureParams}`
   const computedUrl = wrapper.instance().getLaunch(tool)
   equal(computedUrl, correctUrl)
 })
@@ -220,7 +218,7 @@ test('shows beginning info alert and adds styles to iframe', () => {
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.before_external_content_info_alert').simulate('focus')
   equal(wrapper.state().beforeExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '-4px'})
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
 })
 
 test('shows ending info alert and adds styles to iframe', () => {
@@ -230,7 +228,7 @@ test('shows ending info alert and adds styles to iframe', () => {
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.after_external_content_info_alert').simulate('focus')
   equal(wrapper.state().afterExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '-4px'})
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
 })
 
 test('hides beginning info alert and adds styles to iframe', () => {
@@ -302,7 +300,10 @@ test('sets the iframe allowances', () => {
   )
 
   equal(
-    wrapper.find('.tool_launch').instance().getAttribute('allow'),
+    wrapper
+      .find('.tool_launch')
+      .instance()
+      .getAttribute('allow'),
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
   )
 })
@@ -317,5 +318,11 @@ test('sets the iframe "data-lti-launch" attribute', () => {
     />
   )
 
-  equal(wrapper.find('.tool_launch').instance().getAttribute('data-lti-launch'), 'true')
+  equal(
+    wrapper
+      .find('.tool_launch')
+      .instance()
+      .getAttribute('data-lti-launch'),
+    'true'
+  )
 })

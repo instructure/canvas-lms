@@ -154,11 +154,11 @@ test('Grid.View.legacyMasteryDetails', () => {
     'returns "exceeds" if 150% or more of mastery score'
   )
   ok(
-    isEqual(Grid.View.legacyMasteryDetails(5, outcome), ['rating_1', '#0B874B', 'Meets Mastery']),
+    isEqual(Grid.View.legacyMasteryDetails(5, outcome), ['rating_1', '#00AC18', 'Meets Mastery']),
     'returns "mastery" if equal to mastery score'
   )
   ok(
-    isEqual(Grid.View.legacyMasteryDetails(7, outcome), ['rating_1', '#0B874B', 'Meets Mastery']),
+    isEqual(Grid.View.legacyMasteryDetails(7, outcome), ['rating_1', '#00AC18', 'Meets Mastery']),
     'returns "mastery" if above mastery score'
   )
   ok(
@@ -168,7 +168,7 @@ test('Grid.View.legacyMasteryDetails', () => {
   ok(
     isEqual(Grid.View.legacyMasteryDetails(1, outcome), [
       'rating_3',
-      '#E0061F',
+      '#EE0612',
       'Well Below Mastery'
     ]),
     'returns "remedial" if less than half of mastery score'

@@ -36,28 +36,10 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-export const ImageSection = ({settings, onChange, editing}) => {
+export const ImageSection = ({onChange}) => {
   const [openCropModal, setOpenCropModal] = useState(false)
   const [state, dispatch] = useReducer(reducer, initialState)
   const allowedModes = {[modes.courseImages.type]: Course}
-
-  useEffect(() => {
-    if (editing) {
-      dispatch({
-        type: actions.SET_IMAGE.type,
-        payload: settings.encodedImage
-      })
-    }
-  }, [settings.encodedImage])
-
-  useEffect(() => {
-    if (editing) {
-      dispatch({
-        type: actions.SET_IMAGE_NAME.type,
-        payload: settings.encodedImageName
-      })
-    }
-  }, [settings.encodedImageName])
 
   useEffect(() => {
     onChange({
@@ -72,13 +54,6 @@ export const ImageSection = ({settings, onChange, editing}) => {
       payload: state.mode
     })
   }, [state.mode])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE_NAME,
-      payload: state.imageName
-    })
-  }, [state.imageName])
 
   return (
     <Group as="section" defaultExpanded summary={formatMessage('Image')}>

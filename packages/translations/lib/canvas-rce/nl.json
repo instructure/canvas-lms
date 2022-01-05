@@ -40,8 +40,6 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Audio- en video-opname wordt niet ondersteund; gebruik een andere browser."
   },
-  "audio_options_feb58e2c": { "message": "Audio-opties" },
-  "audio_options_tray_33a90711": { "message": "Gebied met audio-opties" },
   "audio_player_for_title_20cc70d": {
     "message": "Audio-speler voor { title }"
   },
@@ -283,7 +281,6 @@
   "loading_please_wait_d276220a": {
     "message": "Bezig met laden, even wachten"
   },
-  "loading_preview_9f077aa1": { "message": "Voorbeeld laden" },
   "locked_762f138b": { "message": "Vergrendeld" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
@@ -339,9 +336,6 @@
   "pentagon_17d82ea3": { "message": "Vijfhoek" },
   "people_b4ebb13c": { "message": "Personen" },
   "percentage_34ab7c2c": { "message": "Percentage" },
-  "percentage_must_be_a_number_8033c341": {
-    "message": "Percentage moet een getal zijn"
-  },
   "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Geplaatst: { when }" },
   "preformatted_d0670862": { "message": "Voorgeformatteerd" },
@@ -381,7 +375,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O om de pretty HTML-editor te openen."
   },
-  "show_audio_options_b489926b": { "message": "Audio-opties weergeven" },
   "show_embed_options_ef8d7ef": { "message": "Ingesloten opties weergeven" },
   "show_image_options_1e2ecc6b": { "message": "Afbeeldingsopties weergeven" },
   "show_link_options_545338fd": { "message": "Linkopties weergeven" },

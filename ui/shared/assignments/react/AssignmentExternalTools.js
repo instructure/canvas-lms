@@ -93,7 +93,7 @@ class AssignmentExternalTools extends React.Component {
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.getMaxIFrameWidth() - 4}px`}
+      iframeStyle: {border: '2px solid #008EE2', width: `${this.getMaxIFrameWidth() - 4}px`}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -200,7 +200,7 @@ AssignmentExternalTools.defaultProps = {
   assignmentId: undefined
 }
 
-const attach = function (element, placement, courseId, assignmentId) {
+const attach = function(element, placement, courseId, assignmentId) {
   const configTools = (
     <AssignmentExternalTools
       placement={placement}

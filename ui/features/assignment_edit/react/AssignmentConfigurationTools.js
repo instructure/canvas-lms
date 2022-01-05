@@ -70,7 +70,7 @@ class AssignmentConfigurationTools extends React.Component {
       type: 'GET',
       url: toolsUrl,
       data,
-      success: $.proxy(function (data) {
+      success: $.proxy(function(data) {
         let prevToolLaunch
         if (this.props.selectedTool && this.props.selectedToolType) {
           for (let i = 0; i < data.length; i++) {
@@ -137,7 +137,7 @@ class AssignmentConfigurationTools extends React.Component {
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`}
+      iframeStyle: {border: '2px solid #008EE2', width: `${this.iframe.offsetWidth - 4}px`}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -262,7 +262,7 @@ class AssignmentConfigurationTools extends React.Component {
   }
 }
 
-const attach = function (
+const attach = function(
   element,
   courseId,
   secureParams,

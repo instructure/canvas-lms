@@ -151,45 +151,5 @@ describe "Discussion Topic Show" do
         expect(fj("p:contains('@JeffreyHI!')")).to be_present
       end
     end
-
-    it "open Find Outcome dialog when adding a rubric" do
-      assignment = @course.assignments.create!(
-        name: "Assignment",
-        submission_types: ["online_text_entry"],
-        points_possible: 20
-      )
-      dt = @course.discussion_topics.create!(
-        title: "Graded Discussion",
-        discussion_type: "threaded",
-        posted_at: "2017-07-09 16:32:34",
-        user: @teacher,
-        assignment: assignment
-      )
-
-      get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
-
-      f("button[data-testid='discussion-post-menu-trigger']").click
-      fj("span[role='menuitem']:contains('Add Rubric')").click
-      fj("a.add_rubric_link:contains('Add Rubric')").click
-      f("a#add_learning_outcome_link").click
-
-      expect(fj("span.ui-dialog-title:contains('Find Outcomes')")).to be_present
-    end
-
-    it "Able to reply to a group discussion" do
-      gc = @course.account.group_categories.create(name: "Group Category")
-      group = group_model(name: "Group", group_category: gc, context: @course.account)
-      group_membership_model(group: group, user: @teacher)
-      topic = discussion_topic_model(context: group, type: "Announcement")
-
-      get "/groups/#{group.id}/discussion_topics/#{topic.id}"
-
-      f("button[data-testid='discussion-topic-reply']").click
-      wait_for_ajaximations
-      type_in_tiny "textarea", "Test Reply"
-      fj("button:contains('Reply')").click
-      wait_for_ajaximations
-      expect(fj("p:contains('Test Reply')")).to be_present
-    end
   end
 end

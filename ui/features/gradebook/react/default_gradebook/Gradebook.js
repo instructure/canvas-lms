@@ -1366,7 +1366,6 @@ class Gradebook extends React.Component {
       ref1 = studentSubmissionGroup.submissions
       for (k = 0, len1 = ref1.length; k < len1; k++) {
         submission = ref1[k]
-        submission.posted_at = tz.parse(submission.posted_at)
         ensureAssignmentVisibility(this.getAssignment(submission.assignment_id), submission)
         submissions.push(submission)
         this.updateSubmission(submission)
@@ -1413,7 +1412,6 @@ class Gradebook extends React.Component {
     const changedStudentIds = []
     for (let j = 0, len = submissions.length; j < len; j++) {
       const submission = submissions[j]
-      submission.posted_at = tz.parse(submission.posted_at)
       student = this.student(submission.user_id)
       if (!student) {
         // if the student isn't loaded, we don't need to update it
@@ -4577,49 +4575,19 @@ class Gradebook extends React.Component {
       ReactDOM.unmountComponentAtNode(mountPoint)
     }
 
+    const onApply = args => {
+      // TODO: actually apply the scores
+      close()
+    }
+
     const props = {
       assignmentGroup,
-      onApply: args => {
-        this.executeApplyScoreToUngraded(args)
-        close()
-      },
+      onApply,
       onClose: close,
       open: true
     }
 
     renderComponent(ApplyScoreToUngradedModal, mountPoint, props)
-  }
-
-  executeApplyScoreToUngraded(args) {
-    const {value, ...options} = args
-
-    // TODO: if updated Gradebook filters are enabled, we should use those
-    // instead, either by replacing the lines below with checks against the
-    // current filters or by passing the ID of the active filter (and looking up
-    // the contents of the filter on the back-end)
-    const optionsWithFilters = {
-      ...options,
-      courseSectionId: this.getFilterRowsBySetting('sectionId'),
-      gradingPeriodId: this.getFilterColumnsBySetting('gradingPeriodId'),
-      moduleId: this.getFilterColumnsBySetting('contextModuleId'),
-      studentGroupId: this.getFilterRowsBySetting('studentGroupId')
-    }
-
-    if (value === 'excused') {
-      optionsWithFilters.excuse = true
-    } else {
-      optionsWithFilters.percent = value
-    }
-
-    return GradebookApi.applyScoreToUngradedSubmissions(this.options.context_id, optionsWithFilters)
-      .then(
-        FlashAlert.showFlashSuccess(
-          I18n.t(
-            'Request successfully sent. Note that applying scores may take a while and changes will not appear until you reload the page.'
-          )
-        )
-      )
-      .catch(FlashAlert.showFlashError(I18n.t('There was a problem applying scores.')))
   }
 
   destroy() {

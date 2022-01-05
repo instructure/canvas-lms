@@ -82,6 +82,9 @@ class AssetUserAccessLog
     AuaLog0, AuaLog1, AuaLog2, AuaLog3, AuaLog4, AuaLog5, AuaLog6
   ].freeze
   METADATUM_KEY = "aua_logs_compaction_state"
+  PULSAR_NAMESPACE = "asset_user_access_log"
+  PULSAR_SUBSCRIPTION = "aua_log_compactor"
+  PULSAR_TOPIC_PREFIX = "view-increments"
 
   def self.put_view(asset_user_access, timestamp: nil)
     # the "timestamp:" argument is useful for testing or backfill/replay
@@ -93,7 +96,47 @@ class AssetUserAccessLog
     ts = timestamp || Time.now.utc
     log_values = { asset_user_access_id: asset_user_access.id, created_at: ts }
     log_entry = log_model(ts).new(log_values)
-    log_entry.save_without_transaction(touch: false)
+    if write_to_db_partition?(::Switchman::Shard.current)
+      log_entry.save_without_transaction(touch: false)
+    end
+
+    # make sure that any message bus config is relative to the shard
+    # the actual AUA record lives on.  The topic name
+    # and channel config need to be read relative
+    # to the same shard throughput.
+    asset_user_access.shard.activate do
+      shard = ::Switchman::Shard.current
+      if write_to_message_bus?(shard)
+        log_values[:created_at] = log_values[:created_at].to_i
+        # TODO: these 2 values are used to keep the metadata
+        # about which records have been processed already in sync
+        # between the postgres and pulsar versions.  Even if we switch
+        # back and forth between consuming from postgres and pulsar,
+        # we won't compact the same record twice.  When we no longer
+        # use the postgres path, we can rely on the internal sequence IDs from
+        # the message bus to track what we have and have not processed
+        # and the daily partitions won't be relevant anymore; at that point
+        # we will no longer need to add these 2 values to the log entry.
+        log_values[:log_entry_id] = log_entry.id
+        log_values[:partition_index] = ts.wday
+        log_values[:root_account_id] = asset_user_access.root_account_id
+        root_account = asset_user_access.root_account
+        publish_message_to_bus(log_values, root_account)
+      end
+    end
+  end
+
+  def self.publish_message_to_bus(log_values, root_account)
+    topic_name = message_bus_topic_name(root_account)
+    msg = log_values.to_json
+    MessageBus.send_one_message(PULSAR_NAMESPACE, topic_name, msg)
+  rescue ::MessageBus::MemoryQueueFullError => e
+    Rails.logger.warn("[AUA LOG] Write failed due to throughput: #{topic_name} , #{msg}")
+    CanvasErrors.capture_exception(:asset_user_access_logs, e, :warn)
+  end
+
+  def self.message_bus_topic_name(root_account)
+    "#{PULSAR_TOPIC_PREFIX}-#{root_account.uuid}"
   end
 
   # mostly useful for verifying writes by using the same
@@ -115,6 +158,44 @@ class AssetUserAccessLog
     PluginSetting.find_by_name(:asset_user_access_logs)
   end
 
+  # TODO: these config predicate methods should only exist while we are
+  # transitioning log compaction from postgres to pulsar.
+  # We can remove them entirely, along with the postgres read/write
+  # code paths, once that transition is complete.
+  def self.write_to_message_bus?(shard)
+    channel_config(shard).fetch("pulsar_writes_enabled", false)
+  end
+
+  # TODO: these config predicate methods should only exist while we are
+  # transitioning log compaction from postgres to pulsar.
+  # We can remove them entirely, along with the postgres read/write
+  # code paths, once that transition is complete.
+  def self.write_to_db_partition?(shard)
+    channel_config(shard).fetch("db_writes_enabled", true)
+  end
+
+  # TODO: these config predicate methods should only exist while we are
+  # transitioning log compaction from postgres to pulsar.
+  # We can remove them entirely, along with the postgres read/write
+  # code paths, once that transition is complete.
+  def self.read_from_message_bus?(shard)
+    channel_config(shard).fetch("pulsar_reads_enabled", false)
+  end
+
+  # This config map is intended to be used during the transition
+  # between writing these log updates through postgres directly
+  # to writing them through an external message bus to save on
+  # write throughput.
+  #
+  # TODO: Once we are stably writing logs through the message bus
+  # we can drop this config information entirely.
+  def self.channel_config(shard)
+    settings = DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
+    YAML.safe_load(settings["aua.yml"] || "{}")
+  end
+
+  # TODO: After completing transition to pulsar, we can remove the "max_log_ids" from this
+  # metadata entry entirely and just store the message bus sequence number
   def self.metadatum_payload
     default_metadatum = {
       max_log_ids: [0, 0, 0, 0, 0, 0, 0],
@@ -185,14 +266,333 @@ class AssetUserAccessLog
       return log_message("PluginSetting configured OFF, aborting")
     end
 
-    caught_up = postgres_compact
+    shard = ::Switchman::Shard.current
+    caught_up = if read_from_message_bus?(shard)
+                  message_bus_compact
+                else
+                  postgres_compact
+                end
     # it's ok if we didn't complete, we time the job out so that
     # for things that need to move or hold jobs they don't have to
     # wait forever.  If we completed compaction, though, just finish.
     AssetUserAccessLog.reschedule! unless caught_up
   end
 
+  # Open (usually RE-open) a subscription
+  # to the pulsar topic for this shard,
+  # use the metadata state (basically an iterator position)
+  # to make sure that we aren't double-processing messages,
+  # and turn all the messages that we can into bulk SQL
+  # update statements so we minimize the consumed DB primary
+  # write throughput for keeping AUA counts up to date
+  # at the tradeoff of some eventual consistency.
+  def self.message_bus_compact
+    Bundler.require(:pulsar) # makes sure we can capture Pulsar errors
+    # Step 0) load iterator state and settings
+    compaction_state = metadatum_payload
+    compaction_start = Time.now.utc
+    mb_settings = compaction_settings
+    log_batch_size = mb_settings[:log_batch_size]
+    max_compaction_time = mb_settings[:max_compaction_time]
+    receive_timeout = mb_settings[:receive_timeout]
+    early_exit = false # use to signal as soon as we've decided to bail on compaction.
+    positive_runtime_budget = true # set to false when budget runtime exceed allocation
+
+    # 1) begin root_account iteration
+    #   most shards have exactly 1 root account.
+    #   a few shards have up to 20 root accounts.
+    #   there exists at least one shard with around 200 root accounts.
+    #   Because we factor topic names by root account ID to be resiliant
+    #   to shard changes, we need to iterate through them.
+    #   We iterate through them in random order to avoid favoring one root
+    #   account over others during heavy compaction load where friction is
+    #   being applied to gate down the speed of updates.
+    Account.root_accounts.active.order("RANDOM()").pluck(:id).each do |root_account_id|
+      # before processing the (next) account in line, make sure we have runtime budget.
+      # If not, we need to bail and do other accounts later, just let the job get rescheduled.
+      # This is to keep the job healthy by not having it run for too long (that can block
+      # things like shard moves, job cluster scaledowns, etc).
+      unless positive_runtime_budget
+        # make sure this is configured to show we're skipping at least one account.
+        early_exit = true
+        break
+      end
+
+      root_account = Account.find(root_account_id)
+      # tracking whether we've consumed all the messages in the topic for just this root account
+      caught_up_for_account = false
+
+      # 2) open subscription
+      # usually this will be RE-opening an existing subscription,
+      # which means that pulsar's stored state (keyed by the
+      # subscription name, "PULSAR_SUBSCRIPTION") will know to
+      # start giving us messages from the last place we left off.
+      # If that subscription is allowed to expire because the jobs
+      # queue gets backlogged badly, a new subscription will start from
+      # the earliest message in storage on that topic, but we
+      # can use the compaction state from metadatum_payload to
+      # skip forward until we find messages we haven't processed.
+      topic = message_bus_topic_name(root_account)
+      # we explicitly close this consumer at the end of processing, so we don't want
+      # a cached consumer.
+      consumer = nil
+      connect_attempts = 0
+      begin
+        consumer = MessageBus.consumer_for(PULSAR_NAMESPACE, topic, PULSAR_SUBSCRIPTION, force_fresh: true)
+      rescue ::Pulsar::Error::ConsumerBusy => e
+        # this means that another consumer is already running, or is being
+        # held open improperly.  If it's the former, we don't want
+        # to run at the same time.  If it's the later, we can't really tell
+        # that from here, so we should just stop and let that other consumer eventually
+        # time out.  No need to fail the job, it will get rescheduled, just like if
+        # we'd run out of runtime budget.
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :info)
+        early_exit = true
+        break
+      rescue *::MessageBus.rescuable_pulsar_errors => e
+        connect_attempts += 1
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :warn)
+        if connect_attempts >= 2
+          # treat it like a runtime timeout, reschedule the job
+          # and let it try again.
+          early_exit = true
+          break
+        end
+        # It's possible the brokers are being restarted; we'll try
+        # one more time to see if pulling new connections allows us to
+        # find the brokers again.
+        MessageBus.reset!
+        retry
+      end
+
+      # 3) establish in-memory datastructure for compacting a set of events FOR THIS ROOT ACCOUNT.
+      # the hash will have IDs for asset_user_access records as it's key, and
+      # the value will be a hash containing the aggregation state for that
+      # one record based on all messages addressed to it in the current batch
+      # like this:
+      #
+      # asset_user_access_id => {
+      #  count: INT,
+      #  max_updated_at: TIMESTAMP
+      # }
+      compaction_map = {}
+      to_acknowledge = []
+      new_iterator_state = compaction_state[:max_log_ids].dup
+      compaction_state[:temp_root_account_max_log_ids] ||= {}
+      root_account_postgres_iterators = compaction_state[:temp_root_account_max_log_ids].dup
+      # map of partition ids to max message ID seen for that partition
+      # of the topic for the current root account
+      root_account_pulsar_state = compaction_state[:pulsar_partition_iterators].fetch(root_account_id.to_s, {})
+      # if there is no temporary state for this root account right now, we should use the global state
+      # since that is the max value seen in each partition regardless of root account.
+      root_account_postgres_iterator_state = root_account_postgres_iterators.fetch(root_account_id.to_s, new_iterator_state.dup)
+      new_message_bus_iterator_state = root_account_pulsar_state.dup
+      continue_consuming_from_bus = true
+
+      while continue_consuming_from_bus
+        consumed_count = 0
+        skip_count = 0
+        log_message("Pulling messages from bus for RA #{root_account_id}...")
+        # 4) subscribe to start receiving messages
+        while !caught_up_for_account && (consumed_count < log_batch_size)
+          message = nil
+          begin
+            message = consumer.receive(receive_timeout)
+          rescue Pulsar::Error::Timeout
+            # this basically means we caught up to the end of THIS topic
+            # and don't need to reschedule immediately
+            caught_up_for_account = true
+            break
+          end
+          message_hash = JSON.parse(message.data).with_indifferent_access
+          unless message_hash.key?(:asset_user_access_id)
+            log_message("MALFORMED MESSAGE, skipping: #{message.data}")
+            next
+          end
+          # 5) check each entry against the metadata index to see if it should be processed before adding to datastructure
+          pulsar_message_id = MessageBus::MessageId.from_string(message.message_id.to_s)
+          pulsar_partition_id = pulsar_message_id.partition_id
+          # TODO: The postgres iterator and metadata values are only here for maintaining
+          # iterator state while transitioning from postgres to pulsar.
+          # we can ONLY use the message ids from pulsar and the :pulsar_partition_iterators
+          # iterator state once that transition is complete.
+          message_partition_index = message_hash[:partition_index]
+          log_entry_id = message_hash[:log_entry_id]
+
+          max_postgres_partition_id = compaction_state[:max_log_ids][message_partition_index]
+          max_pulsar_partition_message_id = root_account_pulsar_state[pulsar_partition_id.to_s]
+          should_process_message = (
+            # nil would mean this message ONLY got written to pulsar.
+            # exceeding the iterator state would mean the POSTGRES compaction had not processed the letter.
+            # NOT nil, but lower than the postgres iterator would mean we'd seen
+            # it already in postgres compaction, so no reason to process it now.
+            (log_entry_id.nil? || (log_entry_id > max_postgres_partition_id)) &&
+            (
+              max_pulsar_partition_message_id.nil? ||
+              pulsar_message_id > MessageBus::MessageId.from_string(max_pulsar_partition_message_id)
+            )
+          )
+
+          # even if we don't PROCESS the message, that's only because
+          # we already have that data compacted into the AUA table state
+          # so we still want to acknowledge it to avoid seeing it again.
+          to_acknowledge << message
+          # 6) store the max metadata for each index (order is guaranteed within the partition)
+          # for the same reason: even if we don't want to process the message, we want to make sure
+          # our iterator is advanced as far as possible.
+          # (TODO: When we're off of postgres, this iterator state update can go away, and we can
+          # just rely on the subsequent MESSAGE BUS iterator state)
+          # This is currently only set on the temporary state for this contextual root account
+          # in case we have to abort the job (because we cannot make guarantees about postgres
+          # ordering when we're processing from each root account in turn).
+          root_account_postgres_iterator_state[message_partition_index] = [root_account_postgres_iterator_state[message_partition_index], log_entry_id].compact.max
+          # always hold on to the largest message ID we've seen for this pulsar partition.
+          most_recent_id_in_this_partition = [
+            new_message_bus_iterator_state[pulsar_partition_id.to_s], # might be nil if this is the first one
+            pulsar_message_id.to_s
+          ].compact.map { |mids| MessageBus::MessageId.from_string(mids) }.max.to_s
+          new_message_bus_iterator_state[pulsar_partition_id.to_s] = most_recent_id_in_this_partition
+
+          if should_process_message
+            # 7) compact the message into our bulk-update in-memory state
+            aua_id = message_hash[:asset_user_access_id]
+            event_ts = Time.zone.at(message_hash[:created_at])
+            if compaction_map.key?(aua_id)
+              compaction_map[aua_id][:count] += 1
+              compaction_map[aua_id][:max_updated_at] = [compaction_map[aua_id][:max_updated_at], event_ts].max
+            else
+              compaction_map[aua_id] = {
+                count: 1,
+                max_updated_at: event_ts
+              }
+            end
+            consumed_count += 1
+          else
+            skip_count += 1
+            if skip_count % 1000 == 0
+              log_message("...Skipped #{skip_count} so far...")
+            end
+          end
+          # 8) loop on subscription until the datastructure is filled or the receive operation times out
+        end
+
+        # 9) Either we coudn't find anymore messages on the topic, or we have a full batch.
+        #  turn the compaction_map data structure into a sql update.
+        #  The adapter array built here turns the message bus reduction
+        #  datastructure into the same shape as the results
+        #  from the aggregation query in the postgres path so
+        #  we can use the same SQL generation in both paths.
+        aggregation_results = compaction_map.map do |aua_id_key, aggregation|
+          {
+            "aua_id" => aua_id_key,
+            "view_count" => aggregation[:count],
+            "max_updated_at" => aggregation[:max_updated_at]
+          }
+        end
+
+        # 10) Write batch update if there's anything to compact, and update metadata
+        GuardRail.activate(:primary) do
+          # transaction ensures that aggregation results and iterator
+          # state are updated in lock step, so if we fail we should re-aggregate from the same point.
+          AssetUserAccess.transaction do
+            unless aggregation_results.empty?
+              log_message("message bus batch updating (sometimes these queries don't get logged)...")
+              AssetUserAccess.connection.execute(compaction_sql(aggregation_results))
+            end
+            # Here we want to write the iteration state into the database
+            # so that we don't double count rows later.  The next time the job
+            # runs it can pick up at this point and only count rows that haven't yet been counted.
+            compaction_state[:temp_root_account_max_log_ids][root_account_id.to_s] = root_account_postgres_iterator_state
+            compaction_state[:pulsar_partition_iterators][root_account_id.to_s] = new_message_bus_iterator_state
+            update_metadatum(compaction_state)
+            log_message("...batch update complete")
+          end
+        end
+
+        # 11) acknowledge the messages to pulsar.
+        #  no problem if this fails, really, because
+        # we'll skip any messages that get re-delivered
+        # due to the iterator state stored in the db.
+        to_acknowledge.each { |m| consumer.acknowledge(m) }
+
+        # 12) reset data structure for a new batch
+        # of messages, then repeat unless the job has timed out or
+        # we've caught all the way up to the head of the topic.
+        to_acknowledge = []
+        compaction_map = {}
+        if caught_up_for_account
+          continue_consuming_from_bus = false
+        else
+          batch_timestamp = Time.now.utc
+          positive_runtime_budget = ((batch_timestamp - compaction_start) <= (max_compaction_time * 60))
+          # keep going if we still have time
+          continue_consuming_from_bus = positive_runtime_budget
+          unless positive_runtime_budget
+            # ensure we record this exit since even though we haven't caught
+            # up for this account, we're going to signal that it's time
+            # to stop.
+            early_exit = true
+          end
+          # if false, we ran out of time, let the job get re-scheduled
+        end
+      end
+
+      # 13) close the subscription politely so another
+      # job can start a new one later on a different box safely.
+      # we want to stay in "exclusive" mode so that only one job
+      # can be updating the iterator state.
+      begin
+        consumer.close
+      rescue ::Pulsar::Error::ConnectError => e
+        # if we fail to close the connection, but we're already here
+        # the job didn't really fail; we already got past all the state updating.
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :warn)
+      end
+    end
+
+    # 14) return value indicating whether we should immediately re-schedule or not
+    # As long as we have never flipped the "early_exit" sign, that means
+    # we made it through all accounts and didn't run out of job time.
+    !early_exit
+    # you might think "Ah, here we can compact all our postgres iterators into
+    # a single global state update since we finished all the root accounts!".
+    # Alas, we cannot.  In the time it takes to consume messages
+    # from the LAST root account, they may be interleaved with messages from the FIRST root account,
+    # and it would be wrong to advance the global iterator state to max values in the last RA
+    # without guarantees about what other messages have come in since.  Only
+    # a POSTGRES backed compaction job can make global iterator state writes.
+    # once we're compacting on the message bus, we need to keep the state-per-root-account
+    # until and unless we switch back to postgres.
+    # implicit return
+  end
+
+  def self.compaction_settings
+    {
+      # how many messages should we pull off the log before compacting them.
+      # a higher value would mean more memory pressure for the job,
+      # and longer transaction time for the bulk update, but the tradeoff
+      # is less overall write throughput because more of the log backlog
+      # is packed into a single update (especially between messages that
+      # are incrementing counts on the same AUA record).
+      log_batch_size: Setting.get("aua_log_batch_size", "10000").to_i,
+      # how long should we allow this job to run before rescheduling.
+      # higher values mean that the job will be allowed to process more of the log
+      # in a single execution, which lowers the overall data latency,
+      # but the tradeoff is longer running jobs complicate queue management
+      # and juggling.
+      max_compaction_time: Setting.get("aua_compaction_time_limit_in_minutes", "5").to_i,
+      # how long should we block waiting to see if there are any more messages
+      # on the pulsar topic.  This should stay short, because if we make it to
+      # the "HEAD" of the topic and block for 30 seconds or something then it's
+      # very likely a new message will come in, but that's mostly wasted compute time.
+      # If this timeout is exceeded, we can catch that and decide "we've caught up for now,
+      # no more work to do".
+      receive_timeout: Setting.get("aua_compaction_receive_timeout_ms", "1000").to_i
+    }
+  end
+
   # If we're using postgres as the transport layer
+  # (TODO: THIS IS GOING AWAY)
   # This should help reduce write throughput on the DB
   # because in many cases people "view" the same
   # asset repeatedly (refreshing over and over for example), so we can condense

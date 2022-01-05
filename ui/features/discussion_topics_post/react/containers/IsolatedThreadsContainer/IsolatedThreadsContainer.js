@@ -32,7 +32,7 @@ import {
 } from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useEffect, useCallback} from 'react'
+import React, {useContext, useState, useEffect, useRef} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {ShowMoreRepliesButton} from '../../components/ShowMoreRepliesButton/ShowMoreRepliesButton'
 import {Spinner} from '@instructure/ui-spinner'
@@ -193,11 +193,8 @@ const IsolatedThreadContainer = props => {
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {filter} = useContext(SearchContext)
-  const [threadRefCurrent, setThreadRefCurrent] = useState(null)
 
-  const onThreadRefCurrentSet = useCallback(refCurrent => {
-    setThreadRefCurrent(refCurrent)
-  }, [])
+  const threadRef = useRef()
 
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
@@ -208,21 +205,21 @@ const IsolatedThreadContainer = props => {
       filter !== 'drafts'
     ) {
       const observer = new IntersectionObserver(
-        ([entry]) => entry.isIntersecting && props.setToBeMarkedAsRead(props.discussionEntry._id),
+        () => props.setToBeMarkedAsRead(props.discussionEntry._id),
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4
+          threshold: 0.1
         }
       )
 
-      if (threadRefCurrent) observer.observe(threadRefCurrent)
+      if (threadRef.current) observer.observe(threadRef.current)
 
       return () => {
-        if (threadRefCurrent) observer.unobserve(threadRefCurrent)
+        if (threadRef.current) observer.unobserve(threadRef.current)
       }
     }
-  }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, filter])
+  }, [threadRef, props.discussionEntry.entryParticipant.read, props, filter])
 
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -324,7 +321,7 @@ const IsolatedThreadContainer = props => {
         }
       }}
       render={responsiveProps => (
-        <div ref={onThreadRefCurrentSet}>
+        <div ref={threadRef}>
           <View as="div" padding={responsiveProps.padding}>
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
@@ -364,18 +361,6 @@ const IsolatedThreadContainer = props => {
                           )
                         }}
                         goToTopic={props.goToTopic}
-                        goToQuotedReply={
-                          props.discussionEntry.quotedEntry !== null
-                            ? () => {
-                                props.onOpenIsolatedView(
-                                  props.discussionEntry.rootEntryId,
-                                  props.discussionEntry.rootEntryId,
-                                  false,
-                                  props.discussionEntry.quotedEntry._id
-                                )
-                              }
-                            : null
-                        }
                         onReport={
                           ENV?.student_reporting_enabled &&
                           props.discussionTopic.permissions?.studentReporting

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {svgSettings} from '../svgSettings'
+import {svgSettings, defaultState} from '../svgSettings'
 
 describe('svgSettings()', () => {
   let initialState = {}
@@ -46,21 +46,10 @@ describe('svgSettings()', () => {
     expect(nextState.encodedImageType).toEqual(type)
   })
 
-  it('handles "SetEncodedImageName" actions', () => {
-    const name = 'banana.jpg'
-
-    const nextState = subject({
-      type: 'SetEncodedImageName',
-      payload: name
-    })
-
-    expect(nextState.encodedImageName).toEqual(name)
-  })
-
   describe('with an unrecognized action', () => {
     const type = 'FooBar'
 
-    beforeEach(() => (initialState = {encodedImage: 'some encodedImage'}))
+    beforeEach(() => initialState = {encodedImage: 'some encodedImage'})
 
     it('does not modify the state', () => {
       const nextState = subject({type})

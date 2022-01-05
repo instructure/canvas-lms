@@ -77,7 +77,12 @@ describe('ProficiencyRating', () => {
           />
         </div>
       )
-      expect(wrapper.find('RadioInput').find('input').instance()).not.toBe(document.activeElement)
+      expect(
+        wrapper
+          .find('RadioInput')
+          .find('input')
+          .instance()
+      ).not.toBe(document.activeElement)
     })
 
     it('clicking mastery checkbox does not trigger change', () => {
@@ -85,7 +90,10 @@ describe('ProficiencyRating', () => {
       const wrapper = mount(
         <ProficiencyRating {...defaultProps({onMasteryChange, mastery: true, canManage: false})} />
       )
-      wrapper.find('RadioInput').find('input').simulate('change')
+      wrapper
+        .find('RadioInput')
+        .find('input')
+        .simulate('change')
       expect(onMasteryChange).not.toHaveBeenCalled()
     })
 
@@ -100,7 +108,10 @@ describe('ProficiencyRating', () => {
 
     it('includes the points', () => {
       const wrapper = shallow(<ProficiencyRating {...defaultProps({canManage: false})} />)
-      const content = wrapper.find('.points').find('PresentationContent').at(0)
+      const content = wrapper
+        .find('.points')
+        .find('PresentationContent')
+        .at(0)
       expect(content.childAt(0).text()).toBe('10')
     })
   })
@@ -129,7 +140,10 @@ describe('ProficiencyRating', () => {
       const wrapper = mount(
         <ProficiencyRating {...defaultProps({onMasteryChange, canManage: true})} />
       )
-      wrapper.find('RadioInput').find('input').simulate('change')
+      wrapper
+        .find('RadioInput')
+        .find('input')
+        .simulate('change')
       expect(onMasteryChange).toHaveBeenCalledTimes(1)
     })
 
@@ -144,7 +158,11 @@ describe('ProficiencyRating', () => {
       const wrapper = mount(
         <ProficiencyRating {...defaultProps({onDescriptionChange, canManage: true})} />
       )
-      wrapper.find('TextInput').at(0).find('input').simulate('change')
+      wrapper
+        .find('TextInput')
+        .at(0)
+        .find('input')
+        .simulate('change')
       expect(onDescriptionChange).toHaveBeenCalledTimes(1)
     })
 
@@ -159,7 +177,11 @@ describe('ProficiencyRating', () => {
       const wrapper = mount(
         <ProficiencyRating {...defaultProps({onPointsChange, canManage: true})} />
       )
-      wrapper.find('TextInput').at(1).find('input').simulate('change')
+      wrapper
+        .find('TextInput')
+        .at(1)
+        .find('input')
+        .simulate('change')
       expect(onPointsChange).toHaveBeenCalledTimes(1)
     })
 
@@ -186,20 +208,6 @@ describe('ProficiencyRating', () => {
       )
       fireEvent.click(queryByText('Delete mastery level 1'))
       expect(queryByText('Remove Mastery Level')).not.toBeInTheDocument()
-    })
-
-    it('shows color input', () => {
-      const {getByText} = render(<ProficiencyRating {...defaultProps({canManage: true})} />)
-      expect(getByText('Change color for mastery level 1')).toBeInTheDocument()
-    })
-
-    describe('when forOutcome is true', () => {
-      it('hides color input', () => {
-        const {queryByText} = render(
-          <ProficiencyRating {...defaultProps({canManage: true, forOutcome: true})} />
-        )
-        expect(queryByText('Change color for mastery level 1')).not.toBeInTheDocument()
-      })
     })
   })
 })

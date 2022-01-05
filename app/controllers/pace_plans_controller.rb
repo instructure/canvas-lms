@@ -137,9 +137,9 @@ class PacePlansController < ApplicationController
     @pace_plan.course = @course
     start_date = params.dig(:pace_plan, :start_date).present? ? Date.parse(params.dig(:pace_plan, :start_date)) : @pace_plan.start_date
     compressed_module_items = @pace_plan.compress_dates(save: false, start_date: start_date)
-                                        .group_by { |ppmi| ppmi.module_item.context_module }
-                                        .sort_by { |context_module, _items| context_module.position }
-                                        .to_h.values.flatten
+                                        .sort do |a, b|
+                                          a.module_item.position <=> b.module_item.position
+                                        end
 
     days_from_start_date = 0
     compressed_dates = {}

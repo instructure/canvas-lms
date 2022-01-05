@@ -30,7 +30,7 @@ module Factories
       outcome_group = opts.delete(:outcome_group) || context.root_outcome_group
       @outcome = outcome_context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
     end
-    @outcome.rubric_criterion = opts[:rubric_criterion] || valid_outcome_data
+    @outcome.rubric_criterion = valid_outcome_data
     @outcome.save!
     outcome_group.add_outcome(@outcome)
     outcome_group.save!
@@ -133,29 +133,6 @@ module Factories
 
     @rubric = context.rubrics.build
     @rubric.update_criteria(rubric_params)
-  end
-
-  def outcome_with_individual_ratings(opts = {})
-    context = opts[:context] || opts[:course] || @course
-    @outcome_group ||= context.root_outcome_group
-    @outcome = opts[:outcome] || outcome_model(context: context,
-                                               outcome_context: opts[:outcome_context] || context,
-                                               title: "new outcome",
-                                               description: "<p>This is <b>awesome</b>.</p>",
-                                               calculation_method: "n_mastery",
-                                               calculation_int: 3,
-                                               rubric_criterion: {
-                                                 ratings: [
-                                                   { description: "Rating Criteria 1", points: 5, mastery: false },
-                                                   { description: "Rating Criteria 2", points: 3, mastery: true },
-                                                   { description: "Rating Criteria 3", points: 2, mastery: false }
-                                                 ]
-                                               })
-    [opts[:outcome_context], context].compact.uniq.each do |ctxt|
-      root = ctxt.root_outcome_group
-      root.add_outcome(@outcome)
-      root.save!
-    end
   end
 
   def make_group_structure(group_attrs, context, parent_group = nil)

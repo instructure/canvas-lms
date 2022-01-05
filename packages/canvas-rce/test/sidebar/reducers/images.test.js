@@ -129,8 +129,7 @@ describe('Images reducer', () => {
         payload: {
           files: [{id: 1}, {id: 2}],
           bookmark: 'some bookmark',
-          contextType: 'course',
-          searchString: ''
+          contextType: 'course'
         }
       }
       assert(images(state, action).course.hasMore)

@@ -53,7 +53,6 @@ export const Discussion = {
       subscribed
       published
       canUnpublish
-      canReplyAnonymously
       lockAt
       availableForUser
       entryCounts {
@@ -112,7 +111,6 @@ export const Discussion = {
     subscribed: bool,
     published: bool,
     canUnpublish: bool,
-    canReplyAnonymously: bool,
     searchEntryCount: number,
     availableForUser: bool,
     entryCounts: shape({
@@ -154,7 +152,6 @@ export const Discussion = {
     subscribed = true,
     published = true,
     canUnpublish = false,
-    canReplyAnonymously = false,
     searchEntryCount = 3,
     availableForUser = true,
     entryCounts = {
@@ -204,7 +201,6 @@ export const Discussion = {
     subscribed,
     published,
     canUnpublish,
-    canReplyAnonymously,
     entryCounts,
     availableForUser,
     author,

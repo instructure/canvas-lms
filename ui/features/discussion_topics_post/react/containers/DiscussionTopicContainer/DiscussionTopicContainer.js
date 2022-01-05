@@ -55,8 +55,6 @@ import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubric
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 import {AssignmentAvailabilityWindow} from '../../components/AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
 
-import('@canvas/rubrics/jquery/rubricEditBinding')
-
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
@@ -395,10 +393,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                     ? () => {
                                         rubricTriggers.openDialog()
                                         rubricEditing.init()
-
-                                        const event = document.createEvent('Event')
-                                        event.initEvent('rubricEditDataReady', true, true)
-                                        document.dispatchEvent(event)
                                       }
                                     : null
                                 }
