@@ -164,7 +164,7 @@ class Header extends React.Component {
             {context => (
               <Badge
                 margin="x-small"
-                count={this.props.submission.unreadCommentCount || null}
+                count={this.props.submission ? this.props.submission.unreadCommentCount : null}
                 countUntil={100}
               >
                 <Button
@@ -172,7 +172,7 @@ class Header extends React.Component {
                   onClick={this.openCommentsTray}
                   disabled={addCommentsDisabled}
                 >
-                  {this.props.submission.feedbackForCurrentAttempt ||
+                  {(this.props.submission && this.props.submission.feedbackForCurrentAttempt) ||
                   !context.allowChangesToSubmission
                     ? I18n.t('View Feedback')
                     : I18n.t('Add Comment')}
@@ -246,9 +246,9 @@ class Header extends React.Component {
               </Flex.Item>
             )}
           </Flex>
-          {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
-            <Flex alignItems="center" wrap="wrap">
-              <Flex.Item shouldGrow>
+          <Flex alignItems="center" wrap="wrap">
+            <Flex.Item shouldGrow>
+              {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
                 <Flex wrap="wrap">
                   {this.props.allSubmissions && (
                     <Flex.Item>
@@ -266,21 +266,21 @@ class Header extends React.Component {
                     </Flex.Item>
                   )}
                 </Flex>
-              </Flex.Item>
-
-              <Flex.Item shouldShrink>
-                <Flex as="div" wrap="wrap">
-                  {(this.props.submission.state === 'graded' ||
+              )}
+            </Flex.Item>
+            <Flex.Item shouldShrink>
+              <Flex as="div" wrap="wrap">
+                {this.props.submission &&
+                  (this.props.submission.state === 'graded' ||
                     this.props.submission.state === 'submitted') && (
                     <Flex.Item margin="0 small 0 0">{this.selectedSubmissionGrade()}</Flex.Item>
                   )}
-                  <Flex.Item margin="0 small 0 0">
-                    {this.renderViewFeedbackButton(addCommentsDisabled)}
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-            </Flex>
-          )}
+                <Flex.Item margin="0 small 0 0">
+                  {this.renderViewFeedbackButton(addCommentsDisabled)}
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+          </Flex>
         </div>
       </>
     )
