@@ -164,9 +164,9 @@ module Importers
       items = items.map { |i| flatten_item(i, 0) }.flatten
 
       imported_migration_ids = []
-
+      frozen_positions = item.content_tags.where(migration_id: nil).pluck(:position)
       items.each do |tag_hash|
-        tags = add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+        tags = add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration, frozen_positions)
         imported_migration_ids.concat tags.map(&:migration_id)
       rescue
         migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
@@ -198,7 +198,7 @@ module Importers
       item
     end
 
-    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
+    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration, frozen_positions = [])
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
@@ -354,7 +354,12 @@ module Importers
           context_module.item_migration_position += 1
           item.position = context_module.item_migration_position
         elsif hash[:position]
-          item.position = hash[:position]
+          new_position = hash[:position]
+          while frozen_positions.include?(new_position)
+            new_position += 1
+          end
+          item.position = new_position
+          frozen_positions.append(new_position)
         end
 
         item.mark_as_importing!(migration)
