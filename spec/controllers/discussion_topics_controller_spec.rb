@@ -448,6 +448,22 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id
       end
 
+      context "no current user" do
+        it "public course sets ATTACHMENTS_FOLDER_ID" do
+          Account.default.enable_feature! :react_discussions_post
+          @course.update(is_public: true)
+          discussion.assignment = course.assignments.build(submission_types: "discussion_topic", title: discussion.title)
+          discussion.assignment.infer_times
+          discussion.assignment.saved_by = :discussion_topic
+          discussion.save
+          remove_user_session
+
+          subject
+          expect(discussion).to be_for_assignment
+          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id
+        end
+      end
+
       context "for_assignment" do
         it "sets ATTACHMENTS_FOLDER_ID" do
           discussion.assignment = course.assignments.build(submission_types: "discussion_topic", title: discussion.title)
