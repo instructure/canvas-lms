@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, forwardRef} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {outcomeShape} from './shapes'
 
-const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
+const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, ref) => {
   const [showOutcomesList, setShowOutcomesList] = useState(false)
   const closeOutcomesList = () => {
     setShowOutcomesList(false)
@@ -54,6 +54,7 @@ const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
         onToggle={setShowOutcomesList}
         shouldContainFocus
         shouldReturnFocus
+        positionTarget={() => (ref?.current == null ? null : ref.current)}
       >
         <Popover.Trigger>
           <Button
@@ -113,7 +114,7 @@ const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
       </Popover>
     </ApplyTheme>
   )
-}
+})
 
 OutcomesPopover.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
