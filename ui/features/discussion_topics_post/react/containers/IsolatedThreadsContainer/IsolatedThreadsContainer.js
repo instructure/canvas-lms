@@ -32,7 +32,7 @@ import {
 } from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useEffect, useRef} from 'react'
+import React, {useContext, useState, useEffect, useCallback} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {ShowMoreRepliesButton} from '../../components/ShowMoreRepliesButton/ShowMoreRepliesButton'
 import {Spinner} from '@instructure/ui-spinner'
@@ -193,8 +193,11 @@ const IsolatedThreadContainer = props => {
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {filter} = useContext(SearchContext)
+  const [threadRefCurrent, setThreadRefCurrent] = useState(null)
 
-  const threadRef = useRef()
+  const onThreadRefCurrentSet = useCallback(refCurrent => {
+    setThreadRefCurrent(refCurrent)
+  }, [])
 
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
@@ -205,21 +208,21 @@ const IsolatedThreadContainer = props => {
       filter !== 'drafts'
     ) {
       const observer = new IntersectionObserver(
-        () => props.setToBeMarkedAsRead(props.discussionEntry._id),
+        ([entry]) => entry.isIntersecting && props.setToBeMarkedAsRead(props.discussionEntry._id),
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.1
+          threshold: 0.4
         }
       )
 
-      if (threadRef.current) observer.observe(threadRef.current)
+      if (threadRefCurrent) observer.observe(threadRefCurrent)
 
       return () => {
-        if (threadRef.current) observer.unobserve(threadRef.current)
+        if (threadRefCurrent) observer.unobserve(threadRefCurrent)
       }
     }
-  }, [threadRef, props.discussionEntry.entryParticipant.read, props, filter])
+  }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, filter])
 
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -321,7 +324,7 @@ const IsolatedThreadContainer = props => {
         }
       }}
       render={responsiveProps => (
-        <div ref={threadRef}>
+        <div ref={onThreadRefCurrentSet}>
           <View as="div" padding={responsiveProps.padding}>
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
