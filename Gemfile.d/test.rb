@@ -24,7 +24,7 @@ group :test do
   gem "dotenv", "2.7.5", require: false
   gem "testingbot", require: false
   gem "brakeman", require: false
-  gem "simplecov", "0.15.1", require: false
+  gem "simplecov", "0.21.2", require: false
     gem "docile", "1.1.5", require: false
   gem "simplecov-rcov", "0.2.3", require: false
   gem "puma", "5.2.2", require: false

@@ -123,6 +123,11 @@ def tearDownNode(prefix) {
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
+  if (env.COVERAGE == '1') {
+    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage tmp/coverage canvas_ --allow-error --clean-dir'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/coverage/**/*'
+  }
+
   if (env.ENABLE_CRYSTALBALL == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
     sh 'ls tmp/crystalball'
@@ -180,6 +185,7 @@ def runRspecqSuite() {
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
                                        -e JOB_NAME \
+                                       -e COVERAGE \
                                        -e BUILD_NUMBER canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
