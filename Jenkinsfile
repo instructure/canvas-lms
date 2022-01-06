@@ -552,13 +552,7 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
-                  extendedStage('RspecQ Tests')
-                    .hooks(buildSummaryReportHooks.withRunManifest())
-                    .queue(nestedStages, jobName: '/Canvas/test-suites/test-queue', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ])
+                  rspecStage.createDistribution(nestedStages)
 
                   parallel(nestedStages)
                 }
