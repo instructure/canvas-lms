@@ -47,6 +47,11 @@ Migration/RemoveColumn:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/RenameTable:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/SendLater:
   Enabled: true
   Include:
