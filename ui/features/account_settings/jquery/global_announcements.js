@@ -31,7 +31,7 @@ RichContentEditor.preloadRemoteModule()
 // used for working with the Announcements tab
 export default {
   bindDomEvents() {
-    $('.add_notification_toggle_focus').on('click', () => {
+    $('.add_notification_toggle_focus').click(() => {
       const aria_expanded = $('add_notification_form').attr('aria-expanded') === 'true'
       if (!aria_expanded) {
         setTimeout(() => {
@@ -40,7 +40,7 @@ export default {
       }
     })
 
-    $('.edit_notification_toggle_focus').on('click', function () {
+    $('.edit_notification_toggle_focus').click(function() {
       const id = $(this).attr('data-edit-toggle-id')
       const form_id = '#edit_notification_form_' + id
       const aria_expanded = $(form_id).attr('aria-expanded') === 'true'
@@ -51,16 +51,16 @@ export default {
       }
     })
 
-    $('.add_notification_cancel_focus').on('click', () => {
+    $('.add_notification_cancel_focus').click(() => {
       $('#add_announcement_button').focus()
     })
 
-    $('.edit_cancel_focus').on('click', function () {
+    $('.edit_cancel_focus').click(function() {
       const id = $(this).attr('data-cancel-focus-id')
       $('#notification_edit_' + id).focus()
     })
 
-    $('#add_notification_form, .edit_notification_form').on('submit', function () {
+    $('#add_notification_form, .edit_notification_form').submit(function(event) {
       const $this = $(this)
       const $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)')
       if ($confirmation.length > 0) {
@@ -83,7 +83,7 @@ export default {
         }
       }
       if (
-        $this[0].id === 'add_notification_form' &&
+        $this[0].id == 'add_notification_form' &&
         $('#account_notification_months_in_display_cycle').length > 0
       ) {
         validations.numbers.push('months_in_display_cycle')
@@ -94,23 +94,23 @@ export default {
       }
     })
 
-    $('#account_notification_required_account_service').on('click', function () {
+    $('#account_notification_required_account_service').click(function(event) {
       const $this = $(this)
       $('#confirm_global_announcement_field').showIf(!$this.is(':checked'))
       $('#account_notification_months_in_display_cycle').prop('disabled', !$this.is(':checked'))
     })
 
-    $('.delete_notification_link').on('click', function (event) {
+    $('.delete_notification_link').click(function(event) {
       event.preventDefault()
       const $link = $(this)
       $link.parents('li').confirmDelete({
-        url: $link.attr('data-url'),
+        url: $link.attr('rel'),
         message: I18n.t(
           'confirms.delete_announcement',
           'Are you sure you want to delete this announcement?'
         ),
         success() {
-          $(this).slideUp(function () {
+          $(this).slideUp(function() {
             $(this).remove()
           })
         }
@@ -119,7 +119,7 @@ export default {
   },
 
   augmentView() {
-    $('textarea.edit_notification_form, #add_notification_form textarea').each(function (_i) {
+    $('textarea.edit_notification_form, #add_notification_form textarea').each(function(i) {
       RichContentEditor.loadNewEditor($(this))
     })
   }
