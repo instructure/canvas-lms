@@ -120,9 +120,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
 
   function createGradebookAndAddData(options) {
     gradebook = createGradebook(options)
-    sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
-      onSuccess(settings)
-    })
+    sinon.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
     gradebook.initialize()
     addGridData()
   }
@@ -605,9 +603,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
           ]
         }
       })
-      sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
-        onSuccess(settings)
-      })
+      sinon.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
     })
 
     test('excludes assignment group columns when setting is disabled', () => {
@@ -677,8 +673,8 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gradebook.getAssignment('2302').published = false
     })
 
-    test('removes unpublished assignment columns when filtered', () => {
-      gradebook.toggleUnpublishedAssignments()
+    test('removes unpublished assignment columns when filtered', async () => {
+      await gradebook.toggleUnpublishedAssignments()
       const expectedOrder = [
         'assignment_2301',
         'assignment_group_2201',
@@ -688,8 +684,8 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('removes unrelated assignment columns when filtering by assignment group', () => {
-      gradebook.updateCurrentAssignmentGroup('2202')
+    test('removes unrelated assignment columns when filtering by assignment group', async () => {
+      await gradebook.updateCurrentAssignmentGroup('2202')
       const expectedOrder = [
         'assignment_2302',
         'assignment_group_2201',
@@ -699,8 +695,8 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('removes unrelated assignment columns when filtering by grading period', () => {
-      gradebook.updateCurrentGradingPeriod('1401')
+    test('removes unrelated assignment columns when filtering by grading period', async () => {
+      await gradebook.updateCurrentGradingPeriod('1401')
       const expectedOrder = [
         'assignment_2301',
         'assignment_group_2201',
@@ -710,9 +706,9 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('does not duplicate the total column when filtering by grading period', () => {
+    test('does not duplicate the total column when filtering by grading period', async () => {
       gradebook.freezeTotalGradeColumn()
-      gradebook.updateCurrentGradingPeriod('1401')
+      await gradebook.updateCurrentGradingPeriod('1401')
       const totalGradeColumns = gridSpecHelper
         .listFrozenColumnIds()
         .filter(id => id === 'total_grade')

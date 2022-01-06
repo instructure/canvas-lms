@@ -27,6 +27,11 @@ function constructRelativeUrl({path, params}: {path: string; params: {[k: string
   return `${path}?${queryString}`
 }
 
+// https://fetch.spec.whatwg.org/#requestinit
+interface RequestInit {
+  signal?: AbortSignal
+}
+
 export type DoFetchApiOpts = {
   path: string
   method?: string
