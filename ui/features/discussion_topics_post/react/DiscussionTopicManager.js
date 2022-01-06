@@ -235,7 +235,8 @@ const DiscussionTopicManager = props => {
           createDiscussionEntry({
             variables: {
               discussionTopicId: ENV.discussion_topic_id,
-              message: text
+              message: text,
+              courseID: ENV.course_id
             },
             optimisticResponse: getOptimisticResponse(
               text,

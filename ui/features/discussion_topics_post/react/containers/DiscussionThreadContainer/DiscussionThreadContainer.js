@@ -320,7 +320,8 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
         replyFromEntryId: props.discussionEntry._id,
-        message: text
+        message: text,
+        courseID: ENV.course_id
       }
     })
     setEditorExpanded(false)
