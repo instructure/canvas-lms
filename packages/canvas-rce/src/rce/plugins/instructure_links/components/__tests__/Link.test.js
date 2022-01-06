@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import formatMessage from '../../../../../format-message'
 import Link from '../Link'
 
 function renderComponent(props) {
@@ -38,6 +37,13 @@ function queryIconByName(elem, name) {
 }
 
 describe('RCE "Links" Plugin > Link', () => {
+  beforeAll(() => {
+    ENV = {
+      // 	UTC/GMT -7 hours
+      TIMEZONE: 'America/Denver'
+    }
+  })
+
   describe('object type variant', () => {
     const linkTypes = [
       {type: 'assignments', icon: 'IconAssignment'},
@@ -79,7 +85,7 @@ describe('RCE "Links" Plugin > Link', () => {
   })
   describe('date variant', () => {
     const value = '2019-04-24T13:00:00Z'
-    const formattedValue = formatMessage.date(Date.parse(value), 'long')
+    const formattedValue = 'April 24, 2019'
 
     it('renders muliple due dates', () => {
       const link = {
@@ -159,6 +165,90 @@ describe('RCE "Links" Plugin > Link', () => {
       expect(getByText(`To Be Posted: ${formattedValue}`)).toBeInTheDocument()
     })
   })
+
+  describe('date changes by timezone', () => {
+    const value = '2019-04-24T01:00:00Z'
+    const formattedValue = 'April 23, 2019'
+
+    it('renders muliple due dates', () => {
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true,
+        date: 'multiple',
+        date_type: 'due'
+      }
+      const {getByText} = renderComponent({type: 'assignments', link})
+
+      expect(getByText('Due: Multiple Dates')).toBeInTheDocument()
+    })
+
+    it('renders a due date', () => {
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true,
+        date: value,
+        date_type: 'due'
+      }
+      const {getByText} = renderComponent({type: 'assignments', link})
+
+      expect(getByText(`Due: ${formattedValue}`)).toBeInTheDocument()
+    })
+
+    it('renders a to do date', () => {
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true,
+        date: value,
+        date_type: 'todo'
+      }
+      const {getByText} = renderComponent({type: 'wikiPages', link})
+
+      expect(getByText(`To Do: ${formattedValue}`)).toBeInTheDocument()
+    })
+
+    it('renders a published date', () => {
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true,
+        date: value,
+        date_type: 'published'
+      }
+      const {getByText} = renderComponent({type: 'wikiPages', link})
+
+      expect(getByText(`Published: ${formattedValue}`)).toBeInTheDocument()
+    })
+
+    it('renders a posted date', () => {
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true,
+        date: value,
+        date_type: 'posted'
+      }
+      const {getByText} = renderComponent({type: 'announcements', link})
+
+      expect(getByText(`Posted: ${formattedValue}`)).toBeInTheDocument()
+    })
+
+    it('renders a delayed post date', () => {
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true,
+        date: value,
+        date_type: 'delayed_post'
+      }
+      const {getByText} = renderComponent({type: 'announcements', link})
+
+      expect(getByText(`To Be Posted: ${formattedValue}`)).toBeInTheDocument()
+    })
+  })
+
   describe('handles input', () => {
     it('calls onClick when clicked', () => {
       const onClick = jest.fn()
