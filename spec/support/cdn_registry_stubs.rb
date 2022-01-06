@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,15 +16,22 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-# This is where we monkeypatch rails to look at the rev-manifest.json file we make in `gulp rev`
-# instead of doing it's normal cache busting stuff on the url.
-# eg: instead of '/images/whatever.png?12345', we want '/dist/images/whatever-<md5 of file>.png'.
-# There is a different method that needs to be monkeypatched for rails 3 vs rails 4
-
-require_dependency "action_view/helpers"
-require_dependency "canvas/cdn/revved_asset_urls"
-
-Rails.configuration.to_prepare do
-  ActionView::Base.include(Canvas::Cdn::RevvedAssetUrls)
+RSpec.shared_context "cdn registry stubs" do
+  before do
+    allow(::Canvas::Cdn).to receive(:registry).and_return(
+      ::Canvas::Cdn::Registry.new(
+        cache: ::Canvas::Cdn::Registry::StaticCache.new(
+          gulp: {
+            "fonts/lato/extended/Lato-Regular.woff2" => "mock_revved_url",
+            "images/apple-touch-icon.png" => "images/apple-touch-icon-1234.png"
+          },
+          webpack: {
+            "main" => ["main-1234.js"]
+          }
+        )
+      )
+    )
+  end
 end

@@ -19,6 +19,8 @@
 #
 
 describe InfoController do
+  include_context "cdn registry stubs"
+
   describe "GET 'health_check'" do
     it "works" do
       get "health_check"
@@ -29,7 +31,6 @@ describe InfoController do
     it "respond_toes json" do
       request.accept = "application/json"
       allow(Canvas).to receive(:revision).and_return("Test Proc")
-      allow(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).and_return({ test_key: "mock_revved_url" })
       get "health_check"
       expect(response).to be_successful
       json = JSON.parse(response.body)
@@ -40,8 +41,8 @@ describe InfoController do
                            "revision" => "Test Proc",
                            "asset_urls" => {
                              "common_css" => "/dist/brandable_css/new_styles_normal_contrast/bundles/common-#{BrandableCSS.cache_for("bundles/common", "new_styles_normal_contrast")[:combinedChecksum]}.css",
-                             "common_js" => ActionController::Base.helpers.javascript_url("#{ENV["USE_OPTIMIZED_JS"] == "true" ? "/dist/webpack-production" : "/dist/webpack-dev"}/common"),
-                             "revved_url" => "mock_revved_url"
+                             "common_js" => "/dist/webpack-dev/main-1234.js",
+                             "revved_url" => "/dist/mock_revved_url"
                            }
                          })
     end
@@ -298,7 +299,7 @@ describe InfoController do
       get "web_app_manifest"
       manifest = json_parse(response.body)
       src = manifest["icons"].first["src"]
-      expect(src).to start_with("/dist/images/")
+      expect(src).to eq("/dist/images/apple-touch-icon-1234.png")
     end
   end
 end
