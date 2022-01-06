@@ -552,6 +552,24 @@ describe ContextModulesController do
       expect(@module.content_tags.map { |tag| [tag.title, tag.position] }).to match_array([["foo!", 3], ["bar!", 4]])
     end
 
+    it "sets the launch dimensions of the iframe" do
+      post "add_item", params: {
+        course_id: @course.id,
+        context_module_id: @module.id,
+        item: {
+          type: "context_external_tool",
+          title: "new item",
+          position: 1,
+          iframe: {
+            width: 123,
+            height: 456
+          }
+        }
+      }
+      last_item_module = @module.content_tags.last
+      expect(last_item_module.link_settings).to eq({ "selection_width" => "123", "selection_height" => "456" })
+    end
+
     describe "update_module_link_default_tab" do
       context "with the :remember_module_links_default flag disabled" do
         it "does not update the user preference value" do
