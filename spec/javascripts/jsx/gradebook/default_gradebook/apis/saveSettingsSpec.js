@@ -53,19 +53,7 @@ QUnit.module('Gradebook', suiteHooks => {
     })
 
     function saveSettings(additionalSettings = {}) {
-      return new Promise(resolve => {
-        gradebook.saveSettings(
-          additionalSettings,
-          (...args) => {
-            onSuccess(...args)
-            resolve()
-          },
-          (...args) => {
-            onFailure(...args)
-            resolve()
-          }
-        )
-      })
+      return gradebook.saveSettings(additionalSettings).then(onSuccess).catch(onFailure)
     }
 
     function getSavedSettings() {

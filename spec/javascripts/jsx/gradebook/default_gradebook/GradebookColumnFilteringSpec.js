@@ -40,9 +40,9 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
       },
       ...options
     })
-    sinon.stub(gradebook, 'saveSettings').callsFake((settings, onSuccess = () => {}) => {
-      onSuccess(settings)
-    })
+    sinon
+      .stub(gradebook, 'saveSettings')
+      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
   }
 
   function createContextModules() {

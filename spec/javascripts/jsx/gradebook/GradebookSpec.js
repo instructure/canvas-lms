@@ -2819,7 +2819,7 @@ QUnit.module('Gradebook#updateCurrentSection', {
       setSelectedSection: sinon.stub()
     }
     sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForSectionFilterChange')
-    sinon.spy(this.gradebook, 'saveSettings')
+    sinon.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
     sandbox.stub(this.gradebook, 'updateSectionFilterVisibility')
   },
 
@@ -2844,8 +2844,8 @@ test('includes the selected section when updating the post grades store', functi
   strictEqual(sectionId, '2001')
 })
 
-test('re-renders the section filter', function () {
-  this.gradebook.updateCurrentSection('2001')
+test('re-renders the section filter', async function () {
+  await this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.updateSectionFilterVisibility.callCount, 1)
 })
 
@@ -2885,8 +2885,8 @@ test('has no effect when the section has not changed', function () {
   )
 })
 
-test('reloads student data after saving settings', function () {
-  this.gradebook.updateCurrentSection('2001')
+test('reloads student data after saving settings', async function () {
+  await this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.dataLoader.reloadStudentDataForSectionFilterChange.callCount, 1)
 })
 
@@ -4531,7 +4531,9 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
     let saveSettingsStub
 
     hooks.beforeEach(() => {
-      saveSettingsStub = sinon.stub(gradebook, 'saveSettings')
+      saveSettingsStub = sinon
+        .stub(gradebook, 'saveSettings')
+        .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
     })
 
     hooks.afterEach(() => {
@@ -4938,9 +4940,7 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
       }
     }
     sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForEnrollmentFilterChange')
-    sandbox.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => {
-      callback()
-    })
+    sandbox.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
   }
 })
 
@@ -4958,20 +4958,20 @@ test('saves settings', function () {
   strictEqual(this.gradebook.saveSettings.callCount, 1)
 })
 
-test('updates the student column header', function () {
-  this.gradebook.toggleEnrollmentFilter('inactive')
+test('updates the student column header', async function () {
+  await this.gradebook.toggleEnrollmentFilter('inactive')
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
 })
 
-test('includes the "student" column id when updating column headers', function () {
-  this.gradebook.toggleEnrollmentFilter('inactive')
+test('includes the "student" column id when updating column headers', async function () {
+  await this.gradebook.toggleEnrollmentFilter('inactive')
   const [columnIds] =
     this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
   deepEqual(columnIds, ['student'])
 })
 
-test('reloads student data after saving settings', function () {
-  this.gradebook.toggleEnrollmentFilter('inactive')
+test('reloads student data after saving settings', async function () {
+  await this.gradebook.toggleEnrollmentFilter('inactive')
   strictEqual(this.gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange.callCount, 1)
 })
 
@@ -5070,9 +5070,7 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 
   QUnit.module('#updateEnterGradesAsSetting', hooks => {
     hooks.beforeEach(() => {
-      sinon.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
-        callback()
-      })
+      sinon.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
       sinon.stub(gradebook.gradebookGrid, 'invalidate')
       sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
     })
@@ -5091,36 +5089,34 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
       strictEqual(gradebook.saveSettings.callCount, 1)
     })
 
-    test('saves gradebooks settings after updating the "enter grades as" setting', () => {
-      gradebook.saveSettings.callsFake(() => {
-        equal(gradebook.getEnterGradesAsSetting('2301'), 'percent')
-      })
-      gradebook.updateEnterGradesAsSetting('2301', 'percent')
+    test('saves gradebooks settings after updating the "enter grades as" setting', async () => {
+      await gradebook.updateEnterGradesAsSetting('2301', 'percent')
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'percent')
     })
 
-    test('updates the column header for the related assignment column', () => {
-      gradebook.updateEnterGradesAsSetting('2301', 'percent')
+    test('updates the column header for the related assignment column', async () => {
+      await gradebook.updateEnterGradesAsSetting('2301', 'percent')
       strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
     })
 
-    test('updates the column header with the assignment column id', () => {
-      gradebook.updateEnterGradesAsSetting('2301', 'percent')
+    test('updates the column header with the assignment column id', async () => {
+      await gradebook.updateEnterGradesAsSetting('2301', 'percent')
       const [columnIds] =
         gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
       deepEqual(columnIds, ['assignment_2301'])
     })
 
-    test('updates the column header after settings have been saved', () => {
-      gradebook.saveSettings.callsFake((_data, callback) => {
-        strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 0)
-        callback()
-        strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
-      })
+    test('updates the column header after settings have been saved', async () => {
+      strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 0)
       gradebook.updateEnterGradesAsSetting('2301', 'percent')
+      await gradebook.saveSettings.callsFake(() => {
+        return Promise.resolve()
+      })
+      strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
     })
 
-    test('invalidates the grid', () => {
-      gradebook.updateEnterGradesAsSetting('2301', 'percent')
+    test('invalidates the grid', async () => {
+      await gradebook.updateEnterGradesAsSetting('2301', 'percent')
       strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1)
     })
 
@@ -5411,7 +5407,9 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     const gradebook = createGradebook()
     gradebook.gridDisplaySettings.showUnpublishedAssignments = false
     sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    sandbox.stub(gradebook, 'saveSettings')
+    sandbox
+      .stub(gradebook, 'saveSettings')
+      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
     gradebook.toggleUnpublishedAssignments()
 
     strictEqual(gradebook.gridDisplaySettings.showUnpublishedAssignments, true)
@@ -5421,7 +5419,7 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     const gradebook = createGradebook()
     gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    sandbox.stub(gradebook, 'saveSettings')
+    sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
     gradebook.toggleUnpublishedAssignments()
 
     strictEqual(gradebook.gridDisplaySettings.showUnpublishedAssignments, false)
@@ -5435,7 +5433,9 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
       .callsFake(() => {
         strictEqual(gradebook.gridDisplaySettings.showUnpublishedAssignments, false)
       })
-    sandbox.stub(gradebook, 'saveSettings')
+    sandbox
+      .stub(gradebook, 'saveSettings')
+      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
     gradebook.toggleUnpublishedAssignments()
 
     strictEqual(stubFn.callCount, 1)
@@ -5447,7 +5447,9 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
       gradebook,
       'updateColumnsAndRenderViewOptionsMenu'
     )
-    const saveSettingsStub = sandbox.stub(gradebook, 'saveSettings')
+    const saveSettingsStub = sandbox
+      .stub(gradebook, 'saveSettings')
+      .callsFake(() => Promise.resolve())
     gradebook.toggleUnpublishedAssignments()
 
     sinon.assert.callOrder(updateColumnsAndRenderViewOptionsMenuStub, saveSettingsStub)
@@ -5457,7 +5459,9 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     const settings = {show_unpublished_assignments: 'true'}
     const gradebook = createGradebook({settings})
     sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    const saveSettingsStub = sandbox.stub(gradebook, 'saveSettings')
+    const saveSettingsStub = sandbox
+      .stub(gradebook, 'saveSettings')
+      .callsFake(() => Promise.resolve())
     gradebook.toggleUnpublishedAssignments()
 
     const [{showUnpublishedAssignments}] = saveSettingsStub.firstCall.args
@@ -5483,7 +5487,7 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     server.restore()
   })
 
-  test('calls saveSettings and rolls back on failure', () => {
+  test('calls saveSettings and rolls back on failure', async () => {
     const server = sinon.fakeServer.create({respondImmediately: true})
     const options = {settings_update_url: '/course/1/gradebook_settings'}
     server.respondWith('POST', options.settings_update_url, [
@@ -5501,7 +5505,7 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     stubFn.onSecondCall().callsFake(() => {
       strictEqual(gradebook.gridDisplaySettings.showUnpublishedAssignments, true)
     })
-    gradebook.toggleUnpublishedAssignments()
+    await gradebook.toggleUnpublishedAssignments()
     strictEqual(stubFn.callCount, 2)
     server.restore()
   })
@@ -6047,7 +6051,9 @@ QUnit.module('Gradebook', () => {
       })
 
       sinon.spy(gradebook, 'setFilterColumnsBySetting')
-      sinon.stub(gradebook, 'saveSettings')
+      sinon
+        .stub(gradebook, 'saveSettings')
+        .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
       sinon.stub(gradebook, 'resetGrading')
       sinon.stub(gradebook, 'sortGridRows')
       sinon.stub(gradebook, 'updateFilteredContentInfo')
@@ -9784,9 +9790,7 @@ QUnit.module('Gradebook#toggleShowSeparateFirstLastNames', hooks => {
       }
     })
 
-    sandbox.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
-      callback()
-    })
+    sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
   })
 
   test('toggles showSeparateFirstLastNames to true when false', () => {
@@ -9843,9 +9847,7 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
       }
     })
 
-    sandbox.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
-      callback()
-    })
+    sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
   })
 
   test('toggles viewUngradedAsZero to true when false', () => {
@@ -10157,8 +10159,8 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         const [courseId, params] = GradebookApi.saveUserSettings.lastCall.args
         strictEqual(courseId, '100')
         strictEqual(params.colors.dropped, '#000000')
-        strictEqual(params.show_unpublished_assignments, true)
-        strictEqual(params.view_ungraded_as_zero, true)
+        strictEqual(params.show_unpublished_assignments, 'true')
+        strictEqual(params.view_ungraded_as_zero, 'true')
       })
 
       test('does not call saveUserSettings if no value has changed', async () => {
@@ -10364,14 +10366,14 @@ QUnit.module('Gradebook#saveSettings', () => {
 
     test('calls the provided successFn if the request succeeds', async () => {
       saveUserSettingsStub.resolves({})
-      await gradebook.saveSettings({}, successFn, errorFn)
+      await gradebook.saveSettings({}).then(successFn).catch(errorFn)
       strictEqual(successFn.callCount, 1)
       ok(errorFn.notCalled)
     })
 
     test('calls the provided errorFn if the request fails', async () => {
       saveUserSettingsStub.rejects(new Error(':('))
-      await gradebook.saveSettings({}, successFn, errorFn)
+      await gradebook.saveSettings({}).then(successFn).catch(errorFn)
       strictEqual(errorFn.callCount, 1)
       ok(successFn.notCalled)
     })
