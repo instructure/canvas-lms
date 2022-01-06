@@ -72,7 +72,7 @@ Naming/HeredocDelimiterNaming:
 Performance:
   Severity: error
 Performance/Casecmp:
-  AutoCorrect: false # prefer using casecmp?(other) instead of casecmp(other).zero?; it handles unicode better
+  Enabled: false # casecmp(other).zero? is a bad suggestion because it's not Unicode-aware (also it's less clear)
 Performance/CollectionLiteralInLoop:
   Severity: convention # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
 Performance/MethodObjectAsBlock:
