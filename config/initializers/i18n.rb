@@ -96,6 +96,11 @@ module I18n
 end
 # rubocop:enable Style/OptionalBooleanParameter
 
+I18n.backend = LazyPresumptuousI18nBackend.new(
+  meta_keys: %w[aliases crowdsourced custom locales],
+  logger: Rails.logger.method(:debug)
+)
+
 module DontTrustI18nPluralizations
   def pluralize(locale, entry, count)
     super
@@ -104,14 +109,7 @@ module DontTrustI18nPluralizations
     ""
   end
 end
-
-Rails.configuration.to_prepare do
-  I18n.backend = LazyPresumptuousI18nBackend.new(
-    meta_keys: %w[aliases crowdsourced custom locales],
-    logger: Rails.logger.method(:debug)
-  )
-  LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
-end
+LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
 
 module FormatInterpolatedNumbers
   def interpolate_hash(string, values)

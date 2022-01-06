@@ -289,9 +289,7 @@ module CanvasRails
     config.exceptions_app = ExceptionsApp.new
 
     config.before_initialize do
-      config.action_controller.asset_host = lambda do |source, *_|
-        ::Canvas::Cdn.asset_host_for(source)
-      end
+      config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)
     end
 
     if config.action_dispatch.rack_cache != false

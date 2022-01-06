@@ -29,6 +29,6 @@ describe "/terms/index" do
     assign(:course_counts_by_term, EnrollmentTerm.course_counts(terms))
     render "terms/index"
     page = Nokogiri("<document>" + response.body + "</document>")
-    expect(page.css(".delete_term_link")[0]["class"]).to include("delete_term_link")
+    expect(page.css(".delete_term_link")[0]["href"]).to eq "#"
   end
 end
