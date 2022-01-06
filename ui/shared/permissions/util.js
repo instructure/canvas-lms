@@ -127,13 +127,17 @@ export function groupGranularPermissionsInRole(role) {
   if (!role?.permissions) return // some JS tests don't bother to fill this in
 
   const groups = {}
-  let accountPermissionsByName = null
-
-  if (ENV.ACCOUNT_PERMISSIONS) {
-    accountPermissionsByName = ENV.ACCOUNT_PERMISSIONS.find(
-      el => el.context_type && el.context_type === 'Account'
-    ).group_permissions.map(perm => perm.permission_name)
-  }
+  const accountPermissionsByName = ENV.ACCOUNT_PERMISSIONS
+    ? ENV.ACCOUNT_PERMISSIONS.find(
+        el => el.context_type && el.context_type === 'Account'
+      ).group_permissions.map(perm => perm.permission_name)
+    : null
+  const courseRoleTypes = ENV.COURSE_ROLES
+    ? ENV.COURSE_ROLES.map(courseRole => courseRole.base_role_type)
+    : null
+  const accountRoleTypes = ENV.ACCOUNT_ROLES
+    ? ENV.ACCOUNT_ROLES.map(accountRole => accountRole.base_role_type)
+    : null
 
   Object.entries(role.permissions).forEach(([permissionName, permission]) => {
     // Fix up boolean enabled values to the enabled state
@@ -152,10 +156,10 @@ export function groupGranularPermissionsInRole(role) {
       // We need to get all of the permissions in a group, to determine
       // what the button status will be for the encompassing permission
       if (
-        (role.contextType === 'Course' &&
+        (courseRoleTypes.includes(role.base_role_type) &&
           accountPermissionsByName &&
           !accountPermissionsByName.includes(permissionName)) ||
-        role.contextType === 'Account'
+        accountRoleTypes.includes(role.base_role_type)
       ) {
         groups[group_name].enabled.push(permission.enabled)
         groups[group_name].explicit.push(permission.explicit)
