@@ -200,7 +200,8 @@ export const IsolatedViewContainer = props => {
         discussionTopicId: props.discussionTopic._id,
         replyFromEntryId: replyId,
         message,
-        includeReplyPreview
+        includeReplyPreview,
+        courseID: ENV.course_id
       },
       optimisticResponse: getOptimisticResponse(
         message,
