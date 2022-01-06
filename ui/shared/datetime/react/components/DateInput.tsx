@@ -107,6 +107,10 @@ export type CanvasDateInputProps = {
    * data test id for test selection
    */
   dataTestid?: string
+  /**
+   * Specifies the input size. One of: small medium large
+   */
+  size?: string
 }
 
 /**
@@ -129,7 +133,8 @@ export default function CanvasDateInput({
   layout = 'stacked',
   width,
   dateIsDisabled,
-  dataTestid
+  dataTestid,
+  size
 }: CanvasDateInputProps) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate ? moment.tz(selectedDate, timezone) : null
@@ -396,6 +401,7 @@ export default function CanvasDateInput({
       layout={layout}
       width={width}
       data-testid={dataTestid}
+      size={size}
     >
       {renderDays()}
     </DateInput>
