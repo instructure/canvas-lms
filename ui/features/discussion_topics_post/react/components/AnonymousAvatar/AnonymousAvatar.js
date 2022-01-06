@@ -24,10 +24,9 @@ import {string} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-export const AnonymousAvatar = ({seedString, size, addFocus}) => {
+export const AnonymousAvatar = ({seedString, size}) => {
   return (
     <View
-      tabIndex={addFocus}
       display="inline-block"
       textAlign="center"
       borderRadius="circle"
@@ -53,11 +52,9 @@ export const AnonymousAvatar = ({seedString, size, addFocus}) => {
 
 AnonymousAvatar.propTypes = {
   seedString: string,
-  addFocus: string,
   size: string
 }
 
 AnonymousAvatar.defaultProps = {
-  size: 'medium',
-  addFocus: null
+  size: 'medium'
 }
