@@ -109,7 +109,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: ENV.TIMEZONE || 'UTC'
     })
   }
 
@@ -274,7 +275,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   renderDate = () => {
     // change the date format and you'll probably have to change
     // the column width in AssignmentRow
-    return this.dateFormatter.format(moment(this.props.dueDate))
+    return this.dateFormatter.format(new Date(this.props.dueDate))
   }
 
   renderTitle() {
