@@ -102,7 +102,7 @@ export const Module: React.FC<PassedProps> = props => {
     // status changes or the pace plan changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${item.duration}|${props.pacePlan.hard_end_dates}`
+    const key = `${item.id}|${item.module_item_id}|${props.pacePlan.hard_end_dates}|${props.pacePlan.updated_at}`
     return (
       <AssignmentRow
         key={key}
