@@ -50,6 +50,7 @@ export const AnonymousResponseSelector = props => {
           onRequestSelectOption={(event, {id}) => {
             setShowOptions(false)
             setSelectedOption(id)
+            props.setAnonymousAuthorState(id === 'Anonymous')
           }}
           onBlur={() => {
             setHighlightedOption(null)
@@ -121,6 +122,7 @@ export const AnonymousResponseSelector = props => {
 AnonymousResponseSelector.propTypes = {
   avatarUrl: propTypes.string,
   username: propTypes.string,
+  setAnonymousAuthorState: propTypes.func,
   discussionAnonymousState: propTypes.string
 }
 

@@ -44,6 +44,9 @@ export const DiscussionEdit = props => {
   const textAreaId = useRef(`message-body-${nanoid()}`)
   const [draftTimeout, setDraftTimeout] = useState(null)
   const [awaitingChanges, setAwaitingChanges] = useState(false)
+  const [anonymousAuthorState, setAnonymousAuthorState] = useState(
+    !!props.discussionAnonymousState && props.canReplyAnonymously
+  )
 
   const [attachment, setAttachment] = useState(null)
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
@@ -126,6 +129,7 @@ export const DiscussionEdit = props => {
           username={ENV.current_user?.display_name}
           avatarUrl={ENV.current_user?.avatar_image_url}
           discussionAnonymousState={props.discussionAnonymousState}
+          setAnonymousAuthorState={setAnonymousAuthorState}
         />
       )}
       <View display="block">
@@ -202,7 +206,14 @@ export const DiscussionEdit = props => {
               >
                 <Button
                   onClick={() => {
-                    props.onSubmit(rceContent, includeReplyPreview, attachment?._id)
+                    if (props.onSubmit) {
+                      props.onSubmit(
+                        rceContent,
+                        includeReplyPreview,
+                        attachment?._id,
+                        anonymousAuthorState
+                      )
+                    }
                   }}
                   display={responsiveProps.display}
                   color="primary"

@@ -196,11 +196,12 @@ export const IsolatedViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, fileId, includeReplyPreview, replyId) => {
+  const onReplySubmit = (message, fileId, includeReplyPreview, replyId, isAnonymousAuthor) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         replyFromEntryId: replyId,
+        isAnonymousAuthor,
         message,
         fileId,
         includeReplyPreview,
@@ -436,8 +437,14 @@ export const IsolatedViewContainer = props => {
               <DiscussionEdit
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                onSubmit={(message, includeReplyPreview, fileId) => {
-                  onReplySubmit(message, fileId, includeReplyPreview, props.replyFromId)
+                onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
+                  onReplySubmit(
+                    message,
+                    fileId,
+                    includeReplyPreview,
+                    props.replyFromId,
+                    anonymousAuthorState
+                  )
                   props.setRCEOpen(false)
                 }}
                 onCancel={() => props.setRCEOpen(false)}
