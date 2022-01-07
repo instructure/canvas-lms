@@ -33,6 +33,9 @@ if settings.present?
     config.environment = Canvas.environment
     config.release = Canvas.revision
 
+    # sentry_logger would be nice here (it records log messages), but it currently includes raw SQL logs
+    config.breadcrumbs_logger = [:http_logger] if Canvas::Plugin.value_to_boolean(Setting.get("sentry_backend_breadcrumbs_enabled", "false"))
+
     filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
     config.before_send = lambda do |event, _|
       filter.filter(event.to_hash)
