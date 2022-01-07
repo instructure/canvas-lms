@@ -113,6 +113,7 @@ gem "oauth", "0.5.4", require: false
 gem "oauth2", "1.4.4", require: false
 gem "oj", "3.10.16"
 gem "outrigger", "3.0.0"
+gem "pg_query", "2.1.2"
 gem "prawn-rails", "1.3.0"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
