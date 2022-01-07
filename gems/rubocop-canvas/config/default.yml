@@ -22,6 +22,11 @@ Migration/AddForeignKey:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/BooleanColumns:
+  Enable: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/ConcurrentIndex:
   Enabled: true
   Include:
