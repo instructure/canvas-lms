@@ -19,6 +19,9 @@
 <html class="scripts-not-loaded" dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
+  <% if @sentry_trace.present? %>
+  <meta name="sentry-trace" content="<%= @sentry_trace %>"/>
+  <% end %>
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <% if Setting.get('disable_lato_extended', false) == 'false' %>
     <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Regular.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonmyous' }) %>
