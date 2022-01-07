@@ -121,10 +121,10 @@ export const DiscussionEdit = props => {
           <ReplyPreview {...props.quotedEntry} />
         </>
       )}
-      {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
+      {props.discussionAnonymousState && props.canReplyAnonymously && (
         <AnonymousResponseSelector
-          username={ENV.current_user.display_name}
-          avatarUrl={ENV.current_user.avatar_image_url}
+          username={ENV.current_user?.display_name}
+          avatarUrl={ENV.current_user?.avatar_image_url}
           discussionAnonymousState={props.discussionAnonymousState}
         />
       )}
@@ -276,6 +276,7 @@ export const DiscussionEdit = props => {
 DiscussionEdit.propTypes = {
   show: PropTypes.bool,
   discussionAnonymousState: PropTypes.string,
+  canReplyAnonymously: PropTypes.bool,
   draftSaved: PropTypes.bool,
   value: PropTypes.string,
   attachment: PropTypes.object,
