@@ -177,6 +177,7 @@ export const DiscussionEntryContainer = props => {
             {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
               discussionAnonymousState={props.discussionTopic?.anonymousState}
+              canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
               title={props.title}
               message={props.message}
               attachment={props.attachment}
