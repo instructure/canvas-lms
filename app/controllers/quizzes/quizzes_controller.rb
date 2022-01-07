@@ -70,17 +70,20 @@ class Quizzes::QuizzesController < ApplicationController
 
       can_manage = @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
 
+      quiz_index = scoped_quizzes_index
+      quiz_index += scoped_new_quizzes_index if quiz_lti_enabled?
+
       quiz_options = Rails.cache.fetch(
         [
           "quiz_user_permissions", @context.id, @current_user,
-          scoped_quizzes_index.map(&:id), # invalidate on add/delete of quizzes
-          scoped_quizzes_index.map(&:updated_at).max # invalidate on modifications
+          quiz_index.map(&:id), # invalidate on add/delete of quizzes
+          quiz_index.map(&:updated_at).max # invalidate on modifications
         ].cache_key
       ) do
         if can_manage
           Quizzes::Quiz.preload_can_unpublish(scoped_quizzes_index)
         end
-        scoped_quizzes_index.each_with_object({}) do |quiz, quiz_user_permissions|
+        quiz_index.each_with_object({}) do |quiz, quiz_user_permissions|
           quiz_user_permissions[quiz.id] = {
             can_update: can_manage,
             can_unpublish: can_manage && quiz.can_unpublish?
@@ -124,12 +127,10 @@ class Quizzes::QuizzesController < ApplicationController
         FLAGS: {
           question_banks: feature_enabled?(:question_banks),
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
-          quiz_lti_enabled: quiz_lti_enabled?,
+          quiz_lti_enabled: quiz_lti_on_quizzes_page?,
           new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
           new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
-          migrate_quiz_enabled:
-            @context.feature_enabled?(:quizzes_next) &&
-            @context.quiz_lti_tool.present?,
+          migrate_quiz_enabled: quiz_lti_enabled?,
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
@@ -1052,12 +1053,15 @@ class Quizzes::QuizzesController < ApplicationController
     end
   end
 
-  def quiz_lti_enabled?
-    quiz_lti_tool = @context.quiz_lti_tool
+  def quiz_lti_on_quizzes_page?
     @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
-      @context.feature_enabled?(:quizzes_next) &&
-      quiz_lti_tool.present? &&
-      quiz_lti_tool.url != "http://void.url.inseng.net"
+      quiz_lti_enabled? &&
+      @context.quiz_lti_tool.url != "http://void.url.inseng.net"
+  end
+
+  def quiz_lti_enabled?
+    @context.feature_enabled?(:quizzes_next) &&
+      @context.quiz_lti_tool.present?
   end
 
   def assignment_quizzes_json(serializer_options)
@@ -1066,9 +1070,8 @@ class Quizzes::QuizzesController < ApplicationController
       return quizzes_json(old_quizzes, *serializer_options)
     end
 
-    new_quizzes = Assignments::ScopedToUser.new(@context, @current_user).scope.preload(:duplicate_of).type_quiz_lti
     quizzes_next_json(
-      sort_quizzes(old_quizzes + new_quizzes),
+      sort_quizzes(old_quizzes + scoped_new_quizzes_index),
       *serializer_options
     )
   end
@@ -1118,6 +1121,12 @@ class Quizzes::QuizzesController < ApplicationController
     scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
 
     @_quizzes_index = sort_quizzes(scope)
+  end
+
+  def scoped_new_quizzes_index
+    return @_new_quizzes_index if @_new_quizzes_index
+
+    @_new_quizzes_index = Assignments::ScopedToUser.new(@context, @current_user).scope.preload(:duplicate_of).type_quiz_lti
   end
 
   def scoped_quizzes
