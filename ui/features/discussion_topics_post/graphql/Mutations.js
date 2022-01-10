@@ -171,8 +171,20 @@ export const CREATE_DISCUSSION_ENTRY = gql`
 `
 
 export const UPDATE_DISCUSSION_ENTRY = gql`
-  mutation UpdateDiscussionEntry($discussionEntryId: ID!, $message: String) {
-    updateDiscussionEntry(input: {discussionEntryId: $discussionEntryId, message: $message}) {
+  mutation UpdateDiscussionEntry(
+    $discussionEntryId: ID!
+    $message: String
+    $fileId: ID
+    $removeAttachment: Boolean
+  ) {
+    updateDiscussionEntry(
+      input: {
+        discussionEntryId: $discussionEntryId
+        message: $message
+        fileId: $fileId
+        removeAttachment: $removeAttachment
+      }
+    ) {
       discussionEntry {
         ...DiscussionEntry
         editor {

@@ -69,6 +69,7 @@ export function PostMessage({...props}) {
                 discussionAnonymousState={props.discussionAnonymousState}
                 onCancel={props.onCancel}
                 value={props.draftMessage || props.message}
+                attachment={props.attachment}
                 onSubmit={props.onSave}
                 isEdit
                 onSetDraftSaved={props.onSetDraftSaved}
@@ -117,6 +118,10 @@ PostMessage.propTypes = {
    * Display text for the post's message
    */
   message: PropTypes.string.isRequired,
+  /*
+   * Display attachment for the post's message
+   */
+  attachment: PropTypes.object,
   /**
    * Determines if the editor should be displayed
    */

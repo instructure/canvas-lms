@@ -44,7 +44,7 @@ unless $canvas_tasks_loaded
       build_dev_js = ENV["JS_BUILD_NO_FALLBACK"] != "1" && (!build_prod_js || ENV["JS_BUILD_NO_UGLIFY"] != "1")
 
       batches = Rake::TaskGraph.draw do
-        task "brand_configs:write" if write_brand_configs
+        task "brand_configs:write" => ["js:gulp_rev"] if write_brand_configs
         task "css:compile" => ["js:gulp_rev"] if build_css
         task "css:styleguide" if build_styleguide
         task "doc:api" if build_api_docs
