@@ -5324,6 +5324,13 @@ describe Course do
       expect(@course.sync_homeroom_enrollments).not_to eq(false)
     end
 
+    it "returns false if course has a SIS batch id" do
+      batch = @course.root_account.sis_batches.create!
+      @course.sis_batch_id = batch.id
+      @course.save!
+      expect(@course.sync_homeroom_enrollments).to eq(false)
+    end
+
     it "works with linked observers observing multiple students" do
       student2 = user_with_pseudonym
       UserObservationLink.create_or_restore(observer: @observer, student: @student, root_account: @course.root_account)
@@ -5393,6 +5400,16 @@ describe Course do
       expect(@course.restrict_enrollments_to_course_dates).to be_truthy
       expect(@course.start_at).to eq @homeroom_course.start_at
       expect(@course.conclude_at).to eq @homeroom_course.conclude_at
+    end
+
+    it "does not sync participation settings if course has a SIS batch id" do
+      batch = @course.root_account.sis_batches.create!
+      @course.sis_batch_id = batch.id
+      @course.save!
+      @homeroom_course.restrict_enrollments_to_course_dates = true
+      @homeroom_course.save!
+      @course.sync_homeroom_participation
+      expect(@course.restrict_enrollments_to_course_dates).to be_falsey
     end
 
     it "doesn't process courses with no linked homeroom" do

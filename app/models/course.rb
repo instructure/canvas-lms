@@ -3427,7 +3427,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.sync_with_homeroom
-    where.not(homeroom_course_id: nil).sync_homeroom_enrollments_enabled.find_each(&:sync_with_homeroom)
+    where.not(homeroom_course_id: nil).where(sis_batch_id: nil).sync_homeroom_enrollments_enabled.find_each(&:sync_with_homeroom)
   end
 
   def sync_with_homeroom
@@ -3435,8 +3435,12 @@ class Course < ActiveRecord::Base
     sync_homeroom_enrollments
   end
 
+  def can_sync_with_homeroom?
+    elementary_subject_course? && sync_enrollments_from_homeroom && linked_homeroom_course.present? && sis_batch_id.blank?
+  end
+
   def sync_homeroom_participation
-    return unless linked_homeroom_course
+    return unless can_sync_with_homeroom?
 
     if linked_homeroom_course.restrict_enrollments_to_course_dates
       self.restrict_enrollments_to_course_dates = true
@@ -3450,7 +3454,7 @@ class Course < ActiveRecord::Base
   end
 
   def sync_homeroom_enrollments(progress = nil)
-    return false unless elementary_subject_course? && sync_enrollments_from_homeroom && linked_homeroom_course
+    return false unless can_sync_with_homeroom?
 
     progress&.calculate_completion!(0, linked_homeroom_course.enrollments.size)
     linked_homeroom_course.all_enrollments.find_each do |enrollment|
