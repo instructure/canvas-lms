@@ -321,7 +321,13 @@ module CanvasRails
         # and these resources actually aren't even on disk in those cases.
         # do not remove this conditional until the asset build no longer
         # needs the rails app for anything.
+
+        # because the require_dependency line below will create a module "Canvas",
+        # the base module won't be autoloaded later. Force it to load first for
+        # now, until we can remove the require_dependency.
+        ::Canvas # rubocop:disable Lint/Void forces it to autoload
         require_dependency "canvas/dynamic_settings"
+
         Canvas::DynamicSettingsInitializer.bootstrap!
       end
     end
