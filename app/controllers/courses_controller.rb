@@ -1461,6 +1461,10 @@ class CoursesController < ApplicationController
                             @current_user.courses_for_enrollments(@current_user.teacher_enrollments).homeroom.to_a
                           end
 
+      if @context.elementary_homeroom_course?
+        @synced_subjects = Course.where(homeroom_course_id: @context.id).where(sis_batch_id: nil).sync_homeroom_enrollments_enabled.limit(100).select(&:elementary_subject_course?).sort_by { |c| Canvas::ICU.collation_key(c.name) }
+      end
+
       @alerts = @context.alerts
       add_crumb(t("#crumbs.settings", "Settings"), named_context_url(@context, :context_details_url))
 
