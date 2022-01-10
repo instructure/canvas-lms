@@ -185,6 +185,8 @@ Style/RescueStandardError:
   EnforcedStyle: implicit
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
+Style/SoleNestedConditional:
+  AllowModifier: true # it makes lines too long and complicated otherwise
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
 Style/StringLiterals:
