@@ -70,6 +70,46 @@ describe Course do
       @course.save!
     end
 
+    it "recalculates grades if enrollment term changes" do
+      @course.save!
+      teacher = User.create!
+      @course.enroll_teacher(teacher, enrollment_state: "active")
+      student = User.create!
+      student_enrollment = @course.enroll_student(student, enrollment_state: "active")
+      now = Time.zone.now
+      first_period_assignment = @course.assignments.create!(
+        due_at: 1.day.from_now(now),
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      first_period_assignment.grade_student(student, grade: 10, grader: teacher)
+      second_period_assignment = @course.assignments.create!(
+        due_at: 25.days.from_now(now),
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      second_period_assignment.grade_student(student, grade: 8, grader: teacher)
+      new_term = EnrollmentTerm.create!(root_account: @course.root_account, workflow_state: "active")
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << new_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago(now),
+        end_date: 10.days.from_now(now),
+        weight: 60
+      )
+      grading_period_set.grading_periods.create!(
+        title: "Another Grading Period",
+        start_date: 20.days.from_now(now),
+        end_date: 30.days.from_now(now),
+        weight: 40
+      )
+      score = student_enrollment.scores.find_by(course_score: true)
+      expect { @course.update!(enrollment_term: new_term) }.to change {
+        score.reload.current_score
+      }.from(90).to(92)
+    end
+
     it "does not re-run DueDateCacher if enrollment term does not change" do
       @course.save!
       expect(DueDateCacher).not_to receive(:recompute_course)

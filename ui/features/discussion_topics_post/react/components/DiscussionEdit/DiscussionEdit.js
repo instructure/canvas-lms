@@ -119,6 +119,7 @@ export const DiscussionEdit = props => {
       {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
         <AnonymousResponseSelector
           username={ENV.current_user.display_name}
+          avatarUrl={ENV.current_user.avatar_image_url}
           discussionAnonymousState={props.discussionAnonymousState}
         />
       )}

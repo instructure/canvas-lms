@@ -89,8 +89,12 @@ class PacePlan < ActiveRecord::Base
     Assignment.suspend_due_date_caching do
       Assignment.suspend_grading_period_grade_recalculation do
         progress&.calculate_completion!(0, student_enrollments.size)
+        ordered_module_items = pace_plan_module_items.not_deleted
+                                                     .group_by { |ppmi| ppmi.module_item.context_module }
+                                                     .sort_by { |context_module, _items| context_module.position }
+                                                     .to_h.values.flatten
         student_enrollments.each do |enrollment|
-          dates = PacePlanDueDatesCalculator.new(self).get_due_dates(pace_plan_module_items.not_deleted, enrollment)
+          dates = PacePlanDueDatesCalculator.new(self).get_due_dates(ordered_module_items, enrollment)
           pace_plan_module_items.each do |pace_plan_module_item|
             content_tag = pace_plan_module_item.module_item
             assignment = content_tag.assignment

@@ -371,6 +371,15 @@ describe('Add Comment/View Feedback button', () => {
     expect(getByText('Add Comment')).toBeInTheDocument()
   })
 
+  it('renders as "Add Comment" by default for nonDigitalSubmission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {nonDigitalSubmission: true},
+      Submission: {...SubmissionMocks.submitted}
+    })
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('Add Comment')).toBeInTheDocument()
+  })
+
   it('renders as "View Feedback" for observers', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByText} = render(
@@ -383,6 +392,15 @@ describe('Add Comment/View Feedback button', () => {
 
   it('renders as "View Feedback" if feedback exists', async () => {
     const props = await mockAssignmentAndSubmission({
+      Submission: {feedbackForCurrentAttempt: true}
+    })
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('View Feedback')).toBeInTheDocument()
+  })
+
+  it('renders as "View Feedback" if feedback exists for nonDigitalSubmission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {nonDigitalSubmission: true},
       Submission: {feedbackForCurrentAttempt: true}
     })
     const {getByText} = render(<Header {...props} />)
@@ -443,13 +461,5 @@ describe('Add Comment/View Feedback button', () => {
         name: /After the first attempt, you cannot leave comments until you submit the assignment./
       })
     ).not.toBeInTheDocument()
-  })
-
-  it('does not render when no submission is present', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: null})
-    props.allSubmissions = [{id: '1', _id: '1'}]
-    const {queryByText} = render(<Header {...props} />)
-    expect(queryByText('View Feedback')).not.toBeInTheDocument()
-    expect(queryByText('Add Comment')).not.toBeInTheDocument()
   })
 })

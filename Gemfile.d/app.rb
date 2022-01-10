@@ -81,7 +81,7 @@ gem "i18nliner", "0.1.2"
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
 gem "diplomat", "2.5.1", require: false
-gem "ims-lti", "2.3.0", require: "ims"
+gem "ims-lti", "2.3.1", require: "ims"
 gem "inst_access", "0.1.1"
 gem "inst_statsd", "2.2.0"
   gem "statsd-ruby", "1.4.0", require: false
@@ -131,7 +131,9 @@ gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.1"
   gem "nokogiri-xmlsec-instructure", "0.10.1", require: false
 gem "sanitize", "6.0.0", require: false
-gem "sentry-raven", "2.13.0", require: false
+gem "sentry-ruby", "4.8.1", github: "rmsy/sentry-ruby"
+gem "sentry-rails", "4.8.1", github: "rmsy/sentry-ruby"
+gem "sentry-inst_jobs", "1.0.0"
 gem "simple_oauth", "0.3.1", require: false
 gem "twilio-ruby", "5.36.0", require: false
 gem "vault", "0.15.0", require: false

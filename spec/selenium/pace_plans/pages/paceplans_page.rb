@@ -25,6 +25,10 @@ module PacePlansPageObject
     "button:contains('Cancel')"
   end
 
+  def compression_tooltip_selector
+    "[data-testid='duedate-tooltip']"
+  end
+
   def duration_field_selector
     "[data-testid='duration-number-input']"
   end
@@ -55,6 +59,10 @@ module PacePlansPageObject
 
   def pace_plan_menu_selector
     "[data-position-target='pace-plan-menu']"
+  end
+
+  def pace_plans_page_selector
+    "#pace_plans"
   end
 
   def pace_plan_start_date_selector
@@ -131,6 +139,10 @@ module PacePlansPageObject
     fj(cancel_button_selector)
   end
 
+  def compression_tooltip
+    f(compression_tooltip_selector)
+  end
+
   def duration_field
     f(duration_field_selector)
   end
@@ -165,6 +177,10 @@ module PacePlansPageObject
 
   def pace_plan_menu
     ff(pace_plan_menu_selector)
+  end
+
+  def pace_plans_page
+    f(pace_plans_page_selector)
   end
 
   def pace_plan_start_date
@@ -290,12 +306,30 @@ module PacePlansPageObject
     pace_plan_table_module_elements[element_number].text
   end
 
+  delegate :text, to: :pace_plans_page, prefix: true
+
+  def select_student_pace_plan
+    click_main_pace_plan_menu
+    wait_for(method: nil, timeout: 5) { students_menu_item.displayed? }
+    click_students_menu_item
+
+    wait_for(method: nil, timeout: 10) { student_pace_plan(@student.name).displayed? }
+    click_student_pace_plan(@student.name)
+  end
+
   #----------------------------Element Management---------------------
 
   def add_required_end_date(required_end_date)
-    formatted_date = required_end_date.strftime("%m/%d/%Y")
-    required_end_date_input[:value].size.times { required_end_date_input.send_keys(:backspace) }
-    required_end_date_input.send_keys(formatted_date, :enter)
+    required_end_date_input.send_keys([:control, "a"], :backspace, format_date_for_view(required_end_date), :enter)
+  end
+
+  def add_start_date(start_date)
+    pace_plan_start_date.send_keys([:control, "a"], :backspace, format_date_for_view(start_date), :enter)
+  end
+
+  def calculate_saturday_date
+    current_date = Date.today
+    current_date + ((6 - current_date.wday) % 7)
   end
 
   def module_item_exists?
