@@ -62,6 +62,7 @@ module RuboCop
         PATTERN
 
         def on_class(node)
+          @class_node = node
           @non_transactional = non_transactional?(node)
           @new_tables = new_tables(node)
         end
@@ -87,15 +88,15 @@ module RuboCop
           end
         end
 
-        def check_non_transactional(node)
-          if !@non_transactional && !@already_nagged_about_this
-            add_offense node, message: NON_TRANSACTIONAL_MSG, severity: :warning
+        def check_non_transactional
+          if @class_node && !@non_transactional && !@already_nagged_about_this
+            add_offense @class_node, message: NON_TRANSACTIONAL_MSG, severity: :warning
             @already_nagged_about_this = true
           end
         end
 
         def check_add_index(node)
-          check_non_transactional(node)
+          check_non_transactional
 
           unless algorithm_concurrently?(node)
             add_offense node, message: ALGORITHM_CONCURRENTLY_MSG, severity: :warning
@@ -103,7 +104,7 @@ module RuboCop
         end
 
         def check_add_reference(node)
-          check_non_transactional(node)
+          check_non_transactional
 
           arg = index_argument(node).first
           if arg.nil? || (!false?(arg) && !algorithm_concurrently?(arg))
