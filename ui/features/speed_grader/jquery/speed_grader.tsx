@@ -354,19 +354,32 @@ function mergeStudentsAndSubmission() {
     window.jsonData.submissionsMap[submission[anonymizableUserId]] = submission
   })
 
+  jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions.reduce(
+    (students, student, index) => {
+      const submission = jsonData.submissionsMap[student[anonymizableId]]
+      // Hide students that don't have a submission object. This is legacy support
+      // for when we used to not create submission objects for assigned concluded students.
+      // For all new assignments, every assigned student (regardless of concluded/inactive
+      // status) should have a submission object.
+      if (submission) {
+        student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]]
+        student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student[anonymizableId]])
+        student.submission = submission
+        student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
+        student.index = index
+        students.push(student)
+      }
+
+      return students
+    },
+    []
+  )
+
   // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
   if (isAnonymous)
     window.jsonData.studentsWithSubmissions.sort((a, b) =>
       a.anonymous_name_position > b.anonymous_name_position ? 1 : -1
     )
-
-  window.jsonData.studentsWithSubmissions.forEach((student, index) => {
-    student.enrollments = window.jsonData.studentEnrollmentMap[student[anonymizableId]]
-    student.section_ids = Object.keys(window.jsonData.studentSectionIdsMap[student[anonymizableId]])
-    student.submission = window.jsonData.submissionsMap[student[anonymizableId]]
-    student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
-    student.index = index
-  })
 
   // handle showing students only in a certain section.
   if (!window.jsonData.GROUP_GRADING_MODE) {
@@ -2602,18 +2615,18 @@ EG = {
     $grded_so_far.text(
       I18n.t('portion_graded', '%{x}/%{y}', {
         x: I18n.n(gradedStudents.length),
-        y: I18n.n(window.jsonData.context.students.length)
+        y: I18n.n(window.jsonData.studentsWithSubmissions.length)
       })
     )
   },
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(window.jsonData.context.students, student =>
+      return _.filter(jsonData.studentsWithSubmissions, student =>
         _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
-      return window.jsonData.context.students.length
+      return jsonData.studentsWithSubmissions.length
     }
   },
 
@@ -3661,7 +3674,7 @@ EG = {
         snapshot =>
           snapshot &&
           $.map(
-            window.jsonData.context.students,
+            jsonData.studentsWithSubmissions,
             student => snapshot === student && student.name
           )[0]
       )
