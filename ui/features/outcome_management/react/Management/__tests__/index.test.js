@@ -416,6 +416,25 @@ describe('OutcomeManagementPanel', () => {
     expect(queryByText('1 Outcome')).toBeInTheDocument()
   })
 
+  it('Removes selected outcome from the selected outcomes popover', async () => {
+    const {queryByText, getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps,
+      mocks: [...defaultMocks, deleteOutcomeMock({ids: ['1']})]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    fireEvent.click(getByText('Select outcome Outcome 1 - Course folder 0'))
+    expect(queryByText('1 Outcome Selected')).toBeInTheDocument()
+    fireEvent.click(getByRole('button', {name: /remove/i}))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Remove Outcome'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+    expect(queryByText('0 Outcomes Selected')).toBeInTheDocument()
+  })
+
   it('clears selected outcome when move outcome modal is closed', async () => {
     const {getByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
