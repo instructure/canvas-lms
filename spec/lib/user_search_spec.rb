@@ -170,6 +170,21 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
           end
 
+          describe "will match against a suspended user" do
+            before do
+              pseudonym.workflow_state = "suspended"
+              pseudonym.save!
+            end
+
+            it "by sis id" do
+              expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
+            end
+
+            it "by user name" do
+              expect(UserSearch.for_user_in_context("admin", course, user)).to eq [user]
+            end
+          end
+
           it "will not match against a sis id without :read_sis permission" do
             RoleOverride.create!(context: Account.default, role: teacher_role,
                                  permission: "read_sis", enabled: false)
