@@ -25,6 +25,8 @@ require "csv"
 require "socket"
 
 describe Course do
+  include K5Common
+
   context "with basic course" do
     before :once do
       Account.default
@@ -2896,8 +2898,6 @@ describe Course do
       end
 
       describe "with canvas_for_elementary account setting on" do
-        include K5Common
-
         context "homeroom course" do
           before :once do
             toggle_k5_setting(@course.account)
@@ -5247,7 +5247,7 @@ describe Course do
   describe "#sync_homeroom_enrollments" do
     before :once do
       @homeroom_course = course_factory(active_course: true)
-      @homeroom_course.account.settings[:enable_as_k5_account] = { value: true }
+      toggle_k5_setting(@homeroom_course.account, true)
       @homeroom_course.homeroom_course = true
       @homeroom_course.save!
 
@@ -5331,6 +5331,17 @@ describe Course do
       expect(@course.sync_homeroom_enrollments).to eq(false)
     end
 
+    it "returns false if linked homeroom course is deleted" do
+      @homeroom_course.destroy!
+      expect(@course.sync_homeroom_enrollments).to eq(false)
+    end
+
+    it "returns false if linked homeroom course is no longer a homeroom course" do
+      @homeroom_course.homeroom_course = false
+      @homeroom_course.save!
+      expect(@course.sync_homeroom_enrollments).to eq(false)
+    end
+
     it "works with linked observers observing multiple students" do
       student2 = user_with_pseudonym
       UserObservationLink.create_or_restore(observer: @observer, student: @student, root_account: @course.root_account)
@@ -5346,7 +5357,7 @@ describe Course do
       before :once do
         @shard1.activate do
           account = Account.create!
-          account.enable_as_k5_account!
+          toggle_k5_setting(account, true)
           @cross_shard_course = course_factory(account: account, active_course: true)
           @cross_shard_course.sync_enrollments_from_homeroom = true
           @cross_shard_course.homeroom_course_id = @homeroom_course.id
@@ -5371,7 +5382,7 @@ describe Course do
   describe "#sync_homeroom_participation" do
     before :once do
       @homeroom_course = course_factory(active_course: true)
-      @homeroom_course.account.settings[:enable_as_k5_account] = { value: true }
+      toggle_k5_setting(@homeroom_course.account, true)
       @homeroom_course.homeroom_course = true
       @homeroom_course.save!
 
@@ -5407,6 +5418,22 @@ describe Course do
       @course.sis_batch_id = batch.id
       @course.save!
       @homeroom_course.restrict_enrollments_to_course_dates = true
+      @homeroom_course.save!
+      @course.sync_homeroom_participation
+      expect(@course.restrict_enrollments_to_course_dates).to be_falsey
+    end
+
+    it "does not sync participation settings if linked homeroom course is deleted" do
+      @homeroom_course.restrict_enrollments_to_course_dates = true
+      @homeroom_course.save!
+      @homeroom_course.destroy!
+      @course.sync_homeroom_participation
+      expect(@course.restrict_enrollments_to_course_dates).to be_falsey
+    end
+
+    it "does not sync participation settings if linked homeroom course is no longer a homeroom course" do
+      @homeroom_course.restrict_enrollments_to_course_dates = true
+      @homeroom_course.homeroom_course = false
       @homeroom_course.save!
       @course.sync_homeroom_participation
       expect(@course.restrict_enrollments_to_course_dates).to be_falsey
