@@ -885,7 +885,7 @@ class Course < ActiveRecord::Base
   scope :templates, -> { where(template: true) }
 
   scope :homeroom, -> { where(homeroom_course: true) }
-  scope :sync_homeroom_enrollments_enabled, -> { where(sync_enrollments_from_homeroom: true) }
+  scope :syncing_subjects, -> { joins("INNER JOIN #{Course.quoted_table_name} AS homeroom ON homeroom.id = courses.homeroom_course_id").where("homeroom.homeroom_course = true AND homeroom.workflow_state <> 'deleted'").where(sis_batch_id: nil).where(sync_enrollments_from_homeroom: true) }
 
   def potential_collaborators
     current_users
@@ -3427,7 +3427,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.sync_with_homeroom
-    where.not(homeroom_course_id: nil).where(sis_batch_id: nil).sync_homeroom_enrollments_enabled.find_each(&:sync_with_homeroom)
+    syncing_subjects.find_each(&:sync_with_homeroom)
   end
 
   def sync_with_homeroom
@@ -3436,7 +3436,7 @@ class Course < ActiveRecord::Base
   end
 
   def can_sync_with_homeroom?
-    elementary_subject_course? && sync_enrollments_from_homeroom && linked_homeroom_course.present? && sis_batch_id.blank?
+    elementary_subject_course? && sync_enrollments_from_homeroom && sis_batch_id.blank? && linked_homeroom_course.present? && linked_homeroom_course.elementary_homeroom_course? && !linked_homeroom_course.deleted?
   end
 
   def sync_homeroom_participation
