@@ -1461,6 +1461,10 @@ class CoursesController < ApplicationController
                             @current_user.courses_for_enrollments(@current_user.teacher_enrollments).homeroom.to_a
                           end
 
+      if @context.elementary_homeroom_course?
+        @synced_subjects = Course.where(homeroom_course_id: @context.id).where(sis_batch_id: nil).sync_homeroom_enrollments_enabled.limit(100).select(&:elementary_subject_course?).sort_by { |c| Canvas::ICU.collation_key(c.name) }
+      end
+
       @alerts = @context.alerts
       add_crumb(t("#crumbs.settings", "Settings"), named_context_url(@context, :context_details_url))
 
@@ -3102,7 +3106,7 @@ class CoursesController < ApplicationController
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
-        if @course.elementary_enabled? && value_to_boolean(params[:course][:sync_enrollments_from_homeroom]) && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
+        if @course.can_sync_with_homeroom?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!
