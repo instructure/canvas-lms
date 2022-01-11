@@ -32,6 +32,11 @@ Migration/ConcurrentIndex:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/DataFixup:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/Delay:
   Enabled: true
   Include:
