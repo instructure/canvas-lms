@@ -27,6 +27,16 @@ Migration/BooleanColumns:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/ChangeColumn:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
+Migration/ChangeColumnNull:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/ConcurrentIndex:
   Enabled: true
   Include:
@@ -47,12 +57,7 @@ Migration/Execute:
   Include:
     - "**/db/migrate/*.rb"
 
-Migration/ChangeColumn:
-  Enabled: true
-  Include:
-    - "**/db/migrate/*.rb"
-
-Migration/ChangeColumnNull:
+Migration/Predeploy:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"
