@@ -223,7 +223,7 @@ export default function CanvasDateInput({
     setInputValue(value)
     // If we have been asked to show the running value, hide the popup
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
-    const newDate = tz.parse(value)
+    const newDate = tz.parse(value, timezone)
     if (newDate) {
       const msgs: CanvasDateInputMessageType[] = withRunningValue
         ? [{type: 'success', text: formatDate(newDate)}]

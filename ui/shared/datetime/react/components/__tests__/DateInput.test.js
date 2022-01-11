@@ -183,6 +183,18 @@ describe('dirty input state', () => {
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(null)
     expect(getInput().value).toBe('')
   })
+
+  it('handles the date in the given timezone', () => {
+    const tz = 'Pacific/Tarawa' // +12
+    const handleDateChange = jest.fn()
+    const {getInput} = renderAndDirtyInput('May 20, 2020', {
+      selectedDate: new Date(),
+      timezone: tz,
+      onSelectedDateChange: handleDateChange
+    })
+    fireEvent.blur(getInput())
+    expect(handleDateChange.mock.calls[0][0].toISOString()).toEqual('2020-05-20T00:00:00.000Z')
+  })
 })
 
 describe('rendered month', () => {
