@@ -124,7 +124,7 @@ class GradebooksController < ApplicationController
 
     grading_period = @grading_periods&.find { |period| period[:id] == gp_id }
 
-    ags_json = light_weight_ags_json(@presenter.groups, { student: @presenter.student })
+    ags_json = light_weight_ags_json(@presenter.groups)
     root_account = @context.root_account
 
     js_hash = {
@@ -180,31 +180,31 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def light_weight_ags_json(assignment_groups, opts = {})
-    assignment_groups.map do |ag|
-      visible_assignments = ag.visible_assignments(opts[:student] || @current_user).to_a
+  def light_weight_ags_json(assignment_groups)
+    assignments_by_group = @presenter.assignments.each_with_object({}) do |assignment, assignments|
+      # Pseudo-assignment objects with a "special_class" set are created for
+      # assignment group totals, grading period totals, and course totals. We
+      # only care about real assignments here, so we'll ignore those
+      # pseudo-assignment objects.
+      next if assignment.special_class
 
-      if grading_periods? && @current_grading_period_id && !view_all_grading_periods?
-        current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
-        visible_assignments = current_period.assignments_for_student(@context, visible_assignments, opts[:student])
-      end
+      assignments[assignment.assignment_group_id] ||= []
+      assignments[assignment.assignment_group_id] << {
+        id: assignment.id,
+        submission_types: assignment.submission_types_array,
+        points_possible: assignment.points_possible,
+        due_at: assignment.due_at,
+        omit_from_final_grade: assignment.omit_from_final_grade?,
+        muted: assignment.muted?
+      }
+    end
 
-      visible_assignments.map! do |a|
-        {
-          id: a.id,
-          submission_types: a.submission_types_array,
-          points_possible: a.points_possible,
-          due_at: a.due_at,
-          omit_from_final_grade: a.omit_from_final_grade?,
-          muted: a.muted?
-        }
-      end
-
+    assignment_groups.map do |group|
       {
-        id: ag.id,
-        rules: ag.rules_hash({ stringify_json_ids: true }),
-        group_weight: ag.group_weight,
-        assignments: visible_assignments,
+        id: group.id,
+        rules: group.rules_hash({ stringify_json_ids: true }),
+        group_weight: group.group_weight,
+        assignments: assignments_by_group.fetch(group.id, [])
       }
     end
   end

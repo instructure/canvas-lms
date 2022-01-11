@@ -418,6 +418,30 @@ describe Assignment do
       end
     end
 
+    describe "#assigned_to_student" do
+      it "returns assignments assigned to the given student" do
+        assignment = @course.assignments.create!
+        expect(@course.assignments.assigned_to_student(@initial_student.id)).to include assignment
+      end
+
+      it "does not return assignments not assigned to the given student" do
+        new_student = student_in_course(course: @course, active_all: true, user_name: "new student").user
+        assignment = @course.assignments.create!(only_visible_to_overrides: true)
+        create_adhoc_override_for_assignment(assignment, new_student)
+        aggregate_failures do
+          expect(@course.assignments.assigned_to_student(new_student.id)).to include assignment
+          expect(@course.assignments.assigned_to_student(@initial_student.id)).not_to include assignment
+        end
+      end
+
+      it "returns assignments for a which a student does not have visibility but is assigned" do
+        assignment = @course.assignments.create!
+        # deactivated students can not view assignments they are assigned to
+        @course.enrollments.find_by(user: @initial_student).deactivate
+        expect(@course.assignments.assigned_to_student(@initial_student.id)).to include assignment
+      end
+    end
+
     describe "#update_submittable" do
       before do
         Timecop.freeze(1.day.ago) do

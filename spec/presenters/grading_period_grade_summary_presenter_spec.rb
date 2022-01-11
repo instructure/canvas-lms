@@ -74,19 +74,32 @@ describe GradingPeriodGradeSummaryPresenter do
     end
   end
 
-  describe "#assignments_visible_to_student" do
+  describe "#assignments_for_student" do
     it "excludes assignments that are not due for the student in the given grading period" do
-      expect(presenter.assignments_visible_to_student).not_to include(@assignment_not_due_in_period)
+      expect(presenter.assignments_for_student).not_to include(@assignment_not_due_in_period)
     end
 
     it "includes assignments that are due for the student in the given grading period" do
-      expect(presenter.assignments_visible_to_student).to include(@assignment_due_in_period)
+      expect(presenter.assignments_for_student).to include(@assignment_due_in_period)
     end
 
     it "includes overridden assignments that are due for the student in the given grading period" do
       student_override = @assignment_not_due_in_period.assignment_overrides.create!(due_at: @now, due_at_overridden: true)
       student_override.assignment_override_students.create!(user: @student)
-      expect(presenter.assignments_visible_to_student).to include(@assignment_not_due_in_period)
+      expect(presenter.assignments_for_student).to include(@assignment_not_due_in_period)
+    end
+
+    it "includes assignments for deactivated students when a teacher is viewing" do
+      teacher = User.create!
+      @course.enroll_teacher(teacher, active_all: true)
+      @course.enrollments.find_by(user: @student).deactivate
+      presenter = GradingPeriodGradeSummaryPresenter.new(
+        @course,
+        teacher,
+        @student.id,
+        grading_period_id: @period.id
+      )
+      expect(presenter.assignments_for_student).to include(@assignment_due_in_period)
     end
   end
 
