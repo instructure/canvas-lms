@@ -1029,7 +1029,7 @@ describe GradebookImporter do
       setup_DA
     end
 
-    it "ignores submissions for students without visibility" do
+    it "ignores submissions for students that are not assigned" do
       @assignment_one.grade_student(@student_one, grade: "3", grader: @teacher)
       @assignment_two.grade_student(@student_two, grade: "3", grader: @teacher)
       importer_with_rows(
@@ -1042,6 +1042,17 @@ describe GradebookImporter do
       expect(json[:students][0][:submissions][1]["grade"]).to eq ""
       expect(json[:students][1][:submissions][0]["grade"]).to eq ""
       expect(json[:students][1][:submissions][1]["grade"]).to eq "9"
+    end
+
+    it "includes submissions for students that are assigned but do not have visibility (deactivated students)" do
+      @assignment_one.grade_student(@student_one, grade: "3", grader: @teacher)
+      @course.student_enrollments.find_by(user: @student_one).deactivate
+      importer_with_rows(
+        "Student,ID,Section,a1,a2",
+        ",#{@student_one.id},#{@section_one.id},7,"
+      )
+      json = @gi.as_json
+      expect(json[:students][0][:submissions][0]["grade"]).to eq "7"
     end
 
     it "does not break the creation of new assignments" do
