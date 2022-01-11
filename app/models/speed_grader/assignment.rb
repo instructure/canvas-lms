@@ -73,10 +73,7 @@ module SpeedGrader
 
       res[:context][:rep_for_student] = {}
 
-      # If we're working with anonymous IDs, skip students who don't have a
-      # valid submission object, which means no inactive or concluded students
-      # even if the user has elected to show them in gradebook
-      includes = assignment.anonymize_students? ? [] : gradebook_includes(user: current_user, course: course)
+      includes = gradebook_includes(user: current_user, course: course)
       students = assignment.representatives(user: current_user, includes: includes, group_id: group_id_filter, section_id: section_id_filter) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end

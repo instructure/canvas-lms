@@ -1507,31 +1507,68 @@ describe SpeedGrader::Assignment do
       course_with_teacher
 
       @active_student = @course.enroll_student(User.create!, enrollment_state: "active").user
-      @course.enroll_student(User.create!, enrollment_state: "inactive")
-      @course.enroll_student(User.create!, enrollment_state: "completed")
-      @course.enroll_student(User.create!, enrollment_state: "completed")
+      @inactive_student = User.create!
+      @course.enroll_student(@inactive_student, enrollment_state: "inactive")
+      @concluded_student = User.create!
+      @course.enroll_student(@concluded_student, enrollment_state: "completed")
+      @concluded_student2 = User.create!
+      @course.enroll_student(@concluded_student2, enrollment_state: "completed")
     end
 
     let(:assignment) { @course.assignments.create!(title: "anonymous", anonymous_grading: true) }
     let(:speed_grader_json) { SpeedGrader::Assignment.new(assignment, @teacher).json }
     let(:students) { speed_grader_json[:context][:students] }
+    let(:returned_ids) { students.map { |student| student["anonymous_id"] } }
 
-    it "returns only active students if assignment is muted" do
-      active_student_submission = assignment.submission_for_student(@active_student)
+    context "unposted assignments" do
+      it "returns only active students if the teacher is not viewing inactive or concluded" do
+        active_student_submission = assignment.submission_for_student(@active_student)
+        expect(returned_ids).to match_array [active_student_submission.anonymous_id]
+      end
 
-      returned_ids = students.map { |student| student["anonymous_id"] }
-      expect(returned_ids).to match_array [active_student_submission.anonymous_id]
+      it "returns active and inactive if the teacher is viewing inactive" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => { "show_inactive_enrollments" => "true" }
+        }
+        expected_ids = assignment.submissions.where(user: [@active_student, @inactive_student]).pluck(:anonymous_id)
+        expect(returned_ids).to match_array expected_ids
+      end
+
+      it "returns active and concluded if the teacher is viewing concluded" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => { "show_concluded_enrollments" => "true" }
+        }
+        expected_ids = assignment.submissions.where(
+          user: [@active_student, @concluded_student, @concluded_student2]
+        ).pluck(:anonymous_id)
+        expect(returned_ids).to match_array expected_ids
+      end
+
+      it "returns all students if teacher is viewing inactive and concluded" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => {
+            "show_concluded_enrollments" => "true",
+            "show_inactive_enrollments" => "true"
+          }
+        }
+        expected_ids = assignment.submissions.where(
+          user: [@active_student, @inactive_student, @concluded_student, @concluded_student2]
+        ).pluck(:anonymous_id)
+        expect(returned_ids).to match_array expected_ids
+      end
     end
 
-    it "returns students in accord with user gradebook preferences if assignment is not muted" do
-      @teacher.preferences[:gradebook_settings] = {}
-      @teacher.preferences[:gradebook_settings][@course.global_id] = {
-        "show_concluded_enrollments" => "true",
-        "show_inactive_enrollments" => "true"
-      }
-      assignment.unmute!
+    context "posted assignments" do
+      it "returns students in accord with user gradebook preferences if assignment is not muted" do
+        @teacher.preferences[:gradebook_settings] = {}
+        @teacher.preferences[:gradebook_settings][@course.global_id] = {
+          "show_concluded_enrollments" => "true",
+          "show_inactive_enrollments" => "true"
+        }
+        assignment.unmute!
 
-      expect(students.length).to eq 4
+        expect(students.length).to eq 4
+      end
     end
   end
 

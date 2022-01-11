@@ -2362,6 +2362,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           ]
         })
 
+        test('filters out students that do not have submissions', () => {
+          window.jsonData.submissions.shift()
+          SpeedGrader.EG.jsonReady()
+          const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+          deepEqual(ids, ['1102', '1103', '1104'])
+        })
+
         test('preserves student order (from server) when sorting alphabetically', () => {
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)

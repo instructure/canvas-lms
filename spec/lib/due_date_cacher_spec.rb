@@ -612,17 +612,6 @@ describe DueDateCacher do
           cacher.recompute
           expect(submission.reload.cached_due_date).to be_nil
         end
-
-        it "does not update submissions for students with concluded enrollments" do
-          student2 = user_factory
-          @course.enroll_student(student2, enrollment_state: "active")
-          submission2 = submission_model(assignment: @assignment, user: student2)
-          submission2.update(cached_due_date: nil)
-          student2.enrollments.find_by(course: @course).conclude
-
-          DueDateCacher.new(@course, [@assignment]).recompute
-          expect(submission2.reload.cached_due_date).to be nil
-        end
       end
 
       context "one applicable override" do
@@ -667,17 +656,6 @@ describe DueDateCacher do
           cacher.recompute
           expect(submission.reload.cached_due_date).to eq @assignment.due_at.change(usec: 0)
         end
-
-        it "does not update submissions for students with concluded enrollments" do
-          student2 = user_factory
-          @course.enroll_student(student2, enrollment_state: "active")
-          submission2 = submission_model(assignment: @assignment, user: student2)
-          submission2.update(cached_due_date: nil)
-          student2.enrollments.find_by(course: @course).conclude
-
-          DueDateCacher.new(@course, [@assignment]).recompute
-          expect(submission2.reload.cached_due_date).to be nil
-        end
       end
 
       context "adhoc override" do
@@ -705,12 +683,6 @@ describe DueDateCacher do
         it "does not apply to students not in the adhoc set" do
           cacher.recompute
           expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(usec: 0)
-        end
-
-        it "does not update submissions for students with concluded enrollments" do
-          @student2.enrollments.find_by(course: @course).conclude
-          DueDateCacher.new(@course, [@assignment]).recompute
-          expect(@submission2.reload.cached_due_date).to be nil
         end
       end
 
@@ -793,12 +765,6 @@ describe DueDateCacher do
           cacher.recompute
           @group.add_user(@student1, "deleted")
           expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(usec: 0)
-        end
-
-        it "does not update submissions for students with concluded enrollments" do
-          @student2.enrollments.find_by(course: @course).conclude
-          DueDateCacher.new(@course, [@assignment]).recompute
-          expect(@submission2.reload.cached_due_date).to be nil
         end
       end
 
