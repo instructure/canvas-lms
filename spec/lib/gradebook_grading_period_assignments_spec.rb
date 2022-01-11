@@ -124,9 +124,16 @@ describe GradebookGradingPeriodAssignments do
           @student_enrollment = student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!(due_at: @period2.end_date)
           @settings = {}
+          @includes = []
         end
 
-        let(:hash) { GradebookGradingPeriodAssignments.new(@course, course_settings: @settings).to_h }
+        let(:hash) do
+          GradebookGradingPeriodAssignments.new(
+            @course,
+            course_settings: @settings,
+            includes: @includes
+          ).to_h
+        end
 
         describe "concluded students" do
           before(:once) do
@@ -154,12 +161,17 @@ describe GradebookGradingPeriodAssignments do
             expect(hash[@period2.id]).to be_nil
           end
 
-          it "optionally includes assignments assigned exclusively to concluded students" do
+          it "can optionally include assignments assigned exclusively to concluded students" do
+            @includes = ["completed"]
+            expect(hash[@period2.id]).to include @assignment.id.to_s
+          end
+
+          it "can be passed course settings to include assignments assigned exclusively to concluded students" do
             @settings = { "show_concluded_enrollments" => "true" }
             expect(hash[@period2.id]).to include @assignment.id.to_s
           end
 
-          it "optionally excludes assignments assigned exclusively to concluded students" do
+          it "can be passed course settings to exclude assignments assigned exclusively to concluded students" do
             @settings = { "show_concluded_enrollments" => "false" }
             expect(hash[@period2.id]).to be_nil
           end
@@ -191,12 +203,17 @@ describe GradebookGradingPeriodAssignments do
             expect(hash[@period2.id]).to be_nil
           end
 
-          it "optionally includes assignments assigned exclusively to deactivated students" do
+          it "can optionally include assignments assigned exclusively to deactivated students" do
+            @includes = ["inactive"]
+            expect(hash[@period2.id]).to include @assignment.id.to_s
+          end
+
+          it "can be passed course settings to include assignments assigned exclusively to deactivated students" do
             @settings = { "show_inactive_enrollments" => "true" }
             expect(hash[@period2.id]).to include @assignment.id.to_s
           end
 
-          it "optionally excludes assignments assigned exclusively to deactivated students" do
+          it "can be passed course settings to exclude assignments assigned exclusively to deactivated students" do
             @settings = { "show_inactive_enrollments" => "false" }
             expect(hash[@period2.id]).to be_nil
           end

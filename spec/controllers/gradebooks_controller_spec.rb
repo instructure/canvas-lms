@@ -351,7 +351,7 @@ describe GradebooksController do
       expect(submission[:workflow_state]).to eq "graded"
     end
 
-    it "returns submissions of even inactive students" do
+    it "returns submissions for inactive students" do
       user_session(@teacher)
       assignment = @course.assignments.create!(points_possible: 10)
       assignment.grade_student(@student, grade: 6.6, grader: @teacher)
@@ -359,6 +359,17 @@ describe GradebooksController do
       enrollment.deactivate
       get :grade_summary, params: { course_id: @course.id, id: @student.id }
       expect(assigns.fetch(:js_env).fetch(:submissions).first.fetch(:score)).to be 6.6
+    end
+
+    it "returns assignments for inactive students" do
+      user_session(@teacher)
+      assignment = @course.assignments.create!(points_possible: 10)
+      assignment.grade_student(@student, grade: 6.6, grader: @teacher)
+      enrollment = @course.enrollments.find_by(user: @student)
+      enrollment.deactivate
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      assignment_id = assigns.dig(:js_env, :assignment_groups, 0, :assignments, 0, :id)
+      expect(assignment_id).to eq assignment.id
     end
 
     context "assignment sorting" do
@@ -2952,6 +2963,7 @@ describe GradebooksController do
       AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
       @controller.instance_variable_set(:@current_user, @user)
+      @controller.instance_variable_set(:@presenter, @controller.send(:grade_summary_presenter))
       expect(@controller.light_weight_ags_json([ag])).to eq [
         {
           id: ag.id,
@@ -2989,6 +3001,7 @@ describe GradebooksController do
 
       @controller.instance_variable_set(:@context, @course)
       @controller.instance_variable_set(:@current_user, @user)
+      @controller.instance_variable_set(:@presenter, @controller.send(:grade_summary_presenter))
       expect(@controller.light_weight_ags_json([ag])).to eq [
         {
           id: ag.id,
