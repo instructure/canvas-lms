@@ -152,13 +152,13 @@ const Ratings = ({ratings, onChangeRatings, canManage}) => {
             isMobileView={isMobileView}
             position={index + 1}
             canManage={canManage}
-            forOutcome
+            individualOutcome
           />
           {renderBorder()}
         </React.Fragment>
       ))}
       {canManage && (
-        <View textAlign="center" padding="small small medium small" as="div">
+        <View textAlign="center" padding="small" as="div">
           <IconButton
             onClick={addRow}
             withBorder={false}

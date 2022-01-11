@@ -28,6 +28,8 @@ import {
   IMPORT_OUTCOMES,
   CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
+import {defaultOutcomesManagementRatings} from '../react/hooks/useRatings'
+import _ from 'lodash'
 
 import {uniq, flattenDeep} from 'lodash'
 
@@ -1411,8 +1413,15 @@ export const createLearningOutcomeMock = ({
   failMutation = false,
   calculationMethod = 'decaying_average',
   calculationInt = 65,
-  individualCalculation = false
+  individualCalculation = false,
+  ratings = defaultOutcomesManagementRatings,
+  individualRatings = false
 } = {}) => {
+  const inputRatings = ratings.map(rating => _.pick(rating, ['description', 'points', 'mastery']))
+  const masteryPoints = ratings.filter(rating => rating.mastery)[0].points
+  const pointsPossible = ratings.sort((a, b) => b.points - a.points)[0].points
+  const outputRatings = inputRatings.map(r => ({...r, __typename: 'ProficiencyRating'}))
+
   const successfulResponse = {
     data: {
       createLearningOutcome: {
@@ -1423,6 +1432,9 @@ export const createLearningOutcomeMock = ({
           displayName,
           calculationMethod,
           calculationInt,
+          masteryPoints,
+          pointsPossible,
+          ratings: outputRatings,
           __typename: 'LearningOutcome'
         },
         __typename: 'CreateLearningOutcomePayload',
@@ -1475,6 +1487,9 @@ export const createLearningOutcomeMock = ({
   if (individualCalculation) {
     input.calculationMethod = calculationMethod
     input.calculationInt = calculationInt
+  }
+  if (individualRatings) {
+    input.ratings = inputRatings
   }
 
   return {
