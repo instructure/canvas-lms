@@ -29,6 +29,7 @@ beforeAll(() => {
     end_at: {date: COURSE.end_at, date_context: 'course'},
     start_at: {date: COURSE.start_at, date_context: 'course'}
   }
+  window.ENV.CONTEXT_TIMEZONE = 'Asia/Tokyo'
 })
 
 afterEach(() => {
@@ -37,7 +38,7 @@ afterEach(() => {
 
 describe('PacePlansDateSelector', () => {
   const defaultProps: PacePlansDateInputProps = {
-    dateValue: '2021-09-01',
+    dateValue: COURSE.start_at,
     label: 'The Label',
     helpText: 'help text',
     message: undefined,
