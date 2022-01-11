@@ -144,4 +144,35 @@ describe BrandableCSS do
       end
     end
   end
+
+  it "has a migration to generate BrandConfig records for the *latest* default variables" do
+    migration_version = BrandableCSS.migration_version
+    migration_name = BrandableCSS::MIGRATION_NAME.underscore
+
+    predeploy_file = "db/migrate/#{migration_version}_#{migration_name}_predeploy.rb"
+    postdeploy_file = "db/migrate/#{migration_version + 1}_#{migration_name}_postdeploy.rb"
+
+    help = lambda do |oldfile:, newfile:|
+      <<~TEXT
+        If you have made changes to "app/stylesheets/brandable_variables.json"
+        or any of the image files referenced in it, you must also rename the
+        corresponding database migration file with a command similar to:
+
+            mv #{oldfile} \\
+               #{newfile}
+
+        If you have no idea what this is about, reach out to the FOO team.
+      TEXT
+    end
+
+    expect(Rails.root.join(predeploy_file)).to exist, help.call(
+      oldfile: "db/migrate/*_#{migration_name}_predeploy.rb",
+      newfile: predeploy_file
+    )
+
+    expect(Rails.root.join(postdeploy_file)).to exist, help.call(
+      oldfile: "db/migrate/*_#{migration_name}_postdeploy.rb",
+      newfile: postdeploy_file
+    )
+  end
 end

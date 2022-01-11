@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,11 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This needs to run any time someone changes either app/stylesheets/brandable_variables.json
-# or one of the images it references. There has to be a predeploy AND a postdeploy migration
-# to handle case of anyone saving a new theme in theme editor between when we run predeploys
-# and the new code is active. There is code in BrandableCSS that makes sure these 2
-# migrations get renamed and ran again when they need to.
+# If you've made changes to app/stylesheets/brandable_variables.json or changed
+# any of the static assets (like images) referenced in it, you must rename this
+# migration file along with its "postdeploy.rb" counterpart in order for your
+# changes to take effect.
+#
+# The numerical prefix for this migration file can be retrieved by running
+# the following command in a Rails console after you've compiled the assets
+# (the "gulp rev" part specifically):
+#
+#     BrandableCSS.migration_version
+#
+# And for the "postdeploy.rb" counterpart:
+#
+#     BrandableCSS.migration_version + 1
+#
+# Again, make sure to compile the assets (gulp rev) before running this
+# migration:
+#
+#     rake canvas:compile_assets
+#
+# The reason there has to be a predeploy AND a postdeploy migration is to handle
+# the case of anyone saving a new theme in theme editor between when we run
+# predeploys and the new code is active.
 class RegenerateBrandFilesBasedOnNewDefaultsPredeploy < ActiveRecord::Migration[5.0]
   tag :predeploy
 
