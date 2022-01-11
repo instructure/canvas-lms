@@ -25,7 +25,7 @@ import '@canvas/rails-flash-notifications'
 
 const PER_PAGE = 50
 
-const sort = function(tools) {
+const sort = function (tools) {
   if (tools) {
     return _.sortBy(tools, tool => {
       if (tool.name) {
@@ -44,19 +44,23 @@ const defaultState = {
   links: {},
   isLoading: false, // flag to indicate fetch is in progress
   isLoaded: false, // flag to indicate data has loaded
-  hasMore: false // flag to indicate if there are more pages of external tools
+  hasMore: false, // flag to indicate if there are more pages of external tools
+  lastReset: 0 // time of last reset. if a reset happens while waiting for an
+  // AJAX request, we will ignore the response
 }
 
 const store = createStore(defaultState)
 
-store.reset = function() {
-  this.setState(defaultState)
+store.reset = function () {
+  this.setState({...defaultState, lastReset: window.performance.now()})
 }
 
-store.fetch = function() {
+store.fetch = function () {
   if (this.getState().isLoading) {
     return
   }
+  const lastReset = this.getState().lastReset
+  const self = this
   const url =
     this.getState().links.next ||
     '/api/v1' + ENV.CONTEXT_BASE_URL + '/lti_apps?per_page=' + PER_PAGE
@@ -64,12 +68,13 @@ store.fetch = function() {
   $.ajax({
     url,
     type: 'GET',
-    success: this._fetchSuccessHandler.bind(this),
-    error: this._fetchErrorHandler.bind(this)
+    success: (tools, status, xhr) =>
+      this._fetchSuccessHandler.call(self, tools, status, xhr, lastReset),
+    error: () => this._fetchErrorHandler.call(self, lastReset)
   })
 }
 
-store.fetchWithDetails = function(tool) {
+store.fetchWithDetails = function (tool) {
   if (tool.app_type === 'ContextExternalTool') {
     return $.getJSON(
       '/api/v1/' +
@@ -85,7 +90,7 @@ store.fetchWithDetails = function(tool) {
   }
 }
 
-store.togglePlacements = function({tool, placements, onSuccess = () => {}, onError = () => {}}) {
+store.togglePlacements = function ({tool, placements, onSuccess = () => {}, onError = () => {}}) {
   const data = {
     // include this always, since it will only change for
     // 1.1 tools toggling default placements
@@ -104,7 +109,7 @@ store.togglePlacements = function({tool, placements, onSuccess = () => {}, onErr
   })
 }
 
-store.save = function(configurationType, data, success, error) {
+store.save = function (configurationType, data, success, error) {
   configurationType = configurationType || 'manual'
 
   const params = this._generateParams(configurationType, data)
@@ -130,7 +135,7 @@ store.save = function(configurationType, data, success, error) {
   })
 }
 
-store.setAsFavorite = function(tool, isFavorite, success, error) {
+store.setAsFavorite = function (tool, isFavorite, success, error) {
   const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/rce_favorites/' + tool.app_id
   const method = isFavorite ? 'POST' : 'DELETE'
 
@@ -143,7 +148,7 @@ store.setAsFavorite = function(tool, isFavorite, success, error) {
   })
 }
 
-store.updateAccessToken = function(context_base_url, accessToken, success, error) {
+store.updateAccessToken = function (context_base_url, accessToken, success, error) {
   $.ajax({
     url: context_base_url,
     dataType: 'json',
@@ -154,7 +159,7 @@ store.updateAccessToken = function(context_base_url, accessToken, success, error
   })
 }
 
-store.delete = function(tool) {
+store.delete = function (tool) {
   let url
 
   if (tool.app_type === 'ContextExternalTool') {
@@ -194,19 +199,19 @@ function handleToolUpdate(tool, dismiss = false) {
   })
 }
 
-store.acceptUpdate = function(tool) {
+store.acceptUpdate = function (tool) {
   handleToolUpdate.call(this, tool)
 }
 
-store.dismissUpdate = function(tool) {
+store.dismissUpdate = function (tool) {
   handleToolUpdate.call(this, tool, true)
 }
 
-store.triggerUpdate = function() {
+store.triggerUpdate = function () {
   this.setState({externalTools: sort(this.getState().externalTools)})
 }
 
-store.activate = function(tool, success, error) {
+store.activate = function (tool, success, error) {
   const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id
   const tools = _.map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
@@ -225,7 +230,7 @@ store.activate = function(tool, success, error) {
   })
 }
 
-store.deactivate = function(tool, success, error) {
+store.deactivate = function (tool, success, error) {
   const tools = _.map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
       t.enabled = false
@@ -243,11 +248,11 @@ store.deactivate = function(tool, success, error) {
   })
 }
 
-store.findById = function(toolId) {
+store.findById = function (toolId) {
   return _.find(this.getState().externalTools, tool => tool.app_id === toolId)
 }
 
-store._generateParams = function(configurationType, data) {
+store._generateParams = function (configurationType, data) {
   const params = {}
   params.name = data.name
   params.privacy_level = 'anonymous'
@@ -298,7 +303,11 @@ store._generateParams = function(configurationType, data) {
 
 //* ** CALLBACK HANDLERS ***/
 
-store._fetchSuccessHandler = function(tools, status, xhr) {
+store._fetchSuccessHandler = function (tools, status, xhr, lastReset) {
+  if (this.getState().lastReset > lastReset) {
+    return
+  }
+
   const links = parseLinkHeader(xhr)
   tools = this.getState().externalTools.concat(tools)
 
@@ -311,7 +320,11 @@ store._fetchSuccessHandler = function(tools, status, xhr) {
   })
 }
 
-store._fetchErrorHandler = function() {
+store._fetchErrorHandler = function (lastReset) {
+  if (this.getState().lastReset > lastReset) {
+    return
+  }
+
   this.setState({
     isLoading: false,
     isLoaded: false,
@@ -320,21 +333,21 @@ store._fetchErrorHandler = function() {
   })
 }
 
-store._genericSuccessHandler = store._deleteSuccessHandler = function() {
+store._genericSuccessHandler = store._deleteSuccessHandler = function () {
   // noop
 }
 
-store._deleteErrorHandler = function() {
+store._deleteErrorHandler = function () {
   $.flashError(I18n.t('Unable to remove app'))
   this.fetch({force: true})
 }
 
-store._acceptUpdateErrorHandler = function() {
+store._acceptUpdateErrorHandler = function () {
   $.flashError(I18n.t('Unable to accept update'))
   this.fetch({force: true})
 }
 
-store._dismissUpdateErrorHandler = function() {
+store._dismissUpdateErrorHandler = function () {
   $.flashError(I18n.t('Unable to dismiss update'))
   this.fetch({force: true})
 }
