@@ -57,6 +57,11 @@ Migration/Execute:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/IdColumn:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/Predeploy:
   Enabled: true
   Include:
