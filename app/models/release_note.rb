@@ -351,7 +351,7 @@ class ReleaseNote
     end
 
     def settings
-      YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["release_notes.yml"] || "{}")
+      YAML.safe_load(DynamicSettings.find(tree: :private)["release_notes.yml"] || "{}")
     end
 
     def ddb_table_name

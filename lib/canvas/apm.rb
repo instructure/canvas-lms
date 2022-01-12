@@ -64,9 +64,9 @@ module Canvas
       def config
         return @_config if @_config.present?
 
-        dynamic_settings = Canvas::DynamicSettings.find(tree: :private)
+        dynamic_settings = DynamicSettings.find(tree: :private)
         if canvas_cluster.present?
-          dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: canvas_cluster)
+          dynamic_settings = DynamicSettings.find(tree: :private, cluster: canvas_cluster)
         end
         @_config = YAML.safe_load(dynamic_settings["datadog_apm.yml"] || "{}")
       end

@@ -151,10 +151,10 @@ module CanvasRails
 
     config.middleware.use Rack::Chunked
     config.middleware.use Rack::Deflater, if: lambda { |*|
-      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
+      ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
     config.middleware.use Rack::Brotli, if: lambda { |*|
-      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
+      ::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
     config.i18n.load_path << Rails.root.join("config/locales/locales.yml")
