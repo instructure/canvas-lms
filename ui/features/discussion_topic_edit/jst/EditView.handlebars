@@ -150,6 +150,9 @@
                       {{#t}}Full: student names and profile pictures will be hidden{{/t}}
                     </label>
                   </div>
+                  {{#if is_student}}
+                    <div id="sections_anonymous_post_selector" style="display: none"></div>
+                  {{/if}}
                 {{/ifAny}}
               {{/if}}
             {{/if}}
