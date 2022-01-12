@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CURRENT_USER} from '../../utils/constants'
 import Identicon from 'react-identicons'
 import React from 'react'
 import {string} from 'prop-types'
 
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+
+const CURRENT_USER = 'current_user'
 
 export const AnonymousAvatar = ({seedString, size, addFocus}) => {
   return (
