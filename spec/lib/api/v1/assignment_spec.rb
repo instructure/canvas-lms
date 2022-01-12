@@ -100,6 +100,21 @@ describe "Api::V1::Assignment" do
       expect(json["planner_override"]).to be_nil
     end
 
+    it "includes the original assignment's lti_resource_link_id if the assignment is a duplicate" do
+      original_assignment = assignment_model
+      allow(original_assignment).to receive(:lti_resource_link_id).and_return("b85797748e3f0ffc2d0c21eb9865e76676cf67d0")
+      assignment.update!(duplicate_of: original_assignment)
+      json = api.assignment_json(assignment, user, session, { override_dates: false })
+
+      expect(json["original_lti_resource_link_id"]).to eq "b85797748e3f0ffc2d0c21eb9865e76676cf67d0"
+    end
+
+    it "returns nil for lti_resource_link_id if the assignment is not a duplicate" do
+      json = api.assignment_json(assignment, user, session, { override_dates: false })
+
+      expect(json["original_lti_resource_link_id"]).to be_nil
+    end
+
     describe "the allowed_attempts attribute" do
       it "returns -1 if set to nil" do
         assignment.update_attribute(:allowed_attempts, nil)
