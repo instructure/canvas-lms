@@ -32,6 +32,7 @@ import SectionsAutocomplete from './react/SectionsAutocomplete'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!discussions'
+import {AnonymousPostSelector} from './react/AnonymousPostSelector/AnonymousPostSelector'
 
 const isAnnouncement =
   ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
@@ -121,7 +122,8 @@ ready(() => {
     partially_anonymous_discussions: ENV.PARTIAL_ANONYMITY,
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
     allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
-    context_is_not_group: ENV.context_is_not_group
+    context_is_not_group: ENV.context_is_not_group,
+    is_student: ENV.current_user_is_student
   })
   view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 
@@ -145,7 +147,8 @@ ready(() => {
   setTimeout(() => renderSectionsAutocomplete(view))
 
   setTimeout(() => {
-    const container = document.querySelector('#sections_groups_not_allowed_root')
+    const groupsNotAllowedRoot = document.querySelector('#sections_groups_not_allowed_root')
+    const anonymousPostSelector = document.querySelector('#sections_anonymous_post_selector')
 
     const radioButtons = document.querySelectorAll('input[name=anonymous_state]')
     radioButtons.forEach(radioButton => {
@@ -154,13 +157,19 @@ ready(() => {
         const hasGroupCategory = document.querySelector(
           'input[name=has_group_category][type=checkbox]'
         )
-        const isAnonymous = anonymousState === 'full_anonymity'
+        const isPartiallyAnonymous = anonymousState === 'partial_anonymity'
+        const isFullyAnonymous = anonymousState === 'full_anonymity'
+        const isAnonymous = isPartiallyAnonymous || isFullyAnonymous
 
         document.querySelector('#group_category_options').hidden = isAnonymous
-        container.style.display = isAnonymous ? 'inline' : 'none'
+        groupsNotAllowedRoot.style.display = isAnonymous ? 'inline' : 'none'
 
         if (isAnonymous && hasGroupCategory) {
           hasGroupCategory.checked = false
+        }
+
+        if (anonymousPostSelector) {
+          anonymousPostSelector.style.display = isPartiallyAnonymous ? 'inline' : 'none'
         }
       })
     })
@@ -171,7 +180,11 @@ ready(() => {
           {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
         </Alert>
       </View>,
-      container
+      groupsNotAllowedRoot
     )
+
+    if (anonymousPostSelector) {
+      ReactDOM.render(<AnonymousPostSelector />, anonymousPostSelector)
+    }
   })
 })
