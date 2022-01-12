@@ -1619,7 +1619,7 @@ class Gradebook extends React.Component {
     if (currentSection !== sectionId) {
       this.setFilterRowsBySetting('sectionId', sectionId)
       this.postGradesStore.setSelectedSection(sectionId)
-      return this.saveSettings({}, () => {
+      return this.saveSettings({}).then(() => {
         this.updateSectionFilterVisibility()
         return this.dataLoader.reloadStudentDataForSectionFilterChange()
       })
@@ -1670,7 +1670,7 @@ class Gradebook extends React.Component {
     groupId = groupId === '0' ? null : groupId
     if (this.getFilterRowsBySetting('studentGroupId') !== groupId) {
       this.setFilterRowsBySetting('studentGroupId', groupId)
-      return this.saveSettings({}, () => {
+      return this.saveSettings({}).then(() => {
         this.updateStudentGroupFilterVisibility()
         return this.dataLoader.reloadStudentDataForStudentGroupFilterChange()
       })
@@ -2916,22 +2916,18 @@ class Gradebook extends React.Component {
     })
   }
 
-  saveSettings(
-    {
-      selectedViewOptionsFilters = this.listSelectedViewOptionsFilters(),
-      showConcludedEnrollments = this.getEnrollmentFilters().concluded,
-      showInactiveEnrollments = this.getEnrollmentFilters().inactive,
-      showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
-      showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
-      studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
-      studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
-      sortRowsBy = this.getSortRowsBySetting(),
-      viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
-      colors = this.state.gridColors
-    } = {},
-    successFn,
-    errorFn
-  ) {
+  saveSettings({
+    selectedViewOptionsFilters = this.listSelectedViewOptionsFilters(),
+    showConcludedEnrollments = this.getEnrollmentFilters().concluded,
+    showInactiveEnrollments = this.getEnrollmentFilters().inactive,
+    showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
+    showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
+    studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
+    studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
+    sortRowsBy = this.getSortRowsBySetting(),
+    viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
+    colors = this.state.gridColors
+  } = {}) {
     if (!(selectedViewOptionsFilters.length > 0)) {
       selectedViewOptionsFilters.push('')
     }
@@ -2940,27 +2936,27 @@ class Gradebook extends React.Component {
         enter_grades_as: this.gridDisplaySettings.enterGradesAs,
         filter_columns_by: underscore(this.gridDisplaySettings.filterColumnsBy),
         selected_view_options_filters: selectedViewOptionsFilters,
-        show_concluded_enrollments: showConcludedEnrollments,
-        show_inactive_enrollments: showInactiveEnrollments,
-        show_unpublished_assignments: showUnpublishedAssignments,
-        show_separate_first_last_names: showSeparateFirstLastNames,
+        show_concluded_enrollments: showConcludedEnrollments ? 'true' : 'false',
+        show_inactive_enrollments: showInactiveEnrollments ? 'true' : 'false',
+        show_unpublished_assignments: showUnpublishedAssignments ? 'true' : 'false',
+        show_separate_first_last_names: showSeparateFirstLastNames ? 'true' : 'false',
         student_column_display_as: studentColumnDisplayAs,
         student_column_secondary_info: studentColumnSecondaryInfo,
         filter_rows_by: underscore(this.gridDisplaySettings.filterRowsBy),
         sort_rows_by_column_id: sortRowsBy.columnId,
         sort_rows_by_setting_key: sortRowsBy.settingKey,
         sort_rows_by_direction: sortRowsBy.direction,
-        view_ungraded_as_zero: viewUngradedAsZero,
+        view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
         colors
       }
     }
 
     if (this.options.enhanced_gradebook_filters) {
       return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
-        .then(successFn)
-        .catch(errorFn)
     } else {
-      return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
+      return new Promise((resolve, reject) => {
+        $.ajaxJSON(this.options.settings_update_url, 'PUT', data, resolve, reject)
+      })
     }
   }
 
@@ -3777,16 +3773,13 @@ class Gradebook extends React.Component {
     const toggleableAction = () => {
       this.gridDisplaySettings.showUnpublishedAssignments =
         !this.gridDisplaySettings.showUnpublishedAssignments
-      return this.updateColumnsAndRenderViewOptionsMenu()
+      this.updateColumnsAndRenderViewOptionsMenu()
     }
     toggleableAction()
-    return this.saveSettings(
-      {
-        showUnpublishedAssignments: this.gridDisplaySettings.showUnpublishedAssignments
-      },
-      () => {},
-      toggleableAction
-    ) // on success, do nothing since the render happened earlier
+    // on success, do nothing since the render happened earlier
+    return this.saveSettings({
+      showUnpublishedAssignments: this.gridDisplaySettings.showUnpublishedAssignments
+    }).catch(toggleableAction)
   }
 
   initShowSeparateFirstLastNames(showSeparateFirstLastNames = false) {
@@ -3800,13 +3793,10 @@ class Gradebook extends React.Component {
       return this.updateColumnsAndRenderViewOptionsMenu() && this.renderActionMenu()
     }
     toggleableAction()
-    return this.saveSettings(
-      {
-        showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames
-      },
-      () => {},
-      toggleableAction
-    ) // on success, do nothing since the render happened earlier
+    // on success, do nothing since the render happened earlier
+    return this.saveSettings({
+      showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames
+    }).catch(toggleableAction)
     // this pattern keeps the ui snappier rather than waiting for ajax call to complete
   }
 
@@ -3821,11 +3811,10 @@ class Gradebook extends React.Component {
       this.updateAllTotalColumns()
     }
     toggleableAction()
-    return this.saveSettings(
-      {viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero},
-      () => {},
-      toggleableAction
-    ) // on success, do nothing since the render happened earlier
+    // on success, do nothing since the render happened earlier
+    return this.saveSettings({
+      viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero
+    }).catch(toggleableAction)
   }
 
   assignmentsLoadedForCurrentView() {
@@ -4096,7 +4085,7 @@ class Gradebook extends React.Component {
       this.setState({gridColors: statusColors(this.gridDisplaySettings.colors)})
       return successFn()
     }
-    return this.saveSettings({colors}, setAndRenderColors, errorFn)
+    return this.saveSettings({colors}).then(setAndRenderColors).catch(errorFn)
   }
 
   listAvailableViewOptionsFilters() {
@@ -4127,7 +4116,7 @@ class Gradebook extends React.Component {
     return this.gridDisplaySettings.selectedViewOptionsFilters
   }
 
-  toggleEnrollmentFilter(enrollmentFilter, skipApply) {
+  toggleEnrollmentFilter(enrollmentFilter, skipApply = false) {
     this.getEnrollmentFilters()[enrollmentFilter] = !this.getEnrollmentFilters()[enrollmentFilter]
     if (!skipApply) {
       return this.applyEnrollmentFilter()
@@ -4142,7 +4131,9 @@ class Gradebook extends React.Component {
   applyEnrollmentFilter() {
     const showInactive = this.getEnrollmentFilters().inactive
     const showConcluded = this.getEnrollmentFilters().concluded
-    return this.saveSettings({showInactive, showConcluded}, this.updateStudentHeadersAndReloadData)
+    return this.saveSettings({showInactive, showConcluded}).then(
+      this.updateStudentHeadersAndReloadData
+    )
   }
 
   getEnrollmentFilters() {
@@ -4180,7 +4171,7 @@ class Gradebook extends React.Component {
 
   updateEnterGradesAsSetting(assignmentId, value) {
     this.setEnterGradesAsSetting(assignmentId, value)
-    return this.saveSettings({}, () => {
+    return this.saveSettings({}).then(() => {
       this.gradebookGrid.gridSupport.columns.updateColumnHeaders([
         getAssignmentColumnId(assignmentId)
       ])
