@@ -467,7 +467,8 @@ export const DiscussionThreadContainer = props => {
                 margin="none none x-small none"
               >
                 <DiscussionEdit
-                  discussionAnonymousState={props.discussionTopic.anonymousState}
+                  discussionAnonymousState={props.discussionTopic?.anonymousState}
+                  canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                   onSubmit={(message, _includeReplyPreview, fileId) => {
                     onReplySubmit(message, fileId)
                   }}
