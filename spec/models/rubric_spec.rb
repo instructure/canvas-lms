@@ -194,6 +194,14 @@ describe Rubric do
       expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, outcome2.id].sort)
     end
 
+    it "prevents an outcome to be aligned more then once" do
+      @rubric.data[1][:learning_outcome_id] = @rubric.data[0][:learning_outcome_id]
+      @rubric.save
+
+      expect(@rubric).not_to be_valid
+      expect(@rubric.errors.to_a[0]).to eql("This rubric has Outcomes aligned more than once")
+    end
+
     it "creates outcome results when outcome-aligned rubrics are assessed" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
