@@ -33,6 +33,10 @@ module PacePlansPageObject
     "[data-testid='duration-number-input']"
   end
 
+  def duration_readonly_selector
+    "[data-testid='duration-input']"
+  end
+
   def edit_tray_close_button_selector
     "button:contains('Close')"
   end
@@ -59,6 +63,14 @@ module PacePlansPageObject
 
   def pace_plan_menu_selector
     "[data-position-target='pace-plan-menu']"
+  end
+
+  def pace_plan_picker_selector
+    "[data-testid='pace-plan-picker']"
+  end
+
+  def pace_plan_student_option_selector
+    "[data-position-target='pace-plan-student-menu']"
   end
 
   def pace_plans_page_selector
@@ -117,8 +129,16 @@ module PacePlansPageObject
     "[data-testid='skip-weekends-toggle']"
   end
 
+  def student_menu_selector
+    "ul[aria-label='Students']"
+  end
+
   def student_pace_plan_selector(student_name)
     "span[role=menuitem]:contains(#{student_name})"
+  end
+
+  def student_pp_xpath_selector(student_name)
+    "//ul[@aria-label = 'Students']//span[text() = '#{student_name}']"
   end
 
   def students_menu_item_selector
@@ -133,6 +153,10 @@ module PacePlansPageObject
     "[aria-label='Unpublished Changes tray']"
   end
 
+  def unpublished_warning_modal_selector
+    "[data-testid='unpublished-warning-modal']"
+  end
+
   #------------------------- Elements --------------------------------
 
   def cancel_button
@@ -145,6 +169,10 @@ module PacePlansPageObject
 
   def duration_field
     f(duration_field_selector)
+  end
+
+  def duration_readonly
+    f(duration_readonly_selector)
   end
 
   def edit_tray_close_button
@@ -177,6 +205,14 @@ module PacePlansPageObject
 
   def pace_plan_menu
     ff(pace_plan_menu_selector)
+  end
+
+  def pace_plan_picker
+    f(pace_plan_picker_selector)
+  end
+
+  def pace_plan_student_option
+    f(pace_plan_student_option_selector)
   end
 
   def pace_plans_page
@@ -243,6 +279,10 @@ module PacePlansPageObject
     f(unpublished_changes_tray_selector)
   end
 
+  def unpublished_warning_modal
+    f(unpublished_warning_modal_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   def visit_pace_plans_page
     get "/courses/#{@course.id}/pace_plans"
@@ -259,7 +299,7 @@ module PacePlansPageObject
   end
 
   def click_main_pace_plan_menu
-    pace_plan_menu[1].click
+    pace_plan_picker.click
   end
 
   def click_require_end_date_checkbox
@@ -279,13 +319,26 @@ module PacePlansPageObject
   end
 
   def click_student_pace_plan(student_name)
+    # This check reduces the flakiness of the clicking in this menu.  Keeping
+    # the puts line for verification in the logs
+    unless element_exists?(student_pp_xpath_selector(student_name), true)
+      puts "Student pace plan selector didn't exist so retrying click"
+      click_students_menu_item
+    end
+
     student_pace_plan(student_name).click
-    driver.action.send_keys(:escape).perform
   end
 
   def click_students_menu_item
-    students_menu_item.click # focus on it
-    students_menu_item.click # click on it
+    unless element_exists?(pace_plan_student_option_selector)
+      puts "retrying the main menu click"
+      click_main_pace_plan_menu
+    end
+    pace_plan_student_option.click
+    # Reducing the flakiness of this menu
+    unless element_exists?(student_menu_selector)
+      pace_plan_student_option.click
+    end
   end
 
   def click_unpublished_changes_button
@@ -307,15 +360,6 @@ module PacePlansPageObject
   end
 
   delegate :text, to: :pace_plans_page, prefix: true
-
-  def select_student_pace_plan
-    click_main_pace_plan_menu
-    wait_for(method: nil, timeout: 5) { students_menu_item.displayed? }
-    click_students_menu_item
-
-    wait_for(method: nil, timeout: 10) { student_pace_plan(@student.name).displayed? }
-    click_student_pace_plan(@student.name)
-  end
 
   #----------------------------Element Management---------------------
 

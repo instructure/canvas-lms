@@ -92,7 +92,7 @@ module PacePlansCommonPageObject
     # We want the module item autopublish to happen immediately in test
     Setting.set("pace_plan_publish_interval", "0")
 
-    pace_plan_model(course: @course)
+    pace_plan_model(course: @course, end_date: Time.zone.now.advance(days: 30))
     pace_plan_module = create_course_module(module_title)
     pace_plan_assignment = create_assignment(@course, assignment_title, "Assignment 1", 10, "published")
     pace_plan_module.add_item(id: pace_plan_assignment.id, type: "assignment")
