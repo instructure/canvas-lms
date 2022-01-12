@@ -269,6 +269,18 @@ describe LearningOutcomeResult do
       expect(learning_outcome_result.percent).to eq 0.60
     end
 
+    it "does not use a scale if outcome has nil points possible" do
+      allow(learning_outcome_result.learning_outcome).to receive_messages({
+                                                                            points_possible: nil, mastery_points: 3
+                                                                          })
+      allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
+      learning_outcome_result.update(score: 6)
+      learning_outcome_result.update(possible: 10)
+      learning_outcome_result.calculate_percent!
+
+      expect(learning_outcome_result.percent).to eq 0.60
+    end
+
     describe "with account_level_mastery_scales FF enabled" do
       before do
         course.root_account.enable_feature!(:account_level_mastery_scales)

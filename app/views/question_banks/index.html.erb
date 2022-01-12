@@ -54,7 +54,7 @@
 
 <% provide :right_side do %>
   <% if !@context.is_a?(User) && @context.assessment_question_banks.temp_record.grants_right?(@current_user, session, :create) %>
-    <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
+    <button class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></button>
   <% end %>
   <% if @current_user && @context != @current_user %>
     <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><i class="icon-bookmark" role="presentation"></i> <%= t 'see_bookmarked_banks', 'View Bookmarked Banks' %></a>

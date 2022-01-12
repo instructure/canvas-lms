@@ -35,7 +35,7 @@ describe "course settings" do
     expect(ff("#section-tabs .section.section-hidden").count).to be > 0
   end
 
-  context "k5 courses" do
+  context "k5 subjects" do
     before do
       @account.enable_as_k5_account!
     end
@@ -99,6 +99,21 @@ describe "course settings" do
       expect(ff("#course_details_tabs > ul li").length).to eq 2
       expect(f("#course_details_tab")).to be_displayed
       expect(f("#sections_tab")).to be_displayed
+    end
+
+    it "shows synced subjects" do
+      @homeroom = @course
+      subject1 = course_factory(course_name: "Synced Subject 1", account: @account)
+      subject2 = course_factory(course_name: "Synced Subject 2", account: @account)
+      subject1.homeroom_course_id = @homeroom.id
+      subject1.sync_enrollments_from_homeroom = true
+      subject1.save!
+      subject2.homeroom_course_id = @homeroom.id
+      subject2.sync_enrollments_from_homeroom = true
+      subject2.save!
+
+      get "/courses/#{@homeroom.id}/settings"
+      expect(f(".coursesettings")).to include_text("This homeroom syncs enrollments and subject start/end dates to: Synced Subject 1, Synced Subject 2")
     end
   end
 

@@ -39,16 +39,8 @@ export const RemovableItem = ({onRemove, screenReaderLabel, childrenAriaLabel, c
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          padding: 'medium xx-small small'
-        },
-        desktop: {
-          padding: 'medium medium small'
-        }
-      }}
-      render={(responsiveProps, matches) => (
+      query={responsiveQuerySizes({mobile: true, desktop: true, tablet: true})}
+      render={(_responsiveProps, matches) => (
         <View display="inline-block">
           <View
             display="inline-block"
@@ -63,7 +55,7 @@ export const RemovableItem = ({onRemove, screenReaderLabel, childrenAriaLabel, c
           >
             {children}
           </View>
-          {showRemove && (
+          {(showRemove || ['mobile', 'tablet'].some(device => matches.includes(device))) && (
             <div style={{display: 'inline-block', margin: '0 0.25rem'}}>
               <IconButton
                 size="small"
