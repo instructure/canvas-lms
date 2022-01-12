@@ -38,7 +38,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
+import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 
 export const getMenuConfig = props => {
   const options = {

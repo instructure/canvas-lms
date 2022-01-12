@@ -1462,7 +1462,7 @@ class CoursesController < ApplicationController
                           end
 
       if @context.elementary_homeroom_course?
-        @synced_subjects = Course.where(homeroom_course_id: @context.id).where(sis_batch_id: nil).sync_homeroom_enrollments_enabled.limit(100).select(&:elementary_subject_course?).sort_by { |c| Canvas::ICU.collation_key(c.name) }
+        @synced_subjects = Course.where(homeroom_course_id: @context.id).syncing_subjects.limit(100).select(&:elementary_subject_course?).sort_by { |c| Canvas::ICU.collation_key(c.name) }
       end
 
       @alerts = @context.alerts
