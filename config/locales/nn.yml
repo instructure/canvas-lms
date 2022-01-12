@@ -6189,7 +6189,7 @@ nn:
     zero: "mindre enn 1 minutt"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} av %{max} maks teikn"
   count_of_submissions_for_day_83a88e68: "Antal innleveringar for dag"
-  count_of_submissions_per_day_c1f6ae32: "Telling av innleveringar per dag"
+  count_of_submissions_per_day_c1f6ae32: "Antal innleveringar per dag"
   count_options_190d6373: 
     one: "1 alternativ"
     other: "%{count} alternativ"
@@ -11416,7 +11416,7 @@ nn:
       til innleveringa.
       
       *Pass på at du ikkje endrer namna på innleveringsfilene så vi kjenner dei att.*
-  if_you_need_to_make_your_course_public_please_cont_7084c67b: "Treng du å gjere emnet offentleg, kontakt administrator/brukarstøtte."
+  if_you_need_to_make_your_course_public_please_cont_7084c67b: "Om du vil gjere emnet offentleg, ver venleg og ta kontakt administrator/brukarstøtte."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Dersom du har brukt eit anna administrasjonssystem for emnet, er det sannsynleg at du har einingar i det systemet du vil flytte over i Canvas. Vi kan rettleie deg gjennom prosessen for ei enkel overføring av innhaldet til Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Du kan omdøpe \"SIS\" til noko som er meir kjent for dine tilsette"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Dersom du vil behalde kommentarar du ikkje har sendt inn, kan du lagre dei før du går ut av denne sida."
@@ -20238,7 +20238,7 @@ nn:
   shared_content_803ac37b: "Delt innhald"
   shared_secret_892c88f2: "Delt hemmelegheit"
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Deling av QR-kode kan gi andre umiddelbar tilgang til kontoen din gjennom %{canvas} mobilapplikasjonar."
-  she_her_3f459cc2: Ho/Hennar
+  she_her_3f459cc2: Ho/Henne
   shift_dates_b5a7b7a1: "Bytt om på datoar"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Flytt innleveringsfristar og oppgåvetilgjengelegheit fram eit antal dagar."
   short_name_42f454a1: "Kort namn"
@@ -21465,8 +21465,8 @@ nn:
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "den aktuelle filen med file_id har allereie ein originalitetsrapport"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Denne brukaren (%{id})er ikkje student på dette emnet"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Denne brukaren er ikkje student på dette emnet"
-  the_start_date_was_set_to_1_month_ago_778e3d7f: "Startdato satt til ein månad sidan."
-  the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: "Startdato satt til byrjinga på førre veke."
+  the_start_date_was_set_to_1_month_ago_778e3d7f: "Startdato satt til 1 månad sidan."
+  the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: "Startdato vart satt til byrjinga på førre veke."
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Studenten som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i student_id_type"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
@@ -21595,7 +21595,7 @@ nn:
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Desse karaktersetjingsperiodane er oppretta for deg av ein administrator."
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "Disse pronomena kan veljast av Canvasbrukarar som tilhøyrer kontoen. "
   these_scores_are_out_of_order_4f0859ef: "Resultata er i feil rekkefølgje"
-  they_them_f4d17a04: De/Dykk
+  they_them_f4d17a04: Dei/Dei
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Funksjonen er deaktivert av administrator. "
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Her skriv ein inn kommentarar som er relatert til kriteriet."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
@@ -21637,10 +21637,10 @@ nn:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette mogleggjer ein oppdatert navigasjon, nytt dashbord og eit enklare, meir moderne uttrykk."
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette gjer at brukarane kan generere og laste ned EPUB for emne."
   this_environment_is_currently_being_updated_with_a_235f1875: "Systemet oppdaterast akkurat no med ein kopi av dei siste produksjonsdata. Kom tilbake seinare."
-  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Denne ePortfolioen har blit markert som mulig spam. Du vil ikkje kunne sjå den før ein administrator har gjort ein vurdering av den. Kontakt ein administrator dersom du har spørsmål."
-  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Denne ePortfolioen har blitt markert som mulig spam. Per no er det kun administratorar og forfattaren som kan sjå den. Dersom du veit ePortfolioen ikkje er spam, kan du markere den som trygg. Ellers kan du bekrefte den som spam."
-  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Denne ePortfolioen har blitt markert som spam og er kun synleg for deg. Kontakt ein administrator dersom du har spørsmål."
-  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "This ePortfolio has been identified as possible spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Denne ePortfolioen har blit markert som mulig spam. Inntil ein administrator har gjort ei vurdering av den, vil den kun vera synleg for deg. Kontakt ein administrator dersom du har spørsmål."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Denne ePortfolioen har blitt identifisert som mulig spam. Per no er det kun administratorar og forfattaren som kan sjå den. Dersom du veit ePortfolioen ikkje er spam, kan du markere den som trygg. Ellers kan du bekrefte den som spam."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Denne ePortfolioen har blitt identifisert som spam og er kun synleg for deg. Kontakt ein administrator dersom du har spørsmål."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolioen har blitt identifisert som spam. Per no er det kun administratorar og forfattaren som kan sjå den. Dersom du veit ePortfolioen ikkje er spam, kan du markere den som trygg. "
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Funksjonen gir faglærarar løyve til å kopiere enkeltelement frå eitt emne til eit anna, og dele eit innhaldselement med andre brukarar sånn at dei kan importere elementa inn i eigne emne."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funksjonen kan ikkje slåast av fordi det er minst ein underkonto eller eit emne som har aktivert funksjonen."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denne funksjonen kan ikkje vere slått på samstundes som autogjenkjenning av feltskilje er slått på"
