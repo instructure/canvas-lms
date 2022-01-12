@@ -123,7 +123,6 @@
     "lodash": "^4",
     "minimatch": "~3.0.4",
     "mathlive": "^0.69.8",
-    "moment-timezone": "^0.5.13",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
     "react-dom": "^0.14.8 || ^15.0.0 || ^16",

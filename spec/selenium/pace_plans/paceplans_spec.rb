@@ -191,31 +191,6 @@ describe "pace plan page" do
       expect(show_hide_icon_button_exists?).to be_truthy
       expect(show_hide_pace_plans_exists?).to be_falsey
     end
-
-    it "shows an error message when weekend date is input and skip weekends is toggled on" do
-      visit_pace_plans_page
-      click_show_hide_projections_button
-      add_start_date(calculate_saturday_date)
-
-      expect { pace_plans_page_text.include?("The selected date is on a weekend and this pace plan skips weekends.") }.to become(true)
-    end
-
-    it "shows a due date tooltip when plan is compressed" do
-      @course_module = create_course_module("New Module", "active")
-      @assignment = create_assignment(@course, "Module Assignment", "Module Assignment Description", 10, "published")
-      @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
-
-      visit_pace_plans_page
-      click_show_hide_projections_button
-      click_require_end_date_checkbox
-
-      today = Date.today
-      add_start_date(today)
-      add_required_end_date(today + 10.days)
-      update_module_item_duration("15")
-      wait_for(method: nil, timeout: 10) { compression_tooltip.displayed? }
-      expect(compression_tooltip).to be_displayed
-    end
   end
 
   context "Pace Plan Menu" do

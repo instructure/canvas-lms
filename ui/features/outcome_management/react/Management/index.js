@@ -56,13 +56,8 @@ const OutcomeManagementPanel = ({
     useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
   const [rhsGroupIdsToRefetch, setRhsGroupIdsToRefetch] = useState([])
-  const {
-    selectedOutcomeIds,
-    selectedOutcomesCount,
-    toggleSelectedOutcomes,
-    removeSelectedOutcome,
-    clearSelectedOutcomes
-  } = useSelectedOutcomes()
+  const {selectedOutcomeIds, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
+    useSelectedOutcomes()
   const {
     error,
     isLoading,
@@ -129,10 +124,6 @@ const OutcomeManagementPanel = ({
   const [isFindOutcomesModalOpen, openFindOutcomesModal, closeFindOutcomesModal] = useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
   const selectedOutcomeObj = selectedOutcome ? {[selectedOutcome.linkId]: selectedOutcome} : {}
-  const onRemoveLearningOutcome = removableLinkIds => {
-    removeLearningOutcomes(removableLinkIds)
-    removeSelectedOutcome(selectedOutcome)
-  }
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
     setSelectedOutcome(null)
@@ -462,7 +453,7 @@ const OutcomeManagementPanel = ({
                 isOpen={isOutcomeRemoveModalOpen}
                 onCloseHandler={onCloseOutcomeRemoveModal}
                 onCleanupHandler={onCloseOutcomeRemoveModal}
-                onRemoveLearningOutcomesHandler={onRemoveLearningOutcome}
+                onRemoveLearningOutcomesHandler={removeLearningOutcomes}
               />
               <OutcomeEditModal
                 outcome={selectedOutcome}

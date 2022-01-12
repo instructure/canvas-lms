@@ -31,7 +31,6 @@ import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
 import {User} from './User'
-import {Attachment} from './Attachment'
 
 /* Query Mocks */
 export const getDiscussionQueryMock = ({
@@ -270,18 +269,14 @@ export const updateDiscussionEntryParticipantMock = ({
 
 export const updateDiscussionEntryMock = ({
   discussionEntryId = '1',
-  message = '<p>This is the parent reply</p>',
-  fileId = '7',
-  removeAttachment = !fileId
+  message = '<p>This is the parent reply</p>'
 } = {}) => [
   {
     request: {
       query: UPDATE_DISCUSSION_ENTRY,
       variables: {
         discussionEntryId,
-        message,
-        ...(fileId !== null && {fileId}),
-        removeAttachment
+        message
       }
     },
     result: {
@@ -290,8 +285,7 @@ export const updateDiscussionEntryMock = ({
           discussionEntry: DiscussionEntry.mock({
             id: btoa(`DiscussionEntry-${discussionEntryId}`),
             _id: discussionEntryId,
-            message,
-            attachment: removeAttachment ? null : Attachment.mock()
+            message
           }),
           __typename: 'UpdateDiscussionEntryPayload'
         }
@@ -333,8 +327,7 @@ export const createDiscussionEntryMock = ({
   replyFromEntryId = null,
   fileId = null,
   includeReplyPreview = null,
-  isAnonymousAuthor = null,
-  courseID = '1'
+  isAnonymousAuthor = null
 } = {}) => [
   {
     request: {
@@ -345,8 +338,7 @@ export const createDiscussionEntryMock = ({
         ...(replyFromEntryId !== null && {replyFromEntryId}),
         ...(fileId !== null && {fileId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
-        ...(isAnonymousAuthor !== null && {isAnonymousAuthor}),
-        ...(courseID !== null && {courseID})
+        ...(isAnonymousAuthor !== null && {isAnonymousAuthor})
       }
     },
     result: {

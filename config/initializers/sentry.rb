@@ -19,28 +19,24 @@
 
 # This initializer is for the Sentry exception tracking system.
 #
-# Sentry's config file would be "config/sentry.yml". If that config doesn't exist,
+# "Raven" is the ruby library that is the client to sentry, and it's
+# config file would be "config/raven.yml". If that config doesn't exist,
 # nothing happens.  If it *does*, we register a callback with Canvas::Errors
 # so that every time an exception is reported, we can fire off a sentry
 # call to track it and aggregate it for us.
-settings = ConfigFile.load("sentry")
+settings = ConfigFile.load("raven")
 
 if settings.present?
-  return if Canvas::Plugin.value_to_boolean(Setting.get("sentry_disabled", "false"))
-
-  Sentry.init do |config|
+  require "raven/base"
+  Raven.configure do |config|
+    config.logger = Rails.logger
+    config.silence_ready = true
     config.dsn = settings[:dsn]
-    config.environment = Canvas.environment
+    config.current_environment = Canvas.environment
+    config.tags = settings.fetch(:tags, {}).merge("canvas_revision" => Canvas.revision)
     config.release = Canvas.revision
-
-    # sentry_logger would be nice here (it records log messages), but it currently includes raw SQL logs
-    config.breadcrumbs_logger = [:http_logger] if Canvas::Plugin.value_to_boolean(Setting.get("sentry_backend_breadcrumbs_enabled", "false"))
-
-    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-    config.before_send = lambda do |event, _|
-      filter.filter(event.to_hash)
-    end
-
+    config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
+    config.sanitize_credit_cards = false
     # this array should only contain exceptions that are intentionally
     # thrown to drive client facing behavior.  A good example
     # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
@@ -56,8 +52,6 @@ if settings.present?
       PG::UnableToSend
     ]
   end
-
-  Sentry.set_tags(settings.fetch(:tags, {}))
 
   Rails.configuration.to_prepare do
     Setting.get("ignorable_errors", "").split(",").each do |error|

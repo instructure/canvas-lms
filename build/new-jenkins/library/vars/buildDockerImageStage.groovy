@@ -209,7 +209,6 @@ def i18nGenerate() {
         -e RAILS_LOAD_ALL_LOCALES=1 \
         -e COMPILE_ASSETS_CSS=0 \
         -e COMPILE_ASSETS_STYLEGUIDE=0 \
-        -e COMPILE_ASSETS_BRAND_CONFIGS=0 \
         -e COMPILE_ASSETS_BUILD_JS=0 \
         $PATCHSET_TAG \
           bundle exec rake canvas:compile_assets i18n:generate

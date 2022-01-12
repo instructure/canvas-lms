@@ -2897,8 +2897,7 @@ class ApplicationController < ActionController::Base
 
   def should_show_migration_limitation_message
     @context.is_a?(Course) && @context.user_is_instructor?(@current_user) &&
-      @context.quiz_migration_alert_for_user(@current_user.id).present? &&
-      %r{^/courses/\d+(/assignments|/quizzes|/modules|.?)$}.match?(request.path)
+      @context.quiz_migration_alert_for_user(@current_user.id).present?
   end
   helper_method :should_show_migration_limitation_message
 

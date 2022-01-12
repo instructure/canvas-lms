@@ -26,50 +26,31 @@ function initFlashContainer() {
   helper.initScreenreaderHolder()
 }
 
-function makeSafeHtml(contentString) {
-  if (typeof contentString === 'object' && contentString.html) {
-    return contentString.html
-  }
-  return contentString
-}
-
 // Pops up a small notification box at the top of the screen.
-$.flashMessage = function (content, timeout = 3000) {
+$.flashMessage = function(content, timeout = 3000) {
   helper.createNode('success', content, timeout)
   createScreenreaderNodeWithDelay(content)
 }
 
-// Like flashMessage, but escapes html even if 'html' field given
-// To be used when the input comes from an external source (e.g. an LTI tool)
-$.flashMessageSafe = function (contentString, timeout) {
-  contentString = makeSafeHtml(contentString)
-  $.flashMessage(contentString.toString(), timeout)
-}
-
 // Pops up a small error box at the top of the screen.
-$.flashError = function (content, timeout) {
+$.flashError = function(content, timeout) {
   helper.createNode('error', content, timeout)
   createScreenreaderNodeWithDelay(content)
 }
 
-// Like flashError, but escapes html even if 'html' field given
-// To be used when the input comes from an external source (e.g. an LTI tool)
-$.flashErrorSafe = function (contentString, timeout) {
-  contentString = makeSafeHtml(contentString)
+// Like flashError but does escapes html even if 'html' field given To be used
+// when the input comes from an external source (e.g. an LTI tool)
+$.flashErrorSafe = function(contentString, timeout) {
+  if (typeof contentString === 'object' && contentString.html) {
+    contentString = contentString.html
+  }
   $.flashError(contentString.toString(), timeout)
 }
 
 // Pops up a small warning box at the top of the screen.
-$.flashWarning = function (content, timeout = 3000) {
+$.flashWarning = function(content, timeout = 3000) {
   helper.createNode('warning', content, timeout)
   createScreenreaderNodeWithDelay(content)
-}
-
-// Like flashWarning, but escapes html even if 'html' field given
-// To be used when the input comes from an external source (e.g. an LTI tool)
-$.flashWarningSafe = function (contentString, timeout) {
-  contentString = makeSafeHtml(contentString)
-  $.flashWarning(contentString.toString(), timeout)
 }
 
 $.screenReaderFlashMessage = content => helper.createScreenreaderNode(content, false)

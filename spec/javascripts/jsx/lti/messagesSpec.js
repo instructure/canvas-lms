@@ -155,14 +155,4 @@ QUnit.module('Messages', suiteHooks => {
     await ltiMessageHandler(postMessageEvent(alertMessage()))
     ok($.screenReaderFlashMessageExclusive.calledOnce)
   })
-
-  test('uses iframe title for visible alert', async () => {
-    sinon.spy($, 'flashMessageSafe')
-    const title = 'Tool Name'
-    ltiToolWrapperFixture.append(`
-      <iframe data-lti-launch="true" title="${title}" src="https://canvas.example.com/courses/4/external_tools/retrieve?display=borderless"></iframe>
-    `)
-    await ltiMessageHandler(postMessageEvent({subject: 'lti.showAlert', body: 'Hello world!'}))
-    sinon.assert.calledWith($.flashMessageSafe, sinon.match(title))
-  })
 })

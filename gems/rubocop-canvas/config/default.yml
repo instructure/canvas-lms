@@ -12,11 +12,6 @@ Lint/NoSleep:
   Exclude:
     - "**/spec/selenium/test_setup/**/*.rb"
 
-Migration/AddIndex:
-  Enable: true
-  Include:
-    - "**/db/migrate/*.rb"
-
 Migration/AddForeignKey:
   Enable: true
   Include:
@@ -42,22 +37,12 @@ Migration/ChangeColumn:
   Include:
     - "**/db/migrate/*.rb"
 
-Migration/ChangeColumnNull:
-  Enabled: true
-  Include:
-    - "**/db/migrate/*.rb"
-
 Migration/PrimaryKey:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"
 
 Migration/RemoveColumn:
-  Enabled: true
-  Include:
-    - "**/db/migrate/*.rb"
-
-Migration/RenameTable:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"

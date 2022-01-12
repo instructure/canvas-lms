@@ -505,40 +505,6 @@ describe ContentMigration do
       expect(@copy_to.lti_resource_links.first.lookup_uuid).to eq "1b302c1e-c0a2-42dc-88b6-c029699a7c7a"
     end
 
-    context "with prevent_course_availability_editing_by_teachers on" do
-      it "does not copy restrict_enrollments_to_course_dates for teachers" do
-        @copy_from.root_account.settings[:prevent_course_availability_editing_by_teachers] = true
-        @copy_from.root_account.save!
-
-        @copy_to.restrict_enrollments_to_course_dates = false
-        @copy_to.save!
-
-        @copy_from.restrict_enrollments_to_course_dates = true
-        @copy_from.save!
-
-        run_course_copy
-
-        expect(@copy_to.restrict_enrollments_to_course_dates).to eq false
-      end
-
-      it "does copy restrict_enrollments_to_course_dates for admins" do
-        account_admin_user(user: @cm.user, account: @copy_to.account)
-
-        @copy_from.root_account.settings[:prevent_course_availability_editing_by_teachers] = true
-        @copy_from.root_account.save!
-
-        @copy_to.restrict_enrollments_to_course_dates = false
-        @copy_to.save!
-
-        @copy_from.restrict_enrollments_to_course_dates = true
-        @copy_from.save!
-
-        run_course_copy
-
-        expect(@copy_to.restrict_enrollments_to_course_dates).to eq true
-      end
-    end
-
     it "copies the overridable course visibility setting" do
       visibility_type = "superfunvisibility"
       allow_any_instantiation_of(@copy_from.root_account).to receive(:available_course_visibility_override_options)

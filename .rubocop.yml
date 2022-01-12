@@ -72,7 +72,7 @@ Naming/HeredocDelimiterNaming:
 Performance:
   Severity: error
 Performance/Casecmp:
-  Enabled: false # casecmp(other).zero? is a bad suggestion because it's not Unicode-aware (also it's less clear)
+  AutoCorrect: false # prefer using casecmp?(other) instead of casecmp(other).zero?; it handles unicode better
 Performance/CollectionLiteralInLoop:
   Severity: convention # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
 Performance/MethodObjectAsBlock:
@@ -185,8 +185,6 @@ Style/RescueStandardError:
   EnforcedStyle: implicit
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
-Style/SoleNestedConditional:
-  AllowModifier: true # it makes lines too long and complicated otherwise
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
 Style/StringLiterals:

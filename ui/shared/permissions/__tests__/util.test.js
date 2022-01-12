@@ -78,30 +78,6 @@ describe('permissions::utils', () => {
         group_permissions: [{permission_name: 'manage_courses_add'}],
         context_type: 'Account'
       }
-    ],
-    ACCOUNT_ROLES: [
-      {
-        role: 'AccountAdmin',
-        label: 'Account Admin',
-        base_role_type: 'AccountMembership'
-      },
-      {
-        role: 'CustomAccountAdmin',
-        label: 'Custom Account Admin',
-        base_role_type: 'AccountMembership'
-      }
-    ],
-    COURSE_ROLES: [
-      {
-        role: 'TeacherEnrollment',
-        label: 'Teacher',
-        base_role_type: 'TeacherEnrollment'
-      },
-      {
-        role: 'Custom Teacher Role',
-        label: 'Custom Teacher Role',
-        base_role_type: 'TeacherEnrollment'
-      }
     ]
   })
 
@@ -441,20 +417,12 @@ describe('permissions::utils', () => {
   describe('groupGranularPermissionsInRole', () => {
     let accountRole
     let courseRole
-    let customAccountRole
-    let customCourseRole
     let groupPermissions
 
     beforeEach(() => {
       groupPermissions = makeGroupPermissions()
-      accountRole = {
-        base_role_type: 'AccountMembership',
-        contextType: 'Account',
-        ...groupPermissions
-      }
+      accountRole = {base_role_type: 'AccountAdmin', contextType: 'Account', ...groupPermissions}
       courseRole = {base_role_type: 'TeacherEnrollment', contextType: 'Course', ...groupPermissions}
-      customCourseRole = {base_role_type: 'TeacherEnrollment', ...groupPermissions}
-      customAccountRole = {base_role_type: 'AccountMembership', ...groupPermissions}
     })
 
     it('transforms boolean enabled into enum value', () => {
@@ -500,11 +468,6 @@ describe('permissions::utils', () => {
         expect(courseRole.permissions.manage_courses.enabled).toBe(ENABLED_FOR_ALL)
       })
 
-      it('sets the right enabled enum given a custom role', () => {
-        groupGranularPermissionsInRole(customCourseRole)
-        expect(customCourseRole.permissions.manage_courses.enabled).toBe(ENABLED_FOR_ALL)
-      })
-
       it('sets the correct readonly bool given grouped course/account granular permissions', () => {
         groupGranularPermissionsInRole(courseRole)
         expect(courseRole.permissions.manage_courses.readonly).toBe(false)
@@ -515,11 +478,6 @@ describe('permissions::utils', () => {
       it('sets the right enabled enum given grouped course/account granular permissions', () => {
         groupGranularPermissionsInRole(accountRole)
         expect(accountRole.permissions.manage_courses.enabled).toBe(ENABLED_FOR_PARTIAL)
-      })
-
-      it('sets the right enabled enum given a custom role', () => {
-        groupGranularPermissionsInRole(customAccountRole)
-        expect(customAccountRole.permissions.manage_courses.enabled).toBe(ENABLED_FOR_PARTIAL)
       })
 
       it('sets the correct readonly bool given grouped course/account granular permissions', () => {

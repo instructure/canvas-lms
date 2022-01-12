@@ -1312,100 +1312,91 @@ export const createLearningOutcomeMock = ({
   }
 }
 
-export const updateLearningOutcomeMocks = ({
+export const updateOutcomeMocks = ({
   id = '1',
   title = 'Updated name',
   displayName = 'Friendly outcome name',
-  description = 'Updated description',
-  calculationMethod = 'decaying_average',
-  calculationInt = 65,
-  individualCalculation = false
-} = {}) => {
-  const input = {
-    title,
-    displayName,
-    description
-  }
-  if (individualCalculation) {
-    input.calculationMethod = calculationMethod
-    input.calculationInt = calculationInt
-  }
-  const output = {
-    ...input,
-    calculationMethod,
-    calculationInt
-  }
-  return [
-    {
-      request: {
-        query: UPDATE_LEARNING_OUTCOME,
-        variables: {
-          input: {
-            id,
-            ...input
-          }
-        }
-      },
-      result: {
-        data: {
-          updateLearningOutcome: {
-            __typename: 'UpdateLearningOutcomePayload',
-            learningOutcome: {
-              __typename: 'LearningOutcome',
-              _id: '1',
-              ...output
-            },
-            errors: null
-          }
+  description = 'Updated description'
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id,
+          title,
+          displayName,
+          description
         }
       }
     },
-    {
-      request: {
-        query: UPDATE_LEARNING_OUTCOME,
-        variables: {
-          input: {
-            id: '3',
-            ...input
-          }
+    result: {
+      data: {
+        updateLearningOutcome: {
+          __typename: 'UpdateLearningOutcomePayload',
+          learningOutcome: {
+            __typename: 'LearningOutcome',
+            _id: '1',
+            title,
+            displayName,
+            description
+          },
+          errors: null
         }
-      },
-      result: {
-        data: {
-          updateLearningOutcome: {
-            __typename: 'UpdateLearningOutcomePayload',
-            learningOutcome: {
-              __typename: 'LearningOutcome',
-              _id: '1',
-              ...output
-            },
-            errors: null
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: UPDATE_LEARNING_OUTCOME,
-        variables: {
-          input: {
-            id: '2',
-            ...input
-          }
-        }
-      },
-      result: {
-        data: null,
-        errors: [
-          {
-            attribute: 'title',
-            message: "can't be blank"
-          }
-        ]
       }
     }
-  ]
-}
+  },
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id: '3',
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: {
+        updateLearningOutcome: {
+          __typename: 'UpdateLearningOutcomePayload',
+          learningOutcome: {
+            __typename: 'LearningOutcome',
+            _id: '1',
+            title,
+            displayName,
+            description
+          },
+          errors: null
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id: '2',
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: null,
+      errors: [
+        {
+          attribute: 'title',
+          message: "can't be blank"
+        }
+      ]
+    }
+  }
+]
 
 export const importOutcomeMocks = ({
   outcomeId = '200',

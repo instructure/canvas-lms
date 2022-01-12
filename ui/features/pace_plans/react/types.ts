@@ -86,7 +86,6 @@ export interface PacePlan {
   readonly context_id: string
   readonly published_at?: string
   readonly compressed_due_dates: PacePlanItemDueDates | undefined
-  readonly updated_at: string
 }
 
 export interface Progress {

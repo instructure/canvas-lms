@@ -372,11 +372,7 @@ export default (
       }
 
     case PacePlanConstants.RESET_PLAN:
-      return {
-        ...state.originalPlan,
-        originalPlan: state.originalPlan,
-        updated_at: new Date().toISOString() // kicks react into re-rendering the assignment_rows
-      }
+      return {...state.originalPlan, originalPlan: state.originalPlan}
     case PacePlanConstants.SET_PROGRESS:
       return {...state, publishingProgress: action.payload}
     case PacePlanConstants.SET_COMPRESSED_ITEM_DATES: {

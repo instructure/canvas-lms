@@ -30,7 +30,6 @@ const defaultProps = ({
   onSubmit = jest.fn(),
   updateDraft = jest.fn(),
   draftSaved = false,
-  canReplyAnonymously = false,
   discussionAnonymousState = null
 } = {}) => ({
   show,
@@ -39,7 +38,6 @@ const defaultProps = ({
   updateDraft,
   onCancel,
   onSubmit,
-  canReplyAnonymously,
   discussionAnonymousState
 })
 
@@ -60,6 +58,13 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps())
       const container = getByTestId('DiscussionEdit-container')
       expect(container.style.display).toBe('')
+    })
+
+    it('should render anonymous response selector when topic is anonymous', () => {
+      ENV.current_user = {display_name: 'Ronald Weasley'}
+      ENV.current_user_roles = ['student']
+      const container = setup(defaultProps({discussionAnonymousState: 'full_anonymity'}))
+      expect(container.queryByTestId('anonymous-response-selector')).toBeTruthy()
     })
   })
 
@@ -98,40 +103,6 @@ describe('DiscussionEdit', () => {
       const container = setup(defaultProps({draftSaved: true}))
       await waitFor(() => expect(container.queryByText('Saving')).toBeNull())
       expect(container.queryByText('Saved')).toBeTruthy()
-    })
-  })
-
-  describe('Anonymous Response Selector', () => {
-    beforeAll(() => {
-      ENV.current_user = {display_name: 'Ronald Weasley', avatar_image_url: ''}
-    })
-
-    describe('Topic is anonymous', () => {
-      it('should render when can reply anonymously', () => {
-        const container = setup(
-          defaultProps({canReplyAnonymously: true, discussionAnonymousState: 'full_anonymity'})
-        )
-        expect(container.queryByTestId('anonymous-response-selector')).toBeTruthy()
-      })
-
-      it('should not render when cannot reply anonymously', () => {
-        const container = setup(
-          defaultProps({canReplyAnonymously: false, discussionAnonymousState: 'full_anonymity'})
-        )
-        expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
-      })
-    })
-
-    describe('Topic is not anonymous', () => {
-      it('should not render when can reply anonymously', () => {
-        const container = setup(defaultProps({canReplyAnonymously: false}))
-        expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
-      })
-
-      it('should not render when cannot reply anonymously', () => {
-        const container = setup(defaultProps({canReplyAnonymously: false}))
-        expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
-      })
     })
   })
 })

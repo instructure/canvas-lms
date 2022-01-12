@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {TextInput} from '@instructure/ui-text-input'
@@ -39,9 +39,6 @@ import {
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from '../shared/OutcomesRceField'
-import ProficiencyCalculation, {
-  defaultProficiencyCalculation
-} from '../MasteryCalculation/ProficiencyCalculation'
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
@@ -51,8 +48,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   const [description, setDescription, descriptionChanged] = useInput(outcome.description || '')
   const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
     useInput(outcome.friendlyDescription?.description || '')
-  const {contextType, contextId, friendlyDescriptionFF, individualOutcomeRatingAndCalculationFF} =
-    useCanvasContext()
+  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   let attributesEditable = {
@@ -63,22 +59,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
       ...attributesEditable,
       title: true,
       displayName: true,
-      description: true,
-      calculationMethod: true
+      description: true
     }
   }
-  const [
-    proficiencyCalculationMethod,
-    setProficiencyCalculationMethod,
-    proficiencyCalculationMethodChanged
-  ] = useInput(outcome.calculationMethod || defaultProficiencyCalculation.calculationMethod)
-  const [
-    proficiencyCalculationInt,
-    setProficiencyCalculationInt,
-    proficiencyCalculationIntChanged
-  ] = useInput(outcome.calculationInt || defaultProficiencyCalculation.calculationInt)
-  const calculationInt = parseInt(proficiencyCalculationInt, 10) || null
-  const [proficiencyCalculationError, setProficiencyCalculationError] = useState(false)
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -90,46 +73,27 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
       type: 'error'
     })
   }
-  const formValid =
-    !invalidTitle &&
-    !invalidDisplayName &&
-    friendlyDescriptionMessages.length === 0 &&
-    (individualOutcomeRatingAndCalculationFF ? !proficiencyCalculationError : true)
-
-  const updateProficiencyCalculation = (calculationMethodKey, calcInt) => {
-    setProficiencyCalculationMethod(calculationMethodKey)
-    setProficiencyCalculationInt(calcInt)
-  }
+  const formValid = !(invalidTitle || invalidDisplayName || friendlyDescriptionMessages.length > 0)
 
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
       try {
         const promises = []
-        const input = {id: outcome._id, title}
-        if (displayName && displayNameChanged) input.displayName = displayName
         // description can be null/empty. no need to check if it is available only if it has changed
-        if (descriptionChanged) input.description = description
-        if (individualOutcomeRatingAndCalculationFF) {
-          if (
-            proficiencyCalculationMethodChanged ||
-            proficiencyCalculationIntChanged ||
-            !outcome.calculationMethod
-          ) {
-            input.calculationMethod = proficiencyCalculationMethod
-            input.calculationInt = calculationInt
-          }
-        }
-        // update outcome only if data has changed
-        if (titleChanged || Object.keys(input).length > 2) {
+        if ((title && titleChanged) || (displayName && displayNameChanged) || descriptionChanged) {
           promises.push(
             updateLearningOutcomeMutation({
               variables: {
-                input
+                input: {
+                  id: outcome._id,
+                  title,
+                  displayName,
+                  description
+                }
               }
             })
           )
         }
-
         if (friendlyDescriptionFF && friendlyDescriptionChanged) {
           promises.push(
             setOutcomeFriendlyDescription({
@@ -248,21 +212,6 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
               />
             </View>
           )}
-          {individualOutcomeRatingAndCalculationFF && (
-            <View as="div" minHeight={attributesEditable.calculationMethod ? '14rem' : '5rem'}>
-              <hr style={{margin: '1rem 0 0'}} />
-              <ProficiencyCalculation
-                method={{
-                  calculationMethod: proficiencyCalculationMethod,
-                  calculationInt
-                }}
-                individualOutcome={attributesEditable.calculationMethod ? 'edit' : 'display'}
-                canManage={!!attributesEditable.calculationMethod}
-                update={updateProficiencyCalculation}
-                setError={setProficiencyCalculationError}
-              />
-            </View>
-          )}
         </Modal.Body>
         <Modal.Footer>
           <Button type="button" color="secondary" margin="0 x-small 0 0" onClick={onCloseHandler}>
@@ -291,8 +240,6 @@ OutcomeEditModal.propTypes = {
     displayName: PropTypes.string,
     contextId: PropTypes.string,
     contextType: PropTypes.string,
-    calculationMethod: PropTypes.string,
-    calculationInt: PropTypes.number,
     friendlyDescription: PropTypes.shape({
       description: PropTypes.string.isRequired
     })
