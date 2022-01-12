@@ -23,14 +23,12 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 @Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
 @Field static final RSPEC_NODE_REQUIREMENTS = [label: 'canvas-docker']
 
-
 def createDistribution(nestedStages) {
   def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-    "ENABLE_CRYSTALBALL=${env.ENABLE_CRYSTALBALL}",
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20210929'
   ]
@@ -68,7 +66,6 @@ def createLegacyDistribution(nestedStages) {
   def setupNodeHook = this.&setupNode
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-    "ENABLE_CRYSTALBALL=${env.ENABLE_CRYSTALBALL}",
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20210929'
   ]
@@ -106,7 +103,6 @@ def setupNode() {
       return
     }
     libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-    env.RSPECQ_REDIS_URL = "redis://${TEST_QUEUE_HOST}:6379"
     credentials.withStarlordCredentials { ->
       sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
     }
@@ -190,13 +186,12 @@ def runRspecqSuite() {
       return
     }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
-                                       -e ENABLE_CRYSTALBALL \
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
                                        -e JOB_NAME \
                                        -e COVERAGE \
                                        -e BUILD_NAME \
-                                       -e BUILD_NUMBER canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
+                                       -e CRYSTAL_BALL_SPECS canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */
