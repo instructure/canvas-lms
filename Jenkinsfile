@@ -424,6 +424,24 @@ pipeline {
                     .timeout(10)
                     .execute { runMigrationsStage() }
 
+                  extendedStage('Generate Crystalball Prediction')
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .timeout(2)
+                    .execute {
+                      /* groovylint-disable-next-line GStringExpressionWithinString */
+                      sh '''
+                        diffFrom=\$(git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
+                        docker run --name=crystal --volume \$(pwd)/.git:/usr/src/app/.git \
+                                   -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
+                                   -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
+                                   $PATCHSET_TAG bundle exec crystalball --dry-run
+                        docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
+                        ls -a tmp/
+                      '''
+                      archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
+                    }
+
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                     def stages = [:]
 
@@ -559,6 +577,17 @@ pipeline {
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
+
+                    // Testing Crystalball build, will not vote on builds. Only run pre-merge.
+                    if (!configuration.isChangeMerged()) {
+                      build(wait: false,
+                            propagate: false,
+                            job: '/Canvas/proofs-of-concept/test-queue',
+                            parameters: buildParameters + [string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                                                           string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                                                           string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                                                           string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),])
+                    }
 
                   parallel(nestedStages)
                 }

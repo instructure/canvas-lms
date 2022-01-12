@@ -3,6 +3,7 @@
 set -o nounset -o errexit -o errtrace -o pipefail -o xtrace
 
 PROCESSES=$((${RSPEC_PROCESSES:=1}-1))
+SPECS="${CRYSTAL_BALL_SPECS:=.}"
 BUILD_NAME="${BUILD_NAME:=${JOB_NAME}_build${BUILD_NUMBER}}"
 
 for i in $(seq 0 $PROCESSES); do
@@ -18,7 +19,7 @@ for i in $(seq 0 $PROCESSES); do
                                           -- --require './spec/formatters/error_context/stderr_formatter.rb' \
                                           --require './spec/formatters/error_context/html_page_formatter.rb' \
                                           --format ErrorContext::HTMLPageFormatter \
-                                          --format ErrorContext::StderrFormatter .")
+                                          --format ErrorContext::StderrFormatter ${SPECS}")
 done
 
 for command in "${commands[@]}"; do
