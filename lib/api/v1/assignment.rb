@@ -188,6 +188,7 @@ module Api::V1::Assignment
     hash["can_duplicate"] = assignment.can_duplicate?
     hash["original_course_id"] = assignment.duplicate_of&.course&.id
     hash["original_assignment_id"] = assignment.duplicate_of&.id
+    hash["original_lti_resource_link_id"] = assignment.duplicate_of&.lti_resource_link_id
     hash["original_assignment_name"] = assignment.duplicate_of&.name
     hash["original_quiz_id"] = assignment.migrate_from_id
     hash["workflow_state"] = assignment.workflow_state
