@@ -23,12 +23,32 @@ declare global {
 
   interface Window {
     readonly ENV?: any
+    external_tool_redirect: any
   }
 
   const ENV: any
 
+  declare interface JQuery {
+    fillWindowWithMe: (options?: {onResize: () => void}) => void
+  }
+
   declare interface JQueryStatic {
     flashError: (any, number?) => void
+    subscribe: any
+    ajaxJSON: (
+      url: string,
+      submit_type?: string,
+      data?: any,
+      success?: any,
+      error?: any,
+      options?: any
+    ) => JQuery.JQueryXHR
+    flashWarning: any
+    flashMessage: any
+  }
+
+  declare interface Object {
+    fromEntries: any
   }
 }
 

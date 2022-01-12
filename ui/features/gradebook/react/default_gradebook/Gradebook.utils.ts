@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+// @ts-ignore
 import I18n from 'i18n!gradebook'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
@@ -107,7 +108,7 @@ export function onGridKeyDown(event, obj) {
   }
 }
 
-export function renderComponent(reactClass, mountPoint, props = {}, children = null) {
+export function renderComponent(reactClass, mountPoint, props = {}, children: any = null) {
   const component = React.createElement(reactClass, props, children)
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, mountPoint)
@@ -120,7 +121,8 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
         'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.'
       ),
       confirmText: I18n.t('OK'),
-      label: I18n.t('View Ungraded as Zero')
+      label: I18n.t('View Ungraded as Zero'),
+      confirmColor: undefined
     })
 
   // If the setting was already enabled, no need to show the confirmation

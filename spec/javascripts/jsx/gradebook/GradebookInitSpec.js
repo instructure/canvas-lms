@@ -21,8 +21,6 @@ import {
   createGradebook,
   setFixtureHtml
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import PropTypes from 'prop-types'
-import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu'
 
 const $fixtures = document.getElementById('fixtures')
 
@@ -211,34 +209,4 @@ QUnit.module('Gradebook#initPostGradesLtis')
 test('sets postGradesLtis as an array', () => {
   const gradebook = createGradebook({post_grades_ltis: []})
   deepEqual(gradebook.postGradesLtis, [])
-})
-
-test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', () => {
-  const options = {
-    post_grades_ltis: [
-      {
-        id: '1',
-        name: 'Pinnacle',
-        onSelect() {}
-      },
-      {
-        id: '2',
-        name: 'Kimono',
-        onSelect() {}
-      }
-    ]
-  }
-
-  const gradebook = createGradebook(options)
-  gradebook.initPostGradesLtis()
-  const props = gradebook.postGradesLtis
-
-  sandbox.spy(console, 'error')
-  PropTypes.checkPropTypes(
-    {postGradesLtis: ActionMenu.propTypes.postGradesLtis},
-    props,
-    'prop',
-    'ActionMenu'
-  )
-  ok(console.error.notCalled) // eslint-disable-line no-console
 })
