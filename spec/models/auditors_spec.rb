@@ -21,13 +21,13 @@
 # for now leaving it here will confirm the Auditors/Audits shim is operating as expected.
 describe Auditors do
   after do
-    Canvas::DynamicSettings.config = nil
-    Canvas::DynamicSettings.reset_cache!
-    Canvas::DynamicSettings.fallback_data = nil
+    DynamicSettings.config = nil
+    DynamicSettings.reset_cache!
+    DynamicSettings.fallback_data = nil
   end
 
   def inject_auditors_settings(yaml_string)
-    Canvas::DynamicSettings.fallback_data = {
+    DynamicSettings.fallback_data = {
       private: {
         canvas: {
           "auditors.yml": yaml_string

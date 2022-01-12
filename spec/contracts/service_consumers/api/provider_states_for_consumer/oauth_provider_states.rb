@@ -157,14 +157,14 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       allow_any_instance_of(Canvas::Security::JwtValidator).to receive(:exp).and_return(true)
 
       # DynamicSettings is not available on Jenkins -- need to stub it to return these values.
-      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
+      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+      allow(DynamicSettings).to receive(:find).with("canvas").and_return(
         {
           "signing-secret" => "astringthatisactually32byteslong",
           "encryption-secret" => "astringthatisactually32byteslong"
         }
       )
-      allow(Canvas::DynamicSettings).to receive(:find)
+      allow(DynamicSettings).to receive(:find)
         .with("live-events-subscription-service", any_args).and_return({
                                                                          "app-host" => ENV.fetch("SUBSCRIPTION_SERVICE_HOST", "http://les.docker:80")
                                                                        })

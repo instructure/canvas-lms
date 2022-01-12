@@ -456,7 +456,7 @@ RSpec.configure do |config|
     Folder.reset_path_lookups!
     Rails.logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.current_root_account = nil
-    Canvas::DynamicSettings.reset_cache!
+    DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
     MultiCache.reset
@@ -704,11 +704,11 @@ RSpec.configure do |config|
   end
 
   def override_dynamic_settings(data)
-    original_fallback = Canvas::DynamicSettings.fallback_data
-    Canvas::DynamicSettings.fallback_data = data
+    original_fallback = DynamicSettings.fallback_data
+    DynamicSettings.fallback_data = data
     yield
   ensure
-    Canvas::DynamicSettings.fallback_data = original_fallback
+    DynamicSettings.fallback_data = original_fallback
   end
 
   def json_parse(json_string = response.body)

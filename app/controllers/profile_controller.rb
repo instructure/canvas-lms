@@ -500,7 +500,7 @@ class ProfileController < ApplicationController
     set_active_tab "content_shares"
     @context = @user.profile
 
-    ccv_settings = Canvas::DynamicSettings.find("common_cartridge_viewer") || {}
+    ccv_settings = DynamicSettings.find("common_cartridge_viewer") || {}
     js_env({
              COMMON_CARTRIDGE_VIEWER_URL: ccv_settings["base_url"]
            })

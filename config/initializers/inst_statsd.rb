@@ -20,7 +20,7 @@
 # Initialize canvas statsd configuration. See config/statsd.yml.example.
 
 Rails.configuration.to_prepare do
-  settings = YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["statsd.yml"] || "")
+  settings = YAML.safe_load(DynamicSettings.find(tree: :private)["statsd.yml"] || "")
   settings ||= ConfigFile.load("statsd").dup
   settings ||= {}
   InstStatsd.settings = settings

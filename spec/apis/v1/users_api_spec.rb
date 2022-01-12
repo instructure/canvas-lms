@@ -3006,9 +3006,9 @@ describe "Users API", type: :request do
     end
 
     before do
-      allow(Canvas::DynamicSettings).to receive(:find)
+      allow(DynamicSettings).to receive(:find)
         .with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find)
+      allow(DynamicSettings).to receive(:find)
         .with("events", service: "pandata").and_return(fake_secrets)
     end
 

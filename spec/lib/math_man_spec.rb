@@ -27,8 +27,8 @@ describe MathMan do
   let(:use_for_svg) { false }
 
   before do
-    @original_fallback = Canvas::DynamicSettings.fallback_data
-    Canvas::DynamicSettings.fallback_data = {
+    @original_fallback = DynamicSettings.fallback_data
+    DynamicSettings.fallback_data = {
       config: {
         canvas: {
           "math-man": {
@@ -47,7 +47,7 @@ describe MathMan do
   end
 
   after do
-    Canvas::DynamicSettings.fallback_data = @original_fallback
+    DynamicSettings.fallback_data = @original_fallback
   end
 
   describe ".url_for" do
@@ -63,7 +63,7 @@ describe MathMan do
     end
 
     it "errors if DynamicSettings is not configured" do
-      Canvas::DynamicSettings.fallback_data = nil
+      DynamicSettings.fallback_data = nil
       expect { MathMan.url_for(latex: latex, target: :mml) }.to raise_error MathMan::InvalidConfigurationError
     end
 
@@ -87,7 +87,7 @@ describe MathMan do
     end
 
     it "does not error if DynamicSettings is not configured" do
-      Canvas::DynamicSettings.fallback_data = nil
+      DynamicSettings.fallback_data = nil
       expect(MathMan.use_for_mml?).to be_falsey
     end
 
@@ -111,7 +111,7 @@ describe MathMan do
     end
 
     it "does not error if DynamicSettings is not configured" do
-      Canvas::DynamicSettings.fallback_data = nil
+      DynamicSettings.fallback_data = nil
       expect(MathMan.use_for_svg?).to be_falsey
     end
 
