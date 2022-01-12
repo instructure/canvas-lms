@@ -20,10 +20,11 @@ import I18n from 'i18n!discussions_posts'
 import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Avatar} from '@instructure/ui-avatar'
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
-import {CURRENT_USER} from '../../utils/constants'
+import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {Text} from '@instructure/ui-text'
 import {Select} from '@instructure/ui-select'
+
+const CURRENT_USER = 'current_user'
 
 export const AnonymousPostSelector = () => {
   const [inputValue, setInputValue] = useState('Show to everyone')
@@ -32,7 +33,8 @@ export const AnonymousPostSelector = () => {
   const [highlightedOption, setHighlightedOption] = useState(null)
 
   return (
-    <>
+    <div style={{marginBottom: '36px', marginTop: '3px'}}>
+      <input name="is_anonymous_author" type="hidden" value={selectedOptionId === 'hide'} />
       <Flex>
         <Flex.Item align="start">
           {selectedOptionId === 'show' && (
@@ -78,6 +80,7 @@ export const AnonymousPostSelector = () => {
             setHighlightedOption(id)
           }}
           data-testid="anonymous_post_selector"
+          data-component="anonymous_post_selector"
         >
           <Select.Option
             id="show"
@@ -104,6 +107,6 @@ export const AnonymousPostSelector = () => {
             : I18n.t('Hide name and profile picture')}
         </Text>
       </Flex>
-    </>
+    </div>
   )
 }
