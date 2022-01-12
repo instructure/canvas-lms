@@ -439,7 +439,7 @@ RSpec.describe ApplicationController do
         end
 
         it "loads gateway uri from dynamic settings" do
-          allow(Canvas::DynamicSettings).to receive(:find).and_return({
+          allow(DynamicSettings).to receive(:find).and_return({
                                                                         "api_gateway_enabled" => "true",
                                                                         "api_gateway_uri" => "http://the-gateway/graphql"
                                                                       })
@@ -448,7 +448,7 @@ RSpec.describe ApplicationController do
         end
 
         it "will not expose gateway uri from dynamic settings if not enabled" do
-          allow(Canvas::DynamicSettings).to receive(:find).and_return({
+          allow(DynamicSettings).to receive(:find).and_return({
                                                                         "api_gateway_enabled" => "false",
                                                                         "api_gateway_uri" => "http://the-gateway/graphql"
                                                                       })

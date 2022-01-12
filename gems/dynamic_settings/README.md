@@ -27,7 +27,7 @@ Fetch the recaptcha_server_key config value from the root of the Private Local C
 Create an object to query the live-events configuration keyspace with a long cache TTL and use it to fetch some keys:
 
 ```ruby
-le_settings = Canvas::DynamicSettings.find('live-events', default_ttl: 2.hours)
+le_settings = DynamicSettings.find('live-events', default_ttl: 2.hours)
 le_settings['stream_name']
 le_settings['acl_token']
 ```
@@ -38,9 +38,9 @@ Fetch the disable_needs_grading_queries config value, looking first in a keyspac
 
 ## Fallback Rules
 
-An initializer configures the Canvas::DynamicSettings with an environment, e.g. DynamicSettings.config = { 'environment' => 'production' }, which influences the fallback paths followed for any query.  The easiest way to describe the behavior is probably through a set of examples, so here we go.
+An initializer configures the DynamicSettings with an environment, e.g. DynamicSettings.config = { 'environment' => 'production' }, which influences the fallback paths followed for any query.  The easiest way to describe the behavior is probably through a set of examples, so here we go.
 
-Query: Canvas::DynamicSettings.find()['key']
+Query: DynamicSettings.find()['key']
 Search paths:
 
 ```bash

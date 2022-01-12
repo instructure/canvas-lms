@@ -62,8 +62,8 @@ describe EportfoliosController do
       end
 
       before do
-        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
       end
 
       it "assigns variables" do
@@ -74,7 +74,7 @@ describe EportfoliosController do
       end
 
       it "exposes the feature state for rich content service to js_env" do
-        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
+        allow(DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
           DynamicSettings::FallbackProxy.new("app-host" => "rce.docker",
                                              "cdn-host" => "rce.docker")
         )

@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
           },
         }
 
-        dynamic_settings_tree = Canvas::DynamicSettings.find(tree: :private)
+        dynamic_settings_tree = DynamicSettings.find(tree: :private)
         if dynamic_settings_tree["api_gateway_enabled"] == "true"
           @js_env[:API_GATEWAY_URI] = dynamic_settings_tree["api_gateway_uri"]
         end
@@ -2089,7 +2089,7 @@ class ApplicationController < ActionController::Base
   def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil) # TODO: generalize this
     host_and_shard ||= HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     host, shard = host_and_shard
-    config = Canvas::DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
+    config = DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
     if config["attachment_specific_file_domain"] == "true"
       separator = config["attachment_specific_file_domain_separator"] || "."
       host = "a#{attachment.shard.id}-#{attachment.local_id}#{separator}#{host}"
@@ -2838,13 +2838,13 @@ class ApplicationController < ActionController::Base
     else
       return value_to_boolean(params[:force_stream]) if params.key?(:force_stream)
 
-      ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming", failsafe: false] &&
+      ::DynamicSettings.find(tree: :private)["enable_template_streaming", failsafe: false] &&
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end
 
   def recaptcha_enabled?
-    Canvas::DynamicSettings.find(tree: :private)["recaptcha_server_key"].present? && @domain_root_account.self_registration_captcha?
+    DynamicSettings.find(tree: :private)["recaptcha_server_key"].present? && @domain_root_account.self_registration_captcha?
   end
 
   # Show Student View button on the following controller/action pages, as long as defined tabs are not hidden

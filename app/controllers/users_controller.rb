@@ -2607,7 +2607,7 @@ class UsersController < ApplicationController
   #     "expires_at": 1521667783000,
   #   }
   def pandata_events_token
-    settings = Canvas::DynamicSettings.find("events", service: "pandata")
+    settings = DynamicSettings.find("events", service: "pandata")
     dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
 
     unless @access_token
@@ -3141,7 +3141,7 @@ class UsersController < ApplicationController
     return nil unless @access_token.nil?
 
     response = CanvasHttp.post("https://www.google.com/recaptcha/api/siteverify", form_data: {
-                                 secret: Canvas::DynamicSettings.find(tree: :private)["recaptcha_server_key"],
+                                 secret: DynamicSettings.find(tree: :private)["recaptcha_server_key"],
                                  response: recaptcha_response
                                })
 
