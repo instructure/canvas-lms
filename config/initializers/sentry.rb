@@ -29,6 +29,14 @@ if settings.present?
   return if Canvas::Plugin.value_to_boolean(Setting.get("sentry_disabled", "false"))
 
   Sentry.init do |config|
+    config.traces_sample_rate = Setting.get("sentry_backend_traces_sample_rate", "0.0").to_f
+    config.rails.tracing_subscribers = [
+      Sentry::Rails::Tracing::ActionControllerSubscriber,
+      Sentry::Rails::Tracing::ActionViewSubscriber,
+      Sentry::Rails::Tracing::ActiveStorageSubscriber,
+      SentryExtensions::Tracing::ActiveRecordSubscriber # overridden from the Sentry-provided one
+    ]
+
     config.dsn = settings[:dsn]
     config.environment = Canvas.environment
     config.release = Canvas.revision

@@ -127,6 +127,10 @@ class ApplicationController < ActionController::Base
     @js_env = nil
   end
 
+  def set_sentry_trace
+    @sentry_trace = Sentry&.get_current_scope&.get_transaction&.to_sentry_trace
+  end
+
   ##
   # Sends data from rails to JavaScript
   #
@@ -2351,6 +2355,7 @@ class ApplicationController < ActionController::Base
 
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
+    set_sentry_trace
     if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
