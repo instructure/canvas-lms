@@ -230,11 +230,11 @@ module AssignmentOverrideApplicator
       context.sections_visible_to(
         user,
         context.active_course_sections,
-        excluded_workflows: ["deleted", "completed"]
+        excluded_workflows: ["deleted"]
       ).map(&:id) +
         context.section_visibilities_for(
           user,
-          excluded_workflows: ["deleted", "completed"]
+          excluded_workflows: ["deleted"]
         ).select do |v|
           %w[StudentEnrollment ObserverEnrollment StudentViewEnrollment].include? v[:type]
         end.pluck(:course_section_id).uniq
