@@ -32,12 +32,31 @@ def setupNode() {
   checkout scm
 
   distribution.stashBuildScripts()
+  if (env.ENABLE_CRYSTALBALL == '1') {
+    copyArtifacts filter: 'tmp/crystalball_spec_list.txt', projectName: "${env.UPSTREAM}", selector: upstream()
+  }
 
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
 
   sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
+}
+
+def computeTestCount() {
+  def partition = (env.RSPEC_PROCESSES.toInteger() * 2)
+  def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
+  def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
+  env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
+  def specCount = specUnique.size()
+  if (specCount == 0) {
+    return
+  }
+  if (specCount <= partition) {
+    rspecqNodeTotal = 1
+    return
+  }
+  rspecqNodeTotal = (specCount.intdiv(partition) > 25) ? 25 : specCount.intdiv(partition)
 }
 
 def redisUrl() {
@@ -75,6 +94,7 @@ pipeline {
       steps {
         script {
           def rspecNodeRequirements = [label: 'canvas-docker']
+          env.CRYSTAL_BALL_SPECS = '.'
 
           def postBuildHandler = [
             onStageEnded: { stageName, stageConfig, result ->
@@ -96,10 +116,16 @@ pipeline {
                 setupNode()
               }
 
+              if (env.ENABLE_CRYSTALBALL == '1') {
+                stage('Compute Build Distribution') {
+                  computeTestCount()
+                }
+              }
+
               extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                 def rspecqStages = [:]
 
-                extendedStage('RSpecQ Reporter for Rspec').timeout(30).queue(rspecqStages) {
+                extendedStage('RSpecQ Reporter for Rspec').required(env.ENABLE_CRYSTALBALL != '1').timeout(30).queue(rspecqStages) {
                   try {
                     sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
                       --build=${JOB_NAME}_build${BUILD_NUMBER}_rspec \
@@ -132,7 +158,7 @@ pipeline {
                     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                       /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
                       sh '''#!/bin/bash
-                        ids=( $(docker ps -aq --filter "name=canvas_") )
+                        ids=($(docker ps -aq --filter "name=canvas_"))
                         for i in "${ids[@]}"
                           do
                             docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
@@ -145,6 +171,7 @@ pipeline {
 
                 extendedStage('RSpecQ Selenium Set 00')
                     .envVars(['CI_NODE_INDEX=0',
+                        "CRYSTAL_BALL_SPECS=${env.CRYSTAL_BALL_SPECS}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
                         "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
                         'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
@@ -156,6 +183,7 @@ pipeline {
                   def index = i
                   extendedStage("RSpecQ Selenium Set ${(index).toString().padLeft(2, '0')}")
                     .envVars(["CI_NODE_INDEX=$index",
+                        "CRYSTAL_BALL_SPECS=${env.CRYSTAL_BALL_SPECS}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
                         "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
                         'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
@@ -167,8 +195,9 @@ pipeline {
 
                 rspecNodeTotal.times { index ->
                   extendedStage("RSpecQ Rspec Set ${(index + 1).toString().padLeft(2, '0')}")
-                    .envVars(["CI_NODE_INDEX=$index", "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
+                    .envVars(["CI_NODE_INDEX=$index", "CRYSTAL_BALL_SPECS=.", "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
                     .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                    .required(env.ENABLE_CRYSTALBALL != '1') /* don't run again, already running in regular build */
                     .nodeRequirements(rspecNodeRequirements)
                     .timeout(30)
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
