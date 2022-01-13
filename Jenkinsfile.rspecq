@@ -195,7 +195,7 @@ pipeline {
 
                 rspecNodeTotal.times { index ->
                   extendedStage("RSpecQ Rspec Set ${(index + 1).toString().padLeft(2, '0')}")
-                    .envVars(["CI_NODE_INDEX=$index", "CRYSTAL_BALL_SPECS=.", "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
+                    .envVars(["CI_NODE_INDEX=$index", 'CRYSTAL_BALL_SPECS=.', "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
                     .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
                     .required(env.ENABLE_CRYSTALBALL != '1') /* don't run again, already running in regular build */
                     .nodeRequirements(rspecNodeRequirements)
