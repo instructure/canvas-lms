@@ -285,13 +285,9 @@ export default function CanvasDateInput({
     }
   }
 
-  function handleKeyDown(e: KeyboardEvent) {
+  function handleKey(e: KeyboardEvent) {
     if (e.key === 'Enter') {
       handleBlur()
-    } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
-      modifySelectedMoment(1, 'day')
-    } else if (e.key === 'ArrowUp' || e.keyCode === 38) {
-      modifySelectedMoment(-1, 'day')
     }
   }
 
@@ -376,7 +372,7 @@ export default function CanvasDateInput({
       value={inputValue}
       onChange={handleChange}
       onPaste={trackPasteEvent}
-      onKeyDown={handleKeyDown}
+      onKeyUp={handleKey}
       isInline
       placement={placement}
       messages={messages.concat(internalMessages)}

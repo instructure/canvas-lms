@@ -21,6 +21,11 @@ import moment from 'moment'
 import {render, fireEvent} from '@testing-library/react'
 import CourseAvailabilityOptions from '../CourseAvailabilityOptions'
 
+function pressKey(inputElem, keyOpts) {
+  fireEvent.keyDown(inputElem, keyOpts)
+  fireEvent.keyUp(inputElem, keyOpts)
+}
+
 function createFormField(wrapper, id, value) {
   const field = document.createElement('input')
   field.setAttribute('type', 'hidden')
@@ -238,7 +243,7 @@ describe('CourseAvailabilityOptions', () => {
     const startDate = getByLabelText('Start')
     const year = moment().year()
     fireEvent.change(startDate, {target: {value: `Jan 1, ${year} 12:00am`}})
-    fireEvent.keyDown(startDate, {key: 'Enter'})
+    pressKey(startDate, {key: 'Enter'})
     expect(document.getElementById('course_start_at').value).toBe(`${year}-01-01T00:00:00.000Z`)
   })
 
@@ -249,7 +254,7 @@ describe('CourseAvailabilityOptions', () => {
     const endDate = getByLabelText('End')
     const year = moment().year()
     fireEvent.change(endDate, {target: {value: `Feb 1, ${year} 12:00am`}})
-    fireEvent.keyDown(endDate, {key: 'Enter'})
+    pressKey(endDate, {key: 'Enter'})
     expect(document.getElementById('course_conclude_at').value).toBe(`${year}-02-01T00:00:00.000Z`)
   })
 
