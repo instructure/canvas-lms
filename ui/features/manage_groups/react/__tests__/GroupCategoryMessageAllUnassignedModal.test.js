@@ -133,7 +133,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
     const [, fetchOptions] = fetchMock.lastCall()
     expect(fetchOptions.method).toBe('POST')
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
-      body: {message: 'hi'},
+      body: 'hi',
       context_code: 'course_1',
       recipients: ['1']
     })
