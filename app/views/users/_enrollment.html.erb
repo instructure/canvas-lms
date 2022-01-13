@@ -42,23 +42,7 @@
       class="subtitle<%= @responsive_misc ? '' : ' ellipsis' %>"
       style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
       <%= Enrollment.workflow_readable_type(enrollment.readable_state_based_on_date) %>,
-      <%=
-        case enrollment.class.to_s
-        when 'TeacherEnrollment'
-          t('roles_teacher', "Enrolled as a Teacher.")
-        when 'StudentEnrollment'
-          t('roles_student', "Enrolled as a Student.")
-        when 'TaEnrollment'
-          t('roles_ta', "Enrolled as a TA.")
-        when 'ObserverEnrollment'
-          t('roles_observer', "Enrolled as an Observer.")
-        when 'DesignerEnrollment'
-          t('roles_designer', "Enrolled as a Designer.")
-        else
-          t('roles_student', "Enrolled as a Student.")
-        end
-      %>
-
+      <%= t("Enrolled as: %{enrollment_type}", enrollment_type: enrollment.readable_role_name) %>
       <% if enrollment.associated_user %>
         <%= t('linked_to_user', '(Linked to %{user_name})', :user_name => enrollment.associated_user.name) %>
       <% end %>
