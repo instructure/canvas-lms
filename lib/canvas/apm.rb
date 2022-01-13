@@ -20,8 +20,6 @@
 require "ddtrace"
 require "digest/sha1"
 
-require_dependency "canvas/dynamic_settings"
-
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace
   # to send APM information to Datadog, but could in the future be re-worked to
