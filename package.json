@@ -51,7 +51,7 @@
     "@instructure/ui-img": "^7",
     "@instructure/ui-link": "^7",
     "@instructure/ui-list": "^7",
-    "@instructure/ui-media-player": "^7",
+    "@instructure/ui-media-player": "8.2.0",
     "@instructure/ui-menu": "^7",
     "@instructure/ui-metric": "^7",
     "@instructure/ui-modal": "^7",
