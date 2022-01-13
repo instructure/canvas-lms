@@ -52,11 +52,22 @@ def computeTestCount() {
   if (specCount == 0) {
     return
   }
+
+  def totalPrediction = specUnique.join("\n")
+  sendCrystalballSlack(totalPrediction)
+  echo "total prediction: \n====\n$totalPrediction\n===="
+  
   if (specCount <= partition) {
     rspecqNodeTotal = 1
     return
   }
   rspecqNodeTotal = (specCount.intdiv(partition) > 25) ? 25 : specCount.intdiv(partition)
+}
+
+def sendCrystalballSlack(predictedTests) {
+  def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
+  def message = "$jobInfo\n$predictedTests"
+  slackSend channel: '#crystalball-noisy', color: 'good', message: message
 }
 
 def redisUrl() {
