@@ -17,7 +17,7 @@
  */
 
 import gql from 'graphql-tag'
-import {shape, string} from 'prop-types'
+import {number, shape, string} from 'prop-types'
 
 export const Section = {
   fragment: gql`
@@ -27,6 +27,7 @@ export const Section = {
       id
       name
       updatedAt
+      userCount
     }
   `,
 
@@ -35,7 +36,8 @@ export const Section = {
     createdAt: string,
     id: string,
     name: string,
-    updatedAt: string
+    updatedAt: string,
+    userCount: number
   }),
 
   mock: ({
@@ -43,13 +45,15 @@ export const Section = {
     createdAt = '2020-11-13T11:27:58-07:00',
     id = '2',
     name = 'X-Men A-Team',
-    updatedAt = '2020-11-13T11:27:58-07:00'
+    updatedAt = '2020-11-13T11:27:58-07:00',
+    userCount = 1
   } = {}) => ({
     _id,
     createdAt,
     id,
     name,
     updatedAt,
+    userCount,
     __typename: 'Section'
   })
 }
