@@ -427,19 +427,24 @@ pipeline {
                   extendedStage('Generate Crystalball Prediction')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
+                    .required(!configuration.isChangeMerged())
                     .timeout(2)
                     .execute {
-                      /* groovylint-disable-next-line GStringExpressionWithinString */
-                      sh '''
-                        diffFrom=\$(git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
-                        docker run --name=crystal --volume \$(pwd)/.git:/usr/src/app/.git \
-                                   -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
-                                   -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
-                                   $PATCHSET_TAG bundle exec crystalball --dry-run
-                        docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
-                        ls -a tmp/
-                      '''
-                      archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
+                      try {
+                        /* groovylint-disable-next-line GStringExpressionWithinString */
+                        sh '''
+                          diffFrom=\$(git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
+                          docker run --name=crystal --volume \$(pwd)/.git:/usr/src/app/.git \
+                                     -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
+                                     -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
+                                     $PATCHSET_TAG bundle exec crystalball --dry-run
+                          docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
+                        '''
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
+                      /* groovylint-disable-next-line CatchException */
+                      } catch (Exception e) {
+                        // don't fail build for this
+                      }
                     }
 
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
