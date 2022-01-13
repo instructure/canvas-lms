@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-path = "/tmp/crystalball"
+path = ARGV[0] || "/tmp/crystalball"
 map_header = nil
 map_body = {}
 Dir.glob("#{path}/**/*_map.yml") do |filename|
   puts "Looking through #{filename}"
   doc = File.read(filename)
   (header, body) = doc.split("---").reject(&:empty?)
-  map_header ||= header
+  map_header ||= header.gsub(":version:", ":version: #{Time.now.utc}")
   body.split("\n").slice_when { |_before, after| after.include?(":") }.each do |group|
     spec = group.shift
     changed_files = group
