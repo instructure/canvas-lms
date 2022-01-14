@@ -254,6 +254,12 @@ export const UPDATE_LEARNING_OUTCOME = gql`
         description
         calculationMethod
         calculationInt
+        masteryPoints
+        pointsPossible
+        ratings {
+          description
+          points
+        }
       }
       errors {
         attribute
