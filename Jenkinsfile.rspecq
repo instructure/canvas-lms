@@ -52,11 +52,23 @@ def computeTestCount() {
   if (specCount == 0) {
     return
   }
-
+ 
   def totalPrediction = specUnique.join("\n")
-  sendCrystalballSlack(totalPrediction)
+  if (specCount == 1 && specUnique[0] == '.') {
+    sendCrystalballSlack('New File Detected! - Complete Suite Re-run!', 'danger')
+  } else {
+    def individualSpecs = specs.split(',').size()
+    def summary = "$individualSpecs Individual Selenium spec(s) across $specCount file(s)\n$totalPrediction"
+    def color = 'danger'
+    if (specCount <= 10) {
+      color = 'good'
+    } else if (specCount <= 25) {
+      color = 'warning'
+    }
+    sendCrystalballSlack(summary, color)
+  }
   echo "total prediction: \n====\n$totalPrediction\n===="
-  
+
   if (specCount <= partition) {
     rspecqNodeTotal = 1
     return
@@ -64,10 +76,10 @@ def computeTestCount() {
   rspecqNodeTotal = (specCount.intdiv(partition) > 25) ? 25 : specCount.intdiv(partition)
 }
 
-def sendCrystalballSlack(predictedTests) {
+def sendCrystalballSlack(summary, color) {
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
-  def message = "$jobInfo\n$predictedTests"
-  slackSend channel: '#crystalball-noisy', color: 'good', message: message
+  def message = "$jobInfo\n$summary"
+  slackSend channel: '#crystalball-noisy', color: color, message: message
 }
 
 def redisUrl() {
