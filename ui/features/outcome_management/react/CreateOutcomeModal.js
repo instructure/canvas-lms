@@ -45,6 +45,7 @@ import ProficiencyCalculation, {
   defaultProficiencyCalculation
 } from './MasteryCalculation/ProficiencyCalculation'
 import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
+import convertRatings from '@canvas/outcomes/react/helpers/convertRatings'
 import Ratings from './Management/Ratings'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
@@ -132,11 +133,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
         if (individualOutcomeRatingAndCalculationFF) {
           input.calculationMethod = proficiencyCalculation.calculationMethod
           input.calculationInt = proficiencyCalculation.calculationInt
-          input.ratings = ratings.map(({description: ratingDescription, points, mastery}) => ({
-            description: ratingDescription,
-            points: parseFloat(points),
-            mastery
-          }))
+          const {masteryPoints, ratings: inputRatings} = convertRatings(ratings)
+          input.masteryPoints = masteryPoints
+          input.ratings = inputRatings
         }
         const createLearningOutcomeResult = await createLearningOutcome({
           variables: {

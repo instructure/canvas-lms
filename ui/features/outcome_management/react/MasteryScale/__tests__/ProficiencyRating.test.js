@@ -78,6 +78,7 @@ describe('ProficiencyRating', () => {
       const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
       expect(wrapper.find('TextInput').exists()).toBeFalsy()
     })
+
     it('does not render delete button', () => {
       const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
       expect(wrapper.find('.deleteButton').exists()).toBeFalsy()

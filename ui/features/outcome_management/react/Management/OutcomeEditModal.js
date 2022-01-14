@@ -42,6 +42,10 @@ import OutcomesRceField from '../shared/OutcomesRceField'
 import ProficiencyCalculation, {
   defaultProficiencyCalculation
 } from '../MasteryCalculation/ProficiencyCalculation'
+import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
+import convertRatings from '@canvas/outcomes/react/helpers/convertRatings'
+import Ratings from './Ratings'
+import {outcomeEditShape} from './shapes'
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
@@ -53,6 +57,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     useInput(outcome.friendlyDescription?.description || '')
   const {contextType, contextId, friendlyDescriptionFF, individualOutcomeRatingAndCalculationFF} =
     useCanvasContext()
+  const {
+    ratings,
+    setRatings,
+    hasError: proficiencyRatingsError,
+    hasChanged: proficiencyRatingsChanged
+  } = useRatings({initialRatings: defaultOutcomesManagementRatings})
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   let attributesEditable = {
@@ -64,7 +74,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
       title: true,
       displayName: true,
       description: true,
-      calculationMethod: true
+      calculationMethod: true,
+      individualRatings: true
     }
   }
   const [
@@ -90,11 +101,14 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
       type: 'error'
     })
   }
+
   const formValid =
     !invalidTitle &&
     !invalidDisplayName &&
     friendlyDescriptionMessages.length === 0 &&
-    (individualOutcomeRatingAndCalculationFF ? !proficiencyCalculationError : true)
+    (individualOutcomeRatingAndCalculationFF
+      ? !proficiencyCalculationError && !proficiencyRatingsError
+      : true)
 
   const updateProficiencyCalculation = (calculationMethodKey, calcInt) => {
     setProficiencyCalculationMethod(calculationMethodKey)
@@ -117,6 +131,11 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
           ) {
             input.calculationMethod = proficiencyCalculationMethod
             input.calculationInt = calculationInt
+          }
+          if (proficiencyRatingsChanged || !outcome.ratings) {
+            const {masteryPoints, ratings: inputRatings} = convertRatings(ratings)
+            input.masteryPoints = masteryPoints
+            input.ratings = inputRatings
           }
         }
         // update outcome only if data has changed
@@ -249,18 +268,25 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
             </View>
           )}
           {individualOutcomeRatingAndCalculationFF && (
-            <View as="div" minHeight={attributesEditable.calculationMethod ? '14rem' : '5rem'}>
-              <hr style={{margin: '1rem 0 0'}} />
-              <ProficiencyCalculation
-                method={{
-                  calculationMethod: proficiencyCalculationMethod,
-                  calculationInt
-                }}
-                individualOutcome={attributesEditable.calculationMethod ? 'edit' : 'display'}
-                canManage={!!attributesEditable.calculationMethod}
-                update={updateProficiencyCalculation}
-                setError={setProficiencyCalculationError}
+            <View as="div" padding="small 0 0">
+              <Ratings
+                ratings={ratings}
+                onChangeRatings={setRatings}
+                canManage={!!attributesEditable.individualRatings}
               />
+              <View as="div" minHeight={attributesEditable.calculationMethod ? '14rem' : '5rem'}>
+                {attributesEditable.calculationMethod && <hr style={{margin: '1rem 0 0'}} />}
+                <ProficiencyCalculation
+                  method={{
+                    calculationMethod: proficiencyCalculationMethod,
+                    calculationInt
+                  }}
+                  individualOutcome={attributesEditable.calculationMethod ? 'edit' : 'display'}
+                  canManage={!!attributesEditable.calculationMethod}
+                  update={updateProficiencyCalculation}
+                  setError={setProficiencyCalculationError}
+                />
+              </View>
             </View>
           )}
         </Modal.Body>
@@ -284,19 +310,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
 }
 
 OutcomeEditModal.propTypes = {
-  outcome: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    displayName: PropTypes.string,
-    contextId: PropTypes.string,
-    contextType: PropTypes.string,
-    calculationMethod: PropTypes.string,
-    calculationInt: PropTypes.number,
-    friendlyDescription: PropTypes.shape({
-      description: PropTypes.string.isRequired
-    })
-  }).isRequired,
+  outcome: outcomeEditShape.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onEditLearningOutcomeHandler: PropTypes.func.isRequired

@@ -29,9 +29,7 @@ import {
   CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 import {defaultOutcomesManagementRatings} from '../react/hooks/useRatings'
-import _ from 'lodash'
-
-import {uniq, flattenDeep} from 'lodash'
+import {pick, uniq, flattenDeep} from 'lodash'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
   {
@@ -1414,11 +1412,11 @@ export const createLearningOutcomeMock = ({
   calculationMethod = 'decaying_average',
   calculationInt = 65,
   individualCalculation = false,
+  masteryPoints = 3,
   ratings = defaultOutcomesManagementRatings,
   individualRatings = false
 } = {}) => {
-  const inputRatings = ratings.map(rating => _.pick(rating, ['description', 'points', 'mastery']))
-  const masteryPoints = ratings.filter(rating => rating.mastery)[0].points
+  const inputRatings = ratings.map(rating => pick(rating, ['description', 'points']))
   const pointsPossible = ratings.sort((a, b) => b.points - a.points)[0].points
   const outputRatings = inputRatings.map(r => ({...r, __typename: 'ProficiencyRating'}))
 
@@ -1489,6 +1487,7 @@ export const createLearningOutcomeMock = ({
     input.calculationInt = calculationInt
   }
   if (individualRatings) {
+    input.masteryPoints = masteryPoints
     input.ratings = inputRatings
   }
 
@@ -1510,8 +1509,15 @@ export const updateLearningOutcomeMocks = ({
   description = 'Updated description',
   calculationMethod = 'decaying_average',
   calculationInt = 65,
-  individualCalculation = false
+  individualCalculation = false,
+  masteryPoints = 3,
+  ratings = defaultOutcomesManagementRatings,
+  individualRatings = false
 } = {}) => {
+  const inputRatings = ratings.map(rating => pick(rating, ['description', 'points']))
+  const pointsPossible = ratings.sort((a, b) => b.points - a.points)[0].points
+  const outputRatings = inputRatings.map(r => ({...r, __typename: 'ProficiencyRating'}))
+
   const input = {
     title,
     displayName,
@@ -1521,11 +1527,19 @@ export const updateLearningOutcomeMocks = ({
     input.calculationMethod = calculationMethod
     input.calculationInt = calculationInt
   }
+  if (individualRatings) {
+    input.masteryPoints = masteryPoints
+    input.ratings = inputRatings
+  }
   const output = {
     ...input,
     calculationMethod,
-    calculationInt
+    calculationInt,
+    masteryPoints,
+    pointsPossible,
+    ratings: outputRatings
   }
+
   return [
     {
       request: {
@@ -1773,7 +1787,7 @@ export const deleteOutcomeMock = ({
     data: {
       deleteOutcomeLinks: {
         __typename: 'DeleteOutcomeLinksPayload',
-        deletedOutcomeLinkIds: ids.filter((_, idx) => idx !== 0),
+        deletedOutcomeLinkIds: ids.filter((_id, idx) => idx !== 0),
         errors: [
           {
             attribute: ids[0],
@@ -1885,7 +1899,7 @@ export const moveOutcomeMock = ({
     data: {
       moveOutcomeLinks: {
         movedOutcomeLinks: outcomeLinkIds
-          .filter((_, idx) => idx !== 0)
+          .filter((_outcomeLinkId, idx) => idx !== 0)
           .map(idx => ({
             _id: idx,
             group: {
