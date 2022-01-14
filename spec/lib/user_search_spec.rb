@@ -36,6 +36,14 @@ describe UserSearch do
       TeacherEnrollment.create!(user: user, course: course, workflow_state: "active")
     end
 
+    describe "when excluding a group" do
+      it "does not include users in that group" do
+        group = Group.create! name: "test", context: course
+        group.add_user user
+        expect(UserSearch.for_user_in_context("admin", course, user, nil, exclude_groups: [group.id]).size).to eq 0
+      end
+    end
+
     describe "with complex search enabled" do
       before { Setting.set("user_search_with_full_complexity", "true") }
 
@@ -128,17 +136,28 @@ describe UserSearch do
           end
 
           describe "with the role name parameter" do
-            let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_role: "StudentEnrollment").to_a }
-
             before do
               newstudent = User.create!(name: "Tyler Student")
               StudentEnrollment.create!(user: newstudent, course: course, workflow_state: "active")
             end
 
-            it { should include("Rose Tyler") }
-            it { should include("Tyler Pickett") }
-            it { should include("Tyler Student") }
-            it { should_not include("Tyler Teacher") }
+            describe "when the context is a course" do
+              let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_role: "StudentEnrollment").to_a }
+
+              it { is_expected.to include("Rose Tyler") }
+              it { is_expected.to include("Tyler Pickett") }
+              it { is_expected.to include("Tyler Student") }
+              it { is_expected.not_to include("Tyler Teacher") }
+            end
+
+            describe "when the context is an account" do
+              let(:users) { UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_role: "StudentEnrollment").to_a }
+
+              it { is_expected.to include("Rose Tyler") }
+              it { is_expected.to include("Tyler Pickett") }
+              it { is_expected.to include("Tyler Student") }
+              it { is_expected.not_to include("Tyler Teacher") }
+            end
           end
 
           describe "with the role id parameter" do
