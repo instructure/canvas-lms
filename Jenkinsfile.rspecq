@@ -25,6 +25,8 @@ loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 def rspecqNodeTotal = 23
 @groovy.transform.Field
 def rspecNodeTotal = 27
+def startTime = 0
+def endTime = 0
 
 def setupNode() {
   sh 'rm -vrf ./tmp'
@@ -48,7 +50,7 @@ def computeTestCount() {
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
   env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
-  def totalPrediction = specUnique.join("\n")
+  def totalPrediction = specUnique.join('\n')
   def specCount = 0
 
   // Crystalball predictor returned empty text file
@@ -60,28 +62,28 @@ def computeTestCount() {
   if (specUnique.size() == 1 && specUnique[0] == '.') {
     sendCrystalballSlack('New File Detected! - Complete Suite Re-run!', 'danger')
     return
-  } else {
-    sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
-                                      --require './spec/formatters/example_count_formatter.rb' \
-                                      --format ExampleCountRecorder \
-                                      --out spec_count.txt ${specUnique.join(' ')}", label: 'Get Test Count')
-    specCount = sh(script: "docker-compose exec -T canvas cat spec_count.txt", returnStdout: true).trim().toInteger()
-    def summary = "$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
-    def color = 'danger'
-    if (specCount <= partition) {
-      color = 'good'
-    } else if (specCount <= (partition * 4)) {
-      color = 'warning'
-    }
-    sendCrystalballSlack(summary, color)
   }
+  sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
+                                    --require './spec/formatters/example_count_formatter.rb' \
+                                    --format ExampleCountRecorder \
+                                    --out spec_count.txt ${specUnique.join(' ')}", label: 'Get Test Count')
+  specCount = sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
+  def summary = "$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
+  def color = 'danger'
+  if (specCount <= partition) {
+    color = 'good'
+  } else if (specCount <= (partition * 4)) {
+    color = 'warning'
+  }
+  sendCrystalballSlack(summary, color)
+
   echo "total prediction: \n====\n$totalPrediction\n===="
 
   if (specCount <= partition) {
     rspecqNodeTotal = 1
     return
   }
-  rspecqNodeTotal = ((specCount+partition-1).intdiv(partition) > rspecqNodeTotal) ? rspecqNodeTotal : (specCount+partition-1).intdiv(partition)
+  rspecqNodeTotal = ((specCount + partition - 1).intdiv(partition) > rspecqNodeTotal) ? rspecqNodeTotal : (specCount + partition - 1).intdiv(partition)
 }
 
 def sendCrystalballSlack(summary, color) {
@@ -180,11 +182,13 @@ pipeline {
 
                 extendedStage('RSpecQ Reporter for Selenium').timeout(30).queue(rspecqStages) {
                   try {
+                    startTime = System.currentTimeMillis()
                     sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
                       --build=${JOB_NAME}_build${BUILD_NUMBER}_selenium \
                       --queue-wait-timeout 120 \
                       --redis-url $RSPECQ_REDIS_URL \
                       --report", label: 'Reporter')
+                      endTime = System.currentTimeMillis()
                   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
                     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                       /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
@@ -236,6 +240,19 @@ pipeline {
 
                 parallel(rspecqStages)
               } //rspecQ
+
+              stage('Splunk Metrics') {
+                def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+                                                    redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_selenium:example_count'", returnStdout: true)
+
+                reportToSplunk('selenium_crystalball_data', [
+                  'node_count': rspecqNodeTotal,
+                  'example_count': exampleCount,
+                  'execution_time': (endTime - startTime),
+                  'result': currentBuild.currentResult,
+                  'gerrit_revision': "${env.GERRIT_PATCHSET_REVISION}"
+                ])
+              }
             } //builder
           } //runner
         } //script
