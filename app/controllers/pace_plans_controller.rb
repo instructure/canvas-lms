@@ -146,6 +146,7 @@ class PacePlansController < ApplicationController
     end
 
     compressed_module_items = @pace_plan.compress_dates(save: false, start_date: start_date)
+                                        .sort_by { |ppmi| ppmi.module_item.position }
                                         .group_by { |ppmi| ppmi.module_item.context_module }
                                         .sort_by { |context_module, _items| context_module.position }
                                         .to_h.values.flatten
@@ -241,7 +242,6 @@ class PacePlansController < ApplicationController
   end
 
   def publish_pace_plan
-    @progress = Progress.create!(context: @pace_plan, tag: "pace_plan_publish")
-    @progress.process_job(@pace_plan, :publish, {})
+    @progress = @pace_plan.create_publish_progress(run_at: Time.now)
   end
 end
