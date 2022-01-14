@@ -219,6 +219,13 @@ describe "pace plan page" do
   end
 
   context "Pace Plan Menu" do
+    let(:pace_module_title) { "Pace Module" }
+    let(:module_assignment_title) { "Module Assignment 1" }
+
+    before :once do
+      create_published_pace_plan(pace_module_title, module_assignment_title)
+    end
+
     it "initially shows the Course Pace Plan in pace plan menu" do
       visit_pace_plans_page
 
@@ -226,16 +233,31 @@ describe "pace plan page" do
     end
 
     it "opens the pace plan menu and selects the student view when clicked" do
-      skip("LS-2857 this spec continues to flake out on the student click and will have to be looked at or removed")
       visit_pace_plans_page
-
       click_main_pace_plan_menu
       click_students_menu_item
-
-      wait_for(method: nil, timeout: 5) { student_pace_plan(@student.name).displayed? }
       click_student_pace_plan(@student.name)
 
       expect(pace_plan_menu_value).to eq(@student.name)
+    end
+
+    it "shows actual student assignment day and due dates" do
+      visit_pace_plans_page
+      click_main_pace_plan_menu
+      click_students_menu_item
+      click_student_pace_plan(@student.name)
+
+      expect(duration_readonly.text).to eq("2")
+    end
+
+    it "displays modal regarding unpublished changes when going to student view" do
+      visit_pace_plans_page
+      update_module_item_duration(3)
+      click_main_pace_plan_menu
+      click_students_menu_item
+      click_student_pace_plan(@student.name)
+
+      expect(unpublished_warning_modal).to be_displayed
     end
   end
 
