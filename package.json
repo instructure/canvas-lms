@@ -103,6 +103,7 @@
     "axios-cache-adapter": "^2.7.0",
     "backbone": "1.1.1",
     "big.js": "^5.0.3",
+    "browserslist": "^4.19.1",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
