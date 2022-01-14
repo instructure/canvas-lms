@@ -39,6 +39,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
+import {pacePlanTimezone} from '../../shared/api/backend_serializer'
 import {PacePlanItem, PacePlan, StoreState} from '../../types'
 import {BlackoutDate} from '../../shared/types'
 import {
@@ -110,7 +111,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-      timeZone: ENV.TIMEZONE || 'UTC'
+      timeZone: pacePlanTimezone
     })
   }
 
