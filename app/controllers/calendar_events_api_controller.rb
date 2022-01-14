@@ -1474,6 +1474,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def includes(keys = params[:include])
-    (Array(keys) + DEFAULT_INCLUDES).uniq
+    (Array(keys) + DEFAULT_INCLUDES).uniq - (params[:excludes] || [])
   end
 end
