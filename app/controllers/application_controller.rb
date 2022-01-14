@@ -185,6 +185,7 @@ class ApplicationController < ActionController::Base
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
+          current_user_global_id: @current_user&.global_id,
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_is_student: @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
@@ -209,8 +210,19 @@ class ApplicationController < ActionController::Base
             open_registration: @domain_root_account&.open_registration?,
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
-          },
+          }
         }
+
+        unless SentryExtensions::Settings.disabled? || SentryExtensions::Settings.settings.blank?
+          @js_env[:SENTRY_FRONTEND] = {
+            dsn: SentryExtensions::Settings.settings[:frontend_dsn],
+            error_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
+
+            # these values need to correlate with the backend for Sentry features to work properly
+            environment: Canvas.environment,
+            revision: Canvas.revision
+          }
+        end
 
         dynamic_settings_tree = DynamicSettings.find(tree: :private)
         if dynamic_settings_tree["api_gateway_enabled"] == "true"
