@@ -31,12 +31,49 @@ import {
   findOutcomesMocks,
   groupMocks,
   importGroupMocks,
-  importOutcomeMocks
+  importOutcomeMocks,
+  treeGroupMocks
 } from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
+import resolveProgress from '@canvas/progress/resolve_progress'
 
 jest.mock('@canvas/progress/resolve_progress')
 jest.useFakeTimers()
+
+const delayImportOutcomesProgress = () => {
+  let realResolve
+  resolveProgress.mockReturnValueOnce(
+    new Promise(resolve => {
+      realResolve = resolve
+    })
+  )
+
+  return realResolve
+}
+
+const defaultTreeGroupMocks = () =>
+  treeGroupMocks({
+    groupsStruct: {
+      100: [200],
+      200: [300],
+      300: [400, 401, 402]
+    },
+    detailsStructure: {
+      100: [1, 2, 3],
+      200: [1, 2, 3],
+      300: [1, 2, 3],
+      400: [1],
+      401: [2],
+      402: [3]
+    },
+    contextId: '1',
+    contextType: 'Course',
+    findOutcomesTargetGroupId: '0',
+    groupOutcomesNotImportedCount: {
+      200: 3,
+      300: 3
+    }
+  })
 
 describe('FindOutcomesModal', () => {
   let cache
@@ -68,6 +105,7 @@ describe('FindOutcomesModal', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+    resolveProgress.mockReset()
   })
 
   const render = (
@@ -524,24 +562,110 @@ describe('FindOutcomesModal', () => {
       })
 
       it('replaces Add buttons of individual outcomes with loading spinner during group import', async () => {
-        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [
-            ...courseImportMocks,
-            ...importGroupMocks({
-              groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
-        })
+        const doResolveProgress = delayImportOutcomesProgress()
+        const {getByText, getAllByText, queryByText} = render(
+          <FindOutcomesModal {...defaultProps()} />,
+          {
+            contextType: 'Course',
+            mocks: [
+              ...courseImportMocks,
+              ...importGroupMocks({
+                groupId: '300',
+                targetContextType: 'Course'
+              })
+            ]
+          }
+        )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         expect(getAllByText('Add').length).toBe(2)
         await clickEl(getByText('Add All Outcomes').closest('button'))
-        fireEvent.click(getByText('Import Anyway'))
+        await clickEl(getByText('Import Anyway'))
         expect(getAllByText('Loading').length).toBe(2)
+        await act(async () => doResolveProgress())
+        expect(queryByText('Loading')).not.toBeInTheDocument()
+        expect(getAllByText('Added').length).toBe(2)
+      })
+
+      it('replaces Add buttons of individual outcomes with loading spinner during group import or a parent group', async () => {
+        const doResolveProgress = delayImportOutcomesProgress()
+
+        const {getByText, getAllByText, queryByText} = render(
+          <FindOutcomesModal {...defaultProps()} />,
+          {
+            contextType: 'Course',
+            mocks: [
+              ...findModalMocks({parentAccountChildren: 1}),
+              ...defaultTreeGroupMocks(),
+              ...importGroupMocks({
+                groupId: '200',
+                targetContextType: 'Course'
+              })
+            ]
+          }
+        )
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 200'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+
+        // loading for outcome 1, 2, 3
+        expect(getAllByText('Loading').length).toBe(3)
+        await clickEl(getByText('Group 300'))
+        await clickEl(getByText('Group 400'))
+
+        // loading for outcome 1
+        expect(getAllByText('Loading').length).toBe(1)
+        await act(async () => doResolveProgress())
+        expect(queryByText('Loading')).not.toBeInTheDocument()
+        expect(getAllByText('Added').length).toBe(1)
+
+        // disables Add All Outcomes button for child groups
+        expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+        await clickEl(getByText('Group 200'))
+
+        // disables Add All Outcomes button for the group
+        expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+      })
+
+      it('loads localstorage.activeImports if present', async () => {
+        const doResolveProgress = delayImportOutcomesProgress()
+
+        localStorage.activeImports = JSON.stringify([
+          {
+            outcomeOrGroupId: '300',
+            isGroup: true,
+            groupTitle: 'Group 300',
+            progress: {_id: '111', state: 'queued', __typename: 'Progress'}
+          }
+        ])
+
+        const {getByText, getAllByText, queryByText} = render(
+          <FindOutcomesModal {...defaultProps()} />,
+          {
+            contextType: 'Course',
+            mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()]
+          }
+        )
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 200'))
+
+        // No loading since we've imported group 300
+        expect(queryByText('Loading')).not.toBeInTheDocument()
+
+        await clickEl(getByText('Group 300'))
+        // group 300 is loading. length 3 means outcome 1, 2, 3
+        expect(getAllByText('Loading').length).toBe(3)
+        await act(async () => doResolveProgress())
+        expect(queryByText('Loading')).not.toBeInTheDocument()
+        expect(getAllByText('Added').length).toBe(3)
+        // resets latestImport after progress is resolved
+        expect(localStorage.latestImport).toBeUndefined()
       })
 
       it('changes button text of individual outcomes from Add to Added after group import completes', async () => {
@@ -693,25 +817,68 @@ describe('FindOutcomesModal', () => {
     })
 
     describe('individual outcome import', () => {
+      it('loads localstorage.activeImports if present', async () => {
+        const doResolveProgress = delayImportOutcomesProgress()
+
+        localStorage.activeImports = JSON.stringify([
+          {
+            outcomeOrGroupId: '1',
+            isGroup: false,
+            progress: {_id: '111', state: 'queued', __typename: 'Progress'}
+          }
+        ])
+
+        const {getByText, queryByText, queryAllByText} = render(
+          <FindOutcomesModal {...defaultProps()} />,
+          {
+            contextType: 'Course',
+            mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()]
+          }
+        )
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 200'))
+        await clickEl(getByText('Group 300'))
+        await clickEl(getByText('Group 400'))
+
+        // No loading since we've imported group 300
+        expect(queryAllByText('Loading').length).toBe(1)
+
+        await act(async () => doResolveProgress())
+        expect(queryByText('Loading')).not.toBeInTheDocument()
+        expect(queryAllByText('Added').length).toBe(1)
+        // resets latestImport after progress is resolved
+        expect(localStorage.activeImports).toEqual('[]')
+        delete localStorage.activeImports
+      })
+
       it('replaces Add button of outcome with loading spinner during outcome import', async () => {
-        const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [
-            ...courseImportMocks,
-            ...importOutcomeMocks({
-              outcomeId: '5',
-              targetContextType: 'Course',
-              sourceContextId: '1',
-              sourceContextType: 'Account'
-            })
-          ]
-        })
+        const doResolveProgress = delayImportOutcomesProgress()
+
+        const {getByText, getAllByText, queryByText} = render(
+          <FindOutcomesModal {...defaultProps()} />,
+          {
+            contextType: 'Course',
+            mocks: [
+              ...courseImportMocks,
+              ...importOutcomeMocks({
+                outcomeId: '5',
+                targetContextType: 'Course',
+                sourceContextId: '1',
+                sourceContextType: 'Account'
+              })
+            ]
+          }
+        )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
-        fireEvent.click(getAllByText('Add')[0].closest('button'))
+        await clickEl(getAllByText('Add')[0].closest('button'))
         expect(getByText('Loading')).toBeInTheDocument()
+        await act(async () => doResolveProgress())
+        expect(queryByText('Loading')).not.toBeInTheDocument()
       })
 
       it('changes button text of outcome from Add to Added after outcome import completes', async () => {
