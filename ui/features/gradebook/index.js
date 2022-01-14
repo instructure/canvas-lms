@@ -35,11 +35,13 @@ ready(() => {
   const applyScoreToUngradedModalNode = document.querySelector(
     '[data-component="ApplyScoreToUngradedModal"]'
   )
+  const flashMessageContainer = document.getElementById('flash_message_holder')
 
   const props = {
     applyScoreToUngradedModalNode,
     currentUserId: ENV.current_user_id,
     locale: ENV.LOCALE,
+    flashMessageContainer,
     gradebookMenuNode,
     gridColorNode,
     filterNavNode,
