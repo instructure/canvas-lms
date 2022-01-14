@@ -44,27 +44,33 @@ def setupNode() {
 }
 
 def computeTestCount() {
-  def partition = (env.RSPEC_PROCESSES.toInteger() * 2)
+  def partition = (env.RSPEC_PROCESSES.toInteger() * 30) // 30 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
   env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
-  def specCount = specUnique.size()
   def totalPrediction = specUnique.join("\n")
+  def specCount = 0
 
-  if (specCount == 0) {
+  // Crystalball predictor returned empty text file
+  if (specUnique.size() == 0) {
     sendCrystalballSlack('No App Code Detected! - Running everything!', 'danger')
     return
   }
-  if (specCount == 1 && specUnique[0] == '.') {
+  // Crystalball predictor returned "."
+  if (specUnique.size() == 1 && specUnique[0] == '.') {
     sendCrystalballSlack('New File Detected! - Complete Suite Re-run!', 'danger')
     return
   } else {
-    def individualSpecs = specs.split(',').size()
-    def summary = "$individualSpecs Individual Selenium spec(s) across $specCount file(s)\n$totalPrediction"
+    sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
+                                      --require './spec/formatters/example_count_formatter.rb' \
+                                      --format ExampleCountRecorder \
+                                      --out spec_count.txt ${specUnique.join(' ')}", label: 'Get Test Count')
+    specCount = sh(script: "docker-compose exec -T canvas cat spec_count.txt", returnStdout: true).trim().toInteger()
+    def summary = "$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
     def color = 'danger'
-    if (specCount <= 10) {
+    if (specCount <= partition) {
       color = 'good'
-    } else if (specCount <= 25) {
+    } else if (specCount <= (partition * 4)) {
       color = 'warning'
     }
     sendCrystalballSlack(summary, color)
@@ -75,7 +81,7 @@ def computeTestCount() {
     rspecqNodeTotal = 1
     return
   }
-  rspecqNodeTotal = (specCount.intdiv(partition) > 25) ? 25 : specCount.intdiv(partition)
+  rspecqNodeTotal = ((specCount+partition-1).intdiv(partition) > rspecqNodeTotal) ? rspecqNodeTotal : (specCount+partition-1).intdiv(partition)
 }
 
 def sendCrystalballSlack(summary, color) {
