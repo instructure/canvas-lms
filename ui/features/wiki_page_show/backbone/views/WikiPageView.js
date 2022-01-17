@@ -135,6 +135,12 @@ export default class WikiPageView extends Backbone.View {
         })
     }
 
+    // Fixes issue when using anchors IDs scroll. Sometimes the browsers can't find the element
+    // due it is not loaded yet.
+    if (window.location?.hash !== '') {
+      window.location.href = window.location.hash
+    }
+
     // Adds class if a LTI iframe is embed in content
     const ltisEmbedded = $('.show-content iframe.lti-embed')
     if (ltisEmbedded.length > 0) {
