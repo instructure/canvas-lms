@@ -60,8 +60,14 @@ describe('Comment', () => {
 
   it('calls the onClick prop when the comment is clicked', () => {
     const {getByText} = render(<Comment {...defaultProps()} />)
-    fireEvent.click(getByText('My assignment comment'))
+    fireEvent.click(getByText('My assignment comment'), {detail: 1})
     expect(onClickMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call the onClick prop when the comment is double clicked', () => {
+    const {getByText} = render(<Comment {...defaultProps()} />)
+    fireEvent.click(getByText('My assignment comment'), {detail: 2})
+    expect(onClickMock).not.toHaveBeenCalled()
   })
 
   it('calls the onDelete prop when the trash icon is clicked', () => {
