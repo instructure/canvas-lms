@@ -28,6 +28,7 @@ const defaultProps = ({
   value = undefined,
   onCancel = jest.fn(),
   onSubmit = jest.fn(),
+  isEdit = false,
   updateDraft = jest.fn(),
   draftSaved = false,
   canReplyAnonymously = false,
@@ -36,6 +37,7 @@ const defaultProps = ({
   show,
   value,
   draftSaved,
+  isEdit,
   updateDraft,
   onCancel,
   onSubmit,
@@ -130,6 +132,19 @@ describe('DiscussionEdit', () => {
 
       it('should not render when cannot reply anonymously', () => {
         const container = setup(defaultProps({canReplyAnonymously: false}))
+        expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
+      })
+    })
+
+    describe('Editing a response', () => {
+      it('should not show anonymous response selector', () => {
+        const container = setup(
+          defaultProps({
+            canReplyAnonymously: true,
+            discussionAnonymousState: 'partial_anonymity',
+            isEdit: true
+          })
+        )
         expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
       })
     })
