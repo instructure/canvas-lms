@@ -283,4 +283,23 @@ testWebpackConfig.module.rules.unshift({
   loaders: ['imports-loader?test=>QUnit.test']
 })
 
+// override babel-loader until we stop using @instructure/ui-babel-preset for
+// test
+testWebpackConfig.module.rules = testWebpackConfig.module.rules.map(rule => {
+  if (rule.use && !Array.isArray(rule.use) && rule.use.loader === 'babel-loader') {
+    return Object.assign({}, rule, {
+      use: {
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+          configFile: true,
+        }
+      }
+    })
+  }
+  else {
+    return rule
+  }
+})
+
 module.exports = testWebpackConfig
