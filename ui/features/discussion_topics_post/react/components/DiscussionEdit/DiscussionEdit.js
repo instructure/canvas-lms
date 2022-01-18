@@ -124,7 +124,7 @@ export const DiscussionEdit = props => {
           <ReplyPreview {...props.quotedEntry} />
         </>
       )}
-      {props.discussionAnonymousState && props.canReplyAnonymously && (
+      {props.discussionAnonymousState && props.canReplyAnonymously && !props.isEdit && (
         <AnonymousResponseSelector
           username={ENV.current_user?.display_name}
           avatarUrl={ENV.current_user?.avatar_image_url}
