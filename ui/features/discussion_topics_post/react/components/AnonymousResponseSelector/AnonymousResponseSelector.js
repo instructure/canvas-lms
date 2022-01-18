@@ -114,7 +114,7 @@ export const AnonymousResponseSelector = props => {
           hasInverseColor
         />
       )}
-      <View margin="0 0 0 small">{replyAsOption()}</View>
+      <View margin="0 0 small small">{replyAsOption()}</View>
     </Flex>
   )
 }
