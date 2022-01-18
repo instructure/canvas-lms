@@ -864,7 +864,7 @@ describe DiscussionEntry do
     end
 
     it "returns You as anonymous author name" do
-      expect(anon_entry.author_name(user)).to eq "You"
+      expect(anon_entry.author_name(user)).to eq "John Doe"
     end
   end
 end
