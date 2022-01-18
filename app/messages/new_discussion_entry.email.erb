@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user} replied to %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name, :user => asset.user.short_name %>
+  <%= t :subject, "%{user} replied to %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name, :user => asset.author_name %>
 <% end %>
 
-<%= t :body, "%{user} replied to %{discussion_topic}, %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
+<%= t :body, "%{user} replied to %{discussion_topic}, %{course}:", :user => asset.author_name, :discussion_topic => asset.title, :course => asset.context.name %>
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
