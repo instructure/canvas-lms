@@ -32,6 +32,7 @@
     "message": "Gosod newidiadau i bob achos o’r Botymau a’r Eiconau hyn yn y Cwrs."
   },
   "apps_54d24a47": { "message": "Apiau" },
+  "arrows_464a3e54": { "message": "Saethau" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bydd y gymhareb agwedd yn cael ei chadw"
   },
@@ -49,6 +50,7 @@
     "message": "Mae cynnwys sydd wedi’i gadw’n awtomatig yn bodoli. Hoffech chi lwytho’r cynnwys sydd wedi’i gadw’n awtomatig?"
   },
   "available_folders_694d0436": { "message": "Ffolderi sydd ar gael" },
+  "basic_554cdc0a": { "message": "Sylfaenol" },
   "below_81d4dceb": { "message": "O dan" },
   "bottom_third_5f5fec1d": { "message": "Traean Isaf" },
   "button_color_608a0242": { "message": "Lliw’r Botwm" },
@@ -137,6 +139,7 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "rhestr ddiofyn o rifau sydd mewn trefn"
   },
+  "delimiters_4db4840d": { "message": "Amffinyddion" },
   "describe_the_image_e65d2e32": { "message": "(Disgrifio''r ddelwedd)" },
   "describe_the_video_2fe8f46a": { "message": "(Disgrifiwch y fideo)" },
   "details_98a31b68": { "message": "Manylion" },
@@ -144,6 +147,7 @@
   "dimension_type_55c83e4e": { "message": "Math o ddimensiwn" },
   "dimensions_45ddb7b7": { "message": "Dimensiynau" },
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
+  "directly_edit_latex_b7e9235b": { "message": "Golygu LaTeX yn Uniongyrchol" },
   "discussions_a5f96392": { "message": "Trafodaethau" },
   "discussions_index_6c36ced": { "message": "Mynegai Trafodaethau" },
   "display_options_315aba85": { "message": "Dangos Opsiynau" },
@@ -180,6 +184,7 @@
     "message": "Rhowch o leiaf 3 nod i chwilio"
   },
   "equation_1c5ac93c": { "message": "Hafaliad" },
+  "equation_editor_39fbc3f1": { "message": "Golygydd Hafaliadau" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Ehangu rhagolwg yn ddiofyn"
   },
@@ -219,6 +224,7 @@
     "message": "Ewch i far offer y golygydd"
   },
   "grades_a61eba0a": { "message": "Graddau" },
+  "greek_65c5b3f7": { "message": "Groeg" },
   "group_documents_8bfd6ae6": { "message": "Dogfennau Grŵp" },
   "group_files_4324f3df": { "message": "Ffeiliau Grŵp" },
   "group_files_82e5dcdb": { "message": "Ffeiliau grŵp" },
@@ -280,6 +286,7 @@
   "media_af190855": { "message": "Cyfryngau" },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
   "middle_27dc1d5": { "message": "Canol" },
+  "misc_3b692ea7": { "message": "Amrywiol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
   "modules_c4325335": { "message": "Modiwlau" },
   "multi_color_image_63d7372f": { "message": "Delwedd mwy nag un lliw" },
@@ -314,6 +321,7 @@
     "message": "Agor y ddeialog bysellau hwylus"
   },
   "open_title_application_fd624fc5": { "message": "Agor rhaglen { title }" },
+  "operators_a2ef9a93": { "message": "Gweithredyddion" },
   "options_3ab0ea65": { "message": "Opsiynau" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Rhestrau Mewn Trefn a Rhestrau Ddim Mewn Trefn"
@@ -351,6 +359,7 @@
   "record_upload_media_5fdce166": {
     "message": "Recordio Cyfryngau/Llwytho Cyfryngau i Fyny"
   },
+  "relationships_6602af70": { "message": "Perthynas" },
   "remove_link_d1f2f4d0": { "message": "Tynnu Dolen" },
   "resize_ec83d538": { "message": "Ailfeintio" },
   "restore_auto_save_deccd84b": { "message": "Adfer cadw’n awtomatig?" },
