@@ -369,6 +369,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       end
 
       guard_against_big_fields do
+        @question.create_assessment_question if @question.assessment_question.nil? && !@question.generated?
         @question.question_data = question_data
         @question.save
         @quiz.did_edit if @quiz.created?
