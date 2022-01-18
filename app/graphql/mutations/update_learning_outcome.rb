@@ -19,8 +19,9 @@
 #
 
 class Mutations::UpdateLearningOutcome < Mutations::BaseLearningOutcomeMutation
-  graphql_name "UpdateLearningOutcome"
+  include OutcomesFeaturesHelper
 
+  graphql_name "UpdateLearningOutcome"
   argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
 
   def resolve(input:)
@@ -29,6 +30,11 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseLearningOutcomeMutation
     validate!(record, input[:id])
 
     outcome_input = attrs(input, record.context)
+
+    if individual_outcome_rating_and_calculation_enabled?(record.context)
+      update_rubric_criterion(record, outcome_input)
+      outcome_input.delete(:rubric_criterion)
+    end
 
     if record.update(outcome_input)
       { learning_outcome: record }
@@ -47,5 +53,24 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseLearningOutcomeMutation
 
   def check_permission(outcome)
     outcome.grants_right? current_user, :update
+  end
+
+  def update_rubric_criterion(outcome, input)
+    return unless input[:rubric_criterion]
+
+    mastery_points = input[:rubric_criterion][:mastery_points]
+    ratings = input[:rubric_criterion][:ratings]
+    updated_criterion = outcome.rubric_criterion
+    updated_criterion ||= {}
+
+    if mastery_points
+      updated_criterion[:mastery_points] = mastery_points
+    else
+      updated_criterion.delete(:mastery_points)
+    end
+
+    updated_criterion[:ratings] = ratings if ratings
+
+    outcome.rubric_criterion = updated_criterion
   end
 end

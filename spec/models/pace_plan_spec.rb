@@ -31,7 +31,6 @@ describe PacePlan do
     @pace_plan_module_item = @pace_plan.pace_plan_module_items.create! module_item: @tag
     @unpublished_assignment = @course.assignments.create! workflow_state: "unpublished"
     @unpublished_tag = @unpublished_assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module", workflow_state: "unpublished"
-    @pace_plan.pace_plan_module_items.create! module_item: @unpublished_tag
   end
 
   context "associations" do
@@ -194,7 +193,7 @@ describe PacePlan do
       @pace_plan_module_item.update duration: 2
       @pace_plan.publish
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-02").end_of_day)
+      expect(assignment_override.due_at).to eq(Date.parse("2021-09-03").end_of_day)
     end
 
     it "updates user overrides that are already present if the days have changed" do
@@ -205,7 +204,7 @@ describe PacePlan do
       @pace_plan.publish
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-02").end_of_day)
+      expect(assignment_override.due_at).to eq(Date.parse("2021-09-03").end_of_day)
       expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
     end
 
@@ -217,7 +216,7 @@ describe PacePlan do
       @pace_plan.publish
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-02").end_of_day)
+      expect(assignment_override.due_at).to eq(Date.parse("2021-09-03").end_of_day)
       expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
     end
 
@@ -250,7 +249,7 @@ describe PacePlan do
       expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").end_of_day)
       # Publish student specific pace plan and verify dates have changed
       student_pace_plan = @course.pace_plans.create! user: @student, workflow_state: "active"
-      @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-05")
+      @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-06")
       student_pace_plan.pace_plan_module_items.create! module_item: @tag
       expect(student_pace_plan.publish).to eq(true)
       assignment_override.reload
@@ -268,7 +267,7 @@ describe PacePlan do
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").end_of_day)
       # Publish course section specific pace plan and verify dates have changed
-      @course_section.update(start_at: "2021-09-05")
+      @course_section.update(start_at: "2021-09-06")
       section_pace_plan = @course.pace_plans.create! course_section: @course_section, workflow_state: "active"
       section_pace_plan.pace_plan_module_items.create! module_item: @tag
       expect(section_pace_plan.publish).to eq(true)
@@ -288,7 +287,7 @@ describe PacePlan do
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").end_of_day)
       # Publish student specific pace plan and verify dates have changed
-      @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-05")
+      @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-06")
       student_pace_plan = @course.pace_plans.create! user: @student, workflow_state: "active"
       student_pace_plan.pace_plan_module_items.create! module_item: @tag
       expect(student_pace_plan.publish).to eq(true)

@@ -29,8 +29,8 @@ describe InstFS do
 
     before do
       allow(InstFS).to receive(:enabled?).and_return(true)
-      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find)
+      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+      allow(DynamicSettings).to receive(:find)
         .with(service: "inst-fs", default_ttl: 5.minutes)
         .and_return(settings_hash)
     end
@@ -560,8 +560,8 @@ describe InstFS do
 
   context "settings not set" do
     before do
-      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs")
+      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+      allow(DynamicSettings).to receive(:find).with(service: "inst-fs")
                                                       .and_return({
                                                                     "app-host" => nil,
                                                                     "secret" => nil

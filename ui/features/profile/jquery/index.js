@@ -39,7 +39,7 @@ const $profile_table = $('.profile_table'),
   $default_email_id = $('#default_email_id'),
   profile_pics_url = '/api/v1/users/self/avatars'
 
-$edit_settings_link.click(function(event) {
+$edit_settings_link.click(function (event) {
   $(this).hide()
   $profile_table
     .addClass('editing')
@@ -66,21 +66,12 @@ $profile_table.find('.cancel_button').click(event => {
 
 $profile_table
   .find('#change_password_checkbox')
-  .change(function(event) {
+  .change(function (event) {
     if (!$(this).attr('checked')) {
-      $profile_table
-        .find('.change_password_row')
-        .hide()
-        .find(':password')
-        .val('')
+      $profile_table.find('.change_password_row').hide().find(':password').val('')
     } else {
       $(this).addClass('showing')
-      $profile_table
-        .find('.change_password_row')
-        .show()
-        .find('#old_password')
-        .focus()
-        .select()
+      $profile_table.find('.change_password_row').show().find('#old_password').focus().select()
     }
   })
   .attr('checked', false)
@@ -93,7 +84,7 @@ $update_profile_form
     required: $update_profile_form.find('#user_name').length ? ['name'] : [],
     object_name: 'user',
     property_validations: {
-      '=default_email_id': function(val, data) {
+      '=default_email_id': function (val, data) {
         if ($('#default_email_id').length && (!val || val == 'new')) {
           return I18n.t('please_select_an_option', 'Please select an option')
         }
@@ -128,9 +119,7 @@ $update_profile_form
     },
     error(errors) {
       if (errors.password) {
-        const pseudonymId = $(this)
-          .find('#profile_pseudonym_id')
-          .val()
+        const pseudonymId = $(this).find('#profile_pseudonym_id').val()
         errors = Pseudonym.prototype.normalizeErrors(
           errors,
           ENV.PASSWORD_POLICIES[pseudonymId] || ENV.PASSWORD_POLICY
@@ -147,21 +136,18 @@ $update_profile_form
     return false
   })
 
-$('#default_email_id').change(function() {
+$('#default_email_id').change(function () {
   if ($(this).val() == 'new') {
     $('.add_email_link:first').click()
   }
 })
 
-$('#unregistered_services li.service').click(function(event) {
+$('#unregistered_services li.service').click(function (event) {
   event.preventDefault()
   $('#' + $(this).attr('id') + '_dialog').dialog({
     width: 350,
     open() {
-      $(this)
-        .dialog('widget')
-        .find('a')
-        .focus()
+      $(this).dialog('widget').find('a').focus()
     }
   })
 })
@@ -171,10 +157,7 @@ $('.create_user_service_form').formSubmit({
     $(this).loadingImage()
   },
   success(data) {
-    $(this)
-      .loadingImage('remove')
-      .parents('.content')
-      .dialog('close')
+    $(this).loadingImage('remove').parents('.content').dialog('close')
     document.location.reload()
   },
   error(data) {
@@ -188,12 +171,10 @@ $('.create_user_service_form').formSubmit({
       )
   }
 })
-$('#unregistered_services li.service .content form .cancel_button').click(function(event) {
-  $(this)
-    .parents('.content')
-    .dialog('close')
+$('#unregistered_services li.service .content form .cancel_button').click(function (event) {
+  $(this).parents('.content').dialog('close')
 })
-$('#registered_services li.service .delete_service_link').click(function(event) {
+$('#registered_services li.service .delete_service_link').click(function (event) {
   event.preventDefault()
   $(this)
     .parents('li.service')
@@ -204,7 +185,7 @@ $('#registered_services li.service .delete_service_link').click(function(event) 
       ),
       url: $(this).attr('href'),
       success(data) {
-        $(this).slideUp(function() {
+        $(this).slideUp(function () {
           $('#unregistered_services')
             .find('#unregistered_' + $(this).attr('id'))
             .slideDown()
@@ -213,14 +194,14 @@ $('#registered_services li.service .delete_service_link').click(function(event) 
     })
 })
 $('.service').hover(
-  function() {
+  function () {
     $(this).addClass('service-hover')
   },
-  function() {
+  function () {
     $(this).removeClass('service-hover')
   }
 )
-$('#show_user_services').change(function() {
+$('#show_user_services').change(function () {
   $.ajaxJSON(
     $('#update_profile_form').attr('action'),
     'PUT',
@@ -229,7 +210,7 @@ $('#show_user_services').change(function() {
     data => {}
   )
 })
-$('#disable_inbox').change(function() {
+$('#disable_inbox').change(function () {
   $.ajaxJSON(
     '/profile/toggle_disable_inbox',
     'POST',
@@ -238,7 +219,7 @@ $('#disable_inbox').change(function() {
     data => {}
   )
 })
-$('.delete_pseudonym_link').click(function(event) {
+$('.delete_pseudonym_link').click(function (event) {
   event.preventDefault()
   $(this)
     .parents('.pseudonym')
@@ -248,13 +229,10 @@ $('.delete_pseudonym_link').click(function(event) {
     })
 })
 $('.datetime_field').datetime_field()
-$('.expires_field').bind('change keyup', function() {
-  $(this)
-    .closest('td')
-    .find('.hint')
-    .showIf(!$(this).val())
+$('.expires_field').bind('change keyup', function () {
+  $(this).closest('td').find('.hint').showIf(!$(this).val())
 })
-$('.delete_key_link').click(function(event) {
+$('.delete_key_link').click(function (event) {
   event.preventDefault()
   const $key_row = $(this).closest('.access_token')
   let $focus_row = $key_row.prevAll(':not(.blank)').first()
@@ -306,11 +284,10 @@ $('#access_token_form').formSubmit({
     $('#add_access_token_dialog').dialog('close')
     $('#no_approved_integrations').hide()
     $('#access_tokens_holder').show()
-    const $token = $('.access_token.blank:first')
-      .clone(true)
-      .removeClass('blank')
+    const $token = $('.access_token.blank:first').clone(true).removeClass('blank')
     data.created = $.datetimeString(data.created_at) || '--'
-    data.expires = $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+    data.expires =
+      $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
     data.used = '--'
     $token.fillTemplateData({
       data,
@@ -328,7 +305,7 @@ $('#access_token_form').formSubmit({
       .text(I18n.t('errors.generating_token_failed', 'Generating Token Failed'))
   }
 })
-$('#token_details_dialog .regenerate_token').click(function() {
+$('#token_details_dialog .regenerate_token').click(function () {
   const result = confirm(
     I18n.t(
       'confirms.regenerate_token',
@@ -350,7 +327,8 @@ $('#token_details_dialog .regenerate_token').click(function() {
     {'access_token[regenerate]': '1'},
     data => {
       data.created = $.datetimeString(data.created_at) || '--'
-      data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
+      data.expires =
+        $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
       data.used = $.datetimeString(data.last_used_at) || '--'
       data.visible_token = data.visible_token || 'protected'
       $dialog
@@ -367,7 +345,7 @@ $('#token_details_dialog .regenerate_token').click(function() {
     }
   )
 })
-$('.show_token_link').click(function(event) {
+$('.show_token_link').click(function (event) {
   event.preventDefault()
   const $dialog = $('#token_details_dialog')
   const url = $(this).attr('rel')
@@ -376,12 +354,7 @@ $('.show_token_link').click(function(event) {
   })
   const $token = $(this).parents('.access_token')
   $dialog.data('token', $token)
-  $dialog
-    .find('.loading_message')
-    .show()
-    .end()
-    .find('.results,.error_loading_message')
-    .hide()
+  $dialog.find('.loading_message').show().end().find('.results,.error_loading_message').hide()
   function tokenLoaded(token) {
     $dialog.fillTemplateData({data: token})
     $dialog.data('token_url', url)
@@ -412,24 +385,20 @@ $('.show_token_link').click(function(event) {
       {},
       data => {
         data.created = $.datetimeString(data.created_at) || '--'
-        data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
+        data.expires =
+          $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
         data.used = $.datetimeString(data.last_used_at) || '--'
         data.visible_token = data.visible_token || 'protected'
         $token.data('token', data)
         tokenLoaded(data)
       },
       () => {
-        $dialog
-          .find('.error_loading_message')
-          .show()
-          .end()
-          .find('.results,.loading_message')
-          .hide()
+        $dialog.find('.error_loading_message').show().end().find('.results,.loading_message').hide()
       }
     )
   }
 })
-$('.add_access_token_link').click(function(event) {
+$('.add_access_token_link').click(function (event) {
   event.preventDefault()
   $('#access_token_form')
     .find('button')
@@ -443,9 +412,7 @@ $('.add_access_token_link').click(function(event) {
     .dialog({
       width: 500,
       open() {
-        $(this)
-          .closest('.ui-dialog')
-          .focus()
+        $(this).closest('.ui-dialog').focus()
       }
     })
     .fixDialogButtons()
@@ -464,7 +431,7 @@ $(document)
 
 new AvatarWidget('.profile_pic_link')
 
-$('#disable_mfa_link').click(function(event) {
+$('#disable_mfa_link').click(function (event) {
   const $disable_mfa_link = $(this)
   $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', {}, () => {
     $.flashMessage(I18n.t('notices.mfa_disabled', 'Multi-factor authentication disabled'))

@@ -47,9 +47,9 @@ function updateSubmission(courseId, assignmentId, userId, submission) {
   return axios.put(url, {submission: underscore(submission), include: ['visibility']})
 }
 
-function saveUserSettings(courseId, settings) {
+function saveUserSettings(courseId, gradebook_settings) {
   const url = `/api/v1/courses/${courseId}/gradebook_settings`
-  return axios.put(url, {gradebook_settings: settings})
+  return axios.put(url, {gradebook_settings})
 }
 
 function updateColumnOrder(courseId, columnOrder) {

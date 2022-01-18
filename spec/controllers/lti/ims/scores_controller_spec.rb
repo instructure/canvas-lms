@@ -718,6 +718,52 @@ module Lti::IMS
           end
         end
 
+        context "when the assignment is pass-fail" do
+          before { assignment.update! grading_type: :pass_fail }
+
+          {
+            { points_possible: 0, score_max: 0, score_given: 0 } => { score: 0, grade: "incomplete" },
+            { points_possible: 0, score_max: 0, score_given: 2 } => { score: 0, grade: "complete" },
+            { points_possible: 0, score_max: 4, score_given: 0 } => { score: 0, grade: "incomplete" },
+            { points_possible: 0, score_max: 4, score_given: 2 } => { score: 0, grade: "complete" },
+            { points_possible: 6, score_max: 0, score_given: 0 } => :error,
+            { points_possible: 6, score_max: 0, score_given: 2 } => :error,
+            { points_possible: 6, score_max: 4, score_given: 0 } => { score: 0, grade: "incomplete" },
+            { points_possible: 6, score_max: 4, score_given: 2 } => { score: 6, grade: "complete" },
+          }.each do |conditions, expected|
+            context "with assignment points_possible #{conditions[:points_possible]}, AGS " \
+                    "maxScore #{conditions[:score_max]}, AGS givenScore #{conditions[:score_given]}" do
+              before do
+                line_item.update! score_maximum: conditions[:points_possible]
+                assignment.update! points_possible: conditions[:points_possible]
+              end
+
+              let(:params_overrides) do
+                super().merge(
+                  scoreGiven: conditions[:score_given], scoreMaximum: conditions[:score_max]
+                )
+              end
+
+              if expected == :error
+                it "errors" do
+                  result
+                  send_request
+                  expect(response.status.to_i).to eq(422)
+                end
+              else
+                it "sets score=#{expected[:score]} and grade=#{expected[:grade]} on the grade" do
+                  result
+                  send_request
+                  expect(response.status.to_i).to eq(200)
+                  result.reload
+                  expect(result.reload.submission.reload.score).to eq(expected[:score])
+                  expect(result.submission.grade).to eq(expected[:grade])
+                end
+              end
+            end
+          end
+        end
+
         context "with online_url" do
           let(:params_overrides) do
             super().merge(

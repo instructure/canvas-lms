@@ -50,9 +50,9 @@ export default class Header extends React.Component {
               linkRef={this.setLinkRef}
             >
               <ScreenReaderContent>{I18n.t('Link to lti tools.')}</ScreenReaderContent>
+              {I18n.t('See some LTI tools that work great with Canvas.')}
             </Link>
             &nbsp;
-            {I18n.t('See some LTI tools that work great with Canvas.')}
           </p>
         </div>
       </div>

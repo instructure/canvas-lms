@@ -113,6 +113,8 @@
         <a href="<%= context_url(@context, controller:'lti/lti_apps', action:'launch_definitions', :placements => lti_app_placements, :per_page => '100') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
         <input type="hidden" name="custom_params" id="external_tool_create_custom_params" />
         <input type="hidden" name="assignment_id" id="external_tool_create_assignment_id" />
+        <input type="hidden" name="iframe_width" id="external_tool_create_iframe_width"/>
+        <input type="hidden" name="iframe_height" id="external_tool_create_iframe_height"/>
         <table>
           <tr>
             <td colspan="2">

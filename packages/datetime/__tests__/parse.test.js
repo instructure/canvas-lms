@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '../'
-import { configure } from '../'
+import moment from 'moment-timezone'
 import timezone from 'timezone'
-import { moonwalk, epoch, equal, setup } from './helpers'
+import * as tz from '..'
+import {moonwalk, equal, setup} from './helpers'
 
 setup(this)
 
@@ -37,6 +37,15 @@ test('parse(Date object)', () => {
 
 test('parse(date array)', () => {
   equal(+tz.parse([1969, 7, 21, 2, 56]), +moonwalk)
+})
+
+test('parse(datetime string with timezone)', () => {
+  moment.tz.setDefault('America/New_York')
+  // same tz as the default, so it doesn't get fudged
+  equal(tz.parse('November 11, 1955', 'America/New_York').toISOString(), '1955-11-11T05:00:00.000Z') // -5
+  // different tz, so gets fudged to midnight.
+  equal(tz.parse('November 11, 1955', 'Asia/Kamchatka').toISOString(), '1955-11-11T00:00:00.000Z') // +12
+  equal(tz.parse('November 11, 1955', 'Pacific/Honolulu').toISOString(), '1955-11-11T00:00:00.000Z') // -10
 })
 
 test('parse() should return null on failure', () => equal(tz.parse('bogus'), null))

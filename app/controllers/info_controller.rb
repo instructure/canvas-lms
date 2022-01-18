@@ -70,8 +70,12 @@ class InfoController < ApplicationController
     # javascript/css build process didn't die, right?
     asset_urls = {
       common_css: css_url_for("common"), # ensures brandable_css_bundles_with_deps exists
-      common_js: ActionController::Base.helpers.javascript_url("#{js_base_url}/common"), # ensures webpack worked
-      revved_url: Canvas::Cdn::RevManifest.gulp_manifest.values.first # makes sure `gulp rev` has ran
+      common_js: ActionController::Base.helpers.javascript_path(
+        Canvas::Cdn.registry.scripts_for("main").first
+      ),
+      revved_url: ActionController::Base.helpers.font_path(
+        "/fonts/lato/extended/Lato-Regular.woff2"
+      )
     }
 
     respond_to do |format|
@@ -179,9 +183,7 @@ class InfoController < ApplicationController
       # ensures brandable_css_bundles_with_deps exists, returns a string (path), treated as truthy
       common_css: check.call { css_url_for("common") },
       # ensures webpack worked; returns a string, treated as truthy
-      common_js: check.call do
-        ActionController::Base.helpers.javascript_url("#{js_base_url}/common")
-      end,
+      common_js: check.call { Canvas::Cdn.registry.scripts_available? },
       # returns a PrefixProxy instance, treated as truthy
       consul: check.call { DynamicSettings.find(tree: :private)[:readiness].nil? },
       # returns the value of the block <integer>, treated as truthy
@@ -195,7 +197,7 @@ class InfoController < ApplicationController
       # nil response treated as truthy
       ha_cache: check.call { MultiCache.cache.fetch("readiness").nil? },
       # ensures `gulp rev` has ran; returns a string, treated as truthy
-      rev_manifest: check.call { Canvas::Cdn::RevManifest.gulp_manifest.values.first },
+      rev_manifest: check.call { Canvas::Cdn.registry.statics_available? },
       # ensures we retrieved something back from Vault; returns a boolean
       vault: check.call { !Canvas::Vault.read("#{Canvas::Vault.kv_mount}/data/secrets").nil? }
     }

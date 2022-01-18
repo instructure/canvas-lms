@@ -148,7 +148,6 @@ class DueDateCacher
                                    else
                                      Set.new
                                    end
-
     @user_ids = Array(user_ids)
     @update_grades = update_grades
     @original_caller = original_caller

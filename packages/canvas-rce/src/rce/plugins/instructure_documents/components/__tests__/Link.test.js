@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import formatMessage from '../../../../../format-message'
 import Link from '../Link'
 
 function renderComponent(props) {
@@ -46,10 +45,26 @@ function queryIconByName(elem, name) {
 }
 
 describe('RCE "Documents" Plugin > Document', () => {
+  beforeAll(() => {
+    ENV = {
+      // 	UTC/GMT -7 hours
+      TIMEZONE: 'America/Denver'
+    }
+  })
+
   describe('renders', () => {
     it('the date', () => {
       const value = '2019-04-24T13:00:00Z'
-      const formattedValue = formatMessage.date(Date.parse(value), 'long')
+      const formattedValue = 'April 24, 2019'
+
+      const {getByText} = renderComponent({date: value})
+
+      expect(getByText(formattedValue)).toBeInTheDocument()
+    })
+
+    it('the date that change by timezone', () => {
+      const value = '2019-04-24T01:00:00Z'
+      const formattedValue = 'April 23, 2019'
 
       const {getByText} = renderComponent({date: value})
 

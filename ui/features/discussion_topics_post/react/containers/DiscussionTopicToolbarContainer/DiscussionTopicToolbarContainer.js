@@ -74,6 +74,7 @@ export const DiscussionTopicToolbarContainer = props => {
         onTopClick={() => {}}
         searchTerm={currentSearchValue}
         discussionAnonymousState={props.discussionTopic.anonymousState}
+        canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
       />
     </View>
   )

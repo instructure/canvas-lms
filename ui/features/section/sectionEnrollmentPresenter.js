@@ -30,42 +30,42 @@ import toUnderscore from './str-underscore'
 const keys = {
   limited: {
     get TeacherEnrollment() {
-      return I18n.t('enrolled_as_limited_teacher', 'enrolled as a teacher with section-only access')
+      return I18n.t('enrolled_as_limited_teacher', 'enrolled as: Teacher with section-only access')
     },
     get TaEnrollment() {
-      return I18n.t('enrolled_as_limited_ta', 'enrolled as a TA with section-only access')
+      return I18n.t('enrolled_as_limited_ta', 'enrolled as: TA with section-only access')
     },
     get ObserverEnrollment() {
       return I18n.t(
         'enrolled_as_limited_observer',
-        'enrolled as a observer with section-only access'
+        'enrolled as: Observer with section-only access'
       )
     },
     get DesignerEnrollment() {
       return I18n.t(
         'enrolled_as_limited_designer',
-        'enrolled as a designer with section-only access'
+        'enrolled as: Designer with section-only access'
       )
     },
     get StudentEnrollment() {
-      return I18n.t('enrolled_as_limited_student', 'enrolled as a student with section-only access')
+      return I18n.t('enrolled_as_limited_student', 'enrolled as: Student with section-only access')
     }
   },
   standard: {
     get TeacherEnrollment() {
-      return I18n.t('enrolled_as_teacher', 'enrolled as a teacher')
+      return I18n.t('enrolled_as_teacher', 'enrolled as: Teacher')
     },
     get TaEnrollment() {
-      return I18n.t('enrolled_as_ta', 'enrolled as a TA')
+      return I18n.t('enrolled_as_ta', 'enrolled as: TA')
     },
     get ObserverEnrollment() {
-      return I18n.t('enrolled_as_observer', 'enrolled as a observer')
+      return I18n.t('enrolled_as_observer', 'enrolled as: Observer')
     },
     get DesignerEnrollment() {
-      return I18n.t('enrolled_as_designer', 'enrolled as a designer')
+      return I18n.t('enrolled_as_designer', 'enrolled as: Designer')
     },
     get StudentEnrollment() {
-      return I18n.t('enrolled_as_student', 'enrolled as a student')
+      return I18n.t('enrolled_as_student', 'enrolled as: Student')
     }
   }
 }
@@ -76,9 +76,16 @@ const keys = {
 export default data =>
   _.map(data, enrollment => {
     const scope = enrollment.limit_privileges_to_course_section ? 'limited' : 'standard'
+    const customLimited = I18n.t('enrolled as: %{enrollment_type} with section-only access', {
+      enrollment_type: `${enrollment.role}`
+    })
+    const customStandard = I18n.t('enrolled as: %{enrollment_type}', {
+      enrollment_type: `${enrollment.role}`
+    })
+    const customLabel = scope === 'limited' ? customLimited : customStandard
 
     // add extra fields to enrollments
-    enrollment.typeLabel = keys[scope][enrollment.type]
+    enrollment.typeLabel = keys[scope][enrollment.role] || customLabel
     enrollment.typeClass = toUnderscore(enrollment.type)
 
     return enrollment

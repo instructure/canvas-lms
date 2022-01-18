@@ -101,6 +101,9 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Tem certeza de que deseja excluir este item do planejador?"
     },
+    "arrows_464a3e54": {
+        "message": "Setas"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Proporção do aspecto será preservado"
     },
@@ -160,6 +163,9 @@
     },
     "available_folders_694d0436": {
         "message": "Pastas disponíveis"
+    },
+    "basic_554cdc0a": {
+        "message": "Básico"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Começo do seu histórico de tarefas"
@@ -377,6 +383,9 @@
     "delete_a6efa79d": {
         "message": "Excluir"
     },
+    "delimiters_4db4840d": {
+        "message": "Delimitadores"
+    },
     "describe_the_image_e65d2e32": {
         "message": "(Descreva a imagem)"
     },
@@ -400,6 +409,9 @@
     },
     "directionality_26ae9e08": {
         "message": "Direcionalidade"
+    },
+    "directly_edit_latex_b7e9235b": {
+        "message": "Editar diretamente LaTeX"
     },
     "discussion_6719c51d": {
         "message": "Fórum"
@@ -502,6 +514,9 @@
     },
     "equation_1c5ac93c": {
         "message": "Equação"
+    },
+    "equation_editor_39fbc3f1": {
+        "message": "Editor de equação"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Erro ao carregar notas"
@@ -634,6 +649,9 @@
     },
     "grades_loaded_5056277c": {
         "message": "Notas carregadas"
+    },
+    "greek_65c5b3f7": {
+        "message": "Grego"
     },
     "group_documents_8bfd6ae6": {
         "message": "Agrupar documentos"
@@ -842,6 +860,9 @@
     "middle_27dc1d5": {
         "message": "Meio"
     },
+    "misc_3b692ea7": {
+        "message": "Diversos"
+    },
     "miscellaneous_e9818229": {
         "message": "Diversos"
     },
@@ -962,6 +983,9 @@
     "open_title_application_fd624fc5": {
         "message": "Abrir o aplicativo { title }"
     },
+    "operators_a2ef9a93": {
+        "message": "Operadores"
+    },
     "opportunities_popup_f6703842": {
         "message": "pop-up de oportunidades"
     },
@@ -1069,6 +1093,9 @@
     },
     "redo_363c58b7": {
         "message": "Refazer"
+    },
+    "relationships_6602af70": {
+        "message": "Relacionamentos"
     },
     "reminder_date_4564d12d": {
         "message": "Lembrete: { date }"

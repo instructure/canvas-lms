@@ -24,9 +24,18 @@ class GradebookFilter < ApplicationRecord
 
   validates :user_id, :course_id, :payload, presence: true
   validates :name, length: { maximum: maximum_string_length }, allow_blank: false, presence: true
+  validate :payload_is_hash
 
   set_policy do
     given { |u| u.id == user_id }
     can :read and can :update and can :destroy
+  end
+
+  private
+
+  def payload_is_hash
+    if !payload.nil? && !payload.is_a?(Hash)
+      errors.add(:payload, "must be a hash")
+    end
   end
 end

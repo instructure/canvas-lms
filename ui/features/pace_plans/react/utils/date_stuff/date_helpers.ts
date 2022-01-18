@@ -43,9 +43,9 @@ export const adjustDateOnSkipWeekends = (rawDate: string): string => {
   return formatDate(date)
 }
 
-// Takes a date string and formats it in YYYY-MM-DD format
+// Takes a date string and formats it in iso8601 in the pace plan timezone
 export const formatDate = (date: string | moment.Moment): string => {
-  return moment(date).format('YYYY-MM-DD')
+  return moment(date).toISOString(true)
 }
 
 // Calculates the days between the start and end dates.

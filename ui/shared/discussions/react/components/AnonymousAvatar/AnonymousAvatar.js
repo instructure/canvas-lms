@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CURRENT_USER} from '../../utils/constants'
 import Identicon from 'react-identicons'
 import React from 'react'
 import {string} from 'prop-types'
@@ -24,9 +23,12 @@ import {string} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-export const AnonymousAvatar = ({seedString, size}) => {
+const CURRENT_USER = 'current_user'
+
+export const AnonymousAvatar = ({seedString, size, addFocus}) => {
   return (
     <View
+      tabIndex={addFocus}
       display="inline-block"
       textAlign="center"
       borderRadius="circle"
@@ -35,7 +37,6 @@ export const AnonymousAvatar = ({seedString, size}) => {
       height={size === 'medium' ? '50px' : '20px'}
       data-testid="anonymous_avatar"
       background={seedString === CURRENT_USER ? 'primary-inverse' : undefined}
-      borderColor={seedString === CURRENT_USER ? 'info' : 'primary'}
     >
       <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
         <Flex.Item margin="xx-small 0 0 0">
@@ -52,9 +53,11 @@ export const AnonymousAvatar = ({seedString, size}) => {
 
 AnonymousAvatar.propTypes = {
   seedString: string,
+  addFocus: string,
   size: string
 }
 
 AnonymousAvatar.defaultProps = {
-  size: 'medium'
+  size: 'medium',
+  addFocus: null
 }

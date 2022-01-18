@@ -72,4 +72,16 @@ describe('GridColor', () => {
     ].join('')
     expect(node.innerHTML).toContain(styleText)
   })
+
+  describe('FlashAlert', () => {
+    it('renders flash alerts if the flashAlerts prop has content', () => {
+      const node = document.createElement('div')
+      const alert = {key: 'alert', message: 'Uh oh!', variant: 'error'}
+      render(
+        <Gradebook {...defaultGradebookProps} flashAlerts={[alert]} flashMessageContainer={node} />
+      )
+      const {getByText} = within(node)
+      expect(node).toContainElement(getByText(/Uh oh!/i))
+    })
+  })
 })

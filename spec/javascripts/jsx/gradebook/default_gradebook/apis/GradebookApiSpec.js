@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi.js'
+import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
 
 QUnit.module('GradebookApi.createTeacherNotesColumn', {
   setup() {

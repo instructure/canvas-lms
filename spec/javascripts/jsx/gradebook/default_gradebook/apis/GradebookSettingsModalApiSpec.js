@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -29,7 +29,7 @@ import {
   createLatePolicy,
   updateCourseSettings,
   updateLatePolicy
-} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
+} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi'
 
 const latePolicyData = {
   id: '15',
