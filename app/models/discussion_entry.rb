@@ -649,9 +649,22 @@ class DiscussionEntry < ActiveRecord::Base
 
     if discussion_topic.anonymous?
       discussion_topic_participant = DiscussionTopicParticipant.find_by(discussion_topic_id: discussion_topic_id, user_id: user.id)
+      roles = if context.is_a?(Course)
+                Enrollment
+                  .joins(:course)
+                  .where.not(enrollments: { workflow_state: "deleted" })
+                  .where.not(courses: { workflow_state: "deleted" })
+                  .where(course_id: context.id)
+                  .where(user_id: user.id)
+                  .select(:type, :user_id)
+                  .distinct
+                  .pluck(:type)
+              else
+                []
+              end
 
-      if discussion_topic_participant.user == current_user
-        t("You")
+      if discussion_topic_participant.user == current_user || roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (discussion_topic.anonymous_state == "partial_anonymity" && !is_anonymous_author)
+        user.short_name
       else
         t("Anonymous") + " " + discussion_topic_participant&.id.to_s(36)
       end

@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user} replied to %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name, :user => asset.user.short_name %>
+  <%= t :subject, "%{user} replied to %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name, :user => asset.author_name %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -17,13 +17,13 @@
       <td></td>
     </tr>
     <tr >
-      <td align="left" width="50" style="width: 50px"><img style="border-radius: 50px; height: 50px; width: 50px;" height="50" width="50" src="<%=author_avatar_url%>" alt="<%=author_short_name%>"> </td>
+      <td align="left" width="50" style="width: 50px"><img style="border-radius: 50px; height: 50px; width: 50px;" height="50" width="50" src="<%=author_avatar_url%>" alt="<%=asset.author_name%>"> </td>
       <td width="10"></td>
       <td>
         <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
           <tr>
             <td valign="bottom" align="left">
-              <b><%= author_short_name%></b>
+              <b><%= asset.author_name%></b>
             </td>
           </tr>
           <tr>
@@ -40,7 +40,7 @@
 <% else %>
   <p height="30px"></p>
   <p>
-    <b><%= author_short_name%></b>
+    <b><%= asset.author_name%></b>
     <br/>
     <a href="mailto:<%= author_email_address %>">
       <%= author_email_address%>
@@ -48,7 +48,7 @@
   </p>
 <% end %>
 
-<p><%= t :body, "%{user} replied to %{discussion_topic}, %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
+<p><%= t :body, "%{user} replied to %{discussion_topic}, %{course}:", :user => asset.author_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
 
 <p>
 <%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>

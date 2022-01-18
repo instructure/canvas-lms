@@ -292,6 +292,10 @@ class Message < ActiveRecord::Base
   end
 
   def author_avatar_url
+    if context.is_a?(DiscussionEntry) && context.discussion_topic.anonymous?
+      return "https://canvas.instructure.com/images/messages/avatar-50.png"
+    end
+
     url = author.try(:avatar_url)
     # The User model currently supports storing either a path or full
     # URL for an avatar. Because of this, alternatives to URI.encode
@@ -306,10 +310,18 @@ class Message < ActiveRecord::Base
   end
 
   def author_short_name
+    if context.is_a?(DiscussionEntry) && context.discussion_topic.anonymous?
+      return context.author_name
+    end
+
     author.try(:short_name)
   end
 
   def author_email_address
+    if context.is_a?(DiscussionEntry) && context.discussion_topic.anonymous?
+      return nil
+    end
+
     if context_root_account.try(:author_email_in_notifications?)
       author.try(:email)
     end
@@ -1128,6 +1140,10 @@ class Message < ActiveRecord::Base
   private
 
   def infer_from_name
+    if context.is_a?(DiscussionEntry) && context.discussion_topic.anonymous?
+      return context.author_name
+    end
+
     return name_helper.from_name if name_helper.from_name.present?
 
     if name_helper.asset.is_a?(AppointmentGroup) && !(names = name_helper.asset.contexts_for_user(user)).nil?
