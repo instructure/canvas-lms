@@ -39,7 +39,9 @@ def call() {
     }
   }
 
-  pluginsToPull.add([name: 'qti_migration_tool', version: _getPluginVersion('qti_migration_tool'), target: 'vendor/qti_migration_tool'])
+  if (env.GERRIT_PROJECT != 'qti_migration_tool') {
+    pluginsToPull.add([name: 'qti_migration_tool', version: _getPluginVersion('qti_migration_tool'), target: 'vendor/qti_migration_tool'])
+  }
 
   pullRepos(pluginsToPull)
   echo 'Pulling Crystalball Map'
