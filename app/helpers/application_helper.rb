@@ -175,29 +175,6 @@ module ApplicationHelper
     object.grants_any_right?(user, session, *actions)
   end
 
-  # See `js_base_url`
-  def use_optimized_js?
-    if params.key?(:optimized_js)
-      params[:optimized_js] == "true" || params[:optimized_js] == "1"
-    else
-      ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
-    end
-  end
-
-  # Determines the location from which to load JavaScript assets
-  #
-  # uses optimized:
-  #  * when ENV['USE_OPTIMIZED_JS'] is true
-  #  * or when ?optimized_js=true is present in the url. Run `rake js:build` to
-  #    build the optimized files
-  #
-  # uses non-optimized:
-  #   * when ENV['USE_OPTIMIZED_JS'] is false
-  #   * or when ?debug_assets=true is present in the url
-  def js_base_url
-    (use_optimized_js? ? "/dist/webpack-production" : "/dist/webpack-dev").freeze
-  end
-
   def load_scripts_async_in_order(script_urls)
     # this is how you execute scripts in order, in a way that doesn’t block rendering,
     # and without having to use 'defer' to wait until the whole DOM is loaded.
@@ -227,14 +204,14 @@ module ApplicationHelper
     # if there is a moment locale besides english set, put a script tag for it
     # so it is loaded and ready before we run any of our app code
     if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != "en"
-      moment_chunks =
-        Canvas::Cdn::RevManifest.all_webpack_chunks_for("moment/locale/#{js_env[:MOMENT_LOCALE]}")
-      @script_chunks += moment_chunks if moment_chunks
+      @script_chunks += ::Canvas::Cdn.registry.scripts_for(
+        "moment/locale/#{js_env[:MOMENT_LOCALE]}"
+      )
     end
-    @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("main")
+    @script_chunks += ::Canvas::Cdn.registry.scripts_for("main")
     @script_chunks.uniq!
 
-    chunk_urls = @script_chunks.map { |s| "#{js_base_url}/#{s}" }
+    chunk_urls = @script_chunks
 
     capture do
       # if we don't also put preload tags for these, the browser will prioritize and
@@ -259,13 +236,12 @@ module ApplicationHelper
     @rendered_preload_chunks ||= []
     preload_chunks =
       new_js_bundles.map do |(bundle, plugin, *)|
-        key = "#{plugin ? "#{plugin}-" : ""}#{bundle}"
-        Canvas::Cdn::RevManifest.all_webpack_chunks_for(key)
+        ::Canvas::Cdn.registry.scripts_for("#{plugin ? "#{plugin}-" : ""}#{bundle}")
       end.flatten.uniq - @script_chunks - @rendered_preload_chunks # subtract out the ones we already preloaded in the <head>
     @rendered_preload_chunks += preload_chunks
 
     capture do
-      preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
+      preload_chunks.each { |url| concat preload_link_tag(url) }
 
       # if you look the ui/main.js, there is a function there that will
       # process anything on window.bundles and knows how to load everything it needs
@@ -333,11 +309,6 @@ module ApplicationHelper
     cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
     base_dir = cache[:includesNoVariables] ? "no_variables" : css_variant(opts)
     File.join("/dist", "brandable_css", base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
-  end
-
-  def font_url_for(nominal_font_href)
-    cache = BrandableCSS.font_path_cache
-    cache[nominal_font_href] || nominal_font_href
   end
 
   def brand_variable(variable_name)

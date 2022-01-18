@@ -22,12 +22,13 @@ const useInput = initialValue => {
   const initialState = initialValue || ''
   const [value, setValue] = useState(initialState)
   const changeValue = arg => {
-    if (typeof arg === 'object' && arg.target?.value !== undefined) {
+    if (typeof arg === 'object' && arg?.target?.value !== undefined) {
       setValue(arg.target.value)
     } else {
       setValue(arg)
     }
   }
+
   const valueChanged = (value || '').length !== initialState.length || value !== initialState
 
   return [value, changeValue, valueChanged]

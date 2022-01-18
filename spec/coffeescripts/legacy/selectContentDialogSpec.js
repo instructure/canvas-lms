@@ -58,6 +58,8 @@ QUnit.module('SelectContentDialog: deepLinkingListener', {
         <input type='text' id='external_tool_create_title' />
         <input type='text' id='external_tool_create_custom_params' />
         <input type='text' id='external_tool_create_assignment_id' />
+        <input type='text' id='external_tool_create_iframe_width' />
+        <input type='text' id='external_tool_create_iframe_height' />
         <div id='context_external_tools_select'>
           <span class='domain_message'"
         </div>
@@ -94,7 +96,11 @@ const deepLinkingEvent = {
         url: 'https://www.my-tool.com/launch-url',
         title: 'My Tool',
         new_tab: '0',
-        custom: customParams
+        custom: customParams,
+        iframe: {
+          width: 123,
+          height: 456
+        }
       }
     ],
     ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
@@ -141,6 +147,16 @@ test('sets the content item assignment id if given', async () => {
   equal($('#external_tool_create_assignment_id').val(), assignmentId)
 })
 
+test('sets the iframe width', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+  equal($('#external_tool_create_iframe_height').val(), 456)
+})
+
+test('sets the iframe height', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+  equal($('#external_tool_create_iframe_width').val(), 123)
+})
+
 test('recover item data from context external tool item', async () => {
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
 
@@ -153,6 +169,8 @@ test('recover item data from context external tool item', async () => {
   equal(data['item[url]'], 'https://www.my-tool.com/launch-url')
   equal(data['item[title]'], 'My Tool')
   equal(data['item[custom_params]'], JSON.stringify(customParams))
+  equal(data['item[iframe][width]'], 123)
+  equal(data['item[iframe][height]'], 456)
 })
 
 test('recover assignment id from context external tool item data if given', async () => {
@@ -167,11 +185,15 @@ test('reset external tool fields', async () => {
   $('#external_tool_create_title').val('Sample')
   $('#external_tool_create_custom_params').val('Sample')
   $('#external_tool_create_assignment_id').val('Sample')
+  $('#external_tool_create_iframe_width').val('Sample')
+  $('#external_tool_create_iframe_height').val('Sample')
 
   equal($('#external_tool_create_url').val(), 'Sample')
   equal($('#external_tool_create_title').val(), 'Sample')
   equal($('#external_tool_create_custom_params').val(), 'Sample')
   equal($('#external_tool_create_assignment_id').val(), 'Sample')
+  equal($('#external_tool_create_iframe_width').val(), 'Sample')
+  equal($('#external_tool_create_iframe_height').val(), 'Sample')
 
   SelectContentDialog.resetExternalToolFields()
 
@@ -179,6 +201,8 @@ test('reset external tool fields', async () => {
   equal($('#external_tool_create_title').val(), '')
   equal($('#external_tool_create_custom_params').val(), '')
   equal($('#external_tool_create_assignment_id').val(), '')
+  equal($('#external_tool_create_iframe_width').val(), '')
+  equal($('#external_tool_create_iframe_height').val(), '')
 })
 
 test('close all dialogs when content items attribute is empty', async () => {

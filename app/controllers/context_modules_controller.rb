@@ -333,6 +333,10 @@ class ContextModulesController < ApplicationController
         m.save_without_touching_context
         Canvas::LiveEvents.module_updated(m) if m.position != order_before[m.id]
       end
+      # Update pace plans if enabled
+      if @context.account.feature_enabled?(:pace_plans) && @context.enable_pace_plans
+        @context.pace_plans.primary.find_each(&:create_publish_progress)
+      end
       @context.touch
 
       # # Background this, not essential that it happen right away
@@ -619,6 +623,7 @@ class ContextModulesController < ApplicationController
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
+      params[:item][:link_settings] = launch_dimensions
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
         body = @tag.nil? ? { error: "Could not find item to tag" } : @tag.errors
@@ -796,5 +801,14 @@ class ContextModulesController < ApplicationController
         @current_user.set_preference(:module_links_default_new_tab, true)
       end
     end
+  end
+
+  def launch_dimensions
+    return nil unless (iframe = params[:item][:iframe])
+
+    {
+      selection_width: iframe[:width],
+      selection_height: iframe[:height]
+    }
   end
 end

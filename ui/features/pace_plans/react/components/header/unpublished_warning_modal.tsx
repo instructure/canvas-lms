@@ -32,7 +32,13 @@ export type UnpublishedWarningModalProps = {
 
 const UnpublishedWarningModal = ({open, onCancel, onConfirm}) => {
   return (
-    <Modal size="small" open={open} onDismiss={onCancel} label={I18n.t('Warning')}>
+    <Modal
+      data-testid="unpublished-warning-modal"
+      size="small"
+      open={open}
+      onDismiss={onCancel}
+      label={I18n.t('Warning')}
+    >
       <Modal.Body>
         <View>
           <Text>

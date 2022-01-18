@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
+import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
@@ -57,6 +57,12 @@ export const AuthorInfo = props => {
           timestampTextSize: 'small',
           nameAndRoleDirection: 'row',
           badgeMarginLeft: '-24px'
+        },
+        mobile: {
+          authorNameTextSize: 'small',
+          timestampTextSize: 'x-small',
+          nameAndRoleDirection: 'column',
+          badgeMarginLeft: '-16px'
         }
       }}
       render={responsiveProps => (

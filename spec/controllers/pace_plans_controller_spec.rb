@@ -55,10 +55,8 @@ describe PacePlansController, type: :controller do
     @mod2.add_item id: @a3.id, type: "assignment"
     @mod2.add_item type: "external_url", title: "External URL", url: "http://localhost"
 
-    @course.context_module_tags.each_with_index do |tag, i|
-      next unless tag.assignment
-
-      @pace_plan.pace_plan_module_items.create! module_item: tag, duration: i * 2
+    @pace_plan.pace_plan_module_items.each_with_index do |ppmi, i|
+      ppmi.update! duration: i * 2
     end
 
     @course.enable_pace_plans = true
@@ -382,52 +380,117 @@ describe PacePlansController, type: :controller do
       post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
       expect(response).to be_successful
       json_response = JSON.parse(response.body)
-      expect(json_response.values).to eq(%w[2021-09-30 2021-10-03])
+      expect(json_response.values).to eq(%w[2021-09-30 2021-10-05])
     end
 
     it "supports changing durations and start dates" do
-      pace_plan_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-06")
+      pace_plan_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-05")
       post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
       expect(response).to be_successful
       json_response = JSON.parse(response.body)
-      expect(json_response.values).to eq(%w[2021-11-01 2021-11-06])
+      expect(json_response.values).to eq(%w[2021-11-01 2021-11-05])
+    end
+
+    it "squishes proportionally and ends on the end date" do
+      pace_plan_params = @valid_params.merge(
+        start_date: "2021-12-27",
+        end_date: "2021-12-31",
+        pace_plan_module_items_attributes: [
+          {
+            id: @pace_plan.pace_plan_module_items.first.id,
+            module_item_id: @pace_plan.pace_plan_module_items.first.module_item_id,
+            duration: 2,
+          },
+          {
+            id: @pace_plan.pace_plan_module_items.second.id,
+            module_item_id: @pace_plan.pace_plan_module_items.second.module_item_id,
+            duration: 4,
+          },
+          {
+            id: @pace_plan.pace_plan_module_items.third.id,
+            module_item_id: @pace_plan.pace_plan_module_items.third.module_item_id,
+            duration: 6,
+          },
+        ]
+      )
+
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response.values).to eq(%w[2021-12-28 2021-12-29 2021-12-31])
+    end
+
+    it "rolls over years properly" do
+      assignment = @course.assignments.create! name: "A4", workflow_state: "active"
+      @mod1.add_item id: assignment.id, type: "assignment"
+      tag = @mod1.add_item id: assignment.id, type: "assignment"
+      @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 8
+
+      pace_plan_params = @valid_params.merge(
+        start_date: "2021-12-13",
+        end_date: "2022-01-12",
+        exclude_weekends: true,
+        pace_plan_module_items_attributes: [
+          {
+            id: @pace_plan.pace_plan_module_items.first.id,
+            module_item_id: @pace_plan.pace_plan_module_items.first.module_item_id,
+            duration: 7,
+          },
+          {
+            id: @pace_plan.pace_plan_module_items.second.id,
+            module_item_id: @pace_plan.pace_plan_module_items.second.module_item_id,
+            duration: 6,
+          },
+          {
+            id: @pace_plan.pace_plan_module_items.third.id,
+            module_item_id: @pace_plan.pace_plan_module_items.third.module_item_id,
+            duration: 5,
+          },
+          {
+            id: @pace_plan.pace_plan_module_items.third.id,
+            module_item_id: @pace_plan.pace_plan_module_items.fourth.module_item_id,
+            duration: 5,
+          },
+        ]
+      )
+
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response.values).to eq(%w[2021-12-22 2021-12-28 2022-01-05 2022-01-12])
+    end
+
+    it "returns an error if the start date is after the end date" do
+      pace_plan_params = @valid_params.merge(start_date: "2022-01-27", end_date: "2022-01-20")
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      expect(response).not_to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response["errors"]).to eq("End date cannot be before start date")
+    end
+
+    it "returns uncompressed items if the end date is not set" do
+      pace_plan_params = @valid_params.merge(start_date: "2022-01-27", end_date: nil)
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response.values).to eq(%w[2022-01-28 2022-02-11])
     end
 
     it "returns the dates in the correct order" do
       @mod3 = @course.context_modules.create! name: "M3"
       2.times do |i|
         assignment = @course.assignments.create! name: i, workflow_state: "published"
-        tag = @mod3.add_item id: assignment.id, type: "assignment"
-        @pace_plan.pace_plan_module_items.create! module_item: tag
+        @mod3.add_item id: assignment.id, type: "assignment"
       end
 
-      pace_plan_module_items_attributes = [
+      pace_plan_module_items_attributes = @pace_plan.pace_plan_module_items.order(:id).map do |ppmi|
         {
-          id: @pace_plan.pace_plan_module_items[0].id,
-          module_item_id: @pace_plan.pace_plan_module_items[0].module_item_id,
-          duration: 8,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[1].id,
-          module_item_id: @pace_plan.pace_plan_module_items[1].module_item_id,
-          duration: 10,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[2].id,
-          module_item_id: @pace_plan.pace_plan_module_items[2].module_item_id,
-          duration: 5,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[3].id,
-          module_item_id: @pace_plan.pace_plan_module_items[3].module_item_id,
-          duration: 3,
-        },
-        {
-          id: @pace_plan.pace_plan_module_items[4].id,
-          module_item_id: @pace_plan.pace_plan_module_items[4].module_item_id,
-          duration: 2,
-        },
-      ]
+          id: ppmi.id,
+          module_item_id: ppmi.module_item_id,
+          duration: 1
+        }
+      end
+
       pace_plan_params = @valid_params.merge(
         start_date: "2021-11-01",
         end_date: "2021-11-06",

@@ -53,6 +53,22 @@ describe('useSelectedOutcomes', () => {
     expect(result.current.selectedOutcomeIds).toEqual(new Set())
   })
 
+  test('should remove outcome in state if removeSelectedOutcome is called', () => {
+    const outcome = generateOutcomes(1)[1]
+    const {result} = renderHook(() => useSelectedOutcomes(initialState))
+    expect(result.current.selectedOutcomesCount).toBe(2)
+    act(() => result.current.removeSelectedOutcome(outcome))
+    expect(result.current.selectedOutcomesCount).toBe(1)
+  })
+
+  test('should not update state if outcome linkId is not in current state when removeSelectedOutcome is called', () => {
+    const outcome = {linkId: '4'}
+    const {result} = renderHook(() => useSelectedOutcomes(initialState))
+    expect(result.current.selectedOutcomesCount).toBe(2)
+    act(() => result.current.removeSelectedOutcome(outcome))
+    expect(result.current.selectedOutcomesCount).toBe(2)
+  })
+
   test('should toggle selected outcome in state if toggleSelectedOutcome is called', () => {
     const outcome = generateOutcomes(1)[1]
     const {result} = renderHook(() => useSelectedOutcomes(initialState))

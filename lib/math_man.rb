@@ -59,7 +59,7 @@ module MathMan
     end
 
     def dynamic_settings
-      Canvas::DynamicSettings.find("math-man")
+      DynamicSettings.find("math-man")
     end
   end
 end

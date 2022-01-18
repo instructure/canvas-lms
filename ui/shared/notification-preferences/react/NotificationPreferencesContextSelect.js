@@ -21,7 +21,7 @@ import {arrayOf, func, string} from 'prop-types'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {EnrollmentShape} from './Shape'
-import I18n from 'i18n!*'
+import I18n from 'i18n!notification_preferences'
 import {groupBy, sortBy, sortedUniqBy} from 'lodash'
 
 export default function NotificationPreferencesContextSelect(props) {

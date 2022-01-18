@@ -1787,6 +1787,13 @@ describe CoursesController do
       end
 
       describe "update" do
+        before :once do
+          @subject = @course
+          @homeroom = course_factory
+          @homeroom.homeroom_course = true
+          @homeroom.save!
+        end
+
         it "syncs enrollments if setting is set" do
           progress = double("Progress").as_null_object
           allow(Progress).to receive(:new).and_return(progress)
@@ -1795,9 +1802,9 @@ describe CoursesController do
           user_session(@teacher)
 
           get "update", params: {
-            id: @course.id,
+            id: @subject.id,
             course: {
-              homeroom_course_id: "17",
+              homeroom_course_id: @homeroom.id,
               sync_enrollments_from_homeroom: "1"
             }
           }
@@ -1809,14 +1816,14 @@ describe CoursesController do
           expect(progress).not_to receive(:process_job)
 
           user_session(@teacher)
-          sis = @course.account.sis_batches.create
-          @course.sis_batch_id = sis.id
-          @course.save!
+          sis = @subject.account.sis_batches.create
+          @subject.sis_batch_id = sis.id
+          @subject.save!
 
           get "update", params: {
-            id: @course.id,
+            id: @subject.id,
             course: {
-              homeroom_course_id: "17",
+              homeroom_course_id: @homeroom.id,
               sync_enrollments_from_homeroom: "1"
             }
           }
