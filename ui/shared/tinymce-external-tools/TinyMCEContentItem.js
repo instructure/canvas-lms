@@ -61,7 +61,7 @@ function linkText(tinyMCEContentItem) {
   )
 }
 
-ContentItem.fromJSON = function(obj) {
+ContentItem.fromJSON = function (obj) {
   return new ContentItem(obj)
 }
 
@@ -77,6 +77,7 @@ const TinyMCEPayloadGenerators = {
           mozallowfullscreen: 'true',
           allow: iframeAllowances()
         })
+          .addClass(tinyMCEContentItem.class)
           .css({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
             height: tinyMCEContentItem.placementAdvice.displayHeight
@@ -150,32 +151,32 @@ function TinyMCEContentItem(contentItem) {
 
   exportPropsToSelf.call(this, contentItem, Object.getOwnPropertyNames)
 
-  decorate('isLTI', function() {
+  decorate('isLTI', function () {
     return !!~LTI_MIME_TYPES.indexOf(this.mediaType)
   })
 
-  decorate('isOverriddenForThumbnail', function() {
+  decorate('isOverriddenForThumbnail', function () {
     return (
       this.isLTI && this.thumbnail && this.placementAdvice.presentationDocumentTarget === 'iframe'
     )
   })
 
-  decorate('isImage', function() {
+  decorate('isImage', function () {
     return this.mediaType && this.mediaType.indexOf('image') == 0
   })
 
-  decorate('linkClassName', function() {
+  decorate('linkClassName', function () {
     return this.isOverriddenForThumbnail ? 'lti-thumbnail-launch' : ''
   })
 
-  decorate('url', function() {
+  decorate('url', function () {
     return (this.isLTI ? this.canvasURL : this.contentItem.url).replace(
       /^(data:text\/html|javascript:)/,
       '#$1'
     )
   })
 
-  decorate('linkTarget', function() {
+  decorate('linkTarget', function () {
     if (this.isOverriddenForThumbnail) {
       return JSON.stringify(this.placementAdvice)
     }
@@ -185,7 +186,7 @@ function TinyMCEContentItem(contentItem) {
       : null
   })
 
-  decorate('docTarget', function() {
+  decorate('docTarget', function () {
     if (this.placementAdvice.presentationDocumentTarget == 'embed' && !this.isImage) {
       return 'text'
     } else if (this.isOverriddenForThumbnail) {
@@ -195,7 +196,7 @@ function TinyMCEContentItem(contentItem) {
     return this.placementAdvice.presentationDocumentTarget.toLowerCase()
   })
 
-  decorate('codePayload', function() {
+  decorate('codePayload', function () {
     switch (this.docTarget) {
       case 'iframe':
         return TinyMCEPayloadGenerators.iframe(this)
@@ -213,7 +214,7 @@ function TinyMCEContentItem(contentItem) {
 }
 
 TinyMCEContentItem.ContentItem = ContentItem
-TinyMCEContentItem.fromJSON = function(data) {
+TinyMCEContentItem.fromJSON = function (data) {
   const contentItem = ContentItem.fromJSON(data)
   return new TinyMCEContentItem(contentItem)
 }
