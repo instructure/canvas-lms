@@ -38,6 +38,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
           }
           usersConnection(first: 20) {
             nodes {
+              _id
               id
               name
             }
