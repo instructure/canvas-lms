@@ -101,6 +101,9 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Èske vrèman ou vle elemine eleman planifikatè sa a?"
     },
+    "arrows_464a3e54": {
+        "message": "Flèch"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Fòma ap konsève"
     },
@@ -160,6 +163,9 @@
     },
     "available_folders_694d0436": {
         "message": "Dosye disponib"
+    },
+    "basic_554cdc0a": {
+        "message": "Bazik"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Kòmansman Istwa Tach ou yo"
@@ -377,6 +383,9 @@
     "delete_a6efa79d": {
         "message": "Efase"
     },
+    "delimiters_4db4840d": {
+        "message": "Delimitè"
+    },
     "describe_the_image_e65d2e32": {
         "message": "(Dekri imaj la)"
     },
@@ -400,6 +409,9 @@
     },
     "directionality_26ae9e08": {
         "message": "Direksyonalite"
+    },
+    "directly_edit_latex_b7e9235b": {
+        "message": "Chanje LaTex Dirèkteman"
     },
     "discussion_6719c51d": {
         "message": "Diskisyon"
@@ -502,6 +514,9 @@
     },
     "equation_1c5ac93c": {
         "message": "Ekwasyon"
+    },
+    "equation_editor_39fbc3f1": {
+        "message": "Editè Ekwasyon"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Erè nan chajman nòt yo"
@@ -634,6 +649,9 @@
     },
     "grades_loaded_5056277c": {
         "message": "Nòt yo chaje"
+    },
+    "greek_65c5b3f7": {
+        "message": "Grèk"
     },
     "group_documents_8bfd6ae6": {
         "message": "Gwoupe Dokiman"
@@ -842,6 +860,9 @@
     "middle_27dc1d5": {
         "message": "Mitan"
     },
+    "misc_3b692ea7": {
+        "message": "Divès"
+    },
     "miscellaneous_e9818229": {
         "message": "Divès"
     },
@@ -962,6 +983,9 @@
     "open_title_application_fd624fc5": {
         "message": "Ouvri { title } aplikasyon"
     },
+    "operators_a2ef9a93": {
+        "message": "Operatè"
+    },
     "opportunities_popup_f6703842": {
         "message": "opòtinite afiche"
     },
@@ -1069,6 +1093,9 @@
     },
     "redo_363c58b7": {
         "message": "Refè"
+    },
+    "relationships_6602af70": {
+        "message": "Relasyon"
     },
     "reminder_date_4564d12d": {
         "message": "Rapèl: { date }"
