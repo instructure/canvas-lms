@@ -66,7 +66,7 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def self.jwt_secret
-    secret = DynamicSettings.find(service: "canvadoc", default_ttl: 5.minutes)["secret"]
+    secret = Canvas::DynamicSettings.find(service: "canvadoc", default_ttl: 5.minutes)["secret"]
     Base64.decode64(secret) if secret
   end
 

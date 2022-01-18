@@ -44,19 +44,21 @@ describe Mutations::UpdateLearningOutcome do
     {
       calculation_method: "n_mastery",
       calculation_int: 3,
-      mastery_points: 2,
       ratings: [
         {
           description: "GraphQL Exceeds Expectations",
-          points: 3
+          points: 3,
+          mastery: false
         },
         {
           description: "GraphQL Expectations",
-          points: 2
+          points: 2,
+          mastery: true
         },
         {
           description: "GraphQL Does Not Meet Expectations",
-          points: 1
+          points: 1,
+          mastery: false
         }
       ]
     }
@@ -68,7 +70,6 @@ describe Mutations::UpdateLearningOutcome do
     <<~GQL
       calculationMethod: "#{args[:calculation_method]}",
       calculationInt: #{args[:calculation_int]},
-      masteryPoints: #{args[:mastery_points]},
       ratings: #{
         args[:ratings]
           .to_json
@@ -97,6 +98,7 @@ describe Mutations::UpdateLearningOutcome do
             ratings {
               description
               points
+              mastery
             }
           }
           errors {
@@ -110,7 +112,7 @@ describe Mutations::UpdateLearningOutcome do
     CanvasSchema.execute(mutation_command, context: context)
   end
 
-  it "updates learning outcome" do
+  it "updates a learning outcome" do
     result = execute_with_input(variables)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateLearningOutcome", "errors")).to be_nil
@@ -121,116 +123,33 @@ describe Mutations::UpdateLearningOutcome do
     expect(result["vendorGuid"]).to eq "vg--1"
   end
 
-  context "individual ratings and calculation method feature flag enabled" do
-    def expect_result(rating_vars, calculation_method, calculation_int, mastery_points, ratings)
-      result = execute_with_input "#{variables},#{rating_vars}"
-      expect(result["errors"]).to be_nil
-      expect(result.dig("data", "updateLearningOutcome", "errors")).to be_nil
+  it "updates a learning outcome with mastery scale" do
+    @domain_root_account.enable_feature!(:individual_outcome_rating_and_calculation)
+    @domain_root_account.enable_feature!(:improved_outcomes_management)
+    @domain_root_account.disable_feature!(:account_level_mastery_scales)
 
-      result = result.dig("data", "updateLearningOutcome", "learningOutcome")
-      result_record = LearningOutcome.find(record.id)
+    calculation_method = default_rating_variables[:calculation_method]
+    calculation_int = default_rating_variables[:calculation_int]
+    ratings = default_rating_variables[:ratings]
 
-      expect(result["calculationMethod"]).to eq calculation_method
-      expect(result["calculationInt"]).to eq calculation_int
-      expect(result["masteryPoints"]).to eq mastery_points
-      expect(result["ratings"].count).to eq ratings.count
-      expect(result["ratings"][0]["description"]).to eq ratings[0][:description]
+    result = execute_with_input "#{variables},#{rating_variables}"
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateLearningOutcome", "errors")).to be_nil
 
-      expect(result_record.calculation_method).to eq calculation_method
-      expect(result_record.calculation_int).to eq calculation_int
-      expect(result_record.mastery_points).to eq mastery_points
-      expect(result_record.rubric_criterion[:ratings].count).to eq ratings.count
-      expect(result_record.rubric_criterion[:ratings][0][:description]).to eq ratings[0][:description]
-    end
+    result = result.dig("data", "updateLearningOutcome", "learningOutcome")
+    result_record = LearningOutcome.find(record.id)
 
-    before do
-      @domain_root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-      @domain_root_account.enable_feature!(:improved_outcomes_management)
-      @domain_root_account.disable_feature!(:account_level_mastery_scales)
-    end
+    expect(result["calculationMethod"]).to eq calculation_method
+    expect(result["calculationInt"]).to eq calculation_int
+    expect(result["masteryPoints"]).to eq ratings[1][:points]
+    expect(result["ratings"].count).to eq ratings.count
+    expect(result["ratings"][0]["description"]).to eq ratings[0][:description]
 
-    it "updates individual ratings and calculation method for learning outcome" do
-      calculation_method = default_rating_variables[:calculation_method]
-      calculation_int = default_rating_variables[:calculation_int]
-      mastery_points = default_rating_variables[:mastery_points]
-      ratings = default_rating_variables[:ratings]
-
-      expect_result(rating_variables, calculation_method, calculation_int, mastery_points, ratings)
-    end
-
-    it "updates individual calculation method for learning outcome" do
-      rating_variables_calculation_only = <<~GQL
-        calculationMethod: "#{default_rating_variables[:calculation_method]}",
-        calculationInt: #{default_rating_variables[:calculation_int]},
-      GQL
-      calculation_method = default_rating_variables[:calculation_method]
-      calculation_int = default_rating_variables[:calculation_int]
-      mastery_points = record.data[:rubric_criterion][:mastery_points]
-      ratings = record.data[:rubric_criterion][:ratings]
-
-      expect_result(rating_variables_calculation_only, calculation_method, calculation_int, mastery_points, ratings)
-    end
-
-    it "updates individual ratings for learning outcome" do
-      rating_variables_ratings_only = <<~GQL
-        masteryPoints: #{default_rating_variables[:mastery_points]},
-        ratings: #{
-          default_rating_variables[:ratings]
-            .to_json
-            .gsub(/"([a-z]+)":/, '\1:')
-        }
-      GQL
-      calculation_method = record[:calculation_method]
-      calculation_int = record[:calculation_int]
-      mastery_points = default_rating_variables[:mastery_points]
-      ratings = default_rating_variables[:ratings]
-
-      expect_result(rating_variables_ratings_only, calculation_method, calculation_int, mastery_points, ratings)
-    end
-
-    it "updates individual mastery points independent of ratings for learning outcome" do
-      rating_variables_mastery_points_only = <<~GQL
-        masteryPoints: #{default_rating_variables[:mastery_points]}
-      GQL
-      calculation_method = record[:calculation_method]
-      calculation_int = record[:calculation_int]
-      mastery_points = default_rating_variables[:mastery_points]
-      ratings = record.data[:rubric_criterion][:ratings]
-
-      expect_result(rating_variables_mastery_points_only, calculation_method, calculation_int, mastery_points, ratings)
-    end
-
-    it "updates individual mastery points dependent on ratings if no mastery points provided for learning outcome" do
-      rating_variables_without_mastery_points = <<~GQL
-        ratings: #{
-          default_rating_variables[:ratings]
-            .to_json
-            .gsub(/"([a-z]+)":/, '\1:')
-        }
-      GQL
-      calculation_method = record[:calculation_method]
-      calculation_int = record[:calculation_int]
-      mastery_points = default_rating_variables[:ratings][0][:points]
-      ratings = default_rating_variables[:ratings]
-
-      expect_result(rating_variables_without_mastery_points, calculation_method, calculation_int, mastery_points, ratings)
-    end
-
-    it "updates individual ratings independent of mastery points for learning outcome" do
-      rating_variables_ratings_only = <<~GQL
-        ratings: #{
-          default_rating_variables[:ratings]
-            .to_json
-            .gsub(/"([a-z]+)":/, '\1:')
-        }
-      GQL
-      calculation_method = record[:calculation_method]
-      calculation_int = record[:calculation_int]
-      mastery_points = record.data[:rubric_criterion][:mastery_points]
-      ratings = default_rating_variables[:ratings]
-
-      expect_result(rating_variables_ratings_only, calculation_method, calculation_int, mastery_points, ratings)
-    end
+    expect(result_record.calculation_method).to eq calculation_method
+    expect(result_record.calculation_int).to eq calculation_int
+    expect(result_record.mastery_points).to eq ratings[1][:points]
+    expect(result_record.rubric_criterion[:ratings].count).to eq ratings.count
+    expect(result_record.rubric_criterion[:ratings][0][:description]).to eq ratings[0][:description]
   end
 
   context "errors" do

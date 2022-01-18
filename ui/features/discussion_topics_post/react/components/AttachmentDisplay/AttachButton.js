@@ -22,21 +22,12 @@ import React from 'react'
 
 import {CondensedButton} from '@instructure/ui-buttons'
 import {IconPaperclipLine} from '@instructure/ui-icons'
-import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
-export const UploadButton = ({...props}) => {
+export const AttachButton = ({...props}) => {
   let attachmentInput = null
   const handleAttachmentClick = () => attachmentInput?.click()
-  return props.attachmentToUpload ? (
-    <>
-      <Spinner
-        renderTitle={I18n.t('Uploading file in progress')}
-        margin="0 0 0 small"
-        size="x-small"
-      />
-    </>
-  ) : (
+  return (
     <>
       <CondensedButton
         color="primary"
@@ -58,13 +49,9 @@ export const UploadButton = ({...props}) => {
   )
 }
 
-UploadButton.propTypes = {
+AttachButton.propTypes = {
   /**
    * function that performs on the file after button click, then upload file, upload
    */
-  onAttachmentUpload: PropTypes.func.isRequired,
-  /**
-   * toggles loading state
-   */
-  attachmentToUpload: PropTypes.bool
+  onAttachmentUpload: PropTypes.func.isRequired
 }

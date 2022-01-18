@@ -112,14 +112,4 @@ describe "course" do
     course_list = doc.at_css("#courses_list").to_s
     expect(course_list).not_to include "STUDENT_NICKNAME"
   end
-
-  it "shows readable role types that includes custom roles" do
-    custom_role = custom_teacher_role("CustomTeacherRole", account: Account.default)
-    user = course_with_teacher(course_name: "Course 1", user: @user, active_all: true, role: custom_role).user
-    user_session(@teacher)
-    get "/courses/#{@course.id}/users/#{user.id}"
-    doc = Nokogiri::HTML5(response.body)
-    membership = doc.at_css(".enrollment td").to_s
-    expect(membership).to match(/CustomTeacherRole/)
-  end
 end

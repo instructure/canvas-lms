@@ -253,6 +253,19 @@ const mathImageHelper = {
     if (eqimgs.length > 0) {
       eqimgs.forEach(img => {
         const equation_text = this.getImageEquationText(img)
+        if (equation_text) {
+          img.setAttribute('mathjaxified', '')
+          const mathtex = document.createElement('span')
+          mathtex.setAttribute('class', 'math_equation_latex')
+          mathtex.setAttribute('style', img.getAttribute('style'))
+          mathtex.textContent = `\\(${equation_text}\\)`
+          mathtex.style.maxWidth = ''
+          if (img.nextSibling) {
+            img.parentElement.insertBefore(mathtex, img.nextSibling)
+          } else {
+            img.parentElement.appendChild(mathtex)
+          }
+        }
       })
       return true
     }

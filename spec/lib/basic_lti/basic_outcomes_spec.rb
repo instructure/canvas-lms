@@ -191,7 +191,7 @@ describe BasicLTI::BasicOutcomes do
           "lti-signing-secret" => "signing-secret-vp04BNqApwdwUYPUI",
           "lti-encryption-secret" => "encryption-secret-5T14NjaTbcYjc4"
         }
-        allow(DynamicSettings).to receive(:find) { dynamic_settings }
+        allow(Canvas::DynamicSettings).to receive(:find) { dynamic_settings }
       end
 
       let(:jwt_source_id) do

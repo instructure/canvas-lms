@@ -36,7 +36,6 @@ unless $canvas_tasks_loaded
       build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
       build_i18n = ENV["RAILS_LOAD_ALL_LOCALES"] != "0"
       build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
-      write_brand_configs = ENV["COMPILE_ASSETS_BRAND_CONFIGS"] != "0"
       build_prod_js = ENV["RAILS_ENV"] == "production" || ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
       # build dev bundles even in prod mode so you can debug with ?optimized_js=0
       # query string (except for on jenkins where we set JS_BUILD_NO_UGLIFY anyway
@@ -44,7 +43,6 @@ unless $canvas_tasks_loaded
       build_dev_js = ENV["JS_BUILD_NO_FALLBACK"] != "1" && (!build_prod_js || ENV["JS_BUILD_NO_UGLIFY"] != "1")
 
       batches = Rake::TaskGraph.draw do
-        task "brand_configs:write" => ["js:gulp_rev"] if write_brand_configs
         task "css:compile" => ["js:gulp_rev"] if build_css
         task "css:styleguide" if build_styleguide
         task "doc:api" if build_api_docs
@@ -103,7 +101,6 @@ unless $canvas_tasks_loaded
       ENV["COMPILE_ASSETS_NPM_INSTALL"] = "0"
       ENV["COMPILE_ASSETS_STYLEGUIDE"] = "0"
       ENV["COMPILE_ASSETS_API_DOCS"] = "0"
-      ENV["COMPILE_ASSETS_BRAND_CONFIGS"] = "0"
       Rake::Task["canvas:compile_assets"].invoke
     end
 

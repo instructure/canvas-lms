@@ -35,16 +35,11 @@ import {
 
 export const BLACKOUT_DATES: BlackoutDate[] = []
 
-window.ENV.TIMEZONE = 'America/Denver'
-window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
-
 export const COURSE: Course = {
   id: '30',
   name: 'Neuromancy 300',
-  created_at: '2021-09-01T00:00:00-06:00',
-  start_at: '2021-09-01T00:00:00-06:00',
-  end_at: '2021-12-31T00:00:00-07:00',
-  time_zone: window.ENV.CONTEXT_TIMEZONE
+  start_at: '2021-09-01',
+  end_at: '2021-12-31'
 }
 
 export const ENROLLMENT_1: Enrollment = {

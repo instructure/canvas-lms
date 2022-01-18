@@ -101,9 +101,6 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Segur que voleu suprimir aquest element del planificador?"
     },
-    "arrows_464a3e54": {
-        "message": "Fletxes"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "La relació d''aspecte es mantindrà"
     },
@@ -163,9 +160,6 @@
     },
     "available_folders_694d0436": {
         "message": "Carpetes disponibles"
-    },
-    "basic_554cdc0a": {
-        "message": "Bàsic"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Principi de l''historial de tasques pendents"
@@ -383,9 +377,6 @@
     "delete_a6efa79d": {
         "message": "Suprimeix"
     },
-    "delimiters_4db4840d": {
-        "message": "Delimitadors"
-    },
     "describe_the_image_e65d2e32": {
         "message": "(Descriu la imatge)"
     },
@@ -409,9 +400,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Direccionalitat"
-    },
-    "directly_edit_latex_b7e9235b": {
-        "message": "Edita directament LaTeX"
     },
     "discussion_6719c51d": {
         "message": "Debat"
@@ -514,9 +502,6 @@
     },
     "equation_1c5ac93c": {
         "message": "Equació"
-    },
-    "equation_editor_39fbc3f1": {
-        "message": "Editor d’equacions"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "S''ha produït un error en carregar les qualificacions"
@@ -649,9 +634,6 @@
     },
     "grades_loaded_5056277c": {
         "message": "S''han carregat les qualificacions"
-    },
-    "greek_65c5b3f7": {
-        "message": "Grec"
     },
     "group_documents_8bfd6ae6": {
         "message": "Agrupa els documents"
@@ -860,9 +842,6 @@
     "middle_27dc1d5": {
         "message": "Centre"
     },
-    "misc_3b692ea7": {
-        "message": "Miscel·lània"
-    },
     "miscellaneous_e9818229": {
         "message": "Diversos"
     },
@@ -983,9 +962,6 @@
     "open_title_application_fd624fc5": {
         "message": "Obre l’aplicació { title }"
     },
-    "operators_a2ef9a93": {
-        "message": "Operadors"
-    },
     "opportunities_popup_f6703842": {
         "message": "finestra emergent d''oportunitats"
     },
@@ -1093,9 +1069,6 @@
     },
     "redo_363c58b7": {
         "message": "Refés"
-    },
-    "relationships_6602af70": {
-        "message": "Relacions"
     },
     "reminder_date_4564d12d": {
         "message": "Recordatori: { date }"

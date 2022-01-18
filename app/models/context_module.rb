@@ -285,7 +285,7 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
-    ContentTag.where(context_module_id: self).where.not(workflow_state: "deleted").update(workflow_state: "deleted", updated_at: deleted_at)
+    ContentTag.where(context_module_id: self).where.not(workflow_state: "deleted").update_all(workflow_state: "deleted", updated_at: deleted_at)
     delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams
     save!
     true

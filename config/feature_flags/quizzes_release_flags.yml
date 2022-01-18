@@ -39,10 +39,6 @@ new_quizzes_bank_migrations:
   description: Enable migrating item banks to New Quizzes during course import/copy
   applies_to: SiteAdmin
   state: hidden
-  beta: true
-  environments:
-    production:
-      state: hidden
 new_quizzes_account_course_level_item_banks:
   display_name: New Quizzes Account and Course Level Item Banks
   description: |-

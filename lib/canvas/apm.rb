@@ -20,6 +20,8 @@
 require "ddtrace"
 require "digest/sha1"
 
+require_dependency "canvas/dynamic_settings"
+
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace
   # to send APM information to Datadog, but could in the future be re-worked to
@@ -62,9 +64,9 @@ module Canvas
       def config
         return @_config if @_config.present?
 
-        dynamic_settings = DynamicSettings.find(tree: :private)
+        dynamic_settings = Canvas::DynamicSettings.find(tree: :private)
         if canvas_cluster.present?
-          dynamic_settings = DynamicSettings.find(tree: :private, cluster: canvas_cluster)
+          dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: canvas_cluster)
         end
         @_config = YAML.safe_load(dynamic_settings["datadog_apm.yml"] || "{}")
       end

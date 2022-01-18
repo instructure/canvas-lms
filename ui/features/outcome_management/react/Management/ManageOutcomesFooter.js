@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -46,7 +46,6 @@ const ManageOutcomesFooter = ({
     onClick: onRemoveHandler,
     renderIcon: IconTrashLine
   }
-  const outcomesIconRef = useRef()
 
   return (
     <footer
@@ -84,7 +83,7 @@ const ManageOutcomesFooter = ({
                     paddingLeft: isMobileView ? '0' : '0.75rem'
                   }}
                 >
-                  <IconOutcomesLine size="x-small" ref={outcomesIconRef} />
+                  <IconOutcomesLine size="x-small" />
                 </div>
               </Flex.Item>
               <Flex.Item as="div">
@@ -93,7 +92,6 @@ const ManageOutcomesFooter = ({
                     outcomes={selected}
                     outcomeCount={selectedCount}
                     onClearHandler={onClearHandler}
-                    ref={outcomesIconRef}
                   />
                 </div>
               </Flex.Item>

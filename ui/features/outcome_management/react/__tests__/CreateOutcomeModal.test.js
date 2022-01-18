@@ -462,7 +462,6 @@ describe('CreateOutcomeModal', () => {
           })
         })
       })
-
       describe('Invidiual Outcome Proficiency and Calculation Feature Flag', () => {
         describe('when feature flag enabled', () => {
           it('displays Calculation Method selection form', async () => {
@@ -473,15 +472,7 @@ describe('CreateOutcomeModal', () => {
             expect(getByLabelText('Calculation Method')).toBeInTheDocument()
           })
 
-          it('displays Proficiency Ratings selection form', async () => {
-            const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
-            })
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
-          })
-
-          it('creates outcome with calculation method and proficiency ratings', async () => {
+          it('creates outcome with calculation method', async () => {
             const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
             const {getByText, getByLabelText, getByDisplayValue} = render(
               <CreateOutcomeModal {...defaultProps()} />,
@@ -489,6 +480,9 @@ describe('CreateOutcomeModal', () => {
                 individualOutcomeRatingAndCalculationFF: true,
                 mocks: [
                   ...smallOutcomeTree(),
+                  setFriendlyDescriptionOutcomeMock({
+                    inputDescription: 'Friendly Description value'
+                  }),
                   createLearningOutcomeMock({
                     title: 'Outcome 123',
                     displayName: 'Display name',
@@ -496,8 +490,7 @@ describe('CreateOutcomeModal', () => {
                     groupId: '1',
                     calculationMethod: 'n_mastery',
                     calculationInt: 5,
-                    individualCalculation: true,
-                    individualRatings: true
+                    individualCalculation: true
                   })
                 ]
               }
@@ -525,12 +518,6 @@ describe('CreateOutcomeModal', () => {
             const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
             await act(async () => jest.runOnlyPendingTimers())
             expect(queryByLabelText('Calculation Method')).not.toBeInTheDocument()
-          })
-
-          it('does not display Proficiency Ratings selection form', async () => {
-            const {queryByTestId} = render(<CreateOutcomeModal {...defaultProps()} />)
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(queryByTestId('outcome-management-ratings')).not.toBeInTheDocument()
           })
         })
       })

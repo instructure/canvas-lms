@@ -32,15 +32,13 @@ import {renderLink as renderLinkHtml} from '../../../contentRendering'
 import dragHtml from '../../../../sidebar/dragHtml'
 import {getIconFromType} from '../../shared/fileTypeUtils'
 import {isPreviewable} from '../../shared/Previewable'
-import {applyTimezoneOffsetToDate} from '../../shared/dateUtils'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
   const {filename, display_name, title, content_type, published, date} = props
   const Icon = getIconFromType(content_type)
   const color = published ? 'success' : 'primary'
-  // Uses user locale and timezone
-  const dateString = formatMessage.date(applyTimezoneOffsetToDate(date, ENV.TIMEZONE), 'long')
+  const dateString = formatMessage.date(Date.parse(date), 'long')
   const publishedMsg = published ? formatMessage('published') : formatMessage('unpublished')
 
   function linkAttrsFromDoc() {

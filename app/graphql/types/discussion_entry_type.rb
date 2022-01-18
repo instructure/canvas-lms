@@ -68,14 +68,13 @@ module Types
     end
     def author(course_id: nil, role_types: nil, built_in_only: true)
       load_association(:discussion_topic).then do |topic|
-        if topic.anonymous? && object.is_anonymous_author
+        if topic.anonymous? && !course_id
           nil
         else
           load_association(:user).then do |user|
             if !topic.anonymous? || !user
               user
             else
-              course_id = topic.course.id if course_id.nil?
               Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
                 if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (topic.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                   user

@@ -851,12 +851,6 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def hash_identity
-    props = [name, context.asset_string, domain, url, consumer_key, shared_secret,
-             description, workflow_state, Utils::HashUtils.sort_nested_data(settings)]
-    Digest::SHA2.new(256).hexdigest(props.to_json)
-  end
-
   def self.from_content_tag(tag, context)
     return nil if tag.blank? || context.blank?
 

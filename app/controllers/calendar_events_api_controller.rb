@@ -508,13 +508,11 @@ class CalendarEventsApiController < ApplicationController
       dup_options = get_duplicate_params(params[:calendar_event])
 
       if dup_options[:count] > RECURRING_EVENT_LIMIT
-        InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", dup_options[:count])
         return render json: {
           message: t("only a maximum of %{limit} events can be created",
                      limit: RECURRING_EVENT_LIMIT)
         }, status: :bad_request
       elsif dup_options[:count] > 0
-        InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dup_options[:count])
         events += create_event_and_duplicates(dup_options)
       else
         events = [@event]
@@ -1474,6 +1472,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def includes(keys = params[:include])
-    (Array(keys) + DEFAULT_INCLUDES).uniq - (params[:excludes] || [])
+    (Array(keys) + DEFAULT_INCLUDES).uniq
   end
 end

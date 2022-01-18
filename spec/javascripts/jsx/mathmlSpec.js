@@ -245,7 +245,8 @@ test('catchEquationImages processes equation images', () => {
     >
   `
   mathImageHelper.catchEquationImages(root)
-  equal(document.querySelectorAll('img[mathjaxified]').length, 0)
+  equal(document.querySelectorAll('img[mathjaxified]').length, 1)
+  equal(document.querySelector('.math_equation_latex').textContent, '\\(17\\)')
 })
 
 test('removeStrayEquationImages only removes tagged images', () => {

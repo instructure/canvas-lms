@@ -345,24 +345,6 @@ $revision-button-color: $ic-color-dark;
     @include breakpoint(desktop) {
       padding: direction-sides(0 $ic-sp * 2 0 $ic-sp);
     }
-
-    @include lti-min-size {
-      &.lti-content {
-        overflow-x: visible;
-
-        p.lti-embed-container {
-          width: 100vw;
-          min-width: 100vw;
-          margin-#{direction(left)}: - 2 * $ic-sp;
-          overflow-x: auto;
-
-          iframe.lti-embed {
-            // Min size to let the video/audio player show the audio slider
-            min-width: 375px;
-          }
-        }
-      }
-    }
   }
   .floating_links {
     margin-#{direction(right)}: 15px;

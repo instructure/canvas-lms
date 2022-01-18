@@ -27,7 +27,6 @@ module Mutations
     argument :vendor_guid, String, required: false
     argument :calculation_method, String, required: false
     argument :calculation_int, Integer, required: false
-    argument :mastery_points, Float, required: false
     argument :ratings, [Types::ProficiencyRatingInputType], required: false
 
     field :learning_outcome, Types::LearningOutcomeType, null: true
@@ -41,22 +40,20 @@ module Mutations
     end
 
     def ratings_attrs(input, context)
-      ratings_input = input.to_h.slice(:calculation_method, :calculation_int, :mastery_points, :ratings)
+      ratings_input = input.to_h.slice(:calculation_method, :calculation_int, :ratings)
 
       return {} unless ratings_input.count.positive? && context
 
       raise GraphQL::ExecutionError, I18n.t("individual ratings data input with invidual_outcome_rating_and_calculation FF disabled") unless context.root_account.feature_enabled?(:individual_outcome_rating_and_calculation)
       raise GraphQL::ExecutionError, I18n.t("individual ratings data input with acount_level_mastery_scale FF enabled") if context.root_account.feature_enabled?(:account_level_mastery_scales)
 
-      updated_ratings_attrs = {}
-      rubric_criterion = {}
-      rubric_criterion[:mastery_points] = ratings_input[:mastery_points] if ratings_input[:mastery_points]
-      rubric_criterion[:ratings] = ratings_input[:ratings] if ratings_input[:ratings]
-      updated_ratings_attrs[:calculation_method] = ratings_input[:calculation_method] if ratings_input[:calculation_method]
-      updated_ratings_attrs[:calculation_int] = ratings_input[:calculation_int] if ratings_input[:calculation_int]
-      updated_ratings_attrs[:rubric_criterion] = rubric_criterion if rubric_criterion.present?
-
-      updated_ratings_attrs
+      {
+        calculation_method: ratings_input[:calculation_method],
+        calculation_int: ratings_input[:calculation_int],
+        rubric_criterion: {
+          ratings: ratings_input[:ratings]
+        }
+      }
     end
   end
 end

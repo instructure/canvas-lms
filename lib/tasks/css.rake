@@ -29,12 +29,25 @@ namespace :css do
   end
 
   task :compile do
-    require "action_view/helpers"
-    require "canvas/cdn/revved_asset_urls"
-    require "brandable_css"
-    ActionView::Base.include(Canvas::Cdn::RevvedAssetUrls)
-    BrandableCSS.save_default_files!
-    system("yarn run build:css")
-    raise "error running brandable_css" unless $?.success?
+    # try to get a conection to the database so we can do the brand_configs:write below
+    begin
+      require "config/environment"
+    rescue => e
+      puts "WARN: failed to load rails environment before compiling: #{e}"
+    end
+    require "config/initializers/revved_asset_urls"
+    require "lib/brandable_css"
+    puts "--> Starting: 'css:compile'"
+    time = Benchmark.realtime do
+      if (BrandConfig.table_exists? rescue false)
+        Rake::Task["brand_configs:write"].invoke
+      else
+        puts "--> no DB connection, skipping generation of brand_config files"
+      end
+      BrandableCSS.save_default_files!
+      system("yarn run build:css")
+      raise "error running brandable_css" unless $?.success?
+    end
+    puts "--> Finished: 'css:compile' in #{time}"
   end
 end

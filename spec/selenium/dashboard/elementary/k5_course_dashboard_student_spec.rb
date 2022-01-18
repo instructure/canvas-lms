@@ -22,7 +22,6 @@ require_relative "../pages/k5_dashboard_page"
 require_relative "../pages/k5_dashboard_common_page"
 require_relative "../pages/k5_grades_tab_page"
 require_relative "../pages/k5_modules_tab_page"
-require_relative "../pages/k5_schedule_tab_page"
 require_relative "../pages/k5_resource_tab_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/k5_announcements_shared_examples"
@@ -34,7 +33,6 @@ describe "student k5 course dashboard" do
   include K5DashboardCommonPageObject
   include K5GradesTabPageObject
   include K5ModulesTabPageObject
-  include K5ScheduleTabPageObject
   include K5ResourceTabPageObject
   include K5Common
 
@@ -139,17 +137,6 @@ describe "student k5 course dashboard" do
       wait_for_ajaximations
 
       expect(assignment_page_title.text).to eq(@module_assignment_title)
-    end
-  end
-
-  context "subject schedule tab" do
-    it "loads the planner for students who have observer enrollment with no linked students" do
-      course_with_teacher(user: @student, active_all: true)
-      observer_course = course_factory(active_all: true)
-      observer_course.enroll_user(@student, "ObserverEnrollment", enrollment_state: "active")
-
-      get "/courses/#{@subject_course.id}#schedule"
-      expect(today_header).to be_displayed
     end
   end
 

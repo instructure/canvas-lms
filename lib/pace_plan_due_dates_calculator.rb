@@ -28,23 +28,30 @@ class PacePlanDueDatesCalculator
     due_dates = {}
     start_date = start_date || enrollment&.start_at&.to_date || pace_plan.start_date
 
-    # We have to make sure we start counting on a day that is enabled
-    unless PacePlansDateHelpers.day_is_enabled?(start_date, pace_plan.exclude_weekends, blackout_dates)
-      start_date = PacePlansDateHelpers.first_enabled_day(start_date, pace_plan.exclude_weekends, blackout_dates)
-    end
+    # We have to make sure we start counting from one day before the plan start, so that the first day is inclusive.
+    # If the plan start date is enabled (i.e., not on a blackout date) we can just subtract one working day.
+    # However, if the plan start date is on a blackout date this will cause issues, because the BusinessTime
+    # `business_days.after` method will find the day before the first workday when you subtract, which means we'll
+    # be one day off in our calculation. So if the day is disabled, we just find the first enabled day in the past,
+    # and start from that.
+    start_date = if PacePlansDateHelpers.day_is_enabled?(start_date, pace_plan.exclude_weekends,
+                                                         blackout_dates)
+                   PacePlansDateHelpers.add_days(start_date, -1, pace_plan.exclude_weekends, blackout_dates)
+                 else
+                   PacePlansDateHelpers.previously_enabled_day(start_date, pace_plan.exclude_weekends,
+                                                               blackout_dates)
+                 end
 
-    items.each do |item|
+    items.each_with_index do |item, index|
+      duration = index == 0 && item.duration == 0 ? 1 : item.duration
+
       due_date = PacePlansDateHelpers.add_days(
         start_date,
-        item.duration,
+        duration,
         pace_plan.exclude_weekends,
         blackout_dates
       )
-
-      # If the pace plan hasn't been committed yet we need to group the items from their module_item_id or we will
-      # end up grouping them by nil and losing the data for each item as it gets overwritten by the next item.
-      key = pace_plan.persisted? ? item.id : item.module_item_id
-      due_dates[key] = due_date.to_date
+      due_dates[item.id] = due_date.to_date
       start_date = due_date # The next item's start date is this item's due date
     end
 

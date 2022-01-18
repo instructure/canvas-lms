@@ -22,7 +22,6 @@ import Gradebook from './Gradebook'
 import PerformanceControls from './PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import useModules from './hooks/useModules'
-import useFilters from './hooks/useFilters'
 
 export default function GradebookData(props) {
   const performanceControls = useRef(
@@ -34,36 +33,21 @@ export default function GradebookData(props) {
     })
   )
   const courseId = props.gradebookEnv.context_id
-  const {
-    data: modules,
-    errors: modulesErrors,
-    loading: isModulesLoading
-  } = useModules(
+  const {data: modules, loading: isModulesLoading} = useModules(
     dispatch.current,
     courseId,
     performanceControls.contextModulesPerPage,
     props.gradebookEnv.has_modules
   )
 
-  const {
-    data: filters,
-    errors: filtersErrors,
-    loading: isFiltersLoading,
-    setData: handleFiltersChange
-  } = useFilters(courseId, props.gradebookEnv.enhanced_gradebook_filters)
-
   return (
     <Gradebook
       {...props}
-      flashAlerts={[...modulesErrors, ...filtersErrors]}
-      filters={filters}
-      isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
       dispatch={dispatch.current}
-      onFiltersChange={handleFiltersChange}
     />
   )
 }

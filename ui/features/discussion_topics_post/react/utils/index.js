@@ -172,14 +172,14 @@ export const isTopicAuthor = (topicAuthor, entryAuthor) => {
   return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
 }
 
-export const getOptimisticResponse = ({
-  message = '',
+export const getOptimisticResponse = (
+  message,
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
   isolatedEntryId = null,
   quotedEntry = null,
   isAnonymous = false
-} = {}) => {
+) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
       createdAt: quotedEntry.createdAt,

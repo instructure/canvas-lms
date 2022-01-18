@@ -223,7 +223,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
       outcome_proficiency.mastery_points.to_f / outcome_proficiency.points_possible.to_f
     else
-      return unless parent_has_mastery? && parent_outcome.points_possible.to_f > 0
+      return unless parent_has_mastery? && parent_outcome.points_possible > 0
 
       parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
     end

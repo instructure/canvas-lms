@@ -31,7 +31,7 @@
   "homepage": "https://github.com/instructure/canvas-lms#readme",
   "dependencies": {
     "@instructure/canvas-theme": "7",
-    "@instructure/k5uploader": "*",
+    "@instructure/k5uploader": "^1.0.0",
     "@instructure/media-capture": "~8.0.1-rc.11",
     "@instructure/ui-a11y-content": "^7",
     "@instructure/ui-alerts": "^7",

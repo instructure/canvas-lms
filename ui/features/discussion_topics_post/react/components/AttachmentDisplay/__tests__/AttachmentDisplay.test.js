@@ -22,12 +22,17 @@ import {AttachmentDisplay} from '../AttachmentDisplay'
 
 const setup = props => {
   return render(
-    <AttachmentDisplay setAttachment={() => {}} setAttachmentToUpload={() => {}} {...props} />
+    <AttachmentDisplay
+      setAttachments={() => {}}
+      setAttachmentsToUpload={() => {}}
+      attachments={[]}
+      {...props}
+    />
   )
 }
 
 describe('AttachmentDisplay', () => {
-  it('displays AttachButton when there is no attachment', () => {
+  it('displays AttachButton when there are no attachments', () => {
     const {queryByText} = setup()
     expect(queryByText('Attach')).toBeTruthy()
   })
@@ -38,29 +43,18 @@ describe('AttachmentDisplay', () => {
     expect(queryByTestId('attachment-input')).not.toHaveAttribute('multiple')
   })
 
-  it('displays AttachmentButton when there is an attachment', () => {
+  it('displays AttachmentButton when there are no attachments', () => {
     const {queryByText} = setup({
-      attachment: {
-        _id: 1,
-        displayName: 'file_name.file',
-        url: 'file_download_example.com'
-      }
+      attachments: [
+        {
+          id: 1,
+          display_name: 'file_name.file',
+          url: 'file_download_example.com'
+        }
+      ]
     })
 
     expect(queryByText('Attach')).toBeFalsy()
     expect(queryByText('file_name.file')).toBeTruthy()
-  })
-
-  it('truncates filenames > 30 characters', () => {
-    const {queryByText} = setup({
-      attachment: {
-        _id: 1,
-        displayName: 'Fundamentals of Differential Equations - Exercise 17 _ Quizlet.pdf',
-        url: 'file_download_example.com'
-      }
-    })
-
-    expect(queryByText('Attach')).toBeFalsy()
-    expect(queryByText('Fundamentals of Differential E...')).toBeTruthy()
   })
 })

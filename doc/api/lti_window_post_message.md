@@ -201,32 +201,6 @@ window.parent.postMessage(
 )
 ```
 
-## lti.showAlert
-
-Shows an alert using Canvas's alert system, and includes the name of the LTI
-tool that sent the message.
-
-**Required properties:**
-- subject: "lti.showAlert"
-- body: The contents of the alert - can either be a string, or JSON string.
-
-**Optional properties:**
-- alertType: "success", "warning", or "error". Defaults to "success".
-- title: A display name for the tool. If not provided, Canvas will attempt to
-  supply the tool name or default to "External Tool".
-
-```js
-window.parent.postMessage(
-  {
-    subject: "lti.showAlert",
-    alertType: "warning",
-    body: "An warning to be shown",
-    title: "Tool Name"
-  },
-  "*"
-)
-```
-
 ## lti.enableScrollEvents
 
 Sends a debounced postMessage event to the tool every time its containing

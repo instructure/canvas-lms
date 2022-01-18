@@ -151,10 +151,10 @@ module CanvasRails
 
     config.middleware.use Rack::Chunked
     config.middleware.use Rack::Deflater, if: lambda { |*|
-      ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
     config.middleware.use Rack::Brotli, if: lambda { |*|
-      ::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
     config.i18n.load_path << Rails.root.join("config/locales/locales.yml")
@@ -289,9 +289,7 @@ module CanvasRails
     config.exceptions_app = ExceptionsApp.new
 
     config.before_initialize do
-      config.action_controller.asset_host = lambda do |source, *_|
-        ::Canvas::Cdn.asset_host_for(source)
-      end
+      config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)
     end
 
     if config.action_dispatch.rack_cache != false
@@ -321,8 +319,8 @@ module CanvasRails
         # and these resources actually aren't even on disk in those cases.
         # do not remove this conditional until the asset build no longer
         # needs the rails app for anything.
-
-        DynamicSettingsInitializer.bootstrap!
+        require_dependency "canvas/dynamic_settings"
+        Canvas::DynamicSettingsInitializer.bootstrap!
       end
     end
 

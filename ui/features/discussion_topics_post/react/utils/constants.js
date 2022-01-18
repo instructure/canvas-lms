@@ -21,7 +21,6 @@ export const AUTO_MARK_AS_READ_DELAY = 3000
 export const CURRENT_USER = 'current_user'
 export const HIGHLIGHT_TIMEOUT = 6000
 export const SEARCH_TERM_DEBOUNCE_DELAY = 500
-export const DEFAULT_AVATAR_URL = 'http://canvas.instructure.com/images/messages/avatar-50.png'
 
 const searchFilter = {
   searchTerm: '',

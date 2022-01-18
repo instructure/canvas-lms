@@ -31,8 +31,8 @@ describe MicrosoftSync::LoginService do
 
     context "when not configured" do
       before do
-        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(DynamicSettings).to receive(:find).with("microsoft-sync").and_return(nil)
+        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(Canvas::DynamicSettings).to receive(:find).with("microsoft-sync").and_return(nil)
       end
 
       it 'returns an error "MicrosoftSync not configured"' do
@@ -51,8 +51,8 @@ describe MicrosoftSync::LoginService do
 
       context "when Microsoft returns a response" do
         before do
-          allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-          allow(DynamicSettings).to receive(:find).with("microsoft-sync").and_return({
+          allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+          allow(Canvas::DynamicSettings).to receive(:find).with("microsoft-sync").and_return({
                                                                                                "client-id" => "theclientid",
                                                                                                "client-secret" => "thesecret"
                                                                                              })

@@ -42,7 +42,7 @@ module Services
       end
 
       def config
-        @config ||= DynamicSettings.find("feature_analytics", tree: :private) || {}
+        @config ||= Canvas::DynamicSettings.find("feature_analytics", tree: :private) || {}
       end
     end
   end

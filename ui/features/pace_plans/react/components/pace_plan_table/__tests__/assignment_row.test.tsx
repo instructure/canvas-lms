@@ -35,7 +35,7 @@ const setPlanItemDuration = jest.fn()
 
 const defaultProps = {
   pacePlan: PRIMARY_PLAN,
-  dueDate: '2020-01-01T02:00:00-05:00',
+  dueDate: '2020-01-01',
   excludeWeekends: false,
   pacePlanItem: PRIMARY_PLAN.modules[0].items[0],
   pacePlanItemPosition: 0,
@@ -50,10 +50,6 @@ const defaultProps = {
   isStacked: false,
   isStudentPlan: false
 }
-
-beforeAll(() => {
-  ENV.CONTEXT_TIMEZONE = 'America/New_York' // to match defaultProps.dueDate
-})
 
 afterEach(() => {
   jest.clearAllMocks()
