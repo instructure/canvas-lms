@@ -168,20 +168,22 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   return (
     <SlideTransition expanded={showProjections} direction="vertical" size="30rem">
       <View as="div">
-        <Flex as="section" alignItems="start" margin="0 0 small">
-          <PacePlanDateInput
-            label={I18n.t('Start Date')}
-            helpText={startHelpText}
-            message={startMessage}
-            interaction={startInteraction}
-            dateValue={startDateValue}
-            onDateChange={setStartDate}
-            weekendsDisabled={weekendsDisabled}
-            blackoutDates={blackoutDates}
-            validateDay={validateStart}
-            width="14rem"
-          />
-          <View margin="0 0 0 medium">
+        <Flex as="section" alignItems="center" margin="0" wrap="wrap">
+          <Flex.Item margin="0 medium medium 0" shouldGrow>
+            <PacePlanDateInput
+              label={I18n.t('Start Date')}
+              helpText={startHelpText}
+              message={startMessage}
+              interaction={startInteraction}
+              dateValue={startDateValue}
+              onDateChange={setStartDate}
+              weekendsDisabled={weekendsDisabled}
+              blackoutDates={blackoutDates}
+              validateDay={validateStart}
+              width="15rem"
+            />
+          </Flex.Item>
+          <Flex.Item margin="0 medium medium 0" shouldGrow>
             <PacePlanDateInput
               id="pace-plans-required-end-date-input"
               label={I18n.t('End Date')}
@@ -189,9 +191,10 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
               interaction={endDateInteraction}
               dateValue={endDateValue}
               onDateChange={setEndDate}
+              width="15rem"
             />
-          </View>
-          <Flex.Item margin="0 0 0 medium" align="center">
+          </Flex.Item>
+          <Flex.Item margin="0 medium medium 0" align="center">
             <Checkbox
               data-testid="require-end-date-toggle"
               label={I18n.t('Require Completion by Specified End Date')}
@@ -203,8 +206,8 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
             />
           </Flex.Item>
         </Flex>
-        <Flex as="section" margin="0 0 small" justifyItems="space-between" wrap="wrap">
-          <Flex.Item margin="0 x-small 0 0">
+        <Flex as="section" justifyItems="space-between" wrap="wrap" margin="0 0 x-small">
+          <Flex.Item margin="0 x-small x-small 0">
             <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
               <Text>
                 <i>
@@ -235,7 +238,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
               </Text>
             </View>
           </Flex.Item>
-          <Flex.Item>
+          <Flex.Item margin="0 0 x-small">
             <Text fontStyle="italic">{I18n.t('Dates shown in course time zone')}</Text>
           </Flex.Item>
         </Flex>

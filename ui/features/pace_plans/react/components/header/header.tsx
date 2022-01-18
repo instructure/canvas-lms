@@ -32,16 +32,18 @@ export type HeaderProps = {
 
 const Header = (props: HeaderProps) => (
   <View as="div">
-    <View as="div" borderWidth="0 0 small 0" margin="0 0 medium">
-      <Flex as="section" alignItems="end" margin="0 0 medium" wrapItems>
-        <PlanPicker />
-        <View margin="0 0 0 small">
-          <Settings />
-        </View>
-        <View margin="0 auto 0 small">
-          <ShowProjectionsButton />
-        </View>
-        <UnpublishedChangesIndicator onClick={props.handleDrawerToggle} margin="medium 0 0" />
+    <View as="div" borderWidth="0 0 small 0" margin="0 0 medium" padding="0 0 small">
+      <Flex as="section" alignItems="end" wrapItems>
+        <Flex.Item margin="0 0 small">
+          <PlanPicker />
+        </Flex.Item>
+        <Flex.Item margin="0 0 small" shouldGrow>
+          <Settings margin="0 0 0 small" />
+          <ShowProjectionsButton margin="0 auto 0 small" />
+        </Flex.Item>
+        <Flex.Item textAlign="end" margin="0 0 small small">
+          <UnpublishedChangesIndicator onClick={props.handleDrawerToggle} />
+        </Flex.Item>
       </Flex>
     </View>
     <ProjectedDates />

@@ -39,9 +39,14 @@ interface DispatchProps {
   readonly toggleShowProjections: typeof uiActions.toggleShowProjections
 }
 
-type ComponentProps = StoreProps & DispatchProps
+interface PassedProps {
+  readonly margin?: string
+}
+
+type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 export const ShowProjectionsButton: React.FC<ComponentProps> = ({
+  margin,
   responsiveSize,
   showProjections,
   studentPlan,
@@ -57,6 +62,7 @@ export const ShowProjectionsButton: React.FC<ComponentProps> = ({
     return (
       <IconButton
         data-testid="projections-icon-button"
+        margin={margin}
         screenReaderLabel={buttonText}
         onClick={toggleShowProjections}
       >
@@ -67,6 +73,7 @@ export const ShowProjectionsButton: React.FC<ComponentProps> = ({
   return (
     <Button
       data-test-id="projections-text-button"
+      margin={margin}
       renderIcon={Icon}
       onClick={toggleShowProjections}
     >
