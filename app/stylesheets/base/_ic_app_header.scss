@@ -105,6 +105,10 @@ $ic-tooltip-arrow-size: 0.375rem;
     .ic-icon-svg {
       fill: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
     }
+    .menu-item__badge {
+      background: var(--ic-brand-global-nav-menu-item__badge-bgd--active);
+      color: var(--ic-brand-global-nav-menu-item__badge-text--active);
+    }
     .ic-avatar {
       border-color: $ic-border-light;
       &.ic-avatar--fake-student {
