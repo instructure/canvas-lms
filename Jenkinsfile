@@ -48,6 +48,10 @@ def getDockerWorkDir() {
 }
 
 def getLocalWorkDir() {
+  if (env.GERRIT_PROJECT == 'qti_migration_tool') {
+    return "vendor/${env.GERRIT_PROJECT}"
+  }
+
   return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
