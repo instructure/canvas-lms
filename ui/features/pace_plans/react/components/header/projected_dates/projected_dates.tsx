@@ -166,7 +166,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   }
 
   return (
-    <SlideTransition expanded={showProjections} direction="vertical" size="12rem">
+    <SlideTransition expanded={showProjections} direction="vertical" size="30rem">
       <View as="div">
         <Flex as="section" alignItems="start" margin="0 0 small">
           <PacePlanDateInput
@@ -203,36 +203,41 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
             />
           </Flex.Item>
         </Flex>
-        <Flex as="section" margin="0 0 small">
-          <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
-            <Text>
-              <i>
-                {I18n.t(
-                  {
-                    one: '1 assignment',
-                    other: '%{count} assignments'
-                  },
-                  {count: assignments}
-                )}
-              </i>
-            </Text>
-          </View>
-          <PresentationContent>
-            <Text color="secondary">|</Text>
-          </PresentationContent>
-          <View margin="0 0 0 x-small">
-            <Text>
-              <i>
-                {I18n.t(
-                  {
-                    one: '1 week',
-                    other: '%{count} weeks'
-                  },
-                  {count: planWeeks}
-                )}
-              </i>
-            </Text>
-          </View>
+        <Flex as="section" margin="0 0 small" justifyItems="space-between" wrap="wrap">
+          <Flex.Item margin="0 x-small 0 0">
+            <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
+              <Text>
+                <i>
+                  {I18n.t(
+                    {
+                      one: '1 assignment',
+                      other: '%{count} assignments'
+                    },
+                    {count: assignments}
+                  )}
+                </i>
+              </Text>
+            </View>
+            <PresentationContent>
+              <Text color="secondary">|</Text>
+            </PresentationContent>
+            <View margin="0 0 0 x-small">
+              <Text>
+                <i>
+                  {I18n.t(
+                    {
+                      one: '1 week',
+                      other: '%{count} weeks'
+                    },
+                    {count: planWeeks}
+                  )}
+                </i>
+              </Text>
+            </View>
+          </Flex.Item>
+          <Flex.Item>
+            <Text fontStyle="italic">{I18n.t('Dates shown in course time zone')}</Text>
+          </Flex.Item>
         </Flex>
       </View>
     </SlideTransition>
