@@ -3197,6 +3197,84 @@ describe "Submissions API", type: :request do
       }.by(1)
     end
 
+    context "grading scheme with numerics in names" do
+      before do
+        @standard = @course.grading_standards.create!(title: "course standard", standard_data: { a: { name: "5", value: "90" }, b: { name: "4", value: "70" }, c: { name: "3", value: "50" }, d: { name: "Revision required/Komplettering", value: "25" }, e: { name: "U", value: "0" } })
+        @assignment.update_attribute :grading_standard, @standard
+        api_call(:put, "/api/v1/courses/#{@course.id}",
+                 { controller: "courses", action: "update", format: "json", id: @course.to_param }, course: { grading_standard_id: @standard.id })
+        @course.reload
+      end
+
+      it "can grade when it matches grading name and enter grades is set to points" do
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              posted_grade: 5
+            },
+            prefer_points_over_scheme: true
+          }
+        )
+
+        expect(json["grade"]).to eq "Revision required/Komplettering"
+        expect(json["score"]).to eq 5.0
+      end
+
+      it "can grade when it matches grading scheme name" do
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              posted_grade: 5
+            }
+          }
+        )
+
+        expect(json["grade"]).to eq "5"
+        expect(json["score"]).to eq @assignment.points_possible
+      end
+
+      it "can grade when it does not match grading scheme name" do
+        # grading_type = "letter_grade"
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              posted_grade: 9
+            }
+          }
+        )
+
+        expect(json["grade"]).to eq "3"
+        expect(json["score"]).to eq 9.0
+      end
+    end
+
     context "group assignments" do
       before do
         @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
