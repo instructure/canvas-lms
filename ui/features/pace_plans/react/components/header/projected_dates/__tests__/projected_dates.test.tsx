@@ -129,6 +129,25 @@ describe('ProjectedDates', () => {
       expect(getByTestId('paceplan-date-text').textContent).toStrictEqual('December 31, 2021')
     })
 
+    it('shows term end date text', () => {
+      window.ENV.VALID_DATE_RANGE = {
+        end_at: {date: COURSE.end_at, date_context: 'term'},
+        start_at: {date: COURSE.start_at, date_context: 'term'}
+      }
+      const plan = {
+        ...defaultProps.pacePlan,
+        hard_end_dates: false,
+        start_sate: '2022-01-03',
+        end_date: undefined
+      }
+      const {getAllByText, getByTestId} = renderConnected(
+        <ProjectedDates {...defaultProps} pacePlan={plan} />
+      )
+      expect(getAllByText('Required by term end date').length).toBeTruthy()
+      // expect the term end date
+      expect(getByTestId('paceplan-date-text').textContent).toStrictEqual('December 31, 2021')
+    })
+
     it('shows specified end date input', () => {
       const {getAllByText, getByDisplayValue} = renderConnected(
         <ProjectedDates {...defaultProps} />
