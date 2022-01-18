@@ -229,14 +229,12 @@ describe BrandConfig do
   end
 
   it "expects md5 to be correct" do
-    what_it_should_be_if_you_have_not_ran_gulp_rev = 338_164_632_037_494_729
-    what_it_should_be_if_you_have = 5_142_524_871_566_800_521
+    what_it_should_be_if_you_have_not_ran_gulp_rev = 249_250_173_663_295_064_325
+    what_it_should_be_if_you_have = 748_091_800_218_022_945_873
     expect(BrandableCSS.migration_version).to eq(what_it_should_be_if_you_have_not_ran_gulp_rev).or eq(what_it_should_be_if_you_have)
-    # 12142021: previous version of 'what_it_should_be_if_you_have' variable is 839_184_435_922_331_766
-    # 12162021: previous version of 'what_it_should_be_if_you_have' variable is 9_870_895_717_200_317_536_012
     # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
     # you will need to update the migration that runs brand_configs and update these md5s that are
     # with and without running `rake canvas:compile_assets`
-    # Also update the other use of 338_164_632_037_494_729 in lib/brandable_css.rb
+    # See the following migration file for more info: "#{BrandableCSS::MIGRATION_NAME.underscore}_predeploy.rb"
   end
 end

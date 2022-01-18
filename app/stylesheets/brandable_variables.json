@@ -70,9 +70,19 @@
     "default": "#ffffff"
   },
   {
+    "variable_name": "ic-brand-global-nav-menu-item__badge-bgd--active",
+    "type": "color",
+    "default": "$ic-brand-primary"
+  },
+  {
     "variable_name": "ic-brand-global-nav-menu-item__badge-text",
     "type": "color",
     "default": "#000000"
+  },
+  {
+    "variable_name": "ic-brand-global-nav-menu-item__badge-text--active",
+    "type": "color",
+    "default": "#ffffff"
   },
   {
     "variable_name": "ic-brand-global-nav-logo-bgd",
