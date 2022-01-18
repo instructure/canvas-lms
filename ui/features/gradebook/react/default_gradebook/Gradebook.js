@@ -22,7 +22,6 @@ import {intersection} from 'lodash'
 import tz from '@canvas/timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
@@ -165,9 +164,11 @@ class Gradebook extends React.Component {
       modules: [],
       assignmentGroups: [],
       sections: this.sections_enabled ? this.options.sections.map(htmlEscape) : [],
+      filters: [],
       isEssentialDataLoaded: false
     }
     this.gradebookSettingsModalButton = React.createRef()
+    this.onChangeFilters = this.onChangeFilters.bind(this)
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
     this.bindGridEvents = this.bindGridEvents.bind(this)
@@ -1268,7 +1269,7 @@ class Gradebook extends React.Component {
 
     const assignmentGroupIds = findAllAppliedFilterValuesOfType(
       'assignment-group',
-      this.props.filters
+      this.state.filters
     )
     return (
       assignmentGroupIds.length === 0 || assignmentGroupIds.includes(assignment.assignment_group_id)
@@ -1294,12 +1295,12 @@ class Gradebook extends React.Component {
       )
     }
 
-    const moduleIds = findAllAppliedFilterValuesOfType('module', this.props.filters)
+    const moduleIds = findAllAppliedFilterValuesOfType('module', this.state.filters)
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
   }
 
   filterAssignmentByStartDate(assignment) {
-    const date = findAllAppliedFilterValuesOfType('start-date', this.props.filters)[0]
+    const date = findAllAppliedFilterValuesOfType('start-date', this.state.filters)[0]
     if (!date) {
       return true
     }
@@ -1309,7 +1310,7 @@ class Gradebook extends React.Component {
   }
 
   filterAssignmentByEndDate(assignment) {
-    const date = findAllAppliedFilterValuesOfType('end-date', this.props.filters)[0]
+    const date = findAllAppliedFilterValuesOfType('end-date', this.state.filters)[0]
     if (!date) {
       return true
     }
@@ -1618,7 +1619,7 @@ class Gradebook extends React.Component {
     if (currentSection !== sectionId) {
       this.setFilterRowsBySetting('sectionId', sectionId)
       this.postGradesStore.setSelectedSection(sectionId)
-      return this.saveSettings({}).then(() => {
+      return this.saveSettings({}, () => {
         this.updateSectionFilterVisibility()
         return this.dataLoader.reloadStudentDataForSectionFilterChange()
       })
@@ -1669,7 +1670,7 @@ class Gradebook extends React.Component {
     groupId = groupId === '0' ? null : groupId
     if (this.getFilterRowsBySetting('studentGroupId') !== groupId) {
       this.setFilterRowsBySetting('studentGroupId', groupId)
-      return this.saveSettings({}).then(() => {
+      return this.saveSettings({}, () => {
         this.updateStudentGroupFilterVisibility()
         return this.dataLoader.reloadStudentDataForStudentGroupFilterChange()
       })
@@ -2527,27 +2528,19 @@ class Gradebook extends React.Component {
     })
     if (!this.hideAggregateColumns()) {
       for (assignmentGroupId in this.assignmentGroups) {
-        const column =
+        scrollableColumns.push(
           this.gridData.columns.definitions[getAssignmentGroupColumnId(assignmentGroupId)]
-        if (column) {
-          scrollableColumns.push(column)
-        }
+        )
       }
       if (this.getColumnOrder().freezeTotalGrade) {
         if (!parentColumnIds.includes('total_grade')) {
           parentColumnIds.push('total_grade')
         }
       } else {
-        const column = this.gridData.columns.definitions.total_grade
-        if (column) {
-          scrollableColumns.push(column)
-        }
+        scrollableColumns.push(this.gridData.columns.definitions.total_grade)
       }
       if (this.courseSettings.allowFinalGradeOverride) {
-        const column = this.gridData.columns.definitions.total_grade_override
-        if (column) {
-          scrollableColumns.push(column)
-        }
+        scrollableColumns.push(this.gridData.columns.definitions.total_grade_override)
       }
     }
     if ((ref1 = this.gradebookColumnOrderSettings) != null ? ref1.sortType : undefined) {
@@ -2923,18 +2916,22 @@ class Gradebook extends React.Component {
     })
   }
 
-  saveSettings({
-    selectedViewOptionsFilters = this.listSelectedViewOptionsFilters(),
-    showConcludedEnrollments = this.getEnrollmentFilters().concluded,
-    showInactiveEnrollments = this.getEnrollmentFilters().inactive,
-    showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
-    showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
-    studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
-    studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
-    sortRowsBy = this.getSortRowsBySetting(),
-    viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
-    colors = this.state.gridColors
-  } = {}) {
+  saveSettings(
+    {
+      selectedViewOptionsFilters = this.listSelectedViewOptionsFilters(),
+      showConcludedEnrollments = this.getEnrollmentFilters().concluded,
+      showInactiveEnrollments = this.getEnrollmentFilters().inactive,
+      showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
+      showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
+      studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
+      studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
+      sortRowsBy = this.getSortRowsBySetting(),
+      viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
+      colors = this.state.gridColors
+    } = {},
+    successFn,
+    errorFn
+  ) {
     if (!(selectedViewOptionsFilters.length > 0)) {
       selectedViewOptionsFilters.push('')
     }
@@ -2943,27 +2940,27 @@ class Gradebook extends React.Component {
         enter_grades_as: this.gridDisplaySettings.enterGradesAs,
         filter_columns_by: underscore(this.gridDisplaySettings.filterColumnsBy),
         selected_view_options_filters: selectedViewOptionsFilters,
-        show_concluded_enrollments: showConcludedEnrollments ? 'true' : 'false',
-        show_inactive_enrollments: showInactiveEnrollments ? 'true' : 'false',
-        show_unpublished_assignments: showUnpublishedAssignments ? 'true' : 'false',
-        show_separate_first_last_names: showSeparateFirstLastNames ? 'true' : 'false',
+        show_concluded_enrollments: showConcludedEnrollments,
+        show_inactive_enrollments: showInactiveEnrollments,
+        show_unpublished_assignments: showUnpublishedAssignments,
+        show_separate_first_last_names: showSeparateFirstLastNames,
         student_column_display_as: studentColumnDisplayAs,
         student_column_secondary_info: studentColumnSecondaryInfo,
         filter_rows_by: underscore(this.gridDisplaySettings.filterRowsBy),
         sort_rows_by_column_id: sortRowsBy.columnId,
         sort_rows_by_setting_key: sortRowsBy.settingKey,
         sort_rows_by_direction: sortRowsBy.direction,
-        view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
+        view_ungraded_as_zero: viewUngradedAsZero,
         colors
       }
     }
 
     if (this.options.enhanced_gradebook_filters) {
       return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
+        .then(successFn)
+        .catch(errorFn)
     } else {
-      return new Promise((resolve, reject) => {
-        $.ajaxJSON(this.options.settings_update_url, 'PUT', data, resolve, reject)
-      })
+      return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
     }
   }
 
@@ -3780,13 +3777,16 @@ class Gradebook extends React.Component {
     const toggleableAction = () => {
       this.gridDisplaySettings.showUnpublishedAssignments =
         !this.gridDisplaySettings.showUnpublishedAssignments
-      this.updateColumnsAndRenderViewOptionsMenu()
+      return this.updateColumnsAndRenderViewOptionsMenu()
     }
     toggleableAction()
-    // on success, do nothing since the render happened earlier
-    return this.saveSettings({
-      showUnpublishedAssignments: this.gridDisplaySettings.showUnpublishedAssignments
-    }).catch(toggleableAction)
+    return this.saveSettings(
+      {
+        showUnpublishedAssignments: this.gridDisplaySettings.showUnpublishedAssignments
+      },
+      () => {},
+      toggleableAction
+    ) // on success, do nothing since the render happened earlier
   }
 
   initShowSeparateFirstLastNames(showSeparateFirstLastNames = false) {
@@ -3800,10 +3800,13 @@ class Gradebook extends React.Component {
       return this.updateColumnsAndRenderViewOptionsMenu() && this.renderActionMenu()
     }
     toggleableAction()
-    // on success, do nothing since the render happened earlier
-    return this.saveSettings({
-      showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames
-    }).catch(toggleableAction)
+    return this.saveSettings(
+      {
+        showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames
+      },
+      () => {},
+      toggleableAction
+    ) // on success, do nothing since the render happened earlier
     // this pattern keeps the ui snappier rather than waiting for ajax call to complete
   }
 
@@ -3818,10 +3821,11 @@ class Gradebook extends React.Component {
       this.updateAllTotalColumns()
     }
     toggleableAction()
-    // on success, do nothing since the render happened earlier
-    return this.saveSettings({
-      viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero
-    }).catch(toggleableAction)
+    return this.saveSettings(
+      {viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero},
+      () => {},
+      toggleableAction
+    ) // on success, do nothing since the render happened earlier
   }
 
   assignmentsLoadedForCurrentView() {
@@ -4092,7 +4096,7 @@ class Gradebook extends React.Component {
       this.setState({gridColors: statusColors(this.gridDisplaySettings.colors)})
       return successFn()
     }
-    return this.saveSettings({colors}).then(setAndRenderColors).catch(errorFn)
+    return this.saveSettings({colors}, setAndRenderColors, errorFn)
   }
 
   listAvailableViewOptionsFilters() {
@@ -4123,7 +4127,7 @@ class Gradebook extends React.Component {
     return this.gridDisplaySettings.selectedViewOptionsFilters
   }
 
-  toggleEnrollmentFilter(enrollmentFilter, skipApply = false) {
+  toggleEnrollmentFilter(enrollmentFilter, skipApply) {
     this.getEnrollmentFilters()[enrollmentFilter] = !this.getEnrollmentFilters()[enrollmentFilter]
     if (!skipApply) {
       return this.applyEnrollmentFilter()
@@ -4138,9 +4142,7 @@ class Gradebook extends React.Component {
   applyEnrollmentFilter() {
     const showInactive = this.getEnrollmentFilters().inactive
     const showConcluded = this.getEnrollmentFilters().concluded
-    return this.saveSettings({showInactive, showConcluded}).then(
-      this.updateStudentHeadersAndReloadData
-    )
+    return this.saveSettings({showInactive, showConcluded}, this.updateStudentHeadersAndReloadData)
   }
 
   getEnrollmentFilters() {
@@ -4178,7 +4180,7 @@ class Gradebook extends React.Component {
 
   updateEnterGradesAsSetting(assignmentId, value) {
     this.setEnterGradesAsSetting(assignmentId, value)
-    return this.saveSettings({}).then(() => {
+    return this.saveSettings({}, () => {
       this.gradebookGrid.gridSupport.columns.updateColumnHeaders([
         getAssignmentColumnId(assignmentId)
       ])
@@ -4675,7 +4677,7 @@ class Gradebook extends React.Component {
     this.onShow()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (
       prevProps.isModulesLoading !== this.props.isModulesLoading &&
       !this.props.isModulesLoading
@@ -4683,10 +4685,10 @@ class Gradebook extends React.Component {
       this.updateContextModules(this.props.modules)
     }
 
-    if (prevProps.filters !== this.props.filters) {
+    if (prevState.filters !== this.state.filters) {
       this.updateColumns()
 
-      const sectionIds = findAllAppliedFilterValuesOfType('section', this.props.filters)
+      const sectionIds = findAllAppliedFilterValuesOfType('section', this.state.filters)
       if (sectionIds.length > 0) {
         this.updateCurrentSection(sectionIds[0])
       } else {
@@ -4695,22 +4697,13 @@ class Gradebook extends React.Component {
     }
   }
 
+  onChangeFilters(filters) {
+    this.setState({filters})
+  }
+
   render() {
     return (
       <>
-        <Portal node={this.props.flashMessageContainer}>
-          {this.props.flashAlerts.map(alert => (
-            <div key={alert.key} id={alert.key} className="Gradebook__FlashMessage">
-              {/* eslint-disable-next-line react/jsx-pascal-case */}
-              <FlashAlert.default
-                message={alert.message}
-                onClose={() => document.getElementById(alert.key).remove()}
-                timeout={5000}
-                variant={alert.variant}
-              />
-            </div>
-          ))}
-        </Portal>
         <Portal node={this.props.settingsModalButtonContainer}>
           <Button
             renderIcon={IconSettingsSolid}
@@ -4733,54 +4726,20 @@ class Gradebook extends React.Component {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
-        {this.options.enhanced_gradebook_filters &&
-          !this.props.isFiltersLoading &&
-          this.state.isEssentialDataLoaded && (
-            <Portal node={this.props.filterNavNode}>
-              <FilterNav
-                filters={this.props.filters}
-                onChange={this.props.onFiltersChange}
-                modules={this.state.modules}
-                assignmentGroups={this.state.assignmentGroups}
-                sections={this.state.sections}
-              />
-            </Portal>
-          )}
+        {this.options.enhanced_gradebook_filters && this.state.isEssentialDataLoaded && (
+          <Portal node={this.props.filterNavNode}>
+            <FilterNav
+              filters={this.state.filters}
+              onChange={this.onChangeFilters}
+              modules={this.state.modules}
+              assignmentGroups={this.state.assignmentGroups}
+              sections={this.state.sections}
+            />
+          </Portal>
+        )}
       </>
     )
   }
-}
-
-Gradebook.propTypes = {
-  filterNavNode: PropTypes.instanceOf(Element).isRequired,
-  filters: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      conditions: PropTypes.array.isRequired,
-      isApplied: PropTypes.bool.isRequired,
-      createdAt: PropTypes.string.isRequired
-    })
-  ),
-  flashAlerts: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-      variant: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  flashMessageContainer: PropTypes.instanceOf(Element).isRequired,
-  gridColorNode: PropTypes.instanceOf(Element).isRequired,
-  isFiltersLoading: PropTypes.bool.isRequired,
-  isModulesLoading: PropTypes.bool.isRequired,
-  modules: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  onFiltersChange: PropTypes.func.isRequired,
-  settingsModalButtonContainer: PropTypes.instanceOf(Element).isRequired
 }
 
 Gradebook.prototype.hasSections = $.Deferred()

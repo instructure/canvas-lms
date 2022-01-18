@@ -26,34 +26,34 @@ describe SentryProxy do
   before { SentryProxy.clear_ignorable_errors }
 
   describe ".capture" do
-    it "forwards exceptions on to sentry" do
+    it "forwards exceptions on to raven" do
       e = error_klass.new
-      expect(Sentry).to receive(:capture_exception).with(e, data)
+      expect(Raven).to receive(:capture_exception).with(e, data)
       SentryProxy.capture(e, data)
     end
 
-    it "passes messages to the capture_message sentry method" do
+    it "passes messages to the capture_message raven method" do
       e = "Some Message"
-      expect(Sentry).to receive(:capture_message).with(e, data)
+      expect(Raven).to receive(:capture_message).with(e, data)
       SentryProxy.capture(e, data)
     end
 
-    it "changes symbols to strings because sentry chokes otherwise" do
+    it "changes symbols to strings because raven chokes otherwise" do
       e = :some_exception_type
-      expect(Sentry).to receive(:capture_message).with("some_exception_type", data)
+      expect(Raven).to receive(:capture_message).with("some_exception_type", data)
       SentryProxy.capture(e, data)
     end
 
     it "does not send the message if configured as ignorable" do
       SentryProxy.register_ignorable_error(error_klass)
       e = error_klass.new
-      expect(Sentry).to_not receive(:capture_exception)
+      expect(Raven).to_not receive(:capture_exception)
       SentryProxy.capture(e, data)
     end
 
     it "does not send to sentry for low-level errors" do
       e = error_klass.new
-      expect(Sentry).not_to receive(:capture_exception)
+      expect(Raven).not_to receive(:capture_exception)
       SentryProxy.capture(e, data, :warn)
     end
   end
@@ -73,7 +73,7 @@ describe SentryProxy do
     it "registers strings to skip capture_message" do
       e = "Some Message"
       SentryProxy.register_ignorable_error(e)
-      expect(Sentry).to_not receive(:capture_message)
+      expect(Raven).to_not receive(:capture_message)
       SentryProxy.capture(e, data)
     end
   end

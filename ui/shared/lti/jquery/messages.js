@@ -37,7 +37,6 @@ const SUBJECT_ALLOW_LIST = [
   'lti.screenReaderAlert',
   'lti.scrollToTop',
   'lti.setUnloadMessage',
-  'lti.showAlert',
   'lti.showModuleNavigation',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu'

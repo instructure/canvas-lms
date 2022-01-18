@@ -576,60 +576,6 @@ describe Types::DiscussionType do
         .and_return(false)
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be true
     end
-
-    describe "delayed post" do
-      before do
-        @delayed_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
-                                                      message: "delayed",
-                                                      context: @course,
-                                                      user: @teacher,
-                                                      editor: @teacher,
-                                                      delayed_post_at: 10.days.from_now)
-        @past_delayed_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
-                                                           message: "past delay",
-                                                           context: @course,
-                                                           user: @teacher,
-                                                           editor: @teacher,
-                                                           delayed_post_at: 1.day.ago)
-
-        @delayed_discussion.discussion_entries.create!(message: "teacher entry", user: @teacher)
-        @past_delayed_discussion.discussion_entries.create!(message: "teacher entry", user: @teacher)
-        discussion.discussion_entries.create!(message: "teacher entry", user: @teacher)
-
-        course_with_student(course: @course)
-
-        @delayed_type_with_student = GraphQLTypeTester.new(@delayed_discussion, current_user: @student)
-        @delayed_type_with_teacher = GraphQLTypeTester.new(@delayed_discussion, current_user: @teacher)
-        @nil_delayed_at_type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
-        @past_delayed_type_with_student = GraphQLTypeTester.new(@past_delayed_discussion, current_user: @student)
-      end
-
-      it "exposes title field" do
-        expect(@delayed_type_with_student.resolve("title")).to eq @delayed_discussion.title
-        expect(@delayed_type_with_teacher.resolve("title")).to eq @delayed_discussion.title
-      end
-
-      it "returns nil for message and emtpy entries array for student" do
-        expect(@delayed_type_with_student.resolve("message")).to be nil
-        expect(@delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }")).to eq []
-      end
-
-      it "returns correct message and entries for teachers" do
-        expect(@delayed_type_with_teacher.resolve("message")).to eq @delayed_discussion.message
-        expect(@delayed_type_with_teacher.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 1
-      end
-
-      it "returns correct message and entries of topics when delayed_post_at is nil" do
-        expect(discussion.delayed_post_at).to eq nil
-        expect(@nil_delayed_at_type_with_student.resolve("message")).to eq discussion.message
-        expect(@nil_delayed_at_type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 1
-      end
-
-      it "returns correct message and entries of topics when delayed_post_at is past" do
-        expect(@past_delayed_type_with_student.resolve("message")).to eq @past_delayed_discussion.message
-        expect(@past_delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 1
-      end
-    end
   end
 
   context "group discussion" do

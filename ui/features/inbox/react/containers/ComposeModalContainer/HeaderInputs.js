@@ -29,7 +29,6 @@ import {Flex} from '@instructure/ui-flex'
 import {MediaAttachment} from '../../components/MediaAttachment/MediaAttachment'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer'
 
 const HeaderInputs = props => {
   let moreCourses
@@ -68,27 +67,6 @@ const HeaderInputs = props => {
           shouldGrow={false}
         />
       </Flex.Item>
-      {!props.isReply && (
-        <Flex.Item>
-          <ComposeInputWrapper
-            title={
-              <PresentationContent>
-                <Text size="small">{I18n.t('To')}</Text>
-              </PresentationContent>
-            }
-            input={
-              <AddressBookContainer
-                width="100%"
-                open={props.addressBookContainerOpen}
-                onSelectedIdsChange={ids => {
-                  props.onSelectedIdsChange(ids)
-                }}
-              />
-            }
-            shouldGrow
-          />
-        </Flex.Item>
-      )}
       {props.isReply ? (
         <ComposeInputWrapper
           title={
@@ -136,17 +114,12 @@ HeaderInputs.propTypes = {
   courses: PropTypes.object,
   isReply: PropTypes.bool,
   onContextSelect: PropTypes.func,
-  onSelectedIdsChange: PropTypes.func,
   onSendIndividualMessagesChange: PropTypes.func,
   onSubjectChange: PropTypes.func,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   mediaAttachmentTitle: PropTypes.string,
-  onRemoveMediaComment: PropTypes.func,
-  /**
-   * Bool to control open/closed state of the AddressBookContainer menu for testing
-   */
-  addressBookContainerOpen: PropTypes.bool
+  onRemoveMediaComment: PropTypes.func
 }
 
 export default HeaderInputs

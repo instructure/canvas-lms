@@ -109,7 +109,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
 
   def validate_user(user)
     # if they have any memberships, we are moving them via delete and add
-    GroupMembership.where(group_id: group_category.groups.select(:id), user_id: user.id).destroy_all
+    GroupMembership.where(group_id: group_category.groups.select(:id), user_id: user.id).take&.destroy
   end
 
   def user_from_row(row)

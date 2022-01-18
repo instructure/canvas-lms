@@ -237,7 +237,6 @@ export const handlers = [
         usersConnection: {
           nodes: [
             {
-              _id: '1',
               id: 'TWVzc2FnZWFibGVVc2VyLTQx',
               name: 'Frederick Dukes',
               __typename: 'MessageableUser'
@@ -257,7 +256,6 @@ export const handlers = [
         usersConnection: {
           nodes: [
             {
-              _id: '1',
               id: 'TWVzc2FnZWFibGVVc2VyLTQx',
               name: 'Frederick Dukes',
               __typename: 'MessageableUser'
@@ -283,19 +281,16 @@ export const handlers = [
         usersConnection: {
           nodes: [
             {
-              _id: '1',
               id: 'TWVzc2FnZWFibGVVc2VyLTQx',
               name: 'Frederick Dukes',
               __typename: 'MessageableUser'
             },
             {
-              _id: '2',
               id: 'TWVzc2FnZWFibGVVc2VyLTY1',
               name: 'Trevor Fitzroy',
               __typename: 'MessageableUser'
             },
             {
-              _id: '3',
               id: 'TWVzc2FnZWFibGVVc2VyLTMy',
               name: 'Null Forge',
               __typename: 'MessageableUser'

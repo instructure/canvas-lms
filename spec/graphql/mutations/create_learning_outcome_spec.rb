@@ -54,6 +54,7 @@ describe Mutations::CreateLearningOutcome do
             ratings {
               description
               points
+              mastery
             }
           }
           errors {
@@ -78,19 +79,21 @@ describe Mutations::CreateLearningOutcome do
     {
       calculation_method: "n_mastery",
       calculation_int: 3,
-      mastery_points: 2,
       ratings: [
         {
           description: "GraphQL Exceeds Expectations",
-          points: 3
+          points: 3,
+          mastery: false
         },
         {
           description: "GraphQL Expectations",
-          points: 2
+          points: 2,
+          mastery: true
         },
         {
           description: "GraphQL Does Not Meet Expectations",
-          points: 1
+          points: 1,
+          mastery: false
         }
       ]
     }
@@ -102,7 +105,6 @@ describe Mutations::CreateLearningOutcome do
     <<~GQL
       calculationMethod: "#{args[:calculation_method]}",
       calculationInt: #{args[:calculation_int]},
-      masteryPoints: #{args[:mastery_points]},
       ratings: #{
         args[:ratings]
           .to_json
@@ -130,14 +132,13 @@ describe Mutations::CreateLearningOutcome do
     expect(record.context).to eq @course
   end
 
-  it "creates a learning outcome with individual ratings and calculation method" do
+  it "creates a learning outcome with mastery scale" do
     @domain_root_account.enable_feature!(:individual_outcome_rating_and_calculation)
     @domain_root_account.enable_feature!(:improved_outcomes_management)
     @domain_root_account.disable_feature!(:account_level_mastery_scales)
 
     calculation_method = default_rating_variables[:calculation_method]
     calculation_int = default_rating_variables[:calculation_int]
-    mastery_points = default_rating_variables[:mastery_points]
     ratings = default_rating_variables[:ratings]
 
     result = execute_with_input "#{variables},#{rating_variables}"
@@ -149,13 +150,13 @@ describe Mutations::CreateLearningOutcome do
 
     expect(result["calculationMethod"]).to eq calculation_method
     expect(result["calculationInt"]).to eq calculation_int
-    expect(result["masteryPoints"]).to eq mastery_points
+    expect(result["masteryPoints"]).to eq ratings[1][:points]
     expect(result["ratings"].count).to eq ratings.count
     expect(result["ratings"][0]["description"]).to eq ratings[0][:description]
 
     expect(result_record.calculation_method).to eq calculation_method
     expect(result_record.calculation_int).to eq calculation_int
-    expect(result_record.mastery_points).to eq mastery_points
+    expect(result_record.mastery_points).to eq ratings[1][:points]
     expect(result_record.rubric_criterion[:ratings].count).to eq ratings.count
     expect(result_record.rubric_criterion[:ratings][0][:description]).to eq ratings[0][:description]
   end

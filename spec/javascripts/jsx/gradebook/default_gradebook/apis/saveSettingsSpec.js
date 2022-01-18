@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -20,7 +20,7 @@ import FakeServer, {
   formBodyFromRequest,
   pathFromRequest
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook', suiteHooks => {
   let gradebook
@@ -53,7 +53,19 @@ QUnit.module('Gradebook', suiteHooks => {
     })
 
     function saveSettings(additionalSettings = {}) {
-      return gradebook.saveSettings(additionalSettings).then(onSuccess).catch(onFailure)
+      return new Promise(resolve => {
+        gradebook.saveSettings(
+          additionalSettings,
+          (...args) => {
+            onSuccess(...args)
+            resolve()
+          },
+          (...args) => {
+            onFailure(...args)
+            resolve()
+          }
+        )
+      })
     }
 
     function getSavedSettings() {

@@ -135,7 +135,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $fileId: ID
     $includeReplyPreview: Boolean
     $isAnonymousAuthor: Boolean
-    $courseID: ID
   ) {
     createDiscussionEntry(
       input: {
@@ -149,10 +148,10 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor(courseId: $courseID) {
+        editor {
           ...User
         }
-        author(courseId: $courseID) {
+        author {
           ...User
         }
         anonymousAuthor {
@@ -171,20 +170,8 @@ export const CREATE_DISCUSSION_ENTRY = gql`
 `
 
 export const UPDATE_DISCUSSION_ENTRY = gql`
-  mutation UpdateDiscussionEntry(
-    $discussionEntryId: ID!
-    $message: String
-    $fileId: ID
-    $removeAttachment: Boolean
-  ) {
-    updateDiscussionEntry(
-      input: {
-        discussionEntryId: $discussionEntryId
-        message: $message
-        fileId: $fileId
-        removeAttachment: $removeAttachment
-      }
-    ) {
+  mutation UpdateDiscussionEntry($discussionEntryId: ID!, $message: String) {
+    updateDiscussionEntry(input: {discussionEntryId: $discussionEntryId, message: $message}) {
       discussionEntry {
         ...DiscussionEntry
         editor {

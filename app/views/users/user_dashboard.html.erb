@@ -70,6 +70,9 @@
         <%= dashboard_title %>
       </h1>
     </div>
+    <% if Account.site_admin.feature_enabled?(:observer_picker) && @current_user.roles(@domain_root_account).include?("observer") %>
+      <div id="dashboard-observer-picker"></div>
+    <% end %>
     <% if planner_enabled? %>
       <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
     <% end %>

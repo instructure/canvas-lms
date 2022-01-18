@@ -109,7 +109,7 @@ end
 module DelayedJobConfig
   class << self
     def config
-      @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["delayed_jobs.yml"] || "{}")
+      @config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["delayed_jobs.yml"] || "{}")
     end
 
     def strands_to_send_to_statsd

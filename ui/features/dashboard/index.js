@@ -21,9 +21,12 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
 import ready from '@instructure/ready'
+import {View} from '@instructure/ui-view'
 
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import ObserverOptions from '@canvas/observer-picker'
+import loadCardDashboard, {resetDashboardCards} from '@canvas/dashboard-card'
 import DashboardHeader from './react/DashboardHeader'
 
 ready(() => {
@@ -50,5 +53,27 @@ ready(() => {
     // but on a course dashboard, erb html is there as part of the page load and
     // we can initialize the backbone view immediately
     import('./backbone/views/DashboardView').then(({default: DashboardView}) => new DashboardView())
+  }
+
+  const observerPickerContainer = document.getElementById('dashboard-observer-picker')
+  if (observerPickerContainer) {
+    const reloadCardDashboard = userId => {
+      resetDashboardCards()
+      loadCardDashboard(undefined, userId)
+    }
+
+    ReactDOM.render(
+      <View as="div" maxWidth="16em">
+        <ObserverOptions
+          margin="medium 0 0"
+          currentUser={ENV.current_user}
+          currentUserRoles={ENV.current_user_roles}
+          observerList={ENV.OBSERVER_LIST}
+          canAddObservee={ENV.CAN_ADD_OBSERVEE}
+          handleChangeObservedUser={reloadCardDashboard}
+        />
+      </View>,
+      observerPickerContainer
+    )
   }
 })

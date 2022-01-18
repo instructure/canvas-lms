@@ -135,15 +135,6 @@ export default class WikiPageView extends Backbone.View {
         })
     }
 
-    // Adds class if a LTI iframe is embed in content
-    const ltisEmbedded = $('.show-content iframe.lti-embed')
-    if (ltisEmbedded.length > 0) {
-      $('.show-content').addClass('lti-content')
-      ltisEmbedded.each(function () {
-        $(this).closest('p').addClass('lti-embed-container')
-      })
-    }
-
     // attach/re-attach the sequence footer (if this is a course, but not the home page)
     if (!this.$sequenceFooter && !this.course_home && !!this.course_id) {
       if (!this.$sequenceFooter) this.$sequenceFooter = $('<div></div>').hide()

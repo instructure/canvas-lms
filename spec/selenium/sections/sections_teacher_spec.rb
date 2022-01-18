@@ -43,18 +43,6 @@ describe "sections" do
       expect(f("#enrollment_#{@teacher.enrollments.first.id}")).to include_text @teacher.name
     end
 
-    it "shows readable role types that includes custom roles" do
-      course_with_teacher_logged_in(active_course: true, active_user: true)
-      custom_student = user_factory(name: "Señor Chang")
-      role = custom_student_role("CustomStudentRole", account: @course.account)
-      @course.enroll_user(custom_student, "StudentEnrollment", role: role)
-
-      get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
-      wait_for_ajaximations
-
-      expect(f("#enrollment_#{@user.enrollments.first.id}").text).to match(/CustomStudentRole/)
-    end
-
     it "does not include X buttons for enrollments that can't be removed" do
       course_with_teacher_logged_in(active_all: true)
       e1 = student_in_course(active_all: true, name: "Mr. Bland")

@@ -455,14 +455,6 @@ describe ContextExternalTool do
     end
   end
 
-  describe "#hash_identity" do
-    it "calculates an identity hash" do
-      tool = external_tool_model
-      expect { tool.hash_identity }.not_to raise_error
-      expect(tool.hash_identity).to be_kind_of(String)
-    end
-  end
-
   describe "#content_migration_configured?" do
     let(:tool) do
       ContextExternalTool.new.tap do |t|

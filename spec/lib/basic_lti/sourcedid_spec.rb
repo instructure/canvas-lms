@@ -43,7 +43,7 @@ describe BasicLTI::Sourcedid do
       "lti-encryption-secret" => "encryption-secret-5T14NjaTbcYjc4",
     }
 
-    allow(DynamicSettings).to receive(:find).and_return(fake_secrets)
+    allow(Canvas::DynamicSettings).to receive(:find).and_return(fake_secrets)
   end
 
   it "creates a signed and encrypted sourcedid" do

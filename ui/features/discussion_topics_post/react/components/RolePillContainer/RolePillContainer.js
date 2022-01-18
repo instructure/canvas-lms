@@ -41,10 +41,6 @@ export function RolePillContainer({...props}) {
         desktop: {
           display: 'inline-block',
           delimiter: 'none'
-        },
-        mobile: {
-          display: 'inline',
-          delimiter: 'pipe'
         }
       }}
       render={(responsiveProps, matches) => (

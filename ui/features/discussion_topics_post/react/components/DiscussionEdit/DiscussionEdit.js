@@ -33,7 +33,6 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
 import {ReplyPreview} from '../ReplyPreview/ReplyPreview'
 import {Spinner} from '@instructure/ui-spinner'
-import {AttachmentDisplay} from '../AttachmentDisplay/AttachmentDisplay'
 
 export const DiscussionEdit = props => {
   const rceRef = useRef()
@@ -44,12 +43,6 @@ export const DiscussionEdit = props => {
   const textAreaId = useRef(`message-body-${nanoid()}`)
   const [draftTimeout, setDraftTimeout] = useState(null)
   const [awaitingChanges, setAwaitingChanges] = useState(false)
-  const [anonymousAuthorState, setAnonymousAuthorState] = useState(
-    !!props.discussionAnonymousState && props.canReplyAnonymously
-  )
-
-  const [attachment, setAttachment] = useState(null)
-  const [attachmentToUpload, setAttachmentToUpload] = useState(false)
 
   const rceMentionsIsEnabled = () => {
     return !!ENV.rce_mentions_in_discussions
@@ -71,8 +64,7 @@ export const DiscussionEdit = props => {
 
   useEffect(() => {
     setRceContent(props.value)
-    setAttachment(props.attachment)
-  }, [props.value, setRceContent, props.attachment])
+  }, [props.value, setRceContent])
 
   const handleDraftResponse = nextDraft => {
     if (!ENV.draft_discussions) return
@@ -124,12 +116,10 @@ export const DiscussionEdit = props => {
           <ReplyPreview {...props.quotedEntry} />
         </>
       )}
-      {props.discussionAnonymousState && props.canReplyAnonymously && !props.isEdit && (
+      {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
         <AnonymousResponseSelector
-          username={ENV.current_user?.display_name}
-          avatarUrl={ENV.current_user?.avatar_image_url}
+          username={ENV.current_user.display_name}
           discussionAnonymousState={props.discussionAnonymousState}
-          setAnonymousAuthorState={setAnonymousAuthorState}
         />
       )}
       <View display="block">
@@ -166,7 +156,6 @@ export const DiscussionEdit = props => {
               display: 'block',
               marginCancel: 'xx-small',
               marginReply: 'xx-small',
-              paddingAttachment: 'xx-small',
               viewAs: 'div'
             },
             desktop: {
@@ -174,7 +163,6 @@ export const DiscussionEdit = props => {
               display: 'inline-block',
               marginCancel: '0 0 0 0',
               marginReply: '0 0 0 small',
-              paddingAttachment: '0 0 0 0',
               viewAs: 'span'
             }
           }}
@@ -207,19 +195,13 @@ export const DiscussionEdit = props => {
                 <Button
                   onClick={() => {
                     if (props.onSubmit) {
-                      props.onSubmit(
-                        rceContent,
-                        includeReplyPreview,
-                        attachment?._id,
-                        anonymousAuthorState
-                      )
+                      props.onSubmit(rceContent, includeReplyPreview)
                     }
                   }}
                   display={responsiveProps.display}
                   color="primary"
                   data-testid="DiscussionEdit-submit"
                   key="rce-reply-button"
-                  interaction={attachmentToUpload ? 'disabled' : 'enabled'}
                 >
                   <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
                 </Button>
@@ -227,28 +209,10 @@ export const DiscussionEdit = props => {
             ]
             return matches.includes('mobile') ? (
               <View as="div" padding={undefined} key="mobileButtons">
-                <View as={responsiveProps.viewAs} padding={responsiveProps.paddingAttachment}>
-                  <AttachmentDisplay
-                    attachment={attachment}
-                    setAttachment={setAttachment}
-                    setAttachmentToUpload={setAttachmentToUpload}
-                    attachmentToUpload={attachmentToUpload}
-                  />
-                </View>
                 {rceButtons.reverse()}
               </View>
             ) : (
               <Flex key="nonMobileButtons">
-                <Flex.Item shouldGrow textAlign="start">
-                  <View as={responsiveProps.viewAs} padding={responsiveProps.paddingAttachment}>
-                    <AttachmentDisplay
-                      attachment={attachment}
-                      setAttachment={setAttachment}
-                      setAttachmentToUpload={setAttachmentToUpload}
-                      attachmentToUpload={attachmentToUpload}
-                    />
-                  </View>
-                </Flex.Item>
                 {ENV.draft_discussions && (
                   <Flex.Item shouldGrow textAlign="start">
                     {props.draftSaved ? (
@@ -287,10 +251,8 @@ export const DiscussionEdit = props => {
 DiscussionEdit.propTypes = {
   show: PropTypes.bool,
   discussionAnonymousState: PropTypes.string,
-  canReplyAnonymously: PropTypes.bool,
   draftSaved: PropTypes.bool,
   value: PropTypes.string,
-  attachment: PropTypes.object,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSetDraftSaved: PropTypes.func,

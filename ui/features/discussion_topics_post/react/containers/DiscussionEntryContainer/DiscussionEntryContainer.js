@@ -80,7 +80,7 @@ export const DiscussionEntryContainer = props => {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({tablet: true, desktop: true, mobile: false})}
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
         tablet: {
           direction: 'column-reverse',
@@ -112,22 +112,6 @@ export const DiscussionEntryContainer = props => {
             padding: 'x-small 0 small xx-large',
             paddingNoAuthor: '0 0 xx-small xx-small',
             margin: '0'
-          }
-        },
-        mobile: {
-          direction: 'column-reverse',
-          authorInfo: {
-            padding: '0'
-          },
-          postUtilities: {
-            align: 'stretch',
-            margin: '0 0 x-small 0',
-            padding: 'xx-small'
-          },
-          postMessage: {
-            padding: '0 xx-small xx-small',
-            paddingNoAuthor: '0 xx-small xx-small',
-            margin: 'xx-small 0 0 0'
           }
         }
       }}
@@ -177,10 +161,8 @@ export const DiscussionEntryContainer = props => {
             {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
               discussionAnonymousState={props.discussionTopic?.anonymousState}
-              canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
               title={props.title}
               message={props.message}
-              attachment={props.attachment}
               isEditing={props.isEditing}
               onSave={props.onSave}
               onCancel={props.onCancel}

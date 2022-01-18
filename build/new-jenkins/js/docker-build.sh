@@ -3,9 +3,6 @@
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 WORKSPACE=${WORKSPACE:-$(pwd)}
-CRYSTALBALL_MAP=${CRYSTALBALL_MAP:-0}
-
-echo "CRYSTALBALL_MAP VALUE ${CRYSTALBALL_MAP}"
 
 export CACHE_VERSION="2020-02-02.1"
 

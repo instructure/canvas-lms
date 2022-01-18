@@ -236,9 +236,9 @@ export const IsolatedParent = props => {
                     anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
-                    onSave={(message, _includeReplyPreview, fileId) => {
+                    onSave={message => {
                       if (props.onSave) {
-                        props.onSave(props.discussionEntry, message, fileId)
+                        props.onSave(props.discussionEntry, message)
                         setIsEditing(false)
                       }
                     }}

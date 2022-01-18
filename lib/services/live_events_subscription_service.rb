@@ -108,7 +108,7 @@ module Services
       end
 
       def settings
-        DynamicSettings.find("live-events-subscription-service", default_ttl: 5.minutes)
+        Canvas::DynamicSettings.find("live-events-subscription-service", default_ttl: 5.minutes)
       end
 
       def tool_proxy_jwt_body(tool_proxy, options = {})
