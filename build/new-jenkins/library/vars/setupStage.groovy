@@ -27,7 +27,7 @@ def call() {
 
     // Plugin builds using the dir step above will create this @tmp file, we need to remove it
     // https://issues.jenkins.io/browse/JENKINS-52750
-    sh 'rm -vr gems/plugins/*@tmp'
+    sh "rm -vrf ${env.LOCAL_WORKDIR}@tmp"
   }
 
   gems = configuration.plugins()
