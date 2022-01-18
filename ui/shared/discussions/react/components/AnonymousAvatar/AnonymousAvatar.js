@@ -37,7 +37,6 @@ export const AnonymousAvatar = ({seedString, size, addFocus}) => {
       height={size === 'medium' ? '50px' : '20px'}
       data-testid="anonymous_avatar"
       background={seedString === CURRENT_USER ? 'primary-inverse' : undefined}
-      borderColor={seedString === CURRENT_USER ? 'info' : 'primary'}
     >
       <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
         <Flex.Item margin="xx-small 0 0 0">
