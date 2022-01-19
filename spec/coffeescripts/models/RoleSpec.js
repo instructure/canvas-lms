@@ -25,7 +25,7 @@ QUnit.module('RoleModel', {
     this.account = new Account({id: 4})
     this.role = new Role({account: this.account})
     this.server = sinon.fakeServer.create()
-    fakeENV.setup({CURRENT_ACCOUNT: {account: {id: 3}}})
+    fakeENV.setup({ACCOUNT_ID: 3})
   },
   teardown() {
     this.server.restore()
