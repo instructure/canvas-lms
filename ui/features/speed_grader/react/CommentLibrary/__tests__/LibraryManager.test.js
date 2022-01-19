@@ -91,8 +91,8 @@ describe('LibraryManager', () => {
     it('calls focus when a comment within the tray is clicked', async () => {
       const {getByText} = render()
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Library'))
-      fireEvent.click(getByText('Comment item 0'))
+      fireEvent.click(getByText('Open Comment Library'), {detail: 1})
+      fireEvent.click(getByText('Comment item 0'), {detail: 1})
       expect(setFocusToTextAreaMock).toHaveBeenCalled()
     })
   })

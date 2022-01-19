@@ -367,8 +367,21 @@ class RCEWrapper extends React.Component {
         // eslint-disable-next-line no-console
         console.error('Failed initializing a11y checker', err)
       })
+  }
 
-    this.canvasUrl = getCanvasUrl(this.props.trayProps);
+  getCanvasUrl() {
+    if(!this.canvasUrl)
+      this.canvasUrl = getCanvasUrl(this.props.trayProps);
+
+    return this.canvasUrl.then(url => {
+        if(!url) {
+          console.warn(
+            'Could not determine Canvas base URL.',
+            'Content will be referenced by relative URL.'
+          );
+        }
+        return url;
+      });
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -599,7 +612,7 @@ class RCEWrapper extends React.Component {
 
   insertMathEquation(tex) {
     const editor = this.mceInstance()
-    return this.canvasUrl.then(domain =>
+    return this.getCanvasUrl().then(domain =>
       contentInsertion.insertEquation(editor, tex, domain));
   }
 

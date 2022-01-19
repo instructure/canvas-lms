@@ -23,6 +23,10 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
 import splitAssetString from '@canvas/util/splitAssetString'
 
+const EVENT_TYPES = {
+  todo_item: 'todo_item'
+}
+
 export default function CommonEvent(data, contextInfo, actualContextInfo) {
   this.eventType = 'generic'
   this.contextInfo = contextInfo
@@ -75,7 +79,14 @@ Object.assign(CommonEvent.prototype, {
   },
 
   isCompleted() {
-    return false
+    switch (this.eventType) {
+      case EVENT_TYPES.todo_item: {
+        return !!this.calendarEvent.planner_override?.marked_complete
+      }
+      default: {
+        return false
+      }
+    }
   },
 
   displayTimeString() {

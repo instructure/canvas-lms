@@ -61,7 +61,7 @@ StatusBar.propTypes = {
 }
 
 StatusBar.defaultProps = {
-  a11yBadgeColor: '#FC5E13',
+  a11yBadgeColor: '#0374B5',
   a11yErrorsCount: 0
 }
 
