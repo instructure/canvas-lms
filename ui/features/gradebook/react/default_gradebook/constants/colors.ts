@@ -18,6 +18,14 @@
 
 import Color from 'tinycolor2'
 
+export type StatusColors = {
+  dropped: string
+  excused: string
+  late: string
+  missing: string
+  resubmitted: string
+}
+
 export const defaultColors = {
   salmon: '#FFE8E5',
   orange: '#FEF0E5',

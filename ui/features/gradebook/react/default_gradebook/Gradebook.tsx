@@ -23,7 +23,34 @@ import tz from '@canvas/timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import type {ActionMenuProps} from './components/ActionMenu'
-import type {FlashAlertType, Module, Filter} from './gradebook.d'
+import type {
+  Assignment,
+  AssignmentDueDate,
+  AssignmentGroup,
+  AssignmentGroupMap,
+  AssignmentMap,
+  ColumnSizeSettings,
+  ContentLoadStates,
+  Course,
+  CourseContent,
+  EffectiveDueDateAssignmentUserMap,
+  Filter,
+  FlashAlertType,
+  GradingPeriodSet,
+  InitialActionStates,
+  Module,
+  Section,
+  SectionMap,
+  Student,
+  StudentMap,
+  StudentGroup,
+  StudentGroupMap,
+  StudentGroupCategory,
+  StudentGroupCategoryMap,
+  Submission,
+  UserSubmissionGroup
+} from './gradebook.d'
+import type {GridColumn, GridData, GridDisplaySettings} from './grid.d'
 
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 // @ts-ignore
@@ -75,6 +102,7 @@ import GridColor from './components/GridColor'
 import StatusesModal from './components/StatusesModal'
 import AnonymousSpeedGraderAlert from './components/AnonymousSpeedGraderAlert'
 import {statusColors} from './constants/colors'
+import type {StatusColors} from './constants/colors'
 import StudentDatastore from './stores/StudentDatastore'
 import PostGradesStore from '../SISGradePassback/PostGradesStore'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
@@ -166,43 +194,43 @@ type GradebookProps = {
   settingsModalButtonContainer: HTMLElement
   gridColorNode: HTMLElement
   gradebookMenuNode: HTMLElement
-  applyScoreToUngradedModalNode: any
-  colors: any
+  applyScoreToUngradedModalNode: HTMLElement
+  colors: StatusColors
   filters: Filter[]
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
   isFiltersLoading: boolean
   isModulesLoading: boolean
-  onFiltersChange: any
+  onFiltersChange: (any) => void
   modules: Module[]
 }
 
 type GradebookState = {
-  gridColors: any
-  modules: any
-  assignmentGroups: any
-  sections: any
+  gridColors: StatusColors
+  modules: Module[]
+  assignmentGroups: AssignmentGroup[]
+  sections: Section[]
   isEssentialDataLoaded: boolean
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
-  kbDialog: any
+  kbDialog: KeyboardNavDialog
 
-  anonymousSpeedGraderAlert: any
+  anonymousSpeedGraderAlert?: any
 
-  userFilter: any
+  userFilter: InputFilterView
 
-  assignmentStudentVisibility: any
+  assignmentStudentVisibility: any = {}
 
   teacherNotesNotYetLoaded: any
 
-  headerComponentRefs: any
+  headerComponentRefs: any = {}
 
-  hasSections: any
+  hasSections: any = $.Deferred()
 
-  calculatedGradesByStudentId: any
+  calculatedGradesByStudentId: any = {}
 
-  effectiveDueDates: any
+  effectiveDueDates: EffectiveDueDateAssignmentUserMap = {}
 
   $grid: any
 
@@ -212,54 +240,57 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   viewOptionsMenu?: HTMLElement
 
-  studentViewStudents: any
+  studentViewStudents: StudentMap = {}
 
-  keyboardNav: any
+  keyboardNav?: GradebookKeyboardNav
 
-  filteredContentInfo: any
+  filteredContentInfo: any = {
+    invalidAssignmentGroups: [],
+    totalPointsPossible: 0
+  }
 
-  sections: any
+  sections: SectionMap = {}
 
   userFilterTerm?: string
 
-  filteredStudentIds?: any[]
+  filteredStudentIds: string[] = []
 
-  assignmentGroups?: any
+  assignmentGroups: AssignmentGroupMap = {}
 
-  contentLoadStates: any
+  contentLoadStates: ContentLoadStates
 
-  course: any
+  course: Course
 
-  filteredAssignmentIds?: any[]
+  filteredAssignmentIds: string[] = []
 
   gradebookEnv: any
 
-  gradebookSettingsModal: any
+  gradebookSettingsModal?: React.RefObject<HTMLElement & {open: () => void}>
 
-  gradebookSettingsModalButton: any
+  gradebookSettingsModalButton: React.RefObject<any> = React.createRef()
 
-  gradingPeriodSet: any
+  gradingPeriodSet: GradingPeriodSet | null = null
 
   options: any
 
-  sections_enabled: boolean
+  sections_enabled: boolean = false
 
   show_attendance?: boolean
 
-  statusesModal?: any
+  statusesModal?: HTMLElement & {open?: () => void}
 
-  studentGroups?: any[]
+  studentGroups: StudentGroupMap = {}
 
   studentGroupsEnabled?: boolean
 
-  students: any
+  students: StudentMap = {}
 
   totalColumnPositionChanged?: boolean
 
   uid?: string
 
   courseFeatures: {
-    finalGradeOverrideEnabled: any
+    finalGradeOverrideEnabled: boolean
     allowViewUngradedAsZero: boolean
   }
 
@@ -267,7 +298,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   dataLoader: DataLoader
 
-  gridData: any
+  gridData: GridData = {
+    columns: {
+      definitions: {},
+      frozen: [],
+      scrollable: []
+    },
+    rows: []
+  }
 
   gradebookGrid: GradebookGrid
 
@@ -275,19 +313,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   postPolicies: PostPolicies
 
-  gridReady: any
+  gridReady: any = $.Deferred()
 
-  _essentialDataLoaded: any
+  _essentialDataLoaded: any = deferPromise()
 
-  courseContent: any
+  courseContent: CourseContent
 
   gradebookContent?: {
     customColumns: any[]
   }
 
-  actionStates?: {
-    pendingGradeInfo: any[]
-  }
+  actionStates?: InitialActionStates
 
   gradebookColumnOrderSettings?: {
     direction: string
@@ -296,25 +332,25 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     customOrder?: any
   }
 
-  defaultSortType?: string
+  defaultSortType: string = 'assignment_group'
 
   spinner?: Spinner
 
-  gridDisplaySettings: any
+  gridDisplaySettings: GridDisplaySettings
 
   startedInitializing?: boolean
 
-  assignments: any
+  assignments: AssignmentMap = {}
 
-  postGradesStore: any
+  postGradesStore?: any
 
-  submissionStateMap: any
+  submissionStateMap!: SubmissionStateMap
 
-  studentGroupCategories: any
+  studentGroupCategories: StudentGroupCategoryMap = {}
 
-  gradebookColumnSizeSettings: any
+  gradebookColumnSizeSettings: ColumnSizeSettings = {}
 
-  gradingPeriodId: any
+  gradingPeriodId: string = '0'
 
   constructor(props) {
     super(props)
@@ -326,311 +362,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       sections: [],
       isEssentialDataLoaded: false
     }
-
-    this.defaultSortType = 'assignment_group'
-    this.hasSections = $.Deferred()
-    this.sections_enabled = false
-    this.gradebookSettingsModalButton = React.createRef()
-    this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
-    this.setInitialState = this.setInitialState.bind(this)
-    this.bindGridEvents = this.bindGridEvents.bind(this)
-    this.addOverridesToPostGradesStore = this.addOverridesToPostGradesStore.bind(this)
-    this.gotCustomColumns = this.gotCustomColumns.bind(this)
-    this.gotCustomColumnDataChunk = this.gotCustomColumnDataChunk.bind(this)
-    // Assignment Group Data & Lifecycle Methods
-    this.updateAssignmentGroups = this.updateAssignmentGroups.bind(this)
-    this.gotAllAssignmentGroups = this.gotAllAssignmentGroups.bind(this)
-
-    // Grading Period Assignment Data & Lifecycle Methods
-    this.assignmentsLoadedForCurrentView = this.assignmentsLoadedForCurrentView.bind(this)
-    this.updateGradingPeriodAssignments = this.updateGradingPeriodAssignments.bind(this)
-    this.gotGradingPeriodAssignments = this.gotGradingPeriodAssignments.bind(this)
-    this.gotSections = this.gotSections.bind(this)
-    this.gotChunkOfStudents = this.gotChunkOfStudents.bind(this)
-
-    // # Post-Data Load Initialization
-    this.finishRenderingUI = this.finishRenderingUI.bind(this)
-    this.setupGrading = this.setupGrading.bind(this)
-    this.resetGrading = this.resetGrading.bind(this)
-    this.getSubmission = this.getSubmission.bind(this)
-    this.updateEffectiveDueDatesFromSubmissions =
-      this.updateEffectiveDueDatesFromSubmissions.bind(this)
-
-    // Student Data & Lifecycle Methods
-    this.updateStudentIds = this.updateStudentIds.bind(this)
-    this.updateStudentsLoaded = this.updateStudentsLoaded.bind(this)
-    this.isInvalidSort = this.isInvalidSort.bind(this)
-    this.getColumnOrder = this.getColumnOrder.bind(this)
-    this.saveCustomColumnOrder = this.saveCustomColumnOrder.bind(this)
-    this.arrangeColumnsBy = this.arrangeColumnsBy.bind(this)
-    this.makeColumnSortFn = this.makeColumnSortFn.bind(this)
-    this.compareAssignmentModulePositions = this.compareAssignmentModulePositions.bind(this)
-    this.compareAssignmentNames = this.compareAssignmentNames.bind(this)
-    this.makeCompareAssignmentCustomOrderFn = this.makeCompareAssignmentCustomOrderFn.bind(this)
-
-    // # Filtering
-    this.rowFilter = this.rowFilter.bind(this)
-    this.filterAssignments = this.filterAssignments.bind(this)
-    this.filterAssignmentBySubmissionTypes = this.filterAssignmentBySubmissionTypes.bind(this)
-    this.filterAssignmentByPublishedStatus = this.filterAssignmentByPublishedStatus.bind(this)
-    this.filterAssignmentByAssignmentGroup = this.filterAssignmentByAssignmentGroup.bind(this)
-    this.filterAssignmentByGradingPeriod = this.filterAssignmentByGradingPeriod.bind(this)
-    this.filterAssignmentByModule = this.filterAssignmentByModule.bind(this)
-    this.filterAssignmentBySearchInput = this.filterAssignmentBySearchInput.bind(this)
-    this.filterAssignmentByStartDate = this.filterAssignmentByStartDate.bind(this)
-    this.filterAssignmentByEndDate = this.filterAssignmentByEndDate.bind(this)
-
-    // # Course Content Event Handlers
-    this.handleSubmissionPostedChange = this.handleSubmissionPostedChange.bind(this)
-    this.handleSubmissionsDownloading = this.handleSubmissionsDownloading.bind(this)
-
-    // filter, sort, and build the dataset for slickgrid to read from, then
-    // force a full redraw
-    this.buildRows = this.buildRows.bind(this)
-    this.buildRow = this.buildRow.bind(this)
-
-    // Submission Data & Lifecycle Methods
-    this.updateSubmissionsLoaded = this.updateSubmissionsLoaded.bind(this)
-    this.gotSubmissionsChunk = this.gotSubmissionsChunk.bind(this)
-    this.student = this.student.bind(this)
-    this.updateSubmission = this.updateSubmission.bind(this)
-    // this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
-    // because there is no *bulk* submissions#update endpoint in the api.
-    // It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
-    // where each student has an array of submissions.  This one just expects an array of submissions,
-    // they are not grouped by student.
-    this.updateSubmissionsFromExternal = this.updateSubmissionsFromExternal.bind(this)
-    this.submissionsForStudent = this.submissionsForStudent.bind(this)
-    this.calculateStudentGrade = this.calculateStudentGrade.bind(this)
-    this.getStudentGrades = this.getStudentGrades.bind(this)
-    // SlickGrid doesn't have a blur event for the grid, so this mimics it in
-    // conjunction with a click listener on <body />. When we 'blur' the grid
-    // by clicking outside of it, save the current field.
-    this.onGridBlur = this.onGridBlur.bind(this)
-    this.updateCurrentSection = this.updateCurrentSection.bind(this)
-    this.getStudentGroupToShow = this.getStudentGroupToShow.bind(this)
-    this.updateCurrentStudentGroup = this.updateCurrentStudentGroup.bind(this)
-    this.updateCurrentAssignmentGroup = this.updateCurrentAssignmentGroup.bind(this)
-    this.updateCurrentGradingPeriod = this.updateCurrentGradingPeriod.bind(this)
-    this.updateCurrentModule = this.updateCurrentModule.bind(this)
-    this.initSubmissionStateMap = this.initSubmissionStateMap.bind(this)
-    this.initPostGradesLtis = this.initPostGradesLtis.bind(this)
-    this.updatePostGradesFeatureButton = this.updatePostGradesFeatureButton.bind(this)
-    this.initHeader = this.initHeader.bind(this)
-    this.renderGradebookMenus = this.renderGradebookMenus.bind(this)
-    this.getFilterSettingsViewOptionsMenuProps =
-      this.getFilterSettingsViewOptionsMenuProps.bind(this)
-    this.updateFilterSettings = this.updateFilterSettings.bind(this)
-    this.renderViewOptionsMenu = this.renderViewOptionsMenu.bind(this)
-    this.getActionMenuProps = this.getActionMenuProps.bind(this)
-    this.renderActionMenu = this.renderActionMenu.bind(this)
-    this.renderFilters = this.renderFilters.bind(this)
-    this.renderSearchFilters = this.renderSearchFilters.bind(this)
-    this.renderGradebookSettingsModal = this.renderGradebookSettingsModal.bind(this)
-    this.renderStatusesModal = this.renderStatusesModal.bind(this)
-    this.weightedGroups = this.weightedGroups.bind(this)
-    this.weightedGrades = this.weightedGrades.bind(this)
-    this.switchTotalDisplay = this.switchTotalDisplay.bind(this)
-    this.togglePointsOrPercentTotals = this.togglePointsOrPercentTotals.bind(this)
-    this.onUserFilterInputStudents = this.onUserFilterInputStudents.bind(this)
-    this.onFilterToAssignments = this.onFilterToAssignments.bind(this)
-    this.onFilterToStudents = this.onFilterToStudents.bind(this)
-    this.assignmentSearchMatcher = this.assignmentSearchMatcher.bind(this)
-    this.studentSearchMatcher = this.studentSearchMatcher.bind(this)
-    this.renderStudentSearchFilter = this.renderStudentSearchFilter.bind(this)
-    this.renderAssignmentSearchFilter = this.renderAssignmentSearchFilter.bind(this)
-    // Custom Column
-    this.buildCustomColumn = this.buildCustomColumn.bind(this)
-    this.initGrid = this.initGrid.bind(this)
-    this.createGrid = this.createGrid.bind(this)
-    // # Grid Body Event Handlers
-
-    // The target cell will enter editing mode
-    this.onBeforeEditCell = this.onBeforeEditCell.bind(this)
-    // The current cell editor has been changed and is valid
-    this.onCellChange = this.onCellChange.bind(this)
-    this.saveSettings = this.saveSettings.bind(this)
-    this.getColumnTypeForColumnId = this.getColumnTypeForColumnId.bind(this)
-    this.secondaryAndTertiarySort = this.secondaryAndTertiarySort.bind(this)
-    this.gradeSort = this.gradeSort.bind(this)
-    this.missingSort = this.missingSort.bind(this)
-    this.lateSort = this.lateSort.bind(this)
-    this.setCurrentGradingPeriod = this.setCurrentGradingPeriod.bind(this)
-    this.sortByStudentColumn = this.sortByStudentColumn.bind(this)
-    this.sortByCustomColumn = this.sortByCustomColumn.bind(this)
-    this.sortByAssignmentColumn = this.sortByAssignmentColumn.bind(this)
-    // when 'unposted' # TODO: in a future milestone, unposted will be added
-    this.sortByAssignmentGroupColumn = this.sortByAssignmentGroupColumn.bind(this)
-    this.sortByTotalGradeColumn = this.sortByTotalGradeColumn.bind(this)
-    this.sortGridRows = this.sortGridRows.bind(this)
-    // Grid Update Methods
-    this.updateStudentRow = this.updateStudentRow.bind(this)
-    // Filtered Content Information Methods
-    this.updateFilteredContentInfo = this.updateFilteredContentInfo.bind(this)
-    this.listInvalidAssignmentGroups = this.listInvalidAssignmentGroups.bind(this)
-    this.listHiddenAssignments = this.listHiddenAssignments.bind(this)
-    this.getTotalPointsPossible = this.getTotalPointsPossible.bind(this)
-    this.handleColumnHeaderMenuClose = this.handleColumnHeaderMenuClose.bind(this)
-    this.toggleNotesColumn = this.toggleNotesColumn.bind(this)
-    this.showNotesColumn = this.showNotesColumn.bind(this)
-    this.hideNotesColumn = this.hideNotesColumn.bind(this)
-    // # Grid DOM Access/Reference Methods
-    this.addAssignmentColumnDefinition = this.addAssignmentColumnDefinition.bind(this)
-    // # SlickGrid Data Access Methods
-    this.listRows = this.listRows.bind(this)
-    this.listRowIndicesForStudentIds = this.listRowIndicesForStudentIds.bind(this)
-    // # SlickGrid Update Methods
-    this.updateRowCellsForStudentIds = this.updateRowCellsForStudentIds.bind(this)
-    this.invalidateRowsForStudentIds = this.invalidateRowsForStudentIds.bind(this)
-    this.updateTotalGradeColumn = this.updateTotalGradeColumn.bind(this)
-    this.updateAllTotalColumns = this.updateAllTotalColumns.bind(this)
-    this.updateColumnWithId = this.updateColumnWithId.bind(this)
-
-    // # Gradebook Bulk UI Update Methods
-    this.updateColumns = this.updateColumns.bind(this)
-    this.updateColumnsAndRenderViewOptionsMenu =
-      this.updateColumnsAndRenderViewOptionsMenu.bind(this)
-    this.updateColumnsAndRenderGradebookSettingsModal =
-      this.updateColumnsAndRenderGradebookSettingsModal.bind(this)
-    // # React Header Component Ref Methods
-    this.setHeaderComponentRef = this.setHeaderComponentRef.bind(this)
-    this.getHeaderComponentRef = this.getHeaderComponentRef.bind(this)
-    this.removeHeaderComponentRef = this.removeHeaderComponentRef.bind(this)
-    // # React Grid Component Rendering Methods
-    this.updateColumnHeaders = this.updateColumnHeaders.bind(this)
-    this.updateStudentColumnHeaders = this.updateStudentColumnHeaders.bind(this)
-    // Column Header Helpers
-    this.handleHeaderKeyDown = this.handleHeaderKeyDown.bind(this)
-    // Total Grade Column Header
-    this.freezeTotalGradeColumn = this.freezeTotalGradeColumn.bind(this)
-    this.moveTotalGradeColumnToEnd = this.moveTotalGradeColumnToEnd.bind(this)
-    // Submission Tray
-    this.assignmentColumns = this.assignmentColumns.bind(this)
-    this.navigateAssignment = this.navigateAssignment.bind(this)
-    this.loadTrayStudent = this.loadTrayStudent.bind(this)
-    this.loadTrayAssignment = this.loadTrayAssignment.bind(this)
-    this.getSubmissionTrayProps = this.getSubmissionTrayProps.bind(this)
-    this.renderSubmissionTray = this.renderSubmissionTray.bind(this)
-    this.loadSubmissionComments = this.loadSubmissionComments.bind(this)
-    this.updateRowAndRenderSubmissionTray = this.updateRowAndRenderSubmissionTray.bind(this)
-    this.toggleSubmissionTrayOpen = this.toggleSubmissionTrayOpen.bind(this)
-    this.openSubmissionTray = this.openSubmissionTray.bind(this)
-    this.closeSubmissionTray = this.closeSubmissionTray.bind(this)
-    this.getSubmissionTrayState = this.getSubmissionTrayState.bind(this)
-    this.setSubmissionTrayState = this.setSubmissionTrayState.bind(this)
-    this.setCommentsUpdating = this.setCommentsUpdating.bind(this)
-    this.getCommentsUpdating = this.getCommentsUpdating.bind(this)
-    this.setSubmissionComments = this.setSubmissionComments.bind(this)
-    this.updateSubmissionComments = this.updateSubmissionComments.bind(this)
-    this.unloadSubmissionComments = this.unloadSubmissionComments.bind(this)
-    this.apiCreateSubmissionComment = this.apiCreateSubmissionComment.bind(this)
-    this.apiUpdateSubmissionComment = this.apiUpdateSubmissionComment.bind(this)
-    this.apiDeleteSubmissionComment = this.apiDeleteSubmissionComment.bind(this)
-    this.editSubmissionComment = this.editSubmissionComment.bind(this)
-    this.setEditedCommentId = this.setEditedCommentId.bind(this)
-    this.getSubmissionComments = this.getSubmissionComments.bind(this)
-    this.removeSubmissionComment = this.removeSubmissionComment.bind(this)
-    this.setSubmissionCommentsLoaded = this.setSubmissionCommentsLoaded.bind(this)
-    this.getSubmissionCommentsLoaded = this.getSubmissionCommentsLoaded.bind(this)
-    // # Gradebook Application State Methods
-    this.initShowSeparateFirstLastNames = this.initShowSeparateFirstLastNames.bind(this)
-    this.initShowUnpublishedAssignments = this.initShowUnpublishedAssignments.bind(this)
-    this.toggleShowSeparateFirstLastNames = this.toggleShowSeparateFirstLastNames.bind(this)
-    this.toggleUnpublishedAssignments = this.toggleUnpublishedAssignments.bind(this)
-    this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
-    this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
-    this.setAssignmentGroupsLoaded = this.setAssignmentGroupsLoaded.bind(this)
-    this.setCustomColumnsLoaded = this.setCustomColumnsLoaded.bind(this)
-    this.setGradingPeriodAssignmentsLoaded = this.setGradingPeriodAssignmentsLoaded.bind(this)
-    this.setStudentIdsLoaded = this.setStudentIdsLoaded.bind(this)
-    this.setStudentsLoaded = this.setStudentsLoaded.bind(this)
-    this.setSubmissionsLoaded = this.setSubmissionsLoaded.bind(this)
-    this.isGradeEditable = this.isGradeEditable.bind(this)
-    this.isGradeVisible = this.isGradeVisible.bind(this)
-    this.isStudentGradeable = this.isStudentGradeable.bind(this)
-    this.studentCanReceiveGradeOverride = this.studentCanReceiveGradeOverride.bind(this)
-    this.studentHasGradedSubmission = this.studentHasGradedSubmission.bind(this)
-    this.addPendingGradeInfo = this.addPendingGradeInfo.bind(this)
-    this.removePendingGradeInfo = this.removePendingGradeInfo.bind(this)
-    this.getPendingGradeInfo = this.getPendingGradeInfo.bind(this)
-    this.setTeacherNotesColumnUpdating = this.setTeacherNotesColumnUpdating.bind(this)
-    this.setOverridesColumnUpdating = this.setOverridesColumnUpdating.bind(this)
-    // # Grid Display Settings Access Methods
-    this.getFilterColumnsBySetting = this.getFilterColumnsBySetting.bind(this)
-    this.setFilterColumnsBySetting = this.setFilterColumnsBySetting.bind(this)
-    this.getFilterRowsBySetting = this.getFilterRowsBySetting.bind(this)
-    this.setFilterRowsBySetting = this.setFilterRowsBySetting.bind(this)
-    this.isFilteringColumnsByAssignmentGroup = this.isFilteringColumnsByAssignmentGroup.bind(this)
-    this.getAssignmentGroupToShow = this.getAssignmentGroupToShow.bind(this)
-    this.getModuleToShow = this.getModuleToShow.bind(this)
-    this.isFilteringColumnsByGradingPeriod = this.isFilteringColumnsByGradingPeriod.bind(this)
-    this.isFilteringRowsBySearchTerm = this.isFilteringRowsBySearchTerm.bind(this)
-    this.getGradingPeriodAssignments = this.getGradingPeriodAssignments.bind(this)
-    this.getGradingPeriod = this.getGradingPeriod.bind(this)
-    this.setSelectedPrimaryInfo = this.setSelectedPrimaryInfo.bind(this)
-    this.toggleDefaultSort = this.toggleDefaultSort.bind(this)
-    this.getSelectedPrimaryInfo = this.getSelectedPrimaryInfo.bind(this)
-    this.setSelectedSecondaryInfo = this.setSelectedSecondaryInfo.bind(this)
-    this.getSelectedSecondaryInfo = this.getSelectedSecondaryInfo.bind(this)
-    this.setSortRowsBySetting = this.setSortRowsBySetting.bind(this)
-    this.getSortRowsBySetting = this.getSortRowsBySetting.bind(this)
-    this.updateGridColors = this.updateGridColors.bind(this)
-    this.listAvailableViewOptionsFilters = this.listAvailableViewOptionsFilters.bind(this)
-    this.setSelectedViewOptionsFilters = this.setSelectedViewOptionsFilters.bind(this)
-    this.listSelectedViewOptionsFilters = this.listSelectedViewOptionsFilters.bind(this)
-    this.toggleEnrollmentFilter = this.toggleEnrollmentFilter.bind(this)
-    this.updateStudentHeadersAndReloadData = this.updateStudentHeadersAndReloadData.bind(this)
-    this.applyEnrollmentFilter = this.applyEnrollmentFilter.bind(this)
-    this.getEnrollmentFilters = this.getEnrollmentFilters.bind(this)
-    this.getSelectedEnrollmentFilters = this.getSelectedEnrollmentFilters.bind(this)
-    this.setEnterGradesAsSetting = this.setEnterGradesAsSetting.bind(this)
-    this.getEnterGradesAsSetting = this.getEnterGradesAsSetting.bind(this)
-    this.updateEnterGradesAsSetting = this.updateEnterGradesAsSetting.bind(this)
-    this.postAssignmentGradesTrayOpenChanged = this.postAssignmentGradesTrayOpenChanged.bind(this)
-    // # Gradebook Content Access Methods
-    this.getSections = this.getSections.bind(this)
-    this.setSections = this.setSections.bind(this)
-    this.setStudentGroups = this.setStudentGroups.bind(this)
-    this.setAssignments = this.setAssignments.bind(this)
-    this.setAssignmentGroups = this.setAssignmentGroups.bind(this)
-    this.getAssignment = this.getAssignment.bind(this)
-    this.getAssignmentGroup = this.getAssignmentGroup.bind(this)
-    this.getCustomColumn = this.getCustomColumn.bind(this)
-    this.getTeacherNotesColumn = this.getTeacherNotesColumn.bind(this)
-    // Context Module Data & Lifecycle Methods
-    this.updateContextModules = this.updateContextModules.bind(this)
-    this.setContextModules = this.setContextModules.bind(this)
-    this.onLatePolicyUpdate = this.onLatePolicyUpdate.bind(this)
-    this.setLatePolicy = this.setLatePolicy.bind(this)
-    this.applyLatePolicy = this.applyLatePolicy.bind(this)
-    this.getContextModule = this.getContextModule.bind(this)
-    // # Assignment UI Action Methods
-    this.getDownloadSubmissionsAction = this.getDownloadSubmissionsAction.bind(this)
-    this.getReuploadSubmissionsAction = this.getReuploadSubmissionsAction.bind(this)
-    this.getSetDefaultGradeAction = this.getSetDefaultGradeAction.bind(this)
-    this.getCurveGradesAction = this.getCurveGradesAction.bind(this)
-    // # Gradebook Content Api Methods
-    this.createTeacherNotes = this.createTeacherNotes.bind(this)
-    this.setTeacherNotesHidden = this.setTeacherNotesHidden.bind(this)
-    this.apiUpdateSubmission = this.apiUpdateSubmission.bind(this)
-    this.gradeSubmission = this.gradeSubmission.bind(this)
-    this.updateSubmissionAndRenderSubmissionTray =
-      this.updateSubmissionAndRenderSubmissionTray.bind(this)
-    this.renderAnonymousSpeedGraderAlert = this.renderAnonymousSpeedGraderAlert.bind(this)
-    this.showAnonymousSpeedGraderAlertForURL = this.showAnonymousSpeedGraderAlertForURL.bind(this)
-    this.hideAnonymousSpeedGraderAlert = this.hideAnonymousSpeedGraderAlert.bind(this)
-    this.requireStudentGroupForSpeedGrader = this.requireStudentGroupForSpeedGrader.bind(this)
-    this.showSimilarityScore = this.showSimilarityScore.bind(this)
-    this.viewUngradedAsZero = this.viewUngradedAsZero.bind(this)
-    // # "PRIVILEGED" methods
-
-    // The methods here are intended to support specs, but not intended to be a
-    // permanent part of the API for this class. The existence of these methods
-    // suggests that the behavior they provide does not yet have a more suitable
-    // home elsewhere in the code. They are prefixed with '_' to suggest this
-    // aspect of their presence here.
-    this._gridHasRendered = this._gridHasRendered.bind(this)
-    this._updateEssentialDataLoaded = this._updateEssentialDataLoaded.bind(this)
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {
@@ -642,14 +373,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       performanceControls: props.performanceControls,
       loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
     })
-    this.gridData = {
-      columns: {
-        definitions: {},
-        frozen: [],
-        scrollable: []
-      },
-      rows: []
-    }
     this.gradebookGrid = new GradebookGrid({
       $container: document.getElementById('gradebook_grid'),
       activeBorderColor: '#1790DF', // $active-border-color
@@ -669,14 +392,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     $.subscribe('currentSection/change', this.updateCurrentSection)
     // emitted by GradingPeriodMenuView
     $.subscribe('currentGradingPeriod/change', this.updateCurrentGradingPeriod)
-    this.gridReady = $.Deferred()
-    this._essentialDataLoaded = deferPromise()
-    this.setInitialState()
-    this.loadSettings()
-    this.bindGridEvents()
-  }
-
-  setInitialState() {
     this.courseContent = getInitialCourseContent(this.options)
     this.gradebookContent = getInitialGradebookContent(this.options)
     this.gridDisplaySettings = getInitialGridDisplaySettings(
@@ -685,25 +400,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
     this.contentLoadStates = getInitialContentLoadStates(this.options)
     this.actionStates = getInitialActionStates()
-    this.headerComponentRefs = {}
-    this.filteredContentInfo = {
-      invalidAssignmentGroups: [],
-      totalPointsPossible: 0
-    }
     this.setAssignments({})
     this.setAssignmentGroups({})
-    this.effectiveDueDates = {}
-    this.students = {}
-    this.studentViewStudents = {}
     this.courseContent.students = new StudentDatastore(this.students, this.studentViewStudents)
-    this.calculatedGradesByStudentId = {}
     this.initPostGradesStore()
     this.initPostGradesLtis()
     this.checkForUploadComplete()
-  }
 
-  loadSettings() {
-    let ref1
     if (this.options.grading_period_set) {
       this.gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(this.options.grading_period_set)
     } else {
@@ -732,8 +435,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.setColumnOrder({
       ...this.options.gradebook_column_order_settings,
       freezeTotalGrade:
-        ((ref1 = this.options.gradebook_column_order_settings) != null
-          ? ref1.freezeTotalGrade
+        (this.options.gradebook_column_order_settings != null
+          ? this.options.gradebook_column_order_settings.freezeTotalGrade
           : undefined) === 'true'
     })
     this.teacherNotesNotYetLoaded =
@@ -749,12 +452,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
     })
-    return this.setStudentGroups(this.options.student_groups)
+    this.setStudentGroups(this.options.student_groups)
+
+    this.bindGridEvents()
   }
 
-  bindGridEvents() {
+  bindGridEvents = () => {
     this.gradebookGrid.events.onColumnsReordered.subscribe((_event, columns) => {
-      let currentCustomColumnIds, currentFrozenColumns, updatedCustomColumnIds
+      let currentCustomColumnIds: string[]
+      let currentFrozenColumns: GridColumn[]
+      let updatedCustomColumnIds: string[]
       // determine if assignment columns or custom columns were reordered
       // (this works because frozen columns and non-frozen columns are can't be
       // swapped)
@@ -772,10 +479,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         })
         currentCustomColumnIds = (function () {
           let j, len
-          const results: any = []
+          const results: string[] = []
           for (j = 0, len = currentFrozenColumns.length; j < len; j++) {
             const column = currentFrozenColumns[j]
-            if (column.type === 'custom_column') {
+            if (column.type === 'custom_column' && column.customColumnId) {
               results.push(column.customColumnId)
             }
           }
@@ -784,7 +491,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         updatedCustomColumnIds = (function () {
           let j, len
           const ref1 = columns.frozen
-          const results: any = []
+          const results: string[] = []
           for (j = 0, len = ref1.length; j < len; j++) {
             const column = ref1[j]
             if (column.type === 'custom_column') {
@@ -820,7 +527,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  initialize() {
+  initialize = () => {
     this.dataLoader.loadInitialData()
     // Until GradebookGrid is rendered reactively, it will need to be rendered
     // once and only once. It depends on all essential data from the initial
@@ -841,7 +548,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // called from ui/bundles/gradebook.js
-  onShow() {
+  onShow = () => {
     $('.post-grades-button-placeholder').show()
     if (this.startedInitializing) {
       return
@@ -865,13 +572,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  loadOverridesForSIS() {
+  loadOverridesForSIS = () => {
     if (this.options.post_grades_feature) {
       return this.dataLoader.loadOverridesForSIS()
     }
   }
 
-  addOverridesToPostGradesStore(assignmentGroups) {
+  addOverridesToPostGradesStore = assignmentGroups => {
     let assignment, group, j, k, len, len1, ref1
     for (j = 0, len = assignmentGroups.length; j < len; j++) {
       group = assignmentGroups[j]
@@ -887,9 +594,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // dependencies - gridReady
-  setAssignmentVisibility(studentIds) {
+  setAssignmentVisibility = studentIds => {
     let a, assignmentId, hiddenStudentIds, j, k, len, len1, student, studentId
-    const studentsWithHiddenAssignments: any = []
+    const studentsWithHiddenAssignments: string[] = []
     const ref1 = this.assignments
     for (assignmentId in ref1) {
       a = ref1[assignmentId]
@@ -906,17 +613,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
     }
-    const ref2 = _.uniq(studentsWithHiddenAssignments)
-    const results: any = []
+    const ref2: string[] = _.uniq(studentsWithHiddenAssignments)
     for (k = 0, len1 = ref2.length; k < len1; k++) {
       studentId = ref2[k]
       student = this.student(studentId)
-      results.push(this.calculateStudentGrade(student))
+      this.calculateStudentGrade(student)
     }
-    return results
   }
 
-  updateAssignmentVisibilities(hiddenSub) {
+  updateAssignmentVisibilities = hiddenSub => {
     const assignment = this.assignments[hiddenSub.assignment_id]
     const filteredVisibility = assignment.assignment_visibility.filter(function (id) {
       return id !== hiddenSub.user_id
@@ -924,7 +629,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return (assignment.assignment_visibility = filteredVisibility)
   }
 
-  gotCustomColumns(columns) {
+  gotCustomColumns = columns => {
     if (!this.gradebookContent) throw new Error('Gradebook not initialized')
     this.gradebookContent.customColumns = columns
     columns.forEach(column => {
@@ -932,10 +637,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return (this.gridData.columns.definitions[customColumn.id] = customColumn)
     })
     this.setCustomColumnsLoaded(true)
-    return this._updateEssentialDataLoaded()
+    this._updateEssentialDataLoaded()
   }
 
-  gotCustomColumnDataChunk(customColumnId, columnData) {
+  gotCustomColumnDataChunk = (customColumnId: string, columnData) => {
     let datum, j, len, student
     const studentIds: string[] = []
     for (j = 0, len = columnData.length; j < len; j++) {
@@ -949,17 +654,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.invalidateRowsForStudentIds(_.uniq(studentIds))
   }
 
-  updateAssignmentGroups(assignmentGroups, gradingPeriodIds) {
+  // Assignment Group Data & Lifecycle Methods
+  updateAssignmentGroups = (assignmentGroups, gradingPeriodIds) => {
     this.gotAllAssignmentGroups(assignmentGroups)
     this.setState({assignmentGroups})
     this.setAssignmentsLoaded(gradingPeriodIds)
     this.renderViewOptionsMenu()
     this.renderFilters()
     this.updateColumnHeaders()
-    return this._updateEssentialDataLoaded()
+    this._updateEssentialDataLoaded()
   }
 
-  gotAllAssignmentGroups(assignmentGroups) {
+  gotAllAssignmentGroups = assignmentGroups => {
     this.setAssignmentGroupsLoaded(true)
     assignmentGroups.forEach(assignmentGroup => {
       let group = this.assignmentGroups[assignmentGroup.id]
@@ -983,7 +689,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  updateGradingPeriodAssignments(gradingPeriodAssignments) {
+  updateGradingPeriodAssignments = gradingPeriodAssignments => {
     this.gotGradingPeriodAssignments({
       grading_period_assignments: gradingPeriodAssignments
     })
@@ -997,24 +703,24 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (this._gridHasRendered()) {
       this.updateColumns()
     }
-    return this._updateEssentialDataLoaded()
+    this._updateEssentialDataLoaded()
   }
 
-  getGradingPeriodAssignments(gradingPeriodId) {
+  getGradingPeriodAssignments = (gradingPeriodId: string) => {
     return this.courseContent.gradingPeriodAssignments[gradingPeriodId] || []
   }
 
-  gotGradingPeriodAssignments({grading_period_assignments: gradingPeriodAssignments}) {
+  gotGradingPeriodAssignments = ({grading_period_assignments: gradingPeriodAssignments}) => {
     return (this.courseContent.gradingPeriodAssignments = gradingPeriodAssignments)
   }
 
-  gotSections(sections) {
+  gotSections = sections => {
     this.setSections(sections.map(htmlEscape))
     this.hasSections.resolve()
     return this.postGradesStore.setSections(this.sections)
   }
 
-  gotChunkOfStudents(students) {
+  gotChunkOfStudents = (students: Student[]) => {
     this.courseContent.assignmentStudentVisibility = {}
     const escapeStudentContent = student => {
       const unescapedName = student.name
@@ -1080,14 +786,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  finishRenderingUI() {
+  // # Post-Data Load Initialization
+  finishRenderingUI = () => {
     this.initGrid()
     this.initHeader()
     this.gridReady.resolve()
     return this.loadOverridesForSIS()
   }
 
-  setupGrading(students) {
+  setupGrading = students => {
     let assignment, assignment_id, j, len, name, ref1, student, submissionState
     // set up a submission for each student even if we didn't receive one
     this.submissionStateMap.setup(students, this.assignments)
@@ -1113,17 +820,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.invalidateRowsForStudentIds(studentIds)
   }
 
-  resetGrading() {
+  resetGrading = () => {
     this.initSubmissionStateMap()
     return this.setupGrading(this.courseContent.students.listStudents())
   }
 
-  getSubmission(studentId, assignmentId) {
+  getSubmission = (studentId, assignmentId) => {
     const student = this.student(studentId)
     return student != null ? student[`assignment_${assignmentId}`] : undefined
   }
 
-  updateEffectiveDueDatesFromSubmissions(submissions) {
+  updateEffectiveDueDatesFromSubmissions = submissions => {
     let ref1
     return EffectiveDueDates.updateWithSubmissions(
       this.effectiveDueDates,
@@ -1132,22 +839,23 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  updateAssignmentEffectiveDueDates(assignment) {
+  updateAssignmentEffectiveDueDates = (assignment: Assignment) => {
     assignment.effectiveDueDates = this.effectiveDueDates[assignment.id] || {}
     return (assignment.inClosedGradingPeriod = _.some(assignment.effectiveDueDates, date => {
       return date.in_closed_grading_period
     }))
   }
 
-  updateStudentIds(studentIds) {
+  // Student Data & Lifecycle Methods
+  updateStudentIds = (studentIds: string[]) => {
     this.courseContent.students.setStudentIds(studentIds)
     this.assignmentStudentVisibility = {}
     this.setStudentIdsLoaded(true)
     this.buildRows()
-    return this._updateEssentialDataLoaded()
+    this._updateEssentialDataLoaded()
   }
 
-  updateStudentsLoaded(loaded) {
+  updateStudentsLoaded = (loaded: boolean) => {
     this.setStudentsLoaded(loaded)
     if (this._gridHasRendered()) {
       this.updateColumnHeaders()
@@ -1161,7 +869,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  studentsThatCanSeeAssignment(assignmentId) {
+  studentsThatCanSeeAssignment = (assignmentId: string) => {
     const {assignmentStudentVisibility} = this.courseContent
     if (assignmentStudentVisibility[assignmentId] == null) {
       const allStudentsById = {...this.students, ...this.studentViewStudents}
@@ -1178,8 +886,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // This is like studentsThatCanSeeAssignment, but returns only students
   // visible with the current filters, instead of all the students the
   // Gradebook knows about.
-  visibleStudentsThatCanSeeAssignment(assignmentId) {
-    const visibleStudentsIgnoringSearch = _.pick(
+  visibleStudentsThatCanSeeAssignment = (assignmentId: string) => {
+    const visibleStudentsIgnoringSearch: {[key: string]: Student} = _.pick(
       this.studentsThatCanSeeAssignment(assignmentId),
       this.courseContent.students.listStudentIds()
     )
@@ -1191,7 +899,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  isInvalidSort() {
+  isInvalidSort = () => {
     const sortSettings = this.gradebookColumnOrderSettings
     if (
       (sortSettings != null ? sortSettings.sortType : undefined) === 'custom' &&
@@ -1213,7 +921,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return false
   }
 
-  setColumnOrder(order) {
+  setColumnOrder = order => {
     if (this.gradebookColumnOrderSettings == null) {
       this.gradebookColumnOrderSettings = {
         direction: 'ascending',
@@ -1236,7 +944,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getColumnOrder() {
+  getColumnOrder = () => {
     if (this.isInvalidSort() || !this.gradebookColumnOrderSettings) {
       return {
         direction: 'ascending',
@@ -1248,7 +956,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  saveColumnOrder() {
+  saveColumnOrder = () => {
     let url
     if (!this.isInvalidSort()) {
       url = this.options.gradebook_column_order_settings_url
@@ -1258,13 +966,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  reorderCustomColumns(ids) {
+  reorderCustomColumns = ids => {
     return $.ajaxJSON(this.options.reorder_custom_columns_url, 'POST', {
       order: ids
     })
   }
 
-  saveCustomColumnOrder() {
+  saveCustomColumnOrder = () => {
     this.setColumnOrder({
       customOrder: this.gridData.columns.scrollable,
       sortType: 'custom'
@@ -1272,7 +980,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.saveColumnOrder()
   }
 
-  arrangeColumnsBy(newSortOrder, isFirstArrangement) {
+  arrangeColumnsBy = (newSortOrder, isFirstArrangement) => {
     if (!isFirstArrangement) {
       this.setColumnOrder(newSortOrder)
       this.saveColumnOrder()
@@ -1289,7 +997,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.updateColumnHeaders()
   }
 
-  makeColumnSortFn(sortOrder) {
+  makeColumnSortFn = sortOrder => {
     switch (sortOrder.sortType) {
       case 'due_date':
         return wrapColumnSortFn(compareAssignmentDueDates, sortOrder.direction)
@@ -1306,7 +1014,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  compareAssignmentModulePositions(a, b) {
+  compareAssignmentModulePositions = (a, b) => {
     let firstPositionInModule, ref1, ref2, secondPositionInModule
     const firstAssignmentModulePosition =
       (ref1 = this.getContextModule(a.object.module_ids[0])) != null ? ref1.position : undefined
@@ -1331,11 +1039,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  compareAssignmentNames(a, b) {
+  compareAssignmentNames = (a, b) => {
     return localeSort(a.object.name, b.object.name)
   }
 
-  makeCompareAssignmentCustomOrderFn(sortOrder) {
+  makeCompareAssignmentCustomOrderFn = sortOrder => {
     let assignmentId, indexCounter, j, len
     const sortMap = {}
     indexCounter = 0
@@ -1376,7 +1084,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  rowFilter(student) {
+  // Filtering
+  rowFilter = (student: Student) => {
     if (!this.isFilteringRowsBySearchTerm()) {
       return true
     }
@@ -1393,7 +1102,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  filterAssignments(assignments) {
+  filterAssignments = (assignments: Assignment[]) => {
     const assignmentFilters = [
       this.filterAssignmentBySubmissionTypes,
       this.filterAssignmentByPublishedStatus,
@@ -1409,7 +1118,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return assignments.filter(matchesAllFilters)
   }
 
-  filterAssignmentBySearchInput(assignment) {
+  filterAssignmentBySearchInput = (assignment: Assignment) => {
     if (this.filteredAssignmentIds?.length) {
       return this.filteredAssignmentIds.includes(assignment.id)
     }
@@ -1417,18 +1126,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return true
   }
 
-  filterAssignmentBySubmissionTypes(assignment) {
+  filterAssignmentBySubmissionTypes = (assignment: Assignment) => {
     const submissionType = '' + assignment.submission_types
     return (
       submissionType !== 'not_graded' && (submissionType !== 'attendance' || this.show_attendance)
     )
   }
 
-  filterAssignmentByPublishedStatus(assignment) {
+  // Filtering
+  filterAssignmentByPublishedStatus = (assignment: Assignment) => {
     return assignment.published || this.gridDisplaySettings.showUnpublishedAssignments
   }
 
-  filterAssignmentByAssignmentGroup(assignment) {
+  filterAssignmentByAssignmentGroup = (assignment: Assignment) => {
     if (!this.options.enhanced_gradebook_filters) {
       if (!this.isFilteringColumnsByAssignmentGroup()) {
         return true
@@ -1445,14 +1155,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  filterAssignmentByGradingPeriod(assignment) {
+  filterAssignmentByGradingPeriod = (assignment: Assignment) => {
     if (!this.isFilteringColumnsByGradingPeriod()) return true
 
     const assignmentsForPeriod = this.getGradingPeriodAssignments(this.gradingPeriodId)
     return assignmentsForPeriod.includes(assignment.id)
   }
 
-  filterAssignmentByModule(assignment) {
+  filterAssignmentByModule = (assignment: Assignment) => {
     if (!this.options.enhanced_gradebook_filters) {
       const contextModuleFilterSetting = this.getModuleToShow()
       if (contextModuleFilterSetting === '0') {
@@ -1468,27 +1178,30 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
   }
 
-  filterAssignmentByStartDate(assignment) {
+  filterAssignmentByStartDate = (assignment: Assignment) => {
     const date = findAllAppliedFilterValuesOfType('start-date', this.props.filters)[0]
     if (!date) {
       return true
     }
     return Object.values(assignment.effectiveDueDates).some(
-      (effectiveDueDateObject: any) => tz.parse(effectiveDueDateObject.due_at) >= tz.parse(date)
+      (effectiveDueDateObject: AssignmentDueDate) =>
+        tz.parse(effectiveDueDateObject.due_at) >= tz.parse(date)
     )
   }
 
-  filterAssignmentByEndDate(assignment) {
+  filterAssignmentByEndDate = (assignment: Assignment) => {
     const date = findAllAppliedFilterValuesOfType('end-date', this.props.filters)[0]
     if (!date) {
       return true
     }
     return Object.values(assignment.effectiveDueDates).some(
-      (effectiveDueDateObject: any) => tz.parse(effectiveDueDateObject.due_at) <= tz.parse(date)
+      (effectiveDueDateObject: AssignmentDueDate) =>
+        tz.parse(effectiveDueDateObject.due_at) <= tz.parse(date)
     )
   }
 
-  handleSubmissionPostedChange(assignment) {
+  // Course Content Event Handlers
+  handleSubmissionPostedChange = (assignment: Assignment) => {
     let anonymousColumnIds
     if (assignment.anonymize_students) {
       anonymousColumnIds = [
@@ -1508,14 +1221,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.resetGrading()
   }
 
-  handleSubmissionsDownloading(assignmentId) {
+  handleSubmissionsDownloading = (assignmentId: string) => {
     this.getAssignment(assignmentId).hasDownloadedSubmissions = true
     return this.gradebookGrid.gridSupport?.columns.updateColumnHeaders([
       getAssignmentColumnId(assignmentId)
     ])
   }
 
-  buildRows() {
+  // filter, sort, and build the dataset for slickgrid to read from, then
+  // force a full redraw
+  buildRows = () => {
     let j, len, student
     this.gridData.rows.length = 0 // empty the list of rows
     const ref1 = this.courseContent.students.listStudents()
@@ -1529,12 +1244,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid.invalidate()
   }
 
-  buildRow(student) {
+  buildRow = (student: Student) => {
     // because student is current mutable, we need to retain the reference
     return student
   }
 
-  updateSubmissionsLoaded(loaded) {
+  // Submission Data & Lifecycle Methods
+  updateSubmissionsLoaded = (loaded: boolean) => {
     this.setSubmissionsLoaded(loaded)
     this.updateColumnHeaders()
     this.renderFilters()
@@ -1546,17 +1262,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  gotSubmissionsChunk(student_submissions) {
-    let j, k, len, len1, ref1, student, studentSubmissionGroup, submission
+  gotSubmissionsChunk = (student_submission_groups: UserSubmissionGroup[]) => {
     let changedStudentIds: string[] = []
-    const submissions: any = []
-    for (j = 0, len = student_submissions.length; j < len; j++) {
-      studentSubmissionGroup = student_submissions[j]
+    const submissions: Submission[] = []
+    for (let j = 0, len = student_submission_groups.length; j < len; j++) {
+      const studentSubmissionGroup = student_submission_groups[j]
       changedStudentIds.push(studentSubmissionGroup.user_id)
-      student = this.student(studentSubmissionGroup.user_id)
-      ref1 = studentSubmissionGroup.submissions
-      for (k = 0, len1 = ref1.length; k < len1; k++) {
-        submission = ref1[k]
+      const student = this.student(studentSubmissionGroup.user_id)
+      const ref1 = studentSubmissionGroup.submissions
+      for (let k = 0, len1 = ref1.length; k < len1; k++) {
+        const submission = ref1[k]
         submission.posted_at = tz.parse(submission.posted_at)
         ensureAssignmentVisibility(this.getAssignment(submission.assignment_id), submission)
         submissions.push(submission)
@@ -1573,11 +1288,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.setupGrading(students)
   }
 
-  student(id) {
+  student = (id: string) => {
     return this.students[id] || this.studentViewStudents[id]
   }
 
-  updateSubmission(submission) {
+  updateSubmission = (
+    submission: Partial<Submission> & Pick<Submission, 'user_id' | 'assignment_id'>
+  ) => {
     let assignment, name
     const student = this.student(submission.user_id)
     submission.submitted_at = tz.parse(submission.submitted_at)
@@ -1597,7 +1314,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return _.extend(cell, submission)
   }
 
-  updateSubmissionsFromExternal(submissions) {
+  // this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
+  // because there is no *bulk* submissions#update endpoint in the api.
+  // It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
+  // where each student has an array of submissions.  This one just expects an array of submissions,
+  // they are not grouped by student.
+  updateSubmissionsFromExternal = (submissions: Submission[]) => {
     let cell, column, idToMatch, index, k, len1, student, submissionState
     const columns = this.gradebookGrid.grid.getColumns()
     const changedColumnHeaders = {}
@@ -1640,7 +1362,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateRowCellsForStudentIds(_.uniq(changedStudentIds))
   }
 
-  submissionsForStudent(student) {
+  submissionsForStudent = student => {
     let key, value
     const allSubmissions = (function () {
       const results: any = []
@@ -1665,7 +1387,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  getStudentGrades(student, preferCachedGrades) {
+  getStudentGrades = (student: Student, preferCachedGrades) => {
     if (preferCachedGrades && this.calculatedGradesByStudentId[student.id] != null) {
       return this.calculatedGradesByStudentId[student.id]
     }
@@ -1686,13 +1408,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return grades
   }
 
-  calculateStudentGrade(student, preferCachedGrades = false) {
+  calculateStudentGrade = (student: Student, preferCachedGrades = false): null | void => {
     if (!(student.loaded && student.initialized)) {
       return null
     }
 
     let grades = this.getStudentGrades(student, preferCachedGrades)
-    if (this.isFilteringColumnsByGradingPeriod()) {
+    if (this.isFilteringColumnsByGradingPeriod() && this.gradingPeriodId) {
       grades = grades.gradingPeriods[this.gradingPeriodId]
     }
 
@@ -1720,11 +1442,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // $("<div class='slick-header-columns' style='width:10000px; left:-1000px' />")
   // if a course has a ton of assignments then it will not be wide enough to
   // contain them all
-  fixMaxHeaderWidth() {
+  fixMaxHeaderWidth = () => {
     return this.$grid.find('.slick-header-columns').width(1000000)
   }
 
-  onGridBlur(e) {
+  // SlickGrid doesn't have a blur event for the grid, so this mimics it in
+  // conjunction with a click listener on <body />. When we 'blur' the grid
+  // by clicking outside of it, save the current field.
+  onGridBlur = e => {
     let className
     if (this.getSubmissionTrayState().open) {
       this.closeSubmissionTray()
@@ -1760,7 +1485,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid.gridSupport?.state.blur()
   }
 
-  updateSectionFilterVisibility() {
+  updateSectionFilterVisibility = () => {
     let props
     const mountPoint = document.getElementById('sections-filter-container')
     if (
@@ -1780,7 +1505,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateCurrentSection(sectionId) {
+  updateCurrentSection = (sectionId: string | null) => {
     sectionId = sectionId === '0' ? null : sectionId
     const currentSection = this.getFilterRowsBySetting('sectionId')
     if (currentSection !== sectionId) {
@@ -1793,24 +1518,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  showSections() {
+  showSections = () => {
     return this.sections_enabled
   }
 
-  showStudentGroups() {
+  showStudentGroups = () => {
     return this.studentGroupsEnabled
   }
 
-  updateStudentGroupFilterVisibility() {
+  updateStudentGroupFilterVisibility = () => {
     let props, studentGroupSets
     const mountPoint = document.getElementById('student-group-filter-container')
     if (
       this.showStudentGroups() &&
       this.gridDisplaySettings.selectedViewOptionsFilters.indexOf('studentGroups') >= 0
     ) {
-      studentGroupSets = Object.values(this.studentGroupCategories).sort((a: any, b: any) => {
-        return a.id - b.id
-      })
+      studentGroupSets = Object.values(this.studentGroupCategories).sort(
+        (a: StudentGroupCategory, b: StudentGroupCategory) => {
+          return a.id - b.id
+        }
+      )
       props = {
         studentGroupSets,
         onSelect: this.updateCurrentStudentGroup,
@@ -1824,7 +1551,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getStudentGroupToShow() {
+  getStudentGroupToShow = () => {
     const groupId = this.getFilterRowsBySetting('studentGroupId') || '0'
     if (Object.keys(this.studentGroups || {}).indexOf(groupId) >= 0) {
       return groupId
@@ -1833,7 +1560,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateCurrentStudentGroup(groupId) {
+  updateCurrentStudentGroup = (groupId: string | null) => {
     groupId = groupId === '0' ? null : groupId
     if (this.getFilterRowsBySetting('studentGroupId') !== groupId) {
       this.setFilterRowsBySetting('studentGroupId', groupId)
@@ -1844,16 +1571,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  assignmentGroupList() {
+  assignmentGroupList = () => {
     if (!this.assignmentGroups) {
       return []
     }
-    return Object.values(this.assignmentGroups).sort((a: any, b: any) => {
+    return Object.values(this.assignmentGroups).sort((a: AssignmentGroup, b: AssignmentGroup) => {
       return a.position - b.position
     })
   }
 
-  updateAssignmentGroupFilterVisibility() {
+  updateAssignmentGroupFilterVisibility = () => {
     let props
     const mountPoint = document.getElementById('assignment-group-filter-container')
     const groups = this.assignmentGroupList()
@@ -1874,7 +1601,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateCurrentAssignmentGroup(group) {
+  updateCurrentAssignmentGroup = group => {
     if (this.getFilterColumnsBySetting('assignmentGroupId') !== group) {
       this.setFilterColumnsBySetting('assignmentGroupId', group)
       this.saveSettings()
@@ -1885,7 +1612,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateGradingPeriodFilterVisibility() {
+  updateGradingPeriodFilterVisibility = () => {
     let props
     const mountPoint = document.getElementById('grading-periods-filter-container')
     if (
@@ -1907,7 +1634,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateCurrentGradingPeriod(period) {
+  updateCurrentGradingPeriod = period => {
     if (this.getFilterColumnsBySetting('gradingPeriodId') !== period) {
       this.setFilterColumnsBySetting('gradingPeriodId', period)
       this.setCurrentGradingPeriod()
@@ -1921,7 +1648,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateCurrentModule(moduleId) {
+  updateCurrentModule = (moduleId: string | null) => {
     if (this.getFilterColumnsBySetting('contextModuleId') !== moduleId) {
       this.setFilterColumnsBySetting('contextModuleId', moduleId)
       this.saveSettings()
@@ -1931,13 +1658,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  moduleList() {
-    return this.courseContent.contextModules.sort((a, b) => {
+  moduleList = () => {
+    return this.courseContent.contextModules.sort((a: Module, b: Module) => {
       return a.position - b.position
     })
   }
 
-  updateModulesFilterVisibility() {
+  updateModulesFilterVisibility = () => {
     let props, ref1
     const mountPoint = document.getElementById('modules-filter-container')
     if (
@@ -1957,15 +1684,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  initSubmissionStateMap() {
-    return (this.submissionStateMap = new SubmissionStateMap({
+  initSubmissionStateMap = () => {
+    this.submissionStateMap = new SubmissionStateMap({
       hasGradingPeriods: this.gradingPeriodSet != null,
       selectedGradingPeriodID: this.gradingPeriodId,
       isAdmin: isAdmin()
-    }))
+    })
   }
 
-  initPostGradesStore() {
+  initPostGradesStore = () => {
     this.postGradesStore = PostGradesStore({
       course: {
         id: this.options.context_id,
@@ -1974,10 +1701,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
     this.postGradesStore.addChangeListener(this.updatePostGradesFeatureButton)
     const sectionId = this.getFilterRowsBySetting('sectionId')
-    return this.postGradesStore.setSelectedSection(sectionId)
+    this.postGradesStore.setSelectedSection(sectionId)
   }
 
-  initPostGradesLtis() {
+  initPostGradesLtis = () => {
     return (this.postGradesLtis = this.options.post_grades_ltis.map(lti => {
       return {
         id: lti.id,
@@ -2002,7 +1729,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }))
   }
 
-  updatePostGradesFeatureButton() {
+  updatePostGradesFeatureButton = () => {
     this.disablePostGradesFeature =
       !this.postGradesStore.hasAssignments() || !this.postGradesStore.selectedSISId()
     return this.gridReady.then(() => {
@@ -2010,7 +1737,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  initHeader() {
+  initHeader = () => {
     this.renderGradebookMenus()
     this.renderFilters()
     this.arrangeColumnsBy(this.getColumnOrder(), true)
@@ -2025,12 +1752,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  renderGradebookMenus() {
+  renderGradebookMenus = () => {
     this.renderViewOptionsMenu()
     this.renderActionMenu()
   }
 
-  getTeacherNotesViewOptionsMenuProps() {
+  getTeacherNotesViewOptionsMenuProps = () => {
     let onSelect
     const teacherNotes = this.getTeacherNotesColumn()
     const showingNotes = teacherNotes != null && !teacherNotes.hidden
@@ -2053,7 +1780,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getColumnSortSettingsViewOptionsMenuProps() {
+  getColumnSortSettingsViewOptionsMenuProps = () => {
     const storedSortOrder = this.getColumnOrder()
     const criterion = isDefaultSortOrder(storedSortOrder.sortType)
       ? 'default'
@@ -2147,7 +1874,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getFilterSettingsViewOptionsMenuProps() {
+  getFilterSettingsViewOptionsMenuProps = () => {
     return {
       available: this.listAvailableViewOptionsFilters(),
       onSelect: this.updateFilterSettings,
@@ -2155,14 +1882,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateFilterSettings(filters) {
+  updateFilterSettings = filters => {
     this.setSelectedViewOptionsFilters(filters)
     this.renderViewOptionsMenu()
     this.renderFilters()
     return this.saveSettings()
   }
 
-  getViewOptionsMenuProps() {
+  getViewOptionsMenuProps = () => {
     return {
       teacherNotes: this.getTeacherNotesViewOptionsMenuProps(),
       columnSortSettings: this.getColumnSortSettingsViewOptionsMenuProps(),
@@ -2173,7 +1900,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames,
       onSelectShowSeparateFirstLastNames: this.toggleShowSeparateFirstLastNames,
       onSelectShowStatusesModal: () => {
-        return this.statusesModal.open()
+        this.statusesModal?.open?.()
       },
       onSelectViewUngradedAsZero: () => {
         confirmViewUngradedAsZero({
@@ -2188,7 +1915,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  renderViewOptionsMenu() {
+  renderViewOptionsMenu = () => {
     // TODO: if enhanced_gradebook_filters is enabled, we can skip rendering
     // this menu when we have the filters in place. Until then, keep rendering
     // it so we can still filter when we have the flag on.
@@ -2201,8 +1928,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     ))
   }
 
-  getAssignmentOrder() {
-    return this.gridData.columns.scrollable.reduce((acc, column) => {
+  getAssignmentOrder = () => {
+    return this.gridData.columns.scrollable.reduce((acc: string[], column) => {
       const matches = column.match(/assignment_(\d+)/)
       if (matches) {
         const assignmentId = matches[1]
@@ -2212,7 +1939,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }, [])
   }
 
-  getActionMenuProps() {
+  getActionMenuProps = () => {
     let attachmentData
     const focusReturnPoint = document.querySelector("[data-component='ActionMenu'] button")
     const actionMenuProps: ActionMenuProps = {
@@ -2254,7 +1981,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return actionMenuProps
   }
 
-  renderActionMenu() {
+  renderActionMenu = () => {
     const componentId = this.options.enhanced_gradebook_filters
       ? 'EnhancedActionMenu'
       : 'ActionMenu'
@@ -2265,7 +1992,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return renderComponent(component, mountPoint, props)
   }
 
-  renderFilters() {
+  renderFilters = () => {
     // Sections and grading periods are passed into the constructor, and therefore are always
     // available, whereas assignment groups and context modules are fetched via the DataLoader,
     // so we need to wait until they are loaded to set their filter visibility.
@@ -2281,14 +2008,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.renderSearchFilters()
   }
 
-  renderSearchFilters() {
+  renderSearchFilters = () => {
     this.renderStudentSearchFilter(
       this.courseContent.students.listStudents({includePlaceholders: false})
     )
     this.renderAssignmentSearchFilter(this.assignments)
   }
 
-  renderGradebookSettingsModal() {
+  renderGradebookSettingsModal = () => {
     this.gradebookSettingsModal = React.createRef()
     const props = {
       anonymousAssignmentsPresent: _.some(this.assignments, assignment => {
@@ -2301,7 +2028,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       locale: this.options.locale,
       gradebookIsEditable: this.options.gradebook_is_editable,
       onClose: () => {
-        return this.gradebookSettingsModalButton.current.focus()
+        return this.gradebookSettingsModalButton.current?.focus()
       },
       onCourseSettingsUpdated: settings => {
         return this.courseSettings.handleUpdated(settings)
@@ -2319,7 +2046,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return AsyncComponents.renderGradebookSettingsModal(props, $container)
   }
 
-  gradebookSettingsModalViewOptionsProps() {
+  gradebookSettingsModalViewOptionsProps = () => {
     const {modulesEnabled} = this.getColumnSortSettingsViewOptionsMenuProps()
 
     return {
@@ -2357,7 +2084,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     // update the grid when they change. Let's sort out which endpoints we
     // actually need to call and return a single promise encapsulating all of
     // them.
-    const promises: any = []
+    const promises: Promise<void>[] = []
 
     // Column sort settings have their own endpoint.
     const {criterion: oldCriterion, direction: oldDirection} =
@@ -2496,7 +2223,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  renderStatusesModal() {
+  renderStatusesModal = () => {
     const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
     const statusesModalProps = {
       onClose: () => {
@@ -2512,18 +2239,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     ))
   }
 
-  checkForUploadComplete() {
+  checkForUploadComplete = () => {
     if (UserSettings.contextGet('gradebookUploadComplete')) {
       $.flashMessage(I18n.t('Upload successful'))
       return UserSettings.contextRemove('gradebookUploadComplete')
     }
   }
 
-  weightedGroups() {
+  weightedGroups = () => {
     return this.options.group_weighting_scheme === 'percent'
   }
 
-  weightedGrades() {
+  weightedGrades = () => {
     let ref1
     return (
       this.weightedGroups() ||
@@ -2531,7 +2258,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  switchTotalDisplay({dontWarnAgain = false} = {}) {
+  switchTotalDisplay = ({dontWarnAgain = false} = {}) => {
     if (dontWarnAgain) {
       UserSettings.contextSet('warned_about_totals_display', true)
     }
@@ -2550,7 +2277,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  togglePointsOrPercentTotals(cb) {
+  togglePointsOrPercentTotals = cb => {
     let dialog_options
     if (UserSettings.contextGet('warned_about_totals_display')) {
       this.switchTotalDisplay()
@@ -2567,23 +2294,23 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  onUserFilterInputStudents(term) {
+  onUserFilterInputStudents = (term: string) => {
     this.userFilterTerm = term
     return this.buildRows()
   }
 
-  onFilterToAssignments(assignmentIds) {
+  onFilterToAssignments = (assignmentIds: string[]) => {
     this.filteredAssignmentIds = assignmentIds
     this.setVisibleGridColumns()
     this.updateGrid()
   }
 
-  onFilterToStudents(studentIds) {
+  onFilterToStudents = (studentIds: string[]) => {
     this.filteredStudentIds = studentIds
     this.buildRows()
   }
 
-  studentSearchMatcher(option, searchTerm) {
+  studentSearchMatcher = (option, searchTerm: string) => {
     const term = searchTerm?.toLowerCase() || ''
     const studentName = option.label?.toLowerCase() || ''
 
@@ -2595,13 +2322,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return !!sisId && sisId.toLowerCase() === term
   }
 
-  assignmentSearchMatcher(option, searchTerm) {
+  assignmentSearchMatcher = (option, searchTerm: string) => {
     const term = searchTerm?.toLowerCase() || ''
     const assignmentName = option.label?.toLowerCase() || ''
     return assignmentName.includes(term)
   }
 
-  renderStudentSearchFilter(students) {
+  renderStudentSearchFilter = (students: Student[]) => {
     if (this.options.gradebook_assignment_search_and_redesign) {
       const props = {
         id: 'student-names-filter',
@@ -2633,7 +2360,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  renderAssignmentSearchFilter(assignmentsById) {
+  renderAssignmentSearchFilter = (assignmentsById: AssignmentMap) => {
     if (this.options.gradebook_assignment_search_and_redesign) {
       const assignments = Object.values(assignmentsById)
       const props = {
@@ -2642,7 +2369,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         label: I18n.t('Assignment Names'),
         customMatcher: this.assignmentSearchMatcher,
         onChange: this.onFilterToAssignments,
-        options: assignments.map((assignment: any) => ({id: assignment.id, text: assignment.name})),
+        options: assignments.map((assignment: Assignment) => ({
+          id: assignment.id,
+          text: assignment.name
+        })),
         placeholder: I18n.t('Search Assignments')
       }
 
@@ -2651,7 +2381,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  setVisibleGridColumns() {
+  setVisibleGridColumns = () => {
     let assignmentGroupId, ref1
     let parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
       return !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
@@ -2702,7 +2432,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }))
   }
 
-  updateGrid() {
+  updateGrid = () => {
     this.gradebookGrid.updateColumns()
     return this.gradebookGrid.invalidate()
   }
@@ -2710,7 +2440,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // # Grid Column Definitions
 
   // Student Columns
-  buildStudentColumn(columnId, gradebookColumnSizeSetting, defaultWidth) {
+  buildStudentColumn = (
+    columnId: string,
+    gradebookColumnSizeSetting: string,
+    defaultWidth: number
+  ) => {
     const studentColumnWidth = gradebookColumnSizeSetting
       ? parseInt(gradebookColumnSizeSetting, 10)
       : defaultWidth
@@ -2724,7 +2458,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  buildCustomColumn(customColumn) {
+  // Custom Column
+  buildCustomColumn = (customColumn: GridColumn) => {
     const columnId = getCustomColumnId(customColumn.id)
     return {
       id: columnId,
@@ -2742,7 +2477,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Assignment Column
-  buildAssignmentColumn(assignment) {
+  buildAssignmentColumn = (assignment: Assignment) => {
     let assignmentWidth
     const shrinkForOutOfText =
       assignment && assignment.grading_type === 'points' && assignment.points_possible != null
@@ -2778,7 +2513,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return columnDef
   }
 
-  buildAssignmentGroupColumn(assignmentGroup) {
+  buildAssignmentGroupColumn = (assignmentGroup: AssignmentGroup) => {
     let width
     const columnId = getAssignmentGroupColumnId(assignmentGroup.id)
     const fieldName = `assignment_group_${assignmentGroup.id}`
@@ -2806,7 +2541,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  buildTotalGradeColumn() {
+  buildTotalGradeColumn = () => {
     let totalWidth
     const label = I18n.t('Total')
     if (this.gradebookColumnSizeSettings && this.gradebookColumnSizeSettings.total_grade) {
@@ -2827,7 +2562,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  buildTotalGradeOverrideColumn() {
+  buildTotalGradeOverrideColumn = () => {
     let totalWidth
     const label = I18n.t('Override')
     if (this.gradebookColumnSizeSettings && this.gradebookColumnSizeSettings.total_grade_override) {
@@ -2855,7 +2590,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  initGrid() {
+  initGrid = () => {
     let assignmentGroup, assignmentGroupColumn, id
     this.updateFilteredContentInfo()
     const studentColumn = this.buildStudentColumn(
@@ -2893,14 +2628,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.createGrid()
   }
 
-  addAssignmentColumnDefinition(assignment) {
+  // Grid DOM Access/Reference Methods
+  addAssignmentColumnDefinition = (assignment: Assignment) => {
     const assignmentColumn = this.buildAssignmentColumn(assignment)
     if (!this.gridData.columns.definitions[assignmentColumn.id]) {
       this.gridData.columns.definitions[assignmentColumn.id] = assignmentColumn
     }
   }
 
-  createGrid() {
+  createGrid = () => {
     this.setVisibleGridColumns()
     this.gradebookGrid.initialize()
     if (!this.gradebookGrid.gridSupport) throw new Error('grid did not initialize')
@@ -2992,7 +2728,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.onGridInit()
   }
 
-  onGridInit() {
+  onGridInit = () => {
     if (this.spinner) {
       // TODO: this "if @spinner" crap is necessary because the outcome
       // gradebook kicks off the gradebook (unnecessarily).  back when the
@@ -3017,16 +2753,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.$grid.addClass('editable')
     }
     this.fixMaxHeaderWidth()
-    this.keyboardNav.init()
-    const keyBindings = this.keyboardNav.keyBindings
+    this.keyboardNav?.init()
+    const keyBindings = this.keyboardNav?.keyBindings
     this.kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
     return $(document).trigger('gridready')
   }
 
-  onBeforeEditCell(event, obj) {
+  // The target cell will enter editing mode
+  onBeforeEditCell = (_event, obj: {item: Student; column: GridColumn}) => {
     let ref1
     if (
       obj.column.type === 'custom_column' &&
+      obj.column.customColumnId &&
       ((ref1 = this.getCustomColumn(obj.column.customColumnId)) != null
         ? ref1.read_only
         : undefined)
@@ -3039,10 +2777,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return !!this.student(obj.item.id)
   }
 
-  onCellChange(_event, obj) {
+  // The current cell editor has been changed and is valid
+  onCellChange = (_event, obj: {item: Student; column: GridColumn}) => {
     let col_id, url
     const {item, column} = obj
-    if (column.type === 'custom_column') {
+    if (column.type === 'custom_column' && column.field) {
       col_id = column.field.match(/^custom_col_(\d+)/)
       url = this.options.custom_column_datum_url
         .replace(/:id/, col_id[1])
@@ -3058,7 +2797,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Persisted Gradebook Settings
-  saveColumnWidthPreference(id, newWidth) {
+  saveColumnWidthPreference = (id, newWidth) => {
     const url = this.options.gradebook_column_size_settings_url
     return $.ajaxJSON(url, 'POST', {
       column_id: id,
@@ -3066,7 +2805,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  saveSettings({
+  saveSettings = ({
     selectedViewOptionsFilters = this.listSelectedViewOptionsFilters(),
     showConcludedEnrollments = this.getEnrollmentFilters().concluded,
     showInactiveEnrollments = this.getEnrollmentFilters().inactive,
@@ -3077,7 +2816,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     sortRowsBy = this.getSortRowsBySetting(),
     viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
     colors = this.state.gridColors
-  } = {}) {
+  } = {}) => {
     if (!(selectedViewOptionsFilters.length > 0)) {
       selectedViewOptionsFilters.push('')
     }
@@ -3110,8 +2849,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  // # Grid Sorting Methods
-  sortRowsBy(sortFn) {
+  // Grid Sorting Methods
+  sortRowsBy = (sortFn: (row1: Student, row2: Student) => number) => {
     const respectorOfPersonsSort = () => {
       if (_(this.studentViewStudents).size()) {
         return (a, b) => {
@@ -3132,7 +2871,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid.invalidate()
   }
 
-  getColumnTypeForColumnId(columnId) {
+  getColumnTypeForColumnId = (columnId: string) => {
     if (columnId.match(/^custom_col/)) {
       return 'custom_column'
     } else if (columnId.match(ASSIGNMENT_KEY_REGEX)) {
@@ -3150,7 +2889,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  secondaryAndTertiarySort(a, b, {asc = true}) {
+  secondaryAndTertiarySort = (a, b, {asc = true}) => {
     let result
     result = localeSort(a.sortable_name, b.sortable_name, {asc})
     if (result === 0) {
@@ -3159,7 +2898,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return result
   }
 
-  gradeSort(a, b, field, asc) {
+  gradeSort = (a, b, field, asc) => {
     let result
     const scoreForSorting = student => {
       const grade = getStudentGradeForColumn(student, field)
@@ -3186,11 +2925,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // when fn is true, those rows get a -1 so they go to the top of the sort
-  sortRowsWithFunction(fn, {asc = true} = {}) {
+  sortRowsWithFunction = (fn: (row: Student) => boolean | number, {asc = true} = {}) => {
     return this.sortRowsBy((a, b) => {
-      let rowA, rowB
-      rowA = fn(a)
-      rowB = fn(b)
+      let rowA = fn(a)
+      let rowB = fn(b)
       if (!asc) {
         ;[rowA, rowB] = [rowB, rowA]
       }
@@ -3204,20 +2942,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  missingSort(columnId) {
+  missingSort = (columnId: string) => {
     return this.sortRowsWithFunction(row => {
       let ref1
       return !!((ref1 = row[columnId]) != null ? ref1.missing : undefined)
     })
   }
 
-  lateSort(columnId) {
+  lateSort = columnId => {
     return this.sortRowsWithFunction(row => {
       return row[columnId].late
     })
   }
 
-  sortByStudentColumn(settingKey, direction) {
+  sortByStudentColumn = (settingKey: string, direction: 'ascending' | 'descending') => {
     return this.sortRowsBy((a, b) => {
       let result
       const asc = direction === 'ascending'
@@ -3232,7 +2970,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  sortByCustomColumn(columnId, direction) {
+  sortByCustomColumn = (columnId: string, direction: 'ascending' | 'descending') => {
     return this.sortRowsBy((a, b) => {
       let result
       const asc = direction === 'ascending'
@@ -3244,7 +2982,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  sortByAssignmentColumn(columnId, settingKey, direction) {
+  sortByAssignmentColumn = (
+    columnId: string,
+    settingKey: string,
+    direction: 'ascending' | 'descending'
+  ) => {
     switch (settingKey) {
       case 'grade':
         return this.sortRowsBy((a, b) => {
@@ -3257,7 +2999,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  sortByAssignmentGroupColumn(columnId, settingKey, direction) {
+  // when 'unposted' # TODO: in a future milestone, unposted will be added
+  sortByAssignmentGroupColumn = (
+    columnId: string,
+    settingKey: string,
+    direction: 'ascending' | 'descending'
+  ) => {
     if (settingKey === 'grade') {
       return this.sortRowsBy((a, b) => {
         return this.gradeSort(a, b, columnId, direction === 'ascending')
@@ -3265,13 +3012,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  sortByTotalGradeColumn(direction) {
+  sortByTotalGradeColumn = (direction: 'ascending' | 'descending') => {
     return this.sortRowsBy((a, b) => {
       return this.gradeSort(a, b, 'total_grade', direction === 'ascending')
     })
   }
 
-  sortGridRows() {
+  sortGridRows = () => {
     const {columnId, settingKey, direction} = this.getSortRowsBySetting()
     const columnType = this.getColumnTypeForColumnId(columnId)
     switch (columnType) {
@@ -3293,7 +3040,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateColumnHeaders()
   }
 
-  updateStudentRow(student) {
+  // Grid Update Methods
+  updateStudentRow = student => {
     const index = this.gridData.rows.findIndex(row => {
       return row.id === student.id
     })
@@ -3303,7 +3051,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateFilteredContentInfo() {
+  // Filtered Content Information Methods
+  updateFilteredContentInfo = () => {
     let invalidAssignmentGroups
     this.filteredContentInfo.totalPointsPossible = _.reduce(
       this.assignmentGroups,
@@ -3322,11 +3071,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  listInvalidAssignmentGroups() {
+  listInvalidAssignmentGroups = () => {
     return this.filteredContentInfo.invalidAssignmentGroups
   }
 
-  listHiddenAssignments(studentId) {
+  listHiddenAssignments = (studentId: string) => {
     if (!(this.contentLoadStates.submissionsLoaded && this.assignmentsLoadedForCurrentView())) {
       return []
     }
@@ -3348,15 +3097,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  getTotalPointsPossible() {
+  getTotalPointsPossible = () => {
     return this.filteredContentInfo.totalPointsPossible
   }
 
-  handleColumnHeaderMenuClose() {
-    return this.keyboardNav.handleMenuOrDialogClose()
+  handleColumnHeaderMenuClose = () => {
+    return this.keyboardNav?.handleMenuOrDialogClose()
   }
 
-  toggleNotesColumn() {
+  toggleNotesColumn = () => {
     const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
       return !/^custom_col_/.test(columnId)
     })
@@ -3367,7 +3116,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateGrid()
   }
 
-  showNotesColumn() {
+  showNotesColumn = () => {
     let ref1
     if (this.teacherNotesNotYetLoaded) {
       this.teacherNotesNotYetLoaded = false
@@ -3379,7 +3128,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.toggleNotesColumn()
   }
 
-  hideNotesColumn() {
+  hideNotesColumn = () => {
     let ref1
     if ((ref1 = this.getTeacherNotesColumn()) != null) {
       ref1.hidden = true
@@ -3387,7 +3136,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.toggleNotesColumn()
   }
 
-  hideAggregateColumns() {
+  hideAggregateColumns = () => {
     if (this.gradingPeriodSet == null) {
       return false
     }
@@ -3397,11 +3146,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return !this.isFilteringColumnsByGradingPeriod()
   }
 
-  listRows() {
+  // SlickGrid Data Access Methods
+  listRows = () => {
     return this.gridData.rows // currently the source of truth for filtered and sorted rows
   }
 
-  listRowIndicesForStudentIds(studentIds) {
+  listRowIndicesForStudentIds = studentIds => {
     const rowIndicesByStudentId = this.listRows().reduce((map, row, index) => {
       map[row.id] = index
       return map
@@ -3411,7 +3161,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  updateRowCellsForStudentIds(studentIds) {
+  // SlickGrid Update Methods
+  updateRowCellsForStudentIds = studentIds => {
     let columnIndex, j, k, len, len1, rowIndex
     if (!this.gradebookGrid.grid) {
       return
@@ -3429,7 +3180,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return null // skip building an unused array return value
   }
 
-  invalidateRowsForStudentIds(studentIds) {
+  invalidateRowsForStudentIds = studentIds => {
     let j, len, rowIndex
     const rowIndices = this.listRowIndicesForStudentIds(studentIds)
     for (j = 0, len = rowIndices.length; j < len; j++) {
@@ -3442,11 +3193,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return null // skip building an unused array return value
   }
 
-  updateTotalGradeColumn() {
+  updateTotalGradeColumn = () => {
     this.updateColumnWithId('total_grade')
   }
 
-  updateAllTotalColumns() {
+  updateAllTotalColumns = () => {
     this.updateTotalGradeColumn()
 
     Object.keys(this.assignmentGroups).forEach(assignmentGroupId => {
@@ -3454,7 +3205,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  updateColumnWithId(id) {
+  updateColumnWithId = (id: string) => {
     let j, len, rowIndex
     if (this.gradebookGrid.grid == null) {
       return
@@ -3473,49 +3224,51 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return null // skip building an unused array return value
   }
 
-  updateColumns() {
+  // Gradebook Bulk UI Update Methods
+  updateColumns = () => {
     this.setVisibleGridColumns()
     this.gradebookGrid.updateColumns()
     return this.updateColumnHeaders()
   }
 
-  updateColumnsAndRenderViewOptionsMenu() {
+  updateColumnsAndRenderViewOptionsMenu = () => {
     this.updateColumns()
     return this.renderViewOptionsMenu()
   }
 
-  updateColumnsAndRenderGradebookSettingsModal() {
+  updateColumnsAndRenderGradebookSettingsModal = () => {
     this.updateColumns()
     return this.renderGradebookSettingsModal()
   }
 
-  setHeaderComponentRef(columnId, ref) {
+  // React Header Component Ref Methods
+  setHeaderComponentRef = (columnId, ref) => {
     return (this.headerComponentRefs[columnId] = ref)
   }
 
-  getHeaderComponentRef(columnId) {
+  getHeaderComponentRef = (columnId: string) => {
     return this.headerComponentRefs[columnId]
   }
 
-  removeHeaderComponentRef(columnId) {
+  removeHeaderComponentRef = (columnId: string) => {
     return delete this.headerComponentRefs[columnId]
   }
 
-  updateColumnHeaders(columnIds = []) {
-    let ref1
-    return (ref1 = this.gradebookGrid.gridSupport) != null
-      ? ref1.columns.updateColumnHeaders(columnIds)
-      : undefined
+  // React Grid Component Rendering Methods
+  updateColumnHeaders = (columnIds: string[] = []) => {
+    const ref1 = this.gradebookGrid.gridSupport
+    return ref1 != null ? ref1.columns.updateColumnHeaders(columnIds) : undefined
   }
 
-  updateStudentColumnHeaders() {
-    const columnIds: any = this.gridDisplaySettings.showSeparateFirstLastNames
+  updateStudentColumnHeaders = () => {
+    const columnIds: string[] = this.gridDisplaySettings.showSeparateFirstLastNames
       ? ['student_lastname', 'student_firstname']
       : ['student']
     return this.updateColumnHeaders(columnIds)
   }
 
-  handleHeaderKeyDown(e, columnId) {
+  // Column Header Helpers
+  handleHeaderKeyDown = (e, columnId: string) => {
     this.gradebookGrid.gridSupport?.navigation.handleHeaderKeyDown(e, {
       region: 'header',
       cell: this.gradebookGrid.grid.getColumnIndex(columnId),
@@ -3523,7 +3276,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  freezeTotalGradeColumn() {
+  // Total Grade Column Header
+  freezeTotalGradeColumn = () => {
     if (!this.gradebookColumnOrderSettings) throw new Error('gradebookColumnOrderSettings not set')
     this.totalColumnPositionChanged = true
     this.gradebookColumnOrderSettings.freezeTotalGrade = true
@@ -3538,7 +3292,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.gradebookGrid.gridSupport?.columns.scrollToStart()
   }
 
-  moveTotalGradeColumnToEnd() {
+  moveTotalGradeColumnToEnd = () => {
     if (!this.gradebookColumnOrderSettings) throw new Error('gradebookColumnOrderSettings not set')
     this.totalColumnPositionChanged = true
     this.gradebookColumnOrderSettings.freezeTotalGrade = false
@@ -3559,7 +3313,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid.gridSupport?.columns.scrollToEnd()
   }
 
-  totalColumnShouldFocus() {
+  totalColumnShouldFocus = () => {
     if (this.totalColumnPositionChanged) {
       this.totalColumnPositionChanged = false
       return true
@@ -3568,22 +3322,23 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  assignmentColumns() {
+  // Submission Tray
+  assignmentColumns = () => {
     if (!this.gradebookGrid.gridSupport) throw new Error('grid not initialized')
     return this.gradebookGrid.gridSupport.grid.getColumns().filter(column => {
       return column.type === 'assignment'
     })
   }
 
-  navigateAssignment(direction) {
+  navigateAssignment = (direction = 'next') => {
     if (!this.gradebookGrid?.gridSupport) throw new Error('grid not initialized')
     let assignment, curAssignment, i, ref1, ref3
     const location = this.gradebookGrid.gridSupport.state.getActiveLocation()
-    const columns = this.gradebookGrid.grid.getColumns()
+    const columns: GridColumn[] = this.gradebookGrid.grid.getColumns()
     const range =
       direction === 'next'
         ? function () {
-            const results: any = []
+            const results: GridColumn[] = []
             for (
               let j = (ref1 = location.cell + 1), ref2 = columns.length;
               ref1 <= ref2 ? j <= ref2 : j >= ref2;
@@ -3594,7 +3349,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             return results
           }.apply(this)
         : function () {
-            const results: any = []
+            const results: number[] = []
             for (
               let j = (ref3 = location.cell - 1);
               ref3 <= 0 ? j < 0 : j > 0;
@@ -3620,7 +3375,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return assignment
   }
 
-  loadTrayStudent(direction) {
+  loadTrayStudent = direction => {
     if (!this.gradebookGrid.gridSupport) throw new Error('grid is not initialized')
     const location = this.gradebookGrid.gridSupport.state.getActiveLocation()
     const rowDelta = direction === 'next' ? 1 : -1
@@ -3637,8 +3392,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateRowAndRenderSubmissionTray(student.id)
   }
 
-  loadTrayAssignment(direction) {
-    const studentId = this.getSubmissionTrayState().studentId
+  loadTrayAssignment = direction => {
+    const studentId: string = this.getSubmissionTrayState().studentId
     const assignment = this.navigateAssignment(direction)
     if (!assignment) {
       return
@@ -3647,7 +3402,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
-  getSubmissionTrayProps(student: any = null) {
+  getSubmissionTrayProps = (student: null | Student = null) => {
     if (!this.gradebookGrid.gridSupport) throw new Error('grid is not initialized')
     const {open, studentId, assignmentId, comments, editedCommentId} = this.getSubmissionTrayState()
     student || (student = this.student(studentId))
@@ -3758,7 +3513,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  renderSubmissionTray(student: any = null) {
+  renderSubmissionTray = (student: Student | null = null) => {
     const {open, studentId, assignmentId} = this.getSubmissionTrayState()
     const mountPoint = document.getElementById('StudentTray__Container')
     const props = this.getSubmissionTrayProps(student)
@@ -3768,7 +3523,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return AsyncComponents.renderGradeDetailTray(props, mountPoint)
   }
 
-  loadSubmissionComments(assignmentId, studentId) {
+  loadSubmissionComments = (assignmentId: string, studentId: string) => {
     return SubmissionCommentApi.getSubmissionComments(
       this.options.context_id,
       assignmentId,
@@ -3781,23 +3536,23 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       .catch(FlashAlert.showFlashError(I18n.t('There was an error fetching Submission Comments')))
   }
 
-  updateRowAndRenderSubmissionTray(studentId) {
+  updateRowAndRenderSubmissionTray = (studentId: string) => {
     this.unloadSubmissionComments()
     this.updateRowCellsForStudentIds([studentId])
     return this.renderSubmissionTray(this.student(studentId))
   }
 
-  toggleSubmissionTrayOpen(studentId, assignmentId) {
+  toggleSubmissionTrayOpen = (studentId: string, assignmentId: string) => {
     this.setSubmissionTrayState(!this.getSubmissionTrayState().open, studentId, assignmentId)
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
-  openSubmissionTray(studentId, assignmentId) {
+  openSubmissionTray = (studentId: string, assignmentId: string) => {
     this.setSubmissionTrayState(true, studentId, assignmentId)
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
-  closeSubmissionTray() {
+  closeSubmissionTray = () => {
     this.setSubmissionTrayState(false)
     const rowIndex = this.gradebookGrid.grid.getActiveCell().row
     const studentId = this.gridData.rows[rowIndex].id
@@ -3805,11 +3560,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid.gridSupport?.helper.beginEdit()
   }
 
-  getSubmissionTrayState() {
+  getSubmissionTrayState = () => {
     return this.gridDisplaySettings.submissionTray
   }
 
-  setSubmissionTrayState(open, studentId = null, assignmentId = null) {
+  setSubmissionTrayState = (
+    open,
+    studentId: string | null = null,
+    assignmentId: string | null = null
+  ) => {
     this.gridDisplaySettings.submissionTray.open = open
     if (studentId) {
       this.gridDisplaySettings.submissionTray.studentId = studentId
@@ -3822,31 +3581,31 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  setCommentsUpdating(status) {
+  setCommentsUpdating = status => {
     return (this.gridDisplaySettings.submissionTray.commentsUpdating = !!status)
   }
 
-  getCommentsUpdating() {
+  getCommentsUpdating = () => {
     return this.gridDisplaySettings.submissionTray.commentsUpdating
   }
 
-  setSubmissionComments(comments) {
+  setSubmissionComments = comments => {
     return (this.gridDisplaySettings.submissionTray.comments = comments)
   }
 
-  updateSubmissionComments(comments) {
+  updateSubmissionComments = comments => {
     this.setSubmissionComments(comments)
     this.setEditedCommentId(null)
     this.setCommentsUpdating(false)
     this.renderSubmissionTray()
   }
 
-  unloadSubmissionComments() {
+  unloadSubmissionComments = () => {
     this.setSubmissionComments([])
     return this.setSubmissionCommentsLoaded(false)
   }
 
-  apiCreateSubmissionComment(comment) {
+  apiCreateSubmissionComment = comment => {
     const {assignmentId, studentId} = this.getSubmissionTrayState()
     const assignment = this.getAssignment(assignmentId)
     const groupComment = assignmentHelper.gradeByGroup(assignment) ? 1 : 0
@@ -3868,7 +3627,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       .catch(FlashAlert.showFlashError(I18n.t('There was a problem saving the comment')))
   }
 
-  apiUpdateSubmissionComment(updatedComment, commentId) {
+  apiUpdateSubmissionComment = (updatedComment, commentId) => {
     return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
       .then(response => {
         const {id, comment, editedAt} = response.data
@@ -3885,47 +3644,47 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       .catch(FlashAlert.showFlashError(I18n.t('There was a problem updating the comment')))
   }
 
-  apiDeleteSubmissionComment(commentId) {
+  apiDeleteSubmissionComment = (commentId: string) => {
     return SubmissionCommentApi.deleteSubmissionComment(commentId)
       .then(() => this.removeSubmissionComment(commentId))
       .then(FlashAlert.showFlashSuccess(I18n.t('Successfully deleted the comment')))
       .catch(FlashAlert.showFlashError(I18n.t('There was a problem deleting the comment')))
   }
 
-  editSubmissionComment(commentId) {
+  editSubmissionComment = (commentId: string) => {
     this.setEditedCommentId(commentId)
     return this.renderSubmissionTray()
   }
 
-  setEditedCommentId(id) {
+  setEditedCommentId = (id: string | null) => {
     return (this.gridDisplaySettings.submissionTray.editedCommentId = id)
   }
 
-  getSubmissionComments() {
+  getSubmissionComments = () => {
     return this.gridDisplaySettings.submissionTray.comments
   }
 
-  removeSubmissionComment(commentId) {
+  removeSubmissionComment = (commentId: string) => {
     const comments = _.reject(this.getSubmissionComments(), c => {
       return c.id === commentId
     })
     return this.updateSubmissionComments(comments)
   }
 
-  setSubmissionCommentsLoaded(loaded) {
+  setSubmissionCommentsLoaded = loaded => {
     return (this.gridDisplaySettings.submissionTray.commentsLoaded = loaded)
   }
 
-  getSubmissionCommentsLoaded() {
+  getSubmissionCommentsLoaded = () => {
     return this.gridDisplaySettings.submissionTray.commentsLoaded
   }
 
-  initShowUnpublishedAssignments(showUnpublishedAssignments = 'true') {
+  initShowUnpublishedAssignments = (showUnpublishedAssignments = 'true') => {
     return (this.gridDisplaySettings.showUnpublishedAssignments =
       showUnpublishedAssignments === 'true')
   }
 
-  toggleUnpublishedAssignments() {
+  toggleUnpublishedAssignments = () => {
     const toggleableAction = () => {
       this.gridDisplaySettings.showUnpublishedAssignments =
         !this.gridDisplaySettings.showUnpublishedAssignments
@@ -3938,11 +3697,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }).catch(toggleableAction)
   }
 
-  initShowSeparateFirstLastNames(showSeparateFirstLastNames = false) {
+  // Gradebook Application State Methods
+  initShowSeparateFirstLastNames = (showSeparateFirstLastNames = false) => {
     this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames
   }
 
-  toggleShowSeparateFirstLastNames() {
+  toggleShowSeparateFirstLastNames = () => {
     const toggleableAction = () => {
       this.gridDisplaySettings.showSeparateFirstLastNames =
         !this.gridDisplaySettings.showSeparateFirstLastNames
@@ -3956,7 +3716,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     // this pattern keeps the ui snappier rather than waiting for ajax call to complete
   }
 
-  toggleViewUngradedAsZero() {
+  toggleViewUngradedAsZero = () => {
     const toggleableAction = () => {
       this.gridDisplaySettings.viewUngradedAsZero = !this.gridDisplaySettings.viewUngradedAsZero
       this.updateColumnsAndRenderViewOptionsMenu()
@@ -3973,7 +3733,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }).catch(toggleableAction)
   }
 
-  assignmentsLoadedForCurrentView() {
+  // Grading Period Assignment Data & Lifecycle Methods
+  assignmentsLoadedForCurrentView = () => {
     const gradingPeriodId = this.gradingPeriodId
     const loadStates = this.contentLoadStates.assignmentsLoaded
     if (loadStates.all || gradingPeriodId === '0') {
@@ -3983,7 +3744,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return loadStates.gradingPeriod[gradingPeriodId]
   }
 
-  setAssignmentsLoaded(gradingPeriodIds) {
+  setAssignmentsLoaded = (gradingPeriodIds: string[]) => {
     const {assignmentsLoaded} = this.contentLoadStates
     if (!gradingPeriodIds) {
       assignmentsLoaded.all = true
@@ -3999,31 +3760,31 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  setAssignmentGroupsLoaded(loaded) {
+  setAssignmentGroupsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.assignmentGroupsLoaded = loaded)
   }
 
-  setCustomColumnsLoaded(loaded) {
+  setCustomColumnsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.customColumnsLoaded = loaded)
   }
 
-  setGradingPeriodAssignmentsLoaded(loaded) {
+  setGradingPeriodAssignmentsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.gradingPeriodAssignmentsLoaded = loaded)
   }
 
-  setStudentIdsLoaded(loaded) {
+  setStudentIdsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.studentIdsLoaded = loaded)
   }
 
-  setStudentsLoaded(loaded) {
+  setStudentsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.studentsLoaded = loaded)
   }
 
-  setSubmissionsLoaded(loaded) {
+  setSubmissionsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.submissionsLoaded = loaded)
   }
 
-  isGradeEditable(studentId, assignmentId) {
+  isGradeEditable = (studentId: string, assignmentId: string) => {
     if (!this.isStudentGradeable(studentId)) {
       return false
     }
@@ -4034,7 +3795,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return submissionState != null && !submissionState.locked
   }
 
-  isGradeVisible(studentId, assignmentId) {
+  isGradeVisible = (studentId: string, assignmentId: string) => {
     const submissionState = this.submissionStateMap.getSubmissionState({
       assignment_id: assignmentId,
       user_id: studentId
@@ -4042,16 +3803,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return submissionState != null && !submissionState.hideGrade
   }
 
-  isStudentGradeable(studentId) {
+  isStudentGradeable = (studentId: string) => {
     const student = this.student(studentId)
     return !(!student || student.isConcluded)
   }
 
-  studentCanReceiveGradeOverride(studentId) {
+  studentCanReceiveGradeOverride = (studentId: string) => {
     return this.isStudentGradeable(studentId) && this.studentHasGradedSubmission(studentId)
   }
 
-  studentHasGradedSubmission(studentId) {
+  studentHasGradedSubmission = (studentId: string) => {
     const student = this.student(studentId)
     const submissions = this.submissionsForStudent(student)
     if (!(submissions.length > 0)) {
@@ -4067,7 +3828,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  addPendingGradeInfo(submission, gradeInfo) {
+  addPendingGradeInfo = (submission, gradeInfo) => {
     if (!this.actionStates) throw new Error('actionStates not initialized')
     const {userId, assignmentId} = submission
     const pendingGradeInfo = {assignmentId, userId, ...gradeInfo}
@@ -4075,7 +3836,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.actionStates.pendingGradeInfo.push(pendingGradeInfo)
   }
 
-  removePendingGradeInfo(submission) {
+  removePendingGradeInfo = submission => {
     if (!this.actionStates) throw new Error('actionStates missing')
     this.actionStates.pendingGradeInfo = _.reject(
       this.actionStates.pendingGradeInfo,
@@ -4086,49 +3847,47 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.actionStates.pendingGradeInfo
   }
 
-  getPendingGradeInfo(submission) {
+  getPendingGradeInfo = submission => {
     if (!this.actionStates) throw new Error('actionStates missing')
     return (
-      this.actionStates.pendingGradeInfo.find(function (info: any) {
+      this.actionStates.pendingGradeInfo.find(function (info) {
         return info.userId === submission.userId && info.assignmentId === submission.assignmentId
       }) || null
     )
   }
 
-  submissionIsUpdating(submission) {
-    let ref1
-    return Boolean((ref1 = this.getPendingGradeInfo(submission)) != null ? ref1.valid : undefined)
+  submissionIsUpdating = submission => {
+    const ref1 = this.getPendingGradeInfo(submission)
+    return Boolean(ref1 != null ? ref1.valid : undefined)
   }
 
-  setTeacherNotesColumnUpdating(updating) {
+  setTeacherNotesColumnUpdating = (updating: boolean) => {
     return (this.contentLoadStates.teacherNotesColumnUpdating = updating)
   }
 
-  setOverridesColumnUpdating(updating) {
-    return (this.contentLoadStates.overridesColumnUpdating = updating)
-  }
-
-  getFilterColumnsBySetting(filterKey) {
+  // Grid Display Settings Access Methods
+  getFilterColumnsBySetting = filterKey => {
     return this.gridDisplaySettings.filterColumnsBy[filterKey]
   }
 
-  setFilterColumnsBySetting(filterKey, value) {
+  // Grid Display Settings Access Methods
+  setFilterColumnsBySetting = (filterKey: string, value: null | string) => {
     return (this.gridDisplaySettings.filterColumnsBy[filterKey] = value)
   }
 
-  getFilterRowsBySetting(filterKey) {
+  getFilterRowsBySetting = (filterKey: string) => {
     return this.gridDisplaySettings.filterRowsBy[filterKey]
   }
 
-  setFilterRowsBySetting(filterKey, value) {
+  setFilterRowsBySetting = (filterKey: string, value: null | string) => {
     return (this.gridDisplaySettings.filterRowsBy[filterKey] = value)
   }
 
-  isFilteringColumnsByAssignmentGroup() {
+  isFilteringColumnsByAssignmentGroup = () => {
     return this.getAssignmentGroupToShow() !== '0'
   }
 
-  getModuleToShow() {
+  getModuleToShow = (): string => {
     const moduleId = this.getFilterColumnsBySetting('contextModuleId')
     if (
       moduleId == null ||
@@ -4139,7 +3898,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return moduleId
   }
 
-  getAssignmentGroupToShow() {
+  getAssignmentGroupToShow = () => {
     const groupId = this.getFilterColumnsBySetting('assignmentGroupId') || '0'
     if (_.pluck(this.assignmentGroups, 'id').indexOf(groupId) >= 0) {
       return groupId
@@ -4148,11 +3907,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  isFilteringColumnsByGradingPeriod() {
+  isFilteringColumnsByGradingPeriod = () => {
     return this.gradingPeriodId !== '0'
   }
 
-  isFilteringRowsBySearchTerm() {
+  isFilteringRowsBySearchTerm = () => {
     if (this.options.gradebook_assignment_search_and_redesign) {
       return this.filteredStudentIds != null && this.filteredStudentIds.length > 0
     }
@@ -4160,7 +3919,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.userFilterTerm != null && this.userFilterTerm !== ''
   }
 
-  setCurrentGradingPeriod() {
+  setCurrentGradingPeriod = () => {
     if (this.gradingPeriodSet == null) {
       this.gradingPeriodId = '0'
       return
@@ -4176,7 +3935,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getGradingPeriod(gradingPeriodId) {
+  getGradingPeriod = (gradingPeriodId: string) => {
     let ref1
     return (((ref1 = this.gradingPeriodSet) != null ? ref1.gradingPeriods : undefined) || []).find(
       gradingPeriod => {
@@ -4185,7 +3944,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  setSelectedPrimaryInfo(primaryInfo, skipRedraw) {
+  setSelectedPrimaryInfo = (primaryInfo: string, skipRedraw: boolean) => {
     this.gridDisplaySettings.selectedPrimaryInfo = primaryInfo
     this.saveSettings()
     if (!skipRedraw) {
@@ -4194,7 +3953,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  toggleDefaultSort(columnId) {
+  toggleDefaultSort = (columnId: string) => {
     let direction
     const sortSettings = this.getSortRowsBySetting()
     const columnType = this.getColumnTypeForColumnId(columnId)
@@ -4210,11 +3969,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.setSortRowsBySetting(columnId, settingKey, direction)
   }
 
-  getSelectedPrimaryInfo() {
+  getSelectedPrimaryInfo = () => {
     return this.gridDisplaySettings.selectedPrimaryInfo
   }
 
-  setSelectedSecondaryInfo(secondaryInfo, skipRedraw) {
+  setSelectedSecondaryInfo = (secondaryInfo: string, skipRedraw: boolean) => {
     this.gridDisplaySettings.selectedSecondaryInfo = secondaryInfo
     this.saveSettings()
     if (!skipRedraw) {
@@ -4223,11 +3982,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getSelectedSecondaryInfo() {
+  getSelectedSecondaryInfo = () => {
     return this.gridDisplaySettings.selectedSecondaryInfo
   }
 
-  setSortRowsBySetting(columnId, settingKey, direction) {
+  setSortRowsBySetting = (columnId: string, settingKey, direction) => {
     this.gridDisplaySettings.sortRowsBy.columnId = columnId
     this.gridDisplaySettings.sortRowsBy.settingKey = settingKey
     this.gridDisplaySettings.sortRowsBy.direction = direction
@@ -4235,11 +3994,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.sortGridRows()
   }
 
-  getSortRowsBySetting() {
+  getSortRowsBySetting = () => {
     return this.gridDisplaySettings.sortRowsBy
   }
 
-  updateGridColors(colors, successFn, errorFn) {
+  updateGridColors = (colors: StatusColors, successFn, errorFn) => {
     const setAndRenderColors = () => {
       this.gridDisplaySettings.colors = colors
       this.setState({gridColors: statusColors(this.gridDisplaySettings.colors)})
@@ -4248,8 +4007,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.saveSettings({colors}).then(setAndRenderColors).catch(errorFn)
   }
 
-  listAvailableViewOptionsFilters() {
-    const filters: any = []
+  listAvailableViewOptionsFilters = () => {
+    const filters: string[] = []
     if (Object.keys(this.assignmentGroups || {}).length > 1) {
       filters.push('assignmentGroups')
     }
@@ -4268,27 +4027,27 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return filters
   }
 
-  setSelectedViewOptionsFilters(filters) {
+  setSelectedViewOptionsFilters = filters => {
     return (this.gridDisplaySettings.selectedViewOptionsFilters = filters)
   }
 
-  listSelectedViewOptionsFilters() {
+  listSelectedViewOptionsFilters = () => {
     return this.gridDisplaySettings.selectedViewOptionsFilters
   }
 
-  toggleEnrollmentFilter(enrollmentFilter, skipApply = false) {
+  toggleEnrollmentFilter = (enrollmentFilter, skipApply = false) => {
     this.getEnrollmentFilters()[enrollmentFilter] = !this.getEnrollmentFilters()[enrollmentFilter]
     if (!skipApply) {
       return this.applyEnrollmentFilter()
     }
   }
 
-  updateStudentHeadersAndReloadData() {
+  updateStudentHeadersAndReloadData = () => {
     this.updateStudentColumnHeaders()
     return this.dataLoader.reloadStudentDataForEnrollmentFilterChange()
   }
 
-  applyEnrollmentFilter() {
+  applyEnrollmentFilter = () => {
     const showInactiveEnrollments = this.getEnrollmentFilters().inactive
     const showConcludedEnrollments = this.getEnrollmentFilters().concluded
     return this.saveSettings({showInactiveEnrollments, showConcludedEnrollments}).then(
@@ -4296,15 +4055,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  getEnrollmentFilters() {
+  getEnrollmentFilters = () => {
     return this.gridDisplaySettings.showEnrollments
   }
 
-  getSelectedEnrollmentFilters() {
-    let filter
+  getSelectedEnrollmentFilters = () => {
     const filters = this.getEnrollmentFilters()
-    const selectedFilters: any = []
-    for (filter in filters) {
+    const selectedFilters: string[] = []
+    for (const filter in filters) {
       if (filters[filter]) {
         selectedFilters.push(filter)
       }
@@ -4312,11 +4070,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return selectedFilters
   }
 
-  setEnterGradesAsSetting(assignmentId, setting) {
+  setEnterGradesAsSetting = (assignmentId: string, setting) => {
     return (this.gridDisplaySettings.enterGradesAs[assignmentId] = setting)
   }
 
-  getEnterGradesAsSetting(assignmentId) {
+  getEnterGradesAsSetting = (assignmentId: string) => {
     const gradingType = this.getAssignment(assignmentId).grading_type
     const options = EnterGradesAsSetting.optionsForGradingType(gradingType)
     if (!options.length) {
@@ -4329,7 +4087,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return EnterGradesAsSetting.defaultOptionForGradingType(gradingType)
   }
 
-  updateEnterGradesAsSetting(assignmentId, value) {
+  updateEnterGradesAsSetting = (assignmentId: string, value) => {
     this.setEnterGradesAsSetting(assignmentId, value)
     return this.saveSettings({}).then(() => {
       if (!this.gradebookGrid.gridSupport) {
@@ -4342,7 +4100,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  postAssignmentGradesTrayOpenChanged({assignmentId, isOpen}) {
+  postAssignmentGradesTrayOpenChanged = ({assignmentId, isOpen}) => {
     const columnId = getAssignmentColumnId(assignmentId)
     const definition = this.gridData.columns.definitions[columnId]
     if (!(definition && definition.type === 'assignment')) {
@@ -4353,75 +4111,78 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // # Course Settings Access Methods
-  getCourseGradingScheme() {
+  getCourseGradingScheme = () => {
     return this.courseContent.courseGradingScheme
   }
 
-  getDefaultGradingScheme() {
+  getDefaultGradingScheme = () => {
     return this.courseContent.defaultGradingScheme
   }
 
-  getGradingScheme(gradingSchemeId) {
+  getGradingScheme = (gradingSchemeId: string | null) => {
     return this.courseContent.gradingSchemes.find(scheme => {
       return scheme.id === gradingSchemeId
     })
   }
 
-  getAssignmentGradingScheme(assignmentId) {
+  getAssignmentGradingScheme = (assignmentId: string) => {
     const assignment = this.getAssignment(assignmentId)
     return this.getGradingScheme(assignment.grading_standard_id) || this.getDefaultGradingScheme()
   }
 
-  getSections() {
+  // Gradebook Content Access Methods
+  getSections = () => {
     return Object.values(this.sections)
   }
 
-  setSections(sections) {
+  setSections = (sections: Section[]) => {
     this.sections = _.indexBy(sections, 'id')
     return (this.sections_enabled = sections.length > 1)
   }
 
-  setStudentGroups(groupCategories) {
+  setStudentGroups = (groupCategories: StudentGroupCategoryMap) => {
     this.studentGroupCategories = _.indexBy(groupCategories, 'id')
-    const studentGroupList = _.flatten(_.pluck(groupCategories, 'groups')).map(htmlEscape)
+    const studentGroupList: StudentGroup[] = _.flatten(_.pluck(groupCategories, 'groups')).map(
+      htmlEscape
+    )
     this.studentGroups = _.indexBy(studentGroupList, 'id')
     return (this.studentGroupsEnabled = studentGroupList.length > 0)
   }
 
-  setAssignments(assignmentMap) {
+  setAssignments = assignmentMap => {
     return (this.assignments = assignmentMap)
   }
 
-  setAssignmentGroups(assignmentGroupMap) {
+  setAssignmentGroups = assignmentGroupMap => {
     return (this.assignmentGroups = assignmentGroupMap)
   }
 
-  getAssignment(assignmentId) {
+  getAssignment = (assignmentId: string): Assignment => {
     return this.assignments[assignmentId]
   }
 
-  getAssignmentGroup(assignmentGroupId) {
+  getAssignmentGroup = (assignmentGroupId: string) => {
     return this.assignmentGroups[assignmentGroupId]
   }
 
-  getCustomColumn(customColumnId) {
+  getCustomColumn = (customColumnId: string) => {
     return this.gradebookContent?.customColumns.find(function (column) {
       return column.id === customColumnId
     })
   }
 
-  getTeacherNotesColumn() {
+  getTeacherNotesColumn = () => {
     return this.gradebookContent?.customColumns.find(function (column) {
       return column.teacher_notes
     })
   }
 
-  isTeacherNotesColumnShown() {
+  isTeacherNotesColumnShown = () => {
     const column = this.getTeacherNotesColumn()
     return column != null && !column.hidden
   }
 
-  listVisibleCustomColumns() {
+  listVisibleCustomColumns = () => {
     return (
       this.gradebookContent?.customColumns.filter(function (column) {
         return !column.hidden
@@ -4429,15 +4190,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  updateContextModules(contextModules) {
+  // Context Module Data & Lifecycle Methods
+  updateContextModules = (contextModules: Module[]) => {
     this.setContextModules(contextModules)
     this.setState({modules: contextModules})
     this.renderViewOptionsMenu()
     this.renderFilters()
-    return this._updateEssentialDataLoaded()
+    this._updateEssentialDataLoaded()
   }
 
-  setContextModules(contextModules) {
+  setContextModules = (contextModules: Module[]) => {
     let contextModule, j, len
     this.courseContent.contextModules = contextModules
     this.courseContent.modulesById = {}
@@ -4450,16 +4212,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return contextModules
   }
 
-  onLatePolicyUpdate(latePolicy) {
+  onLatePolicyUpdate = latePolicy => {
     this.setLatePolicy(latePolicy)
     return this.applyLatePolicy()
   }
 
-  setLatePolicy(latePolicy) {
-    return (this.courseContent.latePolicy = latePolicy)
+  setLatePolicy = latePolicy => {
+    this.courseContent.latePolicy = latePolicy
   }
 
-  applyLatePolicy() {
+  applyLatePolicy = () => {
     let ref1
     const latePolicy = (ref1 = this.courseContent) != null ? ref1.latePolicy : undefined
     const gradingStandard = this.options.grading_standard || this.options.default_grading_standard
@@ -4491,14 +4253,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.invalidateRowsForStudentIds(studentIds)
   }
 
-  getContextModule(contextModuleId) {
+  getContextModule = (contextModuleId: string) => {
     let ref1
     if (contextModuleId != null) {
       return (ref1 = this.courseContent.modulesById) != null ? ref1[contextModuleId] : undefined
     }
   }
 
-  getDownloadSubmissionsAction(assignmentId) {
+  // Assignment UI Action Methods
+  getDownloadSubmissionsAction = (assignmentId: string) => {
     const assignment = this.getAssignment(assignmentId)
     const manager = new DownloadSubmissionsDialogManager(
       assignment,
@@ -4511,7 +4274,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getReuploadSubmissionsAction(assignmentId) {
+  getReuploadSubmissionsAction = (assignmentId: string) => {
     const assignment = this.getAssignment(assignmentId)
     const manager = new ReuploadSubmissionsDialogManager(
       assignment,
@@ -4524,7 +4287,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getSetDefaultGradeAction(assignmentId) {
+  getSetDefaultGradeAction = (assignmentId: string) => {
     const assignment = this.getAssignment(assignmentId)
     const manager = new SetDefaultGradeDialogManager(
       assignment,
@@ -4540,7 +4303,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getCurveGradesAction(assignmentId) {
+  getCurveGradesAction = (assignmentId: string) => {
     const assignment = this.getAssignment(assignmentId)
     return CurveGradesDialogManager.createCurveGradesAction(
       assignment,
@@ -4553,7 +4316,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  createTeacherNotes() {
+  // Gradebook Content Api Methods
+  createTeacherNotes = () => {
     this.setTeacherNotesColumnUpdating(true)
     this.renderViewOptionsMenu()
     return GradebookApi.createTeacherNotesColumn(this.options.context_id)
@@ -4572,7 +4336,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  setTeacherNotesHidden(hidden) {
+  setTeacherNotesHidden = (hidden: boolean) => {
     this.setTeacherNotesColumnUpdating(true)
     this.renderViewOptionsMenu()
     const teacherNotes = this.getTeacherNotesColumn()
@@ -4604,7 +4368,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  apiUpdateSubmission(submission, gradeInfo) {
+  apiUpdateSubmission = (submission, gradeInfo) => {
     const {userId, assignmentId} = submission
     const student = this.student(userId)
     this.addPendingGradeInfo(submission, gradeInfo)
@@ -4632,7 +4396,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  gradeSubmission(submission, gradeInfo) {
+  gradeSubmission = (submission, gradeInfo) => {
     let gradeChangeOptions, submissionData
     if (gradeInfo.valid) {
       gradeChangeOptions = {
@@ -4687,7 +4451,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  updateSubmissionAndRenderSubmissionTray(data) {
+  updateSubmissionAndRenderSubmissionTray = data => {
     const {studentId, assignmentId} = this.getSubmissionTrayState()
     const submissionData = {
       assignmentId,
@@ -4704,11 +4468,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.apiUpdateSubmission(submissionData, gradeInfo)
   }
 
-  renderAnonymousSpeedGraderAlert(props) {
+  renderAnonymousSpeedGraderAlert = props => {
     return renderComponent(AnonymousSpeedGraderAlert, anonymousSpeedGraderAlertMountPoint(), props)
   }
 
-  showAnonymousSpeedGraderAlertForURL(speedGraderUrl) {
+  showAnonymousSpeedGraderAlertForURL = (speedGraderUrl: string) => {
     const props = {
       speedGraderUrl,
       onClose: this.hideAnonymousSpeedGraderAlert
@@ -4717,7 +4481,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.anonymousSpeedGraderAlert.open()
   }
 
-  hideAnonymousSpeedGraderAlert() {
+  hideAnonymousSpeedGraderAlert = () => {
     // React throws an error if we try to unmount while the event is being handled
     return setTimeout(() => {
       const node = anonymousSpeedGraderAlertMountPoint()
@@ -4725,7 +4489,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }, 0)
   }
 
-  requireStudentGroupForSpeedGrader(assignment) {
+  requireStudentGroupForSpeedGrader = (assignment: Assignment) => {
     if (assignmentHelper.gradeByGroup(assignment)) {
       // Assignments that grade by group (not by student) don't require a group selection
       return false
@@ -4736,21 +4500,21 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  showSimilarityScore(_assignment) {
+  showSimilarityScore = _assignment => {
     return !!this.options.show_similarity_score
   }
 
-  viewUngradedAsZero() {
+  viewUngradedAsZero = () => {
     return !!(
       this.courseFeatures.allowViewUngradedAsZero && this.gridDisplaySettings.viewUngradedAsZero
     )
   }
 
-  allowApplyScoreToUngraded() {
+  allowApplyScoreToUngraded = () => {
     return this.options.allow_apply_score_to_ungraded
   }
 
-  onApplyScoreToUngradedRequested(assignmentGroup) {
+  onApplyScoreToUngradedRequested = assignmentGroup => {
     const mountPoint = this.props.applyScoreToUngradedModalNode
     if (!this.allowApplyScoreToUngraded() || mountPoint == null) {
       return null
@@ -4773,7 +4537,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     renderComponent(ApplyScoreToUngradedModal, mountPoint, props)
   }
 
-  executeApplyScoreToUngraded(args) {
+  executeApplyScoreToUngraded = args => {
     const {value, ...options} = args
 
     // TODO: if updated Gradebook filters are enabled, we should use those
@@ -4805,19 +4569,24 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       .catch(FlashAlert.showFlashError(I18n.t('There was a problem applying scores.')))
   }
 
-  destroy() {
-    let ref1
+  destroy = () => {
     $(window).unbind('resize.fillWindowWithMe')
     $(document).unbind('gridready')
     this.gradebookGrid.destroy()
-    return (ref1 = this.postPolicies) != null ? ref1.destroy() : undefined
+    return this.postPolicies?.destroy()
   }
 
-  _gridHasRendered() {
+  // "PRIVILEGED" methods
+  // The methods here are intended to support specs, but not intended to be a
+  // permanent part of the API for this class. The existence of these methods
+  // suggests that the behavior they provide does not yet have a more suitable
+  // home elsewhere in the code. They are prefixed with '_' to suggest this
+  // aspect of their presence here.
+  _gridHasRendered = () => {
     return this.gridReady.state() === 'resolved'
   }
 
-  _updateEssentialDataLoaded() {
+  _updateEssentialDataLoaded = () => {
     if (
       this.contentLoadStates.studentIdsLoaded &&
       !this.props.isModulesLoading &&
@@ -4878,7 +4647,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             ref={this.gradebookSettingsModalButton}
             id="gradebook-settings-button"
             variant="icon"
-            onClick={() => this.gradebookSettingsModal.current?.open()}
+            onClick={() => this.gradebookSettingsModal?.current?.open()}
           >
             <ScreenReaderContent>{I18n.t('Gradebook Settings')}</ScreenReaderContent>
           </Button>

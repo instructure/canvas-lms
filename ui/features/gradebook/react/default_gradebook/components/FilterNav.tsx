@@ -30,38 +30,9 @@ import {Tray} from '@instructure/ui-tray'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import FilterNavFilter from './FilterNavFilter'
+import type {Module, Section, Filter, AssignmentGroup} from '../gradebook.d'
 
 const {Item} = Flex as any
-
-type FilterCondition = {
-  id: string
-  type?: string
-  value?: string
-  createdAt: string
-}
-
-type Filter = {
-  id: string
-  label?: string
-  conditions: FilterCondition[]
-  isApplied: boolean
-  createdAt: string
-}
-
-type Module = {
-  id: string
-  name: string
-}
-
-type Section = {
-  id: string
-  name: string
-}
-
-type AssignmentGroup = {
-  id: string
-  name: string
-}
 
 type Props = {
   filters: Filter[]

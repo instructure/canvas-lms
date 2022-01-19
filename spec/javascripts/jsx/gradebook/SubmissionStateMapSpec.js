@@ -507,13 +507,11 @@ test('sets the submission state map .hasGradingPeriods to true when a grading pe
   const gradebook = createGradebook({
     grading_period_set: {id: '1501', grading_periods: [{id: '701'}, {id: '702'}]}
   })
-  gradebook.initSubmissionStateMap()
   strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true)
 })
 
 test('sets the submission state map .hasGradingPeriods to false when no grading period set exists', () => {
   const gradebook = createGradebook()
-  gradebook.initSubmissionStateMap()
   strictEqual(gradebook.submissionStateMap.hasGradingPeriods, false)
 })
 
@@ -527,14 +525,12 @@ test('sets the submission state map .selectedGradingPeriodID to the "grading per
 test('sets the submission state map .isAdmin when the current user roles includes "admin"', () => {
   fakeENV.setup({current_user_roles: ['admin']})
   const gradebook = createGradebook()
-  gradebook.initSubmissionStateMap()
   strictEqual(gradebook.submissionStateMap.isAdmin, true)
   fakeENV.teardown()
 })
 
 test('sets the submission state map .isAdmin when the current user roles do not include "admin"', () => {
   const gradebook = createGradebook()
-  gradebook.initSubmissionStateMap()
   strictEqual(gradebook.submissionStateMap.isAdmin, false)
 })
 

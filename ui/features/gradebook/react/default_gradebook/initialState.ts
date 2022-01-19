@@ -17,6 +17,9 @@
  */
 
 import studentRowHeaderConstants from './constants/studentRowHeaderConstants'
+import StudentDatastore from './stores/StudentDatastore'
+import type {InitialActionStates, CourseContent, ContentLoadStates} from './gradebook.d'
+import type {GridDisplaySettings} from './grid.d'
 import {camelize} from 'convert-case'
 
 export function getInitialGradebookContent(options) {
@@ -25,7 +28,7 @@ export function getInitialGradebookContent(options) {
   }
 }
 
-export function getInitialGridDisplaySettings(settings, colors) {
+export function getInitialGridDisplaySettings(settings, colors): GridDisplaySettings {
   const selectedPrimaryInfo = studentRowHeaderConstants.primaryInfoKeys.includes(
     settings.student_column_display_as
   )
@@ -76,11 +79,13 @@ export function getInitialGridDisplaySettings(settings, colors) {
       commentsUpdating: false,
       editedCommentId: null
     },
-    viewUngradedAsZero: settings.view_ungraded_as_zero === 'true'
+    viewUngradedAsZero: settings.view_ungraded_as_zero === 'true',
+    showUnpublishedAssignments: false,
+    showSeparateFirstLastNames: false
   }
 }
 
-export function getInitialContentLoadStates(options) {
+export function getInitialContentLoadStates(options): ContentLoadStates {
   return {
     assignmentGroupsLoaded: false,
     contextModulesLoaded: !options.has_modules,
@@ -95,19 +100,17 @@ export function getInitialContentLoadStates(options) {
   }
 }
 
-export function getInitialCourseContent(options) {
-  let courseGradingScheme = null
-  let defaultGradingScheme = null
-  if (options.grading_standard) {
-    courseGradingScheme = {
-      data: options.grading_standard
-    }
-  }
-  if (options.default_grading_standard) {
-    defaultGradingScheme = {
-      data: options.default_grading_standard
-    }
-  }
+export function getInitialCourseContent(options): CourseContent {
+  const courseGradingScheme = options.grading_standard
+    ? {
+        data: options.grading_standard
+      }
+    : null
+  const defaultGradingScheme = options.default_grading_standard
+    ? {
+        data: options.default_grading_standard
+      }
+    : null
   return {
     contextModules: [],
     courseGradingScheme,
@@ -115,11 +118,13 @@ export function getInitialCourseContent(options) {
     gradingSchemes: options.grading_schemes.map(camelize),
     gradingPeriodAssignments: {},
     assignmentStudentVisibility: {},
-    latePolicy: options.late_policy ? camelize(options.late_policy) : undefined
+    latePolicy: options.late_policy ? camelize(options.late_policy) : undefined,
+    students: new StudentDatastore({}, {}),
+    modulesById: {}
   }
 }
 
-export function getInitialActionStates() {
+export function getInitialActionStates(): InitialActionStates {
   return {
     pendingGradeInfo: []
   }
