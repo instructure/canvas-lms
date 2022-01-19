@@ -3052,6 +3052,30 @@ describe Course do
               expect(last_tab_id).to start_with "context_external_tool_"
             end
           end
+
+          context "public k5 subject" do
+            before :once do
+              @course.update(is_public: true, indexed: true)
+              @course.groups.create!
+            end
+
+            it "does not show groups tabs without a current user" do
+              tab_ids = @course.tabs_available(nil, course_subject_tabs: true).pluck(:id)
+              expect(tab_ids).not_to include(Course::TAB_GROUPS)
+            end
+
+            it "does not show groups tabs to a user not enrolled in the class" do
+              user_factory
+              tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+              expect(tab_ids).not_to include(Course::TAB_GROUPS)
+            end
+
+            it "shows the groups tab to an enrolled user" do
+              @course.enroll_student(user_factory).accept!
+              tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+              expect(tab_ids).to include(Course::TAB_GROUPS)
+            end
+          end
         end
       end
 

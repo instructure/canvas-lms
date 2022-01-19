@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module PacePlansPageObject
   #------------------------- Selectors -------------------------------
+  def assignment_due_date_selector
+    "[data-testid='assignment-due-date']"
+  end
+
   def cancel_button_selector
     "button:contains('Cancel')"
   end
@@ -39,6 +43,10 @@ module PacePlansPageObject
 
   def edit_tray_close_button_selector
     "button:contains('Close')"
+  end
+
+  def hypothetical_end_date_selector
+    "[data-testid='pace-plans-collapse']:contains('Hypothetical end date')"
   end
 
   def module_item_points_possible_selector
@@ -109,6 +117,10 @@ module PacePlansPageObject
     "#pace-plans-required-end-date-input [data-testid='pace-plan-date']"
   end
 
+  def required_end_date_message_selector
+    "#pace-plans-required-end-date-input:contains('Required by specified end date')"
+  end
+
   def settings_button_selector
     "button:contains('Modify Settings')"
   end
@@ -159,6 +171,10 @@ module PacePlansPageObject
 
   #------------------------- Elements --------------------------------
 
+  def assignment_due_date
+    f(assignment_due_date_selector)
+  end
+
   def cancel_button
     fj(cancel_button_selector)
   end
@@ -177,6 +193,10 @@ module PacePlansPageObject
 
   def edit_tray_close_button
     fj(edit_tray_close_button_selector)
+  end
+
+  def hypothetical_end_date
+    fj(hypothetical_end_date_selector)
   end
 
   def module_item_points_possible
@@ -245,6 +265,10 @@ module PacePlansPageObject
 
   def required_end_date_input
     f(required_end_date_input_selector)
+  end
+
+  def required_end_date_message
+    fj(required_end_date_message_selector)
   end
 
   def settings_button
@@ -370,6 +394,8 @@ module PacePlansPageObject
   def add_start_date(start_date)
     pace_plan_start_date.send_keys([:control, "a"], :backspace, format_date_for_view(start_date), :enter)
   end
+
+  delegate :text, to: :assignment_due_date, prefix: true
 
   def calculate_saturday_date
     current_date = Date.today
