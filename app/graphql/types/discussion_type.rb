@@ -63,9 +63,7 @@ module Types
     field :require_initial_post, Boolean, null: true
 
     field :message, String, null: true
-    def message
-      available_for_user ? object.message : nil
-    end
+    delegate :message, to: :object
 
     field :available_for_user, Boolean, null: false
     def available_for_user
@@ -287,7 +285,7 @@ module Types
     end
 
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
-      return [] if object.initial_post_required?(current_user, session) || !available_for_user
+      return [] if object.initial_post_required?(current_user, session)
 
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,

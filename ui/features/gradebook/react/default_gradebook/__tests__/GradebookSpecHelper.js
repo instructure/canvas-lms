@@ -26,11 +26,6 @@ const performance_controls = {
 }
 
 export const defaultGradebookProps = {
-  filters: [],
-  isFiltersLoading: false,
-  onFiltersChange: () => {},
-  flashAlerts: [],
-  flashMessageContainer: document.createElement('div'),
   gradebookMenuNode: document.createElement('div'),
   settingsModalButtonContainer: document.createElement('div'),
   gridColorNode: document.createElement('div'),

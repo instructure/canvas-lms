@@ -23,7 +23,7 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
   include_context "lti_1_3_tool_configuration_spec_helper"
 
   let(:fallback_proxy) do
-    DynamicSettings::FallbackProxy.new({
+    Canvas::DynamicSettings::FallbackProxy.new({
                                                  CanvasSecurity::KeyStorage::PAST => CanvasSecurity::KeyStorage.new_key,
                                                  CanvasSecurity::KeyStorage::PRESENT => CanvasSecurity::KeyStorage.new_key,
                                                  CanvasSecurity::KeyStorage::FUTURE => CanvasSecurity::KeyStorage.new_key
@@ -33,6 +33,6 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
   let(:developer_key) { DeveloperKey.create!(account: account) }
 
   before do
-    allow(DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
+    allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
   end
 end

@@ -37,8 +37,8 @@ describe DatadogRumHelper do
     end
 
     before do
-      allow(DynamicSettings).to receive(:find).and_call_original
-      allow(DynamicSettings).to(
+      allow(Canvas::DynamicSettings).to receive(:find).and_call_original
+      allow(Canvas::DynamicSettings).to(
         receive(:find).with("datadog-rum", tree: "config", service: "canvas").and_return(datadog_rum_config)
       )
       allow(self).to receive(:random).and_return(0.5)

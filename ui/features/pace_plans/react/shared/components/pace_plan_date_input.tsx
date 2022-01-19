@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import moment, {Moment, MomentInput} from 'moment-timezone'
-import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import tz from '@canvas/timezone'
 
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -30,7 +30,7 @@ import CanvasDateInput, {
   CanvasDateInputMessageType
 } from '@canvas/datetime/react/components/DateInput'
 import {BlackoutDate, InputInteraction} from '../types'
-import {pacePlanTimezone, weekendIntegers} from '../api/backend_serializer'
+import {weekendIntegers} from '../api/backend_serializer'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plan_date_input'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
@@ -64,6 +64,8 @@ export type PacePlansDateInputProps = {
   endDate?: MomentInput
 }
 
+const formatDate = date => tz.format(date, 'date.formats.long')
+
 /**
  * A wrapper around the `instructure-ui` `DateInput` component
  *
@@ -88,7 +90,6 @@ const PacePlanDateInput = ({
   endDate
 }: PacePlansDateInputProps) => {
   const [customErrors, setCustomErrors] = useState<string[]>([])
-  const formatDate = useDateTimeFormat('date.formats.long', pacePlanTimezone, ENV.LOCALE)
 
   const calculateErrors = (date: Moment = moment(dateValue)): string[] => {
     const errors: string[] = []
@@ -113,7 +114,7 @@ const PacePlanDateInput = ({
     const parsedDate = moment(date)
 
     if (parsedDate.isValid()) {
-      onDateChange(parsedDate.toISOString(true).split('T')[0])
+      onDateChange(parsedDate.toISOString(false).split('T')[0])
       setCustomErrors([])
     } else {
       setCustomErrors([I18n.t('The date entered is invalid.')])
@@ -128,7 +129,7 @@ const PacePlanDateInput = ({
           {helpText && <ScreenReaderContent>{helpText}</ScreenReaderContent>}
         </View>
         <Flex data-testid="paceplan-date-text" as="div" height="2.25rem" alignItems="center">
-          {formatDate(moment.tz(dateValue, pacePlanTimezone).toISOString(true))}
+          {formatDate(dateValue)}
         </Flex>
         {helpText && (
           <div style={{whiteSpace: 'nowrap', marginTop: '.75rem'}}>
@@ -181,7 +182,6 @@ const PacePlanDateInput = ({
         <CanvasDateInput
           dataTestid="pace-plan-date"
           renderLabel={dateInputLabel}
-          timezone={pacePlanTimezone}
           formatDate={formatDate}
           onSelectedDateChange={handleDateChange}
           selectedDate={dateValue}

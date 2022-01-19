@@ -123,7 +123,7 @@ module Services
       private
 
       def setting(key)
-        DynamicSettings.find("address-book", default_ttl: 5.minutes)[key, failsafe: nil]
+        Canvas::DynamicSettings.find("address-book", default_ttl: 5.minutes)[key, failsafe: nil]
       end
 
       def app_host

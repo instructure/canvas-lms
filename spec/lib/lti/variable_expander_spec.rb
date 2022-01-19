@@ -1147,11 +1147,11 @@ module Lti
 
           context "when the RCS in configured" do
             before do
-              allow(DynamicSettings).to receive(:find)
+              allow(Canvas::DynamicSettings).to receive(:find)
                 .with(any_args)
                 .and_call_original
 
-              allow(DynamicSettings).to receive(:find)
+              allow(Canvas::DynamicSettings).to receive(:find)
                 .with("rich-content-service", default_ttl: 5.minutes)
                 .and_return(DynamicSettings::FallbackProxy.new({ "app-host" => app_host }))
             end

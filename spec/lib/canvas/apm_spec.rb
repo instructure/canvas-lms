@@ -21,14 +21,14 @@ require_relative "apm_common"
 
 describe Canvas::Apm do
   after do
-    DynamicSettings.config = nil
-    DynamicSettings.reset_cache!
-    DynamicSettings.fallback_data = nil
+    Canvas::DynamicSettings.config = nil
+    Canvas::DynamicSettings.reset_cache!
+    Canvas::DynamicSettings.fallback_data = nil
     Canvas::Apm.reset!
   end
 
   def inject_apm_settings(yaml_string)
-    DynamicSettings.fallback_data = {
+    Canvas::DynamicSettings.fallback_data = {
       private: {
         canvas: {
           "datadog_apm.yml": yaml_string
@@ -49,7 +49,7 @@ describe Canvas::Apm do
         inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0")
         expect(Canvas::Apm).to_not be_analytics_enabled
         Canvas::Apm.reset!
-        DynamicSettings.reset_cache!
+        Canvas::DynamicSettings.reset_cache!
         inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0\napp_analytics_enabled: false")
         expect(Canvas::Apm).to_not be_analytics_enabled
       end
@@ -58,7 +58,7 @@ describe Canvas::Apm do
 
   describe ".configured?" do
     it "is false for empty config" do
-      DynamicSettings.fallback_data = {}
+      Canvas::DynamicSettings.fallback_data = {}
       expect(Canvas::Apm.configured?).to eq(false)
     end
 
@@ -112,7 +112,7 @@ describe Canvas::Apm do
 
     around do |example|
       Canvas::Apm.reset!
-      DynamicSettings.fallback_data = {
+      Canvas::DynamicSettings.fallback_data = {
         private: {
           canvas: {
             "datadog_apm.yml": "sample_rate: 1.0\nhost_sample_rate: 1.0"
@@ -164,7 +164,7 @@ describe Canvas::Apm do
 
     it "still yields if there is no configuration" do
       Canvas::Apm.reset!
-      DynamicSettings.fallback_data = {
+      Canvas::DynamicSettings.fallback_data = {
         private: {
           canvas: {
             "datadog_apm.yml": "sample_rate: 0.0\nhost_sample_rate: 0.0"

@@ -45,11 +45,6 @@ function renderAndDirtyInput(inputValue, overrides = {}) {
   return result
 }
 
-function pressKey(inputElem, keyOpts) {
-  fireEvent.keyDown(inputElem, keyOpts)
-  fireEvent.keyUp(inputElem, keyOpts)
-}
-
 const oldLocale = moment.locale()
 
 beforeEach(() => {
@@ -123,28 +118,28 @@ describe('choosing a day on the calendar', () => {
   it('selects the first of the month on ArrowDown if selectedDate is null', () => {
     const {props, getInput} = renderInput()
     fireEvent.click(getInput())
-    pressKey(getInput(), {key: 'ArrowDown', code: 40, keyCode: 40})
+    fireEvent.keyDown(getInput(), {key: 'ArrowDown', code: 40, keyCode: 40})
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-01'))
   })
 
   it('selects the first of the month on up-arrow if selectedDate is null', () => {
     const {props, getInput} = renderInput()
     fireEvent.click(getInput())
-    pressKey(getInput(), {key: 'ArrowUp', code: 38, keyCode: 38})
+    fireEvent.keyDown(getInput(), {key: 'ArrowUp', code: 38, keyCode: 38})
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-01'))
   })
 
   it('selects the next date on down-arrow', () => {
     const {props, getInput} = renderInput({selectedDate: new Date()})
     fireEvent.click(getInput())
-    pressKey(getInput(), {key: 'ArrowDown', code: 40, keyCode: 40})
+    fireEvent.keyDown(getInput(), {key: 'ArrowDown', code: 40, keyCode: 40})
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-20'))
   })
 
   it('selects the previous date on up-arrow', () => {
     const {props, getInput} = renderInput({selectedDate: new Date()})
     fireEvent.click(getInput())
-    pressKey(getInput(), {key: 'ArrowUp', code: 38, keyCode: 38})
+    fireEvent.keyDown(getInput(), {key: 'ArrowUp', code: 38, keyCode: 38})
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-18'))
   })
 })
@@ -178,7 +173,7 @@ describe('dirty input state', () => {
   it('calls onSelectedDateChange with parsed date when Enter is pressed on the input', () => {
     const {props, getInput} = renderAndDirtyInput('May 20')
     const newDate = new Date('2020-05-20')
-    pressKey(getInput(), {key: 'Enter'})
+    fireEvent.keyDown(getInput(), {key: 'Enter'})
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate)
   })
 
@@ -187,18 +182,6 @@ describe('dirty input state', () => {
     fireEvent.blur(getInput())
     expect(props.onSelectedDateChange).toHaveBeenCalledWith(null)
     expect(getInput().value).toBe('')
-  })
-
-  it('handles the date in the given timezone', () => {
-    const tz = 'Pacific/Tarawa' // +12
-    const handleDateChange = jest.fn()
-    const {getInput} = renderAndDirtyInput('May 20, 2020', {
-      selectedDate: new Date(),
-      timezone: tz,
-      onSelectedDateChange: handleDateChange
-    })
-    fireEvent.blur(getInput())
-    expect(handleDateChange.mock.calls[0][0].toISOString()).toEqual('2020-05-20T00:00:00.000Z')
   })
 })
 

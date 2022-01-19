@@ -21,16 +21,16 @@
         "name": "AssignmentOverrideSet",
         "possibleTypes": [
           {
-            "name": "AdhocStudents"
+            "name": "Section"
           },
           {
             "name": "Group"
           },
           {
-            "name": "Noop"
+            "name": "AdhocStudents"
           },
           {
-            "name": "Section"
+            "name": "Noop"
           }
         ]
       },
@@ -69,9 +69,6 @@
             "name": "AccountDomainLookup"
           },
           {
-            "name": "AssessmentRequest"
-          },
-          {
             "name": "Assignment"
           },
           {
@@ -97,9 +94,6 @@
           },
           {
             "name": "DiscussionEntry"
-          },
-          {
-            "name": "DiscussionEntryDraft"
           },
           {
             "name": "Enrollment"
@@ -219,13 +213,13 @@
             "name": "Discussion"
           },
           {
-            "name": "Module"
+            "name": "Quiz"
           },
           {
             "name": "Page"
           },
           {
-            "name": "Quiz"
+            "name": "Module"
           }
         ]
       },
@@ -423,9 +417,6 @@
             "name": "AccountDomainLookup"
           },
           {
-            "name": "AssessmentRequest"
-          },
-          {
             "name": "Assignment"
           },
           {
@@ -451,9 +442,6 @@
           },
           {
             "name": "DiscussionEntry"
-          },
-          {
-            "name": "DiscussionEntryDraft"
           },
           {
             "name": "Enrollment"
@@ -528,10 +516,10 @@
         "name": "TurnitinContext",
         "possibleTypes": [
           {
-            "name": "File"
+            "name": "Submission"
           },
           {
-            "name": "Submission"
+            "name": "File"
           }
         ]
       }

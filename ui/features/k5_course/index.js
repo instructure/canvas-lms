@@ -60,6 +60,7 @@ ready(() => {
         observerList={ENV.OBSERVER_LIST}
         selfEnrollment={ENV.COURSE.self_enrollment}
         tabContentOnly={ENV.TAB_CONTENT_ONLY}
+        currentUserRoles={ENV.current_user_roles || []}
         isMasterCourse={ENV.BLUEPRINT_COURSES_DATA?.isMasterCourse}
       />,
       courseContainer

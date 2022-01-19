@@ -470,8 +470,6 @@ export default class EditView extends ValidatedFormView
     if isAnnouncement then announcementsFlag else discussionsFlag
 
   validateBeforeSave: (data, errors) =>
-    # The anonymous_state is missing if the fields are disabled. We need the value for edit mode too.
-    data.anonymous_state = $('input[name=anonymous_state]:checked').val()
     if data.delay_posting == "0"
       data.delayed_post_at = null
     if data.anonymous_state != 'full_anonymity' && data.anonymous_state != 'partial_anonymity'

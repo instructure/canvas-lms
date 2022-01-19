@@ -1079,7 +1079,7 @@ describe UsersController do
                "error-codes" => ["missing-input-response"]
              }.to_json)
       # Fallback for any dynamicsettings call that isn't mocked below
-      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     end
 
     after do
@@ -1087,22 +1087,22 @@ describe UsersController do
     end
 
     it "returns nil if there is no token" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => nil })
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => nil })
       expect(subject.send(:validate_recaptcha, nil)).to be_nil
     end
 
     it "returns nil for valid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
       expect(subject.send(:validate_recaptcha, "valid-submit-key")).to be_nil
     end
 
     it "returns an error for missing recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
       expect(subject.send(:validate_recaptcha, nil)).not_to be_nil
     end
 
     it "returns an error for invalid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
       expect(subject.send(:validate_recaptcha, "invalid-submit-key")).not_to be_nil
     end
   end

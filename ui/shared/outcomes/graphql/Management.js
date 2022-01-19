@@ -217,12 +217,6 @@ export const CREATE_LEARNING_OUTCOME = gql`
         description
         calculationMethod
         calculationInt
-        masteryPoints
-        pointsPossible
-        ratings {
-          description
-          points
-        }
       }
       errors {
         attribute
@@ -252,14 +246,6 @@ export const UPDATE_LEARNING_OUTCOME = gql`
         title
         displayName
         description
-        calculationMethod
-        calculationInt
-        masteryPoints
-        pointsPossible
-        ratings {
-          description
-          points
-        }
       }
       errors {
         attribute

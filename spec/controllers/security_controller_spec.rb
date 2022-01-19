@@ -23,7 +23,7 @@ RSpec.describe SecurityController, type: :request do
   let(:json) { JSON.parse(response.body) }
 
   let(:fallback_proxy) do
-    DynamicSettings::FallbackProxy.new({
+    Canvas::DynamicSettings::FallbackProxy.new({
                                                  CanvasSecurity::KeyStorage::PAST => CanvasSecurity::KeyStorage.new_key,
                                                  CanvasSecurity::KeyStorage::PRESENT => CanvasSecurity::KeyStorage.new_key,
                                                  CanvasSecurity::KeyStorage::FUTURE => CanvasSecurity::KeyStorage.new_key
@@ -31,7 +31,7 @@ RSpec.describe SecurityController, type: :request do
   end
 
   before do
-    allow(DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
+    allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
   end
 
   it "returns ok status" do

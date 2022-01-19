@@ -162,7 +162,7 @@ if ENV["ENABLE_AXE_SELENIUM"] == "1"
   end
 end
 
-if ENV["CRYSTALBALL_MAP"] == "1"
+if ENV["ENABLE_CRYSTALBALL"] == "1"
   Crystalball::MapGenerator.start! do |config|
     config.register Crystalball::MapGenerator::CoverageStrategy.new
     config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
@@ -177,11 +177,6 @@ if ENV["CRYSTALBALL_MAP"] == "1"
           yield example_map, example
           after = Coverage.peek_result
           example_map.push(*execution_detector.detect(before, after))
-
-          # rubocop:disable Specs/NoExecuteScript
-          js_coverage = SeleniumDriverSetup.driver.execute_script("return window.__coverage__")&.keys&.uniq
-          # rubocop:enable Specs/NoExecuteScript
-          example_map.used_files.concat(js_coverage) if js_coverage
         end
       end
     end
@@ -456,7 +451,7 @@ RSpec.configure do |config|
     Folder.reset_path_lookups!
     Rails.logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.current_root_account = nil
-    DynamicSettings.reset_cache!
+    Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
     MultiCache.reset
@@ -704,11 +699,11 @@ RSpec.configure do |config|
   end
 
   def override_dynamic_settings(data)
-    original_fallback = DynamicSettings.fallback_data
-    DynamicSettings.fallback_data = data
+    original_fallback = Canvas::DynamicSettings.fallback_data
+    Canvas::DynamicSettings.fallback_data = data
     yield
   ensure
-    DynamicSettings.fallback_data = original_fallback
+    Canvas::DynamicSettings.fallback_data = original_fallback
   end
 
   def json_parse(json_string = response.body)

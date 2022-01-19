@@ -466,6 +466,7 @@ export function K5Course({
   observerList,
   selfEnrollment,
   tabContentOnly,
+  currentUserRoles,
   isMasterCourse
 }) {
   const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
@@ -475,16 +476,13 @@ export function K5Course({
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
-  const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
     singleCourse: true,
-    observedUserId,
-    isObserver:
-      observerList.length > 1 ||
-      (observerList.length === 1 && observerList[0].id !== currentUser.id)
+    observedUserId: initialObservedId,
+    isObserver: currentUserRoles.includes('observer')
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
@@ -497,6 +495,7 @@ export function K5Course({
   const tabsPaddingRef = useRef(null)
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
+  const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const showObserverOptions =
     parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
   const showingMobileNav = windowSize.width < MOBILE_NAV_BREAKPOINT_PX
@@ -744,6 +743,7 @@ K5Course.propTypes = {
   observerList: ObserverListShape.isRequired,
   selfEnrollment: PropTypes.object,
   tabContentOnly: PropTypes.bool,
+  currentUserRoles: PropTypes.array.isRequired,
   isMasterCourse: PropTypes.bool.isRequired
 }
 

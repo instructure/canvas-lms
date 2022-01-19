@@ -90,52 +90,6 @@ describe GroupAndMembershipImporter do
       expect(progress.workflow_state).to eq "completed"
     end
 
-    it "works multiple times" do
-      import_csv_data(%(user_id,group_name
-                        user_0, first group
-                        user_1, second group
-                        user_2, third group
-                        user_3, third group
-                        user_4, first group))
-
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_4]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq ["user_1"]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq %w[user_2 user_3]
-
-      import_csv_data(%(user_id,group_name
-                        user_0, first group
-                        user_1, first group
-                        user_2, first group
-                        user_3, third group
-                        user_4, third group))
-
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq %w[user_3 user_4]
-
-      import_csv_data(%(user_id,group_name
-                        user_0, third group
-                        user_1, third group
-                        user_2, third group
-                        user_3, third group
-                        user_4, third group))
-
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2 user_3 user_4]
-
-      import_csv_data(%(user_id,group_name
-                        user_0, first group
-                        user_1, first group
-                        user_2, first group
-                        user_3, first group
-                        user_4, first group))
-
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2 user_3 user_4]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq []
-    end
-
     it "skips invalid_users" do
       progress = import_csv_data(%(user_id,group_name
                                    user_0, first group

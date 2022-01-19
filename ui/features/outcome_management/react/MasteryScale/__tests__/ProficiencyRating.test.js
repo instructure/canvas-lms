@@ -26,7 +26,6 @@ const defaultProps = (props = {}) => ({
   description: 'Stellar',
   disableDelete: false,
   mastery: false,
-  canManage: false,
   onColorChange: () => {},
   onDelete: () => {},
   onDescriptionChange: () => {},
@@ -40,18 +39,32 @@ const defaultProps = (props = {}) => ({
 describe('ProficiencyRating', () => {
   describe('can not manage', () => {
     it('renders the ProficiencyRating component', () => {
-      const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
+      const wrapper = shallow(<ProficiencyRating {...defaultProps({canManage: false})} />)
       expect(wrapper).toMatchSnapshot()
     })
 
     it('mastery checkbox is checked if mastery', () => {
-      const wrapper = shallow(<ProficiencyRating {...defaultProps({mastery: true})} />)
+      const wrapper = shallow(
+        <ProficiencyRating
+          {...defaultProps({
+            mastery: true,
+            canManage: false
+          })}
+        />
+      )
       const radio = wrapper.find('RadioInput')
       expect(radio.props().checked).toBe(true)
     })
 
     it('mastery checkbox does not appear if not mastery', () => {
-      const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
+      const wrapper = shallow(
+        <ProficiencyRating
+          {...defaultProps({
+            mastery: false,
+            canManage: false
+          })}
+        />
+      )
       const radio = wrapper.find('RadioInput')
       expect(radio.exists()).toBeFalsy()
     })
@@ -59,7 +72,9 @@ describe('ProficiencyRating', () => {
     it('mastery checkbox does not receive focus', () => {
       const wrapper = mount(
         <div>
-          <ProficiencyRating {...defaultProps({focusField: 'mastery', mastery: true})} />
+          <ProficiencyRating
+            {...defaultProps({focusField: 'mastery', canManage: false, mastery: true})}
+          />
         </div>
       )
       expect(wrapper.find('RadioInput').find('input').instance()).not.toBe(document.activeElement)
@@ -68,24 +83,23 @@ describe('ProficiencyRating', () => {
     it('clicking mastery checkbox does not trigger change', () => {
       const onMasteryChange = jest.fn()
       const wrapper = mount(
-        <ProficiencyRating {...defaultProps({onMasteryChange, mastery: true})} />
+        <ProficiencyRating {...defaultProps({onMasteryChange, mastery: true, canManage: false})} />
       )
       wrapper.find('RadioInput').find('input').simulate('change')
       expect(onMasteryChange).not.toHaveBeenCalled()
     })
 
     it('does not render TextInput', () => {
-      const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
+      const wrapper = shallow(<ProficiencyRating {...defaultProps({canManage: false})} />)
       expect(wrapper.find('TextInput').exists()).toBeFalsy()
     })
-
     it('does not render delete button', () => {
-      const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
+      const wrapper = shallow(<ProficiencyRating {...defaultProps({canManage: false})} />)
       expect(wrapper.find('.deleteButton').exists()).toBeFalsy()
     })
 
     it('includes the points', () => {
-      const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
+      const wrapper = shallow(<ProficiencyRating {...defaultProps({canManage: false})} />)
       const content = wrapper.find('.points').find('PresentationContent').at(0)
       expect(content.childAt(0).text()).toBe('10')
     })
@@ -179,13 +193,12 @@ describe('ProficiencyRating', () => {
       expect(getByText('Change color for mastery level 1')).toBeInTheDocument()
     })
 
-    describe('when individualOutcome is true', () => {
+    describe('when forOutcome is true', () => {
       it('hides color input', () => {
-        const {queryByText, container} = render(
-          <ProficiencyRating {...defaultProps({canManage: true, individualOutcome: true})} />
+        const {queryByText} = render(
+          <ProficiencyRating {...defaultProps({canManage: true, forOutcome: true})} />
         )
         expect(queryByText('Change color for mastery level 1')).not.toBeInTheDocument()
-        expect(container.getElementsByClassName('color').length).toBe(0)
       })
     })
   })

@@ -490,10 +490,10 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to be_empty
         end
 
-        it "includes section overrides for sections with concluded enrollments" do
+        it "does not include section overrides for sections with concluded enrollments" do
           @student2.student_enrollments.first.conclude
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
-          expect(overrides).to eq [@override2]
+          expect(overrides).to be_empty
         end
 
         it "includes all relevant section overrides" do

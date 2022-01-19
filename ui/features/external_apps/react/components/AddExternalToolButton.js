@@ -138,7 +138,6 @@ export default class AddExternalToolButton extends React.Component {
     }
 
     this.throttleCreation = false
-    store.reset()
     store.fetch({force: true})
     this.setState({tool: {}, isLti2: false, lti2RegistrationUrl: null})
     $.flashError(errorMessage)

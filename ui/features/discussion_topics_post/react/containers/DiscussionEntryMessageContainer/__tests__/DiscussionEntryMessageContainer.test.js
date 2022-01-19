@@ -79,6 +79,7 @@ describe('DiscussionEntryMessageContainer', () => {
   it('displays deletion info if delete', () => {
     const {getByText} = setup(defaultProps({deleted: true}))
     expect(getByText('Deleted by Hank Mccoy')).toBeInTheDocument()
+    expect(getByText('Created Feb 8, 2021 8:35pm')).toBeInTheDocument()
     expect(getByText('Deleted Apr 13, 2021 4pm')).toBeInTheDocument()
   })
 

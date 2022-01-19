@@ -93,31 +93,10 @@ const CalculationIntInput = ({updateCalculationInt, calculationMethod, calculati
   )
 }
 
-const Display = ({calculationInt, currentMethod, individualOutcomeDisplay}) => (
-  <View as="div" padding="small none none">
-    <Flex
-      wrap="wrap"
-      direction={individualOutcomeDisplay ? 'row' : 'column'}
-      padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
-    >
-      <Flex.Item
-        as="div"
-        padding="none xx-small none none"
-        data-testid="read-only-calculation-method"
-      >
-        {individualOutcomeDisplay ? (
-          <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
-        ) : (
-          <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
-        )}
-      </Flex.Item>
-      <Flex.Item>
-        <Text color="primary" weight="normal">
-          {currentMethod.friendlyCalculationMethod}
-        </Text>
-      </Flex.Item>
-    </Flex>
-    {currentMethod.validRange && (
+const Display = ({calculationInt, currentMethod, individualOutcome}) => {
+  const individualOutcomeDisplay = individualOutcome === 'display'
+  return (
+    <View as="div" padding="small none none">
       <Flex
         wrap="wrap"
         direction={individualOutcomeDisplay ? 'row' : 'column'}
@@ -125,22 +104,42 @@ const Display = ({calculationInt, currentMethod, individualOutcomeDisplay}) => (
       >
         <Flex.Item as="div" padding="none xx-small none none">
           {individualOutcomeDisplay ? (
-            <Text weight="bold">{I18n.t('Parameter:')}</Text>
+            <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
           ) : (
-            <Heading margin="medium none none" level="h4">
-              {I18n.t('Parameter')}
-            </Heading>
+            <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
           )}
         </Flex.Item>
         <Flex.Item>
           <Text color="primary" weight="normal">
-            {calculationInt}
+            {currentMethod.friendlyCalculationMethod}
           </Text>
         </Flex.Item>
       </Flex>
-    )}
-  </View>
-)
+      {currentMethod.validRange && (
+        <Flex
+          wrap="wrap"
+          direction={individualOutcomeDisplay ? 'row' : 'column'}
+          padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
+        >
+          <Flex.Item as="div" padding="none xx-small none none">
+            {individualOutcomeDisplay ? (
+              <Text weight="bold">{I18n.t('Parameter:')}</Text>
+            ) : (
+              <Heading margin="medium none none" level="h4">
+                {I18n.t('Parameter')}
+              </Heading>
+            )}
+          </Flex.Item>
+          <Flex.Item>
+            <Text color="primary" weight="normal">
+              {calculationInt}
+            </Text>
+          </Flex.Item>
+        </Flex>
+      )}
+    </View>
+  )
+}
 
 const Form = ({
   calculationMethodKey,
@@ -232,7 +231,6 @@ const ProficiencyCalculation = ({
   const [allowSave, realSetAllowSave] = useState(false)
   const [showConfirmation, setShowConfirmationModal] = useState(false)
 
-  const individualOutcomeDisplay = individualOutcome === 'display'
   const individualOutcomeEdit = individualOutcome === 'edit'
 
   const setAllowSave = newAllowSave => {
@@ -296,6 +294,8 @@ const ProficiencyCalculation = ({
     setAllowSave(false)
   }
 
+  const individualOutcomeDisplay = individualOutcome === 'display'
+
   return (
     <View as="div">
       <Flex
@@ -326,7 +326,7 @@ const ProficiencyCalculation = ({
             <Display
               currentMethod={currentMethod}
               calculationInt={calculationInt}
-              individualOutcomeDisplay={individualOutcomeDisplay}
+              individualOutcome={individualOutcome}
             />
           )}
         </Flex.Item>
@@ -345,7 +345,7 @@ const ProficiencyCalculation = ({
           </Flex.Item>
         )}
       </Flex>
-      {canManage && !individualOutcome && (
+      {canManage && !individualOutcomeEdit && (
         <div className="save">
           <Button
             variant="primary"

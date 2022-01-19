@@ -35,8 +35,8 @@ describe DocviewerAuditEventsController do
   before do
     # Assignment.create! will hit MultiCache, and if a default stub doesn't
     # exist, the stub with args will throw an error.
-    allow(DynamicSettings).to receive(:find).and_return({})
-    allow(DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return(
+    allow(Canvas::DynamicSettings).to receive(:find).and_return({})
+    allow(Canvas::DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return(
       { "secret" => @encoded64_secret }
     )
   end

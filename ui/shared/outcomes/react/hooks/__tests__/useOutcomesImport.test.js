@@ -29,7 +29,6 @@ import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks, importOutcomeMocks} from '../../../mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import resolveProgress from '@canvas/progress/resolve_progress'
-import {waitFor} from '@testing-library/react'
 
 jest.mock('@canvas/progress/resolve_progress')
 jest.useFakeTimers()
@@ -60,18 +59,6 @@ describe('useOutcomesImport', () => {
       </OutcomesContext.Provider>
     </MockedProvider>
   )
-
-  const sharedResolverSpecs = () => {
-    it('calls for resolveProgress', async () => {
-      renderHook(() => useOutcomesImport(), {
-        wrapper
-      })
-
-      await waitFor(() => {
-        expect(resolveProgress).toHaveBeenCalledTimes(1)
-      })
-    })
-  }
 
   it('creates custom hook with proper exports', () => {
     const {result} = renderHook(() => useOutcomesImport(), {
@@ -299,33 +286,6 @@ describe('useOutcomesImport', () => {
       })
       expect(result.current.importGroupsStatus).toEqual({})
     })
-
-    describe('when has group in the localStorage', () => {
-      beforeEach(() => {
-        localStorage.activeImports = JSON.stringify([
-          {
-            outcomeOrGroupId: groupId,
-            isGroup: true,
-            groupTitle: 'Group 100',
-            progress: {_id: '111', state: 'queued', __typename: 'Progress'}
-          }
-        ])
-      })
-
-      afterEach(() => {
-        delete localStorage.activeImports
-      })
-
-      it('returns group with import pending status', () => {
-        const {result} = renderHook(() => useOutcomesImport(), {
-          wrapper
-        })
-
-        expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
-      })
-
-      sharedResolverSpecs()
-    })
   })
 
   describe('Outcome import', () => {
@@ -502,31 +462,5 @@ describe('useOutcomesImport', () => {
       await act(async () => jest.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})
     })
-  })
-
-  describe('when has outcome in the localStorage', () => {
-    beforeEach(() => {
-      localStorage.activeImports = JSON.stringify([
-        {
-          outcomeOrGroupId: outcomeId,
-          isGroup: false,
-          progress: {_id: '111', state: 'queued', __typename: 'Progress'}
-        }
-      ])
-    })
-
-    afterEach(() => {
-      delete localStorage.activeImports
-    })
-
-    it('returns outcome with import pending status', () => {
-      const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
-      })
-
-      expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
-    })
-
-    sharedResolverSpecs()
   })
 })

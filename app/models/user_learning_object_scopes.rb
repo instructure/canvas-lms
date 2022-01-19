@@ -292,7 +292,7 @@ module UserLearningObjectScopes
 
   # opts forwaded to course_ids_for_todo_lists
   def submissions_needing_grading_count(**opts)
-    if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return 0
     end
 
@@ -313,7 +313,7 @@ module UserLearningObjectScopes
   end
 
   def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
-    if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
       return scope_only ? Assignment.none : []
     end
 

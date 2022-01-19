@@ -1193,10 +1193,10 @@ class DiscussionTopicsController < ApplicationController
   API_ALLOWED_TOPIC_FIELDS = %w[title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post pinned todo_date
                                 group_category_id allow_rating only_graders_can_rate sort_by_rating
-                                anonymous_state is_anonymous_author].freeze
+                                anonymous_state].freeze
 
   API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w[title message discussion_type podcast_enabled pinned todo_date
-                                          allow_rating only_graders_can_rate sort_by_rating anonymous_state is_anonymous_author].freeze
+                                          allow_rating only_graders_can_rate sort_by_rating anonymous_state].freeze
 
   def set_sections
     if params[:specific_sections] == "all"

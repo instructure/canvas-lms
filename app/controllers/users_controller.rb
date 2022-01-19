@@ -1104,24 +1104,24 @@ class UsersController < ApplicationController
         return render_unauthorized_action unless (included_course_ids - valid_course_ids).empty?
       end
 
+      submissions = []
+
       filter = Array(params[:filter])
       only_submittable = filter.include?("submittable")
       only_current_grading_period = filter.include?("current_grading_period")
 
       course_ids = user.participating_student_course_ids
-      # participating_student_course_ids returns ids relative to user, but included_course_ids are relative to the current shard
-      course_ids.map! { |course_id| Shard.relative_id_for(course_id, user.shard, Shard.current) }
       course_ids = course_ids.select { |id| included_course_ids.include?(id) } unless included_course_ids.empty?
 
-      submissions = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+      Shard.partition_by_shard(course_ids) do |shard_course_ids|
         subs = Submission.active.preload(:assignment)
                          .missing
                          .where(user_id: user.id,
                                 assignments: { context_id: shard_course_ids })
                          .merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
-        subs = subs.in_current_grading_period_for_courses(shard_course_ids) if only_current_grading_period
-        subs.order(:cached_due_date, :id)
+        subs = subs.in_current_grading_period_for_courses(course_ids) if only_current_grading_period
+        submissions = subs.order(:cached_due_date, :id)
       end
       assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
 
@@ -2607,7 +2607,7 @@ class UsersController < ApplicationController
   #     "expires_at": 1521667783000,
   #   }
   def pandata_events_token
-    settings = DynamicSettings.find("events", service: "pandata")
+    settings = Canvas::DynamicSettings.find("events", service: "pandata")
     dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
 
     unless @access_token
@@ -3141,7 +3141,7 @@ class UsersController < ApplicationController
     return nil unless @access_token.nil?
 
     response = CanvasHttp.post("https://www.google.com/recaptcha/api/siteverify", form_data: {
-                                 secret: DynamicSettings.find(tree: :private)["recaptcha_server_key"],
+                                 secret: Canvas::DynamicSettings.find(tree: :private)["recaptcha_server_key"],
                                  response: recaptcha_response
                                })
 
