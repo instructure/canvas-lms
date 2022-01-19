@@ -78,11 +78,6 @@
             <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
           <% end %>
 
-          <% if @user.grants_right?(@current_user, :manage_user_details) %>
-            <%= "|" unless first %><% first = false %>
-            <div style="display: inline;" id="suspend-reactivate-link"></div>
-          <% end %>
-
           <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
             <%= "|" unless first %><% first = false %>
             <% if @context && !@context.is_a?(Account) && !@context.is_a?(User) %>
@@ -98,6 +93,11 @@
             <% if UserMergeData.active.splitable.where(user_id: @user).shard(@user).exists? %>
               | <a class="split_user_link" href="<%= user_admin_split_url(@user) %>"><%= t('Split Merged Users')%></a>
             <% end %>
+          <% end %>
+
+          <% if @user.grants_right?(@current_user, :manage_user_details) %>
+            <%= "|" unless first %><% first = false %>
+            <div style="display: inline;" id="suspend-reactivate-link"></div>
           <% end %>
 
           <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
