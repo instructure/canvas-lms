@@ -79,6 +79,18 @@ describe('useRatings', () => {
 
       expectPoints(result, [5, 4, 2, 1, 0])
     })
+
+    it('returns false for hasChanged if ratings have not changed', () => {
+      const {result} = renderHook(() => useRatings({initialRatings}))
+      expect(result.current.hasChanged).toBe(false)
+    })
+
+    it('returns true for hasChanged if ratings have changed', () => {
+      const {result} = renderHook(() => useRatings({initialRatings}))
+      changeRating(result, 0, {description: 'New Exceeds Mastery', points: 5})
+      changeRating(result, 1, {description: 'New Mastery', points: 4})
+      expect(result.current.hasChanged).toBe(true)
+    })
   })
 
   describe('Validations', () => {
