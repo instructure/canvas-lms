@@ -243,11 +243,11 @@ pipeline {
 
               stage('Splunk Metrics') {
                 def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
-                                                    redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_selenium:example_count'", returnStdout: true)
+                                                    redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_selenium:example_count'", returnStdout: true).replaceAll('"', '').trim()
 
                 reportToSplunk('selenium_crystalball_data', [
                   'node_count': rspecqNodeTotal,
-                  'example_count': exampleCount,
+                  'example_count': exampleCount.toInteger(),
                   'execution_time': (endTime - startTime),
                   'result': currentBuild.currentResult,
                   'gerrit_revision': "${env.GERRIT_PATCHSET_REVISION}"
