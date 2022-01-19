@@ -150,7 +150,7 @@ class UserObservationLink < ActiveRecord::Base
   def primary_record
     if cross_shard? && !primary_record?
       Shard.shard_for(user_id).activate do
-        self.class.where(user_id: user_id, observer_id: observer_id).take!
+        self.class.where(user_id: user_id, observer_id: observer_id, root_account_id: root_account_id).take!
       end
     else
       self
@@ -162,7 +162,7 @@ class UserObservationLink < ActiveRecord::Base
       self
     else
       Shard.shard_for(observer_id).activate do
-        self.class.where(user_id: user_id, observer_id: observer_id).take!
+        self.class.where(user_id: user_id, observer_id: observer_id, root_account_id: root_account_id).take!
       end
     end
   end
