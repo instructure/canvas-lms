@@ -50,6 +50,10 @@ def getResultsHTMLUrl() {
   return "${env.BUILD_URL}/artifact/results.html"
 }
 
+def redisUrl() {
+  return "redis://${TEST_QUEUE_HOST}:6379"
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -63,6 +67,7 @@ pipeline {
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
+    RSPECQ_REDIS_URL = redisUrl()
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
