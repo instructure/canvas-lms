@@ -32,6 +32,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include LegalInformationHelper
+  include FullStoryHelper
 
   helper :all
 
@@ -211,12 +212,15 @@ class ApplicationController < ActionController::Base
             open_registration: @domain_root_account&.open_registration?,
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
-          }
+          },
+          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
         }
 
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
+            org_slug: SentryExtensions::Settings.settings[:org_slug],
+            base_url: SentryExtensions::Settings.settings[:base_url],
             error_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
 
             # these values need to correlate with the backend for Sentry features to work properly

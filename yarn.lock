@@ -1431,6 +1431,11 @@
     "@formatjs/intl-localematcher" "0.2.23"
     tslib "^2.1.0"
 
+"@fullstory/browser@^1.4.10":
+  version "1.4.10"
+  resolved "https://registry.yarnpkg.com/@fullstory/browser/-/browser-1.4.10.tgz#c51114b9179b025968fddae2a7a3d5f3b0ee8aaf"
+  integrity sha512-TLasSmwq0iNe7w9YT4IVt1H3BM+YWwUvBu32zaX7fZ8nBCvq8WoJCut/Pb9ovl38kChJpq7aO0H2kwBwYOgx2w==
+
 "@graphql-typed-document-node/core@^3.0.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.1.0.tgz#0eee6373e11418bfe0b5638f654df7a4ca6a3950"
@@ -4438,6 +4443,11 @@
     "@sentry/types" "6.16.1"
     "@sentry/utils" "6.16.1"
     tslib "^1.9.3"
+
+"@sentry/fullstory@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@sentry/fullstory/-/fullstory-1.1.7.tgz#6e992e81440dc3e6432004e53ccd950f626b6dad"
+  integrity sha512-0w/d29rqn1QSxg84r+o2VvB/xcYSYoUWzMTWg1o/h/K4xtIoSdOBCqEMg+mTF2lVu8oSN48GafwliMUfdP0t5Q==
 
 "@sentry/hub@6.16.1":
   version "6.16.1"
