@@ -170,23 +170,48 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       equal(button.prop('releaseGradesStatus'), AssignmentActions.STARTED)
     })
 
-    test('displays a confirmation dialog when clicked', () => {
+    test('displays a confirmation dialog when clicked', assert => {
+      const done = assert.async()
+
+      function waitForConfirm() {
+        if (window.confirm.callCount > 0) {
+          strictEqual(window.confirm.callCount, 1)
+          done()
+        } else requestAnimationFrame(waitForConfirm)
+      }
+
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
-      strictEqual(window.confirm.callCount, 1)
+      waitForConfirm()
     })
 
-    test('releases grades when dialog is confirmed', () => {
+    test('releases grades when dialog is confirmed', assert => {
+      const done = assert.async()
+
+      function waitForConfirm() {
+        if (window.confirm.callCount > 0) {
+          equal(store.getState().assignment.releaseGradesStatus, AssignmentActions.STARTED)
+          done()
+        } else requestAnimationFrame(waitForConfirm)
+      }
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
-      equal(store.getState().assignment.releaseGradesStatus, AssignmentActions.STARTED)
+      waitForConfirm()
     })
 
-    test('does not release grades when dialog is dismissed', () => {
+    test('does not release grades when dialog is dismissed', assert => {
+      const done = assert.async()
       window.confirm.returns(false)
+
+      function waitForConfirm() {
+        if (window.confirm.callCount > 0) {
+          strictEqual(store.getState().assignment.releaseGradesStatus, null)
+          done()
+        } else requestAnimationFrame(waitForConfirm)
+      }
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
-      strictEqual(store.getState().assignment.releaseGradesStatus, null)
+      waitForConfirm()
     })
 
     test('enables onClick when there are no grades', () => {
@@ -256,23 +281,47 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       equal(button.prop('unmuteAssignmentStatus'), AssignmentActions.STARTED)
     })
 
-    test('displays a confirmation dialog when clicked', () => {
+    test('displays a confirmation dialog when clicked', assert => {
+      const done = assert.async()
+
+      function waitForConfirm() {
+        if (window.confirm.callCount > 0) {
+          strictEqual(window.confirm.callCount, 1)
+          done()
+        } else requestAnimationFrame(waitForConfirm)
+      }
       mountComponent()
       wrapper.find('PostToStudentsButton').simulate('click')
-      strictEqual(window.confirm.callCount, 1)
+      waitForConfirm()
     })
 
-    test('unmutes the assignment when dialog is confirmed', () => {
+    test('unmutes the assignment when dialog is confirmed', assert => {
+      const done = assert.async()
+
+      function waitForConfirm() {
+        if (window.confirm.callCount > 0) {
+          equal(store.getState().assignment.unmuteAssignmentStatus, AssignmentActions.STARTED)
+          done()
+        } else requestAnimationFrame(waitForConfirm)
+      }
       mountComponent()
       wrapper.find('PostToStudentsButton').simulate('click')
-      equal(store.getState().assignment.unmuteAssignmentStatus, AssignmentActions.STARTED)
+      waitForConfirm()
     })
 
-    test('does not unmute the assignment when dialog is dismissed', () => {
+    test('does not unmute the assignment when dialog is dismissed', assert => {
+      const done = assert.async()
       window.confirm.returns(false)
+
+      function waitForConfirm() {
+        if (window.confirm.callCount > 0) {
+          strictEqual(store.getState().assignment.unmuteAssignmentStatus, null)
+          done()
+        } else requestAnimationFrame(waitForConfirm)
+      }
       mountComponent()
       wrapper.find('PostToStudentsButton').simulate('click')
-      strictEqual(store.getState().assignment.unmuteAssignmentStatus, null)
+      waitForConfirm()
     })
   })
 })
