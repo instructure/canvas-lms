@@ -191,6 +191,7 @@ def runRspecqSuite() {
                                        -e JOB_NAME \
                                        -e COVERAGE \
                                        -e BUILD_NAME \
+                                       -e BUILD_NUMBER \
                                        -e CRYSTAL_BALL_SPECS canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
