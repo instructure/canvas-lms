@@ -98,7 +98,8 @@ export default class SetDefaultGradeDialog
           prefix = "submissions[submission_#{s.id}]"
           [["#{prefix}[assignment_id]", @assignment.id],
           ["#{prefix}[user_id]", s.id],
-          ["#{prefix}[grade]", grade]]
+          ["#{prefix}[grade]", grade],
+          ["#{prefix}[set_by_default_grade]", true]]
         .flatten(true)
         .object()
         .value()

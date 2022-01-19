@@ -680,10 +680,11 @@ class GradebooksController < ApplicationController
         @user = users[submission[:user_id].to_i]
 
         submission = submission.permit(:grade, :score, :excuse, :excused,
-                                       :graded_anonymously, :provisional, :final,
+                                       :graded_anonymously, :provisional, :final, :set_by_default_grade,
                                        :comment, :media_comment_id, :media_comment_type, :group_comment).to_unsafe_h
+        is_default_grade_for_missing = value_to_boolean(submission.delete(:set_by_default_grade)) && submission_record.missing? && submission_record.late_policy_status.nil?
 
-        submission[:grader] = @current_user
+        submission[:grader] = @current_user unless is_default_grade_for_missing
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
           submission[:comment_attachments] = params[:attachments].keys.map do |idx|
@@ -706,7 +707,7 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
-            subs = @assignment.grade_student(@user, submission)
+            subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
