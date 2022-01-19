@@ -44,6 +44,10 @@ def getSummaryUrl() {
 }
 
 def getDockerWorkDir() {
+  if (env.GERRIT_PROJECT == 'qti_migration_tool') {
+    return "/usr/src/app/vendor/${env.GERRIT_PROJECT}"
+  }
+
   return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
 
