@@ -40,19 +40,8 @@ describe "Late Policy statuses:" do
       StudentGradesPage.visit_as_teacher(@course, @course.students.first)
     end
 
-    it "missing submission has missing pill" do
-      expect(StudentGradesPage.status_pill(@a2.id, "missing")).to be_displayed
-    end
-
-    context "remove_missing_status_when_graded enabled" do
-      before do
-        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
-        StudentGradesPage.visit_as_teacher(@course, @course.students.first)
-      end
-
-      it "missing submission has missing pill removed" do
-        expect(find_all_with_jquery("#submission_#{@a2.id} .submission-missing-pill:contains('missing')").length).to eq 0
-      end
+    it "missing submission has missing pill removed after being graded" do
+      expect(find_all_with_jquery("#submission_#{@a2.id} .submission-missing-pill:contains('missing')").length).to eq 0
     end
 
     it "late submission has late pill" do

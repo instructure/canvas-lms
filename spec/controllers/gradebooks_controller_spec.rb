@@ -1931,6 +1931,58 @@ describe GradebooksController do
         end
       end
 
+      describe "set default grade" do
+        before do
+          user_session(@teacher)
+        end
+
+        let(:post_params) do
+          {
+            course_id: @course.id,
+            submission: {
+              assignment_id: @assignment.id,
+              user_id: @student.id,
+              grade: 10,
+              set_by_default_grade: true
+            }
+          }
+        end
+
+        it "does not set the grader_id on missing submissions if set_by_default_grade is true" do
+          @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+
+          expect { post(:update_submission, params: post_params, format: :json) }.not_to change {
+            @submission.reload.grader_id
+          }.from(nil)
+        end
+
+        it "sets the grader_id on missing submissions if set_by_default_grade is false" do
+          post_params[:submission][:set_by_default_grade] = false
+          @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+
+          expect { post(:update_submission, params: post_params, format: :json) }.to change {
+            @submission.reload.grader_id
+          }.from(nil).to(@teacher.id)
+        end
+
+        it "sets the grader_id on missing submissions when set_by_default_grade is true and the late policy status is missing" do
+          @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+          @submission.update!(late_policy_status: "missing")
+
+          expect { post(:update_submission, params: post_params, format: :json) }.to change {
+            @submission.reload.grader_id
+          }.from(nil).to(@teacher.id)
+        end
+
+        it "sets the grader_id on non missing submissions when set_by_default_grade is true" do
+          @assignment.update!(due_at: 10.days.from_now, submission_types: "online_text_entry")
+
+          expect { post(:update_submission, params: post_params, format: :json) }.to change {
+            @submission.reload.grader_id
+          }.from(nil).to(@teacher.id)
+        end
+      end
+
       describe "anonymous assignment" do
         before(:once) do
           @assignment.update!(anonymous_grading: true)
