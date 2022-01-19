@@ -232,7 +232,7 @@ export const getOptimisticResponse = ({
           : null,
         anonymousAuthor: isAnonymous
           ? {
-              id: CURRENT_USER,
+              id: null,
               avatarUrl: null,
               shortName: CURRENT_USER,
               __typename: 'AnonymousUser'
@@ -271,9 +271,13 @@ export const isAnonymous = discussionEntry =>
 
 export const getDisplayName = discussionEntry => {
   if (isAnonymous(discussionEntry)) {
-    return discussionEntry.anonymousAuthor.shortName === CURRENT_USER
-      ? I18n.t('Anonymous %{id} (You)', {id: discussionEntry.anonymousAuthor.id})
-      : I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
+    if (discussionEntry.anonymousAuthor.shortName === CURRENT_USER) {
+      if (!discussionEntry.anonymousAuthor.id) {
+        return I18n.t('Anonymous (You)')
+      }
+      return I18n.t('Anonymous %{id} (You)', {id: discussionEntry.anonymousAuthor.id})
+    }
+    return I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
   }
   return discussionEntry.author?.displayName || discussionEntry.author?.shortName
 }
