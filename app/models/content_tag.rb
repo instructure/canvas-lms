@@ -57,7 +57,7 @@ class ContentTag < ActiveRecord::Base
   before_save :associate_external_tool
   before_save :default_values
   before_save :set_root_account
-  after_save :update_could_be_locked
+  before_save :update_could_be_locked
   after_save :touch_context_module_after_transaction
   after_save :touch_context_if_learning_outcome
   after_save :run_due_date_cacher_for_quizzes_next
