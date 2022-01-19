@@ -114,6 +114,17 @@ module PacePlansCommonPageObject
     @account.enable_feature!(:pace_plans)
   end
 
+  def skip_weekends(date, duration = 1)
+    until duration == 0
+      date += 1.day
+      while date.wday == 0 || date.wday == 6
+        date += 1.day
+      end
+      duration -= 1
+    end
+    date
+  end
+
   def teacher_setup
     feature_setup
     @course_name = "Pace Plans Course"
