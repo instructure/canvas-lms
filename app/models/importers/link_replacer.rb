@@ -26,6 +26,7 @@ module Importers
       calendar_event: CalendarEvent,
       discussion_topic: DiscussionTopic,
       quiz: Quizzes::Quiz,
+      learning_outcome: LearningOutcome,
       wiki_page: WikiPage
     }.freeze
 

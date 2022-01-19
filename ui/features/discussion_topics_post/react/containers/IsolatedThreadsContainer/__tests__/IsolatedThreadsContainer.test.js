@@ -178,7 +178,7 @@ describe('IsolatedThreadsContainer', () => {
     it('allows toggling the unread state of an entry', async () => {
       const onToggleUnread = jest.fn()
       const props = defaultProps({overrides: {onToggleUnread}})
-      props.discussionEntry.discussionSubentriesConnection.nodes[0].read = true
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.read = true
       const {findAllByTestId, findByTestId} = setup(props)
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
@@ -308,5 +308,61 @@ describe('IsolatedThreadsContainer', () => {
       expect(container.queryByText('Sorry, Something Broke')).toBeNull()
       expect(container.getByText('Anonymous 1')).toBeInTheDocument()
     })
+  })
+
+  describe('auto read', () => {
+    const intersectionObserverMock = () => ({
+      observe: () => null,
+      unobserve: () => null
+    })
+
+    beforeEach(() => {
+      window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock)
+    })
+
+    it('observer is not created when entry is already read', () => {
+      const props = defaultProps()
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.read = true
+      const container = setup(props)
+      expect(container).toBeTruthy()
+      expect(window.IntersectionObserver).toHaveBeenCalledTimes(0)
+    })
+
+    it('observer is not created when entry is set to force unread', () => {
+      const props = defaultProps()
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.read = false
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.forcedReadState = true
+      const container = setup(props)
+      expect(container).toBeTruthy()
+      expect(window.IntersectionObserver).toHaveBeenCalledTimes(0)
+    })
+
+    it('observer is created for unread entries', () => {
+      const props = defaultProps()
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.read = false
+      const container = setup(props)
+      expect(container).toBeTruthy()
+      expect(window.IntersectionObserver).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  it('Go To Quoted Reply should work', () => {
+    const onOpenIsolatedView = jest.fn()
+    const props = defaultProps({
+      discussionEntryOverrides: {
+        rootEntryId: '50',
+        quotedEntry: {
+          ...DiscussionEntry.mock({_id: '100'}),
+          previewMessage: '<p>This is the quoted reply</p>'
+        }
+      },
+      overrides: {onOpenIsolatedView}
+    })
+    const {getByTestId, queryByText} = setup(props)
+
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    fireEvent.click(queryByText('Go To Quoted Reply'))
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', '50', false, '100')
   })
 })

@@ -95,6 +95,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   private debouncedCommitChanges: any
 
+  private dateFormatter: Intl.DateTimeFormat
+
   /* Component lifecycle */
 
   constructor(props: ComponentProps) {
@@ -102,6 +104,12 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     this.debouncedCommitChanges = debounce(this.commitChanges, 300, {
       leading: false,
       trailing: true
+    })
+    this.dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     })
   }
 
@@ -266,7 +274,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   renderDate = () => {
     // change the date format and you'll probably have to change
     // the column width in AssignmentRow
-    return moment(this.props.dueDate).format('ddd, MMM D, YYYY')
+    return this.dateFormatter.format(moment(this.props.dueDate))
   }
 
   renderTitle() {

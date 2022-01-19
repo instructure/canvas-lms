@@ -23,7 +23,7 @@ import {
   updateMediaObject,
   updateMediaObjectFailure,
   updateClosedCaptions
-} from '../../../src/sidebar/sources/fake'
+} from '../../../src/rcs/fake'
 import alertHandler from '../../../src/rce/alertHandler'
 
 const sortBy = {sort: 'alphabetical', order: 'asc'}
@@ -42,14 +42,6 @@ function getInitialState() {
     contextType: 'course'
   }
 }
-
-beforeEach(() => {
-  global.ENV = {
-    FEATURES: {
-      cc_in_rce_video_tray: true
-    }
-  }
-})
 
 describe('Media actions', () => {
   afterEach(() => {

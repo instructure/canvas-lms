@@ -91,7 +91,7 @@ describe('PeerReview', () => {
       }
       const {getByText} = render(<PeerReview {...props} />)
 
-      expect(getByText('Peer review due Jul 4')).toBeTruthy()
+      expect(getByText('Peer review due Jul 4, 2021')).toBeTruthy()
     })
 
     it('omits the due date when there is not one', () => {

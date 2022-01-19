@@ -14,6 +14,20 @@ provided by a tool provider (i.e., the external tool).
 
 *   Embedding custom content into a rich text editor from a tool provider.
 
+*   Providing a teacher the ability to select a customized LTI launch link from
+the tool and include grading information with it, which is used to create an assignment
+directly from the tool.
+> **This is a new feature currently being tested, and can be turned on for your**
+> **partner sandbox account by partner support, or for your**
+> **institution through your CSM.**
+
+*   Using an external tool to create multiple pieces of content directly from,
+the tool, whether ungraded (like module items), or graded (like assignments),
+and return them to Canvas in bulk.
+> **This is a new feature currently being tested, and can be turned on for your**
+> **partner sandbox account by partner support, or for your**
+> **institution through your CSM.**
+
 Deep Linking is supported in the LTI 1.1 Outcomes Service and LTI Advantage
 specifications. To see the full spec for content item and other code examples
 see these documents:
@@ -49,6 +63,23 @@ External Tool submission type.
 * <a href="file.link_selection_placement.html" target="_blank">link_selection</a>:
 Allows users that have permission to create module items to
 launch to a tool, select a deep link, and return it as a module item.
+
+The following placements support deep linking with LTI 1.3/Advantage tools, but not
+with LTI 1.1 tools:
+> **These placements are part of a new feature currently being tested, and can be turned on for your**
+> **partner sandbox account by partner support, or for your**
+> **institution through your CSM.**
+
+* course_assignments_menu:
+Appears in the dropdown menu in the top left of the assignments page. Allows users that
+have permission to create module items to launch to a tool, select one or many deep
+links, and return them as module items or assignments.
+
+* module_index_menu_modal:
+Appears in the dropdown menu in the top left of the modules page. Allows users that
+have permission to create module items to launch to a tool, select one or many deep
+links, and return them as module items or assignments. Adds all returned deep links
+to a newly created module.
 
 
 This document will continue referring to this process as "Content-Item" for LTI
@@ -89,6 +120,35 @@ Support for the following optional properties:
 - thumbnail
 - iframe
 - custom (allows for setting link-specific LTI launch parameters. See documentation <a href="https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link">here</a>.)
+- lineItem **(in testing)** (if present, requires `scoreMaximum`)
+- available **(in testing)**
+- submission **(in testing)** (except `startDateTime`)
+
+#### Line Items
+
+> **This is a new feature currently being tested, and can be turned on for your**
+> **partner sandbox account by partner support, or for your**
+> **institution through your CSM.**
+
+If a returned content item has the `lineItem` property, then it is used to create
+a new assignment, instead of a normal LTI link. The `available` and `submission`
+properties are also used for the assignment unlock, lock, and due dates. Note that
+since Canvas has no notion of a start date for submissions, it ignores the
+`submission.startDateTime` sub-property.
+
+There are only 3 places that support assigment creation using Line Items, and each of
+them respond differently:
+
+- assignment_selection: creates an assignment using the given data and presents it to
+the user for further editing.
+
+- course_assignments_menu: creates one or many assignments from the given Line Items.
+If any given content items do not have the `lineItem` property, a new module is created
+and they are added to it as new module items.
+
+- module_index_menu_modal: creates a new module and adds all given content items to it
+as either module items or assignments, based on the presence or absence of the `lineItem`
+property.
 
 ### HTML fragment
 Full support for required properties.

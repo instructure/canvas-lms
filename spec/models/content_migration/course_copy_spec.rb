@@ -830,6 +830,18 @@ describe ContentMigration do
       expect(new_tag2).to be_unpublished
     end
 
+    it "copies over link_settings of external tool items" do
+      link_settings = { selection_width: 456, selection_height: 789 }
+      tool = @copy_from.context_external_tools.create!(name: "b", url: "http://derp.derp/somethingelse", consumer_key: "12345", shared_secret: "secret")
+      mod = @copy_from.context_modules.create!(name: "some module")
+      tag = mod.add_item({ id: tool.id, type: "context_external_tool", url: tool.url, link_settings: link_settings })
+
+      run_course_copy
+
+      new_tag = @copy_to.context_module_tags.where(migration_id: mig_id(tag)).first
+      expect(new_tag.link_settings).to eq link_settings.stringify_keys
+    end
+
     it "preserves publish state of external tool items" do
       tool = @copy_from.context_external_tools.create!(name: "b", url: "http://derp.derp/somethingelse", consumer_key: "12345", shared_secret: "secret")
       mod = @copy_from.context_modules.create!(name: "some module")

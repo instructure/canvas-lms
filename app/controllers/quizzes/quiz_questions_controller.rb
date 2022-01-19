@@ -466,13 +466,11 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   def process_answer_html_content(question_data)
-    if Account.site_admin.feature_enabled?(:strip_origin_from_quiz_answer_file_references)
-      answers = question_data[:answers]
-      answers = answers.values if answers.is_a?(Hash)
-      answers&.each do |answer|
-        %i[answer_html answer_comment_html].each do |key|
-          answer[key] = process_incoming_html_content(answer[key]) if answer[key]&.present?
-        end
+    answers = question_data[:answers]
+    answers = answers.values if answers.is_a?(Hash)
+    answers&.each do |answer|
+      %i[answer_html answer_comment_html].each do |key|
+        answer[key] = process_incoming_html_content(answer[key]) if answer[key]&.present?
       end
     end
   end

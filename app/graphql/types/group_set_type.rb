@@ -77,6 +77,13 @@ module Types
       end
     end
 
+    field :current_group, GroupType, null: true
+    def current_group
+      load_association(:groups).then do
+        object.groups.active.find { |group| group.has_member?(current_user) }
+      end
+    end
+
     field :sis_id, String, null: true
     def sis_id
       load_association(:root_account).then do |root_account|

@@ -137,7 +137,7 @@ const GroupActionDrillDown = ({
           <div
             style={{
               ...margin,
-              color: isActionLinkHighlighted ? '' : '#008EE2'
+              color: isActionLinkHighlighted ? '' : '#0374B5'
             }}
           >
             {I18n.t(

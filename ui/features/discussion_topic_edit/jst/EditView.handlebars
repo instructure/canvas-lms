@@ -139,6 +139,12 @@
                       <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#if isEditing}}disabled{{/if}} />
                       {{#t}}Off: student names and profile pictures will be visible to other members of this course{{/t}}
                     </label>
+                    {{#if partially_anonymous_discussions}}
+                    <label class="radio" style="display: block;">
+                      <input type="radio" name="anonymous_state" value="partial_anonymity" {{checkedIf anonymousState "partial_anonymity"}} {{#if isEditing}}disabled{{/if}} />
+                      {{#t}}Partial: students can choose to reveal their name and profile picture{{/t}}
+                    </label>
+                    {{/if}}
                     <label class="radio" style="display: block;">
                       <input type="radio" name="anonymous_state" value="full_anonymity" {{checkedIf anonymousState "full_anonymity"}} {{#if isEditing}}disabled{{/if}} />
                       {{#t}}Full: student names and profile pictures will be hidden{{/t}}

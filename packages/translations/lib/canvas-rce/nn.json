@@ -32,6 +32,7 @@
     "message": "Bruk endringane på alle forekomster av denne knappen og ikonet i emnet."
   },
   "apps_54d24a47": { "message": "Appar" },
+  "arrows_464a3e54": { "message": "Piler" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Storleiksforhold vil bli behalden"
   },
@@ -40,11 +41,14 @@
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Opptak av lyd og bilde støttast ikkje: bruk ein annan nettlesar."
   },
+  "audio_options_feb58e2c": { "message": "Lydalternativ" },
+  "audio_options_tray_33a90711": { "message": "Menyalternativ for lyd" },
   "audio_player_for_title_20cc70d": { "message": "Audiospelar for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-lagra innhald finst. Vil du laste inn auto-lagra innhald i staden for?"
   },
   "available_folders_694d0436": { "message": "Tilgjengelege mapper" },
+  "basic_554cdc0a": { "message": "Standard" },
   "below_81d4dceb": { "message": "Nedanfor" },
   "bottom_third_5f5fec1d": { "message": "Nedre tredel" },
   "button_color_608a0242": { "message": "Knappefarge" },
@@ -127,6 +131,7 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "standard numerisk ordna liste"
   },
+  "delimiters_4db4840d": { "message": "Skiljeteikn" },
   "describe_the_image_e65d2e32": { "message": "(Skildre bildet)" },
   "describe_the_video_2fe8f46a": { "message": "(Skildre videoen)" },
   "details_98a31b68": { "message": "Detaljar" },
@@ -204,6 +209,7 @@
     "message": "Gå til verktøylinja i redigeringsprogrammet"
   },
   "grades_a61eba0a": { "message": "Vurderingar" },
+  "greek_65c5b3f7": { "message": "Gresk" },
   "group_documents_8bfd6ae6": { "message": "Grupper dokument" },
   "group_files_4324f3df": { "message": "Gruppefiler" },
   "group_files_82e5dcdb": { "message": "Gruppefiler" },
@@ -259,6 +265,7 @@
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Midtpunkt" },
+  "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Modular" },
   "multi_color_image_63d7372f": { "message": "Fleirfargebilete" },
@@ -289,6 +296,7 @@
   "open_title_application_fd624fc5": {
     "message": "Opne { title } applikasjon"
   },
+  "operators_a2ef9a93": { "message": "Operatør" },
   "options_3ab0ea65": { "message": "Alternativ" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordna og uordna lister"
@@ -304,6 +312,9 @@
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personar" },
   "percentage_34ab7c2c": { "message": "Prosenttal" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Prosent må være eit tal"
+  },
   "pixels_52ece7d1": { "message": "Pixlar" },
   "posted_when_a578f5ab": { "message": "Posta: { when }" },
   "preformatted_d0670862": { "message": "Førehandsformatert" },
@@ -321,6 +332,7 @@
   "raw_html_editor_e3993e41": { "message": "HTML-redigeringsprogram" },
   "record_7c9448b": { "message": "Spel inn" },
   "record_upload_media_5fdce166": { "message": "Ta opp / last opp media" },
+  "relationships_6602af70": { "message": "Relasjon" },
   "remove_link_d1f2f4d0": { "message": "Fjern lenke" },
   "resize_ec83d538": { "message": "Endre storleik" },
   "restore_auto_save_deccd84b": { "message": "Gjenopprette auto-lagring?" },
@@ -341,6 +353,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Bruk Shift-O for å opne den pene HTML-editoren."
   },
+  "show_audio_options_b489926b": { "message": "Vis lydalternativ" },
   "show_embed_options_ef8d7ef": { "message": "Vis sett inn-alternativ" },
   "show_image_options_1e2ecc6b": { "message": "Vis alternativ for bilde" },
   "show_link_options_545338fd": { "message": "Vis lenkealternativ" },

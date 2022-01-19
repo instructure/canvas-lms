@@ -4,7 +4,7 @@
   "variables": [{
     "variable_name": "ic-brand-primary",
     "type": "color",
-    "default": "#008EE2"
+    "default": "#0374B5"
   },{
     "variable_name": "ic-brand-font-color-dark",
     "type": "color",
@@ -12,7 +12,7 @@
   },{
     "variable_name": "ic-link-color",
     "type": "color",
-    "default": "#008EE2"
+    "default": "#0374B5"
   },{
     "variable_name": "ic-brand-button--primary-bgd",
     "type": "color",
@@ -67,10 +67,20 @@
   {
     "variable_name": "ic-brand-global-nav-menu-item__badge-bgd",
     "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "variable_name": "ic-brand-global-nav-menu-item__badge-bgd--active",
+    "type": "color",
     "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-global-nav-menu-item__badge-text",
+    "type": "color",
+    "default": "#000000"
+  },
+  {
+    "variable_name": "ic-brand-global-nav-menu-item__badge-text--active",
     "type": "color",
     "default": "#ffffff"
   },

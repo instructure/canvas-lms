@@ -266,6 +266,8 @@ class User < ActiveRecord::Base
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
 
+  scope :has_created_account, -> { where("users.workflow_state NOT IN ('creation_pending', 'deleted')") }
+
   scope :has_current_student_enrollments, lambda {
     where("EXISTS (?)",
           Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
@@ -425,15 +427,23 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope, associated_user = nil)
+  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
     if associated_user && associated_user != self
-      Course.active.joins(:observer_enrollments)
-            .merge(enrollment_scope.except(:joins))
-            .where(enrollments: { associated_user_id: associated_user.id })
+      join = :observer_enrollments
+      scope = Course.active.joins(join)
+                    .merge(enrollment_scope.except(:joins))
+                    .where(enrollments: { associated_user_id: associated_user.id })
     else
-      enrollments_to_include = associated_user == self ? :non_observer_enrollments : :all_enrollments
-      Course.active.joins(enrollments_to_include).merge(enrollment_scope.except(:joins)).distinct
+      join = associated_user == self ? :non_observer_enrollments : :all_enrollments
+      scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
     end
+
+    unless include_completed_courses
+      scope = scope.joins(join => :enrollment_state)
+                   .where(enrollment_states: { restricted_access: false })
+                   .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
+    end
+    scope
   end
 
   def courses
@@ -1844,9 +1854,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = shard.activate do
         result = Rails.cache.fetch([self, "courses_with_primary_enrollment2", association, options, ApplicationController.region].cache_key, expires_in: 15.minutes) do
-          # Set the actual association based on if its asking for favorite courses or not.
-          actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-          scope = send(actual_association, options[:observee_user])
+          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], !!options[:include_completed_courses])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
@@ -1857,11 +1865,6 @@ class User < ActiveRecord::Base
               shards &= ids.map { |id| Shard.shard_for(id) }
               scope = scope.where(id: ids)
             end
-          end
-
-          unless options[:include_completed_courses]
-            scope = scope.joins(all_enrollments: :enrollment_state).where(enrollment_states: { restricted_access: false })
-                         .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
           end
 
           GuardRail.activate(:secondary) do

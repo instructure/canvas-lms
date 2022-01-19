@@ -24,11 +24,25 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
+import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import moment from 'moment'
+import {MomentInput} from 'moment-timezone'
+import tz from '@canvas/timezone'
 
 const {Item} = Flex as any
 const {Option} = SimpleSelect as any
+const formatDate = date => tz.format(date, 'date.formats.medium')
+const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 
-export default function ({condition, onChange, modules, assignmentGroups, sections, onDelete}) {
+export default function ({
+  condition,
+  conditionsInFilter,
+  onChange,
+  modules,
+  assignmentGroups,
+  sections,
+  onDelete
+}) {
   let items = []
   switch (condition.type) {
     case 'module':
@@ -40,6 +54,12 @@ export default function ({condition, onChange, modules, assignmentGroups, sectio
     case 'section':
       items = sections.map(({id, name}) => [id, name])
       break
+  }
+
+  const shouldShowDateOption = type => {
+    const isSelectedType = condition.type === type
+    const isTypeAlreadyInFilter = conditionsInFilter.some(condition_ => condition_.type === type)
+    return isSelectedType || !isTypeAlreadyInFilter
   }
 
   return (
@@ -75,6 +95,18 @@ export default function ({condition, onChange, modules, assignmentGroups, sectio
               {I18n.t('Section')}
             </Option>
           )}
+
+          {shouldShowDateOption('start-date') && (
+            <Option id={`${condition.id}-start-date`} value="start-date">
+              {I18n.t('Start Date')}
+            </Option>
+          )}
+
+          {shouldShowDateOption('end-date') && (
+            <Option id={`${condition.id}-end-date`} value="end-date">
+              {I18n.t('End Date')}
+            </Option>
+          )}
         </SimpleSelect>
       </Item>
       <Flex>
@@ -100,6 +132,22 @@ export default function ({condition, onChange, modules, assignmentGroups, sectio
               )
             })}
           </SimpleSelect>
+        )}
+        {['start-date', 'end-date'].includes(condition.type) && (
+          <CanvasDateInput
+            size="small"
+            dataTestid="date-input"
+            renderLabel={<ScreenReaderContent>{dateLabels[condition.type]}</ScreenReaderContent>}
+            selectedDate={condition.value}
+            formatDate={formatDate}
+            interaction="enabled"
+            onSelectedDateChange={(value: MomentInput) => {
+              onChange({
+                ...condition,
+                value: value ? moment(value).toISOString() : null
+              })
+            }}
+          />
         )}
         <IconButton
           onClick={() => onDelete(condition)}

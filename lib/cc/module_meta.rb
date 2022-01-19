@@ -102,6 +102,7 @@ module CC
                   item_node.position ct.position
                   item_node.new_tab ct.new_tab
                   item_node.indent ct.indent
+                  item_node.link_settings_json ct.link_settings.to_json
                 end
               end
             end

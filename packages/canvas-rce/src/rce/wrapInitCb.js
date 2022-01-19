@@ -20,8 +20,7 @@ import $ from 'jquery'
 
 // mirror attributes onto tinymce editor (if this can be done
 // via tiny api, it is preferable, but I dont see a way)
-export default function wrapInitCb(mirroredAttrs, editorOptions, MutationObserver) {
-  MutationObserver = MutationObserver === undefined ? window.MutationObserver : MutationObserver
+export default function wrapInitCb(mirroredAttrs, editorOptions) {
   const oldInitInstCb = editorOptions.init_instance_callback
   editorOptions.init_instance_callback = function (ed) {
     const attrs = mirroredAttrs || {}

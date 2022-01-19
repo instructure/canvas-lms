@@ -97,8 +97,7 @@ def setupNode() {
       return
     }
     libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-    def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
+    env.RSPECQ_REDIS_URL = "redis://${TEST_QUEUE_HOST}:6379"
     credentials.withStarlordCredentials { ->
       sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
     }
@@ -123,6 +122,11 @@ def tearDownNode(prefix) {
   sh 'rm -rf ./tmp && mkdir -p tmp'
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
+
+  if (env.COVERAGE == '1') {
+    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage tmp/coverage canvas_ --allow-error --clean-dir'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/coverage/**/*'
+  }
 
   if (env.ENABLE_CRYSTALBALL == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
@@ -181,6 +185,7 @@ def runRspecqSuite() {
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
                                        -e JOB_NAME \
+                                       -e COVERAGE \
                                        -e BUILD_NUMBER canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
@@ -252,7 +257,7 @@ def runReporter() {
 def queue_empty() {
   env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $REGISTRY_BASE/redis:alpine"
-  def queueInfo = sh(script: "docker run -e REDISCLI_AUTH=${env.RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+  def queueInfo = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
                                       redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed;\
                                       redis-cli -h $TEST_QUEUE_HOST -p 6379 scard ${JOB_NAME}_build${BUILD_NUMBER}:queue:processed;\
                                       redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}:queue:status'", returnStdout: true).split('\n')

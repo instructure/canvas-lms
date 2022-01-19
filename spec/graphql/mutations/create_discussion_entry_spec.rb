@@ -32,7 +32,8 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     message: nil,
     parent_entry_id: nil,
     file_id: nil,
-    include_reply_preview: nil
+    include_reply_preview: nil,
+    is_anonymous_author: nil
   )
     <<~GQL
       mutation {
@@ -42,6 +43,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
           #{"parentEntryId: #{parent_entry_id}" unless parent_entry_id.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
           #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}
+          #{"isAnonymousAuthor: #{is_anonymous_author}" unless is_anonymous_author.nil?}
           }) {
           discussionEntry {
             _id
@@ -79,6 +81,17 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     entry = @topic.discussion_entries.last
     expect(result.dig("data", "createDiscussionEntry", "discussionEntry", "_id")).to eq entry.id.to_s
     expect(result.dig("data", "createDiscussionEntry", "discussionEntry", "message")).to eq entry.message
+  end
+
+  it "creates a discussion entry with anonymous author" do
+    result = run_mutation(discussion_topic_id: @topic.id, message: "Howdy Hey", is_anonymous_author: true)
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createDiscussionEntry", "errors")).to be nil
+
+    entry = @topic.discussion_entries.last
+    expect(result.dig("data", "createDiscussionEntry", "discussionEntry", "_id")).to eq entry.id.to_s
+    expect(result.dig("data", "createDiscussionEntry", "discussionEntry", "message")).to eq entry.message
+    expect(entry.is_anonymous_author).to eq true
   end
 
   it "deletes discussion_entry_drafts on create" do

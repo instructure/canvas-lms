@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import moment from 'moment-timezone'
 import {act, screen} from '@testing-library/react'
 
 import {COURSE, PRIMARY_PLAN} from '../../../../__tests__/fixtures'
@@ -32,6 +33,7 @@ const toggleHardEndDates = jest.fn()
 const setEndDate = jest.fn()
 
 const defaultProps = {
+  course: COURSE,
   courseId: COURSE.id,
   excludeWeekends: PRIMARY_PLAN.exclude_weekends,
   pacePlan: PRIMARY_PLAN,
@@ -63,9 +65,6 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     expect(screen.getByRole('checkbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    expect(
-      screen.getByRole('checkbox', {name: 'Require Completion by Specified End Date'})
-    ).toBeInTheDocument()
     // Commented out since we're not implementing these features yet
     // expect(screen.getByRole('button', {name: 'View Blackout Dates'})).toBeInTheDocument()
   })
@@ -79,13 +78,6 @@ describe('Settings', () => {
     expect(skipWeekendsToggle).not.toBeDisabled()
     act(() => skipWeekendsToggle.click())
     expect(toggleExcludeWeekends).toHaveBeenCalled()
-
-    const hardEndDatesToggle = screen.getByRole('checkbox', {
-      name: 'Require Completion by Specified End Date'
-    })
-    expect(hardEndDatesToggle).not.toBeDisabled
-    act(() => hardEndDatesToggle.click())
-    expect(toggleHardEndDates).toHaveBeenCalled()
   })
 
   it('disables all settings while publishing', () => {
@@ -95,26 +87,6 @@ describe('Settings', () => {
 
     const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
     expect(skipWeekendsToggle).toBeDisabled()
-  })
-
-  it('does not display end date selector when hard end dates is false', () => {
-    const {getByRole, queryByRole} = renderConnected(
-      <Settings {...defaultProps} pacePlan={{...PRIMARY_PLAN, hard_end_dates: false}} />
-    )
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
-    act(() => settingsButton.click())
-    expect(queryByRole('combobox', {name: 'End Date'})).not.toBeInTheDocument()
-  })
-
-  it('displays end date selector when hard end dates is true', () => {
-    const {getByRole, queryByRole, getByLabelText} = renderConnected(
-      <Settings {...defaultProps} pacePlan={{...PRIMARY_PLAN, hard_end_dates: true}} />
-    )
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
-    act(() => settingsButton.click())
-    const requireCompletionCheckbox = getByLabelText('Require Completion by Specified End Date')
-    act(() => requireCompletionCheckbox.click())
-    expect(queryByRole('combobox', {name: /^End Date/})).toBeInTheDocument()
   })
 
   // Skipped since we're not implementing this feature yet

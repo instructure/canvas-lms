@@ -132,13 +132,6 @@ describe "pace plan page" do
       expect(publish_status_exists?).to be_falsey
     end
 
-    it "has Publish and Cancel buttons initially disabled" do
-      visit_pace_plans_page
-
-      expect(publish_button).to be_disabled
-      expect(cancel_button).to be_disabled
-    end
-
     it "updates duration to make Publish and Cancel buttons enabled" do
       visit_pace_plans_page
 
@@ -239,31 +232,6 @@ describe "pace plan page" do
       click_weekends_checkbox
       expect(is_checked(skip_weekends_checkbox_selector)).to be_truthy
     end
-
-    it "toggles provides input field for required end date when clicked" do
-      visit_pace_plans_page
-      click_settings_button
-
-      click_require_end_date_checkbox
-      expect(is_checked(require_end_date_checkbox_selector)).to be_truthy
-      expect(required_end_date_input_exists?).to be_truthy
-
-      click_require_end_date_checkbox
-      expect(is_checked(require_end_date_checkbox_selector)).to be_falsey
-    end
-
-    it "allows inputting a field in the required date field" do
-      later_date = Time.zone.now + 2.weeks
-      visit_pace_plans_page
-      click_settings_button
-
-      click_require_end_date_checkbox
-      add_required_end_date(later_date)
-      click_settings_button
-      click_settings_button
-
-      expect(required_end_date_value).to eq(later_date.strftime("%B %-d, %Y"))
-    end
   end
 
   context "Published Pace Plan Status" do
@@ -278,6 +246,33 @@ describe "pace plan page" do
       visit_pace_plans_page
 
       expect { publish_status.text }.to become("All changes published")
+    end
+  end
+
+  context "Projected Dates" do
+    it "toggles provides input field for required end date when clicked" do
+      visit_pace_plans_page
+      click_show_hide_projections_button
+
+      click_require_end_date_checkbox
+      expect(is_checked(require_end_date_checkbox_selector)).to be_truthy
+      expect(required_end_date_input_exists?).to be_truthy
+
+      click_require_end_date_checkbox
+      expect(is_checked(require_end_date_checkbox_selector)).to be_falsey
+    end
+
+    it "allows inputting a field in the required date field" do
+      later_date = Time.zone.now + 2.weeks
+      visit_pace_plans_page
+      click_show_hide_projections_button
+
+      click_require_end_date_checkbox
+      add_required_end_date(later_date)
+      click_settings_button
+      click_settings_button
+
+      expect(required_end_date_value).to eq(later_date.strftime("%B %-d, %Y"))
     end
   end
 end

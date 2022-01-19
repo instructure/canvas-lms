@@ -203,11 +203,18 @@ describe('Upload data actions', () => {
   })
 
   describe('uploadToButtonsAndIconsFolder', () => {
-    let baseState, svg
+    let baseState, svg, getContextOriginal
 
     beforeEach(() => {
+      getContextOriginal = HTMLCanvasElement.prototype.getContext
+      HTMLCanvasElement.prototype.getContext = () => ({})
+
       baseState = setupState({contextId: 101, contextType: 'course'})
       svg = {name: 'button.svg', domElement: buildSvg(DEFAULT_SETTINGS)}
+    })
+
+    afterEach(() => {
+      HTMLCanvasElement.prototype.getContext = getContextOriginal
     })
 
     it('dispatches a preflightUpload with the proper parentFolderId set', () => {
@@ -216,14 +223,14 @@ describe('Upload data actions', () => {
       const fileMetaProps = {
         file: {name: svg.name, type: 'image/svg+xml'},
         name: svg.name,
-        parentFolderId: 2,
-        onDuplicate: undefined
+        parentFolderId: 2
       }
 
       const canvasProps = {
         host: 'http://host:port',
         contextId: 101,
-        contextType: 'course'
+        contextType: 'course',
+        onDuplicate: undefined
       }
 
       return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
@@ -263,13 +270,13 @@ describe('Upload data actions', () => {
               type: 'image/svg+xml'
             },
             name: 'button.svg',
-            onDuplicate: 'overwrite',
             parentFolderId: 2
           },
           {
             contextId: 101,
             contextType: 'course',
-            host: 'http://host:port'
+            host: 'http://host:port',
+            onDuplicate: 'overwrite'
           }
         ])
       })

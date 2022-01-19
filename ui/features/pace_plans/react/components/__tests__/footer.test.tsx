@@ -53,18 +53,28 @@ describe('Footer', () => {
     expect(publishPlan).toHaveBeenCalled()
   })
 
-  it('disables cancel and publish buttons when there are no unpublished changes or there is network activity', () => {
-    Object.entries({
-      autoSaving: true,
-      showLoadingOverlay: true,
-      unpublishedChanges: false
-    }).forEach(([prop, value]) => {
-      const overrideProps = {...defaultProps, [prop]: value}
-      const {getByRole, unmount} = render(<Footer {...overrideProps} />)
-      expect(getByRole('button', {name: 'Cancel'})).toBeDisabled()
-      expect(getByRole('button', {name: 'Publish'})).toBeDisabled()
-      unmount()
-    })
+  it('shows cannot cancel and publish tooltip when there are no unpublished changes', () => {
+    const {getByText} = render(<Footer {...defaultProps} unpublishedChanges={false} />)
+    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
+    expect(getByText('There are no pending changes to publish')).toBeInTheDocument()
+  })
+
+  it('shows cannot cancel and publish tooltip while publishing', () => {
+    const {getByText} = render(<Footer {...defaultProps} planPublishing />)
+    expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
+    expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
+  })
+
+  it('shows cannot cancel and publish tooltip while auto saving', () => {
+    const {getByText} = render(<Footer {...defaultProps} autoSaving />)
+    expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
+    expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
+  })
+
+  it('shows cannot cancel and publish tooltip while loading', () => {
+    const {getByText} = render(<Footer {...defaultProps} showLoadingOverlay />)
+    expect(getByText('You cannot cancel while loading the plan')).toBeInTheDocument()
+    expect(getByText('You cannot publish while loading the plan')).toBeInTheDocument()
   })
 
   it('renders a loading spinner inside the publish button when publishing is ongoing', () => {

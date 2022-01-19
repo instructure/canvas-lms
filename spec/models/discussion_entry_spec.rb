@@ -20,7 +20,7 @@
 
 describe DiscussionEntry do
   let(:topic) { discussion_topic_model }
-  let(:anonymous_topic) { discussion_topic_model(anonymous_state: "fully_anonymous") }
+  let(:anonymous_topic) { discussion_topic_model(anonymous_state: "full_anonymity") }
 
   describe "callback lifecycle" do
     before(:once) do
@@ -864,7 +864,7 @@ describe DiscussionEntry do
     end
 
     it "returns You as anonymous author name" do
-      expect(anon_entry.author_name(user)).to eq "You"
+      expect(anon_entry.author_name(user)).to eq "John Doe"
     end
   end
 end

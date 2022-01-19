@@ -117,7 +117,6 @@ describe Quizzes::QuizQuestionsController do
     end
 
     it "strips the origin from local URLs in answers" do
-      Account.site_admin.enable_feature!(:strip_origin_from_quiz_answer_file_references)
       user_session(@teacher)
       post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
         question_type: "multiple_choice_question",
@@ -133,7 +132,6 @@ describe Quizzes::QuizQuestionsController do
     end
 
     it "strips the origin from local URLs in answers when they are provided as an array" do
-      Account.site_admin.enable_feature!(:strip_origin_from_quiz_answer_file_references)
       user_session(@teacher)
       post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
         question_type: "multiple_choice_question",

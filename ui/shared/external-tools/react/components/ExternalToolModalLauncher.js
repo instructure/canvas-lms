@@ -149,7 +149,7 @@ export default class ExternalToolModalLauncher extends React.Component {
     const newState = {
       modalLaunchStyle: {
         width: this.iframe.offsetWidth - 4,
-        border: '2px solid #008EE2'
+        border: '2px solid #0374B5'
       }
     }
     if (event.target.className.search('before') > -1) {

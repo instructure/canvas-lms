@@ -58,7 +58,7 @@ module PacePlansPageObject
   end
 
   def pace_plan_start_date_selector
-    "[data-testid='pace-plan-start-date']"
+    "[data-testid='pace-plan-date']"
   end
 
   def pace_plan_table_module_selector
@@ -86,7 +86,7 @@ module PacePlansPageObject
   end
 
   def required_end_date_input_selector
-    "#pace-plans-required-end-date-input [data-testid='pace-plan-start-date']"
+    "#pace-plans-required-end-date-input [data-testid='pace-plan-date']"
   end
 
   def settings_button_selector
@@ -289,10 +289,12 @@ module PacePlansPageObject
   def module_title_text(element_number)
     pace_plan_table_module_elements[element_number].text
   end
+
   #----------------------------Element Management---------------------
 
   def add_required_end_date(required_end_date)
     formatted_date = required_end_date.strftime("%m/%d/%Y")
+    required_end_date_input[:value].size.times { required_end_date_input.send_keys(:backspace) }
     required_end_date_input.send_keys(formatted_date, :enter)
   end
 

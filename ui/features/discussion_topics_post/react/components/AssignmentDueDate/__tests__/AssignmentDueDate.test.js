@@ -56,7 +56,7 @@ describe('AssignmentDueDate', () => {
 
     it('should render due date', () => {
       const container = setup(mockProps)
-      expect(container.getByText('Due Mar 31 5:59am')).toBeInTheDocument()
+      expect(container.getByText('Due Mar 31, 2021 5:59am')).toBeInTheDocument()
     })
 
     it('should not find open due date tray button', () => {
@@ -73,7 +73,7 @@ describe('AssignmentDueDate', () => {
 
     it('should render due date', () => {
       const container = setup(mockProps)
-      expect(container.getByText('Due Mar 31')).toBeInTheDocument()
+      expect(container.getByText('Due Mar 31, 2021')).toBeInTheDocument()
     })
 
     it('should find open due date tray button', () => {

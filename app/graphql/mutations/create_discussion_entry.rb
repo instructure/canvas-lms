@@ -26,6 +26,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
   argument :parent_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
   argument :include_reply_preview, Boolean, required: false
+  argument :is_anonymous_author, Boolean, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
   def resolve(input:)
@@ -33,7 +34,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     raise ActiveRecord::RecordNotFound unless topic.grants_right?(current_user, session, :read)
 
     association = topic.discussion_entries
-    entry = build_entry(association, input[:message], topic)
+    entry = build_entry(association, input[:message], topic, !!input[:is_anonymous_author])
 
     if input[:parent_entry_id]
       parent_entry = topic.discussion_entries.find(input[:parent_entry_id])
@@ -58,9 +59,9 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     validation_error(I18n.t("Insufficient Permissions"))
   end
 
-  def build_entry(association, message, topic)
+  def build_entry(association, message, topic, is_anonymous_author)
     message = Api::Html::Content.process_incoming(message, host: context[:request].host, port: context[:request].port)
-    entry = association.build(message: message, user: current_user, discussion_topic: topic)
+    entry = association.build(message: message, user: current_user, discussion_topic: topic, is_anonymous_author: is_anonymous_author)
     raise InsufficientPermissionsError unless entry.grants_right?(current_user, session, :create)
 
     entry

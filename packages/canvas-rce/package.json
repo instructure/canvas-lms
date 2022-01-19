@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-rce",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -122,6 +122,7 @@
     "keycode": "^2",
     "lodash": "^4",
     "minimatch": "~3.0.4",
+    "mathlive": "^0.69.8",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
     "react-dom": "^0.14.8 || ^15.0.0 || ^16",
@@ -160,6 +161,7 @@
     "fetch-mock": "^6",
     "format-message-cli": "^6",
     "format-message-parse": "^6",
+    "escape-html": "^1",
     "jest": "^26",
     "jest-canvas-mock": "^2",
     "jest-environment-jsdom-fourteen": "^0.1.0",

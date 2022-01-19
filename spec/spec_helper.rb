@@ -35,13 +35,17 @@ require "tmpdir"
 require "crystalball"
 
 ENV["RAILS_ENV"] = "test"
-require_relative "../config/environment"
 
-if ENV["COVERAGE"] == "1"
-  puts "Code Coverage enabled"
-  require_relative "coverage_tool"
-  CoverageTool.start("RSpec:#{Process.pid}")
+# SimpleCov needs to be added first thing in the spec_helper.rb
+# No other configurations should be loaded/performed before this block
+if ENV["COVERAGE"] == "1" && (ENV["SUPPRESS_OUTPUT"] != "1")
+  require_relative("canvas_simplecov")
+  require_relative("coverage_tool")
+  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1"
+  CoverageTool.start("RSpec")
 end
+
+require_relative "../config/environment"
 
 require "rspec/rails"
 

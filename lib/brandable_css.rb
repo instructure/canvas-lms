@@ -42,7 +42,9 @@ module BrandableCSS
     "ic-brand-global-nav-menu-item__text-color--active" => -> { I18n.t("Nav Text Active") },
     "ic-brand-global-nav-avatar-border" => -> { I18n.t("Nav Avatar Border") },
     "ic-brand-global-nav-menu-item__badge-bgd" => -> { I18n.t("Nav Badge") },
+    "ic-brand-global-nav-menu-item__badge-bgd--active" => -> { I18n.t("Nav Badge Active") },
     "ic-brand-global-nav-menu-item__badge-text" => -> { I18n.t("Nav Badge Text") },
+    "ic-brand-global-nav-menu-item__badge-text--active" => -> { I18n.t("Nav Badge Text Active") },
     "ic-brand-global-nav-logo-bgd" => -> { I18n.t("Nav Logo Background") },
     "ic-brand-header-image" => -> { I18n.t("Nav Logo") },
     "ic-brand-mobile-global-nav-logo" => -> { I18n.t("Responsive Global Nav Logo") },
@@ -132,7 +134,7 @@ module BrandableCSS
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
         expected_version = (pre_or_post == "predeploy") ? migration_version : (migration_version + 1)
-        raise BrandConfigWithOutCompileAssets if expected_version == 85_663_486_644_871_658_581_990
+        raise BrandConfigWithOutCompileAssets if expected_version == 338_164_632_037_494_729
         raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
       end
     end

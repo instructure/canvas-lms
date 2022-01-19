@@ -22,6 +22,7 @@ import moment from 'moment-timezone'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_projected_dates'
 
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -35,7 +36,8 @@ import {
   getPacePlanItems,
   getPlanWeeks,
   getProjectedEndDate,
-  getExcludeWeekends
+  getExcludeWeekends,
+  getPlanPublishing
 } from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {getShowProjections} from '../../../reducers/ui'
@@ -46,7 +48,7 @@ import SlideTransition from '../../../utils/slide_transition'
 
 interface StoreProps {
   readonly pacePlan: PacePlan
-  readonly planPublishing?: boolean
+  readonly planPublishing: boolean
   readonly projectedEndDate: string
   readonly assignments: number
   readonly planWeeks: number
@@ -57,8 +59,10 @@ interface StoreProps {
 
 type DispatchProps = {
   setStartDate: typeof actions.setStartDate
+  readonly setEndDate: typeof actions.setEndDate
   compressDates: typeof actions.compressDates
   uncompressDates: typeof actions.uncompressDates
+  readonly toggleHardEndDates: typeof actions.toggleHardEndDates
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -70,8 +74,10 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   planWeeks,
   projectedEndDate,
   setStartDate,
+  setEndDate,
   compressDates,
   uncompressDates,
+  toggleHardEndDates,
   showProjections,
   blackoutDates,
   weekendsDisabled
@@ -130,16 +136,19 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     ? I18n.t('Student enrollment date')
     : I18n.t('Hypothetical student enrollment date')
 
-  let endDateValue, endHelpText
+  let endDateValue, endHelpText, endDateInteraction
   if (pacePlan.hard_end_dates) {
     endDateValue = pacePlan.end_date
     endHelpText = I18n.t('Required by specified end date')
+    endDateInteraction = planPublishing ? 'disabled' : 'enabled'
   } else if (ENV.VALID_DATE_RANGE.end_at.date) {
     endDateValue = ENV.VALID_DATE_RANGE.end_at.date
     endHelpText = I18n.t('Required by course end date')
+    endDateInteraction = 'readonly'
   } else {
     endDateValue = projectedEndDate
     endHelpText = I18n.t('Hypothetical end date')
+    endDateInteraction = 'readonly'
   }
 
   let startInteraction: InputInteraction = 'enabled'
@@ -167,13 +176,25 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
           />
           <View margin="0 0 0 medium">
             <PacePlanDateInput
+              id="pace-plans-required-end-date-input"
               label={I18n.t('End Date')}
               helpText={endHelpText}
-              interaction="readonly"
+              interaction={endDateInteraction}
               dateValue={endDateValue}
-              onDateChange={() => {}}
+              onDateChange={setEndDate}
             />
           </View>
+          <Flex.Item margin="0 0 0 medium" align="center">
+            <Checkbox
+              data-testid="require-end-date-toggle"
+              label={I18n.t('Require Completion by Specified End Date')}
+              checked={pacePlan.hard_end_dates}
+              disabled={planPublishing}
+              onChange={() => {
+                toggleHardEndDates()
+              }}
+            />
+          </Flex.Item>
         </Flex>
         <Flex as="section" margin="0 0 small">
           <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
@@ -219,12 +240,15 @@ const mapStateToProps = (state: StoreState) => {
     showProjections: getShowProjections(state),
     projectedEndDate: getProjectedEndDate(state),
     weekendsDisabled: getExcludeWeekends(state),
-    blackoutDates: getBlackoutDates(state)
+    blackoutDates: getBlackoutDates(state),
+    planPublishing: getPlanPublishing(state)
   }
 }
 
 export default connect(mapStateToProps, {
   setStartDate: actions.setStartDate,
+  setEndDate: actions.setEndDate,
   compressDates: actions.compressDates,
-  uncompressDates: actions.uncompressDates
+  uncompressDates: actions.uncompressDates,
+  toggleHardEndDates: actions.toggleHardEndDates
 })(ProjectedDates)

@@ -146,6 +146,12 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Aufzeichnung von Audio und Video wird nicht unterstützt, bitte nutzen Sie einen anderen Browser."
     },
+    "audio_options_feb58e2c": {
+        "message": "Audiooptionen"
+    },
+    "audio_options_tray_33a90711": {
+        "message": "Fach für Audiooptionen"
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Audioplayer für { title }"
     },
@@ -812,6 +818,9 @@
     "loading_please_wait_d276220a": {
         "message": "Ladevorgang, bitte warten"
     },
+    "loading_preview_9f077aa1": {
+        "message": "Vorschau wird geladen"
+    },
     "location_3b6ff307": {
         "message": "Standort:"
     },
@@ -995,6 +1004,9 @@
     "percentage_34ab7c2c": {
         "message": "Prozentsatz"
     },
+    "percentage_must_be_a_number_8033c341": {
+        "message": "Prozentsatz muss eine Zahl sein"
+    },
     "pixels_52ece7d1": {
         "message": "Pixel"
     },
@@ -1120,6 +1132,9 @@
     },
     "show_all_ae37d610": {
         "message": "Allen zeigen"
+    },
+    "show_audio_options_b489926b": {
+        "message": "Audiooptionen anzeigen"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Einbettungsoptionen anzeigen"
