@@ -960,53 +960,38 @@ describe Submission do
       end
     end
 
-    it "remains missing when missing submission is graded" do
-      Timecop.freeze(1.day.from_now(@date)) do
-        expect(submission.missing?).to be true
-        @assignment.grade_student(@student, score: 500, grader: @teacher)
-        submission.reload
-        expect(submission.missing?).to be true
-      end
-    end
-
-    context "remove_missing_status_when_graded enabled" do
-      before do
-        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
-      end
-
-      context "past due date" do
-        it "removes missing status when missing submission is graded" do
-          Timecop.freeze(1.day.from_now(@date)) do
-            expect(submission.missing?).to be true
-            @assignment.grade_student(@student, score: 500, grader: @teacher)
-            submission.reload
-            expect(submission.missing?).to be false
-          end
-        end
-
-        it "does not remove missing status when missing status was given manually" do
-          Timecop.freeze(1.day.from_now(@date)) do
-            expect(submission.missing?).to be true
-            submission.update!(late_policy_status: "missing")
-            expect(submission.missing?).to be true
-            @assignment.grade_student(@student, score: 500, grader: @teacher)
-            submission.reload
-            expect(submission.missing?).to be true
-          end
+    context "past due date" do
+      it "removes missing status when missing submission is graded" do
+        Timecop.freeze(1.day.from_now(@date)) do
+          expect(submission.missing?).to be true
+          @assignment.grade_student(@student, score: 500, grader: @teacher)
+          submission.reload
+          expect(submission.missing?).to be false
         end
       end
 
       it "does not remove missing status when missing status was given manually" do
-        @assignment.update!(due_at: 3.hours.from_now(@date), points_possible: 1000, submission_types: "online_text_entry")
-        submission.reload
-        Timecop.freeze(@date) do
-          expect(submission.missing?).to be false
+        Timecop.freeze(1.day.from_now(@date)) do
+          expect(submission.missing?).to be true
           submission.update!(late_policy_status: "missing")
           expect(submission.missing?).to be true
           @assignment.grade_student(@student, score: 500, grader: @teacher)
           submission.reload
           expect(submission.missing?).to be true
         end
+      end
+    end
+
+    it "does not remove missing status when missing status was given manually" do
+      @assignment.update!(due_at: 3.hours.from_now(@date), points_possible: 1000, submission_types: "online_text_entry")
+      submission.reload
+      Timecop.freeze(@date) do
+        expect(submission.missing?).to be false
+        submission.update!(late_policy_status: "missing")
+        expect(submission.missing?).to be true
+        @assignment.grade_student(@student, score: 500, grader: @teacher)
+        submission.reload
+        expect(submission.missing?).to be true
       end
     end
 
@@ -6045,6 +6030,25 @@ describe Submission do
         @submission.ensure_grader_can_grade
 
         expect(@submission.errors[:grade]).not_to be_empty
+      end
+
+      describe "skip_grader_check" do
+        it "does not add an error to the :grade field if skip_grader_check is true" do
+          @submission.skip_grader_check = true
+          @submission.ensure_grader_can_grade
+          expect(@submission.errors[:grade]).to be_empty
+        end
+
+        it "adds an error to the :grade field if skip_grader_check is false" do
+          @submission.skip_grader_check = false
+          @submission.ensure_grader_can_grade
+          expect(@submission.errors[:grade]).not_to be_empty
+        end
+
+        it "adds an error to the :grade field if skip_grader_check is not set" do
+          @submission.ensure_grader_can_grade
+          expect(@submission.errors[:grade]).not_to be_empty
+        end
       end
     end
   end

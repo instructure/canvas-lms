@@ -42,33 +42,20 @@ describe "Grade Detail Tray:" do
       Gradebook.visit(@course)
     end
 
-    it "missing submission has missing-radiobutton selected", priority: "1" do
+    it "missing submission has missing-radiobutton unselected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
 
-      expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be true
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be false
     end
 
-    context "remove_missing_status_when_graded enabled" do
-      before do
-        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
-        Gradebook.visit(@course)
-      end
+    it "updates status when none-option is selected", priority: "2" do
+      Gradebook::Cells.open_tray(@course.students.first, @a2)
+      Gradebook::GradeDetailTray.change_status_to("Missing")
+      Gradebook::GradeDetailTray.change_status_to("None")
 
-      it "missing submission has missing-radiobutton unselected", priority: "1" do
-        Gradebook::Cells.open_tray(@course.students.first, @a2)
+      late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
 
-        expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be false
-      end
-
-      it "updates status when none-option is selected", priority: "2" do
-        Gradebook::Cells.open_tray(@course.students.first, @a2)
-        Gradebook::GradeDetailTray.change_status_to("Missing")
-        Gradebook::GradeDetailTray.change_status_to("None")
-
-        late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
-
-        expect(late_policy_status).to eq "none"
-      end
+      expect(late_policy_status).to eq "none"
     end
 
     it "on-time submission has none-radiobutton selected", priority: "1" do
@@ -92,13 +79,13 @@ describe "Grade Detail Tray:" do
       expect(excuse_status).to be true
     end
 
-    it "updates status when none-option is selected", priority: "2" do
+    it "updates status when missing-option is selected", priority: "2" do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
-      Gradebook::GradeDetailTray.change_status_to("None")
+      Gradebook::GradeDetailTray.change_status_to("Missing")
 
       late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
 
-      expect(late_policy_status).to eq "none"
+      expect(late_policy_status).to eq "missing"
     end
 
     it "grade input is saved", priority: "1" do
