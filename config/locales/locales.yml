@@ -467,7 +467,7 @@ es:
   proper_noun_singular_genitive: de %{noun}
 es-ES:
   locales:
-    es-ES: Español (españa)
+    es-ES: Español (España)
   bigeasy_locale: es_ES
   moment_locale: es
   dow_offset: 1
