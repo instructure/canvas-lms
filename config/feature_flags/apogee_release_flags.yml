@@ -109,6 +109,13 @@ remove_missing_status_when_graded:
   applies_to: SiteAdmin
   display_name: Remove Missing Status When Graded
   description: If set, removes the missing status from submissions when graded
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment
 visible_assignments_scope_change:
   state: hidden
   applies_to: SiteAdmin

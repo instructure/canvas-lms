@@ -1932,10 +1932,12 @@ class Assignment < ActiveRecord::Base
     ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional], occupy_slot: true) do
       if grade_group_students
         find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item)) do |submission|
+          submission.skip_grader_check = true if opts[:skip_grader_check]
           submissions << save_grade_to_submission(submission, original_student, group, opts)
         end
       else
-        submission = find_or_create_submission(original_student)
+        submission = find_or_create_submission(original_student, skip_grader_check: opts[:skip_grader_check])
+        submission.skip_grader_check = true if opts[:skip_grader_check]
         submissions << save_grade_to_submission(submission, original_student, group, opts)
       end
     end
@@ -2082,12 +2084,13 @@ class Assignment < ActiveRecord::Base
   end
   private :save_grade_to_submission
 
-  def find_or_create_submission(user)
+  def find_or_create_submission(user, skip_grader_check: false)
     Assignment.unique_constraint_retry do
       s = all_submissions.where(user_id: user).first
       unless s
         s = submissions.build
         user.is_a?(User) ? s.user = user : s.user_id = user
+        s.skip_grader_check = true if skip_grader_check
         s.save!
       end
       s
