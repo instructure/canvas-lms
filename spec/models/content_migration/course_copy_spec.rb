@@ -877,27 +877,44 @@ describe ContentMigration do
       expect(page_to.body).to eq(body % @copy_to.id.to_s)
     end
 
-    it "copies over late policy" do
-      @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
-      run_course_copy
+    context "with late policy" do
+      it "copies it over" do
+        @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
+        run_course_copy
 
-      new_late_policy = @copy_to.late_policy
-      expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
-    end
+        new_late_policy = @copy_to.late_policy
+        expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
+      end
 
-    it "does not copy over late policy if other settings won't be imported" do
-      @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
-      @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 10.0, late_submission_interval: "day")
-      @cm = ContentMigration.create!(
-        context: @copy_to,
-        user: @user,
-        source_course: @copy_from,
-        migration_type: "course_copy_importer",
-        copy_options: { everything: false }
-      )
-      run_course_copy
-      new_late_policy = @copy_to.late_policy
-      expect(new_late_policy.late_submission_deduction).to eq 10.0
+      it "does not copy it over if the export should have had no settings" do
+        @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
+        @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 10.0, late_submission_interval: "day")
+
+        @cm.copy_options = { everything: true }
+        @cm.save!
+
+        run_export_and_import do |export|
+          export.selected_content = { all_course_settings: false }
+        end
+
+        expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
+      end
+
+      # This is for faulty direct shares that were exported with
+      # late policy in their cartridges when they shouldn't have
+      it "does not copy it over if the import requires no settings" do
+        @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
+        @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 10.0, late_submission_interval: "day")
+
+        @cm.copy_options = { everything: false }
+        @cm.save!
+
+        run_export_and_import do |export|
+          export.selected_content = { all_course_settings: true }
+        end
+
+        expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
+      end
     end
   end
 end

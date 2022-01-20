@@ -48,7 +48,7 @@ module CC
       resources << run_and_set_progress(:create_learning_outcomes, nil, I18n.t("course_exports.errors.learning_outcomes", "Failed to export learning outcomes"))
       resources << run_and_set_progress(:files_meta_path, nil, I18n.t("course_exports.errors.file_meta", "Failed to export file meta data"))
       resources << run_and_set_progress(:create_events, 25, I18n.t("course_exports.errors.events", "Failed to export calendar events"))
-      resources << run_and_set_progress(:add_late_policy, nil, I18n.t("course_exports.errors.late_policy", "Failed to export late policy"))
+      resources << run_and_set_progress(:add_late_policy, nil, I18n.t("course_exports.errors.late_policy", "Failed to export late policy")) if export_symbol?(:all_course_settings)
 
       if export_media_objects?
         File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), "") # just in case an error happens later
