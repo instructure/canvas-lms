@@ -70,6 +70,7 @@ x-mutagen:
           - "!/packages/*/lib/"
           - "/packages/*/node_modules/*"
           - "/packages/*/es/*"
+          - "!/packages/canvas-rce/es/*"
           - "/packages/*/lib/*"
           - "!/packages/translations/lib/*"
           - "!/gems/**/node_modules/"
