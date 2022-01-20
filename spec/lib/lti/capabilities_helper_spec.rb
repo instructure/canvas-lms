@@ -115,7 +115,13 @@ module Lti
          com.instructure.Person.pronouns
          com.instructure.User.observees
          com.instructure.User.sectionNames
-         com.instructure.Observee.sisIds]
+         com.instructure.Observee.sisIds
+         ResourceLink.id
+         ResourceLink.description
+         ResourceLink.title
+         ResourceLink.available.startDateTime
+         ResourceLink.available.endDateTime
+         ResourceLink.submission.endDateTime]
     end
 
     describe "#supported_capabilities" do
