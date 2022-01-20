@@ -89,18 +89,6 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {props.isReply ? (
-        <ComposeInputWrapper
-          title={
-            <PresentationContent>
-              <Text size="small">{I18n.t('Subject')}</Text>
-            </PresentationContent>
-          }
-          input={<Text size="small">{props.subject}</Text>}
-        />
-      ) : (
-        <SubjectInput onChange={props.onSubjectChange} value={props.subject} />
-      )}
       {!props.isReply && (
         <Flex.Item>
           <ComposeInputWrapper
@@ -113,6 +101,18 @@ const HeaderInputs = props => {
             }
           />
         </Flex.Item>
+      )}
+      {props.isReply ? (
+        <ComposeInputWrapper
+          title={
+            <PresentationContent>
+              <Text size="small">{I18n.t('Subject')}</Text>
+            </PresentationContent>
+          }
+          input={<Text size="small">{props.subject}</Text>}
+        />
+      ) : (
+        <SubjectInput onChange={props.onSubjectChange} value={props.subject} />
       )}
       {props.mediaAttachmentTitle && (
         <Flex.Item data-testid="media-attachment">

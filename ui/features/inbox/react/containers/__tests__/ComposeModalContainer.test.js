@@ -25,6 +25,12 @@ import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
+import {responsiveQuerySizes} from '../../../util/utils'
+
+jest.mock('../../../util/utils', () => ({
+  ...jest.requireActual('../../../util/utils'),
+  responsiveQuerySizes: jest.fn()
+}))
 
 describe('ComposeModalContainer', () => {
   const server = mswServer(handlers)
@@ -32,6 +38,22 @@ describe('ComposeModalContainer', () => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
+
+    // Add appropriate mocks for responsive
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
+    // Repsonsive Query Mock Default
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {minWidth: '768px'}
+    }))
   })
 
   afterEach(() => {
@@ -299,6 +321,36 @@ describe('ComposeModalContainer', () => {
       fireEvent.click(button)
 
       await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+    })
+  })
+
+  describe('Responsive', () => {
+    describe('Mobile', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          mobile: {maxWidth: '67'}
+        }))
+      })
+
+      it('Should emit correct testId for mobile compose window', async () => {
+        const component = setup()
+        const modal = await component.findByTestId('compose-modal-mobile')
+        expect(modal).toBeTruthy()
+      })
+    })
+
+    describe('Desktop', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          desktop: {minWidth: '768'}
+        }))
+      })
+
+      it('Should emit correct testId for destop compose window', async () => {
+        const component = setup()
+        const modal = await component.findByTestId('compose-modal-desktop')
+        expect(modal).toBeTruthy()
+      })
     })
   })
 })
