@@ -20,8 +20,8 @@ import _ from 'underscore'
 import axios from '@canvas/axios'
 
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+// @ts-ignore
 import I18n from 'i18n!gradingPeriodSetsApi'
-
 import DateHelper from '@canvas/datetime/dateHelper'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
@@ -51,7 +51,8 @@ const baseDeserializeSet = set => ({
   displayTotalsForAllGradingPeriods: set.display_totals_for_all_grading_periods,
   gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods),
   permissions: set.permissions,
-  createdAt: new Date(set.created_at)
+  createdAt: new Date(set.created_at),
+  enrollmentTermIDs: undefined
 })
 
 const gradingPeriodSetTitle = set => {
@@ -63,7 +64,7 @@ const gradingPeriodSetTitle = set => {
   }
 }
 
-const deserializeSet = function(set) {
+const deserializeSet = function (set) {
   const newSet = baseDeserializeSet(set)
   newSet.enrollmentTermIDs = set.enrollment_term_ids
   return newSet
@@ -96,6 +97,6 @@ export default {
   },
 
   update(set) {
-    return axios.patch(updateUrl(set.id), serializeSet(set)).then(response => set)
+    return axios.patch(updateUrl(set.id), serializeSet(set)).then(_response => set)
   }
 }
