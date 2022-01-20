@@ -164,6 +164,7 @@ describe LtiApiController, type: :request do
     sourceid = opts[:sourceid]
     result_data = opts[:result_data]
     raw_score = opts[:raw_score]
+    submitted_at = opts[:submitted_at]
 
     sourceid ||= source_id
 
@@ -217,6 +218,9 @@ describe LtiApiController, type: :request do
                 #{raw_score_xml}
               </result>
             </resultRecord>
+            <submissionDetails>
+              <submittedAt>#{submitted_at}</submittedAt>
+            </submissionDetails>
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
@@ -310,6 +314,30 @@ describe LtiApiController, type: :request do
       expect(submission).to be_submitted_at
       expect(submission.submission_type).to eql "external_tool"
       expect(submission.score).to eq 12
+    end
+
+    it "includes the appropriate data in the request headers" do
+      submission_time = Time.zone.now.to_s
+
+      make_call("body" => replace_result(score: "0.6", sourceid: nil, result_data: { text: "oioi" }, submitted_at: submission_time))
+      check_success
+
+      headers = response.headers["X-Canvas-Meta"]
+      header_keys = {}
+      headers.split(";").each do |header|
+        split_header = header.split("=")
+        header_keys[split_header[0]] = split_header[1]
+      end
+
+      source_id_parts = header_keys["si"].split("-")
+
+      # source_id is a string consisting of 5 parts which are random in these tests.
+      # [@tool.id, @context.id, assignment.id, @user.id, some_hash]
+      # We simply test for their presence in the headers.
+      (0...4).each do |i|
+        expect(source_id_parts[i]).not_to be_empty
+      end
+      expect(header_keys["sa"]).to eql submission_time
     end
 
     it "sets the submission data text" do
