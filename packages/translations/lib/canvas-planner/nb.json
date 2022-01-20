@@ -58,7 +58,7 @@
   "canvas_planner_98ed106": { "message": "Canvas planlegger" },
   "close_d634289d": { "message": "Lukk" },
   "close_opportunity_center_popup_9907d981": {
-    "message": "Lukk boksen «Mulighetsmarked»"
+    "message": "Lukk popup-vinduet «Mulighetsmarked»"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
@@ -96,7 +96,7 @@
   "edit_c5fbea07": { "message": "Rediger" },
   "edit_title_72e5a21e": { "message": "Rediger { title }" },
   "error_loading_grades_e0b38f4d": {
-    "message": "Kunne ikke laste inn karakterer"
+    "message": "Kunne ikke laste inn vurderinger"
   },
   "error_loading_items_5218438e": {
     "message": "Feil ved lasting av elementer"
@@ -132,13 +132,13 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Kunne ikke lagre gjøremål" },
   "feedback_6dcc1991": { "message": "Tilbakemelding" },
-  "fun_quiz_47ab0b0": { "message": "Morsom test" },
+  "fun_quiz_47ab0b0": { "message": "Morsom quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Gå til Kortvisningsdashbord"
   },
-  "graded_25cd3fcd": { "message": "Karaktersatt" },
-  "grades_are_loading_c899652d": { "message": "Laster karakterer" },
-  "grades_loaded_5056277c": { "message": "Karakterene er lastet inn" },
+  "graded_25cd3fcd": { "message": "Vurdert" },
+  "grades_are_loading_c899652d": { "message": "Laster vurderinger" },
+  "grades_loaded_5056277c": { "message": "Vurderingene er lastet inn" },
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } Fullført { items, plural,\n     =1 {del}\n  other {deler}\n}"
   },
@@ -153,14 +153,14 @@
   "jump_to_today_254ccf41": { "message": "Hopp til i dag" },
   "language_arts_35b79a8b": { "message": "Språkkunst" },
   "late_2be42b88": { "message": "Sent" },
-  "load_more_a36f9cf9": { "message": "Last mer" },
+  "load_more_a36f9cf9": { "message": "Last inn flere" },
   "load_prior_dates_f2b0f6f0": { "message": "Last inn tidligere datoer" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
     "message": "Lastet inn { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
   },
-  "loading_25990131": { "message": "Laster..." },
+  "loading_25990131": { "message": "Laster…" },
   "loading_725811ca": { "message": "laster inn" },
-  "loading_grades_c842c887": { "message": "Laster inn karakterer" },
+  "loading_grades_c842c887": { "message": "Laster inn vurderinger" },
   "loading_past_items_ca499e75": { "message": "Laster tidligere elementer" },
   "loading_planner_items_947a813d": { "message": "Laster elementplanlegger" },
   "location_3b6ff307": { "message": "Sted:" },
@@ -172,7 +172,7 @@
   "missing_items_for_title_516511f8": {
     "message": "Mangler elementer til { title }"
   },
-  "my_grades_98834476": { "message": "Mine karakterer" },
+  "my_grades_98834476": { "message": "Mine vurderinger" },
   "new_13daf639": { "message": "Ny" },
   "new_activity_8b84847d": { "message": "Ny aktivitet" },
   "new_activity_for_title_14c9c3af": {
@@ -183,7 +183,7 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Ingen forfallsdatoer tildelt"
   },
-  "no_grade_3b4d7f3e": { "message": "Ingen karakter" },
+  "no_grade_3b4d7f3e": { "message": "Ingen vurdering" },
   "nothing_due_this_week_d45c9ef9": {
     "message": "Ingenting må leveres denne uken"
   },
@@ -204,20 +204,20 @@
   "nothing_planned_yet_8675ffe9": { "message": "Ingenting planlagt enda" },
   "numpoints_points_8621a43b": { "message": "{ numPoints } poeng" },
   "only_most_recent_grading_period_shown_f1ad6458": {
-    "message": "*Bare den nyeste karakterperioden vises."
+    "message": "*Bare den nyeste vurderingsperioden vises."
   },
-  "opportunities_popup_f6703842": { "message": "muligheter-boksen" },
+  "opportunities_popup_f6703842": { "message": "popup-vinduet for muligheter" },
   "optional_add_course_ef0d70fc": { "message": "Valgfri: Legg til emne" },
   "page_50c4823d": { "message": "Side" },
-  "peer_review_74f26a13": { "message": "Hverandrevurdering" },
+  "peer_review_74f26a13": { "message": "Fagfellevurdering hverandrevurdering" },
   "peer_review_for_itemtitle_358cb413": {
     "message": "Hverandrevurdering for { itemTitle }"
   },
   "points_bceb5005": { "message": "poeng" },
   "points_points_63e59cce": { "message": "{ points } poeng" },
   "previous_month_bb1e3c84": { "message": "Forrige måned" },
-  "pts_699bd9aa": { "message": "Poeng" },
-  "quiz_e0dcce8f": { "message": "Test" },
+  "pts_699bd9aa": { "message": "poeng" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "redo_363c58b7": { "message": "Gjør om" },
   "reminder_date_4564d12d": { "message": "Påminnelse: { date }" },
   "replies_4a8577c8": { "message": "Svar" },
@@ -231,7 +231,7 @@
     "message": "Ruller opp til forrige element med ny aktivitet."
   },
   "show_all_ae37d610": { "message": "Vis alle" },
-  "show_my_grades_ebd08684": { "message": "Vis mine karakterer" },
+  "show_my_grades_ebd08684": { "message": "Vis mine vurderinger" },
   "social_studies_13fa30c7": { "message": "Samfunnsfag" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
@@ -245,7 +245,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } til { endTime }"
   },
-  "submitted_318fad53": { "message": "Sendt inn" },
+  "submitted_318fad53": { "message": "Innlevert" },
   "success_to_do_created_e34ed395": {
     "message": "Vellykket: Opprette gjøremål"
   },
@@ -263,15 +263,15 @@
   "time_2b5aac58": { "message": "Tid" },
   "title_ee03d132": { "message": "Tittel" },
   "title_is_required_6ddcab69": { "message": "tittel er obligatorisk" },
-  "to_do_1d554f36": { "message": "Å gjøre" },
-  "to_do_date_4b211ad0": { "message": "Å gjøre: { date }" },
-  "to_do_items_loading_d1cdfcd5": { "message": "Å gjøre-elementer laster" },
+  "to_do_1d554f36": { "message": "Gjøremål" },
+  "to_do_date_4b211ad0": { "message": "Gjøremål: { date }" },
+  "to_do_items_loading_d1cdfcd5": { "message": "Gjøremålselementer laster" },
   "today_76e10f9c": { "message": "I dag" },
   "today_at_date_8ac30d6": { "message": "I dag på { date }" },
   "tomorrow_9a6c9a00": { "message": "I morgen" },
   "tomorrow_at_date_b53f2cf1": { "message": "I morgen på { date }" },
   "unable_to_mark_as_complete_8141856d": {
-    "message": "Kan ikke markere som fullført."
+    "message": "Kan ikke markere som godkjent."
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Bruk piltaster for å navigere i valgene."
