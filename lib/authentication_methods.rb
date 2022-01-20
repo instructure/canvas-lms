@@ -304,6 +304,9 @@ module AuthenticationMethods
     end
 
     logger.info "[AUTH] final user: #{@current_user&.id}"
+    if Sentry.initialized? && !Rails.env.test?
+      Sentry.set_user({ id: @current_user&.global_id, ip_address: request.remote_ip }.compact)
+    end
     @current_user
   end
   private :load_user
@@ -378,19 +381,28 @@ module AuthenticationMethods
 
   def render_json_unauthorized
     add_www_authenticate_header if api_request? && !@current_user
-    if @current_user
-      render json: {
-        status: I18n.t("lib.auth.status_unauthorized", "unauthorized"),
-        errors: [{ message: I18n.t("lib.auth.not_authorized", "user not authorized to perform that action") }]
-      },
-             status: :unauthorized
+
+    if Account.site_admin.feature_enabled?(:api_auth_error_updates)
+      if @current_user
+        code = :forbidden
+        status = "unauthorized"
+        message = I18n.t("lib.auth.not_authorized", "user not authorized to perform that action")
+      else
+        code = :unauthorized
+        status = "unauthenticated"
+        message = I18n.t("lib.auth.authentication_required", "user authorization required")
+      end
     else
-      render json: {
-        status: I18n.t("lib.auth.status_unauthenticated", "unauthenticated"),
-        errors: [{ message: I18n.t("lib.auth.authentication_required", "user authorization required") }]
-      },
-             status: :unauthorized
+      code = :unauthorized
+      if @current_user
+        status = I18n.t("lib.auth.status_unauthorized", "unauthorized")
+        message = I18n.t("lib.auth.not_authorized", "user not authorized to perform that action")
+      else
+        status = I18n.t("lib.auth.status_unauthenticated", "unauthenticated")
+        message = I18n.t("lib.auth.authentication_required", "user authorization required")
+      end
     end
+    render status: code, json: { status: status, errors: [{ message: message }] }
   end
 
   def add_www_authenticate_header

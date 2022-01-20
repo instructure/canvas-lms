@@ -1313,6 +1313,22 @@ describe CalendarEventsApiController, type: :request do
         event
       end
 
+      it "lists child events by default" do
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@course.id}&start_date=2011-12-31&end_date=2012-01-02", {
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], start_date: Date.parse("2011-12-31"), end_date: Date.parse("2012-01-02")
+                        })
+        expect(json[0]["child_events"].length).to eql 1
+      end
+
+      it "excludes child events when asked to" do
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@course.id}&start_date=2011-12-31&end_date=2012-01-02&excludes[]=child_events", {
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], start_date: Date.parse("2011-12-31"), end_date: Date.parse("2012-01-02"), excludes: ["child_events"]
+                        })
+        expect(json[0]["child_events"]).to be nil
+      end
+
       it "creates an event with child events" do
         json = api_call(:post, "/api/v1/calendar_events",
                         { controller: "calendar_events_api", action: "create", format: "json" },

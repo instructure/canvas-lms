@@ -193,6 +193,16 @@ describe UsersController do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(response).to be_successful
     end
+
+    it "shows readable role types that includes custom roles" do
+      custom_role = custom_teacher_role("CustomTeacherRole", account: Account.default)
+      user = course_with_teacher(course_name: "Course 1", user: @user, active_all: true, role: custom_role).user
+      user_session(account_admin_user)
+      get "/users/#{user.id}"
+      doc = Nokogiri::HTML5(response.body)
+      membership = doc.at_css(".courses span.subtitle").to_s
+      expect(membership).to match(/CustomTeacherRole/)
+    end
   end
 
   describe "#avatar_image_url" do

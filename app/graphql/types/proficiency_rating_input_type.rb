@@ -22,6 +22,5 @@ module Types
   class ProficiencyRatingInputType < Types::BaseInputObject
     argument :description, String, required: true
     argument :points, Float, required: true
-    argument :mastery, Boolean, required: true
   end
 end

@@ -703,12 +703,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe "js_base_url" do
-    it "returns an immutable string" do
-      expect(js_base_url).to be_frozen
-    end
-  end
-
   describe "brand_config_account" do
     it "handles not having @domain_root_account set" do
       expect(helper.send(:brand_config_account)).to be_nil

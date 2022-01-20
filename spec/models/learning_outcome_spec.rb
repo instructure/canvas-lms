@@ -614,27 +614,6 @@ describe LearningOutcome do
       end.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
     end
 
-    it "set mastery_points based on ratings if IORC" do
-      @outcome.rubric_criterion = {
-        ratings: [
-          {
-            description: "Strong work",
-            points: 5
-          },
-          {
-            description: "Passable",
-            points: 4,
-            mastery: true
-          },
-          {
-            description: "Weak sauce",
-            points: 1
-          }
-        ],
-      }
-      expect(@outcome.mastery_points).to eq(4.0)
-    end
-
     it "updates aligned rubrics after save" do
       rubric = Rubric.create!(context: @course)
       rubric.data = [

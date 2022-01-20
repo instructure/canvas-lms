@@ -22,7 +22,6 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
 export function DeletedPostMessage({...props}) {
@@ -49,27 +48,18 @@ export function DeletedPostMessage({...props}) {
               </Text>
             </View>
           )}
-          <Tooltip
-            renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
+          <Text
+            size={
+              props.deleterName
+                ? responsiveProps.timestampTextSize
+                : responsiveProps.deletedByTextSize
+            }
+            weight={props.deleterName ? undefined : 'bold'}
           >
-            <span
-              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-              tabIndex="0"
-            >
-              <Text
-                size={
-                  props.deleterName
-                    ? responsiveProps.timestampTextSize
-                    : responsiveProps.deletedByTextSize
-                }
-                weight={props.deleterName ? undefined : 'bold'}
-              >
-                {I18n.t('Deleted %{deletedTimingDisplay}', {
-                  deletedTimingDisplay: props.deletedTimingDisplay
-                })}
-              </Text>
-            </span>
-          </Tooltip>
+            {I18n.t('Deleted %{deletedTimingDisplay}', {
+              deletedTimingDisplay: props.deletedTimingDisplay
+            })}
+          </Text>
           {props.children}
         </>
       )}

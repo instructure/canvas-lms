@@ -31,6 +31,8 @@ import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
 import {User} from './User'
+import {Attachment} from './Attachment'
+import {AnonymousUser} from './AnonymousUser'
 
 /* Query Mocks */
 export const getDiscussionQueryMock = ({
@@ -98,6 +100,61 @@ export const getDiscussionQueryMock = ({
               courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
               id: 'role-user'
             })
+          })
+        })()
+      }
+    },
+    ...(shouldError && {error: new Error('graphql error')})
+  }
+]
+
+export const getAnonymousDiscussionQueryMock = ({
+  courseID = '1',
+  discussionID = '1',
+  filter = 'all',
+  page = 'MA==',
+  perPage = 20,
+  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
+  rootEntries = true,
+  searchTerm = '',
+  sort = 'desc',
+  shouldError = false
+} = {}) => [
+  {
+    request: {
+      query: DISCUSSION_QUERY,
+      variables: {
+        courseID,
+        discussionID,
+        filter,
+        page,
+        perPage,
+        rolePillTypes,
+        rootEntries,
+        searchTerm,
+        sort
+      }
+    },
+    result: {
+      data: {
+        legacyNode: (() => {
+          return Discussion.mock({
+            author: User.mock({
+              courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
+              id: 'role-user'
+            }),
+            anonymousState: 'partial_anonymity',
+            canReplyAnonymously: true,
+            discussionEntriesConnection: {
+              nodes: [
+                DiscussionEntry.mock({
+                  author: null,
+                  anonymousAuthor: AnonymousUser.mock({shortName: 'current_user'})
+                })
+              ],
+              pageInfo: PageInfo.mock(),
+              __typename: 'DiscussionEntriesConnection'
+            }
           })
         })()
       }
@@ -269,14 +326,18 @@ export const updateDiscussionEntryParticipantMock = ({
 
 export const updateDiscussionEntryMock = ({
   discussionEntryId = '1',
-  message = '<p>This is the parent reply</p>'
+  message = '<p>This is the parent reply</p>',
+  fileId = '7',
+  removeAttachment = !fileId
 } = {}) => [
   {
     request: {
       query: UPDATE_DISCUSSION_ENTRY,
       variables: {
         discussionEntryId,
-        message
+        message,
+        ...(fileId !== null && {fileId}),
+        removeAttachment
       }
     },
     result: {
@@ -285,7 +346,8 @@ export const updateDiscussionEntryMock = ({
           discussionEntry: DiscussionEntry.mock({
             id: btoa(`DiscussionEntry-${discussionEntryId}`),
             _id: discussionEntryId,
-            message
+            message,
+            attachment: removeAttachment ? null : Attachment.mock()
           }),
           __typename: 'UpdateDiscussionEntryPayload'
         }
@@ -327,7 +389,8 @@ export const createDiscussionEntryMock = ({
   replyFromEntryId = null,
   fileId = null,
   includeReplyPreview = null,
-  isAnonymousAuthor = null
+  isAnonymousAuthor = false,
+  courseID = '1'
 } = {}) => [
   {
     request: {
@@ -335,10 +398,11 @@ export const createDiscussionEntryMock = ({
       variables: {
         discussionTopicId,
         message,
+        isAnonymousAuthor,
         ...(replyFromEntryId !== null && {replyFromEntryId}),
         ...(fileId !== null && {fileId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
-        ...(isAnonymousAuthor !== null && {isAnonymousAuthor})
+        ...(courseID !== null && {courseID})
       }
     },
     result: {

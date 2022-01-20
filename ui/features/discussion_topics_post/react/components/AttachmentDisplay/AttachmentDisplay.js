@@ -20,7 +20,7 @@ import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {AttachButton} from './AttachButton'
+import {UploadButton} from './UploadButton'
 import {AttachmentButton} from './AttachmentButton'
 
 import {Responsive} from '@instructure/ui-responsive'
@@ -30,12 +30,8 @@ import {uploadFiles} from '@canvas/upload-file'
 export function AttachmentDisplay(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
-  const removeAttachment = id => {
-    props.setAttachments(prev => {
-      const index = prev.findIndex(attachment => attachment.id === id)
-      prev.splice(index, 1)
-      return [...prev]
-    })
+  const removeAttachment = () => {
+    props.setAttachment(null)
   }
 
   const fileUploadUrl = attachmentFolderId => {
@@ -44,33 +40,29 @@ export function AttachmentDisplay(props) {
 
   const addAttachment = async e => {
     const files = Array.from(e.currentTarget?.files)
-    if (!(files.length === 1)) {
-      setOnFailure(I18n.t('Error adding files to discussion message'))
+    if (files.length !== 1) {
+      setOnFailure(I18n.t('Error adding file to discussion message'))
     }
 
-    const newAttachmentsToUpload = files.map(file => {
-      return {isLoading: true, id: file.url ? `${file.url}` : `${file.name}`}
-    })
+    props.setAttachmentToUpload(true)
 
-    props.setAttachmentsToUpload(prev => prev.concat(newAttachmentsToUpload))
-
-    setOnSuccess(I18n.t('Uploading files'))
+    setOnSuccess(I18n.t('Uploading file'))
 
     try {
       const newFiles = await uploadFiles(
         files,
         fileUploadUrl(ENV.DISCUSSION?.ATTACHMENTS_FOLDER_ID)
       )
-      props.setAttachments(prev => prev.concat(newFiles))
+      const newFile = {
+        _id: newFiles[0].id,
+        url: newFiles[0].url,
+        displayName: newFiles[0].display_name
+      }
+      props.setAttachment(newFile)
     } catch (err) {
-      setOnFailure(I18n.t('Error uploading files'))
+      setOnFailure(I18n.t('Error uploading file'))
     } finally {
-      props.setAttachmentsToUpload(prev => {
-        const attachmentsStillUploading = prev.filter(
-          file => !newAttachmentsToUpload.includes(file)
-        )
-        return attachmentsStillUploading
-      })
+      props.setAttachmentToUpload(false)
     }
   }
 
@@ -89,10 +81,13 @@ export function AttachmentDisplay(props) {
         }
       }}
       render={(responsiveProps, matches) =>
-        props.attachments.length ? (
-          <AttachmentButton attachment={props.attachments[0]} onDeleteItem={removeAttachment} />
+        props.attachment?._id ? (
+          <AttachmentButton attachment={props.attachment} onDeleteItem={removeAttachment} />
         ) : (
-          <AttachButton onAttachmentUpload={addAttachment} />
+          <UploadButton
+            attachmentToUpload={props.attachmentToUpload}
+            onAttachmentUpload={addAttachment}
+          />
         )
       }
     />
@@ -104,15 +99,19 @@ AttachmentDisplay.propTypes = {
    * Array of one attachment, from useState
    * This toggles AttachmentButton (attachment present) vs AttachButton (no attachment)
    */
-  attachments: PropTypes.array.isRequired,
+  attachment: PropTypes.object,
   /**
    * Used to set the attachments prop, if no attachment is set
    */
-  setAttachments: PropTypes.func.isRequired,
+  setAttachment: PropTypes.func.isRequired,
   /**
    * Used to set the setAttachmentsToUpload prop, allows for returning loading state
    */
-  setAttachmentsToUpload: PropTypes.func.isRequired
+  setAttachmentToUpload: PropTypes.func.isRequired,
+  /**
+   * toggles loading state
+   */
+  attachmentToUpload: PropTypes.bool
 }
 
 export default AttachmentDisplay

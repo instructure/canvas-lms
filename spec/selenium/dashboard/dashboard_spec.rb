@@ -484,7 +484,7 @@ describe "dashboard" do
         get "/"
         expect(card_container).to include_text("Course 1")
         expect(card_container).to include_text("Course 2")
-        expect(dashboard_container).not_to contain_css(observer_picker_container_selector)
+        expect(dashboard_container).not_to contain_css(observed_student_dropdown_selector)
       end
     end
 

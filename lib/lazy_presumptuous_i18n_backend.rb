@@ -41,6 +41,7 @@
 # strings that have already been loaded.
 class LazyPresumptuousI18nBackend
   include I18n::Backend::Base
+  include I18n::Backend::Fallbacks
 
   def initialize(meta_keys: [], logger: nil)
     @meta_keys = meta_keys.map(&:to_s)

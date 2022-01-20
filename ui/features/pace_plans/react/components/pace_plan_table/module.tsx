@@ -80,7 +80,7 @@ export const Module: React.FC<PassedProps> = props => {
         <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
           {I18n.t('Due Date')}
           {!isStudentPlan && props.isCompressing && (
-            <View as="span" margin="0 0 0 x-small">
+            <View data-testid="duedate-tooltip" as="span" margin="0 0 0 x-small">
               <Tooltip
                 renderTip={I18n.t(
                   'Due Dates are being compressed based on your start and end dates'
@@ -102,7 +102,7 @@ export const Module: React.FC<PassedProps> = props => {
     // status changes or the pace plan changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${item.duration}|${props.pacePlan.hard_end_dates}`
+    const key = `${item.id}|${item.module_item_id}|${props.pacePlan.hard_end_dates}|${props.pacePlan.updated_at}`
     return (
       <AssignmentRow
         key={key}

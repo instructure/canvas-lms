@@ -198,7 +198,7 @@ module UserSearch
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
           AND logins.account_id = #{User.connection.quote(params[:account])}
           AND logins.workflow_state = 'active'")
-                 .where(pseudonyms: { account_id: params[:account], workflow_state: "active" })
+                 .where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] })
                  .where(like_condition("pseudonyms.sis_user_id"), pattern: params[:pattern])
     end
 

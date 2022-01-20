@@ -21,6 +21,6 @@
 # initialization to happen early enough that other
 # initializing things can read their consul settings,
 # so all of the "setup" stuff for reading from consul is
-# in lib/canvas/dynamic_settings.rb and it gets invoked
+# in lib/dynamic_settings_initializer.rb and it gets invoked
 # from application.rb as the "canvas.init_dynamic_settings"
 # initializer.

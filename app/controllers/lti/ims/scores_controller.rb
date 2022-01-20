@@ -310,10 +310,14 @@ module Lti::IMS
         submission = line_item.assignment.find_or_create_submission(user)
         submission.update(score: nil)
       else
-        submission = line_item.assignment.grade_student(
-          user,
-          { score: submission_score, grader_id: -tool.id }
-        ).first
+        submission_hash = { grader_id: -tool.id }
+        if line_item.assignment.grading_type == "pass_fail"
+          # This reflects behavior/logic in Basic Outcomes.
+          submission_hash[:grade] = scores_params[:result_score].to_f > 0 ? "pass" : "fail"
+        else
+          submission_hash[:score] = submission_score
+        end
+        submission = line_item.assignment.grade_student(user, submission_hash).first
       end
       submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
       submission

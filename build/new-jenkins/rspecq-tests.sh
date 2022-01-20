@@ -3,13 +3,14 @@
 set -o nounset -o errexit -o errtrace -o pipefail -o xtrace
 
 PROCESSES=$((${RSPEC_PROCESSES:=1}-1))
-COVERAGE=${COVERAGE:-0}
+SPECS="${CRYSTAL_BALL_SPECS:=.}"
+BUILD_NAME="${BUILD_NAME:=${JOB_NAME}_build${BUILD_NUMBER}}"
 
 for i in $(seq 0 $PROCESSES); do
   WORKER_NAME="${JOB_NAME}_worker${CI_NODE_INDEX}-${i}"
 
-  commands+=("COVERAGE=${COVERAGE} PARALLEL_INDEX=${i} RAILS_DB_NAME_TEST=canvas_test_${i} bundle exec rspecq \
-                                          --build ${JOB_NAME}_build${BUILD_NUMBER} \
+  commands+=("COVERAGE=${COVERAGE:-0} PARALLEL_INDEX=${i} RAILS_DB_NAME_TEST=canvas_test_${i} bundle exec rspecq \
+                                          --build ${BUILD_NAME} \
                                           --worker ${WORKER_NAME} \
                                           --include-pattern '${TEST_PATTERN}'  \
                                           --exclude-pattern '${EXCLUDE_TESTS}' \
@@ -18,7 +19,7 @@ for i in $(seq 0 $PROCESSES); do
                                           -- --require './spec/formatters/error_context/stderr_formatter.rb' \
                                           --require './spec/formatters/error_context/html_page_formatter.rb' \
                                           --format ErrorContext::HTMLPageFormatter \
-                                          --format ErrorContext::StderrFormatter .")
+                                          --format ErrorContext::StderrFormatter ${SPECS}")
 done
 
 for command in "${commands[@]}"; do

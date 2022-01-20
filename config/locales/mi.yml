@@ -5602,7 +5602,7 @@ mi:
         fields_required: "Ko te whīra \"%{field}\" hiahiatia te"
         invalid_live_events_url: "Koirä muhu, me te waiho i te URL whaimana."
         invalid_url: "URL muhu"
-        login_expiration_minimum: "Ko te wāhanga paunga 20 meneti nui rānei"
+        login_expiration_minimum: "Ko te wāhanga paunga %{minutes} meneti nui rānei"
         need_integer: "Tēnā koa whakauru he tau tōpū mo te keteroki rārangi tākaro"
         stream_name_required: "Ko te ingoa awa kinesis hiahiatia te."
   canvas_3962b702: Canvas

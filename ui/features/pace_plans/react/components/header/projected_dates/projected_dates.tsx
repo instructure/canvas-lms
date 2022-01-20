@@ -94,18 +94,21 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   // See useEffect for that
   const validateStart = useCallback(
     (date: moment.Moment) => {
-      if (ENV.VALID_DATE_RANGE.start_at.date && date < moment(ENV.VALID_DATE_RANGE.start_at.date)) {
+      if (
+        ENV.VALID_DATE_RANGE.start_at.date &&
+        date.isBefore(moment(ENV.VALID_DATE_RANGE.start_at.date), 'day')
+      ) {
         return I18n.t('Date is before the course start date')
       }
 
-      if (pacePlan.hard_end_dates && date > moment(pacePlan.end_date)) {
+      if (pacePlan.hard_end_dates && date.isAfter(moment(pacePlan.end_date), 'day')) {
         return I18n.t('Date is after the specified end date')
       }
 
       if (
         !pacePlan.hard_end_dates &&
         ENV.VALID_DATE_RANGE.end_at.date &&
-        date > moment(ENV.VALID_DATE_RANGE.end_at.date)
+        date.isAfter(moment(ENV.VALID_DATE_RANGE.end_at.date), 'day')
       ) {
         return I18n.t('Date is after the course end date')
       }
@@ -143,7 +146,11 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     endDateInteraction = planPublishing ? 'disabled' : 'enabled'
   } else if (ENV.VALID_DATE_RANGE.end_at.date) {
     endDateValue = ENV.VALID_DATE_RANGE.end_at.date
-    endHelpText = I18n.t('Required by course end date')
+    if (ENV.VALID_DATE_RANGE.end_at.date_context === 'course') {
+      endHelpText = I18n.t('Required by course end date')
+    } else {
+      endHelpText = I18n.t('Required by term end date')
+    }
     endDateInteraction = 'readonly'
   } else {
     endDateValue = projectedEndDate

@@ -26,9 +26,9 @@ import {Text} from '@instructure/ui-text'
 
 export function DueDatesForParticipantList({...props}) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const truncateLength = 10
-  const truncateTo = 5
-  const isExpandable = props.assignmentOverride?.set?.students?.length > truncateLength
+  const TRUNCATE_LENGTH = 10
+  const TRUNCATE_TO = 5
+  const isExpandable = props.assignmentOverride?.set?.students?.length > TRUNCATE_LENGTH
 
   if (props.assignmentOverride?.set?.students?.length > 0) {
     return (
@@ -38,7 +38,7 @@ export function DueDatesForParticipantList({...props}) {
             ? props.assignmentOverride.set.students.map(student => student.shortName).join(', ') +
               ' '
             : props.assignmentOverride.set.students
-                .slice(0, truncateTo)
+                .slice(0, TRUNCATE_TO)
                 .map(student => student.shortName)
                 .join(', ')}
         </Text>
@@ -48,10 +48,10 @@ export function DueDatesForParticipantList({...props}) {
             <Link onClick={() => setIsExpanded(!isExpanded)}>
               {isExpanded
                 ? I18n.t('%{count} less', {
-                    count: props.assignmentOverride.set.students.length - truncateTo
+                    count: props.assignmentOverride.set.students.length - TRUNCATE_TO
                   })
                 : I18n.t('%{count} more', {
-                    count: props.assignmentOverride.set.students.length - truncateTo
+                    count: props.assignmentOverride.set.students.length - TRUNCATE_TO
                   })}
             </Link>
           </Text>

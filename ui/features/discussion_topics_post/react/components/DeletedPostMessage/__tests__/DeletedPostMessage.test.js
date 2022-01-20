@@ -39,13 +39,11 @@ describe('DeletedPostMessage', () => {
     const container = setup()
     expect(container.getByText('Deleted by Rick Sanchez')).toBeInTheDocument()
     expect(container.getByText('Deleted Feb 2 2:00pm')).toBeInTheDocument()
-    expect(container.getByText('Created Jan 1 1:00pm')).toBeInTheDocument()
   })
 
   it('displays some deletion info when missing deleter name', () => {
     const container = setup()
     expect(container.queryByText('Deleted by')).toBeNull()
     expect(container.getByText('Deleted Feb 2 2:00pm')).toBeInTheDocument()
-    expect(container.getByText('Created Jan 1 1:00pm')).toBeInTheDocument()
   })
 })

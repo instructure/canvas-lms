@@ -181,6 +181,15 @@ describe('AuthorInfo', () => {
       expect(container.getByText('Anonymous 1 (You)')).toBeInTheDocument()
     })
 
+    // happens in optimistic response
+    it('removes id if null', () => {
+      const container = setup({
+        author: null,
+        anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER, id: null})
+      })
+      expect(container.getByText('Anonymous (You)')).toBeInTheDocument()
+    })
+
     it('should not highlight terms in the author name', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock(), searchTerm: 'Anonymous'})
       expect(container.queryByTestId('highlighted-search-item')).toBeNull()

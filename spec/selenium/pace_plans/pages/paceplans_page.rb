@@ -21,16 +21,32 @@ require_relative "../../common"
 
 module PacePlansPageObject
   #------------------------- Selectors -------------------------------
+  def assignment_due_date_selector
+    "[data-testid='assignment-due-date']"
+  end
+
   def cancel_button_selector
     "button:contains('Cancel')"
+  end
+
+  def compression_tooltip_selector
+    "[data-testid='duedate-tooltip']"
   end
 
   def duration_field_selector
     "[data-testid='duration-number-input']"
   end
 
+  def duration_readonly_selector
+    "[data-testid='duration-input']"
+  end
+
   def edit_tray_close_button_selector
     "button:contains('Close')"
+  end
+
+  def hypothetical_end_date_selector
+    "[data-testid='pace-plans-collapse']:contains('Hypothetical end date')"
   end
 
   def module_item_points_possible_selector
@@ -55,6 +71,18 @@ module PacePlansPageObject
 
   def pace_plan_menu_selector
     "[data-position-target='pace-plan-menu']"
+  end
+
+  def pace_plan_picker_selector
+    "[data-testid='pace-plan-picker']"
+  end
+
+  def pace_plan_student_option_selector
+    "[data-position-target='pace-plan-student-menu']"
+  end
+
+  def pace_plans_page_selector
+    "#pace_plans"
   end
 
   def pace_plan_start_date_selector
@@ -89,6 +117,10 @@ module PacePlansPageObject
     "#pace-plans-required-end-date-input [data-testid='pace-plan-date']"
   end
 
+  def required_end_date_message_selector
+    "#pace-plans-required-end-date-input:contains('Required by specified end date')"
+  end
+
   def settings_button_selector
     "button:contains('Modify Settings')"
   end
@@ -109,8 +141,16 @@ module PacePlansPageObject
     "[data-testid='skip-weekends-toggle']"
   end
 
+  def student_menu_selector
+    "ul[aria-label='Students']"
+  end
+
   def student_pace_plan_selector(student_name)
     "span[role=menuitem]:contains(#{student_name})"
+  end
+
+  def student_pp_xpath_selector(student_name)
+    "//ul[@aria-label = 'Students']//span[text() = '#{student_name}']"
   end
 
   def students_menu_item_selector
@@ -125,18 +165,38 @@ module PacePlansPageObject
     "[aria-label='Unpublished Changes tray']"
   end
 
+  def unpublished_warning_modal_selector
+    "[data-testid='unpublished-warning-modal']"
+  end
+
   #------------------------- Elements --------------------------------
+
+  def assignment_due_date
+    f(assignment_due_date_selector)
+  end
 
   def cancel_button
     fj(cancel_button_selector)
+  end
+
+  def compression_tooltip
+    f(compression_tooltip_selector)
   end
 
   def duration_field
     f(duration_field_selector)
   end
 
+  def duration_readonly
+    f(duration_readonly_selector)
+  end
+
   def edit_tray_close_button
     fj(edit_tray_close_button_selector)
+  end
+
+  def hypothetical_end_date
+    fj(hypothetical_end_date_selector)
   end
 
   def module_item_points_possible
@@ -167,6 +227,18 @@ module PacePlansPageObject
     ff(pace_plan_menu_selector)
   end
 
+  def pace_plan_picker
+    f(pace_plan_picker_selector)
+  end
+
+  def pace_plan_student_option
+    f(pace_plan_student_option_selector)
+  end
+
+  def pace_plans_page
+    f(pace_plans_page_selector)
+  end
+
   def pace_plan_start_date
     f(pace_plan_start_date_selector)
   end
@@ -193,6 +265,10 @@ module PacePlansPageObject
 
   def required_end_date_input
     f(required_end_date_input_selector)
+  end
+
+  def required_end_date_message
+    fj(required_end_date_message_selector)
   end
 
   def settings_button
@@ -227,6 +303,10 @@ module PacePlansPageObject
     f(unpublished_changes_tray_selector)
   end
 
+  def unpublished_warning_modal
+    f(unpublished_warning_modal_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   def visit_pace_plans_page
     get "/courses/#{@course.id}/pace_plans"
@@ -243,7 +323,7 @@ module PacePlansPageObject
   end
 
   def click_main_pace_plan_menu
-    pace_plan_menu[1].click
+    pace_plan_picker.click
   end
 
   def click_require_end_date_checkbox
@@ -263,13 +343,26 @@ module PacePlansPageObject
   end
 
   def click_student_pace_plan(student_name)
+    # This check reduces the flakiness of the clicking in this menu.  Keeping
+    # the puts line for verification in the logs
+    unless element_exists?(student_pp_xpath_selector(student_name), true)
+      puts "Student pace plan selector didn't exist so retrying click"
+      click_students_menu_item
+    end
+
     student_pace_plan(student_name).click
-    driver.action.send_keys(:escape).perform
   end
 
   def click_students_menu_item
-    students_menu_item.click # focus on it
-    students_menu_item.click # click on it
+    unless element_exists?(pace_plan_student_option_selector)
+      puts "retrying the main menu click"
+      click_main_pace_plan_menu
+    end
+    pace_plan_student_option.click
+    # Reducing the flakiness of this menu
+    unless element_exists?(student_menu_selector)
+      pace_plan_student_option.click
+    end
   end
 
   def click_unpublished_changes_button
@@ -290,12 +383,23 @@ module PacePlansPageObject
     pace_plan_table_module_elements[element_number].text
   end
 
+  delegate :text, to: :pace_plans_page, prefix: true
+
   #----------------------------Element Management---------------------
 
   def add_required_end_date(required_end_date)
-    formatted_date = required_end_date.strftime("%m/%d/%Y")
-    required_end_date_input[:value].size.times { required_end_date_input.send_keys(:backspace) }
-    required_end_date_input.send_keys(formatted_date, :enter)
+    required_end_date_input.send_keys([:control, "a"], :backspace, format_date_for_view(required_end_date), :enter)
+  end
+
+  def add_start_date(start_date)
+    pace_plan_start_date.send_keys([:control, "a"], :backspace, format_date_for_view(start_date), :enter)
+  end
+
+  delegate :text, to: :assignment_due_date, prefix: true
+
+  def calculate_saturday_date
+    current_date = Date.today
+    current_date + ((6 - current_date.wday) % 7)
   end
 
   def module_item_exists?

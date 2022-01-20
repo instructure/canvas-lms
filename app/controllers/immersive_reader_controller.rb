@@ -30,7 +30,7 @@ class ImmersiveReaderController < ApplicationController
   class ServiceError < StandardError; end
 
   def ir_config
-    @ir_config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["immersive_reader.yml"] || "{}").with_indifferent_access
+    @ir_config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["immersive_reader.yml"] || "{}").with_indifferent_access
   end
 
   def require_config

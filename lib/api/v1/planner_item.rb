@@ -258,7 +258,7 @@ module Api::V1::PlannerItem
   end
 
   def online_meeting_url(event_description, event_location)
-    config = Canvas::DynamicSettings.find("canvas", tree: "config", service: "canvas")
+    config = DynamicSettings.find("canvas", tree: "config", service: "canvas")
     default_regex = <<~'REGEX'
       https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
       https:\/\/[\w-]+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?

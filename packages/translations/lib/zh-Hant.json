@@ -101,6 +101,9 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "是否確定要刪除此手冊項目？"
     },
+    "arrows_464a3e54": {
+        "message": "箭號"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "外觀比例將被保留"
     },
@@ -160,6 +163,9 @@
     },
     "available_folders_694d0436": {
         "message": "可用資料夾"
+    },
+    "basic_554cdc0a": {
+        "message": "基本"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "開始您的待辦事項歷程紀錄"
@@ -377,6 +383,9 @@
     "delete_a6efa79d": {
         "message": "刪除"
     },
+    "delimiters_4db4840d": {
+        "message": "分隔符號"
+    },
     "describe_the_image_e65d2e32": {
         "message": "（描述影像）"
     },
@@ -400,6 +409,9 @@
     },
     "directionality_26ae9e08": {
         "message": "方向"
+    },
+    "directly_edit_latex_b7e9235b": {
+        "message": "直接編輯 LaTeX"
     },
     "discussion_6719c51d": {
         "message": "討論"
@@ -502,6 +514,9 @@
     },
     "equation_1c5ac93c": {
         "message": "方程式"
+    },
+    "equation_editor_39fbc3f1": {
+        "message": "方程式編輯器"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "載入成績時發生錯誤"
@@ -634,6 +649,9 @@
     },
     "grades_loaded_5056277c": {
         "message": "已載入成績"
+    },
+    "greek_65c5b3f7": {
+        "message": "希臘語"
     },
     "group_documents_8bfd6ae6": {
         "message": "群組文件"
@@ -842,6 +860,9 @@
     "middle_27dc1d5": {
         "message": "中間"
     },
+    "misc_3b692ea7": {
+        "message": "雜項"
+    },
     "miscellaneous_e9818229": {
         "message": "雜項"
     },
@@ -962,6 +983,9 @@
     "open_title_application_fd624fc5": {
         "message": "開啟 { title } 應用程式"
     },
+    "operators_a2ef9a93": {
+        "message": "操作員"
+    },
     "opportunities_popup_f6703842": {
         "message": "機會彈出視窗"
     },
@@ -1069,6 +1093,9 @@
     },
     "redo_363c58b7": {
         "message": "重做"
+    },
+    "relationships_6602af70": {
+        "message": "關聯"
     },
     "reminder_date_4564d12d": {
         "message": "提醒：{ date }"

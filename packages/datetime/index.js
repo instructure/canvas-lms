@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment'
+import moment from 'moment-timezone'
 import timezone from 'timezone'
 import en_US from 'timezone/en_US'
 import parseDateTimeWithMoment, {
@@ -73,7 +73,7 @@ export function configure({tz, tzData, momentLocale, formats}) {
   return previousState
 }
 
-export function parse(value) {
+export function parse(value, parsingTimezone = '') {
   const {tz, momentLocale} = state
 
   // hard code '' and null as unparseable
@@ -95,7 +95,7 @@ export function parse(value) {
   if (typeof value === 'string') {
     let m = parseDateTimeWithMoment(value, momentLocale)
 
-    if (m && !specifiesTimezone(m)) {
+    if (m && !specifiesTimezone(m) && m.tz() !== parsingTimezone) {
       const fudged = tz(toRFC3339WithoutTZ(m))
 
       m = moment(new Date(fudged))

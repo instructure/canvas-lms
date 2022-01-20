@@ -17,10 +17,11 @@
  */
 
 import {useState, useEffect} from 'react'
+import I18n from 'i18n!gradebook'
 
 const useModules = (dispatch, courseId, contextModulesPerPage, enabled = true) => {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(true)
+  const [errors, setErrors] = useState([])
   const [data, setData] = useState([])
 
   useEffect(() => {
@@ -34,8 +35,14 @@ const useModules = (dispatch, courseId, contextModulesPerPage, enabled = true) =
           setData(contextModules)
           setLoading(false)
         })
-        .catch(err => {
-          setError(err)
+        .catch(() => {
+          setErrors([
+            {
+              key: 'modules-loading-error',
+              message: I18n.t('There was an error fetching modules.'),
+              variant: 'error'
+            }
+          ])
           setLoading(false)
         })
     } else {
@@ -43,7 +50,7 @@ const useModules = (dispatch, courseId, contextModulesPerPage, enabled = true) =
     }
   }, [enabled, contextModulesPerPage, dispatch, courseId])
 
-  return {loading, error, data}
+  return {loading, errors, data}
 }
 
 export default useModules

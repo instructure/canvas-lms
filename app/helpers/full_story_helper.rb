@@ -27,14 +27,14 @@ module FullStoryHelper
     # this session is already hooked up
     return if session.key?(:fullstory_enabled)
 
-    fsconfig = Canvas::DynamicSettings.find("fullstory", tree: "config", service: "canvas")
+    fsconfig = DynamicSettings.find("fullstory", tree: "config", service: "canvas")
     rate = fsconfig[:sampling_rate, failsafe: 0.0].to_f
     sample = rand
     session[:fullstory_enabled] = rate >= 0.0 && rate <= 1.0 && sample < rate
   end
 
   def fullstory_app_key
-    Canvas::DynamicSettings.find("fullstory", tree: "config", service: "canvas")[:app_key, failsafe: nil]
+    DynamicSettings.find("fullstory", tree: "config", service: "canvas")[:app_key, failsafe: nil]
   end
 
   def fullstory_enabled_for_session?(session)
