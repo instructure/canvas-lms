@@ -109,16 +109,12 @@ describe Types::DiscussionEntryType do
                                                            context: @course,
                                                            user: @teacher)
 
-      @anon_teacher_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
-      @anon_teacher_discussion_entry_type = GraphQLTypeTester.new(@anon_teacher_discussion_entry, current_user: @teacher)
+      @anon_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
+      @anon_discussion_entry_type = GraphQLTypeTester.new(@anon_discussion_entry, current_user: @teacher)
 
       course_with_student(course: @course)
       @anon_student_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Why, hello back to you!", user: @student, editor: @student)
       @anon_student_discussion_entry_type = GraphQLTypeTester.new(@anon_student_discussion_entry, current_user: @teacher)
-
-      ta_in_course(course: @course)
-      @anon_ta_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Why, hello back to you!", user: @ta, editor: @ta)
-      @anon_ta_discussion_entry_type = GraphQLTypeTester.new(@anon_ta_discussion_entry, current_user: @teacher)
 
       course_with_designer(course: @course)
       @anon_designer_discussion_entry = @anon_discussion.discussion_entries.create!(message: "I designed this course!", user: @designer, editor: @designer)
@@ -131,41 +127,29 @@ describe Types::DiscussionEntryType do
       @partial_anon_student_discussion_entry_not_exposed_type = GraphQLTypeTester.new(@partial_anon_student_discussion_entry_not_exposed, current_user: @teacher)
     end
 
-    it "returns the author of teacher post" do
-      expect(@anon_teacher_discussion_entry_type.resolve("author { shortName }")).to eq @teacher.short_name
+    it "does not return the author" do
+      expect(@anon_discussion_entry_type.resolve("author { shortName }")).to eq nil
     end
 
-    it "returns the author of ta post" do
-      expect(@anon_ta_discussion_entry_type.resolve("author { shortName }")).to eq @ta.short_name
-    end
-
-    it "returns the author of designer post" do
-      expect(@anon_designer_discussion_entry_type.resolve("author { shortName }")).to eq @designer.short_name
-    end
-
-    it "does not return the author of student anonymous entry" do
-      expect(@anon_student_discussion_entry_type.resolve("author { shortName }")).to eq nil
-    end
-
-    it "does not return the editor of student anonymous entry" do
-      expect(@anon_student_discussion_entry_type.resolve("editor { shortName }")).to eq nil
+    it "does not return the editor" do
+      expect(@anon_discussion_entry_type.resolve("editor { shortName }")).to eq nil
     end
 
     it "returns current_user for anonymousAuthor when the current user created the entry" do
-      expect(@anon_teacher_discussion_entry_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
+      expect(@anon_discussion_entry_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
     end
 
     it "returns anonymous short name for an anonymous author" do
       student_in_course(active_all: true)
-      expect(GraphQLTypeTester.new(@anon_teacher_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to eq @anon_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.id.to_s(36)
+      expect(GraphQLTypeTester.new(@anon_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to eq @anon_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.id.to_s(36)
     end
 
     it "returns the teacher author if a course id is provided" do
-      expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+      expect(@anon_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
     end
 
     it "returns the teacher editor if a course id is provided" do
-      expect(@anon_teacher_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+      expect(@anon_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
     end
 
     it "returns the designer author if a course id is provided" do
@@ -182,40 +166,6 @@ describe Types::DiscussionEntryType do
 
     it "does not return the student editor if a course id is provided" do
       expect(@anon_student_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
-    end
-
-    describe "quoted reply" do
-      let(:anon_discussion_teacher_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting teacher", parent_id: @anon_teacher_discussion_entry.id, user: @student, include_reply_preview: true) }
-      let(:anon_teacher_quoted_type) { GraphQLTypeTester.new(anon_discussion_teacher_quoted, current_user: @teacher) }
-
-      let(:anon_discussion_ta_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_ta_discussion_entry.id, user: @student, include_reply_preview: true) }
-      let(:anon_ta_quoted_type) { GraphQLTypeTester.new(anon_discussion_ta_quoted, current_user: @teacher) }
-
-      let(:anon_discussion_designer_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting designer", parent_id: @anon_designer_discussion_entry.id, user: @student, include_reply_preview: true) }
-      let(:anon_designer_quoted_type) { GraphQLTypeTester.new(anon_discussion_designer_quoted, current_user: @teacher) }
-
-      let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, include_reply_preview: true) }
-      let(:anon_student_quoted_type) { GraphQLTypeTester.new(anon_discussion_student_quoted, current_user: @teacher) }
-
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
-      end
-
-      it "returns the author information of a teacher post" do
-        expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
-      end
-
-      it "returns the author information of a ta post" do
-        expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
-      end
-
-      it "returns the author information of a designer post" do
-        expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
-      end
-
-      it "does not return author of anonymous student" do
-        expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq nil
-      end
     end
 
     context "partial anonymity" do

@@ -19,9 +19,9 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import $ from 'jquery'
-import PostGradesApp from 'ui/features/gradebook/react/SISGradePassback/PostGradesApp'
-import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager'
-import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu'
+import PostGradesApp from 'ui/features/gradebook/react/SISGradePassback/PostGradesApp.js'
+import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager.js'
+import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu.js'
 
 const workingMenuProps = () => ({
   getAssignmentOrder() {},

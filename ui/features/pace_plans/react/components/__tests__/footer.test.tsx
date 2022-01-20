@@ -91,26 +91,4 @@ describe('Footer', () => {
     const {queryByRole} = render(<Footer {...defaultProps} studentPlan />)
     expect(queryByRole('button')).not.toBeInTheDocument()
   })
-
-  it('keeps focus on Cancel button after clicking', () => {
-    const {getByRole} = render(<Footer {...defaultProps} />)
-
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    act(() => {
-      cancelButton.focus()
-      cancelButton.click()
-    })
-    expect(document.activeElement).toBe(cancelButton)
-  })
-
-  it('keeps focus on Publish button after clicking', () => {
-    const {getByRole} = render(<Footer {...defaultProps} />)
-
-    const pubButton = getByRole('button', {name: 'Publish'})
-    act(() => {
-      pubButton.focus()
-      pubButton.click()
-    })
-    expect(document.activeElement).toBe(pubButton)
-  })
 })

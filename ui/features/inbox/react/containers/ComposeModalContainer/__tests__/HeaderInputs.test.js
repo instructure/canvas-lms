@@ -18,18 +18,13 @@
 
 import {Course} from '../../../../graphql/Course'
 import {Enrollment} from '../../../../graphql/Enrollment'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {Group} from '../../../../graphql/Group'
 import HeaderInputs from '../HeaderInputs'
 import React from 'react'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
-import {handlers} from '../../../../graphql/mswHandlers'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {ApolloProvider} from 'react-apollo'
 
 describe('HeaderInputs', () => {
-  const server = mswServer(handlers)
-  const defaultProps = props => ({
+  const defaultProps = () => ({
     courses: {
       favoriteGroupsConnection: {
         nodes: [Group.mock()]
@@ -40,76 +35,33 @@ describe('HeaderInputs', () => {
       enrollments: [Enrollment.mock()]
     },
     onContextSelect: jest.fn(),
-    onSelectedIdsChange: jest.fn(),
     onSendIndividualMessagesChange: jest.fn(),
     onSubjectChange: jest.fn(),
-    onRemoveMediaComment: jest.fn(),
-    ...props
+    onRemoveMediaComment: jest.fn()
   })
-
-  beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
-  })
-
-  afterEach(() => {
-    server.resetHandlers()
-  })
-
-  afterAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
-    server.close()
-  })
-
-  const setup = props => {
-    return render(
-      <ApolloProvider client={mswClient}>
-        <HeaderInputs {...props} />
-      </ApolloProvider>
-    )
-  }
 
   describe('Media Comments', () => {
     it('does not render a media comment if one is not provided', () => {
-      const container = setup(defaultProps())
+      const container = render(<HeaderInputs {...defaultProps()} />)
       expect(container.queryByTestId('media-attachment')).toBeNull()
     })
 
     it('does render a media comment if one is provided', () => {
-      const container = setup(defaultProps({mediaAttachmentTitle: 'I am Lord Lemon'}))
+      const container = render(
+        <HeaderInputs {...defaultProps()} mediaAttachmentTitle="I am Lord Lemon" />
+      )
       expect(container.getByTestId('media-attachment')).toBeInTheDocument()
       expect(container.getByText('I am Lord Lemon')).toBeInTheDocument()
     })
 
     it('calls the onRemoveMediaComment callback when the remove media button is clicked', () => {
-      const props = defaultProps({mediaAttachmentTitle: 'No really I am Lord Lemon'})
-      const container = setup(props)
+      const props = defaultProps()
+      const container = render(
+        <HeaderInputs {...props} mediaAttachmentTitle="No really I am Lord Lemon" />
+      )
       const removeMediaButton = container.getByTestId('remove-media-attachment')
       fireEvent.click(removeMediaButton)
       expect(props.onRemoveMediaComment).toHaveBeenCalled()
-    })
-
-    it('calls onSelectedIdsChange when using the Address Book component', async () => {
-      const props = defaultProps({addressBookContainerOpen: true})
-      const container = setup(props)
-
-      const input = await container.findByTestId('address-book-input')
-      fireEvent.change(input, {target: {value: 'Fred'}})
-
-      const items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[0])
-
-      expect(container.findAllByTestId('address-book-tag')).toBeTruthy()
-
-      expect(props.onSelectedIdsChange).toHaveBeenCalledWith([
-        {
-          _id: '1',
-          id: 'TWVzc2FnZWFibGVVc2VyLTQx',
-          name: 'Frederick Dukes'
-        }
-      ])
     })
   })
 })

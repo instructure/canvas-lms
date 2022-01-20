@@ -59,7 +59,7 @@ describe Types::LearningOutcomeType do
       expect(outcome_type.resolve("pointsPossible")).to eq @outcome.points_possible
       expect(outcome_type.resolve("masteryPoints")).to eq @outcome.rubric_criterion[:mastery_points]
 
-      raw = outcome_type_raw.resolve("ratings { description points }")
+      raw = outcome_type_raw.resolve("ratings { description points mastery }")
       expect(raw["ratings"].map(&:symbolize_keys)).to eq @outcome.rubric_criterion[:ratings]
 
       expect(outcome_type.resolve("canEdit")).to eq true

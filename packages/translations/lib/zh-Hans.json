@@ -101,9 +101,6 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "是否确定要删除此规划者项目？"
     },
-    "arrows_464a3e54": {
-        "message": "箭头"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "保留长宽比"
     },
@@ -163,9 +160,6 @@
     },
     "available_folders_694d0436": {
         "message": "可用文件夹"
-    },
-    "basic_554cdc0a": {
-        "message": "基本"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "您的待办事项历史记录的开始"
@@ -383,9 +377,6 @@
     "delete_a6efa79d": {
         "message": "删除"
     },
-    "delimiters_4db4840d": {
-        "message": "分隔符"
-    },
     "describe_the_image_e65d2e32": {
         "message": "（图像说明）"
     },
@@ -409,9 +400,6 @@
     },
     "directionality_26ae9e08": {
         "message": "方向"
-    },
-    "directly_edit_latex_b7e9235b": {
-        "message": "直接编辑 LaTeX"
     },
     "discussion_6719c51d": {
         "message": "讨论"
@@ -514,9 +502,6 @@
     },
     "equation_1c5ac93c": {
         "message": "等式"
-    },
-    "equation_editor_39fbc3f1": {
-        "message": "方程式编辑器"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "加载评分时出错"
@@ -649,9 +634,6 @@
     },
     "grades_loaded_5056277c": {
         "message": "已加载评分"
-    },
-    "greek_65c5b3f7": {
-        "message": "希腊语"
     },
     "group_documents_8bfd6ae6": {
         "message": "组文档"
@@ -860,9 +842,6 @@
     "middle_27dc1d5": {
         "message": "中间"
     },
-    "misc_3b692ea7": {
-        "message": "其他"
-    },
     "miscellaneous_e9818229": {
         "message": "其他"
     },
@@ -983,9 +962,6 @@
     "open_title_application_fd624fc5": {
         "message": "打开{ title }应用程序"
     },
-    "operators_a2ef9a93": {
-        "message": "运算符"
-    },
     "opportunities_popup_f6703842": {
         "message": "机会弹出窗口"
     },
@@ -1093,9 +1069,6 @@
     },
     "redo_363c58b7": {
         "message": "重新操作"
-    },
-    "relationships_6602af70": {
-        "message": "关系"
     },
     "reminder_date_4564d12d": {
         "message": "提醒：{ date }"

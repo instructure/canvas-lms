@@ -19,8 +19,8 @@
 
 describe UserMerge do
   describe "with simple users" do
-    let!(:user1) { user_model(name: "target_user") }
-    let!(:user2) { user_model(name: "from_user") }
+    let!(:user1) { user_model }
+    let!(:user2) { user_model }
     let(:course1) { course_factory(active_all: true) }
     let(:course2) { course_factory(active_all: true) }
 
@@ -159,48 +159,6 @@ describe UserMerge do
       expect(user1.submissions.length).to eql(2)
       expect(user1.submissions.map(&:id)).to be_include(s1.id)
       expect(user1.submissions.map(&:id)).to be_include(s3.id)
-    end
-
-    it "recalculates cached_due_date on unsubmitted placeholder submissions for the new user" do
-      due_date_timestamp = DateTime.now.iso8601
-      course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
-      assignment = course1.assignments.create!(
-        title: "some assignment",
-        grading_type: "points",
-        submission_types: "online_text_entry",
-        due_at: due_date_timestamp
-      )
-      expect(Submission.where(user_id: user2.id, assignment_id: assignment.id).take.cached_due_date)
-        .to eq due_date_timestamp
-      UserMerge.from(user2).into(user1)
-      run_jobs
-      expect(Submission.where(user_id: user1.id, assignment_id: assignment.id).take.cached_due_date)
-        .to eq due_date_timestamp
-    end
-
-    it "recalculates cached_due_date on submissions for assignments with overrides" do
-      due_date_timestamp = DateTime.now.iso8601
-      course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
-      assignment = course1.assignments.create!(
-        title: "Assignment with student due date override",
-        grading_type: "points",
-        submission_types: "online_text_entry"
-      )
-      override = assignment.assignment_overrides.create!(
-        due_at: due_date_timestamp,
-        due_at_overridden: true,
-        all_day: true,
-        unlock_at_overridden: true,
-        lock_at_overridden: true
-      )
-      override.assignment_override_students.create!(user: user2)
-      assignment.update(due_at: nil, only_visible_to_overrides: true)
-      expect(Submission.where(user_id: user2.id, assignment_id: assignment.id).take.cached_due_date)
-        .to eq due_date_timestamp
-      UserMerge.from(user2).into(user1)
-      run_jobs
-      expect(Submission.where(user_id: user1.id, assignment_id: assignment.id).take.cached_due_date)
-        .to eq due_date_timestamp
     end
 
     it "does not move or delete submission when both users have submissions" do

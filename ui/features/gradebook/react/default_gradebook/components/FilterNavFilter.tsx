@@ -46,18 +46,14 @@ export default function FilterNavFilter({
   sections
 }) {
   const [isRenaming, setIsRenaming] = useState(false)
-  const [wasRenaming, setWasRenaming] = useState(false)
   const [label, setLabel] = useState(filter.label)
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const renameButtonRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (isRenaming) {
-      inputRef.current?.focus()
-    } else if (wasRenaming) {
-      renameButtonRef.current?.focus()
+    if (inputRef.current instanceof HTMLInputElement && isRenaming) {
+      inputRef.current.focus()
     }
-  }, [isRenaming, wasRenaming])
+  }, [isRenaming])
 
   const onAddCondition = () => {
     onChange({
@@ -70,19 +66,10 @@ export default function FilterNavFilter({
       })
     })
   }
-  const onDeleteCondition = (condition_, divRef: React.RefObject<HTMLElement>) => {
-    if (divRef.current?.previousElementSibling) {
-      const buttons = Array.from(divRef.current.previousElementSibling.querySelectorAll('button'))
-      const lastButton = buttons[buttons.length - 1]
-      if (lastButton) {
-        lastButton.focus()
-      } else {
-        throw new Error('expected button missing')
-      }
-    }
+  const onDeleteCondition = condition => {
     onChange({
       ...filter,
-      conditions: filter.conditions.filter(c => c.id !== condition_.id)
+      conditions: filter.conditions.filter(c => c.id !== condition.id)
     })
   }
   const onChangeCondition = condition => {
@@ -148,12 +135,8 @@ export default function FilterNavFilter({
         <View as="div">
           {filter.label}
           <IconButton
-            elementRef={el => (renameButtonRef.current = el)}
             color="primary"
-            onClick={() => {
-              setIsRenaming(true)
-              setWasRenaming(true)
-            }}
+            onClick={() => setIsRenaming(true)}
             screenReaderLabel={I18n.t('Rename filter')}
             withBackground={false}
             withBorder={false}

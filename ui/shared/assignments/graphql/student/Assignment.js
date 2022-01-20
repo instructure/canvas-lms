@@ -40,7 +40,6 @@ export const Assignment = {
       expectsSubmission
       gradingType
       gradeGroupStudentsIndividually
-      groupCategoryId
       groupSet {
         ...GroupSet
       }
@@ -73,7 +72,6 @@ export const Assignment = {
     expectsSubmission: bool.isRequired,
     gradingType: string,
     gradeGroupStudentsIndividually: bool,
-    groupCategoryId: number,
     groupSet: GroupSet.shape,
     lockAt: string,
     lockInfo: LockInfo.shape,

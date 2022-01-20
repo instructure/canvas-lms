@@ -31,13 +31,11 @@ import {
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import DashboardOptionsMenu from './DashboardOptionsMenu'
-import loadCardDashboard, {resetDashboardCards} from '@canvas/dashboard-card'
+import loadCardDashboard from '@canvas/dashboard-card'
 import $ from 'jquery'
 import {asText, getPrefetchedXHR} from '@instructure/js-utils'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
-import ObserverOptions from '@canvas/observer-picker'
-import {View} from '@instructure/ui-view'
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)
@@ -235,11 +233,6 @@ class DashboardHeader extends React.Component {
     elements[newView].forEach(show)
   }
 
-  reloadCardDashboard = userId => {
-    resetDashboardCards()
-    loadCardDashboard(undefined, userId)
-  }
-
   render() {
     return (
       <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
@@ -247,17 +240,6 @@ class DashboardHeader extends React.Component {
           <span className="hidden-phone">{I18n.t('Dashboard')}</span>
         </h1>
         <div className="ic-Dashboard-header__actions">
-          {ENV.FEATURES?.observer_picker && ENV.current_user_roles?.includes('observer') && (
-            <View as="div" maxWidth="16em" margin="0 small">
-              <ObserverOptions
-                currentUser={ENV.current_user}
-                currentUserRoles={ENV.current_user_roles}
-                observerList={ENV.OBSERVER_LIST}
-                canAddObservee={ENV.CAN_ADD_OBSERVEE}
-                handleChangeObservedUser={this.reloadCardDashboard}
-              />
-            </View>
-          )}
           {this.props.planner_enabled && (
             <div
               id="dashboard-planner-header"

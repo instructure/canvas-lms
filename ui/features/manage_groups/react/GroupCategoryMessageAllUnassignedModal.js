@@ -51,7 +51,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
   const chunkSize = ENV.MAX_GROUP_CONVERSATION_SIZE || 100
 
   const payload = {
-    body: message,
+    body: {message},
     context_code: contextAssetString,
     recipients: recipients.map(user => user.id)
   }

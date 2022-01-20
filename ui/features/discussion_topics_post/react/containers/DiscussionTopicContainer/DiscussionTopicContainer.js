@@ -494,16 +494,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           {expandedReply && (
                             <DiscussionEdit
                               discussionAnonymousState={props.discussionTopic.anonymousState}
-                              canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
                               show={expandedReply}
-                              onSubmit={(
-                                message,
-                                _includeReplyPreview,
-                                fileId,
-                                anonymousAuthorState
-                              ) => {
+                              onSubmit={text => {
                                 if (createDiscussionEntry) {
-                                  createDiscussionEntry(message, fileId, anonymousAuthorState)
+                                  createDiscussionEntry(text)
                                   setExpandedReply(false)
                                 }
                               }}

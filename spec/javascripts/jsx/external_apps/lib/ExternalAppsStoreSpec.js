@@ -75,7 +75,7 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
   }
 })
 
-test('fetch', function () {
+test('fetch', function() {
   this.server.respondWith('GET', /\/lti_apps/, [
     200,
     {'Content-Type': 'application/json'},
@@ -86,26 +86,7 @@ test('fetch', function () {
   equal(store.getState().externalTools.length, 3)
 })
 
-test('resets and fetch responses interwoven', function () {
-  this.server.respondWith('GET', /\/lti_apps/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.tools)
-  ])
-  this.server.respondWith('GET', /\/lti_apps/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.tools)
-  ])
-  store.fetch()
-  store.reset()
-  store.fetch()
-  this.server.respond()
-  this.server.respond()
-  equal(store.getState().externalTools.length, 3)
-})
-
-test('updateAccessToken', function () {
+test('updateAccessToken', function() {
   this.server.respondWith('PUT', /\/accounts/, [
     200,
     {'Content-Type': 'application/json'},
@@ -117,7 +98,7 @@ test('updateAccessToken', function () {
   return this.server.respond()
 })
 
-test('fetchWithDetails with ContextExternalTool', function () {
+test('fetchWithDetails with ContextExternalTool', function() {
   expect(1)
   const tool = this.tools[0]
   this.server.respondWith('GET', /\/external_tools/, [
@@ -129,7 +110,7 @@ test('fetchWithDetails with ContextExternalTool', function () {
   return this.server.respond()
 })
 
-test('fetchWithDetails with Lti::ToolProxy', function () {
+test('fetchWithDetails with Lti::ToolProxy', function() {
   expect(1)
   const tool = this.tools[1]
   this.server.respondWith('GET', /\/tool_proxies/, [
@@ -141,13 +122,13 @@ test('fetchWithDetails with Lti::ToolProxy', function () {
   return this.server.respond()
 })
 
-test('save', function () {
+test('save', function() {
   expect(4)
   const {_generateParams} = store
   store._generateParams = () => ({foo: 'bar'})
   const spy = sandbox.spy(store, 'save')
   const data = {some: 'data'}
-  const success = function (data, statusText, xhr) {
+  const success = function(data, statusText, xhr) {
     equal(statusText, 'success')
     equal(data.status, 'ok')
   }
@@ -164,7 +145,7 @@ test('save', function () {
   store._generateParams = _generateParams
 })
 
-test('save stringifys JSON payload', function () {
+test('save stringifys JSON payload', function() {
   const {_generateParams} = store
   const {ajax} = $
   const ajaxSpy = sinon.spy()
@@ -173,7 +154,7 @@ test('save stringifys JSON payload', function () {
     url: null
   })
   const data = {some: 'data'}
-  const success = function (data, statusText, xhr) {
+  const success = function(data, statusText, xhr) {
     equal(statusText, 'success')
     equal(data.status, 'ok')
   }
@@ -191,7 +172,7 @@ test('save stringifys JSON payload', function () {
   $.ajax = ajax
 })
 
-test('save sets the content type to application/json', function () {
+test('save sets the content type to application/json', function() {
   const {_generateParams} = store
   const {ajax} = $
   const ajaxSpy = sinon.spy()
@@ -200,7 +181,7 @@ test('save sets the content type to application/json', function () {
     url: null
   })
   const data = {some: 'data'}
-  const success = function (data, statusText, xhr) {
+  const success = function(data, statusText, xhr) {
     equal(statusText, 'success')
     equal(data.status, 'ok')
   }
@@ -283,11 +264,11 @@ test('_generateParams xml', () => {
   })
 })
 
-test('delete ContextExternalTool', function () {
+test('delete ContextExternalTool', function() {
   expect(4)
   store.setState({externalTools: this.tools})
   const tool = this.tools[0]
-  const success = function (data, statusText, xhr) {
+  const success = function(data, statusText, xhr) {
     equal(statusText, 'success')
     equal(data.status, 'ok')
   }
@@ -309,11 +290,11 @@ test('delete ContextExternalTool', function () {
   store._deleteErrorHandler = _deleteErrorHandler
 })
 
-test('delete Lti::ToolProxy', function () {
+test('delete Lti::ToolProxy', function() {
   expect(4)
   store.setState({externalTools: this.tools})
   const tool = this.tools[1]
-  const success = function (data, statusText, xhr) {
+  const success = function(data, statusText, xhr) {
     equal(statusText, 'success')
     equal(data.status, 'ok')
   }
@@ -335,11 +316,11 @@ test('delete Lti::ToolProxy', function () {
   store._deleteErrorHandler = _deleteErrorHandler
 })
 
-test('deactivate', function () {
+test('deactivate', function() {
   expect(4)
   store.setState({externalTools: this.tools})
   const tool = this.tools[1]
-  const success = function (data, statusText, xhr) {
+  const success = function(data, statusText, xhr) {
     equal(statusText, 'success')
     equal(data.status, 'ok')
   }
@@ -356,7 +337,7 @@ test('deactivate', function () {
   equal(updatedTool.enabled, false)
 })
 
-test('findById', function () {
+test('findById', function() {
   store.setState({externalTools: this.tools})
   const tool = store.findById(3)
   equal(tool.name, 'LinkedIn')

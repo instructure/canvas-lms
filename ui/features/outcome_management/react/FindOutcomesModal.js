@@ -39,17 +39,6 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-const getSelectegGroupAncestorsWithSelf = (collections, selectedGroupId) => {
-  const resp = []
-  let currGroupId = selectedGroupId
-  while (currGroupId) {
-    resp.push(currGroupId)
-    currGroupId = collections[currGroupId]?.parentGroupId
-  }
-
-  return resp
-}
-
 const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
   const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
@@ -89,11 +78,15 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
     importOutcomes,
     importGroupsStatus,
     importOutcomesStatus,
+    clearGroupsStatus,
+    clearOutcomesStatus,
     hasAddedOutcomes,
     setHasAddedOutcomes
   } = useOutcomesImport()
 
   const onCloseModalHandler = () => {
+    clearGroupsStatus()
+    clearOutcomesStatus()
     onCloseHandler(hasAddedOutcomes)
   }
 
@@ -162,11 +155,6 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
     ? I18n.t('Add Outcomes to Course')
     : I18n.t('Add Outcomes to Account')
 
-  const selfOrParentBeingImported =
-    getSelectegGroupAncestorsWithSelf(collections, selectedGroupId).find(
-      gid => importGroupsStatus[gid]
-    ) || selectedGroupId
-
   const findOutcomesView = (
     <FindOutcomesView
       outcomesGroup={group}
@@ -175,7 +163,7 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
       disableAddAllButton={isConfirmBoxOpen}
-      importGroupStatus={importGroupsStatus[selfOrParentBeingImported]}
+      importGroupStatus={importGroupsStatus[selectedGroupId]}
       onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}

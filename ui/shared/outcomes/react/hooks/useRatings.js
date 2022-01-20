@@ -80,16 +80,10 @@ const useRatings = ({initialRatings}) => {
     return ratingsWithValidations.some(r => r.pointsError || r.descriptionError)
   }, [ratingsWithValidations])
 
-  const hasChanged = useMemo(
-    () => JSON.stringify(ratings) !== JSON.stringify(initialRatings),
-    [ratings, initialRatings]
-  )
-
   return {
     ratings: ratingsWithValidations,
     setRatings,
-    hasError,
-    hasChanged
+    hasError
   }
 }
 

@@ -50,7 +50,7 @@ module Canvas
 
   def self.cache_store_config_for(cluster)
     yaml_config = ConfigFile.load("cache_store", cluster)
-    consul_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster: cluster)["cache_store.yml"] || "{}") || {}
+    consul_config = YAML.safe_load(Canvas::DynamicSettings.find(tree: :private, cluster: cluster)["cache_store.yml"] || "{}") || {}
     consul_config = consul_config.with_indifferent_access if consul_config.is_a?(Hash)
 
     consul_config.presence || yaml_config

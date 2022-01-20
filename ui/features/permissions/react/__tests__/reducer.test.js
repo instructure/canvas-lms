@@ -47,30 +47,6 @@ describe('permissions::reducer', () => {
         group_permissions: [{permission_name: 'manage_courses_add'}],
         context_type: 'Account'
       }
-    ],
-    ACCOUNT_ROLES: [
-      {
-        role: 'AccountAdmin',
-        label: 'Account Admin',
-        base_role_type: 'AccountMembership'
-      },
-      {
-        role: 'CustomAccountAdmin',
-        label: 'Custom Account Admin',
-        base_role_type: 'AccountMembership'
-      }
-    ],
-    COURSE_ROLES: [
-      {
-        role: 'TeacherEnrollment',
-        label: 'Teacher',
-        base_role_type: 'TeacherEnrollment'
-      },
-      {
-        role: 'Custom Teacher Role',
-        label: 'Custom Teacher Role',
-        base_role_type: 'TeacherEnrollment'
-      }
     ]
   })
 
@@ -418,9 +394,6 @@ describe('permissions::reducer', () => {
     const payload = {
       role: {
         id: '1',
-        role: 'AccountAdmin',
-        label: 'Account Admin',
-        base_role_type: 'AccountMembership',
         permissions: {
           granular_1: {
             enabled: false,
@@ -442,9 +415,6 @@ describe('permissions::reducer', () => {
     const expectedState = [
       {
         id: '1',
-        role: 'AccountAdmin',
-        label: 'Account Admin',
-        base_role_type: 'AccountMembership',
         permissions: {
           granular_1: {
             enabled: ENABLED_FOR_NONE,
@@ -584,9 +554,6 @@ describe('permissions::reducer', () => {
 
     const payload = {
       id: '2',
-      role: 'TeacherEnrollment',
-      label: 'Teacher',
-      base_role_type: 'TeacherEnrollment',
       permissions: {
         granular_1: {
           enabled: true,
@@ -606,10 +573,13 @@ describe('permissions::reducer', () => {
 
     const expectedState = [
       {
+        id: '1',
+        permissions: {},
+        contextType: COURSE,
+        displayed: true
+      },
+      {
         id: '2',
-        role: 'TeacherEnrollment',
-        label: 'Teacher',
-        base_role_type: 'TeacherEnrollment',
         contextType: COURSE,
         displayed: true,
         permissions: {
@@ -633,12 +603,6 @@ describe('permissions::reducer', () => {
             readonly: false
           }
         }
-      },
-      {
-        id: '1',
-        permissions: {},
-        contextType: COURSE,
-        displayed: true
       }
     ]
 

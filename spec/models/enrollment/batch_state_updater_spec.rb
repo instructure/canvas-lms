@@ -69,17 +69,6 @@ describe "Enrollment::BatchStateUpdater" do
       # gm3 still has an enrollment
       expect(gm3.reload.workflow_state).to eq "accepted"
     end
-
-    it "removes leader" do
-      group = group_model(context: @course)
-      GroupMembership.create(group: group, user: @user, workflow_state: "accepted")
-      GroupMembership.create(group: group, user: @user2, workflow_state: "accepted")
-      group.update!(leader_id: @user.id)
-
-      Enrollment::BatchStateUpdater.remove_group_memberships([@enrollment.id], [@course], [@user.id])
-
-      expect(group.reload.leader_id).to eq nil
-    end
   end
 
   describe ".clear_email_caches" do

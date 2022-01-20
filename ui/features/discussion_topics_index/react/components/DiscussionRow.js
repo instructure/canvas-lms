@@ -267,8 +267,7 @@ export class DiscussionRow extends Component {
 
   isInaccessibleDueToAnonymity = () => {
     return (
-      (this.props.discussion.anonymous_state === 'full_anonymity' ||
-        this.props.discussion.anonymous_state === 'partial_anonymity') &&
+      this.props.discussion.anonymous_state === 'full_anonymity' &&
       !ENV.discussion_anonymity_enabled
     )
   }
@@ -647,15 +646,15 @@ export class DiscussionRow extends Component {
       return null
     }
 
-    let anonText = null
-    if (this.props.discussion.anonymous_state === 'full_anonymity') {
-      anonText = I18n.t('Anonymous Discussion | ')
-    } else if (this.props.discussion.anonymous_state === 'partial_anonymity') {
-      anonText = I18n.t('Partially Anonymous Discussion | ')
-    }
-
-    const textColor = this.isInaccessibleDueToAnonymity() ? 'secondary' : null
-
+    const anonText =
+      this.props.discussion.anonymous_state === 'full_anonymity'
+        ? I18n.t('Anonymous Discussion | ')
+        : null
+    const textColor =
+      this.props.discussion.anonymous_state === 'full_anonymity' &&
+      !ENV.discussion_anonymity_enabled
+        ? 'secondary'
+        : null
     return (
       <SectionsTooltip
         totalUserCount={this.props.discussion.user_count}

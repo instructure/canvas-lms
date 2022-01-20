@@ -28,7 +28,6 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
 import React, {useContext, useState} from 'react'
 import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
@@ -70,9 +69,6 @@ export default function CommentsTrayBody(props) {
   }
 
   const {allowChangesToSubmission} = useContext(StudentViewContext)
-
-  const gradeAsGroup =
-    props.assignment.groupCategoryId && !props.assignment.gradeGroupStudentsIndividually
 
   if (loading) return <LoadingIndicator />
   if (error) {
@@ -128,17 +124,9 @@ export default function CommentsTrayBody(props) {
         </Flex.Item>
 
         {allowChangesToSubmission && (
-          <Flex as="div" direction="column">
-            {gradeAsGroup && (
-              <Flex.Item padding="x-small medium">
-                <Text as="div">{I18n.t('All comments are sent to the whole group.')}</Text>
-              </Flex.Item>
-            )}
-
-            <Flex.Item padding="x-small medium">
-              <CommentTextArea assignment={props.assignment} submission={props.submission} />
-            </Flex.Item>
-          </Flex>
+          <Flex.Item padding="x-small medium">
+            <CommentTextArea assignment={props.assignment} submission={props.submission} />
+          </Flex.Item>
         )}
       </Flex>
     </ErrorBoundary>

@@ -217,7 +217,7 @@ module FeatureFlags
     context_type = self.class.name
     return unless %w[Course Account].include?(context_type)
 
-    config = DynamicSettings.find("feature_analytics", tree: :private)
+    config = Canvas::DynamicSettings.find("feature_analytics", tree: :private)
     cache_expiry = (config[:cache_expiry] || 1.day).to_i
     sampling_rate = (config[:sampling_rate] || 0).to_f
     return unless rand < sampling_rate

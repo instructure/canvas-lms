@@ -199,19 +199,6 @@ test('when feature flag is off, renders anonymous discussion unavailable for stu
   fakeENV.teardown()
 })
 
-test('when feature flag is off, renders partially anonymous discussion unavailable for students, etc.', () => {
-  fakeENV.setup()
-  ENV.discussion_anonymity_enabled = false
-  const discussion = {locked: false, title: 'blerp', anonymous_state: 'partial_anonymity'}
-  const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: false, discussion})} />)
-  const node = tree.find('.discussion-availability')
-
-  ok(node.text().includes('Unavailable'))
-  ok(node.exists())
-  tree.unmount()
-  fakeENV.teardown()
-})
-
 test('renders "Delayed until" date label if discussion is delayed', () => {
   const delayedDate = new Date()
   delayedDate.setYear(delayedDate.getFullYear() + 1)
@@ -346,25 +333,6 @@ test('includes Anonymous Discussion prefix when discussion is anonymous', () => 
   equal(
     tree.find('SectionsTooltip Text').at(0).text(),
     'Anonymous Discussion | 2 Sectionssection 4section 2'
-  )
-  tree.unmount()
-  fakeENV.teardown()
-})
-
-test('includes Partially Anonymous Discussion prefix when discussion is anonymous', () => {
-  fakeENV.setup()
-  ENV.discussion_anonymity_enabled = false
-  const discussion = {
-    sections: [
-      {id: 6, course_id: 1, name: 'section 4', user_count: 2},
-      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
-    ],
-    anonymous_state: 'partial_anonymity'
-  }
-  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  equal(
-    tree.find('SectionsTooltip Text').at(0).text(),
-    'Partially Anonymous Discussion | 2 Sectionssection 4section 2'
   )
   tree.unmount()
   fakeENV.teardown()

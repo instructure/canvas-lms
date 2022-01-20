@@ -81,6 +81,7 @@ describe('Ratings', () => {
     it('calls onChangeRatings when delete rating without the deleted rating', () => {
       const {getByText} = render(<Ratings {...defaultProps()} />)
       fireEvent.click(getByText('Delete mastery level 1'))
+      fireEvent.click(getByText('Confirm'))
       expect(onChangeRatingsMock).toHaveBeenCalled()
       const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
       expect(newRatings.length).toEqual(1)
@@ -90,6 +91,7 @@ describe('Ratings', () => {
     it('calls onChangeRatings when delete a mastery rating with new mastery', () => {
       const {getByText} = render(<Ratings {...defaultProps()} />)
       fireEvent.click(getByText('Delete mastery level 2'))
+      fireEvent.click(getByText('Confirm'))
       expect(onChangeRatingsMock).toHaveBeenCalled()
       const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
       expect(newRatings.length).toEqual(1)

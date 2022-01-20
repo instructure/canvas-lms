@@ -47,12 +47,6 @@ const optionsList = {
     dateStyle: 'long',
     timeStyle: 'short'
   },
-  'date.formats.long': {
-    // MMM D, YYYY
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
-  },
   'date.formats.long_with_weekday': {
     // dddd, MMMM D
     weekday: 'long',

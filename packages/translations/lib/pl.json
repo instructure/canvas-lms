@@ -101,9 +101,6 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Czy na pewno chcesz usunąć ten element planera?"
     },
-    "arrows_464a3e54": {
-        "message": "Strzałki"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Współczynnik proporcji zostanie zachowany"
     },
@@ -163,9 +160,6 @@
     },
     "available_folders_694d0436": {
         "message": "Dostępne foldery"
-    },
-    "basic_554cdc0a": {
-        "message": "Podstawowy"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Początek historii listy zadań"
@@ -383,9 +377,6 @@
     "delete_a6efa79d": {
         "message": "Usuń"
     },
-    "delimiters_4db4840d": {
-        "message": "Ograniczniki"
-    },
     "describe_the_image_e65d2e32": {
         "message": "(opisz obraz)"
     },
@@ -409,9 +400,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Kierunkowość"
-    },
-    "directly_edit_latex_b7e9235b": {
-        "message": "Edytuj bezpośrednio w LaTeX"
     },
     "discussion_6719c51d": {
         "message": "Dyskusja"
@@ -514,9 +502,6 @@
     },
     "equation_1c5ac93c": {
         "message": "Równanie"
-    },
-    "equation_editor_39fbc3f1": {
-        "message": "Edytor równań"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Błąd podczas wczytywania ocen"
@@ -649,9 +634,6 @@
     },
     "grades_loaded_5056277c": {
         "message": "Wczytano oceny"
-    },
-    "greek_65c5b3f7": {
-        "message": "Greckie"
     },
     "group_documents_8bfd6ae6": {
         "message": "Grupuj dokumenty"
@@ -860,9 +842,6 @@
     "middle_27dc1d5": {
         "message": "Środkowy"
     },
-    "misc_3b692ea7": {
-        "message": "Różne"
-    },
     "miscellaneous_e9818229": {
         "message": "Różne"
     },
@@ -983,9 +962,6 @@
     "open_title_application_fd624fc5": {
         "message": "Otwórz aplikację { title }"
     },
-    "operators_a2ef9a93": {
-        "message": "Operatory"
-    },
     "opportunities_popup_f6703842": {
         "message": "okienko wyskakujące z okazjami"
     },
@@ -1093,9 +1069,6 @@
     },
     "redo_363c58b7": {
         "message": "Cofnij"
-    },
-    "relationships_6602af70": {
-        "message": "Powiązania"
     },
     "reminder_date_4564d12d": {
         "message": "Przypomnienie: { date }"

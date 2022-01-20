@@ -223,7 +223,7 @@ export default function CanvasDateInput({
     setInputValue(value)
     // If we have been asked to show the running value, hide the popup
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
-    const newDate = tz.parse(value, timezone)
+    const newDate = tz.parse(value)
     if (newDate) {
       const msgs: CanvasDateInputMessageType[] = withRunningValue
         ? [{type: 'success', text: formatDate(newDate)}]
@@ -285,9 +285,13 @@ export default function CanvasDateInput({
     }
   }
 
-  function handleKey(e: KeyboardEvent) {
+  function handleKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter') {
       handleBlur()
+    } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+      modifySelectedMoment(1, 'day')
+    } else if (e.key === 'ArrowUp' || e.keyCode === 38) {
+      modifySelectedMoment(-1, 'day')
     }
   }
 
@@ -372,7 +376,7 @@ export default function CanvasDateInput({
       value={inputValue}
       onChange={handleChange}
       onPaste={trackPasteEvent}
-      onKeyUp={handleKey}
+      onKeyDown={handleKeyDown}
       isInline
       placement={placement}
       messages={messages.concat(internalMessages)}

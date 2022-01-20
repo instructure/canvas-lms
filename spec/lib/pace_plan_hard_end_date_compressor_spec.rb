@@ -30,19 +30,19 @@ describe PacePlanHardEndDateCompressor do
     context "compresses dates to fit within the end date" do
       before :once do
         assignment = @course.assignments.create!
-        assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
-        @pace_plan.pace_plan_module_items.last.update! duration: 10
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+        @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 10
         assignment = @course.assignments.create!
-        assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
-        @pace_plan.pace_plan_module_items.last.update! duration: 0
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+        @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 0
         assignment = @course.assignments.create!
-        assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
-        @pace_plan.pace_plan_module_items.last.update! duration: 6
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+        @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 6
       end
 
       it "compresses the plan items by the required percentage to reach the hard end date" do
         compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
-        expect(compressed.pluck(:duration)).to eq([5, 0, 2])
+        expect(compressed.pluck(:duration)).to eq([5, 0, 3])
       end
 
       it "does nothing if the duration of the pace plan is within the end date" do
@@ -50,26 +50,16 @@ describe PacePlanHardEndDateCompressor do
         compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
         expect(compressed.pluck(:duration)).to eq([10, 0, 6])
       end
-
-      it "compresses to end on the hard end date" do
-        @course.update(start_at: "2021-12-27")
-        @pace_plan.update(end_date: "2021-12-31", exclude_weekends: true, hard_end_dates: true)
-        @pace_plan.pace_plan_module_items.each_with_index do |item, index|
-          item.update(duration: (index + 1) * 2)
-        end
-        compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
-        expect(compressed.pluck(:duration)).to eq([1, 1, 2])
-      end
     end
 
     it "paces assignments appropriately if there are too many" do
       20.times do |_i|
         assignment = @course.assignments.create!
-        assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+        @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 1
       end
-      @pace_plan.pace_plan_module_items.update(duration: 1)
       compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
-      expect(compressed.pluck(:duration)).to eq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+      expect(compressed.pluck(:duration)).to eq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     end
   end
 

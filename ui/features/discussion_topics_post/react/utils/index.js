@@ -172,14 +172,14 @@ export const isTopicAuthor = (topicAuthor, entryAuthor) => {
   return topicAuthor && entryAuthor && topicAuthor._id === entryAuthor._id
 }
 
-export const getOptimisticResponse = ({
-  message = '',
+export const getOptimisticResponse = (
+  message,
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
   isolatedEntryId = null,
   quotedEntry = null,
   isAnonymous = false
-} = {}) => {
+) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
       createdAt: quotedEntry.createdAt,
@@ -232,7 +232,7 @@ export const getOptimisticResponse = ({
           : null,
         anonymousAuthor: isAnonymous
           ? {
-              id: null,
+              id: CURRENT_USER,
               avatarUrl: null,
               shortName: CURRENT_USER,
               __typename: 'AnonymousUser'
@@ -271,13 +271,9 @@ export const isAnonymous = discussionEntry =>
 
 export const getDisplayName = discussionEntry => {
   if (isAnonymous(discussionEntry)) {
-    if (discussionEntry.anonymousAuthor.shortName === CURRENT_USER) {
-      if (!discussionEntry.anonymousAuthor.id) {
-        return I18n.t('Anonymous (You)')
-      }
-      return I18n.t('Anonymous %{id} (You)', {id: discussionEntry.anonymousAuthor.id})
-    }
-    return I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
+    return discussionEntry.anonymousAuthor.shortName === CURRENT_USER
+      ? I18n.t('Anonymous %{id} (You)', {id: discussionEntry.anonymousAuthor.id})
+      : I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
   }
   return discussionEntry.author?.displayName || discussionEntry.author?.shortName
 }

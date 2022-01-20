@@ -53,14 +53,8 @@ QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => 
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS'
     })
-    sinon
-      .stub(gradebook, 'saveSettings')
-      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
-    renderer = new StudentColumnHeaderRenderer(
-      gradebook,
-      StudentLastNameColumnHeader,
-      'student_lastname'
-    )
+    sinon.stub(gradebook, 'saveSettings')
+    renderer = new StudentColumnHeaderRenderer(gradebook, StudentLastNameColumnHeader, 'student_lastname')
   })
 
   suiteHooks.afterEach(() => {
@@ -70,10 +64,7 @@ QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => 
   QUnit.module('#render()', () => {
     test('renders the StudentLastNameColumnHeader to the given container node', () => {
       render()
-      ok(
-        $container.innerText.includes('Student Last Name'),
-        'the "Student Last Name" header is rendered'
-      )
+      ok($container.innerText.includes('Student Last Name'), 'the "Student Last Name" header is rendered')
     })
   })
 
@@ -116,9 +107,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS'
     })
-    sinon
-      .stub(gradebook, 'saveSettings')
-      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
+    sinon.stub(gradebook, 'saveSettings')
     renderer = new StudentColumnHeaderRenderer(gradebook, StudentColumnHeader, 'student')
   })
 
@@ -268,8 +257,8 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       strictEqual(component.props.studentGroupsEnabled, false)
     })
 
-    test('includes the selected enrollment filters', async () => {
-      await gradebook.toggleEnrollmentFilter('concluded')
+    test('includes the selected enrollment filters', () => {
+      gradebook.toggleEnrollmentFilter('concluded')
       render()
       deepEqual(component.props.selectedEnrollmentFilters, ['concluded'])
     })

@@ -46,23 +46,6 @@ describe "discussions" do
   context "on the edit page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/edit" }
 
-    context "anonymous topic" do
-      let(:topic) { course.discussion_topics.create!(user: teacher, title: "anonymous topic title", message: "anonymous topic message", anonymous_state: "full_anonymity") }
-
-      before do
-        Account.site_admin.enable_feature! :react_discussions_post
-        Account.site_admin.enable_feature! :discussion_anonymity
-        user_session(teacher)
-      end
-
-      it "able to save" do
-        get url
-
-        expect_new_page_load { f(".form-actions button[type=submit]").click }
-        expect(fj("span:contains('anonymous topic title')")).to be_present
-      end
-    end
-
     context "as a teacher" do
       let(:topic) { teacher_topic }
 

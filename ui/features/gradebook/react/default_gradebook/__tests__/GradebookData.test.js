@@ -22,11 +22,9 @@ import {RequestDispatch} from '@canvas/network'
 import GradebookData from '../GradebookData'
 import Gradebook from '../Gradebook'
 import PerformanceControls from '../PerformanceControls'
-import {defaultGradebookProps} from './GradebookSpecHelper'
 
 const defaultProps = {
-  ...defaultGradebookProps,
-  gradebookEnv: {context_id: '1', enhanced_gradebook_filters: false},
+  gradebookEnv: {context_id: '1'},
   performance_controls: {
     students_chunk_size: 2 // students per page
   }

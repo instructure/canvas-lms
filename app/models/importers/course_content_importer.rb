@@ -444,11 +444,6 @@ module Importers
       end
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
-
-      if course.root_account.settings[:prevent_course_availability_editing_by_teachers] && !course.account.grants_right?(migration.user, :read_as_admin)
-        atts -= [:restrict_enrollments_to_course_dates]
-      end
-
       course.settings_will_change! unless atts.empty?
 
       # superhax to force new wiki front page if home view changed (or is master course sync)

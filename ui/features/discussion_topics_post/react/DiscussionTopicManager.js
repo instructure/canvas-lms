@@ -224,27 +224,28 @@ const DiscussionTopicManager = props => {
       />
     )
   }
+
   return (
     <SearchContext.Provider value={searchContext}>
       <DiscussionTopicToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
         updateDraftCache={updateDraftCache}
         discussionTopic={discussionTopicQuery.data.legacyNode}
-        createDiscussionEntry={(message, fileId, isAnonymousAuthor) => {
+        createDiscussionEntry={text => {
           createDiscussionEntry({
             variables: {
               discussionTopicId: ENV.discussion_topic_id,
-              message,
-              fileId,
-              courseID: ENV.course_id,
-              isAnonymousAuthor
+              message: text
             },
-            optimisticResponse: getOptimisticResponse({
-              message,
-              isAnonymous:
-                !!discussionTopicQuery.data.legacyNode.anonymousState &&
+            optimisticResponse: getOptimisticResponse(
+              text,
+              'PLACEHOLDER',
+              null,
+              null,
+              null,
+              !!discussionTopicQuery.data.legacyNode.anonymousState &&
                 discussionTopicQuery.data.legacyNode.canReplyAnonymously
-            })
+            )
           })
         }}
         isHighlighted={isTopicHighlighted}

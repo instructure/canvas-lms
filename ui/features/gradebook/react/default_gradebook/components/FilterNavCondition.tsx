@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
+import React from 'react'
 // @ts-ignore
 import I18n from 'i18n!gradebook'
 import {Flex} from '@instructure/ui-flex'
@@ -43,8 +43,6 @@ export default function ({
   sections,
   onDelete
 }) {
-  const divRef = useRef(null)
-
   let items = []
   switch (condition.type) {
     case 'module':
@@ -65,7 +63,7 @@ export default function ({
   }
 
   return (
-    <Flex justifyItems="space-between" elementRef={el => (divRef.current = el)}>
+    <Flex justifyItems="space-between">
       <Item>
         <SimpleSelect
           width="95%"
@@ -152,7 +150,7 @@ export default function ({
           />
         )}
         <IconButton
-          onClick={() => onDelete(condition, divRef)}
+          onClick={() => onDelete(condition)}
           screenReaderLabel={I18n.t('Delete condition')}
           withBackground={false}
           withBorder={false}

@@ -71,9 +71,3 @@ declare module '@instructure/ui-view' {
     className?: string
   }
 }
-
-declare module '@instructure/ui-buttons' {
-  export interface ButtonProps {
-    id?: string
-  }
-}

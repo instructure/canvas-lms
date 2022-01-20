@@ -54,7 +54,6 @@ describe Mutations::CreateAssignment do
             onlyVisibleToOverrides
             submissionTypes
             gradeGroupStudentsIndividually
-            groupCategoryId
             anonymousInstructorAnnotations
             omitFromFinalGrade
             postToSis
@@ -110,7 +109,6 @@ describe Mutations::CreateAssignment do
       ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
       ["submissionTypes", :submission_types, "none", "[ discussion_topic, not_graded ]", ["discussion_topic", "not_graded"], "discussion_topic,not_graded"],
       ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
-      ["groupCategoryId", :group_category_id, 1, 2, nil],
       ["omitFromFinalGrade", :omit_from_final_grade, false, true, true],
       ["anonymousInstructorAnnotations", :anonymous_instructor_annotations, false, true, true],
       ["postToSis", :post_to_sis, false, true, true],
@@ -203,13 +201,10 @@ describe Mutations::CreateAssignment do
 
   it "creates an assignment in an assignment group" do
     new_assignment_group = @course.assignment_groups.create!
-    gc = @course.group_categories.create! name: "Groupy McGroupface"
     result = execute_with_input <<~GQL
       courseId: "#{@course.to_param}"
       name: "assignment in group"
       assignmentGroupId: "#{new_assignment_group.to_param}"
-      groupCategoryId: "#{gc.id}"
-      gradeGroupStudentsIndividually: false
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "createAssignment", "errors")).to be_nil
@@ -217,30 +212,6 @@ describe Mutations::CreateAssignment do
 
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
     expect(assignment.assignment_group).to eq new_assignment_group
-    expect(assignment.grade_group_students_individually).to eq false
-    expect(assignment.group_category_id).to eq gc.id
-    expect(assignment.grade_as_group?).to eq true
-  end
-
-  it "creates an assignment in an assignment group with grading group students individually" do
-    new_assignment_group = @course.assignment_groups.create!
-    gc = @course.group_categories.create! name: "Groupy McGroupface"
-    result = execute_with_input <<~GQL
-      courseId: "#{@course.to_param}"
-      name: "assignment in group"
-      assignmentGroupId: "#{new_assignment_group.to_param}"
-      groupCategoryId: "#{gc.id}"
-      gradeGroupStudentsIndividually: true
-    GQL
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "createAssignment", "errors")).to be_nil
-    expect(result.dig("data", "createAssignment", "assignment", "assignmentGroup", "_id")).to eq new_assignment_group.id.to_s
-
-    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
-    expect(assignment.assignment_group).to eq new_assignment_group
-    expect(assignment.grade_group_students_individually).to eq true
-    expect(assignment.group_category_id).to eq gc.id
-    expect(assignment.grade_as_group?).to eq false
   end
 
   it "creates an assignment in a module" do
