@@ -69,6 +69,11 @@ describe('Reply Preview', () => {
     expect(container.getByText('Deleted by Harry Potter')).toBeTruthy()
   })
 
+  it('shows deleted without by message when deleted', () => {
+    const container = setup(mockProps({editor: null, deleted: true}))
+    expect(container.getByText('Deleted')).toBeTruthy()
+  })
+
   it('read more button should be visible when message length is greater than 170 characters', () => {
     const container = setup(
       mockProps({

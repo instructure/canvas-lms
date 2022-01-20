@@ -32,9 +32,10 @@ export const ReplyPreview = ({...props}) => {
   const [shouldShowTruncatedText, setShouldShowTruncatedText] = useState(true)
   const TRUNCATE_LENGTH = 170
 
-  const message = props.deleted
+  const deletedMessage = props.editor?.shortName
     ? I18n.t('Deleted by %{editor}', {editor: props.editor.shortName})
-    : props.previewMessage
+    : I18n.t('Deleted')
+  const message = props.deleted ? deletedMessage : props.previewMessage
 
   return (
     <Responsive
