@@ -43,6 +43,16 @@ describe('CanvasInbox Full Page', () => {
         id: '9'
       }
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
   })
 
   beforeEach(() => {
