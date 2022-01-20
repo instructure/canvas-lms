@@ -64,11 +64,27 @@ module MicrosoftSync
 
     private
 
-    def find_by_email
+    def find_by_email_local(local_user_ids)
       CommunicationChannel
-        .where(user_id: user_ids, path_type: "email", workflow_state: "active")
+        .where(user_id: local_user_ids, path_type: "email", workflow_state: "active")
         .order(position: :asc)
         .pluck(:user_id, :path)
+    end
+
+    # Looks for for CommunicationChannels on the each user's home shard.
+    def find_by_email
+      sync_shard = Shard.current
+      user_ids.group_by { |uid| Shard.shard_for(uid) }.flat_map do |look_on_shard, uids|
+        ids_relative_to_look_on_shard = uids.map do |uid|
+          Shard.relative_id_for(uid, sync_shard, look_on_shard)
+        end
+
+        look_on_shard.activate do
+          find_by_email_local(ids_relative_to_look_on_shard)
+        end.map do |uid, path|
+          [Shard.relative_id_for(uid, look_on_shard, sync_shard), path]
+        end
+      end
     end
 
     def find_by_active_pseudonyms_field(field)
