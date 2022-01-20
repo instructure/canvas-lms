@@ -907,7 +907,28 @@ describe AssignmentsController do
         context "when the assignments_2_observer_view setting is on" do
           before { Setting.set("assignments_2_observer_view", "true") }
 
-          it "shows data for the first observed student, by sortable name" do
+          before { request.cookies["k5_observed_user_for_#{observer.id}"] = @student.id }
+
+          it "shows data for the first observed student, by sortable name when no cookie" do
+            allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
+
+            @student.update!(name: "Zzzzz")
+
+            prior_student = User.create!(name: "Aaaaa")
+            @course.enroll_student(prior_student, enrollment_state: "active")
+            @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
+
+            request.cookies.delete("k5_observed_user_for_#{observer.id}")
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+
+            aggregate_failures do
+              expect(assigns[:js_env][:SUBMISSION_ID]).to eq prior_student.id.to_s
+              expect(assigns[:js_env][:enrollment_state]).to eq :invited
+              expect(flash[:notice]).to match(/^Observing Aaaaa.*return to the dashboard\.$/)
+            end
+          end
+
+          it "shows data for the selected observed student from cookie" do
             allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
 
             @student.update!(name: "Zzzzz")
@@ -917,9 +938,25 @@ describe AssignmentsController do
             @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
 
             get "show", params: { course_id: @course.id, id: @assignment.id }
+
             aggregate_failures do
-              expect(assigns[:js_env][:SUBMISSION_ID]).to eq prior_student.id.to_s
-              expect(assigns[:js_env][:enrollment_state]).to eq :invited
+              expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student.id.to_s
+              expect(assigns[:js_env][:enrollment_state]).to eq :active
+              expect(flash[:notice]).to match(/^Observing Zzzzz.*return to the dashboard\.$/)
+            end
+          end
+
+          it "shows data for the observer when viewing their own enrollment" do
+            allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
+
+            @course.enroll_student(observer, enrollment_state: "active")
+
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+
+            aggregate_failures do
+              expect(assigns[:js_env][:SUBMISSION_ID]).to eq observer.id.to_s
+              expect(assigns[:js_env][:enrollment_state]).to eq :active
+              expect(flash[:notice]).to be_nil
             end
           end
 
@@ -927,6 +964,7 @@ describe AssignmentsController do
             observer.observer_enrollments.first.update!(associated_user: nil)
 
             get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(flash[:notice]).to match(/^No student is being observed.*return to the dashboard\.$/)
             expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
           end
         end

@@ -457,19 +457,62 @@ describe "Module Items API", type: :request do
                  {}, { expected_status: 400 })
       end
 
-      it "creates with new_tab for external tool items" do
-        tool = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+      context "creates external tool items" do
+        subject do
+          api_call(:post,
+                   "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                   api_call_params,
+                   api_call_body_params)
+        end
 
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        { controller: "context_module_items_api", action: "create", format: "json",
-                          course_id: @course.id.to_s, module_id: @module1.id.to_s },
-                        { module_item: { title: "Blah", type: "ExternalTool", content_id: tool.id,
-                                         external_url: tool.url, new_tab: "true" } })
+        let(:tool) do
+          @course.context_external_tools.create!(
+            name: "b",
+            url: "https://www.google.com",
+            consumer_key: "12345",
+            shared_secret: "secret"
+          )
+        end
 
-        expect(json["new_tab"]).to eq true
+        let(:api_call_params) do
+          {
+            controller: "context_module_items_api",
+            action: "create",
+            format: "json",
+            course_id: @course.id.to_s,
+            module_id: @module1.id.to_s
+          }
+        end
 
-        tag = @module1.content_tags.where(id: json["id"]).first
-        expect(tag.new_tab).to eq true
+        let(:api_call_body_params) do
+          {
+            module_item: {
+              title: "Blah",
+              type: "ExternalTool",
+              content_id: tool.id,
+              external_url: tool.url
+            }
+          }
+        end
+
+        it "with new_tab" do
+          api_call_body_params[:module_item][:new_tab] = "true"
+
+          expect(subject["new_tab"]).to eq true
+
+          tag = @module1.content_tags.where(id: subject["id"]).first
+          expect(tag.new_tab).to eq true
+        end
+
+        it "with iframe launch dimension settings" do
+          api_call_body_params[:module_item][:iframe] = {
+            width: 123,
+            height: 456
+          }
+
+          content_tag = @module1.content_tags.where(id: subject["id"]).last
+          expect(content_tag[:link_settings]).to eq({ "selection_width" => "123", "selection_height" => "456" })
+        end
       end
 
       it "creates with url for external url items" do

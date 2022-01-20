@@ -101,6 +101,9 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "แน่ใจว่าต้องการลบรายการที่วางแผนนี้ไว้หรือไม่"
     },
+    "arrows_464a3e54": {
+        "message": "ลูกศร"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "สัดส่วนจะถูกรักษาไว้ตามเดิม"
     },
@@ -160,6 +163,9 @@
     },
     "available_folders_694d0436": {
         "message": "โฟลเดอร์ที่ใช้ได้"
+    },
+    "basic_554cdc0a": {
+        "message": "พื้นฐาน"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "จุดเริ่มต้นประวัติสิ่งที่ต้องทำของคุณ"
@@ -377,6 +383,9 @@
     "delete_a6efa79d": {
         "message": "ลบ"
     },
+    "delimiters_4db4840d": {
+        "message": "ตัวคั่น"
+    },
     "describe_the_image_e65d2e32": {
         "message": "(ระบุรายละเอียดภาพ)"
     },
@@ -400,6 +409,9 @@
     },
     "directionality_26ae9e08": {
         "message": "ทิศทาง"
+    },
+    "directly_edit_latex_b7e9235b": {
+        "message": "แก้ไข LaTeX โดยตรง"
     },
     "discussion_6719c51d": {
         "message": "การพูดคุย"
@@ -502,6 +514,9 @@
     },
     "equation_1c5ac93c": {
         "message": "สมการ"
+    },
+    "equation_editor_39fbc3f1": {
+        "message": "ตัวแก้ไขสมการ"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "มีข้อผิดพลาดในการโหลดเกรด"
@@ -634,6 +649,9 @@
     },
     "grades_loaded_5056277c": {
         "message": "โหลดเกรดแล้ว"
+    },
+    "greek_65c5b3f7": {
+        "message": "กรีก"
     },
     "group_documents_8bfd6ae6": {
         "message": "เอกสารของกลุ่ม"
@@ -842,6 +860,9 @@
     "middle_27dc1d5": {
         "message": "ตรงกลาง"
     },
+    "misc_3b692ea7": {
+        "message": "เบ็ดเตล็ด"
+    },
     "miscellaneous_e9818229": {
         "message": "เบ็ดเตล็ด"
     },
@@ -962,6 +983,9 @@
     "open_title_application_fd624fc5": {
         "message": "เปิดแอพพลิเคชั่น { title }"
     },
+    "operators_a2ef9a93": {
+        "message": "ผู้ดำเนินการ"
+    },
     "opportunities_popup_f6703842": {
         "message": "ป๊อปอัพโอกาส"
     },
@@ -1069,6 +1093,9 @@
     },
     "redo_363c58b7": {
         "message": "ทำซ้ำ"
+    },
+    "relationships_6602af70": {
+        "message": "ความสัมพันธ์"
     },
     "reminder_date_4564d12d": {
         "message": "แจ้งเตือน: { date }"

@@ -44,7 +44,9 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       ['F', 0.0]
     ]
     gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
-    sinon.stub(gradebook, 'saveSettings')
+    sinon
+      .stub(gradebook, 'saveSettings')
+      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
 
     formatter = new AssignmentCellFormatter(gradebook)
     gradebook.setAssignments({

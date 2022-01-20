@@ -29,3 +29,7 @@
 .skip-to-calendar {
   @include accessibility-prompt;
 }
+
+.calendar_header .recommend_agenda{
+  position: relative ;
+}

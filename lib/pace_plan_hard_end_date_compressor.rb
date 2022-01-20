@@ -54,21 +54,22 @@ class PacePlanHardEndDateCompressor
       start_date_of_item_group,
       pace_plan.end_date,
       pace_plan.exclude_weekends,
-      inclusive_end: true,
       blackout_dates: pace_plan.course.blackout_dates
     )
 
-    final_item_due_date = due_dates[items[-1].id]
+    # If the pace plan hasn't been committed yet we are grouping the items by their module_item_id since the item.id is
+    # not set yet.
+    key = pace_plan.persisted? ? items[-1].id : items[-1].module_item_id
+    final_item_due_date = due_dates[key]
 
     # Return if we are already within the end of the pace plan
-    return items if final_item_due_date < pace_plan.end_date
+    return items if pace_plan.end_date.blank? || final_item_due_date < pace_plan.end_date
 
     # This is how much time we're currently using
     plan_length_with_items = PacePlansDateHelpers.days_between(
       start_date_of_item_group,
       start_date_of_item_group > final_item_due_date ? start_date_of_item_group : final_item_due_date,
       pace_plan.exclude_weekends,
-      inclusive_end: true,
       blackout_dates: pace_plan.course.blackout_dates
     )
 
@@ -82,13 +83,20 @@ class PacePlanHardEndDateCompressor
 
     # when compressing heavily, the final due date can end up being after the pace plan hard end date
     # adjust later module items
-    new_due_dates = PacePlanDueDatesCalculator.new(pace_plan).get_due_dates(items, enrollment)
-    if new_due_dates[items[-1].id] > pace_plan.end_date
-      days_over = (new_due_dates[items[-1].id] - pace_plan.end_date).to_i
+    new_due_dates = PacePlanDueDatesCalculator.new(pace_plan).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
+    # If the pace plan hasn't been committed yet we are grouping the items by their module_item_id since the item.id is
+    # not set yet.
+    key = pace_plan.persisted? ? items[-1].id : items[-1].module_item_id
+    if new_due_dates[key] > pace_plan.end_date
+      days_over = PacePlansDateHelpers.days_between(
+        pace_plan.end_date,
+        new_due_dates[key],
+        pace_plan.exclude_weekends,
+        inclusive_end: false,
+        blackout_dates: pace_plan.course.blackout_dates
+      )
       adjusted_durations = shift_durations_down(rounded_durations, days_over)
       items = update_item_durations(items, adjusted_durations, save)
-    else
-      items
     end
 
     items

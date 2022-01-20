@@ -410,6 +410,9 @@
     "directionality_26ae9e08": {
         "message": "Retningsgivande"
     },
+    "directly_edit_latex_b7e9235b": {
+        "message": "Rediger LaTeX direkte"
+    },
     "discussion_6719c51d": {
         "message": "Diskusjon"
     },
@@ -511,6 +514,9 @@
     },
     "equation_1c5ac93c": {
         "message": "Likning"
+    },
+    "equation_editor_39fbc3f1": {
+        "message": "Likningseditor"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Feil under lasting av vurderingar"

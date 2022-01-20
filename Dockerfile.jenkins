@@ -40,6 +40,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        yarn="$YARN_VERSION" \
        libxmlsec1-dev \
        python-lxml \
+       python3-lxml \
        libicu-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \

@@ -150,50 +150,14 @@ describe "pace plan page" do
     end
   end
 
-  context "pace plans show/hide projections" do
-    it "have a projections button that changes text from hide to show when pressed" do
-      visit_pace_plans_page
-
-      expect(show_hide_pace_plans_button_text).to eq("Show Projections")
-
-      click_show_hide_projections_button
-
-      expect(show_hide_pace_plans_button_text).to eq("Hide Projections")
-    end
-
-    it "shows start and end date fields when Show Projections button is clicked" do
-      visit_pace_plans_page
-
-      click_show_hide_projections_button
-
-      expect(pace_plan_start_date).to be_displayed
-      expect(pace_plan_end_date).to be_displayed
-    end
-
-    it "does not show date fields when Hide Projections button is clicked" do
-      visit_pace_plans_page
-
-      click_show_hide_projections_button
-      click_show_hide_projections_button
-
-      expect(pace_plan_start_date_exists?).to be_falsey
-      expect(pace_plan_end_date_exists?).to be_falsey
-    end
-
-    it "shows only a projection icon when window size is narrowed" do
-      visit_pace_plans_page
-
-      window_size_width = driver.manage.window.size.width
-      window_size_height = driver.manage.window.size.height
-      driver.manage.window.resize_to((window_size_width / 2).to_i, window_size_height)
-      scroll_to_element(show_hide_button_with_icon)
-
-      expect(show_hide_icon_button_exists?).to be_truthy
-      expect(show_hide_pace_plans_exists?).to be_falsey
-    end
-  end
-
   context "Pace Plan Menu" do
+    let(:pace_module_title) { "Pace Module" }
+    let(:module_assignment_title) { "Module Assignment 1" }
+
+    before :once do
+      create_published_pace_plan(pace_module_title, module_assignment_title)
+    end
+
     it "initially shows the Course Pace Plan in pace plan menu" do
       visit_pace_plans_page
 
@@ -201,16 +165,31 @@ describe "pace plan page" do
     end
 
     it "opens the pace plan menu and selects the student view when clicked" do
-      skip("LS-2857 this spec continues to flake out on the student click and will have to be looked at or removed")
       visit_pace_plans_page
-
       click_main_pace_plan_menu
       click_students_menu_item
-
-      wait_for(method: nil, timeout: 5) { student_pace_plan(@student.name).displayed? }
       click_student_pace_plan(@student.name)
 
       expect(pace_plan_menu_value).to eq(@student.name)
+    end
+
+    it "shows actual student assignment day and due dates" do
+      visit_pace_plans_page
+      click_main_pace_plan_menu
+      click_students_menu_item
+      click_student_pace_plan(@student.name)
+
+      expect(duration_readonly.text).to eq("2")
+    end
+
+    it "displays modal regarding unpublished changes when going to student view" do
+      visit_pace_plans_page
+      update_module_item_duration(3)
+      click_main_pace_plan_menu
+      click_students_menu_item
+      click_student_pace_plan(@student.name)
+
+      expect(unpublished_warning_modal).to be_displayed
     end
   end
 
@@ -246,33 +225,6 @@ describe "pace plan page" do
       visit_pace_plans_page
 
       expect { publish_status.text }.to become("All changes published")
-    end
-  end
-
-  context "Projected Dates" do
-    it "toggles provides input field for required end date when clicked" do
-      visit_pace_plans_page
-      click_show_hide_projections_button
-
-      click_require_end_date_checkbox
-      expect(is_checked(require_end_date_checkbox_selector)).to be_truthy
-      expect(required_end_date_input_exists?).to be_truthy
-
-      click_require_end_date_checkbox
-      expect(is_checked(require_end_date_checkbox_selector)).to be_falsey
-    end
-
-    it "allows inputting a field in the required date field" do
-      later_date = Time.zone.now + 2.weeks
-      visit_pace_plans_page
-      click_show_hide_projections_button
-
-      click_require_end_date_checkbox
-      add_required_end_date(later_date)
-      click_settings_button
-      click_settings_button
-
-      expect(required_end_date_value).to eq(later_date.strftime("%B %-d, %Y"))
     end
   end
 end

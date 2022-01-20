@@ -19,8 +19,8 @@
 
 describe AddressBook::Service do
   before do
-    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-    allow(Canvas::DynamicSettings).to receive(:find)
+    allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(DynamicSettings).to receive(:find)
       .with("address-book", anything)
       .and_return({ "app-host" => "http://test.host" })
 

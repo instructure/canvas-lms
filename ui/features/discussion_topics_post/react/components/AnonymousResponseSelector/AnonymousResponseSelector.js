@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
-import {CURRENT_USER} from '../../utils/constants'
+import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
+import {CURRENT_USER, DEFAULT_AVATAR_URL} from '../../utils/constants'
 import I18n from 'i18n!discussions_posts'
 import React, {useState} from 'react'
 
@@ -50,6 +50,7 @@ export const AnonymousResponseSelector = props => {
           onRequestSelectOption={(event, {id}) => {
             setShowOptions(false)
             setSelectedOption(id)
+            props.setAnonymousAuthorState(id === 'Anonymous')
           }}
           onBlur={() => {
             setHighlightedOption(null)
@@ -78,6 +79,7 @@ export const AnonymousResponseSelector = props => {
             renderBeforeLabel={
               <Avatar
                 size="xx-small"
+                src={props.avatarUrl === DEFAULT_AVATAR_URL ? null : props.avatarUrl}
                 name={props.username}
                 color="licorice"
                 hasInverseColor
@@ -105,15 +107,22 @@ export const AnonymousResponseSelector = props => {
       {selectedOption === 'Anonymous' ? (
         <AnonymousAvatar seedString={CURRENT_USER} />
       ) : (
-        <Avatar name={props.username} color="licorice" hasInverseColor />
+        <Avatar
+          name={props.username}
+          src={props.avatarUrl === DEFAULT_AVATAR_URL ? null : props.avatarUrl}
+          color="licorice"
+          hasInverseColor
+        />
       )}
-      <View margin="0 0 0 small">{replyAsOption()}</View>
+      <View margin="0 0 small small">{replyAsOption()}</View>
     </Flex>
   )
 }
 
 AnonymousResponseSelector.propTypes = {
+  avatarUrl: propTypes.string,
   username: propTypes.string,
+  setAnonymousAuthorState: propTypes.func,
   discussionAnonymousState: propTypes.string
 }
 

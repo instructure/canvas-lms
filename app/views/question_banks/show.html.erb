@@ -18,11 +18,11 @@
 <% provide :right_side do %>
   <div class="rs-margin-bottom">
     <% if can_do(@bank.assessment_questions.temp_record, @current_user, :create) %>
-      <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>
+      <button class="add_question_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></button>
     <% end %>
     <% if can_do(@bank, @current_user, :update) %>
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><i class="icon-edit"></i> <%= t 'buttons.edit', "Edit Bank Details" %></a>
-      <a href="#" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right" role="presentation"></i> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
+      <button type="button" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right" role="presentation"></i> <%= t "buttons.move_questions", "Move Multiple Questions" %></button>
     <% end %>
     <% if can_do(@bank, @current_user, :delete) %>
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end" role="presentation"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
@@ -40,19 +40,19 @@
       <% @alignments.each do |alignment| %>
         <li class="outcome" data-id="<%= alignment.learning_outcome_id %>">
           <span class="short_description"><%= alignment.learning_outcome.short_description %></span>
-          <a href="#" class="delete_outcome_link no-hover"><i class="icon-end standalone-icon"></i></a>
+          <button type="button" class="delete_outcome_link Button--link"><i class="icon-end"></i></button>
           <span class="clear"></span>
           <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">#{(alignment.mastery_score || 0) * 100.0}</span>%") %></span>
         </li>
       <% end %>
       <li class="blank outcome" style="display: none;">
         <span class="short_description">&nbsp;</span>
-        <a href="#" class="delete_outcome_link no-hover"><i class="icon-end standalone-icon"></i></a>
+        <button type="button" class="delete_outcome_link Button--link"><i class="icon-end"></i></button>
         <span class="clear"></span>
         <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">&nbsp;</span>%") %></span>
       </li>
     </ul>
-    <a href="#" class="btn button-sidebar-wide add_outcome_link"><i class="icon-paperclip"></i> <span class="add_outcome_text"><%= t 'links.align_outcome', "Align Outcome" %></span></a>
+    <button type="button" class="btn button-sidebar-wide add_outcome_link"><i class="icon-paperclip"></i> <span class="add_outcome_text"><%= t 'links.align_outcome', "Align Outcome" %></span></button>
   </div>
   <%= render :partial => 'shared/find_outcome', :locals => {:purpose => 'question_bank'}  %>
 <% end %>

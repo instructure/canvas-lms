@@ -277,7 +277,7 @@ module InstFS
     private
 
     def setting(key)
-      Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
+      DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
     end
 
     def service_url(path, query_params = nil)

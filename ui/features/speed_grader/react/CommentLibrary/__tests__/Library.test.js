@@ -73,8 +73,8 @@ describe('Library', () => {
 
   it('calls setComment and hides the tray when a tray comment is clicked', async () => {
     const {getByText, queryByText} = render(<Library {...defaultProps()} />)
-    fireEvent.click(getByText('2'))
-    fireEvent.click(getByText('great comment 2'))
+    fireEvent.click(getByText('2'), {detail: 1})
+    fireEvent.click(getByText('great comment 2'), {detail: 1})
     expect(setCommentMock).toHaveBeenCalledWith('great comment 2')
     await act(async () => jest.runAllTimers())
     expect(queryByText('Manage Comment Library')).not.toBeInTheDocument()

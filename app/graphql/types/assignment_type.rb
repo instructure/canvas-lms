@@ -180,6 +180,7 @@ module Types
     field :grade_group_students_individually, Boolean,
           "If this is a group assignment, boolean flag indicating whether or not students will be graded individually.",
           null: true
+    field :group_category_id, Int, null: true
 
     field :time_zone_edited, String, null: true
     field :in_closed_grading_period, Boolean, method: :in_closed_grading_period?, null: true

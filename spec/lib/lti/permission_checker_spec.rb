@@ -35,15 +35,15 @@ describe Lti::PermissionChecker do
       before do
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:destroy_subscription).and_return true
-        @original_fallback = Canvas::DynamicSettings.fallback_data
-        Canvas::DynamicSettings.fallback_data = {
+        @original_fallback = DynamicSettings.fallback_data
+        DynamicSettings.fallback_data = {
           "canvas" => {},
           "live-events-subscription-service" => {},
         }
       end
 
       after do
-        Canvas::DynamicSettings.fallback_data = @original_fallback
+        DynamicSettings.fallback_data = @original_fallback
       end
 
       let(:assignment) do

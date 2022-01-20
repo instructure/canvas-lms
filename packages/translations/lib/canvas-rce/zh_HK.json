@@ -32,6 +32,7 @@
     "message": "在課程中套用變更到此按鈕和圖示的所有執行個體"
   },
   "apps_54d24a47": { "message": "應用程式" },
+  "arrows_464a3e54": { "message": "箭號" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "外觀比例將被保留" },
   "assignments_1e02582c": { "message": "作業列表" },
   "attributes_963ba262": { "message": "屬性" },
@@ -45,6 +46,7 @@
     "message": "自動儲存內容已存在。是否要改為載入自動儲存的內容？"
   },
   "available_folders_694d0436": { "message": "可用資料夾" },
+  "basic_554cdc0a": { "message": "基本" },
   "below_81d4dceb": { "message": "以下" },
   "bottom_third_5f5fec1d": { "message": "底部第三個" },
   "button_color_608a0242": { "message": "按鈕顏色" },
@@ -117,6 +119,7 @@
   "decrease_indent_de6343ab": { "message": "減少縮排" },
   "default_bulleted_unordered_list_47079da8": { "message": "預設符號無序清單" },
   "default_numerical_ordered_list_48dd3548": { "message": "預設數字有序清單" },
+  "delimiters_4db4840d": { "message": "分隔符號" },
   "describe_the_image_e65d2e32": { "message": "（描述影像）" },
   "describe_the_video_2fe8f46a": { "message": "（描述影片）" },
   "details_98a31b68": { "message": "詳細資料" },
@@ -124,6 +127,7 @@
   "dimension_type_55c83e4e": { "message": "尺寸類型" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
+  "directly_edit_latex_b7e9235b": { "message": "直接編輯 LaTeX" },
   "discussions_a5f96392": { "message": "討論區" },
   "discussions_index_6c36ced": { "message": "討論索引" },
   "display_options_315aba85": { "message": "顯示選項" },
@@ -158,6 +162,7 @@
     "message": "請輸入最少 3 個字元以開始搜尋"
   },
   "equation_1c5ac93c": { "message": "方程式" },
+  "equation_editor_39fbc3f1": { "message": "方程式編輯器" },
   "expand_preview_by_default_2abbf9f8": { "message": "預設為展開預覽" },
   "expand_to_see_types_f5d29352": { "message": "展開以查看 { types }" },
   "external_links_3d9f074e": { "message": "外部連結" },
@@ -183,6 +188,7 @@
   "go_to_the_editor_s_menubar_e6674c81": { "message": "前往編輯器的選單欄" },
   "go_to_the_editor_s_toolbar_a5cb875f": { "message": "前往編輯器的工具欄" },
   "grades_a61eba0a": { "message": "成績" },
+  "greek_65c5b3f7": { "message": "希臘語" },
   "group_documents_8bfd6ae6": { "message": "群組文件" },
   "group_files_4324f3df": { "message": "群組檔案" },
   "group_files_82e5dcdb": { "message": "群組檔案" },
@@ -238,6 +244,7 @@
   "media_af190855": { "message": "媒體" },
   "medium_5a8e9ead": { "message": "中" },
   "middle_27dc1d5": { "message": "中間" },
+  "misc_3b692ea7": { "message": "雜項" },
   "miscellaneous_e9818229": { "message": "雜項" },
   "modules_c4325335": { "message": "單元" },
   "multi_color_image_63d7372f": { "message": "多色圖像" },
@@ -272,6 +279,7 @@
     "message": "開啟此鍵盤快速鍵對話方塊"
   },
   "open_title_application_fd624fc5": { "message": "開啟 { title } 應用程式" },
+  "operators_a2ef9a93": { "message": "操作員" },
   "options_3ab0ea65": { "message": "選項" },
   "ordered_and_unordered_lists_cfadfc38": { "message": "有序和無序的清單" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
@@ -303,6 +311,7 @@
   "raw_html_editor_e3993e41": { "message": "原始 HTML 編輯器" },
   "record_7c9448b": { "message": "錄製" },
   "record_upload_media_5fdce166": { "message": "錄製/上傳媒體" },
+  "relationships_6602af70": { "message": "關聯" },
   "remove_link_d1f2f4d0": { "message": "移除連結" },
   "resize_ec83d538": { "message": "調校大小" },
   "restore_auto_save_deccd84b": { "message": "還原自動儲存？" },

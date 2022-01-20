@@ -58,9 +58,9 @@
     "instrument": false
   },
   "dependencies": {
-    "@instructure/canvas-media": ">=1.0.0",
+    "@instructure/canvas-media": "*",
     "@instructure/canvas-theme": "7",
-    "@instructure/k5uploader": ">=1",
+    "@instructure/k5uploader": "*",
     "@instructure/media-capture": "~8.0.1-rc.11",
     "@instructure/ui-a11y-content": "7",
     "@instructure/ui-alerts": "7",
@@ -113,7 +113,7 @@
     "classnames": "^2.2.5",
     "format-message": "^6",
     "format-message-generate-id": "^6",
-    "get-cookie": "1",
+    "get-cookie": "*",
     "i18n-js": "^3",
     "i18nliner": "~0.2.0",
     "isomorphic-fetch": "2.2.1",
@@ -123,6 +123,7 @@
     "lodash": "^4",
     "minimatch": "~3.0.4",
     "mathlive": "^0.69.8",
+    "moment-timezone": "^0.5.13",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
     "react-dom": "^0.14.8 || ^15.0.0 || ^16",

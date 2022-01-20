@@ -68,6 +68,7 @@ export const AddressBookContainer = props => {
 
     userData = data?.legacyNode?.recipients?.usersConnection?.nodes.map(u => {
       return {
+        _id: u._id,
         id: u.id,
         name: u.name
       }
@@ -122,7 +123,7 @@ AddressBookContainer.propTypes = {
    */
   width: PropTypes.string,
   /**
-   * Bool to control open/closed statte of menu for testing
+   * Bool to control open/closed state of menu for testing
    */
   open: PropTypes.bool
 }
