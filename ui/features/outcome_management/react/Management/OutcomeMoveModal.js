@@ -151,6 +151,7 @@ const OutcomeMoveModal = ({
           margin="0 x-small 0 0"
           disabled={disableSaveButton}
           onClick={onMoveOutcomesHandler}
+          data-testid="outcome-management-move-modal-move-button"
         >
           {I18n.t('Move')}
         </Button>
