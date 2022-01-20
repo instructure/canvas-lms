@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import Upload from '../Upload'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import fetchMock from 'fetch-mock'
@@ -31,20 +31,35 @@ jest.mock('../../../../../../../bridge', () => {
 })
 
 let props
-const subject = overrides => render(<Upload {...props} />)
+const subject = () => render(<Upload {...props} />)
 
 describe('Upload()', () => {
   beforeEach(() => {
-    props = {editor: new FakeEditor()}
+    props = {editor: new FakeEditor(), dispatch: jest.fn()}
     fetchMock.mock('/api/session', '{}')
   })
 
   afterEach(() => {
     fetchMock.restore()
+    jest.clearAllMocks()
   })
 
   it('renders an upload modal', async () => {
     const {getAllByText} = subject(props)
     await waitFor(() => expect(getAllByText('Upload Image').length).toBe(2))
+  })
+
+  describe('when the "Close" button is pressed', () => {
+    let rendered
+
+    beforeEach(async () => {
+      rendered = subject()
+      const button = await rendered.findAllByText(/Close/i)
+      fireEvent.click(button[0])
+    })
+
+    it('closes the modal', async () => {
+      expect(props.dispatch).toHaveBeenCalled()
+    })
   })
 })

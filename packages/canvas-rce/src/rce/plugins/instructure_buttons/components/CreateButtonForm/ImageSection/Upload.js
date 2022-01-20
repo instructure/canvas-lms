@@ -19,17 +19,20 @@
 import React from 'react'
 
 import formatMessage from '../../../../../../format-message'
+import {actions} from '../../../reducers/imageSection'
 
 import {UploadFile} from '../../../../shared/Upload/UploadFile'
 
-const Upload = ({editor}) => {
+const Upload = ({editor, dispatch}) => {
   return (
     <UploadFile
       accept={undefined}
       editor={editor}
       label={formatMessage('Upload Image')}
       panels={['COMPUTER']}
-      onDismiss={() => {}}
+      onDismiss={() => {
+        dispatch(actions.CLEAR_MODE)
+      }}
     />
   )
 }

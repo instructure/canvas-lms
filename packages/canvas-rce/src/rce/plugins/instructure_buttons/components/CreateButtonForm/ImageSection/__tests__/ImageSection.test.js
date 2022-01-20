@@ -131,17 +131,15 @@ describe('ImageSection', () => {
   })
 
   describe('when the "upload image" mode is selected', () => {
-    let getByText
+    let rendered
 
     beforeEach(() => {
       fetchMock.mock('/api/session', '{}')
 
-      const rendered = subject({editor: new FakeEditor()})
+      rendered = subject({editor: new FakeEditor()})
 
-      getByText = rendered.getByText
-
-      fireEvent.click(getByText('Add Image'))
-      fireEvent.click(getByText('Upload Image'))
+      fireEvent.click(rendered.getByText('Add Image'))
+      fireEvent.click(rendered.getByText('Upload Image'))
     })
 
     afterEach(() => {
@@ -149,7 +147,18 @@ describe('ImageSection', () => {
     })
 
     it('renders the image upload modal', async () => {
-      await waitFor(() => expect(getByText('Upload Image')).toBeInTheDocument())
+      await waitFor(() => expect(rendered.getByText('Upload Image')).toBeInTheDocument())
+    })
+
+    describe('and the the "close" button is clicked', () => {
+      beforeEach(async () => {
+        const button = await rendered.findAllByText(/Close/i)
+        fireEvent.click(button[0])
+      })
+
+      it('closes the modal', () => {
+        expect(rendered.queryByText('Upload Image')).toBe(null)
+      })
     })
   })
 
