@@ -250,7 +250,7 @@ pipeline {
                   'example_count': exampleCount.toInteger(),
                   'execution_time': (endTime - startTime),
                   'result': currentBuild.currentResult,
-                  'gerrit_revision': "${env.GERRIT_PATCHSET_REVISION}"
+                  'upstream_tag': "${env.UPSTREAM_TAG}"
                 ])
               }
             } //builder
