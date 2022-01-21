@@ -70,60 +70,29 @@ describe('DiscussionTopicAlertManager', () => {
     expect(container.queryByTestId('locked-for-user')).toBeTruthy()
   })
 
-  describe('Full anonymous discussion', () => {
-    it('should render anon alert when status is present', async () => {
-      const {findByTestId} = setup({
-        discussionTopic: Discussion.mock({
-          anonymousState: 'full_anonymity'
-        })
+  it('should render anon alert when status is present', async () => {
+    const {findByTestId} = setup({
+      discussionTopic: Discussion.mock({
+        anonymousState: 'full_anonymous'
       })
-      const anonAlert = await findByTestId('anon-conversation')
-      expect(anonAlert.textContent).toEqual(
-        'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
-      )
     })
-
-    it('should render non-anon alert when user is teacher, ta, or designer', async () => {
-      window.ENV.current_user_roles = ['User', 'teacher']
-      const {findByTestId} = setup({
-        discussionTopic: Discussion.mock({
-          anonymousState: 'full_anonymity'
-        })
-      })
-
-      const anonAlert = await findByTestId('anon-conversation')
-      expect(anonAlert.textContent).toEqual(
-        'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
-      )
-      window.ENV.current_user_roles = null
-    })
+    const anonAlert = await findByTestId('anon-conversation')
+    expect(anonAlert.textContent).toEqual(
+      'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
+    )
   })
 
-  describe('Partial anonymous discussion', () => {
-    it('should render partial anon alert when status is present', async () => {
-      const {findByTestId} = setup({
-        discussionTopic: Discussion.mock({
-          anonymousState: 'partial_anonymity'
-        })
+  it('should render non-anon alert when user is teacher, ta, or designer', async () => {
+    window.ENV.current_user_roles = ['User', 'teacher']
+    const {findByTestId} = setup({
+      discussionTopic: Discussion.mock({
+        anonymousState: 'full_anonymous'
       })
-      const anonAlert = await findByTestId('anon-conversation')
-      expect(anonAlert.textContent).toEqual(
-        'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous.'
-      )
     })
-
-    it('should render non-anon alert when user is teacher, ta, or designer', async () => {
-      window.ENV.current_user_roles = ['User', 'teacher']
-      const {findByTestId} = setup({
-        discussionTopic: Discussion.mock({
-          anonymousState: 'partial_anonymity'
-        })
-      })
-      const anonAlert = await findByTestId('anon-conversation')
-      expect(anonAlert.textContent).toEqual(
-        'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
-      )
-      window.ENV.current_user_roles = null
-    })
+    const anonAlert = await findByTestId('anon-conversation')
+    expect(anonAlert.textContent).toEqual(
+      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
+    )
+    window.ENV.current_user_roles = null
   })
 })

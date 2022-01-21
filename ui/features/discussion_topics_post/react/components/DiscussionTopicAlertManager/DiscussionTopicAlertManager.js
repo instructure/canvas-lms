@@ -28,23 +28,6 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 export const DiscussionTopicAlertManager = props => {
-  const getAnonymousAlertText = () => {
-    /* teachers, tas and designers are assigned the teacher roles in current_user_roles */
-    if (ENV.current_user_roles?.includes('teacher')) {
-      return I18n.t(
-        'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
-      )
-    } else if (props.discussionTopic.anonymousState === 'full_anonymity') {
-      return I18n.t(
-        'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
-      )
-    } else {
-      return I18n.t(
-        'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous.'
-      )
-    }
-  }
-
   return (
     <Responsive
       match="media"
@@ -135,7 +118,14 @@ export const DiscussionTopicAlertManager = props => {
           applicableAlerts.push(
             <Alert key="anon-conversation" variant="info" margin="0 0 x-small">
               <Text data-testid="anon-conversation" size={responsiveProps?.alert?.textSize}>
-                {getAnonymousAlertText()}
+                {/* teachers, tas and designers are assigned the teacher roles in current_user_roles */}
+                {ENV.current_user_roles?.includes('teacher')
+                  ? I18n.t(
+                      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
+                    )
+                  : I18n.t(
+                      'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
+                    )}
               </Text>
             </Alert>
           )
