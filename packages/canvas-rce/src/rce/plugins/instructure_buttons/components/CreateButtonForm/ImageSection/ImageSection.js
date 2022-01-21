@@ -28,13 +28,11 @@ import {Group} from '../Group'
 import ModeSelect from './ModeSelect'
 import Course from './Course'
 import PreviewIcon from '../../../../shared/PreviewIcon'
-import {ImageCropper} from '../ImageCropper'
 import {IconCropSolid} from '@instructure/ui-icons'
-import {Modal} from '@instructure/ui-modal'
-import {Heading} from '@instructure/ui-heading'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
+import {ImageCropperModal} from '../ImageCropper'
 
 export const ImageSection = ({settings, onChange, editing}) => {
   const [openCropModal, setOpenCropModal] = useState(false)
@@ -123,42 +121,11 @@ export const ImageSection = ({settings, onChange, editing}) => {
             }}
           />
           {openCropModal && (
-            <Modal
-              size="large"
+            <ImageCropperModal
               open={openCropModal}
-              onDismiss={() => {
-                setOpenCropModal(false)
-              }}
-              shouldCloseOnDocumentClick={false}
-            >
-              <Modal.Header>
-                <CloseButton
-                  placement="end"
-                  offset="small"
-                  onClick={() => {
-                    setOpenCropModal(false)
-                  }}
-                  screenReaderLabel="Close"
-                />
-                <Heading>{formatMessage('Crop Image')}</Heading>
-              </Modal.Header>
-              <Modal.Body>
-                <ImageCropper />
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  onClick={() => {
-                    setOpenCropModal(false)
-                  }}
-                  margin="0 x-small 0 0"
-                >
-                  {formatMessage('Cancel')}
-                </Button>
-                <Button color="primary" type="submit">
-                  {formatMessage('Save')}
-                </Button>
-              </Modal.Footer>
-            </Modal>
+              onClose={() => setOpenCropModal(false)}
+              image={state.image}
+            />
           )}
         </Flex.Item>
       </Flex>
