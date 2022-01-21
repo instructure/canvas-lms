@@ -51,5 +51,20 @@ describe "new_discussion_entry" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body.include?("replying to this message")).to eq false
     end
+
+    context "fully anonymous topic" do
+      let(:anonymous_topic) { discussion_topic_model(anonymous_state: "full_anonymity") }
+
+      before :once do
+        @user = user_model(name: "Chawn Neal")
+        @object = anonymous_topic.discussion_entries.create!(user: @user)
+      end
+
+      it "does not render user name" do
+        msg = generate_message(notification_name, path_type, @object)
+        expect(msg.body).to match(/Anonymous\s\w+\sreplied\sto/)
+        expect(msg.body).not_to include(@user.short_name)
+      end
+    end
   end
 end
