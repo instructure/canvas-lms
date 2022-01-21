@@ -13447,7 +13447,7 @@ nb:
         one: "*1* Kunngjøring"
         other: "*%{count}* Kunngjøringer"
       x_new_in_assignments: 
-        one: "*1* oppgavevarsel"
+        one: "*1* Oppgavevarsel"
         other: "*%{count}* Oppgavevarsler"
       x_new_in_conversations: 
         one: "*1* Samtalemelding"
