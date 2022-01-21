@@ -23,16 +23,26 @@ import {actions} from '../../../reducers/imageSection'
 
 import {UploadFile} from '../../../../shared/Upload/UploadFile'
 
+export const onSubmit = dispatch => (_editor, _accept, _selectedPanel, uploadData) => {
+  const {theFile} = uploadData
+
+  dispatch({...actions.SET_IMAGE, payload: theFile.preview})
+  dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
+  dispatch(actions.CLEAR_MODE)
+}
+
 const Upload = ({editor, dispatch}) => {
   return (
     <UploadFile
-      accept={undefined}
+      accept="image/*"
       editor={editor}
       label={formatMessage('Upload Image')}
       panels={['COMPUTER']}
       onDismiss={() => {
         dispatch(actions.CLEAR_MODE)
       }}
+      requireA11yAttributes={false}
+      onSubmit={onSubmit(dispatch)}
     />
   )
 }
