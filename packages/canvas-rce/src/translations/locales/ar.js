@@ -55,6 +55,7 @@ const locale = {
     "message": "تطبيق التغييرات على كافة مثيلات هذا الزر والأيقونة في المساق"
   },
   "apps_54d24a47": { "message": "التطبيق" },
+  "arrows_464a3e54": { "message": "الأسهم" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
   },
@@ -70,6 +71,7 @@ const locale = {
     "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
   },
   "available_folders_694d0436": { "message": "المجلدات المتاحة" },
+  "basic_554cdc0a": { "message": "أساسي" },
   "below_81d4dceb": { "message": "الأسفل" },
   "bottom_third_5f5fec1d": { "message": "الثالث من الأسفل" },
   "button_color_608a0242": { "message": "لون الزر" },
@@ -148,6 +150,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "قائمة افتراضية مرقمة غير مرتبة"
   },
+  "delimiters_4db4840d": { "message": "المحدِدات" },
   "describe_the_image_e65d2e32": { "message": "(وصف الصورة)" },
   "describe_the_video_2fe8f46a": { "message": "(وصف الفيديو)" },
   "details_98a31b68": { "message": "التفاصيل" },
@@ -155,6 +158,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "نوع البعد" },
   "dimensions_45ddb7b7": { "message": "الأبعاد" },
   "directionality_26ae9e08": { "message": "الاتجاهية" },
+  "directly_edit_latex_b7e9235b": { "message": "تحرير LaTeX مباشرةً" },
   "discussions_a5f96392": { "message": "النقاشات" },
   "discussions_index_6c36ced": { "message": "فهرس المناقشات" },
   "display_options_315aba85": { "message": "عرض الخيارات" },
@@ -193,6 +197,7 @@ const locale = {
     "message": "أدخل 3 أحرف على الأقل للبحث"
   },
   "equation_1c5ac93c": { "message": "معادلة" },
+  "equation_editor_39fbc3f1": { "message": "محرر المعادلات" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "توسيع المعاينة افتراضيًا"
   },
@@ -230,6 +235,7 @@ const locale = {
     "message": "الانتقال إلى شريط الأدوات الخاص بالمحرر"
   },
   "grades_a61eba0a": { "message": "الدرجات" },
+  "greek_65c5b3f7": { "message": "اليونانية" },
   "group_documents_8bfd6ae6": { "message": "مستندات المجموعة" },
   "group_files_4324f3df": { "message": "ملفات المجموعة" },
   "group_files_82e5dcdb": { "message": "ملفات المجموعة" },
@@ -285,6 +291,7 @@ const locale = {
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
   "middle_27dc1d5": { "message": "الأوسط" },
+  "misc_3b692ea7": { "message": "متنوع" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
@@ -319,6 +326,7 @@ const locale = {
     "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
   },
   "open_title_application_fd624fc5": { "message": "فتح تطبيق { title }" },
+  "operators_a2ef9a93": { "message": "المشغلون" },
   "options_3ab0ea65": { "message": "خيارات" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "القوائم المرتبة وغير المرتبة"
@@ -354,6 +362,7 @@ const locale = {
   "raw_html_editor_e3993e41": { "message": "محرر HTML الأولي" },
   "record_7c9448b": { "message": "تسجيل" },
   "record_upload_media_5fdce166": { "message": "تسجيل/تحميل الوسائط" },
+  "relationships_6602af70": { "message": "العلاقات" },
   "remove_link_d1f2f4d0": { "message": "إزالة الارتباط" },
   "resize_ec83d538": { "message": "تغيير الحجم" },
   "restore_auto_save_deccd84b": { "message": "استعادة الحفظ التلقائي؟" },
