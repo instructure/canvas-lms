@@ -18,6 +18,7 @@
 
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
+import {responsiveQuerySizes} from '../../../../util/utils'
 import {ConversationListHolder} from '../ConversationListHolder'
 
 const props = {
@@ -160,7 +161,29 @@ const props = {
   ]
 }
 
+jest.mock('../../../../util/utils', () => ({
+  ...jest.requireActual('../../../../util/utils'),
+  responsiveQuerySizes: jest.fn()
+}))
+
 describe('ConversationListHolder', () => {
+  beforeAll(() => {
+    // Add appropriate mocks for responsive
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
+    // Repsonsive Query Mock Default
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {minWidth: '768px'}
+    }))
+  })
   beforeEach(() => {
     window.document.getSelection = () => {
       return {
