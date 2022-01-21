@@ -53,6 +53,7 @@ const locale = {
     "message": "将更改应用于课程中的此按钮和图标的所有实例"
   },
   "apps_54d24a47": { "message": "应用程序" },
+  "arrows_464a3e54": { "message": "箭头" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "保留长宽比" },
   "assignments_1e02582c": { "message": "作业" },
   "attributes_963ba262": { "message": "属性" },
@@ -66,6 +67,7 @@ const locale = {
     "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
   },
   "available_folders_694d0436": { "message": "可用文件夹" },
+  "basic_554cdc0a": { "message": "基本" },
   "below_81d4dceb": { "message": "下方" },
   "bottom_third_5f5fec1d": { "message": "倒数第三" },
   "button_color_608a0242": { "message": "按钮颜色" },
@@ -140,6 +142,7 @@ const locale = {
     "message": "默认项目符号无序列表"
   },
   "default_numerical_ordered_list_48dd3548": { "message": "默认数字有序列表" },
+  "delimiters_4db4840d": { "message": "分隔符" },
   "describe_the_image_e65d2e32": { "message": "（图像说明）" },
   "describe_the_video_2fe8f46a": { "message": "（视频说明）" },
   "details_98a31b68": { "message": "详情" },
@@ -147,6 +150,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "维度类型" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
+  "directly_edit_latex_b7e9235b": { "message": "直接编辑 LaTeX" },
   "discussions_a5f96392": { "message": "讨论" },
   "discussions_index_6c36ced": { "message": "讨论索引" },
   "display_options_315aba85": { "message": "显示选项" },
@@ -181,6 +185,7 @@ const locale = {
     "message": "输入至少 3 个字符以进行搜索"
   },
   "equation_1c5ac93c": { "message": "等式" },
+  "equation_editor_39fbc3f1": { "message": "方程式编辑器" },
   "expand_preview_by_default_2abbf9f8": { "message": "默认展开预览" },
   "expand_to_see_types_f5d29352": { "message": "展开以查看 { types }" },
   "external_links_3d9f074e": { "message": "外部链接" },
@@ -206,6 +211,7 @@ const locale = {
   "go_to_the_editor_s_menubar_e6674c81": { "message": "前往编辑器的菜单栏" },
   "go_to_the_editor_s_toolbar_a5cb875f": { "message": "前往编辑器的工具栏" },
   "grades_a61eba0a": { "message": "评分" },
+  "greek_65c5b3f7": { "message": "希腊语" },
   "group_documents_8bfd6ae6": { "message": "组文档" },
   "group_files_4324f3df": { "message": "小组文件" },
   "group_files_82e5dcdb": { "message": "组文件" },
@@ -261,6 +267,7 @@ const locale = {
   "media_af190855": { "message": "媒体" },
   "medium_5a8e9ead": { "message": "中等" },
   "middle_27dc1d5": { "message": "中间" },
+  "misc_3b692ea7": { "message": "其他" },
   "miscellaneous_e9818229": { "message": "其他" },
   "modules_c4325335": { "message": "单元" },
   "multi_color_image_63d7372f": { "message": "彩色图像" },
@@ -293,6 +300,7 @@ const locale = {
     "message": "打开此键盘快捷方式对话框"
   },
   "open_title_application_fd624fc5": { "message": "打开{ title }应用程序" },
+  "operators_a2ef9a93": { "message": "运算符" },
   "options_3ab0ea65": { "message": "选项" },
   "ordered_and_unordered_lists_cfadfc38": { "message": "有序列表和无序列表" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
@@ -324,6 +332,7 @@ const locale = {
   "raw_html_editor_e3993e41": { "message": "原始 HTML 编辑器" },
   "record_7c9448b": { "message": "记录" },
   "record_upload_media_5fdce166": { "message": "记录/上传媒体" },
+  "relationships_6602af70": { "message": "关系" },
   "remove_link_d1f2f4d0": { "message": "删除链接" },
   "resize_ec83d538": { "message": "调整大小" },
   "restore_auto_save_deccd84b": { "message": "是否恢复自动保存？" },

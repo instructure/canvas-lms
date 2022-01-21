@@ -53,6 +53,7 @@ const locale = {
     "message": "Wijzigingen toepassen bij alle gevallen van deze knop en pictogram in de cursus"
   },
   "apps_54d24a47": { "message": "Apps" },
+  "arrows_464a3e54": { "message": "Pijlen" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Beeldverhouding blijft behouden"
   },
@@ -70,6 +71,7 @@ const locale = {
     "message": "Er is automatisch opgeslagen inhoud aanwezig. Wil je liever  de automatisch opgeslagen inhoud laden?"
   },
   "available_folders_694d0436": { "message": "Beschikbare mappen" },
+  "basic_554cdc0a": { "message": "Basis" },
   "below_81d4dceb": { "message": "Hieronder" },
   "bottom_third_5f5fec1d": { "message": "Derde van beneden" },
   "button_color_608a0242": { "message": "Knopkleur" },
@@ -158,6 +160,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "standaard geordende numerieke lijst"
   },
+  "delimiters_4db4840d": { "message": "Scheidingstekens" },
   "describe_the_image_e65d2e32": { "message": "(Beschrijf de afbeelding)" },
   "describe_the_video_2fe8f46a": { "message": "(beschrijf de video)" },
   "details_98a31b68": { "message": "Details" },
@@ -165,6 +168,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "Afmetingstype" },
   "dimensions_45ddb7b7": { "message": "Afmetingen" },
   "directionality_26ae9e08": { "message": "richting" },
+  "directly_edit_latex_b7e9235b": { "message": "LaTeX rechtstreeks bewerken" },
   "discussions_a5f96392": { "message": "Discussies" },
   "discussions_index_6c36ced": { "message": "Discussieoverzicht" },
   "display_options_315aba85": { "message": "Weergaveopties" },
@@ -201,6 +205,7 @@ const locale = {
     "message": "Voer minimaal 3 tekens in om te gaan zoeken"
   },
   "equation_1c5ac93c": { "message": "Vergelijking" },
+  "equation_editor_39fbc3f1": { "message": "Vergelijkingseditor" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Uitvouwvoorbeeld is standaard"
   },
@@ -246,6 +251,7 @@ const locale = {
     "message": "Ga naar de werkbalk van de editor"
   },
   "grades_a61eba0a": { "message": "Cijfers" },
+  "greek_65c5b3f7": { "message": "Grieks" },
   "group_documents_8bfd6ae6": { "message": "Documenten groeperen" },
   "group_files_4324f3df": { "message": "Groepsbestanden" },
   "group_files_82e5dcdb": { "message": "Groepsbestanden" },
@@ -309,6 +315,7 @@ const locale = {
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Midden" },
+  "misc_3b692ea7": { "message": "Diversen" },
   "miscellaneous_e9818229": { "message": "Diversen" },
   "modules_c4325335": { "message": "Modules" },
   "multi_color_image_63d7372f": { "message": "Veelkleurige afbeelding" },
@@ -345,6 +352,7 @@ const locale = {
   "open_title_application_fd624fc5": {
     "message": "{ title } applicatie openen"
   },
+  "operators_a2ef9a93": { "message": "Operators" },
   "options_3ab0ea65": { "message": "Opties" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Geordende en ongeordende lijsten"
@@ -380,6 +388,7 @@ const locale = {
   "raw_html_editor_e3993e41": { "message": "Editor voor onbewerkte HTML" },
   "record_7c9448b": { "message": "Opnemen" },
   "record_upload_media_5fdce166": { "message": "Media opnemen/uploaden" },
+  "relationships_6602af70": { "message": "Relaties" },
   "remove_link_d1f2f4d0": { "message": "Link verwijderen" },
   "resize_ec83d538": { "message": "Grootte wijzigen" },
   "restore_auto_save_deccd84b": {
