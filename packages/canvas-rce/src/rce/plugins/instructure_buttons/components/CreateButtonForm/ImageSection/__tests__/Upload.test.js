@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
-import Upload from '../Upload'
+import Upload, {onSubmit} from '../Upload'
+import {actions} from '../../../../reducers/imageSection'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import fetchMock from 'fetch-mock'
 
@@ -60,6 +61,42 @@ describe('Upload()', () => {
 
     it('closes the modal', async () => {
       expect(props.dispatch).toHaveBeenCalled()
+    })
+  })
+
+  describe('onSubmit()', () => {
+    const dispatch = jest.fn()
+    const theFile = {
+      preview:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEBCAMAAAD1kWivAAADAFBMVEWysrL5nCYYGBj7/+rceo3w1tD+yAfwFTPrIj36',
+      name: 'Test Image.png'
+    }
+
+    const subject = () =>
+      onSubmit(dispatch)(
+        {},
+        {},
+        {},
+        {
+          theFile
+        }
+      )
+
+    afterEach(() => jest.clearAllMocks())
+
+    it('sets the selected image', () => {
+      subject()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE, payload: theFile.preview})
+    })
+
+    it('sets the selected image name', () => {
+      subject()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_NAME, payload: theFile.name})
+    })
+
+    it('closes the modal', () => {
+      subject()
+      expect(dispatch).toHaveBeenCalledWith(actions.CLEAR_MODE)
     })
   })
 })
