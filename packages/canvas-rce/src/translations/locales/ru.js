@@ -53,6 +53,7 @@ const locale = {
     "message": "Применить изменения ко всем экземплярам этой кнопки и пиктограммы в курсе"
   },
   "apps_54d24a47": { "message": "Приложения" },
+  "arrows_464a3e54": { "message": "Стрелки" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Соотношение сторон будет сохранено"
   },
@@ -70,6 +71,7 @@ const locale = {
     "message": "Существует сохраненное в автоматическом режиме содержимое. Вы хотите загрузить сохраненное в автоматическом режиме содержимое?"
   },
   "available_folders_694d0436": { "message": "Доступные папки" },
+  "basic_554cdc0a": { "message": "Основной" },
   "below_81d4dceb": { "message": "Ниже" },
   "bottom_third_5f5fec1d": { "message": "Нижняя треть" },
   "button_color_608a0242": { "message": "Кнопка «Цвет»" },
@@ -164,6 +166,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "нумерованный упорядоченный список по умолчанию"
   },
+  "delimiters_4db4840d": { "message": "Разделители" },
   "describe_the_image_e65d2e32": { "message": "(Опишите изображение)" },
   "describe_the_video_2fe8f46a": { "message": "(опишите видео)" },
   "details_98a31b68": { "message": "Подробные сведения" },
@@ -171,6 +174,9 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "Тип измерения" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_26ae9e08": { "message": "Направленность" },
+  "directly_edit_latex_b7e9235b": {
+    "message": "Непосредственно редактирование LaTeX"
+  },
   "discussions_a5f96392": { "message": "Обсуждения" },
   "discussions_index_6c36ced": { "message": "Индекс обсуждений" },
   "display_options_315aba85": { "message": "Опции отображения" },
@@ -207,6 +213,7 @@ const locale = {
     "message": "Введите не менее 3 знаков для поиска"
   },
   "equation_1c5ac93c": { "message": "Формула" },
+  "equation_editor_39fbc3f1": { "message": "Редактор уравнений" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Разворачивать при предварительном просмотре по умолчанию"
   },
@@ -250,6 +257,7 @@ const locale = {
     "message": "Перейти в панель инструментов редактора"
   },
   "grades_a61eba0a": { "message": "Оценки" },
+  "greek_65c5b3f7": { "message": "Греческий" },
   "group_documents_8bfd6ae6": { "message": "Документы группы" },
   "group_files_4324f3df": { "message": "Файлы группы" },
   "group_files_82e5dcdb": { "message": "Файлы группы" },
@@ -311,6 +319,7 @@ const locale = {
   "media_af190855": { "message": "Мультимедиа" },
   "medium_5a8e9ead": { "message": "Средний" },
   "middle_27dc1d5": { "message": "Середина" },
+  "misc_3b692ea7": { "message": "Различное" },
   "miscellaneous_e9818229": { "message": "Разное" },
   "modules_c4325335": { "message": "Модули" },
   "multi_color_image_63d7372f": { "message": "Многоцветное изображение" },
@@ -347,6 +356,7 @@ const locale = {
   "open_title_application_fd624fc5": {
     "message": "Открыть приложение { title }"
   },
+  "operators_a2ef9a93": { "message": "Операторы" },
   "options_3ab0ea65": { "message": "Опции" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Упорядоченные и неупорядоченные списки"
@@ -388,6 +398,7 @@ const locale = {
   "record_upload_media_5fdce166": {
     "message": "Записать / загрузить мультимедиа"
   },
+  "relationships_6602af70": { "message": "Отношения" },
   "remove_link_d1f2f4d0": { "message": "Удалить ссылку" },
   "resize_ec83d538": { "message": "Изменить размер" },
   "restore_auto_save_deccd84b": { "message": "Восстановить автосохранение?" },

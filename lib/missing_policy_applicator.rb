@@ -59,6 +59,7 @@ class MissingPolicyApplicator
         score: score,
         grade: grade,
         graded_at: now,
+        grader_id: nil,
         posted_at: assignment.post_manually? ? nil : now,
         published_score: score,
         published_grade: grade,

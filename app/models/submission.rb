@@ -67,6 +67,7 @@ class Submission < ActiveRecord::Base
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc,
+                :skip_grader_check,
                 :grade_posting_in_progress,
                 :score_unchanged
   attr_writer :versioned_originality_reports,
@@ -1630,7 +1631,7 @@ class Submission < ActiveRecord::Base
   private :late_policy_relevant_changes?
 
   def ensure_grader_can_grade
-    return true if grader_can_grade?
+    return true if grader_can_grade? || skip_grader_check
 
     error_msg = I18n.t(
       "cannot be changed at this time: %{grading_error}",

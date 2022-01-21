@@ -21,6 +21,7 @@
 describe DiscussionEntry do
   let(:topic) { discussion_topic_model }
   let(:anonymous_topic) { discussion_topic_model(anonymous_state: "full_anonymity") }
+  let(:partially_anonymous_topic) { discussion_topic_model(anonymous_state: "partial_anonymity") }
 
   describe "callback lifecycle" do
     before(:once) do
@@ -863,7 +864,7 @@ describe DiscussionEntry do
     end
   end
 
-  describe "author_name" do
+  describe "#author_name" do
     let(:user) { user_model(name: "John Doe") }
     let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
     let(:anon_entry) { anonymous_topic.discussion_entries.create!(message: "Hello!", user: user) }
@@ -878,6 +879,42 @@ describe DiscussionEntry do
 
     it "returns You as anonymous author name" do
       expect(anon_entry.author_name(user)).to eq "John Doe"
+    end
+
+    context "discussion_topic.anonymous?" do
+      context "TeacherEnrollment" do
+        it "returns user.short_name" do
+          anonymous_topic.course.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user: user)
+
+          expect(entry.author_name).to eq(user.short_name)
+        end
+      end
+
+      context "TaEnrollment" do
+        it "returns user.short_name" do
+          anonymous_topic.course.enroll_user(user, "TaEnrollment", enrollment_state: "active")
+          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user: user)
+
+          expect(entry.author_name).to eq(user.short_name)
+        end
+      end
+
+      context "DesignerEnrollment" do
+        it "returns user.short_name" do
+          anonymous_topic.course.enroll_user(user, "DesignerEnrollment", enrollment_state: "active")
+          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user: user)
+
+          expect(entry.author_name).to eq(user.short_name)
+        end
+      end
+
+      context "discussion_topic partial_anonymity && !entry.is_anonymous_author" do
+        it "returns user.short_name" do
+          entry = partially_anonymous_topic.discussion_entries.create!(message: "Hello!", user: user, is_anonymous_author: false)
+          expect(entry.author_name).to eq(user.short_name)
+        end
+      end
     end
   end
 end
