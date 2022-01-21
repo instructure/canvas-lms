@@ -11394,7 +11394,7 @@ nn:
       Canvas førekomstar der root kontoar er på same fragment
       som områdeadministratorkontoen. Funksjonar i andre førekomstar
       fungerer allereie slik.
-  if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Dersom ekspertisesakalaer er skrudd på, vil rapporten bli avkorta for å ikkje inkludere utrekningsmetode, utrekningsintegrasjon, ekspertisepoeng, eller vurderingar"
+  if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Dersom ekspertisesakalaer er skrudd på, vil rapporten bli avkorta til å ikkje inkludere utrekningsmetode, utrekningsintegrasjon, ekspertisepoeng, eller vurderingar"
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Dersom ingen er markerte sender du til alle som tilhøyrer kontoen)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Dersom ingen er markerte sender du til alle som tilhøyrer underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Dersom ingen er vald, vis til alle i heile underkontoen)"
@@ -20900,7 +20900,7 @@ nn:
   submission_locked_image_93aced38: "Innlevering låst-bilde"
   submission_posted_title_course_138bd744: "Innlevering er posta: %{title}, %{course}"
   submission_preview_383473ec: "Førehandsvising av innlevering"
-  submission_records_will_be_filtered_by_date_using__b3990a1: "Innleveringsoversikta vil bli filtrert på dato med \"submitted_at\"-feltet dersom denne er tilgjengeleg. Når \"submitted_at\" ikkje er tilgjengeleg, \"graded_at\"-feltet vil bli brukt. Dersom begge er tomme, vil ikkje innleveringa bli inkludert i rapporten dersom ein filtrerer på dato."
+  submission_records_will_be_filtered_by_date_using__b3990a1: "Innleveringsoversikta vil bli filtrert på dato med \"submitted_at\"-feltet dersom det er tilgjengeleg. Når \"submitted_at\" ikkje er tilgjengeleg, \"graded_at\"-feltet vil bli brukt. Dersom begge feltene er tomme, vil ikkje innleveringa bli inkludert i rapporten når ein filtrerer på dato."
   submission_requirement_8ba1ee08: "Krav til innlevering"
   submission_score_b7a291e8: "resultat innlevering"
   submission_sent_3f0d2ee1: "Innlevering er sendt"
