@@ -57,6 +57,8 @@ function radioInputContainer() {
 }
 
 QUnit.module('SubmissionTrayRadioInput', hooks => {
+  let updateSubmission
+
   hooks.beforeEach(() => {
     updateSubmission = sinon.stub()
   })
