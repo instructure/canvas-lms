@@ -7,4 +7,8 @@
 <%= t :body, "Your instructor has released grade changes and new comments for %{title}, %{course}.",
       title: assignment.title, course: assignment.context.name %>
 
+<% if asset.score && user.try(:send_scores_in_emails?, assignment.context) %>
+  <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
+<% end %>
+
 <%= t :link_message, "More info at %{link}.", link: content(:link) %>
