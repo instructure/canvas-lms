@@ -15,3 +15,17 @@
 <% end %>
 
 <p><%= t :body, "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.", :title => assignment.title %></p>
+
+<% if asset.graded_at %>
+  <p><%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at) || t("No Date Set")) rescue t(:no_date_set, "No Date Set")) %></p>
+<% end %>
+
+<% if user.try(:send_scores_in_emails?, assignment.context) %>
+  <% if asset.excused? %>
+    <p><%= t :excused, "This assignment has been excused." %>
+  <% elsif asset.score %>
+    <p><%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
+  <% end %>
+<% end %>
+
+<p><%= t(:score_pending_review, "score pending review by the teacher") if asset.pending_review? %></p>
