@@ -8,10 +8,6 @@
   <%= t "Submission Posted: %{title}, %{course}", title: assignment.title, course: assignment.context.name %>
 <% end %>
 
-<%= t <<-BODY, title: assignment.title, course: assignment.context.name, url: content(:link)
-Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+<%= t :body, "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.", title: assignment.title %>
 
-Your can view it here:
-%{url}
-BODY
-%>
+<%= t :link_message, "You can view it here: %{link}.", link: content(:link) %>
