@@ -327,8 +327,7 @@ export const updateDiscussionEntryParticipantMock = ({
 export const updateDiscussionEntryMock = ({
   discussionEntryId = '1',
   message = '<p>This is the parent reply</p>',
-  fileId = '7',
-  removeAttachment = !fileId
+  removeAttachment = !'7'
 } = {}) => [
   {
     request: {
@@ -336,7 +335,6 @@ export const updateDiscussionEntryMock = ({
       variables: {
         discussionEntryId,
         message,
-        ...(fileId !== null && {fileId}),
         removeAttachment
       }
     },
@@ -387,7 +385,6 @@ export const createDiscussionEntryMock = ({
   discussionTopicId = '1',
   message = '',
   replyFromEntryId = null,
-  fileId = null,
   includeReplyPreview = null,
   isAnonymousAuthor = false,
   courseID = '1'
@@ -400,7 +397,6 @@ export const createDiscussionEntryMock = ({
         message,
         isAnonymousAuthor,
         ...(replyFromEntryId !== null && {replyFromEntryId}),
-        ...(fileId !== null && {fileId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
         ...(courseID !== null && {courseID})
       }
