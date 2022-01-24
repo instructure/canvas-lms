@@ -48,7 +48,7 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
   end
 end
 
-map_header = map_header.gsub(":version:", ":version: Test Count: #{map_body.keys.count}")
+map_header = map_header.gsub(":version:", ":version: #{map_body.keys.count} Tests Present in Map")
 
 File.open("crystalball_map.yml", "w") do |file|
   file << "---"
