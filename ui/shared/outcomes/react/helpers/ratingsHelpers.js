@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const convertRatings = rawRatings => {
+import uuid from 'uuid/v1'
+
+export const convertRatings = rawRatings => {
   let masteryPoints
   const ratings = rawRatings.map(({description, points, mastery}) => {
     const pointsFloat = parseFloat(points)
@@ -26,4 +28,10 @@ const convertRatings = rawRatings => {
   return {masteryPoints, ratings}
 }
 
-export default convertRatings
+export const prepareRatings = (ratings, masteryPoints) =>
+  (ratings || []).map(({description, points}) => ({
+    description,
+    points,
+    mastery: Number(points) === Number(masteryPoints),
+    key: uuid()
+  }))

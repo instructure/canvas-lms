@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {render as rtlRender, fireEvent} from '@testing-library/react'
-
 import ManageOutcomeItem from '../ManageOutcomeItem'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {MockedProvider} from '@apollo/react-testing'
+import {defaultRatingsAndCalculationMethod} from './helpers'
 
 const render = (
   children,
@@ -56,10 +56,16 @@ const render = (
 describe('ManageOutcomeItem', () => {
   let onMenuHandlerMock
   let onCheckboxHandlerMock
+  const {calculationMethod, calculationInt, masteryPoints, ratings} =
+    defaultRatingsAndCalculationMethod
   const defaultProps = (props = {}) => ({
     linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
+    calculationMethod,
+    calculationInt,
+    masteryPoints,
+    ratings,
     outcomeContextType: 'Account',
     outcomeContextId: '1',
     isChecked: false,
