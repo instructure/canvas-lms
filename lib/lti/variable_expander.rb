@@ -146,6 +146,57 @@ module Lti
       end
     end
 
+    # LTI - Custom parameter substitution: ResourceLink.id
+    # Returns the LTI value for the resource_link.id property
+    # Returns "$ResourceLink.id" otherwise
+    register_expansion "ResourceLink.id", [],
+                       lambda {
+                         line_item = @assignment.line_items.first
+                         line_item&.resource_id
+                       },
+                       -> { @assignment && @assignment.submission_types == "external_tool" && @assignment.line_items.present? },
+                       default_name: "resourcelink_id"
+
+    # LTI - Custom parameter substitution: ResourceLink.description
+    # Returns the LTI value for the resource_link.description property
+    # Returns "$ResourceLink.description" otherwise
+    register_expansion "ResourceLink.description", [],
+                       -> { @assignment.description },
+                       -> { @assignment && @assignment.description.present? },
+                       default_name: "resourcelink_description"
+
+    # LTI - Custom parameter substitution: ResourceLink.title
+    # Returns the LTI value for the resource_link.title property
+    # Returns "$ResourceLink.title" otherwise
+    register_expansion "ResourceLink.title", [],
+                       -> { @assignment.title },
+                       -> { @assignment && @assignment.title.present? },
+                       default_name: "resourcelink_title"
+
+    # LTI - Custom parameter substitution: ResourceLink.available.startDateTime
+    # Returns the ISO 8601 date and time when this resource is available for learners to access
+    # Returns "$ResourceLink.available.startDateTime" otherwise
+    register_expansion "ResourceLink.available.startDateTime", [],
+                       -> { @assignment.unlock_at.iso8601(3) },
+                       -> { @assignment && @assignment.unlock_at.present? },
+                       default_name: "resourcelink_available_startdatetime"
+
+    # LTI - Custom parameter substitution: ResourceLink.available.endDateTime
+    # Returns the ISO 8601 date and time when this resource ceases to be available for learners to access
+    # Returns "$ResourceLink.available.endDateTime" otherwise
+    register_expansion "ResourceLink.available.endDateTime", [],
+                       -> { @assignment.lock_at.iso8601(3) },
+                       -> { @assignment && @assignment.lock_at.present? },
+                       default_name: "resourcelink_available_enddatetime"
+
+    # LTI - Custom parameter substitution: ResourceLink.submission.endDateTime
+    # Returns the ISO 8601 date and time when this resource stops accepting submissions.
+    # Returns "$ResourceLink.submission.endDateTime" otherwise
+    register_expansion "ResourceLink.submission.endDateTime", [],
+                       -> { @assignment.due_at.iso8601(3) },
+                       -> { @assignment && @assignment.due_at.present? },
+                       default_name: "resourcelink_submission_enddatetime"
+
     # If the current user is an observer in the launch
     # context, this substitution returns a comma-separated
     # list of user IDs linked to the current user for
