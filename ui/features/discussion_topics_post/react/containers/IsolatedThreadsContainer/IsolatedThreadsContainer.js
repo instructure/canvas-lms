@@ -261,7 +261,6 @@ const IsolatedThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
-        fileId,
         removeAttachment: !fileId
       }
     })
