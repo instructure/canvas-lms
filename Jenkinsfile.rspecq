@@ -44,7 +44,7 @@ def setupNode() {
 }
 
 def computeTestCount() {
-  def partition = (env.RSPEC_PROCESSES.toInteger() * 30) // 30 tests per process
+  def partition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
   env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
