@@ -445,6 +445,7 @@ pipeline {
                           docker run --name=crystal --volume \$(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
                                      -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
                                      -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
+                                     -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
                                      $PATCHSET_TAG bundle exec crystalball --dry-run
                           docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
