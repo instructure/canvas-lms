@@ -499,11 +499,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               onSubmit={(
                                 message,
                                 _includeReplyPreview,
-                                fileId,
+                                _fileId,
                                 anonymousAuthorState
                               ) => {
                                 if (createDiscussionEntry) {
-                                  createDiscussionEntry(message, fileId, anonymousAuthorState)
+                                  createDiscussionEntry(message, anonymousAuthorState)
                                   setExpandedReply(false)
                                 }
                               }}
