@@ -55,6 +55,7 @@ const locale = {
     "message": "Aplica els canvis a totes les instàncies d’aquest botó i d’aquesta icona al curs"
   },
   "apps_54d24a47": { "message": "Aplicacions" },
+  "arrows_464a3e54": { "message": "Fletxes" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "La relació d''aspecte es mantindrà"
   },
@@ -72,6 +73,7 @@ const locale = {
     "message": "Existeix contingut desat automàticament. Voleu carregar el contingut desat automàticament al seu lloc?"
   },
   "available_folders_694d0436": { "message": "Carpetes disponibles" },
+  "basic_554cdc0a": { "message": "Bàsic" },
   "below_81d4dceb": { "message": "A sota de" },
   "bottom_third_5f5fec1d": { "message": "Terç inferior" },
   "button_color_608a0242": { "message": "Color del botó" },
@@ -162,6 +164,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "llista ordenada enumerada predeterminada"
   },
+  "delimiters_4db4840d": { "message": "Delimitadors" },
   "describe_the_image_e65d2e32": { "message": "(Descriu la imatge)" },
   "describe_the_video_2fe8f46a": { "message": "(Descriu el vídeo)" },
   "details_98a31b68": { "message": "Detalls" },
@@ -169,6 +172,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "Tipus de dimensió" },
   "dimensions_45ddb7b7": { "message": "Mides" },
   "directionality_26ae9e08": { "message": "Direccionalitat" },
+  "directly_edit_latex_b7e9235b": { "message": "Edita directament LaTeX" },
   "discussions_a5f96392": { "message": "Debats" },
   "discussions_index_6c36ced": { "message": "Índex dels debats" },
   "display_options_315aba85": { "message": "Mostra les opcions" },
@@ -207,6 +211,7 @@ const locale = {
     "message": "Introduïu com a mínim 3 caràcters per cercar"
   },
   "equation_1c5ac93c": { "message": "Equació" },
+  "equation_editor_39fbc3f1": { "message": "Editor d’equacions" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Desplega la visualització prèvia per defecte"
   },
@@ -248,6 +253,7 @@ const locale = {
     "message": "Ves a la barra d''eines de l''editor"
   },
   "grades_a61eba0a": { "message": "Qualificacions" },
+  "greek_65c5b3f7": { "message": "Grec" },
   "group_documents_8bfd6ae6": { "message": "Agrupa els documents" },
   "group_files_4324f3df": { "message": "Fitxers del grup" },
   "group_files_82e5dcdb": { "message": "Fitxers del grup" },
@@ -311,6 +317,7 @@ const locale = {
   "media_af190855": { "message": "Element multimèdia" },
   "medium_5a8e9ead": { "message": "Mitjà" },
   "middle_27dc1d5": { "message": "Centre" },
+  "misc_3b692ea7": { "message": "Miscel·lània" },
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Mòduls" },
   "multi_color_image_63d7372f": { "message": "Imatge multicolor" },
@@ -347,6 +354,7 @@ const locale = {
   "open_title_application_fd624fc5": {
     "message": "Obre l’aplicació { title }"
   },
+  "operators_a2ef9a93": { "message": "Operadors" },
   "options_3ab0ea65": { "message": "Opcions" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Llistes ordenades i desordenades"
@@ -390,6 +398,7 @@ const locale = {
   "record_upload_media_5fdce166": {
     "message": "Enregistra o penja l''element multimèdia"
   },
+  "relationships_6602af70": { "message": "Relacions" },
   "remove_link_d1f2f4d0": { "message": "Elimina l''enllaç" },
   "resize_ec83d538": { "message": "Canvia la mida" },
   "restore_auto_save_deccd84b": {

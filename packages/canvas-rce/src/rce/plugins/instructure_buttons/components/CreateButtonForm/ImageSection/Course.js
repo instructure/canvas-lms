@@ -37,12 +37,9 @@ const Course = ({dispatch}) => {
     dispatch({...actions.SET_IMAGE, payload: dataUrl})
   }, [dataUrl])
 
-
   // Handle loading states
   useEffect(() => {
-    dispatch(
-      dataLoading ? actions.START_LOADING : actions.STOP_LOADING
-    )
+    dispatch(dataLoading ? actions.START_LOADING : actions.STOP_LOADING)
   }, [dataLoading])
 
   return (

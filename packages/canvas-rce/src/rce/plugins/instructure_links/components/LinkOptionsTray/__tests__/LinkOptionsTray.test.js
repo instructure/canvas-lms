@@ -172,13 +172,20 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
           expect(text).toEqual('Syllabus-revised-final__FINAL (2).doc')
         })
 
+        it('omits target and class attributes', () => {
+          renderComponent()
+          tray.$doneButton.click()
+          const [linkAttrs] = props.onSave.mock.calls[0]
+          expect(linkAttrs.target).toBeUndefined()
+          expect(linkAttrs.class).toBeUndefined()
+        })
+
         it('omits embed info if the file is not previewable', () => {
           props.content.isPreviewable = false
           renderComponent()
           tray.$doneButton.click()
           const [linkAttrs] = props.onSave.mock.calls[0]
           expect(linkAttrs.embed).toBeNull()
-          expect(linkAttrs.class).toEqual('inline_disabled')
         })
 
         it('includes embed info if the file is previewable', () => {

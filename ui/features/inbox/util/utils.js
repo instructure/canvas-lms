@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,4 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {ImageCropperModal} from './ImageCropperModal'
+export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
+  const querySizes = {}
+  if (mobile) {
+    querySizes.mobile = {maxWidth: '767px'}
+  }
+  if (tablet) {
+    querySizes.tablet = {maxWidth: '1023px'}
+  }
+  if (desktop) {
+    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
+  }
+  return querySizes
+}
