@@ -441,8 +441,8 @@ pipeline {
                       try {
                         /* groovylint-disable-next-line GStringExpressionWithinString */
                         sh '''
-                          diffFrom=\$(git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
-                          docker run --name=crystal --volume \$(pwd)/.git:/usr/src/app/.git \
+                          diffFrom=\$(git --git-dir $LOCAL_WORKDIR/.git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
+                          docker run --name=crystal --volume \$(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
                                      -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
                                      -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
                                      $PATCHSET_TAG bundle exec crystalball --dry-run
