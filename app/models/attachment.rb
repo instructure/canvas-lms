@@ -45,6 +45,10 @@ class Attachment < ActiveRecord::Base
 
   CLONING_ERROR_TYPE = "attachment_clone_url"
 
+  BUTTONS_AND_ICONS = "buttons_and_icons"
+  UNCATEGORIZED = "uncategorized"
+  VALID_CATEGORIES = [BUTTONS_AND_ICONS, UNCATEGORIZED].freeze
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -414,8 +418,9 @@ class Attachment < ActiveRecord::Base
   after_create :flag_as_recently_created
   attr_accessor :recently_created
 
-  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :context_id, :context_type, :workflow_state, :category, presence: true
   validates :content_type, length: { maximum: maximum_string_length, allow_blank: true }
+  validates :category, inclusion: { in: VALID_CATEGORIES }
 
   # related_attachments: our root attachment, anyone who shares our root attachment,
   # and anyone who calls us a root attachment
@@ -1419,6 +1424,7 @@ class Attachment < ActiveRecord::Base
   scope :not_deleted, -> { where("attachments.file_state<>'deleted'") }
 
   scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
+  scope :uncategorized, -> { where(category: UNCATEGORIZED) }
   scope :not_locked, lambda {
     where("attachments.locked IS NOT TRUE
       AND (attachments.lock_at IS NULL OR attachments.lock_at>?)
