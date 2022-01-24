@@ -27,18 +27,7 @@ import I18n from 'i18n!calendar.edit'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const LOADING_STATE = {
-  PRE_SPINNER: 0,
-  SPINNER_UP: 1,
-  LOADED: 2
-}
-
 export default class CalendarEvent extends Backbone.Model {
-  constructor(event) {
-    super(event)
-    this.loadingState = LOADING_STATE.PRE_SPINNER
-  }
-
   urlRoot = '/api/v1/calendar_events/'
 
   dateAttributes = ['created_at', 'end_at', 'start_at', 'updated_at']
@@ -104,7 +93,6 @@ export default class CalendarEvent extends Backbone.Model {
     const combinedSuccess = (syncArgs = [], sectionsResp = []) => {
       this.hideSpinner()
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [syncResp, syncStatus, syncXhr] = syncArgs
       const calEventData = CalendarEvent.mergeSectionsIntoCalendarEvent(syncResp, sectionsResp)
       if (!this.set(this.parse(calEventData), options)) return false
@@ -117,29 +105,16 @@ export default class CalendarEvent extends Backbone.Model {
   }
 
   showSpinner() {
-    function waitForView() {
-      if (this.view?.el) {
-        if (this.loadingState === LOADING_STATE.LOADED) return
-        this.loadingState = LOADING_STATE.SPINNER_UP
-        ReactDOM.render(
-          <div>
-            <Spinner renderTitle={I18n.t('Loading')} size="medium" />
-          </div>,
-          this.view.el
-        )
-        return
-      }
-      requestAnimationFrame(waitForView.bind(this))
-    }
-
-    waitForView.bind(this)()
+    ReactDOM.render(
+      <div>
+        <Spinner renderTitle={I18n.t('Loading')} size="medium" />
+      </div>,
+      this.view.el
+    )
   }
 
   hideSpinner() {
-    const curState = this.loadingState
-    this.loadingState = LOADING_STATE.LOADED
-
-    if (curState === LOADING_STATE.SPINNER_UP) ReactDOM.unmountComponentAtNode(this.view.el)
+    return ReactDOM.unmountComponentAtNode(this.view.el)
   }
 
   loadFailure(errHandler) {

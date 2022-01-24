@@ -74,8 +74,10 @@ export default function LinkOptionsTray(props) {
           }
         : null,
       text,
+      target: '_blank',
       href: url,
       id: content.id || null,
+      class: embedType ? undefined : 'inline_disabled',
       forceRename: true // A change to "text" should always update the link's text
     }
 

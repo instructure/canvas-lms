@@ -106,7 +106,7 @@ module MicrosoftSync
       @steps_object = steps_object
     end
 
-    # NextStep, Retry, IGNORE, and COMPLETE are structs to signal what to do next. Use
+    # NextStep, Retry, and COMPLETE are structs to signal what to do next. Use
     # these as the return values for your step_foobar() methods.
 
     # Signals that this step of the job succeeded.
@@ -131,13 +131,7 @@ module MicrosoftSync
     end
 
     # Return this when your job is done:
-    Complete = Class.new
-    COMPLETE = Complete.new
-
-    # Ignore this job. Like COMPLETE, but if there is a last_error, that will not overwritten
-    # and workflow_state will be set [back] to errored
-    Ignore = Class.new
-    IGNORE = Ignore.new
+    COMPLETE = Object.new
 
     # Signals that this step of the job failed, but the job may be retriable.
     #
@@ -181,7 +175,7 @@ module MicrosoftSync
     def run_synchronously(initial_mem_state = nil)
       run_with_delay(initial_mem_state: initial_mem_state, synchronous: true)
     rescue IRB::Abort => e
-      update_state_record_to_errored_and_cleanup(error: e, step: nil)
+      update_state_record_to_errored_and_cleanup(e)
       raise
     end
 
@@ -271,28 +265,23 @@ module MicrosoftSync
         rescue => e
           if e.is_a?(Errors::GracefulCancelError)
             statsd_increment(:cancel, current_step, e)
-            update_state_record_to_errored_and_cleanup(error: e, step: current_step)
+            update_state_record_to_errored_and_cleanup(e)
             return
           else
             statsd_increment(:failure, current_step, e)
-            update_state_record_to_errored_and_cleanup(error: e, step: current_step, capture: e)
+            update_state_record_to_errored_and_cleanup(e, capture: e)
             raise
           end
         end
 
         log { "step #{current_step} finished with #{result.class.name.split("::").last}" }
         case result
-        when Complete
+        when COMPLETE
           job_state_record&.update_unless_deleted(
             workflow_state: :completed, job_state: nil, last_error: nil
           )
           steps_object.after_complete
           statsd_increment(:complete, current_step)
-          return
-        when Ignore
-          new_state = job_state_record&.last_error ? :errored : :complete
-          job_state_record&.update_unless_deleted(workflow_state: new_state, job_state: nil)
-          statsd_increment(:ignored, current_step)
           return
         when NextStep
           current_step, memory_state = result.step, result.memory_state
@@ -304,7 +293,7 @@ module MicrosoftSync
           handle_retry(result, current_step, synchronous)
           return
         else
-          raise InternalError, "Step returned #{result.inspect}, expected COMPLETE/NextStep/Retry/IGNORE"
+          raise InternalError, "Step returned #{result.inspect}, expected COMPLETE/NextStep/Retry"
         end
       end
     end
@@ -336,9 +325,9 @@ module MicrosoftSync
         .run(step, initial_mem_state)
     end
 
-    def update_state_record_to_errored_and_cleanup(error:, step:, capture: nil)
+    def update_state_record_to_errored_and_cleanup(error, capture: nil)
       error_report_id = capture && capture_exception(capture)[:error_report]
-      error_msg = MicrosoftSync::Errors.serialize(error, step: step)
+      error_msg = MicrosoftSync::Errors.serialize(error)
       job_state_record&.update_unless_deleted(
         workflow_state: :errored, job_state: nil,
         last_error: error_msg, last_error_report_id: error_report_id
@@ -394,8 +383,7 @@ module MicrosoftSync
 
       if retries >= steps_object.max_retries
         update_state_record_to_errored_and_cleanup(
-          error: retry_object.error, step: current_step,
-          capture: RetriesExhaustedError.new(retry_object.error)
+          retry_object.error, capture: RetriesExhaustedError.new(retry_object.error)
         )
         statsd_increment(:final_retry, current_step, retry_object.error)
         raise retry_object.error
