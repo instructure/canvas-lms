@@ -296,9 +296,11 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
     allStudents = [
       {
         id: '1101',
-        name: "Adam Jone's",
+        name: 'A`dam Jone`s',
+        first_name: 'A`dam',
+        last_name: 'Jone`s',
         enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
-        sortable_name: "Jone's, Adam"
+        sortable_name: 'Jone`s, A`dam'
       },
       {
         id: '1102',
@@ -348,13 +350,25 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
     test('does not escape the name of the student', () => {
       gradebook.gotChunkOfStudents(allStudents)
       const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
-      strictEqual(student.name, "Adam Jone's")
+      strictEqual(student.name, 'A`dam Jone`s')
+    })
+
+    test('does not escape the first name of the student', () => {
+      gradebook.gotChunkOfStudents(allStudents)
+      const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
+      strictEqual(student.first_name, 'A`dam')
+    })
+
+    test('does not escape the last name of the student', () => {
+      gradebook.gotChunkOfStudents(allStudents)
+      const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
+      strictEqual(student.last_name, 'Jone`s')
     })
 
     test('does not escape the sortable name of the student', () => {
       gradebook.gotChunkOfStudents(allStudents)
       const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
-      strictEqual(student.sortable_name, "Jone's, Adam")
+      strictEqual(student.sortable_name, 'Jone`s, A`dam')
     })
 
     test('returns all students when the assignment is visible to everyone', () => {
