@@ -90,7 +90,6 @@ describe('DiscussionThreadAttachment', () => {
         updateDiscussionEntryMock({
           discussionEntryId: '1',
           message: '<p>This is the parent reply</p>',
-          fileId: null,
           removeAttachment: true
         })
       )
