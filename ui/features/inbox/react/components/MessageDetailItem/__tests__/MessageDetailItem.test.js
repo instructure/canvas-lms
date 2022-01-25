@@ -19,21 +19,49 @@
 import I18n from 'i18n!conversations_2'
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
+import {responsiveQuerySizes} from '../../../../util/utils'
 import {MessageDetailItem} from '../MessageDetailItem'
 
-describe('MessageDetailItem', () => {
-  it('renders with provided data', () => {
-    const props = {
-      conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
-        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-        body: 'This is the body text for the message.'
-      },
-      contextName: 'Fake Course 1'
-    }
+jest.mock('../../../../util/utils', () => ({
+  ...jest.requireActual('../../../../util/utils'),
+  responsiveQuerySizes: jest.fn()
+}))
 
-    const {getByText} = render(<MessageDetailItem {...props} />)
+const defaultProps = {
+  conversationMessage: {
+    author: {name: 'Tom Thompson'},
+    recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+    createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+    body: 'This is the body text for the message.'
+  },
+  contextName: 'Fake Course 1'
+}
+
+const setup = props => {
+  return render(<MessageDetailItem {...defaultProps} {...props} />)
+}
+
+describe('MessageDetailItem', () => {
+  beforeAll(() => {
+    // Add appropriate mocks for responsive
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
+    // Repsonsive Query Mock Default
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {minWidth: '768px'}
+    }))
+  })
+
+  it('renders with provided data', () => {
+    const {getByText} = setup()
 
     expect(getByText('Tom Thompson')).toBeInTheDocument()
     expect(getByText(', Billy Harris')).toBeInTheDocument()
@@ -48,7 +76,7 @@ describe('MessageDetailItem', () => {
     }
 
     const createdAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-      new Date(props.conversationMessage.createdAt)
+      new Date(defaultProps.conversationMessage.createdAt)
     )
     expect(getByText(createdAt)).toBeInTheDocument()
   })
@@ -97,5 +125,49 @@ describe('MessageDetailItem', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Delete'))
     expect(props.onDelete).toHaveBeenCalled()
+  })
+
+  describe('Responsive', () => {
+    describe('Mobile', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          mobile: {maxWidth: '67'}
+        }))
+      })
+
+      it('Should emite correct Mobile Test Id', async () => {
+        const {findByTestId} = setup()
+        const item = await findByTestId('message-detail-item-mobile')
+        expect(item).toBeTruthy()
+      })
+    })
+
+    describe('Tablet', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          tablet: {maxWidth: '67'}
+        }))
+      })
+
+      it('Should emite correct Tablet Test Id', async () => {
+        const {findByTestId} = setup()
+        const item = await findByTestId('message-detail-item-tablet')
+        expect(item).toBeTruthy()
+      })
+    })
+
+    describe('Desktop', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          desktop: {maxWidth: '67'}
+        }))
+      })
+
+      it('Should emite correct Desktop Test Id', async () => {
+        const {findByTestId} = setup()
+        const item = await findByTestId('message-detail-item-desktop')
+        expect(item).toBeTruthy()
+      })
+    })
   })
 })
