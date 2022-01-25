@@ -157,6 +157,24 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(submission.submitted_at).to eq timestamp
     end
 
+    context "when submission is deleted" do
+      let(:submission) { Submission.find_or_initialize_by(assignment: assignment, user: @user) }
+      let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
+      before do
+        allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
+        allow(quiz_lti_submission).to receive(:submission).and_return(submission)
+        submission.update_column :workflow_state, "deleted"
+      end
+
+      it "reports failure" do
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(request.code_major).to eq "failure"
+        expect(request.error_code).to eq :submission_deleted
+        expect(request.description).to eq "Submission is deleted and cannot be modified."
+      end
+    end
+
     context "when submission validation raises an error" do
       let(:submission) { Submission.find_or_initialize_by(assignment: assignment, user: @user) }
       let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }

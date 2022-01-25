@@ -35,6 +35,10 @@ module BasicLTI
                               graded_at: graded_at_date
                             )
 
+      unless quiz_lti_submission.active?
+        return report_failure(:submission_deleted, I18n.t("Submission is deleted and cannot be modified."))
+      end
+
       if submission_reopened?
         return begin
           quiz_lti_submission.revert_history(result_url, -tool.id)
