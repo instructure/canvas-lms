@@ -157,6 +157,55 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(submission.submitted_at).to eq timestamp
     end
 
+    context "when submission validation raises an error" do
+      let(:submission) { Submission.find_or_initialize_by(assignment: assignment, user: @user) }
+      let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+      let(:grades) { [0.11, 0.22, 0.33] }
+      let(:launch_urls) do
+        [
+          "https://abcdef.com/uuurrrlll01",
+          "https://abcdef.com/uuurrrlll02",
+          "https://abcdef.com/uuurrrlll03"
+        ]
+      end
+
+      before do
+        allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
+        allow(quiz_lti_submission).to receive(:submission).and_return(submission)
+        (0..2).each do |i|
+          grade = "#{TextHelper.round_if_whole(grades[i] * 100)}%"
+          grade, score = assignment.compute_grade_and_score(grade, nil)
+          submission.grade = grade
+          submission.score = score
+          submission.submission_type = "basic_lti_launch"
+          submission.workflow_state = "submitted"
+          submission.submitted_at = Time.zone.now
+          submission.url = launch_urls[i]
+          submission.grader_id = -1
+          submission.with_versioning(explicit: true) { submission.save! }
+        end
+        allow(submission).to receive(:grader_can_grade?).and_return(false)
+      end
+
+      context "when rolling back a submission version" do
+        let(:text) { '{ "reopened": true }' }
+
+        it "fails with validation error message" do
+          request = BasicLTI::BasicOutcomes.process_request(tool, request_xml(source_id, launch_urls[1], grades[2]))
+          expect(request.code_major).to eq "failure"
+          expect(request.error_code).to eq :submission_revert_failed
+          expect(request.description).to eq "Grade cannot be changed at this time: "
+        end
+      end
+
+      it "fails with validation error message" do
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(request.code_major).to eq "failure"
+        expect(request.error_code).to eq :submission_save_failed
+        expect(request.description).to eq "Grade cannot be changed at this time: "
+      end
+    end
+
     context "result url" do
       it "reads the result_data_url when set" do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
