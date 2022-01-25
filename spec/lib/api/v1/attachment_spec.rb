@@ -244,4 +244,52 @@ describe Api::V1::Attachment do
 
     it { expect(valid_mime_type?("application/pdf")).to be true }
   end
+
+  describe "#api_attachment_preflight" do
+    let_once(:context) { course_model }
+    let(:request) { OpenStruct.new({ params: ActionController::Parameters.new(params) }) }
+    let(:params) { { name: "name", filename: "filename.png" } }
+    let(:opts) { {} }
+
+    def logged_in_user; end
+
+    def render(*); end
+
+    context "with the category param set" do
+      subject { Attachment.find_by(display_name: params[:name]) }
+
+      before { api_attachment_preflight(context, request, opts) }
+
+      let(:params) do
+        super().merge(category: Attachment::BUTTONS_AND_ICONS)
+      end
+
+      it "sets the category on the attachment" do
+        expect(subject.category).to eq params[:category]
+      end
+    end
+
+    context "with InstFS enabled" do
+      let(:params) do
+        super().merge(category: Attachment::BUTTONS_AND_ICONS)
+      end
+
+      before do
+        allow(InstFS).to receive(:enabled?).and_return(true)
+      end
+
+      context "with the category param set" do
+        subject { Attachment.find_by(display_name: params[:name]) }
+
+        it "sets the category on the attachment" do
+          expect(InstFS).to receive(:upload_preflight_json).with(
+            hash_including(
+              additional_capture_params: { category: "buttons_and_icons" }
+            )
+          )
+          api_attachment_preflight(context, request, opts)
+        end
+      end
+    end
+  end
 end
