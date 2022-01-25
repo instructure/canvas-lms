@@ -7496,11 +7496,6 @@ babel-plugin-syntax-trailing-function-commas@^6.22.0:
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-trailing-function-commas/-/babel-plugin-syntax-trailing-function-commas-6.22.0.tgz#ba0360937f8d06e40180a43fe0d5616fff532cf3"
   integrity sha1-ugNgk3+NBuQBgKQ/4NVhb/9TLPM=
 
-babel-plugin-transform-amd-to-commonjs@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-amd-to-commonjs/-/babel-plugin-transform-amd-to-commonjs-1.4.0.tgz#d9bc5003eaa26dbdd4e854e453f84903852af2ca"
-  integrity sha512-Xx0kYPn0LPyms+8n2KLn9yd2R5XMb2P1sNe4qn64/UQY5F2KFYlhhhyYUNm/BThfODAzl7rbaOsEfpU2M8iDKQ==
-
 babel-plugin-transform-ensure-ignore@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-ensure-ignore/-/babel-plugin-transform-ensure-ignore-0.1.0.tgz#28120414ac63416d79b97d1165f03cf275835570"
