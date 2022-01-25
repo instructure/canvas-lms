@@ -53,7 +53,7 @@ nb:
       previous: k
       show_assign: f
   AssignmentListItemView: 
-    complete: Fullført
+    complete: Godkjent
     grade_gpa_scale_screenreader: "Vurdering: %{grade}"
     grade_letter_grade_screenreader: "Vurdering: %{grade}"
     grade_pass_fail_screenreader: "Vurdering: %{grade}"
@@ -6335,13 +6335,13 @@ nb:
   community_releases_beta_test_schedule_e080d4d4: "#community.releases_beta_quiz_schedule"
   complete_4f4efbc: godkjent
   complete_all_items_e1779257: "Fullfør alle elementer"
-  complete_fd828dea: Fullført
+  complete_fd828dea: Godkjent
   complete_icon_7455be93: "fullført ikon"
   complete_one_item_90e5fb03: "Fullfør ett element"
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Fullfør registrering ved å klikke på lenken «gjør ferdig registreringsprosessen» som er send deg på e-post."
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Fullfør registrering ved å klikke på lenken «gjør ferdig registreringsprosessen» som er send deg på e-post."
-  complete_title_7482ddcf: "Fullfør %{title}"
-  completed_19711ce7: Fullført
+  complete_title_7482ddcf: "Godkjent %{title}"
+  completed_19711ce7: Godkjent
   completed_9b809e44: godkjent
   completed_icon_521596e4: "fullført ikon"
   compose_a_new_message_db3a68ed: "Skriv ny melding"
@@ -7082,7 +7082,7 @@ nb:
     index: 
       titles: 
         course_modules: "Moduler for emne"
-    module_complete: Fullført
+    module_complete: Godkjent
     module_empty: "Det er ingen elementer i modulen \"%{module}\""
     module_item_next: 
       drag_to_reorder: "Dra for å ordne eller flytte elementet til en annen modul"
@@ -10512,7 +10512,7 @@ nb:
     with_section: "%{course_name}, %{section_name}"
     workflow: 
       active: Aktiv
-      completed: Fullført
+      completed: Godkjent
       deleted: Slettet
       inactive: Inaktiv
       invited: Invitert
@@ -12403,7 +12403,7 @@ nb:
       show_concluded_enrollments: "Vis fullførte påmeldinger"
       view_grading_history: "Se på karakterhistorikk"
     grades: 
-      complete: Fullført
+      complete: Godkjent
       incomplete: "Ikke godkjent"
     grading_box_extended: 
       labels: 
@@ -12739,7 +12739,7 @@ nb:
   grading_box: 
     out_of_points_possible: "av %{assignment.points_possible}"
   grading_cell: 
-    grade_complete: Fullført
+    grade_complete: Godkjent
     grade_incomplete: "Ikke godkjent"
     grade_ungraded: "Ikke vurdert"
     out_of: "(av %{points})"
@@ -19274,7 +19274,7 @@ nb:
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} fullført"
   percent_complete_a7f6d403: "Prosent godkjent"
-  percent_complete_e46b6148: "%{percent}% fullført"
+  percent_complete_e46b6148: "%{percent}% godkjent"
   percent_of_points_possible_93cd8127: "%{percent} av mulige poeng"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Prosent respondenter som valgte dette svaret"
   percent_of_students_scored_score_53d2c4d5: "%{percent} av studenter scoret %{score}"
