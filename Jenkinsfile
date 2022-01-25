@@ -441,18 +441,14 @@ pipeline {
                       try {
                         /* groovylint-disable-next-line GStringExpressionWithinString */
                         sh '''
-                          diffFrom=\$(git --git-dir $LOCAL_WORKDIR/.git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
-                          docker run --name=crystal --volume \$(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
+                          diffFrom=\$(git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
+                          docker run --name=crystal --volume \$(pwd)/.git:/usr/src/app/.git \
                                      -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
                                      -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
-                                     -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
                                      $PATCHSET_TAG bundle exec crystalball --dry-run
                           docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
-
-                        sh 'grep ":timestamp:" crystalball_map.yml | sed "s/:timestamp: //g" > ./tmp/crystalball_map_version.txt'
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_map_version.txt'
                       /* groovylint-disable-next-line CatchException */
                       } catch (Exception e) {
                         // don't fail build for this
@@ -593,20 +589,18 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
                     ])
 
-                  // Testing Crystalball build, will not vote on builds. Only run pre-merge.
-                  if (!configuration.isChangeMerged()) {
-                    build(wait: false,
-                          propagate: false,
-                          job: '/Canvas/proofs-of-concept/test-queue',
-                          parameters: buildParameters + [string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                                                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                                                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                                                         string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
-                                                         string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),])
-                  }
+                    // Testing Crystalball build, will not vote on builds. Only run pre-merge.
+                    if (!configuration.isChangeMerged()) {
+                      build(wait: false,
+                            propagate: false,
+                            job: '/Canvas/proofs-of-concept/test-queue',
+                            parameters: buildParameters + [string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                                                           string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                                                           string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                                                           string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),])
+                    }
 
                   parallel(nestedStages)
                 }
