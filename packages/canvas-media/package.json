@@ -14,7 +14,7 @@
     "test:debug": "node --inspect-brk ../../node_modules/.bin/jest --runInBand",
     "build": "yarn build:canvas",
     "build:es": "babel src --out-dir es --ignore '**/__tests__'",
-    "build:cjs": "JEST_WORKER_ID=true babel src --out-dir lib --ignore '**/__tests__'",
+    "build:cjs": "babel --config-file=./babel.config.cjs.js src --out-dir lib --ignore '**/__tests__'",
     "build:canvas": "yarn run build:es && yarn run build:cjs",
     "build:watch": "yarn run build:es --watch",
     "clean": "rm -rf lib && rm -rf es && rm -rf coverage",
