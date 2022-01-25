@@ -499,6 +499,117 @@ module ActiveRecord
   end
 end
 
+describe ActiveRecord::ConnectionAdapters::SchemaStatements do
+  describe ".add_replica_identity" do
+    subject { test_adapter_instance.add_replica_identity model_name, field_name, new_default_column_value }
+
+    let(:model_name) { "Example" }
+    let(:field_name) { :test_field }
+    let(:existing_default_column_value) { nil }
+    let(:new_default_column_value) { "test default value" }
+
+    let(:example_model) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "examples"
+      end
+    end
+
+    let(:example_column) do
+      Class.new(ActiveRecord::ConnectionAdapters::Column)
+    end
+
+    let(:test_adapter) do
+      Class.new do
+        include ActiveRecord::ConnectionAdapters::SchemaStatements
+
+        @column_definitions = Hash.new { |h, k| h[k] = {} }
+        class << self
+          attr_reader :column_definitions
+        end
+
+        def initialize
+          super
+          @column_definitions = self.class.column_definitions
+        end
+
+        def self.define_column(table_name, field, column)
+          @column_definitions[table_name][field] = column
+        end
+
+        def column_definitions(table_name)
+          @column_definitions[table_name].keys
+        end
+
+        def new_column_from_field(table_name, field)
+          @column_definitions[table_name][field]
+        end
+
+        def change_column_null(*args); end
+
+        def add_index(*args); end
+
+        # rubocop:disable Naming/AccessorMethodName we're implementing a module method here
+        def set_replica_identity(*args); end
+        # rubocop:enable Naming/AccessorMethodName
+      end
+    end
+
+    let(:test_adapter_instance) { test_adapter.new }
+
+    before do
+      stub_const(model_name, example_model)
+      stub_const("TestColumn", example_column)
+
+      existing_column = TestColumn.new(field_name.to_s, existing_default_column_value)
+      test_adapter.define_column(Example.table_name, field_name, existing_column)
+
+      allow(DataFixup::BackfillNulls).to receive(:run)
+    end
+
+    it "adds an index" do
+      index_name = "index_#{Example.table_name}_replica_identity"
+      expect(test_adapter_instance).to receive(:add_index) do |table_name, column_name, **options|
+        raise "incorrect table name #{table_name}" unless table_name == Example.table_name
+        raise "incorrect column name #{column_name}" unless column_name == [field_name, Example.primary_key]
+        raise "index isn't unique" unless options[:unique]
+        raise "incorrect index name #{options[:name]}" unless options[:name] == index_name
+        raise "didn't add index with algorithm: :concurrently" unless options[:algorithm] == :concurrently
+      end
+      subject
+    end
+
+    it "sets the replica identity" do
+      index_name = "index_#{Example.table_name}_replica_identity"
+      expect(test_adapter_instance).to receive(:set_replica_identity).with(Example.table_name, index_name)
+      subject
+    end
+
+    context "when the column is nullable" do
+      it "backfills nulls with the new default value" do
+        expect(DataFixup::BackfillNulls).to receive(:run).with(Example, field_name, default_value: new_default_column_value)
+        subject
+      end
+
+      it "sets the field to not be nullable" do
+        expect(test_adapter_instance).to receive(:change_column_null).with(Example.table_name, field_name, false)
+        subject
+      end
+    end
+
+    context "when the column is not nullable" do
+      before do
+        existing_column = TestColumn.new(field_name.to_s, existing_default_column_value, nil, false)
+        test_adapter.define_column(Example.table_name, field_name, existing_column)
+      end
+
+      it "does not run a backfill of null values" do
+        expect(DataFixup::BackfillNulls).not_to receive(:run)
+        subject
+      end
+    end
+  end
+end
+
 describe ActiveRecord::Migration::CommandRecorder do
   it "reverses if_exists/if_not_exists" do
     recorder = ActiveRecord::Migration::CommandRecorder.new
