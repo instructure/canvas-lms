@@ -274,7 +274,7 @@ export default class EditCalendarEventDetails {
     if (this.event.startDate()) {
       const dateParts = this.event
         .startDate()
-        .toISOString()
+        .toISOString(true)
         .split('-')
         .map(v => parseInt(v, 10))
       dateParts[1] -= 1 // fix up month since they start at 0
@@ -286,13 +286,15 @@ export default class EditCalendarEventDetails {
       timeStyle: 'short'
     }).format
 
-    const dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, {
-      dateStyle: 'medium'
-    }).format
+    const dateFormatter = (date, timeZone) => {
+      const options = {dateStyle: 'medium'}
+      if (timeZone) options.timeZone = timeZone
+      return new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, options).format(date)
+    }
 
     // set them up as appropriate variants of datetime_field
     $date
-      .val(dateFormatter(dateVal))
+      .val(dateFormatter(dateVal, ENV.TIMEZONE))
       .data('inputdate', dateVal.toISOString())
       .date_field()
       .change(_e => {
