@@ -111,6 +111,10 @@ body#tinyrce {
   text-decoration: underline;
 }
 
+#tinymce.mce-content-body *[data-mce-selected="inline-boundary"] {
+  background-color: transparent;
+}
+
 /* the span tinymce puts around the media player's iframe */
 .mce-content-body .mce-preview-object {
   border-style: none;
