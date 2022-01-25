@@ -19,10 +19,10 @@
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
   if (mobile) {
-    querySizes.mobile = {maxWidth: '767px'}
+    querySizes.mobile = {maxWidth: '768px'}
   }
   if (tablet) {
-    querySizes.tablet = {maxWidth: '1023px'}
+    querySizes.tablet = {minWidth: mobile ? '768px' : '0px'}
   }
   if (desktop) {
     querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
