@@ -65,7 +65,6 @@ const HeaderInputs = props => {
               />
             )
           }
-          shouldGrow={false}
         />
       </Flex.Item>
       {!props.isReply && (
