@@ -101,6 +101,23 @@ describe "new account user search" do
     end
   end
 
+  describe "with filters" do
+    before do
+      user_with_pseudonym(account: @account, name: "diffrient user")
+      visit_users(@account)
+    end
+
+    it "sorts by email and retains focus" do
+      column_sort_button("Email").click
+      wait_for(method: nil, timeout: 0.5) { fj("title:contains('Loading')").displayed? }
+      wait_for_no_such_element { fj("title:contains('Loading')") }
+      check_element_has_focus f("#email-button")
+      users_list = ff("[data-automation='users list'] tr")
+      expect(users_list.count).to eq 2
+      expect(users_list.first).to include_text("diffrient user")
+    end
+  end
+
   describe "with no default visit" do
     before do
       @sub_account = Account.create!(name: "sub", parent_account: @account)
