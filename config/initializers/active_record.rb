@@ -1643,7 +1643,10 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     change_column_null klass.table_name, column_name, false
     primary_column = klass.primary_key
     index_name = "index_#{klass.table_name}_replica_identity"
-    add_index klass.table_name, [column_name, primary_column], name: index_name, algorithm: :concurrently, unique: true, if_not_exists: true
+    options = { name: index_name, unique: true, if_not_exists: true }.tap do |hash|
+      hash[:algorithm] = :concurrently if klass.exists?
+    end
+    add_index klass.table_name, [column_name, primary_column], options
     set_replica_identity klass.table_name, index_name
   end
 
