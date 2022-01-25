@@ -34,6 +34,7 @@ def setupNode() {
   distribution.stashBuildScripts()
   if (env.ENABLE_CRYSTALBALL == '1') {
     copyArtifacts filter: 'tmp/crystalball_spec_list.txt', projectName: "${env.UPSTREAM}", selector: upstream()
+    copyArtifacts filter: 'tmp/crystalball_map_version.txt', projectName: "${env.UPSTREAM}", selector: upstream()
   }
 
   credentials.withStarlordCredentials { ->
@@ -44,8 +45,9 @@ def setupNode() {
 }
 
 def computeTestCount() {
-  def partition = (env.RSPEC_PROCESSES.toInteger() * 30) // 30 tests per process
+  def partition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
+  def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
   env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
   def totalPrediction = specUnique.join('\n')
@@ -66,7 +68,7 @@ def computeTestCount() {
                                     --format ExampleCountRecorder \
                                     --out spec_count.txt ${specUnique.join(' ')}", label: 'Get Test Count')
   specCount = sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
-  def summary = "$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
+  def summary = "Map: $mapVersion\n$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
   def color = 'danger'
   if (specCount <= partition) {
     color = 'good'
