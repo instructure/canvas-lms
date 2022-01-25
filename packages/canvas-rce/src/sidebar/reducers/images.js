@@ -84,7 +84,8 @@ export default function imagesReducer(prevState = {}, action) {
     case FAIL_IMAGES_LOAD:
       state[ctxt] = {
         isLoading: false,
-        error: action.payload.error
+        error: action.payload.error,
+        files: []
       }
       if (action.payload.files && action.payload.files.length === 0) {
         state[ctxt].bookmark = null

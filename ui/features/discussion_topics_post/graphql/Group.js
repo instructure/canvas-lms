@@ -16,4 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {ImageCropperModal} from './ImageCropperModal'
+import gql from 'graphql-tag'
+import {number, shape, string} from 'prop-types'
+
+export const Group = {
+  fragment: gql`
+    fragment Group on Group {
+      id
+      _id
+      name
+      userCount: membersCount
+    }
+  `,
+
+  shape: shape({
+    id: string,
+    _id: string,
+    name: string,
+    userCount: number
+  }),
+
+  mock: ({id = 'R3JvdXAtMw==', _id = '1', name = 'group 1', userCount = 2} = {}) => ({
+    id,
+    _id,
+    name,
+    userCount,
+    __typename: 'Group'
+  })
+}

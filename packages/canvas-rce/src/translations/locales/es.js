@@ -55,6 +55,7 @@ const locale = {
     "message": "Aplicar cambios a todas las instancias en este Ícono y Botón en el Curso"
   },
   "apps_54d24a47": { "message": "Aplicaciones" },
+  "arrows_464a3e54": { "message": "Flechas" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Se conservará la relación de aspecto"
   },
@@ -72,6 +73,7 @@ const locale = {
     "message": "Hay contenido guardado automáticamente. ¿Desea cargar el contenido guardado automáticamente?"
   },
   "available_folders_694d0436": { "message": "Carpetas disponibles" },
+  "basic_554cdc0a": { "message": "Básico" },
   "below_81d4dceb": { "message": "Debajo" },
   "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
   "button_color_608a0242": { "message": "Color del botón" },
@@ -164,6 +166,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "lista numérica ordenada predeterminada"
   },
+  "delimiters_4db4840d": { "message": "Delimitadores" },
   "describe_the_image_e65d2e32": { "message": "(Describir la imagen)" },
   "describe_the_video_2fe8f46a": { "message": "(Describir el video)" },
   "details_98a31b68": { "message": "Detalles" },
@@ -171,6 +174,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "Tipo de dimensión" },
   "dimensions_45ddb7b7": { "message": "Dimensiones" },
   "directionality_26ae9e08": { "message": "Direccionalidad" },
+  "directly_edit_latex_b7e9235b": { "message": "Edición directa en LaTeX" },
   "discussions_a5f96392": { "message": "Foros de discusión" },
   "discussions_index_6c36ced": { "message": "Índice de foros de discusión" },
   "display_options_315aba85": { "message": "Mostrar opciones" },
@@ -207,6 +211,7 @@ const locale = {
     "message": "Ingresar al menos 3 caracteres para buscar"
   },
   "equation_1c5ac93c": { "message": "Ecuación" },
+  "equation_editor_39fbc3f1": { "message": "Editor de ecuaciones" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expandir vista previa de forma predeterminada"
   },
@@ -248,6 +253,7 @@ const locale = {
     "message": "Ir a la barra de herramientas del editor"
   },
   "grades_a61eba0a": { "message": "Calificaciones" },
+  "greek_65c5b3f7": { "message": "Griego" },
   "group_documents_8bfd6ae6": { "message": "Documentos del grupo" },
   "group_files_4324f3df": { "message": "Archivos grupales" },
   "group_files_82e5dcdb": { "message": "Archivos del grupo" },
@@ -309,6 +315,7 @@ const locale = {
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Regular" },
   "middle_27dc1d5": { "message": "El medio" },
+  "misc_3b692ea7": { "message": "Varios" },
   "miscellaneous_e9818229": { "message": "Misceláneo" },
   "modules_c4325335": { "message": "Módulos" },
   "multi_color_image_63d7372f": { "message": "Imagen multicolor" },
@@ -345,6 +352,7 @@ const locale = {
   "open_title_application_fd624fc5": {
     "message": "Abrir aplicación { title }"
   },
+  "operators_a2ef9a93": { "message": "Operadores" },
   "options_3ab0ea65": { "message": "Opciones" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listas ordenadas y no ordenadas"
@@ -380,6 +388,7 @@ const locale = {
   "raw_html_editor_e3993e41": { "message": "Editor HTML puro" },
   "record_7c9448b": { "message": "Grabar" },
   "record_upload_media_5fdce166": { "message": "Grabar/cargar multimedia" },
+  "relationships_6602af70": { "message": "Relaciones" },
   "remove_link_d1f2f4d0": { "message": "Eliminar enlace" },
   "resize_ec83d538": { "message": "Redimensionar" },
   "restore_auto_save_deccd84b": {

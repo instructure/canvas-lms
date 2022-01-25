@@ -276,7 +276,8 @@ module Importers
       return unless ag
 
       assignments = migration.imported_migration_items_by_class(Assignment)
-      return unless assignments.any?
+      quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz)
+      return unless assignments.any? || quizzes.any?
 
       # various callbacks run on assignment_group_id change, so we'll do these one by one
       # (the expected use case for this feature is a migration containing a single assignment anyhow)
@@ -286,6 +287,13 @@ module Importers
         assignment.assignment_group = ag
         assignment.position = nil
         assignment.save!
+      end
+
+      quizzes.each do |quiz|
+        next if quiz.assignment_group == ag
+
+        quiz.assignment_group = ag
+        quiz.save!
       end
     end
 
