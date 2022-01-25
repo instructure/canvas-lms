@@ -34,9 +34,20 @@ module BasicLTI
                               submitted_at: submitted_at_date,
                               graded_at: graded_at_date
                             )
-      return quiz_lti_submission.revert_history(result_url, -tool.id) if submission_reopened?
 
-      quiz_lti_submission.commit_history(result_url, grade, -tool.id)
+      if submission_reopened?
+        return begin
+          quiz_lti_submission.revert_history(result_url, -tool.id)
+        rescue ActiveRecord::RecordInvalid => e
+          report_failure(:submission_revert_failed, e.record.errors.full_messages.join(", "))
+        end
+      end
+
+      begin
+        quiz_lti_submission.commit_history(result_url, grade, -tool.id)
+      rescue ActiveRecord::RecordInvalid => e
+        report_failure(:submission_save_failed, e.record.errors.full_messages.join(", "))
+      end
     end
 
     private
@@ -45,6 +56,7 @@ module BasicLTI
       self.code_major = "failure"
       self.description = message
       self.error_code = code
+      true # signals to caller that request has been handled successfully
     end
 
     def result_url
