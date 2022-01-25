@@ -511,6 +511,8 @@ describe ActiveRecord::ConnectionAdapters::SchemaStatements do
     let(:example_model) do
       Class.new(ActiveRecord::Base) do
         self.table_name = "examples"
+
+        def self.exists?; end
       end
     end
 
@@ -573,7 +575,6 @@ describe ActiveRecord::ConnectionAdapters::SchemaStatements do
         raise "incorrect column name #{column_name}" unless column_name == [field_name, Example.primary_key]
         raise "index isn't unique" unless options[:unique]
         raise "incorrect index name #{options[:name]}" unless options[:name] == index_name
-        raise "didn't add index with algorithm: :concurrently" unless options[:algorithm] == :concurrently
       end
       subject
     end
@@ -604,6 +605,32 @@ describe ActiveRecord::ConnectionAdapters::SchemaStatements do
 
       it "does not run a backfill of null values" do
         expect(DataFixup::BackfillNulls).not_to receive(:run)
+        subject
+      end
+    end
+
+    context "on an existing table" do
+      before do
+        allow(Example).to receive(:exists?).and_return(true)
+      end
+
+      it "adds the index with algorithm: concurrently" do
+        expect(test_adapter_instance).to receive(:add_index) do |_table_name, _field_name, **options|
+          raise "didn't add index with algorithm: :concurrently" unless options[:algorithm] == :concurrently
+        end
+        subject
+      end
+    end
+
+    context "on a new table" do
+      before do
+        allow(Example).to receive(:exists?).and_return(false)
+      end
+
+      it "does not require the migration run outside of a transaction" do
+        expect(test_adapter_instance).to receive(:add_index) do |_table_name, _field_name, **options|
+          raise "added index with algorithm: :concurrently" if options[:algorithm] == :concurrently
+        end
         subject
       end
     end
