@@ -577,7 +577,7 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
   })
 
-  it('should show availability window for ungraded discussions', () => {
+  it('should show discussion availability container for ungraded discussions', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
         assignment: null,
@@ -586,9 +586,7 @@ describe('DiscussionTopicContainer', () => {
       })
     })
 
-    expect(
-      container.getByText('Available from Mar 21, 2021 6am until Sep 4, 2021 5:59am')
-    ).toBeTruthy()
+    expect(container.getByTestId('view-availability-button')).toBeTruthy()
   })
 
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
