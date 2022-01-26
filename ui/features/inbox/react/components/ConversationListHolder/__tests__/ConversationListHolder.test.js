@@ -287,4 +287,19 @@ describe('ConversationListHolder', () => {
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
     expect(checkboxes.filter(c => c.checked === true).length).toBe(1)
   })
+
+  describe('Mobile tests', () => {
+    beforeEach(() => {
+      // Repsonsive Query Mock Default
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {minWidth: '320px'}
+      }))
+    })
+
+    it('Should display No Conversations to Show Panda SVG', async () => {
+      const {findByTestId} = render(<ConversationListHolder conversations={[]} />)
+      const noMessages = await findByTestId('conversation-list-no-messages')
+      expect(noMessages).toBeTruthy()
+    })
+  })
 })
