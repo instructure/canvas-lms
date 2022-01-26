@@ -11709,7 +11709,7 @@ nb-x-k12:
         one: "*1* Beskjed"
         other: "*%{count}* Beskjeder"
       x_new_in_assignments: 
-        one: "*1* oppgavevarsel"
+        one: "*1* Oppgavevarsel"
         other: "*%{count}* Oppgavevarsler"
       x_new_in_conversations: 
         one: "*1* Samtalemelding"
@@ -22745,7 +22745,7 @@ nb-x-k12:
       Canvas Support
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365-leietakeren som er oppgitt i kontoinnstillingene, er ikke en Education-leietaker, så den kan ikke brukes med integrering av Microsoft Teams synk."
   the_module_item_is_locked_27fe420b: "Modul elementet er låst."
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De siste resultatene for brukeren %{current_user_name} og målet %{outcome_name}."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De nyligste resultat for brukeren %{current_user_name} og målet %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Den neste tilgjengelige avtalen i dette faget er på *%{date}*"
   the_original_quizzes_interface_fcda53bc: "Det originale quizer-grensesnittet"
   the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "Målgruppe ble importert til dette faget."
