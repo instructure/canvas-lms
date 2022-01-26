@@ -57,6 +57,7 @@ class ApplicationController < ActionController::Base
   around_action :compute_http_cost
 
   before_action :clear_idle_connections
+  before_action :set_normalized_route
   before_action :set_sentry_trace
   before_action :annotate_apm
   before_action :annotate_sentry
@@ -128,6 +129,16 @@ class ApplicationController < ActionController::Base
 
   def clear_js_env
     @js_env = nil
+  end
+
+  def set_normalized_route
+    # Presently used only by Sentry, and not needed for API requests
+    return unless request.format.html? && SentryExtensions::Settings.settings[:frontend_dsn]
+
+    ::Rails.application.routes.router.recognize(request) { |route, _| @route ||= route }
+    return unless @route
+
+    @normalized_route = CGI.unescape(@route.format(@route.parts.excluding(:format).index_with { |part| "{#{part}}" }))
   end
 
   def set_sentry_trace
@@ -221,7 +232,10 @@ class ApplicationController < ActionController::Base
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
             org_slug: SentryExtensions::Settings.settings[:org_slug],
             base_url: SentryExtensions::Settings.settings[:base_url],
-            error_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
+            normalized_route: @normalized_route,
+
+            errors_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
+            traces_sample_rate: Setting.get("sentry_frontend_traces_sample_rate", "0.0"),
 
             # these values need to correlate with the backend for Sentry features to work properly
             environment: Canvas.environment,
