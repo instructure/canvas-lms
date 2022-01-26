@@ -56,6 +56,11 @@ module BasicLTI
 
     private
 
+    # this is an override of parent method
+    def request_type
+      :quizzes
+    end
+
     def report_failure(code, message)
       self.code_major = "failure"
       self.description = message

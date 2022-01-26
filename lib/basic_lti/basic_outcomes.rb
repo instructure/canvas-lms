@@ -193,16 +193,18 @@ module BasicLTI
         end
 
         op = operation_ref_identifier.underscore
+        return false unless respond_to?("handle_#{op}", true)
+
+        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op: op, type: request_type })
+
         # Write results are disabled for concluded users, read results are still allowed
         if op != "read_result" && !user_enrollment_active?(assignment, user)
           report_failure(:course_not_available, "Course not available for student")
           self.body = "<#{operation_ref_identifier}Response />"
-          return true
-        elsif respond_to?("handle_#{op}", true)
-          return send("handle_#{op}", tool, assignment, user)
+          true
+        else
+          send("handle_#{op}", tool, assignment, user)
         end
-
-        false
       end
 
       def self.ensure_score_update_possible(submission:, prioritize_non_tool_grade:)
@@ -221,6 +223,7 @@ module BasicLTI
           # Exits out of the first job and creates a second one so that the run_at time won't hold back
           # the entire n_strand. Also creates it in a different strand for retries, so we shouldn't block
           # any incoming uploads.
+          InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.fetch_jobs_failures")
           job_options = {
             priority: Delayed::HIGH_PRIORITY,
             # because inst-jobs only takes 2 items from an array to make a string strand
@@ -237,16 +240,22 @@ module BasicLTI
             attempt_number
           )
         else
+          InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.fetch_jobs")
           create_homework_submission submission_hash, assignment, user
         end
       end
 
       protected
 
+      def request_type
+        :basic
+      end
+
       def report_failure(code, description)
         self.code_major = "failure"
         self.description = description
         self.error_code = code
+        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.failures", tags: { op: operation_ref_identifier.underscore, type: request_type, error_code: code })
       end
 
       def failure?
@@ -401,6 +410,10 @@ module BasicLTI
         def initialize(params)
           super(nil)
           @params = params
+        end
+
+        def request_type
+          :legacy
         end
 
         def sourcedid
