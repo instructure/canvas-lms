@@ -74,6 +74,29 @@ describe SIS::UserImporter do
     expect(Pseudonym.last.deleted_at).not_to be_nil
   end
 
+  it "clears sticky fields, even when there are no changes for the pseudonym" do
+    account_model
+    Setting.set("sis_transaction_seconds", "1")
+    active_user = SIS::Models::User.new(user_id: "sis_id", login_id: "123", status: "active",
+                                        full_name: "User One", email: "user1@example.com")
+    SIS::UserImporter.new(@account, { batch: @account.sis_batches.create! }).process([]) do |importer|
+      importer.add_user(active_user)
+    end
+
+    Pseudonym.where(unique_id: "123").first.tap do |pseudonym|
+      pseudonym.unique_id = "321"
+      pseudonym.save!
+    end
+
+    unchanged_user = SIS::Models::User.new(user_id: "sis_id", login_id: "321", status: "active",
+                                           full_name: "User One", email: "user1@example.com")
+    SIS::UserImporter.new(@account, { batch: @account.sis_batches.create!, clear_sis_stickiness: true }).process([]) do |importer|
+      importer.add_user(unchanged_user)
+    end
+
+    expect(Pseudonym.last.read_attribute("stuck_sis_fields")).to eq ""
+  end
+
   it "does not update deleted_at property when user gets deleted but workflow_state is stuck" do
     account_model
     Setting.set("sis_transaction_seconds", "1")
