@@ -333,6 +333,10 @@ class FilesController < ApplicationController
           scope = scope.by_exclude_content_types(Array(params[:exclude_content_types]))
         end
 
+        if params[:category].present?
+          scope = scope.for_category(params[:category])
+        end
+
         url = @context ? context_files_url : api_v1_list_files_url(@folder)
         @files = Api.paginate(scope, self, url)
 

@@ -1425,6 +1425,7 @@ class Attachment < ActiveRecord::Base
 
   scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
   scope :uncategorized, -> { where(category: UNCATEGORIZED) }
+  scope :for_category, ->(category) { where(category: category) }
   scope :not_locked, lambda {
     where("attachments.locked IS NOT TRUE
       AND (attachments.lock_at IS NULL OR attachments.lock_at>?)

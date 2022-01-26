@@ -813,6 +813,27 @@ describe "Files API", type: :request do
       @files_path_options = { controller: "files", action: "api_index", format: "json", course_id: @course.id.to_param }
     end
 
+    context "with a 'category' query parameter" do
+      subject do
+        Attachment.find(
+          api_call(:get, @files_path, @files_path_options, {}).map { |a| a["id"] }
+        )
+      end
+
+      let(:category) { Attachment::BUTTONS_AND_ICONS }
+      let(:button_and_icon) { @a1 }
+      let(:uncategorized) { @a2 }
+
+      before do
+        button_and_icon.update!(category: category)
+
+        @files_path_options[:category] = category
+      end
+
+      it { is_expected.to include button_and_icon }
+      it { is_expected.not_to include uncategorized }
+    end
+
     describe "sort" do
       it "lists files in alphabetical order" do
         json = api_call(:get, @files_path, @files_path_options, {})
