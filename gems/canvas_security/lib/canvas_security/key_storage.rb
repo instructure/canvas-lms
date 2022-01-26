@@ -62,7 +62,8 @@ module CanvasSecurity
       if keys.values.compact.blank?
         initialize_keys
       else
-        return if (Time.zone.now - Time.zone.parse(keys.dig(FUTURE, "kid"))) < min_rotation_period.to_i
+        kid_time = CanvasSecurity::JWKKeyPair.time_from_kid(keys.dig(FUTURE, "kid"))
+        return if (Time.zone.now - kid_time) < min_rotation_period.to_i
 
         kvs = {
           PAST => keys[PRESENT].to_json,

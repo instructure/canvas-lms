@@ -39,13 +39,16 @@ describe CanvasSecurity::KeyStorage do
   end
 
   describe "#rotate_keys" do
-    context "when run more than min_rotation_period after last run" do
+    let(:keys_before) { @key_storage.retrieve_keys }
+    let(:future_kid) { keys_before.dig(CanvasSecurity::KeyStorage::FUTURE, "kid") }
+    let(:future_kid_time) { CanvasSecurity::JWKKeyPair.time_from_kid(future_kid) }
+
+    context "when run more than 60 minutes after last run" do
       before do
-        allow(@key_storage).to receive(:min_rotation_period).and_return(0)
+        allow(CanvasSecurity::JWKKeyPair).to receive(:time_from_kid).and_return(future_kid_time - 61.minutes)
       end
 
       it "rotates the past key" do
-        keys_before = @key_storage.retrieve_keys
         past = keys_before[CanvasSecurity::KeyStorage::PAST].to_json
         present = keys_before[CanvasSecurity::KeyStorage::PRESENT].to_json
         expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[CanvasSecurity::KeyStorage::PAST] }
@@ -53,7 +56,6 @@ describe CanvasSecurity::KeyStorage do
       end
 
       it "rotates the present key" do
-        keys_before = @key_storage.retrieve_keys
         present = keys_before[CanvasSecurity::KeyStorage::PRESENT].to_json
         future = keys_before[CanvasSecurity::KeyStorage::FUTURE].to_json
         expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[CanvasSecurity::KeyStorage::PRESENT] }
@@ -82,22 +84,13 @@ describe CanvasSecurity::KeyStorage do
       end
     end
 
-    it "only rotates if more than 1 hour has passed since last rotating" do
-      keys_before = @key_storage.retrieve_keys
-      # We rely on the fact the the kid is the time the key was generated.
-      # Double-check that here.
-      future_key_time = Time.zone.parse(keys_before[CanvasSecurity::KeyStorage::FUTURE]["kid"])
-      expect(future_key_time).to be_within(29).of(Time.zone.now)
-
-      Timecop.freeze(future_key_time + 59.minutes) do
-        expect { @key_storage.rotate_keys }.not_to change { @fallback_proxy.data[CanvasSecurity::KeyStorage::PRESENT] }
+    context "when run less than 60 minutes after last run" do
+      before do
+        allow(CanvasSecurity::JWKKeyPair).to receive(:time_from_kid).and_return(future_kid_time - 59.minutes)
       end
 
-      Timecop.freeze(future_key_time + 61.minutes) do
-        present = keys_before[CanvasSecurity::KeyStorage::PRESENT].to_json
-        future = keys_before[CanvasSecurity::KeyStorage::FUTURE].to_json
-        expect { @key_storage.rotate_keys }.to change { @fallback_proxy.data[CanvasSecurity::KeyStorage::PRESENT] }
-          .from(present).to(future)
+      it "does not rotate keys" do
+        expect { @key_storage.rotate_keys }.not_to change { @fallback_proxy.data[CanvasSecurity::KeyStorage::PRESENT] }
       end
     end
   end
