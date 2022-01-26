@@ -150,14 +150,6 @@ class EffectiveDueDates
     end
   end
 
-  def filter_section_assigned_enrollments_sql
-    if Account.site_admin.feature_enabled?(:visible_assignments_scope_change)
-      "('rejected', 'deleted')"
-    else
-      "('rejected', 'deleted', 'inactive')"
-    end
-  end
-
   # This beauty of a method brings together assignment overrides,
   # due dates, grading periods, course/group enrollments, etc
   # to calculate each student's effective due date and whether or
@@ -281,7 +273,7 @@ class EffectiveDueDates
             WHERE
               o.set_type = 'CourseSection' AND
               s.workflow_state <> 'deleted' AND
-              e.workflow_state NOT IN #{filter_section_assigned_enrollments_sql} AND
+              e.workflow_state NOT IN ('rejected', 'deleted') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
               #{filter_students_sql("e")}
           ),
