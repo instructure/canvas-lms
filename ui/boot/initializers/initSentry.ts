@@ -17,15 +17,17 @@
  */
 
 import SentryFullStory from '@sentry/fullstory'
-import {init} from '@sentry/react'
+import {configureScope, init} from '@sentry/react'
 import {Integration} from '@sentry/types'
+import {BrowserTracing} from '@sentry/tracing'
 
 export function initSentry() {
   const sentrySettings = ENV.SENTRY_FRONTEND
 
   // Initialize Sentry as early as possible
   if (sentrySettings?.dsn) {
-    const errorSampleRate = parseFloat(sentrySettings.error_sample_rate || 0.0)
+    const errorsSampleRate = parseFloat(sentrySettings.errors_sample_rate) || 0.0
+    const tracesSampleRate = parseFloat(sentrySettings.traces_sample_rate) || 0.0
     const integrations: Integration[] = []
 
     if (ENV.FULL_STORY_ENABLED) {
@@ -34,6 +36,8 @@ export function initSentry() {
       )
     }
 
+    if (tracesSampleRate) integrations.push(new BrowserTracing() as Integration)
+
     init({
       dsn: sentrySettings.dsn,
       environment: sentrySettings.environment,
@@ -41,12 +45,16 @@ export function initSentry() {
 
       integrations,
 
-      sampleRate: Number.isNaN(errorSampleRate) ? 0.0 : errorSampleRate,
+      sampleRate: errorsSampleRate,
+      tracesSampleRate,
 
       initialScope: {
         tags: {k12: ENV.k12, k5_user: ENV.K5_USER, student_user: ENV.current_user_is_student},
         user: {id: ENV.current_user_global_id}
       }
     })
+
+    if (sentrySettings.normalized_route)
+      configureScope(scope => scope.setTransactionName(sentrySettings.normalized_route))
   }
 }

@@ -2546,6 +2546,45 @@ describe CoursesController do
     end
   end
 
+  describe "set_normalized_route" do
+    it "does nothing by default" do
+      get "index"
+      expect(controller.instance_variable_get(:@normalized_route)).to be_nil
+    end
+
+    context "when Sentry is enabled on the frontend" do
+      before do
+        ConfigFile.stub("sentry", { dsn: "dummy-dsn", frontend_dsn: "dummy-frontend-dsn" })
+      end
+
+      after do
+        ConfigFile.unstub
+        SentryExtensions::Settings.reset_settings
+      end
+
+      context "given a standard route" do
+        it "correctly sets the value" do
+          get "index"
+          expect(controller.js_env[:SENTRY_FRONTEND][:normalized_route]).to eq("/courses")
+        end
+      end
+
+      context "given a route with a single path parameter" do
+        it "correctly sets the value" do
+          get "show", params: { id: 1 }
+          expect(controller.js_env[:SENTRY_FRONTEND][:normalized_route]).to eq("/courses/{id}")
+        end
+      end
+
+      context "given a route with multiple path parameters" do
+        it "correctly sets the value" do
+          get "settings", params: { course_id: 1 }
+          expect(controller.js_env[:SENTRY_FRONTEND][:normalized_route]).to eq("/courses/{course_id}/settings/{full_path}")
+        end
+      end
+    end
+  end
+
   context "validate_scopes" do
     let(:account) { double }
 
