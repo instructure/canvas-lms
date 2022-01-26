@@ -41,6 +41,7 @@ describe('HeaderInputs', () => {
     },
     onContextSelect: jest.fn(),
     onSelectedIdsChange: jest.fn(),
+    onUserFilterSelect: jest.fn(),
     onSendIndividualMessagesChange: jest.fn(),
     onSubjectChange: jest.fn(),
     onRemoveMediaComment: jest.fn(),
