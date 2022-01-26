@@ -209,7 +209,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
         <Flex as="section" justifyItems="space-between" wrap="wrap" margin="0 0 x-small">
           <Flex.Item margin="0 x-small x-small 0">
             <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
-              <Text>
+              <Text data-testid="number-of-assignments">
                 <i>
                   {I18n.t(
                     {
@@ -225,7 +225,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
               <Text color="secondary">|</Text>
             </PresentationContent>
             <View margin="0 0 0 x-small">
-              <Text>
+              <Text data-testid="number-of-weeks">
                 <i>
                   {I18n.t(
                     {
@@ -239,7 +239,9 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
             </View>
           </Flex.Item>
           <Flex.Item margin="0 0 x-small">
-            <Text fontStyle="italic">{I18n.t('Dates shown in course time zone')}</Text>
+            <Text data-testid="dates-shown-time-zone" fontStyle="italic">
+              {I18n.t('Dates shown in course time zone')}
+            </Text>
           </Flex.Item>
         </Flex>
       </View>

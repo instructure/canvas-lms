@@ -33,6 +33,10 @@ module PacePlansPageObject
     "[data-testid='duedate-tooltip']"
   end
 
+  def dates_shown_selector
+    "[data-testid='dates-shown-time-zone']"
+  end
+
   def duration_field_selector
     "[data-testid='duration-number-input']"
   end
@@ -63,6 +67,14 @@ module PacePlansPageObject
 
   def module_items_selector
     "[data-testid='pp-title-cell']"
+  end
+
+  def number_of_assignments_selector
+    "[data-testid='number-of-assignments'] i"
+  end
+
+  def number_of_weeks_selector
+    "[data-testid='number-of-weeks'] i"
   end
 
   def pace_plan_end_date_selector
@@ -183,8 +195,12 @@ module PacePlansPageObject
     f(compression_tooltip_selector)
   end
 
+  def dates_shown
+    f(dates_shown_selector)
+  end
+
   def duration_field
-    f(duration_field_selector)
+    ff(duration_field_selector)
   end
 
   def duration_readonly
@@ -217,6 +233,14 @@ module PacePlansPageObject
 
   def module_item_title(item_title)
     flnpt(item_title)
+  end
+
+  def number_of_assignments
+    f(number_of_assignments_selector)
+  end
+
+  def number_of_weeks
+    f(number_of_weeks_selector)
   end
 
   def pace_plan_end_date
@@ -450,8 +474,8 @@ module PacePlansPageObject
     element_exists?(skip_weekends_checkbox_xpath_selector, true)
   end
 
-  def update_module_item_duration(duration)
-    duration_field.send_keys([:control, "a"], :backspace, duration, :tab)
+  def update_module_item_duration(item_number, duration)
+    duration_field[item_number].send_keys([:control, "a"], :backspace, duration, :tab)
   end
 
   def unpublished_changes_tray_exists?
