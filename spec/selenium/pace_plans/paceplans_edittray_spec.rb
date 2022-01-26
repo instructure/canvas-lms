@@ -63,11 +63,11 @@ describe "pace plans edit tray" do
 
       expect(publish_status_button_exists?).to be_falsey
 
-      update_module_item_duration(3)
+      update_module_item_duration(0, 3)
       expect(publish_status_button_exists?).to be_truthy
       expect(publish_status_button.text).to eq("1 unpublished change")
 
-      update_module_item_duration(2)
+      update_module_item_duration(0, 2)
       expect(publish_status_button_exists?).to be_falsey
       expect(publish_status).to be_displayed
     end
@@ -75,7 +75,7 @@ describe "pace plans edit tray" do
     it "brings up the edit tray when unpublished changes button is clicked" do
       visit_pace_plans_page
 
-      update_module_item_duration(3)
+      update_module_item_duration(0, 3)
       click_unpublished_changes_button
 
       expect(unpublished_changes_tray).to be_displayed
@@ -84,7 +84,7 @@ describe "pace plans edit tray" do
     it "shows the unpublished change in the tray" do
       visit_pace_plans_page
 
-      update_module_item_duration(3)
+      update_module_item_duration(0, 3)
       click_unpublished_changes_button
 
       expect(unpublished_changes_list[0].text).to include(module_assignment_title)
@@ -93,7 +93,7 @@ describe "pace plans edit tray" do
     it "closes the tray when close button clicked" do
       visit_pace_plans_page
 
-      update_module_item_duration(3)
+      update_module_item_duration(0, 3)
       click_unpublished_changes_button
       click_edit_tray_close_button
 
