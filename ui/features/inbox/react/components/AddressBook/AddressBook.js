@@ -58,7 +58,8 @@ export const AddressBook = ({
   limitTagCount,
   headerText,
   width,
-  open
+  open,
+  onUserFilterSelect
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -308,6 +309,9 @@ export const AddressBook = ({
     if (!isBackButton && !isCourse) {
       addTag(user)
       onSelect(user.id)
+      if (onUserFilterSelect) {
+        onUserFilterSelect(user?._id ? `user_${user?._id}` : undefined)
+      }
     } else {
       onSelect(user.id, isCourse, isBackButton)
     }
@@ -329,6 +333,7 @@ export const AddressBook = ({
 
   const removeTag = removeUser => {
     let newSelectedUsers = selectedUsers
+    onUserFilterSelect(undefined)
     newSelectedUsers = newSelectedUsers.filter(user => user.id !== removeUser.id)
     setSelectedUsers([...newSelectedUsers])
   }
@@ -476,7 +481,11 @@ AddressBook.propTypes = {
   /**
    * Bool which determines if addressbook is intialed open
    */
-  open: PropTypes.bool
+  open: PropTypes.bool,
+  /**
+   * use State function to set user filter for conversations
+   */
+  onUserFilterSelect: PropTypes.func
 }
 
 export default AddressBook
