@@ -266,7 +266,13 @@ export function uploadToButtonsAndIconsFolder(svg, uploadSettings = {}) {
       .then(({folders}) => {
         fileMetaProps.parentFolderId = folders[0].id
         return source
-          .preflightUpload(fileMetaProps, {host, contextId, contextType, onDuplicate})
+          .preflightUpload(fileMetaProps, {
+            host,
+            contextId,
+            contextType,
+            onDuplicate,
+            category: 'buttons_and_icons'
+          })
           .then(results => {
             return source.uploadFRD(svgAsFile, results)
           })

@@ -936,6 +936,7 @@ class FilesController < ApplicationController
     @attachment.folder = Folder.where(id: params[:folder_id]).first
     @attachment.user = api_find(User, params[:user_id])
     @attachment.set_publish_state_for_usage_rights
+    @attachment.category = params[:category] if params[:category].present?
     @attachment.save!
 
     # apply duplicate handling
