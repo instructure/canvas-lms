@@ -104,7 +104,8 @@ describe('TrayDisplayer', () => {
   describe('dueDateTray', () => {
     it('should render', () => {
       const container = setup()
-      expect(container.getByText('Due Dates')).toBeInTheDocument()
+      expect(container.getAllByText('Due Dates')[0]).toBeInTheDocument()
+      expect(container.getAllByText('Due Dates')[1]).toBeInTheDocument()
     })
 
     it('renders correct data in the dueDateTray', () => {
@@ -129,7 +130,8 @@ describe('TrayDisplayer', () => {
           />
         )
       })
-      expect(container.getByText('Availability')).toBeInTheDocument()
+      expect(container.getAllByText('Availability')[0]).toBeInTheDocument()
+      expect(container.getAllByText('Availability')[1]).toBeInTheDocument()
       expect(container.getByTestId('availability-table')).toBeInTheDocument()
     })
     it('renders correct data in the DiscussionAvailabilityTray', () => {

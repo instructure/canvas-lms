@@ -45,7 +45,7 @@ export function TrayDisplayer({...props}) {
           </Flex.Item>
           <Flex.Item padding="none none medium none" shouldGrow shouldShrink>
             <Text size="x-large" weight="bold">
-              {I18n.t('%{title}.', {title: props.trayTitle})}
+              {I18n.t('%{title}', {title: props.trayTitle})}
             </Text>
           </Flex.Item>
           {props.trayComponent}
