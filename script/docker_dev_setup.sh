@@ -40,7 +40,7 @@ while :; do
       ;;
     --mutagen)
       touch .mutagen
-      DOCKER_COMMAND="mutagen compose"
+      DOCKER_COMMAND="mutagen-compose"
       CANVAS_SKIP_DOCKER_USERMOD='true'
       ;;
     ?*)
