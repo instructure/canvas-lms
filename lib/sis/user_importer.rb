@@ -405,7 +405,7 @@ module SIS
             next
           end
 
-          if pseudo.changed?
+          if pseudo.changed? || (Pseudonym.sis_stickiness_options[:clear_sis_stickiness] && pseudo.read_attribute("stuck_sis_fields").present?)
             pseudo.sis_batch_id = user_row.sis_batch_id if user_row.sis_batch_id
             pseudo.sis_batch_id = @batch.id if @batch
             if pseudo.valid?
