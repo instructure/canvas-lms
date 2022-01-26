@@ -415,6 +415,23 @@ describe Attachment do
       it { is_expected.not_to include button_and_icon }
     end
 
+    describe "for_category" do
+      subject { Attachment.for_category(category) }
+
+      let_once(:button_and_icon) { attachment_model(category: Attachment::BUTTONS_AND_ICONS) }
+      let_once(:uncategorized) { attachment_model }
+
+      let(:category) { "buttons_and_icons" }
+
+      before do
+        button_and_icon
+        uncategorized
+      end
+
+      it { is_expected.to include button_and_icon }
+      it { is_expected.not_to include uncategorized }
+    end
+
     context "by_content_types" do
       before :once do
         course_model
