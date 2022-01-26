@@ -7,7 +7,7 @@ message "It looks like you're using a Mac. Let's set that up."
 
 if is_mutagen; then
   print_mutagen_intro
-  dependencies='docker,mutagen'
+  dependencies='docker,mutagen 0.13.0,mutagen-compose'
   check_dependencies
   check_for_docker_desktop
   docker_running &> /dev/null || attempt_start_docker
