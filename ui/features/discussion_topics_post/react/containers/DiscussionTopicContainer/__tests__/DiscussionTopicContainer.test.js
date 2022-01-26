@@ -578,11 +578,28 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('should show discussion availability container for ungraded discussions', () => {
+    const mockSections = [
+      {
+        id: 'U2VjdGlvbi00',
+        _id: '1',
+        userCount: 5,
+        name: 'section 1'
+      },
+      {
+        id: 'U2VjdGlvbi00',
+        _id: '2',
+        userCount: 99,
+        name: 'section 2'
+      }
+    ]
+
     const container = setup({
       discussionTopic: Discussion.mock({
         assignment: null,
+        courseSections: mockSections,
         delayedPostAt: '2021-03-21T00:00:00-06:00',
-        lockAt: '2021-09-03T23:59:59-06:00'
+        lockAt: '2021-09-03T23:59:59-06:00',
+        groupSet: null
       })
     })
 

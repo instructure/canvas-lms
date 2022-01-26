@@ -106,6 +106,7 @@ describe('DiscussionDetails', () => {
         userCount: 1,
         lockAt: '2022-01-19T23:59:59-07:00',
         delayedPostAt: '2022-01-12T00:00:00-07:00',
+        groupSet: null,
         anonymousState: null,
         assignment: null
       })
@@ -182,6 +183,7 @@ describe('DiscussionDetails', () => {
         userCount: 1,
         lockAt: '2022-01-19T23:59:59-07:00',
         delayedPostAt: '2022-01-12T00:00:00-07:00',
+        groupSet: null,
         anonymousState: null,
         assignment: null
       })

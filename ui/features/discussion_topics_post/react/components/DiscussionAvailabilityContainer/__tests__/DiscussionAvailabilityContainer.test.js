@@ -30,6 +30,12 @@ const mockSections = [
     _id: '1',
     userCount: 99,
     name: 'section 2'
+  },
+  {
+    id: 'U2VjdGlvbi00',
+    _id: '1',
+    userCount: 990,
+    name: 'section 25'
   }
 ]
 const mockLockAt = '2022-01-19T23:59:59-07:00'
