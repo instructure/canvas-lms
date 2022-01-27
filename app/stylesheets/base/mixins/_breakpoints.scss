@@ -50,7 +50,7 @@
   }
 }
 @mixin mobile-only {
-  @media (max-width: 767px) {
+  @media not all and (min-width: 768px) {
     @content;
   }
 }
