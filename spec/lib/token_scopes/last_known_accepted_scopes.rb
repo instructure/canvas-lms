@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Canvas is Copyright (C) 2022 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,12 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module TokenScopesHelper
-  def self.scope_from_route(route)
-    "url:#{route.verb}|#{path_without_format(route)}"
-  end
 
-  def self.path_without_format(route)
-    route.path.spec.to_s.gsub(/\(\.:format\)$/, "")
+module TokenScopesHelper::SpecHelper
+  def self.last_known_accepted_scopes
+    @last_known_accepted_scopes ||= YAML.load_file(__dir__ + "/last_known_scopes.yml")
   end
 end
