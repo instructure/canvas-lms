@@ -114,13 +114,13 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open do |f|
           file_size = 0
-          md5 = entry.extract(f.path, true) do |bytes|
+          sha512 = entry.extract(f.path, true) do |bytes|
             file_size += bytes
           end
           zip_stats.charge_quota(file_size)
           # This is where the attachment actually happens.  See file_in_context.rb
           migration_id = @migration_id_map[entry.name]
-          attachment = attach(f.path, entry, folder, md5, migration_id: migration_id)
+          attachment = attach(f.path, entry, folder, sha512, migration_id: migration_id)
           id_positions[attachment.id] = path_positions[entry.name]
         rescue Attachment::OverQuotaError
           f.unlink
