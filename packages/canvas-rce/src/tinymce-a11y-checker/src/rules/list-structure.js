@@ -10,7 +10,7 @@ import formatMessage from "../format-message"
  * a. list Item
  */
 
-const orderedChars = `[A-Z]+|[a-z]+|[0-9]+`
+const orderedChars = ["[A-Z]", "[a-z]", "[0-9]"].map(pattern => pattern + "{1,4}").join("|")
 const bulletMarkers = ["*", "-"].map(c => "\\" + c).join("|")
 const orderedMarkers = [".", ")"].map(c => "\\" + c).join("|")
 
@@ -66,7 +66,7 @@ const splitParagraphsByBreak = paragraph => {
 
 export default {
   id: "list-structure",
-  test: function(elem) {
+  test: function (elem) {
     const isList = isTextList(elem)
     const isFirst = elem.previousElementSibling
       ? !isTextList(elem.previousElementSibling)
@@ -91,7 +91,7 @@ export default {
     }
   ],
 
-  update: function(elem, data) {
+  update: function (elem, data) {
     const rootElem = elem.parentNode
 
     if (data.formatAsList) {
@@ -137,7 +137,7 @@ export default {
     return elem
   },
 
-  rootNode: function(elem) {
+  rootNode: function (elem) {
     return elem.parentNode
   },
 
