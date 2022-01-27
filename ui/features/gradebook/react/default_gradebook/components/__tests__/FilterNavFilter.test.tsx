@@ -26,23 +26,23 @@ import '@testing-library/jest-dom/extend-expect'
 
 const defaultFilter: Filter = {
   id: '123',
-  label: 'Label',
-  createdAt: '2021-11-02T20:56:23.615Z',
+  name: 'Label',
+  created_at: '2021-11-02T20:56:23.615Z',
   conditions: [
     {
       id: '456',
-      createdAt: '2021-11-02T20:56:23.616Z',
+      created_at: '2021-11-02T20:56:23.616Z',
       type: 'module',
       value: undefined
     },
     {
       id: '567',
-      createdAt: '2021-11-02T20:56:23.617Z',
+      created_at: '2021-11-02T20:56:23.617Z',
       type: 'section',
       value: undefined
     }
   ],
-  isApplied: true
+  is_applied: true
 }
 
 const defaultProps: FilterNavFilterProps = {

@@ -277,24 +277,26 @@ describe('findAllAppliedFilterValuesOfType', () => {
   const filters: Filter[] = [
     {
       id: '1',
-      isApplied: true,
+      name: 'Filter 1',
+      is_applied: true,
       conditions: [
-        {id: '1', type: 'module', value: '1', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '2', createdAt: ''},
-        {id: '3', type: 'assignment-group', value: '7', createdAt: ''},
-        {id: '4', type: 'module', value: '3', createdAt: ''}
+        {id: '1', type: 'module', value: '1', created_at: ''},
+        {id: '2', type: 'assignment-group', value: '2', created_at: ''},
+        {id: '3', type: 'assignment-group', value: '7', created_at: ''},
+        {id: '4', type: 'module', value: '3', created_at: ''}
       ],
-      createdAt: ''
+      created_at: '2019-01-01T00:00:00Z'
     },
     {
       id: '2',
-      isApplied: false,
+      name: 'Filter 2',
+      is_applied: false,
       conditions: [
-        {id: '1', type: 'module', value: '4', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '5', createdAt: ''},
-        {id: '3', type: 'module', value: '6', createdAt: ''}
+        {id: '1', type: 'module', value: '4', created_at: ''},
+        {id: '2', type: 'assignment-group', value: '5', created_at: ''},
+        {id: '3', type: 'module', value: '6', created_at: ''}
       ],
-      createdAt: ''
+      created_at: '2019-01-01T00:00:01Z'
     }
   ]
 
@@ -311,24 +313,26 @@ describe('getAllAppliedFilterValues', () => {
   const filters: Filter[] = [
     {
       id: '1',
-      isApplied: true,
+      name: 'Filter 1',
+      is_applied: true,
       conditions: [
-        {id: '1', type: 'module', value: '1', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '2', createdAt: ''},
-        {id: '3', type: 'assignment-group', value: '7', createdAt: ''},
-        {id: '4', type: 'module', value: '3', createdAt: ''}
+        {id: '1', type: 'module', value: '1', created_at: ''},
+        {id: '2', type: 'assignment-group', value: '2', created_at: ''},
+        {id: '3', type: 'assignment-group', value: '7', created_at: ''},
+        {id: '4', type: 'module', value: '3', created_at: ''}
       ],
-      createdAt: ''
+      created_at: '2019-01-01T00:00:00Z'
     },
     {
       id: '2',
-      isApplied: false,
+      name: 'Filter 2',
+      is_applied: false,
       conditions: [
-        {id: '1', type: 'module', value: '4', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '5', createdAt: ''},
-        {id: '3', type: 'module', value: '6', createdAt: ''}
+        {id: '1', type: 'module', value: '4', created_at: ''},
+        {id: '2', type: 'assignment-group', value: '5', created_at: ''},
+        {id: '3', type: 'module', value: '6', created_at: ''}
       ],
-      createdAt: ''
+      created_at: '2019-01-01T00:00:01Z'
     }
   ]
 
