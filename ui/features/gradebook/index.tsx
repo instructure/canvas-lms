@@ -35,21 +35,23 @@ ready(() => {
   const applyScoreToUngradedModalNode = document.querySelector(
     '[data-component="ApplyScoreToUngradedModal"]'
   )
+  const gradingPeriodsFilterContainer = document.getElementById('grading-periods-filter-container')
   const flashMessageContainer = document.getElementById('flash_message_holder')
 
-  const props = {
-    applyScoreToUngradedModalNode,
-    currentUserId: ENV.current_user_id,
-    locale: ENV.LOCALE,
-    flashMessageContainer,
-    gradebookMenuNode,
-    gridColorNode,
-    filterNavNode,
-    viewOptionsMenuNode,
-    settingsModalButtonContainer,
-    gradebookEnv: ENV.GRADEBOOK_OPTIONS
-  }
-
-  const component = React.createElement(GradebookData, props)
-  ReactDOM.render(component, mountPoint)
+  ReactDOM.render(
+    <GradebookData
+      applyScoreToUngradedModalNode={applyScoreToUngradedModalNode}
+      currentUserId={ENV.current_user_id}
+      filterNavNode={filterNavNode}
+      flashMessageContainer={flashMessageContainer}
+      gradebookEnv={ENV.GRADEBOOK_OPTIONS}
+      gradebookMenuNode={gradebookMenuNode}
+      gradingPeriodsFilterContainer={gradingPeriodsFilterContainer}
+      gridColorNode={gridColorNode}
+      locale={ENV.LOCALE}
+      settingsModalButtonContainer={settingsModalButtonContainer}
+      viewOptionsMenuNode={viewOptionsMenuNode}
+    />,
+    mountPoint
+  )
 })
