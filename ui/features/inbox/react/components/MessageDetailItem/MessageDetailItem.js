@@ -23,8 +23,6 @@ import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/Mess
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../../util/utils'
 import {IconPaperclipLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
@@ -45,87 +43,52 @@ export const MessageDetailItem = ({...props}) => {
   )
 
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
-      props={{
-        mobile: {
-          avatar: 'small',
-          usernames: 'x-small',
-          courseNameDate: 'x-small',
-          messageBody: 'x-small',
-          dataTestId: 'message-detail-item-mobile'
-        },
-        tablet: {
-          avatar: 'medium',
-          usernames: 'small',
-          courseNameDate: 'x-small',
-          messageBody: 'small',
-          dataTestId: 'message-detail-item-tablet'
-        },
-        desktop: {
-          avatar: 'medium',
-          usernames: 'medium',
-          courseNameDate: 'x-small',
-          messageBody: 'medium',
-          dataTestId: 'message-detail-item-desktop'
-        }
-      }}
-      render={responsiveProps => (
-        <>
-          <Flex data-testid={responsiveProps.dataTestId}>
-            <Flex.Item>
-              <Avatar
-                size={responsiveProps.avatar}
-                margin="small small small none"
-                name={props.conversationMessage.author.name}
-                src={props.conversationMessage.author.avatarUrl}
-              />
-            </Flex.Item>
-            <Flex.Item shouldShrink shouldGrow>
-              <MessageDetailParticipants
-                participantsSize={responsiveProps.usernames}
-                conversationMessage={props.conversationMessage}
-              />
-              <View as="div" margin="xx-small none xxx-small">
-                <Text color="secondary" weight="light" size={responsiveProps.courseNameDate}>
-                  {props.contextName}
-                </Text>
-              </View>
-            </Flex.Item>
-            <Flex.Item textAlign="end">
-              <View as="div" margin="none none x-small">
-                <Text weight="light" size={responsiveProps.courseNameDate}>
-                  {createdAt}
-                </Text>
-              </View>
-              <MessageDetailActions
-                onReply={props.onReply}
-                onReplyAll={props.onReplyAll}
-                onDelete={props.onDelete}
-              />
-            </Flex.Item>
-          </Flex>
-          <Text size={responsiveProps.messageBody}>{props.conversationMessage.body}</Text>
-          {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
-            <List isUnstyled margin="medium auto small">
-              {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
-                return (
-                  <List.Item as="div" key={attachment.id}>
-                    <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
-                      {attachment.displayName}
-                    </Link>
-                  </List.Item>
-                )
-              })}
-            </List>
-          )}
-          {props.conversationMessage.mediaComment && (
-            <MessageDetailMediaAttachment mediaComment={props.conversationMessage.mediaComment} />
-          )}
-        </>
+    <>
+      <Flex>
+        <Flex.Item>
+          <Avatar
+            margin="small small small none"
+            name={props.conversationMessage.author.name}
+            src={props.conversationMessage.author.avatarUrl}
+          />
+        </Flex.Item>
+        <Flex.Item shouldShrink shouldGrow>
+          <MessageDetailParticipants conversationMessage={props.conversationMessage} />
+          <View as="div" margin="xx-small none xxx-small">
+            <Text color="secondary" weight="light">
+              {props.contextName}
+            </Text>
+          </View>
+        </Flex.Item>
+        <Flex.Item textAlign="end">
+          <View as="div" margin="none none x-small">
+            <Text weight="light">{createdAt}</Text>
+          </View>
+          <MessageDetailActions
+            onReply={props.onReply}
+            onReplyAll={props.onReplyAll}
+            onDelete={props.onDelete}
+          />
+        </Flex.Item>
+      </Flex>
+      <Text>{props.conversationMessage.body}</Text>
+      {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
+        <List isUnstyled margin="medium auto small">
+          {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
+            return (
+              <List.Item as="div" key={attachment.id}>
+                <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
+                  {attachment.displayName}
+                </Link>
+              </List.Item>
+            )
+          })}
+        </List>
       )}
-    />
+      {props.conversationMessage.mediaComment && (
+        <MessageDetailMediaAttachment mediaComment={props.conversationMessage.mediaComment} />
+      )}
+    </>
   )
 }
 

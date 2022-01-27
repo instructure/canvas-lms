@@ -44,11 +44,7 @@ export function DueDateTray({...props}) {
         }
       }}
       render={responsiveProps => (
-        <Table
-          layout={responsiveProps.layout}
-          caption={I18n.t('Due Dates')}
-          data-testid="due-date-table"
-        >
+        <Table layout={responsiveProps.layout} caption={I18n.t('Due Dates')}>
           <Table.Head>
             <Table.Row>
               <Table.ColHeader id="due_date_tray_header_due_at">

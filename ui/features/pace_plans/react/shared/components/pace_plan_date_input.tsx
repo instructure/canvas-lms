@@ -150,7 +150,7 @@ const PacePlanDateInput = ({
         <Flex.Item margin="0 x-small 0 0" align="start">
           <IconWarningLine />
         </Flex.Item>
-        <span style={{whiteSpace: 'nowrap'}}>{e}</span>
+        {e}
       </Flex>
     )
   }))
@@ -193,7 +193,7 @@ const PacePlanDateInput = ({
         {messages.length === 0 && helpText && (
           <div style={{whiteSpace: 'nowrap', marginTop: '.5rem'}}>
             <PresentationContent>
-              <span style={{fontStyle: 'italic', whiteSpace: 'nowrap'}}>{helpText}</span>
+              <Text fontStyle="italic">{helpText}</Text>
             </PresentationContent>
           </div>
         )}

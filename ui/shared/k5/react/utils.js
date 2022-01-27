@@ -310,7 +310,7 @@ export const transformAnnouncement = announcement => {
     title: announcement.title,
     message: announcement.message,
     url: announcement.html_url,
-    postedDate: announcement.posted_at ? new Date(announcement.posted_at) : undefined,
+    postedDate: new Date(announcement.posted_at),
     attachment
   }
 }

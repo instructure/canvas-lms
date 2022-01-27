@@ -26,17 +26,11 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to add students to a course from the account Courses page.')
     },
     {
-      description: I18n.t('Allows user to update a student’s section enrollment or role.')
-    },
-    {
       description: I18n.t('Allows user to add students to a course.')
     },
     {
       title: I18n.t('Students - remove'),
       description: I18n.t('Allows user to remove students from a course.')
-    },
-    {
-      description: I18n.t('Allows user to remove a student’s section enrollment or role.')
     },
     {
       description: I18n.t('Allows user to deactivate students in a course.')
@@ -73,14 +67,8 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to add students to a course.')
     },
     {
-      description: I18n.t('Allows user to update a student’s section enrollment or role.')
-    },
-    {
       title: I18n.t('Students - remove'),
       description: I18n.t('Allows user to remove students from a course.')
-    },
-    {
-      description: I18n.t('Allows user to remove a student’s section enrollment or role.')
     },
     {
       description: I18n.t('Allows user to deactivate students in a course.')

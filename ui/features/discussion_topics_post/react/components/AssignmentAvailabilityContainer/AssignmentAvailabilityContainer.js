@@ -22,7 +22,12 @@ import {AssignmentSingleAvailabilityWindow} from '../AssignmentSingleAvailabilit
 import {AssignmentMultipleAvailabilityWindows} from '../AssignmentMultipleAvailabilityWindows/AssignmentMultipleAvailabilityWindows'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
-import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
+
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Tray} from '@instructure/ui-tray'
+import {CloseButton} from '@instructure/ui-buttons'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
 
 export function AssignmentAvailabilityContainer({...props}) {
@@ -71,14 +76,28 @@ export function AssignmentAvailabilityContainer({...props}) {
           onSetDueDateTrayOpen={setDueDateTrayOpen}
         />
       )}
-      <TrayDisplayer
-        setTrayOpen={setDueDateTrayOpen}
-        trayTitle="Due Dates"
-        isTrayOpen={dueDateTrayOpen}
-        trayComponent={
-          <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
-        }
-      />
+      <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
+        <View as="div" padding="medium">
+          <Flex direction="column">
+            <Flex.Item>
+              <CloseButton
+                placement="end"
+                offset="small"
+                screenReaderLabel="Close"
+                onClick={() => {
+                  setDueDateTrayOpen(false)
+                }}
+              />
+            </Flex.Item>
+            <Flex.Item padding="none none medium none" shouldGrow shouldShrink>
+              <Text size="x-large" weight="bold" data-testid="due-dates-tray-heading">
+                {I18n.t('Due Dates')}
+              </Text>
+            </Flex.Item>
+            <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
+          </Flex>
+        </View>
+      </Tray>
     </>
   )
 }

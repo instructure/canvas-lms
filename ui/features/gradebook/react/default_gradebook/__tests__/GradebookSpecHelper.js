@@ -36,7 +36,6 @@ export const defaultGradebookProps = {
   gridColorNode: document.createElement('div'),
   filterNavNode: document.createElement('div'),
   viewOptionsMenuNode: document.createElement('div'),
-  gradingPeriodsFilterContainer: document.createElement('div'),
 
   allow_apply_score_to_ungraded: false,
   allow_separate_first_last_names: true,

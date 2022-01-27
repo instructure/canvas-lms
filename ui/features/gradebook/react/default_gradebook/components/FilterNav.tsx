@@ -30,27 +30,19 @@ import {Tray} from '@instructure/ui-tray'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import FilterNavFilter from './FilterNavFilter'
-import type {Module, Section, Filter, AssignmentGroup, GradingPeriod} from '../gradebook.d'
+import type {Module, Section, Filter, AssignmentGroup} from '../gradebook.d'
 
 const {Item} = Flex as any
 
-export type FilterNavProps = {
+type Props = {
   filters: Filter[]
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
-  gradingPeriods: GradingPeriod[]
   onChange: (filters: Filter[]) => void
 }
 
-export default function FilterNav({
-  filters,
-  modules,
-  assignmentGroups,
-  gradingPeriods,
-  sections,
-  onChange
-}: FilterNavProps) {
+export default function FilterNav({filters, modules, assignmentGroups, sections, onChange}: Props) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
 
   const openTray = () => {
@@ -160,7 +152,6 @@ export default function FilterNav({
               modules={modules}
               assignmentGroups={assignmentGroups}
               sections={sections}
-              gradingPeriods={gradingPeriods}
             />
           ))}
 

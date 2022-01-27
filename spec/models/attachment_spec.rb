@@ -27,34 +27,6 @@ describe Attachment do
     it "requires a context" do
       expect { attachment_model(context: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Context/)
     end
-
-    describe "category" do
-      subject { attachment_model category: category }
-
-      context "with a valid category" do
-        let(:category) { Attachment::BUTTONS_AND_ICONS }
-
-        it "does not raise a validation error" do
-          expect { subject }.not_to raise_error
-        end
-      end
-
-      context "with an invalid category" do
-        let(:category) { "banana" }
-
-        it "raises a validation error" do
-          expect { subject }.to raise_error "Validation failed: Category is not included in the list"
-        end
-      end
-
-      context "with a nil category" do
-        let(:category) { nil }
-
-        it "raises a validation error" do
-          expect { subject }.to raise_error "Validation failed: Category can't be blank, Category is not included in the list"
-        end
-      end
-    end
   end
 
   context "file_store_config" do
@@ -405,16 +377,6 @@ describe Attachment do
   end
 
   context "named scopes" do
-    describe "uncategorized" do
-      subject { Attachment.uncategorized }
-
-      let!(:button_and_icon) { attachment_model(category: Attachment::BUTTONS_AND_ICONS) }
-      let!(:uncategorized) { attachment_model }
-
-      it { is_expected.to include uncategorized }
-      it { is_expected.not_to include button_and_icon }
-    end
-
     context "by_content_types" do
       before :once do
         course_model

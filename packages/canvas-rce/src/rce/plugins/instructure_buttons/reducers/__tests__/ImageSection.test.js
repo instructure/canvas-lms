@@ -16,68 +16,64 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import imageSection, {initialState} from '../imageSection'
+import imageSection, {defaultState} from '../imageSection'
 
 describe('imageSection()', () => {
   const subject = (action, stateOverrides) =>
-    imageSection({...initialState, ...stateOverrides}, action)
-
-  it('handles "ClearMode" actions', () => {
-    expect(subject({type: 'ClearMode'})).toMatchObject(initialState)
-  })
+    imageSection({...defaultState, ...stateOverrides}, action)
 
   it('handles "Course" actions', () => {
     expect(subject({type: 'Course'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       mode: 'Course'
     })
   })
 
   it('handles "Upload" actions', () => {
     expect(subject({type: 'Upload'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       mode: 'Upload'
     })
   })
 
   it('handles "SingleColor" actions', () => {
     expect(subject({type: 'SingleColor'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       mode: 'SingleColor'
     })
   })
 
   it('handles "MultiColor" actions', () => {
     expect(subject({type: 'MultiColor'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       mode: 'MultiColor'
     })
   })
 
   it('handles "StartLoading" actions', () => {
     expect(subject({type: 'StartLoading'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       loading: true
     })
   })
 
   it('handles "StopLoading" actions', () => {
     expect(subject({type: 'StopLoading'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       loading: false
     })
   })
 
   it('handles "SetImage" actions', () => {
     expect(subject({type: 'SetImage', payload: 'img'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       image: 'img'
     })
   })
 
   it('handles "SetImageName" actions', () => {
     expect(subject({type: 'SetImageName', payload: 'name'})).toMatchObject({
-      ...initialState,
+      ...defaultState,
       imageName: 'name'
     })
   })

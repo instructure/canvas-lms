@@ -132,7 +132,6 @@ module Canvas::OAuth
       session = controller.session
       redirect_uri = session[:oauth2][:redirect_uri]
       session.delete(:oauth2)
-      opts.compact!
 
       if is_oob?(redirect_uri)
         controller.oauth2_auth_url(opts)

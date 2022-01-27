@@ -197,62 +197,6 @@ describe Message do
     end
   end
 
-  describe "#author_avatar_url" do
-    context "discussion entry and discussion_topic is anonymous" do
-      it "returns correct url" do
-        discussion_topic_model
-        @topic.update(anonymous_state: "full_anonymity")
-        @discussion_entry = @topic.discussion_entries.create!(user: user_model)
-        message_model(context: @discussion_entry)
-
-        expect(@topic).to be_anonymous
-        expect(@message.author_avatar_url).to eq("https://canvas.instructure.com/images/messages/avatar-50.png")
-      end
-    end
-  end
-
-  describe "#author_short_name" do
-    context "discussion entry and discussion_topic is anonymous" do
-      it "returns discussion entry author_name" do
-        discussion_topic_model
-        @topic.update(anonymous_state: "full_anonymity")
-        @discussion_entry = @topic.discussion_entries.create!(user: user_model)
-        message_model(context: @discussion_entry)
-
-        expect(@topic).to be_anonymous
-        expect(@message.author_short_name).to eq(@discussion_entry.author_name)
-      end
-    end
-  end
-
-  describe "#infer_from_name" do
-    context "discussion entry and discussion_topic is anonymous" do
-      it "returns discussion entry author_name" do
-        discussion_topic_model
-        @topic.update(anonymous_state: "full_anonymity")
-        @discussion_entry = @topic.discussion_entries.create!(user: user_model)
-        message_model(context: @discussion_entry)
-
-        expect(@topic).to be_anonymous
-        expect(@message.from_name).to eq(@discussion_entry.author_name)
-      end
-    end
-  end
-
-  describe "#author_email_address" do
-    context "discussion entry and discussion_topic is anonymous" do
-      it "returns nil" do
-        discussion_topic_model
-        @topic.update(anonymous_state: "full_anonymity")
-        @discussion_entry = @topic.discussion_entries.create!(user: user_model)
-        message_model(context: @discussion_entry)
-
-        expect(@topic).to be_anonymous
-        expect(@message.author_email_address).to be_nil
-      end
-    end
-  end
-
   it "raises an error when trying to re-save an existing message" do
     message_model
     @message.body = "something else"

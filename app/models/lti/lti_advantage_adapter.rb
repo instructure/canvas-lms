@@ -132,10 +132,7 @@ module Lti
     # For information on how the cached ID token is eventually retrieved
     # and sent to a tool, please refer to the inline documentation of
     # app/controllers/lti/ims/authentication_controller.rb
-    def generate_post_payload(student_id: nil)
-      # Takes a student ID parameter for compatibility with the LTI 1.1 method
-      # (in LtiOutboundAdapter), but we don't use it here yet. See INTEROP-7227
-      # and student_context_card spec in external_tools_controller_spec.rb
+    def generate_post_payload
       login_request(generate_lti_params)
     end
 

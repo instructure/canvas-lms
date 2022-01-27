@@ -26,13 +26,11 @@ import {
   getCustomColumnId,
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
-  findAllAppliedFilterValuesOfType,
-  getAllAppliedFilterValues
+  findAllAppliedFilterValuesOfType
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
-import type {Filter} from '../gradebook.d'
 
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
@@ -88,7 +86,7 @@ describe('onGridKeyDown', () => {
   })
 
   it('skips SlickGrid default behavior when pressing "enter" on a "student" cell', () => {
-    const event = {which: 13, originalEvent: {skipSlickGridDefaults: undefined}}
+    const event = {which: 13, originalEvent: {}}
     onGridKeyDown(event, {grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
     expect(event.originalEvent.skipSlickGridDefaults).toStrictEqual(true)
   })
@@ -217,36 +215,32 @@ describe('getDefaultSettingKeyForColumnType', () => {
   it('relies on localeSort when rows have equal sorting criteria results', () => {
     const gradebook = createGradebook()
     gradebook.gridData.rows = [
-      // @ts-expect-error
       {id: '3', sortable_name: 'Z Lastington', someProperty: false},
-      // @ts-expect-error
       {id: '4', sortable_name: 'A Firstington', someProperty: true}
     ]
 
     const value = 0
-    // @ts-expect-error
     gradebook.gridData.rows[0].someProperty = value
-    // @ts-expect-error
     gradebook.gridData.rows[1].someProperty = value
     const sortFn = row => row.someProperty
     gradebook.sortRowsWithFunction(sortFn)
     const [firstRow, secondRow] = gradebook.gridData.rows
 
-    expect(firstRow.sortable_name).toStrictEqual('A Firstington')
-    expect(secondRow.sortable_name).toStrictEqual('Z Lastington')
+    expect(firstRow.sortable_name).toStrictEqual('A Firstington', 'A Firstington sorts first')
+    expect(secondRow.sortable_name).toStrictEqual('Z Lastington', 'Z Lastington sorts second')
   })
 })
 
 describe('sectionList', () => {
   const sections = {
-    2: {id: '2', name: 'Hello &lt;script>while(1);&lt;/script> world!'},
-    1: {id: '1', name: 'Section 1'}
+    2: {id: 2, name: 'Hello &lt;script>while(1);&lt;/script> world!'},
+    1: {id: 1, name: 'Section 1'}
   }
 
   it('sorts by id', () => {
     const results = sectionList(sections)
-    expect(results[0].id).toStrictEqual('1')
-    expect(results[1].id).toStrictEqual('2')
+    expect(results[0].id).toStrictEqual(1)
+    expect(results[1].id).toStrictEqual(2)
   })
 
   it('unescapes section names', () => {
@@ -274,27 +268,23 @@ describe('getAssignmentGroupColumnId', () => {
 })
 
 describe('findAllAppliedFilterValuesOfType', () => {
-  const filters: Filter[] = [
+  const filters = [
     {
-      id: '1',
       isApplied: true,
       conditions: [
-        {id: '1', type: 'module', value: '1', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '2', createdAt: ''},
-        {id: '3', type: 'assignment-group', value: '7', createdAt: ''},
-        {id: '4', type: 'module', value: '3', createdAt: ''}
-      ],
-      createdAt: ''
+        {type: 'module', value: '1'},
+        {type: 'assignment-group', value: '2'},
+        {type: 'assignment-group', value: '7'},
+        {type: 'module', value: '3'}
+      ]
     },
     {
-      id: '2',
       isApplied: false,
       conditions: [
-        {id: '1', type: 'module', value: '4', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '5', createdAt: ''},
-        {id: '3', type: 'module', value: '6', createdAt: ''}
-      ],
-      createdAt: ''
+        {type: 'module', value: '4'},
+        {type: 'assignment-group', value: '5'},
+        {type: 'module', value: '6'}
+      ]
     }
   ]
 
@@ -304,35 +294,5 @@ describe('findAllAppliedFilterValuesOfType', () => {
 
   it('only returns selected type', () => {
     expect(findAllAppliedFilterValuesOfType('assignment-group', filters)).toStrictEqual(['2', '7'])
-  })
-})
-
-describe('getAllAppliedFilterValues', () => {
-  const filters: Filter[] = [
-    {
-      id: '1',
-      isApplied: true,
-      conditions: [
-        {id: '1', type: 'module', value: '1', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '2', createdAt: ''},
-        {id: '3', type: 'assignment-group', value: '7', createdAt: ''},
-        {id: '4', type: 'module', value: '3', createdAt: ''}
-      ],
-      createdAt: ''
-    },
-    {
-      id: '2',
-      isApplied: false,
-      conditions: [
-        {id: '1', type: 'module', value: '4', createdAt: ''},
-        {id: '2', type: 'assignment-group', value: '5', createdAt: ''},
-        {id: '3', type: 'module', value: '6', createdAt: ''}
-      ],
-      createdAt: ''
-    }
-  ]
-
-  it('returns only applied filter values', () => {
-    expect(getAllAppliedFilterValues(filters)).toStrictEqual(['1', '2', '7', '3'])
   })
 })

@@ -18,32 +18,8 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {MessageDetailHeader} from '../MessageDetailHeader'
-import {responsiveQuerySizes} from '../../../../util/utils'
-
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
-}))
 
 describe('MessageDetailHeader', () => {
-  beforeAll(() => {
-    // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
-      return {
-        matches: true,
-        media: '',
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn()
-      }
-    })
-
-    // Repsonsive Query Mock Default
-    responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
-    }))
-  })
-
   it('renders with provided text', () => {
     const props = {text: 'Message Header Text'}
     const {getByText} = render(<MessageDetailHeader {...props} />)
@@ -70,37 +46,5 @@ describe('MessageDetailHeader', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Reply All'))
     expect(props.onReplyAll).toHaveBeenCalled()
-  })
-
-  describe('Responsive', () => {
-    describe('Mobile', () => {
-      beforeEach(() => {
-        responsiveQuerySizes.mockImplementation(() => ({
-          mobile: {maxWidth: '67'}
-        }))
-      })
-
-      it('Should render mobile test id for header', async () => {
-        const props = {text: 'Message Header Text'}
-        const {findByTestId} = render(<MessageDetailHeader {...props} />)
-        const headingElm = await findByTestId('message-detail-header-mobile')
-        expect(headingElm).toBeTruthy()
-      })
-    })
-
-    describe('Desktop', () => {
-      beforeEach(() => {
-        responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {maxWidth: '67'}
-        }))
-      })
-
-      it('Should render desktop test id for header', async () => {
-        const props = {text: 'Message Header Text'}
-        const {findByTestId} = render(<MessageDetailHeader {...props} />)
-        const headingElm = await findByTestId('message-detail-header-desktop')
-        expect(headingElm).toBeTruthy()
-      })
-    })
   })
 })
