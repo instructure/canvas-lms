@@ -52,7 +52,12 @@ def call() {
 def _getCrystalballMap() {
   withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
     def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
-    sh "$awsCreds aws s3 cp s3://instructure-canvas-ci/crystalball_map.yml ."
+
+    if (env.CRYSTALBALL_MAP_S3_VERSION && env.CRYSTALBALL_MAP_S3_VERSION != 'latest') {
+      sh "$awsCreds aws s3api get-object --bucket instructure-canvas-ci --key crystalball_map.yml --version-id ${env.CRYSTALBALL_MAP_S3_VERSION} crystalball_map.yml"
+    } else {
+      sh "$awsCreds aws s3 cp s3://instructure-canvas-ci/crystalball_map.yml ."
+    }
   }
 }
 
