@@ -35,7 +35,16 @@ describe("test", () => {
     expect(rule.test(p2)).toBeFalsy()
   })
 
-  test("returns true if li-like", () => {
+  test("returns true if ol-like but item label is more than 4 chars", () => {
+    p1.textContent = "12345. list like"
+    p2.textContent = "ABCDE. list like"
+    p3.textContent = "abcde) list like"
+    expect(rule.test(p1)).toBeTruthy()
+    expect(rule.test(p2)).toBeTruthy()
+    expect(rule.test(p3)).toBeTruthy()
+  })
+
+  test("returns false if li-like", () => {
     p2.textContent = " * List"
     p3.textContent = " * List"
     expect(rule.test(p2)).toBeFalsy()
