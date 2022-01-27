@@ -17,16 +17,18 @@
  */
 
 import I18n from 'i18n!discussion_posts'
-
-import {responsiveQuerySizes} from '../../utils/index'
-import {CondensedButton} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 
-import {Text} from '@instructure/ui-text'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
+
+import {AssignmentAvailabilityWindow} from '../AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
 import {DiscussionAvailabilityTray} from '../DiscussionAvailabilityTray/DiscussionAvailabilityTray'
+import {responsiveQuerySizes} from '../../utils/index'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
+import {Flex} from '@instructure/ui-flex'
 
 export function DiscussionAvailabilityContainer({...props}) {
   const [availabilityTrayOpen, setAvailabilityTrayOpen] = useState(false)
@@ -63,34 +65,50 @@ export function DiscussionAvailabilityContainer({...props}) {
           margin: '0 0 0 xx-small'
         }
       }}
-      render={responsiveProps => (
-        <>
-          {!!prefixText && <Text size={responsiveProps.textSize}>{prefixText}</Text>}
-          <CondensedButton
-            onClick={() => {
-              setAvailabilityTrayOpen(true)
-            }}
-            data-testid="view-availability-button"
-            margin={responsiveProps.margin}
-          >
-            <Text weight="bold" size={responsiveProps.textSize}>
-              {I18n.t('View Availability')}
-            </Text>
-          </CondensedButton>
-          <TrayDisplayer
-            setTrayOpen={setAvailabilityTrayOpen}
-            trayTitle="Availability"
-            isTrayOpen={availabilityTrayOpen}
-            trayComponent={
-              <DiscussionAvailabilityTray
-                lockAt={props.lockAt}
-                delayedPostAt={props.delayedPostAt}
-                availabilities={availabilities}
-              />
-            }
-          />
-        </>
-      )}
+      render={responsiveProps => {
+        return (
+          <Flex>
+            <Flex.Item margin="0 xxx-small 0 0">
+              {prefixText && <Text size={responsiveProps.textSize}>{prefixText}</Text>}
+            </Flex.Item>
+            <Flex.Item>
+              {availabilities.length === 1 ? (
+                <AssignmentAvailabilityWindow
+                  availabilityWindowName={availabilities[0].name}
+                  availableDate={props.delayedPostAt}
+                  untilDate={props.lockAt}
+                />
+              ) : (
+                <>
+                  <CondensedButton
+                    onClick={() => {
+                      setAvailabilityTrayOpen(true)
+                    }}
+                    data-testid="view-availability-button"
+                    margin={responsiveProps.margin}
+                  >
+                    <Text weight="bold" size={responsiveProps.textSize}>
+                      {I18n.t('View Availability')}
+                    </Text>
+                  </CondensedButton>
+                  <TrayDisplayer
+                    setTrayOpen={setAvailabilityTrayOpen}
+                    trayTitle="Availability"
+                    isTrayOpen={availabilityTrayOpen}
+                    trayComponent={
+                      <DiscussionAvailabilityTray
+                        lockAt={props.lockAt}
+                        delayedPostAt={props.delayedPostAt}
+                        availabilities={availabilities}
+                      />
+                    }
+                  />
+                </>
+              )}
+            </Flex.Item>
+          </Flex>
+        )
+      }}
     />
   )
 }
