@@ -303,6 +303,53 @@ module Lti
           let(:launch_url) { "http://tool.url/launch" }
           let(:params) { super().merge({ course_id: course.id, placement: "course_assignments_menu" }) }
 
+          context "when is empty" do
+            let(:content_items) { nil }
+
+            it { is_expected.to be_ok }
+
+            it "does not create a new module" do
+              expect { subject }.not_to change { course.context_modules.count }
+            end
+
+            it "doesn't ask to reload page" do
+              subject
+              expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+            end
+          end
+
+          context "when is omitted" do
+            let(:deep_linking_jwt) do
+              body = {
+                "iss" => iss,
+                "aud" => aud,
+                "iat" => iat,
+                "exp" => exp,
+                "jti" => jti,
+                "nonce" => SecureRandom.uuid,
+                "https://purl.imsglobal.org/spec/lti/claim/message_type" => response_message_type,
+                "https://purl.imsglobal.org/spec/lti/claim/version" => lti_version,
+                "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => deployment_id,
+                "https://purl.imsglobal.org/spec/lti-dl/claim/msg" => msg,
+                "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg" => errormsg,
+                "https://purl.imsglobal.org/spec/lti-dl/claim/log" => log,
+                "https://purl.imsglobal.org/spec/lti-dl/claim/errorlog" => errorlog
+              }
+              JSON::JWT.new(body).sign(private_jwk, alg).to_s
+            end
+
+            it { is_expected.to be_ok }
+
+            it "does not create a new module" do
+              expect { subject }.not_to change { course.context_modules.count }
+            end
+
+            it "doesn't ask to reload page" do
+              subject
+              expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+            end
+          end
+
           context "when module item content items are received" do
             before do
               course
