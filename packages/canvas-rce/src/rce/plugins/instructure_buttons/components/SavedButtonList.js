@@ -16,95 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import {func, shape, string} from 'prop-types'
+import React from 'react'
 
-import {BTN_AND_ICON_ATTRIBUTE} from '../../instructure_buttons/registerEditToolbar'
-import Images from '../../instructure_image/Images'
+import {View} from '@instructure/ui-view'
+import ImageList from '../../instructure_image/Images'
+import {useStoreProps} from '../../shared/StoreContext'
+import {BUTTONS_AND_ICONS} from '../registerEditToolbar'
 
-export function rceToFile({createdAt, id, name, thumbnailUrl, type, url}) {
-  return {
-    content_type: type,
-    date: createdAt,
-    display_name: name,
-    filename: name,
-    href: url,
-    id,
-    thumbnail_url: thumbnailUrl,
-    [BTN_AND_ICON_ATTRIBUTE]: true
-  }
-}
-
-const SavedButtonList = ({context, onImageEmbed, searchString, sortBy, source}) => {
-  const [buttonsAndIconsBookmark, setButtonsAndIconsBookmark] = useState(null)
-  const [buttonsAndIcons, setButtonsAndIcons] = useState([])
-  const [hasMore, setHasMore] = useState(true)
-  const [isLoading, setIsLoading] = useState(true)
-
-  const resetState = () => {
-    setButtonsAndIconsBookmark(null)
-    setButtonsAndIcons([])
-    setHasMore(true)
-    setIsLoading(true)
-  }
-
-  const onLoadedImages = ({bookmark, files}) => {
-    setButtonsAndIconsBookmark(bookmark)
-    setHasMore(bookmark !== null)
-    setIsLoading(false)
-
-    setButtonsAndIcons(prevButtonsAndIcons => [
-      ...prevButtonsAndIcons,
-      ...files.filter(({type}) => type === 'image/svg+xml').map(rceToFile)
-    ])
-  }
-
-  const fetchButtonsAndIcons = bookmark => {
-    setIsLoading(true)
-    source.fetchButtonsAndIcons(
-      {contextId: context.id, contextType: context.type},
-      bookmark,
-      searchString,
-      sortBy,
-      onLoadedImages
-    )
-  }
-
-  useEffect(() => {
-    resetState()
-  }, [searchString, sortBy.order, sortBy.sort])
+const SavedButtonList = ({onImageEmbed}) => {
+  const storeProps = useStoreProps()
+  const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
 
   return (
-    <Images
-      contextType={context.type}
-      fetchInitialImages={() => {
-        fetchButtonsAndIcons()
-      }}
-      fetchNextImages={() => {
-        fetchButtonsAndIcons(buttonsAndIconsBookmark)
-      }}
-      images={{[context.type]: {error: null, files: buttonsAndIcons, hasMore, isLoading}}}
-      onImageEmbed={onImageEmbed}
-      searchString={searchString}
-      sortBy={sortBy}
-    />
+    <View>
+      <ImageList
+        fetchInitialImages={() => storeProps.fetchInitialImages({category: BUTTONS_AND_ICONS})}
+        fetchNextImages={() => storeProps.fetchNextImages({category: BUTTONS_AND_ICONS})}
+        contextType={storeProps.contextType}
+        images={{
+          [storeProps.contextType]: {
+            files,
+            bookmark,
+            hasMore,
+            isLoading
+          }
+        }}
+        sortBy={{
+          sort: 'date_added',
+          order: 'desc'
+        }}
+        onImageEmbed={onImageEmbed}
+      />
+    </View>
   )
-}
-
-SavedButtonList.propTypes = {
-  context: shape({
-    id: string.isRequired,
-    type: string.isRequired
-  }),
-  onImageEmbed: func.isRequired,
-  searchString: string,
-  sortBy: shape({
-    order: string,
-    sort: string
-  }),
-  source: shape({
-    fetchButtonsAndIcons: func.isRequired
-  })
 }
 
 export default SavedButtonList

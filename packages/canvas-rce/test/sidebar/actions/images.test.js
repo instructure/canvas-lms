@@ -58,6 +58,31 @@ describe('Image dispatch shapes', () => {
         assert(payload.searchString === 'panda')
       })
     })
+
+    describe('when the "category" is set to "buttons_and_icons', () => {
+      let buttonAndIconsResponse, opts
+
+      const subject = () => actions.receiveImages(buttonAndIconsResponse)
+
+      beforeEach(() => {
+        buttonAndIconsResponse = {
+          response: {
+            files: [{id: 1}, {id: 2}, {id: 3}]
+          },
+          contextType,
+          opts: {
+            category: 'buttons_and_icons'
+          }
+        }
+      })
+
+      it('applies the buttons and icons attribute to each file', () => {
+        assert.deepEqual(
+          subject().payload.files.map(f => f['data-inst-buttons-and-icons']),
+          [true, true, true]
+        )
+      })
+    })
   })
 })
 

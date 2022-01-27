@@ -302,34 +302,6 @@ class RceApiSource {
     return this.fetchPage(uri)
   }
 
-  fetchButtonsAndIcons(
-    {contextId, contextType},
-    bookmark = null,
-    searchString = null,
-    sortBy,
-    onSuccess
-  ) {
-    const onSuccessWithFixedFileData = data => {
-      onSuccess({
-        ...data,
-        files: data.files.map(file => fixupFileUrl(contextType, contextId, file))
-      })
-    }
-
-    if (bookmark) {
-      this.fetchFilesForFolder(null, bookmark).then(onSuccessWithFixedFileData)
-    } else {
-      this.fetchButtonsAndIconsFolder({contextId, contextType}).then(({folders}) => {
-        this.fetchFilesForFolder({
-          filesUrl: folders[0].filesUrl,
-          perPage: 25,
-          searchString,
-          sortBy
-        }).then(onSuccessWithFixedFileData)
-      })
-    }
-  }
-
   fetchMediaFolder(props) {
     let uri
     if (props.contextType === 'user') {
@@ -347,6 +319,7 @@ class RceApiSource {
   fetchImages(props) {
     const images = props.images[props.contextType]
     const uri = images.bookmark || this.uriFor('images', props)
+
     const headers = headerFor(this.jwt)
     return this.apiFetch(uri, headers).then(({bookmark, files}) => {
       return {
@@ -471,11 +444,13 @@ class RceApiSource {
     if (!this.hasSession) {
       await this.getSession()
     }
+
     return this.apiReallyFetch(uri, headers, options)
   }
 
   apiReallyFetch(uri, headers, options = {}) {
     uri = this.normalizeUriProtocol(uri)
+
     return fetch(uri, {headers})
       .then(response => {
         if (response.status === 401) {

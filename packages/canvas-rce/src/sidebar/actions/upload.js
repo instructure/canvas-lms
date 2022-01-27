@@ -25,6 +25,7 @@ import {fileEmbed} from '../../common/mimeClass'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
 import {fixupFileUrl} from '../../common/fileUrl'
+import {BUTTONS_AND_ICONS} from '../../rce/plugins/instructure_buttons/registerEditToolbar'
 
 export const COMPLETE_FILE_UPLOAD = 'COMPLETE_FILE_UPLOAD'
 export const FAIL_FILE_UPLOAD = 'FAIL_FILE_UPLOAD'
@@ -40,8 +41,6 @@ export const START_MEDIA_UPLOADING = 'START_MEDIA_UPLOADING'
 export const STOP_LOADING = 'STOP_LOADING'
 export const STOP_MEDIA_UPLOADING = 'STOP_MEDIA_UPLOADING'
 export const TOGGLE_UPLOAD_FORM = 'TOGGLE_UPLOAD_FORM'
-
-export const BUTTONS_AND_ICONS = 'buttons_and_icons'
 
 export function startLoading() {
   return {type: START_LOADING}
