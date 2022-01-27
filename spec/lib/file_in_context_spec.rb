@@ -40,6 +40,42 @@ describe FileInContext do
       expect(attachment).to be_published
     end
 
+    describe "duplication handling" do
+      before do
+        @filename = File.expand_path(File.join(__dir__, "../fixtures/files/a_file.txt"))
+        @md5 = "2b00042f7481c7b056c4b410d28f33cf"
+        @sha512 = "8d3fffddf79e9a232ffd19f9ccaa4d6b37a6a243dbe0f23137b108a043d9da13121a9b505c804956b22e93c7f93969f4a7ba8ddea45bf4aab0bebc8f814e0991"
+      end
+
+      it "doesn't duplicate attachments if the right hash is provided" do
+        FileInContext.attach(@course, @filename, folder: @folder)
+        FileInContext.attach(@course, @filename, folder: @folder, md5: @md5)
+        expect(@course.attachments.count).to eq 1
+      end
+
+      it "doesn't duplicate attachments by comparing md5 hashes when sha512 finds nothing" do
+        attachment = FileInContext.attach(@course, @filename, folder: @folder)
+        attachment.update(md5: @md5)
+
+        # Making sure no additions to before blocks mess this up
+        expect(@course.attachments.where(md5: @sha512).take).to be_falsey
+
+        FileInContext.attach(@course, @filename, folder: @folder, md5: @sha512)
+        expect(@course.attachments.count).to eq 1
+      end
+
+      it "doesn't duplicate attachments by comparing sha512 hashes when md5 finds nothing" do
+        attachment = FileInContext.attach(@course, @filename, folder: @folder)
+        attachment.update(md5: @sha512)
+
+        # Making sure no additions to before blocks mess this up
+        expect(@course.attachments.where(md5: @md5).take).to be_falsey
+
+        FileInContext.attach(@course, @filename, folder: @folder, md5: @md5)
+        expect(@course.attachments.count).to eq 1
+      end
+    end
+
     describe "usage rights required" do
       before do
         @course.usage_rights_required = true
