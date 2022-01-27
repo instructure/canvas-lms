@@ -57,7 +57,11 @@ interface DispatchProps {
   readonly toggleExcludeWeekends: typeof pacePlanActions.toggleExcludeWeekends
 }
 
-type ComponentProps = StoreProps & DispatchProps
+interface PassedProps {
+  readonly margin?: string
+}
+
+type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 interface LocalState {
   readonly changeMadeToBlackoutDates: boolean
@@ -174,7 +178,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
       return null
     }
     return (
-      <div>
+      <div style={{display: 'inline-block'}}>
         {this.renderBlackoutDatesModal()}
         <UpdateExistingPlansModal
           open={this.state.showUpdateExistingPlansModal}
@@ -184,7 +188,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
         <Popover
           on="click"
           renderTrigger={
-            <IconButton screenReaderLabel={I18n.t('Modify Settings')}>
+            <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
               <IconSettingsLine />
             </IconButton>
           }

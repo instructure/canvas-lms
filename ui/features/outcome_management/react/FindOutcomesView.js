@@ -221,7 +221,20 @@ const FindOutcomesView = ({
               )}
               {outcomes?.edges?.map(
                 (
-                  {_id: linkId, node: {_id, title, description, friendlyDescription, isImported}},
+                  {
+                    _id: linkId,
+                    node: {
+                      _id,
+                      title,
+                      description,
+                      calculationMethod,
+                      calculationInt,
+                      masteryPoints,
+                      ratings,
+                      friendlyDescription,
+                      isImported
+                    }
+                  },
                   index
                 ) => (
                   <FindOutcomeItem
@@ -229,6 +242,10 @@ const FindOutcomesView = ({
                     id={_id}
                     title={title}
                     description={description}
+                    calculationMethod={calculationMethod}
+                    calculationInt={calculationInt}
+                    masteryPoints={masteryPoints}
+                    ratings={ratings}
                     friendlyDescription={friendlyDescription?.description}
                     isFirst={index === 0}
                     importOutcomeStatus={importOutcomesStatus?.[_id]}

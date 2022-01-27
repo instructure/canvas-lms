@@ -198,6 +198,27 @@ module Crystalball
         prediction_list.include?(ENV["CRYSTALBALL_TEST_SUITE_ROOT"])
     end
   end
+
+  class MapGenerator
+    class CanvasCoverageStrategy < CoverageStrategy
+      def after_register
+        Coverage.start unless Coverage.running?
+      end
+
+      def call(example_map, example)
+        puts "Calling Coverage Strategy for #{example.inspect}"
+        before = Coverage.peek_result
+        yield example_map, example
+        after = Coverage.peek_result
+        example_map.push(*execution_detector.detect(before, after))
+
+        # rubocop:disable Specs/NoExecuteScript
+        js_coverage = SeleniumDriverSetup.driver.execute_script("return window.__coverage__")&.keys&.uniq
+        # rubocop:enable Specs/NoExecuteScript
+        example_map.used_files.concat(js_coverage) if js_coverage
+      end
+    end
+  end
 end
 
 require "crystalball/rspec/runner/configuration"

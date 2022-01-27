@@ -26,7 +26,7 @@ die () {
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 if is_mutagen; then
-  DOCKER_COMMAND="mutagen compose"
+  DOCKER_COMMAND="mutagen-compose"
   CANVAS_SKIP_DOCKER_USERMOD='true'
   print_mutagen_intro
 fi

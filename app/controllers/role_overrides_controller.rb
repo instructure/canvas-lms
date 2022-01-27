@@ -113,7 +113,6 @@
 class RoleOverridesController < ApplicationController
   before_action :require_context
   before_action :require_role, only: %i[activate_role remove_role update show]
-  before_action :set_js_env_for_current_account
 
   # @API List roles
   # A paginated list of the roles available to an account.
@@ -170,7 +169,8 @@ class RoleOverridesController < ApplicationController
                ACCOUNT_PERMISSIONS: account_permissions(@context),
                COURSE_PERMISSIONS: course_permissions(@context),
                IS_SITE_ADMIN: @context.site_admin?,
-               ACCOUNT_ID: @context.id
+               ACCOUNT_ID: @context.id,
+               ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts]
              })
 
       js_bundle :permissions
@@ -588,12 +588,6 @@ class RoleOverridesController < ApplicationController
       render json: { message: t("Permission not found") },
              status: :bad_request
     end
-  end
-
-  # Summary:
-  #   Adds ENV.CURRENT_ACCOUNT with the account we are working with.
-  def set_js_env_for_current_account
-    js_env CURRENT_ACCOUNT: @context
   end
 
   # Internal: Get role from params or return error. Used as before filter.

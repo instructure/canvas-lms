@@ -154,6 +154,17 @@ class SubmissionStateMap {
     return (this.submissionMap[userId] || {})[assignmentId]
   }
 
+  getSubmissions(assignmentId) {
+    const submissionsByStudent = Object.values(this.submissionMap)
+    return submissionsByStudent.reduce((accumulator, submissionsByUserId) => {
+      const submissions = Object.values(submissionsByUserId).filter(
+        submission => submission.assignment_id === assignmentId
+      )
+      accumulator = [...accumulator, ...submissions]
+      return accumulator
+    }, [])
+  }
+
   getSubmissionState({user_id: userId, assignment_id: assignmentId}) {
     return (this.submissionCellMap[userId] || {})[assignmentId]
   }

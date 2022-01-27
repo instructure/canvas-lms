@@ -50,8 +50,10 @@ export const MessageDetailParticipants = ({...props}) => {
   return (
     <Flex>
       <Flex.Item shouldShrink>
-        <Text weight="bold">{props.conversationMessage.author.name}</Text>
-        <Text>
+        <Text weight="bold" size={props.participantsSize}>
+          {props.conversationMessage.author.name}
+        </Text>
+        <Text size={props.participantsSize}>
           {participantStr}
           {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
             <Link
@@ -71,5 +73,6 @@ export const MessageDetailParticipants = ({...props}) => {
 }
 
 MessageDetailParticipants.propTypes = {
-  conversationMessage: PropTypes.object
+  conversationMessage: PropTypes.object,
+  participantsSize: PropTypes.string
 }

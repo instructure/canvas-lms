@@ -299,8 +299,12 @@ module MicrosoftSync
               raise_error(Errors::PublicError, "foo")
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq("errored")
+          end
+
+          it "captures error data and the current_state in the last_error field" do
+            expect { subject.send(:run, :step_initial, nil) }.to raise_error(Errors::PublicError)
             expect(state_record.last_error).to \
-              eq(Errors.serialize(Errors::PublicError.new("foo")))
+              eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_initial"))
           end
 
           it "doesn't run the stash block on the last failure" do
@@ -350,7 +354,7 @@ module MicrosoftSync
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq("errored")
             expect(state_record.last_error).to \
-              eq(Errors.serialize(Errors::PublicError.new("foo")))
+              eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_second"))
           end
 
           context "when delay is an array of integers" do
@@ -511,7 +515,7 @@ module MicrosoftSync
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq("errored")
-            expect(state_record.last_error).to eq(Errors.serialize(error))
+            expect(state_record.last_error).to eq(Errors.serialize(error, step: "step_second"))
             expect(steps_object.steps_run.last).to eq([:after_failure])
           end
 
@@ -551,7 +555,7 @@ module MicrosoftSync
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq("errored")
-            expect(state_record.last_error).to eq(Errors.serialize(error))
+            expect(state_record.last_error).to eq(Errors.serialize(error, step: "step_initial"))
           end
 
           it 'increments a "canceled" statsd metric' do
@@ -564,6 +568,36 @@ module MicrosoftSync
                 category: "MicrosoftSync__GracefulCancelTestError"
               }
             )
+          end
+        end
+      end
+
+      context "when the step returns IGNORED" do
+        let(:error) { Errors::PublicError.new("uhoh") }
+
+        context "when last_error is already set" do
+          it "changes the state back to errored but doesn't overwrite last_error" do
+            expected_serialized_error = Errors.serialize(error, step: "step_initial")
+
+            expect(steps_object).to receive(:step_initial).once.and_raise(error)
+            expect { subject.send(:run, nil, nil) }.to raise_error(error)
+
+            expect(steps_object).to receive(:step_initial).once do
+              expect(state_record.workflow_state).to eq("running")
+              described_class::IGNORE
+            end
+            subject.send(:run, nil, nil)
+
+            expect(state_record.workflow_state).to eq("errored")
+            expect(state_record.last_error).to eq(expected_serialized_error)
+          end
+        end
+
+        context "when last error is not set" do
+          it "just sets the state to complete" do
+            expect(steps_object).to receive(:step_initial).once.and_return(described_class::IGNORE)
+            subject.send(:run, nil, nil)
+            expect(state_record.workflow_state).to eq("complete")
           end
         end
       end
