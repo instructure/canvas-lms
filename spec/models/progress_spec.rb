@@ -49,6 +49,12 @@ describe Progress do
       expect(Jerbs.flag).to eq :flag
     end
 
+    it "stores the delayed_job_id" do
+      progress.process_job(Jerbs, :succeed, {}, :flag)
+      expect(progress).to be_queued
+      expect(progress.delayed_job_id).to be_present
+    end
+
     it "fails the progress if the job fails" do
       progress.process_job(Jerbs, :fail, {})
       run_jobs

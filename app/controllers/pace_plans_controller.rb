@@ -41,7 +41,17 @@ class PacePlansController < ApplicationController
     end
 
     progress = latest_progress
-    progress_json = progress_json(progress, @current_user, session) if progress
+    if progress
+      # start delayed job if it's not already started
+      if progress.queued?
+        if progress.delayed_job.present?
+          progress.delayed_job.update(run_at: Time.now)
+        else
+          progress = publish_pace_plan
+        end
+      end
+      progress_json = progress_json(progress, @current_user, session)
+    end
 
     js_env({
              BLACKOUT_DATES: [],
