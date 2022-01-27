@@ -40,7 +40,7 @@ module Lti::IMS::Concerns
     end
 
     def content_items
-      @content_items ||= deep_linking_jwt["#{CLAIM_PREFIX}content_items"]
+      @content_items ||= deep_linking_jwt["#{CLAIM_PREFIX}content_items"] || []
     end
 
     def client_id
