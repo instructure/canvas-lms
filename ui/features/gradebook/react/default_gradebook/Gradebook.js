@@ -851,10 +851,15 @@ class Gradebook extends React.Component {
     const escapeStudentContent = student => {
       const unescapedName = student.name
       const unescapedSortableName = student.sortable_name
+      const unescapedFirstName = student.first_name
+      const unescapedLastName = student.last_name
 
+      // TODO: selectively escape fields
       const escapedStudent = htmlEscape(student)
       escapedStudent.name = unescapedName
       escapedStudent.sortable_name = unescapedSortableName
+      escapedStudent.first_name = unescapedFirstName
+      escapedStudent.last_name = unescapedLastName
 
       escapedStudent?.enrollments.forEach(enrollment => {
         const gradesUrl = enrollment?.grades?.html_url
