@@ -113,6 +113,8 @@ class Assignment::BulkUpdate
 
     # 4. clear caches
     Assignment.clear_cache_keys(assignments_to_save, :availability)
+    quizzes = assignments_to_save.select(&:quiz?).map(&:quiz)
+    Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
     DueDateCacher.recompute_course(@context, assignments: assignments_to_save, update_grades: true, executing_user: @current_user)
 
     progress.complete

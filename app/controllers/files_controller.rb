@@ -333,6 +333,10 @@ class FilesController < ApplicationController
           scope = scope.by_exclude_content_types(Array(params[:exclude_content_types]))
         end
 
+        if params[:category].present?
+          scope = scope.for_category(params[:category])
+        end
+
         url = @context ? context_files_url : api_v1_list_files_url(@folder)
         @files = Api.paginate(scope, self, url)
 
@@ -936,6 +940,7 @@ class FilesController < ApplicationController
     @attachment.folder = Folder.where(id: params[:folder_id]).first
     @attachment.user = api_find(User, params[:user_id])
     @attachment.set_publish_state_for_usage_rights
+    @attachment.category = params[:category] if params[:category].present?
     @attachment.save!
 
     # apply duplicate handling

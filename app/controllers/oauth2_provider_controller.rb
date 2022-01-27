@@ -54,12 +54,14 @@ class OAuth2ProviderController < ApplicationController
 
     unless provider.key.authorized_for_account?(@domain_root_account)
       return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                state: params[:state],
                                                                 error: "unauthorized_client",
                                                                 error_description: "Client does not have access to the specified Canvas account.")
     end
 
     unless params[:response_type] == "code"
       return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                state: params[:state],
                                                                 error: "unsupported_response_type",
                                                                 error_description: "Only response_type=code is permitted")
     end
@@ -70,10 +72,12 @@ class OAuth2ProviderController < ApplicationController
     when "none"
       if !logged_in_user
         return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                  state: params[:state],
                                                                   error: "login_required",
                                                                   error_description: "prompt=none but there is no current session")
       elsif !provider.authorized_token?(@current_user, real_user: logged_in_user)
         return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                  state: params[:state],
                                                                   error: "interaction_required",
                                                                   error_description: "prompt=none but a token cannot be granted without user interaction")
       else
@@ -82,6 +86,7 @@ class OAuth2ProviderController < ApplicationController
       end
     else
       return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                state: params[:state],
                                                                 error: "unsupported_prompt_type",
                                                                 error_description: 'prompt must be "none" (or omitted)')
     end

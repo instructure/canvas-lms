@@ -25,8 +25,10 @@ loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 def rspecqNodeTotal = 23
 @groovy.transform.Field
 def rspecNodeTotal = 27
-def startTime = 0
-def endTime = 0
+@groovy.transform.Field
+def crystalballSummaryMessage = ''
+@groovy.transform.Field
+def crystalballColor = 'danger'
 
 def setupNode() {
   sh 'rm -vrf ./tmp'
@@ -36,6 +38,7 @@ def setupNode() {
   distribution.stashBuildScripts()
   if (env.ENABLE_CRYSTALBALL == '1') {
     copyArtifacts filter: 'tmp/crystalball_spec_list.txt', projectName: "${env.UPSTREAM}", selector: upstream()
+    copyArtifacts filter: 'tmp/crystalball_map_version.txt', projectName: "${env.UPSTREAM}", selector: upstream()
   }
 
   credentials.withStarlordCredentials { ->
@@ -46,8 +49,9 @@ def setupNode() {
 }
 
 def computeTestCount() {
-  def partition = (env.RSPEC_PROCESSES.toInteger() * 30) // 30 tests per process
+  def partition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
+  def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
   env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
   def totalPrediction = specUnique.join('\n')
@@ -55,12 +59,16 @@ def computeTestCount() {
 
   // Crystalball predictor returned empty text file
   if (specUnique.size() == 0) {
-    sendCrystalballSlack('No App Code Detected! - Running everything!', 'danger')
+    crystalballSummaryMessage = 'No App Code Detected! - Running everything!'
+    // Do not run full builds while still testing
+    env.CRYSTALBALL_SKIP = 'true'
     return
   }
   // Crystalball predictor returned "."
   if (specUnique.size() == 1 && specUnique[0] == '.') {
-    sendCrystalballSlack('New File Detected! - Complete Suite Re-run!', 'danger')
+    crystalballSummaryMessage = 'New File Detected! - Complete Suite Re-run!'
+    // Do not run full builds while still testing
+    env.CRYSTALBALL_SKIP = 'true'
     return
   }
   sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
@@ -68,17 +76,19 @@ def computeTestCount() {
                                     --format ExampleCountRecorder \
                                     --out spec_count.txt ${specUnique.join(' ')}", label: 'Get Test Count')
   specCount = sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
-  def summary = "$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
-  def color = 'danger'
+
+  // Format crystalball message
+  crystalballSummaryMessage = "Map: $mapVersion\n$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
+  crystalballColor = 'danger'
   if (specCount <= partition) {
-    color = 'good'
+    crystalballColor = 'good'
   } else if (specCount <= (partition * 4)) {
-    color = 'warning'
+    crystalballColor = 'warning'
   }
-  sendCrystalballSlack(summary, color)
 
   echo "total prediction: \n====\n$totalPrediction\n===="
 
+  // Calculate nodes
   if (specCount <= partition) {
     rspecqNodeTotal = 1
     return
@@ -86,10 +96,24 @@ def computeTestCount() {
   rspecqNodeTotal = ((specCount + partition - 1).intdiv(partition) > rspecqNodeTotal) ? rspecqNodeTotal : (specCount + partition - 1).intdiv(partition)
 }
 
-def sendCrystalballSlack(summary, color) {
-  def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
+def sendCrystalballSlack(summary, color, status) {
+  def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>: **$status!**"
   def message = "$jobInfo\n$summary"
   slackSend channel: '#crystalball-noisy', color: color, message: message
+}
+
+def sendCrystalballMetrics(startTime, endTime) {
+  if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.CRYSTALBALL_SKIP != 'true') {
+    def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+                                          redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_selenium:example_count'", returnStdout: true).replaceAll('"', '').trim()
+
+    reportToSplunk('selenium_crystalball_data', [
+                    'node_count': rspecqNodeTotal,
+                    'example_count': exampleCount.toInteger(),
+                    'execution_time': (endTime - startTime),
+                    'result': currentBuild.currentResult,
+                    'upstream_tag': "${env.UPSTREAM_TAG}"])
+  }
 }
 
 def redisUrl() {
@@ -128,13 +152,23 @@ pipeline {
         script {
           def rspecNodeRequirements = [label: 'canvas-docker']
           env.CRYSTAL_BALL_SPECS = '.'
+          env.CRYSTALBALL_SKIP = 'false'
+          def startTime = 0
+          def endTime = 0
 
-          def postBuildHandler = [
+          def postRunnerHandler = [
             onStageEnded: { stageName, stageConfig, result ->
               node('master') {
+                if (env.ENABLE_CRYSTALBALL == '1') {
+                  sendCrystalballSlack(crystalballSummaryMessage, crystalballColor, stageConfig.status())
+                }
                 buildSummaryReport.saveRunManifest()
               }
             }
+          ]
+
+          def postBuildHandler = [
+            onNodeReleasing: { sendCrystalballMetrics(startTime, endTime) }
           ]
 
           def postStageHandler = [
@@ -143,8 +177,8 @@ pipeline {
             }
           ]
 
-          extendedStage('Runner').hooks(postBuildHandler).obeysAllowStages(false).execute {
-            extendedStage('Builder').obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
+          extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
+            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
               stage('Setup') {
                 setupNode()
               }
@@ -155,7 +189,7 @@ pipeline {
                 }
               }
 
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
+              extendedStage('Parallel Run Tests').obeysAllowStages(false).required(env.CRYSTALBALL_SKIP == 'false').execute { stageConfig, buildConfig ->
                 def rspecqStages = [:]
 
                 extendedStage('RSpecQ Reporter for Rspec').required(env.ENABLE_CRYSTALBALL != '1').timeout(30).queue(rspecqStages) {
@@ -188,7 +222,6 @@ pipeline {
                       --queue-wait-timeout 120 \
                       --redis-url $RSPECQ_REDIS_URL \
                       --report", label: 'Reporter')
-                      endTime = System.currentTimeMillis()
                   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
                     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                       /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
@@ -201,6 +234,8 @@ pipeline {
                       '''
                     }
                     throw e
+                  } finally {
+                    endTime = System.currentTimeMillis()
                   }
                 }
 
@@ -240,19 +275,6 @@ pipeline {
 
                 parallel(rspecqStages)
               } //rspecQ
-
-              stage('Splunk Metrics') {
-                def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
-                                                    redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_selenium:example_count'", returnStdout: true).replaceAll('"', '').trim()
-
-                reportToSplunk('selenium_crystalball_data', [
-                  'node_count': rspecqNodeTotal,
-                  'example_count': exampleCount.toInteger(),
-                  'execution_time': (endTime - startTime),
-                  'result': currentBuild.currentResult,
-                  'gerrit_revision': "${env.GERRIT_PATCHSET_REVISION}"
-                ])
-              }
             } //builder
           } //runner
         } //script

@@ -94,23 +94,7 @@ export default function K5Announcement({
     async function fetchMoreAnnouncements(firstQuery = false) {
       if (!(firstQuery || moreHomeroomAnnouncementsURL)) return Promise.resolve()
 
-      // this query will get the announcement posted before the most
-      // distant one in the past that we have by bumping the query
-      // end_date one second before its posted_at time
-      const end_date =
-        homeroomAnnouncements.length && homeroomAnnouncements[0].postedDate
-          ? new Date(homeroomAnnouncements[0].postedDate)
-          : new Date()
-      // I bet you're wondering why we're adding a second to the end_date
-      // the announcements api will return records between start and end, inclusive
-      // but while the resolution in the api is seconds, in the db the
-      // announcement is finer grained. If the most current announcement's posted_at
-      // date is stored as 1:02:03.001
-      // then sending 1:02:03 as the end data will miss it.
-      // we also can't subtract a second or millisecond from the currentAnnouncemnt
-      // to start the query because in course import, multiple announcements can end up
-      // with the same posted_at date.
-      end_date.setSeconds(end_date.getSeconds() + 1)
+      const end_date = new Date()
 
       // look back at most 1 year for old announcements
       const start_date = new Date()
@@ -132,20 +116,12 @@ export default function K5Announcement({
         setMoreHomeroomAnnouncementsURL(link?.next?.url)
 
         const parsedAnnouncements = json
-          .filter(a => a.id !== currentAnnouncement?.id)
+          // discard the one announcement we may already have on initial load (so it doesn't show twice)
+          .filter(a => a.id !== firstAnnouncement?.id)
           .map(a => transformAnnouncement(a))
-        setHomeroomAnnouncements(
-          homeroomAnnouncements.concat(parsedAnnouncements).sort((a, b) => {
-            if (!a.postedDate) return 1 // noRecentAnnouncementsFauxAnnouncement, with no postedDate, is always newest
-            if (!b.postedDate) return -1
-            if (a.postedDate < b.postedDate) return -1
-            if (a.postedDate > b.postedDate) return 1
-            // postedDates are equal, the currentAnnouncement passed in should be considered the latest
-            if (a.id === currentAnnouncement?.id) return 1
-            if (b.id === currentAnnouncement?.id) return -1
-            return 0
-          })
-        )
+        // order of homeroomAnnouncements:
+        // [most distant announcement, ..., most recent announcement, faux announcement (if present)]
+        setHomeroomAnnouncements(parsedAnnouncements.reverse().concat(homeroomAnnouncements))
       } catch (ex) {
         showFlashAlert({
           message: I18n.t('Failed getting next batch of announcements.'),
@@ -155,7 +131,7 @@ export default function K5Announcement({
       }
       setLoadingMore(false)
     },
-    [courseId, currentAnnouncement.id, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
+    [courseId, firstAnnouncement, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
   )
 
   const currentAnnouncementIndex = useCallback(() => {
@@ -400,7 +376,7 @@ export const K5AnnouncementType = PropTypes.shape({
   title: PropTypes.string,
   message: PropTypes.string.isRequired,
   url: PropTypes.string,
-  postedDate: PropTypes.instanceOf(Date).isRequired,
+  postedDate: PropTypes.instanceOf(Date),
   attachment: PropTypes.shape({
     url: PropTypes.string.isRequired,
     filename: PropTypes.string.isRequired,

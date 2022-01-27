@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import ready from '@instructure/ready'
 import CalendarEvent from './backbone/models/CalendarEvent'
 import EditEventView from './backbone/views/EditEventView'
 
-$(() => {
+ready(() => {
   const calendarEvent = new CalendarEvent(ENV.CALENDAR_EVENT)
   new EditEventView({model: calendarEvent})
 })

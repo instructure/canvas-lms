@@ -18,26 +18,32 @@
 
 import React from 'react'
 import FilterNav from '../FilterNav'
+import type {FilterNavProps} from '../FilterNav'
 import {render, fireEvent, within, cleanup, screen} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
-const defaultProps = {
-  filters: [],
+const defaultProps: FilterNavProps = {
   onChange: () => {},
+  filters: [],
   modules: [
-    {id: '1', name: 'Module 1'},
-    {id: '2', name: 'Module 2'},
-    {id: '3', name: 'Module 3'}
+    {id: '1', name: 'Module 1', position: 1},
+    {id: '2', name: 'Module 2', position: 2},
+    {id: '3', name: 'Module 3', position: 3}
   ],
   assignmentGroups: [
-    {id: '4', name: 'Assignment Group 4'},
-    {id: '5', name: 'Assignment Group 5'},
-    {id: '6', name: 'Assignment Group 6'}
+    {id: '4', name: 'Assignment Group 4', position: 1, group_weight: 0, assignments: []},
+    {id: '5', name: 'Assignment Group 5', position: 2, group_weight: 0, assignments: []},
+    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []}
   ],
   sections: [
     {id: '7', name: 'Section 7'},
     {id: '8', name: 'Section 8'},
     {id: '9', name: 'Section 9'}
+  ],
+  gradingPeriods: [
+    {id: '1', title: 'Grading Period 1', startDate: 1},
+    {id: '2', title: 'Grading Period 2', startDate: 2},
+    {id: '3', title: 'Grading Period 3', startDate: 3}
   ]
 }
 

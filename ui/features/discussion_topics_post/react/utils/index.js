@@ -22,10 +22,6 @@ import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import I18n from 'i18n!discussion_topics_post'
 
-export const isGraded = (assignment = null) => {
-  return assignment !== null
-}
-
 export const getSpeedGraderUrl = (authorId = null) => {
   let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE
   if (authorId !== null) {

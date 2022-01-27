@@ -41,6 +41,8 @@ export const STOP_LOADING = 'STOP_LOADING'
 export const STOP_MEDIA_UPLOADING = 'STOP_MEDIA_UPLOADING'
 export const TOGGLE_UPLOAD_FORM = 'TOGGLE_UPLOAD_FORM'
 
+export const BUTTONS_AND_ICONS = 'buttons_and_icons'
+
 export function startLoading() {
   return {type: START_LOADING}
 }
@@ -266,7 +268,13 @@ export function uploadToButtonsAndIconsFolder(svg, uploadSettings = {}) {
       .then(({folders}) => {
         fileMetaProps.parentFolderId = folders[0].id
         return source
-          .preflightUpload(fileMetaProps, {host, contextId, contextType, onDuplicate})
+          .preflightUpload(fileMetaProps, {
+            host,
+            contextId,
+            contextType,
+            onDuplicate,
+            category: BUTTONS_AND_ICONS
+          })
           .then(results => {
             return source.uploadFRD(svgAsFile, results)
           })
