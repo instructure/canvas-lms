@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  BUTTONS_AND_ICONS,
+  BTN_AND_ICON_ATTRIBUTE
+} from '../../rce/plugins/instructure_buttons/registerEditToolbar'
+
 export const ADD_IMAGE = 'action.images.add_image'
 export const REQUEST_INITIAL_IMAGES = 'action.images.request_initial_images'
 export const REQUEST_IMAGES = 'action.images.request_images'
@@ -46,13 +51,27 @@ export function requestImages(contextType) {
   return {type: REQUEST_IMAGES, payload: {contextType}}
 }
 
-export function receiveImages({response, contextType}) {
+export function receiveImages({response, contextType, opts = {}}) {
   const {files, bookmark, searchString} = response
-  return {type: RECEIVE_IMAGES, payload: {files, bookmark, contextType, searchString}}
+
+  return {
+    type: RECEIVE_IMAGES,
+    payload: {files: files.map(f => applyAttributes(f, opts)), bookmark, contextType, searchString}
+  }
 }
 
 export function failImagesLoad({error, contextType}) {
   return {type: FAIL_IMAGES_LOAD, payload: {error, contextType}}
+}
+
+export const applyAttributes = (file, opts) => {
+  const augmentedFile = {...file}
+
+  if (opts.category === BUTTONS_AND_ICONS) {
+    augmentedFile[BTN_AND_ICON_ATTRIBUTE] = true
+  }
+
+  return augmentedFile
 }
 
 // dispatches the start of the load, requests a page for the collection from
@@ -65,7 +84,7 @@ export function fetchImages(opts = {}) {
     const state = getState()
     return state.source
       .fetchImages({...state, category})
-      .then(response => dispatch(receiveImages({response, contextType: state.contextType})))
+      .then(response => dispatch(receiveImages({response, contextType: state.contextType, opts})))
       .catch(error => dispatch(failImagesLoad({error, contextType: state.contextType})))
   }
 }
