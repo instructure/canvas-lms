@@ -34,13 +34,13 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import Condition from './FilterNavCondition'
-import type {Filter, Module, Section, GradingPeriod, AssignmentGroup} from '../gradebook.d'
+import type {AssignmentGroup, GradingPeriod, Module, PartialFilter, Section} from '../gradebook.d'
 
 const {Item} = Flex as any
 
 export type FilterNavFilterProps = {
   assignmentGroups: AssignmentGroup[]
-  filter: Filter
+  filter: PartialFilter
   gradingPeriods: GradingPeriod[]
   modules: Module[]
   onChange: any
@@ -59,7 +59,7 @@ export default function FilterNavFilter({
 }: FilterNavFilterProps) {
   const [isRenaming, setIsRenaming] = useState(false)
   const [wasRenaming, setWasRenaming] = useState(false)
-  const [label, setLabel] = useState(filter.label)
+  const [name, setName] = useState(filter.name)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const renameButtonRef = useRef<HTMLElement | null>(null)
 
@@ -79,7 +79,7 @@ export default function FilterNavFilter({
         id,
         type: undefined,
         value: undefined,
-        createdAt: new Date().toISOString()
+        created_at: new Date().toISOString()
       })
     })
   }
@@ -104,14 +104,14 @@ export default function FilterNavFilter({
       conditions: filter.conditions
         .filter(c => c.id !== condition.id)
         .concat(condition)
-        .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))
+        .sort((a, b) => (a.created_at < b.created_at ? -1 : 1))
     })
   }
 
   const toggleApply = () => {
     onChange({
       ...filter,
-      isApplied: !filter.isApplied
+      is_applied: !filter.is_applied
     })
   }
 
@@ -125,10 +125,8 @@ export default function FilterNavFilter({
               width="100%"
               renderLabel={<ScreenReaderContent>{I18n.t('Name')}</ScreenReaderContent>}
               placeholder={I18n.t('Name')}
-              value={label}
-              onChange={(_event, value) => {
-                setLabel(value)
-              }}
+              value={name}
+              onChange={(_event, value) => setName(value)}
             />
           </Item>
           <Item>
@@ -139,7 +137,7 @@ export default function FilterNavFilter({
               onClick={() => {
                 onChange({
                   ...filter,
-                  label: label || I18n.t('Untitled filter')
+                  name: name || I18n.t('Untitled filter')
                 })
                 setIsRenaming(false)
               }}
@@ -149,7 +147,7 @@ export default function FilterNavFilter({
             <IconButton
               screenReaderLabel={I18n.t('Cancel rename')}
               onClick={() => {
-                setLabel(filter.label)
+                setName(filter.name)
                 setIsRenaming(false)
               }}
             >
@@ -159,7 +157,7 @@ export default function FilterNavFilter({
         </Flex>
       ) : (
         <View as="div">
-          {filter.label}
+          {filter.name}
           <IconButton
             elementRef={el => (renameButtonRef.current = el)}
             color="primary"
@@ -207,7 +205,7 @@ export default function FilterNavFilter({
           <Flex>
             <Item>
               <Checkbox
-                checked={filter.isApplied}
+                checked={filter.is_applied}
                 label={I18n.t('Apply filter')}
                 labelPlacement="start"
                 onChange={toggleApply}
