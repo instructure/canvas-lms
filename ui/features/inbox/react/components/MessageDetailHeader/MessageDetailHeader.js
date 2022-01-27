@@ -63,6 +63,7 @@ export const MessageDetailHeader = ({...props}) => {
                 margin="0 x-small 0 0"
                 screenReaderLabel={I18n.t('Reply')}
                 onClick={() => props.onReply()}
+                withBackground={false} withBorder={false}
               >
                 <IconReplyLine />
               </IconButton>
@@ -73,9 +74,13 @@ export const MessageDetailHeader = ({...props}) => {
               placement="bottom"
               trigger={
                 <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-                  <Button margin="0 x-small 0 0" renderIcon={IconMoreLine}>
-                    <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
-                  </Button>
+                  <IconButton 
+                    margin="0 x-small 0 0"
+                    screenReaderLabel={I18n.t('More options')}
+                    withBackground={false}
+                    withBorder={false}>
+                    <IconMoreLine />
+                  </IconButton>
                 </Tooltip>
               }
             >

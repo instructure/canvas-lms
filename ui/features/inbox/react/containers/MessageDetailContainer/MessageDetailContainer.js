@@ -96,7 +96,7 @@ export const MessageDetailContainer = props => {
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
           <MessageDetailItem
             conversationMessage={message}
-            context={props.conversation.contextName}
+            contextName={data?.legacyNode?.contextName}
             onReply={() => props.onReply(message)}
             onReplyAll={() => props.onReplyAll(message)}
             onDelete={() => deleteConversationMessages({variables: {ids: [message._id]}})}
