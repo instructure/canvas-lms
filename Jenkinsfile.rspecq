@@ -22,11 +22,11 @@ library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 @groovy.transform.Field
-def rspecqNodeTotal = 23
+def seleniumNodeTotal = 23
 @groovy.transform.Field
 def rspecNodeTotal = 27
 @groovy.transform.Field
-def crystalballSummaryMessage = ''
+def summaryMessage = ''
 @groovy.transform.Field
 def crystalballColor = 'danger'
 
@@ -48,52 +48,73 @@ def setupNode() {
   sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 }
 
+def exampleCount(testList) {
+  sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
+                                    --require './spec/formatters/example_count_formatter.rb' \
+                                    --format ExampleCountRecorder \
+                                    --out spec_count.txt ${testList.join(' ')}", label: 'Get Test Count')
+  return sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
+}
+
+def calcNodes(seleniumCount, seleniumPartition, rspecCount, rspecPartition) {
+  rspecNodeTotal = ((rspecCount + rspecPartition - 1).intdiv(rspecPartition) > rspecNodeTotal) ? rspecNodeTotal : (rspecCount + rspecPartition - 1).intdiv(rspecPartition)
+  seleniumNodeTotal = ((seleniumCount + seleniumPartition - 1).intdiv(seleniumPartition) > seleniumNodeTotal) ? seleniumNodeTotal : (seleniumCount + seleniumPartition - 1).intdiv(seleniumPartition)
+}
+
+def getColor(testCount, partition) {
+  if (testCount <= partition) {
+    return 'good'
+  } else if (testCount <= (partition * 4)) {
+    return 'warning'
+  }
+  return 'danger'
+}
+
 def computeTestCount() {
-  def partition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
+  def seleniumPartition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
+  def rspecPartition = (env.RSPEC_PROCESSES.toInteger() * 260) // 260 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
-  env.CRYSTAL_BALL_SPECS = specUnique.join(' ')
   def totalPrediction = specUnique.join('\n')
-  def specCount = 0
+  // split crystalball_spec
+  def seleniumTests = specUnique.findAll { it.contains('/selenium') }
+  def rspecTests = specUnique - seleniumTests
+  env.CRYSTALBALL_SELENIUM = seleniumTests.join(' ')
+  env.CRYSTALBALL_RSPEC = rspecTests.join(' ')
 
+  summaryMessage = "Map: $mapVersion\n"
   // Crystalball predictor returned empty text file
   if (specUnique.size() == 0) {
-    crystalballSummaryMessage = "Map: $mapVersion\nNo App Code Detected! - Running everything!"
+    summaryMessage += "No App Code Detected! - Running everything!"
+    crystalballColor = 'danger'
     // Do not run full builds while still testing
     env.CRYSTALBALL_SKIP = 'true'
     return
   }
   // Crystalball predictor returned "."
   if (specUnique.size() == 1 && specUnique[0] == '.') {
-    crystalballSummaryMessage = "Map: $mapVersion\nNew File Detected! - Complete Suite Re-run!"
+    summaryMessage += "New File Detected! - Complete Suite Re-run!"
+    crystalballColor = 'danger'
     // Do not run full builds while still testing
     env.CRYSTALBALL_SKIP = 'true'
     return
   }
-  sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
-                                    --require './spec/formatters/example_count_formatter.rb' \
-                                    --format ExampleCountRecorder \
-                                    --out spec_count.txt ${specUnique.join(' ')}", label: 'Get Test Count')
-  specCount = sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
+
+  def seleniumCount = seleniumTests.size() > 0 ? exampleCount(seleniumTests) : 0
+  def rspecCount = rspecTests.size() > 0 ? exampleCount(rspecTests) : 0
 
   // Format crystalball message
-  crystalballSummaryMessage = "Map: $mapVersion\n$specCount Individual Selenium spec(s) across ${specUnique.size()} file(s)\n$totalPrediction"
-  crystalballColor = 'danger'
-  if (specCount <= partition) {
-    crystalballColor = 'good'
-  } else if (specCount <= (partition * 4)) {
-    crystalballColor = 'warning'
-  }
+  summaryMessage += seleniumCount > 0 ? "$seleniumCount Individual Selenium spec(s) across ${seleniumTests.size()} file(s)\n" : ''
+  summaryMessage += rspecCount > 0 ? "$rspecCount Individual Rspec spec(s) across ${rspecTests.size()} file(s)\n" : ''
+  summaryMessage += "${seleniumTests.join('\n')}${rspecTests.join('\n')}"
+
+  crystalballColor = getColor(seleniumCount+rspecCount, seleniumPartition+rspecPartition)
 
   echo "total prediction: \n====\n$totalPrediction\n===="
 
   // Calculate nodes
-  if (specCount <= partition) {
-    rspecqNodeTotal = 1
-    return
-  }
-  rspecqNodeTotal = ((specCount + partition - 1).intdiv(partition) > rspecqNodeTotal) ? rspecqNodeTotal : (specCount + partition - 1).intdiv(partition)
+  calcNodes(seleniumCount, seleniumPartition, rspecCount, rspecPartition)
 }
 
 def sendCrystalballSlack(summary, color, status) {
@@ -102,13 +123,16 @@ def sendCrystalballSlack(summary, color, status) {
   slackSend channel: '#crystalball-noisy', color: color, message: message
 }
 
-def sendCrystalballMetrics(startTime, endTime) {
+def sendCrystalballMetrics(startTime, endTime, buildType) {
   if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.CRYSTALBALL_SKIP != 'true') {
-    def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
-                                          redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_selenium:example_count'", returnStdout: true).replaceAll('"', '').trim()
+    def splunkTag =  buildType == 'selenium' ? 'selenium_crystalball_data' : 'rspec_crystalball_data'
+    def nodes = buildType == 'selenium' ? seleniumNodeTotal : rspecNodeTotal
 
-    reportToSplunk('selenium_crystalball_data', [
-                    'node_count': rspecqNodeTotal,
+    def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+                                          redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_${buildType}:example_count'", returnStdout: true).replaceAll('"', '').trim()
+
+    reportToSplunk(splunkTag, [
+                    'node_count': nodes,
                     'example_count': exampleCount.toInteger(),
                     'execution_time': (endTime - startTime),
                     'result': currentBuild.currentResult,
@@ -129,6 +153,7 @@ pipeline {
   }
 
   environment {
+    REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
     RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
@@ -151,16 +176,19 @@ pipeline {
       steps {
         script {
           def rspecNodeRequirements = [label: 'canvas-docker']
-          env.CRYSTAL_BALL_SPECS = '.'
+          env.CRYSTALBALL_SELENIUM = ''
+          env.CRYSTALBALL_RSPEC = ''
           env.CRYSTALBALL_SKIP = 'false'
-          def startTime = 0
-          def endTime = 0
+          def seleniumStartTime = 0
+          def seleniumEndTime = 0
+          def rspecStartTime = 0
+          def rspecEndTime = 0
 
           def postRunnerHandler = [
             onStageEnded: { stageName, stageConfig, result ->
               node('master') {
                 if (env.ENABLE_CRYSTALBALL == '1') {
-                  sendCrystalballSlack(crystalballSummaryMessage, crystalballColor, stageConfig.status())
+                  sendCrystalballSlack(summaryMessage, crystalballColor, stageConfig.status())
                 }
                 buildSummaryReport.saveRunManifest()
               }
@@ -168,7 +196,14 @@ pipeline {
           ]
 
           def postBuildHandler = [
-            onNodeReleasing: { sendCrystalballMetrics(startTime, endTime) }
+            onNodeReleasing: {
+              if (env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SELENIUM != '') {
+                sendCrystalballMetrics(seleniumStartTime, seleniumEndTime, 'selenium')
+              }
+              if (env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_RSPEC != '') {
+                sendCrystalballMetrics(rspecStartTime, rspecEndTime, 'rspec')
+              }
+            }
           ]
 
           def postStageHandler = [
@@ -192,8 +227,9 @@ pipeline {
               extendedStage('Parallel Run Tests').obeysAllowStages(false).required(env.CRYSTALBALL_SKIP == 'false').execute { stageConfig, buildConfig ->
                 def rspecqStages = [:]
 
-                extendedStage('RSpecQ Reporter for Rspec').required(env.ENABLE_CRYSTALBALL != '1').timeout(30).queue(rspecqStages) {
+                extendedStage('RSpecQ Reporter for Rspec').required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_RSPEC != '').timeout(30).queue(rspecqStages) {
                   try {
+                    rspecStartTime = System.currentTimeMillis()
                     sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
                       --build=${JOB_NAME}_build${BUILD_NUMBER}_rspec \
                       --queue-wait-timeout 240 \
@@ -211,12 +247,14 @@ pipeline {
                       '''
                     }
                     throw e
+                  } finally {
+                    rspecEndTime = System.currentTimeMillis()
                   }
                 }
 
-                extendedStage('RSpecQ Reporter for Selenium').timeout(30).queue(rspecqStages) {
+                extendedStage('RSpecQ Reporter for Selenium').timeout(30).required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SELENIUM != '').queue(rspecqStages) {
                   try {
-                    startTime = System.currentTimeMillis()
+                    seleniumStartTime = System.currentTimeMillis()
                     sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
                       --build=${JOB_NAME}_build${BUILD_NUMBER}_selenium \
                       --queue-wait-timeout 120 \
@@ -235,39 +273,41 @@ pipeline {
                     }
                     throw e
                   } finally {
-                    endTime = System.currentTimeMillis()
+                    seleniumEndTime = System.currentTimeMillis()
                   }
                 }
 
                 extendedStage('RSpecQ Selenium Set 00')
                     .envVars(['CI_NODE_INDEX=0',
-                        "CRYSTAL_BALL_SPECS=${env.CRYSTAL_BALL_SPECS}",
+                        "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SELENIUM}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
                         "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
                         'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
                     .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('selenium') }])
                     .timeout(30)
+                    .required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SELENIUM != '')
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
 
-                for (int i = 1; i < rspecqNodeTotal; i++) {
+                for (int i = 1; i < seleniumNodeTotal; i++) {
                   def index = i
                   extendedStage("RSpecQ Selenium Set ${(index).toString().padLeft(2, '0')}")
                     .envVars(["CI_NODE_INDEX=$index",
-                        "CRYSTAL_BALL_SPECS=${env.CRYSTAL_BALL_SPECS}",
+                        "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SELENIUM}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
                         "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
                         'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
                     .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('selenium') }])
                     .nodeRequirements(rspecNodeRequirements)
                     .timeout(30)
+                    .required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SELENIUM != '')
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
                 }
 
                 rspecNodeTotal.times { index ->
                   extendedStage("RSpecQ Rspec Set ${(index + 1).toString().padLeft(2, '0')}")
-                    .envVars(["CI_NODE_INDEX=$index", 'CRYSTAL_BALL_SPECS=.', "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
+                    .envVars(["CI_NODE_INDEX=$index", "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_RSPEC}", "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
                     .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
-                    .required(env.ENABLE_CRYSTALBALL != '1') /* don't run again, already running in regular build */
+                    .required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_RSPEC != '')
                     .nodeRequirements(rspecNodeRequirements)
                     .timeout(30)
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
