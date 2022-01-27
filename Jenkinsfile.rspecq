@@ -59,14 +59,14 @@ def computeTestCount() {
 
   // Crystalball predictor returned empty text file
   if (specUnique.size() == 0) {
-    crystalballSummaryMessage = 'No App Code Detected! - Running everything!'
+    crystalballSummaryMessage = "Map: $mapVersion\nNo App Code Detected! - Running everything!"
     // Do not run full builds while still testing
     env.CRYSTALBALL_SKIP = 'true'
     return
   }
   // Crystalball predictor returned "."
   if (specUnique.size() == 1 && specUnique[0] == '.') {
-    crystalballSummaryMessage = 'New File Detected! - Complete Suite Re-run!'
+    crystalballSummaryMessage = "Map: $mapVersion\nNew File Detected! - Complete Suite Re-run!"
     // Do not run full builds while still testing
     env.CRYSTALBALL_SKIP = 'true'
     return
