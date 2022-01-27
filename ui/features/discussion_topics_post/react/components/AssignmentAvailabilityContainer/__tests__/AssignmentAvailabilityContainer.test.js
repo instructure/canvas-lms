@@ -96,12 +96,12 @@ describe('AssignmentAvailabilityContainer', () => {
     })
 
     it('displays tray and correctly formatted dates', async () => {
-      const {queryByText, findByText, findAllByTestId} = setup({
+      const {queryByText, findByText, findByTestId} = setup({
         assignmentOverrides: {nodes: mockOverrides}
       })
       expect(queryByText('Show Due Dates (4)')).toBeTruthy()
       fireEvent.click(queryByText('Show Due Dates (4)'))
-      expect(await findAllByTestId('assignment-override-row')).toBeTruthy()
+      expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
       expect(await findByText('Sep 4, 2021 5:59am')).toBeTruthy()
     })
 

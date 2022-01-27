@@ -24,11 +24,9 @@ type GridColumn = {
   type: string
   field?: string
   width: number
-  hidden?: boolean
   cssClass: string
   headerCssClass: string
   customColumnId?: string
-  teacher_notes?: string
   resizable?: boolean
   postAssignmentGradesTrayOpenForAssignmentId?: string
 }
@@ -62,8 +60,8 @@ export type GridDisplaySettings = {
   }
   submissionTray: {
     open: boolean
-    studentId: null | string
-    assignmentId: null | string
+    studentId: string
+    assignmentId: string
     comments: any[]
     commentsLoaded: boolean
     commentsUpdating: boolean

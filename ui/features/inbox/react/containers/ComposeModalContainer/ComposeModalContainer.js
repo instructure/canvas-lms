@@ -28,8 +28,6 @@ import ModalHeader from './ModalHeader'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../../util/utils'
 import {uploadFiles} from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
 import {MediaCaptureStrings, SelectStrings, UploadMediaStrings} from '../../../util/constants'
@@ -189,74 +187,57 @@ const ComposeModalContainer = props => {
 
   return (
     <>
-      <Responsive
-        match="media"
-        query={responsiveQuerySizes({mobile: true, desktop: true})}
-        props={{
-          mobile: {
-            modalSize: 'fullscreen',
-            dataTestId: 'compose-modal-mobile'
-          },
-          desktop: {
-            modalSize: 'medium',
-            dataTestId: 'compose-modal-desktop'
-          }
-        }}
-        render={responsiveProps => (
-          <Modal
-            open={props.open}
-            onDismiss={props.onDismiss}
-            size={responsiveProps.modalSize}
-            label={I18n.t('Compose Message')}
-            shouldCloseOnDocumentClick={false}
-            onExited={resetState}
-            data-testid={responsiveProps.dataTestId}
-          >
-            <ModalHeader onDismiss={props.onDismiss} />
-            <ModalBody
-              attachments={[...attachments, ...attachmentsToUpload]}
-              bodyMessages={bodyMessages}
-              onBodyChange={onBodyChange}
-              pastMessages={props.pastConversation?.conversationMessagesConnection.nodes}
-              removeAttachment={removeAttachment}
-              replaceAttachment={replaceAttachment}
-            >
-              <HeaderInputs
-                contextName={props.pastConversation?.contextName}
-                courses={props.courses}
-                isReply={props.isReply}
-                onContextSelect={onContextSelect}
-                onSelectedIdsChange={onSelectedIdsChange}
-                onSendIndividualMessagesChange={onSendIndividualMessagesChange}
-                onSubjectChange={onSubjectChange}
-                sendIndividualMessages={sendIndividualMessages}
-                subject={props.isReply ? props.pastConversation?.subject : subject}
-                mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
-                onRemoveMediaComment={onRemoveMedia}
-              />
-            </ModalBody>
-            <Modal.Footer>
-              <ComposeActionButtons
-                onAttachmentUpload={addAttachment}
-                onMediaUpload={() => setMediaUploadOpen(true)}
-                onCancel={props.onDismiss}
-                onSend={() => {
-                  if (!validMessageFields()) {
-                    return
-                  }
+      <Modal
+        open={props.open}
+        onDismiss={props.onDismiss}
+        size="medium"
+        label={I18n.t('Compose Message')}
+        shouldCloseOnDocumentClick={false}
+        onExited={resetState}
+      >
+        <ModalHeader onDismiss={props.onDismiss} />
+        <ModalBody
+          attachments={[...attachments, ...attachmentsToUpload]}
+          bodyMessages={bodyMessages}
+          onBodyChange={onBodyChange}
+          pastMessages={props.pastConversation?.conversationMessagesConnection.nodes}
+          removeAttachment={removeAttachment}
+          replaceAttachment={replaceAttachment}
+        >
+          <HeaderInputs
+            contextName={props.pastConversation?.contextName}
+            courses={props.courses}
+            isReply={props.isReply}
+            onContextSelect={onContextSelect}
+            onSelectedIdsChange={onSelectedIdsChange}
+            onSendIndividualMessagesChange={onSendIndividualMessagesChange}
+            onSubjectChange={onSubjectChange}
+            sendIndividualMessages={sendIndividualMessages}
+            subject={props.isReply ? props.pastConversation?.subject : subject}
+            mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
+            onRemoveMediaComment={onRemoveMedia}
+          />
+        </ModalBody>
+        <Modal.Footer>
+          <ComposeActionButtons
+            onAttachmentUpload={addAttachment}
+            onMediaUpload={() => setMediaUploadOpen(true)}
+            onCancel={props.onDismiss}
+            onSend={() => {
+              if (!validMessageFields()) {
+                return
+              }
 
-                  if (!attachmentsToUpload.length) {
-                    sendMessage()
-                  }
-                  props.setSendingMessage(true)
-                }}
-                isSending={false}
-                hasMediaComment={!!mediaUploadFile}
-              />
-            </Modal.Footer>
-          </Modal>
-        )}
-      />
+              if (!attachmentsToUpload.length) {
+                sendMessage()
+              }
+              props.setSendingMessage(true)
+            }}
+            isSending={false}
+            hasMediaComment={!!mediaUploadFile}
+          />
+        </Modal.Footer>
+      </Modal>
       <UploadMedia
         onStartUpload={() => setUploadingMediaFile(true)}
         onUploadComplete={onMediaUploadComplete}

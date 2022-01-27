@@ -104,38 +104,9 @@ describe "pace plan page" do
       today = Date.today
       add_start_date(today)
       add_required_end_date(today + 10.days)
-      update_module_item_duration(0, "15")
+      update_module_item_duration("15")
       wait_for(method: nil, timeout: 10) { compression_tooltip.displayed? }
       expect(compression_tooltip).to be_displayed
-    end
-
-    it "shows the number of assignments and how many weeks used in plan" do
-      @course_module = create_course_module("New Module", "active")
-      @assignment = create_assignment(@course, "Module Assignment", "Module Assignment Description", 10, "published")
-      @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
-      discussion_assignment = create_graded_discussion(@course, "Module Discussion", "published")
-      @course_module.add_item(id: discussion_assignment.id, type: "discussion_topic")
-
-      visit_pace_plans_page
-      click_show_hide_projections_button
-
-      expect(number_of_assignments.text).to eq("2 assignments")
-      expect(number_of_weeks.text).to eq("0 weeks")
-
-      update_module_item_duration(0, 6)
-
-      expect(number_of_weeks.text).to eq("1 week")
-    end
-
-    it "shows Dates shown in course time zone text" do
-      @course_module = create_course_module("New Module", "active")
-      @assignment = create_assignment(@course, "Module Assignment", "Module Assignment Description", 10, "published")
-      @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
-
-      visit_pace_plans_page
-      click_show_hide_projections_button
-
-      expect(dates_shown).to be_displayed
     end
   end
 
@@ -180,7 +151,7 @@ describe "pace plan page" do
       click_show_hide_projections_button
       today = Date.today
       add_start_date(today)
-      update_module_item_duration(0, 7)
+      update_module_item_duration(7)
 
       expect(assignment_due_date_text).to eq(format_date_for_view(today + 7.days, "%a, %b %-d, %Y"))
     end
@@ -191,7 +162,7 @@ describe "pace plan page" do
       click_show_hide_projections_button
       today = Date.today
       add_start_date(today)
-      update_module_item_duration(0, 7)
+      update_module_item_duration(7)
 
       expect(assignment_due_date_text).to eq(format_date_for_view(skip_weekends(today, 7), "%a, %b %-d, %Y"))
     end

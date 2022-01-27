@@ -29,11 +29,6 @@ module CanvasSecurity
       private_key.public_key.to_jwk(kid: kid, alg: alg, use: use)
     end
 
-    # Must match up with #kid below
-    def self.time_from_kid(kid)
-      Time.zone.parse(kid.split("_").first)
-    end
-
     private
 
     def kid

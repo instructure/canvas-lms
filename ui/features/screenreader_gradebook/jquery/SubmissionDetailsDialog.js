@@ -75,7 +75,7 @@ export default class SubmissionDetailsDialog {
     })
     this.dialog
       .delegate('select[id="submission_to_view"]', 'change', event =>
-        this.dialog.find('.submission_detail').each(function (index) {
+        this.dialog.find('.submission_detail').each(function(index) {
           $(this).showIf(index === event.currentTarget.selectedIndex)
         })
       )
@@ -144,7 +144,7 @@ export default class SubmissionDetailsDialog {
       submission.submission_comments &&
         submission.submission_comments.forEach(comment => {
           comment.url = `${this.options.context_url}/users/${comment.author_id}`
-          const urlPrefix = `${window.location.protocol}//${window.location.host}`
+          const urlPrefix = `${location.protocol}//${location.host}`
           comment.image_url = `${urlPrefix}/images/users/${comment.author_id}`
         })
       submission.turnitin = extractDataForTurnitin(

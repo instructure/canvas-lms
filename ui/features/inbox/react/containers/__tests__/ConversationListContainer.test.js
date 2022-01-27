@@ -24,12 +24,6 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
-import {responsiveQuerySizes} from '../../../util/utils'
-
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
-}))
 
 describe('ConversationListContainer', () => {
   const server = mswServer(handlers)
@@ -37,22 +31,6 @@ describe('ConversationListContainer', () => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
-
-    // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
-      return {
-        matches: true,
-        media: '',
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn()
-      }
-    })
-
-    // Repsonsive Query Mock Default
-    responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
-    }))
   })
 
   afterEach(() => {

@@ -20,7 +20,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook > Submissions', suiteHooks => {
   let $container
@@ -639,8 +639,9 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true}
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
-      const [columnIds] =
-        gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+      const [
+        columnIds
+      ] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
       deepEqual(columnIds.sort(), ['assignment_2301', 'assignment_2302'])
     })
   })

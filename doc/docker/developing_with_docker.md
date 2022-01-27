@@ -59,7 +59,7 @@ After you have [installed the dependencies](getting_docker.md). You'll need to c
 over the required configuration files.
 
 The `docker-compose/config` directory has some config files already set up to use
-the linked containers supplied by config. Only copy yamls, not the contents of new-jenkins folder.
+the linked containers supplied by config. Only copy yamls, not the contents of new-jenkins folder. 
 You can just copy them to
 `config/`:
 
@@ -247,7 +247,7 @@ all docker-compose containers, or when specified explicitly. The selenium
 container needs to be started before running any specs that require selenium.
 
 ```sh
-docker-compose up selenium-firefox # or selenium-chrome or selenium-edge
+docker-compose up selenium-firefox # or selenium-chrome
 ```
 
 With the container running, you should be able to open a VNC session:
@@ -255,7 +255,6 @@ With the container running, you should be able to open a VNC session:
 ```sh
 open vnc://secret:secret@seleniumff.docker          (firefox)
 open vnc://secret:secret@seleniumch.docker:5901     (chrome)
-open vnc://secret:secret@seleniumedge.docker:5902   (edge)
 ```
 
 Now just run your choice of selenium specs:
