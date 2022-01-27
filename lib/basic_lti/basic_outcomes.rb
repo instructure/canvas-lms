@@ -20,7 +20,26 @@
 
 require "nokogiri"
 
+# A collection of classes related to LTI 1.1 Grade Passback.
+# - Errors used during grade passback requests
+# - SourcedId: a canvas-signed tuple of user data used to confirm that only the specific
+#     tool launch can modify the given score.
+# - BasicOutcomes: responds to grade passback requests by modifying submission data.
+#     Conforms to LTI 1.1 spec and parses request and response XML.
+# - QuizzesNext*: a group of classes for the special case of responding to a grade
+#     passback request from the New Quizzes app. Includes some special behavior for
+#     reverting to a previous score.
 module BasicLTI
+  # Handles LTI 1.1 Grade Passback requests. In charge of decoding the sourcedid
+  # parameter to get necessary context, then delegates to one of three related
+  # classes for the actual request parsing, data modification, and response.
+  # Exposes an LtiResponse to the caller (the LtiApiController).
+  #
+  # Note that Quizzes has a special workflow that overrides some of the functionality
+  # of the base LtiResponse class (namely #handle_replace_request), contained in the
+  # quizzes_next_* files, not in this one. It's easy to think of this file when someone mentions
+  # "LTI grade passback" or "basic outcomes", but make sure to double-check whether
+  # that is coming from quizzes or from an external vendor.
   module BasicOutcomes
     class Unauthorized < StandardError
       def response_status
