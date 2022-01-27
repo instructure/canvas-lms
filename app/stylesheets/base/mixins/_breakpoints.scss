@@ -54,7 +54,7 @@
 }
 @mixin mobile-only {
   @if $use_responsive_layout {
-    @media (max-width: 767px) {
+    @media not all and (min-width: 768px) {
       @content;
     }
   }
