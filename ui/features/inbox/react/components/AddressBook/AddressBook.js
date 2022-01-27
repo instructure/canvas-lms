@@ -75,6 +75,7 @@ export const AddressBook = ({
   const backButtonArray = isSubMenu ? [{id: 'backButton', name: I18n.t('Back')}] : []
   const headerArray = headerText ? [{id: 'headerText', name: headerText, focusSkip: true}] : []
   const [data, setData] = useState([...backButtonArray, ...headerArray, ...menuData])
+  const ariaAddressBookLabel = I18n.t('Address Book')
 
   // Update width to match componetViewRef width
   useEffect(() => {
@@ -346,10 +347,21 @@ export const AddressBook = ({
         <Flex>
           <Flex.Item padding="none xxx-small none none" shouldGrow shouldShrink>
             <Popover
-              on="focus"
+              on="click"
               offsetY={4}
               placement="bottom start"
               isShowingContent={isMenuOpen}
+              onShowContent={() => {
+                setIsMenuOpen(true)
+              }}
+              onHideContent={(e, {documentClick}) => {
+                if (
+                  documentClick &&
+                  e?.target?.getAttribute('aria-label') !== ariaAddressBookLabel
+                ) {
+                  setIsMenuOpen(false)
+                }
+              }}
               renderTrigger={
                 <TextInput
                   renderLabel={
@@ -371,7 +383,7 @@ export const AddressBook = ({
                   aria-activedescendant={`address-book-menu-item-${selectedItem?.id}`}
                   type="search"
                   aria-owns={popoverInstanceId.current}
-                  aria-label={I18n.t('Address Book')}
+                  aria-label={ariaAddressBookLabel}
                   aria-autocomplete="list"
                   inputRef={ref => {
                     textInputRef.current = ref
@@ -380,6 +392,7 @@ export const AddressBook = ({
                   onChange={e => {
                     setInputValue(e.target.value)
                     onTextChange(e.target.value)
+                    setIsMenuOpen(true)
                   }}
                   data-testid="address-book-input"
                 />
@@ -416,11 +429,12 @@ export const AddressBook = ({
           </Flex.Item>
           <Flex.Item>
             <IconButton
+              data-testid="address-button"
               screenReaderLabel={I18n.t('Open Address Book')}
               onClick={() => {
-                setIsMenuOpen(!isMenuOpen)
-
                 if (isMenuOpen) {
+                  setIsMenuOpen(false)
+                } else {
                   textInputRef.current.focus()
                 }
               }}

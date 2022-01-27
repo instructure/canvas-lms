@@ -80,6 +80,25 @@ describe('Address Book Component', () => {
       expect(popover).toBeTruthy()
     })
 
+    it('Should close popup menu when address button is pressed and popup is open', async () => {
+      const {container} = setup({...defaultProps, open: true})
+      const button = container.querySelector('button')
+      fireEvent.click(button)
+      const popover = screen.queryByTestId('address-book-popover')
+      expect(popover).toBeFalsy()
+    })
+
+    it('Should close popup menu when focus is changed', async () => {
+      const {container} = setup({...defaultProps})
+      const input = container.querySelector('input')
+      fireEvent.focus(input)
+      let popover = await screen.findByTestId('address-book-popover')
+      expect(popover).toBeTruthy()
+      fireEvent.blur(input)
+      popover = screen.queryByTestId('address-book-popover')
+      expect(popover).toBeFalsy()
+    })
+
     it('Should render popup menu when textInput is focused', async () => {
       const {container} = setup({...defaultProps})
       const input = container.querySelector('input')
