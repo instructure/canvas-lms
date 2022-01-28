@@ -52,14 +52,14 @@ const locale = {
   "announcements_a4b8ed4a": { "message": "Anuncis" },
   "apply_781a2546": { "message": "Aplica" },
   "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Aplica els canvis a totes les instàncies d’aquest botó i d’aquesta icona al curs"
+    "message": "Aplica els canvis a totes les instàncies d’aquest botó i d’aquesta icona a l''assignatura"
   },
   "apps_54d24a47": { "message": "Aplicacions" },
   "arrows_464a3e54": { "message": "Fletxes" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "La relació d''aspecte es mantindrà"
   },
-  "assignments_1e02582c": { "message": "Tasques" },
+  "assignments_1e02582c": { "message": "Activitats" },
   "attributes_963ba262": { "message": "Atributs" },
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "La funció d’enregistrament d’àudio i vídeo no és compatible; utilitzeu un altre navegador."
@@ -141,13 +141,15 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# element carregat}\n  other {# elements carregats}\n}"
   },
-  "course_documents_104d76e0": { "message": "Documents del curs" },
-  "course_files_62deb8f8": { "message": "Fitxers del curs" },
-  "course_files_a31f97fc": { "message": "Fitxers del curs" },
-  "course_images_f8511d04": { "message": "Imatges del curs" },
-  "course_links_b56959b9": { "message": "Enllaços del curs" },
-  "course_media_ec759ad": { "message": "Elements multimèdia del curs" },
-  "course_navigation_dd035109": { "message": "Navegació del curs" },
+  "course_documents_104d76e0": { "message": "Documents de l''assignatura" },
+  "course_files_62deb8f8": { "message": "Fitxers de l''assignatura" },
+  "course_files_a31f97fc": { "message": "Fitxers de l''assignatura" },
+  "course_images_f8511d04": { "message": "Imatges de l''assignatura" },
+  "course_links_b56959b9": { "message": "Enllaços de l''assignatura" },
+  "course_media_ec759ad": {
+    "message": "Elements multimèdia de l''assignatura"
+  },
+  "course_navigation_dd035109": { "message": "Navegació de l''assignatura" },
   "create_button_and_icon_5c089934": { "message": "Botó i icona Crea" },
   "creative_commons_license_725584ae": {
     "message": "Llicència de Creative Commons:"
@@ -173,8 +175,8 @@ const locale = {
   "dimensions_45ddb7b7": { "message": "Mides" },
   "directionality_26ae9e08": { "message": "Direccionalitat" },
   "directly_edit_latex_b7e9235b": { "message": "Edita directament LaTeX" },
-  "discussions_a5f96392": { "message": "Debats" },
-  "discussions_index_6c36ced": { "message": "Índex dels debats" },
+  "discussions_a5f96392": { "message": "Fòrums" },
+  "discussions_index_6c36ced": { "message": "Índex dels fòrums" },
   "display_options_315aba85": { "message": "Mostra les opcions" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Mostra l''enllaç al text (s''obre en una pestanya nova)"
@@ -189,8 +191,10 @@ const locale = {
   "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
     "message": "Arrossegueu el controlador. Utilitzeu les fletxes cap a dalt i cap a baix per canviar la mida"
   },
-  "due_multiple_dates_cc0ee3f5": { "message": "Venciment: Dates múltiples" },
-  "due_when_7eed10c6": { "message": "Venciment: { when }" },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Data de lliurament: Dates múltiples"
+  },
+  "due_when_7eed10c6": { "message": "Data de lliurament: { when }" },
   "edit_c5fbea07": { "message": "Edita" },
   "edit_equation_f5279959": { "message": "Edita l''equació" },
   "edit_existing_button_icon_3d0277bd": {
@@ -252,7 +256,7 @@ const locale = {
   "go_to_the_editor_s_toolbar_a5cb875f": {
     "message": "Ves a la barra d''eines de l''editor"
   },
-  "grades_a61eba0a": { "message": "Qualificacions" },
+  "grades_a61eba0a": { "message": "Notes" },
   "greek_65c5b3f7": { "message": "Grec" },
   "group_documents_8bfd6ae6": { "message": "Agrupa els documents" },
   "group_files_4324f3df": { "message": "Fitxers del grup" },
@@ -319,7 +323,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Centre" },
   "misc_3b692ea7": { "message": "Miscel·lània" },
   "miscellaneous_e9818229": { "message": "Diversos" },
-  "modules_c4325335": { "message": "Mòduls" },
+  "modules_c4325335": { "message": "Continguts" },
   "multi_color_image_63d7372f": { "message": "Imatge multicolor" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Ha de ser un { percentage }% com a mínim"
@@ -390,7 +394,7 @@ const locale = {
   },
   "published_c944a23d": { "message": "publicat" },
   "published_when_302d8e23": { "message": "Publicat: { when }" },
-  "quizzes_7e598f57": { "message": "Qüestionaris" },
+  "quizzes_7e598f57": { "message": "Proves" },
   "raw_html_editor_e3993e41": {
     "message": "Editor de dades HTML sense processar"
   },
@@ -529,7 +533,7 @@ const locale = {
   "usage_right_ff96f3e2": { "message": "Dret d''ús:" },
   "usage_rights_required_5fe4dd68": { "message": "Drets d''ús (obligatori)" },
   "use_arrow_keys_to_navigate_options_2021cc50": {
-    "message": "Utilitzeu les tecles de fletxes per navegar per les opcions."
+    "message": "Utilitzeu les tecles de fletxes per desplaçar-vos per les opcions."
   },
   "use_arrow_keys_to_select_a_shape_c8eb57ed": {
     "message": "Feu servir les tecles de fletxes per seleccionar una forma."
