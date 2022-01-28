@@ -327,7 +327,7 @@ describe PacePlan do
     end
 
     it "returns course's term start if available" do
-      EnrollmentTerm.find(@course.enrollment_term_id).update start_at: "2022-01-27"
+      @course.enrollment_term.update start_at: "2022-01-27"
       expect(@pace_plan.start_date.to_date).to eq(Date.parse("2022-01-27"))
     end
 
