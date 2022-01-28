@@ -36,6 +36,7 @@ ready(() => {
     '[data-component="ApplyScoreToUngradedModal"]'
   )
   const gradingPeriodsFilterContainer = document.getElementById('grading-periods-filter-container')
+  const gradebookGridNode = document.getElementById('gradebook_grid')
   const flashMessageContainer = document.getElementById('flash_message_holder')
 
   ReactDOM.render(
@@ -45,6 +46,7 @@ ready(() => {
       filterNavNode={filterNavNode}
       flashMessageContainer={flashMessageContainer}
       gradebookEnv={ENV.GRADEBOOK_OPTIONS}
+      gradebookGridNode={gradebookGridNode}
       gradebookMenuNode={gradebookMenuNode}
       gradingPeriodsFilterContainer={gradingPeriodsFilterContainer}
       gridColorNode={gridColorNode}

@@ -41,7 +41,7 @@ export default class GradebookGrid {
       editorFactory: new CellEditorFactory(),
       enableCellNavigation: true,
       enableColumnReorder: true,
-      formatterFactory: new CellFormatterFactory(this.options.gradebook),
+      formatterFactory: this.options.formatterFactory,
       headerHeight: 38,
       numberOfColumnsToFreeze: this.gridData.columns.frozen.length,
       rowHeight: 35,
@@ -56,7 +56,7 @@ export default class GradebookGrid {
 
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
-      columnHeaderRenderer: new ColumnHeaderRenderer(this.options.gradebook),
+      columnHeaderRenderer: this.options.columnHeaderRenderer,
       rows: this.gridData.rows
     }
     this.gridSupport = new GridSupport(this.grid, gridSupportOptions)

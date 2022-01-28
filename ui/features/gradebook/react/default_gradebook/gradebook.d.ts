@@ -68,6 +68,7 @@ export type GradebookOptions = {
   gradebook_import_url: string
   gradebook_score_to_ungraded_progress: ProgressData
   gradebook_is_editable: boolean
+  gradebook_score_to_ungraded_progress: ProgressData
   graded_late_submissions_exist: boolean
   grading_period_set: GradingPeriodSet
   grading_standard: boolean

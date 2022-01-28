@@ -65,7 +65,6 @@ QUnit.module('Gradebook#initialize', () => {
 
     function createInitializedGradebook(options) {
       const gradebook = createGradebook(options)
-      gradebook.initialize()
       return gradebook
     }
 
