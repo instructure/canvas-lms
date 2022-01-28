@@ -260,6 +260,7 @@ const locale = {
   "image_8ad06": { "message": "Bilde" },
   "image_options_5412d02c": { "message": "Alternativ for bilde" },
   "image_options_tray_90a46006": { "message": "Redigeringsmeny for bilde" },
+  "image_to_crop_3a34487d": { "message": "Bilete å skjere" },
   "images_7ce26570": { "message": "Bilde" },
   "increase_indent_6d550a4a": { "message": "Auk innrykk" },
   "insert_593145ef": { "message": "Set inn" },
