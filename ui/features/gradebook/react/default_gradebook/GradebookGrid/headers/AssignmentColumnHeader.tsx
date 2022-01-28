@@ -360,12 +360,14 @@ export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
       .filter(student => !student.isInactive && !student.isTestStudent)
 
     return activeStudents.map(student => {
-      const {excused, latePolicyStatus, score, submittedAt} = student.submission
+      const {excused, grade, latePolicyStatus, score, submittedAt, redoRequest} = student.submission
       return {
         excused,
+        grade,
         id: student.id,
         latePolicyStatus,
         name: student.name,
+        redoRequest,
         score,
         sortableName: student.sortableName,
         submittedAt
