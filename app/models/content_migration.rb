@@ -708,6 +708,10 @@ class ContentMigration < ActiveRecord::Base
     migration_type == "course_copy_importer" || for_master_course_import?
   end
 
+  def should_skip_import?(content_importer)
+    migration_settings[:importer_skips]&.include?(content_importer)
+  end
+
   def for_master_course_import?
     migration_type == "master_course_import"
   end
