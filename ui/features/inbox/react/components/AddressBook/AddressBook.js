@@ -326,6 +326,8 @@ export const AddressBook = ({
     // Prevent duplicate IDs from being added
     if (matchedUsers.length === 0) {
       newSelectedUsers.push(user)
+      setInputValue('')
+      onTextChange('')
     }
 
     setSelectedUsers([...newSelectedUsers])
