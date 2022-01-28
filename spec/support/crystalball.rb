@@ -210,12 +210,12 @@ module Crystalball
         before = Coverage.peek_result
         yield example_map, example
         after = Coverage.peek_result
-        example_map.push(*execution_detector.detect(before, after))
+        example_map.push(*execution_detector.detect(before, after).sort)
 
         # rubocop:disable Specs/NoExecuteScript
         js_coverage = SeleniumDriverSetup.driver.execute_script("return window.__coverage__")&.keys&.uniq
         # rubocop:enable Specs/NoExecuteScript
-        example_map.used_files.concat(js_coverage) if js_coverage
+        example_map.used_files.concat(js_coverage.sort) if js_coverage
       end
     end
   end
