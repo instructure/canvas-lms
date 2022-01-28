@@ -25,6 +25,9 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
   doc = File.read(filename)
   (header, body) = doc.split("---").reject(&:empty?)
   map_header ||= header.gsub(":timestamp:", ":timestamp: #{Time.now.utc}")
+  puts "#{filename} Invalid! Likely contains spec failures" unless body
+  next unless body
+
   body.split("\n").slice_when { |_before, after| after.include?(":") }.each do |group|
     spec = group.shift
     changed_files = group
