@@ -57,10 +57,10 @@ td {
 
 a {
   // Canvas High-Contrast link color
-  color: darken($electric, 0%);
+  color: darken(#0770A3, 10%);
   text-decoration: underline;
   &:focus, &:hover {
-    color: darken($electric, 20%);
+    color: darken(#0770A3, 20%);
     text-decoration: underline;
   }
 }
