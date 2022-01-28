@@ -17,14 +17,25 @@
  */
 
 import React from 'react'
+import fetchMock from 'fetch-mock'
 import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
 import {darken, statusColors, defaultColors} from '../../constants/colors'
 import {render, within} from '@testing-library/react'
 import Gradebook from '../../Gradebook'
-
+import store from '../../stores/index'
 import '@testing-library/jest-dom/extend-expect'
 
+const originalState = store.getState()
+
 describe('Gradebook', () => {
+  beforeEach(() => {
+    fetchMock.mock('*', 200)
+  })
+  afterEach(() => {
+    store.setState(originalState, true)
+    fetchMock.restore()
+  })
+
   it('renders', () => {
     const node = document.createElement('div')
     render(<Gradebook {...defaultGradebookProps} gradebookMenuNode={node} />)

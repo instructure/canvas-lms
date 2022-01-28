@@ -17,6 +17,9 @@
  */
 
 import Gradebook from '../Gradebook'
+import GradebookGrid from '../GradebookGrid/index'
+import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
+import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
 import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import {camelize} from 'convert-case'
@@ -26,6 +29,7 @@ const performance_controls = {
 }
 
 export const defaultGradebookProps = {
+  hideGrid: true,
   filters: [],
   isFiltersLoading: false,
   onFiltersChange: () => {},
@@ -36,6 +40,7 @@ export const defaultGradebookProps = {
   gridColorNode: document.createElement('div'),
   filterNavNode: document.createElement('div'),
   viewOptionsMenuNode: document.createElement('div'),
+  gradebookGridNode: document.createElement('div'),
   gradingPeriodsFilterContainer: document.createElement('div'),
 
   allow_apply_score_to_ungraded: false,
@@ -128,6 +133,17 @@ export function createGradebook(options = {}) {
     removeGradebookElement() {}
   }
 
+  const formatterFactory = new CellFormatterFactory(gradebook)
+  const columnHeaderRenderer = new ColumnHeaderRenderer(gradebook)
+  gradebook.gradebookGrid = new GradebookGrid({
+    $container: options.gradebookGridNode || document.getElementById('gradebook_grid'),
+    activeBorderColor: '#1790DF', // $active-border-color
+    data: gradebook.gridData,
+    editable: options.gradebook_is_editable,
+    formatterFactory,
+    columnHeaderRenderer
+  })
+
   gradebook.gradebookGrid.gridSupport = {
     columns: {
       updateColumnHeaders() {},
@@ -135,6 +151,8 @@ export function createGradebook(options = {}) {
       scrollToEnd() {}
     }
   }
+
+  gradebook.bindGridEvents()
 
   return gradebook
 }

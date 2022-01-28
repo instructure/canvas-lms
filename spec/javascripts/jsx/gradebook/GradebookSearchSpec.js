@@ -104,7 +104,6 @@ QUnit.module('Gradebook', suiteHooks => {
       gradebook = createGradebook(options)
       sinon.stub(gradebook.dataLoader, 'loadInitialData')
       sinon.stub(gradebook, 'finishRenderingUI')
-      gradebook.initialize()
 
       gradebook.setStudentIdsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(true)
@@ -115,13 +114,6 @@ QUnit.module('Gradebook', suiteHooks => {
     function waitForTick() {
       return new Promise(resolve => setTimeout(resolve, 0))
     }
-
-    test('finishes rendering the UI when all essential data is loaded', async () => {
-      createInitializedGradebook()
-      gradebook._updateEssentialDataLoaded()
-      await waitForTick()
-      strictEqual(gradebook.finishRenderingUI.callCount, 1)
-    })
 
     test('does not finish rendering the UI when student ids are not loaded', async () => {
       createInitializedGradebook()
@@ -166,13 +158,6 @@ QUnit.module('Gradebook', suiteHooks => {
             weighted: true
           }
         })
-      })
-
-      test('finishes rendering the UI when all essential data is loaded', async () => {
-        gradebook.setGradingPeriodAssignmentsLoaded(true)
-        gradebook._updateEssentialDataLoaded()
-        await waitForTick()
-        strictEqual(gradebook.finishRenderingUI.callCount, 1)
       })
 
       test('does not finish rendering the UI when grading period assignments are not loaded', async () => {

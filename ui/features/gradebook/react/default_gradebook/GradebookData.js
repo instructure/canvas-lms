@@ -74,6 +74,7 @@ export default function GradebookData(props) {
       {...props}
       flashAlerts={flashMessages}
       filters={appliedFilters}
+      hideGrid={false}
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}

@@ -21,7 +21,7 @@ import fakeENV from 'helpers/fakeENV'
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import SlickGridSpecHelper from './GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
@@ -161,7 +161,6 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
 
   function createGradebookAndAddData(options) {
     gradebook = createGradebook(options)
-    gradebook.initialize()
     addGridData()
     gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
   }
@@ -192,7 +191,6 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
     hooks.beforeEach(() => {
       gradebook = createGradebook()
       gradebook.gradebookColumnSizeSettings = {assignment_2302: 10, assignment_2303: 54}
-      gradebook.initialize()
       addGridData()
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
     })
