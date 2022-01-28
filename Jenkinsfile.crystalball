@@ -178,7 +178,6 @@ pipeline {
           sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
           slackSend channel: '#crystalball-noisy', message: "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>"
         }
-
       }
     }
     cleanup {
