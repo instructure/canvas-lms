@@ -60,6 +60,49 @@ describe SentryExtensions::Settings do
     end
   end
 
+  describe ".get" do
+    context "when the key exists in the config file" do
+      before do
+        ConfigFile.stub("sentry", { key: "config-value" })
+        Setting.set("key", "db-value")
+      end
+
+      after do
+        ConfigFile.unstub
+        described_class.reset_settings
+        Setting.remove("key")
+      end
+
+      it "returns the value from the config file" do
+        expect(described_class.get("key", "default")).to eq("config-value")
+      end
+    end
+
+    context "when the setting exists in the db" do
+      before do
+        Setting.set("key", "db-value")
+      end
+
+      after do
+        Setting.remove("key")
+      end
+
+      it "returns the value from the db" do
+        expect(described_class.get("key", "default")).to eq("db-value")
+      end
+    end
+
+    context "when the setting doesn't exist" do
+      it "returns the provided default value" do
+        expect(described_class.get("key", "default")).to eq("default")
+      end
+
+      it "returns nil if no default is provided" do
+        expect(described_class.get("key")).to be_nil
+      end
+    end
+  end
+
   describe ".reset_settings" do
     before do
       ConfigFile.stub("sentry", "first-value")
