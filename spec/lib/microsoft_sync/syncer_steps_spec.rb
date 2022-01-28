@@ -848,6 +848,31 @@ describe MicrosoftSync::SyncerSteps do
 
     before { group.update! ms_group_id: "mygroup" }
 
+    context "when there is a last_error" do
+      before do
+        group.update! \
+          last_error: MicrosoftSync::Errors.serialize(StandardError.new, step: error_step)
+      end
+
+      context "when it was from a full sync" do
+        let(:error_step) { :step_create_team }
+
+        it "doesn't run but returns IGNORE" do
+          expect(MicrosoftSync::PartialSyncChange).to_not receive(:where)
+          expect(subject).to eq(MicrosoftSync::StateMachineJob::IGNORE)
+        end
+      end
+
+      context "when it was from a partial sync" do
+        let(:error_step) { :step_partial_sync }
+
+        it "runs and does not return IGNORE" do
+          expect(MicrosoftSync::PartialSyncChange).to receive(:where).and_call_original
+          expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
+        end
+      end
+    end
+
     context "when there is an ms_group_id but there are no PartialSyncChanges" do
       it "returns COMPLETE" do
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)

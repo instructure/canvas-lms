@@ -88,7 +88,7 @@ describe "pace plan page" do
     end
 
     it "shows the published status for items" do
-      unpublished_assignment = create_assignment(@course, "unpub assignment", "unpub descrition", 10, "unpublished")
+      unpublished_assignment = create_assignment(@course, "unpub assignment", "unpub description", 10, "unpublished")
       @course_module.add_item(id: unpublished_assignment.id, type: "assignment")
 
       visit_pace_plans_page
@@ -135,7 +135,7 @@ describe "pace plan page" do
     it "updates duration to make Publish and Cancel buttons enabled" do
       visit_pace_plans_page
 
-      update_module_item_duration(2)
+      update_module_item_duration(0, 2)
 
       expect(publish_button).to be_enabled
       expect(cancel_button).to be_enabled
@@ -144,9 +144,9 @@ describe "pace plan page" do
     it "does not allow duration to be set to negative number" do
       visit_pace_plans_page
 
-      update_module_item_duration("-1")
+      update_module_item_duration(0, "-1")
 
-      expect(duration_field.text).not_to eq("-1")
+      expect(duration_field[0].text).not_to eq("-1")
     end
   end
 
@@ -184,7 +184,7 @@ describe "pace plan page" do
 
     it "displays modal regarding unpublished changes when going to student view" do
       visit_pace_plans_page
-      update_module_item_duration(3)
+      update_module_item_duration(0, 3)
       click_main_pace_plan_menu
       click_students_menu_item
       click_student_pace_plan(@student.name)

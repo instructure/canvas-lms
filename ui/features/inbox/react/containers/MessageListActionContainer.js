@@ -30,6 +30,7 @@ import React, {useContext} from 'react'
 import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
 import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
+import {Responsive} from '@instructure/ui-responsive'
 
 const MessageListActionContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -351,68 +352,134 @@ const MessageListActionContainer = props => {
   }
 
   return (
-    <View
-      as="div"
-      display="inline-block"
-      width="100%"
-      margin="none"
-      padding="small"
-      background="secondary"
-    >
-      <Flex wrap="wrap">
-        <Flex.Item>
-          <CourseSelect
-            mainPage
-            options={{
-              allCourses: [
-                {
-                  _id: ALL_COURSES_ID,
-                  contextName: I18n.t('All Courses'),
-                  assetString: 'all_courses'
-                }
-              ],
-              favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
-              moreCourses,
-              concludedCourses: [],
-              groups: data?.legacyNode?.favoriteGroupsConnection?.nodes
-            }}
-            onCourseFilterSelect={props.onCourseFilterSelect}
-          />
-        </Flex.Item>
-        <Flex.Item padding="none none none xxx-small">
-          <MailboxSelectionDropdown
-            activeMailbox={props.activeMailbox}
-            onSelect={props.onSelectMailbox}
-          />
-        </Flex.Item>
-        <Flex.Item shouldGrow shouldShrink />
-        <Flex.Item>
-          <MessageActionButtons
-            archive={props.displayUnarchiveButton ? undefined : handleArchive}
-            unarchive={props.displayUnarchiveButton ? handleUnarchive : undefined}
-            archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}
-            compose={props.onCompose}
-            delete={handleDelete}
-            deleteDisabled={props.deleteDisabled}
-            forward={() => {}}
-            markAsUnread={handleMarkAsUnread}
-            markAsRead={handleMarkAsRead}
-            reply={props.onReply}
-            replyAll={props.onReplyAll}
-            replyDisabled={!hasSelectedConversations()}
-            star={!firstConversationIsStarred ? () => handleStar(true) : null}
-            unstar={firstConversationIsStarred ? () => handleStar(false) : null}
-            settingsDisabled={!hasSelectedConversations()}
-            shouldRenderMarkAsRead={shouldRenderMarkAsRead()}
-            shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}
-            hasMultipleSelectedMessages={hasMultipleSelectedMessages()}
-          />
-        </Flex.Item>
-        <Flex.Item padding="none none none x-small" shouldGrow shouldShrink>
-          <AddressBookContainer />
-        </Flex.Item>
-      </Flex>
-    </View>
+    <Responsive
+      match="media"
+      query={{
+        mobile: {maxWidth: '767px'},
+        tablet: {minWidth: '768px'},
+        desktop: {minWidth: '1024px'}
+      }}
+      props={{
+        tablet: {
+          addressBookContainer: {
+            padding: 'x-small',
+            width: '336px'
+          },
+          courseSelect: {
+            padding: 'x-small',
+            itemSize: ''
+          },
+          messageActionButtons: {
+            padding: 'x-small'
+          }
+        },
+        desktop: {
+          addressBookContainer: {
+            padding: 'x-small small x-small x-small',
+            width: ''
+          },
+          courseSelect: {
+            padding: 'x-small',
+            itemSize: ''
+          },
+          messageActionButtons: {
+            padding: 'x-small x-small x-small medium'
+          }
+        },
+        mobile: {
+          addressBookContainer: {
+            padding: 'x-small',
+            width: ''
+          },
+          courseSelect: {
+            padding: 'none x-small none x-small',
+            itemSize: '45%'
+          },
+          messageActionButtons: {
+            padding: 'none x-small none x-small'
+          }
+        }
+      }}
+      render={(responsiveProps, matches) => (
+        <View
+          as="div"
+          display="inline-block"
+          width="100%"
+          margin="none"
+          padding="small"
+          background="secondary"
+        >
+          <Flex wrap="wrap">
+            <Flex.Item
+              shouldGrow={matches.includes('tablet') || matches.includes('mobile')}
+              size={responsiveProps.courseSelect.itemSize}
+              padding={responsiveProps.courseSelect.padding}
+            >
+              <CourseSelect
+                mainPage
+                options={{
+                  allCourses: [
+                    {
+                      _id: ALL_COURSES_ID,
+                      contextName: I18n.t('All Courses'),
+                      assetString: 'all_courses'
+                    }
+                  ],
+                  favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
+                  moreCourses,
+                  concludedCourses: [],
+                  groups: data?.legacyNode?.favoriteGroupsConnection?.nodes
+                }}
+                onCourseFilterSelect={props.onCourseFilterSelect}
+              />
+            </Flex.Item>
+            <Flex.Item
+              shouldGrow={matches.includes('tablet') || matches.includes('mobile')}
+              size={responsiveProps.courseSelect.itemSize}
+              padding={responsiveProps.courseSelect.padding}
+            >
+              <MailboxSelectionDropdown
+                activeMailbox={props.activeMailbox}
+                onSelect={props.onSelectMailbox}
+              />
+            </Flex.Item>
+            <Flex.Item
+              padding={responsiveProps.addressBookContainer.padding}
+              shouldGrow
+              shouldShrink
+              justifyItems="space-between"
+            >
+              <AddressBookContainer width={responsiveProps.addressBookContainer.width} />
+            </Flex.Item>
+            <Flex.Item
+              shouldGrow={matches.includes('mobile')}
+              padding={responsiveProps.messageActionButtons.padding}
+            >
+              <MessageActionButtons
+                archive={props.displayUnarchiveButton ? undefined : handleArchive}
+                unarchive={props.displayUnarchiveButton ? handleUnarchive : undefined}
+                archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}
+                compose={props.onCompose}
+                delete={handleDelete}
+                deleteDisabled={props.deleteDisabled}
+                forward={() => {}}
+                markAsUnread={handleMarkAsUnread}
+                markAsRead={handleMarkAsRead}
+                reply={props.onReply}
+                replyAll={props.onReplyAll}
+                replyDisabled={!hasSelectedConversations()}
+                star={!firstConversationIsStarred ? () => handleStar(true) : null}
+                unstar={firstConversationIsStarred ? () => handleStar(false) : null}
+                settingsDisabled={!hasSelectedConversations()}
+                shouldRenderMarkAsRead={shouldRenderMarkAsRead()}
+                shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}
+                hasMultipleSelectedMessages={hasMultipleSelectedMessages()}
+              />
+            </Flex.Item>
+          </Flex>
+        </View>
+      )}
+    />
   )
 }
 

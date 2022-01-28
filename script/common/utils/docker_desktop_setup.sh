@@ -45,7 +45,7 @@ function attempt_start_docker {
 }
 
 function check_for_docker_desktop {
-  if ! mdfind "kMDItemKind == 'Application'" |grep -q Docker.app$; then
+  if ! mdfind "kMDItemKind == 'Application'" |grep -qE 'Docker.app|Docker\ Desktop.app'; then
     echo "  Docker Desktop is not installed!"
     echo "  Refer to https://docs.docker.com/docker-for-mac/install/ for help installing."
     echo "  Once Docker Desktop is installed rerun this script."

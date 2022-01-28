@@ -31,6 +31,7 @@ import SearchBreadcrumb from '../shared/SearchBreadcrumb'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import SVGWrapper from '@canvas/svg-wrapper'
+import {ratingsShape} from './shapes'
 
 const ManageOutcomesView = ({
   outcomeGroup,
@@ -144,7 +145,18 @@ const ManageOutcomesView = ({
             ({
               canUnlink,
               _id: linkId,
-              node: {_id, title, description, friendlyDescription, contextType, contextId}
+              node: {
+                _id,
+                title,
+                description,
+                calculationMethod,
+                calculationInt,
+                masteryPoints,
+                ratings,
+                friendlyDescription,
+                contextType,
+                contextId
+              }
             }) => (
               <ManageOutcomeItem
                 key={linkId}
@@ -152,6 +164,10 @@ const ManageOutcomesView = ({
                 linkId={linkId}
                 title={title}
                 description={description}
+                calculationMethod={calculationMethod}
+                calculationInt={calculationInt}
+                masteryPoints={masteryPoints}
+                ratings={ratings}
                 friendlyDescription={friendlyDescription?.description}
                 outcomeContextType={contextType}
                 outcomeContextId={contextId}
@@ -187,6 +203,10 @@ ManageOutcomesView.propTypes = {
             _id: PropTypes.string.isRequired,
             title: PropTypes.string.isRequired,
             description: PropTypes.string,
+            calculationMethod: PropTypes.string,
+            calculationInt: PropTypes.number,
+            masteryPoints: PropTypes.number,
+            ratings: ratingsShape,
             canEdit: PropTypes.bool.isRequired,
             contextType: PropTypes.string,
             contextId: PropTypes.string

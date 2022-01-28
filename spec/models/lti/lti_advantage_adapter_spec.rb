@@ -121,7 +121,7 @@ describe Lti::LtiAdvantageAdapter do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end
 
-    it "creats a login message" do
+    it "creates a login message" do
       expect(login_message.keys).to match_array %w[
         iss
         login_hint
@@ -142,6 +142,10 @@ describe Lti::LtiAdvantageAdapter do
 
     it 'sets the "canvas_region" to "not_configured"' do
       expect(login_message["canvas_region"]).to eq "not_configured"
+    end
+
+    it "accepts a student_id parameter" do
+      expect(adapter.generate_post_payload(student_id: 123).keys).to include("iss")
     end
 
     context "when no i18n locale is set in the request" do

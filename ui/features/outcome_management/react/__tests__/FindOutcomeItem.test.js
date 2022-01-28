@@ -24,16 +24,23 @@ import {
   IMPORT_PENDING
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {defaultRatingsAndCalculationMethod} from '../Management/__tests__/helpers'
 
 jest.useFakeTimers()
 
 describe('FindOutcomeItem', () => {
   let onMenuHandlerMock
   let onImportOutcomeHandlerMock
+  const {calculationMethod, calculationInt, masteryPoints, ratings} =
+    defaultRatingsAndCalculationMethod
   const defaultProps = (props = {}) => ({
     id: '1',
     title: 'Outcome Title',
     description: 'Outcome Description',
+    calculationMethod,
+    calculationInt,
+    masteryPoints,
+    ratings,
     isImported: false,
     importGroupStatus: IMPORT_NOT_STARTED,
     sourceContextId: '100',
