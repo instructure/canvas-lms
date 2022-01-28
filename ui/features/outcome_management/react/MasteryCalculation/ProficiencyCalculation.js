@@ -251,16 +251,6 @@ const ProficiencyCalculation = ({
     }
   }, [updateError])
 
-  // Updates state if component is in individual outcome display mode and
-  // calculation method or int was changed externally (e.g. via outcome edit)
-  useEffect(() => {
-    if (individualOutcomeDisplay) {
-      updateCalculationMethod(null, {id: method.calculationMethod})
-      updateCalculationInt(method.calculationInt)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method])
-
   const calculationMethods = new CalculationMethodContent({
     calculation_method: calculationMethodKey,
     calculation_int: calculationInt
@@ -275,7 +265,6 @@ const ProficiencyCalculation = ({
         setError(!validInt(calculationMethods[calcMethodKey], calcInt))
     }
   }
-
   const updateCalculationMethod = (_event, data) => {
     const newMethod = data.id
     const newCalculationInt = calculationMethods[newMethod].defaultInt || null
@@ -396,9 +385,17 @@ ProficiencyCalculation.propTypes = {
 }
 
 ProficiencyCalculation.defaultProps = {
-  method: defaultProficiencyCalculation,
+  method: {
+    calculationMethod: 'decaying_average',
+    calculationInt: 65
+  },
   updateError: null,
   update: () => {}
+}
+
+ProficiencyCalculation.defaultProps = {
+  method: defaultProficiencyCalculation,
+  updateError: null
 }
 
 export default ProficiencyCalculation

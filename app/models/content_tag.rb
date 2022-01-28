@@ -31,7 +31,6 @@ class ContentTag < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
-  restrict_columns :content, %i[content_id url new_tab]
 
   belongs_to :content, polymorphic: [], exhaustive: false
   validates :content_type, inclusion: { allow_nil: true, in: CONTENT_TYPES }

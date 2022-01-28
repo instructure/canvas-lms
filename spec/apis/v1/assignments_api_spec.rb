@@ -6402,7 +6402,6 @@ describe AssignmentsApiController, type: :request do
       @a2 = @course.assignments.create! title: "with overrides", unlock_at: 1.day.ago, due_at: 3.days.from_now, lock_at: 4.days.from_now
       @ao0 = assignment_override_model assignment: @a2, set: @course.default_section, unlock_at: 4.days.ago, due_at: 3.days.ago, lock_at: 4.days.from_now
       @ao1 = assignment_override_model assignment: @a2, set: @s1, due_at: 5.days.from_now, lock_at: 6.days.from_now
-      @q0 = @course.quizzes.create!(title: "a quiz", quiz_type: "assignment")
       @new_dates = (7..9).map { |x| x.days.from_now }
     end
 
@@ -6459,15 +6458,6 @@ describe AssignmentsApiController, type: :request do
                           "all_dates" => [{ "base" => true, "due_at" => @new_dates[1].iso8601 }]
                         }])
         expect(@a0.cache_key(:availability)).to_not eq old_key
-      end
-
-      it "clears cache register values for quizzes" do
-        old_key = Timecop.freeze(1.minute.ago) { @q0.cache_key(:availability) }
-        api_bulk_update(@course, [{
-                          "id" => @q0.assignment.id,
-                          "all_dates" => [{ "base" => true, "due_at" => @new_dates[1].iso8601 }]
-                        }])
-        expect(@q0.cache_key(:availability)).to_not eq old_key
       end
     end
 

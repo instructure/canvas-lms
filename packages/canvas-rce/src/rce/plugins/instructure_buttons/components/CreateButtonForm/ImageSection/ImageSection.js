@@ -16,36 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useState, useEffect, Suspense} from 'react'
+import React, {useReducer, useState, useEffect} from 'react'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
 import {actions as svgActions} from '../../../reducers/svgSettings'
 
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Group} from '../Group'
-import {IconCropSolid} from '@instructure/ui-icons'
-import {ImageCropperModal} from '../ImageCropper'
-import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
+import {Group} from '../Group'
+import ModeSelect from './ModeSelect'
+import Course from './Course'
+import PreviewIcon from '../../../../shared/PreviewIcon'
+import {ImageCropper} from '../ImageCropper'
+import {IconCropSolid} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-modal'
+import {Heading} from '@instructure/ui-heading'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-import Course from './Course'
-import ModeSelect from './ModeSelect'
-import PreviewIcon from '../../../../shared/PreviewIcon'
-
-export const ImageSection = ({settings, onChange, editing, editor}) => {
+export const ImageSection = ({settings, onChange, editing}) => {
   const [openCropModal, setOpenCropModal] = useState(false)
   const [state, dispatch] = useReducer(reducer, initialState)
-
-  const Upload = React.lazy(() => import('./Upload'))
-
-  const allowedModes = {
-    [modes.courseImages.type]: Course,
-    [modes.uploadImages.type]: Upload
-  }
+  const allowedModes = {[modes.courseImages.type]: Course}
 
   useEffect(() => {
     if (editing) {
@@ -119,18 +113,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
           </Flex>
         </Flex.Item>
         <Flex.Item>
-          <Suspense
-            fallback={
-              <Flex justifyItems="center">
-                <Flex.Item>
-                  <Spinner renderTitle={formatMessage('Loading')} />
-                </Flex.Item>
-              </Flex>
-            }
-          >
-            {!!allowedModes[state.mode] &&
-              React.createElement(allowedModes[state.mode], {dispatch, editor})}
-          </Suspense>
+          {!!allowedModes[state.mode] && React.createElement(allowedModes[state.mode], {dispatch})}
         </Flex.Item>
         <Flex.Item>
           <Button
@@ -140,11 +123,42 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
             }}
           />
           {openCropModal && (
-            <ImageCropperModal
+            <Modal
+              size="large"
               open={openCropModal}
-              onClose={() => setOpenCropModal(false)}
-              image={state.image}
-            />
+              onDismiss={() => {
+                setOpenCropModal(false)
+              }}
+              shouldCloseOnDocumentClick={false}
+            >
+              <Modal.Header>
+                <CloseButton
+                  placement="end"
+                  offset="small"
+                  onClick={() => {
+                    setOpenCropModal(false)
+                  }}
+                  screenReaderLabel="Close"
+                />
+                <Heading>{formatMessage('Crop Image')}</Heading>
+              </Modal.Header>
+              <Modal.Body>
+                <ImageCropper />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  onClick={() => {
+                    setOpenCropModal(false)
+                  }}
+                  margin="0 x-small 0 0"
+                >
+                  {formatMessage('Cancel')}
+                </Button>
+                <Button color="primary" type="submit">
+                  {formatMessage('Save')}
+                </Button>
+              </Modal.Footer>
+            </Modal>
           )}
         </Flex.Item>
       </Flex>

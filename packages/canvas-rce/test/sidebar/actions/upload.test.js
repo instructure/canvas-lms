@@ -230,8 +230,7 @@ describe('Upload data actions', () => {
         host: 'http://host:port',
         contextId: 101,
         contextType: 'course',
-        onDuplicate: undefined,
-        category: 'buttons_and_icons'
+        onDuplicate: undefined
       }
 
       return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
@@ -274,7 +273,6 @@ describe('Upload data actions', () => {
             parentFolderId: 2
           },
           {
-            category: 'buttons_and_icons',
             contextId: 101,
             contextType: 'course',
             host: 'http://host:port',

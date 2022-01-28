@@ -18,13 +18,11 @@
 
 import React from 'react'
 import FilterNavFilter from '../FilterNavFilter'
-import type {FilterNavFilterProps} from '../FilterNavFilter'
-import type {Filter} from '../../gradebook.d'
 import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
-const defaultFilter: Filter = {
+const defaultFilter = {
   id: '123',
   label: 'Label',
   createdAt: '2021-11-02T20:56:23.615Z',
@@ -45,29 +43,24 @@ const defaultFilter: Filter = {
   isApplied: true
 }
 
-const defaultProps: FilterNavFilterProps = {
+const defaultProps = {
   filter: defaultFilter,
   onChange: () => {},
   onDelete: () => {},
   modules: [
-    {id: '1', name: 'Module 1', position: 1},
-    {id: '2', name: 'Module 2', position: 2},
-    {id: '3', name: 'Module 3', position: 3}
+    {id: '1', name: 'Module 1'},
+    {id: '2', name: 'Module 2'},
+    {id: '3', name: 'Module 3'}
   ],
   assignmentGroups: [
-    {id: '4', name: 'Assignment Group 4', position: 1, group_weight: 0, assignments: []},
-    {id: '5', name: 'Assignment Group 5', position: 2, group_weight: 0, assignments: []},
-    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []}
+    {id: '4', name: 'Assignment Group 4'},
+    {id: '5', name: 'Assignment Group 5'},
+    {id: '6', name: 'Assignment Group 6'}
   ],
   sections: [
     {id: '7', name: 'Section 7'},
     {id: '8', name: 'Section 8'},
     {id: '9', name: 'Section 9'}
-  ],
-  gradingPeriods: [
-    {id: '1', title: 'Grading Period 1', startDate: 1},
-    {id: '2', title: 'Grading Period 2', startDate: 2},
-    {id: '3', title: 'Grading Period 3', startDate: 3}
   ]
 }
 

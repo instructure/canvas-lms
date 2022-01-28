@@ -18,43 +18,23 @@
 
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
-import {Group} from './Group'
 
 export const GroupSet = {
   fragment: gql`
     fragment GroupSet on GroupSet {
       id
       _id
-      name
-      currentGroup {
-        ...Group
-      }
     }
-    ${Group.fragment}
   `,
 
   shape: shape({
     id: string,
-    _id: string,
-    name: string,
-    currentGroup: Group.shape
+    _id: string
   }),
 
-  mock: ({
-    id = 'QXNzaWHGVJBkn0x22',
-    _id = '1',
-    name = 'group set',
-    currentGroup = null,
-    groupsConnection = {
-      nodes: [Group.mock()],
-      __typename: 'groupsConnection'
-    }
-  } = {}) => ({
+  mock: ({id = 'QXNzaWHGVJBkn0x22', _id = '1'} = {}) => ({
     id,
     _id,
-    name,
-    currentGroup,
-    groupsConnection,
     __typename: 'GroupSet'
   })
 }

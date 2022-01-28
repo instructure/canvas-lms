@@ -31,13 +31,6 @@ import {
 import {defaultOutcomesManagementRatings} from '../react/hooks/useRatings'
 import {pick, uniq, flattenDeep} from 'lodash'
 
-const ratingsWithTypename = ratings =>
-  ratings
-    .map(rating => pick(rating, ['description', 'points', 'mastery']))
-    .map(r => ({...r, __typename: 'ProficiencyRating'}))
-
-const getMasteryPoints = ratings => ratings.filter(rating => rating.mastery)[0].points
-
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
   {
     request: {
@@ -235,10 +228,6 @@ export const treeGroupMocks = ({
 
   const findModalGroupDetailsMocks = allGroupIds.map(gid => {
     const childrenOutcomes = (detailsStructure[gid] || []).map(toString)
-    const calculationMethod = 'decaying_average'
-    const calculationInt = 65
-    const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-    const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
 
     return {
       request: {
@@ -273,10 +262,6 @@ export const treeGroupMocks = ({
                   description: `Description for Outcome ${oid}`,
                   isImported: stringImportedOutcomes.includes(oid),
                   title: `Outcome ${oid}`,
-                  calculationMethod,
-                  calculationInt,
-                  masteryPoints,
-                  ratings,
                   __typename: 'LearningOutcome',
                   friendlyDescription: {
                     _id: oid,
@@ -482,11 +467,6 @@ const createSearchGroupOutcomesOutcomeMocks = (
   title,
   outcomeCount
 ) => {
-  const calculationMethod = 'decaying_average'
-  const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
-
   // Tech Debt - see OUT-4776 - need to switch this over to a dynamic array like the below code
   // for now too many tests are dependant on the number of outcomes and the order
   // of the outcomes to be exactly in the format returned by in the if statement on line 301
@@ -500,10 +480,6 @@ const createSearchGroupOutcomesOutcomeMocks = (
           description: '',
           title: `Outcome 1 - ${title}`,
           displayName: '',
-          calculationMethod,
-          calculationInt,
-          masteryPoints,
-          ratings,
           canEdit,
           contextId,
           contextType,
@@ -525,10 +501,6 @@ const createSearchGroupOutcomesOutcomeMocks = (
           description: '',
           title: `Outcome 2 - ${title}`,
           displayName: '',
-          calculationMethod,
-          calculationInt,
-          masteryPoints,
-          ratings,
           canEdit,
           contextId,
           contextType,
@@ -553,10 +525,6 @@ const createSearchGroupOutcomesOutcomeMocks = (
           description: '',
           title: `Outcome 1 - ${title}`,
           displayName: '',
-          calculationMethod,
-          calculationInt,
-          masteryPoints,
-          ratings,
           canEdit,
           contextId,
           contextType,
@@ -591,262 +559,331 @@ export const groupDetailMocks = ({
   targetGroupId,
   notImportedOutcomesCount = null,
   removeOnRefetch = false
-} = {}) => {
-  const calculationMethod = 'decaying_average'
-  const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
-
-  return [
-    {
-      request: {
-        query: FIND_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          outcomeIsImported,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            title,
-            description: `${groupDescription} 1`,
-            contextType: outcomesGroupContextType,
-            contextId: outcomesGroupContextId,
-            outcomesCount: numOfOutcomes,
-            notImportedOutcomesCount,
-            __typename: 'LearningOutcomeGroup',
-            outcomes: {
-              pageInfo: {
-                hasNextPage: withMorePage,
-                endCursor: 'Mg',
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
+} = {}) => [
+  {
+    request: {
+      query: FIND_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        outcomeIsImported,
+        targetGroupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          title,
+          description: `${groupDescription} 1`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
+          outcomesCount: numOfOutcomes,
+          notImportedOutcomesCount,
+          __typename: 'LearningOutcomeGroup',
+          outcomes: {
+            pageInfo: {
+              hasNextPage: withMorePage,
+              endCursor: 'Mg',
+              __typename: 'PageInfo'
+            },
+            edges: [
+              {
+                _id: '1',
+                node: {
                   _id: '1',
-                  node: {
-                    _id: '1',
-                    description: '',
-                    title: `Outcome 1 - ${title}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    isImported: outcomeIsImported,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      _id: '101',
-                      description: 'Outcome 1 - friendly description',
-                      __typename: 'FriendlyDescription'
-                    }
-                  },
-                  __typename: 'ContentTag'
+                  description: '',
+                  title: `Outcome 1 - ${title}`,
+                  isImported: outcomeIsImported,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '101',
+                    description: 'Outcome 1 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
-                {
+                __typename: 'ContentTag'
+              },
+              {
+                _id: '2',
+                node: {
                   _id: '2',
-                  node: {
-                    _id: '2',
-                    description: '',
-                    title: `Outcome 2 - ${title}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    isImported: outcomeIsImported,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      _id: '102',
-                      description: 'Outcome 2 - friendly description',
-                      __typename: 'FriendlyDescription'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
-            }
+                  description: '',
+                  title: `Outcome 2 - ${title}`,
+                  isImported: outcomeIsImported,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '102',
+                    description: 'Outcome 2 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
           }
         }
       }
+    }
+  },
+  {
+    request: {
+      query: FIND_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        outcomeIsImported,
+        searchQuery,
+        targetGroupId
+      }
     },
-    {
-      request: {
-        query: FIND_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          outcomeIsImported,
-          searchQuery,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            title,
-            description: `${groupDescription} 2`,
-            contextType: outcomesGroupContextType,
-            contextId: outcomesGroupContextId,
-            outcomesCount: 0,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: withMorePage,
-                endCursor: 'Mg',
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          title,
+          description: `${groupDescription} 2`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
+          outcomesCount: 0,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: withMorePage,
+              endCursor: 'Mg',
+              __typename: 'PageInfo'
+            },
+            edges: [
+              {
+                _id: '1',
+                node: {
                   _id: '1',
-                  node: {
-                    _id: '1',
-                    description: '',
-                    title: `Outcome 1 - ${title}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    isImported: outcomeIsImported,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      description: 'Outcome 1 - friendly description',
-                      __typename: 'FriendlyDescription',
-                      _id: '101'
-                    }
-                  },
-                  __typename: 'ContentTag'
+                  description: '',
+                  title: `Outcome 1 - ${title}`,
+                  isImported: outcomeIsImported,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 1 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '101'
+                  }
                 },
-                {
-                  _id: '3',
-                  node: {
-                    _id: '3',
-                    description: '',
-                    title: `Outcome 3 - ${title}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    isImported: outcomeIsImported,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      description: 'Outcome 3 - friendly description',
-                      __typename: 'FriendlyDescription',
-                      _id: '103'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
-            },
-            __typename: 'LearningOutcomeGroup'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: FIND_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomesCursor: 'Mg',
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          searchQuery,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            title,
-            description: `${groupDescription} 3`,
-            contextType: outcomesGroupContextType,
-            contextId: outcomesGroupContextId,
-            outcomesCount: 0,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: 'Mw',
-                __typename: 'PageInfo'
+                __typename: 'ContentTag'
               },
-              edges: [
-                {
-                  _id: '5',
-                  node: {
-                    _id: '5',
-                    description: '',
-                    isImported: false,
-                    title: `Outcome 5 - ${title}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      description: 'Outcome 5 - friendly description',
-                      __typename: 'FriendlyDescription',
-                      _id: '105'
-                    }
-                  },
-                  __typename: 'ContentTag'
+              {
+                _id: '3',
+                node: {
+                  _id: '3',
+                  description: '',
+                  title: `Outcome 3 - ${title}`,
+                  isImported: outcomeIsImported,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 3 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '103'
+                  }
                 },
-                {
-                  _id: '6',
-                  node: {
-                    _id: '6',
-                    description: '',
-                    isImported: outcomeIsImported,
-                    title: `Outcome 6 - ${title}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      description: 'Outcome 6 - friendly description',
-                      __typename: 'FriendlyDescription',
-                      _id: '106'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: FIND_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomesCursor: 'Mg',
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        searchQuery,
+        targetGroupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          title,
+          description: `${groupDescription} 3`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
+          outcomesCount: 0,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: 'Mw',
+              __typename: 'PageInfo'
             },
-            __typename: 'LearningOutcomeGroup'
-          }
+            edges: [
+              {
+                _id: '5',
+                node: {
+                  _id: '5',
+                  description: '',
+                  isImported: false,
+                  title: `Outcome 5 - ${title}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 5 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '105'
+                  }
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                _id: '6',
+                node: {
+                  _id: '6',
+                  description: '',
+                  isImported: outcomeIsImported,
+                  title: `Outcome 6 - ${title}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 6 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '106'
+                  }
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: SEARCH_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        targetGroupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: `${groupDescription} 4`,
+          title,
+          outcomesCount: numOfOutcomes,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: withMorePage,
+              endCursor: 'Mx',
+              __typename: 'PageInfo'
+            },
+            edges: createSearchGroupOutcomesOutcomeMocks(
+              canUnlink,
+              canEdit,
+              contextId,
+              contextType,
+              title,
+              numOfOutcomes
+            ),
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
         }
       }
     },
-    {
-      request: {
-        query: SEARCH_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          targetGroupId
-        }
-      },
-      result: {
+    // for testing graphqls refetch in index.js
+    newData: jest.fn(() => {
+      const outcome1 = {
+        canUnlink,
+        _id: '1',
+        node: {
+          _id: '1',
+          description: '',
+          title: `Refetched Outcome 1 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: {
+            _id: '26',
+            description: 'friendly',
+            __typename: 'OutcomeFriendlyDescriptionType'
+          },
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: groupId,
+          title: `Refetched ${title}`,
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+      const outcome2 = {
+        canUnlink,
+        _id: '2',
+        node: {
+          _id: '2',
+          description: '',
+          title: `Refetched Outcome 2 - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: groupId,
+          title: `Refetched ${title}`,
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+      const outcome3 = {
+        canUnlink,
+        _id: '11',
+        node: {
+          _id: '11',
+          description: '',
+          title: `Newly Created Outcome - ${title}`,
+          displayName: '',
+          canEdit,
+          contextId,
+          contextType,
+          friendlyDescription: null,
+          __typename: 'LearningOutcome'
+        },
+        group: {
+          _id: groupId,
+          title: `Refetched ${title}`,
+          __typename: 'LearningOutcomeGroup'
+        },
+        __typename: 'ContentTag'
+      }
+      const edges = [outcome1, outcome2, outcome3]
+      const afterRemoveEdges = [outcome3]
+      return {
         data: {
           group: {
             _id: groupId,
             description: `${groupDescription} 4`,
-            title,
-            outcomesCount: numOfOutcomes,
+            title: `Refetched ${title}`,
+            outcomesCount: removeOnRefetch ? afterRemoveEdges.length : edges.length,
             notImportedOutcomesCount,
             outcomes: {
               pageInfo: {
@@ -854,273 +891,149 @@ export const groupDetailMocks = ({
                 endCursor: 'Mx',
                 __typename: 'PageInfo'
               },
-              edges: createSearchGroupOutcomesOutcomeMocks(
-                canUnlink,
-                canEdit,
-                contextId,
-                contextType,
-                title,
-                numOfOutcomes
-              ),
-              __typename: 'ContentTagConnection'
-            },
-            __typename: 'LearningOutcomeGroup'
-          }
-        }
-      },
-      // for testing graphqls refetch in index.js
-      newData: jest.fn(() => {
-        const outcome1 = {
-          canUnlink,
-          _id: '1',
-          node: {
-            _id: '1',
-            description: '',
-            title: `Refetched Outcome 1 - ${title}`,
-            displayName: '',
-            calculationMethod,
-            calculationInt,
-            masteryPoints,
-            ratings,
-            canEdit,
-            contextId,
-            contextType,
-            friendlyDescription: {
-              _id: '26',
-              description: 'friendly',
-              __typename: 'OutcomeFriendlyDescriptionType'
-            },
-            __typename: 'LearningOutcome'
-          },
-          group: {
-            _id: groupId,
-            title: `Refetched ${title}`,
-            __typename: 'LearningOutcomeGroup'
-          },
-          __typename: 'ContentTag'
-        }
-        const outcome2 = {
-          canUnlink,
-          _id: '2',
-          node: {
-            _id: '2',
-            description: '',
-            title: `Refetched Outcome 2 - ${title}`,
-            displayName: '',
-            calculationMethod,
-            calculationInt,
-            masteryPoints,
-            ratings,
-            canEdit,
-            contextId,
-            contextType,
-            friendlyDescription: null,
-            __typename: 'LearningOutcome'
-          },
-          group: {
-            _id: groupId,
-            title: `Refetched ${title}`,
-            __typename: 'LearningOutcomeGroup'
-          },
-          __typename: 'ContentTag'
-        }
-        const outcome3 = {
-          canUnlink,
-          _id: '11',
-          node: {
-            _id: '11',
-            description: '',
-            title: `Newly Created Outcome - ${title}`,
-            displayName: '',
-            calculationMethod,
-            calculationInt,
-            masteryPoints,
-            ratings,
-            canEdit,
-            contextId,
-            contextType,
-            friendlyDescription: null,
-            __typename: 'LearningOutcome'
-          },
-          group: {
-            _id: groupId,
-            title: `Refetched ${title}`,
-            __typename: 'LearningOutcomeGroup'
-          },
-          __typename: 'ContentTag'
-        }
-        const edges = [outcome1, outcome2, outcome3]
-        const afterRemoveEdges = [outcome3]
-        return {
-          data: {
-            group: {
-              _id: groupId,
-              description: `${groupDescription} 4`,
-              title: `Refetched ${title}`,
-              outcomesCount: removeOnRefetch ? afterRemoveEdges.length : edges.length,
-              notImportedOutcomesCount,
-              outcomes: {
-                pageInfo: {
-                  hasNextPage: withMorePage,
-                  endCursor: 'Mx',
-                  __typename: 'PageInfo'
-                },
-                edges: removeOnRefetch ? afterRemoveEdges : edges,
-                __typename: 'ContentTagConnection'
-              },
-              __typename: 'LearningOutcomeGroup'
-            }
-          }
-        }
-      })
-    },
-    {
-      request: {
-        query: SEARCH_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomesCursor: 'Mx',
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 5`,
-            title,
-            outcomesCount: 2,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: null,
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
-                  canUnlink,
-                  _id: '3',
-                  node: {
-                    _id: '3',
-                    description: '',
-                    title: `Outcome 3 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                },
-                {
-                  canUnlink,
-                  _id: '4',
-                  node: {
-                    _id: '4',
-                    description: '',
-                    title: `Outcome 4 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
+              edges: removeOnRefetch ? afterRemoveEdges : edges,
               __typename: 'ContentTagConnection'
             },
             __typename: 'LearningOutcomeGroup'
           }
         }
       }
+    })
+  },
+  {
+    request: {
+      query: SEARCH_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomesCursor: 'Mx',
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        targetGroupId
+      }
     },
-    {
-      request: {
-        query: SEARCH_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          searchQuery,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 6`,
-            title,
-            outcomesCount: 1,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: null,
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
-                  canUnlink,
-                  _id: '1',
-                  node: {
-                    _id: '1',
-                    description: '',
-                    title: `Outcome 1 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: `${groupDescription} 5`,
+          title,
+          outcomesCount: 2,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+              __typename: 'PageInfo'
             },
-            __typename: 'LearningOutcomeGroup'
-          }
+            edges: [
+              {
+                canUnlink,
+                _id: '3',
+                node: {
+                  _id: '3',
+                  description: '',
+                  title: `Outcome 3 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '4',
+                node: {
+                  _id: '4',
+                  description: '',
+                  title: `Outcome 4 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
         }
       }
     }
-  ]
-}
+  },
+  {
+    request: {
+      query: SEARCH_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        searchQuery,
+        targetGroupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: `${groupDescription} 6`,
+          title,
+          outcomesCount: 1,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+              __typename: 'PageInfo'
+            },
+            edges: [
+              {
+                canUnlink,
+                _id: '1',
+                node: {
+                  _id: '1',
+                  description: '',
+                  title: `Outcome 1 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  }
+]
 
 export const groupDetailMocksFetchMore = ({
   groupId = '1',
@@ -1134,184 +1047,161 @@ export const groupDetailMocksFetchMore = ({
   groupDescription = 'Group Description',
   targetGroupId,
   notImportedOutcomesCount = null
-} = {}) => {
-  const calculationMethod = 'decaying_average'
-  const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
-
-  return [
-    {
-      request: {
-        query: SEARCH_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 4`,
-            title,
-            outcomesCount: 2,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: withMorePage,
-                endCursor: 'Mx',
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
-                  canUnlink,
-                  _id: '1',
-                  node: {
-                    _id: '1',
-                    description: '',
-                    title: `Outcome 1 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                },
-                {
-                  canUnlink,
-                  _id: '2',
-                  node: {
-                    _id: '2',
-                    description: '',
-                    title: `Outcome 2 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
-            },
-            __typename: 'LearningOutcomeGroup'
-          }
-        }
+} = {}) => [
+  {
+    request: {
+      query: SEARCH_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        targetGroupId
       }
     },
-    {
-      request: {
-        query: SEARCH_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomesCursor: 'Mx',
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 5`,
-            title,
-            outcomesCount: 2,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: null,
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
-                  canUnlink,
-                  _id: '1',
-                  node: {
-                    _id: '1',
-                    description: '',
-                    title: `New Outcome 1 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                },
-                {
-                  canUnlink,
-                  _id: '3',
-                  node: {
-                    _id: '3',
-                    description: '',
-                    title: `Outcome 3 - ${title}`,
-                    displayName: '',
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    canEdit,
-                    contextId,
-                    contextType,
-                    friendlyDescription: null,
-                    __typename: 'LearningOutcome'
-                  },
-                  group: {
-                    _id: '101',
-                    title: 'Outcome Group 1',
-                    __typename: 'LearningOutcomeGroup'
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: `${groupDescription} 4`,
+          title,
+          outcomesCount: 2,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: withMorePage,
+              endCursor: 'Mx',
+              __typename: 'PageInfo'
             },
-            __typename: 'LearningOutcomeGroup'
-          }
+            edges: [
+              {
+                canUnlink,
+                _id: '1',
+                node: {
+                  _id: '1',
+                  description: '',
+                  title: `Outcome 1 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '2',
+                node: {
+                  _id: '2',
+                  description: '',
+                  title: `Outcome 2 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
         }
       }
     }
-  ]
-}
+  },
+  {
+    request: {
+      query: SEARCH_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomesCursor: 'Mx',
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        targetGroupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: `${groupDescription} 5`,
+          title,
+          outcomesCount: 2,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+              __typename: 'PageInfo'
+            },
+            edges: [
+              {
+                canUnlink,
+                _id: '1',
+                node: {
+                  _id: '1',
+                  description: '',
+                  title: `New Outcome 1 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '3',
+                node: {
+                  _id: '3',
+                  description: '',
+                  title: `Outcome 3 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: '101',
+                  title: 'Outcome Group 1',
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  }
+]
 
 export const findOutcomesMocks = ({
   groupId = '100',
@@ -1325,166 +1215,143 @@ export const findOutcomesMocks = ({
   outcomesCount = 25,
   targetGroupId = '0',
   notImportedOutcomesCount = 1
-} = {}) => {
-  const calculationMethod = 'decaying_average'
-  const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
-
-  return [
-    {
-      request: {
-        query: FIND_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            title: `Group ${groupId}`,
-            contextType: outcomesGroupContextType,
-            contextId: outcomesGroupContextId,
-            outcomesCount,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: 'Mw',
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
-                  _id: '5',
-                  node: {
-                    _id: '5',
-                    description: '',
-                    isImported,
-                    title: `Outcome 5 - Group ${groupId}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      _id: '5',
-                      description: 'Outcome 5 - friendly description',
-                      __typename: 'FriendlyDescription'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                },
-                {
-                  _id: '6',
-                  node: {
-                    _id: '6',
-                    description: '',
-                    isImported,
-                    title: `Outcome 6 - Group ${groupId}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      _id: '6',
-                      description: 'Outcome 6 - friendly description',
-                      __typename: 'FriendlyDescription'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
-            },
-            __typename: 'LearningOutcomeGroup'
-          }
-        }
+} = {}) => [
+  {
+    request: {
+      query: FIND_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        targetGroupId
       }
     },
-    {
-      request: {
-        query: FIND_GROUP_OUTCOMES,
-        variables: {
-          id: groupId,
-          outcomeIsImported,
-          outcomesContextId: contextId,
-          outcomesContextType: contextType,
-          searchQuery,
-          targetGroupId
-        }
-      },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            title: `Group ${groupId}`,
-            contextType: outcomesGroupContextType,
-            contextId: outcomesGroupContextId,
-            outcomesCount: 15,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: 'Mw',
-                __typename: 'PageInfo'
-              },
-              edges: [
-                {
-                  _id: '5',
-                  node: {
-                    _id: '5',
-                    description: '',
-                    isImported,
-                    title: `Outcome 5 - Group ${groupId}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      _id: '5',
-                      description: 'Outcome 5 - friendly description',
-                      __typename: 'FriendlyDescription'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                },
-                {
-                  _id: '6',
-                  node: {
-                    _id: '6',
-                    description: '',
-                    isImported,
-                    title: `Outcome 6 - Group ${groupId}`,
-                    calculationMethod,
-                    calculationInt,
-                    masteryPoints,
-                    ratings,
-                    __typename: 'LearningOutcome',
-                    friendlyDescription: {
-                      _id: '6',
-                      description: 'Outcome 6 - friendly description',
-                      __typename: 'FriendlyDescription'
-                    }
-                  },
-                  __typename: 'ContentTag'
-                }
-              ],
-              __typename: 'ContentTagConnection'
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          title: `Group ${groupId}`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
+          outcomesCount,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: 'Mw',
+              __typename: 'PageInfo'
             },
-            __typename: 'LearningOutcomeGroup'
-          }
+            edges: [
+              {
+                _id: '5',
+                node: {
+                  _id: '5',
+                  description: '',
+                  isImported,
+                  title: `Outcome 5 - Group ${groupId}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '5',
+                    description: 'Outcome 5 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                _id: '6',
+                node: {
+                  _id: '6',
+                  description: '',
+                  isImported,
+                  title: `Outcome 6 - Group ${groupId}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '6',
+                    description: 'Outcome 6 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
         }
       }
     }
-  ]
-}
+  },
+  {
+    request: {
+      query: FIND_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomeIsImported,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
+        searchQuery,
+        targetGroupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          title: `Group ${groupId}`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
+          outcomesCount: 15,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: 'Mw',
+              __typename: 'PageInfo'
+            },
+            edges: [
+              {
+                _id: '5',
+                node: {
+                  _id: '5',
+                  description: '',
+                  isImported,
+                  title: `Outcome 5 - Group ${groupId}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '5',
+                    description: 'Outcome 5 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                _id: '6',
+                node: {
+                  _id: '6',
+                  description: '',
+                  isImported,
+                  title: `Outcome 6 - Group ${groupId}`,
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '6',
+                    description: 'Outcome 6 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  }
+]
 
 export const setFriendlyDescriptionOutcomeMock = ({
   inputDescription = 'Updated friendly description',

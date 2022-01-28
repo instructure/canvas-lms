@@ -868,24 +868,6 @@ describe ExternalToolsController do
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
         end
       end
-
-      context "tool is used for student_context_card" do
-        # If and when we add the functionality, we can also test here that the
-        # student_id appears in the launch.
-        it "launches and does not crash" do
-          lti_1_3_tool.student_context_card = { enable: true }
-          lti_1_3_tool.save!
-
-          get "retrieve", params: {
-            course_id: @course.id,
-            url: "http://www.example.com/launch",
-            placement: "student_context_card",
-            student_id: @student.id,
-          }
-          expect(response.status).to eq(200)
-          expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
-        end
-      end
     end
 
     it "requires authentication" do

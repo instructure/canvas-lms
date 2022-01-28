@@ -44,8 +44,7 @@ function run_command {
   if is_running_on_jenkins; then
     docker-compose exec -T web "$@"
   elif is_docker; then
-    # -T needed until https://github.com/docker/compose/issues/9104 is fixed
-    $DOCKER_COMMAND exec -T -e TELEMETRY_OPT_IN web "$@"
+    $DOCKER_COMMAND exec -e TELEMETRY_OPT_IN web "$@"
   else
     "$@"
   fi
@@ -130,8 +129,8 @@ function confirm_command {
 function docker_compose_up {
   if is_mutagen; then
     start_spinner "Starting mutagen containers..."
-    _canvas_lms_track_with_log mutagen-compose up --no-start web
-    _canvas_lms_track_with_log mutagen-compose run -u root --rm web chown docker:docker /usr/src/app
+    _canvas_lms_track_with_log mutagen compose up --no-start web
+    _canvas_lms_track_with_log mutagen compose run -u root --rm web chown docker:docker /usr/src/app
     stop_spinner
   fi
   start_spinner "Starting docker containers..."
@@ -151,7 +150,7 @@ function check_dependencies {
       continue
     fi
     if [[ ${#dep[@]} -gt 1 ]]; then
-      version=$(eval "${dep[0]}" version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+      version=$(eval "${dep[0]}" --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
       if (( $(echo "$version ${dep[1]}" | awk '{print ($1 < $2)}') )); then
         wrong_version+=("$dependency or higher. Found: ${dep[0]} $version.")
       fi
