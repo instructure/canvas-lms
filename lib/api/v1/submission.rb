@@ -143,7 +143,7 @@ module Api::V1::Submission
 
   SUBMISSION_JSON_FIELDS = %w[id user_id url score grade excused attempt submission_type submitted_at body
                               assignment_id graded_at grade_matches_current_submission grader_id workflow_state late_policy_status
-                              points_deducted grading_period_id cached_due_date extra_attempts posted_at].freeze
+                              points_deducted grading_period_id cached_due_date extra_attempts posted_at redo_request].freeze
   SUBMISSION_JSON_METHODS = %w[late missing seconds_late entered_grade entered_score].freeze
   SUBMISSION_OTHER_FIELDS = %w[attachments discussion_entries].freeze
 

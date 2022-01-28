@@ -202,12 +202,14 @@ export default class GradebookHeaderMenu {
     students = _.map(students, student => {
       const sub = student[`assignment_${assignment.id}`]
       return {
+        grade: sub.grade,
         id: student.id,
         name: student.name,
+        redoRequest: sub.redo_request,
         score: sub != null ? sub.score : undefined,
         // Both gradebooks share the Message Students dialog; prefer New Gradebook's casing
         sortableName: student.sortable_name,
-        submitted_at: sub != null ? sub.submitted_at : undefined
+        submittedAt: sub != null ? sub.submitted_at : undefined
       }
     })
 
@@ -217,8 +219,10 @@ export default class GradebookHeaderMenu {
       )
       const props = {
         assignment: {
+          gradingType: assignment.grading_type,
           id: assignment.id,
-          name: assignment.name
+          name: assignment.name,
+          submissionTypes: assignment.submission_types
         },
         onClose: () => {
           ReactDOM.unmountComponentAtNode(mountPoint)

@@ -29,18 +29,23 @@ function getSubmission(student, assignmentId) {
   if (!submission) {
     return {
       excused: false,
+      grade: null,
       hasPostableComments: false,
       latePolicyStatus: null,
+      redoRequest: false,
       postedAt: null,
       score: null,
-      submittedAt: null
+      submittedAt: null,
+      workflowState: null
     }
   }
 
   return {
     excused: submission.excused,
+    grade: submission.grade,
     hasPostableComments: submission.has_postable_comments,
     latePolicyStatus: submission.late_policy_status,
+    redoRequest: submission.redo_request,
     postedAt: submission.posted_at,
     score: submission.score,
     submittedAt: submission.submitted_at,
@@ -89,8 +94,10 @@ function getProps(column, gradebook, options) {
 
     allStudents,
     assignment: {
+      allowedAttempts: assignment.allowed_attempts,
       anonymizeStudents: assignment.anonymize_students,
       courseId: assignment.course_id,
+      dueDate: assignment.due_at,
       htmlUrl: assignment.html_url,
       gradingType: assignment.grading_type,
       id: assignment.id,
