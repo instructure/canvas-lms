@@ -147,13 +147,13 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# ítem cargado}\n  other {# ítems cargados}\n}"
   },
-  "course_documents_104d76e0": { "message": "Documentos de la asignatura" },
-  "course_files_62deb8f8": { "message": "Archivos de la asignatura" },
-  "course_files_a31f97fc": { "message": "Archivos de la asignatura" },
-  "course_images_f8511d04": { "message": "Imágenes de la asignatura" },
-  "course_links_b56959b9": { "message": "Enlaces de la asignatura" },
-  "course_media_ec759ad": { "message": "Multimedia de la asignatura" },
-  "course_navigation_dd035109": { "message": "Navegación de la asignatura" },
+  "course_documents_104d76e0": { "message": "Documentos del curso" },
+  "course_files_62deb8f8": { "message": "Archivos del curso" },
+  "course_files_a31f97fc": { "message": "Archivos del curso" },
+  "course_images_f8511d04": { "message": "Imágenes del curso" },
+  "course_links_b56959b9": { "message": "Enlaces del curso" },
+  "course_media_ec759ad": { "message": "Multimedia del curso" },
+  "course_navigation_dd035109": { "message": "Navegación del curso" },
   "create_button_and_icon_5c089934": { "message": "Crear botón e ícono" },
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
@@ -310,7 +310,7 @@ const locale = {
   "load_more_results_460f49a9": { "message": "Cargar más resultados" },
   "loading_25990131": { "message": "Cargando..." },
   "loading_bde52856": { "message": "Cargando" },
-  "loading_failed_b3524381": { "message": "La carga ha fallado." },
+  "loading_failed_b3524381": { "message": "La carga ha fallado..." },
   "loading_failed_e6a9d8ef": { "message": "La carga ha fallado." },
   "loading_folders_d8b5869e": { "message": "Cargando carpetas" },
   "loading_please_wait_d276220a": { "message": "Cargando, espere" },
@@ -321,7 +321,7 @@ const locale = {
   "middle_27dc1d5": { "message": "El medio" },
   "misc_3b692ea7": { "message": "Varios" },
   "miscellaneous_e9818229": { "message": "Misceláneo" },
-  "modules_c4325335": { "message": "Contenidos" },
+  "modules_c4325335": { "message": "Módulos" },
   "multi_color_image_63d7372f": { "message": "Imagen multicolor" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Debe ser al menos { percentage }%"
@@ -334,7 +334,7 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegar por el menú o la barra de herramientas"
   },
-  "next_page_d2a39853": { "message": "Siguiente página" },
+  "next_page_d2a39853": { "message": "Próxima página" },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": {
     "message": "No se ha seleccionado ningún archivo"
@@ -390,7 +390,7 @@ const locale = {
   },
   "published_c944a23d": { "message": "publicado" },
   "published_when_302d8e23": { "message": "Publicado: { when }" },
-  "quizzes_7e598f57": { "message": "Pruebas" },
+  "quizzes_7e598f57": { "message": "Evaluaciones" },
   "raw_html_editor_e3993e41": { "message": "Editor HTML puro" },
   "record_7c9448b": { "message": "Grabar" },
   "record_upload_media_5fdce166": { "message": "Grabar/cargar multimedia" },
@@ -415,7 +415,7 @@ const locale = {
   "search_term_b2d2235": { "message": "Término de búsqueda" },
   "select_crop_shape_d441feeb": { "message": "Seleccione la forma de recorte" },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
-  "selected_274ce24f": { "message": "Seleccionado" },
+  "selected_274ce24f": { "message": "Seleccionada" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Mayúsc-O para abrir el editor html agradable."
   },
@@ -461,7 +461,7 @@ const locale = {
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Cambiar al editor de texto enriquecido"
   },
-  "syllabus_f191f65b": { "message": "Programa de la asignatura" },
+  "syllabus_f191f65b": { "message": "Programa del curso" },
   "tab_arrows_4cf5abfc": { "message": "Tabulador/flechas" },
   "text_7f4593da": { "message": "Texto" },
   "text_background_color_16e61c3f": { "message": "Color del fondo del texto" },
@@ -485,7 +485,7 @@ const locale = {
   },
   "title_ee03d132": { "message": "Título" },
   "to_be_posted_when_d24bf7dc": { "message": "Para publicar: { when }" },
-  "to_do_when_2783d78f": { "message": "Tareas pendientes: { when }" },
+  "to_do_when_2783d78f": { "message": "Pendiente: { when }" },
   "toggle_summary_group_413df9ac": { "message": "Alternar { summary } grupo" },
   "tools_2fcf772e": { "message": "Herramientas" },
   "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
