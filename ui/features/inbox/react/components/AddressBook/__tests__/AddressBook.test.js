@@ -30,7 +30,8 @@ const demoData = [
 ]
 
 const defaultProps = {
-  menuData: demoData
+  menuData: demoData,
+  onUserFilterSelect: jest.fn()
 }
 
 const setup = props => {
@@ -187,6 +188,21 @@ describe('Address Book Component', () => {
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
       expect(onSelectSpy.mock.calls.length).toBe(1)
+    })
+
+    it('Should call onUserFilterSelect when item is selected', async () => {
+      const onSelectSpy = jest.fn()
+      const onUserFilterSelectSpy = jest.fn()
+      setup({
+        ...defaultProps,
+        open: true,
+        onSelect: onSelectSpy,
+        onUserFilterSelect: onUserFilterSelectSpy
+      })
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[4])
+      expect(onUserFilterSelectSpy.mock.calls.length).toBe(1)
     })
 
     it('Should call back for group clicks', async () => {
