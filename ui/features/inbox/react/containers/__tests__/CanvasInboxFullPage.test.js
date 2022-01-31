@@ -203,4 +203,16 @@ describe('CanvasInbox Full Page', () => {
       expect(setOnSuccess).toHaveBeenCalledWith('The conversations has been successfully starred.')
     )
   })
+
+  it('should trigger confirm when deleting', async () => {
+    window.confirm = jest.fn(() => true)
+    const container = setup()
+
+    const conversation = await container.findByTestId('conversationListItem-Checkbox')
+    fireEvent.click(conversation)
+
+    const deleteBtn = await container.findByTestId('delete')
+    fireEvent.click(deleteBtn)
+    expect(window.confirm).toHaveBeenCalled()
+  })
 })
