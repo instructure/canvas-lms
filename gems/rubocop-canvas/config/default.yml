@@ -82,6 +82,11 @@ Migration/RenameTable:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/RootAccountId:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/SendLater:
   Enabled: true
   Include:
