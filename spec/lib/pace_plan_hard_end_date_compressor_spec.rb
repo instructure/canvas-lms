@@ -60,6 +60,28 @@ describe PacePlanHardEndDateCompressor do
         compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
         expect(compressed.pluck(:duration)).to eq([1, 1, 2])
       end
+
+      context "implicit end dates" do
+        before :once do
+          @course.update(start_at: "2021-12-27")
+          @pace_plan.update(end_date: nil, exclude_weekends: true)
+          @pace_plan.pace_plan_module_items.each_with_index do |item, index|
+            item.update(duration: (index + 1) * 2)
+          end
+        end
+
+        it "supports implicit end dates from the course's term" do
+          @course.enrollment_term.update(end_at: "2021-12-31")
+          compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
+          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+        end
+
+        it "supports implicit end dates from the course" do
+          @course.update(conclude_at: "2021-12-31")
+          compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
+          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+        end
+      end
     end
 
     it "paces assignments appropriately if there are too many" do
