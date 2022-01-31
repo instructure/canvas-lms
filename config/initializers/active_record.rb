@@ -1635,7 +1635,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     execute schema_creation.accept(at)
   end
 
-  def add_replica_identity(model_name, column_name, default_value)
+  def add_replica_identity(model_name, column_name, default_value = 0)
     klass = model_name.constantize
     if columns(klass.table_name).find { |c| c.name == column_name.to_s }.null
       DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
