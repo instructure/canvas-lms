@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,27 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-const path = require('path')
-
-require('@babel/register')({
-  configFile: false,
-  presets: [
-    ['@babel/preset-env'],
-    ['@babel/preset-react', {}],
-  ],
-  plugins: [
-    ['@babel/plugin-proposal-decorators', {legacy: true}],
-    ['@instructure/babel-plugin-themeable-styles', {
-      postcssrc: require('@instructure/ui-postcss-config')()(),
-      themeablerc: {},
-    }]
-  ],
-  targets: {
-    node: 'current'
-  },
-  only: [
-    path.resolve(__dirname, 'src'),
-    path.resolve(__dirname, 'test'),
-    path.resolve(__dirname, '../../packages'),
-  ],
-})
+module.exports = {
+  require: [
+    '@instructure/canvas-theme',
+    'jsdom-global/register',
+    require.resolve('./babel-register.js')
+  ]
+}
