@@ -17,12 +17,14 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ImageSection} from '../ImageSection'
 import fetchMock from 'fetch-mock'
+import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
+    ...jest.requireActual('../../../../../shared/StoreContext'),
     useStoreProps: () => ({
       images: {
         Course: {
@@ -91,6 +93,14 @@ jest.mock('../../../../../shared/StoreContext', () => {
   }
 })
 
+jest.mock('../../../../../../../bridge', () => {
+  return {
+    trayProps: {
+      get: editor => ({foo: 'bar'})
+    }
+  }
+})
+
 describe('ImageSection', () => {
   const defaultProps = {
     settings: {},
@@ -117,6 +127,38 @@ describe('ImageSection', () => {
     it('renders a "None Selected" message', () => {
       const {getByText} = subject()
       expect(getByText('None Selected')).toBeInTheDocument()
+    })
+  })
+
+  describe('when the "upload image" mode is selected', () => {
+    let rendered
+
+    beforeEach(() => {
+      fetchMock.mock('/api/session', '{}')
+
+      rendered = subject({editor: new FakeEditor()})
+
+      fireEvent.click(rendered.getByText('Add Image'))
+      fireEvent.click(rendered.getByText('Upload Image'))
+    })
+
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    it('renders the image upload modal', async () => {
+      await waitFor(() => expect(rendered.getByText('Upload Image')).toBeInTheDocument())
+    })
+
+    describe('and the the "close" button is clicked', () => {
+      beforeEach(async () => {
+        const button = await rendered.findAllByText(/Close/i)
+        fireEvent.click(button[0])
+      })
+
+      it('closes the modal', () => {
+        expect(rendered.queryByText('Upload Image')).toBe(null)
+      })
     })
   })
 

@@ -101,6 +101,7 @@ export const AddressBookContainer = props => {
       isSubMenu={filterHistory.length > 1}
       onSelect={handleSelect}
       onTextChange={setInputValue}
+      onUserFilterSelect={props.onUserFilterSelect}
       onSelectedIdsChange={props.onSelectedIdsChange}
       limitTagCount={props.limitTagCount}
       width={props.width}
@@ -125,7 +126,11 @@ AddressBookContainer.propTypes = {
   /**
    * Bool to control open/closed state of menu for testing
    */
-  open: PropTypes.bool
+  open: PropTypes.bool,
+  /**
+   * use State function to set user filter for conversations
+   */
+  onUserFilterSelect: PropTypes.func
 }
 
 AddressBookContainer.defaultProps = {

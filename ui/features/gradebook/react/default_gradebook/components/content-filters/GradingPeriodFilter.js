@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, shape, string, bool, func} from 'prop-types'
 
 import I18n from 'i18n!gradebook_default_gradebook_components_content_filters_grading_period_filter'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
@@ -30,11 +30,13 @@ function normalizeGradingPeriods(gradingPeriods) {
 }
 
 export default function GradingPeriodFilter(props) {
-  const {gradingPeriods, selectedGradingPeriodId, ...filterProps} = props
+  const {disabled, onSelect, gradingPeriods, selectedGradingPeriodId, ...filterProps} = props
 
   return (
     <ContentFilter
       {...filterProps}
+      disabled={disabled}
+      onSelect={onSelect}
       allItemsId="0"
       allItemsLabel={I18n.t('All Grading Periods')}
       items={normalizeGradingPeriods(gradingPeriods)}
@@ -45,6 +47,8 @@ export default function GradingPeriodFilter(props) {
 }
 
 GradingPeriodFilter.propTypes = {
+  disabled: bool.isRequired,
+  onSelect: func.isRequired,
   gradingPeriods: arrayOf(
     shape({
       id: string.isRequired,

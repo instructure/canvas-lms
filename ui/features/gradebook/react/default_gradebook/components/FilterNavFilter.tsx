@@ -34,17 +34,29 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import Condition from './FilterNavCondition'
+import type {Filter, Module, Section, GradingPeriod, AssignmentGroup} from '../gradebook.d'
 
 const {Item} = Flex as any
+
+export type FilterNavFilterProps = {
+  assignmentGroups: AssignmentGroup[]
+  filter: Filter
+  gradingPeriods: GradingPeriod[]
+  modules: Module[]
+  onChange: any
+  onDelete: any
+  sections: Section[]
+}
 
 export default function FilterNavFilter({
   filter,
   onDelete,
   onChange,
   modules,
+  gradingPeriods,
   assignmentGroups,
   sections
-}) {
+}: FilterNavFilterProps) {
   const [isRenaming, setIsRenaming] = useState(false)
   const [wasRenaming, setWasRenaming] = useState(false)
   const [label, setLabel] = useState(filter.label)
@@ -60,12 +72,13 @@ export default function FilterNavFilter({
   }, [isRenaming, wasRenaming])
 
   const onAddCondition = () => {
+    const id: string = uuid()
     onChange({
       ...filter,
       conditions: filter.conditions.concat({
-        id: uuid(),
-        type: null,
-        value: null,
+        id,
+        type: undefined,
+        value: undefined,
         createdAt: new Date().toISOString()
       })
     })
@@ -168,6 +181,7 @@ export default function FilterNavFilter({
           key={condition.id}
           condition={condition}
           conditionsInFilter={filter.conditions}
+          gradingPeriods={gradingPeriods}
           onChange={onChangeCondition}
           onDelete={onDeleteCondition}
           modules={modules}

@@ -564,6 +564,17 @@ describe('sources/api', () => {
       })
     })
 
+    it('includes "category"', () => {
+      fetchMock.mock(uri, '{}')
+
+      return apiSource
+        .preflightUpload(fileProps, {category: 'buttons_and_icons'}, apiProps)
+        .then(() => {
+          const body = JSON.parse(fetchMock.lastOptions(uri).body)
+          assert.equal(body.category, 'buttons_and_icons')
+        })
+    })
+
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, '{}')
 

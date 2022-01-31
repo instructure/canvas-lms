@@ -24,7 +24,10 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
   puts "Looking through #{filename}"
   doc = File.read(filename)
   (header, body) = doc.split("---").reject(&:empty?)
-  map_header ||= header.gsub(":version:", ":version: #{Time.now.utc}")
+  map_header ||= header.gsub(":timestamp:", ":timestamp: #{Time.now.utc}")
+  puts "#{filename} Invalid! Likely contains spec failures" unless body
+  next unless body
+
   body.split("\n").slice_when { |_before, after| after.include?(":") }.each do |group|
     spec = group.shift
     changed_files = group
@@ -47,6 +50,8 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
     map_body[spec] = changed_files.uniq
   end
 end
+
+map_header = map_header.gsub(":version:", ":version: #{map_body.keys.count} Tests Present in Map")
 
 File.open("crystalball_map.yml", "w") do |file|
   file << "---"

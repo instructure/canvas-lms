@@ -75,7 +75,7 @@ describe('PostToolbar', () => {
       expect(onTogglePublishMock.mock.calls.length).toBe(1)
     })
 
-    it('displays as readonly if canUnpublish is false', () => {
+    it('displays as disabled if canUnpublish is false', () => {
       const onTogglePublishMock = jest.fn()
       const {getByText} = setup({
         onTogglePublish: onTogglePublishMock,

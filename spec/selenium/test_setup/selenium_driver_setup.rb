@@ -224,7 +224,7 @@ module SeleniumDriverSetup
 
     def edge_driver
       puts "using Edge driver"
-      selenium_remote_driver
+      selenium_url ? selenium_remote_driver : ruby_edge_driver
     end
 
     def safari_driver
@@ -285,6 +285,12 @@ module SeleniumDriverSetup
       Selenium::WebDriver.for :safari
     end
 
+    def ruby_edge_driver
+      puts "Thread: provisioning local edge driver"
+      edge_options = Selenium::WebDriver::Edge::Options.new
+      Selenium::WebDriver.for :edge, desired_capabilities: desired_capabilities, options: edge_options
+    end
+
     def selenium_remote_driver
       puts "Thread: provisioning remote #{browser} driver"
       driver = Selenium::WebDriver.for(
@@ -329,7 +335,7 @@ module SeleniumDriverSetup
         end
         caps["unexpectedAlertBehaviour"] = "ignore"
       when :edge
-        # TODO: options for edge driver
+        caps = Selenium::WebDriver::Remote::Capabilities.edge
       when :safari
         # TODO: options for safari driver
       else
@@ -344,7 +350,9 @@ module SeleniumDriverSetup
         CONFIG[:remote_url_firefox] || CONFIG[:remote_url]
       when :chrome
         CONFIG[:remote_url_chrome] || CONFIG[:remote_url]
-      when :internet_explorer, :safari, :edge
+      when :edge
+        CONFIG[:remote_url_edge] || CONFIG[:remote_url]
+      when :internet_explorer, :safari
         CONFIG[:remote_url]
       else
         raise "unsupported browser #{browser}"

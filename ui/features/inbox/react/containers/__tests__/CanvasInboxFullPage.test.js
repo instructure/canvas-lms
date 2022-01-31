@@ -21,6 +21,7 @@ import CanvasInbox from '../CanvasInbox'
 import {ApolloProvider} from 'react-apollo'
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
+import {responsiveQuerySizes} from '../../../util/utils'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import {handlers} from '../../../graphql/mswHandlers'
@@ -28,6 +29,11 @@ import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {graphql} from 'msw'
 import {ConversationParticipant} from '../../../graphql/ConversationParticipant'
 import {Conversation} from '../../../graphql/Conversation'
+
+jest.mock('../../../util/utils', () => ({
+  ...jest.requireActual('../../../util/utils'),
+  responsiveQuerySizes: jest.fn()
+}))
 
 describe('CanvasInbox Full Page', () => {
   const server = mswServer(handlers)
@@ -43,6 +49,21 @@ describe('CanvasInbox Full Page', () => {
         id: '9'
       }
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+
+    // Repsonsive Query Mock Default
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {minWidth: '768px'}
+    }))
   })
 
   beforeEach(() => {

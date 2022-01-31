@@ -33,6 +33,8 @@ module Types
 
     field :name, String, null: true
 
+    field :members_count, Integer, null: true
+
     field :members_connection, GroupMembershipType.connection_type, null: true
     def members_connection
       if group.grants_right?(current_user, :read_roster)

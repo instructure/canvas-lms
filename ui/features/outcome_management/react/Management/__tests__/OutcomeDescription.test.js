@@ -20,6 +20,7 @@ import React from 'react'
 import {render as rtlRender} from '@testing-library/react'
 import OutcomeDescription from '../OutcomeDescription'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {defaultRatingsAndCalculationMethod} from './helpers'
 
 describe('OutcomeDescription', () => {
   const empty = ''
@@ -28,10 +29,17 @@ describe('OutcomeDescription', () => {
   const ratingsTestId = 'outcome-management-ratings'
   const expandedTestId = 'description-expanded'
   const friendlyExpandedTestId = 'friendly-description-expanded'
+  const {calculationMethod, calculationInt, masteryPoints, pointsPossible, ratings} =
+    defaultRatingsAndCalculationMethod
   const defaultProps = (props = {}) => ({
     truncated: true,
     description: 'Description',
     friendlyDescription: '',
+    calculationMethod,
+    calculationInt,
+    masteryPoints,
+    pointsPossible,
+    ratings,
     ...props
   })
 

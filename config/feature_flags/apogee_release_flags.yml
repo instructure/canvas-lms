@@ -116,11 +116,6 @@ remove_missing_status_when_graded:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
-visible_assignments_scope_change:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Visible Assignments Scope Change
-  description: Reverts the visible assignments scope to its original form
 message_observers_of_students_who:
   state: hidden
   applies_to: SiteAdmin

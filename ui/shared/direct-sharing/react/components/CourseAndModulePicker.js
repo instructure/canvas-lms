@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!course_and_module_picker'
 
-import React from 'react'
+import React, {useRef} from 'react'
 import {func, string, bool} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -52,14 +52,17 @@ export default function CourseAndModulePicker({
   disableModuleInsertion,
   includeConcluded
 }) {
+  const trayRef = useRef(null)
+
   return (
-    <>
+    <div ref={trayRef}>
       <View as="div" padding="0 0 small 0">
         <SearchItemSelector
           onItemSelected={setSelectedCourse}
           renderLabel={I18n.t('Select a Course')}
           itemSearchFunction={useManagedCourseSearchApi}
           additionalParams={{include: includeConcluded ? 'concluded' : ''}}
+          mountNodeRef={trayRef}
           renderOption={item => {
             return (
               <View>
@@ -88,6 +91,7 @@ export default function CourseAndModulePicker({
             renderLabel={I18n.t('Select a Module (optional)')}
             itemSearchFunction={useModuleCourseSearchApi}
             contextId={selectedCourseId || null}
+            mountNodeRef={trayRef}
             renderOption={item => {
               return (
                 <View>
@@ -108,6 +112,6 @@ export default function CourseAndModulePicker({
           setModuleItemPosition={setModuleItemPosition}
         />
       )}
-    </>
+    </div>
   )
 }

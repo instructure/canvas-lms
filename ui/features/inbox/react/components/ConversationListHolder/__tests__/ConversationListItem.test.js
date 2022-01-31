@@ -19,6 +19,12 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {ConversationListItem} from '../ConversationListItem'
+import {responsiveQuerySizes} from '../../../../util/utils'
+
+jest.mock('../../../../util/utils', () => ({
+  ...jest.requireActual('../../../../util/utils'),
+  responsiveQuerySizes: jest.fn()
+}))
 
 describe('ConversationListItem', () => {
   const createProps = overrides => {
@@ -70,85 +76,137 @@ describe('ConversationListItem', () => {
     }
   }
 
-  it('calls the onSelect callback with the new state', () => {
-    const onSelectMock = jest.fn()
-
-    const props = createProps({onSelect: onSelectMock})
-
-    const {getByRole} = render(<ConversationListItem {...props} />)
-
-    const checkbox = getByRole('checkbox')
-    fireEvent.click(checkbox)
-    expect(onSelectMock).toHaveBeenCalled()
-    expect(checkbox.checked).toBe(true)
-    fireEvent.click(checkbox)
-    expect(onSelectMock).toHaveBeenCalled()
-    expect(checkbox.checked).toBe(false)
-  })
-
-  it('calls onOpen when the conversation is clicked', () => {
-    const onOpenMock = jest.fn()
-
-    const props = createProps({onOpen: onOpenMock})
-
-    const {getByText} = render(<ConversationListItem {...props} />)
-
-    const subjectLine = getByText('This is the subject line')
-    fireEvent.click(subjectLine)
-    expect(onOpenMock).toHaveBeenCalled()
-  })
-
-  it('shows and hides the star button correctly', () => {
-    const onStarMock = jest.fn()
-
-    const props = createProps({onStar: onStarMock})
-
-    const {queryByTestId, getByText} = render(<ConversationListItem {...props} />)
-
-    // star not shown by default
-    expect(queryByTestId('visible-star')).not.toBeInTheDocument()
-    // star shown when conversation is moused over
-    const subjectLine = getByText('This is the subject line')
-    fireEvent.mouseOver(subjectLine)
-    expect(queryByTestId('visible-star')).toBeInTheDocument()
-
-    fireEvent.click(queryByTestId('visible-star'))
-    expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
-  })
-
-  it('renders the unread badge when the conversation is unread', () => {
-    const props = createProps({isUnread: true})
-
-    const container = render(<ConversationListItem {...props} />)
-
-    expect(container.getByText('Unread')).toBeInTheDocument()
-    expect(container.getByTestId('unread-badge')).toBeInTheDocument()
-  })
-
-  it('renders the read badge when the conversation is read', () => {
-    const props = createProps()
-
-    const container = render(<ConversationListItem {...props} />)
-
-    expect(container.getByText('Read')).toBeInTheDocument()
-    expect(container.getByTestId('read-badge')).toBeInTheDocument()
-  })
-
-  it('update read state called with correct parameters', () => {
-    const changeReadState = jest.fn()
-
-    const props = createProps({readStateChangeConversationParticipants: changeReadState})
-
-    const container = render(<ConversationListItem {...props} />)
-
-    const unreadBadge = container.queryByTestId('read-badge')
-    fireEvent.click(unreadBadge)
-
-    expect(changeReadState).toHaveBeenCalledWith({
-      variables: {
-        conversationIds: ['191'],
-        workflowState: 'unread'
+  beforeAll(() => {
+    // Add appropriate mocks for responsive
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
       }
+    })
+
+    // Repsonsive Query Mock Default
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {minWidth: '768px'}
+    }))
+  })
+
+  describe('behavior', () => {
+    it('calls the onSelect callback with the new state', () => {
+      const onSelectMock = jest.fn()
+
+      const props = createProps({onSelect: onSelectMock})
+
+      const {getByRole} = render(<ConversationListItem {...props} />)
+
+      const checkbox = getByRole('checkbox')
+      fireEvent.click(checkbox)
+      expect(onSelectMock).toHaveBeenCalled()
+      expect(checkbox.checked).toBe(true)
+      fireEvent.click(checkbox)
+      expect(onSelectMock).toHaveBeenCalled()
+      expect(checkbox.checked).toBe(false)
+    })
+
+    it('calls onOpen when the conversation is clicked', () => {
+      const onOpenMock = jest.fn()
+
+      const props = createProps({onOpen: onOpenMock})
+
+      const {getByText} = render(<ConversationListItem {...props} />)
+
+      const subjectLine = getByText('This is the subject line')
+      fireEvent.click(subjectLine)
+      expect(onOpenMock).toHaveBeenCalled()
+    })
+
+    it('shows and hides the star button correctly', () => {
+      const onStarMock = jest.fn()
+
+      const props = createProps({onStar: onStarMock})
+
+      const {queryByTestId, getByText} = render(<ConversationListItem {...props} />)
+
+      // star not shown by default
+      expect(queryByTestId('visible-star')).not.toBeInTheDocument()
+      // star shown when conversation is moused over
+      const subjectLine = getByText('This is the subject line')
+      fireEvent.mouseOver(subjectLine)
+      expect(queryByTestId('visible-star')).toBeInTheDocument()
+
+      fireEvent.click(queryByTestId('visible-star'))
+      expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
+    })
+
+    it('renders the unread badge when the conversation is unread', () => {
+      const props = createProps({isUnread: true})
+
+      const container = render(<ConversationListItem {...props} />)
+
+      expect(container.getByText('Unread')).toBeInTheDocument()
+      expect(container.getByTestId('unread-badge')).toBeInTheDocument()
+    })
+
+    it('renders the read badge when the conversation is read', () => {
+      const props = createProps()
+
+      const container = render(<ConversationListItem {...props} />)
+
+      expect(container.getByText('Read')).toBeInTheDocument()
+      expect(container.getByTestId('read-badge')).toBeInTheDocument()
+    })
+
+    it('update read state called with correct parameters', () => {
+      const changeReadState = jest.fn()
+
+      const props = createProps({readStateChangeConversationParticipants: changeReadState})
+
+      const container = render(<ConversationListItem {...props} />)
+
+      const unreadBadge = container.queryByTestId('read-badge')
+      fireEvent.click(unreadBadge)
+
+      expect(changeReadState).toHaveBeenCalledWith({
+        variables: {
+          conversationIds: ['191'],
+          workflowState: 'unread'
+        }
+      })
+    })
+  })
+
+  describe('responsiveness', () => {
+    describe('tablet', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          tablet: {maxWidth: '67'}
+        }))
+      })
+
+      it('should emit correct test id for tablet', async () => {
+        const props = createProps({})
+        const container = render(<ConversationListItem {...props} />)
+        const listItem = await container.findByTestId('list-item-tablet')
+        expect(listItem).toBeTruthy()
+      })
+    })
+
+    describe('desktop', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          desktop: {minWidth: '768'}
+        }))
+      })
+
+      it('should emit correct test id for desktop', async () => {
+        const props = createProps({})
+        const container = render(<ConversationListItem {...props} />)
+        const listItem = await container.findByTestId('list-item-desktop')
+        expect(listItem).toBeTruthy()
+      })
     })
   })
 })

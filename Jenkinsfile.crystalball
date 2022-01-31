@@ -172,12 +172,13 @@ pipeline {
 
         sh 'docker cp crystalball-parser:/usr/src/app/crystalball_map.yml .'
         archiveArtifacts allowEmptyArchive: true, artifacts: 'crystalball_map.yml'
-        sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
 
-        // Only alert on periodic jobs, not ones resulting from manual tests
-        if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+        // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
+        if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
+          sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
           slackSend channel: '#crystalball-noisy', message: "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>"
         }
+
       }
     }
     cleanup {
