@@ -2852,8 +2852,12 @@ class Assignment < ActiveRecord::Base
   scope :for_group_category, ->(group_category_id) { where(group_category_id: group_category_id) }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
-    joins(:assignment_student_visibilities)
-      .where(assignment_student_visibilities: { user_id: user_id, course_id: course_id })
+    if Account.site_admin.feature_enabled?(:visible_assignments_scope_change)
+      joins(:assignment_student_visibilities)
+        .where(assignment_student_visibilities: { user_id: user_id, course_id: course_id })
+    else
+      joins(:submissions).where(submissions: { user_id: user_id })
+    end
   }
 
   # course_ids should be courses that restrict visibility based on overrides

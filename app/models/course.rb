@@ -359,19 +359,6 @@ class Course < ActiveRecord::Base
     !!@skip_updating_account_associations
   end
 
-  def assigned_assignment_ids_by_user
-    @assigned_assignment_ids_by_user ||=
-      assignments
-      .active
-      .joins(:submissions)
-      .except(:order)
-      .pluck("assignments.id", "submissions.user_id")
-      .each_with_object({}) do |(assignment_id, user_id), hash|
-        hash[user_id] ||= Set.new
-        hash[user_id] << assignment_id
-      end
-  end
-
   def update_account_associations_if_changed
     if (saved_change_to_root_account_id? || saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
       delay(synchronous: !Rails.env.production? || saved_change_to_id?).update_account_associations

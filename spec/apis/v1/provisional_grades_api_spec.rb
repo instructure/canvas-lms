@@ -354,16 +354,6 @@ describe "Provisional Grades API", type: :request do
           expect(@assignment.grades_published_at).to be_within(1.minute.to_i).of(Time.now.utc)
         end
 
-        it "does not publish provisional grades for concluded students" do
-          @course.enrollments.find_by(user: @student).conclude
-          api_call_as_user(@teacher, :post, @path, @params)
-          aggregate_failures do
-            expect(@submission.reload.workflow_state).to eq "submitted"
-            expect(@submission.grader).to be_nil
-            expect(@submission.score).to be_nil
-          end
-        end
-
         it "publishes the selected provisional grade when the student is in the moderation set" do
           @submission.provisional_grade(@ta).update_attribute(:graded_at, 1.minute.ago)
 

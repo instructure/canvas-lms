@@ -19,6 +19,7 @@
 
 describe Course do
   before(:once) do
+    Account.site_admin.enable_feature!(:visible_assignments_scope_change)
     @test_course = Course.create!
     course_with_teacher(course: @test_course, active_all: true)
     @teacher = @user

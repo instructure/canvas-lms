@@ -18,18 +18,18 @@
 
 // pass in an array of {string: text, bold: true, color: red}
 
-import {DiscussionDetails} from './DiscussionDetails'
+import {AssignmentDetails} from './AssignmentDetails'
 
 import React from 'react'
 import {Assignment} from '../../../graphql/Assignment'
 
 export default {
-  title: 'Examples/Discussion Posts/Components/DiscussionDetails',
-  component: DiscussionDetails,
+  title: 'Examples/Discussion Posts/Components/AssignmentDetails',
+  component: AssignmentDetails,
   argTypes: {}
 }
 
-const Template = args => <DiscussionDetails {...args} />
+const Template = args => <AssignmentDetails {...args} />
 
 export const SingleDueDate = Template.bind({})
 SingleDueDate.args = {

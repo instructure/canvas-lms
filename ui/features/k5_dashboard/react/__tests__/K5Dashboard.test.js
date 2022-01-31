@@ -485,7 +485,7 @@ describe('K-5 Dashboard', () => {
             })
             .then(() => {
               // Expect just one announcement request for all cards
-              expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/).length).toBe(1)
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(1)
               done()
             })
         )

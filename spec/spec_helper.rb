@@ -45,16 +45,6 @@ if ENV["COVERAGE"] == "1" && (ENV["SUPPRESS_OUTPUT"] != "1")
   CoverageTool.start("RSpec")
 end
 
-if ENV["CRYSTALBALL_MAP"] == "1"
-  require_relative("support/crystalball")
-
-  Coverage.start unless Coverage.running?
-  Crystalball::MapGenerator.start! do |config|
-    config.register Crystalball::MapGenerator::CanvasCoverageStrategy.new
-    config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
-  end
-end
-
 require_relative "../config/environment"
 
 require "rspec/rails"
@@ -168,6 +158,32 @@ if ENV["ENABLE_AXE_SELENIUM"] == "1"
     if ENV["RSPEC_PROCESSES"]
       config.serialize_output = true
       config.serialize_prefix = "log/results/stormbreaker_results"
+    end
+  end
+end
+
+if ENV["CRYSTALBALL_MAP"] == "1"
+  Crystalball::MapGenerator.start! do |config|
+    config.register Crystalball::MapGenerator::CoverageStrategy.new
+    config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
+  end
+
+  module Crystalball
+    class MapGenerator
+      class CoverageStrategy
+        def call(example_map, example)
+          puts "Calling Coverage Strategy for #{example.inspect}"
+          before = Coverage.peek_result
+          yield example_map, example
+          after = Coverage.peek_result
+          example_map.push(*execution_detector.detect(before, after))
+
+          # rubocop:disable Specs/NoExecuteScript
+          js_coverage = SeleniumDriverSetup.driver.execute_script("return window.__coverage__")&.keys&.uniq
+          # rubocop:enable Specs/NoExecuteScript
+          example_map.used_files.concat(js_coverage) if js_coverage
+        end
+      end
     end
   end
 end

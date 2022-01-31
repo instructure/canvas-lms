@@ -37,7 +37,6 @@ module SIS
         count = SIS::UserImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
             u = create_user(row, csv)
-            validate(row)
             importer.add_user(u)
           rescue ImportError => e
             messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: u.row_info)
@@ -70,12 +69,6 @@ module SIS
           row: row,
           authentication_provider_id: row["authentication_provider_id"]
         )
-      end
-
-      def validate(row)
-        if row.fields.any? { |v| v.to_s.include?("\x00") }
-          raise ImportError, "Some of the fields contain NULL character"
-        end
       end
     end
   end

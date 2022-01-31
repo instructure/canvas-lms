@@ -27,7 +27,7 @@ class Account < ActiveRecord::Base
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   # a list of columns necessary for validation and save callbacks to work on a slim object
-  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings].freeze
+  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state].freeze
 
   include Workflow
   include BrandConfigHelpers
@@ -266,7 +266,6 @@ class Account < ActiveRecord::Base
 
   # Help link settings
   add_setting :custom_help_links, root_only: true
-  add_setting :new_custom_help_links, root_only: true
   add_setting :help_link_icon, root_only: true
   add_setting :help_link_name, root_only: true
   add_setting :support_url, root_only: true
@@ -293,7 +292,6 @@ class Account < ActiveRecord::Base
   add_setting :can_add_pronouns, boolean: true, root_only: true, default: false
   add_setting :can_change_pronouns, boolean: true, root_only: true, default: true
   add_setting :enable_sis_export_pronouns, boolean: true, root_only: true, default: true
-  add_setting :pronouns, root_only: true
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
@@ -310,8 +308,8 @@ class Account < ActiveRecord::Base
   add_setting :admins_can_change_passwords, boolean: true, root_only: true, default: false
   add_setting :admins_can_view_notifications, boolean: true, root_only: true, default: false
   add_setting :canvadocs_prefer_office_online, boolean: true, root_only: true, default: false
-  add_setting :outgoing_email_default_name, root_only: true
-  add_setting :external_notification_warning, boolean: true, root_only: true, default: false
+  add_setting :outgoing_email_default_name
+  add_setting :external_notification_warning, boolean: true, default: false
   # Terms of Use and Privacy Policy settings for the root account
   add_setting :terms_changed_at, root_only: true
   add_setting :account_terms_required, root_only: true, boolean: true, default: true
@@ -633,22 +631,14 @@ class Account < ActiveRecord::Base
   end
 
   def settings
-    # If the settings attribute is not loaded because it's an old cached object or something, return an empty blob that is read-only
-    unless has_attribute?(:settings)
-      return SettingsWrapper.new(self, {}.freeze)
-    end
-
-    result = self[:settings]
+    result = read_attribute(:settings)
     if result
       @old_settings ||= result.dup
-      return SettingsWrapper.new(self, result)
+      return result
     end
-    unless frozen?
-      self[:settings] = {}
-      return SettingsWrapper.new(self, self[:settings])
-    end
+    return write_attribute(:settings, {}) unless frozen?
 
-    SettingsWrapper.new(self, {}.freeze)
+    {}.freeze
   end
 
   def domain(current_host = nil)
@@ -1375,7 +1365,7 @@ class Account < ActiveRecord::Base
     given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
     can :read
 
-    given { |user| !site_admin? && primary_settings_root_account? && grants_right?(user, :manage_site_settings) }
+    given { |user| !site_admin? && root_account? && grants_right?(user, :manage_site_settings) }
     can :manage_privacy_settings
 
     given do |user|

@@ -300,39 +300,4 @@ describe PacePlan do
       expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").end_of_day)
     end
   end
-
-  describe "default plan start_at" do
-    before do
-      @course.update start_at: nil
-      @pace_plan.user_id = nil
-    end
-
-    it "returns student enrollment date, if working on behalf of a student" do
-      student3 = user_model
-      enrollment = StudentEnrollment.create!(user: student3, course: @course)
-      enrollment.update start_at: "2022-01-29"
-      @pace_plan.user_id = student3.id
-      expect(@pace_plan.start_date.to_date).to eq(Date.parse("2022-01-29"))
-    end
-
-    it "returns section start if available" do
-      other_section = @course.course_sections.create! name: "other_section", start_at: "2022-01-30"
-      section_plan = @course.pace_plans.create! course_section: other_section
-      expect(section_plan.start_date.to_date).to eq(Date.parse("2022-01-30"))
-    end
-
-    it "returns course start if available" do
-      @course.update start_at: "2022-01-28"
-      expect(@pace_plan.start_date.to_date).to eq(Date.parse("2022-01-28"))
-    end
-
-    it "returns course's term start if available" do
-      @course.enrollment_term.update start_at: "2022-01-27"
-      expect(@pace_plan.start_date.to_date).to eq(Date.parse("2022-01-27"))
-    end
-
-    it "returns course created_at date as a last resort" do
-      expect(@pace_plan.start_date.to_date).to eq(@course.created_at.to_date)
-    end
-  end
 end

@@ -24,7 +24,6 @@ class Progress < ActiveRecord::Base
        :assignment, :attachment, :epub_export, :sis_batch, :pace_plan,
        { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" }]
   belongs_to :user
-  belongs_to :delayed_job, class_name: "::Delayed::Job", optional: true
 
   validates :context_id, presence: true
   validates :context_type, presence: true
@@ -99,9 +98,7 @@ class Progress < ActiveRecord::Base
     work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
-        job = Delayed::Job.enqueue(work, enqueue_args)
-        update(delayed_job_id: job.id)
-        job
+        Delayed::Job.enqueue(work, enqueue_args)
       end
     end
   end

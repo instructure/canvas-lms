@@ -67,11 +67,9 @@ describe OAuth2ProviderController do
     it "redirects back with an error for invalid response_type" do
       get :auth,
           params: { client_id: key.id,
-                    redirect_uri: "https://example.com/oauth/callback",
-                    state: "value" }
+                    redirect_uri: "https://example.com/oauth/callback" }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback\?error=unsupported_response_type})
-      expect(response.location).to match("&state=value")
     end
 
     it "redirects to the login url" do
@@ -101,13 +99,11 @@ describe OAuth2ProviderController do
           params: { client_id: key.id,
                     redirect_uri: "https://example.com/oauth/callback",
                     prompt: "none",
-                    response_type: "code",
-                    state: "value" }
+                    response_type: "code" }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback})
       redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
       expect(redirect_query_params["error"]).to eq "login_required"
-      expect(redirect_query_params["state"]).to eq "value"
     end
 
     it 'redirects with "unsupported_prompt_type" if prompt is not recognized' do
@@ -115,13 +111,11 @@ describe OAuth2ProviderController do
           params: { client_id: key.id,
                     redirect_uri: "https://example.com/oauth/callback",
                     prompt: "yesplz",
-                    response_type: "code",
-                    state: "value" }
+                    response_type: "code" }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback})
       redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
       expect(redirect_query_params["error"]).to eq "unsupported_prompt_type"
-      expect(redirect_query_params["state"]).to eq "value"
     end
 
     context "with a user logged in" do
@@ -197,8 +191,7 @@ describe OAuth2ProviderController do
             redirect_uri: "https://example.com",
             response_type: "code",
             scope: "/auth/userinfo",
-            prompt: "none",
-            state: "value"
+            prompt: "none"
           }
         end
 
@@ -223,7 +216,6 @@ describe OAuth2ProviderController do
           expect(response.location).to match(%r{https://example.com})
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params["error"]).to eq "interaction_required"
-          expect(redirect_query_params["state"]).to eq "value"
         end
       end
 
@@ -232,28 +224,25 @@ describe OAuth2ProviderController do
         let(:account) { account_developer_key.account || Account.site_admin }
 
         it 'redirects with "unauthorized_client" if binding does not exist for the account' do
-          get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code", state: "value" }
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code" }
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params["error"]).to eq "unauthorized_client"
-          expect(redirect_query_params["state"]).to eq "value"
         end
 
         it 'redirects with "unauthorized_client" if binding for the account is set to "allow"' do
           binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
           binding.update!(workflow_state: "allow")
-          get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code", state: "value" }
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code" }
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params["error"]).to eq "unauthorized_client"
-          expect(redirect_query_params["state"]).to eq "value"
         end
 
         it 'redirects with "unauthorized_client" if binding for the account is set to "off"' do
           binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
           binding.update!(workflow_state: "off")
-          get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code", state: "value" }
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code" }
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params["error"]).to eq "unauthorized_client"
-          expect(redirect_query_params["state"]).to eq "value"
         end
 
         it 'redirects to confirmation page when the binding for the account is set to "on"' do

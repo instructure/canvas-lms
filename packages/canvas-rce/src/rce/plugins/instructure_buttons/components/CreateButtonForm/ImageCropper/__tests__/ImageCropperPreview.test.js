@@ -21,41 +21,22 @@ import {render} from '@testing-library/react'
 
 import ImageCropperPreview from '../ImageCropperPreview'
 
-describe('ImageCropperPreview', () => {
+describe('ImageCropPreview', () => {
   it('renders the image', () => {
-    const {container} = render(
-      <ImageCropperPreview shape="square" image="https://www.fillmurray.com/640/480" />
-    )
+    const {container} = render(<ImageCropperPreview shape="square" />)
     expect(container.querySelector('img')).toBeInTheDocument()
   })
 
-  it('renders the image with src', () => {
-    const {container} = render(
-      <ImageCropperPreview shape="square" image="https://www.fillmurray.com/640/480" />
-    )
-    expect(container.querySelector('img')).toMatchInlineSnapshot(`
-      <img
-        alt="Image to crop"
-        src="https://www.fillmurray.com/640/480"
-        style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; object-fit: contain; text-align: center; cursor: move;"
-      />
-    `)
-  })
-
   it('renders the crop shape container', () => {
-    const {container} = render(
-      <ImageCropperPreview shape="square" image="https://www.fillmurray.com/640/480" />
-    )
+    const {container, rerender} = render(<ImageCropperPreview shape="square" />)
     expect(container.querySelector('#cropShapeContainer')).toBeInTheDocument()
   })
 
   it('changes the crop shape', () => {
-    const {container, rerender} = render(
-      <ImageCropperPreview shape="square" image="https://www.fillmurray.com/640/480" />
-    )
+    const {container, rerender} = render(<ImageCropperPreview shape="square" />)
     const svgContainer = container.querySelector('#cropShapeContainer')
     const squareContent = svgContainer.innerHTML
-    rerender(<ImageCropperPreview shape="octagon" image="https://www.fillmurray.com/640/480" />)
+    rerender(<ImageCropperPreview shape="octagon" />)
     const octagonContent = svgContainer.innerHTML
     expect(squareContent).not.toEqual(octagonContent)
   })

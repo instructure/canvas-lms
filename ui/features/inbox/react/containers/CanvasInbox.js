@@ -28,7 +28,6 @@ import {View} from '@instructure/ui-view'
 const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
-  const [userFilter, setUserFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
   const [selectedConversationMessage, setSelectedConversationMessage] = useState()
   const [composeModal, setComposeModal] = useState(false)
@@ -93,9 +92,6 @@ const CanvasInbox = () => {
               setSelectedConversations([])
               setCourseFilter(course)
             }}
-            onUserFilterSelect={userIDFilter => {
-              setUserFilter(userIDFilter)
-            }}
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
             onReply={() => onReply()}
@@ -113,7 +109,6 @@ const CanvasInbox = () => {
             <Flex.Item width="400px" height="100%">
               <ConversationListContainer
                 course={courseFilter}
-                userFilter={userFilter}
                 scope={scope}
                 onSelectConversation={updateSelectedConversations}
               />

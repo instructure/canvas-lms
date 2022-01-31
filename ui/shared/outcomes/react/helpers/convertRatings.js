@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
-  const querySizes = {}
-  if (mobile) {
-    querySizes.mobile = {maxWidth: '768px'}
-  }
-  if (tablet) {
-    querySizes.tablet = {minWidth: mobile ? '768px' : '0px'}
-  }
-  if (desktop) {
-    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
-  }
-  return querySizes
+const convertRatings = rawRatings => {
+  let masteryPoints
+  const ratings = rawRatings.map(({description, points, mastery}) => {
+    const pointsFloat = parseFloat(points)
+    if (mastery) masteryPoints = pointsFloat
+    return {description, points: pointsFloat}
+  })
+  return {masteryPoints, ratings}
 }
+
+export default convertRatings

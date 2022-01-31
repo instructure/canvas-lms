@@ -337,10 +337,6 @@ module Api::V1::Attachment
                                progress_json(progress, current_user, session)
                              end
 
-      # If an attachment category is set, send it to InstFS to relay back to Canvas
-      # when the attachment record is created
-      additional_capture_params[:category] = params[:category] if params[:category].present?
-
       json = InstFS.upload_preflight_json(
         context: context,
         root_account: context.try(:root_account) || @domain_root_account,
@@ -370,7 +366,6 @@ module Api::V1::Attachment
       @attachment.file_state = "deleted"
       @attachment.workflow_state = opts[:temporary] ? "unattached_temporary" : "unattached"
       @attachment.modified_at = Time.now.utc
-      @attachment.category = params[:category] if params[:category].present?
       @attachment.save!
 
       on_duplicate = infer_on_duplicate(params)

@@ -219,55 +219,6 @@ describe BasicLTI::BasicOutcomes do
       expect(response.body).not_to be_nil
     end
 
-    context "with an unrecognized operation identifier" do
-      before do
-        xml.css("resultData").remove
-        xml.css("replaceResultRequest").each do |node|
-          node.replace(Nokogiri::XML::DocumentFragment.parse(
-                         "<fakeResultRequest>#{xml.css("replaceResultRequest").inner_html}</fakeResultRequest>"
-                       ))
-        end
-      end
-
-      it "returns false" do
-        response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
-        result = response.handle_request(tool)
-        expect(result).to eq false
-      end
-
-      it "does not report a total count metric" do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-        response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
-        response.handle_request(tool)
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("lti.1_1.basic_outcomes.requests")
-      end
-    end
-
-    context "request metrics" do
-      before do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-      end
-
-      it "increments a total count metric" do
-        response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
-        response.handle_request(tool)
-        expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.requests", tags: { op: "replace_result", type: :basic })
-      end
-
-      context "when report_failure is called" do
-        before do
-          e = BasicLTI::Errors::InvalidSourceId.new("test error", :test)
-          allow(BasicLTI::BasicOutcomes).to receive(:decode_source_id).and_raise(e)
-        end
-
-        it "increments a failure count metric" do
-          response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
-          response.handle_request(tool)
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.failures", tags: { op: "replace_result", type: :basic, error_code: :test })
-        end
-      end
-    end
-
     context "when the sourcedid points to a concluded course" do
       before do
         @course.start_at = 1.month.ago
@@ -624,17 +575,6 @@ describe BasicLTI::BasicOutcomes do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(assignment.submissions.first.grade).to eq "A-"
       end
-
-      context "request metrics" do
-        before do
-          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-        end
-
-        it "tags count with request type quizzes" do
-          BasicLTI::BasicOutcomes.process_request(tool, xml)
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.requests", tags: { op: "replace_result", type: :quizzes })
-        end
-      end
     end
 
     context "submissions" do
@@ -767,12 +707,9 @@ describe BasicLTI::BasicOutcomes do
   end
 
   context "with attachments" do
-    before do
+    it "if not provided should submit the homework at the submitted_at time of when the request was received" do
       xml.css("resultScore").remove
       xml.at_css("text").replace("<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>")
-    end
-
-    it "if not provided should submit the homework at the submitted_at time of when the request was received" do
       submitted_at = Timecop.freeze(1.hour.ago) do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         Time.zone.now
@@ -791,6 +728,8 @@ describe BasicLTI::BasicOutcomes do
           grade: "92%"
         }
       )
+      xml.css("resultScore").remove
+      xml.at_css("text").replace("<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>")
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(Delayed::Job.strand_size("file_download/example.com")).to be > 0
       stub_request(:get, "http://example.com/download").to_return(status: 500)
@@ -805,6 +744,8 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it "submits after the retries complete" do
+      xml.css("resultScore").remove
+      xml.at_css("text").replace("<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>")
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(Delayed::Job.strand_size("file_download/example.com")).to be > 0
       stub_const("BasicLTI::BasicOutcomes::MAX_ATTEMPTS", 1)
@@ -818,6 +759,8 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it "submits after successful retry", custom_timeout: 60 do
+      xml.css("resultScore").remove
+      xml.at_css("text").replace("<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>")
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(Delayed::Job.strand_size("file_download/example.com")).to be > 0
       stub_request(:get, "http://example.com/download").to_return({ status: 500 }, { status: 200, body: "file body" })
@@ -832,36 +775,6 @@ describe BasicLTI::BasicOutcomes do
         expect(submission.reload.versions.count).to eq 1
         expect(submission.attachments.count).to eq 1
         expect(submission.attachments.take.file_state).to eq "available"
-      end
-    end
-
-    context "job metrics" do
-      before do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-      end
-
-      context "on success" do
-        before do
-          stub_request(:get, "http://example.com/download").to_return(status: 200, body: "file body")
-        end
-
-        it "increments a total count metric" do
-          BasicLTI::BasicOutcomes.process_request(tool, xml)
-          run_jobs
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.fetch_jobs")
-        end
-      end
-
-      context "on failure" do
-        before do
-          stub_request(:get, "http://example.com/download").to_return(status: 500)
-        end
-
-        it "increments a failure metric" do
-          BasicLTI::BasicOutcomes.process_request(tool, xml)
-          run_jobs
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.fetch_jobs_failures")
-        end
       end
     end
   end

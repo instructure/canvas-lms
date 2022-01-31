@@ -58,8 +58,7 @@ export const AddressBook = ({
   limitTagCount,
   headerText,
   width,
-  open,
-  onUserFilterSelect
+  open
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -75,7 +74,6 @@ export const AddressBook = ({
   const backButtonArray = isSubMenu ? [{id: 'backButton', name: I18n.t('Back')}] : []
   const headerArray = headerText ? [{id: 'headerText', name: headerText, focusSkip: true}] : []
   const [data, setData] = useState([...backButtonArray, ...headerArray, ...menuData])
-  const ariaAddressBookLabel = I18n.t('Address Book')
 
   // Update width to match componetViewRef width
   useEffect(() => {
@@ -310,9 +308,6 @@ export const AddressBook = ({
     if (!isBackButton && !isCourse) {
       addTag(user)
       onSelect(user.id)
-      if (onUserFilterSelect) {
-        onUserFilterSelect(user?._id ? `user_${user?._id}` : undefined)
-      }
     } else {
       onSelect(user.id, isCourse, isBackButton)
     }
@@ -327,8 +322,6 @@ export const AddressBook = ({
     // Prevent duplicate IDs from being added
     if (matchedUsers.length === 0) {
       newSelectedUsers.push(user)
-      setInputValue('')
-      onTextChange('')
     }
 
     setSelectedUsers([...newSelectedUsers])
@@ -336,9 +329,6 @@ export const AddressBook = ({
 
   const removeTag = removeUser => {
     let newSelectedUsers = selectedUsers
-    if (onUserFilterSelect) {
-      onUserFilterSelect(undefined)
-    }
     newSelectedUsers = newSelectedUsers.filter(user => user.id !== removeUser.id)
     setSelectedUsers([...newSelectedUsers])
   }
@@ -349,21 +339,10 @@ export const AddressBook = ({
         <Flex>
           <Flex.Item padding="none xxx-small none none" shouldGrow shouldShrink>
             <Popover
-              on="click"
+              on="focus"
               offsetY={4}
               placement="bottom start"
               isShowingContent={isMenuOpen}
-              onShowContent={() => {
-                setIsMenuOpen(true)
-              }}
-              onHideContent={(e, {documentClick}) => {
-                if (
-                  documentClick &&
-                  e?.target?.getAttribute('aria-label') !== ariaAddressBookLabel
-                ) {
-                  setIsMenuOpen(false)
-                }
-              }}
               renderTrigger={
                 <TextInput
                   renderLabel={
@@ -385,7 +364,7 @@ export const AddressBook = ({
                   aria-activedescendant={`address-book-menu-item-${selectedItem?.id}`}
                   type="search"
                   aria-owns={popoverInstanceId.current}
-                  aria-label={ariaAddressBookLabel}
+                  aria-label={I18n.t('Address Book')}
                   aria-autocomplete="list"
                   inputRef={ref => {
                     textInputRef.current = ref
@@ -394,7 +373,6 @@ export const AddressBook = ({
                   onChange={e => {
                     setInputValue(e.target.value)
                     onTextChange(e.target.value)
-                    setIsMenuOpen(true)
                   }}
                   data-testid="address-book-input"
                 />
@@ -431,12 +409,11 @@ export const AddressBook = ({
           </Flex.Item>
           <Flex.Item>
             <IconButton
-              data-testid="address-button"
               screenReaderLabel={I18n.t('Open Address Book')}
               onClick={() => {
+                setIsMenuOpen(!isMenuOpen)
+
                 if (isMenuOpen) {
-                  setIsMenuOpen(false)
-                } else {
                   textInputRef.current.focus()
                 }
               }}
@@ -499,11 +476,7 @@ AddressBook.propTypes = {
   /**
    * Bool which determines if addressbook is intialed open
    */
-  open: PropTypes.bool,
-  /**
-   * use State function to set user filter for conversations
-   */
-  onUserFilterSelect: PropTypes.func
+  open: PropTypes.bool
 }
 
 export default AddressBook

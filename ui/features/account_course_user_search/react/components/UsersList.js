@@ -52,7 +52,6 @@ export default class UsersList extends React.Component {
               tipAsc={I18n.t('Click to sort by name descending')}
               searchFilter={this.props.searchFilter}
               onUpdateFilters={this.props.onUpdateFilters}
-              columnHeaderRef={this.props.columnHeaderRef}
             />
             <UsersListHeader
               id="email"
@@ -61,7 +60,6 @@ export default class UsersList extends React.Component {
               tipAsc={I18n.t('Click to sort by email descending')}
               searchFilter={this.props.searchFilter}
               onUpdateFilters={this.props.onUpdateFilters}
-              columnHeaderRef={this.props.columnHeaderRef}
             />
             <UsersListHeader
               id="sis_id"
@@ -70,7 +68,6 @@ export default class UsersList extends React.Component {
               tipAsc={I18n.t('Click to sort by SIS ID descending')}
               searchFilter={this.props.searchFilter}
               onUpdateFilters={this.props.onUpdateFilters}
-              columnHeaderRef={this.props.columnHeaderRef}
             />
             <UsersListHeader
               id="last_login"
@@ -79,7 +76,6 @@ export default class UsersList extends React.Component {
               tipAsc={I18n.t('Click to sort by last login descending')}
               searchFilter={this.props.searchFilter}
               onUpdateFilters={this.props.onUpdateFilters}
-              columnHeaderRef={this.props.columnHeaderRef}
             />
             <Table.ColHeader id="header-user-option-links" width="1">
               <ScreenReaderContent>{I18n.t('User option links')}</ScreenReaderContent>
@@ -108,6 +104,5 @@ UsersList.propTypes = {
   permissions: object.isRequired,
   handleSubmitEditUserForm: func.isRequired,
   searchFilter: object.isRequired,
-  onUpdateFilters: func.isRequired,
-  columnHeaderRef: func.isRequired
+  onUpdateFilters: func.isRequired
 }

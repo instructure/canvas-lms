@@ -45,11 +45,6 @@ declare global {
     ) => JQuery.JQueryXHR
     flashWarning: any
     flashMessage: any
-    replaceTags: (string, string, string) => string
-  }
-
-  declare interface Array<T> {
-    flatMap: <Y>(callback: (value: T, index: number, array: T[]) => Y[]) => Y[]
   }
 
   declare interface Object {

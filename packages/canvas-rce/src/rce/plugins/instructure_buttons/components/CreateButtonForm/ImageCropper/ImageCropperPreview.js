@@ -17,10 +17,8 @@
  */
 
 import React, {useRef, useEffect} from 'react'
-import PropTypes from 'prop-types'
 import {buildSvg} from './svg'
 import {PREVIEW_WIDTH, PREVIEW_HEIGHT} from './constants'
-import formatMessage from '../../../../../../format-message'
 
 /**
  * Remove the node contents and append the svg element.
@@ -33,7 +31,7 @@ function replaceSvg(svg, node) {
   node.appendChild(svg)
 }
 
-const ImageCropperPreview = ({image, shape}) => {
+const ImageCropperPreview = ({shape}) => {
   const wrapper = useRef(null)
   useEffect(() => {
     const svg = buildSvg(shape)
@@ -52,8 +50,7 @@ const ImageCropperPreview = ({image, shape}) => {
       }}
     >
       <img
-        src={image}
-        alt={formatMessage('Image to crop')}
+        src="#"
         style={{
           position: 'absolute',
           top: 0,
@@ -76,11 +73,6 @@ const ImageCropperPreview = ({image, shape}) => {
       />
     </div>
   )
-}
-
-ImageCropperPreview.propTypes = {
-  image: PropTypes.string.isRequired,
-  shape: PropTypes.string.isRequired
 }
 
 export default ImageCropperPreview

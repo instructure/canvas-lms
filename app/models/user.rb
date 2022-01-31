@@ -2350,12 +2350,6 @@ class User < ActiveRecord::Base
       end
   end
 
-  def cached_course_ids_for_observed_user(observed_user)
-    Rails.cache.fetch_with_batched_keys(["course_ids_for_observed_user", self, observed_user].cache_key, batch_object: self, batched_keys: :enrollments, expires_in: 1.day) do
-      enrollments.shard(in_region_associated_shards).active_by_date.of_observer_type.where(associated_user_id: observed_user).pluck(:course_id)
-    end
-  end
-
   # context codes of things that might have a schedulable appointment for the
   # given user, i.e. courses and sections
   def appointment_context_codes(include_observers: false)

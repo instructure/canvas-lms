@@ -34,7 +34,6 @@ import {ClosedCaptionPanel} from '@instructure/canvas-media'
 import {
   CUSTOM,
   MIN_WIDTH_VIDEO,
-  MIN_PERCENTAGE,
   videoSizes,
   labelForImageSize,
   scaleToSize
@@ -58,9 +57,8 @@ export default function VideoOptionsTray(props) {
   const [subtitles, setSubtitles] = useState(videoOptions.tracks || [])
   const [minWidth] = useState(MIN_WIDTH_VIDEO)
   const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
-  const [minPercentage] = useState(MIN_PERCENTAGE)
 
-  const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth, minPercentage})
+  const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth})
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
   }
@@ -217,7 +215,6 @@ export default function VideoOptionsTray(props) {
                             disabled={displayAs !== 'embed'}
                             minHeight={minHeight}
                             minWidth={minWidth}
-                            minPercentage={minPercentage}
                           />
                         </View>
                       )}

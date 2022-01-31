@@ -91,7 +91,7 @@ describe PacePlansController, type: :controller do
     it "populates js_env with course, enrollment, sections, and pace_plan details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
-      @progress = @pace_plan.create_publish_progress
+      @progress = Progress.create!(context: @pace_plan, tag: "pace_plan_publish")
       get :index, { params: { course_id: @course.id } }
 
       expect(response).to be_successful
@@ -180,17 +180,6 @@ describe PacePlansController, type: :controller do
       user_session(@student)
       get :index, params: { course_id: @course.id }
       assert_unauthorized
-    end
-
-    context "progress" do
-      it "starts the progress' delayed job if queued" do
-        progress = @pace_plan.create_publish_progress
-        delayed_job = progress.delayed_job
-        original_run_at = delayed_job.run_at
-        get :index, { params: { course_id: @course.id } }
-        expect(response).to be_successful
-        expect(delayed_job.reload.run_at).to be < original_run_at
-      end
     end
   end
 
