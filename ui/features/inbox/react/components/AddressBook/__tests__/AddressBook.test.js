@@ -189,6 +189,17 @@ describe('Address Book Component', () => {
       await screen.findByTestId('address-book-tag')
       expect(onSelectedIdsChangeMock.mock.calls[0][0]).toStrictEqual([demoData[4]])
     })
+
+    it('Should be able to remove a tag', async () => {
+      setup({...defaultProps, open: true})
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[4])
+      const tag = await screen.findByTestId('address-book-tag')
+      expect(tag).toBeInTheDocument()
+      fireEvent.click(tag.querySelector('span'))
+      expect(screen.queryByTestId('address-book-tag')).not.toBeInTheDocument()
+    })
   })
 
   describe('Callbacks', () => {

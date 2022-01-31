@@ -336,7 +336,9 @@ export const AddressBook = ({
 
   const removeTag = removeUser => {
     let newSelectedUsers = selectedUsers
-    onUserFilterSelect(undefined)
+    if (onUserFilterSelect) {
+      onUserFilterSelect(undefined)
+    }
     newSelectedUsers = newSelectedUsers.filter(user => user.id !== removeUser.id)
     setSelectedUsers([...newSelectedUsers])
   }
