@@ -107,7 +107,8 @@ def computeTestCount() {
   // Format crystalball message
   summaryMessage += seleniumCount > 0 ? "$seleniumCount Individual Selenium spec(s) across ${seleniumTests.size()} file(s)\n" : ''
   summaryMessage += rspecCount > 0 ? "$rspecCount Individual Rspec spec(s) across ${rspecTests.size()} file(s)\n" : ''
-  summaryMessage += "${seleniumTests.join('\n')}${rspecTests.join('\n')}"
+  summaryMessage += seleniumCount > 0 ? "${seleniumTests.join('\n')}\n" : ''
+  summaryMessage += rspecCount > 0 ? "${rspecTests.join('\n')}" : ''
 
   crystalballColor = getColor(seleniumCount+rspecCount, seleniumPartition+rspecPartition)
 
