@@ -18,13 +18,16 @@
 
 import React from 'react'
 import FilterNav from '../FilterNav'
+import fetchMock from 'fetch-mock'
+import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
-import {render, fireEvent, within, cleanup, screen} from '@testing-library/react'
+import type {Filter} from '../../gradebook.d'
+import {render, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
+const originalState = store.getState()
+
 const defaultProps: FilterNavProps = {
-  onChange: () => {},
-  filters: [],
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Module 2', position: 2},
@@ -47,23 +50,32 @@ const defaultProps: FilterNavProps = {
   ]
 }
 
-const defaultFilters = [
+const defaultFilters: Filter[] = [
   {
     id: '1',
-    label: 'Unnamed Filter',
+    name: 'Unnamed Filter',
     conditions: [
       {
         id: '2',
         type: 'module',
-        createdAt: new Date().toISOString()
+        created_at: new Date().toISOString()
       }
     ],
-    isApplied: true,
-    createdAt: new Date().toISOString()
+    is_applied: true,
+    created_at: new Date().toISOString()
   }
 ]
 
 describe('FilterNav', () => {
+  beforeEach(() => {
+    store.setState({filters: defaultFilters})
+    fetchMock.mock('*', 200)
+  })
+  afterEach(() => {
+    store.setState(originalState, true)
+    fetchMock.restore()
+  })
+
   it('renders filters button', async () => {
     const {getByRole} = render(<FilterNav {...defaultProps} />)
     await getByRole('button', {name: 'Filters'})
@@ -75,117 +87,70 @@ describe('FilterNav', () => {
   })
 
   it('opens tray', () => {
-    const {container} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(within(container).getByText('Filters'))
-    expect(screen.getByRole('heading')).toHaveTextContent('Gradebook Filters')
-    cleanup()
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    fireEvent.click(getByText('Filters'))
+    expect(getByRole('heading')).toHaveTextContent('Gradebook Filters')
   })
 
   it('renders new filter button', () => {
-    const {container} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(within(container).getByText('Filters'))
-    expect(screen.getByRole('button', {name: /Create New Filter/})).toBeInTheDocument()
-    cleanup()
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    fireEvent.click(getByText('Filters'))
+    expect(getByRole('button', {name: /Create New Filter/})).toBeInTheDocument()
   })
 
   it('clicking Create New Filter triggers onChange with filter', async () => {
-    const onChange = jest.fn()
-    const {container} = render(<FilterNav {...defaultProps} onChange={onChange} />)
-    fireEvent.click(within(container).getByText('Filters'))
-    fireEvent.click(screen.getByRole('button', {name: /Create New Filter/}))
-    expect(onChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({
-        label: expect.any(String),
-        createdAt: expect.any(String),
-        id: expect.any(String),
-        conditions: [
-          expect.objectContaining({
-            createdAt: expect.any(String),
-            id: expect.any(String),
-            type: undefined,
-            value: undefined
-          })
-        ],
-        isApplied: true
-      })
-    ])
-    cleanup()
+    store.setState({filters: []})
+    const {getByText, queryByRole, getByRole} = render(<FilterNav {...defaultProps} />)
+    expect(queryByRole('button', {name: /Save/})).toBeNull()
+    fireEvent.click(getByText('Filters'))
+    fireEvent.click(getByRole('button', {name: /Create New Filter/}))
+    expect(getByRole('button', {name: /Save/})).toBeVisible()
   })
 
   it('Shows condition type placeholder', () => {
-    const {container} = render(<FilterNav {...defaultProps} filters={defaultFilters} />)
-    fireEvent.click(within(container).getByText('Filters'))
-    expect(screen.getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
+    const {getByText, getByPlaceholderText} = render(<FilterNav {...defaultProps} />)
+    fireEvent.click(getByText('Filters'))
+    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
   })
 
   it('Shows condition placeholder; selection triggers change', async () => {
-    const onChange = jest.fn()
-    const {container} = render(
-      <FilterNav {...defaultProps} filters={defaultFilters} onChange={onChange} />
-    )
-    fireEvent.click(within(container).getByText('Filters'))
-    fireEvent.click(screen.getByLabelText('Condition'))
-    fireEvent.click(screen.getByRole('option', {name: /Module 2/}))
-    expect(onChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({
-        conditions: [
-          expect.objectContaining({
-            type: 'module',
-            value: '2'
-          })
-        ]
-      })
-    ])
-    cleanup()
+    const {getByText, getByRole, getByLabelText} = render(<FilterNav {...defaultProps} />)
+    fireEvent.click(getByText('Filters'))
+    expect(getByRole('button', {name: 'Condition'})).not.toHaveValue('Module 2')
+    fireEvent.click(getByLabelText('Condition'))
+    fireEvent.click(getByRole('option', {name: 'Module 2'}))
+    expect(getByRole('button', {name: 'Condition'})).toHaveValue('Module 2')
   })
 
   it('Deletes condition', () => {
-    const onChange = jest.fn()
-    const {container} = render(
-      <FilterNav {...defaultProps} filters={defaultFilters} onChange={onChange} />
+    const {getByText, getByRole, queryByRole, getByPlaceholderText} = render(
+      <FilterNav {...defaultProps} />
     )
-    fireEvent.click(within(container).getByText('Filters'))
-    expect(screen.getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', {name: /Delete condition/}))
-    expect(onChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({
-        conditions: []
-      })
-    ])
-    cleanup()
+    fireEvent.click(getByText('Filters'))
+    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
+    expect(queryByRole('button', {name: /Delete condition/})).toBeVisible()
+    fireEvent.click(getByRole('button', {name: /Delete condition/}))
+    expect(queryByRole('button', {name: /Delete condition/})).toBeNull()
   })
 
   it('Disables filter', () => {
-    const onChange = jest.fn()
-    const {container} = render(
-      <FilterNav {...defaultProps} filters={defaultFilters} onChange={onChange} />
-    )
-    fireEvent.click(within(container).getByText('Filters'))
-    expect(screen.getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('checkbox', {name: /Apply filter/}))
-    expect(onChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({
-        isApplied: false
-      })
-    ])
-    cleanup()
+    const {getByPlaceholderText, getByRole, getByText} = render(<FilterNav {...defaultProps} />)
+    fireEvent.click(getByText('Filters'))
+    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
+    const checkbox = getByRole('checkbox', {name: /Apply filter/})
+    expect(checkbox).toBeChecked()
+    fireEvent.click(checkbox)
+    expect(checkbox).not.toBeChecked()
   })
 
   it('Enables filter', () => {
-    const filters = JSON.parse(JSON.stringify(defaultFilters))
-    filters[0].isApplied = false
-    const onChange = jest.fn()
-    const {container} = render(
-      <FilterNav {...defaultProps} filters={filters} onChange={onChange} />
-    )
-    fireEvent.click(within(container).getByText('Filters'))
-    expect(screen.getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('checkbox', {name: /Apply filter/}))
-    expect(onChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({
-        isApplied: true
-      })
-    ])
-    cleanup()
+    store.setState({filters: [{...defaultFilters[0], is_applied: false}]})
+    const {getByText, getByRole, getByPlaceholderText} = render(<FilterNav {...defaultProps} />)
+    fireEvent.click(getByText('Filters'))
+    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
+    const checkbox = getByRole('checkbox', {name: /Apply filter/})
+    expect(checkbox).not.toBeChecked()
+    fireEvent.click(checkbox)
+    expect(checkbox).toBeChecked()
   })
 })

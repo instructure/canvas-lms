@@ -16,20 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderHook} from '@testing-library/react-hooks/dom'
 import PerformanceControls from '../../PerformanceControls'
-import {RequestDispatch} from '@canvas/network'
 import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
-import useModules from '../useModules'
-
-const defaultProps = {
-  gradebookEnv: {context_id: '1'},
-  performance_controls: {
-    students_chunk_size: 2 // students per page
-  }
-}
-
-const courseId = '1'
+import store from '../index'
 
 const exampleData = {
   contextModules: [{id: '2601'}, {id: '2602 '}, {id: '2603'}]
@@ -37,8 +26,6 @@ const exampleData = {
 
 describe('useModules', () => {
   const url = '/api/v1/courses/1/modules'
-  let performanceControls
-  let dispatch
   let network
 
   function getRequests() {
@@ -46,33 +33,11 @@ describe('useModules', () => {
   }
 
   beforeEach(() => {
-    performanceControls = new PerformanceControls(defaultProps.gradebookEnv.performance_controls)
-    dispatch = new RequestDispatch({
-      activeRequestLimit: performanceControls.activeRequestLimit
-    })
     network = new NetworkFake()
   })
 
-  it('starts loading if has_modules = true', () => {
-    const {result} = renderHook(() =>
-      useModules(dispatch, courseId, performanceControls.contextModulesPerPage, true)
-    )
-    expect(result.current.loading).toStrictEqual(true)
-    expect(result.current.data).toStrictEqual([])
-  })
-
-  it('does not start loading if has_modules = false', () => {
-    const {result} = renderHook(() =>
-      useModules(dispatch, courseId, performanceControls.contextModulesPerPage, false)
-    )
-    expect(result.current.loading).toStrictEqual(false)
-    expect(result.current.data).toStrictEqual([])
-  })
-
   it('sends a request to the context modules url', async () => {
-    renderHook(() =>
-      useModules(dispatch, courseId, performanceControls.contextModulesPerPage, true)
-    )
+    store.getState().fetchModules()
     await network.allRequestsReady()
     const requests = getRequests()
     expect(requests.length).toStrictEqual(1)
@@ -80,10 +45,10 @@ describe('useModules', () => {
 
   describe('when sending the initial request', () => {
     it('sets the `per_page` parameter to the configured per page maximum', async () => {
-      performanceControls = new PerformanceControls({contextModulesPerPage: 45})
-      renderHook(() =>
-        useModules(dispatch, courseId, performanceControls.contextModulesPerPage, true)
-      )
+      store.setState({
+        performanceControls: new PerformanceControls({contextModulesPerPage: 45})
+      })
+      store.getState().fetchModules()
       await network.allRequestsReady()
       const [{params}] = getRequests()
       expect(params.per_page).toStrictEqual('45')
@@ -92,12 +57,10 @@ describe('useModules', () => {
 
   describe('when the first page resolves', () => {
     beforeEach(async () => {
-      renderHook(() =>
-        useModules(dispatch, courseId, performanceControls.contextModulesPerPage, true)
-      )
+      store.getState().fetchModules()
       await network.allRequestsReady()
       const [{response}] = getRequests()
-      setPaginationLinkHeader(response, {last: 3})
+      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
       response.setJson(exampleData.contextModules.slice(0, 1))
       response.send()
       await network.allRequestsReady()
@@ -131,42 +94,36 @@ describe('useModules', () => {
   })
 
   describe('when all pages have resolved', () => {
-    let result
-
     beforeEach(async () => {
-      ;({result} = renderHook(() =>
-        useModules(dispatch, courseId, performanceControls.contextModulesPerPage, true)
-      ))
+      store.getState().fetchModules()
       await network.allRequestsReady()
 
       // Resolve the first page
       const [{response}] = getRequests()
-      setPaginationLinkHeader(response, {last: 3})
+      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
       response.setJson(exampleData.contextModules.slice(0, 1))
       response.send()
       await network.allRequestsReady()
 
       // Resolve the remaining pages
       const [request2, request3] = getRequests().slice(1)
-      setPaginationLinkHeader(request2.response, {last: 3})
+      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
       request2.response.setJson(exampleData.contextModules.slice(1, 2))
       request2.response.send()
 
-      setPaginationLinkHeader(request3.response, {last: 3})
+      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
       request3.response.setJson(exampleData.contextModules.slice(2, 3))
       request3.response.send()
     })
 
     it('includes the loaded context modules when updating the gradebook', () => {
-      expect(result.current.data).toStrictEqual(exampleData.contextModules)
+      expect(store.getState().modules).toStrictEqual(exampleData.contextModules)
     })
   })
 
   describe('if the first response does not link to the last page', () => {
     beforeEach(async () => {
-      renderHook(() =>
-        useModules(dispatch, courseId, performanceControls.contextModulesPerPage, true)
-      )
+      store.getState().fetchModules()
       await network.allRequestsReady()
       const [{response}] = getRequests()
       response.setJson(exampleData.contextModules.slice(0, 1))

@@ -272,15 +272,44 @@ export type FilterCondition = {
   id: string
   type?: string
   value?: string
-  createdAt: string
+  created_at: string
 }
 
 export type Filter = {
   id: string
-  label?: string
+  name: string
   conditions: FilterCondition[]
-  isApplied: boolean
-  createdAt: string
+  is_applied: boolean
+  created_at: string
+}
+
+export type PartialFilter = Omit<Filter, 'id'>
+
+export type AppliedFilter = Omit<Filter, 'id'> & {is_applied: true}
+
+export type GradebookFilterApiRequest = {
+  name: string
+  payload: {
+    is_applied: boolean
+    conditions: FilterCondition[]
+  }
+}
+
+export type GradebookFilterApiResponse = {
+  gradebook_filter: GradebookFilterApiResponseFilter
+}
+
+export type GradebookFilterApiResponseFilter = {
+  course_id: string
+  id: string
+  user_id: string
+  name: string
+  payload: {
+    conditions: FilterCondition[]
+    is_applied: boolean
+  }
+  created_at: string
+  updated_at: string
 }
 
 export type AssignmentDueDate = {
@@ -344,4 +373,10 @@ export type ProgressData = {
 export type FilteredContentInfo = {
   invalidAssignmentGroups: AssignmentGroup[]
   totalPointsPossible: number
+}
+
+export type FlashMessage = {
+  key: string
+  message: string
+  variant: string
 }

@@ -209,7 +209,6 @@ type GradebookProps = {
   isFiltersLoading: boolean
   isModulesLoading: boolean
   modules: Module[]
-  onFiltersChange: (any) => void
   performanceControls: PerformanceControls
   settingsModalButtonContainer: HTMLElement
   viewOptionsMenuNode: HTMLElement
@@ -4750,8 +4749,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           this.state.isEssentialDataLoaded && (
             <Portal node={this.props.filterNavNode}>
               <FilterNav
-                filters={this.props.filters}
-                onChange={this.props.onFiltersChange}
                 gradingPeriods={this.gradingPeriodSet?.gradingPeriods || []}
                 modules={this.state.modules}
                 assignmentGroups={this.state.assignmentGroups}
