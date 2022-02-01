@@ -43,6 +43,7 @@ const ComposeModalContainer = props => {
   const [body, setBody] = useState('')
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
+  const [userNote, setUserNote] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
   const [selectedIds, setSelectedIds] = useState([])
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
@@ -122,6 +123,10 @@ const ComposeModalContainer = props => {
     }
   }
 
+  const onUserNoteChange = () => {
+    setUserNote(prev => !prev)
+  }
+
   const onSendIndividualMessagesChange = () => {
     setSendIndividualMessages(prev => !prev)
   }
@@ -149,6 +154,7 @@ const ComposeModalContainer = props => {
         variables: {
           attachmentIds: attachments.map(a => a.id),
           body,
+          userNote,
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
             c => c._id
           ),
@@ -161,6 +167,7 @@ const ComposeModalContainer = props => {
         variables: {
           attachmentIds: attachments.map(a => a.id),
           body,
+          userNote,
           contextCode: selectedContext,
           recipients: selectedIds.map(rec => rec?._id || rec.id),
           subject,
@@ -227,8 +234,10 @@ const ComposeModalContainer = props => {
                 isReply={props.isReply}
                 onContextSelect={onContextSelect}
                 onSelectedIdsChange={onSelectedIdsChange}
+                onUserNoteChange={onUserNoteChange}
                 onSendIndividualMessagesChange={onSendIndividualMessagesChange}
                 onSubjectChange={onSubjectChange}
+                userNote={userNote}
                 sendIndividualMessages={sendIndividualMessages}
                 subject={props.isReply ? props.pastConversation?.subject : subject}
                 mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
