@@ -14,6 +14,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
   wrap="no-wrap"
 >
   <Item
+    align="start"
     as="span"
     elementRef={[Function]}
     padding="0 medium 0 0"
@@ -345,6 +346,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
   wrap="no-wrap"
 >
   <Item
+    align="start"
     as="span"
     elementRef={[Function]}
     padding="0 medium 0 0"
