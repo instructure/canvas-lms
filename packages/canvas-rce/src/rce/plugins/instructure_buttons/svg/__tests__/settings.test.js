@@ -34,6 +34,7 @@ describe('useSvgSettings()', () => {
       const [settings, _status, _dispatch] = subject().current
 
       expect(settings).toEqual({
+        type: 'image/svg+xml-buttons-and-icons',
         name: '',
         alt: '',
         shape: 'square',
@@ -73,6 +74,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: 'Banana',
           alt: '',
           shape: 'square',
@@ -145,6 +147,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toEqual({
+        type: 'image/svg+xml-buttons-and-icons',
         name: 'Test Image',
         alt: 'a test image',
         shape: 'triangle',
@@ -191,6 +194,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: '',
           alt: '',
           shape: 'square',
@@ -216,6 +220,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: '',
           alt: '',
           shape: 'square',
