@@ -49,7 +49,7 @@ class ExportInProgress extends React.Component {
     return (
       <div className="webzipexport__inprogress">
         <span>{I18n.t('Processing')}</span>
-        <p>{I18n.t('this may take a bit...')}</p>
+        <p>{I18n.t('This may take a while...')}</p>
         <ApiProgressBar
           progress_id={this.props.webzip.progressId}
           onComplete={this.onComplete}
@@ -57,7 +57,7 @@ class ExportInProgress extends React.Component {
         />
         <p>
           {I18n.t(`The download process has started. This
-          can take awhile for large courses. You can leave the
+          can take a while for large courses. You can leave the
           page and you'll get a notification when the download
           is complete.`)}
         </p>
