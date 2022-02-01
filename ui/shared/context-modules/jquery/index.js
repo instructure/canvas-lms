@@ -510,6 +510,15 @@ window.modules = (function () {
       $('#add_context_module_form:visible').dialog('close')
     },
 
+    addContentTagToEnv(content_tag) {
+      ENV.MODULE_FILE_DETAILS[content_tag.id] = {
+        content_details: content_tag.content_details,
+        content_id: content_tag.content_id,
+        id: content_tag.id,
+        module_id: content_tag.context_module_id
+      }
+    },
+
     addItemToModule($module, data) {
       if (!data) {
         return $('<div/>')
@@ -1571,6 +1580,7 @@ modules.initModuleManagement = function (duplicate) {
           'Are you sure you want to remove this item from the module?'
         ),
         success(data) {
+          delete ENV.MODULE_FILE_DETAILS[data.content_tag.id]
           $(this).slideUp(function () {
             $(this).remove()
             modules.updateTaggedItems()
@@ -1805,6 +1815,7 @@ modules.initModuleManagement = function (duplicate) {
           $item.remove()
           data.content_tag.type = item_data['item[type]']
           $item = modules.addItemToModule($module, data.content_tag)
+          modules.addContentTagToEnv(data.content_tag)
           $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
           initNewItemPublishButton($item, data.content_tag)
           initNewItemDirectShare($item, data.content_tag)

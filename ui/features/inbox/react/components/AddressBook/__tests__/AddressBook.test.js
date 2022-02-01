@@ -30,7 +30,8 @@ const demoData = [
 ]
 
 const defaultProps = {
-  menuData: demoData
+  menuData: demoData,
+  onUserFilterSelect: jest.fn()
 }
 
 const setup = props => {
@@ -77,6 +78,25 @@ describe('Address Book Component', () => {
       fireEvent.click(button)
       const popover = await screen.findByTestId('address-book-popover')
       expect(popover).toBeTruthy()
+    })
+
+    it('Should close popup menu when address button is pressed and popup is open', async () => {
+      const {container} = setup({...defaultProps, open: true})
+      const button = container.querySelector('button')
+      fireEvent.click(button)
+      const popover = screen.queryByTestId('address-book-popover')
+      expect(popover).toBeFalsy()
+    })
+
+    it('Should close popup menu when focus is changed', async () => {
+      const {container} = setup({...defaultProps})
+      const input = container.querySelector('input')
+      fireEvent.focus(input)
+      let popover = await screen.findByTestId('address-book-popover')
+      expect(popover).toBeTruthy()
+      fireEvent.blur(input)
+      popover = screen.queryByTestId('address-book-popover')
+      expect(popover).toBeFalsy()
     })
 
     it('Should render popup menu when textInput is focused', async () => {
@@ -169,6 +189,17 @@ describe('Address Book Component', () => {
       await screen.findByTestId('address-book-tag')
       expect(onSelectedIdsChangeMock.mock.calls[0][0]).toStrictEqual([demoData[4]])
     })
+
+    it('Should be able to remove a tag', async () => {
+      setup({...defaultProps, open: true})
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[4])
+      const tag = await screen.findByTestId('address-book-tag')
+      expect(tag).toBeInTheDocument()
+      fireEvent.click(tag.querySelector('span'))
+      expect(screen.queryByTestId('address-book-tag')).not.toBeInTheDocument()
+    })
   })
 
   describe('Callbacks', () => {
@@ -187,6 +218,21 @@ describe('Address Book Component', () => {
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
       expect(onSelectSpy.mock.calls.length).toBe(1)
+    })
+
+    it('Should call onUserFilterSelect when item is selected', async () => {
+      const onSelectSpy = jest.fn()
+      const onUserFilterSelectSpy = jest.fn()
+      setup({
+        ...defaultProps,
+        open: true,
+        onSelect: onSelectSpy,
+        onUserFilterSelect: onUserFilterSelectSpy
+      })
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[4])
+      expect(onUserFilterSelectSpy.mock.calls.length).toBe(1)
     })
 
     it('Should call back for group clicks', async () => {

@@ -16,28 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {node} from 'prop-types'
+import React, {PropsWithChildren, ReactElement} from 'react'
 
-export default class ErrorBoundary extends React.Component {
-  static propTypes = {
-    children: node.isRequired,
-    errorComponent: node.isRequired
-  }
+export type ErrorBoundaryProps = PropsWithChildren<{
+  errorComponent: ReactElement
+}>
 
+type ErrorBoundaryState = {
+  error: Error | null
+  hasError: boolean
+}
+
+export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   static getDerivedStateFromError(error) {
     return {hasError: true, error}
   }
 
   componentDidCatch(error, errorInfo) {
+    // eslint-disable-next-line no-console
     console.error(error, errorInfo)
   }
 
-  state = {hasError: false, error: null}
+  state: ErrorBoundaryState = {hasError: false, error: null}
 
   render() {
     if (this.state.hasError) {
-      return React.cloneElement(this.props.errorComponent, {errorSubject: this.state.error.message})
+      return React.cloneElement(this.props.errorComponent, {
+        errorSubject: this.state.error?.message
+      })
     }
 
     return this.props.children

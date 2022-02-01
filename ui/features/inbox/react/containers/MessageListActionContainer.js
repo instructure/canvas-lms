@@ -33,12 +33,13 @@ import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
 
 const MessageListActionContainer = props => {
+  const LIMIT_TAG_COUNT = 1
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const userID = ENV.current_user_id?.toString()
   const variables = {
     userID,
     scope: props.scope,
-    course: props.course
+    filter: [props.course]
   }
   const options = {
     query: CONVERSATIONS_QUERY,
@@ -449,7 +450,11 @@ const MessageListActionContainer = props => {
               shouldShrink
               justifyItems="space-between"
             >
-              <AddressBookContainer width={responsiveProps.addressBookContainer.width} />
+              <AddressBookContainer
+                onUserFilterSelect={props.onUserFilterSelect}
+                width={responsiveProps.addressBookContainer.width}
+                limitTagCount={LIMIT_TAG_COUNT}
+              />
             </Flex.Item>
             <Flex.Item
               shouldGrow={matches.includes('mobile')}
@@ -490,6 +495,7 @@ MessageListActionContainer.propTypes = {
   scope: PropTypes.string,
   activeMailbox: PropTypes.string,
   onCourseFilterSelect: PropTypes.func,
+  onUserFilterSelect: PropTypes.func,
   onSelectMailbox: PropTypes.func,
   onCompose: PropTypes.func,
   selectedConversations: PropTypes.array,

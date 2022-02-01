@@ -50,8 +50,33 @@ if ENV["CRYSTALBALL_MAP"] == "1"
 
   Coverage.start unless Coverage.running?
   Crystalball::MapGenerator.start! do |config|
-    config.register Crystalball::MapGenerator::CanvasCoverageStrategy.new
+    config.register Crystalball::MapGenerator::CoverageStrategy.new
     config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
+  end
+
+  module Crystalball
+    class MapGenerator
+      class CoverageStrategy
+        def after_register
+          Coverage.start unless Coverage.running?
+        end
+
+        def call(example_map, example)
+          puts "Calling Coverage Strategy for #{example.inspect}"
+          before = Coverage.peek_result
+          yield example_map, example
+          after = Coverage.peek_result
+          example_map.push(*execution_detector.detect(before, after).sort)
+
+          if example.metadata[:location].include?("selenium")
+            # rubocop:disable Specs/NoExecuteScript
+            js_coverage = ::SeleniumDriverSetup.driver.execute_script("return window.__coverage__")&.keys&.uniq
+            # rubocop:enable Specs/NoExecuteScript
+            example_map.used_files.concat(js_coverage.sort) if js_coverage
+          end
+        end
+      end
+    end
   end
 end
 
@@ -397,6 +422,12 @@ RSpec.configure do |config|
 
   # The Pact specs have prerequisite setup steps so we exclude them by default
   config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
+
+  if ENV["CRYSTALBALL_MAP"] == "1"
+    config.filter_run_excluding :pact_live_events
+    config.filter_run_excluding :pact
+  end
+
   # The Pact build needs RspecJunitFormatter and does not run RSpecQ
   file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
   config.add_formatter "RspecJunitFormatter", file if ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]

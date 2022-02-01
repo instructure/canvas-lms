@@ -23,7 +23,6 @@ import {
   createGradebook,
   setFixtureHtml
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
@@ -537,42 +536,43 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
 
 QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
   let gradebook
-  let applyScoreStub
+  let startProcessStub
 
   hooks.beforeEach(() => {
     gradebook = createGradebook({
       allow_apply_score_to_ungraded: true,
       context_id: '1234'
     })
-    applyScoreStub = sandbox.stub(GradebookApi, 'applyScoreToUngradedSubmissions')
-    applyScoreStub.resolves({})
+
+    startProcessStub = sandbox.stub(gradebook.scoreToUngradedManager, 'startProcess')
+    startProcessStub.resolves({})
 
     sandbox.stub(FlashAlert, 'showFlashSuccess')
     sandbox.stub(FlashAlert, 'showFlashError')
   })
 
   hooks.afterEach(() => {
-    applyScoreStub.restore()
+    startProcessStub.restore()
 
     FlashAlert.showFlashSuccess.restore()
     FlashAlert.showFlashError.restore()
   })
 
-  test('calls the endpoint with the course ID as the first argument', async () => {
+  test('calls the startProcess method with the course ID as the first argument', async () => {
     await gradebook.executeApplyScoreToUngraded({value: 50.0})
 
-    strictEqual(applyScoreStub.firstCall.args[0], '1234')
+    strictEqual(startProcessStub.firstCall.args[0], '1234')
   })
 
-  test('calls the endpoint with the "percent" parameter when given a percentage value', async () => {
+  test('calls the startProcess method with the "percent" parameter when given a percentage value', async () => {
     await gradebook.executeApplyScoreToUngraded({value: 50.0})
 
-    strictEqual(applyScoreStub.firstCall.args[1].percent, 50.0)
+    strictEqual(startProcessStub.firstCall.args[1].percent, 50.0)
   })
 
-  test('calls the endpoint with the "excuse" parameter when given a value of "excused"', async () => {
+  test('calls the startProcess method with the "excuse" parameter when given a value of "excused"', async () => {
     await gradebook.executeApplyScoreToUngraded({value: 'excused'})
-    strictEqual(applyScoreStub.firstCall.args[1].excuse, true)
+    strictEqual(startProcessStub.firstCall.args[1].excuse, true)
   })
 
   test('passes any additional arguments to the endpoint', async () => {
@@ -583,50 +583,54 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
       value: 40.0
     })
 
-    const passedArgs = applyScoreStub.firstCall.args[1]
+    const passedArgs = startProcessStub.firstCall.args[1]
     strictEqual(passedArgs.assignmentGroupId, '10', 'assignmentGroupId not passed')
     strictEqual(passedArgs.onlyPastDue, true, 'onlyPastDue not passed')
     strictEqual(passedArgs.markAsMissing, true, 'markAsMissing not passed')
   })
 
-  test('calls the endpoint with the current course section ID when one is set', async () => {
+  test('calls the startProcess method with the current course section ID when one is set', async () => {
     gradebook.setFilterRowsBySetting('sectionId', '5')
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
-    strictEqual(applyScoreStub.firstCall.args[1].courseSectionId, '5')
+    strictEqual(startProcessStub.firstCall.args[1].courseSectionId, '5')
   })
 
-  test('calls the endpoint with the current grading period ID when one is set', async () => {
+  test('calls the startProcess method with the current grading period ID when one is set', async () => {
     gradebook.setFilterColumnsBySetting('gradingPeriodId', '7')
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
-    strictEqual(applyScoreStub.firstCall.args[1].gradingPeriodId, '7')
+    strictEqual(startProcessStub.firstCall.args[1].gradingPeriodId, '7')
   })
 
-  test('calls the endpoint with the current module ID when one is set', async () => {
+  test('calls the startProcess method with the current module ID when one is set', async () => {
     gradebook.setFilterColumnsBySetting('contextModuleId', '12')
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
-    strictEqual(applyScoreStub.firstCall.args[1].moduleId, '12')
+    strictEqual(startProcessStub.firstCall.args[1].moduleId, '12')
   })
 
-  test('calls the endpoint with the current student group ID when one is set', async () => {
+  test('calls the startProcess method with the current student group ID when one is set', async () => {
     gradebook.setFilterRowsBySetting('studentGroupId', '15')
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
-    strictEqual(applyScoreStub.firstCall.args[1].studentGroupId, '15')
+    strictEqual(startProcessStub.firstCall.args[1].studentGroupId, '15')
   })
 
-  test('shows a success flash alert when the request succeeds', async () => {
+  test('shows an initial flash alert when the process starts', async () => {
+    const message =
+      'Request successfully sent. Note that applying scores may take a while and changes will not appear until you reload the page.'
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
-    strictEqual(FlashAlert.showFlashSuccess.callCount, 1)
+    strictEqual(FlashAlert.showFlashSuccess.firstCall.args[0], message)
   })
 
-  test('shows an error flash alert when the request fails', async () => {
-    QUnit.expect(1)
-    applyScoreStub.rejects(new Error(':-/'))
+  test('shows a success flash alert when the process succeeds', async () => {
+    const message = 'Score to ungraded process finished successfully'
+    await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    strictEqual(FlashAlert.showFlashSuccess.secondCall.args[0], message)
+  })
 
-    try {
-      await gradebook.executeApplyScoreToUngraded({value: 10.0})
-    } catch {
-      strictEqual(FlashAlert.showFlashError.callCount, 1)
-    }
+  test('shows an error flash alert when the process fails', async () => {
+    startProcessStub.rejects(new Error(':-/'))
+
+    await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    strictEqual(FlashAlert.showFlashError.callCount, 1)
   })
 })
 

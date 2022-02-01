@@ -2732,6 +2732,92 @@ describe UsersController do
     end
   end
 
+  describe "#dashboard_sidebar" do
+    before :once do
+      @course1 = course_factory(active_all: true)
+      @user1 = user_factory(active_all: true)
+    end
+
+    before do
+      user_session(@user1)
+      allow(controller).to receive(:prepare_current_user_dashboard_items)
+    end
+
+    it "sets appropriate variables for students" do
+      @course1.enroll_student(@user1)
+
+      get "dashboard_sidebar"
+      expect(assigns[:user].id).to be(@user1.id)
+      expect(assigns[:is_observing_student]).to be(false)
+      expect(assigns[:show_recent_feedback]).to be(true)
+      expect(controller).not_to have_received(:prepare_current_user_dashboard_items)
+    end
+
+    it "sets appropriate variables for teachers" do
+      @course1.enroll_teacher(@user1)
+
+      get "dashboard_sidebar"
+      expect(assigns[:user].id).to be(@user1.id)
+      expect(assigns[:is_observing_student]).to be(false)
+      expect(assigns[:show_recent_feedback]).to be(false)
+      expect(controller).to have_received(:prepare_current_user_dashboard_items)
+    end
+
+    it "sets appropriate variables for users with teacher and student enrollments" do
+      @course1.enroll_teacher(@user1)
+      @course1.enroll_student(@user1)
+
+      get "dashboard_sidebar"
+      expect(assigns[:user].id).to be(@user1.id)
+      expect(assigns[:is_observing_student]).to be(false)
+      expect(assigns[:show_recent_feedback]).to be(true)
+      expect(controller).to have_received(:prepare_current_user_dashboard_items)
+    end
+
+    context "with observers" do
+      before :once do
+        Account.site_admin.enable_feature!(:observer_picker)
+        @course2 = course_factory(active_all: true)
+        @student = user_factory(active_all: true)
+        @course1.enroll_student(@student)
+        @course1.enroll_user(@user1, "ObserverEnrollment", associated_user_id: @student.id)
+        @course2.enroll_teacher(@user1)
+      end
+
+      it "sets variables for observer" do
+        get "dashboard_sidebar"
+        expect(assigns[:user].id).to be(@user1.id)
+        expect(assigns[:is_observing_student]).to be(false)
+        expect(assigns[:show_recent_feedback]).to be(false)
+        expect(controller).to have_received(:prepare_current_user_dashboard_items)
+      end
+
+      it "sets variables for observer observing themself" do
+        get "dashboard_sidebar", params: { observed_user: @user1.id }
+        expect(assigns[:user].id).to be(@user1.id)
+        expect(assigns[:is_observing_student]).to be(false)
+        expect(assigns[:show_recent_feedback]).to be(false)
+        expect(controller).to have_received(:prepare_current_user_dashboard_items)
+      end
+
+      it "sets variables for observer observing a student" do
+        get "dashboard_sidebar", params: { observed_user: @student.id }
+        expect(assigns[:user].id).to be(@student.id)
+        expect(assigns[:is_observing_student]).to be(true)
+        expect(assigns[:show_recent_feedback]).to be(true)
+        expect(controller).not_to have_received(:prepare_current_user_dashboard_items)
+      end
+
+      it "returns unauthorized if user passes observed_user who they are not observing" do
+        @another_student = user_factory(active_all: true)
+        @course1.enroll_student(@another_student)
+
+        get "dashboard_sidebar", params: { observed_user: @another_student.id }
+        expect(response).to be_unauthorized
+      end
+    end
+  end
+
   describe "#pandata_events_token" do
     it "returns bad_request if called without an access token" do
       user_factory(active_all: true)

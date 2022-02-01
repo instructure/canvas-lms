@@ -1759,6 +1759,18 @@ describe SIS::CSV::UserImporter do
     expect(pseudonym.sis_user_id).to eql("user_1ö")
   end
 
+  it "forbids NULL character in imported fields" do
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_\u00001,user1,User,Uno,user1@example.com,active"
+    )
+
+    expect(importer.errors.length).to eq 1
+    expect(CommunicationChannel.by_path("user1@example.com").first).to be_nil
+
+    expect(importer.errors.map(&:last).first).to eql("Some of the fields contain NULL character")
+  end
+
   it "validates ccs on create" do
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
