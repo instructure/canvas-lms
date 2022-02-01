@@ -29,6 +29,8 @@ const Course = ({dispatch}) => {
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataError} = useDataUrl()
 
+  const category = 'uncategorized'
+
   // Handle image selection
   useEffect(() => {
     // Don't clear the current image on re-render
@@ -45,8 +47,8 @@ const Course = ({dispatch}) => {
   return (
     <View>
       <ImageList
-        fetchInitialImages={storeProps.fetchInitialImages}
-        fetchNextImages={storeProps.fetchNextImages}
+        fetchInitialImages={() => storeProps.fetchInitialImages({category})}
+        fetchNextImages={() => storeProps.fetchNextImages({category})}
         contextType={storeProps.contextType}
         images={{
           [storeProps.contextType]: {
