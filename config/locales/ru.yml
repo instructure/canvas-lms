@@ -2490,6 +2490,7 @@ ru:
       Позволяет пользователю включать и редактировать оценивание группы заданий в курсе.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Позволяет пользователю добавлять события в панель просмотра списка через окошко метки Добавить к задаче студента. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Позволяет пользователю добавлять события в панель просмотра списка через окошко метки Добавить к задаче студента."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Позволяет добавлять значки внешних приложений на панель инструментов редактора Rich Content Editor."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Позволяет пользователю добавлять членов группы в группы учетной записи или курса."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Позволяет пользователю добавлять новые задания в модуль."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Позволяет пользователю добавлять новые курсы в учетную запись."
@@ -2721,6 +2722,7 @@ ru:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Позволяет пользователю вручную добавлять приложение в настройках учетной записи."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Позволяет пользователю вручную добавлять и удалять приложение в настройках учетной записи."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Позволяет пользователю вручную добавлять и удалять приложение в настройках курса."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Позволяет пользователю вручную удалять приложение в настройках учетной записи."
   allows_user_to_moderate_a_quiz_6953d369: "Позволяет пользователю модерировать тест."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Позволяет пользователю модерировать тест и просматривать страницу статистики по тесту."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Позволяет пользователю модерировать тест. Настройки: Позволяет пользователю редактировать схемы выставления оценок."
@@ -3341,6 +3343,7 @@ ru:
   anonymous_user_d984b9ce: "Анонимный пользователь"
   anonymous_was_never_turned_on_e5e8aeda: "Анонимность никогда не включалась"
   anonymous_was_turned_off_300d25ec: "Анонимность была выключена"
+  anonymous_you_e708af99: "Анонимный (Вы)"
   anonymously_graded_59149570: "Анонимное получение оценок"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Анонимно оцененные задания не могут быть групповыми заданиями"
   another_assignment_name_369f8481: "Другое название задания"
@@ -5703,7 +5706,7 @@ ru:
         fields_required: "Необходимо поле \"%{field}\""
         invalid_live_events_url: "Недопустимая конечная точка, должна быть действительным URL."
         invalid_url: "Неверный URL"
-        login_expiration_minimum: "Длительность сессии должна быть не менее %{minutes} минут"
+        login_expiration_minimum: "Срок действия сеанса должен быть не менее %{minutes} минут(-ы)"
         need_integer: "Введите целое число для кэша списка воспроизведения"
         stream_name_required: "Требуется имя потока активности."
   canvas_3962b702: Canvas
@@ -6886,7 +6889,7 @@ ru:
     media_objects_not_configured: "Мультимедийные объекты не настроены"
     new_roster_user: 
       completed_enrollment: "Завершено *%{completed_at}*"
-      enrolled_as: "Зарегистрировано как %{enrollment_type}"
+      enrolled_as: "Зачислен как: %{enrollment_type}"
       enrollment_linked_to: "Ссылка на *%{linked_user}*"
       labels: 
         user_privileges: Полномочия
@@ -6939,7 +6942,7 @@ ru:
         conclude: "Завершить регистрацию?"
         conclude_student: "Завершить регистрацию этого студента?"
         delete_enrollment: "Удалить это зачисление?"
-      enrolled_as: "Зарегистрировано как %{enrollment_type}"
+      enrolled_as: "Зачислен как: %{enrollment_type}"
       enrollment_change_failed: "Ошибка изменения прав на регистрацию, повторите попытку"
       enrollment_linked_to: "связано с *%{linked_user}*"
       headings: 
@@ -10766,6 +10769,9 @@ ru:
   enroll_in_subject_9c1f1c18: "Зачислить на предмет"
   enrolled_a6a517cd: Зачислен
   enrolled_as_272da3b9: "Зарегистрирован как"
+  enrolled_as_enrollment_type_a008e44a: "Зачислен как: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "зачислен как: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "зачислен как: %{enrollment_type} с доступом только к разделу"
   enrollment: 
     default_course_name: Курс
     default_email: "Электронная почта отсутствует"
@@ -11195,6 +11201,7 @@ ru:
   error_59293a2c: ошибка
   error_98e81528: Ошибка
   error_adding_canvas_file_to_submission_draft_de258021: "Ошибка добавления canvas в черновик подписки"
+  error_adding_file_to_discussion_message_16feef3f: "Ошибка добавления файла в сообщение в обсуждении"
   error_adding_files_to_conversation_message_58e83876: "Ошибка добавления файлов в сообщение в обсуждении"
   error_adding_files_to_discussion_message_8bb819e4: "Ошибка добавления файлов в сообщение в обсуждении"
   error_adding_files_to_submission_draft_6acac337: "Ошибка добавления файлов в черновик подписки"
@@ -11254,6 +11261,7 @@ ru:
   error_updating_comment_4b80c76d: "Ошибка обновления комментария"
   error_updating_status_of_module_item_80336274: "Ошибка при обновлении статуса элемента модуля"
   error_updating_submission_draft_1d40ade7: "Ошибка обновления проекта представления"
+  error_uploading_file_73235601: "Ошибка при загрузке файла"
   error_uploading_file_e2d31b56: "Ошибка при загрузке файла."
   error_uploading_files_f709361f: "Ошибка при загрузке файлов"
   error_uploading_video_audio_recording_16d9730a: "Ошибка при загрузке видео-/аудиозаписи"
@@ -13815,12 +13823,14 @@ ru:
   hide_courses_without_students_fc6fc7a0: "Скрыть курсы без студентов"
   hide_details_df9ef4a2: "Скрыть подробные сведения"
   hide_e057ff36: Скрыть
+  hide_from_everyone_9fc3e6d0: "Скрыть от всех"
   hide_grades_585e63b4: "Скрыть Оценки"
   hide_grades_5ff26682: "Скрыть оценки"
   hide_grades_tray_5ed267fe: "Скрыть лоток оценок"
   hide_groups_navigation_menu_62e8b3d0: "Скрыть меню навигации групп"
   hide_important_dates_c23d2102: "Скрыть важные даты"
   hide_key_e8fe1e8c: "Скрыть ключ"
+  hide_name_and_profile_picture_d18eed70: "Скрыть имя и изображение профиля"
   hide_name_details_23814c37: "Скрыть детали %{name}"
   hide_navigation_menu_f0b3e90: "Скрыть меню навигации"
   hide_notes_column_7749f408: "Скрыть столбец заметок"
@@ -14063,6 +14073,12 @@ ru:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Если включено, разрешает новые предметы window.postMessage для спецификации платформы LTI Platform
       Storage и отправляет ответные сообщения на все postMessage.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      Если эта функция включена, «несанкционированный» ответ от JSON API возвращает код 403
+      (запрещено) вместо кода 401, чтобы соответствовать стандартам HTTP.
+      Кроме того, когда API возвращает неаутентифицированную или неавторизованную ошибку JSON,
+      поле «status» (Состояние) не будет локализовано; оно всегда будет указано на
+      английском языке.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       В случае активации Canvas позволяет пользователям возвращать несколько элементов курса
       за один запрос на странице модулей курса
@@ -14107,6 +14123,7 @@ ru:
       вместо задания. Это создаст события, которые необходимо
       дублировать, если только не удалены подписки в ассоциированных
       заданиях с защитой от плагиата.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Если функция LTI - Add (Добавить) отключена, пользователи по-прежнему могут устанавливать одобренные приложения через Центр приложений Canvas (если эта функция включена для вашего учреждения). Однако, если функция LTI - Delete (Удалить) не включена, они не могут удалять добавленные вручную внешние приложения."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Если параметр «Управление курсами: Админ - управление / обновление» и «Курсы - отменить удаление» также активирован, пользователь уровня учетной записи может восстанавливать удаленные курсы в средствах администрирования."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Если шкалы усвоения активны, отчет будет сокращен, чтобы не включать метод расчета, время расчета, точки усвоения или оценки"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -18319,7 +18336,9 @@ ru:
   nav_avatar_border_3246beb1: "Граница аватара нав."
   nav_background_fd299145: "Фон нав."
   nav_badge_3c67de17: "Ярлык нав."
+  nav_badge_active_1d4be222: "Значок Nav активен"
   nav_badge_text_574b6eb: "Текст ярлыка нав."
+  nav_badge_text_active_9a28e8a2: "Текст значка Nav активен"
   nav_icon_active_e4825558: "Активная иконка нав."
   nav_icon_ca3fef59: "Иконка нав."
   nav_logo_4b255c91: "Логотип нав."
@@ -18568,6 +18587,7 @@ ru:
   no_results_match_searchterm_f28e50e0: "Нет результатов, соответствующих «%{searchTerm}»"
   no_score_yet_c94e919b: "Оценок пока нет"
   no_start_date_6e81c22b: "Нет Даты начала"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "Нет наблюдаемых студентов. Чтобы выбрать студента, вернитесь на панель управления."
   no_students_being_observed_42e11732: "Нет наблюдаемых учащихся"
   no_students_dd8de9f0: "Студенты отсутствуют"
   no_students_have_taken_the_quiz_yet_e667644b: "Ни один студент еще не взял контрольную работу"
@@ -19096,6 +19116,7 @@ ru:
   observers_remove_ad508fbe: "Наблюдатели - удалить"
   observing_f3c5e759: Наблюдение
   observing_observee_d31d5fa2: "Наблюдение: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "Наблюдение %{student_name}. Чтобы выбрать другого студента, вернитесь на панель управления."
   occurrence_s_c12d1aad: "случай (случаев)"
   of_students_5d1af0d2: "# студентов"
   off_5385ef3f: Выкл
@@ -19628,6 +19649,7 @@ ru:
   parents_sign_up_here_f0aa8f4f: "Регистрация для родителей здесь"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Частично: учащиеся могут выбрать раскрытие своего имени и фотографии профиля"
   partially_anonymous_483a892d: "Частично анонимный"
+  partially_anonymous_discussion_13ceb585: "Частично Анонимное обсуждение | "
   partially_enabled_and_locked_9a39d38a: "Частично активировано и заблокировано"
   partially_enabled_cd506819: "Частично активировано"
   participantcount_less_8d258f6: "%{participantCount} меньше"
@@ -20181,7 +20203,7 @@ ru:
       name: Сессии
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Оставшееся до начала сеанса в минутах (минимум 20) для мобильных приложений"
+        mobile_timeout: "Оставшееся до начала сеанса в минутах (минимум 2880 [2 дня]) для мобильных приложений"
         session_timeout: "Время продолжительности сессии в минутах (минимум 20)"
     settings_header: 
       prompt_change_for_all_line1: "Это изменит настройки ВСЕХ УЧЕТНЫХ ЗАПИСЕЙ!"
@@ -23022,6 +23044,7 @@ ru:
   required_access_code_592902d7: "Требуемый код доступа"
   required_by_course_end_date_d87a4772: "Требуется к дате окончания курса"
   required_by_specified_end_date_22dd6b49: "Требуется к указанной дате окончания"
+  required_by_term_end_date_403dff38: "Требуется к дате окончания"
   required_email_address_379b2392: "Требуемый адрес электронной почты"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Обязательные поля включают имя ключа, адрес электронной почты владельца, идентификатор инструмента, URL-адрес перенаправления и URL-адрес значка."
   required_input_message_all_unassigned_students_1e721442: "Требуемый ввод. Оповестить всех неназначенных студентов."
@@ -23653,16 +23676,16 @@ ru:
     confirms: 
       delete_enrollment: "Удалить данную регистрацию без возможности восстановления?"
     default_course_name: "Идентификатор курса \"%{course_id}\""
-    enrolled_as_designer: "зарегистрирован как дизайнер"
-    enrolled_as_limited_designer: "зарегистрирован как дизайнер с доступом только к разделу"
-    enrolled_as_limited_observer: "зарегистрирован как наблюдатель с доступом только к секциям"
-    enrolled_as_limited_student: "зарегистрирован как студент с доступом только к разделу"
-    enrolled_as_limited_ta: "зарегистрирован как ассистент с доступом только к разделу"
-    enrolled_as_limited_teacher: "зарегистрирован как учитель с доступом только к разделу"
-    enrolled_as_observer: "зарегистрирован как наблюдатель"
-    enrolled_as_student: "зарегистрирован как студент"
-    enrolled_as_ta: "зарегистрирован как ассистент"
-    enrolled_as_teacher: "зарегистрирован как учитель"
+    enrolled_as_designer: "зачислен как: Дизайнер"
+    enrolled_as_limited_designer: "зачислен как: Дизайнер с доступом только к разделу"
+    enrolled_as_limited_observer: "зачислен как: Наблюдатель с доступом только к разделу"
+    enrolled_as_limited_student: "зачислен как: Студент с доступом только к разделу"
+    enrolled_as_limited_ta: "зачислен как: TA с доступом только к разделу"
+    enrolled_as_limited_teacher: "зачислен как: Преподаватель с доступом только к разделу"
+    enrolled_as_observer: "зачислен как: Наблюдатель"
+    enrolled_as_student: "зачислен как: Студент"
+    enrolled_as_ta: "зачислен как: TA"
+    enrolled_as_teacher: "зачислен как: Преподаватель"
     errors: 
       confirmation_failed: "Ошибка подтверждения"
       course_not_authorized_for_crosslist: "%{course_name} не авторизован для перекрестных списков"
@@ -24928,6 +24951,7 @@ ru:
   show_me_76823679: Показать
   show_more_8d5f918b: "показать больше"
   show_more_af9cbc16: "Показать больше"
+  show_name_and_profile_picture_9329d8f8: "Показать имя и изображение профиля"
   show_name_details_186d86e6: "Показать %{name} детали"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Показывать имена наблюдаемых учащихся в уведомлениях."
   show_name_of_observed_students_in_notifications_d38b53ca: "Показывать имена наблюдаемых учащихся в уведомлениях"
@@ -24957,6 +24981,7 @@ ru:
   show_sub_accounts_for_account_name_fa71a658: "Показать субучетные записи для %{account_name}"
   show_suggestions_when_typing_b72545de: "Показывать предложения при вводе"
   show_to_d57767f: Показать
+  show_to_everyone_94d66d01: "Показывать всем"
   show_welcome_tour_a105aa2e: "Показать ознакомительный тур"
   showing_1ac6ed70: "Отображение:"
   showing_all_announcements_36ff0cec: "Показывать все объявления"
@@ -26030,6 +26055,7 @@ ru:
   tas_observers_designers_b705118a: "TA / наблюдатели / дизайнеры"
   tas_remove_11059e14: "TA - Удалить"
   tas_remove_16a99b22: "TA - удалить"
+  tea_provisional_graders_d4f19c26: "Промежуточные оценщики TEA"
   teacher_5a73b637: Учитель
   teacher_count_teachers_a92f7199: "%{teacher_count} преподавателей/преподавателя"
   teacher_dashboard_custom_report_6d20bef2: "Личный кабинет преподавателя, пользовательский отчет"
@@ -26562,6 +26588,8 @@ ru:
   there_was_a_problem_updating_the_submission_6e5280a1: "При обновлении документа возникла проблема."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Произошла ошибка при проверке статуса опубликования плана."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Произошла ошибка при получении статистики по курсу"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Произошла ошибка при получении фильтров журнала."
+  there_was_an_error_fetching_modules_8ee451bb: "Произошла ошибка при получении модулей."
   there_was_an_error_fetching_outcome_results_45c57590: "Произошла ошибка при получении конечных результатов"
   there_was_an_error_fetching_submission_comments_ce153077: "Произошла ошибка при получении комментариев по отправке"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Произошла ошибка при создании кода сопряжения"
@@ -26769,6 +26797,7 @@ ru:
       Содержит большее количество таких типов вопросов, как хот-спот,
               категоризация, спаривание и составление заказа. Также имеется
               большее число функций модерирования и размещения.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Эта «домашняя комната» синхронизирует зачисления и даты начала/окончания субъекта для: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Это изображение появляется на странице в качестве фонового водяного знака. Допустимые форматы: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Об этом изображении уже было сообщено."
   this_image_is_currently_unavailable_25c68857: "Это изображение в настоящее время недоступно"
@@ -28275,6 +28304,7 @@ ru:
       Обновляет пользовательский интерфейс предпочтений уведомлений учетной записи до более актуального уровня
       и повышенный комфорт пользователя
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Обновляет значки Политики публикации в заголовке столбца заданий Нового журнала оценок."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Обновление кода HTTP и поля состояния JSON ошибки аутентификации API JSON"
   updating_6edbab78: Обновление
   updating_discussion_failed_aadb2d35: "Не удалось обновить обсуждение"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Обновление URL-адреса каталога приведет к тому, что ваш старый URL станет недоступным для пользователей незамедлительно! Если настроен существующий платежный оператор, для внесения изменений потребуется помощь инженера по каталогу."
@@ -28322,6 +28352,8 @@ ru:
   uploaded_over_time_d59abb68: "загружено в течение длительного времени"
   uploading_19e8a4e7: Загрузка
   uploading_ee585874: "Выполняется отправка..."
+  uploading_file_5c7e14fd: "Загрузка файла"
+  uploading_file_in_progress_5c09e0c9: "Выполняется загрузка файла"
   uploading_files_5ff8f4fd: "Загрузка файлов"
   uploading_files_9e39dbf9: "Загрузка файлов"
   uploading_media_progress_c23a953b: "Ход выгрузки медиа"
