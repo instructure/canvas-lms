@@ -2460,6 +2460,7 @@ nl:
       Hiermee kan een gebruiker de weging van opdrachtgroepen in een cursus inschakelen en bewerken.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Hiermee kan de gebruiker gebeurtenissen toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Hiermee kan de gebruiker gebeurtenissen toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Hiermee kan een gebruiker pictogrammen van externe apps aan de Rich Content Editor-werkbalk toevoegen."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Hiermee kan een gebruiker groepsleden aan account- of cursusgroepen toevoegen."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Hiermee kan een gebruiker nieuwe opdrachten aan een module toevoegen."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Hiermee kan een gebruiker nieuwe cursussen aan een account toevoegen."
@@ -2691,6 +2692,7 @@ nl:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Hiermee kan een gebruiker handmatig een app toevoegen in Accountinstellingen."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Hiermee kan een gebruiker handmatig een app toevoegen en verwijderen in Accountinstellingen."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Hiermee kan een gebruiker handmatig een app toevoegen en verwijderen in Cursusinstellingen."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Hiermee kan een gebruiker handmatig een app verwijderen in Accountinstellingen."
   allows_user_to_moderate_a_quiz_6953d369: "Hiermee kan een gebruiker een toets modereren."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Hiermee kan een gebruiker een toets modereren en de pagina met de toetsstatistieken weergeven."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Hiermee kan een gebruiker een toets modereren. Instellingen: Hiermee kan een gebruiker beoordelingsschema's bewerken."
@@ -3295,6 +3297,7 @@ nl:
   anonymous_user_d984b9ce: "Anonieme gebruiker"
   anonymous_was_never_turned_on_e5e8aeda: "Anoniem was nooit ingeschakeld"
   anonymous_was_turned_off_300d25ec: "Anoniem was uitgeschakeld"
+  anonymous_you_e708af99: "Anoniem (jij)"
   anonymously_graded_59149570: "Anoniem beoordeeld"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Anoniem beoordeelde opdrachten kunnen geen groepsopdrachten zijn"
   another_assignment_name_369f8481: "Nog een opdrachtnaam"
@@ -6792,7 +6795,7 @@ nl:
     media_objects_not_configured: "Mediaobjecten niet geconfigureerd"
     new_roster_user: 
       completed_enrollment: "Voltooid *%{completed_at}*"
-      enrolled_as: "Ingeschreven als %{enrollment_type}"
+      enrolled_as: "Ingeschreven als: %{enrollment_type}"
       enrollment_linked_to: "Gekoppeld aan *%{linked_user}*"
       labels: 
         user_privileges: Bevoegdheden
@@ -6845,7 +6848,7 @@ nl:
         conclude: "Weet je zeker dat deze inschrijving wilt beëindigen?"
         conclude_student: "Weet je zeker dat je deze inschrijving van de cursist wilt voltooien?"
         delete_enrollment: "Weet je zeker dat je deze inschrijving wilt verwijderen?"
-      enrolled_as: "Ingeschreven als %{enrollment_type}"
+      enrolled_as: "Ingeschreven als: %{enrollment_type}"
       enrollment_change_failed: "Wijzigen van inschrijvingsbevoegdheid is mislukt, probeer het opnieuw"
       enrollment_linked_to: "gelinkt aan *%{linked_user}*"
       headings: 
@@ -10483,6 +10486,9 @@ nl:
   enroll_in_subject_9c1f1c18: "Inschrijven in vak"
   enrolled_a6a517cd: Ingeschreven
   enrolled_as_272da3b9: "Ingeschreven als"
+  enrolled_as_enrollment_type_a008e44a: "Ingeschreven als: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "ingeschreven als: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "ingeschreven als: %{enrollment_type} met alleen toegang tot sectie"
   enrollment: 
     default_course_name: Cursus
     default_email: "Geen e-mail"
@@ -10906,6 +10912,7 @@ nl:
   error_59293a2c: fout
   error_98e81528: Fout
   error_adding_canvas_file_to_submission_draft_de258021: "Fout bij het toevoegen van Canvas-bestand aan inleverconcept"
+  error_adding_file_to_discussion_message_16feef3f: "Fout bij toevoegen van bestand aan discussiebericht"
   error_adding_files_to_conversation_message_58e83876: "Fout bij toevoegen van bestanden aan gespreksbericht"
   error_adding_files_to_discussion_message_8bb819e4: "Fout bij toevoegen van bestanden aan discussiebericht"
   error_adding_files_to_submission_draft_6acac337: "Fout bij het toevoegen van bestanden aan inleverconcept"
@@ -10965,6 +10972,7 @@ nl:
   error_updating_comment_4b80c76d: "Fout bij bijwerken van opmerking"
   error_updating_status_of_module_item_80336274: "Fout bij bijwerken van status voor module-item"
   error_updating_submission_draft_1d40ade7: "Fout tijdens het bijwerken van inleverconcept"
+  error_uploading_file_73235601: "Fout bij uploaden van bestand"
   error_uploading_file_e2d31b56: "Er is een fout opgetreden bij het oploaden van bestand."
   error_uploading_files_f709361f: "Fout bij uploaden van bestanden"
   error_uploading_video_audio_recording_16d9730a: "Fout bij het uploaden van video/audio-opnames"
@@ -13472,12 +13480,14 @@ nl:
   hide_courses_without_students_fc6fc7a0: "Cursussen zonder cursisten verbergen"
   hide_details_df9ef4a2: "Details verbergen"
   hide_e057ff36: Verbergen
+  hide_from_everyone_9fc3e6d0: "Voor iedereen verbergen"
   hide_grades_585e63b4: "Cijfers verbergen"
   hide_grades_5ff26682: "Cijfers verbergen"
   hide_grades_tray_5ed267fe: "Tray voor cijfers verbergen"
   hide_groups_navigation_menu_62e8b3d0: "Menu Groepsnavigatie verbergen"
   hide_important_dates_c23d2102: "Belangrijke datums verbergen"
   hide_key_e8fe1e8c: "Sleutel verbergen"
+  hide_name_and_profile_picture_d18eed70: "Naam en profielafbeelding verbergen"
   hide_name_details_23814c37: "%{name} details verbergen"
   hide_navigation_menu_f0b3e90: "Navigatiemenu verbergen"
   hide_notes_column_7749f408: "Opmerkingen in kolom verbergen"
@@ -13719,6 +13729,12 @@ nl:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Indien ingeschakeld zijn nieuwe window.postMessage onderwerpen voor de LTI-platformopslag
       toegestaan en worden antwoordberichten naar alle postMessage verzonden.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      Indien ingeschakeld zal een "niet geautoriseerde" respons vanaf de JSON API een 403
+      (Verboden) retourneren in plaats van een 401 code, voor meer consistentie met HTTP-normen.
+      Ook zal in het geval dat de API een niet-geverifieerde of niet-geautoriseerde JSON-fout retourneert,
+      het "status" veld niet gelokaliseerd worden; het wordt altijd in het
+      Engels gegeven.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Indien ingeschakeld, kunnen tools meerdere inhoudsitems als resultaat geven
       met één aanvraag op de pagina Cursusmodules
@@ -13763,6 +13779,7 @@ nl:
       in plaats van de opdracht. Dit zorgt ervoor dat evenementen
       worden gedupliceerd tenzij de abonnementen op de gekoppelde
       plagiaat-opdrachten worden verwijderd.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Als LTI - toevoegen is uitgeschakeld, kunnen gebruikers nog wel goedgekeurde apps installeren via het Canvas App Center (indien ingeschakeld voor je instituut). Echter, als LTI - verwijderen niet is ingeschakeld, kunnen gebruikers ook geen handmatig toegevoegde externe apps verwijderen."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Als Cursussen beheren: Beheerder - beheren/bijwerken en Cursussen - verwijderen ongedaan maken ook zijn ingeschakeld, kan een gebruiker op accountniveau de verwijderde cursussen herstellen in Beheertools."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Als vakbeheersingsschalen zijn ingeschakeld, zal het rapport worden ingekort en bevat dit geen berekeningsmethode, berekeningen, vakbeheersingspunten of beoordelingen"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -17909,7 +17926,9 @@ nl:
   nav_avatar_border_3246beb1: "Nav Avator Rand"
   nav_background_fd299145: "Nav achtergrond"
   nav_badge_3c67de17: "Nav badge"
+  nav_badge_active_1d4be222: "Nav badge is actief"
   nav_badge_text_574b6eb: "Nav badge tekst"
+  nav_badge_text_active_9a28e8a2: "Nav badge tekst is actief"
   nav_icon_active_e4825558: "Nav pictogram actief"
   nav_icon_ca3fef59: "Nav pictogram"
   nav_logo_4b255c91: "Nav logo"
@@ -18158,6 +18177,7 @@ nl:
   no_results_match_searchterm_f28e50e0: "Geen resultaten komen overeen met \"%{searchTerm}\""
   no_score_yet_c94e919b: "Geen score gegeven"
   no_start_date_6e81c22b: "Geen startdatum"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "Geen cursist wordt waargenomen. Ga terug naar het dashboard om een cursist te selecteren."
   no_students_being_observed_42e11732: "Geen cursisten worden waargenomen"
   no_students_dd8de9f0: "Geen cursisten"
   no_students_have_taken_the_quiz_yet_e667644b: "De toets is nog door geen enkele cursist gemaakt"
@@ -18680,6 +18700,7 @@ nl:
   observers_remove_ad508fbe: "Waarnemers - verwijderen"
   observing_f3c5e759: "Bezig met waarnemen"
   observing_observee_d31d5fa2: "Bezig met waarnemen: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "%{student_name} wordt waargenomen. Ga terug naar het dashboard om een andere cursist te selecteren."
   occurrence_s_c12d1aad: voorval(len)
   of_students_5d1af0d2: "# cursisten"
   off_5385ef3f: Uit
@@ -19203,6 +19224,7 @@ nl:
   parents_sign_up_here_f0aa8f4f: "Ouders hier aanmelden"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Gedeeltelijk: cursisten kunnen ervoor kiezen om hun naam en profielfoto te tonen"
   partially_anonymous_483a892d: "Gedeeltelijk anoniem"
+  partially_anonymous_discussion_13ceb585: "Gedeeltelijk anonieme discussie |  "
   partially_enabled_and_locked_9a39d38a: "Gedeeltelijk ingeschakeld en vergrendeld"
   partially_enabled_cd506819: "Gedeeltelijk ingeschakeld"
   participantcount_less_8d258f6: "%{participantCount} minder"
@@ -19758,7 +19780,7 @@ nl:
       name: Sessies
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Tijd voordat sessie verloopt in minuten (20 minimum) voor mobiele applicaties"
+        mobile_timeout: "Tijd na inloggen voordat sessie verloopt in minuten (minimum 2880 [2 dagen]) voor mobiele applicaties"
         session_timeout: "Tijd voordat sessie verloopt in minuten (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "Dit wijzigt de instellingen voor ALLE ACCOUNTS!"
@@ -22486,6 +22508,7 @@ nl:
   required_access_code_592902d7: "Verplichte toegangscode"
   required_by_course_end_date_d87a4772: "Vereist op einddatum van cursus"
   required_by_specified_end_date_22dd6b49: "Vereist op opgegeven einddatum"
+  required_by_term_end_date_403dff38: "Vereist op einddatum van periode"
   required_email_address_379b2392: "Vereist e-mailadres"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Vereiste velden zijn sleutelnaam, eigenaars-e-mail, tool-ID, redirect-URLen pictogram-URL."
   required_input_message_all_unassigned_students_1e721442: "Verplichte invoer. Bericht naar alle niet toegewezen cursisten."
@@ -23109,16 +23132,16 @@ nl:
     confirms: 
       delete_enrollment: "Weet je zeker dat je deze inschrijving permanent wilt verwijderen?"
     default_course_name: "Cursus-ID \"%{course_id}\""
-    enrolled_as_designer: "ingeschreven als ontwerper"
-    enrolled_as_limited_designer: "ingeschreven als ontwerper met beperkte toegang tot één sectie"
-    enrolled_as_limited_observer: "ingeschreven als waarnemer met beperkte toegang tot één sectie"
-    enrolled_as_limited_student: "ingeschreven als cursist met beperkte toegang tot één sectie"
-    enrolled_as_limited_ta: "ingeschreven als onderwijsassistent met beperkte toegang tot één sectie"
-    enrolled_as_limited_teacher: "ingeschreven als docent met beperkte toegang tot één sectie"
-    enrolled_as_observer: "ingeschreven als waarnemer"
-    enrolled_as_student: "ingeschreven als cursist"
-    enrolled_as_ta: "ingeschreven als onderwijsassistent"
-    enrolled_as_teacher: "ingeschreven als docent"
+    enrolled_as_designer: "ingeschreven als: Ontwerper"
+    enrolled_as_limited_designer: "ingeschreven als: Ontwerper met alleen toegang tot sectie"
+    enrolled_as_limited_observer: "ingeschreven als: Waarnemer met alleen toegang tot sectie"
+    enrolled_as_limited_student: "ingeschreven als: Cursist met alleen toegang tot sectie"
+    enrolled_as_limited_ta: "ingeschreven als: Onderwijsassistent met alleen toegang tot sectie"
+    enrolled_as_limited_teacher: "ingeschreven als: Docent met alleen toegang tot sectie"
+    enrolled_as_observer: "ingeschreven als: Waarnemer"
+    enrolled_as_student: "ingeschreven als: Cursist"
+    enrolled_as_ta: "ingeschreven als: Onderwijsassistent"
+    enrolled_as_teacher: "ingeschreven als: Docent"
     errors: 
       confirmation_failed: "Bevestiging mislukt"
       course_not_authorized_for_crosslist: "%{course_name} mag geen kruisverwijzingen maken"
@@ -24361,6 +24384,7 @@ nl:
   show_me_76823679: "Toon mij"
   show_more_8d5f918b: "meer tonen"
   show_more_af9cbc16: "Meer tonen"
+  show_name_and_profile_picture_9329d8f8: "Naam en profielafbeelding tonen"
   show_name_details_186d86e6: "%{name} details tonen"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Geef de naam van geobserveerde cursisten in meldingen weer."
   show_name_of_observed_students_in_notifications_d38b53ca: "Geef de naam van geobserveerde cursisten in meldingen weer"
@@ -24390,6 +24414,7 @@ nl:
   show_sub_accounts_for_account_name_fa71a658: "Subaccounts tonen voor %{account_name}"
   show_suggestions_when_typing_b72545de: "Toon suggesties bij typen"
   show_to_d57767f: "Weergeven aan"
+  show_to_everyone_94d66d01: "Aan iedereen tonen"
   show_welcome_tour_a105aa2e: "Rondleiding weergeven"
   showing_1ac6ed70: "Wordt getoond:"
   showing_all_announcements_36ff0cec: "Alle aankondigingen tonen"
@@ -25441,6 +25466,7 @@ nl:
   tas_observers_designers_b705118a: Onderwijsassistenten/Waarnemers/Ontwerpers
   tas_remove_11059e14: "Onderwijsassistenten - Verwijderen"
   tas_remove_16a99b22: "Onderwijsassistenten - verwijderen"
+  tea_provisional_graders_d4f19c26: "TEA voorlopige beoordelaars"
   teacher_5a73b637: Docent
   teacher_count_teachers_a92f7199: "%{teacher_count} cursusleiders"
   teacher_dashboard_custom_report_6d20bef2: "Aangepast rapport van docentdashboard"
@@ -25953,6 +25979,8 @@ nl:
   there_was_a_problem_updating_the_submission_6e5280a1: "Er is een probleem met het bijwerken van de inzending."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Er is een fout opgetreden bij het controleren van het plan voor de publicatiestatus."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Er is een fout opgetreden bij het ophalen van cursusstatistieken"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Er is een fout opgetreden bij het ophalen van cijferlijstfilters."
+  there_was_an_error_fetching_modules_8ee451bb: "Er is een fout opgetreden bij het ophalen van modules."
   there_was_an_error_fetching_outcome_results_45c57590: "Er is een fout met het ophalen van leerdoelresultaten"
   there_was_an_error_fetching_submission_comments_ce153077: "Er is een fout met het ophalen van opmerkingen bij de inzending"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Er is een fout opgetreden bij het genereren van de koppelingscode"
@@ -26158,6 +26186,7 @@ nl:
       Deze versie heeft meer vraagtypen zoals hotspot,
               categorisering, vergelijking en rangschikking. Er zijn ook
               meer functies voor modereren en aanpassing.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Deze thuisklas synchroniseert inschrijvingen en start/einddatums van vakken naar: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Deze afbeelding verschijnt als een achtergrond watermerk op je pagina. Geaccepteerde formaten: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Deze afbeelding is gerapporteerd."
   this_image_is_currently_unavailable_25c68857: "Deze afbeelding is momenteel niet beschikbaar"
@@ -27651,6 +27680,7 @@ nl:
       Updaten van accountniveau meldingsvoorkeuren UI tot een meer actuele
       en bijgewerkte gebruikerservaring
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Hiermee wordt de weergave van pictogrammen voor Beleid voor posten bijgewerkt in de kop van de toewijzingskolom in Nieuwe cijferlijst."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Wordt bijgewerkt naar JSON API auth-fout HTTP-code en JSON-statusveld"
   updating_6edbab78: "Bezig met bijwerken"
   updating_discussion_failed_aadb2d35: "Bijwerken van discussie mislukt"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Door de Catalog-URL bij te werken is je oude URL met onmiddellijke ingang niet meer toegankelijk voor gebruikers! Als er een bestaande betalingsverwerker is geconfigureerd, is bij wijzigingen de hulp van een Catalog-engineer nodig."
@@ -27698,6 +27728,8 @@ nl:
   uploaded_over_time_d59abb68: "geüpload in de loop van de tijd"
   uploading_19e8a4e7: "Bezig met uploaden"
   uploading_ee585874: "Bezig met uploaden..."
+  uploading_file_5c7e14fd: "Bestand aan het uploaden"
+  uploading_file_in_progress_5c09e0c9: "Bezig met uploaden van bestand"
   uploading_files_5ff8f4fd: "Bestanden uploaden"
   uploading_files_9e39dbf9: "Bestanden uploaden"
   uploading_media_progress_c23a953b: "Voortgang van uploaden media"
