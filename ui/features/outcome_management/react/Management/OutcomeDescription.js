@@ -25,7 +25,7 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
-import {prepareRatings} from '@canvas/outcomes/react/helpers/ratingsHelpers'
+import {prepareRatings} from '@canvas/outcomes/react/hooks/useRatings'
 import Ratings from './Ratings'
 import {ratingsShape} from './shapes'
 
@@ -114,7 +114,14 @@ const OutcomeDescription = ({
 
       {!truncated && individualOutcomeRatingAndCalculationFF && (
         <View>
-          <Ratings ratings={prepareRatings(ratings, masteryPoints)} canManage={false} />
+          <Ratings
+            ratings={prepareRatings(ratings)}
+            masteryPoints={{
+              value: masteryPoints,
+              error: null
+            }}
+            canManage={false}
+          />
           <ProficiencyCalculation
             method={{calculationMethod, calculationInt}}
             individualOutcome="display"

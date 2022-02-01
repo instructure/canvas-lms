@@ -44,8 +44,11 @@ import OutcomesRceField from './shared/OutcomesRceField'
 import ProficiencyCalculation, {
   defaultProficiencyCalculation
 } from './MasteryCalculation/ProficiencyCalculation'
-import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
-import {convertRatings} from '@canvas/outcomes/react/helpers/ratingsHelpers'
+import useRatings, {
+  defaultRatings,
+  defaultMasteryPoints
+} from '@canvas/outcomes/react/hooks/useRatings'
+import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Management/Ratings'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
@@ -69,9 +72,15 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   })
   const {
     ratings,
+    masteryPoints,
     setRatings,
+    setMasteryPoints,
     hasError: proficiencyRatingsError
-  } = useRatings({initialRatings: defaultOutcomesManagementRatings})
+  } = useRatings({
+    initialRatings: defaultRatings,
+    initialMasteryPoints: defaultMasteryPoints
+  })
+
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
   const [proficiencyCalculation, setProficiencyCalculation] = useState(
@@ -133,8 +142,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
         if (individualOutcomeRatingAndCalculationFF) {
           input.calculationMethod = proficiencyCalculation.calculationMethod
           input.calculationInt = proficiencyCalculation.calculationInt
-          const {masteryPoints, ratings: inputRatings} = convertRatings(ratings)
-          input.masteryPoints = masteryPoints
+          const {masteryPoints: inputMasteryPoints, ratings: inputRatings} =
+            processRatingsAndMastery(ratings, masteryPoints.value)
+          input.masteryPoints = inputMasteryPoints
           input.ratings = inputRatings
         }
         const createLearningOutcomeResult = await createLearningOutcome({
@@ -257,7 +267,13 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
           )}
           {individualOutcomeRatingAndCalculationFF && (
             <View as="div" padding="small 0 0">
-              <Ratings ratings={ratings} onChangeRatings={setRatings} canManage />
+              <Ratings
+                ratings={ratings}
+                onChangeRatings={setRatings}
+                masteryPoints={masteryPoints}
+                onChangeMasteryPoints={setMasteryPoints}
+                canManage
+              />
               <View as="div" minHeight="14rem">
                 <hr style={{margin: '1rem 0 0'}} />
                 <ProficiencyCalculation

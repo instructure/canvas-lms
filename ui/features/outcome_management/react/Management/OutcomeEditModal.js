@@ -41,7 +41,7 @@ import {useMutation} from 'react-apollo'
 import OutcomesRceField from '../shared/OutcomesRceField'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
 import useRatings from '@canvas/outcomes/react/hooks/useRatings'
-import {convertRatings, prepareRatings} from '@canvas/outcomes/react/helpers/ratingsHelpers'
+import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
 
@@ -57,10 +57,15 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     useCanvasContext()
   const {
     ratings,
+    masteryPoints,
     setRatings,
+    setMasteryPoints,
     hasError: proficiencyRatingsError,
     hasChanged: proficiencyRatingsChanged
-  } = useRatings({initialRatings: prepareRatings(outcome.ratings, outcome.masteryPoints)})
+  } = useRatings({
+    initialRatings: outcome.ratings,
+    initialMasteryPoints: outcome.masteryPoints
+  })
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   let attributesEditable = {
@@ -127,8 +132,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
             input.calculationInt = calculationInt
           }
           if (proficiencyRatingsChanged) {
-            const {masteryPoints, ratings: inputRatings} = convertRatings(ratings)
-            input.masteryPoints = masteryPoints
+            const {masteryPoints: inputMasteryPoints, ratings: inputRatings} =
+              processRatingsAndMastery(ratings, masteryPoints.value)
+            input.masteryPoints = inputMasteryPoints
             input.ratings = inputRatings
           }
         }
@@ -265,6 +271,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
             <View as="div" padding="small 0 0">
               <Ratings
                 ratings={ratings}
+                masteryPoints={masteryPoints}
+                onChangeMasteryPoints={setMasteryPoints}
                 onChangeRatings={setRatings}
                 canManage={!!attributesEditable.individualRatings}
               />

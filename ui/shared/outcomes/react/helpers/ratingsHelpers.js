@@ -16,22 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import uuid from 'uuid/v1'
-
-export const convertRatings = rawRatings => {
-  let masteryPoints
-  const ratings = rawRatings.map(({description, points, mastery}) => {
-    const pointsFloat = parseFloat(points)
-    if (mastery) masteryPoints = pointsFloat
-    return {description, points: pointsFloat}
-  })
-  return {masteryPoints, ratings}
-}
-
-export const prepareRatings = (ratings, masteryPoints) =>
-  (ratings || []).map(({description, points}) => ({
-    description,
-    points,
-    mastery: Number(points) === Number(masteryPoints),
-    key: uuid()
-  }))
+export const processRatingsAndMastery = (ratings, masteryPoints) => ({
+  ratings: ratings.map(({description, points}) => ({description, points: parseFloat(points)})),
+  masteryPoints: Number(parseFloat(masteryPoints).toFixed(2))
+})
