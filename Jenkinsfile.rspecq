@@ -80,8 +80,8 @@ def computeTestCount() {
   // split crystalball_spec
   def seleniumTests = specUnique.findAll { it.contains('/selenium') }
   def rspecTests = specUnique - seleniumTests
-  env.CRYSTALBALL_SELENIUM = env.JOB_NAME.endsWith('proofs-of-concept/test-queue') ? '' : seleniumTests.join(' ').trim()
-  env.CRYSTALBALL_RSPEC = env.JOB_NAME.endsWith('test-suites/test-queue') ? '' : rspecTests.join(' ').trim()
+  env.CRYSTALBALL_SELENIUM = seleniumTests.join(' ')
+  env.CRYSTALBALL_RSPEC = rspecTests.join(' ')
 
   summaryMessage = "Map: $mapVersion\n"
   // Crystalball predictor returned empty text file
@@ -89,7 +89,7 @@ def computeTestCount() {
     summaryMessage += "No App Code Detected! - Running everything!"
     crystalballColor = 'danger'
     // Do not run full builds while still testing
-    env.CRYSTALBALL_SKIP = env.JOB_NAME.endsWith('test-suites/test-queue') ? 'false' : 'true'
+    env.CRYSTALBALL_SKIP = 'true'
     return
   }
   // Crystalball predictor returned "."
@@ -97,7 +97,7 @@ def computeTestCount() {
     summaryMessage += "New File Detected! - Complete Suite Re-run!"
     crystalballColor = 'danger'
     // Do not run full builds while still testing
-    env.CRYSTALBALL_SKIP = env.JOB_NAME.endsWith('test-suites/test-queue') ? 'false' : 'true'
+    env.CRYSTALBALL_SKIP = 'true'
     return
   }
 
