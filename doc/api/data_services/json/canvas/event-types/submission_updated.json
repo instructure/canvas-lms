@@ -15,7 +15,7 @@
     "missing": "Whether the submission is missing, which generally means past-due and not yet submitted.",
     "score": "The raw score",
     "submission_id": "The Canvas id of the new submission.",
-    "submission_type": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+    "submission_type": "The types of submission (online_text_entry, online_url, online_upload, media_recording)",
     "submitted_at": "The timestamp when the assignment was submitted.",
     "workflow_state": "The state of the submission, such as 'submitted' or 'graded'.",
     "updated_at": "The time at which this assignment was last modified in any way",
