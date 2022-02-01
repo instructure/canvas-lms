@@ -55,6 +55,7 @@ const locale = {
     "message": "Käytä muutoksia kaikkiin tämän kurssipainikkeen esiintymiin ja kuvakkeeseen kurssilla"
   },
   "apps_54d24a47": { "message": "Sovellukset" },
+  "arrows_464a3e54": { "message": "Nuolet" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Kuvasuhde säilytetään"
   },
@@ -72,6 +73,7 @@ const locale = {
     "message": "Automaattisesti tallennettua sisältöä on olemassa. Haluaisitko ladata automaattisesti tallennetun sisällön tämän sijasta?"
   },
   "available_folders_694d0436": { "message": "Saatavissa olevat kansiot" },
+  "basic_554cdc0a": { "message": "Perus" },
   "below_81d4dceb": { "message": "Alle" },
   "bottom_third_5f5fec1d": { "message": "Alakolmannes" },
   "button_color_608a0242": { "message": "Painikkeen väri" },
@@ -160,6 +162,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "numeerinen järjestetty oletuslista"
   },
+  "delimiters_4db4840d": { "message": "Erottimet" },
   "describe_the_image_e65d2e32": { "message": "(Kuvaa kuva)" },
   "describe_the_video_2fe8f46a": { "message": "(Kuvaa video)" },
   "details_98a31b68": { "message": "Lisätiedot" },
@@ -167,6 +170,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "Ulottuvuuden tyyppi" },
   "dimensions_45ddb7b7": { "message": "Mitat" },
   "directionality_26ae9e08": { "message": "Suuntaisuus" },
+  "directly_edit_latex_b7e9235b": { "message": "Muokkaa LaTeX:iä suoraan" },
   "discussions_a5f96392": { "message": "Keskustelut" },
   "discussions_index_6c36ced": { "message": "Keskustelujen indeksi" },
   "display_options_315aba85": { "message": "Näytä vaihtoehdot" },
@@ -205,6 +209,7 @@ const locale = {
     "message": "Kirjoita vähintään 3 merkkiä ja tee haku"
   },
   "equation_1c5ac93c": { "message": "Yhtälö" },
+  "equation_editor_39fbc3f1": { "message": "Yhtälöeditori" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Laajenna esikatselu oletuksena"
   },
@@ -246,6 +251,7 @@ const locale = {
     "message": "Siirry editorin työkalupalkkiin"
   },
   "grades_a61eba0a": { "message": "Arvosanat" },
+  "greek_65c5b3f7": { "message": "kreikka" },
   "group_documents_8bfd6ae6": { "message": "Ryhmän asiakirjat" },
   "group_files_4324f3df": { "message": "Ryhmän tiedostot" },
   "group_files_82e5dcdb": { "message": "Ryhmän tiedostot" },
@@ -303,6 +309,7 @@ const locale = {
   "media_af190855": { "message": "Tietoväline" },
   "medium_5a8e9ead": { "message": "Tietoväline" },
   "middle_27dc1d5": { "message": "Kohtalainen" },
+  "misc_3b692ea7": { "message": "Sekalainen" },
   "miscellaneous_e9818229": { "message": "Muut asiat" },
   "modules_c4325335": { "message": "Moduulit" },
   "multi_color_image_63d7372f": { "message": "Monivärinen kuva" },
@@ -337,6 +344,7 @@ const locale = {
     "message": "Avaa tämä näppäimistön pikakuvakkeiden valintaruutu"
   },
   "open_title_application_fd624fc5": { "message": "Avoin { title }-sovellus" },
+  "operators_a2ef9a93": { "message": "Operaattorit" },
   "options_3ab0ea65": { "message": "Asetukset" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Järjestetyt ja järjestämättömät listat"
@@ -372,6 +380,7 @@ const locale = {
   "raw_html_editor_e3993e41": { "message": "Raaka HTML-muokkausohjelma" },
   "record_7c9448b": { "message": "Nauhoita" },
   "record_upload_media_5fdce166": { "message": "Nauhoita/lataa mediaa" },
+  "relationships_6602af70": { "message": "Suhteet" },
   "remove_link_d1f2f4d0": { "message": "Poista linkki" },
   "resize_ec83d538": { "message": "Muuta kokoa" },
   "restore_auto_save_deccd84b": {

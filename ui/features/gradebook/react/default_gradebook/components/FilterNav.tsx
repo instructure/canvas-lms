@@ -17,9 +17,9 @@
  */
 
 import React, {useState} from 'react'
-import uuid from 'uuid'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+import uuid from 'uuid'
 // @ts-ignore
 import I18n from 'i18n!gradebook'
 import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
@@ -30,65 +30,60 @@ import {Tray} from '@instructure/ui-tray'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import FilterNavFilter from './FilterNavFilter'
-import type {Module, Section, Filter, AssignmentGroup} from '../gradebook.d'
+import type {
+  AssignmentGroup,
+  Filter,
+  GradingPeriod,
+  Module,
+  PartialFilter,
+  Section
+} from '../gradebook.d'
+import useStore from '../stores/index'
 
 const {Item} = Flex as any
 
-type Props = {
-  filters: Filter[]
+export type FilterNavProps = {
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
-  onChange: (filters: Filter[]) => void
+  gradingPeriods: GradingPeriod[]
 }
 
-export default function FilterNav({filters, modules, assignmentGroups, sections, onChange}: Props) {
+const newFilter = (): PartialFilter => ({
+  name: I18n.t('Unnamed Filter'),
+  conditions: [
+    {
+      id: uuid(),
+      type: undefined,
+      value: undefined,
+      created_at: new Date().toISOString()
+    }
+  ],
+  is_applied: false,
+  created_at: new Date().toISOString()
+})
+
+export default function FilterNav({
+  modules,
+  assignmentGroups,
+  gradingPeriods,
+  sections
+}: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
-
-  const openTray = () => {
-    setIsTrayOpen(true)
-  }
-
-  const onCreateNewFilter = () => {
-    onChange(
-      filters.concat({
-        id: uuid(),
-        label: I18n.t('Unnamed Filter'),
-        conditions: [
-          {
-            id: uuid(),
-            type: undefined,
-            value: undefined,
-            createdAt: new Date().toISOString()
-          }
-        ],
-        isApplied: true,
-        createdAt: new Date().toISOString()
-      })
-    )
-  }
-
-  const onRemoveFilter = filter => {
-    onChange(filters.filter(x => x !== filter))
-  }
-
-  const onChangeFilter = filter => {
-    const newFilters = filters
-      .filter(x => x.id !== filter.id)
-      .concat(filter)
-      .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))
-    onChange(newFilters)
-  }
-
+  const filters = useStore(state => state.filters)
+  const stagedFilter = useStore(state => state.stagedFilter)
+  const saveStagedFilter = useStore(state => state.saveStagedFilter)
+  const updateFilter = useStore(state => state.updateFilter)
+  const deleteFilter = useStore(state => state.deleteFilter)
   const filterComponents = filters
-    .filter(f => f.isApplied)
+    .filter(f => f.is_applied)
     .map(filter => {
       return (
         <Tag
           key={filter.id}
-          text={<AccessibleContent alt={I18n.t('Remove filter')}>{filter.label}</AccessibleContent>}
+          text={<AccessibleContent alt={I18n.t('Remove filter')}>{filter.name}</AccessibleContent>}
           dismissible
-          onClick={() => onRemoveFilter(filter)}
+          onClick={() => deleteFilter(filter)}
           margin="0 xx-small 0 0"
         />
       )
@@ -102,9 +97,8 @@ export default function FilterNav({filters, modules, assignmentGroups, sections,
             <IconFilterLine /> <Text weight="bold">{I18n.t('Applied Filters:')}</Text>
           </Item>
           <Item>
-            {filterComponents.length > 0 ? (
-              filterComponents
-            ) : (
+            {filterComponents.length > 0 && filterComponents}
+            {!filterComponents.length && !stagedFilter && (
               <Text color="secondary" weight="bold">
                 {I18n.t('None')}
               </Text>
@@ -113,7 +107,7 @@ export default function FilterNav({filters, modules, assignmentGroups, sections,
         </Flex>
       </Item>
       <Item>
-        <Button renderIcon={IconFilterSolid} color="secondary" onClick={openTray}>
+        <Button renderIcon={IconFilterSolid} color="secondary" onClick={() => setIsTrayOpen(true)}>
           {I18n.t('Filters')}
         </Button>
       </Item>
@@ -145,13 +139,12 @@ export default function FilterNav({filters, modules, assignmentGroups, sections,
             <FilterNavFilter
               key={filter.id}
               filter={filter}
-              onChange={filter_ => {
-                onChangeFilter(filter_)
-              }}
-              onDelete={() => onRemoveFilter(filter)}
+              onChange={(f: Filter) => updateFilter(f)}
+              onDelete={() => deleteFilter(filter)}
               modules={modules}
               assignmentGroups={assignmentGroups}
               sections={sections}
+              gradingPeriods={gradingPeriods}
             />
           ))}
 
@@ -161,15 +154,38 @@ export default function FilterNav({filters, modules, assignmentGroups, sections,
             padding="small none none none"
             borderWidth="small none none none"
           >
-            <Button
-              renderIcon={IconFilterLine}
-              color="secondary"
-              onClick={onCreateNewFilter}
-              margin="small 0 0 0"
-              data-testid="new-filter-button"
-            >
-              {I18n.t('Create New Filter')}
-            </Button>
+            {stagedFilter ? (
+              <>
+                <FilterNavFilter
+                  key="staged"
+                  filter={stagedFilter}
+                  onChange={(f: PartialFilter) => useStore.setState({stagedFilter: f})}
+                  onDelete={() => useStore.setState({stagedFilter: null})}
+                  modules={modules}
+                  assignmentGroups={assignmentGroups}
+                  sections={sections}
+                  gradingPeriods={gradingPeriods}
+                />
+                <Button
+                  color="secondary"
+                  onClick={saveStagedFilter}
+                  margin="small 0 0 0"
+                  data-testid="save-filter-button"
+                >
+                  Save
+                </Button>
+              </>
+            ) : (
+              <Button
+                renderIcon={IconFilterLine}
+                color="secondary"
+                onClick={() => useStore.setState({stagedFilter: newFilter()})}
+                margin="small 0 0 0"
+                data-testid="new-filter-button"
+              >
+                {I18n.t('Create New Filter')}
+              </Button>
+            )}
           </View>
         </View>
       </Tray>

@@ -18,7 +18,8 @@
 
 import React from 'react'
 import FilterNavCondition from '../FilterNavCondition'
-import {render, fireEvent, screen} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
 const dateTests = (testType: string, dateFieldName: string) => {
@@ -35,6 +36,7 @@ const dateTests = (testType: string, dateFieldName: string) => {
       condition,
       conditionsInFilter,
       modules: [],
+      gradingPeriods: [],
       assignmentGroups: [],
       sections: []
     }
@@ -46,7 +48,7 @@ const dateTests = (testType: string, dateFieldName: string) => {
     const {getByTestId} = render(
       <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
     )
-    const dateComponent = getByTestId('date-input')
+    const dateComponent: Partial<HTMLInputElement> = getByTestId('date-input')
     expect(dateComponent).toBeInTheDocument()
   })
 
@@ -56,7 +58,7 @@ const dateTests = (testType: string, dateFieldName: string) => {
     const {getByTestId} = render(
       <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
     )
-    const dateComponent = getByTestId('date-input')
+    const dateComponent: Partial<HTMLInputElement> = getByTestId('date-input')
     expect(dateComponent.value).toContain('Dec 3, 2021')
   })
 
@@ -109,5 +111,160 @@ describe('FilterNavCondition', () => {
   })
   describe('End Date', () => {
     dateTests('end-date', 'End Date')
+  })
+
+  describe('submissions', () => {
+    let props, condition, conditionsInFilter, onChange, onDelete
+    beforeEach(() => {
+      condition = {
+        id: '456',
+        createdAt: '2021-11-02T20:56:23.616Z',
+        type: 'submissions',
+        value: undefined
+      }
+      conditionsInFilter = []
+      props = {
+        condition,
+        conditionsInFilter,
+        modules: [],
+        gradingPeriods: [],
+        assignmentGroups: [],
+        sections: []
+      }
+      onChange = jest.fn()
+      onDelete = jest.fn()
+    })
+
+    it('renders conditions for submissions', () => {
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const button = getByRole('button', {name: 'Condition type'})
+      expect(button).toBeInTheDocument()
+    })
+
+    it('sets the submissions field if value is present', () => {
+      condition.value = 'has-ungraded-submissions'
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      expect(button?.value).toContain('Has ungraded submissions')
+    })
+
+    it('changing value triggers onChange', async () => {
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('option', {name: 'Has ungraded submissions'}))
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          type: 'submissions',
+          value: 'has-ungraded-submissions'
+        })
+      )
+    })
+  })
+
+  describe('sections', () => {
+    let props, condition, conditionsInFilter, onChange, onDelete
+    beforeEach(() => {
+      condition = {
+        id: '456',
+        createdAt: '2021-11-02T20:56:23.616Z',
+        type: 'section',
+        value: '1'
+      }
+      conditionsInFilter = []
+      props = {
+        condition,
+        conditionsInFilter,
+        modules: [],
+        gradingPeriods: [],
+        assignmentGroups: [],
+        sections: [
+          {id: '1', name: 'Section 1'},
+          {id: '2', name: 'Section 2'}
+        ]
+      }
+      onChange = jest.fn()
+      onDelete = jest.fn()
+    })
+
+    it('sets the sections field if value is present', () => {
+      condition.value = '1'
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      expect(button.value).toContain('Section 1')
+    })
+
+    it('changing value triggers onChange', async () => {
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('option', {name: 'Section 1'}))
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          id: '456',
+          type: 'section',
+          value: '1'
+        })
+      )
+    })
+  })
+
+  describe('grading periods', () => {
+    let props, condition, conditionsInFilter, onChange, onDelete
+    beforeEach(() => {
+      condition = {
+        id: '456',
+        createdAt: '2021-11-02T20:56:23.616Z',
+        type: 'grading-period',
+        value: '1'
+      }
+      conditionsInFilter = []
+      props = {
+        condition,
+        conditionsInFilter,
+        modules: [],
+        gradingPeriods: [
+          {id: '1', title: 'Grading Period 1', startDate: 1},
+          {id: '2', title: 'Grading Period 2', startDate: 2},
+          {id: '3', title: 'Grading Period 3', startDate: 3}
+        ],
+        assignmentGroups: [],
+        sections: []
+      }
+      onChange = jest.fn()
+      onDelete = jest.fn()
+    })
+
+    it('sets the grading periods field if value is present', () => {
+      condition.value = '1'
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      expect(button.value).toContain('Grading Period 1')
+    })
+
+    it('changing value triggers onChange', async () => {
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('option', {name: 'Grading Period 1'}))
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          id: '456',
+          type: 'grading-period',
+          value: '1'
+        })
+      )
+    })
   })
 })

@@ -32,9 +32,6 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to access a user’s settings menu and user details.')
     },
     {
-      description: I18n.t('Allows user to edit a student’s section or role.')
-    },
-    {
       description: I18n.t('Allows user to resend course invitations from the Course People page.')
     }
   ],
@@ -77,9 +74,6 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to access a user’s settings menu and user details.')
     },
     {
-      description: I18n.t('Allows user to edit a student’s section or role.')
-    },
-    {
       description: I18n.t('Allows user to resend course invitations from the Course People page.')
     }
   ],
@@ -87,7 +81,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To add or remove a student to or from a course, the Users - Student permission must be enabled.'
+        'To add or remove a student to or from a course, the Users - Students permissions must be enabled.'
       )
     },
     {

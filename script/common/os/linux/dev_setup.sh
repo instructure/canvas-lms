@@ -7,7 +7,7 @@ dependencies='docker,docker-compose 1.20.0'
 message "It looks like you're using Linux. Let's set that up."
 
 if is_mutagen; then
-  dependencies+=',mutagen'
+  dependencies+=',mutagen 0.13.0,mutagen-compose'
   print_mutagen_intro
 fi
 

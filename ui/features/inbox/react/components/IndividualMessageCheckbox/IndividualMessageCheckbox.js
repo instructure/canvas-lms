@@ -20,14 +20,33 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import I18n from 'i18n!conversations_2'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../../util/utils'
 
 export const IndividualMessageCheckbox = props => {
   return (
-    <Checkbox
-      data-testid="individual-message-checkbox"
-      label={I18n.t('Send an individual message to each recipient')}
-      size="small"
-      {...props}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          variant: 'toggle',
+          dataTestId: 'individual-message-checkbox-mobile'
+        },
+        desktop: {
+          variant: 'simple',
+          dataTestId: 'individual-message-checkbox'
+        }
+      }}
+      render={responsiveProps => (
+        <Checkbox
+          data-testid={responsiveProps.dataTestId}
+          label={I18n.t('Send an individual message to each recipient')}
+          size="small"
+          variant={responsiveProps.variant}
+          {...props}
+        />
+      )}
     />
   )
 }

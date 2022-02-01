@@ -456,19 +456,32 @@ describe Types::UserType do
     it "filters the conversations" do
       conversation(@student, @teacher, { body: "Howdy Partner" })
       conversation(@student, @random_person, { body: "Not in course" })
+      conversation(@student, @ta, { body: "Hey Im using SimpleTags tagged_scope_handler." })
 
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(filter: \"course_#{@course.id}\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
+      expect(result.count).to eq 2
+      expect(result.flatten).to match_array ["Howdy Partner", "Hey Im using SimpleTags tagged_scope_handler."]
+
+      result = type.resolve(
+        "conversationsConnection(filter: \"user_#{@ta.id}\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
       expect(result.count).to eq 1
-      expect(result[0][0]).to eq "Howdy Partner"
+      expect(result[0][0]).to eq "Hey Im using SimpleTags tagged_scope_handler."
 
       result = type.resolve(
         "conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
-      expect(result.count).to eq 2
-      expect(result.flatten).to match_array ["Howdy Partner", "Not in course"]
+      expect(result.count).to eq 3
+      expect(result.flatten).to match_array ["Howdy Partner", "Not in course", "Hey Im using SimpleTags tagged_scope_handler."]
+
+      result = type.resolve(
+        "conversationsConnection(filter: [\"user_#{@ta.id}\", \"course_#{@course.id}\"]) { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.count).to eq 1
+      expect(result[0][0]).to eq "Hey Im using SimpleTags tagged_scope_handler."
     end
 
     it "scopes the conversations" do

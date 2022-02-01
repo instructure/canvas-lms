@@ -224,11 +224,11 @@ class ProficiencyRating extends React.Component {
               }
               onChange={this.handlePointChange}
               defaultValue={I18n.n(points)}
-              width={isMobileView ? '7rem' : '4rem'}
+              width={isMobileView ? '3rem' : '4rem'}
             />
 
             <div className="pointsDescription" aria-hidden="true">
-              {I18n.t('points')}
+              {isMobileView ? I18n.t('pts') : I18n.t('points')}
             </div>
           </>
         ) : (
@@ -368,7 +368,12 @@ class ProficiencyRating extends React.Component {
         width="100%"
         alignItems={isMobileView ? 'center' : 'start'}
       >
-        <Flex.Item textAlign="center" padding="0 medium 0 0" size={isMobileView ? '25%' : '15%'}>
+        <Flex.Item
+          align="start"
+          textAlign="center"
+          padding="0 medium 0 0"
+          size={isMobileView ? '25%' : '15%'}
+        >
           {this.renderMastery()}
         </Flex.Item>
         <Flex.Item

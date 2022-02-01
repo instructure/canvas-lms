@@ -64,7 +64,7 @@ export function AssignmentAvailabilityWindow({...props}) {
       render={responsiveProps => {
         return responsiveProps.displayText ? (
           <Text weight="normal" size={responsiveProps.textSize}>
-            {responsiveProps.displayText}
+            {`${props.availabilityWindowName} ${responsiveProps.displayText}`}
           </Text>
         ) : null
       }}
@@ -74,12 +74,14 @@ export function AssignmentAvailabilityWindow({...props}) {
 
 AssignmentAvailabilityWindow.prototypes = {
   availableDate: PropTypes.string,
+  availabilityWindowName: PropTypes.string,
   untilDate: PropTypes.string,
   showOnMobile: PropTypes.bool,
   showDateWithTime: PropTypes.bool
 }
 
 AssignmentAvailabilityWindow.defaultProps = {
+  availabilityWindowName: '',
   showOnMobile: false,
   showDateWithTime: false
 }

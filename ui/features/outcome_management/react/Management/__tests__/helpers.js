@@ -23,3 +23,24 @@ export const focusChange = (field, value) => {
   fireEvent.change(field, {target: {value}})
   field.blur()
 }
+
+export const defaultRatingsAndCalculationMethod = {
+  calculationMethod: 'decaying_average',
+  calculationInt: 65,
+  masteryPoints: 3,
+  pointsPossible: 4,
+  ratings: [
+    {
+      description: 'Exceeds mastery',
+      points: 4
+    },
+    {
+      description: 'Mastery',
+      points: 3
+    },
+    {
+      description: 'Below mastery',
+      points: 1
+    }
+  ]
+}

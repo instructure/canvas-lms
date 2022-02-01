@@ -85,22 +85,41 @@ describe MicrosoftSync::Errors do
       let(:error) { MicrosoftSync::TestErrorNotPublic.new("abc") }
 
       it "returns a JSON blob with error class and message" do
-        expect(subject).to eq("class" => "MicrosoftSync::TestErrorNotPublic", "message" => "abc")
+        expect(subject).to eq(
+          "class" => "MicrosoftSync::TestErrorNotPublic", "message" => "abc",
+          "extra_metadata" => {}
+        )
       end
     end
 
     context "when the error is a PublicError" do
       let(:error) { MicrosoftSync::TestErrorCountInterpolation.new("foo", 123) }
 
-      it "returns a JSON blob with error class, message, public message, and interpolations" do
+      it "returns a JSON blob with error class, message, public message, extra_metadata, and interpolations" do
         expect(subject).to eq(
           "class" => "MicrosoftSync::TestErrorCountInterpolation",
           "message" => "foo",
           "public_message" =>
             { "one" => "One problem happened", "other" => "%{count} problems happened" },
-          "public_interpolated_values" => { "count" => 123 }
+          "public_interpolated_values" => { "count" => 123 },
+          "extra_metadata" => {}
         )
       end
+    end
+  end
+
+  describe ".extra_metadata_from_serialized" do
+    it "returns the metadata given in serialize, with symbol keys" do
+      serialized = MicrosoftSync::Errors.serialize(
+        StandardError.new,
+        :hello => "abc",
+        "foo" => 123
+      )
+      metadata = MicrosoftSync::Errors.extra_metadata_from_serialized(serialized)
+      expect(metadata).to eq(
+        hello: "abc",
+        foo: 123
+      )
     end
   end
 

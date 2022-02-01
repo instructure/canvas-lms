@@ -119,6 +119,36 @@ describe('Image actions', () => {
       assert(dispatchSpy.called)
     })
 
+    it('sends specified options', () => {
+      const fetchImageStub = sinon.stub()
+      fetchImageStub.returns(new Promise((res, rej) => res({})))
+
+      const dispatch = fn => {
+        if (typeof fn === 'function') {
+          fn(dispatch, getState)
+        }
+      }
+
+      const getState = () => {
+        return {
+          source: {
+            fetchImages: fetchImageStub
+          },
+          images: {
+            user: {
+              files: [],
+              bookmark: null,
+              hasMore: true,
+              isLoading: false
+            }
+          },
+          contextType: 'user'
+        }
+      }
+      actions.fetchInitialImages({category: 'uncategorized'})(dispatch, getState)
+      assert.equal(fetchImageStub.firstCall.args[0].category, 'uncategorized')
+    })
+
     it('fetches initial page if necessary, part 2', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
@@ -136,6 +166,36 @@ describe('Image actions', () => {
       }
       actions.fetchNextImages(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
+    })
+
+    it('sends specified options', () => {
+      const fetchImageStub = sinon.stub()
+      fetchImageStub.returns(new Promise((res, rej) => res({})))
+
+      const dispatch = fn => {
+        if (typeof fn === 'function') {
+          fn(dispatch, getState)
+        }
+      }
+
+      const getState = () => {
+        return {
+          source: {
+            fetchImages: fetchImageStub
+          },
+          images: {
+            user: {
+              files: [],
+              bookmark: null,
+              hasMore: true,
+              isLoading: false
+            }
+          },
+          contextType: 'user'
+        }
+      }
+      actions.fetchNextImages({category: 'uncategorized'})(dispatch, getState)
+      assert.equal(fetchImageStub.firstCall.args[0].category, 'uncategorized')
     })
 
     it('skips the fetch if currently loading', () => {
