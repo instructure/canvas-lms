@@ -2487,6 +2487,7 @@ pl:
       Pozwala użytkownikowi na włączanie i edytowanie ważenia grup zadań w kursie.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Pozwala użytkownikowi dodawać wydarzenia do panelu nawigacyjnego listy za pomocą pola wyboru Dodaj do listy zadań uczestnika. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Pozwala użytkownikowi dodawać wydarzenia do panelu nawigacyjnego listy za pomocą pola wyboru Dodaj do listy zadań uczestnika."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Pozwala użytkownikowi na dodawanie ikon zewnętrznych aplikacji do paska narzędzi edytora formatowanej treści."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Pozwala użytkownikowi na dodawanie członków grupy do konta lub grup kursu."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Pozwala użytkownikowi na dodawanie nowych zadań do modułu."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Pozwala użytkownikowi na dodawanie nowych kursów do konta."
@@ -2718,6 +2719,7 @@ pl:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Pozwala użytkownikowi na ręczne dodawanie aplikacji w Ustawieniach konta."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Pozwala użytkownikowi na ręczne dodawanie i usuwanie aplikacji w Ustawieniach konta."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Pozwala użytkownikowi na ręczne dodawanie i usuwanie aplikacji w Ustawieniach kursu."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Pozwala użytkownikowi na ręczne usuwanie aplikacji w Ustawieniach konta."
   allows_user_to_moderate_a_quiz_6953d369: "Pozwala użytkownikowi na moderowanie testu."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Pozwala użytkownikowi moderować test i wyświetlać stronę statystyk testu."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Pozwala użytkownikowi na moderowanie testu. Ustawienia: Pozwala użytkownikowi na edytowanie schematów oceniania."
@@ -3336,6 +3338,7 @@ pl:
   anonymous_user_d984b9ce: "Anonimowy Użytkownik"
   anonymous_was_never_turned_on_e5e8aeda: "Anonimizacja nigdy nie była włączona"
   anonymous_was_turned_off_300d25ec: "Anonimizacja została wyłączona"
+  anonymous_you_e708af99: "Anonimowy (Ty)"
   anonymously_graded_59149570: "Anonimowo oceniane"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Anonimowo oceniane zadania nie mogą być zadaniami grupowymi"
   another_assignment_name_369f8481: "Nazwa kolejnego zadania"
@@ -6888,7 +6891,7 @@ pl:
     media_objects_not_configured: "Obiekt multimedialny nie został skonfigurowany"
     new_roster_user: 
       completed_enrollment: "Ukończono *%{completed_at}*"
-      enrolled_as: "Zapisany jako %{enrollment_type}"
+      enrolled_as: "Zapisano jako: %{enrollment_type}"
       enrollment_linked_to: "Powiązano z *%{linked_user}*"
       labels: 
         user_privileges: Przywileje
@@ -6941,7 +6944,7 @@ pl:
         conclude: "Czy na pewno chcesz zakończyć tę rejestrację?"
         conclude_student: "Czy na pewno chcesz zaakceptować zapisy tego uczestnika?"
         delete_enrollment: "Czy na pewno chcesz usunąć tę rejestrację?"
-      enrolled_as: "Zapisany jako %{enrollment_type}"
+      enrolled_as: "Zapisano jako: %{enrollment_type}"
       enrollment_change_failed: "Zmiana przywileju zapisów nie powiodła się, ponów próbę"
       enrollment_linked_to: "połączony z użytkownikiem *%{linked_user}*"
       headings: 
@@ -10764,6 +10767,9 @@ pl:
   enroll_in_subject_9c1f1c18: "Zapisz się w temacie"
   enrolled_a6a517cd: Zarejestrowany
   enrolled_as_272da3b9: "Zapisano jako"
+  enrolled_as_enrollment_type_a008e44a: "Zapisano jako: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "zapisano jako: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "zapisano jako: %{enrollment_type} z dostępem tylko do sekcji"
   enrollment: 
     default_course_name: Kurs
     default_email: "Brak adresu e-mail"
@@ -11193,6 +11199,7 @@ pl:
   error_59293a2c: błąd
   error_98e81528: Błąd
   error_adding_canvas_file_to_submission_draft_de258021: "Błąd podczas dodawania pliku Canvas do wersji roboczej przesyłki"
+  error_adding_file_to_discussion_message_16feef3f: "Błąd podczas dodawania pliku do wiadomości w dyskusji"
   error_adding_files_to_conversation_message_58e83876: "Błąd podczas dodawania plików do wiadomości w rozmowie"
   error_adding_files_to_discussion_message_8bb819e4: "Błąd podczas dodawania plików do wiadomości w dyskusji"
   error_adding_files_to_submission_draft_6acac337: "Błąd podczas dodawania plików do wersji roboczej przesyłki"
@@ -11252,6 +11259,7 @@ pl:
   error_updating_comment_4b80c76d: "Błąd podczas aktualizowania komentarza"
   error_updating_status_of_module_item_80336274: "Błąd podczas aktualizowania statusu elementu modułu"
   error_updating_submission_draft_1d40ade7: "Błąd podczas aktualizowania wersji roboczej przesyłki"
+  error_uploading_file_73235601: "Błąd podczas przekazywania pliku"
   error_uploading_file_e2d31b56: "Błąd podczas przekazywania pliku."
   error_uploading_files_f709361f: "Błąd podczas przekazywania plików"
   error_uploading_video_audio_recording_16d9730a: "Błąd podczas przesyłania nagrania wideo/audio"
@@ -13807,12 +13815,14 @@ pl:
   hide_courses_without_students_fc6fc7a0: "Ukryj kursy bez uczestników"
   hide_details_df9ef4a2: "Ukryj informacje szczegółowe"
   hide_e057ff36: Ukryj
+  hide_from_everyone_9fc3e6d0: "Ukryj przed wszystkimi"
   hide_grades_585e63b4: "Ukryj oceny"
   hide_grades_5ff26682: "Ukryj oceny"
   hide_grades_tray_5ed267fe: "Ukryj panel ocen"
   hide_groups_navigation_menu_62e8b3d0: "Ukryj menu nawigacji w grupach"
   hide_important_dates_c23d2102: "Ukryj ważne daty"
   hide_key_e8fe1e8c: "Ukryj klucz"
+  hide_name_and_profile_picture_d18eed70: "Ukryj nazwę i zdjęcie profilowe"
   hide_name_details_23814c37: "Ukryj szczegóły %{name}"
   hide_navigation_menu_f0b3e90: "Ukryj menu nawigacji"
   hide_notes_column_7749f408: "Ukryj kolumnę uwag"
@@ -14055,6 +14065,12 @@ pl:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Jeśli opcja jest włączona, zapewnia nowe tematy window.postMessage dla specyfikacji LTI Platform
       Storage i wysyła odpowiedzi na wszystkie wiadomości postMessage.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      W przypadku włączenia tej opcji, „nieautoryzowana” odpowiedź z JSON API zwróci błąd 403
+      (Dostęp zabroniony) zamiast kodu błędu 401, dla większej zgodności ze standardem HTTP.
+      Jeśli API zwróci błąd dotyczący nieautoryzowanego lub autoryzowanego obiektu JSON,
+      pole stanu nie zostanie zlokalizowane; zawsze pozostanie w
+      języku angielskim.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Jeśli funkcja jest włączona, Canvas pozwoli narzędziom zwracać wiele elementów zawartości
       w ramach jednego żądania na stronie modułów kursu
@@ -14099,6 +14115,7 @@ pl:
       zamiast zadania. Na skutek tego wydarzenia zostaną
       zduplikowane, chyba że subskrypcje dotyczące odpowienich
       zadań plagiatu zostaną usunięte.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Jeśli uprawnienie LTI - Dodaj jest wyłączone, użytkownicy nadal mogą instalować zatwierdzone aplikacje za pomocą Centrum aplikacji Canvas (o ile jest dostępne dla organizacji). Jeśli jednak uprawnienie LTI - Usuń nie jest włączone, nie mogą usuwać ręcznie dodanych aplikacji zewnętrznych."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Jeśli uprawnienia Zarządzaj kursami: Administrator - Zarządzaj / aktualizuj oraz Kursy - Cofnij usuniecie są także włączone, użytkownik na poziomie konta będzie mógł przywracać usunięte kursy w Narzędziach administratora."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Jeśli skale opanowania materiału są włączone, raport zostanie przycięty tak, aby nie zawierać metody obliczeń, danych obliczeń, punktów opanowania materiału lub ocen."
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -18298,7 +18315,9 @@ pl:
   nav_avatar_border_3246beb1: "Nawigacja obramowania Avatar"
   nav_background_fd299145: "Tło nawigacji"
   nav_badge_3c67de17: "Znaczek nawigacji"
+  nav_badge_active_1d4be222: "Znaczek nawigacji aktywny"
   nav_badge_text_574b6eb: "Tekst znaczka nawigacji"
+  nav_badge_text_active_9a28e8a2: "Tekst znaczka nawigacji aktywny"
   nav_icon_active_e4825558: "Aktywna ikona nawigacji"
   nav_icon_ca3fef59: "Ikona nawigacji"
   nav_logo_4b255c91: "Logo nawigacji"
@@ -18547,6 +18566,7 @@ pl:
   no_results_match_searchterm_f28e50e0: "Brak wyników dla \"%{searchTerm}\""
   no_score_yet_c94e919b: "Jeszcze nie ma wyniku punktowego"
   no_start_date_6e81c22b: "Brak daty rozpoczęcia"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "Brak obserwowanych uczestników. Aby wybrać uczestnika, powróć do pulpitu nawigacyjnego."
   no_students_being_observed_42e11732: "Brak obserwowanych uczestników"
   no_students_dd8de9f0: "Brak uczestników"
   no_students_have_taken_the_quiz_yet_e667644b: "Żaden z uczestników nie napisał jeszcze tego testu"
@@ -19077,6 +19097,7 @@ pl:
   observers_remove_ad508fbe: "Obserwujący - Usuń"
   observing_f3c5e759: Obserwowanie
   observing_observee_d31d5fa2: "Obserwowanie: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "Obserwowanie %{student_name}. Aby wybrać innego uczestnika, powróć do pulpitu nawigacyjnego."
   occurrence_s_c12d1aad: wydarzenie(a)
   of_students_5d1af0d2: "Liczba uczestników"
   off_5385ef3f: Wył.
@@ -19609,6 +19630,7 @@ pl:
   parents_sign_up_here_f0aa8f4f: "Rodzice rejestrują się tutaj"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Częściowy: uczestnicy mogą zdecydować o ujawnieniu swojego nazwiska i zdjęcia profilowego"
   partially_anonymous_483a892d: "Częściowo anonimowi"
+  partially_anonymous_discussion_13ceb585: "Dyskusja częściowo anonimowa | "
   partially_enabled_and_locked_9a39d38a: "Częściowo łączono i zablokowano"
   partially_enabled_cd506819: "Częściowo włączono"
   participantcount_less_8d258f6: "%{participantCount} mniej"
@@ -20162,7 +20184,7 @@ pl:
       name: Sesje
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Czas w minutach, zanim sesja wygaśnie, dla aplikacji mobilnych (minimum 20)"
+        mobile_timeout: "Czas w minutach, zanim sesja wygaśnie, dla aplikacji mobilnych (minimum 2880 [2 dni])"
         session_timeout: "Czas przed sesją wygaśnie za następującą liczbę minut (minimum 20)"
     settings_header: 
       prompt_change_for_all_line1: "Zmienia to ustawienia WSZYSTKICH KONT!"
@@ -22994,6 +23016,7 @@ pl:
   required_access_code_592902d7: "Wymagany kod dostępu"
   required_by_course_end_date_d87a4772: "Wymagane przez datą końcową kursu"
   required_by_specified_end_date_22dd6b49: "Wymagane przez określoną datę końcową"
+  required_by_term_end_date_403dff38: "Wymagane przez datę końcową semestru"
   required_email_address_379b2392: "Wymagany adres e-mail"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Wymagane pola obejmują nazwę klucza, adres e-mail właściciela, ID narzędzia oraz adresy URL przekierowania i ikony."
   required_input_message_all_unassigned_students_1e721442: "Wymagane dane. Wyślij wiadomość do wszystkich nieprzydzielonych uczestników."
@@ -23623,16 +23646,16 @@ pl:
     confirms: 
       delete_enrollment: "Czy na pewno chcesz na stałe usunąć te zapisy?"
     default_course_name: "ID kursu \"%{course_id}\""
-    enrolled_as_designer: "zapisano w roli autora"
-    enrolled_as_limited_designer: "zapisano w roli autora z dostępem tylko do sekcji"
-    enrolled_as_limited_observer: "zapisany jako obserwator z dostępem tylko do sekcji"
-    enrolled_as_limited_student: "zapisano w roli uczestnika z dostępem tylko do sekcji"
-    enrolled_as_limited_ta: "zapisano w roli asystenta instruktora z dostępem tylko do sekcji"
-    enrolled_as_limited_teacher: "zapisano w roli instruktora z dostępem tylko do sekcji"
-    enrolled_as_observer: "zapisano w roli słuchacza"
-    enrolled_as_student: "zapisano w roli uczestnika"
-    enrolled_as_ta: "zapisano w roli asystenta instruktora"
-    enrolled_as_teacher: "zapisano w roli instruktora"
+    enrolled_as_designer: "zapisano jako: Projektant"
+    enrolled_as_limited_designer: "zapisano jako: Projektant z dostępem tylko do sekcji"
+    enrolled_as_limited_observer: "zapisano jako: Obserwujący z dostępem tylko do sekcji"
+    enrolled_as_limited_student: "zapisano jako: Uczestnik z dostępem tylko do sekcji"
+    enrolled_as_limited_ta: "zapisano jako: Asystent nauczyciela z dostępem tylko do sekcji"
+    enrolled_as_limited_teacher: "zapisano jako: Nauczyciel z dostępem tylko do sekcji"
+    enrolled_as_observer: "zapisano jako: Obserwujący"
+    enrolled_as_student: "zapisano jako: Uczestnik"
+    enrolled_as_ta: "zapisano jako: TA"
+    enrolled_as_teacher: "zapisano jako: Nauczyciel"
     errors: 
       confirmation_failed: "Potwierdzenie nie powiodło się"
       course_not_authorized_for_crosslist: "Kurs %{course_name} nie uzyskał autoryzacji do udostępnienia"
@@ -24887,6 +24910,7 @@ pl:
   show_me_76823679: "Pokaż mnie"
   show_more_8d5f918b: "Pokaż więcej"
   show_more_af9cbc16: "Pokaż więcej"
+  show_name_and_profile_picture_9329d8f8: "Pokaż nazwę i zdjęcie profilowe"
   show_name_details_186d86e6: "Wyświetl szczegóły dot. %{name}"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Pokazuj nazwy obserwowanych uczestników w powiadomieniach."
   show_name_of_observed_students_in_notifications_d38b53ca: "Pokazuj imię i nazwisko obserwowanych uczestników w powiadomieniach"
@@ -24916,6 +24940,7 @@ pl:
   show_sub_accounts_for_account_name_fa71a658: "Pokaż podkonta dla %{account_name}"
   show_suggestions_when_typing_b72545de: "Pokaż podpowiedzi podczas pisania"
   show_to_d57767f: Pokaż
+  show_to_everyone_94d66d01: "Pokaż każdemu"
   show_welcome_tour_a105aa2e: "Pokaż samouczek"
   showing_1ac6ed70: "Wyświetlanie:"
   showing_all_announcements_36ff0cec: "Pokaż wszystkie ogłoszeniaa"
@@ -25989,6 +26014,7 @@ pl:
   tas_observers_designers_b705118a: "Asystenci / obserwujący / projektanci"
   tas_remove_11059e14: "Asystenci - Usuń"
   tas_remove_16a99b22: "Asystenci - Usuń"
+  tea_provisional_graders_d4f19c26: "Wstępnie oceniający TEA"
   teacher_5a73b637: Instruktor
   teacher_count_teachers_a92f7199: "%{teacher_count} nauczycieli"
   teacher_dashboard_custom_report_6d20bef2: "Niestandardowy raport w panelu nawigacyjnym nauczyciela"
@@ -26520,6 +26546,8 @@ pl:
   there_was_a_problem_updating_the_submission_6e5280a1: "Wystąpił problem z aktualizacją tych materiałów."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Podczas sprawdzania statusu publikacji planu wystąpił błąd."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Wystąpił błąd podczas pobierania statystyk kursu"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Wystąpił błąd podczas pobierania filtrów dziennika ocen."
+  there_was_an_error_fetching_modules_8ee451bb: "Wystąpił błąd podczas pobierania modułów."
   there_was_an_error_fetching_outcome_results_45c57590: "Wystąpił problem z pobieraniem wyników."
   there_was_an_error_fetching_submission_comments_ce153077: "Wystąpił błąd z pobieraniem komentarzy do przesłanych materiałów"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Wystąpił błąd podczas generowania kodu parowania"
@@ -26727,6 +26755,7 @@ pl:
       W tym przypadku występuje więcej pytań typu hotspot,
               kategoryzacja, dopasowanie i porządkowanie. Dostępnych jest także
               więcej funkcji moderowania i akomodacji.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Ten pokój główny synchronizuje zapisy i daty początkowe/końcowe tematu do: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Niniejszy obraz jest wyświetlony jako znak wodny w tle Twojej strony. Akceptowane formaty: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Ten obraz został zgłoszony."
   this_image_is_currently_unavailable_25c68857: "Obecnie ten obraz jest niedostępny"
@@ -28234,6 +28263,7 @@ pl:
       Aktualizuje UI preferencji dot. powiadomień na poziomie konta, oferując bardziej
        nowoczesną obsługę
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Aktualizuje wyświetlanie ikony Zasad publikowania w nagłówku kolumny zadań Nowego dziennika ocen."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Aktualizacje pola stanu JSON oraz kodu HTTP dla błędu autoryzacji JSON API"
   updating_6edbab78: "Trwa aktualizacja"
   updating_discussion_failed_aadb2d35: "Nie udało się zaktualizować dyskusji"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Aktualizowanie adresu URL Catalog spowoduje nagły brak dostępu do starszego adresu URL dla użytkowników! Jeśli skonfigurowano istniejący procesor płatności, zmiany będą wymagać pomocy inżyniera Catalog."
@@ -28282,6 +28312,8 @@ pl:
   uploaded_over_time_d59abb68: "przesłane w okresie"
   uploading_19e8a4e7: Przekazywanie
   uploading_ee585874: Przesyłanie...
+  uploading_file_5c7e14fd: "Przesyłanie pliku"
+  uploading_file_in_progress_5c09e0c9: "Przesyłanie pliku w toku"
   uploading_files_5ff8f4fd: "Przesyłanie plików"
   uploading_files_9e39dbf9: "Przesyłanie plików"
   uploading_media_progress_c23a953b: "Postęp przesyłania multimediów"
