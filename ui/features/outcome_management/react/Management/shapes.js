@@ -59,13 +59,6 @@ export const outcomePageInfoShape = PropTypes.shape({
   hasNextPage: PropTypes.bool.isRequired
 })
 
-export const ratingsShape = PropTypes.arrayOf(
-  PropTypes.shape({
-    description: PropTypes.string,
-    points: PropTypes.number.isRequired
-  })
-)
-
 export const outcomeEditShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
@@ -80,5 +73,10 @@ export const outcomeEditShape = PropTypes.shape({
   }),
   masteryPoints: PropTypes.number,
   pointsPossible: PropTypes.number,
-  ratings: ratingsShape
+  ratings: PropTypes.arrayOf(
+    PropTypes.shape({
+      description: PropTypes.string.isRequired,
+      points: PropTypes.number.isRequired
+    })
+  )
 })

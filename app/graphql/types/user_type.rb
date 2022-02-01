@@ -160,7 +160,7 @@ module Types
 
     field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true do
       argument :scope, String, required: false
-      argument :filter, [String], required: false
+      argument :filter, String, required: false
     end
     def conversations_connection(scope: nil, filter: nil)
       if object == context[:current_user]
@@ -178,9 +178,8 @@ module Types
                                   object.conversations.default
                                 end
 
-          filter_mode = :and
-          filter = filter.presence || []
-          filters = filter.select(&:presence)
+          filter_mode = :or
+          filters = Array(filter || [])
           conversations_scope = conversations_scope.tagged(*filters, mode: filter_mode) if filters.present?
           conversations_scope
         end

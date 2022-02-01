@@ -57,10 +57,10 @@ td {
 
 a {
   // Canvas High-Contrast link color
-  color: darken($electric, 0%);
+  color: darken(#0770A3, 10%);
   text-decoration: underline;
   &:focus, &:hover {
-    color: darken($electric, 20%);
+    color: darken(#0770A3, 20%);
     text-decoration: underline;
   }
 }
@@ -109,10 +109,6 @@ body#tinyrce {
 .Underline-All-Links__enabled
   a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
   text-decoration: underline;
-}
-
-#tinymce.mce-content-body *[data-mce-selected="inline-boundary"] {
-  background-color: transparent;
 }
 
 /* the span tinymce puts around the media player's iframe */

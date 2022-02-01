@@ -45,7 +45,7 @@ import ProficiencyCalculation, {
   defaultProficiencyCalculation
 } from './MasteryCalculation/ProficiencyCalculation'
 import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
-import {convertRatings} from '@canvas/outcomes/react/helpers/ratingsHelpers'
+import convertRatings from '@canvas/outcomes/react/helpers/convertRatings'
 import Ratings from './Management/Ratings'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {

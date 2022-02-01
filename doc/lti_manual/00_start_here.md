@@ -26,7 +26,6 @@
 - [1.1 Implementation](./09_lti_1_1_implementation.md)
 - [Common Testing Scenarios](./11_testing.md)
 - [Deep Linking](./12_deep_linking.md)
-- [Basic Outcomes](./13_basic_outcomes.md)
 
 **Other Docs**
 - [External Tools Introduction - Canvas LMS REST API Documentation (instructure.com)](https://canvas.instructure.com/doc/api/file.tools_intro.html)
@@ -42,6 +41,7 @@ More topics to write about:
 - variable expansion and custom fields
 - custom params
 - Services (implementation specifics)
+	- Outcomes 1.1
 	- AGS 1.3
 	- Plagiarism Platform 2.0
 	- Data Services/Subscriptions

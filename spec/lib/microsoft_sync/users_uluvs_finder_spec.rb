@@ -83,58 +83,6 @@ describe MicrosoftSync::UsersUluvsFinder do
         end
       end
 
-      context "when login_attribute=email and there are cross-shard users" do
-        specs_require_sharding
-
-        let(:root_account) { @shard1.activate { account_model } }
-        let(:course) { @shard1.activate { course_model(account: root_account) } }
-
-        let(:shard1_users) { @shard1.activate { Array.new(3) { user_model } } }
-        let(:shard2_users) { @shard2.activate { Array.new(2) { user_model } } }
-
-        before do
-          @shard1.activate do
-            root_account.settings[:microsoft_sync_enabled] = true
-            root_account.settings[:microsoft_sync_login_attribute] = "email"
-            root_account.save!
-          end
-
-          @shard1.activate do
-            shard1_users[0].communication_channels.create(path: "s1u0@instructure.com").confirm!
-            shard1_users[1].communication_channels.create(path: "s1u1@instructure.com").confirm!
-          end
-
-          @shard2.activate do
-            shard2_users[1].communication_channels.create(path: "s2u1@instructure.com").confirm!
-          end
-
-          @shard1.activate do
-            [*shard1_users, *shard2_users].each { |user| course.enroll_user(user) }
-          end
-        end
-
-        it "finds CommunuicationChannels on other shards" do
-          @shard1.activate do
-            shard1_users.each { |u| expect(u.id).to be < Shard::IDS_PER_SHARD }
-            shard2_users.each { |u| expect(u.id).to be >= (@shard2.id * Shard::IDS_PER_SHARD) }
-            result = described_class.new(course.enrollments.pluck(:user_id), root_account).call
-            expect(result).to contain_exactly(
-              [shard1_users[0].id, "s1u0@instructure.com"],
-              [shard1_users[1].id, "s1u1@instructure.com"],
-              [shard2_users[1].id, "s2u1@instructure.com"]
-            )
-          end
-        end
-
-        it "groups lookups by shard to minimize SQL queries" do
-          @shard1.activate do
-            uuf = described_class.new(course.enrollments.pluck(:user_id), root_account)
-            expect(uuf).to receive(:find_by_email_local).twice.and_call_original
-            uuf.call
-          end
-        end
-      end
-
       shared_examples_for "when the login attribute is set" do |login_attribute, description|
         let(:user_ids) { [user.id] }
 

@@ -56,8 +56,7 @@ const deserializedSets = [
       update: true,
       delete: true
     },
-    createdAt: new Date('2015-12-29T12:00:00Z'),
-    enrollmentTermIDs: undefined
+    createdAt: new Date('2015-12-29T12:00:00Z')
   },
   {
     id: '2',
@@ -71,8 +70,7 @@ const deserializedSets = [
       update: true,
       delete: true
     },
-    createdAt: new Date('2015-11-29T12:00:00Z'),
-    enrollmentTermIDs: undefined
+    createdAt: new Date('2015-11-29T12:00:00Z')
   }
 ]
 const serializedSets = {
@@ -148,7 +146,8 @@ test('calls the resolved endpoint', () => {
   ok($.ajaxJSON.calledWith('api/grading_period_sets'))
 })
 
-test('deserializes returned grading period sets', function () {
+test('deserializes returned grading period sets', function() {
+  let promise
   this.server.respondWith('GET', /grading_period_sets/, [
     200,
     {
@@ -158,10 +157,10 @@ test('deserializes returned grading period sets', function () {
     JSON.stringify(serializedSets)
   ])
   this.server.autoRespond = true
-  return api.list().then(sets => deepEqual(sets, deserializedSets))
+  return (promise = api.list().then(sets => deepEqual(sets, deserializedSets)))
 })
 
-test('creates a title from the creation date when the set has no title', function () {
+test('creates a title from the creation date when the set has no title', function() {
   const untitledSets = {
     grading_period_sets: [
       {
@@ -248,7 +247,7 @@ QUnit.module('gradingPeriodSetsApi.create', {
 })
 
 test('calls the resolved endpoint with the serialized grading period set', () => {
-  sandbox.stub(axios, 'post').returns(new Promise(() => {}))
+  const apiSpy = sandbox.stub(axios, 'post').returns(new Promise(() => {}))
   api.create(deserializedSetCreating)
   ok(axios.post.calledWith('api/grading_period_sets', serializedSetCreating))
 })
@@ -260,9 +259,8 @@ test('deserializes returned grading period sets', () => {
 })
 
 test('rejects the promise upon errors', () => {
-  const fail = new Error('FAIL')
-  sandbox.stub(axios, 'post').returns(Promise.reject(fail))
-  return api.create(deserializedSetCreating).catch(error => equal(error, fail))
+  sandbox.stub(axios, 'post').returns(Promise.reject('FAIL'))
+  return api.create(deserializedSetCreating).catch(error => equal(error, 'FAIL'))
 })
 const deserializedSetUpdating = {
   id: '1',
@@ -330,7 +328,7 @@ QUnit.module('gradingPeriodSetsApi.update', {
 })
 
 test('calls the resolved endpoint with the serialized grading period set', () => {
-  sandbox.stub(axios, 'patch').returns(new Promise(() => {}))
+  const apiSpy = sandbox.stub(axios, 'patch').returns(new Promise(() => {}))
   api.update(deserializedSetUpdating)
   ok(axios.patch.calledWith('api/grading_period_sets/1', serializedSetUpdating))
 })
@@ -341,7 +339,6 @@ test('returns the given grading period set', () => {
 })
 
 test('rejects the promise upon errors', () => {
-  const fail = new Error('FAIL')
-  sandbox.stub(axios, 'patch').returns(Promise.reject(fail))
-  return api.update(deserializedSetUpdating).catch(error => equal(error, fail))
+  sandbox.stub(axios, 'patch').returns(Promise.reject('FAIL'))
+  return api.update(deserializedSetUpdating).catch(error => equal(error, 'FAIL'))
 })

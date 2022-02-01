@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import UsersList from 'ui/features/account_course_user_search/react/components/UsersList'
-import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow'
+import UsersList from 'ui/features/account_course_user_search/react/components/UsersList.js'
+import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow.js'
 
 QUnit.module('Account Course User Search UsersList View')
 
@@ -59,7 +59,6 @@ const usersProps = {
   },
   onUpdateFilters: sinon.spy(),
   onApplyFilters: sinon.spy(),
-  columnHeaderRef: sinon.spy(),
   roles: {}
 }
 
@@ -110,7 +109,11 @@ Object.entries({
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
       const header = icons.closest('[data-testid="UsersListHeader"]')
       ok(
-        header.find('Tooltip').first().prop('tip').match(RegExp(expectedTip, 'i')),
+        header
+          .find('Tooltip')
+          .first()
+          .prop('tip')
+          .match(RegExp(expectedTip, 'i')),
         'has right tooltip'
       )
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)

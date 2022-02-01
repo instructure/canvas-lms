@@ -34,32 +34,20 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import Condition from './FilterNavCondition'
-import type {AssignmentGroup, GradingPeriod, Module, PartialFilter, Section} from '../gradebook.d'
 
 const {Item} = Flex as any
-
-export type FilterNavFilterProps = {
-  assignmentGroups: AssignmentGroup[]
-  filter: PartialFilter
-  gradingPeriods: GradingPeriod[]
-  modules: Module[]
-  onChange: any
-  onDelete: any
-  sections: Section[]
-}
 
 export default function FilterNavFilter({
   filter,
   onDelete,
   onChange,
   modules,
-  gradingPeriods,
   assignmentGroups,
   sections
-}: FilterNavFilterProps) {
+}) {
   const [isRenaming, setIsRenaming] = useState(false)
   const [wasRenaming, setWasRenaming] = useState(false)
-  const [name, setName] = useState(filter.name)
+  const [label, setLabel] = useState(filter.label)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const renameButtonRef = useRef<HTMLElement | null>(null)
 
@@ -72,14 +60,13 @@ export default function FilterNavFilter({
   }, [isRenaming, wasRenaming])
 
   const onAddCondition = () => {
-    const id: string = uuid()
     onChange({
       ...filter,
       conditions: filter.conditions.concat({
-        id,
-        type: undefined,
-        value: undefined,
-        created_at: new Date().toISOString()
+        id: uuid(),
+        type: null,
+        value: null,
+        createdAt: new Date().toISOString()
       })
     })
   }
@@ -104,14 +91,14 @@ export default function FilterNavFilter({
       conditions: filter.conditions
         .filter(c => c.id !== condition.id)
         .concat(condition)
-        .sort((a, b) => (a.created_at < b.created_at ? -1 : 1))
+        .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))
     })
   }
 
   const toggleApply = () => {
     onChange({
       ...filter,
-      is_applied: !filter.is_applied
+      isApplied: !filter.isApplied
     })
   }
 
@@ -125,8 +112,10 @@ export default function FilterNavFilter({
               width="100%"
               renderLabel={<ScreenReaderContent>{I18n.t('Name')}</ScreenReaderContent>}
               placeholder={I18n.t('Name')}
-              value={name}
-              onChange={(_event, value) => setName(value)}
+              value={label}
+              onChange={(_event, value) => {
+                setLabel(value)
+              }}
             />
           </Item>
           <Item>
@@ -137,7 +126,7 @@ export default function FilterNavFilter({
               onClick={() => {
                 onChange({
                   ...filter,
-                  name: name || I18n.t('Untitled filter')
+                  label: label || I18n.t('Untitled filter')
                 })
                 setIsRenaming(false)
               }}
@@ -147,7 +136,7 @@ export default function FilterNavFilter({
             <IconButton
               screenReaderLabel={I18n.t('Cancel rename')}
               onClick={() => {
-                setName(filter.name)
+                setLabel(filter.label)
                 setIsRenaming(false)
               }}
             >
@@ -157,7 +146,7 @@ export default function FilterNavFilter({
         </Flex>
       ) : (
         <View as="div">
-          {filter.name}
+          {filter.label}
           <IconButton
             elementRef={el => (renameButtonRef.current = el)}
             color="primary"
@@ -179,7 +168,6 @@ export default function FilterNavFilter({
           key={condition.id}
           condition={condition}
           conditionsInFilter={filter.conditions}
-          gradingPeriods={gradingPeriods}
           onChange={onChangeCondition}
           onDelete={onDeleteCondition}
           modules={modules}
@@ -205,7 +193,7 @@ export default function FilterNavFilter({
           <Flex>
             <Item>
               <Checkbox
-                checked={filter.is_applied}
+                checked={filter.isApplied}
                 label={I18n.t('Apply filter')}
                 labelPlacement="start"
                 onChange={toggleApply}

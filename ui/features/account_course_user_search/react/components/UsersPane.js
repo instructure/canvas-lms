@@ -53,7 +53,6 @@ export default class UsersPane extends React.Component {
       userList: props.store.getState().userList,
       srMessageDisplayed: false
     }
-    this.columnHeader = null
   }
 
   componentDidMount() {
@@ -64,13 +63,6 @@ export default class UsersPane extends React.Component {
     this.props.store.dispatch(UserActions.updateSearchFilter({search_term, role_filter_id}))
 
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
-  }
-
-  componentDidUpdate() {
-    if (this.columnHeader && this.columnHeader.id) {
-      const columnHeaderButton = document.getElementById(this.columnHeader.id)
-      if (columnHeaderButton) columnHeaderButton.focus()
-    }
   }
 
   componentWillUnmount() {
@@ -84,10 +76,6 @@ export default class UsersPane extends React.Component {
   handleApplyingSearchFilter = () => {
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
     this.updateQueryString()
-  }
-
-  setColumnHeaderRef = element => {
-    if (element) this.columnHeader = element
   }
 
   updateQueryString = () => {
@@ -122,17 +110,19 @@ export default class UsersPane extends React.Component {
           <h1>{I18n.t('People')}</h1>
         </ScreenReaderContent>
 
-        <UsersToolbar
-          onUpdateFilters={this.handleUpdateSearchFilter}
-          onApplyFilters={this.handleApplyingSearchFilter}
-          errors={errors}
-          {...searchFilter}
-          accountId={accountId.toString()}
-          roles={this.props.roles}
-          toggleSRMessage={(show = false) => {
-            this.setState({srMessageDisplayed: show})
-          }}
-        />
+        {
+          <UsersToolbar
+            onUpdateFilters={this.handleUpdateSearchFilter}
+            onApplyFilters={this.handleApplyingSearchFilter}
+            errors={errors}
+            {...searchFilter}
+            accountId={accountId.toString()}
+            roles={this.props.roles}
+            toggleSRMessage={(show = false) => {
+              this.setState({srMessageDisplayed: show})
+            }}
+          />
+        }
 
         {!isEmpty(users) && !isLoading && (
           <UsersList
@@ -142,10 +132,8 @@ export default class UsersPane extends React.Component {
             users={users}
             handleSubmitEditUserForm={this.handleSubmitEditUserForm}
             permissions={this.state.userList.permissions}
-            columnHeaderRef={this.setColumnHeaderRef}
           />
         )}
-
         <SearchMessage
           collection={{data: users, loading: isLoading, links}}
           setPage={this.handleSetPage}

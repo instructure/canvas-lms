@@ -132,16 +132,10 @@ describe('K5Announcement', () => {
     expect(await findByText(tz.format(date, 'date.formats.date_at_time'))).toBeInTheDocument()
   })
 
-  it('renders even if posted date is not available', async () => {
-    const {findByText} = render(<K5Announcement {...getProps({}, {postedDate: undefined})} />)
-    expect(await findByText('20 minutes of weekly reading')).toBeInTheDocument()
-  })
-
   describe('with inter-announcement navigation enabled', () => {
     afterEach(() => {
       fetchMock.restore()
     })
-
     it('does not show prev and next buttons if more announcements do not exist', async () => {
       fetchMock.get(
         /\/api\/v1\/announcements/,
@@ -267,111 +261,6 @@ describe('K5Announcement', () => {
       })
     })
 
-    it('places each page of fetched announcements in correct order', async () => {
-      fetchMock.getOnce(
-        /\/api\/v1\/announcements/,
-        {
-          body: JSON.stringify([
-            {
-              id: '17',
-              title: '20 minutes of weekly reading',
-              message: 'Message here',
-              html_url: '/courses/1/discussion_topics/18',
-              attachments: []
-            },
-            {
-              id: '18',
-              title: 'Announcement B',
-              message: 'Message here',
-              html_url: '/courses/1/discussion_topics/18',
-              attachments: []
-            }
-          ]),
-          headers: {
-            Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=2>; rel="next"'
-          }
-        },
-        {}
-      )
-      fetchMock.getOnce(
-        /\/api\/v1\/announcements.*page=2.*/,
-        {
-          body: JSON.stringify([
-            {
-              id: '19',
-              title: 'Announcement C',
-              message: 'Message here',
-              html_url: '/courses/1/discussion_topics/19',
-              attachments: []
-            },
-            {
-              id: '20',
-              title: 'Announcement D',
-              message: 'Message here',
-              html_url: '/courses/1/discussion_topics/20',
-              attachments: []
-            }
-          ]),
-          headers: {
-            Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=3>; rel="next"'
-          }
-        },
-        {}
-      )
-      fetchMock.getOnce(
-        /\/api\/v1\/announcements.*page=3.*/,
-        {
-          body: JSON.stringify([
-            {
-              id: '21',
-              title: 'Announcement E',
-              message: 'Message here',
-              html_url: '/courses/1/discussion_topics/21',
-              attachments: []
-            }
-          ]),
-          headers: {
-            Link: ''
-          }
-        },
-        {}
-      )
-
-      const {findByText, getByText} = render(<K5Announcement {...getProps()} />)
-      expect(await findByText('20 minutes of weekly reading')).toBeInTheDocument()
-
-      const prevBtn = getByText('Previous announcement').closest('button')
-      await act(async () => {
-        prevBtn.click()
-        expect(await findByText('Announcement B')).toBeInTheDocument()
-      })
-      await act(async () => {
-        prevBtn.click()
-        expect(await findByText('Announcement C')).toBeInTheDocument()
-      })
-      await act(async () => {
-        prevBtn.click()
-        expect(await findByText('Announcement D')).toBeInTheDocument()
-      })
-      await act(async () => {
-        prevBtn.click()
-        expect(await findByText('Announcement E')).toBeInTheDocument()
-        expect(prevBtn.hasAttribute('disabled')).toBeTruthy()
-      })
-
-      const nextBtn = getByText('Next announcement').closest('button')
-      await act(async () => {
-        nextBtn.click()
-        expect(await findByText('Announcement D')).toBeInTheDocument()
-      })
-      await act(async () => {
-        nextBtn.click()
-        expect(await findByText('Announcement C')).toBeInTheDocument()
-        expect(prevBtn.hasAttribute('disabled')).toBeFalsy()
-        expect(nextBtn.hasAttribute('disabled')).toBeFalsy()
-      })
-    })
-
     describe('with no recent announcements', () => {
       let oldDate
       beforeEach(() => {
@@ -393,11 +282,10 @@ describe('K5Announcement', () => {
             {}
           )
         })
-
         it('shows nothing for a student', async () => {
           const {container} = render(<K5Announcement {...getCourseProps({canEdit: false})} />)
 
-          await waitFor(() => {}, {timeout: 10})
+          await waitFor(() => {}, {ttimeout: 10})
           expect(container.innerHTML).toEqual('')
         })
 

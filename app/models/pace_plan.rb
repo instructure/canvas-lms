@@ -212,7 +212,6 @@ class PacePlan < ActiveRecord::Base
     Time.at(
       (
         student_enrollment&.start_at || course_section&.start_at || course.start_at ||
-          course.enrollment_term&.start_at ||
           course.created_at
       ).to_i,
       in: course.time_zone

@@ -21,7 +21,7 @@ require "timecop"
 require "spec_helper"
 
 describe CanvasSecurity::JWKKeyPair do
-  describe "#to_jwk" do
+  describe "to_jwk" do
     it "has the private key in the JWK format" do
       Timecop.freeze(Time.zone.now) do
         keys = CanvasSecurity::RSAKeyPair.new
@@ -32,7 +32,7 @@ describe CanvasSecurity::JWKKeyPair do
     end
   end
 
-  describe "#public_jwk" do
+  describe "public_jwk" do
     it "includes the public key in JWK format" do
       Timecop.freeze(Time.zone.now) do
         keys = CanvasSecurity::RSAKeyPair.new
@@ -47,23 +47,6 @@ describe CanvasSecurity::JWKKeyPair do
         keys = CanvasSecurity::RSAKeyPair.new
         expect(keys.public_jwk.keys).not_to include "d", "p", "q", "dp", "dq", "qi"
       end
-    end
-  end
-
-  describe ".time_from_kid" do
-    subject { described_class.time_from_kid(key["kid"]) }
-
-    let(:key) { CanvasSecurity::RSAKeyPair.new.public_jwk }
-
-    it "returns the time the JWK was created" do
-      expect(subject).to be_within(29).of(Time.zone.now)
-    end
-
-    it "handles kids which happen to have date-like strings in the random uuid" do
-      # NOTE: the 4feb-9 -- Time.zone.parse will pick this up as February 4, year 9
-      expect(SecureRandom).to receive(:uuid).and_return "d2fe13a4-b3f7-4feb-9a1a-2160e8b044f"
-      expect(key["kid"]).to include("4feb-9")
-      expect(subject).to be_within(29).of(Time.zone.now)
     end
   end
 end

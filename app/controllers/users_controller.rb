@@ -622,22 +622,13 @@ class UsersController < ApplicationController
 
   def dashboard_sidebar
     GuardRail.activate(:secondary) do
-      @user = params[:observed_user].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user]) : @current_user
-      @is_observing_student = @current_user != @user
-      course_ids = nil
-
-      if @is_observing_student
-        course_ids = @current_user.cached_course_ids_for_observed_user(@user)
-        return render_unauthorized_action unless course_ids.any?
-      end
-
-      if (!@user&.has_student_enrollment? || @user.non_student_enrollment?) && !@is_observing_student
-        # it's not even using any of this for students/observers observing students - it's just using planner now
+      unless @current_user&.has_student_enrollment? && !@current_user.non_student_enrollment?
+        # it's not even using any of this for students - it's just using planner now
         prepare_current_user_dashboard_items
       end
 
-      if (@show_recent_feedback = @user.student_enrollments.active.exists?)
-        @recent_feedback = @user.recent_feedback(course_ids: course_ids) || []
+      if (@show_recent_feedback = @current_user.student_enrollments.active.exists?)
+        @recent_feedback = @current_user&.recent_feedback || []
       end
     end
 

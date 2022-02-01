@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {func, shape, string} from 'prop-types'
+import {func, shape, string} from 'prop-types';
 
 import {BTN_AND_ICON_ATTRIBUTE} from '../../instructure_buttons/registerEditToolbar'
 import Images from '../../instructure_image/Images'
@@ -55,7 +55,9 @@ const SavedButtonList = ({context, onImageEmbed, searchString, sortBy, source}) 
 
     setButtonsAndIcons(prevButtonsAndIcons => [
       ...prevButtonsAndIcons,
-      ...files.filter(({type}) => type === 'image/svg+xml').map(rceToFile)
+      ...files
+        .filter(({type}) => type === 'image/svg+xml')
+        .map(rceToFile)
     ])
   }
 
@@ -94,7 +96,7 @@ const SavedButtonList = ({context, onImageEmbed, searchString, sortBy, source}) 
 SavedButtonList.propTypes = {
   context: shape({
     id: string.isRequired,
-    type: string.isRequired
+    type: string.isRequired,
   }),
   onImageEmbed: func.isRequired,
   searchString: string,

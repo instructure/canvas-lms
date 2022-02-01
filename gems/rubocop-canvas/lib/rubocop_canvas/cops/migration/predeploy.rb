@@ -59,7 +59,7 @@ module RuboCop
         PATTERN
 
         def on_block(node)
-          return if @current_def == :down || @tags&.include?(:predeploy)
+          return if @current_def == :down || @tags.include?(:predeploy)
 
           if (arg = change_table_block?(node))
             change_table_method_calls(node).each do |subnode|
@@ -77,7 +77,7 @@ module RuboCop
 
         def on_send(node)
           super
-          return if @current_def == :down || @tags&.include?(:predeploy)
+          return if @current_def == :down || @tags.include?(:predeploy)
 
           if create_table?(node)
             add_offense node, message: TABLE_MSG

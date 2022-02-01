@@ -134,39 +134,6 @@ describe Course do
       expect(@course.inactive?).to eq true
     end
 
-    describe "#assigned_assignment_ids_by_user" do
-      before do
-        @course.save!
-        @student = User.create!
-        @course.enroll_student(@student, enrollment_state: "active")
-        @another_student = User.create!
-        @course.enroll_student(@another_student, enrollment_state: "active")
-        @assignment = @course.assignments.create!(title: "assigned to everyone")
-        @override_assignment = @course.assignments.create!(title: "assigned to one student", only_visible_to_overrides: true)
-        create_adhoc_override_for_assignment(@override_assignment, @another_student)
-      end
-
-      it "returns a hash with student IDs for keys and a set of assigned assignment IDs for values" do
-        expect(@course.assigned_assignment_ids_by_user).to include(
-          @student.id => Set[@assignment.id],
-          @another_student.id => Set[@assignment.id, @override_assignment.id]
-        )
-      end
-
-      it "excludes soft-deleted assignments" do
-        @assignment.destroy
-
-        aggregate_failures do
-          expect(@course.assigned_assignment_ids_by_user).to include(
-            @another_student.id => Set[@override_assignment.id]
-          )
-          expect(@course.assigned_assignment_ids_by_user).not_to include(
-            @student.id
-          )
-        end
-      end
-    end
-
     describe "#grading_standard_or_default" do
       it "returns the grading scheme being used by the course, if one exists" do
         @course.save!

@@ -27,7 +27,7 @@ export const ComposeInputWrapper = props => {
       <Flex.Item size="4em" padding="xx-small">
         {props.title}
       </Flex.Item>
-      <Flex.Item shouldGrow shouldShrink padding="xx-small">
+      <Flex.Item shouldGrow={props.shouldGrow} padding="xx-small">
         {props.input}
       </Flex.Item>
     </Flex>
@@ -36,5 +36,6 @@ export const ComposeInputWrapper = props => {
 
 ComposeInputWrapper.propTypes = {
   title: PropTypes.element,
-  input: PropTypes.element
+  input: PropTypes.element,
+  shouldGrow: PropTypes.bool
 }

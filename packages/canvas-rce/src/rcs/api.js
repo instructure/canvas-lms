@@ -365,8 +365,7 @@ class RceApiSource {
       contextType: apiProps.contextType,
       file: fileProps,
       no_redirect: true,
-      onDuplicate: apiProps.onDuplicate,
-      category: apiProps.category
+      onDuplicate: apiProps.onDuplicate
     }
 
     return this.apiPost(uri, headers, body)
@@ -583,7 +582,7 @@ class RceApiSource {
       case 'images':
         extra = `&content_types=image${getSortParams(sortBy.sort, sortBy.dir)}${getSearchParam(
           searchString
-        )}${optionalQuery(props, 'category')}`
+        )}`
         break
       case 'media': // when requesting media files via the documents endpoint
         extra = `&content_types=video,audio${getSortParams(
@@ -622,10 +621,6 @@ function getSortParams(sort, dir) {
     sortBy = 'name'
   }
   return `&sort=${sortBy}&order=${dir}`
-}
-
-function optionalQuery(props, name) {
-  return props[name] ? `&${name}=${props[name]}` : ''
 }
 
 export function getSearchParam(searchString) {

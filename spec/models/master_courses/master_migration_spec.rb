@@ -29,16 +29,6 @@ describe MasterCourses::MasterMigration do
     local_storage!
   end
 
-  def mig_id(obj)
-    @template.migration_id_for(obj)
-  end
-
-  def run_master_migration(opts = {})
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin, opts)
-    run_jobs
-    @migration.reload
-  end
-
   describe "start_new_migration!" do
     it "queues a migration" do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
@@ -141,50 +131,20 @@ describe MasterCourses::MasterMigration do
     end
   end
 
-  describe "Assignment's external tools migration" do
-    before :once do
-      account_admin_user(active_all: true)
-      @copy_from = @course
-    end
-
-    before do
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-
-      @original_assignment = @copy_from.assignments.create!(title: "some assignment", submission_types: "external_tool")
-      @original_assignment.build_external_tool_tag(url: "http://example.com/original", new_tab: true)
-      @original_assignment.save!
-
-      run_master_migration
-    end
-
-    it "copies external tool tag over" do
-      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
-      expect(@assignment_copy.reload.external_tool_tag).to be_truthy
-      expect(@assignment_copy.reload.external_tool_tag.url).to eq "http://example.com/original"
-    end
-
-    it "updates associated course's external tool tag on blueprint update" do
-      @original_assignment.external_tool_tag.update!(url: "http://example.com/blueprint_updated", new_tab: true)
-      @original_assignment.touch
-      run_master_migration
-      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
-      expect(@assignment_copy.external_tool_tag.url).to eq "http://example.com/blueprint_updated"
-    end
-
-    it "does not update associated course's external tool tag on blueprint update if the associated course had an independent update" do
-      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
-      @assignment_copy.external_tool_tag.update!(url: "http://example.com/associated_updated", new_tab: true)
-      @original_assignment.touch
-      run_master_migration
-      expect(@assignment_copy.reload.external_tool_tag.url).to eq "http://example.com/associated_updated"
-    end
-  end
-
   describe "all the copying" do
     before :once do
       account_admin_user(active_all: true)
       @copy_from = @course
+    end
+
+    def mig_id(obj)
+      @template.migration_id_for(obj)
+    end
+
+    def run_master_migration(opts = {})
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin, opts)
+      run_jobs
+      @migration.reload
     end
 
     it "creates an export once and import in each child course" do

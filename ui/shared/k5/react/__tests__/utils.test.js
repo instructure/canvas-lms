@@ -719,14 +719,6 @@ describe('parseAnnouncementDetails', () => {
     const announcementDetails = parseAnnouncementDetails({...announcement, attachments: []}, course)
     expect(announcementDetails.announcement.attachment).toBeUndefined()
   })
-
-  it('handles a missing posted_at date', () => {
-    const announcementDetails = parseAnnouncementDetails(
-      {...announcement, posted_at: undefined},
-      course
-    )
-    expect(announcementDetails.announcement.postedDate).toBeUndefined()
-  })
 })
 
 describe('groupAnnouncementsByHomeroom', () => {

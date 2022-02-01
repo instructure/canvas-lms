@@ -30,16 +30,11 @@ import OutcomeKebabMenu from './OutcomeKebabMenu'
 import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {ratingsShape} from './shapes'
 
 const ManageOutcomeItem = ({
   linkId,
   title,
   description,
-  calculationMethod,
-  calculationInt,
-  masteryPoints,
-  ratings,
   friendlyDescription,
   outcomeContextType,
   outcomeContextId,
@@ -151,10 +146,6 @@ const ManageOutcomeItem = ({
               <OutcomeDescription
                 description={description}
                 friendlyDescription={friendlyDescription}
-                calculationMethod={calculationMethod}
-                calculationInt={calculationInt}
-                masteryPoints={masteryPoints}
-                ratings={ratings}
                 truncated={truncated}
               />
             </View>
@@ -169,10 +160,6 @@ ManageOutcomeItem.propTypes = {
   linkId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  calculationMethod: PropTypes.string,
-  calculationInt: PropTypes.number,
-  masteryPoints: PropTypes.number,
-  ratings: ratingsShape,
   friendlyDescription: PropTypes.string,
   outcomeContextType: PropTypes.string,
   outcomeContextId: PropTypes.string,

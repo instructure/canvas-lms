@@ -516,6 +516,10 @@ describe Assignment do
   end
 
   describe "#visible_to_students_in_course_with_da" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:visible_assignments_scope_change)
+    end
+
     let(:student_enrollment) { @course.enrollments.find_by(user: @student) }
     let(:visible_assignments) do
       Assignment.visible_to_students_in_course_with_da(@student.id, @course.id)

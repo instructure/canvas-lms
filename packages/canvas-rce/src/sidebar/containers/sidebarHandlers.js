@@ -47,8 +47,8 @@ export default function propsFromDispatch(dispatch) {
     fetchNextPage: key => dispatch(fetchNextPage(key)),
     toggleFolder: id => dispatch(toggleFolder(id)),
     fetchFolders: () => dispatch(fetchFolders()),
-    fetchInitialImages: (opts = {}) => dispatch(fetchInitialImages(opts)),
-    fetchNextImages: (opts = {}) => dispatch(fetchNextImages(opts)),
+    fetchInitialImages: () => dispatch(fetchInitialImages()),
+    fetchNextImages: () => dispatch(fetchNextImages()),
     startUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadPreflight(tabContext, fileMetaProps)),
     flickrSearch: term => dispatch(searchFlickr(term)),

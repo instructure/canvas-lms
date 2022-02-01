@@ -82,8 +82,7 @@ const useRatings = ({initialRatings}) => {
 
   const hasChanged = useMemo(
     () => JSON.stringify(ratings) !== JSON.stringify(initialRatings),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ratings]
+    [ratings, initialRatings]
   )
 
   return {
