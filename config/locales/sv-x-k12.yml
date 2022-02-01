@@ -2272,6 +2272,7 @@ sv-x-k12:
       Gör det möjligt för användaren att aktivera och redigera viktning för uppgiftsgrupper i en kurs.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Låter användare lägga till händelser i Listvyöversikten via kryssrutan Lägg till i elevens att-göra-lista. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Låter användare lägga till händelser i Listvyöversikten via kryssrutan Lägg till i elevens att-göra-lista."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Gör att användare kan lägga till ikoner för externa appar i innehållsredigerarens verktygsfält."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Tillåter användaren att lägga till gruppmedlemmar i konto- eller kursgrupper."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Gör det möjligt för användaren att lägga till nya uppgifter till en modul."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Tillåter användare att lägga till nya kurser till ett konto."
@@ -2501,6 +2502,7 @@ sv-x-k12:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Gör att användare kan lägga till en app manuellt i kontoinställningarna."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Gör det möjligt för användaren att manuellt lägga till och ta bort en app i Kontoinställningar."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Gör det möjligt för användaren att lägga till och ta bort en app manuellt i Kursinställningar."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Gör att användare manuellt kan radera en app i kontoinställningarna."
   allows_user_to_moderate_a_quiz_6953d369: "Gör det möjligt för användaren att moderera ett quiz."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Gör att användare kan moderera ett quiz och visa quizets statistiksida."
   allows_user_to_modify_user_account_details_e16fb115: "Tillåter användare att ändra informationen för användarkontot."
@@ -3078,6 +3080,7 @@ sv-x-k12:
   anonymous_user_d984b9ce: "Anonym användare"
   anonymous_was_never_turned_on_e5e8aeda: "Anonym aktiverades aldrig"
   anonymous_was_turned_off_300d25ec: "Anonym var avstängd"
+  anonymous_you_e708af99: "Anonym (Du)"
   anonymously_graded_59149570: "Anonymt bedömd"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Anonymt bedömda uppgifter får inte vara gruppuppgifter"
   another_assignment_name_369f8481: "Annat uppgiftsnamn"
@@ -5138,7 +5141,7 @@ sv-x-k12:
         fields_required: "Fältet ”%{field}” är obligatoriskt"
         invalid_live_events_url: "Ogiltig slutpunkt, måste vara en giltig URL"
         invalid_url: "Ogiltig URL"
-        login_expiration_minimum: "Sessionens sluttid måste vara pm minst %{minutes} minuter"
+        login_expiration_minimum: "Sessionsutgång måste vara %{minutes} minuter eller längre"
         need_integer: "Ange ett heltal för spellistans cache"
         stream_name_required: "Namn på kinesis-ström är obligatoriskt."
   canvas_3962b702: Canvas
@@ -6239,7 +6242,7 @@ sv-x-k12:
     media_objects_not_configured: "Mediaobjekten har inte konfigurerats"
     new_roster_user: 
       completed_enrollment: "Färdig *%{completed_at}*"
-      enrolled_as: "Registrerad som en %{enrollment_type}"
+      enrolled_as: "Registrerad som: %{enrollment_type}"
       enrollment_linked_to: "Länkad till *%{linked_user}*"
       labels: 
         user_privileges: Privilegier
@@ -6278,7 +6281,7 @@ sv-x-k12:
       confirm: 
         conclude: "Vill du verkligen avsluta den här registreringen?"
         delete_enrollment: "Vill du verkligen radera den här registreringen?"
-      enrolled_as: "Registrerad som en %{enrollment_type}"
+      enrolled_as: "Registrerad som: %{enrollment_type}"
       enrollment_change_failed: "Ändringen av registreringsprivilegiet misslyckades, försök igen"
       enrollment_linked_to: "länkad till *%{linked_user}*"
       headings: 
@@ -9449,6 +9452,9 @@ sv-x-k12:
   enroll_in_subject_9c1f1c18: "Registrera sig för ämne"
   enrolled_a6a517cd: Registrerad
   enrolled_as_272da3b9: "Registrerad som"
+  enrolled_as_enrollment_type_a008e44a: "Registrerad som: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "registrerad som: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "registrerad som: %{enrollment_type} med åtkomst endast för sektion"
   enrollment: 
     default_course_name: Kurs
     default_email: "Ingen e-post"
@@ -9849,6 +9855,7 @@ sv-x-k12:
   error_59293a2c: fel
   error_98e81528: Fel
   error_adding_canvas_file_to_submission_draft_de258021: "Det gick inte att lägga till Canvas-filen till inlämningsutkastet"
+  error_adding_file_to_discussion_message_16feef3f: "Ett fel inträffade när filen skulle läggas till i diskussionsmeddelandet"
   error_adding_files_to_conversation_message_58e83876: "Ett fel inträffade när filer skulle läggas till i konversationsmeddelandet"
   error_adding_files_to_discussion_message_8bb819e4: "Ett fel inträffade vid när filer skulle läggas till i diskussionsmeddelande"
   error_adding_files_to_submission_draft_6acac337: "Det gick inte att lägga till filer till inlämningsutkastet"
@@ -9906,6 +9913,7 @@ sv-x-k12:
   error_updating_comment_4b80c76d: "Ett fel inträffade när kommentaren uppdaterades"
   error_updating_status_of_module_item_80336274: "Ett fel inträffade när statusen för modulobjektet skulle uppdateras"
   error_updating_submission_draft_1d40ade7: "Fel vid uppdatering av inlämningsutkast"
+  error_uploading_file_73235601: "Ett fel inträffade under uppladdning av fil"
   error_uploading_file_e2d31b56: "Fel vid uppladdning av fil."
   error_uploading_files_f709361f: "Ett fel inträffade under uppladdning av filer"
   error_uploading_video_audio_recording_16d9730a: "Ett fel uppstod vid uppladdning av video-/ljudinspelningen"
@@ -11717,12 +11725,14 @@ sv-x-k12:
   hide_courses_without_students_fc6fc7a0: "Dölj kurser utan elever"
   hide_details_df9ef4a2: "Dölj detaljer"
   hide_e057ff36: Dölj
+  hide_from_everyone_9fc3e6d0: "Dölj för alla"
   hide_grades_585e63b4: "Dölj omdömen"
   hide_grades_5ff26682: "Dölj omdömen"
   hide_grades_tray_5ed267fe: "Dölj omdömesfacket"
   hide_groups_navigation_menu_62e8b3d0: "Dölj grupp-navigeringsmeny"
   hide_important_dates_c23d2102: "Dölj viktiga datum"
   hide_key_e8fe1e8c: "Dölj nyckel"
+  hide_name_and_profile_picture_d18eed70: "Dölj namn och profilbild"
   hide_name_details_23814c37: "Dölj information för %{name}"
   hide_navigation_menu_f0b3e90: "Dölj navigeringsmeny"
   hide_outcomes_with_no_results_7e4ce06f: "Dölj lärandemål utan resultat"
@@ -11952,6 +11962,12 @@ sv-x-k12:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Om aktiverad tillåts nya window.postMessage-ämnen för LTI-plattformens
       lagringsspecifikationer och svarsmeddelanden skickas till alla postMessage.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      Om aktiverad returneras ett ”ej auktoriserat” svar från JSON API:et felkoden 403
+      (förbjuden) istället för 401-koden, för att bättre överensstämma med HTTP-standarder.
+      Dessutom, när API:et returnerar ett ej auktoriserat eller ej autentiserat JSON-fel,
+      lokaliseras inte statusfältet. Det kommer alltid att vara på
+      engelska.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Om du aktiverar den här inställningen kommer Canvas att tillåta verktyg att returnera flera innehållsobjekt
       i en enda begäran på kursmodulsidan
@@ -11990,6 +12006,7 @@ sv-x-k12:
       istället för i uppgiften. Detta gör att händelser
       dupliceras om inte prenumerationerna på de kopplade
       plagiatuppgifterna tagits bort.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Om LTI – lägg till är inaktiverat, kan användare fortfarande installera godkända appar via Canvas App Center (om aktiverad för din institution). Men, om LTI – radera inte är aktiverat kan de inte radera manuellt tillagda externa appar."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Om även Hanterade kurser: Administratör – hantera/uppdatera och Kurser – ångra ta bort är aktiverade kan en användare på kontonivå återställa kurser i Administratörsverktyg."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Om måluppfyllelseskalor är aktiverade kommer rapporten att trunkeras så att den inte innehåller beräkningsmetod, beräkningsheltal, måluppfyllelsepoäng eller bedömningar."
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -15678,7 +15695,9 @@ sv-x-k12:
   nav_avatar_border_3246beb1: "Kant för navigeringsavtar"
   nav_background_fd299145: Navigeringsbakgrund
   nav_badge_3c67de17: Navigeringsetikett
+  nav_badge_active_1d4be222: "Navigeringsmärke är aktivt: "
   nav_badge_text_574b6eb: "Text på navigeringsetikett"
+  nav_badge_text_active_9a28e8a2: "Text för navigeringsmärke är aktiv:"
   nav_icon_active_e4825558: "Navigeringsikon aktiv"
   nav_icon_ca3fef59: Navigeringsikon
   nav_logo_4b255c91: Navigeringslogotyp
@@ -15908,6 +15927,7 @@ sv-x-k12:
   no_results_match_searchterm_f28e50e0: "Inga resultat matchar ”%{searchTerm}”"
   no_score_yet_c94e919b: "Inga resultat ännu"
   no_start_date_6e81c22b: "Inget startdatum"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "Ingen elev observeras. Gå tillbaka till översikten för att välja en elev."
   no_students_being_observed_42e11732: "Inga elever observeras"
   no_students_dd8de9f0: "Inga elever"
   no_students_have_taken_the_quiz_yet_e667644b: "Inga elever har tagit detta quiz än"
@@ -16396,6 +16416,7 @@ sv-x-k12:
   observers_remove_ad508fbe: "Observatörer – ta bort"
   observing_f3c5e759: Observerar
   observing_observee_d31d5fa2: "Observerar: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "Observerar %{student_name}. Gå tillbaka till översikten för att välja en annan elev."
   of_students_5d1af0d2: "# av elever"
   off_5385ef3f: Av
   off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Av: elevnamn och profilbilder kommer att vara synliga för andra kursmedlemmar"
@@ -16886,6 +16907,7 @@ sv-x-k12:
   parents_sign_up_here_f0aa8f4f: "Föräldrar registrerar sig här"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Delvis: Elever kan välja att visa sitt namn och profilbild"
   partially_anonymous_483a892d: "Delvis anonym"
+  partially_anonymous_discussion_13ceb585: "Delvis anonym diskussion | "
   partially_enabled_and_locked_9a39d38a: "Delvis aktiverad och låst"
   partially_enabled_cd506819: "Delvis aktiverad"
   participantcount_less_8d258f6: "%{participantCount} färre"
@@ -17395,7 +17417,7 @@ sv-x-k12:
       name: Sessioner
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Tid innan sessionen går ut i minuter (minst 20) för mobila appar"
+        mobile_timeout: "Tid efter inloggning innan sessionen går ut i minuter (2880 [2 dagar] minst) för mobila appar"
         session_timeout: "Tid innan sessionen går ut i minuter (minst 20)"
     settings_header: 
       prompt_change_for_all_line1: "Detta ändrar inställningarna för ALLA KONTON!"
@@ -19758,6 +19780,7 @@ sv-x-k12:
   required_access_code_592902d7: "Tillgångskod krävs"
   required_by_course_end_date_d87a4772: "Krävs före kursens slutdatum"
   required_by_specified_end_date_22dd6b49: "Krävs före angivet slutdatum"
+  required_by_term_end_date_403dff38: "Krävs före terminens slutdatum"
   required_email_address_379b2392: "Obligatorisk e-postadress"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Nyckelnamn, ägarens e-postadress, verktygs-ID, omdirigerings-URL och ikon-URL är obligatoriska fält."
   required_input_message_all_unassigned_students_1e721442: "Obligatoriska indata Skicka meddelande till elever som inte tilldelats."
@@ -20321,16 +20344,16 @@ sv-x-k12:
     confirms: 
       delete_enrollment: "Vill du verkligen radera den här registreringen permanent?"
     default_course_name: "Kurs ID \"%{course_id}\""
-    enrolled_as_designer: "registrerad som designer"
-    enrolled_as_limited_designer: "registrerad som en designer som enbart har tillgång till sektion"
-    enrolled_as_limited_observer: "registrerad som en observatör som enbart har tillgång till sektion"
-    enrolled_as_limited_student: "registrerad som en elev som enbart har tillgång till sektion"
-    enrolled_as_limited_ta: "registrerad som en lärarassistent som enbart har tillgång till sektion"
-    enrolled_as_limited_teacher: "registrerad som en lärare som enbart har tillgång till sektion"
-    enrolled_as_observer: "registrerad som observatör"
-    enrolled_as_student: "registrerad som elev"
-    enrolled_as_ta: "registrerad som lärarassistent"
-    enrolled_as_teacher: "registrerad som lärare"
+    enrolled_as_designer: "registrerad som: Designer"
+    enrolled_as_limited_designer: "registrerad som: Designer med åtkomst endast för sektion"
+    enrolled_as_limited_observer: "registrerad som: Observatör med åtkomst endast för sektion"
+    enrolled_as_limited_student: "registrerad som: Elev med åtkomst endast för sektion"
+    enrolled_as_limited_ta: "registrerad som: Lärarassistent med åtkomst endast för sektion"
+    enrolled_as_limited_teacher: "registrerad som: Lärare med åtkomst endast för sektion"
+    enrolled_as_observer: "registrerad som: Observatör"
+    enrolled_as_student: "registrerad som: Elev"
+    enrolled_as_ta: "registrerad som: Lärarassistent"
+    enrolled_as_teacher: "registrerad som: Lärare"
     errors: 
       confirmation_failed: "Bekräftelse misslyckades"
       course_not_authorized_for_crosslist: "%{course_name} inte behörig för flytt av sektion"
@@ -21381,6 +21404,7 @@ sv-x-k12:
   show_links_to_unpublished_content_30c0450d: "Visa länkar till opublicerat innehåll"
   show_more_8d5f918b: "visa fler"
   show_more_af9cbc16: "Visa mer"
+  show_name_and_profile_picture_9329d8f8: "Visa namn och profilbild"
   show_name_details_186d86e6: "Visa information för %{name}"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Visa namn på observerade elever i aviseringar."
   show_name_of_observed_students_in_notifications_d38b53ca: "Visa namn på observerade elever i aviseringar"
@@ -21407,6 +21431,7 @@ sv-x-k12:
   show_sub_accounts_for_account_name_fa71a658: "Visa underkonton för %{account_name}"
   show_suggestions_when_typing_b72545de: "Visa förslag när du skriver"
   show_to_d57767f: "Visa för"
+  show_to_everyone_94d66d01: "Visa för alla"
   show_welcome_tour_a105aa2e: "Visa välkomstgenomgång"
   showing_1ac6ed70: "Visar:"
   showing_all_announcements_36ff0cec: "Visar alla meddelanden"
@@ -22357,6 +22382,7 @@ sv-x-k12:
   tas_observers_designers_b705118a: "TA:er/observatörer/designers"
   tas_remove_11059e14: "TA:er – ta bort"
   tas_remove_16a99b22: "Lärarassistenter – ta bort"
+  tea_provisional_graders_d4f19c26: "Preliminära TEA-bedömare"
   teacher_5a73b637: Lärare
   teacher_count_teachers_a92f7199: "%{teacher_count} lärare"
   teacher_dashboard_custom_report_6d20bef2: "Anpassad rapport för läraröversikt"
@@ -22842,6 +22868,8 @@ sv-x-k12:
   there_was_a_problem_updating_the_submission_6e5280a1: "Det gick inte att uppdatera inlämningen."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Ett fel inträffade vid kontroll av status för planpublicering"
   there_was_an_error_fetching_course_statistics_96e9dbad: "Det gick inte att hämta kursstatistiken"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Ett fel inträffade när bedömningsbokens filter skulle hämtas."
+  there_was_an_error_fetching_modules_8ee451bb: "Ett fel inträffade när moduler skulle hämtas."
   there_was_an_error_fetching_outcome_results_45c57590: "Det uppstod ett fel vid hämtning av lärandemålen"
   there_was_an_error_fetching_submission_comments_ce153077: "Det gick inte att hämta inlämningskommentarer"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Det gick inte att generera kopplingskoden"
@@ -23020,6 +23048,7 @@ sv-x-k12:
       Den har fler frågetyper som hotspot,
               kategorisering, matchning och ordningsföljd. Den har även
               fler modererings- och hjälpfunktioner.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "I detta fjärrundervisningsrum synkroniseras registreringars och ämnens start-/slutdatum till: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Den här bilden visas som en vattenstämpel i bakgrunden på din sida. Godkända format: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Den här bilden har rapporterats."
   this_image_is_currently_unavailable_25c68857: "Den här bilden är för närvarande inte tillgänglig"
@@ -24453,6 +24482,7 @@ sv-x-k12:
       Uppdaterar kontomeddelandepreferenser UI så att den blir en mer aktuell
       och uppdaterad användarupplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Uppdaterade ikoner för publicering av policyer i kolumnrubriken för uppgifter i den nya omdömesboken."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Uppdateringar till JSON API:s HTTP-autentiseringsfelkod och JSON-statusfält"
   updating_6edbab78: Uppdaterar
   updating_discussion_failed_aadb2d35: "Det gick inte att uppdatera diskussionen"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Om du uppdaterar Catalog-URL:n blir din gamla URL omedelbart oåtkomlig för användare! Om en det finns en befintligt konfigurerad betalningsprocessor måste ändringar utföras av en Catalog-tekniker."
@@ -24489,6 +24519,8 @@ sv-x-k12:
   uploaded_media_bc29db35: "Uppladdade media"
   uploaded_over_time_d59abb68: "uppladdade med tiden"
   uploading_ee585874: "Laddar upp ..."
+  uploading_file_5c7e14fd: "Laddar upp fil"
+  uploading_file_in_progress_5c09e0c9: "Uppladdning av fil pågår"
   uploading_files_5ff8f4fd: "Laddar upp filer"
   uploading_files_9e39dbf9: "Laddar upp filer"
   uploading_media_progress_c23a953b: "Laddar upp medieförlopp"
