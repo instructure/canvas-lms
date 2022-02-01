@@ -2291,6 +2291,7 @@ nb-x-k12:
       Lar en bruker aktivere og endre vekting av gruppeoppgave i et fag.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Lar brukeren legge til hendelser i Listevisning oversikt via avkryssingsboksen Legg til elevoppgave. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Lar brukeren legge til hendelser i Listevisning oversikt via avkryssingsboksen Legg til elevoppgave."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Lar brukere legge til eksterne app-ikoner til verktøylinjen i Rich teksteditor."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Lar brukeren legge til gruppemedlemmer i konto- eller faggrupper."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Lar en bruker legge til nye oppgaver i en modul."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Lar brukeren legge til et nytt fag til en konto."
@@ -2521,6 +2522,7 @@ nb-x-k12:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Lar en bruker manuelt legge til en app i kontoinnstillinger."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Tillater bruker manuelt å legge til og slette appen i kontoinnstillinger."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Lar en bruker manuelt legge til og slette en app i faginnstillinger."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Lar brukere manuelt slette en app i Kontoinnstillinger."
   allows_user_to_moderate_a_quiz_6953d369: "Lar en bruker moderere en test."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Lar en bruker moderere en quiz. Og vise siden quizstatistikk."
   allows_user_to_modify_user_account_details_e16fb115: "Lar en bruker endre brukerkontodetaljer."
@@ -3099,6 +3101,7 @@ nb-x-k12:
   anonymous_user_d984b9ce: "Anonym bruker"
   anonymous_was_never_turned_on_e5e8aeda: "Anonym var aldri slått på"
   anonymous_was_turned_off_300d25ec: "Anonym var avslått"
+  anonymous_you_e708af99: "Anonym (deg)"
   anonymously_graded_59149570: "Vurdert anonymt"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Anonymt vurderte oppgaver kan ikke være gruppeoppgaver"
   another_assignment_name_369f8481: "Enda et oppgavenavn"
@@ -6266,7 +6269,7 @@ nb-x-k12:
     media_objects_not_configured: "Medieobjekter ikke konfigurert"
     new_roster_user: 
       completed_enrollment: "Fullført *%{completed_at}*"
-      enrolled_as: "Påmeldt som en %{enrollment_type}"
+      enrolled_as: "Registrert som: %{enrollment_type}"
       enrollment_linked_to: "Lenket til *%{linked_user}*"
       labels: 
         user_privileges: Privilegier
@@ -6305,7 +6308,7 @@ nb-x-k12:
       confirm: 
         conclude: "Er du sikker på at du vil fullføre denne innmeldingen?"
         delete_enrollment: "Er du sikker på at du vil slette denne påmeldingen?"
-      enrolled_as: "Påmeldt som en %{enrollment_type}"
+      enrolled_as: "Registrert som: %{enrollment_type}"
       enrollment_change_failed: "Endring av medlemsrettigheter mislyktes, prøv igjen"
       enrollment_linked_to: "koblet til *%{linked_user}*"
       headings: 
@@ -9481,6 +9484,9 @@ nb-x-k12:
   enroll_in_subject_9c1f1c18: "Registrer deg i fag"
   enrolled_a6a517cd: Registrert
   enrolled_as_272da3b9: "Registrert som"
+  enrolled_as_enrollment_type_a008e44a: "Registrert som: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "registrert som: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "registrert som: %{enrollment_type} med kun seksjonstilgang"
   enrollment: 
     default_course_name: Fag
     default_email: "Ingen epost"
@@ -9881,6 +9887,7 @@ nb-x-k12:
   error_59293a2c: feil
   error_98e81528: Feil
   error_adding_canvas_file_to_submission_draft_de258021: "Feil da canvas-fil skulle legges til som innleveringsutkast"
+  error_adding_file_to_discussion_message_16feef3f: "Feil ved opplasting av fil i diskusjonsmelding"
   error_adding_files_to_conversation_message_58e83876: "Feil da filer skulle legges til samtalemeldinger"
   error_adding_files_to_discussion_message_8bb819e4: "Det oppsto en feil da du skulle legge til filer i diskusjonsmeldingen"
   error_adding_files_to_submission_draft_6acac337: "Feil da filer skulle legges til som innleveringsutkast"
@@ -9938,6 +9945,7 @@ nb-x-k12:
   error_updating_comment_4b80c76d: "Feil ved opplasting av kommentar"
   error_updating_status_of_module_item_80336274: "Feil ved oppdatering av status for modulelement"
   error_updating_submission_draft_1d40ade7: "Kunne ikke oppdatere innleveringsutkast"
+  error_uploading_file_73235601: "Feil ved opplasting av fil"
   error_uploading_file_e2d31b56: "Feil ved opplasting av fil."
   error_uploading_files_f709361f: "Feil ved opplasting av filer"
   error_uploading_video_audio_recording_16d9730a: "Feil ved opplasting av video-/audioinnspilling"
@@ -11750,12 +11758,14 @@ nb-x-k12:
   hide_courses_without_students_fc6fc7a0: "Skjul fag uten elever"
   hide_details_df9ef4a2: "Skjul detaljer"
   hide_e057ff36: Skjul
+  hide_from_everyone_9fc3e6d0: "Skjul for alle"
   hide_grades_585e63b4: "Skjul vurderinger"
   hide_grades_5ff26682: "Skjul vurderinger"
   hide_grades_tray_5ed267fe: "Skjul vurderingsskuffen"
   hide_groups_navigation_menu_62e8b3d0: "Skjul menyen for gruppenavigering"
   hide_important_dates_c23d2102: "Skjul viktige datoer"
   hide_key_e8fe1e8c: "Skjul nøkkel"
+  hide_name_and_profile_picture_d18eed70: "Skjul navn og profilbilde"
   hide_name_details_23814c37: "Skjul %{name} detaljer"
   hide_navigation_menu_f0b3e90: "Skjul navigeringsmenyen"
   hide_outcomes_with_no_results_7e4ce06f: "Gjem utfall med ingen resultater"
@@ -11988,6 +11998,12 @@ nb-x-k12:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Hvis aktivert, tillater nytt vindu.postMeldingstemaer for LTI-plattformen
       Lagringsspesifikasjoner, og sender nye svarmeldinger til all postMeldinger.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      Hvis den er aktivert, vil et «autorisert» svar fra JSON API returnere en 403
+      (Forbudt) i stedet for en 401-kode, for å være mer i tråd med HTTP-standarder.
+      Når API-en returnerer en uautentisert eller uautorisert JSON-feil,
+      blir ikke «statusfeltet» lokalisert – det vil alltid være på
+      engelsk.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Hvis det er aktivert, vil Canvas tillate at verktøy viser flere innholdstyper
       i én og samme forespørsel på fagmodulsiden
@@ -12027,6 +12043,7 @@ nb-x-k12:
       i stedet for oppgaven. Dette vil føre til at arrangementet
       dupliserers med mindre abonnementete på de tilknyttede
       plagiatoppgavene blir slettet.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Hvis LTI – legg til er deaktivert, kan brukere fortsatt installere godkjente apper gjennom Canvas App Center (hvis dette er aktivert for din institusjon). Hvis LTI – slett ikke er aktivert, kan de imidlertid ikke slette eksterne apper som er lagt til manuelt."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Hvis Administrer fag: Admin - administrer/oppdater og Fag - angre sletting også er aktivert, kan en bruker på kontonivå gjenopprette slettede fag i Administratorverktøy."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Hvis mestringsskalaer er aktivert, blir rapporten avkortet slik at den ikke inkluderer beregningsmetode, beregningsintegrasjon, mestringspoeng eller vurderinger"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -15721,7 +15738,9 @@ nb-x-k12:
   nav_avatar_border_3246beb1: "Marg nav-avatar"
   nav_background_fd299145: Nav-bakgrunn
   nav_badge_3c67de17: Nav-merke
+  nav_badge_active_1d4be222: "Nav-merke aktiv"
   nav_badge_text_574b6eb: Nav-merketekst
+  nav_badge_text_active_9a28e8a2: "Nav-merketekst aktiv"
   nav_icon_active_e4825558: "Nav-ikon aktiv"
   nav_icon_ca3fef59: "Nav ikon"
   nav_logo_4b255c91: "Nav logo"
@@ -15951,6 +15970,7 @@ nb-x-k12:
   no_results_match_searchterm_f28e50e0: "Ingen resultater samsvarer med «%{searchTerm}»\""
   no_score_yet_c94e919b: "Ingen resultat ennå"
   no_start_date_6e81c22b: "Ingen startdato"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "Ingen elev blir observert. For å velge en elev, gå tilbake til oversikten."
   no_students_being_observed_42e11732: "Ingen elever blir observert"
   no_students_dd8de9f0: "Ingen elever"
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen elever har tatt quizen"
@@ -16441,6 +16461,7 @@ nb-x-k12:
   observers_remove_ad508fbe: "Observatører - fjern"
   observing_f3c5e759: Observere
   observing_observee_d31d5fa2: "Observerer: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "Observerer %{student_name}. For å velge en annen elev, gå tilbake til oversikten."
   of_students_5d1af0d2: "# Av elever"
   off_5385ef3f: Av
   off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Av: elevnavn og profilbilder vil være synlige for andre medlemmer i dette faget"
@@ -16935,6 +16956,7 @@ nb-x-k12:
   parents_sign_up_here_f0aa8f4f: "Foreldre kan melde seg på her"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Delvis: elever kan velge å vise navn og profilbilde"
   partially_anonymous_483a892d: "Delvis anonym"
+  partially_anonymous_discussion_13ceb585: "Delvis anonym diskusjon | "
   partially_enabled_and_locked_9a39d38a: "Delvis aktivert og låst"
   partially_enabled_cd506819: "Delvis aktivert"
   participantcount_less_8d258f6: "%{participantCount} færre"
@@ -17447,7 +17469,7 @@ nb-x-k12:
       name: Økter
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Tid før økten utløper i minutter (minst 20) for mobilapplikasjoner"
+        mobile_timeout: "Tid etter pålogging før økten utløper i minutter (minst 2880 [2 dager]) for mobilapplikasjoner"
         session_timeout: "Tid før sesjonen utløper i minutter (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "Dette endrer innstillingene for ALLE KONTOER!"
@@ -19821,6 +19843,7 @@ nb-x-k12:
   required_access_code_592902d7: "Påkrevd tilgangskode"
   required_by_course_end_date_d87a4772: "Påkrevd innen sluttdato for fag"
   required_by_specified_end_date_22dd6b49: "Påkrevd innen spesifisert sluttdato"
+  required_by_term_end_date_403dff38: "Påkrevd innen terminslutt"
   required_email_address_379b2392: "Obligatorisk e-postadresse"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Obligatoriske felter inkluderer nøkkelnavn, eierens e-post, verktøy-ID, omdirigerings-URL og ikon-URL."
   required_input_message_all_unassigned_students_1e721442: "Inndata kreves. Send melding til alle elever som ikke er påmeldt."
@@ -20384,16 +20407,16 @@ nb-x-k12:
     confirms: 
       delete_enrollment: "Er du sikker på at du vil slette denne påmeldingen permanent?"
     default_course_name: "Fag ID \"%{course_id}\""
-    enrolled_as_designer: "påmeldt som designer"
-    enrolled_as_limited_designer: "påmeldt som designer med tilgang begrenset til en seksjon"
-    enrolled_as_limited_observer: "påmeldt som ovbservatør med tilgang begrenset til en seksjon"
-    enrolled_as_limited_student: "påmeldt som elev med tilgang begrenset til en seksjon"
-    enrolled_as_limited_ta: "påmeldt som LA med tilgang begrenset til en seksjon"
-    enrolled_as_limited_teacher: "påmeldt som faglærer med tilgang begrenset til en seksjon"
-    enrolled_as_observer: "påmeldt som observatør"
-    enrolled_as_student: "påmeldt som elev"
-    enrolled_as_ta: "påmeldt som LA"
-    enrolled_as_teacher: "påmeldt som faglærer"
+    enrolled_as_designer: "registrert som: Designer"
+    enrolled_as_limited_designer: "registrert som: Designer med kun seksjonstilgang"
+    enrolled_as_limited_observer: "registrert som: Observatør med kun seksjonstilgang"
+    enrolled_as_limited_student: "registrert som: Elev med kun seksjonstilgang"
+    enrolled_as_limited_ta: "registrert som: LA med kun seksjonstilgang"
+    enrolled_as_limited_teacher: "registrert som: Lærer med kun seksjonstilgang"
+    enrolled_as_observer: "registrert som: Observatør"
+    enrolled_as_student: "registrert som: Elev"
+    enrolled_as_ta: "registrert som: LA"
+    enrolled_as_teacher: "registrert som: Lærer"
     errors: 
       confirmation_failed: "Bekreftelse mislyktes"
       course_not_authorized_for_crosslist: "%{course_name} er ikke autorisert for krysslisting"
@@ -21444,6 +21467,7 @@ nb-x-k12:
   show_links_to_unpublished_content_30c0450d: "Vis lenker til innhold som ikke er publisert"
   show_more_8d5f918b: "vis mer"
   show_more_af9cbc16: "Vis mer"
+  show_name_and_profile_picture_9329d8f8: "Vis navn og profilbilde"
   show_name_details_186d86e6: "Vis %{name} detaljer"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Vis navn på observerte elever i varslinger."
   show_name_of_observed_students_in_notifications_d38b53ca: "Vis navnet på observerte elever i varslinger"
@@ -21470,6 +21494,7 @@ nb-x-k12:
   show_sub_accounts_for_account_name_fa71a658: "Vis under-kontoer for %{account_name}"
   show_suggestions_when_typing_b72545de: "Vis forslag når du skriver"
   show_to_d57767f: "Vis til"
+  show_to_everyone_94d66d01: "Vis til alle"
   show_welcome_tour_a105aa2e: "Vis rundtur"
   showing_1ac6ed70: "Viser:"
   showing_all_announcements_36ff0cec: "Viser alle beskjeder"
@@ -22422,6 +22447,7 @@ nb-x-k12:
   tas_observers_designers_b705118a: "LA-er / Observatører / Designere"
   tas_remove_11059e14: "LA-er - Fjern"
   tas_remove_16a99b22: "LA-er - fjern"
+  tea_provisional_graders_d4f19c26: "TEA provisoriske moderatorer"
   teacher_5a73b637: Lærer
   teacher_count_teachers_a92f7199: "%{teacher_count} faglærere"
   teacher_dashboard_custom_report_6d20bef2: "Tilpasset rapport for læreroversikt"
@@ -22907,6 +22933,8 @@ nb-x-k12:
   there_was_a_problem_updating_the_submission_6e5280a1: "Det oppsto et problem med å oppdatere innleveringen."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Det oppsto en feil ved kontroll av publiseringsstatus for plan."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Det oppsto en feil under henting av fagstatistikk."
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Det oppsto en feil under henting av Vurderingsoversiktfiltre."
+  there_was_an_error_fetching_modules_8ee451bb: "Det oppsto en feil under henting av moduler."
   there_was_an_error_fetching_outcome_results_45c57590: "Det oppsto en feil under heting av oppnåelse av mål"
   there_was_an_error_fetching_submission_comments_ce153077: "Det oppsto en feil under henting av Innleverings Kommentarer"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Det oppsto en feil i genereringen av paringskode."
@@ -23085,6 +23113,7 @@ nb-x-k12:
       Dette har flere spørsmålstyper som hotspot,
               kategorisering, samsvar, og rekkefølge. Den har også
               flere funksjonere for moderering og lokalisering.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Homeroom synkroniserer påmeldinger og emnestart-/sluttdatoer til: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet vises som vannmerke i bakgrunnen på siden din. Godkjente formater: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Dette bildet er rapportert."
   this_image_is_currently_unavailable_25c68857: "Dette bildet er utilgjengelig for øyeblikket"
@@ -24527,6 +24556,7 @@ nb-x-k12:
       Oppdaterer varselpreferanser brukergrensesnittoppdatering tl å være en mer
       oppdatert brukeropplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Oppdaterer visningen av Post Personvern-ikon i kolonne-overskriften til oppgave i Ny vurderingsoversikt."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Oppdateringer til JSON API-autentiseringsfeil HTTP-kode og JSON-statusfelt."
   updating_6edbab78: Oppdaterer
   updating_discussion_failed_aadb2d35: "Kunne ikke oppdatere diskusjon"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Oppdatering av Catalog URL vil gjøre den gamle URL-en utilgjengelig for brukere umiddelbart! Hvis det er konfigurert en eksisterende betalingsbehandler, vil endringer kreve hjelp fra en Catalog-ingeniør."
@@ -24565,6 +24595,8 @@ nb-x-k12:
   uploaded_over_time_d59abb68: "lastet opp over tid"
   uploading_19e8a4e7: "Laster opp"
   uploading_ee585874: "Laster opp…"
+  uploading_file_5c7e14fd: "Laster opp fil"
+  uploading_file_in_progress_5c09e0c9: "Opplasting av fil pågår."
   uploading_files_5ff8f4fd: "Laster opp filer"
   uploading_files_9e39dbf9: "Laste opp filer"
   uploading_media_progress_c23a953b: "Fremgang opplasting av mediefil"
