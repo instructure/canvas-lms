@@ -57,6 +57,7 @@ class ApplicationController < ActionController::Base
 
   before_action :clear_idle_connections
   before_action :annotate_apm
+  before_action :annotate_sentry
   before_action :check_pending_otp
   before_action :set_user_id_header
   before_action :set_time_zone
@@ -674,6 +675,12 @@ class ApplicationController < ActionController::Base
       RequestContext::Generator.request_id,
       @current_user
     )
+  end
+
+  def annotate_sentry
+    Sentry.set_tags({
+                      db_cluster: @domain_root_account&.shard&.database_server&.id
+                    })
   end
 
   def store_session_locale
