@@ -18,8 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Importers::ContextExternalToolImporter do
-  it "works for course-level tools" do
+  before :once do
     course_model
+  end
+
+  it "works for course-level tools" do
     migration = @course.content_migrations.create!
     tool = Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course, migration)
     expect(tool).not_to be_nil
@@ -27,7 +30,6 @@ describe Importers::ContextExternalToolImporter do
   end
 
   it 'does not create a new record if "persist" is falsey' do
-    course_model
     migration = @course.content_migrations.create!
     expect do
       Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course, migration, nil, false)
@@ -35,11 +37,36 @@ describe Importers::ContextExternalToolImporter do
   end
 
   it "works for account-level tools" do
-    course_model
     migration = @course.account.content_migrations.create!
     tool = Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course.account, migration)
     expect(tool).not_to be_nil
     expect(tool.context).to eq @course.account
+  end
+
+  it "does not create a new tool with the same identity_hash as another tool" do
+    tool = external_tool_model(context: @course)
+    import_hash = tool.slice(*ContextExternalTool::IDENTITY_FIELDS)
+    import_hash[:title] = import_hash.delete :name
+    import_hash[:privacy_level] = import_hash.delete :workflow_state
+    migration = @course.account.content_migrations.create!
+    expect do
+      Importers::ContextExternalToolImporter.import_from_migration(import_hash, @course, migration, nil, true)
+    end.not_to change { ContextExternalTool.count }
+  end
+
+  it "updates an existing tool's identity_hash to 'duplicate' if it is changed to match another tool" do
+    tool1 = external_tool_model(context: @course)
+    tool2 = external_tool_model(context: @course, opts: { name: "t", migration_id: "hi" })
+    import_hash = tool2.slice(*ContextExternalTool::IDENTITY_FIELDS)
+    import_hash.delete :name
+    import_hash[:title] = tool1.name
+    import_hash[:privacy_level] = import_hash.delete :workflow_state
+    import_hash[:migration_id] = "hi"
+    migration = @course.account.content_migrations.create!
+    expect do
+      Importers::ContextExternalToolImporter.import_from_migration(import_hash, @course, migration, nil, true)
+    end.not_to change { ContextExternalTool.count }
+    expect(tool2.reload.identity_hash).to eq "duplicate"
   end
 
   context "when importing LTI 1.3 tool" do
@@ -51,7 +78,7 @@ describe Importers::ContextExternalToolImporter do
       )
     end
 
-    let(:course) { course_model }
+    let(:course) { @course }
     let(:developer_key) { DeveloperKey.create!(account: course.account) }
     let(:migration) { course.content_migrations.create! }
     let(:settings) { { client_id: developer_key.global_id } }
@@ -83,7 +110,7 @@ describe Importers::ContextExternalToolImporter do
       )
     end
 
-    let(:course) { course_model }
+    let(:course) { @course }
     let(:migration) { course.content_migrations.create! }
     let(:tool) { external_tool_model(context: course) }
     let(:tool_hash) do
@@ -134,7 +161,6 @@ describe Importers::ContextExternalToolImporter do
 
   context "combining imported external tools" do
     before :once do
-      course_model
       @migration = ContentMigration.new(migration_type: "common_cartridge_importer")
     end
 
@@ -257,7 +283,6 @@ describe Importers::ContextExternalToolImporter do
 
   context "searching for existing tools" do
     before :once do
-      course_model
       @tool1 = Account.default.context_external_tools.create!(name: "tool", domain: "example.com",
                                                               shared_secret: "secret", consumer_key: "test", privacy_level: "name_only")
       @tool1.settings[:selection_width] = 100
