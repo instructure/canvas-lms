@@ -264,6 +264,7 @@ const locale = {
   "image_8ad06": { "message": "Image" },
   "image_options_5412d02c": { "message": "Image Options" },
   "image_options_tray_90a46006": { "message": "Image Options Tray" },
+  "image_to_crop_3a34487d": { "message": "Image to crop" },
   "images_7ce26570": { "message": "Images" },
   "increase_indent_6d550a4a": { "message": "Increase indent" },
   "insert_593145ef": { "message": "Insert" },
