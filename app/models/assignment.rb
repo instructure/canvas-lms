@@ -170,8 +170,8 @@ class Assignment < ActiveRecord::Base
   end
 
   accepts_nested_attributes_for :external_tool_tag, update_only: true, reject_if: proc { |attrs|
-    # only accept the url, content_type, content_id, and new_tab params, the other accessible
-    # params don't apply to an content tag being used as an external_tool_tag
+    # only accept the url, link_settings, content_type, content_id and new_tab params
+    # the other accessible params don't apply to an content tag being used as an external_tool_tag
     content = case attrs["content_type"]
               when "Lti::MessageHandler", "lti/message_handler"
                 Lti::MessageHandler.find(attrs["content_id"].to_i)
@@ -180,7 +180,7 @@ class Assignment < ActiveRecord::Base
               end
     attrs[:content] = content if content
     attrs[:external_data] = JSON.parse(attrs[:external_data]) if attrs["external_data"].present? && attrs[:external_data].is_a?(String)
-    attrs.slice!(:url, :new_tab, :content, :external_data)
+    attrs.slice!(:url, :new_tab, :content, :external_data, :link_settings)
     false
   }
   before_validation do |assignment|

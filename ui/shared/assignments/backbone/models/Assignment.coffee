@@ -362,6 +362,18 @@ export default class Assignment extends Model
     tagAttributes.url = url
     @set 'external_tool_tag_attributes', tagAttributes
 
+  externalToolIframeWidth: (width) =>
+    tagAttributes = @get('external_tool_tag_attributes') || {}
+    return tagAttributes?.iframe?.width unless arguments.length > 0
+    tagAttributes.iframe.width = width
+    @set 'external_tool_tag_attributes', tagAttributes
+
+  externalToolIframeHeight: (height) =>
+    tagAttributes = @get('external_tool_tag_attributes') || {}
+    return tagAttributes?.iframe?.height unless arguments.length > 0
+    tagAttributes.iframe.height = height
+    @set 'external_tool_tag_attributes', tagAttributes
+
   externalToolData: =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
     return tagAttributes.external_data
@@ -614,7 +626,7 @@ export default class Assignment extends Model
       'showBuildButton', 'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
       'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen',
       'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
-      'vericiteEnabled', 'importantDates'
+      'vericiteEnabled', 'importantDates', 'externalToolIframeWidth', 'externalToolIframeHeight'
     ]
 
     hash =
