@@ -25,3 +25,4 @@ services:
       SPRING_TMP_PATH: tmp
       SPRING_SOCKET: tmp/spring.sock
       SPRING_PIDFILE: tmp/spring.pid
+      POSTGRES_PASSWORD: sekret
