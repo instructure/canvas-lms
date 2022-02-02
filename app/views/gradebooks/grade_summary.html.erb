@@ -329,12 +329,13 @@
           </span>
           <i class="icon-check-plus standalone-icon"></i>
         </a>
-        <a href="#"
-          class="toggle_rubric_assessments_link tooltip"
+        <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id ) %>?show_rubric=true"
+          class="tooltip"
           aria-label="<%= t('See rubric results') %>"
           aria-expanded='false'
           aria-controls="rubric_<%= assignment.id %>"
           tabindex='0'
+          target="_blank"
           style="<%= 'visibility: hidden;' unless assignment_presenter.has_rubric_assessments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t("See rubric results") %></span>

@@ -405,3 +405,12 @@ import './rubric_assessment' /*global rubricAssessment*/
       $.ajaxJSON(url, 'GET', {}, submissionLoaded);
     }, 500);
   };
+
+$(document).ready(function() {
+  const autoOpenRubric = $('#submissionRubric').data('rubric');
+  setTimeout(function () {
+    if (autoOpenRubric) {
+      openRubric();
+    }
+  }, 1000);
+});
