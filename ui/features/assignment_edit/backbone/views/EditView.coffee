@@ -101,6 +101,8 @@ export default class EditView extends ValidatedFormView
   EXTERNAL_TOOLS_CONTENT_TYPE = '#assignment_external_tool_tag_attributes_content_type'
   EXTERNAL_TOOLS_CONTENT_ID = '#assignment_external_tool_tag_attributes_content_id'
   EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
+  EXTERNAL_TOOLS_IFRAME_WIDTH = '#assignment_external_tool_tag_attributes_iframe_width'
+  EXTERNAL_TOOLS_IFRAME_HEIGHT = '#assignment_external_tool_tag_attributes_iframe_height'
   EXTERNAL_TOOLS_CUSTOM_PARAMS = '#assignment_external_tool_tag_attributes_custom_params'
   ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
   ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
@@ -144,6 +146,8 @@ export default class EditView extends ValidatedFormView
     els["#{PEER_REVIEWS_FIELDS}"] = '$peerReviewsFields'
     els["#{EXTERNAL_TOOLS_URL}"] = '$externalToolsUrl'
     els["#{EXTERNAL_TOOLS_NEW_TAB}"] = '$externalToolsNewTab'
+    els["#{EXTERNAL_TOOLS_IFRAME_WIDTH}"] = '$externalToolsIframeWidth'
+    els["#{EXTERNAL_TOOLS_IFRAME_HEIGHT}"] = '$externalToolsIframeHeight'
     els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
     els["#{EXTERNAL_TOOLS_CUSTOM_PARAMS}"] = '$externalToolsCustomParams'
     els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
@@ -348,6 +352,27 @@ export default class EditView extends ValidatedFormView
       turnitinDialog.off()
       turnitinDialog.remove()
 
+  handleAssignmentSelectionSubmit: (data) =>
+    @$externalToolsCustomParams.val(data['item[custom_params]'])
+    @$externalToolsContentType.val(data['item[type]'])
+    @$externalToolsContentId.val(data['item[id]'])
+    @$externalToolsUrl.val(data['item[url]'])
+    @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
+    @$externalToolsIframeWidth.val(data['item[iframe][width]'])
+    @$externalToolsIframeHeight.val(data['item[iframe][height]'])
+
+    # a content item with an assignment_id means that an assignment was already
+    # created on the backend. redirect to that assignment so that user can make
+    # any desired changes, without having to populate this model with extra
+    # data not found in this content item
+    if (data['item[assignment_id]'])
+      message = I18n.t("Loading assignment details from external app")
+      $.flashMessage(message)
+      $.screenReaderFlashMessageExclusive(message)
+      [context_type, context_id] = ENV.context_asset_string.split("_")
+      window.location.href = "/#{context_type}s/#{context_id}/assignments/#{data['item[assignment_id]']}/edit"
+
+  # assignment_selection placement
   showExternalToolsDialog: =>
     # TODO: don't use this dumb thing
     INST.selectContentDialog
@@ -355,22 +380,7 @@ export default class EditView extends ValidatedFormView
       select_button_text: I18n.t('buttons.select_url', 'Select'),
       no_name_input: true,
       submit: (data) =>
-        @$externalToolsCustomParams.val(data['item[custom_params]'])
-        @$externalToolsContentType.val(data['item[type]'])
-        @$externalToolsContentId.val(data['item[id]'])
-        @$externalToolsUrl.val(data['item[url]'])
-        @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
-
-        # a content item with an assignment_id means that an assignment was already
-        # created on the backend. redirect to that assignment so that user can make
-        # any desired changes, without having to populate this model with extra
-        # data not found in this content item
-        if (data['item[assignment_id]'])
-          message = I18n.t("Loading assignment details from external app")
-          $.flashMessage(message)
-          $.screenReaderFlashMessageExclusive(message)
-          [context_type, context_id] = ENV.context_asset_string.split("_")
-          window.location.href = "/#{context_type}s/#{context_id}/assignments/#{data['item[assignment_id]']}/edit"
+       @handleAssignmentSelectionSubmit(data)
 
   toggleRestrictFileUploads: =>
     @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
