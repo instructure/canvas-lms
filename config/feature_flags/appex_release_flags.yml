@@ -1,0 +1,6 @@
+jobs_v2:
+  state: allowed
+  display_name: Jobs v2
+  description: |-
+    New and improved jobs control panel
+  applies_to: SiteAdmin
