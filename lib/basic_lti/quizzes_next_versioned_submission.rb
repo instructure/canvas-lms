@@ -33,10 +33,6 @@ module BasicLTI
       @prioritize_non_tool_grade = prioritize_non_tool_grade
     end
 
-    def active?
-      !submission.deleted?
-    end
-
     def commit_history(launch_url, grade, grader_id)
       return true if grading_period_closed?
       return false unless valid?(launch_url, grade)

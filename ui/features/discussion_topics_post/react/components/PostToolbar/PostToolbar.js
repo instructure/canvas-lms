@@ -84,7 +84,7 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
                     enabledScreenReaderLabel={I18n.t('Published')}
                     disabledScreenReaderLabel={I18n.t('Unpublished')}
                     onClick={props.onTogglePublish}
-                    interaction={props.canUnpublish ? 'enabled' : 'disabled'}
+                    interaction={props.canUnpublish ? 'enabled' : 'readonly'}
                   />
                 </Flex.Item>
               )}

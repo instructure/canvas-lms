@@ -25,19 +25,11 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
-import {prepareRatings} from '@canvas/outcomes/react/hooks/useRatings'
-import Ratings from './Ratings'
-import {ratingsShape} from './shapes'
+import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
 
-const OutcomeDescription = ({
-  description,
-  friendlyDescription,
-  truncated,
-  calculationMethod,
-  calculationInt,
-  masteryPoints,
-  ratings
-}) => {
+import Ratings from './Ratings'
+
+const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
   const {friendlyDescriptionFF, isStudent, individualOutcomeRatingAndCalculationFF} =
     useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
@@ -53,6 +45,7 @@ const OutcomeDescription = ({
     shouldShowFriendlyDescription &&
     !isStudent &&
     truncatedDescription !== friendlyDescription
+  const {ratings} = useRatings({initialRatings: defaultOutcomesManagementRatings})
 
   if (!description && !friendlyDescription && !individualOutcomeRatingAndCalculationFF) return null
 
@@ -113,21 +106,10 @@ const OutcomeDescription = ({
       )}
 
       {!truncated && individualOutcomeRatingAndCalculationFF && (
-        <View>
-          <Ratings
-            ratings={prepareRatings(ratings)}
-            masteryPoints={{
-              value: masteryPoints,
-              error: null
-            }}
-            canManage={false}
-          />
-          <ProficiencyCalculation
-            method={{calculationMethod, calculationInt}}
-            individualOutcome="display"
-            canManage={false}
-          />
-        </View>
+        <>
+          <Ratings ratings={ratings} canManage={false} />
+          <ProficiencyCalculation individualOutcome="display" canManage={false} />
+        </>
       )}
     </View>
   )
@@ -139,10 +121,6 @@ OutcomeDescription.defaultProps = {
 
 OutcomeDescription.propTypes = {
   description: PropTypes.string,
-  calculationMethod: PropTypes.string,
-  calculationInt: PropTypes.number,
-  masteryPoints: PropTypes.number,
-  ratings: ratingsShape,
   friendlyDescription: PropTypes.string,
   truncated: PropTypes.bool.isRequired
 }

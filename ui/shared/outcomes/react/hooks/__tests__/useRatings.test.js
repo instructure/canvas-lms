@@ -17,7 +17,7 @@
  */
 
 import {renderHook} from '@testing-library/react-hooks/dom'
-import useRatings, {defaultRatings, defaultMasteryPoints, prepareRatings} from '../useRatings'
+import useRatings, {defaultOutcomesManagementRatings} from '../useRatings'
 
 const expectDescriptions = (result, expectedDescriptions) => {
   expect(result.current.ratings.map(r => r.description)).toStrictEqual(expectedDescriptions)
@@ -47,22 +47,11 @@ const changeRating = (result, ratingIndex, attrs) => {
   result.current.setRatings(newRatings)
 }
 
-const changeMasteryPoints = (result, points) => result.current.setMasteryPoints(points)
-
-const expectMasteryPoints = (result, expectedMasteryPoints) => {
-  expect(result.current.masteryPoints.value).toEqual(expectedMasteryPoints)
-}
-
-const expectMasteryPointsErrors = (result, expectedMasteryPointsError) => {
-  expect(result.current.masteryPoints.error).toEqual(expectedMasteryPointsError)
-}
-
 describe('useRatings', () => {
-  const initialRatings = defaultRatings
-  const initialMasteryPoints = defaultMasteryPoints
+  const initialRatings = defaultOutcomesManagementRatings
 
   test('should create custom hook with initialRatings', () => {
-    const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+    const {result} = renderHook(() => useRatings({initialRatings}))
     expectDescriptions(result, [
       'Exceeds Mastery',
       'Mastery',
@@ -71,12 +60,11 @@ describe('useRatings', () => {
       'Well Below Mastery'
     ])
     expectPoints(result, [4, 3, 2, 1, 0])
-    expect(result.current.masteryPoints.value).toEqual(initialMasteryPoints)
   })
 
   describe('Updating', () => {
     it('should reflect changes in ratings', () => {
-      const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+      const {result} = renderHook(() => useRatings({initialRatings}))
 
       changeRating(result, 0, {description: 'New Exceeds Mastery', points: 5})
       changeRating(result, 1, {description: 'New Mastery', points: 4})
@@ -92,31 +80,15 @@ describe('useRatings', () => {
       expectPoints(result, [5, 4, 2, 1, 0])
     })
 
-    it('should reflect changes in mastery points', () => {
-      const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-      changeMasteryPoints(result, 11)
-
-      expectMasteryPoints(result, 11)
-    })
-
-    it('returns false for hasChanged if neither ratings nor mastery points have changed', () => {
-      const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+    it('returns false for hasChanged if ratings have not changed', () => {
+      const {result} = renderHook(() => useRatings({initialRatings}))
       expect(result.current.hasChanged).toBe(false)
     })
 
     it('returns true for hasChanged if ratings have changed', () => {
-      const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+      const {result} = renderHook(() => useRatings({initialRatings}))
       changeRating(result, 0, {description: 'New Exceeds Mastery', points: 5})
       changeRating(result, 1, {description: 'New Mastery', points: 4})
-      expect(result.current.hasChanged).toBe(true)
-    })
-
-    it('returns true for hasChanged if mastery points have changed', () => {
-      const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-      changeMasteryPoints(result, 11)
-
       expect(result.current.hasChanged).toBe(true)
     })
   })
@@ -124,7 +96,7 @@ describe('useRatings', () => {
   describe('Validations', () => {
     describe('Description validations', () => {
       it('should be ok when receiving good data', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {description: 'Any description'})
 
@@ -133,7 +105,7 @@ describe('useRatings', () => {
       })
 
       it('should validate blank', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {description: ''})
 
@@ -144,7 +116,7 @@ describe('useRatings', () => {
 
     describe('Points validations', () => {
       it('should be ok for positive integer', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {points: '10'})
 
@@ -153,7 +125,7 @@ describe('useRatings', () => {
       })
 
       it('should be ok for positive float', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {points: '10.5'})
 
@@ -162,7 +134,7 @@ describe('useRatings', () => {
       })
 
       it('should validate blank points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {points: ''})
 
@@ -171,7 +143,7 @@ describe('useRatings', () => {
       })
 
       it('should validate invalid points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {points: 'lorem'})
 
@@ -180,7 +152,7 @@ describe('useRatings', () => {
       })
 
       it('should validate points with comma as invalid points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {points: '0,5'})
 
@@ -189,7 +161,7 @@ describe('useRatings', () => {
       })
 
       it('should validate negative points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         changeRating(result, 0, {points: '-1'})
 
@@ -198,7 +170,7 @@ describe('useRatings', () => {
       })
 
       it('should validate unique points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
+        const {result} = renderHook(() => useRatings({initialRatings}))
 
         // change the first points to match the second
         changeRating(result, 0, {points: '3'})
@@ -207,115 +179,6 @@ describe('useRatings', () => {
         expectPointsErrors(result, [null, 'Points must be unique', null, null, null])
         expect(result.current.hasError).toBeTruthy()
       })
-    })
-
-    describe('Mastery points validations', () => {
-      it('should pass validations for positive integer', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, 3)
-
-        expectMasteryPointsErrors(result, null)
-        expect(result.current.hasError).toBeFalsy()
-      })
-
-      it('should pass validations for positive float', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, 3.5)
-
-        expectMasteryPointsErrors(result, null)
-        expect(result.current.hasError).toBeFalsy()
-      })
-
-      it('should generate error if no points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, '')
-
-        expectMasteryPointsErrors(result, 'Missing required points')
-        expect(result.current.hasError).toBeTruthy()
-      })
-
-      it('should generate error if invalid points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, 'lorem')
-
-        expectMasteryPointsErrors(result, 'Invalid points')
-        expect(result.current.hasError).toBeTruthy()
-      })
-
-      it('should generate error if points have comma delimiter', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, '0,5')
-
-        expectMasteryPointsErrors(result, 'Invalid points')
-        expect(result.current.hasError).toBeTruthy()
-      })
-
-      it('should generate error if negative points', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, '-1')
-
-        expectMasteryPointsErrors(result, 'Negative points')
-        expect(result.current.hasError).toBeTruthy()
-      })
-
-      it('should generate error if mastery points greater than max rating', () => {
-        const {result} = renderHook(() => useRatings({initialRatings, initialMasteryPoints}))
-
-        changeMasteryPoints(result, 11)
-
-        expectMasteryPointsErrors(result, 'Above max rating')
-        expect(result.current.hasError).toBeTruthy()
-      })
-
-      it('should generate error if mastery points less than min rating', () => {
-        const {result} = renderHook(() =>
-          useRatings({
-            initialRatings: defaultRatings.filter(r => r.points !== 0),
-            initialMasteryPoints
-          })
-        )
-
-        changeMasteryPoints(result, 0)
-
-        expectMasteryPointsErrors(result, 'Below min rating')
-        expect(result.current.hasError).toBeTruthy()
-      })
-
-      it('should bypass mastery point validations if no ratings', () => {
-        const {result} = renderHook(() =>
-          useRatings({
-            initialRatings: null,
-            initialMasteryPoints
-          })
-        )
-
-        changeMasteryPoints(result, 0)
-
-        expectMasteryPointsErrors(result, null)
-        expect(result.current.hasError).toBeFalsy()
-      })
-    })
-  })
-
-  describe('prepareRatings', () => {
-    it('should add a key prop to each rating', () => {
-      const result = prepareRatings(defaultRatings)
-      expect(result[0].key).not.toBeNull()
-      expect(result[1].key).not.toBeNull()
-      expect(result[2].key).not.toBeNull()
-      expect(result[3].key).not.toBeNull()
-      expect(result[4].key).not.toBeNull()
-    })
-
-    it('should return an empty array if no ratings', () => {
-      const result = prepareRatings()
-      expect(result.length).toBe(0)
     })
   })
 })

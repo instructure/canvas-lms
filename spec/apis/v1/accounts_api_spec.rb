@@ -510,7 +510,7 @@ describe "Accounts API", type: :request do
                               })
 
       @a1.reload
-      expect(@a1.settings[:setting]).to be_nil
+      expect(@a1.settings).to be_empty
     end
 
     context "Microsoft Teams Sync" do
@@ -559,9 +559,7 @@ describe "Accounts API", type: :request do
           api_call(:put, update_path, header_options_hash,
                    update_sync_settings_params, {}, { expected_status: 200 })
           account.reload
-          expected_settings.each do |key, value|
-            expect(account.settings[key]).to eq value
-          end
+          expect(account.settings).to eq expected_settings
         end
       end
 
@@ -570,9 +568,7 @@ describe "Accounts API", type: :request do
           api_call(:put, update_path, header_options_hash,
                    update_sync_settings_params, {}, { expected_status: 400 })
           account.reload
-          expected_settings.each do |key, _|
-            expect(account.settings[key]).to be_nil
-          end
+          expect(account.settings.size).to be 0
         end
       end
 
@@ -645,9 +641,7 @@ describe "Accounts API", type: :request do
             api_call_as_user(generic_user, :put, update_path, header_options_hash,
                              update_sync_settings_params, {}, { expected_result: 401 })
             account.reload
-            expected_settings.each do |key, _|
-              expect(account.settings[key]).to be_nil
-            end
+            expect(account.settings.size).to eq 0
           end
         end
 
@@ -1652,12 +1646,11 @@ describe "Accounts API", type: :request do
       api_call_as_user(generic_user, :get, show_settings_path, show_settings_header, {}, { expected_status: 401 })
     end
 
-    it "allows account admins to see selected settings" do
+    it "allows account admins to see settings" do
       @a1.settings = { microsoft_sync_enabled: true, microsoft_sync_tenant: "testtenant.com" }
       @a1.save!
       json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
-      expect(json["microsoft_sync_enabled"]).to eq(true)
-      expect(json["microsoft_sync_tenant"]).to eq("testtenant.com")
+      expect(json).to eq(@a1.settings.with_indifferent_access)
     end
   end
 

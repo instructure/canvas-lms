@@ -1868,7 +1868,7 @@ describe Account do
     end
 
     it "translates string values in mass-assignment" do
-      settings = {}
+      settings = @account.settings
       settings[:restrict_student_future_view] = { "value" => "1", "locked" => "0" }
       settings[:lock_all_announcements] = { "value" => "1", "locked" => "0" }
       @account.settings = settings

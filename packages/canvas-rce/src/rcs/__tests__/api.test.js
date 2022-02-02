@@ -32,42 +32,6 @@ beforeEach(() => {
   fetchMock.mock('/api/session', '{}')
 })
 
-afterEach(() => fetchMock.restore())
-
-describe('fetchImages()', () => {
-  let props
-  let standardProps = {
-    contextType: 'course',
-    images: {
-      course: {}
-    },
-    sortBy: 'date'
-  }
-
-  const subject = () => apiSource.fetchImages(props)
-
-  beforeEach(() => {
-    apiSource.hasSession = true
-    fetchMock.mock(/\/api\/documents*/, '[]')
-  })
-
-  describe('with "category" set', () => {
-    props = {
-      category: 'uncategorized',
-      ...standardProps
-    }
-  })
-
-  it('sends the category', async () => {
-    subject()
-    expect(
-      fetchMock.called(
-        '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized'
-      )
-    ).toEqual(true)
-  })
-})
-
 describe('saveClosedCaptions()', () => {
   let apiProps, media_object_id, subtitles, maxBytes
 

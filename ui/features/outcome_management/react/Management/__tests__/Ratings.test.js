@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as realRender, fireEvent, within} from '@testing-library/react'
+import {render as realRender, fireEvent} from '@testing-library/react'
 import Ratings from '../Ratings'
 import {createRating} from '@canvas/outcomes/react/hooks/useRatings'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
@@ -30,23 +30,19 @@ const render = (children, {isMobileView = false} = {}) => {
 
 describe('Ratings', () => {
   let onChangeRatingsMock
-  let onChangeMasteryPointsMock
 
   const defaultProps = (props = {}) => ({
     onChangeRatings: onChangeRatingsMock,
-    onChangeMasteryPoints: onChangeMasteryPointsMock,
     canManage: true,
-    ratings: [createRating('Exceeds Mastery', 4), createRating('Mastery', 3)],
-    masteryPoints: {
-      value: 3,
-      error: null
-    },
+    ratings: [
+      createRating('Exceeds Mastery', 4, '127A1B'),
+      createRating('Mastery', 3, '00AC18', true)
+    ],
     ...props
   })
 
   beforeEach(() => {
     onChangeRatingsMock = jest.fn()
-    onChangeMasteryPointsMock = jest.fn()
   })
 
   afterEach(() => {
@@ -61,6 +57,16 @@ describe('Ratings', () => {
       expect(onChangeRatingsMock).toHaveBeenCalled()
       const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
       expect(newRatings[1].description).toEqual('New value for description')
+    })
+
+    it('call onChangeRatings with correct mastery when change mastery', () => {
+      const {getByLabelText} = render(<Ratings {...defaultProps()} />)
+      const mastery = getByLabelText('Mastery false for mastery level 1').closest('input')
+      fireEvent.click(mastery)
+      expect(onChangeRatingsMock).toHaveBeenCalled()
+      const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
+      // assert set false to previous mastery too
+      expect(newRatings.map(r => r.mastery)).toStrictEqual([true, false])
     })
 
     it('calls onChangeRatings when Add Mastery Level is clicked', () => {
@@ -81,30 +87,14 @@ describe('Ratings', () => {
       expect(newRatings[0].description).toEqual('Mastery')
     })
 
-    it('call onChangeMasteryPoints with new value of points when mastery points are changed', () => {
-      const {getByLabelText} = render(<Ratings {...defaultProps()} />)
-      fireEvent.change(getByLabelText('Change mastery points').closest('input'), {
-        target: {value: '5'}
-      })
-      expect(onChangeMasteryPointsMock).toHaveBeenCalled()
-      expect(onChangeMasteryPointsMock).toHaveBeenCalledWith('5')
-    })
-
-    it('displays error message for mastery points if validation error', async () => {
-      const {getByDisplayValue} = render(
-        <Ratings
-          {...defaultProps({
-            masteryPoints: {
-              value: 11,
-              error: 'Invalid points'
-            }
-          })}
-        />
-      )
-      const masteryPointsInput = getByDisplayValue('11')
-      expect(
-        within(masteryPointsInput.closest('.points')).getByText('Invalid points')
-      ).toBeInTheDocument()
+    it('calls onChangeRatings when delete a mastery rating with new mastery', () => {
+      const {getByText} = render(<Ratings {...defaultProps()} />)
+      fireEvent.click(getByText('Delete mastery level 2'))
+      expect(onChangeRatingsMock).toHaveBeenCalled()
+      const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
+      expect(newRatings.length).toEqual(1)
+      expect(newRatings[0].description).toEqual('Exceeds Mastery')
+      expect(newRatings[0].mastery).toBeTruthy()
     })
   })
 
@@ -114,22 +104,12 @@ describe('Ratings', () => {
         const {queryByText} = render(<Ratings {...defaultProps({canManage: false})} />)
         expect(queryByText(/Add Mastery Level/)).not.toBeInTheDocument()
       })
-
-      it('shows read only view of mastery points', () => {
-        const {getByTestId} = render(<Ratings {...defaultProps({canManage: false})} />)
-        expect(getByTestId('read-only-mastery-points')).toBeInTheDocument()
-      })
     })
 
     describe('when canManage is true', () => {
       it('show Add Mastery Level button', () => {
         const {queryByText} = render(<Ratings {...defaultProps()} />)
         expect(queryByText(/Add Mastery Level/)).toBeInTheDocument()
-      })
-
-      it('shows mastery points input', () => {
-        const {getByTestId} = render(<Ratings {...defaultProps()} />)
-        expect(getByTestId('mastery-points-input')).toBeInTheDocument()
       })
     })
   })

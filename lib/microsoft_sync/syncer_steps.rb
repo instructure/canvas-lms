@@ -361,16 +361,8 @@ module MicrosoftSync
     end
 
     def step_partial_sync(_mem_state, _job_state)
-      # Step 1. Check prerequisites
-      # - Step 1a. If there is an error from a full sync, don't attempt a partial
-      #   sync (it would overwrite the error message)
-      last_error_metadata = MicrosoftSync::Errors.extra_metadata_from_serialized(group.last_error)
-      if last_error_metadata[:step] && last_error_metadata[:step].to_s != "step_partial_sync"
-        return StateMachineJob::IGNORE
-      end
-
-      # - Step 1b. Kick off a full sync if we haven't created a group yet, or if
-      #   there are too many changes to effectively handle here.
+      # Step 1. Kick off a full sync if we haven't created a group yet, or if
+      # there are too many changes to effectively handle here.
       if group.ms_group_id.nil? ||
          (changes = load_partial_sync_changes).length > MAX_PARTIAL_SYNC_CHANGES
         InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full")

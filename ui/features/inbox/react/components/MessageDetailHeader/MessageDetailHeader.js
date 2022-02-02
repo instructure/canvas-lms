@@ -24,73 +24,47 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../../util/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!conversations_2'
 
 export const MessageDetailHeader = ({...props}) => {
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          level: 'h4',
-          as: 'h3',
-          datatestId: 'message-detail-header-mobile'
-        },
-        desktop: {
-          level: 'h3',
-          as: 'h3',
-          datatestId: 'message-detail-header-desktop'
-        }
-      }}
-      render={responsiveProps => (
-        <Flex padding="small">
-          <Flex.Item shouldGrow shouldShrink>
-            <Heading
-              level={responsiveProps.level}
-              as={responsiveProps.as}
-              data-testid={responsiveProps.datatestId}
-            >
-              {props.text}
-            </Heading>
-          </Flex.Item>
-          <Flex.Item>
-            <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
-              <IconButton
-                margin="0 x-small 0 0"
-                screenReaderLabel={I18n.t('Reply')}
-                onClick={() => props.onReply()}
-              >
-                <IconReplyLine />
-              </IconButton>
+    <Flex padding="small">
+      <Flex.Item shouldGrow shouldShrink>
+        <Heading>{props.text}</Heading>
+      </Flex.Item>
+      <Flex.Item>
+        <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
+          <IconButton
+            margin="0 x-small 0 0"
+            screenReaderLabel={I18n.t('Reply')}
+            onClick={() => props.onReply()}
+          >
+            <IconReplyLine />
+          </IconButton>
+        </Tooltip>
+      </Flex.Item>
+      <Flex.Item>
+        <Menu
+          placement="bottom"
+          trigger={
+            <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
+              <Button margin="0 x-small 0 0" renderIcon={IconMoreLine}>
+                <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
+              </Button>
             </Tooltip>
-          </Flex.Item>
-          <Flex.Item>
-            <Menu
-              placement="bottom"
-              trigger={
-                <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-                  <Button margin="0 x-small 0 0" renderIcon={IconMoreLine}>
-                    <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
-                  </Button>
-                </Tooltip>
-              }
-            >
-              <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
-                {I18n.t('Reply All')}
-              </Menu.Item>
-              <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
-              <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
-              <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
-            </Menu>
-          </Flex.Item>
-          <Flex.Item />
-        </Flex>
-      )}
-    />
+          }
+        >
+          <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
+            {I18n.t('Reply All')}
+          </Menu.Item>
+          <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
+          <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
+          <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
+        </Menu>
+      </Flex.Item>
+      <Flex.Item />
+    </Flex>
   )
 }
 

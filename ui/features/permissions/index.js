@@ -80,7 +80,7 @@ ready(() => {
 
   // Don't display the alert permission if the alert feature isn't enabled
   const permissions = flattenPermissions(ENV.COURSE_PERMISSIONS)
-  if (!ENV.ACCOUNT_ENABLE_ALERTS) {
+  if (!ENV.CURRENT_ACCOUNT.account.settings.enable_alerts) {
     permissions.splice(permissions.findIndex(isAlert), 1)
   }
 

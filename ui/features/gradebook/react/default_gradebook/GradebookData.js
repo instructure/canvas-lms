@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useEffect} from 'react'
-import shallow from 'zustand/shallow'
+import React, {useRef} from 'react'
 import {camelize} from 'convert-case'
 import Gradebook from './Gradebook'
 import PerformanceControls from './PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
-import useStore from './stores/index'
+import useModules from './hooks/useModules'
+import useFilters from './hooks/useFilters'
 
 export default function GradebookData(props) {
   const performanceControls = useRef(
@@ -34,52 +34,36 @@ export default function GradebookData(props) {
     })
   )
   const courseId = props.gradebookEnv.context_id
-  const flashMessages = useStore(state => state.flashMessages)
-
-  const appliedFilters = useStore(state => state.appliedFilters(), shallow)
-  const isFiltersLoading = useStore(state => state.isFiltersLoading)
-  const fetchFilters = useStore(state => state.fetchFilters)
-
-  const modules = useStore(state => state.modules)
-  const isModulesLoading = useStore(state => state.isModulesLoading)
-  const fetchModules = useStore(state => state.fetchModules)
-
-  // Initial state
-  // We might be able to do this in gradebook/index.tsx instead
-  useEffect(() => {
-    useStore.setState({
-      courseId,
-      dispatch: dispatch.current,
-      performanceControls: performanceControls.current
-    })
-  }, [courseId, props.gradebookEnv.enhanced_gradebook_filters])
-
-  // Data loading logic goes here
-  useEffect(() => {
-    if (props.gradebookEnv.enhanced_gradebook_filters) {
-      fetchFilters()
-    }
-    if (props.gradebookEnv.has_modules) {
-      fetchModules()
-    }
-  }, [
-    fetchFilters,
-    fetchModules,
-    props.gradebookEnv.enhanced_gradebook_filters,
+  const {
+    data: modules,
+    errors: modulesErrors,
+    loading: isModulesLoading
+  } = useModules(
+    dispatch.current,
+    courseId,
+    performanceControls.contextModulesPerPage,
     props.gradebookEnv.has_modules
-  ])
+  )
+
+  const {
+    data: filters,
+    errors: filtersErrors,
+    loading: isFiltersLoading,
+    setData: handleFiltersChange
+  } = useFilters(courseId, props.gradebookEnv.enhanced_gradebook_filters)
 
   return (
     <Gradebook
       {...props}
-      flashAlerts={flashMessages}
-      filters={appliedFilters}
+      flashAlerts={[...modulesErrors, ...filtersErrors]}
+      filters={filters}
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
       dispatch={dispatch.current}
+      onFiltersChange={handleFiltersChange}
     />
   )
 }

@@ -72,11 +72,11 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties images fetch initial images to store', () => {
-    testHandler('fetchInitialImages', images, 'fetchInitialImages', {})
+    testHandler('fetchInitialImages', images, 'fetchInitialImages')
   })
 
   it('ties images fetch next images to store', () => {
-    testHandler('fetchNextImages', images, 'fetchNextImages', {})
+    testHandler('fetchNextImages', images, 'fetchNextImages')
   })
 
   it('ties upload preflight to store', () => {

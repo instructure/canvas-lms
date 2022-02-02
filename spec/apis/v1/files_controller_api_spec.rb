@@ -522,40 +522,6 @@ describe "Files API", type: :request do
       )
       expect(redirect_params["include"]).to include("enhanced_preview_url")
     end
-
-    context "with 'category' not present in params" do
-      subject { Attachment.find_by(instfs_uuid: instfs_uuid) }
-
-      let(:category) { "" }
-      let(:params) { base_params.merge(category: category, controller: "files", action: "api_capture", format: "json") }
-
-      it "uses the default category" do
-        raw_api_call(
-          :post,
-          "/api/v1/files/capture?#{params.to_query}",
-          params
-        )
-
-        expect(subject.category).to eq "uncategorized"
-      end
-    end
-
-    context "with 'category' present in params" do
-      subject { Attachment.find_by(instfs_uuid: instfs_uuid) }
-
-      let(:category) { Attachment::BUTTONS_AND_ICONS }
-      let(:params) { base_params.merge(category: category, controller: "files", action: "api_capture", format: "json") }
-
-      it "sets the attachment category" do
-        raw_api_call(
-          :post,
-          "/api/v1/files/capture?#{params.to_query}",
-          params
-        )
-
-        expect(subject.category).to eq category
-      end
-    end
   end
 
   describe "#index" do
@@ -811,27 +777,6 @@ describe "Files API", type: :request do
 
       @files_path = "/api/v1/courses/#{@course.id}/files"
       @files_path_options = { controller: "files", action: "api_index", format: "json", course_id: @course.id.to_param }
-    end
-
-    context "with a 'category' query parameter" do
-      subject do
-        Attachment.find(
-          api_call(:get, @files_path, @files_path_options, {}).map { |a| a["id"] }
-        )
-      end
-
-      let(:category) { Attachment::BUTTONS_AND_ICONS }
-      let(:button_and_icon) { @a1 }
-      let(:uncategorized) { @a2 }
-
-      before do
-        button_and_icon.update!(category: category)
-
-        @files_path_options[:category] = category
-      end
-
-      it { is_expected.to include button_and_icon }
-      it { is_expected.not_to include uncategorized }
     end
 
     describe "sort" do

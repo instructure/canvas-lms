@@ -25,7 +25,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {BUTTONS_AND_ICONS} from '../instructure_buttons/registerEditToolbar'
 import {
   IconLinkLine,
   IconFolderLine,
@@ -101,7 +100,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
   }
 
   // Buttons and Icons are only stored in course folders.
-  if (contentSubtype !== BUTTONS_AND_ICONS) {
+  if (contentSubtype !== 'buttons_and_icons') {
     options.push(
       <SimpleSelect.Option
         key="user_files"
@@ -232,7 +231,7 @@ export default function Filter(props) {
                   // when flipped to All, the context needs to be user
                   // so we can get media_objects, which are all returned in the user context
                   changed.contentType = 'user_files'
-                } else if (changed.contentSubtype === BUTTONS_AND_ICONS) {
+                } else if (changed.contentSubtype === 'buttons_and_icons') {
                   // Buttons and Icons only belong to Courses.
                   changed.contentType = 'course_files'
                 }

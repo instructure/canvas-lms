@@ -735,6 +735,8 @@ export function initializeMedia(_props) {
   }
 }
 
+export function fetchButtonsAndIcons() {}
+
 export function fetchFolders() {
   return new Promise(resolve => {
     setTimeout(() => {

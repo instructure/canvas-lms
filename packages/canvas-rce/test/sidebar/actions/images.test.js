@@ -58,31 +58,6 @@ describe('Image dispatch shapes', () => {
         assert(payload.searchString === 'panda')
       })
     })
-
-    describe('when the "category" is set to "buttons_and_icons', () => {
-      let buttonAndIconsResponse, opts
-
-      const subject = () => actions.receiveImages(buttonAndIconsResponse)
-
-      beforeEach(() => {
-        buttonAndIconsResponse = {
-          response: {
-            files: [{id: 1}, {id: 2}, {id: 3}]
-          },
-          contextType,
-          opts: {
-            category: 'buttons_and_icons'
-          }
-        }
-      })
-
-      it('applies the buttons and icons attribute to each file', () => {
-        assert.deepEqual(
-          subject().payload.files.map(f => f['data-inst-buttons-and-icons']),
-          [true, true, true]
-        )
-      })
-    })
   })
 })
 
@@ -144,36 +119,6 @@ describe('Image actions', () => {
       assert(dispatchSpy.called)
     })
 
-    it('sends specified options', () => {
-      const fetchImageStub = sinon.stub()
-      fetchImageStub.returns(new Promise((res, rej) => res({})))
-
-      const dispatch = fn => {
-        if (typeof fn === 'function') {
-          fn(dispatch, getState)
-        }
-      }
-
-      const getState = () => {
-        return {
-          source: {
-            fetchImages: fetchImageStub
-          },
-          images: {
-            user: {
-              files: [],
-              bookmark: null,
-              hasMore: true,
-              isLoading: false
-            }
-          },
-          contextType: 'user'
-        }
-      }
-      actions.fetchInitialImages({category: 'uncategorized'})(dispatch, getState)
-      assert.equal(fetchImageStub.firstCall.args[0].category, 'uncategorized')
-    })
-
     it('fetches initial page if necessary, part 2', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
@@ -191,36 +136,6 @@ describe('Image actions', () => {
       }
       actions.fetchNextImages(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
-    })
-
-    it('sends specified options', () => {
-      const fetchImageStub = sinon.stub()
-      fetchImageStub.returns(new Promise((res, rej) => res({})))
-
-      const dispatch = fn => {
-        if (typeof fn === 'function') {
-          fn(dispatch, getState)
-        }
-      }
-
-      const getState = () => {
-        return {
-          source: {
-            fetchImages: fetchImageStub
-          },
-          images: {
-            user: {
-              files: [],
-              bookmark: null,
-              hasMore: true,
-              isLoading: false
-            }
-          },
-          contextType: 'user'
-        }
-      }
-      actions.fetchNextImages({category: 'uncategorized'})(dispatch, getState)
-      assert.equal(fetchImageStub.firstCall.args[0].category, 'uncategorized')
     })
 
     it('skips the fetch if currently loading', () => {

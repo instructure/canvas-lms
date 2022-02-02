@@ -114,6 +114,20 @@ If you want to migrate the existing database, cancel now
   [[ ${dropped:-DROP} == 'migrate' ]] || _canvas_lms_track run_command bundle exec rake db:initial_setup
 }
 
+function sync_bundler_version {
+  start_spinner "Checking bundler version..."
+  expected_version=$(run_command bash -c "echo \$BUNDLER_VERSION" |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+  actual_version=$(eval run_command bundler --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+  if [ "$actual_version" != "$expected_version" ]; then
+    stop_spinner
+    start_spinner "  Wrong version of bundler installed, installing correct version..."
+    _canvas_lms_track_with_log run_command bash -c "gem uninstall --all --ignore-dependencies --force --executables bundler"
+    _canvas_lms_track_with_log run_command bash -c "gem install bundler --no-document -v $expected_version"
+    stop_spinner
+  fi
+  stop_spinner
+}
+
 function bundle_install {
   start_spinner "  Installing gems (bundle install) ..."
   run_command bash -c 'rm -f Gemfile.lock* >/dev/null 2>&1'
@@ -122,6 +136,7 @@ function bundle_install {
 }
 
 function bundle_install_with_check {
+  sync_bundler_version
   start_spinner "Checking your gems (bundle check)..."
   if _canvas_lms_track_with_log run_command bundle check ; then
     stop_spinner

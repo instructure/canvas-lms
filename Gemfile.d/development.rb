@@ -26,6 +26,6 @@ group :development do
   gem "active_record_query_trace", "1.8", require: false
 
   gem "byebug", "11.1.3", platform: :mri
-  gem "debase", "0.2.5.beta2", require: false
+  gem "debase", "0.2.4.1", require: false
   gem "ruby-debug-ide", "0.7.2", require: false
 end

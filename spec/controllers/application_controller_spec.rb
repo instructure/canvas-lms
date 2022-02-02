@@ -440,18 +440,18 @@ RSpec.describe ApplicationController do
 
         it "loads gateway uri from dynamic settings" do
           allow(DynamicSettings).to receive(:find).and_return({
-                                                                "api_gateway_enabled" => "true",
-                                                                "api_gateway_uri" => "http://the-gateway/graphql"
-                                                              })
+                                                                        "api_gateway_enabled" => "true",
+                                                                        "api_gateway_uri" => "http://the-gateway/graphql"
+                                                                      })
           jsenv = controller.js_env({})
           expect(jsenv[:API_GATEWAY_URI]).to eq("http://the-gateway/graphql")
         end
 
         it "will not expose gateway uri from dynamic settings if not enabled" do
           allow(DynamicSettings).to receive(:find).and_return({
-                                                                "api_gateway_enabled" => "false",
-                                                                "api_gateway_uri" => "http://the-gateway/graphql"
-                                                              })
+                                                                        "api_gateway_enabled" => "false",
+                                                                        "api_gateway_uri" => "http://the-gateway/graphql"
+                                                                      })
           jsenv = controller.js_env({})
           expect(jsenv[:API_GATEWAY_URI]).to be_nil
         end

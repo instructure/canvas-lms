@@ -689,68 +689,6 @@ describe GradebooksController do
         get "show", params: { course_id: @course.id, version: "individual" }
         expect(response).to render_template("gradebooks/gradebook")
       end
-
-      describe "score to ungraded" do
-        before do
-          options = ::Gradebook::ApplyScoreToUngradedSubmissions::Options.new(
-            percent: 50,
-            excused: false,
-            mark_as_missing: false,
-            only_apply_to_past_due: false
-          )
-          @progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(course: @course, grader: @teacher, options: options)
-        end
-
-        describe "FF disabled" do
-          before do
-            @course.account.disable_feature!(:apply_score_to_ungraded)
-          end
-
-          it "sets gradebook_score_to_ungraded_progress in js_env as null" do
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(nil)
-          end
-        end
-
-        describe "FF enabled" do
-          before do
-            @course.account.enable_feature!(:apply_score_to_ungraded)
-          end
-
-          it "sets gradebook_score_to_ungraded_progress in js_env as null if the last progress has workflow state failed" do
-            @progress.fail!
-
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(nil)
-          end
-
-          it "sets gradebook_score_to_ungraded_progress object in js_env if the last progress has workflow state queued" do
-            @progress.update_attribute(:workflow_state, "queued")
-
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(@progress)
-          end
-
-          it "sets gradebook_score_to_ungraded_progress object in js_env if the last progress has workflow state running" do
-            @progress.start!
-
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(@progress)
-          end
-
-          it "sets gradebook_score_to_ungraded_progress object in js_env if the last progress has workflow state completed" do
-            @progress.update_attribute(:workflow_state, "completed")
-
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(@progress)
-          end
-        end
-      end
     end
 
     context "in development and requested version is 'default'" do

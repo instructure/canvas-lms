@@ -39,9 +39,11 @@ import {
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from '../shared/OutcomesRceField'
-import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
-import useRatings from '@canvas/outcomes/react/hooks/useRatings'
-import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
+import ProficiencyCalculation, {
+  defaultProficiencyCalculation
+} from '../MasteryCalculation/ProficiencyCalculation'
+import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
+import convertRatings from '@canvas/outcomes/react/helpers/convertRatings'
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
 
@@ -57,15 +59,10 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     useCanvasContext()
   const {
     ratings,
-    masteryPoints,
     setRatings,
-    setMasteryPoints,
     hasError: proficiencyRatingsError,
     hasChanged: proficiencyRatingsChanged
-  } = useRatings({
-    initialRatings: outcome.ratings,
-    initialMasteryPoints: outcome.masteryPoints
-  })
+  } = useRatings({initialRatings: defaultOutcomesManagementRatings})
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   let attributesEditable = {
@@ -85,12 +82,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     proficiencyCalculationMethod,
     setProficiencyCalculationMethod,
     proficiencyCalculationMethodChanged
-  ] = useInput(outcome.calculationMethod)
+  ] = useInput(outcome.calculationMethod || defaultProficiencyCalculation.calculationMethod)
   const [
     proficiencyCalculationInt,
     setProficiencyCalculationInt,
     proficiencyCalculationIntChanged
-  ] = useInput(outcome.calculationInt)
+  ] = useInput(outcome.calculationInt || defaultProficiencyCalculation.calculationInt)
   const calculationInt = parseInt(proficiencyCalculationInt, 10) || null
   const [proficiencyCalculationError, setProficiencyCalculationError] = useState(false)
 
@@ -127,14 +124,17 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         // description can be null/empty. no need to check if it is available only if it has changed
         if (descriptionChanged) input.description = description
         if (individualOutcomeRatingAndCalculationFF) {
-          if (proficiencyCalculationMethodChanged || proficiencyCalculationIntChanged) {
+          if (
+            proficiencyCalculationMethodChanged ||
+            proficiencyCalculationIntChanged ||
+            !outcome.calculationMethod
+          ) {
             input.calculationMethod = proficiencyCalculationMethod
             input.calculationInt = calculationInt
           }
-          if (proficiencyRatingsChanged) {
-            const {masteryPoints: inputMasteryPoints, ratings: inputRatings} =
-              processRatingsAndMastery(ratings, masteryPoints.value)
-            input.masteryPoints = inputMasteryPoints
+          if (proficiencyRatingsChanged || !outcome.ratings) {
+            const {masteryPoints, ratings: inputRatings} = convertRatings(ratings)
+            input.masteryPoints = masteryPoints
             input.ratings = inputRatings
           }
         }
@@ -271,8 +271,6 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
             <View as="div" padding="small 0 0">
               <Ratings
                 ratings={ratings}
-                masteryPoints={masteryPoints}
-                onChangeMasteryPoints={setMasteryPoints}
                 onChangeRatings={setRatings}
                 canManage={!!attributesEditable.individualRatings}
               />

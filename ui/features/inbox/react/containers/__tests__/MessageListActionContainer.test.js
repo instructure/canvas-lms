@@ -31,16 +31,6 @@ describe('MessageListActionContainer', () => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
-
-    window.matchMedia = jest.fn().mockImplementation(() => {
-      return {
-        matches: true,
-        media: '',
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn()
-      }
-    })
   })
 
   afterEach(() => {
@@ -230,16 +220,15 @@ describe('MessageListActionContainer', () => {
     expect(window.confirm).toHaveBeenCalled()
   })
 
-  it('should trigger delete function', async () => {
-    const deleteMock = jest.fn()
+  it('should trigger confirm when deleting', async () => {
+    window.confirm = jest.fn(() => true)
     const component = setup({
       deleteDisabled: false,
-      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}],
-      onDelete: deleteMock
+      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}]
     })
 
     const deleteBtn = await component.findByTestId('delete')
     fireEvent.click(deleteBtn)
-    expect(deleteMock).toHaveBeenCalled()
+    expect(window.confirm).toHaveBeenCalled()
   })
 })

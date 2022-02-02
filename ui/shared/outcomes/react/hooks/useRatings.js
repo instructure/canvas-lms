@@ -16,38 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo, useState, useCallback} from 'react'
+import {useMemo, useState} from 'react'
 import I18n from 'i18n!ProficiencyTable'
 import uuid from 'uuid/v1'
-import useBoolean from './useBoolean'
 
 const floatRegex = /^[+-]?\d+(\.\d+)?$/
 
-export const createRating = (description, points) => ({
+export const createRating = (description, points, color, mastery = false) => ({
   description,
   points,
-  key: uuid()
+  key: uuid(),
+  color,
+  mastery
 })
 
-export const defaultRatings = [
-  createRating(I18n.t('Exceeds Mastery'), 4),
-  createRating(I18n.t('Mastery'), 3),
-  createRating(I18n.t('Near Mastery'), 2),
-  createRating(I18n.t('Below Mastery'), 1),
-  createRating(I18n.t('Well Below Mastery'), 0)
+export const defaultOutcomesManagementRatings = [
+  createRating(I18n.t('Exceeds Mastery'), 4, '127A1B'),
+  createRating(I18n.t('Mastery'), 3, '00AC18', true),
+  createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
+  createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),
+  createRating(I18n.t('Well Below Mastery'), 0, 'EE0612')
 ]
-
-export const defaultMasteryPoints = 3
-
-export const prepareRatings = ratings =>
-  (ratings || []).map(({description, points}) => createRating(description, points))
 
 const invalidDescription = description => (description?.trim() || '').length === 0
 
-const useRatings = ({initialRatings, initialMasteryPoints}) => {
-  const [ratings, setRatings] = useState(() => prepareRatings(initialRatings))
-  const [masteryPoints, setMasteryPoints] = useState(initialMasteryPoints)
-  const [hasChanged, setHasChanged] = useBoolean(false)
+const useRatings = ({initialRatings}) => {
+  const [ratings, setRatings] = useState(initialRatings)
 
   const ratingsWithValidations = useMemo(() => {
     const allPoints = ratings.map(r => r.points)
@@ -76,69 +70,24 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
 
       return {
         ...r,
-        points,
         pointsError,
         descriptionError
       }
     })
   }, [ratings])
 
-  const masteryPointsWithValidations = useMemo(() => {
-    let error = null
-    const masteryPointsFloat = masteryPoints ? parseFloat(masteryPoints) : null
-
-    if (ratings.length > 0) {
-      const sortedRatings = [...ratings].sort((a, b) => parseFloat(a.points) - parseFloat(b.points))
-      const minRatingPoints = parseFloat(sortedRatings[0].points)
-      const maxRatingPoints = parseFloat(sortedRatings[sortedRatings.length - 1].points)
-
-      if ([null, undefined, ''].includes(masteryPoints)) {
-        error = I18n.t('Missing required points')
-      } else if (!floatRegex.test(masteryPoints)) {
-        error = I18n.t('Invalid points')
-      } else if (masteryPointsFloat < 0) {
-        error = I18n.t('Negative points')
-      } else if (masteryPointsFloat > maxRatingPoints) {
-        error = I18n.t('Above max rating')
-      } else if (masteryPointsFloat < minRatingPoints) {
-        error = I18n.t('Below min rating')
-      }
-    }
-
-    return {
-      value: masteryPointsFloat,
-      error
-    }
-  }, [ratings, masteryPoints])
-
   const hasError = useMemo(() => {
-    return (
-      ratingsWithValidations.some(r => r.pointsError || r.descriptionError) ||
-      masteryPointsWithValidations.error
-    )
-  }, [ratingsWithValidations, masteryPointsWithValidations])
+    return ratingsWithValidations.some(r => r.pointsError || r.descriptionError)
+  }, [ratingsWithValidations])
 
-  const changeRatings = useCallback(
-    value => {
-      if (!hasChanged) setHasChanged()
-      setRatings(value)
-    },
-    [hasChanged, setHasChanged]
-  )
-
-  const changeMasteryPoints = useCallback(
-    value => {
-      if (!hasChanged) setHasChanged()
-      setMasteryPoints(value)
-    },
-    [hasChanged, setHasChanged]
+  const hasChanged = useMemo(
+    () => JSON.stringify(ratings) !== JSON.stringify(initialRatings),
+    [ratings, initialRatings]
   )
 
   return {
     ratings: ratingsWithValidations,
-    masteryPoints: masteryPointsWithValidations,
-    setRatings: changeRatings,
-    setMasteryPoints: changeMasteryPoints,
+    setRatings,
     hasError,
     hasChanged
   }

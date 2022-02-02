@@ -99,6 +99,7 @@ shared_examples_for "k5 subject grades" do
       assignments.each { |a| @subject_course.submissions.create!(user: @student, assignment_id: a) }
 
       get "/courses/#{@subject_course.id}#grades"
+
       scroll_to(grades_assignments_links[-1])
 
       # Find the first assignment link that is not overlapped by the K5 header
@@ -108,12 +109,10 @@ shared_examples_for "k5 subject grades" do
 
       # Tab backwards to focus the previous two assignment links hidden under the K5 header
       first_visible_link.send_keys([:shift, :tab])
+      focused_element.send_keys([:shift, :tab])
 
       # Assert that the viewport scrolled up to reveal the hidden links
-      keep_trying_until do
-        focused_element.send_keys([:shift, :tab])
-        expect(scroll_height).to be < initial_scroll_height
-      end
+      keep_trying_until { expect(scroll_height).to be < initial_scroll_height }
     end
   end
 end

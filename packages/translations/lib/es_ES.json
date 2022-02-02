@@ -24,10 +24,10 @@
         "message": "Añadir imagen"
     },
     "add_to_do_7537af64": {
-        "message": "Añadir tarea pendiente"
+        "message": "Añadir actividad pendiente"
     },
     "add_to_do_7def3c37": {
-        "message": "Añadir tarea pendiente"
+        "message": "Añadir actividad pendiente"
     },
     "address_3159962f": {
         "message": "Dirección:"
@@ -255,7 +255,7 @@
         "message": "Cerrar"
     },
     "close_opportunity_center_popup_9907d981": {
-        "message": "Cerrar ventana emergente del Centro de oportunidades"
+        "message": "Cerrar ventana emergente del centro de oportunidades"
     },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "El archivo de transcripción de audio debe tener menos de { maxKb } kb"
@@ -294,10 +294,10 @@
         "message": "{ count, plural,\n     =0 {0 palabras}\n    one {1 palabra}\n  other {# palabras}\n}"
     },
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}"
+        "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}"
     },
     "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {Ocultar # ítem no presentado}\n  other {Ocultar # ítems no presentados}\n}"
+        "message": "{ count, plural,\n    one {Ocultar # ítem faltante}\n  other {Ocultar # ítems faltantes}\n}"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# ítem cargado}\n  other {# ítems cargados}\n}"
@@ -306,34 +306,34 @@
         "message": "{ count, plural,\n    one {Mostrar # ítem completado}\n  other {Mostrar # ítems completados}\n}"
     },
     "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {Mostrar # ítem no presentado}\n  other {Mostrar # ítems no presentados}\n}"
+        "message": "{ count, plural,\n    one {Mostrar # ítem faltante}\n  other {Mostrar # ítems faltantes}\n}"
     },
     "course_8a63b4a3": {
         "message": "Curso"
     },
     "course_documents_104d76e0": {
-        "message": "Documentos de la asignatura"
+        "message": "Documentos del curso"
     },
     "course_files_62deb8f8": {
-        "message": "Archivos de la asignatura"
+        "message": "Archivos del curso"
     },
     "course_files_a31f97fc": {
-        "message": "Archivos de la asignatura"
+        "message": "Archivos del curso"
     },
     "course_images_f8511d04": {
-        "message": "Imágenes de la asignatura"
+        "message": "Imágenes del curso"
     },
     "course_links_b56959b9": {
-        "message": "Enlaces de la asignatura"
+        "message": "Enlaces del curso"
     },
     "course_media_ec759ad": {
-        "message": "Multimedia de la asignatura"
+        "message": "Multimedia del curso"
     },
     "course_navigation_dd035109": {
-        "message": "Navegación de la asignatura"
+        "message": "Navegación del curso"
     },
     "course_to_do_bcbbab54": {
-        "message": "{ course } TAREAS PENDIENTES"
+        "message": "{ course } PENDIENTE"
     },
     "create_button_and_icon_5c089934": {
         "message": "Crear botón e ícono"
@@ -567,7 +567,7 @@
         "message": "No se ha podido eliminar { name }."
     },
     "failed_to_delete_to_do_64edff49": {
-        "message": "Error al eliminar tareas pendientes"
+        "message": "Error al eliminar actividades pendientes"
     },
     "failed_to_get_new_activity_17e7ec7c": {
         "message": "Error al obtener nueva actividad"
@@ -576,7 +576,7 @@
         "message": "Error al cargar oportunidades"
     },
     "failed_to_save_to_do_ddc7503b": {
-        "message": "Error al guardar tareas pendientes"
+        "message": "Error al guardar actividades pendientes"
     },
     "feedback_6dcc1991": {
         "message": "Comentarios"
@@ -624,7 +624,7 @@
         "message": "Pantalla completa"
     },
     "fun_quiz_47ab0b0": {
-        "message": "Prueba divertido"
+        "message": "Examen divertido"
     },
     "generating_preview_45b53be0": {
         "message": "Generando la vista previa..."
@@ -765,7 +765,7 @@
         "message": "Salte a la barra de herramientas de navegación"
     },
     "jump_to_today_254ccf41": {
-        "message": "Hoy"
+        "message": "Saltar a hoy"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Métodos abreviados de teclado"
@@ -816,7 +816,7 @@
         "message": "Cargando"
     },
     "loading_failed_b3524381": {
-        "message": "La carga ha fallado."
+        "message": "La carga ha fallado..."
     },
     "loading_failed_e6a9d8ef": {
         "message": "La carga ha fallado."
@@ -867,13 +867,13 @@
         "message": "Misceláneo"
     },
     "missing_1a256b3b": {
-        "message": "No presentado"
+        "message": "Faltante"
     },
     "missing_items_for_title_516511f8": {
-        "message": "Ítems no presentados para { title }"
+        "message": "Ítems faltantes para { title }"
     },
     "modules_c4325335": {
-        "message": "Contenidos"
+        "message": "Módulos"
     },
     "multi_color_image_63d7372f": {
         "message": "Imagen multicolor"
@@ -912,7 +912,7 @@
         "message": "Mes siguiente"
     },
     "next_page_d2a39853": {
-        "message": "Siguiente página"
+        "message": "Próxima página"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "No hay fechas de entrega asignadas"
@@ -1077,10 +1077,10 @@
         "message": "Publicado: { when }"
     },
     "quiz_e0dcce8f": {
-        "message": "Prueba"
+        "message": "Examen"
     },
     "quizzes_7e598f57": {
-        "message": "Pruebas"
+        "message": "Evaluaciones"
     },
     "raw_html_editor_e3993e41": {
         "message": "Editor HTML puro"
@@ -1152,7 +1152,7 @@
         "message": "Seleccionar idioma"
     },
     "selected_274ce24f": {
-        "message": "Seleccionado"
+        "message": "Seleccionada"
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Mayúsc-O para abrir el editor html agradable."
@@ -1248,7 +1248,7 @@
         "message": "Subíndice"
     },
     "success_to_do_created_e34ed395": {
-        "message": "Hecho: Tarea pendiente creada"
+        "message": "Hecho: Actividad pendiente creada"
     },
     "superscript_8cb349a2": {
         "message": "Superíndice"
@@ -1263,7 +1263,7 @@
         "message": "Cambiar al editor de texto enriquecido"
     },
     "syllabus_f191f65b": {
-        "message": "Programa de la asignatura"
+        "message": "Programa del curso"
     },
     "tab_arrows_4cf5abfc": {
         "message": "Tabulador/flechas"
@@ -1290,7 +1290,7 @@
         "message": "La mejor actividad"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "La fecha y la hora de entrega de esta tarea pendiente han vencido"
+        "message": "La fecha y la hora de entrega de esta actividad pendiente han vencido"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "El material es de dominio público"
@@ -1326,16 +1326,16 @@
         "message": "Para publicar: { when }"
     },
     "to_do_1d554f36": {
-        "message": "Tareas pendientes"
+        "message": "Pendiente"
     },
     "to_do_date_4b211ad0": {
-        "message": "Tareas pendientes: { date }"
+        "message": "Pendiente: { date }"
     },
     "to_do_items_loading_d1cdfcd5": {
-        "message": "Cargando las tareas pendientes"
+        "message": "Cargando los ítems pendientes"
     },
     "to_do_when_2783d78f": {
-        "message": "Tareas pendientes: { when }"
+        "message": "Pendiente: { when }"
     },
     "today_76e10f9c": {
         "message": "Hoy"

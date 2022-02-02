@@ -56,7 +56,6 @@ export const Discussion = {
       canReplyAnonymously
       lockAt
       availableForUser
-      userCount
       entryCounts {
         unreadCount
         repliesCount
@@ -116,7 +115,6 @@ export const Discussion = {
     canReplyAnonymously: bool,
     searchEntryCount: number,
     availableForUser: bool,
-    userCount: number,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number
@@ -159,7 +157,6 @@ export const Discussion = {
     canReplyAnonymously = false,
     searchEntryCount = 3,
     availableForUser = true,
-    userCount = 4,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -210,7 +207,6 @@ export const Discussion = {
     canReplyAnonymously,
     entryCounts,
     availableForUser,
-    userCount,
     author,
     anonymousAuthor,
     editor,

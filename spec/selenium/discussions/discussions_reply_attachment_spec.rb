@@ -35,87 +35,59 @@ describe "reply attachment" do
     stub_rcs_config
   end
 
-  context "when react_discussions_post ff is OFF" do
-    before :once do
-      Account.site_admin.disable_feature! :react_discussions_post
-    end
+  it "creates a discussion" do
+    Discussion.visit(@course, @topic)
 
-    it "allows reply after cancel" do
-      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      f(".discussion-reply-box").click
-      wait_for_tiny(f("#root_reply_message_for_#{@topic.id}"))
-      f(".cancel_button").click
-      force_click(".discussion-reply-box")
-      wait_for_ajaximations
-      begin
-        tinymce = f(".tox-tinymce")
-        expect(tinymce.enabled?).to eq true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        expect("tinymce not loaded").to eq "loaded"
-      end
-    end
+    expect(f(".discussion-title").text).to eq @topic_title
+  end
 
-    it "replies to the discussion with attachment" do
-      file_attachment = "graded.png"
-      entry_text = "new entry"
-      Discussion.visit(@course, @topic)
-
-      add_reply(entry_text, file_attachment)
-      expect(get_all_replies.count).to eq 1
-
-      expect(@last_entry.find_element(:css, ".message").text).to eq entry_text
-      expect(@last_entry.find_element(:css, ".comment_attachments a.image")).to be_displayed
-    end
-
-    it "deletes the attachment from the reply" do
-      skip_if_chrome("Cancel button click does not reliably happen")
-      file_attachment = "graded.png"
-      entry_text = "new entry"
-      Discussion.visit(@course, @topic)
-
-      add_reply(entry_text, file_attachment)
-
-      # open the gear menu
-      @last_entry.find_element(:css, ".admin-links a").click
-      # click on edit
-      @last_entry.find_element(:css, ".al-options li.ui-menu-item:nth-of-type(2)").click
-      # click on the cancel attachment button
-      @last_entry.find_element(:css, ".comment_attachments .cancel_button").click
-      # the attachment is hidden
-      expect(@last_entry.find_element(:css, ".comment_attachments > div").displayed?).to be(false)
-
-      # click Done
-      @last_entry.find_element(:css, ".edit_html_done").click
-      # attachment is gone
-      expect(@last_entry).not_to contain_css(".comment_attachments")
+  it "allows reply after cancel" do
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    f(".discussion-reply-box").click
+    wait_for_tiny(f("#root_reply_message_for_#{@topic.id}"))
+    f(".cancel_button").click
+    force_click(".discussion-reply-box")
+    wait_for_ajaximations
+    begin
+      tinymce = f(".tox-tinymce")
+      expect(tinymce.enabled?).to eq true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      expect("tinymce not loaded").to eq "loaded"
     end
   end
 
-  context "when react_discussions_post ff is ON" do
-    before :once do
-      Account.site_admin.enable_feature! :react_discussions_post
-    end
+  it "replies to the discussion with attachment" do
+    file_attachment = "graded.png"
+    entry_text = "new entry"
+    Discussion.visit(@course, @topic)
 
-    it "can view and delete legacy reply attachments" do
-      entry = @topic.discussion_entries.create!(
-        user: @student,
-        message: "new threaded reply from student",
-        attachment: attachment_model
-      )
+    add_reply(entry_text, file_attachment)
+    expect(get_all_replies.count).to eq 1
 
-      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      attachment_link = fj("a:contains('#{entry.attachment.filename}')")
-      expect(attachment_link).to be_truthy
-      expect(attachment_link.attribute("href")).to include("/files/#{entry.attachment.id}")
+    expect(@last_entry.find_element(:css, ".message").text).to eq entry_text
+    expect(@last_entry.find_element(:css, ".comment_attachments a.image")).to be_displayed
+  end
 
-      f("button[data-testid='thread-actions-menu']").click
-      fj("li:contains('Edit')").click
-      driver.action.move_to(fj("a:contains('#{entry.attachment.filename}')")).perform # hover
-      f("button[data-testid='remove-button']").click
-      expect(f("body")).not_to contain_jqcss("a:contains('#{entry.attachment.filename}')")
-      fj("button:contains('Save')").click
-      wait_for_ajaximations
-      expect(f("body")).not_to contain_jqcss("a:contains('#{entry.attachment.filename}')")
-    end
+  it "deletes the attachment from the reply" do
+    skip_if_chrome("Cancel button click does not reliably happen")
+    file_attachment = "graded.png"
+    entry_text = "new entry"
+    Discussion.visit(@course, @topic)
+
+    add_reply(entry_text, file_attachment)
+
+    # open the gear menu
+    @last_entry.find_element(:css, ".admin-links a").click
+    # click on edit
+    @last_entry.find_element(:css, ".al-options li.ui-menu-item:nth-of-type(2)").click
+    # click on the cancel attachment button
+    @last_entry.find_element(:css, ".comment_attachments .cancel_button").click
+    # the attachment is hidden
+    expect(@last_entry.find_element(:css, ".comment_attachments > div").displayed?).to be(false)
+
+    # click Done
+    @last_entry.find_element(:css, ".edit_html_done").click
+    # attachment is gone
+    expect(@last_entry).not_to contain_css(".comment_attachments")
   end
 end

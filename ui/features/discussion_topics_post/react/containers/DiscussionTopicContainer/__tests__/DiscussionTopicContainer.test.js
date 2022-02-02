@@ -577,33 +577,18 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
   })
 
-  it('should show discussion availability container for ungraded discussions', () => {
-    const mockSections = [
-      {
-        id: 'U2VjdGlvbi00',
-        _id: '1',
-        userCount: 5,
-        name: 'section 1'
-      },
-      {
-        id: 'U2VjdGlvbi00',
-        _id: '2',
-        userCount: 99,
-        name: 'section 2'
-      }
-    ]
-
+  it('should show availability window for ungraded discussions', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
         assignment: null,
-        courseSections: mockSections,
         delayedPostAt: '2021-03-21T00:00:00-06:00',
-        lockAt: '2021-09-03T23:59:59-06:00',
-        groupSet: null
+        lockAt: '2021-09-03T23:59:59-06:00'
       })
     })
 
-    expect(container.getByTestId('view-availability-button')).toBeTruthy()
+    expect(
+      container.getByText('Available from Mar 21, 2021 6am until Sep 4, 2021 5:59am')
+    ).toBeTruthy()
   })
 
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {

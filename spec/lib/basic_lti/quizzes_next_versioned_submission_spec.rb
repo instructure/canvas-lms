@@ -88,24 +88,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     XML
   end
 
-  describe "#active?" do
-    context "when submission is deleted" do
-      before do
-        subject.send(:submission).update_column :workflow_state, "deleted"
-      end
-
-      it "returns false" do
-        expect(subject.active?).to eq false
-      end
-    end
-
-    context "when submission is active" do
-      it "returns true" do
-        expect(subject.active?).to eq true
-      end
-    end
-  end
-
   describe "#grade_history" do
     before do
       submission = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)

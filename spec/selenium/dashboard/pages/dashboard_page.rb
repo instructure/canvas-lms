@@ -29,18 +29,6 @@ module DashboardPage
     "#dashboard"
   end
 
-  def coming_up_selector
-    ".coming_up"
-  end
-
-  def recent_feedback_selector
-    ".recent_feedback"
-  end
-
-  def body_selector
-    "body"
-  end
-
   #------------------------- Elements --------------------------
   def card_container
     f(card_container_selector)
@@ -48,17 +36,5 @@ module DashboardPage
 
   def dashboard_container
     f(dashboard_container_selector)
-  end
-
-  def coming_up
-    f(coming_up_selector)
-  end
-
-  def recent_feedback
-    f(recent_feedback_selector)
-  end
-
-  def body
-    f(body_selector)
   end
 end

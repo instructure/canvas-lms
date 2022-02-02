@@ -90,7 +90,6 @@ $.fn.datepicker = function (options) {
       options.prevOnSelect.call(this, text, picker)
     }
     const $div = picker.dpDiv
-    const $input = picker.input
     // We want to pass the inputdate metadata back into our target because
     // if there has been a change via the datepicker, there's no guarantee
     // that the formatted value we are about to jam into the input field
@@ -104,41 +103,29 @@ $.fn.datepicker = function (options) {
       picker.selectedMonth,
       parseInt(picker.selectedDay, 10)
     )
-    const format = {month: 'short', day: 'numeric', year: 'numeric'}
 
-    const hr =
-      $div.find('.ui-datepicker-time-hour').val() ||
-      $input.data('time-hour') ||
-      $input.data('timeHour')
-    const min =
-      $div.find('.ui-datepicker-time-minute').val() ||
-      $input.data('time-minute') ||
-      $input.data('timeMinute')
-    const ampm =
-      $div.find('.ui-datepicker-time-ampm').val() ||
-      $input.data('time-ampm') ||
-      $input.data('timeAmpm')
+    const hr = $div.find('.ui-datepicker-time-hour').val() || $(this).data('time-hour')
+    const min = $div.find('.ui-datepicker-time-minute').val() || $(this).data('time-minute')
+    const ampm = $div.find('.ui-datepicker-time-ampm').val() || $(this).data('time-ampm')
     if (hr || min) {
-      let numericHr = parseInt(hr || '0', 10)
+      let numericHr = parseInt(hr, 10)
       const numericMin = parseInt(min || '0', 10)
-
+      let meridiem = ''
       if (tz.hasMeridian()) {
         const isPM =
           !ampm || !!ampm.match(new RegExp('^' + I18n.t('#time.pm'), 'i')) || numericHr > 12
+        meridiem = ' ' + (isPM ? I18n.t('#time.pm') : I18n.t('#time.am'))
         numericHr %= 12
-        if (isPM) numericHr = (numericHr + 12) % 24
+        text += ' ' + (numericHr || 12).toString() + ':' + (min || '00') + meridiem
+        if (isPM) numericHr += 12
       }
-
       inputdate.setHours(numericHr)
       inputdate.setMinutes(numericMin)
-      format.hour = 'numeric'
-      format.minute = 'numeric'
     }
     // We have to be careful because Date objects are always in the browser's
     // timezone, not necessarily what's reflected by ENV.TIMEZONE.
-    $input.data('inputdate', changeTimezone(inputdate, {desiredTZ: ENV.TIMEZONE}))
-    const formatter = new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, format)
-    $input.val(formatter.format(inputdate)).change()
+    picker.input.data('inputdate', changeTimezone(inputdate, {desiredTZ: ENV.TIMEZONE}))
+    picker.input.val(text).change()
   }
   if (!$.fn.datepicker.timepicker_initialized) {
     $(document).delegate('.ui-datepicker-ok', 'click', () => {

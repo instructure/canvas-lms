@@ -23,7 +23,7 @@
 </div>
 <% end %>
 <%# Use the legacy to do list for non-students until it works for those roles %>
-<% if (planner_enabled? && !@user.non_student_enrollment?) || @is_observing_student %>
+<% if planner_enabled? && !@current_user.non_student_enrollment? %>
   <div class="Sidebar__TodoListContainer"></div>
 <% else %>
   <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true} %>

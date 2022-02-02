@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
+import {AssignmentDetails} from '../../components/AssignmentDetails/AssignmentDetails'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
-import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
+import {getSpeedGraderUrl, isGraded, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
@@ -53,6 +53,7 @@ import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+import {AssignmentAvailabilityWindow} from '../../components/AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 
@@ -227,7 +228,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           alert: {
             textSize: 'small'
           },
-          discussionDetails: {
+          assignmentDetails: {
             margin: '0'
           },
           border: {
@@ -254,7 +255,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           alert: {
             textSize: 'medium'
           },
-          discussionDetails: {
+          assignmentDetails: {
             margin: '0 0 small 0'
           },
           border: {
@@ -297,30 +298,43 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       <LockedDiscussion title={props.discussionTopic.title} />
                     ) : (
                       <Flex direction="column" padding={responsiveProps.container.padding}>
-                        <Flex.Item
-                          shouldShrink
-                          shouldGrow
-                          margin={responsiveProps.discussionDetails.margin}
-                        >
-                          <DiscussionDetails discussionTopic={props.discussionTopic} />
-                          {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
-                            assessmentRequest => (
-                              <PeerReview
-                                key={assessmentRequest._id}
-                                dueAtDisplayText={
-                                  props.discussionTopic.assignment.peerReviews?.dueAt
-                                }
-                                revieweeName={assessmentRequest.user.displayName}
-                                reviewLinkUrl={getReviewLinkUrl(
-                                  ENV.course_id,
-                                  props.discussionTopic.assignment._id,
-                                  assessmentRequest.user._id
-                                )}
-                                workflowState={assessmentRequest.workflowState}
-                              />
-                            )
-                          )}
-                        </Flex.Item>
+                        {isGraded(props.discussionTopic.assignment) ? (
+                          <Flex.Item
+                            shouldShrink
+                            shouldGrow
+                            margin={responsiveProps.assignmentDetails.margin}
+                          >
+                            <AssignmentDetails
+                              pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
+                              assignment={props.discussionTopic.assignment}
+                              isAdmin={props.discussionTopic.permissions.readAsAdmin}
+                            />
+                            {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
+                              assessmentRequest => (
+                                <PeerReview
+                                  key={assessmentRequest._id}
+                                  dueAtDisplayText={
+                                    props.discussionTopic.assignment.peerReviews?.dueAt
+                                  }
+                                  revieweeName={assessmentRequest.user.displayName}
+                                  reviewLinkUrl={getReviewLinkUrl(
+                                    ENV.course_id,
+                                    props.discussionTopic.assignment._id,
+                                    assessmentRequest.user._id
+                                  )}
+                                  workflowState={assessmentRequest.workflowState}
+                                />
+                              )
+                            )}
+                          </Flex.Item>
+                        ) : (
+                          <AssignmentAvailabilityWindow
+                            availableDate={props.discussionTopic.delayedPostAt}
+                            untilDate={props.discussionTopic.lockAt}
+                            showOnMobile
+                            showDateWithTime
+                          />
+                        )}
                         <Flex.Item shouldShrink shouldGrow>
                           <DiscussionEntryContainer
                             isTopic

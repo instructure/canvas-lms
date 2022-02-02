@@ -17,126 +17,127 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
-import SavedButtonList from '../SavedButtonList'
+import {render, waitFor} from '@testing-library/react'
+import sinon from 'sinon'
 
-jest.mock('../../../shared/StoreContext', () => {
-  return {
-    useStoreProps: () => ({
-      images: {
-        Course: {
-          files: [
-            {
-              id: 722,
-              filename: 'grid.png',
-              thumbnail_url:
-                'http://canvas.docker/images/thumbnails/722/E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
-              display_name: 'image_one.png',
-              href: 'http://canvas.docker/courses/21/files/722?wrap=1',
-              download_url: 'http://canvas.docker/files/722/download?download_frd=1',
-              content_type: 'image/png',
-              published: true,
-              hidden_to_user: true,
-              locked_for_user: false,
-              unlock_at: null,
-              lock_at: null,
-              date: '2021-11-03T19:21:27Z',
-              uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
-            },
-            {
-              id: 716,
-              filename: '1635371359_565__0266554465.jpeg',
-              thumbnail_url:
-                'http://canvas.docker/images/thumbnails/716/9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
-              display_name: 'image_two.jpg',
-              href: 'http://canvas.docker/courses/21/files/716?wrap=1',
-              download_url: 'http://canvas.docker/files/716/download?download_frd=1',
-              content_type: 'image/jpeg',
-              published: true,
-              hidden_to_user: false,
-              locked_for_user: false,
-              unlock_at: null,
-              lock_at: null,
-              date: '2021-10-27T21:49:19Z',
-              uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
-            },
-            {
-              id: 715,
-              filename: '1635371358_548__h3zmqPb-6dw.jpg',
-              thumbnail_url:
-                'http://canvas.docker/images/thumbnails/715/rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
-              display_name: 'image_three.jpg',
-              href: 'http://canvas.docker/courses/21/files/715?wrap=1',
-              download_url: 'http://canvas.docker/files/715/download?download_frd=1',
-              content_type: 'image/jpeg',
-              published: true,
-              hidden_to_user: false,
-              locked_for_user: false,
-              unlock_at: null,
-              lock_at: null,
-              date: '2021-10-27T21:49:18Z',
-              uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
-            }
-          ],
-          bookmark: 'bookmark',
-          isLoading: false,
-          hasMore: false
-        }
-      },
-      contextType: 'Course',
-      fetchInitialImages: jest.fn(),
-      fetchNextImages: jest.fn()
-    })
-  }
-})
+import RceApiSource from '../../../../../rcs/api'
 
-describe('SavedButtonList()', () => {
-  let props
-  const subject = () => render(<SavedButtonList {...props} />)
+import SavedButtonList, {rceToFile} from '../SavedButtonList'
+
+describe('RCE "Buttons and Icons" Plugin > SavedButtonList', () => {
+  let defaultProps, fetchPageStub, globalFetchStub
+
+  const apiSource = new RceApiSource({
+    alertFunc: () => {},
+    jwt: 'theJWT'
+  })
 
   beforeEach(() => {
-    props = {
-      onImageEmbed: jest.fn()
+    globalFetchStub = sinon.stub(global, 'fetch')
+    const context = {id: '101', type: 'course'}
+    const buttonsAndIconsFolder = {filesUrl: 'http://rce.example.com/api/folders/52', id: '1'}
+    const buttonAndIcon = {
+      createdAt: '',
+      id: 1,
+      name: 'button.svg',
+      thumbnailUrl: '',
+      type: 'image/svg+xml',
+      url: ''
+    }
+    const otherImage = {
+      createdAt: '',
+      id: 2,
+      name: 'screenshot.jpg',
+      thumbnailUrl: '',
+      type: 'image/jpeg',
+      url: ''
+    }
+    const folders = [buttonsAndIconsFolder]
+
+    fetchPageStub = sinon.stub(apiSource, 'fetchPage')
+    fetchPageStub
+      .withArgs(`/api/folders/buttons_and_icons?contextType=course&contextId=${context.id}`)
+      .returns(Promise.resolve({folders}))
+
+    fetchPageStub
+      .withArgs(
+        'http://rce.example.com/api/folders/52?per_page=25&sort=created_at&order=desc',
+        'theJWT'
+      )
+      .returns(Promise.resolve({bookmark: '', files: [buttonAndIcon, otherImage]}))
+
+    defaultProps = {
+      context,
+      onImageEmbed: () => {},
+      searchString: '',
+      sortBy: {order: 'desc', sort: 'date_added'},
+      source: apiSource
     }
   })
 
-  afterEach(() => jest.clearAllMocks())
-
-  it('renders the image list', () => {
-    const {getByTitle} = subject()
-
-    expect(getByTitle('Click to embed image_one.png')).toBeInTheDocument()
-    expect(getByTitle('Click to embed image_two.jpg')).toBeInTheDocument()
-    expect(getByTitle('Click to embed image_three.jpg')).toBeInTheDocument()
+  afterEach(() => {
+    fetchPageStub.restore()
+    globalFetchStub.restore()
   })
 
-  describe('when an image is clicked', () => {
-    beforeEach(() => {
-      const {getByTitle} = subject()
+  const renderComponent = componentProps => {
+    return render(<SavedButtonList {...defaultProps} {...componentProps} />)
+  }
 
-      // Click the first image
-      fireEvent.click(getByTitle('Click to embed image_one.png'))
-    })
+  it('loads and displays svgs', async () => {
+    const {getByAltText} = renderComponent()
 
-    it('dispatches a "loading" action', () => {
-      expect(props.onImageEmbed.mock.calls[0][0]).toMatchInlineSnapshot(`
-        Object {
-          "content_type": "image/png",
-          "date": "2021-11-03T19:21:27Z",
-          "display_name": "image_one.png",
-          "download_url": "http://canvas.docker/files/722/download?download_frd=1",
-          "filename": "grid.png",
-          "hidden_to_user": true,
-          "href": "http://canvas.docker/courses/21/files/722?wrap=1",
-          "id": 722,
-          "lock_at": null,
-          "locked_for_user": false,
-          "published": true,
-          "thumbnail_url": "http://canvas.docker/images/thumbnails/722/E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b",
-          "unlock_at": null,
-          "uuid": "E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b",
-        }
-      `)
-    })
+    await waitFor(() => expect(getByAltText('button.svg')).toBeInTheDocument())
+  })
+
+  it('ignores non-svg files', async () => {
+    const {queryByAltText} = renderComponent()
+
+    await waitFor(() => queryByAltText('button.svg') != null)
+
+    expect(queryByAltText('screenshot.jpg')).toBeNull()
+  })
+})
+
+describe('rceToFile', () => {
+  const rceFile = {
+    createdAt: '2021-08-12T18:30:53Z',
+    id: '101',
+    name: 'kitten.gif',
+    thumbnailUrl: 'http://example.com/kitten.png',
+    type: 'image/gif',
+    url: 'http://example.com/kitten.gif'
+  }
+
+  it('returns an object with type as content_type', () => {
+    expect(rceToFile(rceFile).content_type).toStrictEqual('image/gif')
+  })
+
+  it('returns an object with createdAt as date', () => {
+    expect(rceToFile(rceFile).date).toStrictEqual('2021-08-12T18:30:53Z')
+  })
+
+  it('returns an object with name as display_name', () => {
+    expect(rceToFile(rceFile).display_name).toStrictEqual('kitten.gif')
+  })
+
+  it('returns an object with name as filename', () => {
+    expect(rceToFile(rceFile).filename).toStrictEqual('kitten.gif')
+  })
+
+  it('returns an object with url as href', () => {
+    expect(rceToFile(rceFile).href).toStrictEqual('http://example.com/kitten.gif')
+  })
+
+  it('returns an object with id as id', () => {
+    expect(rceToFile(rceFile).id).toStrictEqual('101')
+  })
+
+  it('returns an object with thumbnailUrl as thumbnail_url', () => {
+    expect(rceToFile(rceFile).thumbnail_url).toStrictEqual('http://example.com/kitten.png')
+  })
+
+  it('returns an object with the buttons/icons attr set to true', () => {
+    expect(rceToFile(rceFile)['data-inst-buttons-and-icons']).toEqual(true)
   })
 })

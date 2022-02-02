@@ -24,22 +24,12 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import I18n from 'i18n!gradebook'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
-import type {
-  Assignment,
-  Filter,
-  GradebookFilterApiResponse,
-  GradebookFilterApiRequest,
-  PartialFilter,
-  Section,
-  SectionMap,
-  Submission
-} from './gradebook.d'
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
 }
 
-export function ensureAssignmentVisibility(assignment: Assignment, submission: Submission) {
+export function ensureAssignmentVisibility(assignment, submission) {
   if (
     assignment?.only_visible_to_overrides &&
     !assignment.assignment_visibility.includes(submission.user_id)
@@ -88,7 +78,7 @@ export function getGradeAsPercent(grade) {
   }
 }
 
-export function getStudentGradeForColumn(student, field: string) {
+export function getStudentGradeForColumn(student, field) {
   return student[field] || {score: null, possible: 0}
 }
 
@@ -143,11 +133,11 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
   }
 }
 
-export function hiddenStudentIdsForAssignment(studentIds: string[], assignment: Assignment) {
+export function hiddenStudentIdsForAssignment(studentIds, assignment) {
   return _.difference(studentIds, assignment.assignment_visibility)
 }
 
-export function getDefaultSettingKeyForColumnType(columnType: string) {
+export function getDefaultSettingKeyForColumnType(columnType) {
   if (
     columnType === 'assignment' ||
     columnType === 'assignment_group' ||
@@ -159,70 +149,31 @@ export function getDefaultSettingKeyForColumnType(columnType: string) {
   }
 }
 
-export function sectionList(sections: SectionMap) {
-  const x: Section[] = _.values(sections)
-  return x
-    .sort((a, b) => a.id.localeCompare(b.id))
+export function sectionList(sections) {
+  return _.values(sections)
+    .sort((a, b) => {
+      return a.id - b.id
+    })
     .map(section => {
       return {...section, name: htmlEscape.unescape(section.name)}
     })
 }
 
-export function getCustomColumnId(customColumnId: string) {
+export function getCustomColumnId(customColumnId) {
   return `custom_col_${customColumnId}`
 }
 
-export function getAssignmentColumnId(assignmentId: string) {
+export function getAssignmentColumnId(assignmentId) {
   return `assignment_${assignmentId}`
 }
 
-export function getAssignmentGroupColumnId(assignmentGroupId: string) {
+export function getAssignmentGroupColumnId(assignmentGroupId) {
   return `assignment_group_${assignmentGroupId}`
 }
 
-export function findAllAppliedFilterValuesOfType(type: string, filters: Filter[]) {
+export function findAllAppliedFilterValuesOfType(type, filters) {
   return filters
-    .filter(f => f.is_applied)
+    .filter(f => f.isApplied)
     .flatMap(f => f.conditions.filter(c => c.type === type && c.value))
     .map(c => c.value)
-}
-
-export function getAllAppliedFilterValues(filters: Filter[]) {
-  return filters
-    .filter(f => f.is_applied)
-    .flatMap(f => f.conditions.filter(c => c.value))
-    .map(c => c.value)
-}
-
-// Extra normalization; comes from jsonb payload
-export const deserializeFilter = (json: GradebookFilterApiResponse): Filter => {
-  const filter = json.gradebook_filter
-  if (!filter.id || typeof filter.id !== 'string') throw new Error('invalid filter id')
-  if (!Array.isArray(filter.payload.conditions)) throw new Error('invalid filter conditions')
-  const conditions = filter.payload.conditions.map(c => {
-    if (!c || typeof c.id !== 'string') throw new Error('invalid condition id')
-    return {
-      id: c.id,
-      type: c.type,
-      value: c.value,
-      created_at: String(c.created_at)
-    }
-  })
-  return {
-    id: filter.id,
-    name: String(filter.name),
-    conditions,
-    is_applied: !!filter.payload.is_applied,
-    created_at: String(filter.created_at)
-  }
-}
-
-export const serializeFilter = (filter: PartialFilter): GradebookFilterApiRequest => {
-  return {
-    name: filter.name,
-    payload: {
-      is_applied: filter.is_applied,
-      conditions: filter.conditions
-    }
-  }
 }

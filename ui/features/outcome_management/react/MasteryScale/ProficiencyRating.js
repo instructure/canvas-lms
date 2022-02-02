@@ -45,7 +45,7 @@ class ProficiencyRating extends React.Component {
     descriptionError: PropTypes.string,
     disableDelete: PropTypes.bool.isRequired,
     focusField: PropTypes.oneOf(['description', 'points', 'mastery', 'trash']),
-    mastery: requiredIf(({individualOutcome}) => !individualOutcome, PropTypes.bool),
+    mastery: PropTypes.bool.isRequired,
     onColorChange: requiredIf(({individualOutcome}) => !individualOutcome, PropTypes.func),
     onDelete: PropTypes.func.isRequired,
     onDescriptionChange: PropTypes.func.isRequired,
@@ -224,11 +224,11 @@ class ProficiencyRating extends React.Component {
               }
               onChange={this.handlePointChange}
               defaultValue={I18n.n(points)}
-              width={isMobileView ? '3rem' : '4rem'}
+              width={isMobileView ? '7rem' : '4rem'}
             />
 
             <div className="pointsDescription" aria-hidden="true">
-              {isMobileView ? I18n.t('pts') : I18n.t('points')}
+              {I18n.t('points')}
             </div>
           </>
         ) : (
@@ -364,24 +364,16 @@ class ProficiencyRating extends React.Component {
     const {isMobileView, canManage, individualOutcome} = this.props
     return (
       <Flex
-        padding={`${
-          isMobileView
-            ? '0 0 small 0'
-            : individualOutcome
-            ? '0 small small 0'
-            : '0 small small small'
-        }`}
+        padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}
         width="100%"
         alignItems={isMobileView ? 'center' : 'start'}
       >
-        {!individualOutcome && (
-          <Flex.Item textAlign="center" padding="0 medium 0 0" size={isMobileView ? '25%' : '15%'}>
-            {this.renderMastery()}
-          </Flex.Item>
-        )}
+        <Flex.Item textAlign="center" padding="0 medium 0 0" size={isMobileView ? '25%' : '15%'}>
+          {this.renderMastery()}
+        </Flex.Item>
         <Flex.Item
           padding="0 small 0 0"
-          size={isMobileView ? '75%' : individualOutcome ? (canManage ? '80%' : '60%') : '40%'}
+          size={isMobileView ? '75%' : individualOutcome ? '65%' : '40%'}
           align="start"
         >
           {this.renderDescription()}

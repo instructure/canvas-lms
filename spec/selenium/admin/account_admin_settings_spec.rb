@@ -109,9 +109,7 @@ describe "root account basic settings" do
           wait_for_ajaximations
 
           account.reload
-          expected_settings.each do |key, value|
-            expect(account.settings[key]).to eq value
-          end
+          expect(account.settings).to eq expected_settings
         end
 
         it "lets a user toggle Microsoft Teams sync" do
@@ -130,9 +128,7 @@ describe "root account basic settings" do
           wait_for_ajaximations
 
           account.reload
-          expected_settings.each do |key, value|
-            expect(account.settings[key]).to eq value
-          end
+          expect(account.settings).to eq expected_settings
         end
       end
     end

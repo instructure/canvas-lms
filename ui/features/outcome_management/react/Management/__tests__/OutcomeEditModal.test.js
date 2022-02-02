@@ -28,7 +28,7 @@ import {
   updateLearningOutcomeMocks,
   setFriendlyDescriptionOutcomeMock
 } from '@canvas/outcomes/mocks/Management'
-import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
+import {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
 
 jest.useFakeTimers()
 
@@ -46,8 +46,8 @@ describe('OutcomeEditModal', () => {
     contextId: '1',
     calculationMethod: 'decaying_average',
     calculationInt: 65,
-    masteryPoints: defaultMasteryPoints,
-    ratings: defaultRatings.map(rating => pick(rating, ['description', 'points']))
+    masteryPoints: 3,
+    ratings: defaultOutcomesManagementRatings.map(rating => pick(rating, ['description', 'points']))
   }
 
   const defaultProps = (props = {}) => ({
@@ -328,7 +328,7 @@ describe('OutcomeEditModal', () => {
     })
   })
 
-  describe('Individual Outcome Proficiency and Calculation Feature Flag', () => {
+  describe('with Individual Outcome Proficiency and Calculation Feature Flag enabled', () => {
     describe('when feature flag enabled', () => {
       it('displays calculation method selection form if outcome is created in same context', async () => {
         const {getByLabelText} = renderWithProvider({
@@ -414,7 +414,7 @@ describe('OutcomeEditModal', () => {
         const mocks = updateLearningOutcomeMocks({
           description: 'Updated description',
           displayName: 'Updated friendly outcome name',
-          ratings: defaultRatings
+          ratings: defaultOutcomesManagementRatings
             .filter(r => r.points !== 0)
             .map(rating => pick(rating, ['description', 'points'])),
           individualRatings: true

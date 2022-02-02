@@ -724,7 +724,6 @@ describe Quizzes::QuizSubmission do
     end
 
     context "update_assignment_submission" do
-      let(:lock_at) { 5.days.from_now }
       let(:quiz) do
         quiz = @course.quizzes.create!
         quiz.generate_quiz_data
@@ -732,8 +731,7 @@ describe Quizzes::QuizSubmission do
           published_at: Time.zone.now,
           workflow_state: "available",
           scoring_policy: "keep_highest",
-          due_at: 5.days.from_now,
-          lock_at: lock_at
+          due_at: 5.days.from_now
         )
         quiz
       end
@@ -762,15 +760,6 @@ describe Quizzes::QuizSubmission do
       it "does not set graded_at to be in the future" do
         save_quiz_submission
         expect(submission.graded_at.to_i).to be <= Time.zone.now.to_i
-      end
-
-      it "sets graded_at to current time, even if after end_at" do
-        save_quiz_submission
-        Timecop.freeze(10.days.from_now) do
-          save_quiz_submission
-          expect(submission.graded_at.to_i).to be > lock_at.to_i
-          expect(submission.graded_at.to_i).to eq Time.zone.now.to_i
-        end
       end
 
       it "posts the submission if the assignment is automatically posted" do
