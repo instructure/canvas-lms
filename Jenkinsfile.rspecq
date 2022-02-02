@@ -124,18 +124,21 @@ def sendCrystalballSlack(summary, color, status) {
   slackSend channel: '#crystalball-noisy', color: color, message: message
 }
 
-def sendCrystalballMetrics(startTime, endTime, buildType) {
+def sendCrystalballMetrics(buildType) {
   if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.CRYSTALBALL_SKIP != 'true') {
     def splunkTag =  buildType == 'selenium' ? 'selenium_crystalball_data' : 'rspec_crystalball_data'
     def nodes = buildType == 'selenium' ? seleniumNodeTotal : rspecNodeTotal
 
-    def exampleCount = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
-                                          redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_${buildType}:example_count'", returnStdout: true).replaceAll('"', '').trim()
+    def queueInfo = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+                                          redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_${buildType}:example_count;\
+                                          redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}_${buildType}:build_time'", returnStdout: true).split('\n')
+    def exampleCount = queueInfo[0].replaceAll('"', '').trim()
+    def buildTime = queueInfo[1].replaceAll('"', '').trim()
 
     reportToSplunk(splunkTag, [
                     'node_count': nodes,
                     'example_count': exampleCount.toInteger(),
-                    'execution_time': (endTime - startTime),
+                    'execution_time': buildTime.toInteger(),
                     'result': currentBuild.currentResult,
                     'upstream_tag': "${env.UPSTREAM_TAG}"])
   }
@@ -180,10 +183,6 @@ pipeline {
           env.CRYSTALBALL_SELENIUM = ''
           env.CRYSTALBALL_RSPEC = ''
           env.CRYSTALBALL_SKIP = 'false'
-          def seleniumStartTime = 0
-          def seleniumEndTime = 0
-          def rspecStartTime = 0
-          def rspecEndTime = 0
 
           def postRunnerHandler = [
             onStageEnded: { stageName, stageConfig, result ->
@@ -199,10 +198,10 @@ pipeline {
           def postBuildHandler = [
             onNodeReleasing: {
               if (env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SELENIUM != '') {
-                sendCrystalballMetrics(seleniumStartTime, seleniumEndTime, 'selenium')
+                sendCrystalballMetrics('selenium')
               }
               if (env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_RSPEC != '') {
-                sendCrystalballMetrics(rspecStartTime, rspecEndTime, 'rspec')
+                sendCrystalballMetrics('rspec')
               }
             }
           ]
@@ -230,7 +229,6 @@ pipeline {
 
                 extendedStage('RSpecQ Reporter for Rspec').required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_RSPEC != '').timeout(30).queue(rspecqStages) {
                   try {
-                    rspecStartTime = System.currentTimeMillis()
                     sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
                       --build=${JOB_NAME}_build${BUILD_NUMBER}_rspec \
                       --queue-wait-timeout 240 \
@@ -248,14 +246,11 @@ pipeline {
                       '''
                     }
                     throw e
-                  } finally {
-                    rspecEndTime = System.currentTimeMillis()
                   }
                 }
 
                 extendedStage('RSpecQ Reporter for Selenium').timeout(30).required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SELENIUM != '').queue(rspecqStages) {
                   try {
-                    seleniumStartTime = System.currentTimeMillis()
                     sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
                       --build=${JOB_NAME}_build${BUILD_NUMBER}_selenium \
                       --queue-wait-timeout 120 \
@@ -273,8 +268,6 @@ pipeline {
                       '''
                     }
                     throw e
-                  } finally {
-                    seleniumEndTime = System.currentTimeMillis()
                   }
                 }
 
