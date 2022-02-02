@@ -621,6 +621,11 @@ class UserMerge
                             .where.not(unique_id => already_scope.having_submission.select(unique_id))
                             .where.not(id: to_move_ids)
                             .pluck(:id)
+        to_move_ids += scope.without_submission # placeholder submissions
+                            .select(unique_id)
+                            .where.not(unique_id => already_scope.without_submission.select(unique_id))
+                            .where.not(id: to_move_ids)
+                            .pluck(:id)
         to_move = scope.where(id: to_move_ids).to_a
         move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
         merge_data.build_more_data(to_move, data: data) unless to_move.empty?
@@ -644,7 +649,7 @@ class UserMerge
     @data = []
   end
 
-  def swap_submission(model, move_back, table, to_move, to_move_ids, fk)
+  def swap_submission(model, move_back, table, to_move, to_move_ids, fkey)
     return if to_move_ids.empty?
 
     model.transaction do
@@ -653,7 +658,7 @@ class UserMerge
       # to get around this and to allow us to swap we are setting the
       # user_id to the negative user_id and then the user_id, after the
       # conflicting rows have been updated.
-      model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(fk)} DEFERRED")
+      model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(fkey)} DEFERRED")
       model.where(id: move_back).update_all(user_id: -from_user.id)
       model.where(id: to_move_ids).update_all(user_id: target_user.id)
       model.where(id: move_back).update_all(user_id: from_user.id)

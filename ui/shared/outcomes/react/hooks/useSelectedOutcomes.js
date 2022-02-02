@@ -24,6 +24,14 @@ const useSelectedOutcomes = (initialValue = new Set()) => {
       case 'clear': {
         return new Set()
       }
+      case 'remove': {
+        const {linkId} = action.payload
+        const newState = new Set(prevState)
+        if (newState.has(linkId)) {
+          newState.delete(linkId)
+        }
+        return newState
+      }
       case 'toggle': {
         const {linkId} = action.payload
         const newState = new Set(prevState)
@@ -46,12 +54,16 @@ const useSelectedOutcomes = (initialValue = new Set()) => {
     []
   )
   const clearSelectedOutcomes = useCallback(() => dispatchSelectedOutcomeIds({type: 'clear'}), [])
-
+  const removeSelectedOutcome = useCallback(
+    outcome => dispatchSelectedOutcomeIds({type: 'remove', payload: {linkId: outcome.linkId}}),
+    []
+  )
   return {
     selectedOutcomeIds,
     selectedOutcomesCount,
     toggleSelectedOutcomes,
     clearSelectedOutcomes,
+    removeSelectedOutcome,
     dispatchSelectedOutcomeIds
   }
 }

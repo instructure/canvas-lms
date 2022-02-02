@@ -32,6 +32,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
 async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
   const variables = {submissionAttempt: 0, submissionId: '1', ...variableOverrides}
@@ -110,6 +111,77 @@ describe('CommentsTrayBody', () => {
 
   afterEach(() => {
     window.ENV = originalENV
+  })
+
+  describe('group assignments', () => {
+    it('renders warning that comments will be sent to the whole group for group assignments', async () => {
+      const mocks = [await mockSubmissionCommentQuery()]
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          gradeGroupStudentsIndividually: false,
+          groupSet: {
+            _id: '1',
+            name: 'sample-group-set'
+          },
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.onlineUploadReadyToSubmit
+        }
+      })
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
+      )
+      await waitFor(() =>
+        expect(queryByText('All comments are sent to the whole group.')).toBeInTheDocument()
+      )
+    })
+
+    it('does not render warning for grade students individually group assignments', async () => {
+      const mocks = [await mockSubmissionCommentQuery()]
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          gradeGroupStudentsIndividually: true,
+          groupSet: {
+            _id: '1',
+            name: 'sample-group-set'
+          },
+          submissionTypes: ['online_text_entry', 'online_upload']
+        },
+        Submission: {
+          ...SubmissionMocks.onlineUploadReadyToSubmit
+        }
+      })
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
+      )
+      await waitFor(() =>
+        expect(queryByText('All comments are sent to the whole group.')).not.toBeInTheDocument()
+      )
+    })
+
+    it('does not render group comment warning for non-group assignments', async () => {
+      const mocks = [await mockSubmissionCommentQuery()]
+      const props = await mockAssignmentAndSubmission()
+      const {queryByText} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
+      )
+      await waitFor(() =>
+        expect(queryByText('All comments are sent to the whole group.')).not.toBeInTheDocument()
+      )
+    })
   })
 
   describe('hidden submissions', () => {

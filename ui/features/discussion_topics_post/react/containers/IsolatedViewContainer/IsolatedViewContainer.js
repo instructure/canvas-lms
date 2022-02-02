@@ -181,11 +181,12 @@ export const IsolatedViewContainer = props => {
     }
   }
 
-  const onUpdate = (discussionEntry, message) => {
+  const onUpdate = (discussionEntry, message, fileId) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: discussionEntry._id,
-        message
+        message,
+        removeAttachment: !fileId
       }
     })
   }
@@ -194,25 +195,27 @@ export const IsolatedViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, replyId, includeReplyPreview) => {
+  const onReplySubmit = (message, includeReplyPreview, replyId, isAnonymousAuthor) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         replyFromEntryId: replyId,
+        isAnonymousAuthor,
         message,
-        includeReplyPreview
+        includeReplyPreview,
+        courseID: ENV.course_id
       },
-      optimisticResponse: getOptimisticResponse(
+      optimisticResponse: getOptimisticResponse({
         message,
-        replyId,
-        props.discussionEntryId,
-        null,
-        buildQuotedReply(
+        parentId: replyId,
+        rootEntryId: props.discussionEntryId,
+        quotedEntry: buildQuotedReply(
           isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
           props.replyFromId
         ),
-        !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously
-      )
+        isAnonymous:
+          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously
+      })
     })
   }
 
@@ -430,9 +433,15 @@ export const IsolatedViewContainer = props => {
               margin="none none x-small"
             >
               <DiscussionEdit
-                discussionAnonymousState={props.discussionTopic.anonymousState}
-                onSubmit={(text, includeReplyPreview) => {
-                  onReplySubmit(text, props.replyFromId, includeReplyPreview)
+                discussionAnonymousState={props.discussionTopic?.anonymousState}
+                canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
+                onSubmit={(message, includeReplyPreview, _fileId, anonymousAuthorState) => {
+                  onReplySubmit(
+                    message,
+                    includeReplyPreview,
+                    props.replyFromId,
+                    anonymousAuthorState
+                  )
                   props.setRCEOpen(false)
                 }}
                 onCancel={() => props.setRCEOpen(false)}

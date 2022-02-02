@@ -255,7 +255,8 @@ shared_context "in-process server selenium tests" do
           browser_errors_we_dont_care_about.none? { |s| e.message.include?(s) }
       end
 
-      if javascript_errors.present?
+      # Crystalball is going to get a few JS errors when using istanbul-instrumenter
+      if javascript_errors.present? && ENV["CRYSTALBALL_MAP"] != "1"
         raise javascript_errors.map(&:message).join("\n\n")
       end
     end

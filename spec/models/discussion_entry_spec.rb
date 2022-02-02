@@ -322,22 +322,35 @@ describe DiscussionEntry do
       expect(@topic.last_reply_at).to eq @new_last_reply_at
     end
 
-    it "leaves last_reply_at on the associated discussion_topic alone given an older entry" do
-      @new_last_reply_at = @entry.created_at = @original_last_reply_at - 5.minutes
-      @entry.save
+    it "does not update last_reply_at on the associated discussion_topic if less than a minute" do
+      fresh_topic = @course.discussion_topics.create!(title: "title", message: "fresh")
+      initial_last_reply_at = fresh_topic.last_reply_at
 
-      @entry.update_topic
-      @topic.reload
-      expect(@topic.last_reply_at).to eq @original_last_reply_at
+      entry = fresh_topic.discussion_entries.create!(message: "entry", user: @user)
+      entry.created_at = initial_last_reply_at + 30.seconds
+      entry.update_topic
+      fresh_topic.reload
+      expect(fresh_topic.last_reply_at).to eq initial_last_reply_at
+    end
+
+    it "leaves last_reply_at on the associated discussion_topic alone given an older entry" do
+      fresh_topic = @course.discussion_topics.create!(title: "title", message: "fresh")
+      initial_last_reply_at = fresh_topic.last_reply_at
+
+      entry = fresh_topic.discussion_entries.create!(message: "entry", user: @user)
+      entry.created_at = initial_last_reply_at - 5.minutes
+      entry.update_topic
+      fresh_topic.reload
+      expect(fresh_topic.last_reply_at).to eq initial_last_reply_at
     end
 
     it "still works with no last_reply_at" do
       @topic.saved_by = :migration
       @topic.last_reply_at = nil
       @topic.save!
-
       @entry.reload
       @entry.update_topic
+      expect(@topic.last_reply_at).to be_nil
     end
   end
 

@@ -19,8 +19,15 @@
 import moment from 'moment-timezone'
 
 moment.locale(window.ENV.MOMENT_LOCALE) // Set the locale globally
+
+export const pacePlanTimezone =
+  window.ENV?.CONTEXT_TIMEZONE ||
+  window.ENV?.TIMEZONE ||
+  Intl.DateTimeFormat().resolvedOptions().timeZone
+
 // Set the timezone globally
-moment.tz.setDefault(window.ENV.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone)
+moment.tz.setDefault(pacePlanTimezone)
+
 // 2018-01-06 was a Saturday and 2018-01-07 was a Sunday. This is necessary because different
 // locales use different weekday integers, so we need to determine what the current values
 // would be so that the DatePicker knows to disable the right weekend days.

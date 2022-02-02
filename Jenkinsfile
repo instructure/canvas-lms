@@ -44,10 +44,18 @@ def getSummaryUrl() {
 }
 
 def getDockerWorkDir() {
+  if (env.GERRIT_PROJECT == 'qti_migration_tool') {
+    return "/usr/src/app/vendor/${env.GERRIT_PROJECT}"
+  }
+
   return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def getLocalWorkDir() {
+  if (env.GERRIT_PROJECT == 'qti_migration_tool') {
+    return "vendor/${env.GERRIT_PROJECT}"
+  }
+
   return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
@@ -424,6 +432,29 @@ pipeline {
                     .timeout(10)
                     .execute { runMigrationsStage() }
 
+                  extendedStage('Generate Crystalball Prediction')
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .required(!configuration.isChangeMerged())
+                    .timeout(2)
+                    .execute {
+                      try {
+                        /* groovylint-disable-next-line GStringExpressionWithinString */
+                        sh '''
+                          diffFrom=\$(git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
+                          docker run --name=crystal --volume \$(pwd)/.git:/usr/src/app/.git \
+                                     -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
+                                     -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
+                                     $PATCHSET_TAG bundle exec crystalball --dry-run
+                          docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
+                        '''
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
+                      /* groovylint-disable-next-line CatchException */
+                      } catch (Exception e) {
+                        // don't fail build for this
+                      }
+                    }
+
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                     def stages = [:]
 
@@ -552,7 +583,24 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
-                  rspecStage.createDistribution(nestedStages)
+                  extendedStage('RspecQ Tests')
+                    .hooks(buildSummaryReportHooks.withRunManifest())
+                    .queue(nestedStages, jobName: '/Canvas/test-suites/test-queue', buildParameters: buildParameters + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ])
+
+                    // Testing Crystalball build, will not vote on builds. Only run pre-merge.
+                    if (!configuration.isChangeMerged()) {
+                      build(wait: false,
+                            propagate: false,
+                            job: '/Canvas/proofs-of-concept/test-queue',
+                            parameters: buildParameters + [string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                                                           string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                                                           string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                                                           string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),])
+                    }
 
                   parallel(nestedStages)
                 }

@@ -21,40 +21,31 @@ import {render} from '@testing-library/react'
 import {AttachmentDisplay} from '../AttachmentDisplay'
 
 const setup = props => {
-  return render(
-    <AttachmentDisplay
-      setAttachments={() => {}}
-      setAttachmentsToUpload={() => {}}
-      attachments={[]}
-      {...props}
-    />
-  )
+  return render(<AttachmentDisplay setAttachment={() => {}} {...props} />)
 }
 
 describe('AttachmentDisplay', () => {
-  it('displays AttachButton when there are no attachments', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Attach')).toBeTruthy()
-  })
-
-  it('only allows one attachment at a time', () => {
-    const {queryByTestId} = setup()
-    expect(queryByTestId('attachment-input')).toHaveAttribute('type', 'file')
-    expect(queryByTestId('attachment-input')).not.toHaveAttribute('multiple')
-  })
-
-  it('displays AttachmentButton when there are no attachments', () => {
+  it('displays AttachmentButton when there is an attachment', () => {
     const {queryByText} = setup({
-      attachments: [
-        {
-          id: 1,
-          display_name: 'file_name.file',
-          url: 'file_download_example.com'
-        }
-      ]
+      attachment: {
+        _id: 1,
+        displayName: 'file_name.file',
+        url: 'file_download_example.com'
+      }
     })
 
-    expect(queryByText('Attach')).toBeFalsy()
     expect(queryByText('file_name.file')).toBeTruthy()
+  })
+
+  it('truncates filenames > 30 characters', () => {
+    const {queryByText} = setup({
+      attachment: {
+        _id: 1,
+        displayName: 'Fundamentals of Differential Equations - Exercise 17 _ Quizlet.pdf',
+        url: 'file_download_example.com'
+      }
+    })
+
+    expect(queryByText('Fundamentals of Differential E...')).toBeTruthy()
   })
 })

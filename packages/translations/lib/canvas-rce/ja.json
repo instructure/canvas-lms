@@ -32,6 +32,7 @@
     "message": "コース内のこのボタンとアイコンのすべてのインスタンスに変更を適用する"
   },
   "apps_54d24a47": { "message": "アプリ" },
+  "arrows_464a3e54": { "message": "矢印" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "アスペクト比は維持されます"
   },
@@ -49,6 +50,7 @@
     "message": "自動保存されたコンテンツが存在します。自動保存されたコンテンツを代わりにロードしますか？"
   },
   "available_folders_694d0436": { "message": "使用可能なフォルダ" },
+  "basic_554cdc0a": { "message": "ベーシック" },
   "below_81d4dceb": { "message": "下の" },
   "bottom_third_5f5fec1d": { "message": "下から3番目" },
   "button_color_608a0242": { "message": "ボタンの色" },
@@ -137,6 +139,7 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "デフォルトの番号順リスト"
   },
+  "delimiters_4db4840d": { "message": "デリミタ" },
   "describe_the_image_e65d2e32": { "message": "(画像の説明)" },
   "describe_the_video_2fe8f46a": { "message": "（ビデオを説明する）" },
   "details_98a31b68": { "message": "詳細" },
@@ -144,6 +147,7 @@
   "dimension_type_55c83e4e": { "message": "サイズタイプ" },
   "dimensions_45ddb7b7": { "message": "寸法" },
   "directionality_26ae9e08": { "message": "方向性" },
+  "directly_edit_latex_b7e9235b": { "message": "ディレクトリ編集 LaTeX" },
   "discussions_a5f96392": { "message": "ディスカッション" },
   "discussions_index_6c36ced": { "message": "ディスカッションのインデックス" },
   "display_options_315aba85": { "message": "オプションを表示する" },
@@ -180,6 +184,7 @@
     "message": "検索する語を3文字以上入力してください"
   },
   "equation_1c5ac93c": { "message": "方程式" },
+  "equation_editor_39fbc3f1": { "message": "方程式エディタ" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "デフォルトによるプレビューの拡大"
   },
@@ -219,6 +224,7 @@
     "message": "エディタのツールバーに移動する"
   },
   "grades_a61eba0a": { "message": "成績" },
+  "greek_65c5b3f7": { "message": "ギリシャ文字" },
   "group_documents_8bfd6ae6": { "message": "グループドキュメント" },
   "group_files_4324f3df": { "message": "グループファイル" },
   "group_files_82e5dcdb": { "message": "グループ ファイル" },
@@ -280,6 +286,7 @@
   "media_af190855": { "message": "メディア" },
   "medium_5a8e9ead": { "message": "中" },
   "middle_27dc1d5": { "message": "中位" },
+  "misc_3b692ea7": { "message": "その他" },
   "miscellaneous_e9818229": { "message": "その他" },
   "modules_c4325335": { "message": "モジュール" },
   "multi_color_image_63d7372f": { "message": "マルチカラー画像" },
@@ -316,6 +323,7 @@
   "open_title_application_fd624fc5": {
     "message": "{ title }アプリケーションを開く"
   },
+  "operators_a2ef9a93": { "message": "演算子" },
   "options_3ab0ea65": { "message": "オプション" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "番号付きリストと番号無しリスト"
@@ -351,6 +359,7 @@
   "raw_html_editor_e3993e41": { "message": "無変換の HTML エディタ" },
   "record_7c9448b": { "message": "記録" },
   "record_upload_media_5fdce166": { "message": "メディアの記録/アップロード" },
+  "relationships_6602af70": { "message": "関係" },
   "remove_link_d1f2f4d0": { "message": "リンクの削除" },
   "resize_ec83d538": { "message": "サイズ変更" },
   "restore_auto_save_deccd84b": {

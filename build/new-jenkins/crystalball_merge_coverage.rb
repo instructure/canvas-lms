@@ -17,15 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-path = "/tmp/crystalball"
+path = ARGV[0] || "/tmp/crystalball"
 map_header = nil
 map_body = {}
 Dir.glob("#{path}/**/*_map.yml") do |filename|
   puts "Looking through #{filename}"
   doc = File.read(filename)
   (header, body) = doc.split("---").reject(&:empty?)
-  map_header ||= header
+  map_header ||= header.gsub(":version:", ":version: #{Time.now.utc}")
   body.split("\n").slice_when { |_before, after| after.include?(":") }.each do |group|
     spec = group.shift
     changed_files = group
@@ -34,7 +33,18 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
 
     raise "#{spec} already has entries: #{map_body[spec]}" unless map_body[spec].nil?
 
-    map_body[spec] = changed_files
+    # JS files will be added to the map based on the parent directory of the file only
+    # TODO: we should have a flag to filter JS at this level
+    changed_files.map! do |file|
+      if /(\.js|\.ts|\.tsx)/.match?(file)
+        # Wrap in File.dirname if we want to filter by directories
+        file.gsub(%r{("|/usr/src/app/)}, "")
+      else
+        file
+      end
+    end
+
+    map_body[spec] = changed_files.uniq
   end
 end
 

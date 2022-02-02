@@ -40,13 +40,13 @@ function formatColor(color) {
 }
 class ProficiencyRating extends React.Component {
   static propTypes = {
-    color: requiredIf(({forOutcome}) => !forOutcome, PropTypes.string),
+    color: requiredIf(({individualOutcome}) => !individualOutcome, PropTypes.string),
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
     disableDelete: PropTypes.bool.isRequired,
     focusField: PropTypes.oneOf(['description', 'points', 'mastery', 'trash']),
     mastery: PropTypes.bool.isRequired,
-    onColorChange: requiredIf(({forOutcome}) => !forOutcome, PropTypes.func),
+    onColorChange: requiredIf(({individualOutcome}) => !individualOutcome, PropTypes.func),
     onDelete: PropTypes.func.isRequired,
     onDescriptionChange: PropTypes.func.isRequired,
     onMasteryChange: PropTypes.func.isRequired,
@@ -56,7 +56,7 @@ class ProficiencyRating extends React.Component {
     isMobileView: PropTypes.bool,
     position: PropTypes.number.isRequired,
     canManage: PropTypes.bool,
-    forOutcome: PropTypes.bool
+    individualOutcome: PropTypes.bool
   }
 
   static defaultProps = {
@@ -65,7 +65,7 @@ class ProficiencyRating extends React.Component {
     pointsError: null,
     canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
     isMobileView: false,
-    forOutcome: false
+    individualOutcome: false
   }
 
   constructor(props) {
@@ -330,7 +330,7 @@ class ProficiencyRating extends React.Component {
   }
 
   renderDeleteButton = () => {
-    const {disableDelete, position} = this.props
+    const {disableDelete, position, individualOutcome} = this.props
     const {showDeleteModal} = this.state
 
     return (
@@ -340,19 +340,20 @@ class ProficiencyRating extends React.Component {
           withBorder={false}
           disabled={disableDelete}
           elementRef={this.setTrashRef}
-          onClick={this.handleDelete}
+          onClick={individualOutcome ? this.handleRealDelete : this.handleDelete}
           renderIcon={<IconTrashLine />}
           screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
         />
-
-        <ConfirmMasteryModal
-          onConfirm={this.handleRealDelete}
-          modalText={I18n.t('This will remove the mastery level from your mastery scale.')}
-          isOpen={showDeleteModal}
-          onClose={this.handleCloseDeleteModal}
-          title={I18n.t('Remove Mastery Level')}
-          confirmButtonText={I18n.t('Confirm')}
-        />
+        {!individualOutcome && (
+          <ConfirmMasteryModal
+            onConfirm={this.handleRealDelete}
+            modalText={I18n.t('This will remove the mastery level from your mastery scale.')}
+            isOpen={showDeleteModal}
+            onClose={this.handleCloseDeleteModal}
+            title={I18n.t('Remove Mastery Level')}
+            confirmButtonText={I18n.t('Confirm')}
+          />
+        )}
       </div>
     )
   }
@@ -360,7 +361,7 @@ class ProficiencyRating extends React.Component {
   errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
 
   render() {
-    const {isMobileView, canManage, forOutcome} = this.props
+    const {isMobileView, canManage, individualOutcome} = this.props
     return (
       <Flex
         padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}
@@ -372,7 +373,7 @@ class ProficiencyRating extends React.Component {
         </Flex.Item>
         <Flex.Item
           padding="0 small 0 0"
-          size={isMobileView ? '75%' : forOutcome ? '65%' : '40%'}
+          size={isMobileView ? '75%' : individualOutcome ? '65%' : '40%'}
           align="start"
         >
           {this.renderDescription()}
@@ -380,7 +381,7 @@ class ProficiencyRating extends React.Component {
             <>
               {this.renderPointsInput()}
               <div className={`mobileRow ${canManage ? null : 'view-only'}`}>
-                {!forOutcome && this.renderColorPicker()}
+                {!individualOutcome && this.renderColorPicker()}
                 {canManage && this.renderDeleteButton()}
               </div>
             </>
@@ -388,10 +389,10 @@ class ProficiencyRating extends React.Component {
         </Flex.Item>
         {!isMobileView && (
           <>
-            <Flex.Item size={forOutcome ? '10%' : '15%'} padding="0 small 0 0" align="start">
+            <Flex.Item size={individualOutcome ? '10%' : '15%'} padding="0 small 0 0" align="start">
               {this.renderPointsInput()}
             </Flex.Item>
-            {!forOutcome && <Flex.Item>{this.renderColorPicker()}</Flex.Item>}
+            {!individualOutcome && <Flex.Item>{this.renderColorPicker()}</Flex.Item>}
             {canManage && (
               <Flex.Item size="10%" padding="0 small 0 small">
                 {this.renderDeleteButton()}

@@ -42,6 +42,7 @@ const ComposeModalContainer = props => {
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
+  const [selectedIds, setSelectedIds] = useState([])
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
@@ -127,6 +128,10 @@ const ComposeModalContainer = props => {
     setSelectedContext(id)
   }
 
+  const onSelectedIdsChange = ids => {
+    setSelectedIds(ids)
+  }
+
   const validMessageFields = () => {
     // TODO: validate recipients
     if (!body) {
@@ -155,7 +160,7 @@ const ComposeModalContainer = props => {
           attachmentIds: attachments.map(a => a.id),
           body,
           contextCode: selectedContext,
-          recipients: ['5'], // TODO: replace this with selected users
+          recipients: selectedIds.map(rec => rec?._id || rec.id),
           subject,
           groupConversation: !sendIndividualMessages,
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
@@ -173,6 +178,7 @@ const ComposeModalContainer = props => {
     setBody(null)
     setBodyMessages([])
     setSelectedContext(null)
+    setSelectedIds([])
     props.setSendingMessage(false)
     setSubject(null)
     setSendIndividualMessages(false)
@@ -203,6 +209,7 @@ const ComposeModalContainer = props => {
             courses={props.courses}
             isReply={props.isReply}
             onContextSelect={onContextSelect}
+            onSelectedIdsChange={onSelectedIdsChange}
             onSendIndividualMessagesChange={onSendIndividualMessagesChange}
             onSubjectChange={onSubjectChange}
             sendIndividualMessages={sendIndividualMessages}

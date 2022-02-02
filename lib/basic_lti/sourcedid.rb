@@ -106,11 +106,11 @@ module BasicLTI
     end
 
     def self.signing_secret
-      Canvas::DynamicSettings.find["lti-signing-secret"]
+      DynamicSettings.find["lti-signing-secret"]
     end
 
     def self.encryption_secret
-      Canvas::DynamicSettings.find["lti-encryption-secret"]
+      DynamicSettings.find["lti-encryption-secret"]
     end
   end
 end

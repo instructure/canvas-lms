@@ -22,7 +22,7 @@ def nodeRequirementsTemplate() {
     command: 'cat',
     envVars: [
       GERGICH_DB_PATH: '/home/docker/gergich',
-      GERGICH_GIT_PATH: env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/$GERRIT_PROJECT",
+      GERGICH_GIT_PATH: env.DOCKER_WORKDIR,
     ]
   ]
 

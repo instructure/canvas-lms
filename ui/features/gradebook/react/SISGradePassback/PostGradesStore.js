@@ -157,7 +157,7 @@ const PostGradesStore = state => {
 
     setSelectedSection(section) {
       const state = this.getState()
-      const section_id = parseInt(section)
+      const section_id = parseInt(section, 10)
       let selected
       if (section) {
         selected = {

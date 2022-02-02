@@ -29,3 +29,21 @@ def call() {
      }
    ]
 }
+
+def withRunManifest() {
+  return [
+     onStageEnded: { stageName, stageConfig, buildResult ->
+       if (buildResult) {
+         buildSummaryReport.addFailureRun(stageName, buildResult)
+
+         node('master') {
+           buildSummaryReport.loadRunManifest(buildResult)
+         }
+
+         buildSummaryReport.setStageIgnored(stageName)
+       }
+
+       buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
+     }
+   ]
+}

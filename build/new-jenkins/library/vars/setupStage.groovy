@@ -27,7 +27,7 @@ def call() {
 
     // Plugin builds using the dir step above will create this @tmp file, we need to remove it
     // https://issues.jenkins.io/browse/JENKINS-52750
-    sh 'rm -vr gems/plugins/*@tmp'
+    sh "rm -vrf ${env.LOCAL_WORKDIR}@tmp"
   }
 
   gems = configuration.plugins()
@@ -39,11 +39,21 @@ def call() {
     }
   }
 
-  pluginsToPull.add([name: 'qti_migration_tool', version: _getPluginVersion('qti_migration_tool'), target: 'vendor/qti_migration_tool'])
+  if (env.GERRIT_PROJECT != 'qti_migration_tool') {
+    pluginsToPull.add([name: 'qti_migration_tool', version: _getPluginVersion('qti_migration_tool'), target: 'vendor/qti_migration_tool'])
+  }
 
   pullRepos(pluginsToPull)
-
+  echo 'Pulling Crystalball Map'
+  _getCrystalballMap()
   libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
+}
+
+def _getCrystalballMap() {
+  withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
+    def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
+    sh "$awsCreds aws s3 cp s3://instructure-canvas-ci/crystalball_map.yml ."
+  }
 }
 
 def _getPluginVersion(plugin) {

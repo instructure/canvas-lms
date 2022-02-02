@@ -754,8 +754,7 @@ class DiscussionTopicsController < ApplicationController
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
-                 CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
-                 ATTACHMENTS_FOLDER_ID: (@topic.for_assignment? && !@current_user.nil?) ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id
+                 CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : ""
                },
                apollo_caching: @current_user &&
                  Account.site_admin.feature_enabled?(:apollo_caching),
@@ -1193,10 +1192,10 @@ class DiscussionTopicsController < ApplicationController
   API_ALLOWED_TOPIC_FIELDS = %w[title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post pinned todo_date
                                 group_category_id allow_rating only_graders_can_rate sort_by_rating
-                                anonymous_state].freeze
+                                anonymous_state is_anonymous_author].freeze
 
   API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w[title message discussion_type podcast_enabled pinned todo_date
-                                          allow_rating only_graders_can_rate sort_by_rating anonymous_state].freeze
+                                          allow_rating only_graders_can_rate sort_by_rating anonymous_state is_anonymous_author].freeze
 
   def set_sections
     if params[:specific_sections] == "all"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,6 +19,8 @@
 import {fromJS} from 'immutable'
 import moment from 'moment'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import fakeENV from 'helpers/fakeENV'
 
 const studentWithoutSubmission = {
   id: '1',
@@ -489,4 +491,50 @@ QUnit.module('#setSubmissionCellState', () => {
       })
     })
   })
+})
+
+QUnit.module('Gradebook#initSubmissionStateMap')
+
+test('initializes a new submission state map', () => {
+  const gradebook = createGradebook()
+  const originalMap = gradebook.submissionStateMap
+  gradebook.initSubmissionStateMap()
+  strictEqual(gradebook.submissionStateMap.constructor, SubmissionStateMap)
+  notEqual(originalMap, gradebook.submissionStateMap)
+})
+
+test('sets the submission state map .hasGradingPeriods to true when a grading period set exists', () => {
+  const gradebook = createGradebook({
+    grading_period_set: {id: '1501', grading_periods: [{id: '701'}, {id: '702'}]}
+  })
+  strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true)
+})
+
+test('sets the submission state map .hasGradingPeriods to false when no grading period set exists', () => {
+  const gradebook = createGradebook()
+  strictEqual(gradebook.submissionStateMap.hasGradingPeriods, false)
+})
+
+test('sets the submission state map .selectedGradingPeriodID to the "grading period to show"', () => {
+  const gradebook = createGradebook()
+  gradebook.gradingPeriodId = '1401'
+  gradebook.initSubmissionStateMap()
+  strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, '1401')
+})
+
+test('sets the submission state map .isAdmin when the current user roles includes "admin"', () => {
+  fakeENV.setup({current_user_roles: ['admin']})
+  const gradebook = createGradebook()
+  strictEqual(gradebook.submissionStateMap.isAdmin, true)
+  fakeENV.teardown()
+})
+
+test('sets the submission state map .isAdmin when the current user roles do not include "admin"', () => {
+  const gradebook = createGradebook()
+  strictEqual(gradebook.submissionStateMap.isAdmin, false)
+})
+
+test('initializes a submission state map', () => {
+  const gradebook = createGradebook()
+  strictEqual(gradebook.submissionStateMap.constructor, SubmissionStateMap)
 })

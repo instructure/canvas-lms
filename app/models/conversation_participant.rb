@@ -156,7 +156,11 @@ class ConversationParticipant < ActiveRecord::Base
           conversation_ids = ConversationParticipant.where(shard_conditions).pluck(:conversation_id).map do |id|
             Shard.relative_id_for(id, Shard.current, scope_shard)
           end
-          ["conversation_id IN (#{conversation_ids.join(",")})"]
+          if conversation_ids.empty?
+            []
+          else
+            ["conversation_id IN (#{conversation_ids.join(",")})"]
+          end
         end
       end
     end

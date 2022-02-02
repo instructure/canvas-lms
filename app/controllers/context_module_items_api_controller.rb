@@ -372,6 +372,12 @@ class ContextModuleItemsApiController < ApplicationController
   #   Minimum score required to complete. Required for completion_requirement
   #   type 'min_score'.
   #
+  # @argument module_item[iframe][width] [Integer]
+  #   Width of the ExternalTool on launch
+  #
+  # @argument module_item[iframe][height] [Integer]
+  #   Height of the ExternalTool on launch
+  #
   # @example_request
   #
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items \
@@ -382,7 +388,9 @@ class ContextModuleItemsApiController < ApplicationController
   #       -d 'module_item[content_id]=10' \
   #       -d 'module_item[position]=2' \
   #       -d 'module_item[indent]=1' \
-  #       -d 'module_item[new_tab]=true'
+  #       -d 'module_item[new_tab]=true' \
+  #       -d 'module_item[iframe][width]=300' \
+  #       -d 'module_item[iframe][height]=200'
   #
   # @returns ModuleItem
   def create
@@ -405,6 +413,10 @@ class ContextModuleItemsApiController < ApplicationController
       end
 
       item_params[:url] = params[:module_item][:external_url]
+
+      if (iframe = params[:module_item][:iframe])
+        item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
+      end
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
         @module.touch

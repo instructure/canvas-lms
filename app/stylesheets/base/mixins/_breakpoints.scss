@@ -59,3 +59,11 @@
     }
   }
 }
+
+@mixin lti-min-size {
+  @if $use_responsive_layout {
+    @media (max-width: 320px) {
+      @content;
+    }
+  }
+}

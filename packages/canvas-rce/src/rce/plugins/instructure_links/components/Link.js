@@ -22,6 +22,7 @@ import {linkShape} from './propTypes'
 import formatMessage from '../../../../format-message'
 import {renderLink as renderLinkHtml} from '../../../contentRendering'
 import dragHtml from '../../../../sidebar/dragHtml'
+import {applyTimezoneOffsetToDate} from '../../shared/dateUtils'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -79,7 +80,8 @@ export default function Link(props) {
     if (date === 'multiple') {
       dateString = formatMessage('Due: Multiple Dates')
     } else {
-      const when = formatMessage.date(Date.parse(date), 'long')
+      // Uses user locale and timezone
+      const when = formatMessage.date(applyTimezoneOffsetToDate(date, ENV.TIMEZONE), 'long')
       switch (date_type) {
         case 'todo':
           dateString = formatMessage('To Do: {when}', {when})

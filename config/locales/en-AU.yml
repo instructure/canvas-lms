@@ -2464,6 +2464,7 @@ en-AU:
       Allows user to enable and edit assignment group weighting in a course.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Allows user to add external app icons to the Rich Content Editor toolbar."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Allows user to add group members to account or course groups."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Allows user to add new assignments to a module."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Allows user to add new courses to an account."
@@ -2695,6 +2696,7 @@ en-AU:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Allows user to manually add an app in Account Settings."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Allows user to manually add and delete an app in Account Settings."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Allows user to manually add and delete an app in Course Settings."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Allows user to manually delete an app in Account Settings."
   allows_user_to_moderate_a_quiz_6953d369: "Allows user to moderate a quiz."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Allows user to moderate a quiz and view the quiz statistics page."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Allows user to moderate a quiz. Settings: Allows user to edit grading schemes."
@@ -3301,6 +3303,7 @@ en-AU:
   anonymous_user_d984b9ce: "Anonymous User"
   anonymous_was_never_turned_on_e5e8aeda: "Anonymous was never turned on"
   anonymous_was_turned_off_300d25ec: "Anonymous was turned off"
+  anonymous_you_e708af99: "Anonymous (You)"
   anonymously_graded_59149570: "Anonymously graded"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Anonymously graded assignments can't be group assignments"
   another_assignment_name_369f8481: "Another Assignment Name"
@@ -6812,7 +6815,7 @@ en-AU:
     media_objects_not_configured: "Media Objects not configured"
     new_roster_user: 
       completed_enrollment: "Completed *%{completed_at}*"
-      enrolled_as: "Enrolled as a %{enrollment_type}"
+      enrolled_as: "Enrolled as: %{enrollment_type}"
       enrollment_linked_to: "Linked to *%{linked_user}*"
       labels: 
         user_privileges: Privileges
@@ -6865,7 +6868,7 @@ en-AU:
         conclude: "Are you sure you want to conclude this enrolment?"
         conclude_student: "Are you sure you want to conclude this student's enrolment?"
         delete_enrollment: "Are you sure you want to delete this enrolment?"
-      enrolled_as: "Enrolled as a %{enrollment_type}"
+      enrolled_as: "Enrolled as: %{enrollment_type}"
       enrollment_change_failed: "Enrolment privilege change failed, please try again"
       enrollment_linked_to: "linked to *%{linked_user}*"
       headings: 
@@ -10509,6 +10512,9 @@ en-AU:
   enroll_in_subject_9c1f1c18: "Enrol in Subject"
   enrolled_a6a517cd: Enrolled
   enrolled_as_272da3b9: "Enrolled as"
+  enrolled_as_enrollment_type_a008e44a: "Enrolled as: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "enrolled as: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "enrolled as: %{enrollment_type} with section-only access"
   enrollment: 
     default_course_name: Course
     default_email: "No Email"
@@ -10932,6 +10938,7 @@ en-AU:
   error_59293a2c: error
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: "Error adding canvas file to submission draft"
+  error_adding_file_to_discussion_message_16feef3f: "Error adding file to discussion message"
   error_adding_files_to_conversation_message_58e83876: "Error adding files to conversation message"
   error_adding_files_to_discussion_message_8bb819e4: "Error adding files to discussion message"
   error_adding_files_to_submission_draft_6acac337: "Error adding files to submission draft"
@@ -10991,6 +10998,7 @@ en-AU:
   error_updating_comment_4b80c76d: "Error updating comment"
   error_updating_status_of_module_item_80336274: "Error updating status of module item"
   error_updating_submission_draft_1d40ade7: "Error updating submission draft"
+  error_uploading_file_73235601: "Error uploading file"
   error_uploading_file_e2d31b56: "Error uploading file."
   error_uploading_files_f709361f: "Error uploading files"
   error_uploading_video_audio_recording_16d9730a: "Error uploading video/audio recording"
@@ -13507,12 +13515,14 @@ en-AU:
   hide_courses_without_students_fc6fc7a0: "Hide courses without students"
   hide_details_df9ef4a2: "Hide Details"
   hide_e057ff36: Hide
+  hide_from_everyone_9fc3e6d0: "Hide from everyone"
   hide_grades_585e63b4: "Hide Grades"
   hide_grades_5ff26682: "Hide marks"
   hide_grades_tray_5ed267fe: "Hide grades tray"
   hide_groups_navigation_menu_62e8b3d0: "Hide Groups Navigation Menu"
   hide_important_dates_c23d2102: "Hide Important Dates"
   hide_key_e8fe1e8c: "Hide Key"
+  hide_name_and_profile_picture_d18eed70: "Hide name and profile picture"
   hide_name_details_23814c37: "Hide %{name} details"
   hide_navigation_menu_f0b3e90: "Hide Navigation Menu"
   hide_notes_column_7749f408: "Hide Notes Column"
@@ -13755,6 +13765,12 @@ en-AU:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       If enabled, allows new window.postMessage subjects for the LTI Platform
       Storage spec, and sends reponse messages to all postMessage.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      If enabled, an "unauthorised" response from the JSON API will return a 403
+      (Forbidden) instead of a 401 code, to be more in line with HTTP standards.
+      Also, when the API returns a unauthenticated or unauthorised JSON error,
+      the "status" field will not be localised; it will always be given in
+      English.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       If enabled, Canvas will allow tools to return multiple content items
       in a single request at the course modules page
@@ -13799,6 +13815,7 @@ en-AU:
       instead of the assignment. This will cause events to be
       duplicated unless the subscriptions on the associated
       plagiarism assignments are deleted.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "If LTI - add is disabled, users can still install approved apps through the Canvas App Centre (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "If Manage Courses: Admin - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "If mastery scales are enabled, the report will be truncated to not include calculation method, calculation int, mastery points, or ratings"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -17966,7 +17983,9 @@ en-AU:
   nav_avatar_border_3246beb1: "Nav Avatar Border"
   nav_background_fd299145: "Nav Background"
   nav_badge_3c67de17: "Nav Badge"
+  nav_badge_active_1d4be222: "Nav Badge Active"
   nav_badge_text_574b6eb: "Nav Badge Text"
+  nav_badge_text_active_9a28e8a2: "Nav Badge Text Active"
   nav_icon_active_e4825558: "Nav Icon Active"
   nav_icon_ca3fef59: "Nav Icon"
   nav_logo_4b255c91: "Nav Logo"
@@ -18215,6 +18234,7 @@ en-AU:
   no_results_match_searchterm_f28e50e0: "No results match \"%{searchTerm}\""
   no_score_yet_c94e919b: "No score yet"
   no_start_date_6e81c22b: "No Start Date"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "No student is being observed. To select a student, return to the dashboard."
   no_students_being_observed_42e11732: "No students being observed"
   no_students_dd8de9f0: "No Students"
   no_students_have_taken_the_quiz_yet_e667644b: "No Students have taken the quiz yet"
@@ -18737,6 +18757,7 @@ en-AU:
   observers_remove_ad508fbe: "Observers - remove"
   observing_f3c5e759: Observing
   observing_observee_d31d5fa2: "Observing: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "Observing %{student_name}. To select a different student, return to the dashboard."
   occurrence_s_c12d1aad: occurrence(s)
   of_students_5d1af0d2: "# of students"
   off_5385ef3f: "Off"
@@ -19266,6 +19287,7 @@ en-AU:
   parents_sign_up_here_f0aa8f4f: "Parents sign up here"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Partial: students can choose to reveal their name and profile picture"
   partially_anonymous_483a892d: "Partially Anonymous"
+  partially_anonymous_discussion_13ceb585: "Partially Anonymous Discussion | "
   partially_enabled_and_locked_9a39d38a: "Partially enabled and Locked"
   partially_enabled_cd506819: "Partially enabled"
   participantcount_less_8d258f6: "%{participantCount} less"
@@ -19819,7 +19841,7 @@ en-AU:
       name: Sessions
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Time before session expires in minutes (20 minimum) for mobile applications"
+        mobile_timeout: "Time after login before session expires in minutes (2880 [2 day] minimum) for mobile applications"
         session_timeout: "Time before session expires in minutes (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "This changes the settings for ALL ACCOUNTS!"
@@ -22554,6 +22576,7 @@ en-AU:
   required_access_code_592902d7: "Required access code"
   required_by_course_end_date_d87a4772: "Required by course end date"
   required_by_specified_end_date_22dd6b49: "Required by specified end date"
+  required_by_term_end_date_403dff38: "Required by term end date"
   required_email_address_379b2392: "Required Email Address"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Required fields include key name, owner email, tool ID, redirect URL, and icon URL."
   required_input_message_all_unassigned_students_1e721442: "Required input. Message all unassigned students."
@@ -23177,16 +23200,16 @@ en-AU:
     confirms: 
       delete_enrollment: "Are you sure you want to delete this enrolment permanently?"
     default_course_name: "Course ID \"%{course_id}\""
-    enrolled_as_designer: "enrolled as a designer"
-    enrolled_as_limited_designer: "enrolled as a designer with section-only access"
-    enrolled_as_limited_observer: "enrolled as a observer with section-only access"
-    enrolled_as_limited_student: "enrolled as a student with section-only access"
-    enrolled_as_limited_ta: "enrolled as a TA with section-only access"
-    enrolled_as_limited_teacher: "enrolled as a teacher with section-only access"
-    enrolled_as_observer: "enrolled as a observer"
-    enrolled_as_student: "enrolled as a student"
-    enrolled_as_ta: "enrolled as a TA"
-    enrolled_as_teacher: "enrolled as a teacher"
+    enrolled_as_designer: "enrolled as: Designer"
+    enrolled_as_limited_designer: "enrolled as: Designer with section-only access"
+    enrolled_as_limited_observer: "enrolled as: Observer with section-only access"
+    enrolled_as_limited_student: "enrolled as: Student with section-only access"
+    enrolled_as_limited_ta: "enrolled as: TA with section-only access"
+    enrolled_as_limited_teacher: "enrolled as: Teacher with section-only access"
+    enrolled_as_observer: "enrolled as: Observer"
+    enrolled_as_student: "enrolled as: Student"
+    enrolled_as_ta: "enrolled as: TA"
+    enrolled_as_teacher: "enrolled as: Teacher"
     errors: 
       confirmation_failed: "Confirmation Failed"
       course_not_authorized_for_crosslist: "%{course_name} not authorized for cross-listing"
@@ -24436,6 +24459,7 @@ en-AU:
   show_me_76823679: "Show me"
   show_more_8d5f918b: "show more"
   show_more_af9cbc16: "Show More"
+  show_name_and_profile_picture_9329d8f8: "Show name and profile picture"
   show_name_details_186d86e6: "Show %{name} details"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Show name of observed students in notifications."
   show_name_of_observed_students_in_notifications_d38b53ca: "Show name of observed students in notifications"
@@ -24465,6 +24489,7 @@ en-AU:
   show_sub_accounts_for_account_name_fa71a658: "Show Sub-Accounts for %{account_name}"
   show_suggestions_when_typing_b72545de: "Show suggestions when typing"
   show_to_d57767f: "Show to"
+  show_to_everyone_94d66d01: "Show to everyone"
   show_welcome_tour_a105aa2e: "Show Welcome Tour"
   showing_1ac6ed70: "Showing:"
   showing_all_announcements_36ff0cec: "Showing all announcements"
@@ -25522,6 +25547,7 @@ en-AU:
   tas_observers_designers_b705118a: "TAs / Observers / Designers"
   tas_remove_11059e14: "TAs - Remove"
   tas_remove_16a99b22: "TAs - remove"
+  tea_provisional_graders_d4f19c26: "TEA Provisional Graders"
   teacher_5a73b637: Teacher
   teacher_count_teachers_a92f7199: "%{teacher_count} teachers"
   teacher_dashboard_custom_report_6d20bef2: "Teacher Dashboard Custom Report"
@@ -26036,6 +26062,8 @@ en-AU:
   there_was_a_problem_updating_the_submission_6e5280a1: "There was a problem updating the submission."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "There was an error checking plan publishing status."
   there_was_an_error_fetching_course_statistics_96e9dbad: "There was an error fetching course statistics"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "There was an error fetching gradebook filters."
+  there_was_an_error_fetching_modules_8ee451bb: "There was an error fetching modules."
   there_was_an_error_fetching_outcome_results_45c57590: "There was an error fetching outcome results"
   there_was_an_error_fetching_submission_comments_ce153077: "There was an error fetching Submission Comments"
   there_was_an_error_generating_the_pairing_code_9edd639b: "There was an error generating the pairing code"
@@ -26241,6 +26269,7 @@ en-AU:
       This has more question types like hotspot,
               categorisation, matching, and ordering. It also has
               more moderation and accommodation features.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "This homeroom syncs enrolments and subject start/end dates to: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg."
   this_image_has_been_reported_9360e581: "This image has been reported."
   this_image_is_currently_unavailable_25c68857: "This image is currently unavailable"
@@ -27737,6 +27766,7 @@ en-AU:
       Updates account notification preferences UI to be a more current
       and updated user experience
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Updates the display of Post Policy icons in the New Gradebook assignment column header."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Updates to JSON API auth error HTTP code and JSON status field"
   updating_6edbab78: Updating
   updating_discussion_failed_aadb2d35: "Updating discussion failed"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Updating the Catalogue URL will make your old URL inaccessible for users effective immediately! If there’s an existing payment processor configured, changes will require the help of a Catalogue engineer."
@@ -27785,6 +27815,8 @@ en-AU:
   uploaded_over_time_d59abb68: "uploaded over time"
   uploading_19e8a4e7: Uploading
   uploading_ee585874: Uploading...
+  uploading_file_5c7e14fd: "Uploading file"
+  uploading_file_in_progress_5c09e0c9: "Uploading file in progress"
   uploading_files_5ff8f4fd: "Uploading files"
   uploading_files_9e39dbf9: "Uploading Files"
   uploading_media_progress_c23a953b: "Uploading media Progress"

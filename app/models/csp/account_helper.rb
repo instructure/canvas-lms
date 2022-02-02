@@ -159,7 +159,7 @@ module Csp::AccountHelper
 
   def csp_files_domains(request)
     files_host = HostUrl.file_host(root_account, request.host_with_port)
-    config = Canvas::DynamicSettings.find(tree: :private, cluster: root_account.shard.database_server.id)
+    config = DynamicSettings.find(tree: :private, cluster: root_account.shard.database_server.id)
     if config["attachment_specific_file_domain"] == "true"
       separator = config["attachment_specific_file_domain_separator"] || "."
       files_host = if separator == "."
@@ -174,6 +174,6 @@ module Csp::AccountHelper
   end
 
   def csp_logging_config
-    @config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)["csp_logging.yml"] || "{}")
+    @config ||= YAML.safe_load(DynamicSettings.find(tree: :private, cluster: shard.database_server.id)["csp_logging.yml"] || "{}")
   end
 end

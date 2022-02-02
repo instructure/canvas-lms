@@ -89,11 +89,15 @@ module PacePlansCommonPageObject
   end
 
   def create_published_pace_plan(module_title, assignment_title)
-    pace_plan_model(course: @course)
+    # We want the module item autopublish to happen immediately in test
+    Setting.set("pace_plan_publish_interval", "0")
+
+    pace_plan_model(course: @course, end_date: Time.zone.now.advance(days: 30))
     pace_plan_module = create_course_module(module_title)
     pace_plan_assignment = create_assignment(@course, assignment_title, "Assignment 1", 10, "published")
     pace_plan_module.add_item(id: pace_plan_assignment.id, type: "assignment")
-    @pace_plan.pace_plan_module_items.create! module_item: @course.context_module_tags[0], duration: 2
+    @pace_plan.pace_plan_module_items.last.update! duration: 2
+    run_jobs # Run the autopublish job
     @pace_plan
   end
 
@@ -108,6 +112,17 @@ module PacePlansCommonPageObject
   def feature_setup
     @account = Account.default
     @account.enable_feature!(:pace_plans)
+  end
+
+  def skip_weekends(date, duration = 1)
+    until duration == 0
+      date += 1.day
+      while date.wday == 0 || date.wday == 6
+        date += 1.day
+      end
+      duration -= 1
+    end
+    date
   end
 
   def teacher_setup

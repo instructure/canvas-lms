@@ -19,9 +19,6 @@
 
 require_dependency "lazy_presumptuous_i18n_backend"
 
-Rails.application.config.i18n.enforce_available_locales = true
-Rails.application.config.i18n.fallbacks = true
-
 module CanvasI18nFallbacks
   # see BCP-47 "Tags for Identifying Languages" for the grammar
   # definition that led to this pattern match. It is not 100%
@@ -96,11 +93,6 @@ module I18n
 end
 # rubocop:enable Style/OptionalBooleanParameter
 
-I18n.backend = LazyPresumptuousI18nBackend.new(
-  meta_keys: %w[aliases crowdsourced custom locales],
-  logger: Rails.logger.method(:debug)
-)
-
 module DontTrustI18nPluralizations
   def pluralize(locale, entry, count)
     super
@@ -109,7 +101,17 @@ module DontTrustI18nPluralizations
     ""
   end
 end
-LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
+
+Rails.configuration.to_prepare do
+  Rails.application.config.i18n.enforce_available_locales = true
+  Rails.application.config.i18n.fallbacks = true
+
+  I18n.backend = LazyPresumptuousI18nBackend.new(
+    meta_keys: %w[aliases crowdsourced custom locales],
+    logger: Rails.logger.method(:debug)
+  )
+  LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
+end
 
 module FormatInterpolatedNumbers
   def interpolate_hash(string, values)

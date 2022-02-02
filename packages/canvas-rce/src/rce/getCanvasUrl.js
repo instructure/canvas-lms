@@ -24,6 +24,10 @@ export async function getCanvasUrl(props) {
   }
 
   const source = new RceApiSource(props)
-  const session = await source.getSession()
-  return session.canvasUrl
+  try {
+    const session = await source.getSession()
+    return session.canvasUrl
+  } catch (e) {
+    return null
+  }
 }

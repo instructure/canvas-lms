@@ -113,7 +113,9 @@ export default class ExternalToolDialog extends React.Component {
       send(win.$(`#${editor.id}`), 'set_code', code)
     } else {
       for (let i = 0, len = contentItems.length; i < len; ++i) {
-        const code = TinyMCEContentItem.fromJSON(contentItems[i]).codePayload
+        const contentData = contentItems[i]
+        contentData.class = 'lti-embed'
+        const code = TinyMCEContentItem.fromJSON(contentData).codePayload
         send(win.$(`#${editor.id}`), 'insert_code', code)
       }
     }

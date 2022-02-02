@@ -165,7 +165,11 @@ const FocusedComment = ({onClick, comment, handleUpdate, isExpanded}) => {
       padding="small"
       cursor="pointer"
       isWithinText={false}
-      onClick={() => onClick(comment)}
+      onClick={e => {
+        if (e.detail === 1) {
+          onClick(comment)
+        }
+      }}
       background={isFocused ? 'brand' : 'transparent'}
       onMouseEnter={() => setIsFocused(true)}
       onMouseLeave={() => setIsFocused(false)}

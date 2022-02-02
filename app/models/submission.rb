@@ -2378,7 +2378,7 @@ class Submission < ActiveRecord::Base
 
     def missing?
       return false if excused?
-      return false if Account.site_admin.feature_enabled?(:remove_missing_status_when_graded) && grader_id && late_policy_status.nil?
+      return false if grader_id && late_policy_status.nil?
       return late_policy_status == "missing" if late_policy_status.present?
       return false if submitted_at.present?
       return false unless past_due?

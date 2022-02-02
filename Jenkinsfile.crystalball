@@ -20,6 +20,7 @@
 
 library 'canvas-builds-library'
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
+final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
 
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
@@ -64,9 +65,17 @@ pipeline {
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
 
+    BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+    KARMA_BUILDER_PREFIX = configuration.buildRegistryPath('karma-builder')
+    KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
+    LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
+    RUBY_RUNNER_PREFIX = configuration.buildRegistryPath('ruby-runner')
+    YARN_RUNNER_PREFIX = configuration.buildRegistryPath('yarn-runner')
+    WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath('webpack-builder')
+    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath('webpack-cache')
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
     RSPEC_PROCESSES = 6
@@ -74,24 +83,65 @@ pipeline {
     CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    POSTGRES_CLIENT = configuration.postgresClient()
   }
 
   stages {
-    stage('Setup') {
+    stage('Pre-Setup') {
       steps {
         cleanAndSetup()
       }
     }
 
-    stage('Parallel Run Tests') {
+    stage('Crystalball Map') {
       steps {
         script {
-          def stages = [:]
+          def postBuildHandler = [
+            onStageEnded: { stageName, stageConfig, result ->
+              buildSummaryReport.addFailureRun('Main Build', currentBuild)
+            }
+          ]
 
           distribution.stashBuildScripts()
-          rspecStage.createDistribution(stages)
+          extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).reportTimings(false).execute {
+            def rootStages = [:]
 
-          parallel(stages)
+            extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: null).obeysAllowStages(false).reportTimings(false).queue(rootStages) {
+              extendedStage('Setup')
+                .hooks(buildSummaryReportHooks.call())
+                .obeysAllowStages(false)
+                .timeout(2)
+                .execute { setupStage() }
+
+              extendedStage('Build Docker Image (Pre-Merge)')
+                .hooks(buildSummaryReportHooks.call())
+                .obeysAllowStages(false)
+                .required(configuration.isChangeMerged())
+                .timeout(20)
+                .execute(buildDockerImageStage.&premergeCacheImage)
+
+              extendedStage('Build Docker Image')
+                .hooks(buildSummaryReportHooks.call())
+                .obeysAllowStages(false)
+                .timeout(20)
+                .execute(buildDockerImageStage.&patchsetImage)
+
+              extendedStage(RUN_MIGRATIONS_STAGE)
+                .hooks(buildSummaryReportHooks.call())
+                .obeysAllowStages(false)
+                .timeout(10)
+                .execute { runMigrationsStage() }
+            }
+
+            extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
+              def nestedStages = [:]
+              rspecStage.createLegacyDistribution(nestedStages)
+
+              parallel(nestedStages)
+            }
+
+            parallel(rootStages)
+          }
         }
       }
     }

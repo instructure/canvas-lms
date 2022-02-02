@@ -38,7 +38,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
+import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 
 export const getMenuConfig = props => {
   const options = {
@@ -217,17 +217,21 @@ export const DiscussionPostToolbar = props => {
                     </Button>
                   </Tooltip>
                 </Flex.Item>
+                {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
+                  <Flex.Item shouldGrow>
+                    <Flex justifyItems="end">
+                      <Flex.Item>
+                        <Tooltip renderTip={I18n.t('This is your anonymous avatar')}>
+                          <div>
+                            <AnonymousAvatar addFocus="0" seedString={CURRENT_USER} />
+                          </div>
+                        </Tooltip>
+                      </Flex.Item>
+                    </Flex>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
-            {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
-              <Flex.Item align="end">
-                <Tooltip renderTip={I18n.t('This is your anonymous avatar')}>
-                  <div>
-                    <AnonymousAvatar seedString={CURRENT_USER} />
-                  </div>
-                </Tooltip>
-              </Flex.Item>
-            )}
           </Flex>
         </View>
       )}

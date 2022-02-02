@@ -2460,6 +2460,7 @@ zh-Hans:
       允许用户在课程中启用和编辑作业组权重。
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "允许用户通过“添加学生到待办事项”选框，添加事件至“查看列表控制面板”。 "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: 允许用户通过“添加学生到待办事项”选框，添加事件至“查看列表控制面板”。
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "允许用户向富内容编辑器工具栏添加外部 app 图标。"
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: 允许用户向帐户或课程小组添加小组成员。
   allows_user_to_add_new_assignments_to_a_module_51ae198c: 允许用户向单元添加新作业。
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: 允许用户在帐户中添加新课程。
@@ -2691,6 +2692,7 @@ zh-Hans:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: 允许用户在“帐户设置”中手动添加应用程序。
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: 允许用户在帐户设置中手动添加和删除应用程序。
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: 允许用户在“课程设置”中手动添加和删除应用程序。
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "允许用户手动删除帐户设置中的 app。"
   allows_user_to_moderate_a_quiz_6953d369: 允许用户审核测验。
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: 允许用户调整测验并查看测验统计页面。
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: 允许用户审核测验。设置：允许用户编辑评分方案。
@@ -3295,6 +3297,7 @@ zh-Hans:
   anonymous_user_d984b9ce: 匿名用户
   anonymous_was_never_turned_on_e5e8aeda: 从未启用匿名
   anonymous_was_turned_off_300d25ec: 已禁用匿名
+  anonymous_you_e708af99: 匿名（您）
   anonymously_graded_59149570: 匿名评分
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: 匿名评分的作业不能为小组作业
   another_assignment_name_369f8481: 另一个作业名称
@@ -5612,7 +5615,7 @@ zh-Hans:
         fields_required: "字段“%{field}”为必填字段"
         invalid_live_events_url: 无效的终端，必须是有效的网址
         invalid_url: "URL 无效"
-        login_expiration_minimum: "会话过期必须为 %{minutes} 分钟或更长时间"
+        login_expiration_minimum: "距离会话过期必须至少有 %{minutes} 分钟"
         need_integer: 请为播放列表缓存输入一个整数
         stream_name_required: Kinesis流名称是必需的。
   canvas_3962b702: Canvas
@@ -6790,7 +6793,7 @@ zh-Hans:
     media_objects_not_configured: 媒体对象未配置
     new_roster_user: 
       completed_enrollment: "已完成*%{completed_at}*"
-      enrolled_as: "已注册为 %{enrollment_type}"
+      enrolled_as: "注册为：%{enrollment_type}"
       enrollment_linked_to: "链接至*%{linked_user}*"
       labels: 
         user_privileges: 权限
@@ -6843,7 +6846,7 @@ zh-Hans:
         conclude: 是否确定要结束此注册？
         conclude_student: 是否确定要结束此学生的注册?
         delete_enrollment: 是否确定要删除此注册？
-      enrolled_as: "已注册为 %{enrollment_type}"
+      enrolled_as: "注册为：%{enrollment_type}"
       enrollment_change_failed: 注册权限更改失败，请重试
       enrollment_linked_to: "已链接到 *%{linked_user}*"
       headings: 
@@ -10478,6 +10481,9 @@ zh-Hans:
   enroll_in_subject_9c1f1c18: 注册科目
   enrolled_a6a517cd: 已注册
   enrolled_as_272da3b9: 注册为
+  enrolled_as_enrollment_type_a008e44a: "注册为：%{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "注册为：%{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "注册为：具有仅限于班次访问权限的 %{enrollment_type}"
   enrollment: 
     default_course_name: 课程
     default_email: 无电子邮件
@@ -10901,6 +10907,7 @@ zh-Hans:
   error_59293a2c: 错误
   error_98e81528: 错误
   error_adding_canvas_file_to_submission_draft_de258021: 向提交项草稿添加canvas文件出错
+  error_adding_file_to_discussion_message_16feef3f: 在讨论消息中添加文件时出错
   error_adding_files_to_conversation_message_58e83876: 将文件添加到会话消息时发生错误
   error_adding_files_to_discussion_message_8bb819e4: 向讨论消息添加文件时发生错误
   error_adding_files_to_submission_draft_6acac337: 向提交项草稿添加文件出错
@@ -10960,6 +10967,7 @@ zh-Hans:
   error_updating_comment_4b80c76d: 更新评论时出错
   error_updating_status_of_module_item_80336274: 更新模块项目状态时发生错误
   error_updating_submission_draft_1d40ade7: 更新提交项草稿时发生错误
+  error_uploading_file_73235601: 上传文件时出错
   error_uploading_file_e2d31b56: 上传文件时出错。
   error_uploading_files_f709361f: 上传文件时发生错误
   error_uploading_video_audio_recording_16d9730a: 上传视频/音频录制文件时出错
@@ -13466,12 +13474,14 @@ zh-Hans:
   hide_courses_without_students_fc6fc7a0: 隐藏没有学生的课程
   hide_details_df9ef4a2: 隐藏详情
   hide_e057ff36: 隐藏
+  hide_from_everyone_9fc3e6d0: 对所有人不可见
   hide_grades_585e63b4: 隐藏评分
   hide_grades_5ff26682: 隐藏评分
   hide_grades_tray_5ed267fe: 隐藏评分托盘
   hide_groups_navigation_menu_62e8b3d0: 隐藏小组导航菜单
   hide_important_dates_c23d2102: 隐藏重要日期
   hide_key_e8fe1e8c: 隐藏密钥
+  hide_name_and_profile_picture_d18eed70: 隐藏姓名和头像
   hide_name_details_23814c37: "隐藏 %{name} 详情"
   hide_navigation_menu_f0b3e90: 隐藏导航菜单
   hide_notes_column_7749f408: 隐藏备注栏
@@ -13713,6 +13723,12 @@ zh-Hans:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       如果启用，允许为 LTI 平台
       储存规格新增 window.postMessage 主体，并向所有 postMessage 发送响应消息。
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      如果启用，来自 JSON API 的“未授权”响应将返回 403
+      （禁止）而不是更加符合 HTTP 标准的 401 代码。
+      而且，当 API 返回未经过身份验证或未授权 JSON 错误时，
+      “状态”字段将不会本地化，
+      而是始终保留英语。
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       如果启用，Canvas 将允许工具在一次请求中在课程模块页面
       返回多个内容项
@@ -13757,6 +13773,7 @@ zh-Hans:
       ，而不是在作业上创建。这将导致活动
       重复，除非删除相关剽窃作业上的订阅
       。
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "如果禁用了“LTI - 添加”，用户仍然可以通过 Canvas App Center 安装经批准的 app（如果对您的机构启用了此功能）。但是，如果未启用“LTI - 删除”，他们将无法删除手动添加到外部 app。"
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "如果还启用了“管理课程：管理员 - 管理/更新”和“课程 - 取消删除”，帐户级用户仍然可以在管理员工具中恢复删除的课程。"
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: 如果启用掌握程度量表，报告将被截断为不包括计算方法、计算整数、掌握程度分数或等级
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: 如果启用新测验，将允许创建和管理归特定课程及新测验中的根帐户所有的项目库。
@@ -17900,7 +17917,9 @@ zh-Hans:
   nav_avatar_border_3246beb1: 导航头像边框
   nav_background_fd299145: 导航背景
   nav_badge_3c67de17: 导航徽章
+  nav_badge_active_1d4be222: 导航面板活跃
   nav_badge_text_574b6eb: 导航徽章文本
+  nav_badge_text_active_9a28e8a2: 导航面板文本活跃
   nav_icon_active_e4825558: 导航图标活动
   nav_icon_ca3fef59: 导航图标
   nav_logo_4b255c91: 导航标志
@@ -18149,6 +18168,7 @@ zh-Hans:
   no_results_match_searchterm_f28e50e0: "没有与“%{searchTerm}”匹配的结果"
   no_score_yet_c94e919b: 尚无分数
   no_start_date_6e81c22b: 无起始日期
+  no_student_is_being_observed_to_select_a_student_r_73301db2: 目前没有观察任何学生。要选择学生，请返回到控制面板。
   no_students_being_observed_42e11732: 没有学生正被观察
   no_students_dd8de9f0: 没有学生
   no_students_have_taken_the_quiz_yet_e667644b: 学生尚未参加测验
@@ -18671,6 +18691,7 @@ zh-Hans:
   observers_remove_ad508fbe: "观察员 - 移除"
   observing_f3c5e759: 观察
   observing_observee_d31d5fa2: "正在观察：%{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "正在观察 %{student_name}要选择其他学生，请返回到控制面板。"
   occurrence_s_c12d1aad: 多个发生
   of_students_5d1af0d2: 学生数目
   off_5385ef3f: 关
@@ -19194,6 +19215,7 @@ zh-Hans:
   parents_sign_up_here_f0aa8f4f: 家长在此登记
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: 局部：学生可以选择公开其姓名和头像
   partially_anonymous_483a892d: 部分匿名
+  partially_anonymous_discussion_13ceb585: "部分匿名讨论 | "
   partially_enabled_and_locked_9a39d38a: 已部分启用和锁定
   partially_enabled_cd506819: 已部分启用
   participantcount_less_8d258f6: "减少 %{participantCount} 个"
@@ -19747,7 +19769,7 @@ zh-Hans:
       name: 会话
     sessions_timeout: 
       labels: 
-        mobile_timeout: "移动应用程序的课程有效期剩余分钟数（至少 20 分钟）"
+        mobile_timeout: "对于移动应用程序，登录后距离会话过期的分钟数时间（2880 [2 天] 分钟）"
         session_timeout: "会话到期前的时间 (以分钟为单位，最少为 20 分钟)"
     settings_header: 
       prompt_change_for_all_line1: 这将针对所有帐户更改设置!
@@ -22472,6 +22494,7 @@ zh-Hans:
   required_access_code_592902d7: 需要访问代码
   required_by_course_end_date_d87a4772: 必须在课程结束日期之前
   required_by_specified_end_date_22dd6b49: 必须在指定结束日期之前
+  required_by_term_end_date_403dff38: 必须按学期结束日期
   required_email_address_379b2392: 要求填写电子邮箱地址
   required_fields_include_key_name_owner_email_tool__b8e42174: 必填字段包括密钥名称、所有者电子邮件、工具ID、重定向URL和图标URL。
   required_input_message_all_unassigned_students_1e721442: 要求输入。向所有未分配的学生发送消息。
@@ -23094,16 +23117,16 @@ zh-Hans:
     confirms: 
       delete_enrollment: 是否确定要永久删除此注册?
     default_course_name: "课程 ID\"%{course_id}\""
-    enrolled_as_designer: 注册为设计者
-    enrolled_as_limited_designer: 注册为仅班级访问权限的设计者
-    enrolled_as_limited_observer: 注册为仅具有班级访问权限的观察员
-    enrolled_as_limited_student: 注册为仅班级访问权限的学生
-    enrolled_as_limited_ta: 注册为仅班级访问权限的助教
-    enrolled_as_limited_teacher: 注册为仅班级访问权限的教师
-    enrolled_as_observer: 注册为观察员
-    enrolled_as_student: 注册为学生
-    enrolled_as_ta: 注册为助教
-    enrolled_as_teacher: 注册为教师
+    enrolled_as_designer: 注册为：设计者
+    enrolled_as_limited_designer: 注册为：具有仅限于班次访问权限的设计者
+    enrolled_as_limited_observer: 注册为：具有仅限于班次访问权限的观察员
+    enrolled_as_limited_student: 注册为：具有仅限于班次访问权限的学生
+    enrolled_as_limited_ta: 注册为：具有仅限于班次访问权限的助教
+    enrolled_as_limited_teacher: 注册为：具有仅限于班次访问权限的教师
+    enrolled_as_observer: 注册为：观察员
+    enrolled_as_student: 注册为：学生
+    enrolled_as_ta: 注册为：助教
+    enrolled_as_teacher: 注册为：教师
     errors: 
       confirmation_failed: 确认失败
       course_not_authorized_for_crosslist: "%{course_name} 没有授权交叉列出"
@@ -24338,6 +24361,7 @@ zh-Hans:
   show_me_76823679: 给我看看
   show_more_8d5f918b: 显示更多
   show_more_af9cbc16: 显示更多
+  show_name_and_profile_picture_9329d8f8: 显示姓名和头像
   show_name_details_186d86e6: "显示 %{name} 详情"
   show_name_of_observed_students_in_notifications_a56dd9e4: 在通知中显示观察到的学生的姓名。
   show_name_of_observed_students_in_notifications_d38b53ca: 在通知中显示观察到的学生的姓名
@@ -24367,6 +24391,7 @@ zh-Hans:
   show_sub_accounts_for_account_name_fa71a658: "显示子帐户%{account_name}"
   show_suggestions_when_typing_b72545de: 键入时显示建议
   show_to_d57767f: 显示给
+  show_to_everyone_94d66d01: 对所有人显示
   show_welcome_tour_a105aa2e: 显示欢迎导览
   showing_1ac6ed70: 正在显示：
   showing_all_announcements_36ff0cec: 显示全部的公告
@@ -25418,6 +25443,7 @@ zh-Hans:
   tas_observers_designers_b705118a: TA/观察员/设计员
   tas_remove_11059e14: "助教 - 删除"
   tas_remove_16a99b22: "助教 - 移除"
+  tea_provisional_graders_d4f19c26: "TEA 临时评分员"
   teacher_5a73b637: 教师、老师
   teacher_count_teachers_a92f7199: "%{teacher_count} 位教师"
   teacher_dashboard_custom_report_6d20bef2: 教师控制面板自定义报告
@@ -25929,6 +25955,8 @@ zh-Hans:
   there_was_a_problem_updating_the_submission_6e5280a1: 更新作业时出现问题。
   there_was_an_error_checking_plan_publishing_status_e7edfd25: 检查计划发布状态时出现错误。
   there_was_an_error_fetching_course_statistics_96e9dbad: 获取课程统计信息时出错
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: 获取评分册过滤器时出错。
+  there_was_an_error_fetching_modules_8ee451bb: 获取单元时出错。
   there_was_an_error_fetching_outcome_results_45c57590: 抓取结果时出错
   there_was_an_error_fetching_submission_comments_ce153077: 提取提交评论时出错
   there_was_an_error_generating_the_pairing_code_9edd639b: 生成配对代码时出错。
@@ -26134,6 +26162,7 @@ zh-Hans:
       这拥有更多问题类型，如热点、
               分类、匹配和排序。它还拥有
               更多审核和调节功能。
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "该教室将注册学生和科目开始/结束日期同步到： "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: 此图像作为背景的水印显示到您的网页。接受的格式：PNG，SVG，GIF，JPEG
   this_image_has_been_reported_9360e581: 此图像已报告。
   this_image_is_currently_unavailable_25c68857: 该图像目前不可用
@@ -27624,6 +27653,7 @@ zh-Hans:
   updated_ui_for_searching_and_displaying_users_and__6755e08e: 更新的用户界面用于搜索和显示一个帐户内的用户和课程。
   updates_account_notification_preferences_ui_to_be__1765f66a: "将帐户通知首选项 UI 更新到最新"
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: 在新评分册作业列标题中更新显示帖子政策图标。
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "更新到 JSON API 授权错误 HTTP 代码和状态字段"
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新讨论失败
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: 更新目录网址将使用户立即无法访问您原来的网址！如果配置了任何现有的支付处理系统，将要求在目录工程师的帮助下进行更改。
@@ -27671,6 +27701,8 @@ zh-Hans:
   uploaded_over_time_d59abb68: 一段时间内上传
   uploading_19e8a4e7: 正在上传
   uploading_ee585874: 正在上传...
+  uploading_file_5c7e14fd: 上传文件
+  uploading_file_in_progress_5c09e0c9: 正在上传文件
   uploading_files_5ff8f4fd: 正在上传文件
   uploading_files_9e39dbf9: 上传文件
   uploading_media_progress_c23a953b: 正在上传媒体进度

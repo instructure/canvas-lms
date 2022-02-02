@@ -32,6 +32,7 @@
     "message": "Apply changes to all instances of this Button and Icon in the Course"
   },
   "apps_54d24a47": { "message": "Apps" },
+  "arrows_464a3e54": { "message": "Arrows" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
   },
@@ -47,6 +48,7 @@
     "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
   },
   "available_folders_694d0436": { "message": "Available folders" },
+  "basic_554cdc0a": { "message": "Basic" },
   "below_81d4dceb": { "message": "Below" },
   "bottom_third_5f5fec1d": { "message": "Bottom Third" },
   "button_color_608a0242": { "message": "Button Colour" },
@@ -129,6 +131,7 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "default numerical ordered list"
   },
+  "delimiters_4db4840d": { "message": "Delimiters" },
   "describe_the_image_e65d2e32": { "message": "(Describe the image)" },
   "describe_the_video_2fe8f46a": { "message": "(Describe the video)" },
   "details_98a31b68": { "message": "Details" },
@@ -136,6 +139,7 @@
   "dimension_type_55c83e4e": { "message": "Dimension type" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_26ae9e08": { "message": "Directionality" },
+  "directly_edit_latex_b7e9235b": { "message": "Directly Edit LaTeX" },
   "discussions_a5f96392": { "message": "Discussions" },
   "discussions_index_6c36ced": { "message": "Discussions Index" },
   "display_options_315aba85": { "message": "Display Options" },
@@ -172,6 +176,7 @@
     "message": "Enter at least 3 characters to search"
   },
   "equation_1c5ac93c": { "message": "Equation" },
+  "equation_editor_39fbc3f1": { "message": "Equation Editor" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expand preview by Default"
   },
@@ -209,6 +214,7 @@
     "message": "Go to the editor''s toolbar"
   },
   "grades_a61eba0a": { "message": "Marks" },
+  "greek_65c5b3f7": { "message": "Greek" },
   "group_documents_8bfd6ae6": { "message": "Group Documents" },
   "group_files_4324f3df": { "message": "Group Files" },
   "group_files_82e5dcdb": { "message": "Group files" },
@@ -266,6 +272,7 @@
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Middle" },
+  "misc_3b692ea7": { "message": "Misc" },
   "miscellaneous_e9818229": { "message": "Miscellaneous" },
   "modules_c4325335": { "message": "Modules" },
   "multi_color_image_63d7372f": { "message": "Multi Colour Image" },
@@ -302,6 +309,7 @@
   "open_title_application_fd624fc5": {
     "message": "Open { title } application"
   },
+  "operators_a2ef9a93": { "message": "Operators" },
   "options_3ab0ea65": { "message": "Options" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordered and Unordered Lists"
@@ -337,6 +345,7 @@
   "raw_html_editor_e3993e41": { "message": "Raw HTML Editor" },
   "record_7c9448b": { "message": "Record" },
   "record_upload_media_5fdce166": { "message": "Record/Upload Media" },
+  "relationships_6602af70": { "message": "Relationships" },
   "remove_link_d1f2f4d0": { "message": "Remove Link" },
   "resize_ec83d538": { "message": "Resize" },
   "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },

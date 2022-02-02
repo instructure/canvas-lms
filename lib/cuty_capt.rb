@@ -57,7 +57,7 @@ class CutyCapt
     return @@config if defined?(@@config) && @@config
 
     setting = begin
-      consul_config = Canvas::DynamicSettings.find(tree: :private)["cutycapt.yml"]
+      consul_config = DynamicSettings.find(tree: :private)["cutycapt.yml"]
       (consul_config && YAML.safe_load(consul_config).with_indifferent_access) || ConfigFile.load("cutycapt") || {}
     end
     setting = setting.symbolize_keys

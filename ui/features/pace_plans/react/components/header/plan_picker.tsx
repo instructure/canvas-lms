@@ -122,6 +122,7 @@ export const PlanPicker: React.FC<ComponentProps> = ({
         open ? <IconArrowOpenUpSolid inline={false} /> : <IconArrowOpenDownSolid inline={false} />
       }
       value={selectedContextName}
+      data-testid="pace-plan-picker"
       interaction="readonly"
       role="button"
       onKeyDown={handleKeyDown}
@@ -153,7 +154,7 @@ export const PlanPicker: React.FC<ComponentProps> = ({
         {/*    renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`) */}
         {/*  )} */}
         {/* </Menu> */}
-        <Menu id="pace-plan-menu" label={I18n.t('Students')}>
+        <Menu id="pace-plan-student-menu" label={I18n.t('Students')}>
           {enrollments.map(e =>
             renderOption(createContextKey('Enrollment', e.id), e.full_name, `student-${e.id}`)
           )}

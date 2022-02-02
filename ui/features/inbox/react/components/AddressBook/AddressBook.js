@@ -349,7 +349,6 @@ export const AddressBook = ({
                     <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
                   }
                   renderBeforeInput={selectedUsers.length === 0 ? null : renderedSelectedTags}
-                  placeholder="Test"
                   onFocus={() => {
                     if (!isLimitReached) {
                       setIsMenuOpen(true)
@@ -413,7 +412,10 @@ export const AddressBook = ({
               screenReaderLabel={I18n.t('Open Address Book')}
               onClick={() => {
                 setIsMenuOpen(!isMenuOpen)
-                textInputRef.current.focus()
+
+                if (isMenuOpen) {
+                  textInputRef.current.focus()
+                }
               }}
               disabled={isLimitReached}
             >
