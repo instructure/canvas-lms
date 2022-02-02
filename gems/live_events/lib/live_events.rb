@@ -108,6 +108,9 @@ module LiveEvents
       if context.is_a?(Proc)
         context = Thread.current[:live_events_ctx] = context.call
       end
+      if context.blank?
+        LiveEvents&.statsd&.increment("live_events.missing_context")
+      end
       context
     end
 

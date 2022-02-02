@@ -54,3 +54,30 @@ For testing new features that may not have been added to the test tool, or for m
   - [Line Item API docs](https://canvas.instructure.com/doc/api/line_items.html)
   - [Score API docs](https://canvas.instructure.com/doc/api/score.html)
   - [Result API docs](https://canvas.instructure.com/doc/api/result.html)
+
+## Miscellaneous
+
+### Stubbing Statsd Calls
+
+This isn't exactly LTI-specific, but can come in handy. There isn't a great way to get
+visibility into the calls made to `InstStatsd::Statsd`, which is the way to get metrics
+sent to Datadog. It's possible to monkey-patch that class and stub the methods you care
+about and just log them to stdout. If you're working entirely in the Rails console, you
+can paste this patch directly into the console. If you're working with Canvas requests
+at all, you can paste this patch into any Ruby file in Canvas and save it (I prefer the
+one I'm currently working in, for consistency).
+
+Replace `increment` with any Statsd method you need, or add more methods if needed.
+
+```
+class << InstStatsd::Statsd
+  def increment(*args)
+    puts "DEBUG STATSD increment: #{args.to_json}"
+  end
+end
+```
+
+Then, look in the logs for your method calls. If you are working entirely in the Rails
+console, they will appear there. If you are working with Canvas requests, tail the web
+container's logs with `docker-compose logs -f --tail=100 web` and then search for
+`DEBUG STATSD`.

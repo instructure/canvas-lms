@@ -28,15 +28,14 @@ import {
   IMPORT_OUTCOMES,
   CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
-import {defaultOutcomesManagementRatings} from '../react/hooks/useRatings'
+import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
 import {pick, uniq, flattenDeep} from 'lodash'
 
-const ratingsWithTypename = ratings =>
-  ratings
-    .map(rating => pick(rating, ['description', 'points', 'mastery']))
-    .map(r => ({...r, __typename: 'ProficiencyRating'}))
+const testRatings = defaultRatings.map(rating => pick(rating, ['description', 'points']))
 
-const getMasteryPoints = ratings => ratings.filter(rating => rating.mastery)[0].points
+const ratingsWithTypename = ratings => ratings.map(r => ({...r, __typename: 'ProficiencyRating'}))
+
+const maxPoints = ratings => ratings.sort((a, b) => b.points - a.points)[0].points
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
   {
@@ -237,8 +236,8 @@ export const treeGroupMocks = ({
     const childrenOutcomes = (detailsStructure[gid] || []).map(toString)
     const calculationMethod = 'decaying_average'
     const calculationInt = 65
-    const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-    const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
+    const masteryPoints = defaultMasteryPoints
+    const ratings = ratingsWithTypename(testRatings)
 
     return {
       request: {
@@ -484,8 +483,8 @@ const createSearchGroupOutcomesOutcomeMocks = (
 ) => {
   const calculationMethod = 'decaying_average'
   const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
+  const masteryPoints = defaultMasteryPoints
+  const ratings = ratingsWithTypename(testRatings)
 
   // Tech Debt - see OUT-4776 - need to switch this over to a dynamic array like the below code
   // for now too many tests are dependant on the number of outcomes and the order
@@ -594,8 +593,8 @@ export const groupDetailMocks = ({
 } = {}) => {
   const calculationMethod = 'decaying_average'
   const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
+  const masteryPoints = defaultMasteryPoints
+  const ratings = ratingsWithTypename(testRatings)
 
   return [
     {
@@ -1137,8 +1136,8 @@ export const groupDetailMocksFetchMore = ({
 } = {}) => {
   const calculationMethod = 'decaying_average'
   const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
+  const masteryPoints = defaultMasteryPoints
+  const ratings = ratingsWithTypename(testRatings)
 
   return [
     {
@@ -1328,8 +1327,8 @@ export const findOutcomesMocks = ({
 } = {}) => {
   const calculationMethod = 'decaying_average'
   const calculationInt = 65
-  const masteryPoints = getMasteryPoints(defaultOutcomesManagementRatings)
-  const ratings = ratingsWithTypename(defaultOutcomesManagementRatings)
+  const masteryPoints = defaultMasteryPoints
+  const ratings = ratingsWithTypename(testRatings)
 
   return [
     {
@@ -1545,13 +1544,12 @@ export const createLearningOutcomeMock = ({
   calculationMethod = 'decaying_average',
   calculationInt = 65,
   individualCalculation = false,
-  masteryPoints = 3,
-  ratings = defaultOutcomesManagementRatings,
+  masteryPoints = defaultMasteryPoints,
+  ratings = testRatings,
   individualRatings = false
 } = {}) => {
-  const inputRatings = ratings.map(rating => pick(rating, ['description', 'points']))
-  const pointsPossible = ratings.sort((a, b) => b.points - a.points)[0].points
-  const outputRatings = inputRatings.map(r => ({...r, __typename: 'ProficiencyRating'}))
+  const pointsPossible = maxPoints(ratings)
+  const outputRatings = ratingsWithTypename(ratings)
 
   const successfulResponse = {
     data: {
@@ -1621,7 +1619,7 @@ export const createLearningOutcomeMock = ({
   }
   if (individualRatings) {
     input.masteryPoints = masteryPoints
-    input.ratings = inputRatings
+    input.ratings = ratings
   }
 
   return {
@@ -1643,13 +1641,12 @@ export const updateLearningOutcomeMocks = ({
   calculationMethod = 'decaying_average',
   calculationInt = 65,
   individualCalculation = false,
-  masteryPoints = 3,
-  ratings = defaultOutcomesManagementRatings,
+  masteryPoints = defaultMasteryPoints,
+  ratings = testRatings,
   individualRatings = false
 } = {}) => {
-  const inputRatings = ratings.map(rating => pick(rating, ['description', 'points']))
-  const pointsPossible = ratings.sort((a, b) => b.points - a.points)[0].points
-  const outputRatings = inputRatings.map(r => ({...r, __typename: 'ProficiencyRating'}))
+  const pointsPossible = maxPoints(ratings)
+  const outputRatings = ratingsWithTypename(ratings)
 
   const input = {
     title,
@@ -1662,7 +1659,7 @@ export const updateLearningOutcomeMocks = ({
   }
   if (individualRatings) {
     input.masteryPoints = masteryPoints
-    input.ratings = inputRatings
+    input.ratings = ratings
   }
   const output = {
     ...input,
