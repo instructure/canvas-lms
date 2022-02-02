@@ -406,7 +406,7 @@ export const AddressBook = ({
                 }}
                 as="div"
                 width={popoverWidth}
-                maxHeight="80vh"
+                maxHeight="45vh"
                 overflowY="auto"
               >
                 {isLoading && renderLoading()}
