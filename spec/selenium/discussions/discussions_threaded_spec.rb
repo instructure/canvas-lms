@@ -32,7 +32,6 @@ describe "threaded discussions" do
   end
 
   before do
-    user_session(@teacher)
     stub_rcs_config
   end
 
@@ -42,6 +41,7 @@ describe "threaded discussions" do
     end
 
     it "replies with iframe element" do
+      user_session(@teacher)
       entry_text = "<iframe src='https://example.com'></iframe>"
       Discussion.visit(@course, @topic)
       f("#discussion_topic").find_element(:css, ".discussion-reply-action").click
@@ -60,6 +60,7 @@ describe "threaded discussions" do
     end
 
     it "allows edits to entries with replies", priority: "2" do
+      user_session(@teacher)
       edit_text = "edit message"
       entry = @topic.discussion_entries.create!(
         user: @student,
@@ -116,6 +117,7 @@ describe "threaded discussions" do
     end
 
     it "allows edits to discussion with replies", priority: "1" do
+      user_session(@teacher)
       reply_depth = 3
       reply_depth.times do |i|
         @topic.discussion_entries.create!(user: @student,
@@ -142,6 +144,7 @@ describe "threaded discussions" do
     end
 
     it "shows a reply time that is different from the creation time", priority: "2" do
+      user_session(@teacher)
       @enrollment.workflow_state = "active"
       @enrollment.save!
 
@@ -171,6 +174,8 @@ describe "threaded discussions" do
     end
 
     it "deletes a reply", priority: "1" do
+      user_session(@teacher)
+
       skip_if_safari(:alert)
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
@@ -178,6 +183,8 @@ describe "threaded discussions" do
     end
 
     it "displays editor name and timestamp after edit", priority: "2" do
+      user_session(@teacher)
+
       skip_if_chrome("needs research: passes locally fails on Jenkins ")
       edit_text = "edit message"
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
@@ -188,6 +195,8 @@ describe "threaded discussions" do
     end
 
     it "supports repeated editing", priority: "2" do
+      user_session(@teacher)
+
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
       edit_entry(entry, "New text 1")
@@ -199,6 +208,8 @@ describe "threaded discussions" do
     end
 
     it "re-renders replies after editing", priority: "2" do
+      user_session(@teacher)
+
       edit_text = "edit message"
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
 
@@ -216,6 +227,8 @@ describe "threaded discussions" do
     end
 
     it "displays editor name and timestamp after delete", priority: "2" do
+      user_session(@teacher)
+
       entry_text = "new entry"
       Discussion.visit(@course, @topic)
 
@@ -242,6 +255,8 @@ describe "threaded discussions" do
           message: "new threaded reply from student",
           parent_entry: DiscussionEntry.last
         )
+        user_session(@teacher)
+
         Discussion.visit(@course, topic)
         f("a[data-student_id='#{@student.id}']").click
         expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student")
@@ -255,6 +270,8 @@ describe "threaded discussions" do
     end
 
     it "replies with iframe element" do
+      user_session(@teacher)
+
       entry_text = "<iframe src='https://example.com'></iframe>"
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("button[data-testid='discussion-topic-reply']").click
@@ -272,6 +289,8 @@ describe "threaded discussions" do
     end
 
     it "allows edits to entries with replies" do
+      user_session(@teacher)
+
       edit_text = "edit message"
       entry = @topic.discussion_entries.create!(
         user: @student,
@@ -333,6 +352,8 @@ describe "threaded discussions" do
         user: @student,
         message: "new threaded reply from student"
       )
+      user_session(@teacher)
+
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("button[data-testid='thread-actions-menu']").click
       fj("li:contains('Delete')").click
@@ -352,6 +373,7 @@ describe "threaded discussions" do
           user: @student,
           message: "this is offensive content"
         )
+        user_session(@teacher)
 
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         f("button[data-testid='thread-actions-menu']").click
@@ -370,6 +392,55 @@ describe "threaded discussions" do
         wait_for_ajaximations
         f("button[data-testid='thread-actions-menu']").click
         expect(fj("li:contains('Reported')")).to be_present
+      end
+    end
+
+    context "fully anonymous discussions" do
+      before :once do
+        Account.site_admin.enable_feature! :discussion_anonymity
+      end
+
+      it "only shows students as anonymous" do
+        designer = designer_in_course(course: @course, name: "Designer", active_all: true).user
+        ta = ta_in_course(course: @course, name: "TA", active_all: true).user
+
+        anon_topic = @course.discussion_topics.create!(
+          user: @teacher,
+          title: "Fully Anonymous Topic",
+          message: "Teachers, TAs and Designers are anonymized",
+          workflow_state: "published",
+          anonymous_state: "full_anonymity"
+        )
+
+        anon_topic.discussion_entries.create!(
+          user: @teacher,
+          message: "this a teacher entry"
+        )
+
+        anon_topic.discussion_entries.create!(
+          user: designer,
+          message: "this a designer entry"
+        )
+
+        anon_topic.discussion_entries.create!(
+          user: ta,
+          message: "this a ta entry"
+        )
+
+        student_entry = anon_topic.discussion_entries.create!(
+          user: @student,
+          message: "this a student entry"
+        )
+
+        user_session(@teacher)
+        get "/courses/#{@course.id}/discussion_topics/#{anon_topic.id}"
+        expect(fj("span[data-testid='non-graded-discussion-info'] span:contains('Anonymous Discussion')")).to be_present
+
+        author_spans = ff("span[data-testid='author_name']")
+        authors = author_spans.map(&:text)
+        expect(student_entry.author_name).to include "Anonymous "
+        expect(authors).to include("teacher", "TA", "Designer", student_entry.author_name)
+        expect(authors).not_to include("student")
       end
     end
   end

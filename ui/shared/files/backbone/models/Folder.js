@@ -110,7 +110,7 @@ class __Folder extends FilesystemObject {
     return $.when(fetchDfd).done(() => {
       let filesDfd, foldersDfd
       if (this.get('folders_count') !== 0) {
-        foldersDfd = this.folders.fetch()
+        foldersDfd = this.folders.fetch({data: {per_page: this.get('folders_count')}})
       }
       if (this.get('files_count') !== 0 && !options.onlyShowSubtrees) {
         filesDfd = this.files.fetch()
@@ -144,7 +144,8 @@ class __Folder extends FilesystemObject {
   isEmpty() {
     return (
       !!(this.files.loadedAll && this.files.length === 0) &&
-      (this.folders.loadedAll && this.folders.length === 0)
+      this.folders.loadedAll &&
+      this.folders.length === 0
     )
   }
 
@@ -212,7 +213,7 @@ class __Folder extends FilesystemObject {
       .sort(this.childrenSorter.bind(null, sort, order))
   }
 }
-__Folder.resolvePath = function(contextType, contextId, folderPath) {
+__Folder.resolvePath = function (contextType, contextId, folderPath) {
   folderPath = urlHelper.decodeSpecialChars(folderPath)
 
   const url = `/api/v1/${contextType}/${contextId}/folders/by_path${folderPath}`

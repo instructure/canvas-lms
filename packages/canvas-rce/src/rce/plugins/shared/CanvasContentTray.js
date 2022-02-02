@@ -30,6 +30,7 @@ import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
 import {getTrayHeight} from './trayUtils'
+import {BUTTONS_AND_ICONS} from '../instructure_buttons/registerEditToolbar'
 
 /**
  * Returns the translated tray label
@@ -46,7 +47,7 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
   }
 
   switch (contentSubtype) {
-    case 'buttons_and_icons':
+    case BUTTONS_AND_ICONS:
       return formatMessage('Buttons and Icons')
     case 'images':
       if (contentType === 'course_files') return formatMessage('Course Images')
@@ -188,7 +189,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   list_buttons_and_icons: {
     contextType: 'course',
     contentType: 'course_files',
-    contentSubtype: 'buttons_and_icons',
+    contentSubtype: BUTTONS_AND_ICONS,
     sortValue: 'date_added',
     sortDir: 'desc',
     searchString: ''

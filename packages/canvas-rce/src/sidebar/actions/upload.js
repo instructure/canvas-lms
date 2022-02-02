@@ -25,6 +25,7 @@ import {fileEmbed} from '../../common/mimeClass'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
 import {fixupFileUrl} from '../../common/fileUrl'
+import {BUTTONS_AND_ICONS} from '../../rce/plugins/instructure_buttons/registerEditToolbar'
 
 export const COMPLETE_FILE_UPLOAD = 'COMPLETE_FILE_UPLOAD'
 export const FAIL_FILE_UPLOAD = 'FAIL_FILE_UPLOAD'
@@ -266,7 +267,13 @@ export function uploadToButtonsAndIconsFolder(svg, uploadSettings = {}) {
       .then(({folders}) => {
         fileMetaProps.parentFolderId = folders[0].id
         return source
-          .preflightUpload(fileMetaProps, {host, contextId, contextType, onDuplicate})
+          .preflightUpload(fileMetaProps, {
+            host,
+            contextId,
+            contextType,
+            onDuplicate,
+            category: BUTTONS_AND_ICONS
+          })
           .then(results => {
             return source.uploadFRD(svgAsFile, results)
           })

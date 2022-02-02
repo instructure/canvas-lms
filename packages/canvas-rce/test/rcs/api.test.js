@@ -418,112 +418,6 @@ describe('sources/api', () => {
     })
   })
 
-  describe('fetchButtonsAndIcons', () => {
-    const props = {contextId: '1', contextType: 'course'}
-
-    beforeEach(() => {
-      const fetchPageResponseBody = {
-        bookmark: 'http://example.com/?p=3',
-        files: [
-          {
-            id: '101',
-            name: 'button.svg',
-            thumbnailUrl: '/files/1/download',
-            type: 'image/svg+xml',
-            url: '/files/1/download/'
-          }
-        ]
-      }
-      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(fetchPageResponseBody))
-    })
-
-    afterEach(() => {
-      apiSource.fetchPage.restore()
-    })
-
-    describe('when a bookmark is present', () => {
-      it('fetches with the bookmark', () => {
-        apiSource.fetchButtonsAndIcons(props, 'http://example.com/?p=2', () => {})
-        sinon.assert.calledWith(apiSource.fetchPage, 'http://example.com/?p=2')
-      })
-
-      it('calls the onSuccess arg with the returned bookmark', () => {
-        const onSuccess = ({bookmark}) => {
-          assert.strictEqual(bookmark, fetchPageResponseBody.bookmark)
-        }
-
-        apiSource.fetchButtonsAndIcons(props, 'http://example.com/?p=2', onSuccess)
-      })
-
-      it('calls the onSuccess arg with the returned files', () => {
-        const onSuccess = ({files}) => {
-          assert.deepEqual(files, [
-            {
-              id: '101',
-              name: 'button.svg',
-              thumbnailUrl: '/files/1/download',
-              type: 'image/svg+xml',
-              url: '/courses/1/files/1?wrap=1' // url is normalized to include the context
-            }
-          ])
-        }
-
-        apiSource.fetchButtonsAndIcons(props, 'http://example.com/?p=2', onSuccess)
-      })
-    })
-
-    describe('when a bookmark is not present', () => {
-      const filesUrl = 'http://example.com'
-      const folderResponseBody = {
-        bookmark: 'http://example.com/?p=2',
-        folders: [{filesUrl, id: 24}]
-      }
-
-      let fetchButtonsAndIconsFolderPromise
-
-      beforeEach(() => {
-        fetchButtonsAndIconsFolderPromise = Promise.resolve(folderResponseBody)
-        sinon
-          .stub(apiSource, 'fetchButtonsAndIconsFolder')
-          .returns(fetchButtonsAndIconsFolderPromise)
-      })
-
-      afterEach(() => {
-        apiSource.fetchButtonsAndIconsFolder.restore()
-      })
-
-      it('fetches the buttons and icons folder, then fetches the files within that folder', async () => {
-        apiSource.fetchButtonsAndIcons(props, null, () => {})
-        await fetchButtonsAndIconsFolderPromise
-        sinon.assert.calledWith(apiSource.fetchPage, `${filesUrl}?per_page=25`)
-      })
-
-      it('calls the onSuccess arg with the returned bookmark', () => {
-        const onSuccess = ({bookmark}) => {
-          assert.strictEqual(bookmark, folderResponseBody.bookmark)
-        }
-
-        apiSource.fetchButtonsAndIcons(props, null, onSuccess)
-      })
-
-      it('calls the onSuccess arg with the returned files', () => {
-        const onSuccess = ({files}) => {
-          assert.deepEqual(files, [
-            {
-              id: '101',
-              name: 'button.svg',
-              thumbnailUrl: '/files/1/download',
-              type: 'image/svg+xml',
-              url: '/courses/1/files/1?wrap=1' // url is normalized to include the context
-            }
-          ])
-        }
-
-        apiSource.fetchButtonsAndIcons(props, null, onSuccess)
-      })
-    })
-  })
-
   describe('fetchMediaFolder', () => {
     let files
     beforeEach(() => {
@@ -562,6 +456,17 @@ describe('sources/api', () => {
         const body = JSON.parse(fetchMock.lastOptions(uri).body)
         assert.equal(body.onDuplicate, 'overwrite')
       })
+    })
+
+    it('includes "category"', () => {
+      fetchMock.mock(uri, '{}')
+
+      return apiSource
+        .preflightUpload(fileProps, {category: 'buttons_and_icons'}, apiProps)
+        .then(() => {
+          const body = JSON.parse(fetchMock.lastOptions(uri).body)
+          assert.equal(body.category, 'buttons_and_icons')
+        })
     })
 
     it('includes jwt in Authorization header', () => {

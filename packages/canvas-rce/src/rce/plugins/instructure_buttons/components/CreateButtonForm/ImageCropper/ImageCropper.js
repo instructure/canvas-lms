@@ -17,6 +17,7 @@
  */
 
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import ImageCropperPreview from './ImageCropperPreview'
@@ -33,16 +34,17 @@ const SHAPE_OPTIONS = [
   {id: 'star', label: formatMessage('Star')}
 ]
 
-export const ImageCropper = () => {
+export const ImageCropper = ({image}) => {
   const [selectedShape, setSelectedShape] = useState('square')
   return (
     <Flex direction="column" margin="none">
-      <Flex.Item margin="none none small">
+      <Flex.Item margin="none none small" overflowY="hidden">
         <SimpleSelect
           isInline
           assistiveText={formatMessage('Select crop shape')}
           value={selectedShape}
           onChange={(event, {id}) => setSelectedShape(id)}
+          renderLabel={null}
         >
           {SHAPE_OPTIONS.map(option => (
             <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
@@ -52,8 +54,12 @@ export const ImageCropper = () => {
         </SimpleSelect>
       </Flex.Item>
       <Flex.Item>
-        <ImageCropperPreview shape={selectedShape} />
+        <ImageCropperPreview image={image} shape={selectedShape} />
       </Flex.Item>
     </Flex>
   )
+}
+
+ImageCropper.propTypes = {
+  image: PropTypes.string
 }

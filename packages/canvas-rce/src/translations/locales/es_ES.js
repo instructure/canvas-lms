@@ -55,6 +55,7 @@ const locale = {
     "message": "Aplica cambios a todas las instancias de este Botón e icono en el Curso"
   },
   "apps_54d24a47": { "message": "Aplicaciones" },
+  "arrows_464a3e54": { "message": "Flechas" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Se conservará la relación de aspecto"
   },
@@ -72,6 +73,7 @@ const locale = {
     "message": "Hay contenido guardado automáticamente. ¿Desea cargar el contenido guardado automáticamente?"
   },
   "available_folders_694d0436": { "message": "Carpetas disponibles" },
+  "basic_554cdc0a": { "message": "Básico" },
   "below_81d4dceb": { "message": "Debajo" },
   "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
   "button_color_608a0242": { "message": "Color del botón" },
@@ -145,13 +147,13 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# ítem cargado}\n  other {# ítems cargados}\n}"
   },
-  "course_documents_104d76e0": { "message": "Documentos del curso" },
-  "course_files_62deb8f8": { "message": "Archivos del curso" },
-  "course_files_a31f97fc": { "message": "Archivos del curso" },
-  "course_images_f8511d04": { "message": "Imágenes del curso" },
-  "course_links_b56959b9": { "message": "Enlaces del curso" },
-  "course_media_ec759ad": { "message": "Multimedia del curso" },
-  "course_navigation_dd035109": { "message": "Navegación del curso" },
+  "course_documents_104d76e0": { "message": "Documentos de la asignatura" },
+  "course_files_62deb8f8": { "message": "Archivos de la asignatura" },
+  "course_files_a31f97fc": { "message": "Archivos de la asignatura" },
+  "course_images_f8511d04": { "message": "Imágenes de la asignatura" },
+  "course_links_b56959b9": { "message": "Enlaces de la asignatura" },
+  "course_media_ec759ad": { "message": "Multimedia de la asignatura" },
+  "course_navigation_dd035109": { "message": "Navegación de la asignatura" },
   "create_button_and_icon_5c089934": { "message": "Crear botón e ícono" },
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
@@ -168,6 +170,7 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "lista numérica ordenada predeterminada"
   },
+  "delimiters_4db4840d": { "message": "Delimitadores" },
   "describe_the_image_e65d2e32": { "message": "(Describir la imagen)" },
   "describe_the_video_2fe8f46a": { "message": "(Describir el video)" },
   "details_98a31b68": { "message": "Detalles" },
@@ -175,6 +178,7 @@ const locale = {
   "dimension_type_55c83e4e": { "message": "Tipo de dimensión" },
   "dimensions_45ddb7b7": { "message": "Dimensiones" },
   "directionality_26ae9e08": { "message": "Direccionalidad" },
+  "directly_edit_latex_b7e9235b": { "message": "Editar directamente LaTeX" },
   "discussions_a5f96392": { "message": "Foros de discusión" },
   "discussions_index_6c36ced": { "message": "Índice de foros de discusión" },
   "display_options_315aba85": { "message": "Mostrar opciones" },
@@ -213,6 +217,7 @@ const locale = {
     "message": "Introduzca al menos 3 caracteres para buscar"
   },
   "equation_1c5ac93c": { "message": "Ecuación" },
+  "equation_editor_39fbc3f1": { "message": "Editor de ecuaciones" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expandir vista previa de forma predeterminada"
   },
@@ -252,6 +257,7 @@ const locale = {
     "message": "Ir a la barra de herramientas del editor"
   },
   "grades_a61eba0a": { "message": "Notas" },
+  "greek_65c5b3f7": { "message": "Griego" },
   "group_documents_8bfd6ae6": { "message": "Documentos del grupo" },
   "group_files_4324f3df": { "message": "Archivos del grupo" },
   "group_files_82e5dcdb": { "message": "Archivos del grupo" },
@@ -304,7 +310,7 @@ const locale = {
   "load_more_results_460f49a9": { "message": "Cargar más resultados" },
   "loading_25990131": { "message": "Cargando..." },
   "loading_bde52856": { "message": "Cargando" },
-  "loading_failed_b3524381": { "message": "La carga ha fallado..." },
+  "loading_failed_b3524381": { "message": "La carga ha fallado." },
   "loading_failed_e6a9d8ef": { "message": "La carga ha fallado." },
   "loading_folders_d8b5869e": { "message": "Cargando carpetas" },
   "loading_please_wait_d276220a": { "message": "Cargando, espere" },
@@ -313,8 +319,9 @@ const locale = {
   "media_af190855": { "message": "Contenido multimedia" },
   "medium_5a8e9ead": { "message": "Regular" },
   "middle_27dc1d5": { "message": "El medio" },
+  "misc_3b692ea7": { "message": "Varios" },
   "miscellaneous_e9818229": { "message": "Misceláneo" },
-  "modules_c4325335": { "message": "Módulos" },
+  "modules_c4325335": { "message": "Contenidos" },
   "multi_color_image_63d7372f": { "message": "Imagen multicolor" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Debe ser al menos { percentage }%"
@@ -327,7 +334,7 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegar por el menú o la barra de herramientas"
   },
-  "next_page_d2a39853": { "message": "Próxima página" },
+  "next_page_d2a39853": { "message": "Siguiente página" },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": {
     "message": "No se ha seleccionado ningún archivo"
@@ -351,6 +358,7 @@ const locale = {
   "open_title_application_fd624fc5": {
     "message": "Abrir aplicación { title }"
   },
+  "operators_a2ef9a93": { "message": "Operadores" },
   "options_3ab0ea65": { "message": "Opciones" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listas ordenadas y no ordenadas"
@@ -382,10 +390,11 @@ const locale = {
   },
   "published_c944a23d": { "message": "publicado" },
   "published_when_302d8e23": { "message": "Publicado: { when }" },
-  "quizzes_7e598f57": { "message": "Evaluaciones" },
+  "quizzes_7e598f57": { "message": "Pruebas" },
   "raw_html_editor_e3993e41": { "message": "Editor HTML puro" },
   "record_7c9448b": { "message": "Grabar" },
   "record_upload_media_5fdce166": { "message": "Grabar/cargar multimedia" },
+  "relationships_6602af70": { "message": "Relaciones" },
   "remove_link_d1f2f4d0": { "message": "Eliminar enlace" },
   "resize_ec83d538": { "message": "Redimensionar" },
   "restore_auto_save_deccd84b": {
@@ -406,7 +415,7 @@ const locale = {
   "search_term_b2d2235": { "message": "Término de búsqueda" },
   "select_crop_shape_d441feeb": { "message": "Seleccione la forma de recorte" },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
-  "selected_274ce24f": { "message": "Seleccionada" },
+  "selected_274ce24f": { "message": "Seleccionado" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Mayúsc-O para abrir el editor html agradable."
   },
@@ -452,7 +461,7 @@ const locale = {
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Cambiar al editor de texto enriquecido"
   },
-  "syllabus_f191f65b": { "message": "Programa del curso" },
+  "syllabus_f191f65b": { "message": "Programa de la asignatura" },
   "tab_arrows_4cf5abfc": { "message": "Tabulador/flechas" },
   "text_7f4593da": { "message": "Texto" },
   "text_background_color_16e61c3f": { "message": "Color del fondo del texto" },
@@ -476,7 +485,7 @@ const locale = {
   },
   "title_ee03d132": { "message": "Título" },
   "to_be_posted_when_d24bf7dc": { "message": "Para publicar: { when }" },
-  "to_do_when_2783d78f": { "message": "Pendiente: { when }" },
+  "to_do_when_2783d78f": { "message": "Tareas pendientes: { when }" },
   "toggle_summary_group_413df9ac": { "message": "Alternar { summary } grupo" },
   "tools_2fcf772e": { "message": "Herramientas" },
   "totalresults_results_found_numdisplayed_results_cu_a0a44975": {

@@ -385,6 +385,11 @@ class GradebooksController < ApplicationController
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
 
+    if allow_apply_score_to_ungraded?
+      last_score_to_ungraded = Progress.where(context: @context, tag: "apply_score_to_ungraded_assignments").order(created_at: :desc).first
+      last_score_to_ungraded = nil if last_score_to_ungraded&.failed?
+    end
+
     grading_standard = @context.grading_standard_or_default
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
     visible_sections = @context.sections_visible_to(@current_user)
@@ -428,6 +433,7 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings: gradebook_column_size_preferences,
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
+      gradebook_score_to_ungraded_progress: last_score_to_ungraded,
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
       gradebook_assignment_search_and_redesign: Account.site_admin.feature_enabled?(:gradebook_assignment_search_and_redesign),

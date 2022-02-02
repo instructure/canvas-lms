@@ -50,14 +50,14 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
 `
 
 export const CONVERSATIONS_QUERY = gql`
-  query GetConversationsQuery($userID: ID!, $course: String, $scope: String = "") {
+  query GetConversationsQuery($userID: ID!, $filter: [String!], $scope: String = "") {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
         id
         conversationsConnection(
           scope: $scope # e.g. archived
-          filter: $course # e.g. course_1
+          filter: $filter # e.g. [course_1, user_1]
         ) {
           nodes {
             ...ConversationParticipant

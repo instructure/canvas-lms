@@ -157,6 +157,20 @@ describe('ProjectedDates', () => {
       expect(getByDisplayValue('December 15, 2021')).toBeInTheDocument()
     })
 
+    it('shows error if end date is before start date', () => {
+      const plan = {...defaultProps.pacePlan, start_date: '2021-08-01', end_date: '2021-07-31'}
+      const {getByText} = renderConnected(<ProjectedDates {...defaultProps} pacePlan={plan} />)
+      expect(getByText('Date is before student enrollment date')).toBeInTheDocument()
+    })
+
+    it('shows error if end date is after course end date', () => {
+      const d = new Date(ENV.VALID_DATE_RANGE.end_at.date)
+      d.setDate(d.getDate() + 1)
+      const plan = {...defaultProps.pacePlan, end_date: d.toISOString()}
+      const {getByText} = renderConnected(<ProjectedDates {...defaultProps} pacePlan={plan} />)
+      expect(getByText('Date is after the course end date')).toBeInTheDocument()
+    })
+
     it('shows open-ended plan text', () => {
       window.ENV.VALID_DATE_RANGE = {
         end_at: {date: null, date_context: 'course'},

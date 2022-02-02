@@ -87,8 +87,13 @@ describe('OutcomeManagementPanel', () => {
     jest.clearAllMocks()
   })
 
+  beforeAll(() => {
+    jest.setTimeout(10000)
+  })
+
   afterAll(() => {
     window.ENV = null
+    jest.setTimeout(5000)
   })
 
   const render = (
@@ -602,7 +607,7 @@ describe('OutcomeManagementPanel', () => {
 
   describe('Bulk remove outcomes', () => {
     it('shows bulk remove outcomes modal if outcomes are selected and remove button is clicked', async () => {
-      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      const {findByText, getByText, getByRole} = render(<OutcomeManagementPanel />, {
         ...groupDetailDefaultProps
       })
       await act(async () => jest.runOnlyPendingTimers())
@@ -612,7 +617,7 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(getByText('Select outcome Outcome 2 - Course folder 0'))
       fireEvent.click(getByRole('button', {name: /remove/i}))
       await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('Remove Outcomes?')).toBeInTheDocument()
+      expect(await findByText('Remove Outcomes?')).toBeInTheDocument()
     })
 
     it('outcome names are passed to the remove modal when using bulk remove', async () => {
@@ -632,45 +637,50 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(getByRole('button', {name: /remove/i}))
       await act(async () => jest.runOnlyPendingTimers())
       const removeModal = getByTestId('outcome-management-remove-modal')
-      expect(within(removeModal).getByText('Remove Outcomes?')).toBeInTheDocument()
-      expect(within(removeModal).getByText(itemOneTitle)).toBeInTheDocument()
-      expect(within(removeModal).getByText(itemTwoTitle)).toBeInTheDocument()
+      expect(await within(removeModal).findByText('Remove Outcomes?')).toBeInTheDocument()
+      expect(await within(removeModal).findByText(itemOneTitle)).toBeInTheDocument()
+      expect(await within(removeModal).findByText(itemTwoTitle)).toBeInTheDocument()
     })
 
     it('updated group names are passed to the remove modal if a selected outcome is moved', async () => {
-      const {getByText, getByRole, getByTestId} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps,
-        mocks: [
-          ...defaultMocks,
-          ...groupMocks({
-            title: 'Course 101',
-            groupId: '101',
-            parentOutcomeGroupTitle: 'Root course folder',
-            parentOutcomeGroupId: '2'
-          }),
-          moveOutcomeMock({
-            groupId: '2',
-            parentGroupTitle: 'Root course folder',
-            outcomeLinkIds: ['1']
-          })
-        ]
-      })
+      const {findByText, getByTestId, findByRole, findByTestId} = render(
+        <OutcomeManagementPanel />,
+        {
+          ...groupDetailDefaultProps,
+          mocks: [
+            ...defaultMocks,
+            ...groupMocks({
+              title: 'Course 101',
+              groupId: '101',
+              parentOutcomeGroupTitle: 'Root course folder',
+              parentOutcomeGroupId: '2'
+            }),
+            moveOutcomeMock({
+              groupId: '2',
+              parentGroupTitle: 'Root course folder',
+              outcomeLinkIds: ['1']
+            })
+          ]
+        }
+      )
       await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Course folder 0'))
+      fireEvent.click(await findByText('Course folder 0'))
       await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Select outcome Outcome 1 - Course folder 0'))
-      fireEvent.click(getByText('Select outcome Outcome 2 - Course folder 0'))
-      fireEvent.click(getByText('Menu for outcome Outcome 1 - Course folder 0'))
-      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      fireEvent.click(await findByText('Select outcome Outcome 1 - Course folder 0'))
+      fireEvent.click(await findByText('Select outcome Outcome 2 - Course folder 0'))
+      fireEvent.click(await findByText('Menu for outcome Outcome 1 - Course folder 0'))
+      fireEvent.click(getByTestId('outcome-kebab-menu-move'))
       await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Back'))
-      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      fireEvent.click(await findByText('Back'))
       await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByRole('button', {name: /remove/i}))
+      fireEvent.click(getByTestId('outcome-management-move-modal-move-button'))
       await act(async () => jest.runOnlyPendingTimers())
-      const removeModal = getByTestId('outcome-management-remove-modal')
+      fireEvent.click(await findByRole('button', {name: /remove/i}))
+      await act(async () => jest.runOnlyPendingTimers())
+
       // Move outcome will trigger a refetch in lhs folder, so i'll change its name
       // by the mocks we have
+      const removeModal = await findByTestId('outcome-management-remove-modal')
       expect(within(removeModal).getByText('From Refetched Course folder 0')).toBeInTheDocument()
     })
   })
