@@ -45,7 +45,9 @@ class ContextExternalTool < ActiveRecord::Base
   serialize :settings
   attr_reader :config_type, :config_url, :config_xml
 
-  before_save :infer_defaults, :validate_vendor_help_link
+  # add_identity_hash needs to calculate off of other data in the object, so it
+  # should always be the last field change callback to run
+  before_save :infer_defaults, :validate_vendor_help_link, :add_identity_hash
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   validate :check_for_xml_error
 
@@ -851,10 +853,24 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def hash_identity
-    props = [name, context.asset_string, domain, url, consumer_key, shared_secret,
-             description, workflow_state, Utils::HashUtils.sort_nested_data(settings)]
+  IDENTITY_FIELDS = %i[name context_id context_type domain url consumer_key shared_secret
+                       description workflow_state settings].freeze
+
+  def calculate_identity_hash
+    props = [*slice(IDENTITY_FIELDS.excluding(:settings)).values, Utils::HashUtils.sort_nested_data(settings)]
     Digest::SHA2.new(256).hexdigest(props.to_json)
+  end
+
+  def add_identity_hash
+    if identity_fields_changed?
+      ident_hash = calculate_identity_hash
+      self.identity_hash = ContextExternalTool.where(identity_hash: ident_hash).exists? ? "duplicate" : ident_hash
+    end
+  end
+
+  def identity_fields_changed?
+    IDENTITY_FIELDS.excluding(:settings).any? { |field| send("#{field}_changed?") } ||
+      (Utils::HashUtils.sort_nested_data(settings_was) != Utils::HashUtils.sort_nested_data(settings))
   end
 
   def self.from_content_tag(tag, context)
