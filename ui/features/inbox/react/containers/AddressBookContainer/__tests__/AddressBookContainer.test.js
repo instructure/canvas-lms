@@ -83,6 +83,20 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(items.length).toBe(1)
     })
 
+    it('Should clear text field when item is clicked', async () => {
+      const {container} = setup()
+      let input = container.querySelector('input')
+      fireEvent.change(input, {target: {value: 'Fred'}})
+      expect(input.value).toBe('Fred')
+
+      const items = await screen.findAllByTestId('address-book-item')
+      expect(items.length).toBe(1)
+
+      fireEvent.mouseDown(items[0])
+      input = container.querySelector('input')
+      expect(input.value).toBe('')
+    })
+
     it('should navigate through filters', async () => {
       setup()
       // Find all current items

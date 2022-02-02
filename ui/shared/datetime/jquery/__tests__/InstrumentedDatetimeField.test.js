@@ -17,7 +17,7 @@
  */
 
 import InstrumentedDatetimeField from '../InstrumentedDatetimeField'
-import { configure } from '@canvas/datetime-natural-parsing-instrument'
+import {configure} from '@canvas/datetime-natural-parsing-instrument'
 import $ from 'jquery'
 
 describe('@canvas/datetime/InstrumentedDatetimeField', () => {
@@ -26,7 +26,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
 
   beforeEach(() => {
     events = []
-    previousState = configure({ events })
+    previousState = configure({events})
   })
 
   afterEach(() => {
@@ -36,7 +36,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
   describe('typing', () => {
     it('tracks it on blur', () => {
       const node = document.createElement('input')
-      const datetimeField = new InstrumentedDatetimeField($(node))
+      new InstrumentedDatetimeField($(node))
       const inputEvent = new Event('input')
 
       inputEvent.inputType = 'insertText'
@@ -60,9 +60,14 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
     it('works', () => {
       const node = document.createElement('input')
       const datetimeField = new InstrumentedDatetimeField($(node))
-      const picker = datetimeField.$field.data('datepicker')
+      const field = datetimeField.$field
+      const picker = field.data('datepicker')
 
-      node.value = '2021-08-24 18:00:00'
+      picker.selectedYear = 2021
+      picker.selectedMonth = 7 // August
+      picker.selectedDay = '24'
+      field.data('timeHour', '18')
+      field.data('timeMinute', '30')
 
       datetimeField.$field.data('datepicker').settings.onSelect(node.value, picker)
       datetimeField.$field.data('datepicker').settings.onClose(node.value)
@@ -70,7 +75,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
       expect(events.length).toEqual(1)
       expect(events[0]).toMatchObject({
         method: 'pick',
-        value: '2021-08-24 18:00:00'
+        value: 'Aug 24, 2021, 6:30 PM'
       })
     })
   })
@@ -78,7 +83,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
   describe('pasting', () => {
     it('works', () => {
       const node = document.createElement('input')
-      const datetimeField = new InstrumentedDatetimeField($(node))
+      new InstrumentedDatetimeField($(node))
 
       node.value = '2021-08-24 18:00:00'
       node.dispatchEvent(new Event('paste'))

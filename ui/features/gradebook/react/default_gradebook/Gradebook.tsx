@@ -127,6 +127,7 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
+import ScoreToUngradedManager from '../shared/ScoreToUngradedManager'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
@@ -209,7 +210,6 @@ type GradebookProps = {
   isFiltersLoading: boolean
   isModulesLoading: boolean
   modules: Module[]
-  onFiltersChange: (any) => void
   performanceControls: PerformanceControls
   settingsModalButtonContainer: HTMLElement
   viewOptionsMenuNode: HTMLElement
@@ -277,6 +277,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   gradebookEnv: any
 
   gradebookSettingsModal?: React.RefObject<HTMLElement & {open: () => void}>
+
+  isRunningScoreToUngraded: boolean
 
   gradebookSettingsModalButton: React.RefObject<any> = React.createRef()
 
@@ -363,6 +365,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   gradebookColumnSizeSettings: ColumnSizeSettings = {}
 
+  scoreToUngradedManager: ScoreToUngradedManager | null
+
   constructor(props: GradebookProps) {
     super(props)
     this.options = {...(props.gradebookEnv || {}), ...props}
@@ -403,6 +407,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.finalGradeOverrides = null
     }
     this.postPolicies = new PostPolicies(this)
+    this.isRunningScoreToUngraded = false
+    if (this.allowApplyScoreToUngraded()) {
+      const progressData = this.options.gradebook_score_to_ungraded_progress
+      let lastProgress
+      if (progressData) {
+        lastProgress = {
+          progressId: `${progressData.progress.id}`,
+          workflowState: progressData.progress.workflow_state
+        }
+      }
+      this.scoreToUngradedManager = new ScoreToUngradedManager(lastProgress)
+    } else {
+      this.scoreToUngradedManager = null
+    }
     $.subscribe('assignment_muting_toggled', this.handleSubmissionPostedChange)
     $.subscribe('submissions_updated', this.updateSubmissionsFromExternal)
     // emitted by SectionMenuView; also subscribed in OutcomeGradebookView
@@ -4597,6 +4615,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     renderComponent(ApplyScoreToUngradedModal, mountPoint, props)
   }
 
+  refreshScoreToUngradedColumnHeaders() {
+    const columnIds = Object.keys(this.assignmentGroups).map(
+      assignmentGroupId => `assignment_group_${assignmentGroupId}`
+    )
+    columnIds.push('total_grade')
+    this.gradebookGrid.gridSupport?.columns.updateColumnHeaders(columnIds)
+  }
+
   executeApplyScoreToUngraded = args => {
     const {value, ...options} = args
 
@@ -4618,7 +4644,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       optionsWithFilters.percent = value
     }
 
-    return GradebookApi.applyScoreToUngradedSubmissions(this.options.context_id, optionsWithFilters)
+    this.isRunningScoreToUngraded = true
+    this.refreshScoreToUngradedColumnHeaders()
+
+    return Promise.resolve()
       .then(
         FlashAlert.showFlashSuccess(
           I18n.t(
@@ -4626,13 +4655,24 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           )
         )
       )
-      .catch(FlashAlert.showFlashError(I18n.t('There was a problem applying scores.')))
+      .then(() => {
+        this.scoreToUngradedManager!.startProcess(this.options.context_id, optionsWithFilters)
+          .then(
+            FlashAlert.showFlashSuccess(I18n.t('Score to ungraded process finished successfully'))
+          )
+          .finally(() => {
+            this.isRunningScoreToUngraded = false
+            this.refreshScoreToUngradedColumnHeaders()
+          })
+          .catch(FlashAlert.showFlashError(I18n.t('Score to ungraded process failed')))
+      })
   }
 
   destroy = () => {
     $(window).unbind('resize.fillWindowWithMe')
     $(document).unbind('gridready')
     this.gradebookGrid.destroy()
+    this.scoreToUngradedManager?.clearMonitor()
     return this.postPolicies?.destroy()
   }
 
@@ -4750,8 +4790,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           this.state.isEssentialDataLoaded && (
             <Portal node={this.props.filterNavNode}>
               <FilterNav
-                filters={this.props.filters}
-                onChange={this.props.onFiltersChange}
                 gradingPeriods={this.gradingPeriodSet?.gradingPeriods || []}
                 modules={this.state.modules}
                 assignmentGroups={this.state.assignmentGroups}

@@ -36,7 +36,8 @@ def buildParameters = [
   string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
   string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
   string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}"),
-  string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
+  string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}"),
+  string(name: 'CRYSTALBALL_MAP_S3_VERSION', value: "${env.CRYSTALBALL_MAP_S3_VERSION}")
 ]
 
 def getSummaryUrl() {

@@ -2462,6 +2462,7 @@ pt:
       Permite ao utilizador habilitar e editar a ponderação do grupo de atribuições em uma disciplina.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Permite ao utilizador adicionar eventos ao Painel de Visualização de Lista através da caixa de seleção Adicionar à Tarefa do Aluno. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Permite ao utilizador adicionar eventos ao Painel de Visualização de Lista através da caixa de seleção Adicionar à Tarefa do Aluno."
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Permite ao utilizador adicionar ícones de aplicações externas à barra de ferramentas do Editor de Conteúdo Rico."
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Permite ao utilizador adicionar membros de grupos a grupos de contas ou de disciplinas."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Permite ao utilizador adicionar novas tarefas a um módulo."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Permite ao utilizador adicionar novas disciplinas a uma conta."
@@ -2693,6 +2694,7 @@ pt:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Permite ao utilizador adicionar manualmente um aplicativo nas definições da conta."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Permite que o utilizador adicione e exclua manualmente uma aplicação nas Configurações da conta."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Permite ao utilizador adicionar e eliminar manualmente uma aplicação nas Configurações da disciplina."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Permite ao utilizador eliminar manualmente uma aplicação nas Definições da Conta."
   allows_user_to_moderate_a_quiz_6953d369: "Permite ao utilizador moderar um questionário."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Permite ao utilizador moderar um questionário e visualize a página de estatísticas do questionário."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Permite ao utilizador moderar um questionário. Definições: Permite ao utilizador editar esquemas de classificação."
@@ -3298,6 +3300,7 @@ pt:
   anonymous_user_d984b9ce: "Utilizador Anónimo"
   anonymous_was_never_turned_on_e5e8aeda: "Anónimo nunca foi ativado"
   anonymous_was_turned_off_300d25ec: "Anónimo foi desativado"
+  anonymous_you_e708af99: "Anónimo (Você)"
   anonymously_graded_59149570: "Classificado anonimamente"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "Tarefas anonimamente classificadas não podem ser tarefas de grupo"
   another_assignment_name_369f8481: "Outro Nome Agendamento"
@@ -5622,7 +5625,7 @@ pt:
         fields_required: "É necessário o campo \"%{field}\""
         invalid_live_events_url: "Término inválido, tem de ser um URL válido."
         invalid_url: "URL inválido"
-        login_expiration_minimum: "A expiração da sessão tem de ser igual ou superior a %{minutes} minutos"
+        login_expiration_minimum: "A expiração da Sessão %{minutes} deve ser de minutos ou mais"
         need_integer: "Introduza um número inteiro para a cache da lista de reprodução"
         stream_name_required: "O nome de fluxo kinesis é necessário."
   canvas_3962b702: Canvas
@@ -6808,7 +6811,7 @@ pt:
     media_objects_not_configured: "Objetos de mídia não configurados"
     new_roster_user: 
       completed_enrollment: "Concluído *%{completed_at}*"
-      enrolled_as: "Inscrito como %{enrollment_type}"
+      enrolled_as: "Inscrito como: %{enrollment_type}"
       enrollment_linked_to: "Ligado a *%{linked_user}*"
       labels: 
         user_privileges: Privilégios
@@ -6861,7 +6864,7 @@ pt:
         conclude: "Tem a certeza de que deseja concluir essa inscrição?"
         conclude_student: "Tem certeza de que deseja concluir esta inscrição do aluno?"
         delete_enrollment: "Tem a certeza de que deseja eliminar esta inscrição?"
-      enrolled_as: "Inscrito como %{enrollment_type}"
+      enrolled_as: "Inscrito como: %{enrollment_type}"
       enrollment_change_failed: "Falha na alteração de privilégio de inscrição, tente novamente"
       enrollment_linked_to: "vinculado a *%{linked_user}*"
       headings: 
@@ -10501,6 +10504,9 @@ pt:
   enroll_in_subject_9c1f1c18: "Inscrever-se no Assunto"
   enrolled_a6a517cd: Participante
   enrolled_as_272da3b9: "Inscrito como"
+  enrolled_as_enrollment_type_a008e44a: "Inscrito como: %{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "inscrito como: %{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "inscrito como: %{enrollment_type} com acesso apenas por secção"
   enrollment: 
     default_course_name: Disciplina
     default_email: "Sem email"
@@ -10924,6 +10930,7 @@ pt:
   error_59293a2c: erro
   error_98e81528: Erro
   error_adding_canvas_file_to_submission_draft_de258021: "Erro ao adicionar ficheiro canvas ao rascunho de envio"
+  error_adding_file_to_discussion_message_16feef3f: "Erro ao adicionar ficheiro à mensagem de discussão"
   error_adding_files_to_conversation_message_58e83876: "Erro ao adicionar ficheiros à mensagem de conversação"
   error_adding_files_to_discussion_message_8bb819e4: "Erro ao adicionar ficheiros à mensagem de discussão"
   error_adding_files_to_submission_draft_6acac337: "Erro ao adicionar ficheiros ao rascunho de envio"
@@ -10983,6 +10990,7 @@ pt:
   error_updating_comment_4b80c76d: "Comentário de atualização de erro"
   error_updating_status_of_module_item_80336274: "Erro na atualização do estado do item do módulo"
   error_updating_submission_draft_1d40ade7: "Erro ao atualizar o rascunho do envio"
+  error_uploading_file_73235601: "Erro ao carregar o ficheiro"
   error_uploading_file_e2d31b56: "Erro ao carregar o ficheiro."
   error_uploading_files_f709361f: "Carregamento de ficheiros de erro"
   error_uploading_video_audio_recording_16d9730a: "Erro ao carregar vídeo/gravação de áudio"
@@ -13494,12 +13502,14 @@ pt:
   hide_courses_without_students_fc6fc7a0: "Esconder disciplinas sem estudantes"
   hide_details_df9ef4a2: "Detalhes ocultos"
   hide_e057ff36: Ocultar
+  hide_from_everyone_9fc3e6d0: "Ocultar de todos"
   hide_grades_585e63b4: "Esconder Classificações"
   hide_grades_5ff26682: "Ocultar notas"
   hide_grades_tray_5ed267fe: "Esconder bandeja de notas"
   hide_groups_navigation_menu_62e8b3d0: "Ocultar Menu de navegação de grupos"
   hide_important_dates_c23d2102: "Ocultar datas importantes"
   hide_key_e8fe1e8c: "Ocultar chave"
+  hide_name_and_profile_picture_d18eed70: "Ocultar nome e imagem de perfil"
   hide_name_details_23814c37: "Ocultar detalhes %{name}"
   hide_navigation_menu_f0b3e90: "Ocultar Menu de navegação"
   hide_notes_column_7749f408: "Ocultar coluna de notas"
@@ -13742,6 +13752,12 @@ pt:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Se ativado, permite novos temas window.postMessage para a especificação LTI Platform
       Storage, e envia mensagens de resposta para todos os temas postMessage.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      Se habilitado, uma resposta "não autorizada" da API JSON retornará um 403
+      (Proibido) em vez de um código 401, para estar mais alinhado com os padrões http.
+      Além disso, quando a API retornar um erro JSON não autenticado ou não autorizado,
+      o campo "estado" não será localizado; sempre será fornecido em
+      Inglês.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Se ativado, o Canvas permitirá ferramentas para retornar múltiplos itens
       de conteúdo em um único pedido na página de módulos da disciplina
@@ -13786,6 +13802,7 @@ pt:
       ferramenta em vez da tarefa. Isto fará com que os eventos sejam
       duplicados, a menos que as subscrições nos trabalhos deplagiarismo
       associados sejam eliminadas.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Se LTI - adicionar estiver desativado, os utilizadores podem ainda instalar aplicações aprovadas através do Canvas App Center (se ativado para a sua instituição). No entanto, se LTI - eliminar não estiver habilitado, eles não poderão eliminar  aplicações externas adicionadas manualmente."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Se Gerir Disciplinas: Admin - gerir/atualizar e Disciplinas - cancelar estão também ativados, um utilizador a nível de conta será capaz de restaurar disciplinas apagadas em Ferramentas de Administração."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Se as escalas de domínio estiverem habilitadas, o relatório será truncado para não incluir método de cálculo, cálculo int, pontos de domínio, ou classificações"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -17936,7 +17953,9 @@ pt:
   nav_avatar_border_3246beb1: "Limite do Avatar de Navegação"
   nav_background_fd299145: "Fundo do Avatar"
   nav_badge_3c67de17: "Símbolo de Navegação"
+  nav_badge_active_1d4be222: "Selo de Navegação Ativo"
   nav_badge_text_574b6eb: "Texto do símbolo de navegação"
+  nav_badge_text_active_9a28e8a2: "Texto do Selo de Navegação Ativo"
   nav_icon_active_e4825558: "Ícone Ativo de Navegação"
   nav_icon_ca3fef59: "Ícone de Navegação"
   nav_logo_4b255c91: "Logótipo de Navegação"
@@ -18185,6 +18204,7 @@ pt:
   no_results_match_searchterm_f28e50e0: "Nenhum resultado corresponde \"%{searchTerm}\""
   no_score_yet_c94e919b: "Ainda sem pontuação"
   no_start_date_6e81c22b: "Sem data de início"
+  no_student_is_being_observed_to_select_a_student_r_73301db2: "Nenhum aluno está a ser observado. Para selecionar um aluno, regresse ao painel."
   no_students_being_observed_42e11732: "Nenhum aluno a ser observado"
   no_students_dd8de9f0: "Não existem alunos"
   no_students_have_taken_the_quiz_yet_e667644b: "Nenhum aluno fez ainda o teste"
@@ -18707,6 +18727,7 @@ pt:
   observers_remove_ad508fbe: "Observadores - remover"
   observing_f3c5e759: "A observar"
   observing_observee_d31d5fa2: "A observar: %{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "A observar %{student_name}. Para selecionar um aluno diferente, volte ao painel."
   occurrence_s_c12d1aad: ocorrência(s)
   of_students_5d1af0d2: "N.º de alunos"
   off_5385ef3f: Desligada
@@ -19235,6 +19256,7 @@ pt:
   parents_sign_up_here_f0aa8f4f: "Inscrição de pais aqui"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Parcial: os alunos podem optar por revelar o seu nome e imagem de perfil"
   partially_anonymous_483a892d: "Parcialmente anónimo"
+  partially_anonymous_discussion_13ceb585: "Discussão Parcialmente Anônima | "
   partially_enabled_and_locked_9a39d38a: "Parcialmente ativado e Bloqueado"
   partially_enabled_cd506819: "Parcialmente ativado"
   participantcount_less_8d258f6: "%{participantCount} menos"
@@ -19788,7 +19810,7 @@ pt:
       name: Sessões
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Tempo antes da sessão expira em minutos (mínimo 20) para aplicações móveis"
+        mobile_timeout: "Tempo após o início de sessão antes da sessão expirar em minutos (2880 [2 dias] no mínimo) para aplicações móveis"
         session_timeout: "Tempo até a sessão expirar em minutos (20 no mínimo)"
     settings_header: 
       prompt_change_for_all_line1: "Esta operação altera as configurações de TODAS AS CONTAS!"
@@ -22519,6 +22541,7 @@ pt:
   required_access_code_592902d7: "Código de Acesso necessário"
   required_by_course_end_date_d87a4772: "Requerido até à data final da da disciplina"
   required_by_specified_end_date_22dd6b49: "Requerido até data final especificada"
+  required_by_term_end_date_403dff38: "Obrigatório até a data de término do prazo"
   required_email_address_379b2392: "Endereço de e-mail obrigatório"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Os campos obrigatórios incluem nome da chave, e-mail do proprietário, ID da ferramenta, URL de redirecionamento e URL do ícone."
   required_input_message_all_unassigned_students_1e721442: "Entrada obrigatória. Mensagem a todos os alunos não atribuídos."
@@ -23142,16 +23165,16 @@ pt:
     confirms: 
       delete_enrollment: "Tem certeza de que deseja excluir esta inscrição permanentemente?"
     default_course_name: "ID da disciplina \"%{course_id}\""
-    enrolled_as_designer: "inscrito como designer"
-    enrolled_as_limited_designer: "inscrito como designer com acesso somente à seção"
-    enrolled_as_limited_observer: "inscrito como observador com acesso apenas à secção"
-    enrolled_as_limited_student: "inscrito como aluno com acesso somente à seção"
-    enrolled_as_limited_ta: "inscrito como assistente com acesso somente à seção"
-    enrolled_as_limited_teacher: "inscrito como professor com acesso somente à seção"
-    enrolled_as_observer: "inscrito como observador"
-    enrolled_as_student: "inscrito como aluno"
-    enrolled_as_ta: "inscrito como assistente"
-    enrolled_as_teacher: "inscrito como professor"
+    enrolled_as_designer: "inscrito como: Designer"
+    enrolled_as_limited_designer: "inscrito como: Designer com acesso apenas por secção"
+    enrolled_as_limited_observer: "inscrito como: Observador com acesso apenas por seção"
+    enrolled_as_limited_student: "inscrito como: Estudante com acesso apenas por seção"
+    enrolled_as_limited_ta: "inscrito como: TA com acesso apenas por seção"
+    enrolled_as_limited_teacher: "inscrito como: Professor com acesso apenas por seção"
+    enrolled_as_observer: "inscrito como: Observador"
+    enrolled_as_student: "inscrito como: Aluno"
+    enrolled_as_ta: "inscrito como: Assistente"
+    enrolled_as_teacher: "inscrito como: Professor"
     errors: 
       confirmation_failed: "Falha de confirmação"
       course_not_authorized_for_crosslist: "%{course_name} não autorizado para listagem cruzada"
@@ -24401,6 +24424,7 @@ pt:
   show_me_76823679: Mostrar
   show_more_8d5f918b: "mostrar mais"
   show_more_af9cbc16: "Mostrar Mais"
+  show_name_and_profile_picture_9329d8f8: "Mostrar nome e imagem de perfil"
   show_name_details_186d86e6: "Mostrar detalhes %{name}"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Mostrar o nome dos alunos observados nas notificações."
   show_name_of_observed_students_in_notifications_d38b53ca: "Mostrar o nome dos alunos observados nas notificações"
@@ -24430,6 +24454,7 @@ pt:
   show_sub_accounts_for_account_name_fa71a658: "Mostrar Sub-Contas para %{account_name}"
   show_suggestions_when_typing_b72545de: "Mostrar sugestões ao dactilografar"
   show_to_d57767f: "Mostrar para"
+  show_to_everyone_94d66d01: "Mostrar a todos"
   show_welcome_tour_a105aa2e: "Visita de boas-vindas à Visita"
   showing_1ac6ed70: "A mostrar:"
   showing_all_announcements_36ff0cec: "A mostrar todos os anúncios"
@@ -25487,6 +25512,7 @@ pt:
   tas_observers_designers_b705118a: "TAs / Observadores / Designers"
   tas_remove_11059e14: "TAs - Remover"
   tas_remove_16a99b22: "TAs - remover"
+  tea_provisional_graders_d4f19c26: "TEA Provisional Graders"
   teacher_5a73b637: Professor
   teacher_count_teachers_a92f7199: "%{teacher_count} professores"
   teacher_dashboard_custom_report_6d20bef2: "Relatório Personalizado do Painel do Professor"
@@ -26000,6 +26026,8 @@ pt:
   there_was_a_problem_updating_the_submission_6e5280a1: "Ocorreu um problema na atualização do envio."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Houve um erro ao verificar o estado de publicação do plano."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Houve um erro ao buscar as estatísticas da disciplina"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Houve um erro ao buscar os filtros do livro de notas."
+  there_was_an_error_fetching_modules_8ee451bb: "Ocorreu um erro ao buscar os módulos."
   there_was_an_error_fetching_outcome_results_45c57590: "Ocorreu um erro ao obter resultados"
   there_was_an_error_fetching_submission_comments_ce153077: "Ocorreu um erro ao buscar comentários de envio"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Ocorreu um erro ao gerar o código de pareamento"
@@ -26205,6 +26233,7 @@ pt:
       Isto tem mais tipos de perguntas como hotspot,
               categorização, correspondência e pedidos. Também tem
               mais moderação e características de acomodação.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Esta sala de aula sincroniza as inscrições e as datas de início/término do assunto para: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Esta imagem aparece como a marca de água da imagem de fundo para a sua página. Formatos permitidos: png, svg,gif, jpeg"
   this_image_has_been_reported_9360e581: "Esta imagem foi reportada."
   this_image_is_currently_unavailable_25c68857: "Esta imagem está actualmente indisponível"
@@ -27700,6 +27729,7 @@ pt:
       Actualiza as preferências de notificação de conta UI para ser uma experiência de utilizador mais actual
       e actualizada
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Atualiza a exibição dos ícones Publicar Políticas no cabeçalho da coluna tarefa do Novo livro de avaliação."
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Atualizações para código HTTP de erro de autenticação da API JSON e campo de estado JSON"
   updating_6edbab78: Atualizando
   updating_discussion_failed_aadb2d35: "A atualização da discussão falhou"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Atualizar o URL do Catálogo tornará o seu antigo URL inacessível para os utilizadores com efeito imediato! Se já existir um processador de pagamento configurado, as alterações necessitarão da ajuda de um engenheiro de Catálogo."
@@ -27748,6 +27778,8 @@ pt:
   uploaded_over_time_d59abb68: "carregado ao longo do tempo"
   uploading_19e8a4e7: "A realizar carregamento"
   uploading_ee585874: "A realizar carregamento..."
+  uploading_file_5c7e14fd: "A carregar ficheiro"
+  uploading_file_in_progress_5c09e0c9: "A carregar ficheiro em curso"
   uploading_files_5ff8f4fd: "Carregamento de ficheiros"
   uploading_files_9e39dbf9: "Carregamento de ficheiros"
   uploading_media_progress_c23a953b: "Progresso do carregamento de media"

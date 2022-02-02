@@ -357,6 +357,41 @@ describe "context modules" do
         expect(fj(".context_module_item:contains(#{filename})")).to be_displayed
       end
 
+      it "does not duplicate items on multiple uploads when replace is chosen" do
+        # create the existing module item
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+        @mod.add_item({ id: file.id, type: "attachment" })
+
+        get "/courses/#{@course.id}/modules"
+        upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", "#attachments_select", fullpath)
+        upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", "#attachments_select", fullpath)
+        upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", "#attachments_select", fullpath)
+
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "adds an uploaded file if the same content was just deleted" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+        @mod.add_item({ id: file.id, type: "attachment" })
+
+        get "/courses/#{@course.id}/modules"
+        driver.execute_script("window.confirm = function() {return true}")
+
+        f(".context_module_item .al-trigger").click
+        wait_for_ajaximations
+        f(".context_module_item .delete_item_link").click
+        wait_for_ajaximations
+        upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", "#attachments_select", fullpath)
+
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
       it "replaces an existing module item with a replacement uploaded file" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")

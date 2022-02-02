@@ -75,9 +75,7 @@ class GradebookImporter
     @progress = progress
 
     GuardRail.activate(:secondary) do
-      @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
-        course_id: @context.id, user_id: @context.all_students.pluck(:id)
-      )
+      @assigned_assignments = @context.assigned_assignment_ids_by_user
     end
   end
 
@@ -559,7 +557,7 @@ class GradebookImporter
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       assignment_index = @assignment_indices[assignment.id]
       grade = row[assignment_index]&.strip
-      unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
+      unless assignment_assigned_to_student(student, assignment, assignment_id, @assigned_assignments)
         grade = ""
       end
       new_submission = {
@@ -593,14 +591,6 @@ class GradebookImporter
         )
       end
     end
-  end
-
-  def assignment_visible_to_student(student, assignment, assignment_id, visible_assignments)
-    return true unless visible_assignments # wont be set if DA is off
-    return true if assignment.new_record? || student.new_record?
-
-    assignments_visible_to_student = visible_assignments[student.id].to_set
-    assignments_visible_to_student.try(:include?, assignment_id)
   end
 
   def as_json(_options = {})
@@ -767,6 +757,13 @@ class GradebookImporter
   end
 
   private
+
+  def assignment_assigned_to_student(student, assignment, assignment_id, assigned_assignments)
+    return true if assignment.new_record? || student.new_record?
+
+    assignments_assigned_to_student = assigned_assignments[student.id] || Set.new
+    assignments_assigned_to_student.include?(assignment_id)
+  end
 
   def gradeable?(submission:, is_admin: false)
     # `submission#grants_right?` will check if the user

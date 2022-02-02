@@ -19,45 +19,46 @@ all conflicts, including cases where local deletions would overwrite the docker 
 
 # Installing mutagen
 
-Follow the instructions at https://mutagen.io/documentation/introduction/installation to install the beta channel.
-Mutagen 0.12 beta has is the version we need to support mutagen compose.
+Follow the instructions at https://mutagen.io/documentation/introduction/installation to install the stable channel.
+Mutagen 0.13.0 is the version we need to support Mutagen Compose.
+Then follow the instructions at https://github.com/mutagen-io/mutagen-compose#installation to install Mutagen Compose.
 
 # Setting up and running canvas
 
-You'll want to do your initial setup using manual steps documented in
+You can use the `docker_dev_setup.sh --mutagen` to get setup. It will copy the `docker-compose.override.yml` for mutagen.
+Or you can do your initial setup using manual steps documented in
 [develping_with_docker.md](../../doc/docker/developing_with_docker.md) but using the `docker-compose.override.yml` file
-in this directory as your base. (We cannot use the `docker_dev_script.sh` yet because it is not yet aware that you may
-want the mutagen environment running.)
+in this directory as your base.
 
-The one difference from normal docker development is in many cases you'll use `mutagen compose` instead of
+The one difference from normal docker development is in many cases you'll use `mutagen-compose` instead of
 `docker-compose`. This ensures that the mutagen daemon is running as well as the needed mutagen container.
 
-One trick is to do a `mutagen compose up --no-start`. This will ensure the mutagan environment is set up and running,
+One trick is to do a `mutagen-compose up --no-start`. This will ensure the mutagen environment is set up and running,
 but won't start any of your containers.
 
 ## Suggested series of steps for setting up canvas
 1. setup dinghy-http-proxy per the instructions at https://github.com/codekitchen/dinghy-http-proxy
-2. `mutagen compose build --pull`
-3. This step will have mutagen start so it can sync canvas code into the docker volume: `mutagen compose up --no-start
+2. `mutagen-compose build --pull`
+3. This step will have mutagen start so it can sync canvas code into the docker volume: `mutagen-compose up --no-start
    web`
 4. This step fixes a permission issue in /usr/src/app, so your docker environment can create new files that can be
-   synced back to your local environment in the root directory: `mutagen compose run -u root --rm web chown
+   synced back to your local environment in the root directory: `mutagen-compose run -u root --rm web chown
    docker:docker /usr/src/app` You will see mutagen complain about not supporting run fully and also docker messages
-   about an orphan container (which is mutagan's agent.) That is normal.
-5. `mutagen compose run --rm web ./script/install_assets.sh`
-6. `mutagen compose run --rm web bundle exec rake db:create`
-7. `mutagen compose run --rm web bundle exec rake db:initial_setup`
+   about an orphan container (which is mutagen's agent.) That is normal.
+5. `mutagen-compose run --rm web ./script/install_assets.sh`
+6. `mutagen-compose run --rm web bundle exec rake db:create`
+7. `mutagen-compose run --rm web bundle exec rake db:initial_setup`
 8. Enjoy your canvas
 
-Really, for any of the `mutagen compose run` steps you could just use `docker-compose run` since mutagen doesn't do much
-there, but its worth getting into the `mutagen compose` habit. (Although, be aware based on recent chatter in the
+Really, for any of the `mutagen-compose run` steps you could just use `docker-compose run` since mutagen doesn't do much
+there, but its worth getting into the `mutagen-compose` habit. (Although, be aware based on recent chatter in the
 mutagen forums, this will go away.)
 
 # FAQ
 
-**Q: Help! My file changes aren't reflecting in the docker container if I use `mutagen compose run ...`**
+**Q: Help! My file changes aren't reflecting in the docker container if I use `mutagen-compose run ...`**
 
-**A:** Be sure to run `mutagen compose up --no-start web` first or files won't sync. (Run doesn't activate the mutagen
+**A:** Be sure to run `mutagen-compose up --no-start web` first or files won't sync. (Run doesn't activate the mutagen
 daemon or container.)
 
 **Q: Something seems to be wrong with the sync process, how do I get more information?**

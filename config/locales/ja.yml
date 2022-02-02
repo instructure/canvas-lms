@@ -2460,6 +2460,7 @@ ja:
       ユーザーがコースで課題グループの重み付けを有効にして編集できるようにします。
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "ユーザーが [受講生 To-Do に追加する] チェックボックスを使用して、リストビューダッシュボードにイベントを追加できるようにします。 "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "ユーザーが [受講生 To-Do に追加する] チェックボックスを使用して、リストビューダッシュボードにイベントを追加できるようにします。"
+  allows_user_to_add_external_app_icons_to_the_rich__27174e71: リッチコンテンツエディタのツールバーに外部アプリのアイコンを追加できるようになりました。
   allows_user_to_add_group_members_to_account_or_cou_5b143ef: アカウントまたはコースグループにグループメンバーを追加できるようにします。
   allows_user_to_add_new_assignments_to_a_module_51ae198c: ユーザーが新しい課題をモジュールに追加できるようにします。
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: ユーザーがアカウントに新しいコースを追加できるようにします。
@@ -2691,6 +2692,7 @@ ja:
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: ユーザーがアカウント設定でアプリを手動で追加できるようにします。
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: ユーザーがアカウント設定でアプリを手動で追加したり削除したりできるようにします。
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: ユーザーがアカウント設定でアプリを手動で追加したり削除したりできるようにします。
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: ユーザーがアカウント設定内でアプリを削除で追加できるようにします。
   allows_user_to_moderate_a_quiz_6953d369: ユーザーがクイズを調整できるようにします。
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: ユーザーがクイズを管理し、クイズ統計ページを表示できるようにします。
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: ユーザーがクイズを調整できるようにします。設定ユーザーが採点スキームを編集できるようにします。
@@ -3295,6 +3297,7 @@ ja:
   anonymous_user_d984b9ce: 匿名のユーザー
   anonymous_was_never_turned_on_e5e8aeda: 匿名はオンになっていませんでした
   anonymous_was_turned_off_300d25ec: 匿名がオフにされました。
+  anonymous_you_e708af99: "匿名 (あなた)"
   anonymously_graded_59149570: 匿名で採点
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: 匿名で採点された課題は、グループ課題にすることはできません
   another_assignment_name_369f8481: 別の課題名
@@ -5619,7 +5622,7 @@ ja:
         fields_required: "フィールド \"%{field}\" は必須項目です"
         invalid_live_events_url: 無効なエンドポイントです。有効なURLでなければなりません。
         invalid_url: "無効な URL"
-        login_expiration_minimum: "セッションの有効期間は %{minutes} 分以上にする必要があります"
+        login_expiration_minimum: "セッションの有効期限は%{minutes}分以上であること"
         need_integer: "プレイ リスト キャッシュの整数を入力してください"
         stream_name_required: キネシス·ストリーム名が必要です。
   canvas_3962b702: Canvas
@@ -6797,7 +6800,7 @@ ja:
     media_objects_not_configured: "メディア オブジェクトが構成されていません"
     new_roster_user: 
       completed_enrollment: "完了*%{completed_at}*"
-      enrolled_as: "登録のタイプ: %{enrollment_type}"
+      enrolled_as: "（）として登録：%{enrollment_type}"
       enrollment_linked_to: "次へリンク*%{linked_user}*"
       labels: 
         user_privileges: 特権
@@ -6850,7 +6853,7 @@ ja:
         conclude: この登録を終了してよろしいですか？
         conclude_student: この受講生の登録を完了してもよろしいですか?
         delete_enrollment: この登録を削除してもよろしいですか？
-      enrolled_as: "登録のタイプ: %{enrollment_type}"
+      enrolled_as: "（）として登録：%{enrollment_type}"
       enrollment_change_failed: 登録権限の変更に失敗しました。もう一度やり直してください
       enrollment_linked_to: "リンク先: *%{linked_user}*"
       headings: 
@@ -10487,6 +10490,9 @@ ja:
   enroll_in_subject_9c1f1c18: 科目に登録
   enrolled_a6a517cd: 登録済み
   enrolled_as_272da3b9: 登録の役割タイプ
+  enrolled_as_enrollment_type_a008e44a: "（）として登録：%{enrollment_type}"
+  enrolled_as_enrollment_type_a784f82b: "（）として登録：%{enrollment_type}"
+  enrolled_as_enrollment_type_with_section_only_acce_110d7929: "（）として登録：%{enrollment_type}セクションのみのアクセスで"
   enrollment: 
     default_course_name: コース
     default_email: 電子メールなし
@@ -10912,6 +10918,7 @@ ja:
   error_59293a2c: エラー
   error_98e81528: エラー
   error_adding_canvas_file_to_submission_draft_de258021: キャンバスファイルを提出起案に追加する際のエラー
+  error_adding_file_to_discussion_message_16feef3f: ディスカッションメッセージへのファイルの追加中にエラーが発生しました
   error_adding_files_to_conversation_message_58e83876: ファイルを会話メッセージへ追加中にエラーが発生しました
   error_adding_files_to_discussion_message_8bb819e4: ディスカッションメッセージへのファイルの追加中にエラーが発生しました
   error_adding_files_to_submission_draft_6acac337: ファイルを下書きに追加する際のエラー
@@ -10971,6 +10978,7 @@ ja:
   error_updating_comment_4b80c76d: コメントの更新中にエラーが発生しました
   error_updating_status_of_module_item_80336274: モジュールアイテムのステータスの更新中にエラーが発生しました
   error_updating_submission_draft_1d40ade7: 提出起案の更新中にエラーが発生しました
+  error_uploading_file_73235601: ファイルアップロード中にエラー
   error_uploading_file_e2d31b56: ファイルのアップロードでエラーが発生しました。
   error_uploading_files_f709361f: ファイル読み込み中にエラー
   error_uploading_video_audio_recording_16d9730a: 映像/オーディオ録音のアップロード中にエラーが発生しました
@@ -13477,12 +13485,14 @@ ja:
   hide_courses_without_students_fc6fc7a0: 受講生徒のいないコースを非表示にする
   hide_details_df9ef4a2: 詳細を非表示にする
   hide_e057ff36: 非表示にする
+  hide_from_everyone_9fc3e6d0: 全員に非表示にする
   hide_grades_585e63b4: 成績を非表示にする
   hide_grades_5ff26682: 成績を非表示にする
   hide_grades_tray_5ed267fe: 成績トレイを非表示にする
   hide_groups_navigation_menu_62e8b3d0: グループナビゲーションメニューを非表示にする
   hide_important_dates_c23d2102: 重要な日付を非表示にする
   hide_key_e8fe1e8c: キーを非表示にする
+  hide_name_and_profile_picture_d18eed70: 名前とプロフィール画像を非表示にする
   hide_name_details_23814c37: "%{name}詳細を非表示にする"
   hide_navigation_menu_f0b3e90: ナビゲーションメニューを非表示にする
   hide_notes_column_7749f408: メモ列を非表示
@@ -13724,6 +13734,12 @@ ja:
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       有効にすると、LTI Platform
       Storage 仕様の新しい window.postMessage 件名を許可し、すべての postMessage に返信を送信します。
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      この機能を有効にすると、JSON APIからの「認証なし」レスポンスの際に、401コードではなく403(Forbidden)コードが返されるようになり、HTTPの標準に沿ったものになります。
+      (Forbidden) instead of a 401 code, to be more in line with HTTP standards.
+      また、APIが未認証または不正なJSONエラーを返した場合、
+      「ステータス」フィールドはローカライズされず、常に
+      英語で表示されるようになります。
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       有効にすると、Canvas はツールがコースモジュールページで、1つのリクエストで複数のコンテンツアイテムを
       返すことを許可します
@@ -13768,6 +13784,7 @@ ja:
       toolinに直接ライブイベントサブスクリプションが作成されます。これにより、
       盗作関連の課題のサブスクリプションが削除されない限り、
       イベントが複製されます。
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "LTI追加が無効になっていても、ユーザーは Canvas アプリセンターから承認されたアプリをインストールすることができます（貴機関で有効にされている場合）。ただし、LTI削除が有効になっていないと、手動で追加した外部アプリを削除できません。"
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "コースを管理する場合：コース - 追加/編集/削除およびコース - 削除取り消しも有効になっている場合、アカウントレベルのユーザーは、管理ツールで削除されたコースを復元することができます。"
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: 達成度スケールが有効になっている場合レポートは切り捨てられ、計算方法、計算int、達成度ポイント、または評価が含まれなくなります。
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -17916,7 +17933,9 @@ ja:
   nav_avatar_border_3246beb1: "ナビ アバターボーダー"
   nav_background_fd299145: ナビの背景
   nav_badge_3c67de17: ナビバッジ
+  nav_badge_active_1d4be222: ナビゲーションバッジが有効
   nav_badge_text_574b6eb: ナビバッジテキスト
+  nav_badge_text_active_9a28e8a2: ナビゲーションバッジテキストが有効
   nav_icon_active_e4825558: ナビアイコンアクティブ
   nav_icon_ca3fef59: ナビアイコン
   nav_logo_4b255c91: ナビロゴ
@@ -18165,6 +18184,7 @@ ja:
   no_results_match_searchterm_f28e50e0: "「%{searchTerm}」に一致する結果はありません"
   no_score_yet_c94e919b: まだスコアがありません
   no_start_date_6e81c22b: 開始日なし
+  no_student_is_being_observed_to_select_a_student_r_73301db2: 観察されている受講生はいません。受講生を選択するには、ダッシュボードに戻ります。
   no_students_being_observed_42e11732: 観察されている受講生はいません
   no_students_dd8de9f0: 受講生なし
   no_students_have_taken_the_quiz_yet_e667644b: "受講生がまだ 1 人もこのクイズに回答していません"
@@ -18687,6 +18707,7 @@ ja:
   observers_remove_ad508fbe: "オブザーバー - 削除"
   observing_f3c5e759: 監視中
   observing_observee_d31d5fa2: "観察中：%{observee}"
+  observing_student_name_to_select_a_different_stude_e0466126: "%{student_name}を観察中。別の受講生を選択するには、ダッシュボードに戻ります。"
   occurrence_s_c12d1aad: 発生
   of_students_5d1af0d2: 受講生数
   off_5385ef3f: オフ
@@ -19212,6 +19233,7 @@ ja:
   parents_sign_up_here_f0aa8f4f: 親のサインアップはこちらです
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: 部分的：生徒が自分の名前とプロフィール写真を公開するかを選択できる
   partially_anonymous_483a892d: 一部匿名
+  partially_anonymous_discussion_13ceb585: "一部匿名のディスカッション "
   partially_enabled_and_locked_9a39d38a: 一部有効化されてロック
   partially_enabled_cd506819: 一部有効化
   participantcount_less_8d258f6: "%{participantCount} より少なく"
@@ -19763,7 +19785,7 @@ ja:
       name: セッション
     sessions_timeout: 
       labels: 
-        mobile_timeout: モバイルアプリケーションの場合のセッションが終了するまでの時間（分）（最小20分）
+        mobile_timeout: "モバイルアプリケーションの場合の、ログイン後セッションが終了するまでの時間（2880[2日]以上）"
         session_timeout: "分単位でのセッション期限切れまでの時間 (20 分以上)"
     settings_header: 
       prompt_change_for_all_line1: これにより、すべてのアカウントの設定が変更されます!
@@ -22490,6 +22512,7 @@ ja:
   required_access_code_592902d7: 必須アクセスコード
   required_by_course_end_date_d87a4772: コース終了日までに必要
   required_by_specified_end_date_22dd6b49: 指定終了日までに必要
+  required_by_term_end_date_403dff38: 期末日までに必要
   required_email_address_379b2392: 新しいメールアドレス
   required_fields_include_key_name_owner_email_tool__b8e42174: 必須フィールドには、キー名、オーナーのメールアドレス、ツールID、リダイレクトURL、アイコンURLなどがあります。
   required_input_message_all_unassigned_students_1e721442: 入力は必須です。割り当てられていないすべての受講生にメッセージを送ります。
@@ -23112,16 +23135,16 @@ ja:
     confirms: 
       delete_enrollment: この登録を完全に削除してもよろしいですか?
     default_course_name: "コース ID \"%{course_id}\""
-    enrolled_as_designer: 設計者として参加登録済み
-    enrolled_as_limited_designer: セクションのみへのアクセス権を持つ設計者として参加登録済み
-    enrolled_as_limited_observer: セクション限定のアクセス権を持つオブザーバとして参加登録済み
-    enrolled_as_limited_student: セクションのみへのアクセス権を持つ受講生として参加登録済み
-    enrolled_as_limited_ta: "セクションのみへのアクセス権を持つ TA として参加登録済み"
-    enrolled_as_limited_teacher: セクションのみへのアクセス権を持つ講師として参加登録済み
-    enrolled_as_observer: オブザーバとして参加登録済み
-    enrolled_as_student: 受講生として参加登録済み
-    enrolled_as_ta: "TA として参加登録済み"
-    enrolled_as_teacher: 講師として参加登録済み
+    enrolled_as_designer: （）として登録：設計者
+    enrolled_as_limited_designer: （）として登録：セクションのみアクセスを持つ設計者
+    enrolled_as_limited_observer: （）として登録：セクションのみアクセスを持つオブザーバー
+    enrolled_as_limited_student: （）として登録：セクションのみアクセスを持つ受講生
+    enrolled_as_limited_ta: （）として登録：セクションのみアクセスを持つTA
+    enrolled_as_limited_teacher: （）として登録：セクションのみアクセスを持つ教師
+    enrolled_as_observer: （）として登録：オブザーバー
+    enrolled_as_student: （）として登録：受講者
+    enrolled_as_ta: （）として登録：TA
+    enrolled_as_teacher: （）として登録：教師
     errors: 
       confirmation_failed: 確認に失敗しました
       course_not_authorized_for_crosslist: "%{course_name} はクロスリスティングが承認されていません"
@@ -24361,6 +24384,7 @@ ja:
   show_me_76823679: 表示
   show_more_8d5f918b: もっと表示する
   show_more_af9cbc16: さらに表示する
+  show_name_and_profile_picture_9329d8f8: 名前とプロフィール画像を表示する
   show_name_details_186d86e6: "%{name}詳細を表示"
   show_name_of_observed_students_in_notifications_a56dd9e4: 通知内にあった受講生の名前を表示します。
   show_name_of_observed_students_in_notifications_d38b53ca: 通知内にあった観察中の受講生の名前を表示します
@@ -24390,6 +24414,7 @@ ja:
   show_sub_accounts_for_account_name_fa71a658: "サブアカウントを表示する%{account_name}"
   show_suggestions_when_typing_b72545de: 入力時に提案を表示する
   show_to_d57767f: 表示先：
+  show_to_everyone_94d66d01: 全員に表示する
   show_welcome_tour_a105aa2e: ウェルカムツアーを表示する
   showing_1ac6ed70: 表示中：
   showing_all_announcements_36ff0cec: すべてのアナウンスを表示
@@ -25443,6 +25468,7 @@ ja:
   tas_observers_designers_b705118a: "TA /オブザーバー/デザイナー"
   tas_remove_11059e14: "TA - 削除"
   tas_remove_16a99b22: "TA - 削除"
+  tea_provisional_graders_d4f19c26: TEAの暫定的な採点者
   teacher_5a73b637: 講師
   teacher_count_teachers_a92f7199: "%{teacher_count}講師"
   teacher_dashboard_custom_report_6d20bef2: 講師ダッシュボードカスタムレポート
@@ -25955,6 +25981,8 @@ ja:
   there_was_a_problem_updating_the_submission_6e5280a1: 提出の更新中に問題が発生しました。
   there_was_an_error_checking_plan_publishing_status_e7edfd25: プランの公開状況の確認中にエラーが発生しました。
   there_was_an_error_fetching_course_statistics_96e9dbad: コース統計を取得中にエラーが発生しました
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: 成績表フィルターを取得中にエラーが発生しました。
+  there_was_an_error_fetching_modules_8ee451bb: モジュールを取得中にエラーが発生しました。
   there_was_an_error_fetching_outcome_results_45c57590: 結果を取得中にエラーが発生しました
   there_was_an_error_fetching_submission_comments_ce153077: 提出コメントの取得中にエラーが発生しました
   there_was_an_error_generating_the_pairing_code_9edd639b: ペア設定コードの生成中にエラーがありました。
@@ -26160,6 +26188,7 @@ ja:
       これには、ホットスポット、分類、マッチング、順序付けなど、
               より多くの質問タイプがあります。また、
               さらなる調整機能と適応機能も備えています。
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "このホームルームでは、登録者数と科目の開始/終了日を次のように同期しています： "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "この画像はあなたのページの透かし拝啓として表示されます。使用可能な定式: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: この画像は報告されています。
   this_image_is_currently_unavailable_25c68857: この画像は現在利用できません
@@ -27655,6 +27684,7 @@ ja:
       アカウント通知設定UIを最新
       かつアップデートされたユーザーエクスペリエンスに更新します
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "[新しい成績表の割り当て]列ヘッダーの投稿ポリシーアイコンの表示を更新します。"
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "JSON API認証エラーのHTTPコードとJSONステータスフィールドの更新"
   updating_6edbab78: 更新しています
   updating_discussion_failed_aadb2d35: ディスカッションの更新に失敗しました
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Catalog の URL を更新すると、ユーザは古い URL ではアクセスできなくなります。既存の決済代行会社が設定されている場合、変更には Catalog エンジニアの助けが必要です。"
@@ -27703,6 +27733,8 @@ ja:
   uploaded_over_time_d59abb68: 経時アップロード
   uploading_19e8a4e7: アップロードしています
   uploading_ee585874: アップロードしています...
+  uploading_file_5c7e14fd: アップロード中のファイル
+  uploading_file_in_progress_5c09e0c9: 現在アップロード中のファイル
   uploading_files_5ff8f4fd: ファイルをアップロード中
   uploading_files_9e39dbf9: ファイルアップロード中
   uploading_media_progress_c23a953b: メディアの進行状況をアップロード中

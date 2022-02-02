@@ -65,30 +65,29 @@ def createDistribution(nestedStages) {
 def createLegacyDistribution(nestedStages) {
   def setupNodeHook = this.&setupNode
   def baseEnvVars = [
-    "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20210929'
   ]
 
   // Used only for crystalball map generation
-  def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
-  def seleniumEnvVars = baseEnvVars + [
-    "CI_NODE_TOTAL=$seleniumNodeTotal",
+  def legacyNodeTotal = configuration.getInteger('selenium-ci-node-total')
+  def legacyEnvVars = baseEnvVars + [
+    "CI_NODE_TOTAL=$legacyNodeTotal",
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
     'EXCLUDE_TESTS=.*/performance',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
     "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
+    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
     'CRYSTALBALL_MAP=1'
   ]
 
-  seleniumNodeTotal.times { index ->
-    extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
-      .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
+  legacyNodeTotal.times { index ->
+    extendedStage("Legacy Test Set ${(index + 1).toString().padLeft(2, '0')}")
+      .envVars(legacyEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
       .nodeRequirements(RSPEC_NODE_REQUIREMENTS)
-      .timeout(15)
+      .timeout(45)
       .queue(nestedStages, this.&runLegacySuite)
   }
 }

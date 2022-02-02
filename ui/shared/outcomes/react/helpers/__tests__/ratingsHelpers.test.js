@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {convertRatings, prepareRatings} from '../ratingsHelpers'
+import {processRatingsAndMastery} from '../ratingsHelpers'
 
 describe('Ratings Helpers', () => {
   const testMasteryPoints = 3
@@ -34,47 +34,31 @@ describe('Ratings Helpers', () => {
       points: 3
     }
   ]
-  const testConvertRatings = testRatings.map(({description, points}) => ({
-    description,
-    points,
-    mastery: Number(points) === Number(testMasteryPoints)
-  }))
 
-  describe('convertRatings', () => {
-    it('converts masteryPoints', () => {
-      const {masteryPoints} = convertRatings(testConvertRatings)
+  describe('processRatingsAndMastery', () => {
+    it('processes masteryPoints provided as number', () => {
+      const {masteryPoints} = processRatingsAndMastery(testRatings, testMasteryPoints)
       expect(masteryPoints).toEqual(3)
     })
 
-    it('converts points provided as number', () => {
-      const {ratings} = convertRatings(testConvertRatings)
+    it('processes masteryPoints provided as string', () => {
+      const {masteryPoints} = processRatingsAndMastery(testRatings, '123.45')
+      expect(masteryPoints).toEqual(123.45)
+    })
+
+    it('rounds masteryPoints to 2 decimal places', () => {
+      const {masteryPoints} = processRatingsAndMastery(testRatings, 3.125)
+      expect(masteryPoints).toEqual(3.13)
+    })
+
+    it('processes points provided as number', () => {
+      const {ratings} = processRatingsAndMastery(testRatings, testMasteryPoints)
       expect(ratings[0].points).toEqual(1.25)
     })
 
-    it('converts points provided as string', () => {
-      const {ratings} = convertRatings(testConvertRatings)
+    it('processes points provided as string', () => {
+      const {ratings} = processRatingsAndMastery(testRatings, testMasteryPoints)
       expect(ratings[1].points).toEqual(2.5)
-    })
-  })
-
-  describe('prepareRatings', () => {
-    it('adds mastery prop to ratings', () => {
-      const result = prepareRatings(testRatings, testMasteryPoints)
-      expect(result[0].mastery).toBeFalsy()
-      expect(result[1].mastery).toBeFalsy()
-      expect(result[2].mastery).toBeTruthy()
-    })
-
-    it('adds key prop to ratings', () => {
-      const result = prepareRatings(testRatings, testMasteryPoints)
-      expect(result[0].key).not.toBeNull()
-      expect(result[1].key).not.toBeNull()
-      expect(result[2].key).not.toBeNull()
-    })
-
-    it('handles null ratings argument', () => {
-      const result = prepareRatings(null, testMasteryPoints)
-      expect(result.length).toBe(0)
     })
   })
 })

@@ -28,7 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const ConversationListContainer = ({course, scope, onSelectConversation}) => {
+const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const userID = ENV.current_user_id?.toString()
 
@@ -62,7 +62,7 @@ const ConversationListContainer = ({course, scope, onSelectConversation}) => {
   }
 
   const {loading, error, data} = useQuery(CONVERSATIONS_QUERY, {
-    variables: {userID, scope, course},
+    variables: {userID, scope, filter: [userFilter, course]},
     fetchPolicy: 'cache-and-network'
   })
 
@@ -94,6 +94,7 @@ export default ConversationListContainer
 
 ConversationListContainer.propTypes = {
   course: PropTypes.string,
+  userFilter: PropTypes.number,
   scope: PropTypes.string,
   onSelectConversation: PropTypes.func
 }
