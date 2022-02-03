@@ -2843,10 +2843,12 @@ class Submission < ActiveRecord::Base
   end
 
   def word_count
-    return nil unless body && submission_type != "online_quiz"
-
-    tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
-    @word_count ||= ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
+    if body && submission_type != "online_quiz"
+      tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
+      ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
+    elsif versioned_attachments.present?
+      Attachment.where(id: versioned_attachments.pluck(:id)).sum(:word_count)
+    end
   end
 
   private
