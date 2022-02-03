@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SpeedGraderPostGradesMenu from 'ui/features/speed_grader/react/SpeedGraderPostGradesMenu.js'
+import SpeedGraderPostGradesMenu from 'ui/features/speed_grader/react/SpeedGraderPostGradesMenu'
 
 QUnit.module('SpeedGraderPostGradesMenu', hooks => {
   let $container
@@ -168,7 +168,7 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
         context = {allowHidingGradesOrComments: false}
       })
 
-      QUnit.module('when hasGradesOrPostableComments is false', itemHooks => {
+      QUnit.module('when hasGradesOrPostableComments is false (2)', itemHooks => {
         itemHooks.beforeEach(() => {
           context.hasGradesOrPostableComments = false
           renderAndOpenMenu(context)
@@ -183,7 +183,7 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
         })
       })
 
-      QUnit.module('when hasGradesOrPostableComments is true', itemHooks => {
+      QUnit.module('when hasGradesOrPostableComments is true (2)', itemHooks => {
         itemHooks.beforeEach(() => {
           context.hasGradesOrPostableComments = true
           renderAndOpenMenu(context)
