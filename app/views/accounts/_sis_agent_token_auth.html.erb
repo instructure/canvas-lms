@@ -17,7 +17,7 @@
 %>
 
 <% if !@account.site_admin? &&
-    @account.root_account? &&
+    @account.primary_settings_root_account? &&
     @account.grants_right?(@current_user, :manage_site_settings) %>
     <fieldset id="add_sis_app_token">
         <h2 class="screenreader-only"><%= t('SIS Agent Token Authentication') %></h2>
