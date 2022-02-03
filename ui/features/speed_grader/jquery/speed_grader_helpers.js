@@ -22,34 +22,6 @@ import I18n from 'i18n!speed_grader_helpers'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-export function setupIsModerated({moderated_grading}) {
-  return moderated_grading
-}
-
-export function setupIsAnonymous({anonymize_students}) {
-  return anonymize_students
-}
-
-export function setupAnonymousGraders({anonymize_graders}) {
-  return anonymize_graders
-}
-
-export function setupAnonymizableId(isAnonymous) {
-  return isAnonymous ? 'anonymous_id' : 'id'
-}
-
-export function setupAnonymizableStudentId(isAnonymous) {
-  return isAnonymous ? 'anonymous_id' : 'student_id'
-}
-
-export function setupAnonymizableUserId(isAnonymous) {
-  return isAnonymous ? 'anonymous_id' : 'user_id'
-}
-
-export function setupAnonymizableAuthorId(isAnonymous) {
-  return isAnonymous ? 'anonymous_id' : 'author_id'
-}
-
 const speedGraderHelpers = {
   getHistory() {
     return window.history
@@ -108,12 +80,14 @@ const speedGraderHelpers = {
     }
     // check if the index is valid (multiple submissions)
     const currentSelectedIndex = submission.currentSelectedIndex
+    // eslint-disable-next-line no-restricted-globals
     if (currentSelectedIndex == null || isNaN(currentSelectedIndex)) {
       return ''
     }
     const select = '&version='
     // check if the version is valid, or matches the index
     const version = submission.submission_history[currentSelectedIndex].submission.version
+    // eslint-disable-next-line no-restricted-globals
     if (version == null || isNaN(version)) {
       return select + currentSelectedIndex
     }
@@ -182,11 +156,11 @@ const speedGraderHelpers = {
     const submission = student.submission
     if (
       submission &&
-      submission.workflow_state != 'unsubmitted' &&
+      submission.workflow_state !== 'unsubmitted' &&
       (submission.submitted_at || !(typeof submission.grade === 'undefined'))
     ) {
       if (
-        (grading_role == 'provisional_grader' || grading_role == 'moderator') &&
+        (grading_role === 'provisional_grader' || grading_role === 'moderator') &&
         !student.needs_provisional_grade &&
         submission.provisional_grade_id === null
       ) {
@@ -197,7 +171,7 @@ const speedGraderHelpers = {
         !submission.excused &&
         (typeof submission.grade === 'undefined' ||
           submission.grade === null ||
-          submission.workflow_state == 'pending_review')
+          submission.workflow_state === 'pending_review')
       ) {
         return 'not_graded'
       } else if (submission.grade_matches_current_submission) {
@@ -212,9 +186,7 @@ const speedGraderHelpers = {
   plagiarismResubmitHandler: (event, resubmitUrl) => {
     event.preventDefault()
 
-    $(event.target)
-      .attr('disabled', true)
-      .text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
+    $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
     $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
       speedGraderHelpers.reloadPage()
     })
@@ -245,15 +217,7 @@ const speedGraderHelpers = {
 
   reloadPage() {
     window.location.reload()
-  },
-
-  setupIsModerated,
-  setupIsAnonymous,
-  setupAnonymousGraders,
-  setupAnonymizableId,
-  setupAnonymizableUserId,
-  setupAnonymizableStudentId,
-  setupAnonymizableAuthorId
+  }
 }
 
 export default speedGraderHelpers
