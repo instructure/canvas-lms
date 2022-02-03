@@ -31,7 +31,7 @@ describe('buildText()', () => {
   it('builds <text /> if text is valid', () => {
     expect(buildText({...settings})).toMatchInlineSnapshot(`
       <text
-        fill=""
+        fill="#000000"
         font-family="Lato Extended"
         font-size="14"
         font-weight="bold"
@@ -53,7 +53,7 @@ describe('buildText()', () => {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.'
     expect(buildText({...settings, text})).toMatchInlineSnapshot(`
       <text
-        fill=""
+        fill="#000000"
         font-family="Lato Extended"
         font-size="14"
         font-weight="bold"
@@ -106,7 +106,7 @@ describe('buildText()', () => {
     it('is small', () => {
       expect(buildText({...settings, textSize: 'small'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
@@ -126,7 +126,7 @@ describe('buildText()', () => {
     it('is medium', () => {
       expect(buildText({...settings, textSize: 'medium'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="16"
           font-weight="bold"
@@ -146,7 +146,7 @@ describe('buildText()', () => {
     it('is large', () => {
       expect(buildText({...settings, textSize: 'large'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="22"
           font-weight="bold"
@@ -166,7 +166,7 @@ describe('buildText()', () => {
     it('is x-large', () => {
       expect(buildText({...settings, textSize: 'x-large'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="28"
           font-weight="bold"
@@ -230,7 +230,7 @@ describe('buildText()', () => {
     it('is null', () => {
       expect(buildText({...settings, textBackgroundColor: null})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
@@ -250,7 +250,7 @@ describe('buildText()', () => {
     it('is valid', () => {
       expect(buildText({...settings, textBackgroundColor: '#f00'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
@@ -272,7 +272,7 @@ describe('buildText()', () => {
     it('is middle', () => {
       expect(buildText({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
@@ -292,7 +292,7 @@ describe('buildText()', () => {
     it('is bottom-third', () => {
       expect(buildText({...settings, textPosition: 'bottom-third'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
@@ -312,7 +312,7 @@ describe('buildText()', () => {
     it('is below', () => {
       expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
