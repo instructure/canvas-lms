@@ -140,7 +140,8 @@ describe('HeaderInputs', () => {
       {
         _id: '1',
         id: 'TWVzc2FnZWFibGVVc2VyLTQx',
-        name: 'Frederick Dukes'
+        name: 'Frederick Dukes',
+        isLast: true
       }
     ])
   })

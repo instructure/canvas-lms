@@ -23,21 +23,56 @@ import {ADDRESS_BOOK_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from 'react-apollo'
 
 export const AddressBookContainer = props => {
+  const userID = ENV.current_user_id?.toString()
   const [filterHistory, setFilterHistory] = useState([
     {
       context: null
     }
   ])
   const [inputValue, setInputValue] = useState('')
+  const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
 
-  const {data, loading} = useQuery(ADDRESS_BOOK_RECIPIENTS, {
+  const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
     variables: {
       ...filterHistory[filterHistory.length - 1],
       search: inputValue,
-      userID: ENV.current_user_id?.toString()
+      userID
     },
     notifyOnNetworkStatusChange: true
   })
+  const {loading, data} = addressBookRecipientsQuery
+
+  const fetchMoreMenuData = () => {
+    setIsLoadingMoreData(true)
+    addressBookRecipientsQuery.fetchMore({
+      variables: {
+        ...filterHistory[filterHistory.length - 1],
+        search: inputValue,
+        userID,
+        afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor
+      },
+      updateQuery: (previousResult, {fetchMoreResult}) => {
+        setIsLoadingMoreData(false)
+        return {
+          legacyNode: {
+            ...previousResult.legacyNode,
+            recipients: {
+              contextsConnection: fetchMoreResult.legacyNode?.recipients?.contextsConnection,
+              usersConnection: {
+                nodes: [
+                  ...previousResult.legacyNode?.recipients?.usersConnection?.nodes,
+                  ...fetchMoreResult.legacyNode?.recipients?.usersConnection?.nodes
+                ],
+                pageInfo: fetchMoreResult.legacyNode?.recipients?.usersConnection?.pageInfo,
+                __typename: 'MessageableUserConnection'
+              },
+              __typename: 'Recipients'
+            }
+          }
+        }
+      }
+    })
+  }
 
   const addFilterHistory = chosenFilter => {
     const newFilterHistor = filterHistory
@@ -52,7 +87,7 @@ export const AddressBookContainer = props => {
   }
 
   const menuData = useMemo(() => {
-    if (loading) {
+    if (loading && !data) {
       return []
     }
 
@@ -80,6 +115,9 @@ export const AddressBookContainer = props => {
     if (!userData) {
       userData = []
     }
+    if (userData.length > 0 && !loading) {
+      userData[userData.length - 1].isLast = true
+    }
 
     return [...contextData, ...userData]
   }, [data, loading])
@@ -97,6 +135,9 @@ export const AddressBookContainer = props => {
   return (
     <AddressBook
       menuData={menuData}
+      hasMoreMenuData={data?.legacyNode?.recipients?.usersConnection?.pageInfo?.hasNextPage}
+      fetchMoreMenuData={fetchMoreMenuData}
+      isLoadingMoreMenuData={isLoadingMoreData}
       isLoading={loading}
       isSubMenu={filterHistory.length > 1}
       onSelect={handleSelect}
