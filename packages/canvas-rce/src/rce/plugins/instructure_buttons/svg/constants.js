@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const TYPE = 'image/svg+xml-buttons-and-icons'
+
 export const DEFAULT_SETTINGS = {
+  type: TYPE,
   name: '',
   alt: '',
   shape: 'square',

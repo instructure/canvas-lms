@@ -89,6 +89,7 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
             ...ConversationMessage
           }
         }
+        contextName
       }
     }
   }
