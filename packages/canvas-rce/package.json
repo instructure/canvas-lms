@@ -37,7 +37,8 @@
     "prepublishOnly": "yarn build:all && yarn test",
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'",
-    "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean"
+    "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean",
+    "generate-svgs": "yarn build:all && scripts/generateSvgs.js"
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
@@ -121,8 +122,8 @@
     "js-beautify": "1",
     "keycode": "^2",
     "lodash": "^4",
-    "minimatch": "~3.0.4",
     "mathlive": "^0.69.8",
+    "minimatch": "~3.0.4",
     "moment-timezone": "^0.5.13",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
@@ -182,6 +183,7 @@
     "skin-deep": "^1",
     "testcafe": "^1.9.0",
     "testcafe-react-selectors": "^3.3.0",
+    "texsvg": "^1.4.0",
     "webpack": "^4",
     "webpack-merge": "^5",
     "webpack-nano": "^1",
