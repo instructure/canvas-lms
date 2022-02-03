@@ -216,7 +216,7 @@ class CanvasUnzip
         raise DestinationFileExists, "Destination '#{dest_path}' already exists"
       end
 
-      digest = Digest::MD5.new
+      digest = Digest::SHA2.new(512)
       ::File.open(dest_path, "wb") do |os|
         case type
         when :zip
