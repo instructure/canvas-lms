@@ -24,6 +24,7 @@ import getRCSProps from '../getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import EditorConfig from '../tinymce.config'
 import loadEventListeners from '../loadEventListeners'
+import shouldUseFeature, {Feature} from '../shouldUseFeature'
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
@@ -130,7 +131,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onBlur={onBlur}
       onContentChange={onContentChange}
       onInit={onInit}
-      use_rce_buttons_and_icons={!!window.ENV?.FEATURES?.rce_buttons_and_icons}
+      use_rce_buttons_and_icons={shouldUseFeature(Feature.ButtonsAndIcons, window.ENV)}
       use_rce_a11y_checker_notifications={!!window.ENV?.use_rce_a11y_checker_notifications}
       {...rest}
     />
