@@ -20,6 +20,7 @@ import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeI
 import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
 import I18n from 'i18n!conversations_2'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
+import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {reduceDuplicateCourses} from '../../../util/courses_helper'
@@ -39,6 +40,11 @@ const HeaderInputs = props => {
       props.courses.favoriteCoursesConnection.nodes
     )
   }
+
+  const canAddUserNote =
+    ENV.CONVERSATIONS.NOTES_ENABLED &&
+    (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT ||
+      Object.values(ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_COURSES).some(course => !!course))
 
   return (
     <Flex direction="column" width="100%" height="100%" padding="small">
@@ -85,6 +91,16 @@ const HeaderInputs = props => {
               />
             }
             shouldGrow
+          />
+        </Flex.Item>
+      )}
+      {canAddUserNote && (
+        <Flex.Item>
+          <ComposeInputWrapper
+            shouldGrow
+            input={
+              <FacultyJournalCheckBox onChange={props.onUserNoteChange} checked={props.userNote} />
+            }
           />
         </Flex.Item>
       )}
@@ -136,8 +152,10 @@ HeaderInputs.propTypes = {
   isReply: PropTypes.bool,
   onContextSelect: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
+  onUserNoteChange: PropTypes.func,
   onSendIndividualMessagesChange: PropTypes.func,
   onSubjectChange: PropTypes.func,
+  userNote: PropTypes.bool,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   mediaAttachmentTitle: PropTypes.string,
