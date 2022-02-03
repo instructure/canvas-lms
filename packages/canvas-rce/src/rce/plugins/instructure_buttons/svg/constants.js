@@ -29,7 +29,7 @@ export const DEFAULT_SETTINGS = {
   outlineSize: 'none',
   text: '',
   textSize: 'small',
-  textColor: null,
+  textColor: '#000000',
   textBackgroundColor: null,
   textPosition: 'middle',
   encodedImage: '',

@@ -47,7 +47,7 @@ describe('useSvgSettings()', () => {
         outlineSize: 'none',
         text: '',
         textSize: 'small',
-        textColor: null,
+        textColor: '#000000',
         textBackgroundColor: null,
         textPosition: 'middle'
       })
@@ -87,7 +87,7 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
           textPosition: 'middle'
         })
@@ -207,7 +207,7 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
           textPosition: 'middle'
         })
@@ -233,7 +233,7 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
           textPosition: 'middle'
         })
