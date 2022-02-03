@@ -72,7 +72,7 @@ def getColor(testCount, partition) {
 
 def computeTestCount() {
   def seleniumPartition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
-  def rspecPartition = (env.RSPEC_PROCESSES.toInteger() * 260) // 260 tests per process
+  def rspecPartition = (env.RSPEC_PROCESSES.toInteger() * 190) // 190 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
   def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
