@@ -1405,7 +1405,7 @@ EG = {
       const newIndex = (this.currentIndex() + offset + students) % students
       this.goToStudent(jsonData.studentsWithSubmissions[newIndex][anonymizableId], HISTORY_PUSH)
       const nextSubmission = jsonData.studentsWithSubmissions[newIndex].submission
-      if (nextSubmission.missing && nextSubmission.grader_id){
+      if (nextSubmission.missing && nextSubmission.grader_id) {
         updateSubmissionAndPageEffects()
       }
     }
@@ -2099,6 +2099,19 @@ EG = {
     }
   },
 
+  updateWordCount(wordCount) {
+    if (ENV.FEATURES?.word_count_in_speed_grader) {
+      // xsslint safeString.method toLocaleString
+      // xsslint safeString.method t
+      const wordCountHTML = wordCount
+        ? `<label>${I18n.t('Word Count')}:</label> ${I18n.t('word', {
+            count: wordCount
+          })}`
+        : ''
+      $word_count.html($.raw(wordCountHTML))
+    }
+  },
+
   handleSubmissionSelectionChange() {
     clearInterval(sessionTimer)
 
@@ -2254,6 +2267,7 @@ EG = {
         .click(function (event) {
           event.preventDefault()
           EG.loadSubmissionPreview($(this).data('attachment'), null)
+          EG.updateWordCount(attachment.word_count)
         })
         .end()
         .find('a.submission-file-download')
@@ -2315,22 +2329,12 @@ EG = {
     // load up a preview of one of the attachments if we can.
     this.loadSubmissionPreview(preview_attachment, submission)
     renderSubmissionCommentsDownloadLink(submission)
+    EG.updateWordCount(preview_attachment ? preview_attachment.word_count : submission.word_count)
 
     // if there is any submissions after this one, show a notice that they are not looking at the newest
     $submission_not_newest_notice.showIf(
       $submission_to_view.filter(':visible').find(':selected').nextAll().length
     )
-
-    if (ENV.FEATURES?.word_count_in_speed_grader) {
-      // xsslint safeString.method toLocaleString
-      // xsslint safeString.method t
-      const wordCountHTML = submission.word_count
-        ? `<label>${I18n.t('Word Count')}:</label> ${I18n.t('word', {
-            count: submission.word_count
-          })}`
-        : ''
-      $word_count.html($.raw(wordCountHTML))
-    }
 
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')

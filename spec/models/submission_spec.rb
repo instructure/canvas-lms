@@ -7898,6 +7898,10 @@ describe Submission do
   end
 
   describe "word_count" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:word_count_in_speed_grader)
+    end
+
     it "returns the word count" do
       submission.update(body: "test submission")
       expect(submission.word_count).to eq 2
@@ -7927,6 +7931,17 @@ describe Submission do
       submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
         <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
       expect(submission.word_count).to eq 18
+    end
+
+    it "sums word counts of attachments if there are any" do
+      student_in_course(active_all: true)
+      submission_text = "Text based submission with some words"
+      attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      attachment1.update_word_count
+      attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      attachment2.update_word_count
+      sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
+      expect(sub.word_count).to eq 12
     end
   end
 
