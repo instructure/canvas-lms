@@ -45,7 +45,7 @@ describe('buildSvg()', () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <metadata>
-          {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":""}
+          {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":""}
         </metadata>
         <svg
           fill="none"
@@ -138,7 +138,7 @@ describe('buildSvg()', () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <metadata>
-          {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":""}
+          {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":""}
         </metadata>
         <svg
           fill="none"
@@ -164,7 +164,7 @@ describe('buildSvg()', () => {
           fill=""
         />
         <text
-          fill=""
+          fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
