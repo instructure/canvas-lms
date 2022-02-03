@@ -86,6 +86,26 @@ module Services
         env = described_class.env_for(user: {}, domain: "domain")
         expect(env[:JWT]).to eq("InvalidJwtKey")
       end
+
+      describe "RICH_CONTENT_CAN_EDIT_FILES" do
+        context "when the user can edit context files" do
+          subject { described_class.env_for(user: user, context: context)[:RICH_CONTENT_CAN_EDIT_FILES] }
+
+          let(:user) { double("user", global_id: "some-global-id") }
+          let(:context) { double("allowed_context", grants_right?: true) }
+
+          it { is_expected.to be_truthy }
+        end
+
+        context "when the user cannot edit context files" do
+          subject { described_class.env_for(user: user, context: context)[:RICH_CONTENT_CAN_EDIT_FILES] }
+
+          let(:user) { double("user", global_id: "some-global-id") }
+          let(:context) { double("allowed_context", grants_right?: false) }
+
+          it { is_expected.to be_falsey }
+        end
+      end
     end
   end
 end
