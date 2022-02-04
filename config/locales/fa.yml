@@ -12087,6 +12087,7 @@ fa:
   master_lock_590266b6: "قفل اصلی"
   mastered_34d4c857: مسلط
   mastery_7ec348b5: تسلط
+  mastery_at_cf0c477b: "تسلط در"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "تسلط:  %{n_mastery_points_precision_2_str} امتیاز"
   mastery_path_processing_f4471152: "پردازش مسیر تسلط"
   mastery_paths_breakdown_6e0b5fce: "از کار افتادن مسیرهای تسلط"
