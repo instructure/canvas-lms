@@ -10586,6 +10586,7 @@ tr:
   marked_done_9fd646f: "Tamamlandı olarak işaretle"
   masquerade_as_name_8bb004c5: "%{name} kullanıcısının yerine geç"
   mastery_7ec348b5: Yeterlik
+  mastery_at_cf0c477b: "Yeterlilik düzeyi"
   mastery_paths_breakdown_6e0b5fce: "Yeterlilik Süreçleri Dökümü"
   mastery_paths_cc4096c2: "Yeterlilik Süreçleri"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Yeterlik puanı notlandırılmış ödev ya da kısa sınavın en yüksek puanını gösterir."
