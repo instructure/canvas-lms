@@ -3983,7 +3983,7 @@ is:
       labels: 
         ? "false"
         : nei
-        grade: "Einkunn: %{grade}*(%{points_possible}mögulegir punktar)*"
+        grade: "Einkunn: %{grade}*(%{points_possible} mögulegir punktar)*"
         graded_anonymously: "Nafnlaus einkunnargjöf: %{value}"
         ? "no"
         : nei
