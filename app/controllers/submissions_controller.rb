@@ -114,6 +114,7 @@ class SubmissionsController < ApplicationController
       return render_user_not_found
     end
 
+    @show_rubric = params[:show_rubric] == "true"
     @rubric_association = @submission.rubric_association_with_assessing_user_id
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
     @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first

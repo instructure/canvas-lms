@@ -134,7 +134,12 @@
            can_do(@assignment.rubric, @current_user, :read)
          )
       %>
-        <a href="#" class="assess_submission_link Submission__Link--has-icon" style="font-size: 0.8em;" tabindex='0'>
+        <a href="#" class="assess_submission_link Submission__Link--has-icon"
+           style="font-size: 0.8em;"
+           tabindex='0'
+           id="submissionRubric"
+           data-rubric="<%= @show_rubric %>"
+        >
           <i class="icon-rubric" aria-hidden="true"></i>
           <%= t('show_rubric', 'Show Rubric') %>
         </a>
