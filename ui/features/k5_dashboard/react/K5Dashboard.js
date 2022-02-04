@@ -59,7 +59,7 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {ObserverListShape} from '@canvas/observer-picker'
+import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const DASHBOARD_TABS = [
@@ -140,12 +140,12 @@ export const K5Dashboard = ({
   selectedContextCodes,
   selectedContextsLimit,
   parentSupportEnabled,
-  observerList,
+  observedUsersList,
   canAddObservee,
   openTodosInNewTab,
   loadingOpportunities
 }) => {
-  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
+  const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
     : undefined
 
@@ -303,7 +303,7 @@ export const K5Dashboard = ({
                 </Heading>
               </ScreenReaderContent>
               <ObserverOptions
-                observerList={observerList}
+                observedUsersList={observedUsersList}
                 currentUser={currentUser}
                 handleChangeObservedUser={handleChangeObservedUser}
                 margin="medium 0 xx-small 0"
@@ -422,7 +422,7 @@ K5Dashboard.propTypes = {
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
-  observerList: ObserverListShape.isRequired,
+  observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired
 }

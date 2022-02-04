@@ -34,7 +34,7 @@ import {
   MOCK_EVENTS,
   MOCK_PLANNER_ITEM
 } from '@canvas/k5/react/__tests__/fixtures'
-import {MOCK_OBSERVER_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
+import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
@@ -197,7 +197,7 @@ const defaultProps = {
   selectedContextsLimit: 2,
   parentSupportEnabled: false,
   canAddObservee: false,
-  observerList: MOCK_OBSERVER_LIST,
+  observedUsersList: MOCK_OBSERVED_USERS_LIST,
   openTodosInNewTab: true
 }
 
@@ -620,7 +620,7 @@ describe('K-5 Dashboard', () => {
 
       const observerPlannerItem = cloneDeep(MOCK_PLANNER_ITEM)
       observerPlannerItem[0].plannable.title = 'Assignment for Observee'
-      const observerList = [
+      const observedUsersList = [
         {
           id: currentUserId,
           name: 'Self'
@@ -639,7 +639,7 @@ describe('K-5 Dashboard', () => {
           parentSupportEnabled
           canAddObservee
           currentUserRoles={['user', 'observer']}
-          observerList={observerList}
+          observedUsersList={observedUsersList}
         />
       )
       expect(await findByText('Assignment 15')).toBeInTheDocument()
