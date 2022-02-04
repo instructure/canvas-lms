@@ -3029,7 +3029,7 @@ es-ES:
       labels: 
         ? "false"
         : "no"
-        grade: "Nota: %{grade} *(%{points_possible}puntos posibles)*"
+        grade: "Nota: %{grade} *(%{points_possible} puntos posibles)*"
         graded_anonymously: "Evaluado anónimamente: %{value}"
         none_assigned: "Nada asignado"
         ? "true"
