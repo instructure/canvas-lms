@@ -33,10 +33,10 @@ module Lti
       before_action :require_tool
 
       def deep_linking_response
-        # one single content item for an existing module should:
+        # one single non-line item content item for an existing module should:
         # * not create a resource link
         # * not reload the page
-        if add_item_to_existing_module? && lti_resource_links.length == 1
+        if add_item_to_existing_module? && lti_resource_links.length == 1 && !add_assignment?
           render_content_items(reload_page: false)
           return
         end
