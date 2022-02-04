@@ -12749,6 +12749,7 @@ nn:
   master_lock_590266b6: Masterlås
   mastered_34d4c857: Meistra
   mastery_7ec348b5: Meistringsnivå
+  mastery_at_cf0c477b: "Meistringsnivå på"
   mastery_calculation_5fd5f5fe: Ekspertiseberekning
   mastery_calculation_parameters_f072c3: "Utrekningsparameterar for meistring"
   mastery_calculation_saved_df378fdd: "Ekspertiseberekning lagra"

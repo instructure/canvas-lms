@@ -4213,7 +4213,7 @@ es:
       labels: 
         ? "false"
         : "no"
-        grade: "Calificación: %{grade} *(%{points_possible}pts posibles)*"
+        grade: "Calificación: %{grade} *(%{points_possible} pts posibles)*"
         graded_anonymously: "Calificado anónimamente: %{value}"
         ? "no"
         : "no"
