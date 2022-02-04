@@ -353,6 +353,7 @@ module CanvasRails
       app.config.middleware.insert_after(config.session_store, RequestContext::Session)
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
+      app.config.middleware.insert_before(Sentry::Rails::CaptureExceptions, SentryTraceScrubber)
     end
 
     initializer("set_allowed_request_id_setters", after: :finisher_hook) do |app|
