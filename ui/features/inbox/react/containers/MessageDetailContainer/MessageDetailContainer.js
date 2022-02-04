@@ -91,6 +91,7 @@ export const MessageDetailContainer = props => {
         text={props.conversation.subject}
         onReply={props.onReply}
         onReplyAll={props.onReplyAll}
+        onDelete={() => props.onDelete([props.conversation._id])}
       />
       {data?.legacyNode?.conversationMessagesConnection.nodes.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
@@ -110,5 +111,6 @@ export const MessageDetailContainer = props => {
 MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
   onReply: PropTypes.func,
-  onReplyAll: PropTypes.func
+  onReplyAll: PropTypes.func,
+  onDelete: PropTypes.func
 }

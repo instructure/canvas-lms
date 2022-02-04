@@ -215,6 +215,7 @@ const CanvasInbox = () => {
                   conversation={selectedConversations[0]}
                   onReply={conversationMessage => onReply({conversationMessage})}
                   onReplyAll={conversationMessage => onReply({conversationMessage, replyAll: true})}
+                  onDelete={handleDelete}
                 />
               ) : (
                 <View padding="small">

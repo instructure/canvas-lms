@@ -437,5 +437,6 @@ MessageListActionContainer.propTypes = {
 }
 
 MessageListActionContainer.defaultProps = {
-  selectedConversations: []
+  selectedConversations: [],
+  conversationsQueryOptions: {}
 }
