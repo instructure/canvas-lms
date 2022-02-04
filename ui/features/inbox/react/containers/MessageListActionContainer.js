@@ -394,7 +394,7 @@ const MessageListActionContainer = props => {
                 compose={props.onCompose}
                 delete={() => props.onDelete()}
                 deleteDisabled={props.deleteDisabled}
-                forward={() => {}}
+                forward={props.onForward}
                 markAsUnread={handleMarkAsUnread}
                 markAsRead={handleMarkAsRead}
                 reply={props.onReply}
@@ -426,6 +426,7 @@ MessageListActionContainer.propTypes = {
   selectedConversations: PropTypes.array,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
+  onForward: PropTypes.func,
   deleteDisabled: PropTypes.bool,
   archiveToggler: PropTypes.func,
   archiveDisabled: PropTypes.bool,

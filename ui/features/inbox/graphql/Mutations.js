@@ -113,6 +113,7 @@ export const ADD_CONVERSATION_MESSAGE = gql`
     $includedMessages: [ID!]
     $mediaCommentId: ID
     $mediaCommentType: String
+    $contextCode: String
     $recipients: [String!]!
   ) {
     addConversationMessage(
@@ -124,6 +125,7 @@ export const ADD_CONVERSATION_MESSAGE = gql`
         includedMessages: $includedMessages
         mediaCommentId: $mediaCommentId
         mediaCommentType: $mediaCommentType
+        contextCode: $contextCode
         recipients: $recipients
       }
     ) {
