@@ -69,7 +69,7 @@
     <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
     <li><a href="#tab-integrations" id="tab-integrations-link"><%= t(:tab_integrations, "Integrations") %></a></li>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_account_settings) && @account.primary_settings_root_account? && !@account.site_admin? %>
+    <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
@@ -128,7 +128,7 @@
               </td>
             </tr>
             <% end %>
-            <% if @account.primary_settings_root_account? %>
+            <% if @account.root_account? %>
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
                 <td>
@@ -348,7 +348,7 @@
 
         <%= render partial: 'additional_settings', locals: { f: f } %>
 
-        <% if !@account.site_admin? && @account.primary_settings_root_account? && @account.feature_enabled?(:slack_notifications)%>
+        <% if !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:slack_notifications)%>
           <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
           <fieldset>
             <legend><%= t("Slack Api Key") %></legend>
@@ -362,7 +362,7 @@
             <% end %>
           </fieldset>
         <% end %>
-        <% if !@account.site_admin? && @account.primary_settings_root_account? %>
+        <% if !@account.site_admin? && @account.root_account? %>
           <fieldset>
             <legend><%= t("Personal Pronouns") %></legend>
             <%= f.fields_for :settings do |settings| %>
@@ -400,7 +400,7 @@
           <div id="terms_of_service_preview_link"></div>
         <% end %>
         <% if !@account.site_admin? &&
-               @account.primary_settings_root_account? &&
+               @account.root_account? &&
                @account.feature_enabled?(:google_docs_domain_restriction) &&
                @account.grants_right?(@current_user, :manage_site_settings) %>
           <fieldset id="google-docs-domain">
@@ -495,7 +495,7 @@
               </div>
             <% end %>
 
-            <% if @account.primary_settings_root_account? %>
+            <% if @account.root_account? %>
               <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
@@ -666,7 +666,7 @@
             <% end %>
         <% end %>
 
-        <% if @account.primary_settings_root_account? && !@account.site_admin? %>
+        <% if @account.root_account? && !@account.site_admin? %>
           <div id="custom_help_link_settings"></div>
         <% end %>
 
@@ -753,7 +753,7 @@
           <% end %>
         <% end %>
 
-        <% if @account.primary_settings_root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
+        <% if @account.root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
           <fieldset>
             <h2 class="screenreader-only"><%= t('Enabled Web Services') %></h2>
             <legend><%= t('Enabled Web Services') %></legend>
@@ -827,7 +827,7 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
-        <% if @account.primary_settings_root_account? && !@account.site_admin? %>
+        <% if @account.root_account? && !@account.site_admin? %>
           <fieldset>
             <h2 class="screenreader-only"><%= t('Who Can Create New Courses') %></h2>
             <legend><%= t(:create_courses_title, "Who Can Create New Courses") %></legend>
@@ -930,7 +930,7 @@ acknowledge that you have read and agreed to the
     <div id="tab-integrations">
     </div>
   <% end %>
-  <% if can_do(@context, @current_user, :manage_account_settings) && @account.primary_settings_root_account? && !@account.site_admin? %>
+  <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <div id="tab-notifications">
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings_notifications"} do |f| %>
         <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>

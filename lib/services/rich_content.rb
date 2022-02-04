@@ -44,13 +44,6 @@ module Services
         context &&
         context.grants_right?(user, :manage_files_add)
       ) || false
-
-      env_hash[:RICH_CONTENT_CAN_EDIT_FILES] = (
-        user &&
-        context &&
-        context.grants_right?(user, :manage_files_edit)
-      ) || false
-
       env_hash
     end
 
