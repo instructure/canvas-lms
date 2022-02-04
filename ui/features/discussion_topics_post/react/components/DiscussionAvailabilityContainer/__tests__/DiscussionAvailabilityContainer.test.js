@@ -80,12 +80,12 @@ describe('DiscussionAvailabilityContainer', () => {
     })
     it('displays anonymous discussion when anonymous', () => {
       const {queryByText} = setup({anonymousState: 'full_anonymity'})
-      expect(queryByText('Anonymous Discussion |')).toBeInTheDocument()
+      expect(queryByText('Anonymous Discussion')).toBeInTheDocument()
     })
 
     it('displays partially anonymous discussion when partially anonymous', () => {
       const {queryByText} = setup({anonymousState: 'partial_anonymity'})
-      expect(queryByText('Partially Anonymous Discussion |')).toBeInTheDocument()
+      expect(queryByText('Partially Anonymous Discussion')).toBeInTheDocument()
     })
 
     it('clicking view availability opens the tray', () => {
@@ -110,7 +110,7 @@ describe('DiscussionAvailabilityContainer', () => {
     })
     it('displays anonymous discussion when anonymous', () => {
       const {queryByText} = setup({anonymousState: 'full_anonymity'})
-      expect(queryByText('Anonymous Discussion |')).toBeInTheDocument()
+      expect(queryByText('Anonymous Discussion')).toBeInTheDocument()
     })
 
     it('clicking view availability opens the tray', () => {
