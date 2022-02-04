@@ -1803,6 +1803,13 @@ modules.initModuleManagement = function (duplicate) {
 
   function generate_submit(id, focusLink = true) {
     return item_data => {
+      // a content item with an assignment_id means that an assignment was already created
+      // on the backend, so no module item should be created now. Reload the page to show
+      // the newly created assignment
+      if (item_data['item[assignment_id]']) {
+        return window.location.reload()
+      }
+
       const $module = $('#context_module_' + id)
       let nextPosition = modules.getNextPosition($module)
       item_data.content_details = ['items']

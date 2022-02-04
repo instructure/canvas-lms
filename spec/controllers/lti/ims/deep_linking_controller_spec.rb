@@ -593,7 +593,7 @@ module Lti
             end
 
             context "when placement is not allowed to create line items" do
-              let(:params) { super().merge({ placement: "link_selection" }) }
+              let(:params) { super().merge({ placement: "homework_submission" }) }
 
               it_behaves_like "does nothing"
             end
@@ -780,6 +780,27 @@ module Lti
               it "leaves assignment unpublished" do
                 subject
                 expect(course.assignments.last.workflow_state).to eq("unpublished")
+              end
+            end
+
+            context "when creating a single item in an existing module" do
+              let(:context_module) { course.context_modules.create!(name: "Test Module") }
+              let(:params) { super().merge({ context_module_id: context_module.id, placement: "link_selection" }) }
+
+              before do
+                context_module
+              end
+
+              it "does not create a new module" do
+                expect { subject }.not_to change { course.context_modules.count }
+              end
+
+              it "creates an assignment" do
+                expect { subject }.to change { course.assignments.count }.by 1
+              end
+
+              it "adds assignment to given module" do
+                expect { subject }.to change { course.context_modules.last.content_tags.count }.by 1
               end
             end
           end
