@@ -26,6 +26,7 @@ import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
 import {fixupFileUrl} from '../../common/fileUrl'
 import {BUTTONS_AND_ICONS} from '../../rce/plugins/instructure_buttons/registerEditToolbar'
+import * as CategoryProcessor from '../../rce/plugins/shared/Upload/CategoryProcessor'
 
 export const COMPLETE_FILE_UPLOAD = 'COMPLETE_FILE_UPLOAD'
 export const FAIL_FILE_UPLOAD = 'FAIL_FILE_UPLOAD'
@@ -396,64 +397,71 @@ export function uploadPreflight(tabContext, fileMetaProps) {
     const {source, jwt, host, contextId, contextType} = getState()
     const {fileReader} = fileMetaProps
 
+    const getCategory = async fileProps => {
+      const categoryObject = await CategoryProcessor.process(fileProps.domObject)
+      return categoryObject?.category
+    }
+
     dispatch(startUpload(fileMetaProps))
-    return source
-      .preflightUpload(fileMetaProps, {jwt, host, contextId, contextType})
-      .then(results => {
-        return source.uploadFRD(fileMetaProps.domObject, results)
-      })
-      .then(results => {
-        return setUsageRights(source, fileMetaProps, results)
-      })
-      .then(results => {
-        return getFileUrlIfMissing(source, results)
-      })
-      .then(results => {
-        return fixupFileUrl(contextType, contextId, results)
-      })
-      .then(results => {
-        return generateThumbnailUrl(results, fileMetaProps.domObject, fileReader)
-      })
-      .then(results => {
-        return setAltText(fileMetaProps.altText, results)
-      })
-      .then(results => {
-        if (fileMetaProps.isDecorativeImage) {
-          results.isDecorativeImage = fileMetaProps.isDecorativeImage
-        }
-        if (fileMetaProps.displayAs) {
-          results.displayAs = fileMetaProps.displayAs
-        }
-        return results
-      })
-      .then(results => {
-        // This may or may not be necessary depending on the upload
-        dispatch(removePlaceholdersFor(fileMetaProps.name))
-        return results
-      })
-      .then(results => {
-        let newBookmark
-        const editorComponent = bridge.activeEditor()
-        if (fileMetaProps.bookmark) {
-          newBookmark = editorComponent.editor.selection.getBookmark(2, true)
-          editorComponent.editor.selection.moveToBookmark(fileMetaProps.bookmark)
-        }
+    return getCategory(fileMetaProps).then(category => {
+      return source
+        .preflightUpload(fileMetaProps, {jwt, host, contextId, contextType, category})
+        .then(results => {
+          return source.uploadFRD(fileMetaProps.domObject, results)
+        })
+        .then(results => {
+          return setUsageRights(source, fileMetaProps, results)
+        })
+        .then(results => {
+          return getFileUrlIfMissing(source, results)
+        })
+        .then(results => {
+          return fixupFileUrl(contextType, contextId, results)
+        })
+        .then(results => {
+          return generateThumbnailUrl(results, fileMetaProps.domObject, fileReader)
+        })
+        .then(results => {
+          return setAltText(fileMetaProps.altText, results)
+        })
+        .then(results => {
+          if (fileMetaProps.isDecorativeImage) {
+            results.isDecorativeImage = fileMetaProps.isDecorativeImage
+          }
+          if (fileMetaProps.displayAs) {
+            results.displayAs = fileMetaProps.displayAs
+          }
+          return results
+        })
+        .then(results => {
+          // This may or may not be necessary depending on the upload
+          dispatch(removePlaceholdersFor(fileMetaProps.name))
+          return results
+        })
+        .then(results => {
+          let newBookmark
+          const editorComponent = bridge.activeEditor()
+          if (fileMetaProps.bookmark) {
+            newBookmark = editorComponent.editor.selection.getBookmark(2, true)
+            editorComponent.editor.selection.moveToBookmark(fileMetaProps.bookmark)
+          }
 
-        const uploadResult = embedUploadResult({contextType, contextId, ...results}, tabContext)
+          const uploadResult = embedUploadResult({contextType, contextId, ...results}, tabContext)
 
-        if (fileMetaProps.bookmark) {
-          editorComponent.editor.selection.moveToBookmark(newBookmark)
-        }
+          if (fileMetaProps.bookmark) {
+            editorComponent.editor.selection.moveToBookmark(newBookmark)
+          }
 
-        return uploadResult
-      })
-      .then(results => {
-        dispatch(allUploadCompleteActions(results, fileMetaProps, contextType))
-      })
-      .catch(err => {
-        // This may or may not be necessary depending on the upload
-        dispatch(removePlaceholdersFor(fileMetaProps.name))
-        handleFailures(err, dispatch)
-      })
+          return uploadResult
+        })
+        .then(results => {
+          dispatch(allUploadCompleteActions(results, fileMetaProps, contextType))
+        })
+        .catch(err => {
+          // This may or may not be necessary depending on the upload
+          dispatch(removePlaceholdersFor(fileMetaProps.name))
+          handleFailures(err, dispatch)
+        })
+    })
   }
 }

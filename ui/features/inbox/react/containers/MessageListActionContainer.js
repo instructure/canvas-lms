@@ -31,6 +31,7 @@ import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
 import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../util/utils'
 
 const MessageListActionContainer = props => {
   const LIMIT_TAG_COUNT = 1
@@ -285,11 +286,7 @@ const MessageListActionContainer = props => {
   return (
     <Responsive
       match="media"
-      query={{
-        mobile: {maxWidth: '767px'},
-        tablet: {minWidth: '768px'},
-        desktop: {minWidth: '1024px'}
-      }}
+      query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
       props={{
         tablet: {
           addressBookContainer: {
@@ -397,7 +394,7 @@ const MessageListActionContainer = props => {
                 compose={props.onCompose}
                 delete={() => props.onDelete()}
                 deleteDisabled={props.deleteDisabled}
-                forward={() => {}}
+                forward={props.onForward}
                 markAsUnread={handleMarkAsUnread}
                 markAsRead={handleMarkAsRead}
                 reply={props.onReply}
@@ -429,6 +426,7 @@ MessageListActionContainer.propTypes = {
   selectedConversations: PropTypes.array,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
+  onForward: PropTypes.func,
   deleteDisabled: PropTypes.bool,
   archiveToggler: PropTypes.func,
   archiveDisabled: PropTypes.bool,
@@ -439,5 +437,6 @@ MessageListActionContainer.propTypes = {
 }
 
 MessageListActionContainer.defaultProps = {
-  selectedConversations: []
+  selectedConversations: [],
+  conversationsQueryOptions: {}
 }

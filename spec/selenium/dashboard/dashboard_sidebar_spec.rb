@@ -19,9 +19,11 @@
 
 require_relative "../common"
 require_relative "./pages/dashboard_page"
+require_relative "./pages/k5_dashboard_page"
 
 describe "dashboard" do
   include DashboardPage
+  include K5DashboardPageObject
   include_context "in-process server selenium tests"
 
   before :once do
@@ -30,10 +32,10 @@ describe "dashboard" do
     @course1 = course_factory(active_all: true)
     @course2 = course_factory(active_all: true)
 
-    @teacher = user_factory(active_all: true)
-    @student1 = user_factory(active_all: true)
-    @student2 = user_factory(active_all: true)
-    @observer = user_factory(active_all: true)
+    @teacher = user_factory(active_all: true, name: "Teacher")
+    @student1 = user_factory(active_all: true, name: "Student 1")
+    @student2 = user_factory(active_all: true, name: "Student 2")
+    @observer = user_factory(active_all: true, name: "Observer")
 
     @course1.enroll_teacher(@teacher, enrollment_state: :active)
     @course2.enroll_teacher(@teacher, enrollment_state: :active)
@@ -104,7 +106,7 @@ describe "dashboard" do
     get "/dashboard-sidebar?observed_user=#{@student1.id}"
     expect(recent_feedback).to include_text "Comment 1"
     expect(recent_feedback).not_to include_text "Comment 2"
-    expect(recent_feedback).not_to include_text "Comment 2"
+    expect(recent_feedback).not_to include_text "Comment 3"
   end
 
   it "shows observer their own data" do
@@ -114,5 +116,21 @@ describe "dashboard" do
     get "/dashboard-sidebar"
     expect(coming_up).to include_text "Course 2 Event"
     expect(body).not_to include_text "Recent Feedback"
+  end
+
+  context "when injected on dashboard page" do
+    it "loads new sidebar data when observer changes" do
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student2.id, enrollment_state: :active)
+      user_session(@observer)
+
+      get "/"
+      expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Student 1")
+      expect(recent_feedback).to include_text "Comment 1"
+      expect(recent_feedback).not_to include_text "Comment 2"
+      click_observed_student_option("Student 2")
+      wait_for_ajaximations
+      expect(recent_feedback).not_to include_text "Comment 1"
+      expect(recent_feedback).to include_text "Comment 2"
+    end
   end
 end
