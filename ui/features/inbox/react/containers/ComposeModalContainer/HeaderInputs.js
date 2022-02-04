@@ -34,7 +34,7 @@ import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer
 
 const HeaderInputs = props => {
   let moreCourses
-  if (!props.isReply) {
+  if (!props.isReply && !props.isForward) {
     moreCourses = reduceDuplicateCourses(
       props.courses.enrollments,
       props.courses.favoriteCoursesConnection.nodes
@@ -56,7 +56,7 @@ const HeaderInputs = props => {
             </PresentationContent>
           }
           input={
-            props.isReply ? (
+            props.isReply || props.isForward ? (
               <Text size="small">{props.contextName}</Text>
             ) : (
               <CourseSelect
@@ -104,7 +104,7 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {!props.isReply && (
+      {!props.isReply && !props.isForward && (
         <Flex.Item>
           <ComposeInputWrapper
             shouldGrow
@@ -117,7 +117,7 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {props.isReply ? (
+      {props.isReply || props.isForward ? (
         <ComposeInputWrapper
           title={
             <PresentationContent>
@@ -150,6 +150,7 @@ HeaderInputs.propTypes = {
   contextName: PropTypes.string,
   courses: PropTypes.object,
   isReply: PropTypes.bool,
+  isForward: PropTypes.bool,
   onContextSelect: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
   onUserNoteChange: PropTypes.func,
