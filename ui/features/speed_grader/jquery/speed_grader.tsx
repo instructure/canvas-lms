@@ -1349,6 +1349,9 @@ EG = {
         SpeedgraderHelpers.getHistory().back()
       }
     } else {
+      /// unmount spinner
+      const spinnerMount = document.getElementById('speed_grader_loading')
+      if (spinnerMount) ReactDOM.unmountComponentAtNode(spinnerMount)
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
       initDropdown()
