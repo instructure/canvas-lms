@@ -256,7 +256,7 @@ class DashboardHeader extends React.Component {
               <ObserverOptions
                 currentUser={ENV.current_user}
                 currentUserRoles={ENV.current_user_roles}
-                observerList={ENV.OBSERVER_LIST}
+                observedUsersList={ENV.OBSERVED_USERS_LIST}
                 canAddObservee={ENV.CAN_ADD_OBSERVEE}
                 handleChangeObservedUser={this.reloadDashboardForObserver}
               />

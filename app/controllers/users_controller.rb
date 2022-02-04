@@ -518,7 +518,7 @@ class UsersController < ApplicationController
                PERMISSION: create_permission_root_account || create_permission_mcc_account,
                RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
              },
-             OBSERVER_LIST: observed_users(@current_user, session),
+             OBSERVED_USERS_LIST: observed_users(@current_user, session),
              CAN_ADD_OBSERVEE: @current_user
                                  .profile
                                  .tabs_available(@current_user, root_account: @domain_root_account)
