@@ -203,6 +203,10 @@ class Submission < ActiveRecord::Base
               assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
             )
             AND assignments.submission_types IS NOT NULL
+            AND NOT (
+              late_policy_status IS NULL
+              AND grader_id IS NOT NULL
+            )
           )
         )
       SQL
