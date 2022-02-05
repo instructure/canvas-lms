@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,342 +16,295 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {SimpleSelect} from '@instructure/ui-simple-select'
+import React, {useEffect, useMemo, useRef, useReducer} from 'react'
 import I18n from 'i18n!assignment_grade_summary'
-
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Select} from '@instructure/ui-select'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
+import {arrayOf, bool, func, object, oneOf, shape, string} from 'prop-types'
 
 const NO_SELECTION = 'no-selection'
 const NO_SELECTION_LABEL = '–'
 
-function filterOptions(options, filterText) {
-  const exactMatches = []
-  const partialMatches = []
-  const matchText = filterText.toLowerCase()
-
-  options.forEach(option => {
-    const score = String(option.gradeInfo.score)
-    const label = option.label.toLowerCase()
-
-    if (score === matchText) {
-      exactMatches.push(option)
-    } else if (score.includes(matchText)) {
-      partialMatches.push(option)
-    } else if (label.includes(matchText)) {
-      partialMatches.push(option)
-    }
-  })
-
-  return exactMatches.concat(partialMatches)
+const NO_SELECTION_GRADE = {
+  gradeInfo: {},
+  label: NO_SELECTION_LABEL,
+  value: NO_SELECTION,
+  disabled: true
 }
 
-function optionsForGraders(graders, grades) {
-  const options = []
-  for (let i = 0; i < graders.length; i++) {
-    const grader = graders[i]
-    const gradeInfo = grades[grader.graderId]
-    if (gradeInfo) {
-      options.push({
-        gradeInfo,
-        label: `${I18n.n(gradeInfo.score)} (${grader.graderName})`,
-        value: gradeInfo.graderId,
-        disabled: !grader.graderSelectable
-      })
-    }
+const INITIAL_STATE = {
+  input: '',
+  typed: '',
+  expanded: false,
+  highlightedId: null,
+  selectedId: null,
+  options: undefined,
+  graderOptions: undefined,
+  customGradeOption: undefined
+}
+
+/* eslint-disable prettier/prettier */
+function reducer(prevState, action) {
+  let state
+  switch (action.event) {
+    case 'new_props':
+      return {
+        ...prevState,
+        input: action.input,
+        selectedId: action.selectedId,
+        graderOptions: action.graders,
+        customGradeOption: action.custom,
+        options: action.opts
+      }
+    case 'show_options':
+      return {...prevState, expanded: true}
+    case 'hide_options':
+      return {...prevState, expanded: false, highlightedId: null}
+    case 'set_input':
+      state = {...prevState, input: action.input, typed: action.input, expanded: true, customGradeOption: action.custom}
+      state.options = action.custom ? [...prevState.graderOptions, action.custom] : prevState.graderOptions
+      if (action.custom) state.highlightedId = action.custom.value
+      return state
+    case 'set_blur':
+      return {...prevState, typed: '', highlightedId: null, input: action.opt ? action.opt.label : NO_SELECTION_LABEL}
+    case 'set_highlight':
+      state = {...prevState, highlightedId: action.id}
+      if (action.type !== 'keydown') state.input = action.opt.label
+      return state
+    case 'set_select':
+      return {...prevState, selectedId: action.id, input: action.opt.label, typed: '', expanded: false}
+    default:
+      throw new RangeError('bad event passed to dispatcher')
   }
-  return options
 }
+/* eslint-enable prettier/prettier */
 
-function buildCustomGradeOption(gradeInfo) {
+function buildCustomGradeOption(gradeInfo, fmtr) {
   return {
     gradeInfo,
-    label: `${I18n.n(gradeInfo.score)} (${I18n.t('Custom')})`,
+    label: `${fmtr(gradeInfo.score)} (${I18n.t('Custom')})`,
     value: gradeInfo.graderId
   }
 }
+export default function GradeSelect(props) {
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
+  const originalSelectedOption = useRef(null)
+  const inputRef = useRef(null)
 
-function customGradeOptionFromProps({finalGrader, grades}) {
-  if (finalGrader) {
-    const customGrade = grades[finalGrader.graderId]
-    if (customGrade) {
-      return buildCustomGradeOption(customGrade)
-    }
-  }
-  return null
-}
+  const locale = ENV?.LOCALE || navigator.language
+  const numFormatter = useMemo(() => new Intl.NumberFormat(locale).format, [locale])
 
-// for the future author, the behavior of this widget is intended to double as
-// both a select menu and a text input widget. The text input provided by the
-// user is also intended to double as both a filter for the menu options as well
-// as a value for a custom/provisional grade that gets morphed into a menu
-// option if they choose it (either by selecting the menu option or by pressing
-// RETURN).
-//
-// While SimpleSelect takes us a long way, we still need to tune it. That's why
-// you'll see me making some imperative calls to its internal APIs, it's not
-// because I necessarily hate you. This was still a lot cheaper than building
-// off of the underlying Select component, which takes a ton of work.
-class TypableSimpleSelect extends SimpleSelect {
-  componentDidUpdate(prevProps) {
-    if (this.props.value !== prevProps.value) {
-      const option = this.getOption('value', this.props.value)
-
-      if (option) {
-        this.setState({
-          inputValue: option.props.children,
-          selectedOptionId: option.props.id
+  useEffect(() => {
+    const graders = []
+    props.graders.forEach(grader => {
+      const gradeInfo = props.grades[grader.graderId]
+      if (gradeInfo) {
+        graders.push({
+          gradeInfo,
+          label: `${numFormatter(gradeInfo.score)} (${grader.graderName})`,
+          value: gradeInfo.graderId,
+          disabled: !grader.graderSelectable
         })
       }
-      else { // let the text the user is typing go through
-        this.setState({ selectedOptionId: '' })
+    })
+    const opts = [...graders]
+
+    const custom = makeCustomGradeOption()
+    if (custom) opts.push(custom)
+
+    const selected = opts.find(opt => opt.gradeInfo.selected)
+    originalSelectedOption.current = selected || null
+
+    const dispatchData = {event: 'new_props', graders, custom, opts}
+    dispatchData.input = selected ? selected.label : NO_SELECTION_LABEL
+    dispatchData.selectedId = selected ? selected.value : null
+    dispatch(dispatchData)
+    // The dep array is a single element which is clearly a function (the resulting JSON string) of all
+    // the deps, so it’s manifestly correct; unfortunately the linter can’t assume that just because a function
+    // is called with all the necessary deps means that the return value is sensitive to any of them changing,
+    // so it still complains. It doesn’t know what JSON.stringify does. JSON.stringify is used instead of just
+    // listing the three dependencies because they are deep objects and React only compares shallowly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify([props.graders, props.grades, props.finalGrader])])
+
+  function filterOptions(text) {
+    if (text.length === 0) return state.options
+    const exactMatches = []
+    const partialMatches = []
+    const matchText = text.trim().toLowerCase()
+    state.options.forEach(g => {
+      if (g.value === NO_SELECTION) return
+      const score = g.gradeInfo.score.toString()
+      const label = g.label.toLowerCase()
+      if (score === matchText && g.value !== state.customGradeOption.value) {
+        exactMatches.push(g)
+      } else if (score.includes(matchText) || label.includes(matchText)) {
+        partialMatches.push(g)
       }
+    })
+    if (exactMatches.length + partialMatches.length === 0) return [NO_SELECTION_GRADE]
+    return [...exactMatches, ...partialMatches]
+  }
+
+  function makeCustomGradeOption() {
+    if (props.finalGrader) {
+      const customGrade = props.grades[props.finalGrader.graderId]
+      if (customGrade) return buildCustomGradeOption(customGrade, numFormatter)
     }
-  }
-};
-
-export default class GradeSelect extends Component {
-  static propTypes = {
-    disabledCustomGrade: bool.isRequired,
-    finalGrader: shape({
-      graderId: string.isRequired
-    }),
-    /* eslint-disable-next-line react/no-unused-prop-types */
-    graders: arrayOf(
-      shape({
-        graderName: string,
-        graderId: string.isRequired
-      })
-    ).isRequired,
-    grades: shape({}).isRequired,
-    onClose: func,
-    onOpen: func,
-    onSelect: func,
-    selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
-    studentId: string.isRequired,
-    studentName: string.isRequired
+    return null
   }
 
-  static defaultProps = {
-    finalGrader: null,
-    onClose() {},
-    onOpen() {},
-    onSelect() {},
-    selectProvisionalGradeStatus: null
+  function getOptionById(id) {
+    return state.options.find(o => o.value === id)
   }
 
-  constructor(props) {
-    super(props)
+  function performChange(selected) {
+    if (!props.onSelect) return
+    const original = originalSelectedOption.current
 
-    this.bindMenu = ref => {
-      if (ref) {
-        this.$input = ref
-        const menuId = ref.getAttribute('aria-controls')
-        this.$menu = document.getElementById(menuId)
-      } else {
-        this.$menu = null
-      }
-    }
-    this.bindSelect = ref => {
-      this.select = ref
-    }
-
-    this.handleChange = this.handleChange.bind(this)
-    this.handleClose = this.handleClose.bind(this)
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.filterAndBuildCustomOption = this.filterAndBuildCustomOption.bind(this)
-    this.discardCustomOption = this.discardCustomOption.bind(this)
-    this.acceptCustomOption = this.acceptCustomOption.bind(this)
-
-    this.state = this.constructor.createStateFromProps(props)
-  }
-
-  static createStateFromProps(props) {
-    const graderOptions = optionsForGraders(props.graders, props.grades)
-    const options = [...graderOptions]
-
-    const customGradeOption = customGradeOptionFromProps(props)
-
-    if (customGradeOption) {
-      options.push(customGradeOption)
-
-      if (customGradeOption.gradeInfo.selected) {
-        selectedOption = customGradeOption
-      }
-    }
-
-    var selectedOption = options.find(option => option.gradeInfo.selected)
-    if (!selectedOption) {
-      selectedOption = {gradeInfo: {}, label: NO_SELECTION_LABEL, value: NO_SELECTION}
-      options.unshift(selectedOption)
-    }
-
-    return {
-      customGradeOption,
-      graderOptions,
-      options,
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.constructor.createStateFromProps(nextProps))
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return (
-      Object.keys(nextProps).some(key => this.props[key] !== nextProps[key]) ||
-      Object.keys(nextState).some(key => this.state[key] !== nextState[key])
-    )
-  }
-
-  handleChange(_event, selectedOption) {
     if (
-      this.props.onSelect == null ||
-      selectedOption == null ||
-      selectedOption.value === NO_SELECTION
+      state.customGradeOption &&
+      selected.value === state.customGradeOption.value &&
+      (!original || original.gradeInfo.score !== selected.gradeInfo.score)
     ) {
+      props.onSelect(selected.gradeInfo)
       return
     }
 
-    const options = [...this.state.graderOptions]
-    if (this.state.customGradeOption) {
-      options.push(this.state.customGradeOption)
+    if (!original || original.value !== selected.value) {
+      props.onSelect(selected.gradeInfo)
     }
+  }
 
-    this.setState({options}, () => {
-      const optionMatch = this.state.options.find(option => option.value === selectedOption.value)
-      if (!optionMatch.gradeInfo.selected) {
-        this.props.onSelect(optionMatch.gradeInfo)
-      } else {
-        const originalGrade = this.props.grades[optionMatch.value]
-        if (optionMatch.gradeInfo.score !== originalGrade.score) {
-          this.props.onSelect(optionMatch.gradeInfo)
-        }
+  function handleShowOptions(e) {
+    dispatch({event: 'show_options'})
+    props.onOpen?.(e)
+  }
+
+  function handleHideOptions(e) {
+    dispatch({event: 'hide_options'})
+    props.onClose?.(e)
+  }
+
+  function handleInputChange(e) {
+    if (props.disabledCustomGrade) return
+    const input = e.target.value.trimStart()
+    let custom = makeCustomGradeOption()
+
+    if (input.length > 0) {
+      const score = numberHelper.parse(input.trimEnd())
+
+      if (!Number.isNaN(score)) {
+        custom = buildCustomGradeOption(
+          {
+            ...state.customGradeOption?.gradeInfo,
+            graderId: props.finalGrader.graderId,
+            score,
+            studentId: props.studentId
+          },
+          numFormatter
+        )
       }
-    })
-  }
-
-  handleClose() {
-    if (
-      this.$input === document.activeElement ||
-      (this.$menu && this.$menu.contains(document.activeElement))
-    ) {
-      this.select.focus()
     }
 
-    if (this.props.onClose) {
-      this.props.onClose()
-    }
+    dispatch({event: 'set_input', input, custom})
   }
 
-  handleInputChange(event, value) {
-    if (this.select && this.canInputCustomGrades()) {
-      this.select.setState/*[1]*/({ inputValue: event.target.value }, () => {
-        this.filterAndBuildCustomOption()
-      })
-      // [1] yuck yes, a proper solution would be built on top of the underlying
-      //     Select and not SimpleSelect with proper time investment
-    }
+  function handleFocus() {
+    // selecting all text when the input widget is focussed makes it easier for the user to just start typing
+    inputRef.current?.select()
   }
 
-  filterAndBuildCustomOption() {
-    const input = this.getInputBuffer()
-
-    if (!input) {
-      return this.setState(this.constructor.createStateFromProps(this.props))
-    }
-
-    const options = filterOptions(this.state.graderOptions, input)
-    const score = numberHelper.parse(input)
-
-    let customGradeOption = customGradeOptionFromProps(this.props)
-
-    // both filter and a custom grade entry
-    if (!Number.isNaN(score)) {
-      customGradeOption = buildCustomGradeOption({
-        ...customGradeOption?.gradeInfo,
-        graderId: this.props.finalGrader.graderId,
-        score,
-        studentId: this.props.studentId
-      })
-    }
-
-    this.setState({
-      customGradeOption,
-      options: customGradeOption ? options.concat([customGradeOption]) : options
-    })
+  function handleBlur() {
+    const opt = state.selectedId && getOptionById(state.selectedId)
+    dispatch({event: 'set_blur', opt})
   }
 
-  discardCustomOption() {
-    return this.setState(this.constructor.createStateFromProps(this.props))
+  function handleHighlight({type}, {id}) {
+    const opt = getOptionById(id)
+    if (!opt) return
+    dispatch({event: 'set_highlight', id, opt, type})
   }
 
-  getInputBuffer() {
-    const input = this.select && this.select.state.inputValue.trim()
-
-    if (input && input.length && input !== NO_SELECTION_LABEL) {
-      return input
-    }
-    else {
-      return null
-    }
+  function handleSelect(e, {id}) {
+    const opt = getOptionById(id)
+    if (!opt) return
+    dispatch({event: 'set_select', id, opt})
+    performChange(opt)
   }
 
-  acceptCustomOption() {
-    // selecting all the text when the input widget is focused makes it easier
-    // for the user to just type in the provisional grade (or filter), because
-    // the normal Home/End behavior is hijacked by the InstUI select components
-    // and the fact that back-spacing can also produce strange results when you
-    // filter down to 1 option.....
-    this.$input.select()
-  }
-
-  canInputCustomGrades() {
-    return !this.props.disabledCustomGrade && this.props.onSelect
-  }
-
-  getSelectedOption() {
-    return this.state.options.find(x => x.gradeInfo.selected)
-  }
-
-  render() {
-    const readOnly = !this.props.onSelect
-
-    return (
-      <TypableSimpleSelect
-        aria-readonly={readOnly || this.props.selectProvisionalGradeStatus === STARTED}
-        editable={!(this.props.disabledCustomGrade || readOnly)}
-        inputRef={this.bindMenu}
-        renderLabel={
-          <ScreenReaderContent>
-            {I18n.t('Grade for %{studentName}', {studentName: this.props.studentName})}
-          </ScreenReaderContent>
-        }
-        onChange={this.handleChange}
-        onInputChange={this.handleInputChange}
-        onFocus={this.acceptCustomOption}
-        onBlur={this.discardCustomOption}
-        onShowOptions={this.props.onOpen}
-        onHideOptions={this.handleClose}
-        ref={this.bindSelect}
-        value={this.getSelectedOption()?.value || null}
+  function renderOptions() {
+    if (!state.options) return []
+    return filterOptions(state.typed).map(opt => (
+      <Select.Option
+        isDisabled={opt.disabled}
+        isHighlighted={opt.value === state.highlightedId}
+        isSelected={opt.value === state.selectedId}
+        key={opt.value}
+        id={opt.value}
+        value={opt.value}
       >
-        {this.state.options.map(gradeOption => (
-          <SimpleSelect.Option
-            isDisabled={gradeOption.disabled}
-            key={gradeOption.value}
-            id={gradeOption.value}
-            value={gradeOption.value}
-          >
-            {gradeOption.label}
-          </SimpleSelect.Option>
-        ))}
-      </TypableSimpleSelect>
-    )
+        {opt.label}
+      </Select.Option>
+    ))
   }
+
+  const readOnly = !props.onSelect || props.selectProvisionalGradeStatus === STARTED
+
+  return (
+    <Select
+      renderLabel={
+        <ScreenReaderContent>
+          {I18n.t('Grade for %{studentName}', {studentName: props.studentName})}
+        </ScreenReaderContent>
+      }
+      inputRef={ref => {
+        inputRef.current = ref
+      }}
+      interaction={readOnly ? 'disabled' : 'enabled'}
+      inputValue={state.input}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onInputChange={handleInputChange}
+      isShowingOptions={state.expanded}
+      onRequestShowOptions={handleShowOptions}
+      onRequestHideOptions={handleHideOptions}
+      onRequestHighlightOption={handleHighlight}
+      onRequestSelectOption={handleSelect}
+    >
+      {renderOptions()}
+    </Select>
+  )
 }
 
-export { NO_SELECTION_LABEL }
+GradeSelect.propTypes = {
+  disabledCustomGrade: bool.isRequired,
+  finalGrader: shape({
+    graderId: string.isRequired
+  }),
+  graders: arrayOf(
+    shape({
+      graderName: string,
+      graderId: string.isRequired
+    })
+  ).isRequired,
+  grades: object.isRequired,
+  onClose: func,
+  onOpen: func,
+  onSelect: func,
+  selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
+  studentId: string.isRequired,
+  studentName: string.isRequired
+}
+
+GradeSelect.defaultProps = {
+  finalGrader: null,
+  onClose: null,
+  onOpen: null,
+  onSelect: null,
+  selectProvisionalGradeStatus: null
+}
+
+export {NO_SELECTION_LABEL}

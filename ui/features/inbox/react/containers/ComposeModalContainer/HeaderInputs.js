@@ -20,6 +20,7 @@ import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeI
 import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
 import I18n from 'i18n!conversations_2'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
+import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {reduceDuplicateCourses} from '../../../util/courses_helper'
@@ -33,12 +34,17 @@ import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer
 
 const HeaderInputs = props => {
   let moreCourses
-  if (!props.isReply) {
+  if (!props.isReply && !props.isForward) {
     moreCourses = reduceDuplicateCourses(
       props.courses.enrollments,
       props.courses.favoriteCoursesConnection.nodes
     )
   }
+
+  const canAddUserNote =
+    ENV.CONVERSATIONS.NOTES_ENABLED &&
+    (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT ||
+      Object.values(ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_COURSES).some(course => !!course))
 
   return (
     <Flex direction="column" width="100%" height="100%" padding="small">
@@ -50,7 +56,7 @@ const HeaderInputs = props => {
             </PresentationContent>
           }
           input={
-            props.isReply ? (
+            props.isReply || props.isForward ? (
               <Text size="small">{props.contextName}</Text>
             ) : (
               <CourseSelect
@@ -88,7 +94,17 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {!props.isReply && (
+      {canAddUserNote && (
+        <Flex.Item>
+          <ComposeInputWrapper
+            shouldGrow
+            input={
+              <FacultyJournalCheckBox onChange={props.onUserNoteChange} checked={props.userNote} />
+            }
+          />
+        </Flex.Item>
+      )}
+      {!props.isReply && !props.isForward && (
         <Flex.Item>
           <ComposeInputWrapper
             shouldGrow
@@ -101,7 +117,7 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {props.isReply ? (
+      {props.isReply || props.isForward ? (
         <ComposeInputWrapper
           title={
             <PresentationContent>
@@ -134,10 +150,13 @@ HeaderInputs.propTypes = {
   contextName: PropTypes.string,
   courses: PropTypes.object,
   isReply: PropTypes.bool,
+  isForward: PropTypes.bool,
   onContextSelect: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
+  onUserNoteChange: PropTypes.func,
   onSendIndividualMessagesChange: PropTypes.func,
   onSubjectChange: PropTypes.func,
+  userNote: PropTypes.bool,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   mediaAttachmentTitle: PropTypes.string,

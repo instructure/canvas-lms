@@ -50,26 +50,46 @@ describe('MessageDetailHeader', () => {
     expect(getByText('Message Header Text')).toBeInTheDocument()
   })
 
-  it('sends the selected option to the provided callback function', () => {
+  describe('sends the selected option to the provided callback function', () => {
     const props = {
-      text: 'Button Test',
-      onReply: jest.fn(),
-      onReplyAll: jest.fn()
+      text: 'Button Test'
     }
-    const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+    it('sends the selected option to the onReply callback function', () => {
+      props.onReply = jest.fn()
+      const {getByRole} = render(<MessageDetailHeader {...props} />)
+      const replyButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'Reply'
+      )
 
-    const replyButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'Reply'
-    )
-    fireEvent.click(replyButton)
-    expect(props.onReply).toHaveBeenCalled()
+      fireEvent.click(replyButton)
 
-    const moreOptionsButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'More options'
-    )
-    fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Reply All'))
-    expect(props.onReplyAll).toHaveBeenCalled()
+      expect(props.onReply).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onReplyAll callback function', () => {
+      props.onReplyAll = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Reply All'))
+
+      expect(props.onReplyAll).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onDelete callback function', () => {
+      props.onDelete = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Delete'))
+
+      expect(props.onDelete).toHaveBeenCalled()
+    })
   })
 
   describe('Responsive', () => {
