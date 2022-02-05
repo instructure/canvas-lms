@@ -2458,7 +2458,7 @@ nn:
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Gir brukar løyve til å sjå analysedata for emne gjennom emnedashbordet. Gir brukar løyve til å sjå analysedata for student."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gir ein brukar løyve til å sjå analysedata for emne og studentar frå forsida til eit emne eller frå Personoversikta."
   allows_user_to_view_course_sis_id_3a1818a5: "Gir ein brukar løyve til å sjå SIS-ID for emne."
-  allows_user_to_view_course_status_choose_home_page_21bf32a8: "Gir brukar løyve til sjå emnestatus, velje heimeside, og sjekkliste for enmeoppsett-knappar på heimesida."
+  allows_user_to_view_course_status_choose_home_page_21bf32a8: "Gir brukar løyve til å sjå emnestatus, velje heimeside, og sjekkliste for enmeoppsett-knappar på heimesida."
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
       Gir ein brukar løyve til å sjå knappane Emnestatus, Vel  emneforside og Sjekkliste
       for emneoppsett på emneforsida.
@@ -4818,7 +4818,7 @@ nn:
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas hjelp deg med å bruke samarbeidsteknologi slik at mange
       brukarar kan arbeide saman i same dokument samtidig. Opprett
-      samarbeidsdokumenter som lagrast i sanntid—ein endring laga av
+      samarbeidsdokumenter som lagrast i sanntid—ei endring laga av
       kven som helst vil være synleg med ein gong for alle brukarane.
   canvas_id_f42f6ad: Canvas-ID
   canvas_introduction_video_2d81f3ad: "Canvas introduksjonsvideo"
@@ -6417,7 +6417,7 @@ nn:
   count_unread_replies_86976ab: "%{count} uleste svar"
   count_unread_shares_ff9e91a5: 
     one: "Ein ulest deling."
-    other: "%{count} ulest deling."
+    other: "%{count} uleste delingar."
   count_unsynced_changes_1fc147e5: "%{count} usynkroniserte endringar"
   count_users_374d6e47: "(%{count} brukarar)"
   country_is_required_b0afbf52: "Land er obligatorisk"
@@ -8029,7 +8029,7 @@ nn:
   disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
       Deaktiverer du funksjonen Læringsstier, blir konfigurerte oppgåver og innhald til alle studenter frigjort.
       Dersom funksjonen vert aktivert på ny, må desse oppgåvene konfigurerast for Læringsstier igjen.
-  disabling_this_permission_will_override_if_enabled_59c2b5c9: "Å deaktivere dette løyve vil overstyre (dersom aktivert) «vurderingsskjema - legg til / rediger / slett»-løyve, og forhindre brukaren frå å opprette eller redigere vurderingsskjema frå ei spesifikk oppgåve."
+  disabling_this_permission_will_override_if_enabled_59c2b5c9: "Å deaktivere dette løyvet vil overstyre (dersom aktivert) «vurderingsskjema - legg til / rediger / slett»-løyvet, og forhindre brukaren frå å opprette eller redigere vurderingsskjema frå ei spesifikk oppgåve."
   disabling_this_permission_will_override_if_enabled_955dfb03: |-
       Deaktivering av dette løyvet vil overstyre (dersom slått på) 'Vurderingsskjema - legg til / endre / slett'-løyvet og hindre at ein brukar kan opprette eller endre vurderingsskjema frå ein
       individuell oppgåve. Ein brukar kan likevel framleis legge til vurderingsskjema og -kriterier via læringsmål (administrer vurderingsskjema-knappen), så lenge 'Læringsmål - legg til / endre / slett' er slått på.
@@ -15053,7 +15053,7 @@ nn:
   no_allowed_domains_b6633d12: "Ingen tillatne domene"
   no_announcements_280df147: "Ingen kunngjeringar"
   no_announcements_to_display_fbf9ed1e: "Ingen kunngjeringar å vise"
-  no_artifacts_with_that_name_found_b8679f53: "Inga artefaktar med det namnet funne"
+  no_artifacts_with_that_name_found_b8679f53: "Ingen gjenstandar med det namnet funne"
   no_assignment_group_assigned_8f1cdb9b: "Ingen oppgåvegrupper er tilordna"
   no_assignment_name_adbb215b: "Ingen oppgåvenamn"
   no_assignments_with_that_name_found_1d7be1: "Finn ikkje oppgåver med det namnet"
@@ -15073,7 +15073,7 @@ nn:
   no_conversations_selected_ebcd9226: "Ingen samtalar er valde"
   no_courses_favorited_4e69fd63: "Ingen emne er favorittmerka"
   no_courses_found_12d68a74: "Finn ikkje emne"
-  no_courses_to_display_700f94c4: "Inga emne å vise"
+  no_courses_to_display_700f94c4: "Ingen emner å vise"
   no_date_bfeb2df7: "Ingen dato"
   no_description_c2554c25: "Inga skildring"
   no_details_1ee29870: "Ingen detaljar"
@@ -15144,7 +15144,7 @@ nn:
   no_usage_rights_object_supplied_304b8d40: "Ingen 'usage_rights'-objekt er oppgitt"
   no_users_found_64a043ff: "Finn ingen brukarar"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Vel brukarar for å leggja til emnet"
-  no_valid_lti_resource_was_returned_11f7f91f: "Inga gyldig LTI-ressurs returnert"
+  no_valid_lti_resource_was_returned_11f7f91f: "Ingen gyldig LTI-ressurs returnert"
   no_video_1ed00b26: "Ingen video"
   no_violations_have_been_reported_977a08d1: "Ingen brudd har blitt rapportert"
   no_way_to_export_gradebooks_provided_b4c2939d: "Det finst ingen måtar å eksportere vurderingsoversikter"
@@ -15479,7 +15479,7 @@ nn:
   notify_students_in_time_of_assignments_that_requir_332ef10e: "Varsle studentar om oppgåver dei må sjå på."
   notify_users_this_quiz_has_changed_c5b05995: "Varsle brukarane om at quizen er endra"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Emnet ditt er oppretta og tilgjengeleg og du treng sannsynlegvis ikkje sjekklista lenger. Vi tek likevel vare på ho i tilfelle du seinare vil prøve noko nytt, eller treng litt ekstra hjelp når du endrar emneinnhaldet."
-  now_viewing_attempt_current_attempt_918e616: "Viser no forsøk %{current_attempt}"
+  now_viewing_attempt_current_attempt_918e616: "Syner no forsøk %{current_attempt}"
   nuco_submission_data_ded12af8: "Nuco innleveringsdata"
   num_messages_c1949bbc: 
     one: "1 melding"
