@@ -122,12 +122,22 @@ describe('utcDateOffset::', () => {
   let testDate
 
   it('detects the next UTC day', () => {
-    testDate = new Date('2021-04-02T02:35:00.000Z') // April 2nd in UTC in the US
+    testDate = new Date('2021-04-02T02:35:00.000Z') // ... is April 1st in the US
     expect(utcDateOffset(testDate, americaTZ)).toBe(1)
   })
 
   it('detects the previous UTC day', () => {
-    testDate = new Date('2021-04-01T18:45:00.000Z') // March 31st in UTC in Australia (4:15am local)
+    testDate = new Date('2021-04-01T18:45:00.000Z') // ... is 4:15am April 2nd in Australia
+    expect(utcDateOffset(testDate, australiaTZ)).toBe(-1)
+  })
+
+  it('still works if the next UTC day is also the next month', () => {
+    testDate = new Date('2022-04-01T01:00:00.000Z') // ... is March 31st in the US
+    expect(utcDateOffset(testDate, americaTZ)).toBe(1)
+  })
+
+  it('still works if the previous UTC day is also the previous month', () => {
+    testDate = new Date('2022-03-31T22:00:00.000Z') // ... is April 1st in Australia
     expect(utcDateOffset(testDate, australiaTZ)).toBe(-1)
   })
 
