@@ -21,43 +21,31 @@
 // remain in case we need to add any Intl polyfills in the future. Hopefully
 // we will not ever have to.
 
+import {shouldPolyfill as spfNF} from '@formatjs/intl-numberformat/should-polyfill'
+import {shouldPolyfill as spfDTF} from '@formatjs/intl-datetimeformat/should-polyfill'
+import {shouldPolyfill as spfRTF} from '@formatjs/intl-relativetimeformat/should-polyfill'
+
 export function installIntlPolyfills() {
   if (typeof window.Intl === 'undefined') window.Intl = {}
 }
 
-class LocaleLoadError extends Error {
-  constructor(result, ...rest) {
-    super(...rest)
-    Error.captureStackTrace && Error.captureStackTrace(this, LocaleLoadError)
-    this.name = 'LocaleLoadError'
-    this.result = result
-  }
-}
-
-function chromeVersion() {
-  const m = navigator.userAgent.match(new RegExp('Chrom(e|ium)/([0-9]+).'))
-  return m ? parseInt(m[2], 10) : 0
+const shouldPolyfill = {
+  NumberFormat: spfNF,
+  DateTimeFormat: spfDTF,
+  RelativeTimeFormat: spfRTF
 }
 
 //
 // Intl polyfills for locale-specific output of Dates, Times, Numbers, and
 // Relative Times.
 //
-const nativeSubsystem = {
-  DateTimeFormat: Intl.DateTimeFormat,
-  NumberFormat: Intl.NumberFormat,
-  RelativeTimeFormat: Intl.RelativeTimeFormat
-}
-
-const polyfilledSubsystem = {}
-
 const polyfillImports = {
   DateTimeFormat: async () => {
-    await import('@formatjs/intl-datetimeformat/polyfill')
+    await import('@formatjs/intl-datetimeformat/polyfill-force')
     return import('@formatjs/intl-datetimeformat/add-all-tz')
   },
-  NumberFormat: () => import('@formatjs/intl-numberformat/polyfill'),
-  RelativeTimeFormat: () => import('@formatjs/intl-relativetimeformat/polyfill')
+  NumberFormat: () => import('@formatjs/intl-numberformat/polyfill-force'),
+  RelativeTimeFormat: () => import('@formatjs/intl-relativetimeformat/polyfill-force')
 }
 
 const localeImports = {
@@ -66,114 +54,63 @@ const localeImports = {
   RelativeTimeFormat: l => import(`@formatjs/intl-relativetimeformat/locale-data/${l}`)
 }
 
-function reset(locale, subsystem) {
-  Intl[subsystem] = nativeSubsystem[subsystem] // Check browser-native Intl sources first
-  const localeNotNative = Intl[subsystem].supportedLocalesOf([locale]).length === 0
-  return {subsystem, locale, source: localeNotNative ? 'polyfill' : 'native'}
-}
-
-// Mark a return result as a fallback locale
-const fallback = r => ({...r, source: 'fallback'})
-
-// This utility is called when changing locales midstride (Canvas normally never
-// changes ENV.LOCALE except at a page load). It will if necessary dynamically load
-// language and locale support for locales not supported natively in the browser.
-// Called with the desired locale string and a string representing which Intl subsystem
-// is to be operated on ('DateTimeFormat', 'NumberFormat', or 'RelativeTimeFormat')
+// Check to see if there is native support in the specified Intl subsystem for
+// any of the locales given in the list (they are tried in order). If there is not
+// load an appropriate locale polyfill for the list of locales from @formatjs.
 //
-// Returns a Promise which will resolve to an object with properties:
-//      subsystem - the Intl subsystem being (possibly) polyfilled
-//      locale    - the locale that was loaded
-//      source    - one of 'native' or 'polyfill', indicating whether the requested locale
-//                  locale is native to the browser or was loaded via a polyfill
+// Return value is a Promise which resolves to an hash with the following properties:
 //
-// If the polyfill fails to load, the language falls back to whatever the browser's native
-// language is (navigator.language), and the Promise rejects, returning a custom error
-// LocaleLoadError with the `message` explaining the failure and a `result` property which
-// is an object as described above, which will indicate the fallback state of the locale
-// after the failure causing the error to be thrown.
+//   subsys - the subsystem being operated on
+//   locale - the locale that was requested
+//   loaded - the locale that was actually polyfilled (is missing, an error occurred)
+//   source - how that locale is available ('native' or 'polyfill')
+//   error - if an error occurred, contains the error message
+//
+// In most cases, if none of the locales in the list have either native support
+// nor can any of them be polyfilled, the subsystem will fall back to 'en' as a
+// locale (this is what the browser's native Intl would also do).
+//
+async function doPolyfill(givenLocales, subsys) {
+  // 'en' is the final fallback, don't settle for that unless it's the only
+  // available locale, in which case we do nothing.
+  const locales = [...givenLocales]
+  if (locales.length < 1 || (locales.length === 1 && locales[0] === 'en'))
+    return {subsys, locale: 'en', source: 'native'}
+  if (locales.slice(-1)[0] === 'en') locales.pop()
 
-async function doPolyfill(locale, subsys) {
-  // Reset back to the native browser Intl subsystem and see if the requested locale
-  // is one of its supported ones. If not, we need to polyfill it. First import the
-  // polyfilled subsystem itself. We can only do this once as that import is not
-  // idempotent, which is why we save the polyfills and only do the import if there
-  // is no saved one.
-  const result = reset(locale, subsys)
-  if (result.source === 'polyfill') {
-    // Does the requested polyfill locale exist at all? If not, do not proceed,
-    // it breaks some browser behavior around .toLocaleDateString()  [???].
-    try {
-      await localeImports[subsys](locale)
-    } catch (e) {
-      throw new LocaleLoadError(
-        {
-          locale: navigator.language,
-          subsystem: subsys,
-          source: 'fallback'
-        },
-        e.message
-      )
-    }
+  try {
+    /* eslint-disable no-await-in-loop */ // it's actually fine in for-loops
+    for (const locale of locales) {
+      const native = Intl[subsys].supportedLocalesOf([locale])
+      if (native.length > 0) return {subsys, locale: native[0], source: 'native'}
 
-    delete Intl[subsys]
-    if (typeof polyfilledSubsystem[subsys] === 'undefined') {
-      try {
-        await polyfillImports[subsys]()
-        polyfilledSubsystem[subsys] = Intl[subsys]
-      } catch (e) {
-        // restore native one and throw an error
-        throw new LocaleLoadError(fallback(reset(navigator.language, subsys)), e.message)
-      }
-    } else {
-      // Have already loaded the polyfill, just need to stuff it back in
-      Intl[subsys] = polyfilledSubsystem[subsys]
+      const doable = shouldPolyfill[subsys](locale)
+      if (!doable || doable === 'en') continue
+      const origSubsys = Intl[subsys]
+      await polyfillImports[subsys]()
+      await localeImports[subsys](doable)
+      Intl[`Native${subsys}`] = origSubsys
+      return {subsys, locale, source: 'polyfill', loaded: doable}
     }
-
-    // Now load the specific locale... if it fails (it shouldn't because we
-    // already checked this above!!), then fall back to the navigator language.
-    // Note that loading a locale onto the polyfill *is* idempotent, so it
-    // won't matter if we do this multiple times.
-    try {
-      await localeImports[subsys](locale)
-    } catch (e) {
-      throw new LocaleLoadError(fallback(reset(navigator.language, subsys)), e.message)
-    }
+    /* eslint-enable no-await-in-loop */
+    return {subsys, locale: locales[0], error: 'polyfill unavailable'}
+  } catch (e) {
+    return {subsys, locale: locales[0], error: e.message}
   }
-  return result
 }
 
-// Convenience functions that load the Intl polyfill for each of the three
-// supported subsystems supported here (we could add more if needed)
-export function loadDateTimeFormatPolyfill(locale) {
-  return doPolyfill(locale, 'DateTimeFormat')
-}
-
-export function loadNumberFormatPolyfill(locale) {
-  return doPolyfill(locale, 'NumberFormat')
-}
-
-export function loadRelativeTimeFormatPolyfill(locale) {
-  return doPolyfill(locale, 'RelativeTimeFormat')
-}
-
-// Grand cru convenience function that (maybe) polyfills everything here.
+// (Possibly) load the Intl polyfill for each of the given subsystems,
+// for the best available locale in the given list.
 // Returns a Promise that resolves to an array of the result objects
 // (see above) for each subsystem.
-//
-// TEMPORARY PATCH (CNVS-53338) ... these polyfillers break certain date
-// and time Intl functions in recent versions of Chrome. For now, just
-// skip.
-export function loadAllLocalePolyfills(locale) {
-  const ver = chromeVersion()
-  if (ver >= 92) {
-    // eslint-disable-next-line no-console
-    console.info(`Skipping language polyfills for Chrome ${ver}`)
-    return null
-  }
-  return Promise.all([
-    loadDateTimeFormatPolyfill(locale),
-    loadNumberFormatPolyfill(locale),
-    loadRelativeTimeFormatPolyfill(locale)
-  ])
+// It is an error for the subsystems array to contain the name of an
+// Intl subsystem that we are not prepared to polyfill.
+export function loadAllLocalePolyfills(locales, subsystems) {
+  subsystems.forEach(sys => {
+    if (!Object.keys(shouldPolyfill).includes(sys)) {
+      throw new RangeError(`Intl subsystem ${sys} is not polyfillable!`)
+    }
+  })
+
+  return Promise.all(subsystems.map(sys => doPolyfill(locales, sys)))
 }
