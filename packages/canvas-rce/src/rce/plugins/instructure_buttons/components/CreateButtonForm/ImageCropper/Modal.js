@@ -15,15 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useEffect, useReducer} from 'react'
 import PropTypes from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {ImageCropper} from './ImageCropper'
 import formatMessage from '../../../../../../format-message'
+import {cropperSettingsReducer, actions, defaultState} from '../../../reducers/imageCropper'
+import {Preview} from './Preview'
+import {Controls} from './controls'
 
 export const ImageCropperModal = ({open, onClose, image}) => {
+  const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
+  useEffect(() => {
+    dispatch({type: actions.SET_IMAGE, payload: image})
+  }, [image])
+
   return (
     <Modal size="large" open={open} onDismiss={onClose} shouldCloseOnDocumentClick={false}>
       <Modal.Header>
@@ -31,7 +39,14 @@ export const ImageCropperModal = ({open, onClose, image}) => {
         <Heading>{formatMessage('Crop Image')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <ImageCropper image={image} />
+        <Flex direction="column" margin="none">
+          <Flex.Item margin="0 0 small 0">
+            <Controls settings={settings} dispatch={dispatch} />
+          </Flex.Item>
+          <Flex.Item>
+            <Preview settings={settings} dispatch={dispatch} />
+          </Flex.Item>
+        </Flex>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={onClose} margin="0 x-small 0 0">

@@ -19,20 +19,21 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 
-import {ImageCropper} from '../ImageCropper'
+import {ShapeControls} from '../ShapeControls'
 
-describe('ImageCropper', () => {
+describe('ShapeControls', () => {
   it('renders the crop shape dropdown', () => {
-    const {container} = render(<ImageCropper />)
+    const {container} = render(<ShapeControls shape="square" />)
     const dropdown = container.querySelector('input[title="Square"]')
     expect(dropdown).toBeInTheDocument()
   })
 
-  it('changes the selected shape', () => {
-    const {container} = render(<ImageCropper />)
+  it('calls function when shape changes', () => {
+    const callback = jest.fn()
+    const {container} = render(<ShapeControls shape="square" onChange={callback} />)
     const dropdown = container.querySelector('input[title="Square"]')
     fireEvent.click(dropdown)
     fireEvent.click(screen.getByText('Circle'))
-    expect(dropdown.value).toEqual('Circle')
+    expect(callback).toHaveBeenCalledWith('circle')
   })
 })
