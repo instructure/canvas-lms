@@ -31,8 +31,8 @@ const container = document.getElementById('fixtures')
 
 const FakeDashboard = function (props) {
   // let property be null to force the default property on DashboardHeader
-  let loadDashboardSidebar = props.loadDashboardSidebar
-  if (loadDashboardSidebar === null) loadDashboardSidebar = undefined
+  let showTodoList = props.showTodoList
+  if (showTodoList === null) showTodoList = undefined
   return (
     <div>
       <DashboardHeader
@@ -42,7 +42,7 @@ const FakeDashboard = function (props) {
         }}
         planner_enabled={props.planner_enabled}
         dashboard_view={props.dashboard_view}
-        loadDashboardSidebar={loadDashboardSidebar}
+        showTodoList={showTodoList}
         env={window.ENV}
       />
       <div id="flashalert_message_holder" style={{display: 'block'}} />
@@ -57,14 +57,14 @@ FakeDashboard.propTypes = {
   planner_enabled: PropTypes.bool,
   dashboard_view: PropTypes.string,
   headerRef: PropTypes.func,
-  loadDashboardSidebar: PropTypes.func
+  showTodoList: PropTypes.func
 }
 
 FakeDashboard.defaultProps = {
   planner_enabled: false,
   dashboard_view: 'cards',
   headerRef: () => {},
-  loadDashboardSidebar: () => {}
+  showTodoList: () => {}
 }
 
 let plannerStub, saveDashboardViewStub, cardLoadSpy
@@ -104,13 +104,19 @@ test('it renders', () => {
 QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
   const done = assert.async()
   ENV.STUDENT_PLANNER_ENABLED = true
+  ENV.DASHBOARD_SIDEBAR_URL = 'fake-dashboard-sidebar-url'
   const $fakeRightSide = $('<div id="right-side">').appendTo(document.body)
   const fakeServerResponse = Promise.resolve(`
     <div class="Sidebar__TodoListContainer"></div>
     This came from the server
   `)
 
-  sandbox.mock($).expects('get').once().withArgs('/dashboard-sidebar').returns(fakeServerResponse)
+  sandbox
+    .mock($)
+    .expects('get')
+    .once()
+    .withArgs('fake-dashboard-sidebar-url')
+    .returns(fakeServerResponse)
 
   moxios.stubOnce('GET', '/api/v1/planner/items', {
     status: 200,
@@ -119,7 +125,7 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
   const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm')
 
   ReactDOM.render(
-    <FakeDashboard planner_enabled={false} dashboard_view="activity" loadDashboardSidebar={null} />,
+    <FakeDashboard planner_enabled={false} dashboard_view="activity" showTodoList={null} />,
     container
   )
   notOk(

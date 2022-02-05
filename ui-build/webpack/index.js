@@ -170,6 +170,23 @@ module.exports = {
   resolve: {
     alias: {
       d3: 'd3/d3',
+
+      // this is to make instUI themeable work with real es `class`es
+      // it is a change that was backported and is fixed in instUI 6
+      // the file is the same as the on published to npm but we added a
+      // `require('newless')` to make it work
+      './themeable$': path.resolve(
+        canvasDir,
+        'ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
+      ),
+      '../themeable$': path.resolve(
+        canvasDir,
+        'ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
+      ),
+      '@instructure/ui-themeable/es/themeable$': path.resolve(
+        canvasDir,
+        'ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
+      ),
       'node_modules-version-of-backbone$': require.resolve('backbone'),
       'node_modules-version-of-react-modal$': require.resolve('react-modal')
     },
@@ -215,41 +232,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            configFile: false,
-            cacheDirectory: process.env.NODE_ENV !== 'production',
-            assumptions: {
-              setPublicClassFields: true
-            },
-            env: {
-              development: {
-                plugins: ['babel-plugin-typescript-to-proptypes']
-              },
-              production: {
-                plugins: [
-                  ['@babel/plugin-transform-runtime', {
-                    helpers: true,
-                    corejs: 3,
-                    useESModules: true
-                  }],
-                  'transform-react-remove-prop-types',
-                  '@babel/plugin-transform-react-inline-elements',
-                  '@babel/plugin-transform-react-constant-elements'
-                ]
-              }
-            },
-            presets: [
-              ['@babel/preset-typescript'],
-              ['@babel/preset-env', {
-                useBuiltIns: 'entry',
-                corejs: '3.20',
-                modules: false
-              }],
-              ['@babel/preset-react', { useBuiltIns: true }]
-            ],
-            targets: {
-              browsers: 'last 2 versions',
-              esmodules: true
-            }
+            cacheDirectory: process.env.NODE_ENV !== 'production'
           }
         }
       },

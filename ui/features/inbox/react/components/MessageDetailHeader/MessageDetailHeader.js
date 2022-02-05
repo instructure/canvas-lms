@@ -18,7 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {IconButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
@@ -62,8 +63,6 @@ export const MessageDetailHeader = ({...props}) => {
                 margin="0 x-small 0 0"
                 screenReaderLabel={I18n.t('Reply')}
                 onClick={() => props.onReply()}
-                withBackground={false}
-                withBorder={false}
               >
                 <IconReplyLine />
               </IconButton>
@@ -74,15 +73,9 @@ export const MessageDetailHeader = ({...props}) => {
               placement="bottom"
               trigger={
                 <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-                  <IconButton
-                    margin="0 x-small 0 0"
-                    screenReaderLabel={I18n.t('More options')}
-                    withBackground={false}
-                    withBorder={false}
-                    data-testid="more-options"
-                  >
-                    <IconMoreLine />
-                  </IconButton>
+                  <Button margin="0 x-small 0 0" renderIcon={IconMoreLine}>
+                    <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
+                  </Button>
                 </Tooltip>
               }
             >
@@ -91,9 +84,7 @@ export const MessageDetailHeader = ({...props}) => {
               </Menu.Item>
               <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
               <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
-              <Menu.Item value="delete" onSelect={props.onDelete}>
-                {I18n.t('Delete')}
-              </Menu.Item>
+              <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
             </Menu>
           </Flex.Item>
           <Flex.Item />
@@ -106,8 +97,7 @@ export const MessageDetailHeader = ({...props}) => {
 MessageDetailHeader.propTypes = {
   text: PropTypes.string,
   onReply: PropTypes.func,
-  onReplyAll: PropTypes.func,
-  onDelete: PropTypes.func
+  onReplyAll: PropTypes.func
 }
 
 MessageDetailHeader.defaultProps = {

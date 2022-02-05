@@ -4447,20 +4447,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  apiUpdateSubmission(submission, gradeInfo, enterGradesAs) {
+  apiUpdateSubmission = (submission, gradeInfo) => {
     const {userId, assignmentId} = submission
     const student = this.student(userId)
     this.addPendingGradeInfo(submission, gradeInfo)
     if (this.getSubmissionTrayState().open) {
       this.renderSubmissionTray(student)
     }
-    return GradebookApi.updateSubmission(
-      this.options.context_id,
-      assignmentId,
-      userId,
-      submission,
-      enterGradesAs
-    )
+    return GradebookApi.updateSubmission(this.options.context_id, assignmentId, userId, submission)
       .then(response => {
         this.removePendingGradeInfo(submission)
         this.updateSubmissionsFromExternal(response.data.all_submissions)
@@ -4503,11 +4497,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         } else {
           submissionData.posted_grade = gradeInfo.score
         }
-        return this.apiUpdateSubmission(
-          submissionData,
-          gradeInfo,
-          gradeChangeOptions.enterGradesAs
-        ).then(response => {
+        return this.apiUpdateSubmission(submissionData, gradeInfo).then(response => {
           const assignment = this.getAssignment(submission.assignmentId)
           const outlierScoreHelper = new OutlierScoreHelper(
             response.data.score,

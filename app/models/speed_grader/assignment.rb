@@ -261,11 +261,6 @@ module SpeedGrader
                         upload_status: AttachmentUploadStatus.upload_status(a),
                       }
                     )
-
-                    if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
-                      a.set_word_count if a.word_count.nil? && a.word_count_supported?
-                      attachment_json[:attachment][:word_count] = a.word_count
-                    end
                   end
                 end
               end

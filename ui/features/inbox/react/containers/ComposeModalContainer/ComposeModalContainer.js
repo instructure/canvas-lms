@@ -43,7 +43,6 @@ const ComposeModalContainer = props => {
   const [body, setBody] = useState('')
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
-  const [userNote, setUserNote] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
   const [selectedIds, setSelectedIds] = useState([])
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
@@ -123,10 +122,6 @@ const ComposeModalContainer = props => {
     }
   }
 
-  const onUserNoteChange = () => {
-    setUserNote(prev => !prev)
-  }
-
   const onSendIndividualMessagesChange = () => {
     setSendIndividualMessages(prev => !prev)
   }
@@ -154,7 +149,6 @@ const ComposeModalContainer = props => {
         variables: {
           attachmentIds: attachments.map(a => a.id),
           body,
-          userNote,
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
             c => c._id
           ),
@@ -162,26 +156,11 @@ const ComposeModalContainer = props => {
           mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type
         }
       })
-    } else if (props.isForward) {
-      await props.addConversationMessage({
-        variables: {
-          attachmentIds: attachments.map(a => a.id),
-          body,
-          includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
-            c => c._id
-          ),
-          recipients: selectedIds.map(rec => rec?._id || rec.id),
-          mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
-          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type,
-          contextCode: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
-        }
-      })
     } else {
       await props.createConversation({
         variables: {
           attachmentIds: attachments.map(a => a.id),
           body,
-          userNote,
           contextCode: selectedContext,
           recipients: selectedIds.map(rec => rec?._id || rec.id),
           subject,
@@ -246,17 +225,12 @@ const ComposeModalContainer = props => {
                 contextName={props.pastConversation?.contextName}
                 courses={props.courses}
                 isReply={props.isReply}
-                isForward={props.isForward}
                 onContextSelect={onContextSelect}
                 onSelectedIdsChange={onSelectedIdsChange}
-                onUserNoteChange={onUserNoteChange}
                 onSendIndividualMessagesChange={onSendIndividualMessagesChange}
                 onSubjectChange={onSubjectChange}
-                userNote={userNote}
                 sendIndividualMessages={sendIndividualMessages}
-                subject={
-                  props.isReply || props.isForward ? props.pastConversation?.subject : subject
-                }
+                subject={props.isReply ? props.pastConversation?.subject : subject}
                 mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
                 onRemoveMediaComment={onRemoveMedia}
               />
@@ -325,7 +299,6 @@ ComposeModalContainer.propTypes = {
   courses: PropTypes.object,
   createConversation: PropTypes.func,
   isReply: PropTypes.bool,
-  isForward: PropTypes.bool,
   onDismiss: PropTypes.func,
   open: PropTypes.bool,
   pastConversation: Conversation.shape,

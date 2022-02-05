@@ -547,6 +547,10 @@ class UsersController < ApplicationController
       js_bundle :k5_dashboard
     else
       # things needed only for classic dashboard
+      js_env({
+               DASHBOARD_SIDEBAR_URL: dashboard_sidebar_url
+             })
+
       css_bundle :dashboard
       js_bundle :dashboard
     end

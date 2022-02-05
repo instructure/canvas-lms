@@ -19,7 +19,6 @@
 import _ from 'underscore'
 import UploadQueue from './UploadQueue'
 import ReactDOM from 'react-dom'
-import * as CategoryProcessor from '@instructure/canvas-rce/es/rce/plugins/shared/Upload/CategoryProcessor'
 
 /*
 Manages buckets of FileOptions (resolved, nameCollisions, zipOptions)
@@ -49,33 +48,10 @@ class FileOptionsCollection {
     }
   }
 
-  async applyCategory(fileOptions) {
-    const getCategory = async option => {
-      const category = await CategoryProcessor.process(option.file)
-
-      return {
-        ...option,
-        ...category
-      }
-    }
-
-    return Promise.all(fileOptions.map(getCategory))
-  }
-
   queueUploads(contextId, contextType) {
-    // Some uploaded files require a certain category be applied to them.
-    // We use "applyCategory" and CategoryProcessor to add those categories
-    // according to file type and content.
-    this.applyCategory(this.state.resolvedNames)
-      .then(resolvedNamesWithCategories => {
-        resolvedNamesWithCategories.forEach(f => {
-          UploadQueue.enqueue(f, this.folder, contextId, contextType)
-        })
-      })
-      .catch(error => {
-        throw error
-      })
-
+    this.state.resolvedNames.forEach(f => {
+      UploadQueue.enqueue(f, this.folder, contextId, contextType)
+    })
     this.setState({newOptions: false})
   }
 
