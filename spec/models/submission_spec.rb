@@ -3742,7 +3742,8 @@ describe Submission do
         @submission.assignment.update!(submission_types: "online_upload")
       end
 
-      it "includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil" do
+      it "includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil and grader is nil" do
+        @submission.update(grader_id: nil)
         expect(Submission.missing).to include @submission
       end
 
@@ -3753,7 +3754,7 @@ describe Submission do
       end
 
       it "includes submission when late_policy_status is not nil, not missing" do
-        @submission.update(late_policy_status: "foo")
+        @submission.update(late_policy_status: "none")
 
         expect(Submission.missing).to include @submission
       end
@@ -3801,6 +3802,7 @@ describe Submission do
         @assignment.due_at = 1.day.ago(@now)
         @assignment.save!
 
+        @submission.update(grader_id: nil)
         expect(Submission.missing).to include @submission
       end
     end
