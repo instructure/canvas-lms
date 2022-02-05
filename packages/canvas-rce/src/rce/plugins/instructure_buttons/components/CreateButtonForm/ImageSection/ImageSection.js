@@ -22,7 +22,7 @@ import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
 import {actions as svgActions} from '../../../reducers/svgSettings'
 
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Group} from '../Group'
 import {IconCropSolid} from '@instructure/ui-icons'
@@ -139,14 +139,17 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
               React.createElement(allowedModes[state.mode], {dispatch, editor})}
           </Suspense>
         </Flex.Item>
-        <Flex.Item>
-          <Button
-            renderIcon={IconCropSolid}
+        <Flex.Item padding="x-small">
+          <IconButton
             onClick={() => {
               setOpenCropModal(true)
             }}
-          />
-          {openCropModal && (
+            interaction={state.image ? 'enabled' : 'disabled'}
+            screenReaderLabel={formatMessage('Open image cropper')}
+          >
+            <IconCropSolid />
+          </IconButton>
+          {openCropModal && state.image && (
             <ImageCropperModal
               open={openCropModal}
               onClose={() => setOpenCropModal(false)}

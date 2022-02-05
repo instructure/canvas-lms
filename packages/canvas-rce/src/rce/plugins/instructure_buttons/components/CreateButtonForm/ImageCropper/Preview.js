@@ -18,9 +18,11 @@
 
 import React, {useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
+import formatMessage from '../../../../../../format-message'
+import {ImageCropperSettingsPropTypes} from './propTypes'
 import {buildSvg} from './svg'
 import {PREVIEW_WIDTH, PREVIEW_HEIGHT} from './constants'
-import formatMessage from '../../../../../../format-message'
+import {useMouseWheel} from './useMouseWheel'
 
 /**
  * Remove the node contents and append the svg element.
@@ -33,12 +35,15 @@ function replaceSvg(svg, node) {
   node.appendChild(svg)
 }
 
-const ImageCropperPreview = ({image, shape}) => {
-  const wrapper = useRef(null)
+export const Preview = ({settings, dispatch}) => {
+  const shapeRef = useRef(null)
+  const {image, shape, scaleRatio} = settings
+  const [tempScaleRatio, onWheelCallback] = useMouseWheel(scaleRatio, dispatch)
+
   useEffect(() => {
     const svg = buildSvg(shape)
-    replaceSvg(svg, wrapper.current)
-  }, [shape])
+    replaceSvg(svg, shapeRef.current)
+  })
 
   return (
     <div
@@ -50,6 +55,7 @@ const ImageCropperPreview = ({image, shape}) => {
         left: 0,
         overflow: 'hidden'
       }}
+      onWheel={onWheelCallback}
     >
       <img
         src={image}
@@ -62,7 +68,7 @@ const ImageCropperPreview = ({image, shape}) => {
           width: '100%',
           objectFit: 'contain',
           textAlign: 'center',
-          cursor: 'move'
+          transform: `scale(${tempScaleRatio})`
         }}
       />
       <div
@@ -72,15 +78,13 @@ const ImageCropperPreview = ({image, shape}) => {
           top: 0,
           left: 0
         }}
-        ref={wrapper}
+        ref={shapeRef}
       />
     </div>
   )
 }
 
-ImageCropperPreview.propTypes = {
-  image: PropTypes.string.isRequired,
-  shape: PropTypes.string.isRequired
+Preview.propTypes = {
+  settings: ImageCropperSettingsPropTypes.isRequired,
+  dispatch: PropTypes.func.isRequired
 }
-
-export default ImageCropperPreview
