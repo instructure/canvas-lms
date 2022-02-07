@@ -20,7 +20,7 @@
 
 module DataFixup::PopulateIdentityHashOnContextExternalTools
   def self.run(start_at, end_at)
-    ContextExternalTool.where(id: start_at..end_at, identity_hash: nil).preload(:context).find_in_batches do |tools|
+    ContextExternalTool.where(id: start_at..end_at, identity_hash: nil).find_in_batches do |tools|
       dupe_set = Set.new
       identity_hashes = tools.each_with_object({}) do |tool, object|
         tool_hash = tool.calculate_identity_hash
@@ -33,17 +33,19 @@ module DataFixup::PopulateIdentityHashOnContextExternalTools
         UPDATE #{ContextExternalTool.quoted_table_name} AS tool SET
           identity_hash = (
             case
-            when EXISTS (
+            when hashes.calculated_hash::text = 'duplicate'::text OR EXISTS (
               SELECT 1
               FROM #{ContextExternalTool.quoted_table_name} AS cet
-              WHERE cet.identity_hash = c.column_b::text
+              WHERE cet.identity_hash IS NOT NULL
+                AND cet.identity_hash <> 'duplicate'
+                AND cet.identity_hash = hashes.calculated_hash::text
             )
             then 'duplicate'::text
-            else c.column_b::text
+            else hashes.calculated_hash::text
             end
           )
-        FROM (values #{ContextExternalTool.sanitize_sql(ids_identity_hashes)} ) AS c(column_a, column_b)
-        WHERE tool.id = c.column_a
+        FROM (values #{ContextExternalTool.sanitize_sql(ids_identity_hashes)} ) AS hashes(calculated_id, calculated_hash)
+        WHERE tool.id = hashes.calculated_id
       SQL
       ContextExternalTool.connection.execute(query)
     end
