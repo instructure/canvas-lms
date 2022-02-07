@@ -27,6 +27,7 @@ describe DataFixup::PopulateIdentityHashOnContextExternalTools do
         expect do
           DataFixup::PopulateIdentityHashOnContextExternalTools.run(tool.id - 1, tool.id + 1)
         end.to change { tool.reload.identity_hash }.from(nil).to(String)
+        expect(tool.identity_hash).to eq tool.calculate_identity_hash
       end
     end
 
@@ -36,10 +37,13 @@ describe DataFixup::PopulateIdentityHashOnContextExternalTools do
         tool1 = external_tool_model(context: @account)
         tool1.update_column(:identity_hash, nil)
         tool2 = external_tool_model(context: @account)
+        tool2.update_column(:identity_hash, nil)
+        external_tool_model(context: @account)
 
         expect do
           DataFixup::PopulateIdentityHashOnContextExternalTools.run(tool1.id, tool2.id)
         end.to change { tool1.reload.identity_hash }.from(nil).to("duplicate")
+        expect(tool2.reload.identity_hash).to eq "duplicate"
       end
     end
 
