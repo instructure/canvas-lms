@@ -31,7 +31,7 @@
  */
 
 const fs = require('fs')
-const texsvg = require('texsvg')
+const mathjax = require('mathjax')
 
 const buttons =
   require('../lib/rce/plugins/instructure_equation/EquationEditorToolbar/buttons.js').default
@@ -55,14 +55,34 @@ const SVGS_TEMPLATE = `/*
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default svgs = __SVG__CONTENT__`
+export default __SVG__CONTENT__`
 
 const svgs = {}
+
+let ready = false
+let latexToSvg = () => {}
+
+const setupOptions = {
+  loader: {
+    load: ['input/tex', 'output/svg']
+  }
+}
+
+const generateSvg = async latex => {
+  if (!ready) {
+    const MathJax = await mathjax.init(setupOptions)
+    latexToSvg = latexToConvert =>
+      MathJax.startup.adaptor.innerHTML(MathJax.tex2svg(latexToConvert))
+    ready = true
+  }
+
+  return latexToSvg(latex)
+}
 
 const convertSection = section => {
   const commandPromises = section.commands.map(async ({command, svgCommand}) => {
     const commandForSvgRender = svgCommand || command
-    const svg = await texsvg(commandForSvgRender)
+    const svg = await generateSvg(commandForSvgRender)
     svgs[command] = svg
   })
 

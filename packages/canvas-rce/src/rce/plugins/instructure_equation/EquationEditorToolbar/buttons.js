@@ -38,12 +38,13 @@ export default [
         displayName: '\\frac{\u2B1A}{\u2B1A}',
         command: '\\frac{\\placeholder{}}{\\placeholder{}}',
         advancedCommand: '\\frac{ }{ }',
-        svgCommand: '\\frac{\\square}{\\square}'
+        svgCommand: '\\frac{n}{m}'
       },
       {
         displayName: '\\sqrt{\\ }',
         command: '\\sqrt{\\placeholder{}}',
-        advancedCommand: '\\sqrt{ }'
+        advancedCommand: '\\sqrt{ }',
+        svgCommand: '\\sqrt{ }'
       },
       {
         displayName: '\\sqrt[n]{\\ }',
