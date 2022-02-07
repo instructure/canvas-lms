@@ -2728,7 +2728,7 @@ describe UsersController do
           end
         end
 
-        context "@cards_prefetch_observer_param" do
+        context "@cards_prefetch_observed_param" do
           before :once do
             Account.site_admin.enable_feature!(:k5_parent_support)
             @user1 = user_factory(active_all: true, account: @account)
@@ -2744,13 +2744,13 @@ describe UsersController do
             @course.enroll_student(student)
             @course.enroll_user(@user1, "ObserverEnrollment", { associated_user_id: student.id })
             get "user_dashboard"
-            expect(controller.instance_variable_get(:@cards_prefetch_observer_param)).to eq student.id
+            expect(controller.instance_variable_get(:@cards_prefetch_observed_param)).to eq student.id
           end
 
           it "is undefined when user is not an observer" do
             @course.enroll_student(@user1)
             get "user_dashboard"
-            expect(controller.instance_variable_get(:@cards_prefetch_observer_param)).to be_nil
+            expect(controller.instance_variable_get(:@cards_prefetch_observed_param)).to be_nil
           end
         end
       end

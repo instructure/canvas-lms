@@ -240,9 +240,9 @@ QUnit.module('Dashboard Header', hooks => {
     dashboardHeader.changeDashboard('cards')
 
     moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      equal(request.url, '/dashboard/view')
-      equal(request.config.data, '{"dashboard_view":"cards"}')
+      const requests = moxios.requests
+      equal(requests.at(1).url, '/dashboard/view')
+      equal(requests.at(1).config.data, '{"dashboard_view":"cards"}')
       done()
     })
     ok(plannerStub.notCalled)

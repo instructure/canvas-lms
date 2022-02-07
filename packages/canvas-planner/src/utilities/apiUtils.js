@@ -80,7 +80,7 @@ const getApiItemType = overrideType => {
 }
 
 export function findNextLink(response) {
-  const linkHeader = response.headers.link
+  const linkHeader = getResponseHeader(response, 'link')
   if (linkHeader == null) return null
 
   const parsedLinks = parseLinkHeader(linkHeader)
@@ -214,7 +214,11 @@ export function transformApiToInternalGrade(apiResult) {
 }
 
 export function getContextCodesFromState({courses = []}) {
-  return courses?.length ? courses.map(({id}) => `course_${id}`) : undefined
+  return courses?.length
+    ? courses
+        .map(({id}) => `course_${id}`)
+        .sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))
+    : undefined
 }
 
 function getCourseContext(course) {
@@ -260,7 +264,68 @@ function isComplete(apiResponse) {
 }
 
 export function observedUserId(state) {
-  if (state.selectedObservee?.id && state.selectedObservee.id !== state.currentUser.id) {
-    return state.selectedObservee.id
+  if (state.selectedObservee && state.selectedObservee !== state.currentUser.id) {
+    return state.selectedObservee
+  }
+  return null
+}
+
+export function observedUserContextCodes(state) {
+  if (state.selectedObservee && state.selectedObservee !== state.currentUser.id) {
+    return getContextCodesFromState(state)
+  }
+  return undefined
+}
+
+export function getResponseHeader(response, name) {
+  return response.headers.get?.(name) || response.headers[name]
+}
+
+// take a base url and object of params and generate
+// a url with query_string parameters for the params
+//
+// To build a URL that matches the one build for the prefetch
+// params are in the following order
+const paramOrder = [
+  'start_date',
+  'end_date',
+  'include',
+  'filter',
+  'order',
+  'per_page',
+  'observed_user_id',
+  'context_codes',
+  'course_ids'
+]
+export function buildURL(url, params = {}) {
+  const result = new URL(url, 'http://localhost/')
+  const params2 = {...params}
+
+  // first the order-dependent params
+  paramOrder.forEach(key => {
+    if (key in params2) {
+      serializeParamIntoURL(key, params2[key], result)
+      delete params2[key]
+    }
+  })
+  // then any left over
+  Object.keys(params2).forEach(key => {
+    serializeParamIntoURL(key, params2[key], result)
+  })
+  return `${result.pathname}${result.search}`
+}
+
+function serializeParamIntoURL(key, val, url) {
+  if (val === null || typeof val === 'undefined') return
+  if (Array.isArray(val)) {
+    // assumes values are strings
+    val
+      .sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))
+      .forEach(arrayVal => {
+        if (arrayVal === null || typeof arrayVal === 'undefined') return
+        url.searchParams.append(`${key}[]`, arrayVal)
+      })
+  } else {
+    url.searchParams.append(key, val)
   }
 }
