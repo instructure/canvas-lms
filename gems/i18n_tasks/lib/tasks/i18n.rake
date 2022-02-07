@@ -157,7 +157,10 @@ namespace :i18n do
     core_translations = I18n.available_locales.each_with_object({}) do |locale, h1|
       h1[locale.to_s] = all_translations[locale].slice(*I18nTasks::Utils::CORE_KEYS)
     end
-    dump_translations.call("_core_en", { "en" => core_translations.delete("en") })
+
+    # defaults to be used in environments where the translations aren't loaded:
+    dump_translations.call("_core_en", core_translations.slice("en"))
+    # a set of the core keys for all supported locales:
     dump_translations.call("_core", core_translations)
   end
 
