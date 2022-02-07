@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,26 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const MOCK_OBSERVED_USERS_LIST = [
-  {
-    id: '13',
-    name: 'Zelda',
-    avatar_url: 'http://avatar'
-  },
-  {
-    id: '4',
-    name: 'Student 4',
-    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
-  },
-  {
-    id: '2',
-    name: 'Student 2',
-    avatar_url:
-      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
-  },
-  {
-    id: '5',
-    name: 'Student 5',
-    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
+const glob = require('glob')
+const fs = require('fs')
+
+class PluginSpecsRunner {
+  constructor({pattern, outfile}) {
+    this.pattern = pattern
+    this.outfile = outfile
   }
-]
+
+  apply(compiler) {
+    compiler.hooks.beforeCompile.tapAsync('PluginSpecsRunner', (_, callback) => {
+      glob(this.pattern, {absolute: true}, (e, files) => {
+        if (e) {
+          return callback(e)
+        }
+
+        fs.writeFile(this.outfile, files.map(x => `require("${x}")`).join('\n'), 'utf8', callback)
+      })
+    })
+  }
+}
+
+module.exports = PluginSpecsRunner

@@ -18,18 +18,18 @@
 
 import React from 'react'
 import {render, act, fireEvent} from '@testing-library/react'
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 
 import ObserverOptions from '../ObserverOptions'
 import {OBSERVER_COOKIE_PREFIX} from '../../ObserverGetObservee'
-import {MOCK_OBSERVER_LIST} from './fixtures'
+import {MOCK_OBSERVED_USERS_LIST} from './fixtures'
 
 const userId = '13'
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${userId}`
 
 describe('ObserverOptions', () => {
   const getProps = (overrides = {}) => ({
-    observerList: MOCK_OBSERVER_LIST,
+    observedUsersList: MOCK_OBSERVED_USERS_LIST,
     currentUser: {
       id: userId,
       display_name: 'Zelda',
@@ -77,7 +77,7 @@ describe('ObserverOptions', () => {
 
   it('renders a label if there is only one observed student', () => {
     const {getByText, queryByRole} = render(
-      <ObserverOptions {...getProps({observerList: [MOCK_OBSERVER_LIST[2]]})} />
+      <ObserverOptions {...getProps({observedUsersList: [MOCK_OBSERVED_USERS_LIST[2]]})} />
     )
     expect(getByText('You are observing Student 2')).toBeInTheDocument()
     expect(getByText('Student 2')).toBeInTheDocument()
@@ -85,13 +85,13 @@ describe('ObserverOptions', () => {
   })
 
   it('does not render for non-observers', () => {
-    const {container} = render(<ObserverOptions {...getProps({observerList: []})} />)
+    const {container} = render(<ObserverOptions {...getProps({observedUsersList: []})} />)
     expect(container).toBeEmptyDOMElement()
   })
 
   it('does not render if only user is self', () => {
     const {container} = render(
-      <ObserverOptions {...getProps({observerList: [MOCK_OBSERVER_LIST[0]]})} />
+      <ObserverOptions {...getProps({observedUsersList: [MOCK_OBSERVED_USERS_LIST[0]]})} />
     )
     expect(container).toBeEmptyDOMElement()
   })

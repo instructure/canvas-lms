@@ -114,7 +114,6 @@
     "classnames": "^2.2.5",
     "format-message": "^6",
     "format-message-generate-id": "^6",
-    "get-cookie": "*",
     "i18n-js": "^3",
     "i18nliner": "~0.2.0",
     "isomorphic-fetch": "2.2.1",

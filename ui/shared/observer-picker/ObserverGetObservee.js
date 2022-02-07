@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 
 // cookie name prefixed with k5_ for historical reasons but not exclusively used in k5 mode
 export const OBSERVER_COOKIE_PREFIX = 'k5_observed_user_for_'
