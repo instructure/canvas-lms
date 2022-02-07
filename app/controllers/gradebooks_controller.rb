@@ -110,8 +110,7 @@ class GradebooksController < ApplicationController
       json = {
         assignment_id: submission.assignment_id
       }
-
-      if submission.user_can_read_grade?(@current_user)
+      if submission.user_can_read_grade?(@presenter.student)
         json.merge!({
                       excused: submission.excused?,
                       score: submission.score,
