@@ -21,11 +21,10 @@ import ReactDOM from 'react-dom'
 import getDroppableDashboardCardBox from './react/getDroppableDashboardCardBox'
 import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
-import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {asJson, checkStatus, getPrefetchedXHR} from '@instructure/js-utils'
 import buildURL from 'axios/lib/helpers/buildURL'
-
-let promiseToGetDashboardCards
-let observedUsersDashboardCards = {}
+import I18n from 'i18n!load_card_dashboard'
 
 export function createDashboardCards(dashboardCards, cardComponent = DashboardCard, extraProps) {
   const Box = getDroppableDashboardCardBox()
@@ -43,75 +42,110 @@ export function createDashboardCards(dashboardCards, cardComponent = DashboardCa
     />
   )
 }
+export class CardDashboardLoader {
+  static observedUsersDashboardCards = {}
 
-function renderIntoDOM(dashboardCards) {
-  const dashboardContainer = document.getElementById('DashboardCard_Container')
-  ReactDOM.render(createDashboardCards(dashboardCards), dashboardContainer)
-}
-
-export default function loadCardDashboard(renderFn = renderIntoDOM, observedUserId) {
-  if (observedUserId && observedUsersDashboardCards[observedUserId]) {
-    renderFn(observedUsersDashboardCards[observedUserId], true)
-  } else if (promiseToGetDashboardCards) {
-    promiseToGetDashboardCards.then(cards => renderFn(cards, true))
-  } else {
-    let xhrHasReturned = false
-    let sessionStorageTimeout
-    const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
-    const urlPrefix = '/api/v1/dashboard/dashboard_cards'
-    const url = buildURL(urlPrefix, {observed_user: observedUserId})
-    promiseToGetDashboardCards =
-      asJson(getPrefetchedXHR(url)) || axios.get(url).then(({data}) => data)
-    promiseToGetDashboardCards.then(() => (xhrHasReturned = true))
-
-    // Because we use prefetch_xhr to prefetch this xhr request from our rails erb, there is a
-    // chance that the XHR to get the latest dashcard data has already come back before we get
-    // to this point. So if the XHR is ready, there's no need to render twice, just render
-    // once with the newest data.
-    // Otherwise, render with the cached stuff from session storage now, then render again
-    // when the xhr comes back with the latest data.
-    const promiseToGetCardsFromSessionStorage = new Promise(resolve => {
-      sessionStorageTimeout = setTimeout(() => {
-        const cachedCards = sessionStorage.getItem(sessionStorageKey)
-        if (cachedCards) resolve(JSON.parse(cachedCards))
-      }, 1)
-    })
-    Promise.race([promiseToGetDashboardCards, promiseToGetCardsFromSessionStorage]).then(
-      dashboardCards => {
-        clearTimeout(sessionStorageTimeout)
-        // calling the renderFn with `false` indicates to consumers that we're still waiting
-        // on the follow-up xhr request to complete.
-        renderFn(dashboardCards, xhrHasReturned)
-        // calling it with `true` indicates that all outstanding card promises have settled.
-        if (!xhrHasReturned) return promiseToGetDashboardCards.then(cards => renderFn(cards, true))
-      }
-    )
-
-    // Cache the fetched dashcards in sessionStorage so we can render instantly next
-    // time they come to their dashboard (while still fetching the most current data)
-    // Also save the observed user's cards if observing so observer can switch between students
-    // without any delay
-    promiseToGetDashboardCards.then(dashboardCards => {
-      try {
-        sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
-      } catch (_e) {
-        // If saving the cards to session storage fails, we can just ignore the exception; the cards
-        // will still be fetched and displayed on the next load. Telling the user probably doesn't
-        // make sense since it doesn't change the way the app works, nor does it make sense to log
-        // the error since it could happen in normal circumstances (like using Safari in private mode).
-      }
-      if (observedUserId) {
-        observedUsersDashboardCards[observedUserId] = dashboardCards
-      }
-    })
+  constructor() {
+    this.promiseToGetDashboardCards = undefined
+    this.errorShown = false
   }
-}
 
-export function resetDashboardCards() {
-  promiseToGetDashboardCards = undefined
+  renderIntoDOM = dashboardCards => {
+    const dashboardContainer = document.getElementById('DashboardCard_Container')
+    ReactDOM.render(createDashboardCards(dashboardCards), dashboardContainer)
+  }
+
+  loadCardDashboard(renderFn = this.renderIntoDOM, observedUserId) {
+    if (observedUserId && CardDashboardLoader.observedUsersDashboardCards[observedUserId]) {
+      renderFn(CardDashboardLoader.observedUsersDashboardCards[observedUserId], true)
+    } else if (this.promiseToGetDashboardCards) {
+      this.promiseToGetDashboardCards
+        .then(cards => {
+          renderFn(cards, true)
+        })
+        .catch(e => {
+          this.showError(e)
+        })
+    } else {
+      let xhrHasReturned = false
+      let sessionStorageTimeout
+      const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
+      const urlPrefix = '/api/v1/dashboard/dashboard_cards'
+      const url = buildURL(urlPrefix, {observed_user: observedUserId})
+      this.promiseToGetDashboardCards =
+        asJson(getPrefetchedXHR(url)) ||
+        axios
+          .get(url)
+          .then(checkStatus)
+          .then(({data}) => data)
+          .catch(e => {
+            this.showError(e)
+          })
+      this.promiseToGetDashboardCards
+        .then(() => (xhrHasReturned = true))
+        .catch(e => {
+          this.showError(e)
+        })
+
+      // Because we use prefetch_xhr to prefetch this xhr request from our rails erb, there is a
+      // chance that the XHR to get the latest dashcard data has already come back before we get
+      // to this point. So if the XHR is ready, there's no need to render twice, just render
+      // once with the newest data.
+      // Otherwise, render with the cached stuff from session storage now, then render again
+      // when the xhr comes back with the latest data.
+      const promiseToGetCardsFromSessionStorage = new Promise(resolve => {
+        sessionStorageTimeout = setTimeout(() => {
+          const cachedCards = sessionStorage.getItem(sessionStorageKey)
+          if (cachedCards) resolve(JSON.parse(cachedCards))
+        }, 1)
+      })
+      Promise.race([this.promiseToGetDashboardCards, promiseToGetCardsFromSessionStorage])
+        .then(dashboardCards => {
+          clearTimeout(sessionStorageTimeout)
+          // calling the renderFn with `false` indicates to consumers that we're still waiting
+          // on the follow-up xhr request to complete.
+          renderFn(dashboardCards, xhrHasReturned)
+          // calling it with `true` indicates that all outstanding card promises have settled.
+          if (!xhrHasReturned)
+            return this.promiseToGetDashboardCards.then(cards => renderFn(cards, true))
+        })
+        .catch(e => {
+          this.showError(e)
+        })
+
+      // Cache the fetched dashcards in sessionStorage so we can render instantly next
+      // time they come to their dashboard (while still fetching the most current data)
+      // Also save the observed user's cards if observing so observer can switch between students
+      // without any delay
+      this.promiseToGetDashboardCards
+        .then(dashboardCards => {
+          try {
+            sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
+          } catch (_e) {
+            // If saving the cards to session storage fails, we can just ignore the exception; the cards
+            // will still be fetched and displayed on the next load. Telling the user probably doesn't
+            // make sense since it doesn't change the way the app works, nor does it make sense to log
+            // the error since it could happen in normal circumstances (like using Safari in private mode).
+          }
+          if (observedUserId) {
+            CardDashboardLoader.observedUsersDashboardCards[observedUserId] = dashboardCards
+          }
+        })
+        .catch(e => {
+          this.showError(e)
+        })
+    }
+  }
+
+  showError(e) {
+    if (!this.errorShown) {
+      this.errorShown = true
+      showFlashAlert({message: I18n.t('Failed loading course cards'), err: e, type: 'error'})
+    }
+  }
 }
 
 // Clears the cache for use in test suites
 export function resetCardCache() {
-  observedUsersDashboardCards = {}
+  CardDashboardLoader.observedUsersDashboardCards = {}
 }

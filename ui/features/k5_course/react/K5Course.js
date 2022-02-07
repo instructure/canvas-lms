@@ -470,7 +470,7 @@ export function K5Course({
 }) {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
-    : undefined
+    : null
 
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
