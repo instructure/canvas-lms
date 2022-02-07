@@ -69,8 +69,8 @@ FakeDashboard.defaultProps = {
 
 let plannerStub, saveDashboardViewStub, cardLoadSpy
 
-QUnit.module('Dashboard Header', {
-  setup() {
+QUnit.module('Dashboard Header', hooks => {
+  hooks.beforeEach(() => {
     window.ENV = {
       MOMENT_LOCALE: 'en',
       TIMEZONE: 'UTC',
@@ -82,240 +82,264 @@ QUnit.module('Dashboard Header', {
     plannerStub = sinon.stub(DashboardHeader.prototype, 'loadPlannerComponent')
     saveDashboardViewStub = sinon.stub(DashboardHeader.prototype, 'saveDashboardView')
     cardLoadSpy = sinon.spy(DashboardHeader.prototype, 'loadCardDashboard')
-  },
-
-  teardown() {
+  })
+  hooks.afterEach(() => {
     resetPlanner()
     moxios.uninstall()
     plannerStub.restore()
     ReactDOM.unmountComponentAtNode(container)
     saveDashboardViewStub.restore()
     cardLoadSpy.restore()
-  }
-})
-
-test('it renders', () => {
-  const dashboardHeader = shallow(
-    <DashboardHeader planner_enabled planner_selected env={window.ENV} />
-  )
-  ok(dashboardHeader)
-})
-
-QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
-  const done = assert.async()
-  ENV.STUDENT_PLANNER_ENABLED = true
-  const $fakeRightSide = $('<div id="right-side">').appendTo(document.body)
-  const fakeServerResponse = Promise.resolve(`
-    <div class="Sidebar__TodoListContainer"></div>
-    This came from the server
-  `)
-
-  sandbox.mock($).expects('get').once().withArgs('/dashboard-sidebar').returns(fakeServerResponse)
-
-  moxios.stubOnce('GET', '/api/v1/planner/items', {
-    status: 200,
-    responseText: {}
   })
-  const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm')
 
-  ReactDOM.render(
-    <FakeDashboard planner_enabled={false} dashboard_view="activity" loadDashboardSidebar={null} />,
-    container
-  )
-  notOk(
-    $fakeRightSide.find('.Sidebar__TodoListContainer').text().includes('Loading'),
-    'container should not contain "Loading"'
-  )
+  test('it renders', () => {
+    const dashboardHeader = shallow(
+      <DashboardHeader planner_enabled planner_selected env={window.ENV} />
+    )
+    ok(dashboardHeader)
+  })
 
-  Promise.all([promiseToGetNewCourseForm, promiseToGetNewCourseForm]).then(() => {
-    moxios.wait(() => {
-      ok(
-        $fakeRightSide.text().includes('This came from the server'),
-        'injects the server erb html where it should'
+  QUnit.skip(
+    'it waits for the erb html to be injected before rendering the ToDoSidebar',
+    async () => {
+      ENV.STUDENT_PLANNER_ENABLED = true
+      const $fakeRightSide = $('<div id="right-side">').appendTo(document.body)
+      const fakeServerResponse = Promise.resolve(`
+      <div class="Sidebar__TodoListContainer"></div>
+      This came from the server
+    `)
+
+      sandbox
+        .mock($)
+        .expects('get')
+        .once()
+        .withArgs('/dashboard-sidebar')
+        .returns(fakeServerResponse)
+
+      moxios.stubOnce('GET', '/api/v1/planner/items', {
+        status: 200,
+        responseText: {}
+      })
+      const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm')
+
+      ReactDOM.render(
+        <FakeDashboard
+          planner_enabled={false}
+          dashboard_view="activity"
+          loadDashboardSidebar={null}
+        />,
+        container
       )
-
-      ok(
+      notOk(
         $fakeRightSide.find('.Sidebar__TodoListContainer').text().includes('Loading'),
-        'container should contain "Loading"'
+        'container should not contain "Loading"'
       )
-      $fakeRightSide.remove()
+
+      await Promise.all([promiseToGetNewCourseForm, promiseToGetNewCourseForm])
+      moxios.wait(() => {
+        ok(
+          $fakeRightSide.text().includes('This came from the server'),
+          'injects the server erb html where it should'
+        )
+
+        ok(
+          $fakeRightSide.find('.Sidebar__TodoListContainer').text().includes('Loading'),
+          'container should contain "Loading"'
+        )
+        $fakeRightSide.remove()
+      })
+    }
+  )
+
+  test('it should switch dashboard view appropriately when changeDashboard is called', async assert => {
+    const done = assert.async()
+    let dashboardHeader = null
+    ReactDOM.render(
+      <FakeDashboard
+        headerRef={c => {
+          dashboardHeader = c
+        }}
+        planner_enabled={false}
+        dashboard_view="activity"
+      />,
+      container
+    )
+
+    await dashboardHeader.changeDashboard('cards')
+    strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
+    strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
+    strictEqual(saveDashboardViewStub.callCount, 1)
+
+    await dashboardHeader.changeDashboard('activity')
+    strictEqual(document.getElementById('dashboard-activity').style.display, 'block')
+    strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
+    strictEqual(saveDashboardViewStub.callCount, 2)
+    done()
+  })
+
+  test('it should switch dashboard view appropriately with Student Planner enabled', async assert => {
+    const done = assert.async()
+    let dashboardHeader = null
+    ReactDOM.render(
+      <FakeDashboard
+        headerRef={c => {
+          dashboardHeader = c
+        }}
+        planner_enabled
+        dashboard_view="activity"
+      />,
+      container
+    )
+
+    await dashboardHeader.changeDashboard('cards')
+    strictEqual(document.getElementById('dashboard-planner').style.display, 'none')
+    strictEqual(document.getElementById('dashboard-planner-header').style.display, 'none')
+    strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'none')
+    strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
+    strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
+    strictEqual(dashboardHeader.getActiveApp(), 'cards')
+
+    await dashboardHeader.changeDashboard('planner')
+    strictEqual(document.getElementById('dashboard-planner').style.display, 'block')
+    strictEqual(document.getElementById('dashboard-planner-header').style.display, 'block')
+    strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'block')
+    strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
+    strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
+    strictEqual(dashboardHeader.getActiveApp(), 'planner')
+
+    await dashboardHeader.changeDashboard('activity')
+    strictEqual(document.getElementById('dashboard-planner').style.display, 'none')
+    strictEqual(document.getElementById('dashboard-planner-header').style.display, 'none')
+    strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'none')
+    strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
+    strictEqual(document.getElementById('dashboard-activity').style.display, 'block')
+    strictEqual(dashboardHeader.getActiveApp(), 'activity')
+
+    dashboardHeader.changeDashboard('cards')
+    dashboardHeader.changeDashboard('planner')
+    strictEqual(cardLoadSpy.callCount, 1)
+    strictEqual(plannerStub.callCount, 1)
+    done()
+  })
+
+  test('it should use the dashboard view endpoint when Student Planner is enabled', assert => {
+    saveDashboardViewStub.restore()
+    const done = assert.async()
+    let dashboardHeader = null
+    ReactDOM.render(
+      <FakeDashboard
+        headerRef={c => {
+          dashboardHeader = c
+        }}
+        planner_enabled
+        dashboard_view="activity"
+      />,
+      container
+    )
+
+    dashboardHeader.changeDashboard('cards')
+
+    moxios.wait(() => {
+      const request = moxios.requests.mostRecent()
+      equal(request.url, '/dashboard/view')
+      equal(request.config.data, '{"dashboard_view":"cards"}')
+      done()
+    })
+    ok(plannerStub.notCalled)
+  })
+
+  test('it should show the card dashboard if planner is selected, but not enabled', () => {
+    ReactDOM.render(
+      <FakeDashboard headerRef={() => false} planner_enabled={false} dashboard_view="planner" />,
+      container
+    )
+
+    strictEqual(document.getElementById('dashboard-planner'), null)
+    strictEqual(document.getElementById('dashboard-planner-header'), null)
+    strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
+    strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
+  })
+
+  test('it should show a flash error if saving dashboard API call fails', assert => {
+    saveDashboardViewStub.restore()
+    const done = assert.async()
+    let dashboardHeader = null
+    ReactDOM.render(
+      <FakeDashboard
+        headerRef={c => {
+          dashboardHeader = c
+        }}
+        planner_enabled
+        dashboard_view="activity"
+      />,
+      container
+    )
+
+    moxios.stubRequest('/dashboard/view', {
+      status: 500,
+      response: {error: 'Error Text'}
+    })
+
+    dashboardHeader.changeDashboard('cards')
+
+    moxios.wait(() => {
+      strictEqual($('#flashalert_message_holder p').text(), 'Failed to save dashboard selection')
       done()
     })
   })
-})
 
-test('it should switch dashboard view appropriately when changeDashboard is called', async assert => {
-  const done = assert.async()
-  let dashboardHeader = null
-  ReactDOM.render(
-    <FakeDashboard
-      headerRef={c => {
-        dashboardHeader = c
-      }}
-      planner_enabled={false}
-      dashboard_view="activity"
-    />,
-    container
-  )
+  test('it should add planner classes to the page when planner is loaded', () => {
+    let dashboardHeader = null
+    ReactDOM.render(
+      <FakeDashboard
+        headerRef={c => {
+          dashboardHeader = c
+        }}
+        dashboard_view="planner"
+        planner_enabled
+      />,
+      container
+    )
 
-  await dashboardHeader.changeDashboard('cards')
-  strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
-  strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
-  strictEqual(saveDashboardViewStub.callCount, 1)
-
-  await dashboardHeader.changeDashboard('activity')
-  strictEqual(document.getElementById('dashboard-activity').style.display, 'block')
-  strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
-  strictEqual(saveDashboardViewStub.callCount, 2)
-  done()
-})
-
-test('it should switch dashboard view appropriately with Student Planner enabled', async assert => {
-  const done = assert.async()
-  let dashboardHeader = null
-  ReactDOM.render(
-    <FakeDashboard
-      headerRef={c => {
-        dashboardHeader = c
-      }}
-      planner_enabled
-      dashboard_view="activity"
-    />,
-    container
-  )
-
-  await dashboardHeader.changeDashboard('cards')
-  strictEqual(document.getElementById('dashboard-planner').style.display, 'none')
-  strictEqual(document.getElementById('dashboard-planner-header').style.display, 'none')
-  strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'none')
-  strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
-  strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
-  strictEqual(dashboardHeader.getActiveApp(), 'cards')
-
-  await dashboardHeader.changeDashboard('planner')
-  strictEqual(document.getElementById('dashboard-planner').style.display, 'block')
-  strictEqual(document.getElementById('dashboard-planner-header').style.display, 'block')
-  strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'block')
-  strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
-  strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
-  strictEqual(dashboardHeader.getActiveApp(), 'planner')
-
-  await dashboardHeader.changeDashboard('activity')
-  strictEqual(document.getElementById('dashboard-planner').style.display, 'none')
-  strictEqual(document.getElementById('dashboard-planner-header').style.display, 'none')
-  strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'none')
-  strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
-  strictEqual(document.getElementById('dashboard-activity').style.display, 'block')
-  strictEqual(dashboardHeader.getActiveApp(), 'activity')
-
-  dashboardHeader.changeDashboard('cards')
-  dashboardHeader.changeDashboard('planner')
-  strictEqual(cardLoadSpy.callCount, 1)
-  strictEqual(plannerStub.callCount, 1)
-  done()
-})
-
-test('it should use the dashboard view endpoint when Student Planner is enabled', assert => {
-  saveDashboardViewStub.restore()
-  const done = assert.async()
-  let dashboardHeader = null
-  ReactDOM.render(
-    <FakeDashboard
-      headerRef={c => {
-        dashboardHeader = c
-      }}
-      planner_enabled
-      dashboard_view="activity"
-    />,
-    container
-  )
-
-  dashboardHeader.changeDashboard('cards')
-
-  moxios.wait(() => {
-    const request = moxios.requests.mostRecent()
-    equal(request.url, '/dashboard/view')
-    equal(request.config.data, '{"dashboard_view":"cards"}')
-    done()
-  })
-  ok(plannerStub.notCalled)
-})
-
-test('it should show the card dashboard if planner is selected, but not enabled', () => {
-  ReactDOM.render(
-    <FakeDashboard headerRef={() => false} planner_enabled={false} dashboard_view="planner" />,
-    container
-  )
-
-  strictEqual(document.getElementById('dashboard-planner'), null)
-  strictEqual(document.getElementById('dashboard-planner-header'), null)
-  strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
-  strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
-})
-
-test('it should show a flash error if saving dashboard API call fails', assert => {
-  saveDashboardViewStub.restore()
-  const done = assert.async()
-  let dashboardHeader = null
-  ReactDOM.render(
-    <FakeDashboard
-      headerRef={c => {
-        dashboardHeader = c
-      }}
-      planner_enabled
-      dashboard_view="activity"
-    />,
-    container
-  )
-
-  moxios.stubRequest('/dashboard/view', {
-    status: 500,
-    response: {error: 'Error Text'}
+    ok(document.body.classList.contains('dashboard-is-planner'))
+    dashboardHeader.changeDashboard('cards')
+    notOk(document.body.classList.contains('dashboard-is-planner'))
   })
 
-  dashboardHeader.changeDashboard('cards')
+  test('it should allow switching back to the Elementary dashboard if it was disabled', () => {
+    let dashboardHeader = null
+    ReactDOM.render(
+      <FakeDashboard
+        headerRef={c => {
+          dashboardHeader = c
+        }}
+        dashboard_view="activity"
+        canEnableElementaryDashboard
+      />,
+      container
+    )
+    dashboardHeader.changeDashboard('elementary')
 
-  moxios.wait(() => {
-    strictEqual($('#flashalert_message_holder p').text(), 'Failed to save dashboard selection')
-    done()
+    return moxiosWait(req => {
+      strictEqual(req.config.method, 'put')
+      strictEqual(req.config.data, JSON.stringify({elementary_dashboard_disabled: false}))
+      strictEqual(req.url, '/api/v1/users/self/settings')
+    })
   })
-})
 
-test('it should add planner classes to the page when planner is loaded', () => {
-  let dashboardHeader = null
-  ReactDOM.render(
-    <FakeDashboard
-      headerRef={c => {
-        dashboardHeader = c
-      }}
-      dashboard_view="planner"
-      planner_enabled
-    />,
-    container
-  )
+  QUnit.module('with observer', hooks2 => {
+    hooks2.beforeEach(() => {
+      ENV.FEATURES = {observer_picker: true}
+      ENV.current_user_roles = ['user', 'observer']
+      ENV.OBSERVED_USERS_LIST = [
+        {id: '17', name: 'bob', avatar_url: undefined},
+        {id: '19', name: 'mary', avatar_url: undefined}
+      ]
+    })
 
-  ok(document.body.classList.contains('dashboard-is-planner'))
-  dashboardHeader.changeDashboard('cards')
-  notOk(document.body.classList.contains('dashboard-is-planner'))
-})
-
-test('it should allow switching back to the Elementary dashboard if it was disabled', () => {
-  let dashboardHeader = null
-  ReactDOM.render(
-    <FakeDashboard
-      headerRef={c => {
-        dashboardHeader = c
-      }}
-      dashboard_view="activity"
-      canEnableElementaryDashboard
-    />,
-    container
-  )
-  dashboardHeader.changeDashboard('elementary')
-
-  return moxiosWait(req => {
-    strictEqual(req.config.method, 'put')
-    strictEqual(req.config.data, JSON.stringify({elementary_dashboard_disabled: false}))
-    strictEqual(req.url, '/api/v1/users/self/settings')
+    test('it should show the observer options Select', () => {
+      ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="planner" />, container)
+      ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
+    })
   })
 })
