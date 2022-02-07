@@ -17,15 +17,17 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 
 import SVGList, {TYPE} from '../SVGList'
 import MultiColorSVG from '../MultiColor/svg'
 
 describe('SVGList', () => {
-  let type
+  let type, onSelect
 
-  const subject = () => render(<SVGList type={type} />)
+  beforeEach(() => (onSelect = () => {}))
+
+  const subject = () => render(<SVGList type={type} onSelect={onSelect} />)
 
   describe('when "type" is "multicolor"', () => {
     beforeEach(() => (type = TYPE.Multicolor))
@@ -41,6 +43,25 @@ describe('SVGList', () => {
       Object.keys(MultiColorSVG).forEach(iconName => {
         expect(getByTestId(`icon-${iconName}`)).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('when an entry is clicked', () => {
+    beforeEach(() => {
+      type = TYPE.Multicolor
+      onSelect = jest.fn()
+    })
+
+    afterEach(() => jest.clearAllMocks())
+
+    it('calls the "onSelect" handler with the selected icon', () => {
+      const {getByTitle} = subject()
+      fireEvent.click(getByTitle('Art Icon'))
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          label: 'Art Icon'
+        })
+      )
     })
   })
 })
