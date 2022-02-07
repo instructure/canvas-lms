@@ -20,9 +20,27 @@ import React from 'react'
 
 import SVGList from '../SVGList'
 import {TYPE} from '../SVGList'
+import {actions} from '../../../../reducers/imageSection'
 
-const MultiColor = () => {
-  return <SVGList type={TYPE.Multicolor} />
+import {convertFileToBase64} from '../../../../svg/utils'
+
+const MultiColor = ({dispatch}) => {
+  const onSelect = svg => {
+    dispatch({...actions.START_LOADING})
+    dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
+
+    convertFileToBase64(
+      new Blob([svg.source], {
+        type: 'image/svg+xml'
+      })
+    ).then(base64Image => {
+      dispatch({...actions.SET_IMAGE, payload: base64Image})
+      dispatch({...actions.STOP_LOADING})
+      dispatch({...actions.CLEAR_MODE})
+    })
+  }
+
+  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} />
 }
 
 export default MultiColor
