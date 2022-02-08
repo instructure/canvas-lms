@@ -32,19 +32,17 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
 import AddStudentModal from './AddStudentModal'
-import {parseObservedUsersList, parseObservedUsersResponse} from './utils'
+import {parseObserverList, parseObservedUsersResponse} from './utils'
 
 const ObserverOptions = ({
-  observedUsersList,
+  observerList,
   currentUser,
   handleChangeObservedUser,
   margin,
   canAddObservee,
   currentUserRoles
 }) => {
-  const [observedUsers, setObservedUsers] = useState(() =>
-    parseObservedUsersList(observedUsersList)
-  )
+  const [observedUsers, setObservedUsers] = useState(() => parseObserverList(observerList))
   const [selectSearchValue, setSelectSearchValue] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
   const [newStudentModalOpen, setNewStudentModalOpen] = useState(false)
@@ -206,7 +204,7 @@ const ObserverOptions = ({
   }
 }
 
-export const ObservedUsersListShape = PropTypes.arrayOf(
+export const ObserverListShape = PropTypes.arrayOf(
   PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -214,12 +212,11 @@ export const ObservedUsersListShape = PropTypes.arrayOf(
   })
 )
 
-export const shouldShowObserverOptions = (observedUsersList, currentUser) =>
-  observedUsersList.length > 1 ||
-  (observedUsersList.length === 1 && observedUsersList[0].id !== currentUser.id)
+export const shouldShowObserverOptions = (observerList, currentUser) =>
+  observerList.length > 1 || (observerList.length === 1 && observerList[0].id !== currentUser.id)
 
 ObserverOptions.propTypes = {
-  observedUsersList: ObservedUsersListShape.isRequired,
+  observerList: ObserverListShape.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,

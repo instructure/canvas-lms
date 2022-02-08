@@ -115,14 +115,13 @@ describe "Moderated Marking" do
     end
 
     it "allows viewing provisional grades and releasing final grade", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
       # # select a provisional grade for each student
-      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
-      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
 
       # # release the grades
       ModeratePage.click_release_grades_button
-      accept_alert
+      driver.switch_to.alert.accept
       wait_for_ajaximations
 
       # go to gradebook
@@ -134,21 +133,20 @@ describe "Moderated Marking" do
     end
 
     it "post to student allows viewing final grade as student", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
       # select a provisional grade for each student
-      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
-      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
 
       # release the grades
       ModeratePage.click_release_grades_button
-      accept_alert
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       # wait for element to exist, means page has loaded
       ModeratePage.grades_released_button
 
       # Post grades to students
       ModeratePage.click_post_to_students_button
-      accept_alert
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       # wait for element to exist, means page has loaded
       ModeratePage.grades_released_button
@@ -161,8 +159,6 @@ describe "Moderated Marking" do
     end
 
     it "displays comments from chosen grader", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
-
       @submissions2.each do |submission|
         submission.submission_comments.create!(comment: "Just a comment by teacher 2", author: @teacher2)
         submission.save!
@@ -174,19 +170,19 @@ describe "Moderated Marking" do
       end
 
       # select a provisional grade for each student
-      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
-      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
 
       # release the grades
       ModeratePage.click_release_grades_button
-      accept_alert
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       # wait for element to exist, means page has loaded
       ModeratePage.grades_released_button
 
       # Post grades to students
       ModeratePage.click_post_to_students_button
-      accept_alert
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       # wait for element to exist, means page has loaded
       ModeratePage.grades_posted_to_students_button

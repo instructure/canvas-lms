@@ -81,7 +81,6 @@ describe('ComposeModalContainer', () => {
     setOnSuccess = jest.fn(),
     isReply,
     isReplyAll,
-    isForward,
     conversation
   ) => {
     return render(
@@ -92,7 +91,6 @@ describe('ComposeModalContainer', () => {
             onDismiss={jest.fn()}
             isReply={isReply}
             isReplyAll={isReplyAll}
-            isForward={isForward}
             conversation={conversation}
           />
         </AlertManagerContext.Provider>
@@ -231,37 +229,6 @@ describe('ComposeModalContainer', () => {
 
       await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
-
-    it('allows created conversations to be added to faculty journal', async () => {
-      window.ENV.CONVERSATIONS = {
-        ATTACHMENTS_FOLDER_ID: 1,
-        NOTES_ENABLED: true,
-        CAN_ADD_NOTES_FOR_ACCOUNT: true,
-        CAN_ADD_NOTES_FOR_COURSES: {1: true}
-      }
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-
-      const component = setup(jest.fn(), mockedSetOnSuccess)
-
-      // Set subject
-      const subjectInput = await component.findByTestId('subject-input')
-      fireEvent.change(subjectInput, {target: {value: 'Journalized Message'}})
-
-      // Set body
-      const bodyInput = component.getByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'This is a journalized message'}})
-
-      // set as faculty journal entry
-      const checkbox = await component.findByTestId('faculty-message-checkbox')
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(true)
-
-      // Hit send
-      const button = component.getByTestId('send-button')
-      fireEvent.click(button)
-
-      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
-    })
   })
 
   describe('reply', () => {
@@ -278,7 +245,7 @@ describe('ComposeModalContainer', () => {
     })
 
     it('should include past messages', async () => {
-      const component = setup(jest.fn(), jest.fn(), true, false, false, {
+      const component = setup(jest.fn(), jest.fn(), true, false, {
         _id: '1',
         conversationMessagesConnection: {
           nodes: [
@@ -296,7 +263,7 @@ describe('ComposeModalContainer', () => {
 
     it('allows replying to a conversation', async () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = setup(jest.fn(), mockedSetOnSuccess, true, false, false, {
+      const component = setup(jest.fn(), mockedSetOnSuccess, true, false, {
         _id: '1',
         conversationMessagesConnection: {
           nodes: [
@@ -324,43 +291,7 @@ describe('ComposeModalContainer', () => {
   describe('replyAll', () => {
     it('allows replying all to a conversation', async () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = setup(jest.fn(), mockedSetOnSuccess, false, true, false, {
-        _id: '1',
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
-                _id: '1337'
-              },
-              recipients: [
-                {
-                  _id: '1337'
-                },
-                {
-                  _id: '1338'
-                }
-              ]
-            }
-          ]
-        }
-      })
-
-      // Set body
-      const bodyInput = await component.findByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
-
-      // Hit send
-      const button = component.getByTestId('send-button')
-      fireEvent.click(button)
-
-      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
-    })
-  })
-
-  describe('forward', () => {
-    it('allows replying all to a conversation', async () => {
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = setup(jest.fn(), mockedSetOnSuccess, false, false, true, {
+      const component = setup(jest.fn(), mockedSetOnSuccess, false, true, {
         _id: '1',
         conversationMessagesConnection: {
           nodes: [

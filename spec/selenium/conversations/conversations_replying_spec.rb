@@ -48,8 +48,7 @@ describe "conversations new" do
         Account.default.set_feature_flag! :react_inbox, "on"
       end
 
-      # the js errors caught in here are captured by VICE-2507
-      it "show record / upload media ui when kaltura is enabled", ignore_js_errors: true do
+      it "show record / upload media ui when kaltura is enabled" do
         stub_kaltura
         get "/conversations"
         f("div[data-testid='conversation']").click

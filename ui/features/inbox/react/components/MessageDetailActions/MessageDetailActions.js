@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import I18n from 'i18n!conversations_2'
 import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React from 'react'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 export const MessageDetailActions = ({...props}) => {
@@ -34,8 +35,6 @@ export const MessageDetailActions = ({...props}) => {
           screenReaderLabel={I18n.t('Reply')}
           onClick={props.onReply}
           data-testid="message-reply"
-          withBackground={false}
-          withBorder={false}
         >
           <IconReplyLine />
         </IconButton>
@@ -44,16 +43,14 @@ export const MessageDetailActions = ({...props}) => {
         placement="bottom"
         trigger={
           <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-            <IconButton
+            <Button
               margin="0 x-small 0 0"
               size="small"
+              renderIcon={IconMoreLine}
               data-testid="message-more-options"
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('More options')}
             >
-              <IconMoreLine />
-            </IconButton>
+              <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
+            </Button>
           </Tooltip>
         }
       >

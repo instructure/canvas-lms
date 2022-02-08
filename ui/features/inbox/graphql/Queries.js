@@ -23,7 +23,6 @@ import {ConversationParticipant} from './ConversationParticipant'
 import {Enrollment} from './Enrollment'
 import {Course} from './Course'
 import {Group} from './Group'
-import {SubmissionComment} from './SubmissionComment'
 
 export const ADDRESS_BOOK_RECIPIENTS = gql`
   query GetAddressBookRecipients($userID: ID!, $context: String, $search: String) {
@@ -90,7 +89,6 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
             ...ConversationMessage
           }
         }
-        contextName
       }
     }
   }
@@ -145,20 +143,4 @@ export const REPLY_CONVERSATION_QUERY = gql`
     }
   }
   ${ConversationMessage.fragment}
-`
-export const SUBMISSION_COMMENTS_QUERY = gql`
-  query SubmissionCommentsQuery($userID: ID!) {
-    legacyNote(_id: $userID, type: User) {
-      ... on User {
-        _id
-        id
-        submissionCommentsConnection {
-          nodes {
-            ...SubmissionComment
-          }
-        }
-      }
-    }
-  }
-  ${SubmissionComment.fragment}
 `

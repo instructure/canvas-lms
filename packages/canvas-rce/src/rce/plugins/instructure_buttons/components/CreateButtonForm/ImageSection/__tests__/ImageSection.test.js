@@ -241,24 +241,6 @@ describe('ImageSection', () => {
     })
   })
 
-  describe('when the "Multi Color Image" mode is selected', () => {
-    let getByTestId, getByText
-
-    beforeEach(() => {
-      const rendered = subject()
-
-      getByTestId = rendered.getByTestId
-      getByText = rendered.getByText
-
-      fireEvent.click(getByText('Add Image'))
-      fireEvent.click(getByText('Multi Color Image'))
-    })
-
-    it('renders the course images component', async () => {
-      await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
-    })
-  })
-
   describe('when editing mode', () => {
     it('sets the image name', async () => {
       const {getByText, rerender} = subject({editing: true})

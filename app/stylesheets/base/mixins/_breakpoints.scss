@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../variables';
-
 // Breakpoints
 @mixin breakpoint($breakpoint, $maximum: false) {
   $dimension: false;
@@ -64,8 +62,7 @@
 
 @mixin lti-min-size {
   @if $use_responsive_layout {
-    // 2 container paddings (same value) * 2 sides
-    @media (max-width: 320px + ($ic-sp * 4)) {
+    @media (max-width: 320px) {
       @content;
     }
   }

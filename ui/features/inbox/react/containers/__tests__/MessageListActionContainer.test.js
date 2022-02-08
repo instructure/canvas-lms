@@ -68,7 +68,6 @@ describe('MessageListActionContainer', () => {
             onCompose={jest.fn()}
             onReply={jest.fn()}
             onReplyAll={jest.fn()}
-            onForward={jest.fn()}
             onSelectMailbox={jest.fn()}
             {...overrideProps}
           />
@@ -231,7 +230,7 @@ describe('MessageListActionContainer', () => {
     expect(window.confirm).toHaveBeenCalled()
   })
 
-  it.skip('should trigger delete function', async () => {
+  it('should trigger delete function', async () => {
     const deleteMock = jest.fn()
     const component = setup({
       deleteDisabled: false,

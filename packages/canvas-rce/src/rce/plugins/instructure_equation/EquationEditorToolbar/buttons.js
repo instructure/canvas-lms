@@ -22,23 +22,12 @@ export default [
   {
     name: formatMessage('Basic'),
     commands: [
-      {
-        displayName: 'x_{\u2B1A}^{\\ }',
-        command: '_{\\placeholder{}}',
-        advancedCommand: '_',
-        svgCommand: 'x_{\\square}'
-      },
-      {
-        displayName: 'x^{\u2B1A}_{\\ }',
-        command: '^{\\placeholder{}}',
-        advancedCommand: '^',
-        svgCommand: 'x^{\\square}'
-      },
+      {displayName: 'x_{\u2B1A}^{\\ }', command: '_{\\placeholder{}}', advancedCommand: '_'},
+      {displayName: 'x^{\u2B1A}_{\\ }', command: '^{\\placeholder{}}', advancedCommand: '^'},
       {
         displayName: '\\frac{\u2B1A}{\u2B1A}',
         command: '\\frac{\\placeholder{}}{\\placeholder{}}',
-        advancedCommand: '\\frac{ }{ }',
-        svgCommand: '\\frac{\\square}{\\square}'
+        advancedCommand: '\\frac{ }{ }'
       },
       {
         displayName: '\\sqrt{\\ }',
@@ -48,16 +37,14 @@ export default [
       {
         displayName: '\\sqrt[n]{\\ }',
         command: '\\sqrt[\\placeholder{}]{\\placeholder{}}',
-        advancedCommand: '\\sqrt[ ]{ }',
-        svgCommand: '\\sqrt[n]{ }'
+        advancedCommand: '\\sqrt[ ]{ }'
       },
       {command: '\\langle'},
       {command: '\\rangle'},
       {
         displayName: '\\binom{n}{m}',
         command: '\\binom{\\placeholder{}}{\\placeholder{}}',
-        advancedCommand: '\\binom{ }{ }',
-        svgCommand: '\\binom{n}{m}'
+        advancedCommand: '\\binom{ }{ }'
       },
       // TODO maybe re-add vector, after figuring out if it even works
       {command: 'f'},
@@ -76,26 +63,22 @@ export default [
       {
         displayName: '\\sum_{\\ }^{\\ }',
         command: '\\sum_{\\placeholder{}}^{\\placeholder{}}',
-        advancedCommand: '\\sum_{ }^{ }',
-        svgCommand: '\\sum'
+        advancedCommand: '\\sum_{ }^{ }'
       },
       {
         displayName: '\\prod_{\\ }^{\\ }',
         command: '\\prod_{\\placeholder{}}^{\\placeholder{}}',
-        advancedCommand: '\\prod_{ }^{ }',
-        svgCommand: '\\prod'
+        advancedCommand: '\\prod_{ }^{ }'
       },
       {
         displayName: '\\coprod_{\\ }^{\\ }',
         command: '\\coprod_{\\placeholder{}}^{\\placeholder{}}',
-        advancedCommand: '\\coprod_{ }^{ }',
-        svgCommand: '\\coprod'
+        advancedCommand: '\\coprod_{ }^{ }'
       },
       {
         displayName: '\\int_{\\ }^{\\ }',
         command: '\\int_{\\placeholder{}}^{\\placeholder{}}',
-        advancedCommand: '\\int_{ }^{ }',
-        svgCommand: '\\int'
+        advancedCommand: '\\int_{ }^{ }'
       },
       {command: '\\mathbb{N}'},
       {command: '\\mathbb{P}'},

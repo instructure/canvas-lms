@@ -41,17 +41,10 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const Upload = React.lazy(() => import('./Upload'))
-  const MultiColor = React.lazy(() => import('./MultiColor'))
 
-  // This object maps image selection modes to the
-  // component that handles that selection.
-  //
-  // The selected component is dynamically rendered
-  // in this component's returned JSX
   const allowedModes = {
     [modes.courseImages.type]: Course,
-    [modes.uploadImages.type]: Upload,
-    [modes.multiColorImages.type]: MultiColor
+    [modes.uploadImages.type]: Upload
   }
 
   useEffect(() => {
