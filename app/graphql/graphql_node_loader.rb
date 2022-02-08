@@ -191,7 +191,7 @@ module GraphQLNodeLoader
       end
     when "LearningOutcomeGroup"
       Loaders::IDLoader.for(LearningOutcomeGroup).load(id).then do |record|
-        if record.context
+        if record&.context
           next unless record.context.grants_right?(ctx[:current_user], :read_outcomes)
         else
           next unless Account.site_admin.grants_right?(ctx[:current_user], :read_global_outcomes)
@@ -209,7 +209,7 @@ module GraphQLNodeLoader
       end
     when "LearningOutcome"
       Loaders::IDLoader.for(LearningOutcome).load(id).then do |record|
-        if record.context
+        if record&.context
           next unless record.context.grants_right?(ctx[:current_user], :read_outcomes)
         else
           next unless Account.site_admin.grants_right?(ctx[:current_user], :read_global_outcomes)
