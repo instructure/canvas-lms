@@ -23,11 +23,7 @@
 # nothing happens.  If it *does*, we register a callback with Canvas::Errors
 # so that every time an exception is reported, we can fire off a sentry
 # call to track it and aggregate it for us.
-settings = ConfigFile.load("sentry")
-
-if settings.present?
-  return if Canvas::Plugin.value_to_boolean(Setting.get("sentry_disabled", "false"))
-
+unless Rails.env.test? || SentryExtensions::Settings.disabled? || SentryExtensions::Settings.settings.blank?
   Sentry.init do |config|
     config.traces_sampler = lambda do |_|
       Setting.get("sentry_backend_traces_sample_rate", "0.0").to_f
@@ -39,7 +35,7 @@ if settings.present?
       SentryExtensions::Tracing::ActiveRecordSubscriber # overridden from the Sentry-provided one
     ]
 
-    config.dsn = settings[:dsn]
+    config.dsn = SentryExtensions::Settings.settings[:dsn]
     config.environment = Canvas.environment
     config.release = Canvas.revision
 
@@ -67,7 +63,7 @@ if settings.present?
     ]
   end
 
-  Sentry.set_tags(settings.fetch(:tags, {}))
+  Sentry.set_tags(SentryExtensions::Settings.settings.fetch(:tags, {}))
 
   Rails.configuration.to_prepare do
     Setting.get("ignorable_errors", "").split(",").each do |error|
