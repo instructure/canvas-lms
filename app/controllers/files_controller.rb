@@ -497,6 +497,10 @@ class FilesController < ApplicationController
       render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
       return
     end
+    if (@attachment.locked || @attachment.hidden || @attachment.locked_for?(@current_user)) && !@attachment.context.grants_right?(@current_user, session, :view_unpublished_items)
+      render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
+      return
+    end
     params[:include] = Array(params[:include])
     if read_allowed(@attachment, @current_user, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
