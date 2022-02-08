@@ -42,7 +42,7 @@ const ModeSelect = ({dispatch}) => {
     <Menu
       placement="bottom"
       trigger={
-        <Button color="secondary" margin="small">
+        <Button color="secondary">
           {formatMessage('Add Image')}
           <View margin="none none none x-small">
             <IconArrowOpenDownLine />
