@@ -24,7 +24,7 @@ const SVGThumbnail = ({name, source, size = '4rem'}) => {
   return (
     <div style={{fontSize: size}}>
       <SVGIcon
-        src={source[name]?.source}
+        src={source[name]?.source()}
         title={source[name]?.title}
         data-testid={`icon-${name}`}
       />
