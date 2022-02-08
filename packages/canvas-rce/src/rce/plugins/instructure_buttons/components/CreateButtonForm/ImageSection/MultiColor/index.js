@@ -30,7 +30,7 @@ const MultiColor = ({dispatch}) => {
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
 
     convertFileToBase64(
-      new Blob([svg.source], {
+      new Blob([svg.source()], {
         type: 'image/svg+xml'
       })
     ).then(base64Image => {

@@ -26,7 +26,7 @@ describe('SVGThumbnail', () => {
 
   const source = {
     foo: {
-      source: '<svg />',
+      source: () => '<svg />',
       label: 'Foo'
     }
   }
