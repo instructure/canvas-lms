@@ -16,26 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module SentryExtensions
-  class Settings
-    def self.disabled?
-      Canvas::Plugin.value_to_boolean(get("sentry_disabled", "false"))
-    end
-
-    def self.settings
-      @sentry_settings ||= ConfigFile.load("sentry")
-
-      @sentry_settings.presence || {}
-    end
-
-    def self.get(name, default = nil)
-      settings[name.to_sym] || Setting.get(name, default)
-    rescue PG::ConnectionBad
-      default
-    end
-
-    def self.reset_settings
-      @sentry_settings = nil
-    end
+describe "sentry" do
+  it "initializes with a default config so that methods may be safely called" do
+    expect do
+      Sentry.set_tags(tag1: "value1")
+      Sentry.set_user(id: 5)
+      Sentry.set_extras(debug: true)
+      Sentry.set_context("exta", { key1: "value1" })
+    end.not_to raise_error
   end
 end
