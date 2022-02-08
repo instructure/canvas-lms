@@ -23,8 +23,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import buttons from './buttons'
-
-import {convertLatexToMarkup} from '../mathlive'
+import MathIcon from '../MathIcon'
 
 const buttonContainerStyle = {
   display: 'inline-block',
@@ -48,11 +47,7 @@ export default function EquationEditorToolbar(props) {
     >
       {section.commands.map(({displayName, command, advancedCommand}) => {
         const name = displayName || command
-        const icon = (
-          <span
-            dangerouslySetInnerHTML={{__html: convertLatexToMarkup(name, {mathstyle: 'textstyle'})}}
-          />
-        )
+        const icon = <MathIcon command={command} />
 
         // I'm inlining styles here because for some reason the RCE plugin plays
         // poorly with the way webpack is compiling styles, causing rules from a
