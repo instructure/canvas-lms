@@ -33,6 +33,6 @@ function shouldUseButtonsAndIcons(windowEnv: object): boolean {
   return !!(
     windowEnv.RICH_CONTENT_CAN_UPLOAD_FILES &&
     windowEnv.RICH_CONTENT_CAN_EDIT_FILES &&
-    window.ENV?.FEATURES?.rce_buttons_and_icons
+    window.ENV?.FEATURES?.buttons_and_icons_root_account
   )
 }

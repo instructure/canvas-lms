@@ -45,7 +45,7 @@ describe('shouldUseFeature()', () => {
     describe('and the buttons & icons feature flag is on', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
-          rce_buttons_and_icons: true
+          buttons_and_icons_root_account: true
         }
       })
 
@@ -78,7 +78,7 @@ describe('shouldUseFeature()', () => {
     describe('and the buttons & icons feature flag is off', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
-          rce_buttons_and_icons: true
+          buttons_and_icons_root_account: true
         }
       })
 
