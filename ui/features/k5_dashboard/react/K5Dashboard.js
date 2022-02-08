@@ -136,7 +136,6 @@ export const K5Dashboard = ({
   plannerEnabled = false,
   responsiveSize = 'large',
   hideGradesTabForStudents = false,
-  showImportantDates,
   selectedContextCodes,
   selectedContextsLimit,
   parentSupportEnabled,
@@ -246,8 +245,7 @@ export const K5Dashboard = ({
   }
 
   const renderDashboardHeader = sticky => {
-    const showingIcons =
-      (useImportantDatesTray && showImportantDates) || canDisableElementaryDashboard
+    const showingIcons = useImportantDatesTray || canDisableElementaryDashboard
     return (
       <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
         <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
@@ -255,7 +253,7 @@ export const K5Dashboard = ({
             {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
           </Heading>
         </Flex.Item>
-        {useImportantDatesTray && showImportantDates && (
+        {useImportantDatesTray && (
           <Flex.Item align="start">
             <IconButton
               screenReaderLabel={I18n.t('View Important Dates')}
@@ -377,13 +375,13 @@ export const K5Dashboard = ({
             )}
           </K5DashboardContext.Provider>
         </Flex.Item>
-        {!useImportantDatesTray && showImportantDates && (
+        {!useImportantDatesTray && (
           <Flex.Item as="div" size="18rem" id="important-dates-sidebar">
             {importantDates}
           </Flex.Item>
         )}
       </Flex>
-      {useImportantDatesTray && showImportantDates && (
+      {useImportantDatesTray && (
         <Tray
           label={I18n.t('Important Dates Tray')}
           open={trayOpen}
@@ -418,7 +416,6 @@ K5Dashboard.propTypes = {
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string,
   hideGradesTabForStudents: PropTypes.bool,
-  showImportantDates: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,

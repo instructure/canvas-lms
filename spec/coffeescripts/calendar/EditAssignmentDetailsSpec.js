@@ -231,30 +231,14 @@ test('allows assignment event to save if there is no date and post_to_sis is fal
   equal(errors.length, 0)
 })
 
-test('Should not show the important date checkbox if the important_dates feature is disabled', function () {
-  window.ENV.FEATURES = {
-    important_dates: false
-  }
-  const view = createView(commonEvent(), this.event)
-  view.setContext('course_1')
-  view.contextChange({target: '#assignment_context'}, false)
-  equal(view.$('#important_dates').css('display'), 'none')
-})
-
 test('Should not show the important date checkbox if the context is not a k5 subject', function () {
-  window.ENV.FEATURES = {
-    important_dates: true
-  }
   const view = createView(commonEvent(), this.event)
   view.setContext('course_2')
   view.contextChange({target: '#assignment_context'}, false)
   equal(view.$('#important_dates').css('display'), 'none')
 })
 
-test('Should show the important date checkbox if the context is a k5 subject and the important_dates feature is enabled', function () {
-  window.ENV.FEATURES = {
-    important_dates: true
-  }
+test('Should show the important date checkbox if the context is a k5 subject', function () {
   const view = createView(commonEvent(), this.event)
   view.setContext('course_1')
   view.contextChange({target: '#assignment_context'}, false)
@@ -262,9 +246,6 @@ test('Should show the important date checkbox if the context is a k5 subject and
 })
 
 test('Should include the important date value when submitting', function () {
-  window.ENV.FEATURES = {
-    important_dates: true
-  }
   const view = createView(commonEvent(), this.event)
   view.$('#calendar_event_important_dates').click()
   const dataToSubmit = view.getFormData()
