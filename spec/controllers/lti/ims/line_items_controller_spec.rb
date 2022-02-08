@@ -83,10 +83,12 @@ module Lti
       end
 
       describe "#create" do
+        let(:end_date_time) { Time.zone.now }
         let(:params_overrides) do
           {
             scoreMaximum: score_max,
             label: label,
+            endDateTime: end_date_time.iso8601,
             resourceId: resource_id,
             tag: tag,
             resourceLinkId: assignment.lti_context_id,
@@ -247,6 +249,10 @@ module Lti
               expect(item.assignment.context).to eq course
             end
 
+            it "sets the due_at for the assignment" do
+              expect(item.assignment.due_at).to be_within(1.second).of end_date_time
+            end
+
             context "when submission type is external tool and the URL is not for an existing tool" do
               # I'm not sure what the expected behavior is here exactly. We currently
               # create an assignment and line item but no resource link, tool for the ContentTag --
@@ -367,28 +373,62 @@ module Lti
         it_behaves_like "advantage services"
         it_behaves_like "assignment with wrong tool"
 
-        context do
+        context "with score_maximum" do
           let(:new_score_maximum) { 88.2 }
           let(:params_overrides) { super().merge(scoreMaximum: new_score_maximum) }
+          let(:line_item) { assignment.line_items.first }
 
           it "updates the score maximum" do
             send_request
             body = parsed_response_body
             expect(body["scoreMaximum"]).to eq new_score_maximum
           end
+
+          it "updates the assignment points_possible" do
+            send_request
+            expect(line_item.reload.assignment.points_possible).to eq new_score_maximum
+          end
+
+          context "if ResourceLink is absent" do
+            before do
+              line_item.update!(resource_link: nil)
+            end
+
+            it "updates the assignment points_possible" do
+              send_request
+              expect(line_item.reload.assignment.points_possible).to eq new_score_maximum
+            end
+          end
         end
 
-        context do
+        context "with label" do
           let(:new_label) { "a new label!" }
           let(:params_overrides) { super().merge(label: new_label) }
+          let(:line_item) { assignment.line_items.first }
 
           it "updates the label" do
             send_request
             expect(line_item.reload.label).to eq new_label
           end
+
+          it "updates the assignment name" do
+            send_request
+            expect(line_item.reload.assignment.name).to eq "a new label!"
+          end
+
+          context "if ResourceLink is absent" do
+            before do
+              line_item.update!(resource_link: nil)
+            end
+
+            it "updates the assignment name" do
+              send_request
+              expect(line_item.reload.assignment.name).to eq new_label
+            end
+          end
         end
 
-        context do
+        context "if not the default line item" do
           let(:line_item_two) do
             li = line_item_model(resource_link: resource_link, assignment: assignment)
             li.update!(created_at: line_item.created_at + 5.seconds)
@@ -398,48 +438,24 @@ module Lti
           let(:new_label) { "a new label!" }
           let(:params_overrides) { super().merge(label: new_label) }
 
-          it "does not update the assignment name if not the default line item" do
+          it "does not update the assignment name" do
             original_name = assignment.name
             send_request
             expect(line_item.reload.assignment.name).to eq original_name
           end
         end
 
-        context do
-          let(:new_label) { "a new label!" }
-          let(:params_overrides) { super().merge(label: new_label) }
-          let(:line_item) { assignment.line_items.first }
+        context "with endDateTime" do
+          let(:end_date_time) { Time.zone.now }
+          let(:params_overrides) { super().merge(endDateTime: end_date_time.iso8601) }
 
-          it "updates the assignment name if ResourceLink is absent" do
-            line_item.update!(resource_link: nil)
+          it "updates the assignment due_at" do
             send_request
-            expect(line_item.reload.assignment.name).to eq new_label
-          end
-
-          it "updates the assignment name if default line item" do
-            send_request
-            expect(line_item.reload.assignment.name).to eq "a new label!"
+            expect(line_item.reload.assignment.due_at).to be_within(1.second).of end_date_time
           end
         end
 
-        context do
-          let(:new_score_maximum) { 42.0 }
-          let(:params_overrides) { super().merge(scoreMaximum: new_score_maximum) }
-          let(:line_item) { assignment.line_items.first }
-
-          it "updates the assignment points_possible if ResourceLink is absent" do
-            line_item.update!(resource_link: nil)
-            send_request
-            expect(line_item.reload.assignment.points_possible).to eq new_score_maximum
-          end
-
-          it "updates the assignment points_possible if default line item" do
-            send_request
-            expect(line_item.reload.assignment.points_possible).to eq new_score_maximum
-          end
-        end
-
-        context do
+        context "with resourceId" do
           let(:new_resource_id) { "resource-id" }
           let(:params_overrides) { super().merge(resourceId: new_resource_id) }
 
@@ -450,7 +466,7 @@ module Lti
           end
         end
 
-        context do
+        context "with tag" do
           let(:new_tag) { "New Tag" }
           let(:params_overrides) { super().merge(tag: new_tag) }
 
@@ -461,7 +477,7 @@ module Lti
           end
         end
 
-        context do
+        context "with resourceLinkId" do
           let(:new_resource_link_id) do
             a = assignment_model
             a.lti_context_id

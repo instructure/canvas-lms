@@ -65,7 +65,8 @@ class Lti::LineItem < ApplicationRecord
         context: context,
         name: params[:label],
         points_possible: params[:score_maximum],
-        submission_types: "none"
+        submission_types: "none",
+        due_at: params.delete(:end_date_time)
       }
 
       submission_type = params[AGS_EXT_SUBMISSION_TYPE]
