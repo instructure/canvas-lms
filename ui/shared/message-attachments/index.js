@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,3 +17,6 @@
  */
 
 export {AttachmentDisplay} from './react/components/AttachmentDisplay/AttachmentDisplay'
+export {AttachmentUploadSpinner} from './react/components/AttachmentUploadSpinner/AttachmentUploadSpinner'
+export {FileAttachmentUpload} from './react/components/FileAttachmentUpload/FileAttachmentUpload'
+export {addAttachmentsFn, removeAttachmentFn} from './util/attachments'
