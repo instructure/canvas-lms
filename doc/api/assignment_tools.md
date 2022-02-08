@@ -127,6 +127,16 @@ OAuth2 Client Credentials</a> grant to obtain an access token. This covered in
 depth in the <a href="https://www.imsglobal.org/spec/security/v1p0/#securing_web_services" target="_blank">
 IMS LTI Security Framework, SEC 4</a>.
 
+##Request Throttling
+Like all requests made to the Canvas API, AGS requests are throttled (see the
+<a href="/doc/api/file.throttling.html" target="_blank">Throttling docs</a> for details)
+to ensure that Canvas stays up and running. Unlike normal API requests which are made with
+a token specific to a user, AGS tokens are specific to a tool installation for a Course or
+an Account, and so there is the possibility of many more requests in a short amount of time.
+As long as you as a tool provider keep requests more-or-less sequential, and pay attention
+to the request throttling headers as detailed in the above doc, even this elevated level
+of requests per token should not be limited.
+
 ##Extensions
 Canvas has extended several AGS endpoints to support deeper grading
 integrations. Here, we will focus on these extensions and describe how tools can
