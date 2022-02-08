@@ -32,7 +32,7 @@ describe CalendarEventsApiController, type: :request do
       all_context_codes all_day all_day_date child_events child_events_count comments
       context_code created_at description duplicates end_at hidden html_url
       id location_address location_name parent_event_id start_at
-      title type updated_at url workflow_state context_name context_color
+      title type updated_at url workflow_state context_name context_color important_dates
     ]
     expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
@@ -1553,28 +1553,13 @@ describe CalendarEventsApiController, type: :request do
         @course.calendar_events.create(title: "undated important", important_dates: true)
       end
 
-      context "with feature enabled" do
-        before :once do
-          Account.site_admin.enable_feature!(:important_dates)
-        end
-
-        it "returns calendar events that have a date with important dates if the param is sent" do
-          json = api_call(:get, "/api/v1/calendar_events?important_dates=true&context_codes[]=course_#{@course.id}", {
-                            controller: "calendar_events_api", action: "index", format: "json",
-                            context_codes: ["course_#{@course.id}"], important_dates: true
-                          })
-          expect(json.size).to be 1
-          expect(json[0]["important_dates"]).to be true
-        end
-      end
-
-      it "returns all calendar events if the param is sent and the site admin feature is off" do
-        Account.site_admin.disable_feature!(:important_dates)
+      it "returns calendar events that have a date with important dates if the param is sent" do
         json = api_call(:get, "/api/v1/calendar_events?important_dates=true&context_codes[]=course_#{@course.id}", {
                           controller: "calendar_events_api", action: "index", format: "json",
                           context_codes: ["course_#{@course.id}"], important_dates: true
                         })
-        expect(json.size).to be 2
+        expect(json.size).to be 1
+        expect(json[0]["important_dates"]).to be true
       end
     end
   end
@@ -1583,7 +1568,7 @@ describe CalendarEventsApiController, type: :request do
     expected_fields = %w[
       all_day all_day_date assignment context_code created_at
       description end_at html_url id start_at title type updated_at
-      url workflow_state context_name context_color
+      url workflow_state context_name context_color important_dates
     ]
 
     it "returns assignments within the given date range" do
@@ -2634,7 +2619,6 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "returns important dates over multiple shards" do
-        Account.site_admin.enable_feature! :important_dates
         @e0.update important_dates: true
         @e1.update important_dates: true
         json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&important_dates=1",
@@ -2662,37 +2646,31 @@ describe CalendarEventsApiController, type: :request do
         @course.assignments.create!(title: "not important date", due_at: DateTime.current)
       end
 
-      context "with feature enabled" do
-        before :once do
-          Account.site_admin.enable_feature!(:important_dates)
-        end
+      it "returns all assignments with important dates if the user is a teacher" do
+        json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], important_dates: true
+                                })
+        expect(json.size).to be 4
+        expect(json[0]["important_dates"]).to be true
+      end
 
-        it "returns all assignments with important dates if the user is a teacher" do
-          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-                                    controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
-                                    context_codes: ["course_#{@course.id}"], important_dates: true
-                                  })
-          expect(json.size).to be 4
-          expect(json[0]["important_dates"]).to be true
-        end
+      it "returns assignments with dates for the user with important dates if the param is sent" do
+        json = api_call_as_user(@other_student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], important_dates: true
+                                })
+        expect(json.size).to be 3
+        expect(json[0]["important_dates"]).to be true
+      end
 
-        it "returns assignments with dates for the user with important dates if the param is sent" do
-          json = api_call_as_user(@other_student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-                                    controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
-                                    context_codes: ["course_#{@course.id}"], important_dates: true
-                                  })
-          expect(json.size).to be 3
-          expect(json[0]["important_dates"]).to be true
-        end
-
-        it "returns assignments with important dates if the param is sent" do
-          json = api_call_as_user(@student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-                                    controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
-                                    context_codes: ["course_#{@course.id}"], important_dates: true
-                                  })
-          expect(json.size).to be 2
-          expect(json[0]["important_dates"]).to be true
-        end
+      it "returns assignments with important dates if the param is sent" do
+        json = api_call_as_user(@student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], important_dates: true
+                                })
+        expect(json.size).to be 2
+        expect(json[0]["important_dates"]).to be true
       end
     end
   end

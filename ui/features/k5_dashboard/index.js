@@ -37,7 +37,6 @@ ready(() => {
         hideGradesTabForStudents={ENV.HIDE_K5_DASHBOARD_GRADES_TAB}
         createPermission={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
         restrictCourseCreation={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
-        showImportantDates={!!ENV.FEATURES.important_dates}
         selectedContextCodes={ENV.SELECTED_CONTEXT_CODES}
         selectedContextsLimit={ENV.SELECTED_CONTEXTS_LIMIT}
         parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
