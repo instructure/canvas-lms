@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 import parseLinkHeader from 'parse-link-header'
 import {defaultFetchOptions} from '@instructure/js-utils'
 

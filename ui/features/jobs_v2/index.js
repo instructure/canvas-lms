@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// New fonts added here also need to be added to app/stylesheets/bundles/lato_extended.scss
-// Either lato.scss or lato_extended.scss is loaded depending on the value of the 'disable_lato_extended' setting
+import React from 'react'
+import ReactDOM from 'react-dom'
+import JobsIndex from './react'
+import ready from '@instructure/ready'
 
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&subset=latin-ext&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+ready(() => {
+  ReactDOM.render(<JobsIndex />, document.getElementById('content'))
+})
