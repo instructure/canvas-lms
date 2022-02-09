@@ -21,7 +21,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 // @ts-ignore
 import I18n from 'i18n!gradebook'
 import type {PartialFilter, AppliedFilter, Filter} from '../gradebook.d'
-import {deserializeFilter, serializeFilter} from '../Gradebook.utils'
+import {deserializeFilter, serializeFilter, compareFilterByDate} from '../Gradebook.utils'
 import type {GradebookStore} from './index'
 
 export type FiltersState = {
@@ -88,7 +88,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         const newFilter = deserializeFilter(response.json)
         set({
           stagedFilter: null,
-          filters: get().filters.concat([newFilter])
+          filters: get().filters.concat([newFilter]).sort(compareFilterByDate)
         })
       })
       .catch(() => {
@@ -112,6 +112,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       filters: get()
         .filters.filter(f => f.id !== filter.id)
         .concat([filter])
+        .sort(compareFilterByDate)
     })
 
     const {name, payload} = serializeFilter(filter)
@@ -127,6 +128,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           filters: get()
             .filters.filter(f => f.id !== filter.id)
             .concat([updatedFilter])
+            .sort(compareFilterByDate)
         })
       })
       .catch(() => {
@@ -136,6 +138,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
             filters: get()
               .filters.filter(f => f.id !== filter.id)
               .concat([originalFilter])
+              .sort(compareFilterByDate)
           })
         }
 
@@ -162,7 +165,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       // rewind
       const isAbsent = get().filters.some(f => f.id === filter.id)
       if (!isAbsent) {
-        set({filters: get().filters.concat([filter])})
+        set({filters: get().filters.concat([filter]).sort(compareFilterByDate)})
       }
 
       set({
