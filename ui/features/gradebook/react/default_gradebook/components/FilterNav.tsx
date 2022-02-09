@@ -24,7 +24,7 @@ import uuid from 'uuid'
 import I18n from 'i18n!gradebook'
 import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
-import {View} from '@instructure/ui-view'
+import {View, ContextView} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {Tray} from '@instructure/ui-tray'
@@ -135,6 +135,33 @@ export default function FilterNav({
               />
             </FlexItem>
           </Flex>
+
+          {filters.length === 0 && !stagedFilter && (
+            <Flex as="div" margin="small">
+              <FlexItem display="inline-block" width="100px" height="128px">
+                <img
+                  src="/images/tutorial-tray-images/Panda_People.svg"
+                  alt={I18n.t('Friendly panda')}
+                  style={{
+                    width: '100px',
+                    height: '128px'
+                  }}
+                />
+              </FlexItem>
+              <FlexItem shouldShrink>
+                <ContextView
+                  padding="x-small small"
+                  margin="small"
+                  placement="end top"
+                  shadow="resting"
+                >
+                  {I18n.t(
+                    'Did you know you can now create detailed filters and save them for future use?'
+                  )}
+                </ContextView>
+              </FlexItem>
+            </Flex>
+          )}
 
           {filters.map(filter => (
             <FilterNavFilter

@@ -128,6 +128,19 @@ describe('FilterNav', () => {
     expect(getByRole('heading')).toHaveTextContent('Gradebook Filters')
   })
 
+  it('shows friendly panda image when there are no filters', async () => {
+    store.setState({filters: [], stagedFilter: null})
+    const {getByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Filters'))
+    expect(await getByAltText('Friendly panda')).toBeInTheDocument()
+  })
+
+  it('hides friendly panda image when there are filters', async () => {
+    const {queryByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Filters'))
+    expect(await queryByAltText('Friendly panda')).toBeNull()
+  })
+
   it('renders new filter button', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Filters'))
