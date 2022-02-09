@@ -56,7 +56,6 @@ ready(() => {
         pagesPath={ENV.COURSE.pages_url}
         hasWikiPages={ENV.COURSE.has_wiki_pages}
         hasSyllabusBody={ENV.COURSE.has_syllabus_body}
-        parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
         observedUsersList={ENV.OBSERVED_USERS_LIST}
         selfEnrollment={ENV.COURSE.self_enrollment}
         tabContentOnly={ENV.TAB_CONTENT_ONLY}

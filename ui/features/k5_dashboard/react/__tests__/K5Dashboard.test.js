@@ -188,9 +188,8 @@ const defaultProps = {
   hideGradesTabForStudents: false,
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
-  parentSupportEnabled: false,
   canAddObservee: false,
-  observedUsersList: MOCK_OBSERVED_USERS_LIST,
+  observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
   openTodosInNewTab: true
 }
 function createPlannerMocks() {
@@ -602,7 +601,6 @@ describe('K-5 Dashboard', () => {
           {...defaultProps}
           defaultTab="tab-schedule"
           plannerEnabled
-          parentSupportEnabled
           canAddObservee
           currentUserRoles={['user', 'observer']}
           observedUsersList={observedUsersList}
@@ -782,9 +780,9 @@ describe('K-5 Dashboard', () => {
       const {getByRole} = render(
         <K5Dashboard
           {...defaultProps}
-          parentSupportEnabled
           canAddObservee
           currentUserRoles={['user', 'observer']}
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
         />
       )
       const select = getByRole('combobox', {name: 'Select a student to view'})
@@ -803,7 +801,7 @@ describe('K-5 Dashboard', () => {
           {...defaultProps}
           currentUserRoles={['user', 'observer', 'teacher']}
           canAddObservee
-          parentSupportEnabled
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
         />
       )
       // let the dashboard execute all its queries and render
@@ -832,8 +830,8 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard
           {...defaultProps}
           currentUserRoles={['user', 'observer', 'teacher']}
-          parentSupportEnabled
           canAddObservee
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
         />
       )
       expect(await findByText('Economics 101')).toBeInTheDocument()
@@ -889,7 +887,7 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard
           {...defaultProps}
           currentUserRoles={['user', 'observer', 'teacher']}
-          parentSupportEnabled
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
           canAddObservee
           plannerEnabled
         />
