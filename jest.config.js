@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -33,7 +33,8 @@ module.exports = {
     '@instructure/canvas-rce/es/rce/plugins/shared/Upload/CategoryProcessor':
       '<rootDir>/packages/canvas-rce/lib/rce/plugins/shared/Upload/CategoryProcessor',
     // mock the tinymce-react Editor react component
-    '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
+    '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js',
+    'decimal.js/decimal.mjs': 'decimal.js/decimal.js'
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
@@ -64,10 +65,30 @@ module.exports = {
   testEnvironment: 'jest-environment-jsdom-fourteen',
 
   transform: {
-    '^i18n': '<rootDir>/jest/i18nTransformer.js',
-    '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
-    '^.+\\.handlebars': '<rootDir>/jest/handlebarsTransformer.js',
-    '^.+\\.[jt]sx?$': 'babel-jest',
-    '\\.graphql$': 'jest-raw-loader'
+    '^i18n!': '<rootDir>/jest/i18nTransformer.js',
+    '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',
+    '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
+    '\\.graphql$': 'jest-raw-loader',
+    '\\.[jt]sx?$': [
+      'babel-jest',
+      {
+        configFile: false,
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              // until we're on Jest 27 and can look into loading ESMs natively;
+              // https://jestjs.io/docs/ecmascript-modules
+              modules: 'commonjs'
+            }
+          ],
+          ['@babel/preset-react', {useBuiltIns: true}],
+          ['@babel/preset-typescript', {}]
+        ],
+        targets: {
+          node: 'current'
+        }
+      }
+    ]
   }
 }

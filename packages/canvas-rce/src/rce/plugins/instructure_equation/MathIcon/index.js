@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {compile} = require('coffee-script')
-const {transform} = require('@babel/core')
+import React from 'react'
+import {string} from 'prop-types'
+import {IconWarningLine} from '@instructure/ui-icons'
+import {SVGIcon} from '@instructure/ui-svg-images'
+import svgs from './svgs'
 
-exports.process = (coffee, path) => {
-  const esm = compile(coffee, {bare: true})
-  const cjs = transform(esm, {
-    filename: path,
-    plugins: ['@babel/plugin-transform-modules-commonjs']
-  }).code
-  return cjs
+export default function MathIcon({command}) {
+  if (command in svgs) {
+    return <SVGIcon src={svgs[command]} data-testid="math-symbol-icon" />
+  } else {
+    return <IconWarningLine data-testid="warning-icon" />
+  }
+}
+
+MathIcon.propTypes = {
+  command: string.isRequired
 }

@@ -32,10 +32,6 @@ function renderToolbar(overrideProps = {}) {
   return render(<EquationEditorToolbar {...props} {...overrideProps} />)
 }
 
-jest.mock('../../mathlive', () => ({
-  convertLatexToMarkup: jest.fn()
-}))
-
 describe('EquationEditorToolbar', () => {
   it('renders all buttons', () => {
     const {container, getByText} = renderToolbar()
