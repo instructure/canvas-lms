@@ -44,6 +44,7 @@ import {Text} from '@instructure/ui-text'
 import {uploadFile} from '@canvas/upload-file'
 import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import theme from '@instructure/canvas-theme'
 
 const ExternalToolSubmission = React.lazy(() => import('./AttemptType/ExternalToolSubmission'))
 const FilePreview = React.lazy(() => import('./AttemptType/FilePreview'))
@@ -440,8 +441,16 @@ export default class AttemptTab extends Component {
                 />
               )}
 
-            {selectedType != null &&
-              this.renderByType(selectedType, context, this.props.selectedExternalTool)}
+            {selectedType != null && (
+              <div
+                style={{
+                  backgroundColor: theme.variables.colors.backgroundLight,
+                  borderTop: `2px solid ${theme.variables.colors.borderMedium}`
+                }}
+              >
+                {this.renderByType(selectedType, context, this.props.selectedExternalTool)}
+              </div>
+            )}
           </div>
         )}
       </StudentViewContext.Consumer>
