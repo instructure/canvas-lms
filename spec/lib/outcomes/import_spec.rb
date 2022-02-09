@@ -171,6 +171,53 @@ RSpec.describe Outcomes::Import do
         expect(deleted_group.workflow_state).to eq "deleted"
         expect(deleted_group.title).not_to eq existing_group.title
       end
+
+      context "with course_id" do
+        let(:account_group_attributes) do
+          {
+            title: "i'm a group",
+            description: "really i'm a group",
+            vendor_guid: group_vendor_guid + "_account",
+            workflow_state: "active",
+          }
+        end
+
+        before do
+          group_attributes[:course_id] = course.id
+        end
+
+        it "creates a group in a given Course" do
+          importer.import_group(group_attributes)
+          new_group = LearningOutcomeGroup.last
+          expect(new_group.title).to eq group_attributes[:title]
+          expect(new_group.context).to eq course
+        end
+
+        it "fails if the given Course is not in the Account" do
+          course.update!(account: other_context)
+          expect do
+            importer.import_group(group_attributes)
+          end.to raise_error(klass::InvalidDataError, /is not a child of current account/)
+        end
+
+        it "creates and links groups from multiple levels" do
+          cgroup = importer.import_group(group_attributes)
+          agroup = importer.import_group(account_group_attributes)
+          outcome = importer.import_outcome(**outcome_attributes, course_id: nil, parent_guids: "#{group_vendor_guid} #{group_vendor_guid}_account")
+          expect(cgroup.context).to eq course
+          expect(agroup.context).to eq root_account
+          expect(cgroup.child_outcome_links.active.map(&:content)).to include outcome
+          expect(agroup.child_outcome_links.active.map(&:content)).to include outcome
+        end
+
+        it "only links groups from multiple levels if file has a course_id column" do
+          importer.import_group(group_attributes)
+          importer.import_group(account_group_attributes)
+          expect do
+            importer.import_outcome(**outcome_attributes, parent_guids: "#{group_vendor_guid} #{group_vendor_guid}_account")
+          end.to raise_error(klass::InvalidDataError, /Parent references not found prior to this row: \["imagroup"\]/)
+        end
+      end
     end
 
     it "updates attributes" do
