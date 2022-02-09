@@ -18,10 +18,6 @@
 
 module SentryExtensions
   class Settings
-    def self.disabled?
-      Canvas::Plugin.value_to_boolean(get("sentry_disabled", "false"))
-    end
-
     def self.settings
       @sentry_settings ||= ConfigFile.load("sentry")
 
