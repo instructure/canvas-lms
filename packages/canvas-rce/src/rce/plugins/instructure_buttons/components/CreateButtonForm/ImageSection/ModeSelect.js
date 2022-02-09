@@ -38,6 +38,8 @@ const ModeSelect = ({dispatch}) => {
     </Menu.Item>
   )
 
+  const showNonIconImages = !!ENV.FEATURES.buttons_and_icons_cropper
+
   return (
     <Menu
       placement="bottom"
@@ -50,10 +52,10 @@ const ModeSelect = ({dispatch}) => {
         </Button>
       }
     >
-      {menuFor(modes.uploadImages)}
+      {showNonIconImages && menuFor(modes.uploadImages)}
       {menuFor(modes.singleColorImages)}
       {menuFor(modes.multiColorImages)}
-      {menuFor(modes.courseImages)}
+      {showNonIconImages && menuFor(modes.courseImages)}
     </Menu>
   )
 }
