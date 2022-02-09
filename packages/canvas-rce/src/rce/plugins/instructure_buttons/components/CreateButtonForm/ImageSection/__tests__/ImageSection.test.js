@@ -21,6 +21,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ImageSection} from '../ImageSection'
 import fetchMock from 'fetch-mock'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
+import svg from '../SingleColor/svg'
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
@@ -96,12 +97,12 @@ jest.mock('../../../../../shared/StoreContext', () => {
 jest.mock('../../../../../../../bridge', () => {
   return {
     trayProps: {
-      get: editor => ({foo: 'bar'})
+      get: () => ({foo: 'bar'})
     }
   }
 })
 
-describe('ImageSection', () => {
+describe('ImageSectionc', () => {
   const defaultProps = {
     settings: {},
     editing: false,
@@ -242,15 +243,17 @@ describe('ImageSection', () => {
     })
 
     describe('and an image is clicked', () => {
+      let originalFileReader
       const flushPromises = () => new Promise(setImmediate)
 
       beforeEach(() => {
         fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})
 
+        originalFileReader = FileReader
         Object.defineProperty(global, 'FileReader', {
           writable: true,
           value: jest.fn().mockImplementation(() => ({
-            readAsDataURL: function () {
+            readAsDataURL() {
               this.onloadend()
             },
             result: 'data:image/png;base64,asdfasdfjksdf=='
@@ -263,6 +266,10 @@ describe('ImageSection', () => {
 
       afterEach(() => {
         fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
+        Object.defineProperty(global, 'FileReader', {
+          writable: true,
+          value: originalFileReader
+        })
       })
 
       it('dispatches an action to update parent state image', async () => {
@@ -306,6 +313,62 @@ describe('ImageSection', () => {
 
     it('renders the course images component', async () => {
       await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
+    })
+  })
+
+  describe('when the "Single Color Image" mode is selected', () => {
+    let spyFn, getByTestId, getByText, container
+
+    beforeAll(() => {
+      spyFn = jest.spyOn(svg.art, 'source')
+    })
+
+    beforeEach(() => {
+      const rendered = subject()
+
+      getByTestId = rendered.getByTestId
+      getByText = rendered.getByText
+      container = rendered.container
+
+      fireEvent.click(getByText('Add Image'))
+      fireEvent.click(getByText('Single Color Image'))
+    })
+
+    it('renders the course images component', async () => {
+      await waitFor(() => expect(getByTestId('singlecolor-svg-list')).toBeInTheDocument())
+    })
+
+    describe('user selects an image', () => {
+      beforeEach(async () => {
+        await waitFor(() => {
+          expect(getByTestId('selected-image-preview')).toBeInTheDocument()
+        })
+        fireEvent.click(getByTestId('button-icon-art'))
+      })
+
+      it('sets default icon color', async () => {
+        await waitFor(() => {
+          expect(spyFn).toHaveBeenCalledWith('#111111')
+          expect(getByTestId('selected-image-preview')).toHaveStyle(
+            'backgroundImage: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDQ4MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICAgIDxwYXRoIGQ9Ik0yNDAgMEMxMDcuNTUgMCAwIDEwNy41NSAwIDI0MEMwIDM3Mi41NTEgMTA3LjQ1NCA0ODAgMjQwIDQ4MEMyNDYuNDQ2IDQ4MCAyNTIuODMgNDc5Ljc0OSAyNTkuMTUyIDQ3OS4yNDhDMjg4LjU0NiA0NzYuOTI3IDMxMS4xNTggNDUyLjI3NSAzMTEuMTU4IDQyMi43OTJWMzU5LjgyQzMxMS4xNTggMzQ2LjkxNCAzMTYuMjg0IDMzNC41MzYgMzI1LjQxIDMyNS40MUMzMzQuNTM2IDMxNi4yODQgMzQ2LjkxNCAzMTEuMTU4IDM1OS44MiAzMTEuMTU4SDQyMy4zMTFDNDM3LjM5IDMxMS4xNjUgNDUwLjk1NiAzMDUuODc0IDQ2MS4zMTIgMjk2LjMzNkM0NzEuNjY4IDI4Ni43OTkgNDc4LjA1NiAyNzMuNzE0IDQ3OS4yMDUgMjU5LjY4MkM0NzkuNzM1IDI1My4xOTQgNDgwIDI0Ni42MzMgNDgwIDI0MEM0ODAgMTA3LjQ1NCAzNzIuNTUxIDAgMjQwIDBaTTkyLjYxNDYgMzA5LjAyOEM4NC43MzA2IDMxMC40OTQgNzYuNTg4OSAzMDkuNTg5IDY5LjIxOSAzMDYuNDI4QzYxLjg0OSAzMDMuMjY4IDU1LjU4MTYgMjk3Ljk5MyA1MS4yMDkyIDI5MS4yNzFDNDYuODM2NyAyODQuNTQ4IDQ0LjU1NTUgMjc2LjY4MSA0NC42NTQgMjY4LjY2MkM0NC43NTI0IDI2MC42NDQgNDcuMjI2MSAyNTIuODM0IDUxLjc2MjMgMjQ2LjIyMkM1Ni4yOTg1IDIzOS42MDkgNjIuNjkzNSAyMzQuNDg5IDcwLjEzODggMjMxLjUxMUM3Ny41ODQyIDIyOC41MzIgODUuNzQ1NSAyMjcuODI3IDkzLjU5MTIgMjI5LjQ4NkMxMDEuNDM3IDIzMS4xNDUgMTA4LjYxNCAyMzUuMDkzIDExNC4yMTcgMjQwLjgzMUMxMTkuODE5IDI0Ni41NjkgMTIzLjU5NCAyNTMuODM5IDEyNS4wNjUgMjYxLjcyMkMxMjYuMDQxIDI2Ni45NTkgMTI1Ljk3NyAyNzIuMzM3IDEyNC44NzQgMjc3LjU0OUMxMjMuNzcyIDI4Mi43NjEgMTIxLjY1MyAyODcuNzA0IDExOC42NCAyOTIuMDk3QzExNS42MjYgMjk2LjQ5IDExMS43NzcgMzAwLjI0NyAxMDcuMzExIDMwMy4xNTJDMTAyLjg0NiAzMDYuMDU3IDk3Ljg1MTkgMzA4LjA1MyA5Mi42MTQ2IDMwOS4wMjhaTTEwOS4xODcgMTI4LjAyNkMxMDcuNzE5IDEyMC4xNDIgMTA4LjYyMiAxMTEuOTk5IDExMS43ODIgMTA0LjYyN0MxMTQuOTQzIDk3LjI1NTUgMTIwLjIxOCA5MC45ODY2IDEyNi45NDEgODYuNjEzMkMxMzMuNjY0IDgyLjIzOTggMTQxLjUzMyA3OS45NTgyIDE0OS41NTIgODAuMDU3QzE1Ny41NzIgODAuMTU1OCAxNjUuMzgzIDgyLjYzMDYgMTcxLjk5NiA4Ny4xNjgzQzE3OC42MDkgOTEuNzA2MSAxODMuNzI4IDk4LjEwMyAxODYuNzA2IDEwNS41NUMxODkuNjgzIDExMi45OTcgMTkwLjM4NiAxMjEuMTYgMTg4LjcyNCAxMjkuMDA3QzE4Ny4wNjIgMTM2Ljg1MyAxODMuMTExIDE0NC4wMyAxNzcuMzcgMTQ5LjYzMUMxNzEuNjI5IDE1NS4yMzIgMTY0LjM1NyAxNTkuMDA0IDE1Ni40NzIgMTYwLjQ3MkMxNTEuMjM2IDE2MS40NDYgMTQ1Ljg2IDE2MS4zODEgMTQwLjY1MSAxNjAuMjc4QzEzNS40NDEgMTU5LjE3NSAxMzAuNSAxNTcuMDU2IDEyNi4xMDkgMTU0LjA0M0MxMjEuNzE4IDE1MS4wMyAxMTcuOTYzIDE0Ny4xODIgMTE1LjA2IDE0Mi43MThDMTEyLjE1NiAxMzguMjU0IDExMC4xNjEgMTMzLjI2MiAxMDkuMTg3IDEyOC4wMjZaTTIxNS43NzIgNDMyLjg0OEMyMDUuMjk0IDQzMi44NDggMTk1LjA1MSA0MjkuNzQgMTg2LjMzOCA0MjMuOTE5QzE3Ny42MjUgNDE4LjA5NyAxNzAuODM1IDQwOS44MjMgMTY2LjgyNSA0MDAuMTQyQzE2Mi44MTUgMzkwLjQ2MSAxNjEuNzY2IDM3OS44MDkgMTYzLjgxIDM2OS41MzJDMTY1Ljg1NCAzNTkuMjU0IDE3MC45IDM0OS44MTQgMTc4LjMxIDM0Mi40MDVDMTg1LjcxOSAzMzQuOTk2IDE5NS4xNTkgMzI5Ljk1IDIwNS40MzYgMzI3LjkwNUMyMTUuNzEzIDMyNS44NjEgMjI2LjM2NiAzMjYuOTEgMjM2LjA0NyAzMzAuOTJDMjQ1LjcyOCAzMzQuOTMgMjU0LjAwMiAzNDEuNzIxIDI1OS44MjQgMzUwLjQzM0MyNjUuNjQ1IDM1OS4xNDYgMjY4Ljc1MiAzNjkuMzg5IDI2OC43NTIgMzc5Ljg2OEMyNjguNzUyIDM5My45MTkgMjYzLjE3IDQwNy4zOTQgMjUzLjIzNSA0MTcuMzNDMjQzLjI5OSA0MjcuMjY2IDIyOS44MjMgNDMyLjg0OCAyMTUuNzcyIDQzMi44NDhaTTMxMy4xNjYgMTQ0LjI0NEMzMDUuMjgxIDE0NS43MSAyOTcuMTM4IDE0NC44MDYgMjg5Ljc2OCAxNDEuNjQ1QzI4Mi4zOTcgMTM4LjQ4NCAyNzYuMTI5IDEzMy4yMDkgMjcxLjc1NiAxMjYuNDg2QzI2Ny4zODQgMTE5Ljc2MyAyNjUuMTAzIDExMS44OTQgMjY1LjIwMiAxMDMuODc1QzI2NS4zMDEgOTUuODU1MyAyNjcuNzc2IDg4LjA0NTUgMjcyLjMxNCA4MS40MzI4QzI3Ni44NTIgNzQuODIgMjgzLjI0OCA2OS43MDEzIDI5MC42OTUgNjYuNzIzOEMyOTguMTQyIDYzLjc0NjMgMzA2LjMwNCA2My4wNDM4IDMxNC4xNSA2NC43MDUxQzMyMS45OTYgNjYuMzY2NCAzMjkuMTczIDcwLjMxNjkgMzM0Ljc3NCA3Ni4wNTdDMzQwLjM3NSA4MS43OTcyIDM0NC4xNDggODkuMDY5MiAzNDUuNjE2IDk2Ljk1MzZDMzQ3LjU4MyAxMDcuNTI4IDM0NS4yNyAxMTguNDUgMzM5LjE4NCAxMjcuMzE5QzMzMy4wOTkgMTM2LjE4OCAzMjMuNzQgMTQyLjI3NSAzMTMuMTY2IDE0NC4yNDRaTTQwNS45NiAyNjguNTU2QzM5OC4wNzUgMjcwLjAyNCAzODkuOTMyIDI2OS4xMjEgMzgyLjU2MSAyNjUuOTYxQzM3NS4xODkgMjYyLjgwMSAzNjguOTIgMjU3LjUyNSAzNjQuNTQ3IDI1MC44MDJDMzYwLjE3NCAyNDQuMDc5IDM1Ny44OTIgMjM2LjIxIDM1Ny45OTEgMjI4LjE5MUMzNTguMDkgMjIwLjE3MSAzNjAuNTY0IDIxMi4zNjEgMzY1LjEwMiAyMDUuNzQ3QzM2OS42NCAxOTkuMTM0IDM3Ni4wMzcgMTk0LjAxNSAzODMuNDg0IDE5MS4wMzdDMzkwLjkzMSAxODguMDYgMzk5LjA5NCAxODcuMzU3IDQwNi45NCAxODkuMDE5QzQxNC43ODcgMTkwLjY4MSA0MjEuOTY0IDE5NC42MzIgNDI3LjU2NSAyMDAuMzczQzQzMy4xNjUgMjA2LjExNCA0MzYuOTM4IDIxMy4zODcgNDM4LjQwNSAyMjEuMjcyQzQzOS4zOCAyMjYuNTA3IDQzOS4zMTQgMjMxLjg4MyA0MzguMjExIDIzNy4wOTJDNDM3LjEwOCAyNDIuMzAyIDQzNC45OSAyNDcuMjQzIDQzMS45NzcgMjUxLjYzNEM0MjguOTY0IDI1Ni4wMjUgNDI1LjExNiAyNTkuNzggNDIwLjY1MiAyNjIuNjgzQzQxNi4xODggMjY1LjU4NyA0MTEuMTk2IDI2Ny41ODIgNDA1Ljk2IDI2OC41NTZaIiBmaWxsPSIjMTExMTExIi8+CiAgICA8L3N2Zz4=))'
+          )
+        })
+      })
+
+      it('changes the icon color', async () => {
+        await waitFor(() => {
+          expect(container.querySelector('[name="single-color-image-fill"]')).toBeInTheDocument()
+          fireEvent.change(container.querySelector('[name="single-color-image-fill"]'), {
+            target: {value: '#00FF00'}
+          })
+        })
+        await waitFor(() => {
+          expect(spyFn).toHaveBeenCalledWith('#00FF00')
+          expect(getByTestId('selected-image-preview')).toHaveStyle(
+            'backgroundImage: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDQ4MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICAgIDxwYXRoIGQ9Ik0yNDAgMEMxMDcuNTUgMCAwIDEwNy41NSAwIDI0MEMwIDM3Mi41NTEgMTA3LjQ1NCA0ODAgMjQwIDQ4MEMyNDYuNDQ2IDQ4MCAyNTIuODMgNDc5Ljc0OSAyNTkuMTUyIDQ3OS4yNDhDMjg4LjU0NiA0NzYuOTI3IDMxMS4xNTggNDUyLjI3NSAzMTEuMTU4IDQyMi43OTJWMzU5LjgyQzMxMS4xNTggMzQ2LjkxNCAzMTYuMjg0IDMzNC41MzYgMzI1LjQxIDMyNS40MUMzMzQuNTM2IDMxNi4yODQgMzQ2LjkxNCAzMTEuMTU4IDM1OS44MiAzMTEuMTU4SDQyMy4zMTFDNDM3LjM5IDMxMS4xNjUgNDUwLjk1NiAzMDUuODc0IDQ2MS4zMTIgMjk2LjMzNkM0NzEuNjY4IDI4Ni43OTkgNDc4LjA1NiAyNzMuNzE0IDQ3OS4yMDUgMjU5LjY4MkM0NzkuNzM1IDI1My4xOTQgNDgwIDI0Ni42MzMgNDgwIDI0MEM0ODAgMTA3LjQ1NCAzNzIuNTUxIDAgMjQwIDBaTTkyLjYxNDYgMzA5LjAyOEM4NC43MzA2IDMxMC40OTQgNzYuNTg4OSAzMDkuNTg5IDY5LjIxOSAzMDYuNDI4QzYxLjg0OSAzMDMuMjY4IDU1LjU4MTYgMjk3Ljk5MyA1MS4yMDkyIDI5MS4yNzFDNDYuODM2NyAyODQuNTQ4IDQ0LjU1NTUgMjc2LjY4MSA0NC42NTQgMjY4LjY2MkM0NC43NTI0IDI2MC42NDQgNDcuMjI2MSAyNTIuODM0IDUxLjc2MjMgMjQ2LjIyMkM1Ni4yOTg1IDIzOS42MDkgNjIuNjkzNSAyMzQuNDg5IDcwLjEzODggMjMxLjUxMUM3Ny41ODQyIDIyOC41MzIgODUuNzQ1NSAyMjcuODI3IDkzLjU5MTIgMjI5LjQ4NkMxMDEuNDM3IDIzMS4xNDUgMTA4LjYxNCAyMzUuMDkzIDExNC4yMTcgMjQwLjgzMUMxMTkuODE5IDI0Ni41NjkgMTIzLjU5NCAyNTMuODM5IDEyNS4wNjUgMjYxLjcyMkMxMjYuMDQxIDI2Ni45NTkgMTI1Ljk3NyAyNzIuMzM3IDEyNC44NzQgMjc3LjU0OUMxMjMuNzcyIDI4Mi43NjEgMTIxLjY1MyAyODcuNzA0IDExOC42NCAyOTIuMDk3QzExNS42MjYgMjk2LjQ5IDExMS43NzcgMzAwLjI0NyAxMDcuMzExIDMwMy4xNTJDMTAyLjg0NiAzMDYuMDU3IDk3Ljg1MTkgMzA4LjA1MyA5Mi42MTQ2IDMwOS4wMjhaTTEwOS4xODcgMTI4LjAyNkMxMDcuNzE5IDEyMC4xNDIgMTA4LjYyMiAxMTEuOTk5IDExMS43ODIgMTA0LjYyN0MxMTQuOTQzIDk3LjI1NTUgMTIwLjIxOCA5MC45ODY2IDEyNi45NDEgODYuNjEzMkMxMzMuNjY0IDgyLjIzOTggMTQxLjUzMyA3OS45NTgyIDE0OS41NTIgODAuMDU3QzE1Ny41NzIgODAuMTU1OCAxNjUuMzgzIDgyLjYzMDYgMTcxLjk5NiA4Ny4xNjgzQzE3OC42MDkgOTEuNzA2MSAxODMuNzI4IDk4LjEwMyAxODYuNzA2IDEwNS41NUMxODkuNjgzIDExMi45OTcgMTkwLjM4NiAxMjEuMTYgMTg4LjcyNCAxMjkuMDA3QzE4Ny4wNjIgMTM2Ljg1MyAxODMuMTExIDE0NC4wMyAxNzcuMzcgMTQ5LjYzMUMxNzEuNjI5IDE1NS4yMzIgMTY0LjM1NyAxNTkuMDA0IDE1Ni40NzIgMTYwLjQ3MkMxNTEuMjM2IDE2MS40NDYgMTQ1Ljg2IDE2MS4zODEgMTQwLjY1MSAxNjAuMjc4QzEzNS40NDEgMTU5LjE3NSAxMzAuNSAxNTcuMDU2IDEyNi4xMDkgMTU0LjA0M0MxMjEuNzE4IDE1MS4wMyAxMTcuOTYzIDE0Ny4xODIgMTE1LjA2IDE0Mi43MThDMTEyLjE1NiAxMzguMjU0IDExMC4xNjEgMTMzLjI2MiAxMDkuMTg3IDEyOC4wMjZaTTIxNS43NzIgNDMyLjg0OEMyMDUuMjk0IDQzMi44NDggMTk1LjA1MSA0MjkuNzQgMTg2LjMzOCA0MjMuOTE5QzE3Ny42MjUgNDE4LjA5NyAxNzAuODM1IDQwOS44MjMgMTY2LjgyNSA0MDAuMTQyQzE2Mi44MTUgMzkwLjQ2MSAxNjEuNzY2IDM3OS44MDkgMTYzLjgxIDM2OS41MzJDMTY1Ljg1NCAzNTkuMjU0IDE3MC45IDM0OS44MTQgMTc4LjMxIDM0Mi40MDVDMTg1LjcxOSAzMzQuOTk2IDE5NS4xNTkgMzI5Ljk1IDIwNS40MzYgMzI3LjkwNUMyMTUuNzEzIDMyNS44NjEgMjI2LjM2NiAzMjYuOTEgMjM2LjA0NyAzMzAuOTJDMjQ1LjcyOCAzMzQuOTMgMjU0LjAwMiAzNDEuNzIxIDI1OS44MjQgMzUwLjQzM0MyNjUuNjQ1IDM1OS4xNDYgMjY4Ljc1MiAzNjkuMzg5IDI2OC43NTIgMzc5Ljg2OEMyNjguNzUyIDM5My45MTkgMjYzLjE3IDQwNy4zOTQgMjUzLjIzNSA0MTcuMzNDMjQzLjI5OSA0MjcuMjY2IDIyOS44MjMgNDMyLjg0OCAyMTUuNzcyIDQzMi44NDhaTTMxMy4xNjYgMTQ0LjI0NEMzMDUuMjgxIDE0NS43MSAyOTcuMTM4IDE0NC44MDYgMjg5Ljc2OCAxNDEuNjQ1QzI4Mi4zOTcgMTM4LjQ4NCAyNzYuMTI5IDEzMy4yMDkgMjcxLjc1NiAxMjYuNDg2QzI2Ny4zODQgMTE5Ljc2MyAyNjUuMTAzIDExMS44OTQgMjY1LjIwMiAxMDMuODc1QzI2NS4zMDEgOTUuODU1MyAyNjcuNzc2IDg4LjA0NTUgMjcyLjMxNCA4MS40MzI4QzI3Ni44NTIgNzQuODIgMjgzLjI0OCA2OS43MDEzIDI5MC42OTUgNjYuNzIzOEMyOTguMTQyIDYzLjc0NjMgMzA2LjMwNCA2My4wNDM4IDMxNC4xNSA2NC43MDUxQzMyMS45OTYgNjYuMzY2NCAzMjkuMTczIDcwLjMxNjkgMzM0Ljc3NCA3Ni4wNTdDMzQwLjM3NSA4MS43OTcyIDM0NC4xNDggODkuMDY5MiAzNDUuNjE2IDk2Ljk1MzZDMzQ3LjU4MyAxMDcuNTI4IDM0NS4yNyAxMTguNDUgMzM5LjE4NCAxMjcuMzE5QzMzMy4wOTkgMTM2LjE4OCAzMjMuNzQgMTQyLjI3NSAzMTMuMTY2IDE0NC4yNDRaTTQwNS45NiAyNjguNTU2QzM5OC4wNzUgMjcwLjAyNCAzODkuOTMyIDI2OS4xMjEgMzgyLjU2MSAyNjUuOTYxQzM3NS4xODkgMjYyLjgwMSAzNjguOTIgMjU3LjUyNSAzNjQuNTQ3IDI1MC44MDJDMzYwLjE3NCAyNDQuMDc5IDM1Ny44OTIgMjM2LjIxIDM1Ny45OTEgMjI4LjE5MUMzNTguMDkgMjIwLjE3MSAzNjAuNTY0IDIxMi4zNjEgMzY1LjEwMiAyMDUuNzQ3QzM2OS42NCAxOTkuMTM0IDM3Ni4wMzcgMTk0LjAxNSAzODMuNDg0IDE5MS4wMzdDMzkwLjkzMSAxODguMDYgMzk5LjA5NCAxODcuMzU3IDQwNi45NCAxODkuMDE5QzQxNC43ODcgMTkwLjY4MSA0MjEuOTY0IDE5NC42MzIgNDI3LjU2NSAyMDAuMzczQzQzMy4xNjUgMjA2LjExNCA0MzYuOTM4IDIxMy4zODcgNDM4LjQwNSAyMjEuMjcyQzQzOS4zOCAyMjYuNTA3IDQzOS4zMTQgMjMxLjg4MyA0MzguMjExIDIzNy4wOTJDNDM3LjEwOCAyNDIuMzAyIDQzNC45OSAyNDcuMjQzIDQzMS45NzcgMjUxLjYzNEM0MjguOTY0IDI1Ni4wMjUgNDI1LjExNiAyNTkuNzggNDIwLjY1MiAyNjIuNjgzQzQxNi4xODggMjY1LjU4NyA0MTEuMTk2IDI2Ny41ODIgNDA1Ljk2IDI2OC41NTZaIiBmaWxsPSIjMDBGRjAwIi8+CiAgICA8L3N2Zz4=)'
+          )
+        })
+      })
     })
   })
 

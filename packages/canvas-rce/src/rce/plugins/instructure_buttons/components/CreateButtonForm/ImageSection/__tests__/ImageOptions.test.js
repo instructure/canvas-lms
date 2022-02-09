@@ -19,6 +19,7 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import {ImageOptions} from '../ImageOptions'
+import {actions} from '../../../../reducers/imageSection'
 
 describe('ImageOptions', () => {
   const dispatchFn = jest.fn()
@@ -27,6 +28,7 @@ describe('ImageOptions', () => {
       image: null,
       imageName: null,
       mode: null,
+      collectionOpen: false,
       loading: false
     },
     dispatch: dispatchFn
@@ -62,6 +64,7 @@ describe('ImageOptions', () => {
           image: 'data:image/png;base64,asdfasdfjksdf==',
           imageName: 'banana.jpg',
           mode: 'Course',
+          collectionOpen: false,
           loading: false
         }
       })
@@ -94,6 +97,7 @@ describe('ImageOptions', () => {
               image: 'data:image/png;base64,asdfasdfjksdf==',
               imageName: 'banana.jpg',
               mode: 'Upload',
+              collectionOpen: false,
               loading: false
             }}
           />
@@ -116,8 +120,7 @@ describe('ImageOptions', () => {
       it('executes dispatch callback', () => {
         fireEvent.click(getByText(/clear image/i))
 
-        expect(dispatchFn).toHaveBeenCalledWith({type: 'ClearImage'})
-        expect(dispatchFn).toHaveBeenCalledWith({type: 'ClearMode'})
+        expect(dispatchFn).toHaveBeenCalledWith(actions.RESET_ALL)
       })
     })
   })

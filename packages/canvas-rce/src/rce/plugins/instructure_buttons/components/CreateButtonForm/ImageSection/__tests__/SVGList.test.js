@@ -55,8 +55,8 @@ describe('SVGList', () => {
     afterEach(() => jest.clearAllMocks())
 
     it('calls the "onSelect" handler with the selected icon', () => {
-      const {getByTitle} = subject()
-      fireEvent.click(getByTitle('Art Icon'))
+      const {getByTestId} = subject()
+      fireEvent.click(getByTestId('button-icon-art'))
       expect(onSelect).toHaveBeenCalledWith(
         expect.objectContaining({
           label: 'Art Icon'

@@ -25,21 +25,18 @@ import {View} from '@instructure/ui-view'
 
 import SVGThumbnail from './SVGThumbnail'
 import MultiColorSVG from './MultiColor/svg'
-import {IconAnalyticsLine} from '@instructure/ui-icons'
+import SingleColorSVG from './SingleColor/svg'
 
 export const TYPE = {
+  Singlecolor: 'singlecolor',
   Multicolor: 'multicolor'
 }
 
 export function svgSourceFor(type) {
-  return type === TYPE.Multicolor
-    ? MultiColorSVG
-    : {
-        /* TODO: support single-color icons */
-      }
+  return type === TYPE.Multicolor ? MultiColorSVG : SingleColorSVG
 }
 
-const SVGList = ({type, onSelect}) => {
+const SVGList = ({type, onSelect, fillColor}) => {
   const svgSourceList = svgSourceFor(type)
 
   return (
@@ -54,6 +51,7 @@ const SVGList = ({type, onSelect}) => {
       {Object.keys(svgSourceList).map(iconName => (
         <Flex.Item key={iconName} as="div" margin="xx-small xx-small small xx-small" size="4rem">
           <Link
+            data-testid={`button-icon-${iconName}`}
             draggable={false}
             onClick={() => onSelect(svgSourceList[iconName])}
             title={svgSourceList[iconName].label}
@@ -65,7 +63,7 @@ const SVGList = ({type, onSelect}) => {
               overflowX="hidden"
               overflowY="hidden"
             >
-              <SVGThumbnail name={iconName} source={svgSourceList} />
+              <SVGThumbnail name={iconName} source={svgSourceList} fillColor={fillColor} />
             </View>
           </Link>
         </Flex.Item>
@@ -75,8 +73,13 @@ const SVGList = ({type, onSelect}) => {
 }
 
 SVGList.propTypes = {
+  fillColor: PropTypes.string,
   type: PropTypes.oneOf(Object.values(TYPE)).isRequired,
   onSelect: PropTypes.func.isRequired
+}
+
+SVGList.defaultProps = {
+  fillColor: '#000000'
 }
 
 export default SVGList

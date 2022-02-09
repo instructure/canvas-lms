@@ -17,29 +17,35 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import SVGList, {TYPE} from '../SVGList'
 import {actions} from '../../../../reducers/imageSection'
 
-import {convertFileToBase64} from '../../../../svg/utils'
-
-const MultiColor = ({dispatch}) => {
+const SingleColor = ({data, dispatch}) => {
+  const {iconFillColor} = data
   const onSelect = svg => {
-    dispatch({...actions.START_LOADING})
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
-
-    convertFileToBase64(
-      new Blob([svg.source()], {
-        type: 'image/svg+xml'
-      })
-    ).then(base64Image => {
-      dispatch({...actions.SET_IMAGE, payload: base64Image})
-      dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
-      dispatch({...actions.STOP_LOADING})
-    })
+    dispatch({...actions.SET_ICON, payload: svg})
+    dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
   }
 
-  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} />
+  return <SVGList type={TYPE.Singlecolor} onSelect={onSelect} fillColor={iconFillColor} />
 }
 
-export default MultiColor
+SingleColor.propTypes = {
+  dispatch: PropTypes.func,
+  data: PropTypes.shape({
+    fillColor: PropTypes.string.isRequired
+  })
+}
+
+SingleColor.propTypes = {
+  dispatch: () => {},
+  data: {
+    // Black color in color selector component
+    fillColor: '#111111'
+  }
+}
+
+export default SingleColor

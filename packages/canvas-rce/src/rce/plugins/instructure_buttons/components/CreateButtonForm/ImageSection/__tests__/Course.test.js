@@ -21,6 +21,7 @@ import fetchMock from 'fetch-mock'
 
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import Course from '../Course'
+import {actions} from '../../../../reducers/imageSection'
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
@@ -156,8 +157,13 @@ describe('Course()', () => {
       })
     })
 
-    it('dispatches a "clear mode" action', async () => {
-      await waitFor(() => expect(props.dispatch).toHaveBeenCalledWith({type: 'ClearMode'}))
+    it('dispatches a "set image collection open" action', async () => {
+      await waitFor(() =>
+        expect(props.dispatch).toHaveBeenCalledWith({
+          ...actions.SET_IMAGE_COLLECTION_OPEN,
+          payload: false
+        })
+      )
     })
   })
 })

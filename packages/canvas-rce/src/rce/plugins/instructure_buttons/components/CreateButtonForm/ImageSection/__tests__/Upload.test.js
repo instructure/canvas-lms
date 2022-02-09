@@ -94,7 +94,12 @@ describe('Upload()', () => {
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_NAME, payload: theFile.name})
     })
 
-    it('closes the modal', () => {
+    it('closes the collection', () => {
+      subject()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
+    })
+
+    it('clears the mode', () => {
       subject()
       expect(dispatch).toHaveBeenCalledWith(actions.CLEAR_MODE)
     })
