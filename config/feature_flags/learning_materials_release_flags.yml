@@ -23,3 +23,10 @@ buttons_and_icons_root_account:
   display_name: RCE Buttons & Icons
   description: |-
     Manage a library of custom buttons and icons from the RCE.
+buttons_and_icons_cropper:
+  state: hidden
+  display_name: Cropper & Associated Features in Buttons & Icons
+  description: |-
+    When enabled, turns on the Button & Icons image cropper, course images
+    source, and upload image source.
+  applies_to: SiteAdmin
