@@ -25,4 +25,18 @@ describe "sentry" do
       Sentry.set_context("exta", { key1: "value1" })
     end.not_to raise_error
   end
+
+  context "on Canvas reload" do
+    before do
+      Sentry.configuration.sample_rate = 1.0
+    end
+
+    it "sets the new errors sample rate" do
+      Setting.set("sentry_backend_errors_sample_rate", "0.5")
+
+      expect(Sentry.configuration.sample_rate).to eq(1.0)
+      Canvas::Reloader.reload!
+      expect(Sentry.configuration.sample_rate).to eq(0.5)
+    end
+  end
 end

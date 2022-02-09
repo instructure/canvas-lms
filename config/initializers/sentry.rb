@@ -24,13 +24,14 @@
 # so that every time an exception is reported, we can fire off a sentry
 # call to track it and aggregate it for us.
 
-settings = {}
-
-unless Rails.env.test? || SentryExtensions::Settings.disabled?
-  settings = SentryExtensions::Settings.settings
-end
+settings = Rails.env.test? ? {} : SentryExtensions::Settings.settings
 
 Sentry.init do |config|
+  config.dsn = settings[:dsn]
+  config.environment = Canvas.environment
+  config.release = Canvas.revision
+  config.sample_rate = SentryExtensions::Settings.get("sentry_backend_errors_sample_rate", "1.0").to_f
+
   config.traces_sampler = lambda do |_|
     SentryExtensions::Settings.get("sentry_backend_traces_sample_rate", "0.0").to_f
   end
@@ -40,10 +41,6 @@ Sentry.init do |config|
     Sentry::Rails::Tracing::ActiveStorageSubscriber,
     SentryExtensions::Tracing::ActiveRecordSubscriber # overridden from the Sentry-provided one
   ]
-
-  config.dsn = settings[:dsn]
-  config.environment = Canvas.environment
-  config.release = Canvas.revision
 
   # sentry_logger would be nice here (it records log messages), but it currently includes raw SQL logs
   config.breadcrumbs_logger = [:http_logger] if Canvas::Plugin.value_to_boolean(SentryExtensions::Settings.get("sentry_backend_breadcrumbs_enabled", "false"))
@@ -72,6 +69,10 @@ end
 Sentry.set_tags(settings.fetch(:tags, {}))
 
 Rails.configuration.to_prepare do
+  Canvas::Reloader.on_reload do
+    Sentry.configuration&.sample_rate = SentryExtensions::Settings.get("sentry_backend_errors_sample_rate", "1.0").to_f
+  end
+
   SentryExtensions::Settings.get("ignorable_errors", "").split(",").each do |error|
     SentryProxy.register_ignorable_error(error)
   end
