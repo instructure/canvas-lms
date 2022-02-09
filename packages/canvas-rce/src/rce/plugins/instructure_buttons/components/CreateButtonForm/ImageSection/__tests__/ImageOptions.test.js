@@ -124,6 +124,8 @@ describe('ImageOptions', () => {
 
   describe('when the "Upload Image" mode is selected', () => {
     beforeEach(() => {
+      ENV.FEATURES.buttons_and_icons_cropper = true
+
       const component = subject()
 
       fireEvent.click(component.getByText('Add Image'))
@@ -137,6 +139,8 @@ describe('ImageOptions', () => {
 
   describe('when the "Course Images" mode is selected', () => {
     beforeEach(() => {
+      ENV.FEATURES.buttons_and_icons_cropper = true
+
       const component = subject()
 
       fireEvent.click(component.getByText('Add Image'))

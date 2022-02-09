@@ -113,10 +113,52 @@ describe('ImageSection', () => {
 
   afterEach(() => jest.clearAllMocks())
 
+  it('renders the image mode selector', () => {
+    const {getByText} = subject()
+    expect(getByText('Add Image')).toBeInTheDocument()
+  })
+
+  it('renders the image preview', () => {
+    const {getByTestId} = subject()
+    expect(getByTestId('selected-image-preview')).toBeInTheDocument()
+  })
+
+  describe('when the cropper FF is off', () => {
+    let rendered
+
+    beforeEach(() => {
+      ENV.FEATURES.buttons_and_icons_cropper = false
+
+      fetchMock.mock('/api/session', '{}')
+
+      rendered = subject({editor: new FakeEditor()})
+      fireEvent.click(rendered.getByText('Add Image'))
+    })
+
+    afterEach(() => fetchMock.restore())
+
+    it('does not render the "Upload Image" button', () => {
+      expect(rendered.queryByText('Upload Image')).not.toBeInTheDocument()
+    })
+
+    it('does not render the "Course Images" button', () => {
+      expect(rendered.queryByText('Course Images')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when no image is selected', () => {
+    it('renders a "None Selected" message', () => {
+      const {getByText} = subject()
+      expect(getByText('None Selected')).toBeInTheDocument()
+    })
+  })
+
   describe('when the "upload image" mode is selected', () => {
     let rendered
 
     beforeEach(() => {
+      ENV.FEATURES.buttons_and_icons_cropper = true
+
       fetchMock.mock('/api/session', '{}')
 
       rendered = subject({editor: new FakeEditor()})
@@ -149,6 +191,8 @@ describe('ImageSection', () => {
     let getByTestId, getByText, getByTitle
 
     beforeEach(() => {
+      ENV.FEATURES.buttons_and_icons_cropper = true
+
       const rendered = subject()
 
       getByTestId = rendered.getByTestId
