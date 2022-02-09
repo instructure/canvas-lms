@@ -41,7 +41,7 @@ ready(() => {
         selectedContextCodes={ENV.SELECTED_CONTEXT_CODES}
         selectedContextsLimit={ENV.SELECTED_CONTEXTS_LIMIT}
         parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
-        observerList={ENV.OBSERVER_LIST}
+        observedUsersList={ENV.OBSERVED_USERS_LIST}
         canAddObservee={ENV.CAN_ADD_OBSERVEE}
         openTodosInNewTab={ENV.OPEN_TEACHER_TODOS_IN_NEW_TAB}
       />,

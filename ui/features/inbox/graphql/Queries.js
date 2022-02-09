@@ -23,30 +23,45 @@ import {ConversationParticipant} from './ConversationParticipant'
 import {Enrollment} from './Enrollment'
 import {Course} from './Course'
 import {Group} from './Group'
+import {SubmissionComment} from './SubmissionComment'
+import {PageInfo} from './PageInfo'
 
 export const ADDRESS_BOOK_RECIPIENTS = gql`
-  query GetAddressBookRecipients($userID: ID!, $context: String, $search: String) {
+  query GetAddressBookRecipients(
+    $userID: ID!
+    $context: String
+    $search: String
+    $afterUser: String
+    $afterContext: String
+  ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         id
         recipients(context: $context, search: $search) {
-          contextsConnection(first: 20) {
+          contextsConnection(first: 20, after: $afterContext) {
             nodes {
               id
               name
             }
+            pageInfo {
+              ...PageInfo
+            }
           }
-          usersConnection(first: 20) {
+          usersConnection(first: 20, after: $afterUser) {
             nodes {
               _id
               id
               name
+            }
+            pageInfo {
+              ...PageInfo
             }
           }
         }
       }
     }
   }
+  ${PageInfo.fragment}
 `
 
 export const CONVERSATIONS_QUERY = gql`
@@ -89,6 +104,7 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
             ...ConversationMessage
           }
         }
+        contextName
       }
     }
   }
@@ -143,4 +159,20 @@ export const REPLY_CONVERSATION_QUERY = gql`
     }
   }
   ${ConversationMessage.fragment}
+`
+export const SUBMISSION_COMMENTS_QUERY = gql`
+  query SubmissionCommentsQuery($userID: ID!) {
+    legacyNote(_id: $userID, type: User) {
+      ... on User {
+        _id
+        id
+        submissionCommentsConnection {
+          nodes {
+            ...SubmissionComment
+          }
+        }
+      }
+    }
+  }
+  ${SubmissionComment.fragment}
 `

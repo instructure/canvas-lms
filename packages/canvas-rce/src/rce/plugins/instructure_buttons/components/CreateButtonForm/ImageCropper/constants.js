@@ -21,3 +21,14 @@ export const PREVIEW_WIDTH = 942
 export const PREVIEW_HEIGHT = 350
 export const SHAPE_CONTAINER_LENGTH = 350
 export const GLUE_WIDTH = 296
+export const MIN_SCALE_RATIO = 1.0
+export const MAX_SCALE_RATIO = 2.0
+export const BUTTON_SCALE_STEP = 0.1
+export const WHEEL_SCALE_STEP = 0.005
+export const WHEEL_EVENT_DELAY = 100
+
+export const DEFAULT_CROPPER_SETTINGS = {
+  image: null,
+  shape: 'square',
+  scaleRatio: MIN_SCALE_RATIO
+}

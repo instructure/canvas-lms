@@ -176,17 +176,22 @@ export default class GradebookHeaderMenu {
     return dialog.show()
   }
 
+  // TODO(EVAL): This needs to be implemented in EVAL-2064.
+  handleSendMessageStudentsWho = () => {}
+
   messageStudentsWho(
     opts = {
       assignment: this.assignment,
       students: this.gradebook.studentsThatCanSeeAssignment(
         this.gradebook.students,
         this.assignment
-      )
+      ),
+      onSend: this.handleSendMessageStudentsWho
     }
   ) {
     let {students} = opts
     const {assignment} = opts
+    const {onSend} = opts
     students = _.filter(students, student => {
       return !student.is_inactive
     })
@@ -211,6 +216,7 @@ export default class GradebookHeaderMenu {
         onClose: () => {
           ReactDOM.unmountComponentAtNode(mountPoint)
         },
+        onSend,
         students
       })
       ReactDOM.render(dialog, mountPoint)

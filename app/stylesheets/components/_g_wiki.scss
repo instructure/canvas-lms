@@ -357,8 +357,7 @@ $revision-button-color: $ic-color-dark;
           overflow-x: auto;
 
           iframe.lti-embed {
-            // Min size to let the video/audio player show the audio slider
-            min-width: 375px;
+            min-width: 320px;
           }
         }
       }

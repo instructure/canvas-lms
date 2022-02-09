@@ -32,7 +32,7 @@ const PreviewIcon = ({color, testId, variant, image, loading}) => {
     if (!!image) {
       return {
         backgroundImage: `url(${image})`,
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
         borderRadius: '8px'

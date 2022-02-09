@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 
 // this is a patch so you can set the "method" atribute on rails' REST-ful forms.
 $.attrHooks.method = $.extend($.attrHooks.method, {
@@ -37,7 +37,7 @@ $.attrHooks.method = $.extend($.attrHooks.method, {
 })
 
 $.fn.originalScrollTop = $.fn.scrollTop
-$.fn.scrollTop = function() {
+$.fn.scrollTop = function () {
   if (this.selector == 'html,body' && arguments.length === 0) {
     console.error(
       "$('html,body').scrollTop() is not cross-browser compatible... use $.windowScrollTop() instead"
@@ -52,7 +52,7 @@ $.fn.scrollTop = function() {
 //
 // see https://drafts.csswg.org/cssom-view/#dom-element-scrolltop for morbid
 // details of how the scrollTop attribute is calculated.
-$.windowScrollTop = function() {
+$.windowScrollTop = function () {
   // $.browser.safari is true for chrome.
   // with chrome 61, we want the documentElement.scrollTop, so the
   // original code (now the else block) always returns 0.
@@ -83,7 +83,7 @@ $.ajaxPrefilter('json', (options, originalOptions, jqXHR) => {
 })
 
 // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
-const CSRFProtection = function(xhr) {
+const CSRFProtection = function (xhr) {
   const csrfToken = getCookie('_csrf_token')
   if (csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken)
 }

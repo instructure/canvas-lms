@@ -725,6 +725,9 @@ class SubmissionsApiController < ApplicationController
   # @argument include[visibility] [String]
   #   Whether this assignment is visible to the owner of the submission
   #
+  # @argument prefer_points_over_scheme [Boolean]
+  #   Treat posted_grade as points if the value matches a grading scheme value
+  #
   # @argument submission[posted_grade] [String]
   #   Assign a score to the submission, updating both the "score" and "grade"
   #   fields on the submission record. This parameter can be passed in a few
@@ -841,6 +844,7 @@ class SubmissionsApiController < ApplicationController
           submission[:submission_type] = params[:submission][:submission_type]
           submission[:url] = params[:submission][:url]
         end
+        submission[:prefer_points_over_scheme] = value_to_boolean(params[:prefer_points_over_scheme])
       end
 
       if submission[:grade] || submission[:excuse]

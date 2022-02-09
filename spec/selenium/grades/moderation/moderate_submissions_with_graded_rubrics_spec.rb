@@ -77,9 +77,9 @@ describe "Moderated Marking" do
 
       user_session(teacher)
       ModeratePage.visit(course.id, assignment.id)
-      ModeratePage.select_provisional_grade_for_student_by_position(student, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(student, 0)
       ModeratePage.click_release_grades_button
-      driver.switch_to.alert.accept
+      accept_alert
       expect_instui_flash_message "Grades were successfully released to the gradebook"
       wait_for_ajax_requests
     end
