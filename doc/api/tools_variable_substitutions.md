@@ -163,54 +163,54 @@ particular placement:
 ## ResourceLink.id
 LTI - Custom parameter substitution: ResourceLink.id
 Returns the LTI value for the resource_link.id property
-Returns an empty string otherwise.
+Returns "$ResourceLink.id" otherwise.
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 **Launch Parameter**: *resourcelink_id*  
 
 
 ## ResourceLink.description
 LTI - Custom parameter substitution: ResourceLink.description
-Returns resource_link.description property
-Returns an empty string otherwise.
+Returns the LTI value for the resource_link.description property
+Returns "$ResourceLink.description" otherwise.
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 **Launch Parameter**: *resourcelink_description*  
 
 
 ## ResourceLink.title
 LTI - Custom parameter substitution: ResourceLink.title
-Returns resource_link.title property
-Returns an empty string otherwise.
+Returns the LTI value for the resource_link.title property
+Returns "$ResourceLink.title" otherwise.
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 **Launch Parameter**: *resourcelink_title*  
 
 
 ## ResourceLink.available.startDateTime
 LTI - Custom parameter substitution: ResourceLink.available.startDateTime
-Returns the ISO 8601 date and time when this resource is available for learners to access.
-Returns an empty string otherwise.
+Returns the ISO 8601 date and time when this resource is available for learners to access
+Returns "$ResourceLink.available.startDateTime" otherwise.
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 **Launch Parameter**: *resourcelink_available_startdatetime*  
 
 
 ## ResourceLink.available.endDateTime
 LTI - Custom parameter substitution: ResourceLink.available.endDateTime
-Returns the ISO 8601 date and time when this resource ceases to be available for learners to access.
-Returns an empty string otherwise.
+Returns the ISO 8601 date and time when this resource ceases to be available for learners to access
+Returns "$ResourceLink.available.endDateTime" otherwise.
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 **Launch Parameter**: *resourcelink_available_enddatetime*  
 
 
 ## ResourceLink.submission.endDateTime
 LTI - Custom parameter substitution: ResourceLink.submission.endDateTime
 Returns the ISO 8601 date and time when this resource stops accepting submissions.
-Returns an empty string otherwise.
+Returns "$ResourceLink.submission.endDateTime" otherwise.
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 **Launch Parameter**: *resourcelink_submission_enddatetime*  
 
 
