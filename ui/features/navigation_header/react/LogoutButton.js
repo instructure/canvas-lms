@@ -19,7 +19,7 @@
 import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!LogoutButton'
-import getCookie from '@instructure/get-cookie'
+import getCookie from 'get-cookie'
 
 export default function LogoutButton(props) {
   return (

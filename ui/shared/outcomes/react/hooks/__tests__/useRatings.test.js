@@ -68,7 +68,7 @@ describe('useRatings', () => {
       'Mastery',
       'Near Mastery',
       'Below Mastery',
-      'No Evidence'
+      'Well Below Mastery'
     ])
     expectPoints(result, [4, 3, 2, 1, 0])
     expect(result.current.masteryPoints.value).toEqual(initialMasteryPoints)
@@ -86,7 +86,7 @@ describe('useRatings', () => {
         'New Mastery',
         'Near Mastery',
         'Below Mastery',
-        'No Evidence'
+        'Well Below Mastery'
       ])
 
       expectPoints(result, [5, 4, 2, 1, 0])

@@ -97,24 +97,16 @@ class Header extends Component {
     const message = I18n.t(
       'Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.'
     )
-
-    // This is stupid, but Chrome has an issue whereby confirm alerts sometimes just
-    // cancel themselves in certain cases.
-    // See https://stackoverflow.com/questions/51250430/chrome-dismisses-confirm-promps-immediately-without-any-user-interaction
-    setTimeout(() => {
-      if (window.confirm(message)) this.props.releaseGrades()
-    }, 100)
+    if (window.confirm(message)) {
+      this.props.releaseGrades()
+    }
   }
 
   handleUnmuteClick = () => {
     const message = I18n.t('Are you sure you want to post grades for this assignment to students?')
-
-    // This is stupid, but Chrome has an issue whereby confirm alerts sometimes just
-    // cancel themselves in certain cases.
-    // See https://stackoverflow.com/questions/51250430/chrome-dismisses-confirm-promps-immediately-without-any-user-interaction
-    setTimeout(() => {
-      if (window.confirm(message)) this.props.unmuteAssignment()
-    }, 100)
+    if (window.confirm(message)) {
+      this.props.unmuteAssignment()
+    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {

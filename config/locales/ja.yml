@@ -525,7 +525,7 @@ ja:
     report_header_id: ID
     report_header_integration_id: integration_id
     report_header_last_access_at: 最終アクセス日時
-    report_header_last_activity_at: 直近活動日
+    report_header_last_activity_at: 最終アクティビティ
     report_header_last_ip: "前回の IP"
     report_header_last_name: last_name
     report_header_learning_outcome_id: "学習成果 ID"
@@ -2239,7 +2239,7 @@ ja:
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "%{groupTitle}からのすべての成果が、正常に%{targetGroupTitle}に追加されました。"
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "%{groupTitle}からのすべての成果がこのアカウントに追加されました。"
   all_quiz_submissions_report_72a6d2fa: すべてのクイズ提出レポート
-  all_roles_f3bba14d: すべてのロール
+  all_roles_f3bba14d: すべての役割
   all_rubrics_5114c466: すべての注釈
   all_scopename_scopes_6c220783: "すべての%{scopeName}範囲"
   all_sections_daf11554: すべてのセクション
@@ -4789,7 +4789,7 @@ ja:
   belarusian_b2f19c76: ベラルーシ語
   belgium_32_e5f5b598: "ベルギー (+32)"
   belgium_ef8739b6: ベルギー
-  below_mastery_abd1dca5: 熟達していない
+  below_mastery_abd1dca5: 熟達スコア未満
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "この検索フィールドの下には、%{content_type} のリストがあります。入力すると、入力内容に応じてリストがフィルタリングされます。会話メッセージは、選択した任意のオプションでフィルタリングされます。"
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: "べータ LTI 起動:"
@@ -6148,7 +6148,7 @@ ja:
   common_timezones_2b00baba: 共通のタイムゾーン
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: コースの目的を伝える
-  communicate_grading_expectations_484a1f01: 評定の予測を伝える
+  communicate_grading_expectations_484a1f01: 採点の期待を伝える
   communicate_to_your_students_exactly_what_will_be__57a679c5: "受講者に、コース全体を通して正確に何が必要なのかを時系列で伝えます。   作成した課題とイベントに基づいて、ビルトインシラバスを生成します。"
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
       受講者に、コース全体を通して正確に何が必要なのかを時
@@ -8318,7 +8318,7 @@ ja:
         re_send_invitations: 再送信
         re_sending_invitations: 再送信中...
       role_select: 
-        all_roles: すべてのロール
+        all_roles: すべての役割
       roster_tabs: 
         everyone_tab: 全員
         groups: グループ
@@ -8334,14 +8334,14 @@ ja:
         pending_acceptance_of_invitation: 保留
       roster_users: 
         canvas_user_id: "Canvas ユーザ ID"
-        last_activity: 直近活動日
+        last_activity: 最終アクティビティ
         login_name: "ログイン ID"
         login_name_or_sis_id: "ログイン/SIS ID"
         name: 名前
         no_people_found: メンバーが見つかりません
         role: 役割
         section: セクション
-        total_activity: 全活動時間
+        total_activity: 全アクティビティ
         you_can_search_by: "次の条件で検索:"
       section: 
         remove_user_from_course_section: "%{name} からユーザを削除"
@@ -11073,7 +11073,7 @@ ja:
   example_item_scores_6726c689: アイテムのスコアの例
   example_school_of_rock_41f32c31: 例：「ロックスクール」
   exceeds_expectations_5910fc3a: 期待値を超えている
-  exceeds_mastery_1f995dce: 十分熟達している
+  exceeds_mastery_1f995dce: 熟達を上回る
   excelsior_student_activity_tracking_7a1ba44d: 優秀な受講生アクティビティの追跡
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: 指定した日付以降、更新されていないデータを除外することができます。
   excuse_this_assignment_for_the_selected_student_af04e132: 選ばれた受講生に、この課題を免除する
@@ -11640,7 +11640,7 @@ ja:
   final_grade_finalgrade_408580bb: "最終的な成績：*%{finalGrade}*"
   final_grade_info_2aa35d25: 最終成績についての情報
   final_grade_override_be8a21cd: 最終的な成績オーバーライド
-  final_grade_override_in_gradebook_history_767147c: 評定表の履歴での最終成績の上書き
+  final_grade_override_in_gradebook_history_767147c: 成績表の履歴での最終成績の上書き
   final_grade_score_fe69a301: "最終的な成績: %{score}"
   final_grade_with_teacher_notes_33c8de7c: 最終評価と教師のメモ
   final_grader_1693103c: 最終採点者　
@@ -12230,8 +12230,8 @@ ja:
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: 成績表エクスポート並べ替え順のバグ修正（Tally-219）
   gradebook_export_started_723461b9: グレードブックエクスポート開始済み
   gradebook_filters_fc25f772: 成績表フィルター
-  gradebook_history_a3e8e0b4: 評定表の履歴
-  gradebook_history_b03f8524: 評定表の履歴...
+  gradebook_history_a3e8e0b4: 成績表の履歴
+  gradebook_history_b03f8524: 成績表の履歴...
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: 成績表インポート予約名のバグ修正（APG-122）
   gradebook_individual_view_8846598e: 成績ブック...個別ビュー
   gradebook_performance_764d8b3d: 成績表の成績
@@ -13496,7 +13496,7 @@ ja:
   hide_name_details_23814c37: "%{name}詳細を非表示にする"
   hide_navigation_menu_f0b3e90: ナビゲーションメニューを非表示にする
   hide_notes_column_7749f408: メモ列を非表示
-  hide_outcomes_with_no_results_7e4ce06f: 評定のないアウトカムを非表示にする
+  hide_outcomes_with_no_results_7e4ce06f: 結果のない結果を非表示にする
   hide_params_eadf0961: パラメータを非表示にする
   hide_projections_9d4ed1e1: プロジェクションを非表示にする
   hide_score_total_for_assessment_results_d0ef117f: アセスメント結果の合計スコアを非表示
@@ -13542,8 +13542,8 @@ ja:
   hours_late_989e9081: 遅延時間数
   hover_over_me_496521b9: 私にカーソルを移動します
   how_do_i_add_a_module_65f5bf13: モジュールはどのように追加すればよいですか？
-  how_do_i_add_a_rubric_in_a_course_a4c7a40: コースにルーブリックを追加するにはどうすればよいですか？
-  how_do_i_add_a_rubric_to_an_assignment_46fd097e: 課題にルーブリックを追加するにはどうすればよいですか？
+  how_do_i_add_a_rubric_in_a_course_a4c7a40: コースに規定を追加するにはどうすればよいですか？
+  how_do_i_add_a_rubric_to_an_assignment_46fd097e: 課題に規定を追加するにはどうすればよいですか？
   how_do_i_add_an_announcement_in_a_course_63396bb7: コースにお知らせを追加するにはどうすればよいですか？
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: ダッシュボードでコースカードに画像を追加するにはどうすればよいですか？
   how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: モジュールの項目として課題タイプ、ページ、およびファイルを追加するにはどうすればよいですか？
@@ -13551,7 +13551,7 @@ ja:
   how_do_i_add_users_to_a_course_4a88efaf: コースにユーザーを追加するにはどうすればよいですか？
   how_do_i_add_zoom_to_a_course_31300d74: "コースに Zoom を追加するにはどうすればよいですか？"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: コースインポートでイベントと締切日を調整するにはどうすればよいですか？
-  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: コースのルーブリックにアウトカムを合わせるにはどうすればよいですか？
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: コースの規定に結果を合わせるにはどうすればよいですか？
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: コースにファイルを一括でアップロードするにはどうすればよいですか？
   how_do_i_change_a_course_name_and_course_code_23b41292: コース名とコースコードはどのように変更するのですか？
   how_do_i_change_the_course_home_page_326cee50: コースのホームページを変更するにはどうすればよいですか？
@@ -13566,8 +13566,8 @@ ja:
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: 個別の質問でクイズを作成するにはどうすればよいですか？
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: 新しいクイズを使用したアセスメントを作成するにはどうすればよいですか？
   how_do_i_create_an_assignment_35532b59: 課題はどのように作成すればよいですか？
-  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: コースのアウトカムを作成するにはどうすればよいですか？
-  how_do_i_create_outcome_groups_for_a_course_362429a0: コースのアウトカムグループを作成するにはどうすればよいですか？
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: コースの結果を作成するにはどうすればよいですか？
+  how_do_i_create_outcome_groups_for_a_course_362429a0: コースの結果グループを作成するにはどうすればよいですか？
   how_do_i_download_the_student_app_4a4b8a63: 受講生アプリはどのようにダウンロードするのですか？
   how_do_i_download_the_student_app_and_get_addition_3604c207: 受講生アプリをダウンロードして、追加のサポートを得るにはどうすればよいですか？
   how_do_i_edit_an_announcement_in_a_course_815c3c60: コースのお知らせを編集するにはどうすればよいですか？
@@ -13575,11 +13575,11 @@ ja:
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: 成績表には成績をどのように入力して編集するのですか？
   how_do_i_find_my_courses_b826e4ce: コースはどのように見つけるのですか？
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Canvas コースのエクスポートパッケージはどのようにインポートすればよいですか？"
-  how_do_i_import_outcomes_for_a_course_8eced1a: コースのアウトカムをインポートするにはどうすればよいですか？
+  how_do_i_import_outcomes_for_a_course_8eced1a: コースの結果をインポートするにはどうすればよいですか？
   how_do_i_invite_others_to_join_a_meeting_d09bfd6c: 他の人を会議に招待するには？
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: 受講生が会議に参加したかを確認するにはどうすればよいですか？
   how_do_i_manage_and_share_the_recording_52fc2993: 録音を管理および共有するにはどうすればよいですか？
-  how_do_i_manage_rubrics_in_a_course_a5441fb7: コースでルーブリックを管理するにはどうすればよいですか？
+  how_do_i_manage_rubrics_in_a_course_a5441fb7: コースで規定を管理するにはどうすればよいですか？
   how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: 新しいクイズでは、アセスメントの設定をどのように管理するのですか？
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: ファイルを講師として移動および分類するにはどうすればよいですか？
   how_do_i_move_or_reorder_a_module_e64a4baa: モジュールは、どのように移動、または順番変更すればよいですか？
@@ -13610,8 +13610,8 @@ ja:
   how_do_i_use_the_collaborations_index_page_68ee88b5: コラボレーションインデックスページはどのように使用すればよいですか？
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: 講師として、コースのホームページはどのように使用すればよいですか？
   how_do_i_use_the_gradebook_622395dc: 成績表はどのように使用すればよいですか？
-  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: 学習達成度表を使用して、評定からコースのアウトカム結果を表示するにはどうすればよいですか？
-  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: コースでアウトカムページを使用するにはどうすればよいですか？
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: 学習習熟成績表を使用して、成績表からコースの結果結果を表示するにはどうすればよいですか？
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: コースで結果ページを使用するにはどうすればよいですか？
   how_do_i_use_the_pages_index_page_dafb986c: ページインデックスページはどのように使用するのですか？
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: 講師として、コースのメンバーページはどのように使用すればよいですか？
   how_do_i_use_the_quizzes_index_page_cc2e15d3: クイズインデックスページはどのように使用すればよいですか？
@@ -14087,8 +14087,8 @@ ja:
   include_deleted_objects_4b75ef93: 削除されたオブジェクトを含める
   include_fullstory_recording_of_the_user_s_session_656d131e: "ユーザーのセッションの FullStory 録画を含める"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "成績帳エックスポートに統合 ID が含まれます。"
-  include_last_activity_dates_4eb97ed5: 直近活動日を含める
-  include_last_activity_dates_ee2d3de0: 直近活動日を含める
+  include_last_activity_dates_4eb97ed5: 最終アクティビティ日を含める
+  include_last_activity_dates_ee2d3de0: 最終活アクティビティ日を含める
   include_needs_grading_count_b8106ff7: ニーズ成績評価数を含む
   include_quoted_reply_in_message_d0c8af8a: メッセージに引用符付き返信を含める
   include_scores_when_alerting_about_grade_changes_623ec201: 成績変更に関するアラートには、スコアを記載してください。
@@ -14110,7 +14110,7 @@ ja:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: グレードブックの課題ヘッダメニューにSpeedGraderへのリンクを含めます。
   includes_grade_values_in_the_admin_grade_reports_a28200da: 管理者の成績レポートに成績値を含めます。
   includes_outcomes_service_alignments_when_exportin_6c578a35: コースコンテンツのエクスポートおよびインポート時には、結果サービスの調整を含みます
-  includes_overridden_course_grades_in_the_gradebook_d58cffb: 評定表の履歴に上書きされたコースグレードが含まれます。
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: 成績表の履歴に上書きされたコースグレードが含まれます。
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: コースサイドバーナビゲーションに規定を含める
   includes_the_equation_editor_in_the_instructure_ca_19a4be71: "@instructure/canvas-rce パッケージに方程式エディタが含まれる"
   incomplete_95612d72: 未完了
@@ -14687,7 +14687,7 @@ ja:
   learn_more_in_the_canvas_community_3bba7b11: "Canvas Community で詳細を見る"
   learning_analytics_beta_view_46deb4c8: 学習分析（ベータ）-表示
   learning_mastery_5fc34276: 学習の達成度
-  learning_mastery_6ed4fd63: 学習達成度表...
+  learning_mastery_6ed4fd63: 学習マスタリー...
   learning_mastery_context_name_a0b70957: "学習の達成度 - %{context_name}"
   learning_mastery_gradebook_description: |-
       学習達成度成績表を使用すると、教師はコースの学習成果について受講生とコースの
@@ -15363,7 +15363,7 @@ ja:
   master_courses_2aaa4841: マスターコース
   master_lock_590266b6: マスターロック
   mastered_34d4c857: 熟達
-  mastery_7ec348b5: 熟達
+  mastery_7ec348b5: 熟達スコア
   mastery_calculation_5fd5f5fe: 達成度計算
   mastery_calculation_parameters_f072c3: 達成度計算パラメータ
   mastery_calculation_saved_df378fdd: 達成度計算を保存しました
@@ -18131,7 +18131,7 @@ ja:
   no_email_8585ad7e: 電子メールなし
   no_end_date_2608075c: 終了日なし
   no_errors_1ac47724: エラーなし
-  no_evidence_75853352: エビデンスがない
+  no_evidence_75853352: エビデンスなし
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "SIS ID %{user_id}でログイン用の既存ユーザーがありません"
   no_explainer_text_available_9d9a2f3c: 説明文はありません
   no_exports_to_display_7f1b630b: 表示するエクスポートがありません
@@ -18683,7 +18683,7 @@ ja:
       remember_auth: 承認を保存する
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: オブジェクトの種類
-  observe_student_mastery_a1f01a: 受講者のアウトカムを確認する
+  observe_student_mastery_a1f01a: 受講生の習熟を観察する
   observees: 
     being_observed: 監視中の受講生
     new_observee_pairing_code: 受講生ペアリングコード
@@ -22847,12 +22847,12 @@ ja:
   rubrics_associations_export_report_77da1b31: ルーブリック関連エクスポート・レポート
   rubrics_b5ef369b: 規定
   rubrics_can_show_students_your_expectations_for_as_3382da64: |-
-      ルーブリックは、課題の質に対する期待と、
-          それに応じた採点方法を受講生に示すことができます。ルーブリックは、課題、ディスカッション、および
-          小テストに関連付けることができます。ルーブリックは採点のみに使用するか、
+      規定は、課題の質に対する期待と、
+          それに応じた採点方法を受講生に示すことができます。規定は、課題、ディスカッション、および
+          クイズに関連付けることができます。規は定採点のみに使用するか、
           または特にポイントなしの評価ベースおよび
-          結果ベースの採点専用の非採点ルーブリックを作成します。ルーブリックの基準項目として
-          アウトカムを追加することができます。.
+          結果ベースの採点専用の非採点規定を作成します。規定の基準項目として
+          結果を追加することができます。.
   rubrics_export_report_76d30288: "ルーブリック エクスポート レポート"
   rubrics_in_course_navigation_539ea536: コースナビゲーションの規定
   rubrics_speedgrader_a6ebec57: ルービック、SpeedGrader
@@ -23025,7 +23025,7 @@ ja:
     settings: 
       assignment_toggles_and_actions: 
         download_current_scores: "現在のスコア (.csv) のダウンロード"
-        grading_history: 評定表の履歴を表示
+        grading_history: 成績表の履歴を表示
         hide_student_names_label: 受講生の名前を非表示
         include_ungraded_assignments: "未採点分は 0 として表示する"
         set_group_weights: グループの重み付けの設定
@@ -23514,10 +23514,10 @@ ja:
             計算方法で受講生の進行状況を評価し、学習習熟で直接、進行状況を測定します。
             既存のアカウント、状態、およびCommon Core Standards （共通のコアスタンダード）の結果をコースにインポートします。コースの規定で結果を調整することもできます。
   set_up_outcomes_in_your_course_as_measured_by_peda_78eb842e: |-
-      教育上の目標または望まれる目的によって測定されるコースのアウトカムを設定します。
-            成績の評価を単に成功の尺度とするのではなく、受講者がスキルと活動を学べるよう支援します。
-            計算方法で受講者の進行状況を評価し、学習達成度表で直接、進行状況を測定します。
-            既存のアカウントをインポートし、アウトカムをコースに記載します。コースのルーブリックでアウトカムを調整することもできます。
+      教育上の目標または望まれる目的によって測定されるコースの結果を設定します。
+            成績の評価を単に成功の尺度として集中するのではなく、受講生がスキルと活動を学べるよう支援します。
+            計算方法で受講生の進行状況を評価し、学習習熟で直接、進行状況を測定します。
+            既存のアカウントをインポートし、成果をコースに記載します。コースの規定で成果を調整することもできます。
   set_up_video_conferencing_and_other_tools_1a94a350: ビデオ会議とその他ツールをセットアップする
   set_up_video_conferencing_c0049abe: ビデオ会議をセットアップする
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Canvas コースを 30 分以下でセットアップしましょう。"
@@ -27121,7 +27121,7 @@ ja:
   to_view_grades_in_a_course_grades_view_all_grades__d07a67dd: "コースで成績を表示するには、[成績 - すべての成績を表示]も有効にされていなければなりません。"
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "コースの成績を表示するには、[コース管理：管理者-管理/更新]および[成績 - すべての成績を表示]も有効でなければなりません。"
   to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "グループを表示するには、[ユーザー - 表示リスト]も有効でなければなりません。"
-  to_view_last_activity_and_total_activity_informati_473265d8: "コースの人物のページの直近活動日および合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
+  to_view_last_activity_and_total_activity_informati_473265d8: "コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
   to_view_last_activity_and_total_activity_informati_a06859f3: |-
       コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。
               コースの人物のページにアクセスするには、ユーザー - 表示リストも有効にされていなければなりません。
@@ -28399,10 +28399,10 @@ ja:
   view_feedback_f2feabca: フィードバックの表示
   view_file_8a1c62e5: ファイルを表示
   view_gradebook_d6713dd1: 成績表を表示
-  view_gradebook_for_course_10cbf171: "%{course}の評定表の履歴を表示"
+  view_gradebook_for_course_10cbf171: "%{course}の成績表の履歴を表示"
   view_gradebook_history_a9272918: 成績表の履歴を表示
-  view_grades_8d3bae6c: 評定を表示
-  view_grades_for_name_45aeb2f2: "～の評定を表示%{name}"
+  view_grades_8d3bae6c: 成績を表示
+  view_grades_for_name_45aeb2f2: "～の成績を表示%{name}"
   view_grading_history_e64bb8fe: 採点履歴の表示
   view_groups_47b5f60c: グループを表示
   view_important_dates_173c7e1b: 重要な日付を表示する

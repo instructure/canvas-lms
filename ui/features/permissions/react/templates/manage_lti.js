@@ -23,7 +23,7 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('LTI - add'),
-      description: I18n.t('Allows user to manually add an app in Account Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Account Settings.')
     },
     {
       description: I18n.t(
@@ -31,14 +31,14 @@ export const template = generateActionTemplates(
       )
     },
     {
-      description: I18n.t('Allows user to manually add an app in Course Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Course Settings.')
     },
     {
       title: I18n.t('LTI - delete'),
       description: I18n.t('Allows user to manually delete an app in Account Settings.')
     },
     {
-      description: I18n.t('Allows user to manually delete an app in Course Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Course Settings.')
     },
     {
       title: I18n.t('LTI - edit'),
@@ -56,11 +56,11 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('LTI - add'),
-      description: I18n.t('Allows user to manually add an app in Course Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Course Settings.')
     },
     {
       title: I18n.t('LTI - delete'),
-      description: I18n.t('Allows user to manually delete an app in Course Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Course Settings.')
     },
     {
       title: I18n.t('LTI - edit'),
