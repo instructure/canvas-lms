@@ -29,8 +29,7 @@ def createDistribution(nestedStages) {
 
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-    'POSTGRES_PASSWORD=sekret',
-    'SELENIUM_VERSION=3.141.59-20210929'
+    'POSTGRES_PASSWORD=sekret'
   ]
 
   def rspecqEnvVars = baseEnvVars + [
@@ -70,8 +69,7 @@ def createDistribution(nestedStages) {
 def createLegacyDistribution(nestedStages) {
   def setupNodeHook = this.&setupNode
   def baseEnvVars = [
-    'POSTGRES_PASSWORD=sekret',
-    'SELENIUM_VERSION=3.141.59-20210929'
+    'POSTGRES_PASSWORD=sekret'
   ]
 
   // Used only for crystalball map generation

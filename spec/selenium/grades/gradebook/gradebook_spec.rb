@@ -412,6 +412,8 @@ describe "Gradebook" do
       grading_cell.click
 
       Gradebook::Cells.edit_grade(student, essay_quiz.assignment, 10)
+      # Re-select element in case it's gone stale
+      grading_cell = Gradebook::Cells.grading_cell(student, essay_quiz.assignment)
       expect(grading_cell).not_to contain_css(".icon-not-graded")
     end
   end

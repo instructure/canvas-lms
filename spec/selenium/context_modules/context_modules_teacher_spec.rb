@@ -589,6 +589,7 @@ describe "context modules" do
         expect(button.text).to eq("Expand All")
         refresh_page
         assert_collapsed
+        button = f("button#expand_collapse_all")
         button.click
         wait_for_ajaximations
         assert_expanded
