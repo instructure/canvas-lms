@@ -278,7 +278,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links important_dates feature_flag_filters k5_parent_support
     conferencing_in_planner remember_settings_tab word_count_in_speed_grader observer_picker lti_platform_storage
-    scale_equation_images new_equation_editor
+    scale_equation_images new_equation_editor buttons_and_icons_cropper
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     responsive_awareness responsive_misc product_tours files_dnd usage_rights_discussion_topics
