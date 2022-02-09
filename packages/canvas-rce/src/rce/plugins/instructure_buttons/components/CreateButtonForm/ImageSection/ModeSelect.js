@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import formatMessage from '../../../../../../format-message'
-import {modes} from '../../../reducers/imageSection'
+import {modes, actions} from '../../../reducers/imageSection'
 
 import {Button} from '@instructure/ui-buttons'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
@@ -32,6 +32,7 @@ const ModeSelect = ({dispatch}) => {
       value={mode.type}
       onSelect={() => {
         dispatch({type: mode.type})
+        dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: true})
       }}
     >
       {mode.label}

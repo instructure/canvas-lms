@@ -29,11 +29,16 @@ import {Text} from '@instructure/ui-text'
 
 import Course from './Course'
 import {ImageOptions} from './ImageOptions'
+import {ColorInput} from '../../../../shared/ColorInput'
+import {convertFileToBase64} from '../../../svg/utils'
+
+const getColorSection = () => document.querySelector('#buttons-tray-color-section')
 
 export const ImageSection = ({settings, onChange, editing, editor}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const Upload = React.lazy(() => import('./Upload'))
+  const SingleColor = React.lazy(() => import('./SingleColor'))
   const MultiColor = React.lazy(() => import('./MultiColor'))
 
   // This object maps image selection modes to the
@@ -44,6 +49,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
   const allowedModes = {
     [modes.courseImages.type]: Course,
     [modes.uploadImages.type]: Upload,
+    [modes.singleColorImages.type]: SingleColor,
     [modes.multiColorImages.type]: MultiColor
   }
 
@@ -88,7 +94,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
         payload: settings.encodedImage
       })
     }
-  }, [settings.encodedImage])
+  }, [editing, settings.encodedImage])
 
   useEffect(() => {
     if (editing) {
@@ -97,28 +103,46 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
         payload: settings.encodedImageName
       })
     }
-  }, [settings.encodedImageName])
+  }, [editing, settings.encodedImageName])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE,
       payload: state.image
     })
-  }, [state.image])
+  }, [onChange, state.image])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE_TYPE,
       payload: state.mode
     })
-  }, [state.mode])
+  }, [onChange, state.mode])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE_NAME,
       payload: state.imageName
     })
-  }, [state.imageName])
+  }, [onChange, state.imageName])
+
+  useEffect(() => {
+    if (state.icon) {
+      dispatch({...actions.START_LOADING})
+      // eslint-disable-next-line promise/catch-or-return
+      convertFileToBase64(
+        new Blob([state.icon.source(state.iconFillColor)], {
+          type: 'image/svg+xml'
+        })
+      ).then(base64Image => {
+        dispatch({...actions.SET_IMAGE, payload: base64Image})
+        dispatch({...actions.STOP_LOADING})
+      })
+    }
+  }, [state.icon, state.iconFillColor])
+
+  const modeIsAllowed = !!allowedModes[state.mode]
+  const ImageSelector = allowedModes[state.mode]
 
   return (
     <Group as="section" defaultExpanded summary={formatMessage('Image')}>
@@ -138,20 +162,32 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item padding="small">
-          <Suspense
-            fallback={
-              <Flex justifyItems="center">
-                <Flex.Item>
-                  <Spinner renderTitle={formatMessage('Loading')} />
-                </Flex.Item>
-              </Flex>
-            }
-          >
-            {!!allowedModes[state.mode] &&
-              React.createElement(allowedModes[state.mode], {dispatch, editor})}
-          </Suspense>
-        </Flex.Item>
+        <Suspense
+          fallback={
+            <Flex justifyItems="center">
+              <Flex.Item>
+                <Spinner renderTitle={formatMessage('Loading')} />
+              </Flex.Item>
+            </Flex>
+          }
+        >
+          {modeIsAllowed && state.collectionOpen && (
+            <Flex.Item padding="small">
+              <ImageSelector dispatch={dispatch} editor={editor} data={state} />
+            </Flex.Item>
+          )}
+        </Suspense>
+        {state.icon && state.mode === modes.singleColorImages.type && (
+          <Flex.Item padding="small">
+            <ColorInput
+              color={state.iconFillColor}
+              label={formatMessage('Icon Color')}
+              name="single-color-image-fill"
+              onChange={color => dispatch({type: actions.SET_ICON_FILL_COLOR.type, payload: color})}
+              popoverMountNode={getColorSection}
+            />
+          </Flex.Item>
+        )}
       </Flex>
     </Group>
   )

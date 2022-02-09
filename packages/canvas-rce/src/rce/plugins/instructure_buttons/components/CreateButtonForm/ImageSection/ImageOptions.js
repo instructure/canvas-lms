@@ -47,10 +47,10 @@ function renderImageName({imageName}) {
   )
 }
 
-function renderImageActionButtons({mode}, setOpenCropModal, dispatch) {
+function renderImageActionButtons({mode, collectionOpen}, setOpenCropModal, dispatch) {
   return (
     <>
-      {mode === modes.courseImages.type && (
+      {mode === modes.courseImages.type && !collectionOpen && (
         <IconButton
           margin="0 small 0 0"
           screenReaderLabel={formatMessage('Crop image')}
@@ -64,8 +64,7 @@ function renderImageActionButtons({mode}, setOpenCropModal, dispatch) {
       <IconButton
         screenReaderLabel={formatMessage('Clear image')}
         onClick={() => {
-          dispatch({type: actions.CLEAR_IMAGE.type})
-          dispatch({type: actions.CLEAR_MODE.type})
+          dispatch(actions.RESET_ALL)
         }}
       >
         <IconTrashLine />
