@@ -15,7 +15,7 @@ push() {
 }
 
 git checkout -B sync-translations-rce && \
-  git add -A src/translations && \
+  git add -A src && \
   git commit -m "[i18n] Update RCE translations." && \
   push
   
