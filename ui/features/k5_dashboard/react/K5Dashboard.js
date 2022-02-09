@@ -138,7 +138,6 @@ export const K5Dashboard = ({
   hideGradesTabForStudents = false,
   selectedContextCodes,
   selectedContextsLimit,
-  parentSupportEnabled,
   observedUsersList,
   canAddObservee,
   openTodosInNewTab,
@@ -168,7 +167,7 @@ export const K5Dashboard = ({
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
-  const observerMode = parentSupportEnabled && currentUserRoles.includes('observer')
+  const observerMode = currentUserRoles.includes('observer')
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
@@ -421,7 +420,6 @@ K5Dashboard.propTypes = {
   hideGradesTabForStudents: PropTypes.bool,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
-  parentSupportEnabled: PropTypes.bool.isRequired,
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired

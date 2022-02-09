@@ -2730,7 +2730,6 @@ describe UsersController do
 
         context "@cards_prefetch_observed_param" do
           before :once do
-            Account.site_admin.enable_feature!(:k5_parent_support)
             @user1 = user_factory(active_all: true, account: @account)
             @course = course_factory(active_all: true, account: @account)
           end
