@@ -16,31 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import {SVGIcon} from '@instructure/ui-svg-images'
+import {DEFAULT_CROPPER_SETTINGS} from '../components/CreateButtonForm/ImageCropper/constants'
 
-const SVGThumbnail = ({name, source, size = '4rem'}) => {
-  return (
-    <div style={{fontSize: size}}>
-      <SVGIcon
-        src={source[name]?.source()}
-        title={source[name]?.title}
-        data-testid={`icon-${name}`}
-      />
-    </div>
-  )
+export const defaultState = DEFAULT_CROPPER_SETTINGS
+
+export const actions = {
+  SET_IMAGE: 'SetImage',
+  SET_SHAPE: 'SetShape',
+  SET_SCALE_RATIO: 'SetScaleRatio'
 }
 
-SVGThumbnail.propTypes = {
-  size: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  source: PropTypes.objectOf(
-    PropTypes.shape({
-      source: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired
-    }).isRequired
-  ).isRequired
+export const cropperSettingsReducer = (state, action) => {
+  switch (action.type) {
+    case actions.SET_IMAGE:
+      return {...state, image: action.payload}
+    case actions.SET_SHAPE:
+      return {...state, shape: action.payload}
+    case actions.SET_SCALE_RATIO:
+      return {...state, scaleRatio: action.payload}
+    default:
+      return {...state, ...action}
+  }
 }
-
-export default SVGThumbnail

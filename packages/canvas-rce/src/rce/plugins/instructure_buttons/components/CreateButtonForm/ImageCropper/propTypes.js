@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,19 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const PREVIEW_BACKGROUND_COLOR = '#394B58'
-export const PREVIEW_WIDTH = 942
-export const PREVIEW_HEIGHT = 350
-export const SHAPE_CONTAINER_LENGTH = 350
-export const GLUE_WIDTH = 296
-export const MIN_SCALE_RATIO = 1.0
-export const MAX_SCALE_RATIO = 2.0
-export const BUTTON_SCALE_STEP = 0.1
-export const WHEEL_SCALE_STEP = 0.005
-export const WHEEL_EVENT_DELAY = 100
+import PropTypes from 'prop-types'
 
-export const DEFAULT_CROPPER_SETTINGS = {
-  image: null,
-  shape: 'square',
-  scaleRatio: MIN_SCALE_RATIO
-}
+export const ImageCropperSettingsPropTypes = PropTypes.shape({
+  image: PropTypes.string.isRequired,
+  shape: PropTypes.string.isRequired,
+  scaleRatio: PropTypes.number.isRequired
+})

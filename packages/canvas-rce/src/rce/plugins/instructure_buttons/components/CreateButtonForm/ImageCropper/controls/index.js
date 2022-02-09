@@ -17,30 +17,22 @@
  */
 
 import React from 'react'
+import {Flex} from '@instructure/ui-flex'
+import {actions} from '../../../../reducers/imageCropper'
+import {ZoomControls} from './ZoomControls'
+import {ShapeControls} from './ShapeControls'
 
-import SVGList from '../SVGList'
-import {TYPE} from '../SVGList'
-import {actions} from '../../../../reducers/imageSection'
-
-import {convertFileToBase64} from '../../../../svg/utils'
-
-const MultiColor = ({dispatch}) => {
-  const onSelect = svg => {
-    dispatch({...actions.START_LOADING})
-    dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
-
-    convertFileToBase64(
-      new Blob([svg.source()], {
-        type: 'image/svg+xml'
-      })
-    ).then(base64Image => {
-      dispatch({...actions.SET_IMAGE, payload: base64Image})
-      dispatch({...actions.STOP_LOADING})
-      dispatch({...actions.CLEAR_MODE})
-    })
-  }
-
-  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} />
+export const Controls = ({settings, dispatch}) => {
+  return (
+    <Flex direction="row" margin="x-small">
+      <ShapeControls
+        shape={settings.shape}
+        onChange={shape => dispatch({type: actions.SET_SHAPE, payload: shape})}
+      />
+      <ZoomControls
+        scaleRatio={settings.scaleRatio}
+        onChange={scaleRatio => dispatch({type: actions.SET_SCALE_RATIO, payload: scaleRatio})}
+      />
+    </Flex>
+  )
 }
-
-export default MultiColor

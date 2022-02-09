@@ -25,6 +25,7 @@ import {View} from '@instructure/ui-view'
 
 import SVGThumbnail from './SVGThumbnail'
 import MultiColorSVG from './MultiColor/svg'
+import {IconAnalyticsLine} from '@instructure/ui-icons'
 
 export const TYPE = {
   Multicolor: 'multicolor'
@@ -38,7 +39,7 @@ export function svgSourceFor(type) {
       }
 }
 
-const SVGList = ({type}) => {
+const SVGList = ({type, onSelect}) => {
   const svgSourceList = svgSourceFor(type)
 
   return (
@@ -52,7 +53,11 @@ const SVGList = ({type}) => {
     >
       {Object.keys(svgSourceList).map(iconName => (
         <Flex.Item key={iconName} as="div" margin="xx-small xx-small small xx-small" size="4rem">
-          <Link draggable={false} onClick={() => {}} title={svgSourceList[iconName].label}>
+          <Link
+            draggable={false}
+            onClick={() => onSelect(svgSourceList[iconName])}
+            title={svgSourceList[iconName].label}
+          >
             <View
               as="div"
               borderRadius="medium"
@@ -70,7 +75,8 @@ const SVGList = ({type}) => {
 }
 
 SVGList.propTypes = {
-  type: PropTypes.oneOf(Object.values(TYPE))
+  type: PropTypes.oneOf(Object.values(TYPE)).isRequired,
+  onSelect: PropTypes.func.isRequired
 }
 
 export default SVGList
