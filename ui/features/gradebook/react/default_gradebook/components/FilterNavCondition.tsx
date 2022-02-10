@@ -28,10 +28,17 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
-import type {FilterCondition, Module, Section, GradingPeriod, AssignmentGroup} from '../gradebook.d'
+import type {
+  AssignmentGroup,
+  FilterCondition,
+  GradingPeriod,
+  Module,
+  Section,
+  StudentGroupCategoryMap
+} from '../gradebook.d'
 
 const {Item} = Flex as any
-const {Option} = SimpleSelect as any
+const {Option, Group: OptionGroup} = SimpleSelect as any
 const formatDate = date => tz.format(date, 'date.formats.medium')
 const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 
@@ -43,14 +50,15 @@ const submissionTypeOptions: SubmissionTypeOption[] = [
 ]
 
 type Props = {
+  assignmentGroups: AssignmentGroup[]
   condition: FilterCondition
   conditionsInFilter: any
-  onChange: any
-  modules: Module[]
-  assignmentGroups: AssignmentGroup[]
   gradingPeriods: GradingPeriod[]
-  sections: Section[]
+  modules: Module[]
+  onChange: any
   onDelete: any
+  sections: Section[]
+  studentGroupCategories: StudentGroupCategoryMap
 }
 
 type MenuItem = [id: string, name: string]
@@ -63,11 +71,14 @@ export default function ({
   assignmentGroups,
   gradingPeriods,
   sections,
-  onDelete
+  onDelete,
+  studentGroupCategories
 }: Props) {
   const divRef = useRef(null)
 
   let items: MenuItem[] = []
+  let itemGroups: [string, string, MenuItem[]][] = []
+
   switch (condition.type) {
     case 'module': {
       items = modules.map(({id, name}) => [id, name])
@@ -79,6 +90,14 @@ export default function ({
     }
     case 'section': {
       items = sections.map(({id, name}) => [id, name])
+      break
+    }
+    case 'student-group': {
+      itemGroups = Object.values(studentGroupCategories).map(c => [
+        c.id,
+        c.name,
+        c.groups.map(g => [g.id, g.name])
+      ])
       break
     }
     case 'grading-period': {
@@ -112,15 +131,21 @@ export default function ({
             })
           }
         >
-          {modules.length > 0 && (
-            <Option id={`${condition.id}-module`} value="module">
-              {I18n.t('Module')}
-            </Option>
-          )}
-
           {assignmentGroups.length > 0 && (
             <Option id={`${condition.id}-assignment-group`} value="assignment-group">
               {I18n.t('Assignment Group')}
+            </Option>
+          )}
+
+          {gradingPeriods.length > 0 && (
+            <Option id={`${condition.id}-grading-period`} value="grading-period">
+              {I18n.t('Grading Period')}
+            </Option>
+          )}
+
+          {modules.length > 0 && (
+            <Option id={`${condition.id}-module`} value="module">
+              {I18n.t('Module')}
             </Option>
           )}
 
@@ -130,11 +155,15 @@ export default function ({
             </Option>
           )}
 
-          {gradingPeriods.length > 0 && (
-            <Option id={`${condition.id}-grading-period`} value="grading-period">
-              {I18n.t('Grading Period')}
+          {Object.keys(studentGroupCategories).length > 0 && (
+            <Option id={`${condition.id}-student-group`} value="student-group">
+              {I18n.t('Student Group')}
             </Option>
           )}
+
+          <Option id={`${condition.id}-submissions`} value="submissions">
+            {I18n.t('Submissions')}
+          </Option>
 
           {shouldShowDateOption('start-date') && (
             <Option id={`${condition.id}-start-date`} value="start-date">
@@ -147,14 +176,10 @@ export default function ({
               {I18n.t('End Date')}
             </Option>
           )}
-
-          <Option id={`${condition.id}-submissions`} value="submissions">
-            {I18n.t('Submissions')}
-          </Option>
         </SimpleSelect>
       </Item>
       <Flex>
-        {items.length > 0 && (
+        {(items.length > 0 || itemGroups.length > 0) && (
           <SimpleSelect
             key={condition.type} // resets dropdown when condition type is changed
             renderLabel={<ScreenReaderContent>{I18n.t('Condition')}</ScreenReaderContent>}
@@ -173,6 +198,20 @@ export default function ({
                 <Option key={id} id={`${condition.id}-item-${id}`} value={id}>
                   {name}
                 </Option>
+              )
+            })}
+
+            {itemGroups.map(([id, name, items_]) => {
+              return (
+                <OptionGroup value={id} renderLabel={name}>
+                  {items_.map(([itemId, itemName]: [string, string]) => {
+                    return (
+                      <Option key={itemId} id={`${condition.id}-item-${itemId}`} value={itemId}>
+                        {itemName}
+                      </Option>
+                    )
+                  })}
+                </OptionGroup>
               )
             })}
           </SimpleSelect>

@@ -73,7 +73,7 @@ export function getOptions(gradebook) {
       return gradebook.showSections()
     },
     shouldShowGroups() {
-      return gradebook.showStudentGroups()
+      return gradebook.studentGroupsEnabled
     }
   }
 }

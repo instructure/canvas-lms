@@ -367,7 +367,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   submissionStateMap!: SubmissionStateMap
 
-  studentGroupCategories: StudentGroupCategoryMap = {}
+  studentGroupCategoriesById: StudentGroupCategoryMap = {}
 
   gradebookColumnSizeSettings: ColumnSizeSettings = {}
 
@@ -1550,19 +1550,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.sections_enabled
   }
 
-  showStudentGroups = () => {
-    return this.studentGroupsEnabled
-  }
-
   updateStudentGroupFilterVisibility = () => {
     if (this.options.enhanced_gradebook_filters) return
-    let studentGroupSets
     const mountPoint = document.getElementById('student-group-filter-container')
     if (
-      this.showStudentGroups() &&
+      this.studentGroupsEnabled &&
       this.gridDisplaySettings.selectedViewOptionsFilters.indexOf('studentGroups') >= 0
     ) {
-      studentGroupSets = Object.values(this.studentGroupCategories).sort(
+      const studentGroupSets = Object.values(this.studentGroupCategoriesById).sort(
         (a: StudentGroupCategory, b: StudentGroupCategory) => {
           return a.id.localeCompare(b.id)
         }
@@ -4197,13 +4192,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return (this.sections_enabled = sections.length > 1)
   }
 
-  setStudentGroups = (groupCategories: StudentGroupCategoryMap) => {
-    this.studentGroupCategories = _.indexBy(groupCategories, 'id')
-    const studentGroupList: StudentGroup[] = _.flatten(_.pluck(groupCategories, 'groups')).map(
-      htmlEscape
-    )
+  setStudentGroups = (studentGroupCategories: StudentGroupCategoryMap) => {
+    this.studentGroupCategoriesById = _.indexBy(studentGroupCategories, 'id')
+    const studentGroupList: StudentGroup[] = _.flatten(
+      _.pluck(studentGroupCategories, 'groups')
+    ).map(htmlEscape)
     this.studentGroups = _.indexBy(studentGroupList, 'id')
-    return (this.studentGroupsEnabled = studentGroupList.length > 0)
+    this.studentGroupsEnabled = studentGroupList.length > 0
   }
 
   setAssignments = assignmentMap => {
@@ -4426,7 +4421,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  apiUpdateSubmission(submission, gradeInfo, enterGradesAs) {
+  apiUpdateSubmission(submission, gradeInfo, enterGradesAs?: string) {
     const {userId, assignmentId} = submission
     const student = this.student(userId)
     this.addPendingGradeInfo(submission, gradeInfo)
@@ -4729,6 +4724,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
+      const prevStudentGroupIds = findAllAppliedFilterValuesOfType(
+        'student-group',
+        prevProps.filters
+      )
+      const studentGroupIds = findAllAppliedFilterValuesOfType('student-group', this.props.filters)
+      if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
+        if (studentGroupIds.length === 0 || !studentGroupIds[0]) {
+          this.updateCurrentStudentGroup(null)
+        } else {
+          this.updateCurrentStudentGroup(studentGroupIds[0])
+        }
+      }
+
       const prevGradingPeriodId = findAllAppliedFilterValuesOfType(
         'grading-period',
         prevProps.filters
@@ -4831,6 +4839,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
                 modules={this.state.modules}
                 assignmentGroups={this.state.assignmentGroups}
                 sections={this.state.sections}
+                studentGroupCategories={this.options.student_groups}
               />
             </Portal>
           )}
