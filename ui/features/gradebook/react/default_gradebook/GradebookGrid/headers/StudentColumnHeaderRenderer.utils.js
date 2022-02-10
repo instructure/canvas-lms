@@ -75,6 +75,6 @@ export function getProps(gradebook, options, columnHeaderName) {
       },
       settingKey
     },
-    studentGroupsEnabled: gradebook.showStudentGroups()
+    studentGroupsEnabled: gradebook.studentGroupsEnabled
   }
 }

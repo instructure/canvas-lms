@@ -41,7 +41,8 @@ import type {
   Module,
   PartialFilter,
   Filter,
-  Section
+  Section,
+  StudentGroupCategoryMap
 } from '../gradebook.d'
 
 const {Item} = Flex as any
@@ -54,6 +55,7 @@ export type FilterNavFilterProps = {
   onChange: any
   onDelete: any
   sections: Section[]
+  studentGroupCategories: StudentGroupCategoryMap
 }
 
 export default function FilterNavFilter({
@@ -63,7 +65,8 @@ export default function FilterNavFilter({
   modules,
   gradingPeriods,
   assignmentGroups,
-  sections
+  sections,
+  studentGroupCategories
 }: FilterNavFilterProps) {
   const [isRenaming, setIsRenaming] = useState(false)
   const [wasRenaming, setWasRenaming] = useState(false)
@@ -188,15 +191,16 @@ export default function FilterNavFilter({
 
       {filter.conditions.map(condition => (
         <Condition
-          key={condition.id}
+          assignmentGroups={assignmentGroups}
           condition={condition}
           conditionsInFilter={filter.conditions}
           gradingPeriods={gradingPeriods}
+          key={condition.id}
+          modules={modules}
           onChange={onChangeCondition}
           onDelete={onDeleteCondition}
-          modules={modules}
-          assignmentGroups={assignmentGroups}
           sections={sections}
+          studentGroupCategories={studentGroupCategories}
         />
       ))}
       <Flex justifyItems="space-between">
