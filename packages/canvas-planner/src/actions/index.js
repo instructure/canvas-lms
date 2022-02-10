@@ -57,7 +57,8 @@ export const {
   clearWeeklyItems,
   clearOpportunities,
   clearDays,
-  clearCourses
+  clearCourses,
+  clearSidebar
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -81,7 +82,8 @@ export const {
   'CLEAR_WEEKLY_ITEMS',
   'CLEAR_OPPORTUNITIES',
   'CLEAR_DAYS',
-  'CLEAR_COURSES'
+  'CLEAR_COURSES',
+  'CLEAR_SIDEBAR'
 )
 
 export * from './loading-actions'
@@ -284,6 +286,10 @@ export const togglePlannerItemCompletion = plannerItem => {
   }
 }
 
+export const sidebarCompleteItem = item => {
+  return togglePlannerItemCompletion(item)
+}
+
 function updateOverrideDataOnItem(plannerItem, apiOverride) {
   const updatedItem = {...plannerItem}
   updatedItem.overrideId = apiOverride.id
@@ -307,6 +313,7 @@ export const clearItems = () => {
     dispatch(clearCourses(getState().singleCourse))
     dispatch(clearOpportunities())
     dispatch(clearDays())
+    dispatch(clearSidebar())
   }
 }
 
