@@ -230,6 +230,9 @@
   "clear_2084585f": {
     "message": "Clear"
   },
+  "clear_image_3213fe62": {
+    "message": "Clear image"
+  },
   "clear_selected_file_82388e50": {
     "message": "Clear selected file"
   },
@@ -343,6 +346,9 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
+  },
+  "crop_image_41bf940c": {
+    "message": "Crop image"
   },
   "crop_image_807ebb08": {
     "message": "Crop Image"
@@ -1557,5 +1563,11 @@
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "You''ve scrolled back to your very first To-Do!"
+  },
+  "zoom_in_image_bb97d4f": {
+    "message": "Zoom in image"
+  },
+  "zoom_out_image_d0a0a2ec": {
+    "message": "Zoom out image"
   }
 }
