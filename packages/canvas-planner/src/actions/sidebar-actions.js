@@ -18,9 +18,10 @@
 
 import {createActions} from 'redux-actions'
 import axios from 'axios'
-import {togglePlannerItemCompletion} from '.'
-import {transformApiToInternalItem, findNextLink} from '../utilities/apiUtils'
+import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {transformApiToInternalItem, findNextLink, buildURL} from '../utilities/apiUtils'
 import {identifiableThunk} from '../utilities/redux-identifiable-thunk'
+import {getCourseList, gotCourseList} from './loading-actions'
 
 export const {
   sidebarItemsLoading,
@@ -87,23 +88,31 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
 export const sidebarLoadInitialItems = (currentMoment, course_id) => (dispatch, getState) => {
   const firstMomentDate = currentMoment.clone().subtract(2, 'weeks')
   dispatch(sidebarItemsLoading({firstMoment: firstMomentDate, course_id}))
-  const params = {
-    start_date: firstMomentDate.toISOString(),
-    order: 'asc'
-  }
-  if (course_id) {
-    params.context_codes = [`course_${course_id}`, `user_${ENV.current_user_id}`]
-  }
-  return axios
-    .get('/api/v1/planner/items', {params})
-    .then(response => {
-      return handleSidebarLoadingResponse(response, dispatch, getState)
+  return dispatch(getCourseList()) // refer to getWeeklyPlannerItems() if you ever have to handle singleCourse
+    .then(res => {
+      dispatch(gotCourseList(res.data))
+      const params = {
+        start_date: firstMomentDate.toISOString(),
+        order: 'asc'
+      }
+      if (course_id) {
+        params.context_codes = [`course_${course_id}`, `user_${ENV.current_user_id}`]
+      }
+      const observed_user_id = getState().selectedObservee
+      if (observed_user_id) {
+        params.observed_user_id = observed_user_id
+        if (!course_id) {
+          params.context_codes = getState().courses.map(c => c.assetString)
+        }
+      }
+      const url = buildURL('/api/v1/planner/items', params)
+      return (asAxios(getPrefetchedXHR(url)) || axios(url)).then(response => {
+        return handleSidebarLoadingResponse(response, dispatch, getState)
+      })
     })
-    .catch(response => dispatch(sidebarItemsLoadingFailed(response)))
-}
-
-export const sidebarCompleteItem = item => {
-  return togglePlannerItemCompletion(item)
+    .catch(response => {
+      dispatch(sidebarItemsLoadingFailed(response))
+    })
 }
 
 export const maybeUpdateTodoSidebar = identifiableThunk(
