@@ -95,8 +95,7 @@ module Lti::IMS
     # A submission comment with an unknown author will be created when the comment value is included.
     # This also supposes the line_item meets the condition to create a submission.
     #
-    # NOTE: Upcoming Feature
-    # It will soon be possible to submit a file along with this score, which will attach the file to the
+    # It is also possible to submit a file along with this score, which will attach the file to the
     # submission that is created. Files should be formatted as Content Items, with the correct syntax
     # below.
     #
@@ -134,12 +133,22 @@ module Lti::IMS
     #   Comment visible to the student about this score.
     #
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
-    #   (EXTENSION) Optional submission type and data.
-    #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
-    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, online_upload, or online_url. Defaults to external_tool. Ignored if content_items are provided.
-    #   submission_data [String] submission data (URL or body text)
-    #   submitted_at [String] Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. This should match the data and time that the original submission happened in Canvas.
-    #   content_items [Array] Files that should be included with the submission. Each item should contain `type: file`, a url pointing to the file, a title, and a progress url that Canvas can report to. If present, submission_type will be online_upload.
+    #   (EXTENSION) Optional submission type and data. Fields listed below.
+    #
+    # @argument https://canvas.instructure.com/lti/submission[new_submission] [Optional, Boolean]
+    #   (EXTENSION field) flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
+    #
+    # @argument https://canvas.instructure.com/lti/submission[submission_type] [Optional, String]
+    #   (EXTENSION field) permissible values are: none, basic_lti_launch, online_text_entry, external_tool, online_upload, or online_url. Defaults to external_tool. Ignored if content_items are provided.
+    #
+    # @argument https://canvas.instructure.com/lti/submission[submission_data] [Optional, String]
+    #   (EXTENSION field) submission data (URL or body text). Only used for submission_types basic_lti_launch, online_text_entry, online_url. Ignored if content_items are provided.
+    #
+    # @argument https://canvas.instructure.com/lti/submission[submitted_at] [Optional, String]
+    #   (EXTENSION field) Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. This should match the data and time that the original submission happened in Canvas.
+    #
+    # @argument https://canvas.instructure.com/lti/submission[content_items] [Optional, Array]
+    #   (EXTENSION field) Files that should be included with the submission. Each item should contain `type: file`, a url pointing to the file, a title, and a progress url that Canvas can report to. If present, submission_type will be online_upload.
     #
     # @returns resultUrl [String]
     #   The url to the result that was created.
