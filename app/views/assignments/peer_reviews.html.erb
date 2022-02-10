@@ -39,7 +39,7 @@
       <% end %>
       <%= t :reviews_per_user, "%{count} reviews per user", :count => %{<input type="text" name="peer_review_count" value="#{@assignment.peer_review_count || 1}" style="width: 25px;"/>}.html_safe %>
       <div class='button-container button-container-right-aligned'>
-        <button type="submit" class="btn btn-large"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
+        <button type="submit" class="btn btn-large" <%= "disabled" if @assignment.current_submissions_and_assessors[:submissions]&.count&.zero? %>><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
       </div>
     <% end %>
   <% end %>
