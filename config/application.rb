@@ -322,7 +322,9 @@ module CanvasRails
         # do not remove this conditional until the asset build no longer
         # needs the rails app for anything.
 
-        DynamicSettingsInitializer.bootstrap!
+        config.to_prepare do
+          DynamicSettingsInitializer.bootstrap!
+        end
       end
     end
 
