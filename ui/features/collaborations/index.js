@@ -17,9 +17,13 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import CollaborationsPage from './backbone/views/CollaborationsPage.coffee'
 import './jquery/index'
+// eslint-disable-next-line import/extensions
 import '../../boot/initializers/activateKeyClicks.js'
 
-const page = new CollaborationsPage({el: $('body')})
-page.initPageState()
+ready(() => {
+  const page = new CollaborationsPage({el: $('body')})
+  page.initPageState()
+})
