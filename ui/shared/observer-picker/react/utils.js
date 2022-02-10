@@ -18,7 +18,7 @@
 
 import natcompare from '@canvas/util/natcompare'
 
-export const parseObservedUsersList = users =>
+export const parseObserverList = users =>
   users.map(u => ({
     id: u.id,
     name: u.name,

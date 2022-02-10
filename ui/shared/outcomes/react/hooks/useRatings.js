@@ -34,7 +34,7 @@ export const defaultRatings = [
   createRating(I18n.t('Mastery'), 3),
   createRating(I18n.t('Near Mastery'), 2),
   createRating(I18n.t('Below Mastery'), 1),
-  createRating(I18n.t('No Evidence'), 0)
+  createRating(I18n.t('Well Below Mastery'), 0)
 ]
 
 export const defaultMasteryPoints = 3

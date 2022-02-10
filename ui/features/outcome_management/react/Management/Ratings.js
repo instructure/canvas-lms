@@ -22,6 +22,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!OutcomeManagement'
+import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -110,94 +111,21 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
 
   const handleMasteryPointsChange = e => onChangeMasteryPoints(e.target.value)
 
-  const renderMasteryPointsInput = () => (
-    <Flex alignItems="start">
-      <Flex.Item>
-        <div
-          className="points individualOutcome"
-          style={{paddingTop: '0px'}}
-          data-testid="mastery-points-input"
-        >
-          <TextInput
-            type="text"
-            messages={masteryPoints.error ? [{text: masteryPoints.error, type: 'error'}] : null}
-            renderLabel={
-              <ScreenReaderContent>{I18n.t('Change mastery points')}</ScreenReaderContent>
-            }
-            onChange={handleMasteryPointsChange}
-            defaultValue={I18n.n(masteryPoints.value)}
-            width={isMobileView ? '3rem' : '4rem'}
-          />
-        </div>
-      </Flex.Item>
-      <Flex.Item>
-        <div style={{paddingTop: '0.5rem', paddingLeft: isMobileView ? '0.60rem' : '0.75rem'}}>
-          <Text weight="bold">{I18n.t('points')}</Text>
-        </div>
-      </Flex.Item>
-    </Flex>
-  )
-
-  const renderAddButton = () => (
-    <IconButton
-      onClick={addRow}
-      withBorder={false}
-      color="primary"
-      size="medium"
-      shape="circle"
-      screenReaderLabel={I18n.t('Add Mastery Level')}
-    >
-      <IconPlusLine />
-    </IconButton>
-  )
-
   const renderDisplayMasteryPoints = () => (
-    <Flex
-      wrap="wrap"
-      direction={isMobileView ? 'column' : 'row'}
-      padding={isMobileView ? 'none small small none' : 'x-small small small none'}
-    >
-      <Flex.Item as="div" padding="none xx-small none none" data-testid="read-only-mastery-points">
-        <Text weight="bold">{I18n.t('Mastery at:')}</Text>
-      </Flex.Item>
-      <Flex.Item padding={isMobileView ? 'small none none' : 'none'}>
-        <Text color="primary">{I18n.t('%{points} points', {points: masteryPoints.value})}</Text>
-      </Flex.Item>
-    </Flex>
-  )
-
-  const renderEditMasteryPoints = () => (
-    <Flex
-      width="100%"
-      padding={isMobileView ? 'none' : 'small small small none'}
-      alignItems="start"
-      justifyContent={isMobileView ? 'space-between' : 'start'}
-    >
-      <Flex.Item size="80%">
-        {isMobileView ? (
-          <Flex padding="0 small 0 0" alignItems="start">
-            <Flex.Item>
-              <div style={{paddingTop: '0.5rem', paddingRight: '0.60rem'}}>
-                <Text weight="bold">{I18n.t('Mastery at')}</Text>
-              </div>
-            </Flex.Item>
-            <Flex.Item>{renderMasteryPointsInput()}</Flex.Item>
-          </Flex>
-        ) : (
-          <Flex padding="0 small 0 0" alignItems="start" textAlign="end">
-            <Flex.Item size="60%">{renderAddButton()}</Flex.Item>
-            <Flex.Item size="40%">
-              <div style={{paddingTop: '0.5rem'}}>
-                <Text weight="bold">{I18n.t('Mastery at')}</Text>
-              </div>
-            </Flex.Item>
-          </Flex>
-        )}
-      </Flex.Item>
-      <Flex.Item size="20%" textAlign={isMobileView ? 'end' : 'start'}>
-        {isMobileView ? renderAddButton() : renderMasteryPointsInput()}
-      </Flex.Item>
-    </Flex>
+    <View as="div" padding="small none none">
+      <Flex wrap="wrap" direction="row" padding="none small small none">
+        <Flex.Item
+          as="div"
+          padding="none xx-small none none"
+          data-testid="read-only-mastery-points"
+        >
+          <Text weight="bold">{I18n.t('Mastery at:')}</Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Text color="primary">{I18n.t('%{points} points', {points: masteryPoints.value})}</Text>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 
   return (
@@ -239,7 +167,56 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
           individualOutcome
         />
       ))}
-      {canManage ? renderEditMasteryPoints() : renderDisplayMasteryPoints()}
+      {canManage ? (
+        <Flex width="100%" padding="small" alignItems="start">
+          <Flex.Item size="80%">
+            <Flex padding="0 small 0 0" textAlign="end">
+              <Flex.Item size="60%">
+                <IconButton
+                  onClick={addRow}
+                  withBorder={false}
+                  color="primary"
+                  size="medium"
+                  shape="circle"
+                  screenReaderLabel={I18n.t('Add Mastery Level')}
+                >
+                  <IconPlusLine />
+                </IconButton>
+              </Flex.Item>
+              <Flex.Item size="40%">
+                <Text weight="bold">{I18n.t('Mastery at')}</Text>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item size="20%">
+            <Flex alignItems="start">
+              <Flex.Item>
+                <div className="points" data-testid="mastery-points-input">
+                  <TextInput
+                    type="text"
+                    messages={
+                      masteryPoints.error ? [{text: masteryPoints.error, type: 'error'}] : null
+                    }
+                    renderLabel={
+                      <ScreenReaderContent>{I18n.t('Change mastery points')}</ScreenReaderContent>
+                    }
+                    onChange={handleMasteryPointsChange}
+                    defaultValue={I18n.n(masteryPoints.value)}
+                    width="4rem"
+                  />
+                </div>
+              </Flex.Item>
+              <Flex.Item>
+                <div style={{paddingTop: '0.45rem', paddingLeft: '0.60rem'}}>
+                  {I18n.t('points')}
+                </div>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        </Flex>
+      ) : (
+        renderDisplayMasteryPoints()
+      )}
     </>
   )
 }

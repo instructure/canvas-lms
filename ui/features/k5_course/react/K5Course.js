@@ -66,7 +66,7 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import EmptyModules from './EmptyModules'
 import EmptyHome from './EmptyHome'
 import ObserverOptions, {
-  ObservedUsersListShape,
+  ObserverListShape,
   shouldShowObserverOptions
 } from '@canvas/observer-picker'
 import GroupsPage from '@canvas/k5/react/GroupsPage'
@@ -310,7 +310,7 @@ export const CourseHeaderOptions = forwardRef(
       studentViewPath,
       canReadAsAdmin,
       courseContext,
-      observedUsersList,
+      observerList,
       currentUser,
       handleChangeObservedUser,
       showingMobileNav,
@@ -361,7 +361,7 @@ export const CourseHeaderOptions = forwardRef(
             <Heading as="h1">{courseContext}</Heading>
           </ScreenReaderContent>
           <ObserverOptions
-            observedUsersList={observedUsersList}
+            observerList={observerList}
             currentUser={currentUser}
             handleChangeObservedUser={handleChangeObservedUser}
             canAddObservee={false}
@@ -422,7 +422,7 @@ CourseHeaderOptions.propTypes = {
   studentViewPath: PropTypes.string.isRequired,
   canReadAsAdmin: PropTypes.bool.isRequired,
   courseContext: PropTypes.string.isRequired,
-  observedUsersList: ObservedUsersListShape.isRequired,
+  observerList: ObserverListShape.isRequired,
   handleChangeObservedUser: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
   showingMobileNav: PropTypes.bool.isRequired,
@@ -463,12 +463,12 @@ export function K5Course({
   hasWikiPages,
   hasSyllabusBody,
   parentSupportEnabled,
-  observedUsersList,
+  observerList,
   selfEnrollment,
   tabContentOnly,
   isMasterCourse
 }) {
-  const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
+  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
     : undefined
 
@@ -483,8 +483,8 @@ export function K5Course({
     singleCourse: true,
     observedUserId,
     isObserver:
-      observedUsersList.length > 1 ||
-      (observedUsersList.length === 1 && observedUsersList[0].id !== currentUser.id)
+      observerList.length > 1 ||
+      (observerList.length === 1 && observerList[0].id !== currentUser.id)
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
@@ -498,7 +498,7 @@ export function K5Course({
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
   const showObserverOptions =
-    parentSupportEnabled && shouldShowObserverOptions(observedUsersList, currentUser)
+    parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
   const showingMobileNav = windowSize.width < MOBILE_NAV_BREAKPOINT_PX
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
@@ -628,7 +628,7 @@ export function K5Course({
           studentViewPath={`${studentViewPath + window.location.hash}`}
           courseContext={name}
           parentSupportEnabled={parentSupportEnabled}
-          observedUsersList={observedUsersList}
+          observerList={observerList}
           currentUser={currentUser}
           handleChangeObservedUser={setObservedUserId}
           showingMobileNav={showingMobileNav}
@@ -741,7 +741,7 @@ K5Course.propTypes = {
   hasWikiPages: PropTypes.bool.isRequired,
   hasSyllabusBody: PropTypes.bool.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
-  observedUsersList: ObservedUsersListShape.isRequired,
+  observerList: ObserverListShape.isRequired,
   selfEnrollment: PropTypes.object,
   tabContentOnly: PropTypes.bool,
   isMasterCourse: PropTypes.bool.isRequired

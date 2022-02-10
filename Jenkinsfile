@@ -595,7 +595,6 @@ pipeline {
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                       string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
-                      string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
                     ])
 
                   // Testing Crystalball build, will not vote on builds. Only run pre-merge.
@@ -604,10 +603,10 @@ pipeline {
                           propagate: false,
                           job: '/Canvas/proofs-of-concept/test-queue',
                           parameters: buildParameters + [string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                                                          string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                                                          string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                                                          string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
-                                                          string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),])
+                                                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                                                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                                                         string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
+                                                         string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),])
                   }
 
                   parallel(nestedStages)

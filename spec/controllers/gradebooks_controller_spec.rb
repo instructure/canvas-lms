@@ -970,11 +970,6 @@ describe GradebooksController do
         expect(gradebook_options).to have_key :late_policy
       end
 
-      it "includes message_attachment_upload_folder_id" do
-        get :show, params: { course_id: @course.id }
-        expect(gradebook_options).to have_key :message_attachment_upload_folder_id
-      end
-
       it "includes grading_schemes" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options).to have_key :grading_schemes

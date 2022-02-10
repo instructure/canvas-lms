@@ -41,7 +41,6 @@ const CanvasInbox = () => {
   const [archiveDisabled, setArchiveDisabled] = useState(true)
   const [isReply, setIsReply] = useState(false)
   const [isReplyAll, setIsReplyAll] = useState(false)
-  const [isForward, setIsForward] = useState(false)
   const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
   const userID = ENV.current_user_id?.toString()
 
@@ -148,11 +147,6 @@ const CanvasInbox = () => {
     setComposeModal(true)
   }
 
-  const onForward = () => {
-    setIsForward(true)
-    setComposeModal(true)
-  }
-
   useEffect(() => {
     setDeleteDisabled(selectedConversations.length === 0)
     setArchiveDisabled(selectedConversations.length === 0)
@@ -188,7 +182,6 @@ const CanvasInbox = () => {
             onCompose={() => setComposeModal(true)}
             onReply={() => onReply()}
             onReplyAll={() => onReply({replyAll: true})}
-            onForward={() => onForward()}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
             archiveDisabled={archiveDisabled}
@@ -215,7 +208,6 @@ const CanvasInbox = () => {
                   conversation={selectedConversations[0]}
                   onReply={conversationMessage => onReply({conversationMessage})}
                   onReplyAll={conversationMessage => onReply({conversationMessage, replyAll: true})}
-                  onDelete={handleDelete}
                 />
               ) : (
                 <View padding="small">
@@ -231,12 +223,10 @@ const CanvasInbox = () => {
         conversationMessage={selectedConversationMessage}
         isReply={isReply}
         isReplyAll={isReplyAll}
-        isForward={isForward}
         onDismiss={() => {
           setComposeModal(false)
           setIsReply(false)
           setIsReplyAll(false)
-          setIsForward(false)
           setSelectedConversationMessage(null)
         }}
         open={composeModal}

@@ -537,9 +537,9 @@ describe ContentMigration do
     cm.queue_migration
     run_jobs
 
-    html_text = @course.quiz_questions.where(migration_id: "5eb2ac5ba1c19_100").first.question_data[:question_text]
+    html_text = @course.quiz_questions.where(migration_id: "ID_5eb2ac5ba1c19_100").first.question_data[:question_text]
     expect(html_text).to eq "This is <b>Bold</b>"
-    plain_text = @course.quiz_questions.where(migration_id: "5eb2ac5ba1c19_104").first.question_data[:question_text]
+    plain_text = @course.quiz_questions.where(migration_id: "ID_5eb2ac5ba1c19_104").first.question_data[:question_text]
     expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 

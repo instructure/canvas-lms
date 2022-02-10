@@ -34,9 +34,9 @@ export function DiscussionAvailabilityContainer({...props}) {
   const [availabilityTrayOpen, setAvailabilityTrayOpen] = useState(false)
   const prefixText =
     props.anonymousState === 'full_anonymity'
-      ? I18n.t('Anonymous Discussion')
+      ? I18n.t('Anonymous Discussion | ')
       : props.anonymousState === 'partial_anonymity'
-      ? I18n.t('Partially Anonymous Discussion')
+      ? I18n.t('Partially Anonymous Discussion | ')
       : null
   let availabilities = []
   if (!props.groupSet) {
@@ -77,11 +77,9 @@ export function DiscussionAvailabilityContainer({...props}) {
                   availabilityWindowName={availabilities[0].name}
                   availableDate={props.delayedPostAt}
                   untilDate={props.lockAt}
-                  anonymousState={props.anonymousState}
                 />
               ) : (
                 <>
-                  {prefixText && <Text size={responsiveProps.textSize}>{' | '}</Text>}
                   <CondensedButton
                     onClick={() => {
                       setAvailabilityTrayOpen(true)

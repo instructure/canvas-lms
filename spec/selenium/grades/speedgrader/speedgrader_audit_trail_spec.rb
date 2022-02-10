@@ -68,7 +68,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for submission comments", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     complete_moderation!
 
     user_session(@auditor)
@@ -79,7 +78,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for submission comments deleted", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     Speedgrader.visit(@course.id, @assignment.id)
     Speedgrader.delete_comment[0].click
     accept_alert
@@ -94,7 +92,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for grades posted", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     complete_moderation!
 
     user_session(@auditor)
@@ -105,7 +102,6 @@ describe "Audit Trail" do
   end
 
   it "show entry for grades posted to students", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     complete_moderation!
 
     user_session(@auditor)
@@ -117,7 +113,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for editing anonymous grading", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(anonymous_grading: true)
@@ -133,7 +128,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for editing graders anon to graders", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(graders_anonymous_to_graders: true)
@@ -148,7 +142,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for editing grader names visible to final grader", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(grader_names_visible_to_final_grader: false)
@@ -163,7 +156,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for editing grader comments visible", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(grader_comments_visible_to_graders: false)
@@ -178,7 +170,6 @@ describe "Audit Trail" do
   end
 
   it "shows entry for editing grader count", priority: "1" do
-    skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(grader_count: 3)
@@ -194,17 +185,17 @@ describe "Audit Trail" do
 
   def complete_moderation!
     ModeratePage.visit(@course.id, @assignment.id)
-    ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
-    ModeratePage.select_provisional_grade_for_student_by_position(@student2, 1)
+    ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+    ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
     # post the grades
     ModeratePage.click_release_grades_button
-    accept_alert
+    driver.switch_to.alert.accept
     wait_for_ajaximations
     # wait for element to exist, means page has loaded
     ModeratePage.grades_released_button
     # Post grades to students
     ModeratePage.click_post_to_students_button
-    accept_alert
+    driver.switch_to.alert.accept
     wait_for_ajaximations
     # wait for element to exist, means page has loaded
     ModeratePage.grades_posted_to_students_button

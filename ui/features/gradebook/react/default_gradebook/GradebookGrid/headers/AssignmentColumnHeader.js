@@ -189,8 +189,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     onMenuDismiss: func.isRequired,
     showMessageStudentsWithObserversDialog: bool.isRequired,
-    showUnpostedMenuItem: bool.isRequired,
-    messageAttachmentUploadFolderId: string.isRequired
+    showUnpostedMenuItem: bool.isRequired
   }
 
   static defaultProps = {
@@ -268,9 +267,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     this.props.enterGradesAsSetting.onSelect(values[0])
   }
 
-  // TODO(EVAL): This needs to be implemented in EVAL-2064.
-  handleSendMessageStudentsWho = () => {}
-
   showMessageStudentsWhoDialog = async () => {
     this.state.skipFocusOnClose = true
     this.setState({skipFocusOnClose: true})
@@ -293,9 +289,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           onClose: () => {
             ReactDOM.unmountComponentAtNode(mountPoint)
             this.focusAtEnd()
-          },
-          onSend: this.handleSendMessageStudentsWho,
-          messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId
+          }
         }
         ReactDOM.render(<MessageStudentsWhoDialog {...props} />, mountPoint)
       }
