@@ -58,6 +58,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
       className="description"
     >
       <TextInput
+        data-testid="rating-description-input"
         defaultValue="Stellar"
         display="block"
         inputContainerRef={[Function]}
@@ -95,6 +96,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
       className="points"
     >
       <TextInput
+        data-testid="rating-points-input"
         defaultValue="10"
         display="block"
         inputContainerRef={[Function]}
@@ -306,6 +308,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         as="button"
         color="secondary"
         cursor="pointer"
+        data-testid="rating-delete-btn"
         disabled={false}
         elementRef={[Function]}
         margin="0"
