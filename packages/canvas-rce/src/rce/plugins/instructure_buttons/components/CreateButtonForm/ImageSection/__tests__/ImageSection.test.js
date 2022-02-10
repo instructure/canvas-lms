@@ -113,23 +113,6 @@ describe('ImageSection', () => {
 
   afterEach(() => jest.clearAllMocks())
 
-  it('renders the image mode selector', () => {
-    const {getByText} = subject()
-    expect(getByText('Add Image')).toBeInTheDocument()
-  })
-
-  it('renders the image preview', () => {
-    const {getByTestId} = subject()
-    expect(getByTestId('selected-image-preview')).toBeInTheDocument()
-  })
-
-  describe('when no image is selected', () => {
-    it('renders a "None Selected" message', () => {
-      const {getByText} = subject()
-      expect(getByText('None Selected')).toBeInTheDocument()
-    })
-  })
-
   describe('when the "upload image" mode is selected', () => {
     let rendered
 
@@ -202,17 +185,6 @@ describe('ImageSection', () => {
 
       afterEach(() => {
         fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
-      })
-
-      it('sets the image name', () => {
-        expect(getByText('grid.png')).toBeInTheDocument()
-      })
-
-      it('updates the image preview', async () => {
-        await flushPromises()
-        expect(getByTestId('selected-image-preview')).toHaveStyle(
-          'backgroundImage: url(data:image/png;base64,asdfasdfjksdf==)'
-        )
       })
 
       it('dispatches an action to update parent state image', async () => {
