@@ -2621,10 +2621,10 @@ describe UsersController do
       end
 
       shared_examples_for "observer list" do
-        it "sets ENV.OBSERVER_LIST with self and observed users" do
+        it "sets ENV.OBSERVED_USERS_LIST with self and observed users" do
           get "user_dashboard"
 
-          observers = assigns[:js_env][:OBSERVER_LIST]
+          observers = assigns[:js_env][:OBSERVED_USERS_LIST]
           expect(observers.length).to be(1)
           expect(observers[0][:name]).to eq(@student.name)
           expect(observers[0][:id]).to eq(@student.id)

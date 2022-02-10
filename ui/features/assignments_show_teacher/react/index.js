@@ -26,7 +26,10 @@ export default function renderAssignmentsApp(env, elt) {
   const client = createClient()
   ReactDOM.render(
     <ApolloProvider client={client}>
-      <TeacherQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+      <TeacherQuery
+        assignmentLid={ENV.ASSIGNMENT_ID.toString()}
+        messageAttachmentUploadFolderId={null} // This needs to be defined before this view can be enabled
+      />
     </ApolloProvider>,
     elt
   )

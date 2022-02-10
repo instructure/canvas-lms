@@ -19,6 +19,16 @@
 #
 
 class Rubric < ActiveRecord::Base
+  class RubricUniqueAlignments < ActiveModel::Validator
+    def validate(record)
+      return if record.criteria.nil?
+
+      ids = record.criteria.pluck(:learning_outcome_id).compact
+
+      record.errors.add :base, I18n.t("rubric.alignments.duplicated_outcome", "This rubric has Outcomes aligned more than once") if ids.uniq.count != ids.count
+    end
+  end
+
   include Workflow
   include HtmlTextHelper
 
@@ -37,6 +47,8 @@ class Rubric < ActiveRecord::Base
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_blank: false }
+
+  validates_with RubricUniqueAlignments
 
   before_validation :default_values
   before_create :set_root_account_id
@@ -244,6 +256,9 @@ class Rubric < ActiveRecord::Base
     rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
     @skip_updating_points_possible = association_params[:skip_updating_points_possible]
     update_criteria(rubric_params)
+
+    return self unless valid?
+
     RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association_object] || association_params[:url]
   end
 

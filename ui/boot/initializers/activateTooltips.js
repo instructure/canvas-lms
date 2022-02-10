@@ -107,9 +107,9 @@ $.widget('custom.timeoutTooltip', $.ui.tooltip, {
     return this._on(target, {
       mouseleave: 'close',
       focusout: 'close',
-      keyup(event) {
-        if (event.keyCode === $.ui.keyCode.ESCAPE) {
-          const fakeEvent = $.Event(event)
+      keyup(event_) {
+        if (event_.keyCode === $.ui.keyCode.ESCAPE) {
+          const fakeEvent = $.Event(event_)
           fakeEvent.currentTarget = target[0]
           return this.close(fakeEvent, true)
         }
@@ -150,7 +150,7 @@ function using(position, feedback) {
     )
 }
 
-$('body').on('mouseenter focusin', '[data-tooltip]', function(event) {
+$('body').on('mouseenter focusin', '[data-tooltip]', function (_event) {
   const $this = $(this)
   let opts = $this.data('tooltip')
 
@@ -166,7 +166,7 @@ $('body').on('mouseenter focusin', '[data-tooltip]', function(event) {
   if (!opts.position.using) opts.position.using = using
 
   if ($this.data('html-tooltip-title')) {
-    opts.content = function() {
+    opts.content = function () {
       return $.raw($(this).data('html-tooltip-title'))
     }
     opts.items = '[data-html-tooltip-title]'

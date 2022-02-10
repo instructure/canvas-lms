@@ -30,6 +30,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
   argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
+  argument :context_code, String, required: false
   argument :user_note, Boolean, required: false
 
   field :conversation_message, Types::ConversationMessageType, null: true
@@ -43,7 +44,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       current_user: current_user,
       session: session,
       recipients: input[:recipients],
-      context_code: conversation.conversation.context.asset_string,
+      context_code: input[:context_code] || conversation.conversation.context.asset_string,
       message_ids: input[:included_messages],
       body: input[:body],
       attachment_ids: input[:attachment_ids],

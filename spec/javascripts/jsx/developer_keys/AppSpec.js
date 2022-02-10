@@ -296,7 +296,7 @@ test('displays the developer key on click of show key button', () => {
   }
   const wrapper = mount(<DeveloperKeysApp {...props} />)
 
-  btn = wrapper.find('table button').first()
+  const btn = wrapper.find('table button').first()
   ok(btn.html().includes('Show Key'))
   btn.simulate('click')
   ok(btn.html().includes('Hide Key'))

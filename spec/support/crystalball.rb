@@ -198,6 +198,22 @@ module Crystalball
         prediction_list.include?(ENV["CRYSTALBALL_TEST_SUITE_ROOT"])
     end
   end
+
+  class MapStorage
+    # YAML persistence adapter for execution map storage
+    class YAMLStorage
+      def dump(data)
+        path.dirname.mkpath
+        # Any keys longer than 128 chars will have a yaml output starting with "? <value>\n:" instead of "<value>:\n", which crystalball doesn't like
+        data_dump = if %i[type commit timestamp version].all? { |header| data.key? header }
+                      YAML.dump(data)
+                    else
+                      YAML.dump(data).gsub("? ", "").gsub("\n:", ":\n").gsub("\n  -", "\n-").gsub("\n -", "\n-")
+                    end
+        path.open("a") { |f| f.write data_dump }
+      end
+    end
+  end
 end
 
 require "crystalball/rspec/runner/configuration"

@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@use "sass:list";
+
+$fonts: (
+  'Lato Extended': (
+    (normal 300): 'lato/extended/Lato-Light',
+    (normal 400): 'lato/extended/Lato-Regular',
+    (italic 400): 'lato/extended/Lato-Italic',
+    (normal 700): 'lato/extended/Lato-Bold',
+    (italic 700): 'lato/extended/Lato-BoldItalic',
+  ),
+  'Balsamiq Sans': (
+    (normal 400): 'balsamiq_sans/BalsamiqSans-Regular',
+    (italic 400): 'balsamiq_sans/BalsamiqSans-Italic',
+    (normal 700): 'balsamiq_sans/BalsamiqSans-Bold',
+    (italic 700): 'balsamiq_sans/BalsamiqSans-BoldItalic',
+  ),
+  'Architects Daughter': (
+    (normal 400): 'architects_daughter/ArchitectsDaughter-Regular',
+  )
+);
+
+@each $family, $faces in $fonts {
+  @each $desc, $path in $faces {
+    @font-face {
+      font-family: $family;
+      font-style: list.nth($desc, 1);
+      font-weight: list.nth($desc, 2);
+      src: url("/fonts/#{$path}.woff2");
+      font-display: swap;
+    }
+  }
+}

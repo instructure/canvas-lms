@@ -42,9 +42,13 @@ function updateTeacherNotesColumn(courseId, columnId, attr) {
   return axios.put(url, {column: attr})
 }
 
-function updateSubmission(courseId, assignmentId, userId, submission) {
+function updateSubmission(courseId, assignmentId, userId, submission, enterGradesAs) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`
-  return axios.put(url, {submission: underscore(submission), include: ['visibility']})
+  return axios.put(url, {
+    submission: underscore(submission),
+    include: ['visibility'],
+    prefer_points_over_scheme: enterGradesAs === 'points'
+  })
 }
 
 function saveUserSettings(courseId, gradebook_settings) {

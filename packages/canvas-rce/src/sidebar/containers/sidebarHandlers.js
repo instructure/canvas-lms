@@ -38,6 +38,8 @@ import {changeContext, changeSearchString, changeSortBy} from '../actions/filter
 import {allFilesLoading} from '../actions/all_files'
 import {get as getSession} from '../actions/session'
 
+const DEFAULT_FILE_CATEGORY = 'uncategorized'
+
 export default function propsFromDispatch(dispatch) {
   return {
     loadSession: () => dispatch(getSession),
@@ -47,8 +49,9 @@ export default function propsFromDispatch(dispatch) {
     fetchNextPage: key => dispatch(fetchNextPage(key)),
     toggleFolder: id => dispatch(toggleFolder(id)),
     fetchFolders: () => dispatch(fetchFolders()),
-    fetchInitialImages: (opts = {}) => dispatch(fetchInitialImages(opts)),
-    fetchNextImages: (opts = {}) => dispatch(fetchNextImages(opts)),
+    fetchInitialImages: (opts = {category: DEFAULT_FILE_CATEGORY}) =>
+      dispatch(fetchInitialImages(opts)),
+    fetchNextImages: (opts = {category: DEFAULT_FILE_CATEGORY}) => dispatch(fetchNextImages(opts)),
     startUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadPreflight(tabContext, fileMetaProps)),
     flickrSearch: term => dispatch(searchFlickr(term)),
