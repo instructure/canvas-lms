@@ -39,6 +39,10 @@ final SYNC_IMAGES = [
     job: null,
     target: 'starlord.inscloudgate.net/jenkins/selenium-chrome:4.1.1-20220121',
   ],
+  'selenium/node-chrome:98.0': [
+    job: null,
+    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:98.0'
+  ]
 ]
 
 pipeline {
