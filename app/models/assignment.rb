@@ -338,6 +338,13 @@ class Assignment < ActiveRecord::Base
     result
   end
 
+  def finish_duplicating
+    return unless ["duplicating", "failed_to_duplicate"].include?(workflow_state)
+
+    self.workflow_state =
+      (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
+  end
+
   def can_duplicate?
     return false if quiz?
     return false if external_tool_tag.present? && !quiz_lti?
@@ -1306,12 +1313,9 @@ class Assignment < ActiveRecord::Base
       event :publish, transitions_to: :published
     end
     state :duplicating do
-      event :finish_duplicating, transitions_to: :unpublished
       event :fail_to_duplicate, transitions_to: :failed_to_duplicate
     end
-    state :failed_to_duplicate do
-      event :finish_duplicating, transitions_to: :unpublished
-    end
+    state :failed_to_duplicate
     state :importing do
       event :finish_importing, transitions_to: :unpublished
       event :fail_to_import, transitions_to: :fail_to_import
