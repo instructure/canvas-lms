@@ -82,7 +82,7 @@ module SpeedGrader
       end
 
       # Ensure that any test students are sorted last
-      students = students.partition { |r| r.preferences[:fake_student] != true }.flatten
+      students = students.sort_by { |r| r.preferences[:fake_student] == true ? 1 : 0 }
 
       enrollments = course.apply_enrollment_visibility(
         gradebook_enrollment_scope(user: current_user, course: course),
