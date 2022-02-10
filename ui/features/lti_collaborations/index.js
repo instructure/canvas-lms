@@ -17,5 +17,8 @@
  */
 
 import router from './react/router'
+import ready from '@instructure/ready'
 
-router.start()
+ready(() => {
+  router.start()
+})
