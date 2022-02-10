@@ -49,7 +49,14 @@ describe('useSvgSettings()', () => {
         textSize: 'small',
         textColor: '#000000',
         textBackgroundColor: null,
-        textPosition: 'middle'
+        textPosition: 'middle',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        width: 0,
+        height: 0,
+        transform: ''
       })
     })
 
@@ -89,7 +96,14 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })
@@ -162,7 +176,14 @@ describe('useSvgSettings()', () => {
         textSize: 'medium',
         textColor: '#009606',
         textBackgroundColor: '#06A3B7',
-        textPosition: 'middle'
+        textPosition: 'middle',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        width: 0,
+        height: 0,
+        transform: ''
       })
     })
 
@@ -209,7 +230,14 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })
@@ -235,7 +263,14 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })

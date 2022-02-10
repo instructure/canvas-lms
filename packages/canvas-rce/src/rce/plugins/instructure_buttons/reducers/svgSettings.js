@@ -23,7 +23,29 @@ export const defaultState = DEFAULT_SETTINGS
 export const actions = {
   SET_ENCODED_IMAGE: 'SetEncodedImage',
   SET_ENCODED_IMAGE_TYPE: 'SetEncodedImageType',
-  SET_ENCODED_IMAGE_NAME: 'SetEncodedImageName'
+  SET_ENCODED_IMAGE_NAME: 'SetEncodedImageName',
+  SET_X: 'SetX',
+  SET_Y: 'SetY',
+  SET_TRANSLATE_X: 'SetTranslateX',
+  SET_TRANSLATE_Y: 'SetTranslateY',
+  SET_WIDTH: 'SetWidth',
+  SET_HEIGHT: 'SetHeight'
+}
+
+const buildTransformString = state => {
+  // All transforms that may be applied to an image
+  return [`translate(${state.translateX},${state.translateY})`].join(' ')
+}
+
+const nextStateForTransform = (currentState, transformProp, value) => {
+  // Set the transform property that actually changed
+  let nextState = {...currentState, [transformProp]: value}
+
+  // Regenerate the new "transform" string, taking into account the transform
+  // property value that was updated
+  nextState = {...nextState, transform: buildTransformString(nextState)}
+
+  return nextState
 }
 
 export const svgSettings = (state, action) => {
@@ -34,6 +56,18 @@ export const svgSettings = (state, action) => {
       return {...state, encodedImageType: action.payload}
     case actions.SET_ENCODED_IMAGE_NAME:
       return {...state, encodedImageName: action.payload}
+    case actions.SET_X:
+      return {...state, x: action.payload}
+    case actions.SET_Y:
+      return {...state, y: action.payload}
+    case actions.SET_WIDTH:
+      return {...state, width: action.payload}
+    case actions.SET_HEIGHT:
+      return {...state, height: action.payload}
+    case actions.SET_TRANSLATE_X:
+      return nextStateForTransform(state, 'translateX', action.payload)
+    case actions.SET_TRANSLATE_Y:
+      return nextStateForTransform(state, 'translateY', action.payload)
     default:
       return {...state, ...action}
   }

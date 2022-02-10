@@ -123,6 +123,40 @@ describe('ImageSection', () => {
     expect(getByTestId('selected-image-preview')).toBeInTheDocument()
   })
 
+  it('sets default crop settings', () => {
+    subject()
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith({
+      type: 'SetX',
+      payload: '50%'
+    })
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith({
+      type: 'SetY',
+      payload: '50%'
+    })
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith({
+      type: 'SetWidth',
+      payload: 75
+    })
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith({
+      type: 'SetHeight',
+      payload: 75
+    })
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith({
+      type: 'SetTranslateX',
+      payload: -37.5
+    })
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith({
+      type: 'SetTranslateY',
+      payload: -37.5
+    })
+  })
+
   describe('when the cropper FF is off', () => {
     let rendered
 

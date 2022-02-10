@@ -15,32 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {createSvgElement} from './utils'
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import {SVGIcon} from '@instructure/ui-svg-images'
+export const CLIP_PATH_ID = 'clip-path-for-embed'
 
-const SVGThumbnail = ({name, source, size = '4rem'}) => {
-  return (
-    <div style={{fontSize: size}}>
-      <SVGIcon
-        src={source[name]?.source()}
-        title={source[name]?.title}
-        data-testid={`icon-${name}`}
-      />
-    </div>
-  )
+export function buildClipPath() {
+  const clipPath = createSvgElement('clipPath', {
+    id: CLIP_PATH_ID
+  })
+
+  return clipPath
 }
-
-SVGThumbnail.propTypes = {
-  size: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  source: PropTypes.objectOf(
-    PropTypes.shape({
-      source: PropTypes.func.isRequired,
-      label: PropTypes.string.isRequired
-    }).isRequired
-  ).isRequired
-}
-
-export default SVGThumbnail
