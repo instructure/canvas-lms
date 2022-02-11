@@ -67,7 +67,7 @@ es-ES:
     select_calendars: "Seleccionar calendarios"
   EditRubricPage: 
     titles: 
-      find_outcomes: "Buscar resultados"
+      find_outcomes: "Buscar competencias"
   EditorToggle: 
     done: 
       title: "Haga clic para terminar la edición del área de texto con formato"
@@ -365,7 +365,7 @@ es-ES:
     report_header_long_name: "nombre largo"
     report_header_name: nombre
     report_header_nonxlist_course_id: nonxlist_course_id
-    report_header_outcome_score: "nota del resultado"
+    report_header_outcome_score: "nota de la competencia"
     report_header_parent_account_id: parent_account_id
     report_header_restrict_course_dates: restrict_enrollments_to_course_dates
     report_header_restrict_section_dates: restrict_enrollments_to_section_dates
@@ -1338,7 +1338,7 @@ es-ES:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Este informe muestra los resultados de la competencia de aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes actividades asociadas. Este informe solo muestra resultados finales por actividad y no incluye los resultados vinculados a un banco de preguntas."
+            text: "Este informe muestra los resultados de la competencia de aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes actividades asociadas. Este informe solo muestra resultados finales por actividad y no incluye las competencias vinculados a un banco de preguntas."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1717,7 +1717,7 @@ es-ES:
   alerts_6b871b71: Alertas
   alerts_add_edit_delete_d71091c6: "Alertas: añadir/editar/eliminar"
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Las alertas deben estar configuradas para la institución. Las alertas son una funcionalidad que se usa raramente y que está diseñada para enviar un alerta a los alumnos, profesores o administradores para iniciadores específicos (por ejemplo, si no hay interacciones entre los alumnos y los profesores durante 7 días). Se revisan cada día y las notificaciones se envían al alumno o al profesor hasta que el problema que haya iniciado la alerta se resuelva."
-  align_outcomes_to_this_page_7d055196: "Pasar los resultados a esta página"
+  align_outcomes_to_this_page_7d055196: "Pasar las competencias a esta página"
   all_4321c3a1: Todo
   all_account_types_e83c1516: "Todos los tipos de cuentas"
   all_accounts_3bafc860: "Todas las cuentas"
@@ -1828,7 +1828,7 @@ es-ES:
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permite que las competencias de aprendizaje puedan seleccionarse durante la migración del contenido de la asignatura"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permite modificar las configuraciones de notificaciones para cualquier asignatura desde la página de las configuraciones de notificaciones a nivel de la cuenta."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permite configurar escalas de dominio y métodos de cálculo a nivel de la cuenta y de la asignatura, sustituyendo las valoraciones de criterio y los métodos de cálculo en función de la competencia"
-  allows_setting_criterion_ratings_and_calculation_m_24542321: "Le permite configurar las valoraciones del criterio y las opciones del procedimiento de cálculo para resultados individuales."
+  allows_setting_criterion_ratings_and_calculation_m_24542321: "Le permite configurar las valoraciones del criterio y las opciones del procedimiento de cálculo para competencias individuales."
   allows_students_to_access_other_student_groups_wit_43918810: "Permite a los alumnos acceder a otros grupos de alumnos dentro de un conjunto de grupos con un enlace directo."
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "Permite sincronizar los miembros de los asignaturas de Canvas en un Microsoft Team"
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Permite la duplicación de módulos en Canvas"
@@ -2167,7 +2167,7 @@ es-ES:
   an_error_occurred_adding_group_groupname_message_8854de45: "Ha habido un error al añadir el grupo “%{groupName}”: %{message}."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Ha habido un error al cambiar el estado de bloqueo de \"%{fileName}\""
   an_error_occurred_during_the_sync_process_error_62d98be7: "Ha habido un error durante el proceso de sincronización: %{error}"
-  an_error_occurred_loading_outcomes_data_cfd18b61: "Ha habido un error al cargar los datos de los resultados."
+  an_error_occurred_loading_outcomes_data_cfd18b61: "Ha habido un error al cargar los datos de las competencias."
   an_error_occurred_making_a_network_request_d1bda348: "Ha habido un error al realizar una solicitud de red"
   an_error_occurred_moving_group_grouptitle_16ec1ebd: "Ha habido un error al mover el grupo “%{groupTitle}”."
   an_error_occurred_moving_group_grouptitle_message_5c592f26: "Ha habido un error al mover el grupo “%{groupTitle}”: %{message}."
@@ -2271,8 +2271,8 @@ es-ES:
   an_internal_error_occurred_83b8a685: "Ha habido un error interno."
   an_item_named_name_already_exists_in_this_location_147b7312: "Ya existe un elemento llamado “%{name}” en esta ubicación. ¿Desea sustituir el archivo existente?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Un objeto de tipo %{graphql_type} estaba oculto debido a la presencia de ámbitos insuficientes en el token de acceso"
-  an_outcome_group_can_only_have_one_parent_c626c13b: "Un grupo de resultados solo puede tener un grupo de origen"
-  an_outcome_import_is_currently_in_progress_11e6cb38: "En este momento, se está importando un resultado."
+  an_outcome_group_can_only_have_one_parent_c626c13b: "Un grupo de competencias solo puede tener un grupo de origen"
+  an_outcome_import_is_currently_in_progress_11e6cb38: "En este momento, se está importando una competencia."
   an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "Un usuario de SFTP solo puede administrarse desde una cuenta principal."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Ha habido un error inesperado: consulte el informe de errores %{id}"
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Ha habido un error desconocido. Verifique el archivo CSV o inténtelo más tarde."
@@ -3545,7 +3545,7 @@ es-ES:
   breadcrumb_1_cb3c504: "Ruta de navegación 1"
   breadcrumb_2_95ba94be: "Ruta de navegación 2"
   brick_f2656265: Ladrillo
-  bridgerland_outcomes_report_76cb7c68: "Informe de resultados de Bridgerland"
+  bridgerland_outcomes_report_76cb7c68: "Informe de competencias de Bridgerland"
   bring_existing_content_into_your_course_c5fc7e1b: "Incorpore contenido existente a su curso"
   broken_file_link_found_in_your_course_7cc24395: "Se ha encontrado un enlace dañado a un archivo en su curso"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "El nombre del almacenamiento debe tener al menos alguno de los siguientes: %{bucket_names}"
@@ -3625,7 +3625,7 @@ es-ES:
       uploading_button: "Cargando archivo CSV..."
   bundles_quesiton_bank: 
     titles: 
-      find_outcomes: "Buscar resultados"
+      find_outcomes: "Buscar competencias"
   button: 
     submit_assignment: "Entregar actividad"
   button_a1577211: botón
@@ -3633,7 +3633,7 @@ es-ES:
     add_item: "Añadir ítem"
     apply: Aplicar
     authorize_google_drive: "Autorizar acceso a Google Drive"
-    back_to_outcomes: "Volver a resultados"
+    back_to_outcomes: "Volver a competencias"
     cancel: Cancelar
     choose_a_file: "Elegir un archivo"
     delete: Eliminar
@@ -4056,7 +4056,7 @@ es-ES:
   cannot_create_event_for_deleted_course_c800f310: "No se puede crear un evento para una asignatura eliminado"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "No se puede eliminar un archivo que se ha entregado como parte de una actividad"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "No se puede eliminar una anulación con una fecha de entrega dentro de un período de evaluación cerrado"
-  cannot_give_outcomes_extra_credit_696208f0: "No se pueden dar créditos adicionales a los resultados"
+  cannot_give_outcomes_extra_credit_696208f0: "No se pueden dar créditos adicionales a las competencias"
   cannot_grade_at_this_time_489744b0: "No se puede evaluar en este momento"
   cannot_have_a_blueprint_course_with_students_248e3e76: "No puede tener una asignatura Blueprint con los alumnos"
   cannot_import_a_root_group_d4654def: "No se puede importar un grupo de origen"
@@ -4272,7 +4272,7 @@ es-ES:
   clear_selected_file_82388e50: "Borrar archivo seleccionado"
   clear_user_cache_ef079f7f: "Borrar caché del usuario"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Haga clic en Cancelar si no desea que se muestre el código."
-  click_for_more_details_on_this_outcome_8c018d2f: "haga clic para ver más detalles de este resultado"
+  click_for_more_details_on_this_outcome_8c018d2f: "haga clic para ver más detalles de esta competencia"
   click_here_for_an_account_9536cb36: "Haga clic aquí para una cuenta"
   click_here_it_s_free_eeccb9cb: "Haga clic aquí, ¡es gratuito!"
   click_here_to_add_a_discussion_f17c4260: "Haga clic aquí para añadir un foro"
@@ -4833,7 +4833,7 @@ es-ES:
   confirm_delete_6febeafb: "Confirmar eliminación"
   confirm_delete_a5239715: "confirmar eliminación"
   confirm_deletion_b2efe7d4: "Confirmar la eliminación"
-  confirm_edit_outcome_a9746c99: "Confirmar resultado de edición"
+  confirm_edit_outcome_a9746c99: "Confirmar edición de la competencia"
   confirm_mastery_calculation_19ad19f9: "Confirmar el cálculo de dominio"
   confirm_mastery_scale_9a779252: "Confirmar escala de dominio"
   confirm_qr_code_display_49664fa3: "Confirmar vista del código QR"
@@ -5638,11 +5638,11 @@ es-ES:
     other: "%{count} opciones disponibles"
   count_options_loaded_cd59cc3b: "%{count} opciones cargadas."
   count_outcomes_3af5e3e: 
-    one: "%{count} competencia"
-    other: "%{count} Resultados"
+    one: "%{count} Competencia"
+    other: "%{count} Competencias"
   count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
     one: "\"%{outcomeTitle}” se ha trasladado a “%{newGroupTitle}”."
-    other: "Se han trasladado los resultados %{count} a “%{newGroupTitle}”."
+    other: "Se han trasladado las competencias %{count} a “%{newGroupTitle}”."
   count_outcomes_selected_55902958: 
     one: "1 competencia seleccionada"
     other: "%{count} competencias seleccionadas"
@@ -5846,7 +5846,7 @@ es-ES:
       files: "No se han podido exportar algunos archivos"
       grading_standards: "No se han podido exportar los estándares de evaluación"
       late_policy: "No se ha podido realizar la exportación de la política de retrasos"
-      learning_outcomes: "No se han podido exportar los resultados del aprendizaje"
+      learning_outcomes: "No se han podido exportar las competencias del aprendizaje"
       lti_links: "No se han podido exportar algunos enlaces a páginas web"
       media_file: "Un archivo multimedia no se ha podido exportar"
       media_files: "No se han podido exportar algunos archivos multimedia"
@@ -5983,7 +5983,7 @@ es-ES:
   course_notification_settings_initial_query_error_6dfb24ef: "Error en la consulta inicial de las configuraciones de las notificaciones de la asignatura"
   course_notification_settings_updated_f6726d7e: "Configuraciones de las notificaciones de la asignatura actualizadas"
   course_option_links_a79d263d: "Enlaces de opción de la asignatura"
-  course_outcome_mastery_bb12e292: "Resultado del dominio de la asignatura"
+  course_outcome_mastery_bb12e292: "Competencia del dominio de la asignatura"
   course_outcomes_7dc1cbc7: "Competencias de la asignatura"
   course_pace_plan_c79cbffc: "Pace Plans de la asignatura"
   course_pages_449f1dd4: "Páginas de la asignatura"
@@ -6665,7 +6665,7 @@ es-ES:
   custom_gradebook_columns_81944594: "Personalizar columnas del libro de notas"
   custom_link_details_35fd38fc: "Personalizar los detalles del vínculo"
   custom_lti_usage_uwf_b63978a5: "Personalizar el uso de LTI - UWF"
-  custom_outcomes_31a741f5: "Personalizar resultados"
+  custom_outcomes_31a741f5: "Personalizar competencias"
   custom_reports_experimental_features_40bbfe7c: "Informes personalizados: Funcionalidades experimentales"
   customize_course_details_26fd4afe: "Personalizar los detalles de la asignatura"
   customize_learning_mastery_ratings_4ace142a: "Personalizar calificaciones del dominio del aprendizaje"
@@ -7434,7 +7434,7 @@ es-ES:
   don_t_add_this_user_for_now_32912974: "No añadir a este usuario por ahora."
   don_t_miss_notifications_from_your_students_900e9e30: "No se pierda las notificaciones de sus alumnos."
   don_t_move_lti_query_params_to_post_body_5c80e037: "No mueva los parámetros de consulta de LTI al cuerpo de POSTEAR"
-  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "No publicar los resultados en el Libro de notas para el dominio del aprendizaje"
+  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "No publicar las competencias en el Libro de notas para el dominio del aprendizaje"
   don_t_show_again_8c7b7297: "No volver a mostrar"
   done_54e3d4b6: Hecho
   done_8af51c9b: Hecho.
@@ -7757,7 +7757,7 @@ es-ES:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Permite el botón de Lector Inmersivo de Microsoft en las áreas compatibles de Canvas. Puede que el botón siga habilitado en una asignatura independientemente de esta configuración si el administrador de la cuenta lo ha activado para todos los usuarios."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Si se habilita el Tema para primaria, se cambiará la fuente en la interfaz de Canvas y se simplificará el menú de Navegación de la asignatura para todos los usuarios en su curso."
   encourage_student_discourse_7836b9f7: "Fomente el debate entre alumnos"
-  encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Identificaciones encriptadas de origen para resultados básicos"
+  encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Identificaciones encriptadas de origen para competencias básicas"
   end_78c581cd: Fin
   end_course_set_up_tutorial_f358b85d: "Finalizar el tutorial de configuración de la asignatura"
   end_date_cannot_be_before_start_date_eb62ed6d: "La fecha de finalización debe ser anterior a la fecha de inicio"
@@ -8136,7 +8136,7 @@ es-ES:
   error_exporting_gradebook_msg_6ea31e2f: "Ha habido un error al exportar el libro de notas: %{msg}"
   error_fetching_access_token_1445a9e3: "Ha habido un error al obtener el autentificador de acceso"
   error_fetching_user_details_7c85d23: "Ha habido un error al obtener los detalles del usuario"
-  error_importing_outcomes_59a4fe81: "Ha habido un error al importar los resultados"
+  error_importing_outcomes_59a4fe81: "Ha habido un error al importar las competencias"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} en el intervalo de las rutas de dominio %{index}"
   error_loading_comment_library_db6c9045: "Ha habido un error al cargar la biblioteca de comentarios"
   error_loading_course_data_f056172b: "Ha habido un error al cargar los datos de la asignatura"
@@ -8273,7 +8273,7 @@ es-ES:
   expand_all_bb64d2ea: "Mostrar todo"
   expand_all_modules_a7d79134: "Mostrar todos los contenidos"
   expand_collapse_lang_73edc33c: "Expandir/colapsar %{lang}"
-  expand_collapse_title_outcome_group_student_meets__46ffef48: "Expandir/colapsar %{title} grupo del resultado, el alumno ha alcanzado el dominio de %{mastery_count} de %{count} resultados"
+  expand_collapse_title_outcome_group_student_meets__46ffef48: "Expandir/colapsar %{title} grupo de la competencia, el alumno ha alcanzado el dominio de %{mastery_count} de %{count} competencias"
   expand_description_for_outcome_title_abc8f30: "Expandir la descripción para la competencia %{title}"
   expand_discussion_thread_fcbb2bcc: "Expandir foro de discusión"
   expand_global_navigation_2c28d5d4: "Expandir navegación global"
@@ -8346,7 +8346,7 @@ es-ES:
       load_success_title: "Se ha finalizado el uso de la herramienta"
   external_tools_6e77821: "Herramientas externas"
   external_url_e9b87215: "URL externa"
-  extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "No se permite crédito extra en los resultados; puntuación ajustada al máximo posible para %{outcome}"
+  extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "No se permite crédito extra en las competencias; puntuación ajustada al máximo posible para %{outcome}"
   extract_error_error_file_names_a4989ed0: "Extraer error, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "EMERGENCIA CRÍTICA"
   faculty_journal_5634938e: "Diario del profesor"
@@ -8485,7 +8485,7 @@ es-ES:
   file_export_from_date_cf867c8d: "*Exportación de archivo desde %{date}*"
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "El archivo %{filename} no ha podido ser incluido en el documento ePub. Consulte el archivo ZIP independiente para el acceso."
   file_has_no_data_213a4540: "El archivo no tiene datos"
-  file_has_no_outcomes_data_1517801f: "El archivo no tiene datos de resultados"
+  file_has_no_outcomes_data_1517801f: "El archivo no tiene datos de competencias"
   file_has_not_finished_uploading_cfba3b2f: "El archivo no ha terminado de cargarse"
   file_list_350d08df: "Lista de archivos"
   file_list_updated_38e2a5ad: "Se ha actualizado la lista de archivos"
@@ -8623,11 +8623,11 @@ es-ES:
   find_ip_address_filter_96ec70bb: "Encontrar el filtrado de direcciones IP"
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: "La recuperación de resultados ha fallado.  Inténtelo de nuevo."
+      outcome_retrieval_failed: "La recuperación de competencias ha fallado.  Inténtelo de nuevo."
     messages: 
-      loading_outcomes: "Cargando resultados..."
-      no_outcomes_found: "No se encontraron resultados"
-      no_rubric_outcomes_found: "No se encontraron resultados configurados para rúbricas"
+      loading_outcomes: "Cargando competencias..."
+      no_outcomes_found: "No se encontraron competencias"
+      no_rubric_outcomes_found: "No se encontraron competencias configuradas para rúbricas"
     titles: 
       find_outcome: "Buscar competencia"
   find_outcome_746cc57e: "Buscar competencia"
@@ -9495,7 +9495,7 @@ es-ES:
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hola %{name},
       
-      La importación de resultados ha fallado debido a un error con su importación. Examine su archivo e intente cargarlo nuevamente en %{url}
+      La importación de competencias ha fallado debido a un error con su importación. Examine su archivo e intente cargarlo nuevamente en %{url}
       
       Ha habido el siguiente error: 
       %{row}
@@ -9507,18 +9507,18 @@ es-ES:
   hello_name_your_outcomes_were_successfully_importe_a510e0d: |-
       Hola %{name},
       
-      Se han importado sus resultados correctamente. Ahora puede administrarlos en %{url}
+      Se han importado sus competencias correctamente. Ahora puede administrarlas en %{url}
       
       Gracias,
       Instructure
   hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
       Hola %{name},
       
-      Se han importado sus resultados correctamente, pero con los siguientes problemas (solo se muestran hasta las primeras 100 advertencias): 
+      Se han importado sus competencias correctamente, pero con los siguientes problemas (solo se muestran hasta las primeras 100 advertencias): 
       
       %{rows}
       
-      Ahora puede administrarlos en %{url}
+      Ahora puede administrarlas en %{url}
       
       Gracias,
       Instructure
@@ -9634,7 +9634,7 @@ es-ES:
   hide_name_and_profile_picture_d18eed70: "Ocultar el nombre y la foto de perfil"
   hide_name_details_23814c37: "Ocultar %{name} detalles"
   hide_navigation_menu_f0b3e90: "Ocultar menú de navegación"
-  hide_outcomes_with_no_results_7e4ce06f: "Ocultar los resultados vacíos"
+  hide_outcomes_with_no_results_7e4ce06f: "Ocultar las competencias vacías"
   hide_params_eadf0961: "Ocultar parámetros"
   hide_projections_9d4ed1e1: "Ocultar proyecciones"
   hide_score_total_for_assessment_results_d0ef117f: "Ocultar la nota total para los resultados de actividades"
@@ -9829,7 +9829,7 @@ es-ES:
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Si están deshabilitados, el usuario aún podrá tener acceso a las Configuraciones de la asignatura."
   if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Si esta opción está habilitada, se permiten los enlaces profundos desde el índice de contenido a través de un modal."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Si esta opción está habilitada, se permiten los enlaces profundos desde el índice de módulos."
-  if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Si se habilita, permite que se otorgue una puntuación máxima posible mayor a un Resultado en una rúbrica."
+  if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Si se habilita, permite que se otorgue una puntuación máxima posible mayor a un Competencia en una rúbrica."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Si esta opción está habilitada, se permite la compatibilidad con varios enlaces profundos para actividades y contenidos."
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       Si se habilita, permite nuevos temas window.postMessage para la especificación LTI Platform
@@ -9851,7 +9851,7 @@ es-ES:
       token generado por la herramienta para verificar el origen
       de una solicitud de recurso oEmbed.
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si se habilita, los parámetros de consulta no se copiarán en el cuerpo de POST durante el lanzamiento de LTI."
-  if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si se habilita, se encriptarán las identificaciones de origen utilizadas por Canvas para los resultados básicos."
+  if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si se habilita, se encriptarán las identificaciones de origen utilizadas por Canvas para las competencias básicas."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Cuando está habilitado, el historial de entregas de pruebas en Nuevas pruebas se gestiona por separado."
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Si se habilita, estará disponible la sincronización de las inscripciones al curso
@@ -9885,11 +9885,11 @@ es-ES:
   if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "Si Datos de SIS: administrar está deshabilitado y Datos de SIS: leer está habilitado, los usuarios solo pueden ver las identificaciones de SIS de curso, usuario y subcuenta."
   if_sis_data_manage_is_enabled_and_sis_data_read_is_155d15ef: "Si Datos de SIS: administrar está habilitado y Datos de SIS: leer está deshabilitado, el permiso de cuenta anula el permiso de la asignatura."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Si se habilita Estadísticas: ver o Usuarios: administrar detalles de inicio de sesión, el usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
-  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Si la opción de la funcionalidad de Escalas de Dominio de Resultados a Nivel del Usuario y de la Asignatura está habilitada, la pestaña Administrar muestra una interfaz actualizada. Además, la página de Resultados mostrará dos pestañas adicionales que separan las escalas y los cálculos de dominio de la administración de resultados."
+  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Si la opción de la funcionalidad de Escalas de Dominio de Competencias a Nivel del Usuario y de la Asignatura está habilitada, la pestaña Administrar muestra una interfaz actualizada. Además, la página de Competencias mostrará dos pestañas adicionales que separan las escalas y los cálculos de dominio de la administración de competencias."
   if_the_account_and_course_level_outcome_mastery_sc_a59cef30: "Si la funcionalidad de vista previa de Escalas de Dominio de Competencias a Nivel de la Cuenta y del Curso está habilitada, la pestaña Administrar muestra una interfaz actualizada. Además, la página de Competencias mostrará dos pestañas adicionales que separan las escalas y los cálculos de dominio de la administración de competencias."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Si los permisos adicionales están habilitados, pero este permiso no lo está, las configuraciones de bloqueo se pueden editar en foros de discusión individuales."
   if_the_course_content_permission_enabled_and_web_c_85f91e32: "Si el permiso Contenido de la asignatura está habilitado y Conferencias web: crear está deshabilitado, el usuario aún puede administrar las conferencias."
-  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Si la opción de la funcionalidad está habilitada, y este permiso está habilitado, la página de Resultados incluye tres pestañas: Administrar, Dominio y Cálculo."
+  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Si la opción de la funcionalidad está habilitada, y este permiso está habilitado, la página de Competencias incluye tres pestañas: Administrar, Dominio y Cálculo."
   if_the_feature_preview_is_enabled_and_this_permiss_e79925a7: "Si la funcionalidad vista previa está habilitada, y este permiso está habilitado, la página de Competencias incluye tres pestañas: Administrar, Dominio y Cálculo."
   if_the_open_registration_account_setting_is_enable_10b1965c: "Si la configuración de la cuenta de registro abierto está habilitada, los usuarios con este permiso pueden añadir diseñadores a una asignatura desde la página de Asignaturas con la dirección de correo electrónico o con la identificación de inicio de sesión aunque el diseñador todavía no tenga una cuenta de Canvas."
   if_the_open_registration_account_setting_is_enable_1e679e07: "Si la configuración de la cuenta de registro abierto está habilitada, los usuarios con este permiso pueden añadir profesores auxiliares a una asignatura desde la página de Asignaturas con la dirección de correo electrónico o con la identificación de inicio de sesión aunque el profesor auxiliar todavía no tenga una cuenta de Canvas."
@@ -9963,15 +9963,15 @@ es-ES:
   immersive_reader_7b87538: "Lector inmersivo"
   immersive_reader_failed_to_load_bc8d4dd4: "Ha fallado la carga del Lector inmersivo"
   import_1b31507: Importar
-  import_a_set_of_outcomes_6b782192: "Importar un conjunto de resultados"
+  import_a_set_of_outcomes_6b782192: "Importar un conjunto de competencias"
   import_anyway_8c996ef6: "Importar de todos modos"
   import_commons_favorites_e68fce81: "Importar favoritos de Commons"
   import_content_b2fd6620: "Importar contenido"
   import_e929507b: Importar...
   import_groups_3a2ae14b: "Importar grupos"
-  import_learning_outcomes_36d28a2b: "Importar resultados del aprendizaje"
-  import_outcomes_7dda186b: "Importar resultados"
-  import_outcomes_to_groupname_d0a3264d: "Importar resultados a \"%{groupName}\""
+  import_learning_outcomes_36d28a2b: "Importar competencias del aprendizaje"
+  import_outcomes_7dda186b: "Importar competencias"
+  import_outcomes_to_groupname_d0a3264d: "Importar competencias a \"%{groupName}\""
   import_override_scores_in_gradebook_80d51a72: "Importar Anular puntuaciones en el Libro de notas"
   import_sis_data_428cc803: "Importar datos de SIS"
   import_started_successfully_a3467411: "La importación ha comenzado"
@@ -10000,17 +10000,17 @@ es-ES:
     due_dates_warning: "No se han podido ajustar las fechas de entrega."
     file_import_warning: "No se ha podido encontrar el archivo %{file}"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "No se le permite administrar resultados globales, no puede añadir “%{title}\""
+    no_global_permission: "No se le permite administrar competencias globales, no puede añadir “%{title}\""
   importers/learning_outcome_importer: 
-    no_context_found: "No se ha podido encontrar el resultado del aprendizaje externo para “%{title}”. Se está creando una copia."
-    no_global_permission: "No se le permite administrar resultados globales, no puede añadir “%{title}\""
+    no_context_found: "No se ha podido encontrar la competencia del aprendizaje externo para “%{title}”. Se está creando una copia."
+    no_global_permission: "No se le permite administrar competencias globales, no puede añadir “%{title}\""
   importers/wiki_page_importer: 
     title_for_topics_category: "Temas de %{category}"
     warnings: 
       truncated_wiki_title: "Se ha truncado el título de la siguiente página wiki: %{title}"
   importing_course_content_into_the_same_course_will_b09c69e: "El importar el contenido de la asignatura al mismo curso duplicará el contenido la primera vez y anulará los duplicados si es repetido."
   importing_name_8f2b131d: "Importando “%{name}\""
-  importing_outcomes_e62a0375: "importando resultados"
+  importing_outcomes_e62a0375: "importando competencias"
   importing_the_same_course_content_more_than_once_w_8b28b2c6: "Al importar el mismo contenido de una asignatura más de una vez, reemplazará cualquier contenido existente en la asignatura."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Mejorar la detección de la acción de arrastrar y soltar en los archivos"
   improved_filtering_of_students_and_assignments_in__5c6a281: "Filtrado mejorado de alumnos y actividades en el Libro de notas."
@@ -10027,7 +10027,7 @@ es-ES:
   in_closed_grading_period_dc717846: "En el período de evaluación cerrado"
   in_less_than_a_minute_c8595a28: "en menos de un minuto"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Para completar el proceso, se redirigirá a una página de inicio de sesión en el que tendrá que iniciar sesión con las credenciales de su hijo."
-  in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Para importar una gran cantidad de resultados a la vez o para actualizar sus resultados existentes, *siga el formato CSV*."
+  in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Para importar una gran cantidad de competencias a la vez o para actualizar sus competencias existentes, *siga el formato CSV*."
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Recorrido de la formación y puntos importantes dentro del producto para administradores, profesores y alumnos"
   in_progress_13b9e26f: "en progreso"
   in_progress_9d1ce8b9: "En progreso"
@@ -10083,7 +10083,7 @@ es-ES:
   individual_gradebook_c7de9821: "Libro de notas individual..."
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "No se pueden modificar los valores de cálculo de la competencia individual."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "No se pueden modificar los puntos de dominio de la competencia individual."
-  individual_outcome_rating_and_calculation_method_o_f0eae85f: "Calificación individual del resultado y opciones del método de cálculo"
+  individual_outcome_rating_and_calculation_method_o_f0eae85f: "Calificación individual de la competencia y opciones del método de cálculo"
   individual_outcome_ratings_cannot_be_modified_9fcdfb90: "No se pueden modificar las notas de la competencia individual."
   individual_ratings_data_input_with_acount_level_ma_2c23f844: "entrada de datos con calificaciones individuales con acount_level_mastery_scale FF habilitado"
   individual_ratings_data_input_with_invidual_outcom_1152d59e: "entrada de datos con calificaciones individuales con invidual_outcome_rating_and_calculation FF deshabilitado"
@@ -10515,7 +10515,7 @@ es-ES:
   learning_mastery_context_name_a0b70957: "Dominio del aprendizaje: %{context_name}"
   learning_mastery_gradebook_description: |-
       El Libro de notas del dominio del aprendizaje representa el modo en el que los profesores pueden ver con rapidez el progreso de la asignatura y de los alumnos
-      en los resultados del aprendizaje de las asignaturas. Los resultados se presentan en un formato similar al de los
+      en las competencias del aprendizaje de las asignaturas. Las competencias se presentan en un formato similar al de los
       Libros de notas y el progreso del alumno aparece tanto en el formato de puntuación numérica como en el de dominado/casi
       dominio/medidas correctoras.
   learning_mastery_gradebook_redesign_9ca88020: "Rediseño del Libro de notas del dominio del aprendizaje"
@@ -10523,7 +10523,7 @@ es-ES:
   learning_outcome: 
     no_comment: "Sin comentario"
     no_description: "Sin descripción"
-  learning_outcome_and_assignment_type_b7e752fb: "Tipo de resultado de aprendizaje y actividad"
+  learning_outcome_and_assignment_type_b7e752fb: "Tipo de competencia de aprendizaje y actividad"
   learning_outcome_friendly_name_bde2c4fb: "nombre de referencia competencia de aprendizaje"
   learning_outcome_gradebook_for_coursename_4634781b: "Libro de notas de competencia de aprendizaje para %{courseName}"
   learning_outcome_id_88ff198c: "Identificación de competencia de aprendizaje"
@@ -10537,10 +10537,10 @@ es-ES:
   learning_outcomes_can_be_included_in_assignment_ru_a48bb903: |
       
       Las competencias de aprendizaje pueden incluirse en rúbricas de actividades como una forma de evaluar fácilmente
-      el dominio de los resultados vinculados con actividades específicas.  Cuando defina una competencia
+      el dominio de las competencias vinculadas con actividades específicas.  Cuando defina una competencia
       de aprendizaje, también deberá establecer un criterio que pueda usarse al momento de elaborar
       rúbricas de actividades.  Defina tantas columnas de rúbricas como necesite y especifique un umbral de
-      punto(s) que se utilizará para definir el dominio sobre este resultado.
+      punto(s) que se utilizará para definir el dominio sobre esta competencia.
   learning_outcomes_import_eca3a09c: "Competencias de aprendizaje: importar"
   leave_5e852989: Abandonar
   leave_a_comment_7991725b: "Dejar un comentario"
@@ -10592,7 +10592,7 @@ es-ES:
           porque la actividad no tiene puntos posibles.
       no_points_possible: "La actividad no tiene puntos posibles."
       no_score: "No se ha asignado puntuación"
-      no_submission_created: "La solicitud de resultados no ha podido crear una nueva entrega de deberes."
+      no_submission_created: "La solicitud de competencias no ha podido crear una nueva entrega de deberes."
     canvas: 
       migration: 
         announcements: Anuncios
@@ -10605,7 +10605,7 @@ es-ES:
         discussion_topics: "Temas del foro de discusión"
         external_tools: "Herramientas externas"
         groups: "Grupos de alumnos"
-        learning_outcomes: "Resultados del aprendizaje"
+        learning_outcomes: "Competencias del aprendizaje"
         quizzes: Pruebas
         rubrics: Rúbricas
         syllabus_body: "Parte principal del programa de la asignatura"
@@ -10792,7 +10792,7 @@ es-ES:
   loading_name_data_c66ea65f: "Cargando %{name} datos"
   loading_observed_students_dfdda108: "Cargando alumnos observados"
   loading_options_c823e98b: "Cargando opciones..."
-  loading_outcome_results_96e21ce4: "Cargando resultados"
+  loading_outcome_results_96e21ce4: "Cargando competencias"
   loading_release_notes_7deaa2eb: "Cargando notas de la versión"
   loading_results_769c8819: "Cargando resultados"
   loading_section_header_616c8cdd: "Cargando encabezado de la sección"
@@ -12954,7 +12954,7 @@ es-ES:
   moodle_formula_warning_title: "Es necesario volver a generar las respuestas posibles a las preguntas con fórmula"
   more_cf9cc661: Más
   more_courses_5ebbe998: "Más cursos"
-  more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Más importante aún, Canvas le permite añadir resultados a sus rúbricas de notas para poder evaluar el dominio al evaluar actividades. Una vez que haya configurado los resultados, haga clic en Administrar rúbricas para comenzar a usar sus resultados para las evaluaciones."
+  more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Más importante aún, Canvas le permite añadir competencias a sus rúbricas de notas para poder evaluar el dominio al evaluar actividades. Una vez que haya configurado las competencias, haga clic en Administrar rúbricas para comenzar a usar sus competencias para las evaluaciones."
   more_info_at_url_41b4764b: "Más información en %{url}"
   more_info_at_web_address_dba7e187: "Más información en %{web_address}"
   more_information_about_ratings_57cdd446: "Más información sobre las calificaciones"
@@ -12981,7 +12981,7 @@ es-ES:
   move_contents_into_f3e4fd9d: "Mover contenido a"
   move_count_outcomes_c0ca2b30: 
     one: "¿Mover “%{outcomeTitle}”?"
-    other: "¿Mover los resultados %{count}?"
+    other: "¿Mover las %{count} competencias ?"
   move_discussion_9ff5b2d1: "Mover foro de discusión"
   move_discussion_title_93ea7be1: "Mover foro de discusión %{title}"
   move_down_4a9c9b18: "Mover hacia abajo"
@@ -13942,9 +13942,9 @@ es-ES:
     invalid_file: "Competencia de grupo de archivos inválida"
   outcome_groups_3bc3b150: "Grupos de competencias"
   outcome_groups_api: 
-    account_group_description: "Grupo de resultados de nivel de cuenta."
+    account_group_description: "Grupo de competencias de nivel de cuenta."
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "La competencia “%{guid}” ya ha aparecido en esta importación"
-  outcome_imports_c496a81f: "Importación de resultados"
+  outcome_imports_c496a81f: "Importación de competencias"
   outcome_mastery_scales_8c3a814d: "Escalas de dominio de competencias"
   outcome_mastery_scales_add_edit_171551c: "Escalas de dominio de competencias: añadir/editar"
   outcome_menu_4fe5813: "Menú de competencias"
@@ -13952,16 +13952,16 @@ es-ES:
   outcome_path_mastery_points: "%{path} puntos de dominio"
   outcome_path_result: "%{path} resultado"
   outcome_proficiency_calculations_5959b681: "Cálculos de competencia de resultados"
-  outcome_proficiency_calculations_add_edit_5a2217b7: "Cálculos de competencia de resultados: añadir/editar"
+  outcome_proficiency_calculations_add_edit_5a2217b7: "Cálculos de competencia de competencias: añadir/editar"
   outcome_results: 
     outcomes_filename: Competencias
-  outcome_results_23a0a117: Resultados
-  outcome_results_title: Resultados
-  outcome_score_141cf00a: "nota del resultado"
-  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultado: el estado de %{title} es %{statusTooltip}"
+  outcome_results_23a0a117: "Resultados de las Competencias"
+  outcome_results_title: "Resultados de las Competencias"
+  outcome_score_141cf00a: "nota de la competencia"
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Competencia: el estado de %{title} es %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "El resultado “%{title}” se ha creado con éxito."
-  outcome_with_canvas_id_id_not_found_215c5227: "Resultado con identificación de Canvas “%{id}” no encontrado"
-  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "El resultado con la identificación %{guid} ya existe en otro curso o cuenta no relacionados (%{name})"
+  outcome_with_canvas_id_id_not_found_215c5227: "Competencia con identificación de Canvas “%{id}” no encontrado"
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "La competencia con la identificación %{guid} ya existe en otro curso o cuenta no relacionados (%{name})"
   outcomes: 
     criterion: 
       close_rating: Aceptar
@@ -13974,18 +13974,18 @@ es-ES:
     criterion_header: 
       insert_criterion_rating: "Introducir valoración del criterio"
       insert_rating: Insertar
-    failed_outcome_creation: "Ha fallado la creación del resultado"
-    failed_outcome_update: "Ha fallado la actualización del resultado"
+    failed_outcome_creation: "Ha fallado la creación de la competencia"
+    failed_outcome_update: "Ha fallado la actualización de la competencia"
     find_instructions: 
       instructions: 
         find: 
-          description: "*Aquí podrá acceder a los resultados creados por su institución o estado. Al igual que en su curso, el panel de la izquierda le permitirá navegar entre los resultados existentes. Una vez que haya encontrado la competencia o el grupo de competencias que desea utilizar, haga clic en el botón importar que se encuentra abajo para añadirlo a su curso.*"
-          title: "Buscando resultados"
+          description: "*Aquí podrá acceder a las competencias creadas por su institución o estado. Al igual que en su curso, el panel de la izquierda le permitirá navegar entre las competencias existentes. Una vez que haya encontrado la competencia o el grupo de competencias que desea utilizar, haga clic en el botón importar que se encuentra abajo para añadirlo a su curso.*"
+          title: "Buscando competencias"
     main_instructions: 
       instructions: 
         main: 
           manage: 
-            title: "Configurando resultados"
+            title: "Configurando competencias"
     missing_outcome: "No se ha podido encontrar esa competencia de aprendizaje"
     outcome: 
       links: 
@@ -14011,11 +14011,11 @@ es-ES:
       mastery_set_at: "Dominio establecido en"
       no_results: "(no hay resultados)"
     outcome_result: 
-      all_outcomes: "todos los resultados para este alumno"
+      all_outcomes: "todos las competencias para este alumno"
       attempt_info: "intento #%{attempt_number}, %{attempt_date}"
       outcome_mastered: dominado
       scoring: "%{points} de %{possible_points}"
-    outcomes_for: "Resultados para %{user_name}"
+    outcomes_for: "Competencias para %{user_name}"
     show: 
       no_aligned_items: "No hay ítems asignados"
       no_artifacts: "No hay artefactos"
@@ -14035,7 +14035,7 @@ es-ES:
         see_results: "Ver el resultado de %{user_name} para"
       mastery: "Dominio en el último intento"
       no_mastery: "No se ha conseguido el dominio en el último intento"
-      outcomes_for: "Resultados para %{user_name}"
+      outcomes_for: "Competencias para %{user_name}"
       score_out_of_possible: "%{score}* de %{possible}*"
       short_title: 
         attempts: Intentos
@@ -14045,7 +14045,7 @@ es-ES:
   outcomesFindDialog: 
     confirm: 
       import_group: "¿Importar grupo “%{group}” en grupo “%{target}”?"
-      import_outcome: "¿Importar resultado “%{outcome}” a grupo “%{target}”?"
+      import_outcome: "¿Importar competencia “%{outcome}” a grupo “%{target}”?"
     dont_import: "No se puede importar este grupo."
     flash: 
       importError: "Ha ocurrido un error al importar. Inténtelo de nuevo más tarde."
@@ -14058,18 +14058,18 @@ es-ES:
     state_standards_description: "A la izquierda, verá una carpeta para cada estado con sus estándares estatales actualizados. Esto le permite incluir de manera sencilla los estándares estatales de evaluación en su curso."
   outcomesSidebarView: 
     titles: 
-      find_outcomes: "Buscar resultados"
-  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Aquí se crean resultados para realizar un seguimiento del dominio en una asignatura. Para comenzar, compruebe la barra de menú en la parte superior. Haga clic en el botón Nuevo resultado para crear un nuevo resultado, o el botón Nuevo grupo para crear un nuevo grupo donde organizar sus resultados. El botón Buscar le permitirá usar resultados que han sido creados por su estado o su institución. Al crear y usar resultados, podrá usar el panel a la izquierda para navegar por sus resultados. Puede arrastrar y soltar resultados entre diferentes niveles para crear una estructura."
-  outcomes_csv_format_9005acfb: "Resultados en formato CSV"
+      find_outcomes: "Buscar competencias"
+  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Aquí se crean competencias para realizar un seguimiento del dominio en una asignatura. Para comenzar, compruebe la barra de menú en la parte superior. Haga clic en el botón Nueva competencia para crear una nueva competencia, o el botón Nuevo grupo para crear un nuevo grupo donde organizar sus competencias. El botón Buscar le permitirá usar competencias que han sido creadas por su estado o su institución. Al crear y usar competencias, podrá usar el panel a la izquierda para navegar por sus competencias. Puede arrastrar y soltar competencias entre diferentes niveles para crear una estructura."
+  outcomes_csv_format_9005acfb: "Competencias en formato CSV"
   outcomes_d1b18d33: Competencias
   outcomes_for_student_9f91d4d: "Competencias para el alumno"
-  outcomes_friendly_description_9792b2f3: "Descripción de referencia de los resultados"
-  outcomes_import_completed_baff5cb0: "Importación de resultados completa"
-  outcomes_import_failed_77efcdf4: "La importación de resultados ha fallado"
-  outcomes_report_8887bd49: "Informe de resultados"
+  outcomes_friendly_description_9792b2f3: "Descripción de referencia de las competencias"
+  outcomes_import_completed_baff5cb0: "Importación de competencias completa"
+  outcomes_import_failed_77efcdf4: "La importación de competencias ha fallado"
+  outcomes_report_8887bd49: "Informe de competencias"
   outcomes_selected_e9f87772: "Competencias seleccionadas"
-  outcomes_service_alignment_migration_5b4391ad: "Migración de la alineación de servicios de resultados"
-  outcomes_tutorial_tray_ebfce995: "Bandeja de tutoriales: resultados"
+  outcomes_service_alignment_migration_5b4391ad: "Migración de la alineación de servicios de competencias"
+  outcomes_tutorial_tray_ebfce995: "Bandeja de tutoriales: competencias"
   over_time_bee1a733: "durante un período"
   override_3de65b2c: Anular
   override_grade_385adf30: "anular nota"
@@ -15309,11 +15309,11 @@ es-ES:
     move_questions: "Mover las preguntas"
     multiple_questions: "Varias preguntas"
     question_bank: "Banco de preguntas"
-    remove_outcome_from_bank: "¿Está seguro que desea eliminar este resultado del grupo?"
+    remove_outcome_from_bank: "¿Está seguro que desea eliminar esta competencia del grupo?"
     title: 
       move_copy_questions: "Mover/copiar preguntas"
-    update_outcomes_fail: "Ha fallado la actualización de resultados"
-    updating_outcomes: "Actualizando resultados..."
+    update_outcomes_fail: "Ha fallado la actualización de competencias"
+    updating_outcomes: "Actualizando competencias..."
   question_bank_f6c44d62: "Banco de preguntas"
   question_banks: 
     bank_fail: "Ha fallado la creación del banco de preguntas."
@@ -15361,7 +15361,7 @@ es-ES:
         new_question_bank: "Nuevo banco de preguntas"
         title: "Nombre del banco"
       links: 
-        align_outcome: "Adaptar resultado"
+        align_outcome: "Adaptar competencia"
         more_questions: "más preguntas"
       loading_banks: "Cargando bancos de preguntas..."
       mastery_threshold: "dominio en %{threshold_percentage}"
@@ -17150,7 +17150,7 @@ es-ES:
     learning_mastery: 
       download_results: "Descargar resultados (.csv)"
       empty_student_selection: "Seleccionar un alumno para ver su información adicional aquí."
-      empty_submission_selection: "Seleccionar un alumno y un objetivo para ver los resultados."
+      empty_submission_selection: "Seleccionar un alumno y una competencia para ver los resultados."
       hide_student_names_label: "Ocultar los nombres de los alumnos"
       result: Resultado
       result_for: "Resultado de:"
@@ -17456,7 +17456,7 @@ es-ES:
   select_video_file_35b61d4e: "Seleccionar archivo de video"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Seleccione lo que desee que aparezca en la página de inicio."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Seleccione si desea publicar para todas las entregas o solo para las que tienen nota."
-  selectable_outcomes_during_course_content_migratio_3f108a1a: "Resultados seleccionables durante la migración del contenido de la asignatura"
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Competencias seleccionables durante la migración del contenido de la asignatura"
   selected_274ce24f: Seleccionado
   selected_all_courses_9cfef57f: "Se han seleccionado todos las asignaturas"
   selected_answer: "Ha seleccionado esta respuesta."
@@ -17754,7 +17754,7 @@ es-ES:
         events: Eventos
     find_outcome: 
       buttons: 
-        add_outcome: "Añadir resultado"
+        add_outcome: "Añadir competencia"
       labels: 
         criterion_ratings: "Valoraciones del criterio"
         master_level: "Establecer dominio en cualquier puntuación igual o superior a"
@@ -18152,7 +18152,7 @@ es-ES:
   similarityscore_similarity_score_52236e85: "Puntuación de similitud de %{similarityScore}%"
   simple_tls_45df2648: "TLS Simple"
   singapore_65_b4927585: "Singapur (+65)"
-  sioux_city_outcomes_report_710baf47: "Informe de resultados de Sioux City"
+  sioux_city_outcomes_report_710baf47: "Informe de competencias de Sioux City"
   sis_2164965: SIS
   sis_agent_token_authentication_2a0b29e3: "Autenticación de token de agente del SIS"
   sis_batch: 
@@ -18257,8 +18257,8 @@ es-ES:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Algunas conferencias en esta página están ocultas debido a errores al recuperar su estado"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Algunas de las columnas personalizadas no han podido modificarse porque eran de solo lectura; los cambios en esas columnas han sido ignorados."
   some_module_items_could_not_be_published_e4be3c0: "No se han podido publicar algunos ítems del contenido"
-  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Algunos de los resultados que ha seleccionado no se pueden eliminar porque están alineados con el contenido de esta cuenta. ¿Desea proceder a la eliminación de los resultados sin realizar alineaciones?"
-  some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Algunas de los resultados que ha seleccionado no pueden eliminarse porque están alineados con el contenido de esta asignatura. ¿Desea proceder a la eliminación de los resultados sin realizar alineaciones?"
+  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Algunos de las competencias que ha seleccionado no se pueden eliminar porque están alineadas con el contenido de esta cuenta. ¿Desea proceder a la eliminación de las competencias sin realizar alineaciones?"
+  some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Algunas de las competencias que ha seleccionado no pueden eliminarse porque están alineadas con el contenido de esta asignatura. ¿Desea proceder a la eliminación de las competencias sin realizar alineaciones?"
   some_settings_have_been_administratively_locked_9e3ee880: "El administrador ha bloqueado algunas configuraciones."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Algunas configuraciones se han inhabilitado porque la actividad se encuentra en un período de evaluación cerrado."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Algunas actividades no permiten la evaluación; se han ignorado los cambios en la nota para esas entregas."
@@ -18398,7 +18398,7 @@ es-ES:
     media_recordin: "Grabación multimedia"
     next_object: "Siguiente %{type}"
     no_assignment: "No se ha seleccionado ninguna actividad"
-    no_outcome: "No se han seleccionado resultados"
+    no_outcome: "No se han seleccionado competencias"
     no_student: "No se ha seleccionado ningún alumno"
     none: Ninguno
     notes: Notas
@@ -18409,7 +18409,7 @@ es-ES:
     online_url: "URL en línea"
     previous_object: "Anterior %{type}"
     student_hidden_name: "Alumno %{position}"
-  srsd_student_outcome_results_rollups_3cf58a5c: "Paquetes acumulativos de resultados del alumno de SRSD"
+  srsd_student_outcome_results_rollups_3cf58a5c: "Paquetes acumulativos de competencias del alumno de SRSD"
   sso_settings_ebf98263: "Configuraciones de SSO"
   stable_features_84154e5d: "Guardar funcionalidades"
   staff_contact_info_2f7a6603: "Información de contacto del personal"
@@ -18552,7 +18552,7 @@ es-ES:
   student_number_db6f06c1: "Alumno %{number}"
   student_outcome_gradebook_description: |-
       El Libro de notas de dominio del aprendizaje del alumno representa el modo en el que los alumnos pueden ven con rapidez el progreso
-      en los resultados del aprendizaje de las asignaturas. Los resultados se presentan en un formato similar al de los
+      en las competencias del aprendizaje de las asignaturas. Las competencias se presentan en un formato similar al de los
       libros de notas y el progreso aparece tanto en el formato de puntuación numérica como en el de dominado/casi
       dominio/medidas correctoras.
   student_page_history_ce86b3c2: "Historial de la página del alumno"
@@ -19274,12 +19274,12 @@ es-ES:
       Asistencia técnica de Canvas
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "El inquilino de Microsoft 365 proporcionado en las configuraciones de la cuenta no es un inquilino de educación, por lo que no puede utilizarse para integrar la sincronización de Microsoft Teams."
   the_module_item_is_locked_27fe420b: "El ítem del contenido está bloqueado."
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Las puntuaciones más recientes para el usuario %{current_user_name} y resultado %{outcome_name}."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Las puntuaciones más recientes para el usuario %{current_user_name} y competencia %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "El siguiente turno disponible en esta asignatura es el *%{date}*"
   the_original_quizzes_interface_fcda53bc: "La interfaz original de las pruebas"
   the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "El grupo de resultados se ha importado a este curso."
   the_outcome_group_was_successfully_imported_into_t_cf19e3d1: "El grupo de resultados se ha importado a esta cuenta."
-  the_outcome_to_report_on_7d30886d: "El resultado sobre el que se va a informar"
+  the_outcome_to_report_on_7d30886d: "La competencia sobre el que se va a informar"
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     one: "La competencia que ha seleccionado no se puede eliminar porque está alineada con el contenido de esta cuenta."
     other: "Las competencias que ha seleccionado no se pueden eliminar porque están alineadas con el contenido de esta cuenta."
@@ -19376,7 +19376,7 @@ es-ES:
   there_are_no_announcements_for_this_course_5ee649c3: "No hay anuncios para esta asignatura."
   there_are_no_available_signups_for_this_course_26b05c56: "No hay inscripciones disponibles para esta asignatura."
   there_are_no_discussions_to_show_in_this_section_e8f04ebd: "No hay foros de discusión que mostrar en esta sección"
-  there_are_no_outcomes_in_the_course_1d36d9c6: "No hay resultados en esta asignatura."
+  there_are_no_outcomes_in_the_course_1d36d9c6: "No hay competencias en esta asignatura."
   there_are_no_outcomes_in_this_group_9a70fa8a: "No hay competencias en este grupo."
   there_are_no_pending_changes_to_cancel_244389fe: "No hay cambios pendientes para cancelar"
   there_are_no_pending_changes_to_publish_b4ffc6a7: "No hay cambios pendientes para publicar"
@@ -19397,7 +19397,7 @@ es-ES:
   there_was_a_problem_fetching_periods_bdc09a8f: "Ha habido un problema buscando períodos"
   there_was_a_problem_hiding_assignment_grades_1d3fd0c7: "Ha habido un error al ocultar las notas de las actividades."
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "Ha habido un problema al ocultar la columna de observaciones del profesor."
-  there_was_a_problem_importing_some_of_the_outcomes_482bac10: "Ha habido un problema al importar algunos de los resultados en el archivo cargado. Consulte su correo electrónico para ver más información."
+  there_was_a_problem_importing_some_of_the_outcomes_482bac10: "Ha habido un problema al importar algunas de las competencias en el archivo cargado. Consulte su correo electrónico para ver más información."
   there_was_a_problem_loading_final_grade_overrides_e269e08: "Ha habido un problema al cargar las anulaciones de la nota final."
   there_was_a_problem_loading_module_information_e79926f4: "Ha habido un problema al cargar este contenido de información."
   there_was_a_problem_loading_students_5bdb6cf2: "Ha habido un problema al cargar alumnos."
@@ -19427,7 +19427,7 @@ es-ES:
   there_was_an_error_fetching_course_statistics_96e9dbad: "Ha habido un error al buscar las estadísticas de la asignatura"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Ha habido un error al buscar los filtros del libro de notas."
   there_was_an_error_fetching_modules_8ee451bb: "Ha habido un error al buscar los módulos."
-  there_was_an_error_fetching_outcome_results_45c57590: "Ha habido un error al capturar resultados"
+  there_was_an_error_fetching_outcome_results_45c57590: "Ha habido un error al capturar competencias"
   there_was_an_error_fetching_submission_comments_ce153077: "Ha habido un error al recuperar los comentarios de la entrega"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Ha habido un error al generar el código de sincronización"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Ha habido un error al generar el lanzamiento de la herramienta"
@@ -19526,7 +19526,7 @@ es-ES:
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Esta asignatura aún no ha comenzado. Usted no podrá participar en esta asignatura hasta el %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "La asignatura está creado y preparado, pero tiene que finalizar el proceso de registro antes de poder publicarlo.  Tiene que haber recibido un correo electrónico de Canvas con un enlace para finalizar el proceso.  Asegúrese de comprobar su buzón de correo no deseado."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Hasta que se publique, esta asignatura lo podrán ver solo los profesores."
-  this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Este criterio depende de un resultado del aprendizaje"
+  this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Este criterio depende de una competencia del aprendizaje"
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Este elemento ofrece una alternativa más accesible a la reordenación mediante la función arrastrar y soltar. Presione las teclas entrar o espacio para mover esta pregunta."
   this_email_address_is_unconfirmed_f0fc8c6e: "Esta dirección de correo electrónico no está confirmada"
   this_enables_users_to_generate_and_download_course_4c69c531: "Esta opción permite que los usuarios generen y descarguen asignaturas en formato ePub."
@@ -19625,7 +19625,7 @@ es-ES:
   this_name_appears_in_sorted_lists_dccbd84b: "Este nombre aparece en las listas clasificables."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Este nombre lo usarán los profesores para la nota."
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Esta opción no es compatible con Nuevas pruebas"
-  this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Este resultado se ha utilizado para evaluar a un alumno y algunas ediciones afectarán los resultados del alumno."
+  this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Esta competencia se ha utilizado para evaluar a un alumno y algunas ediciones afectarán los resultados del alumno."
   this_outcome_was_successfully_updated_b323e27c: "Esta competencia se ha actualizado."
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Este paquete incluye archivo(s) APIP, que no son compatibles con Canvas y no se han incluido en la importación."
   this_package_includes_curriculum_standards_which_a_1a137060: "Este paquete incluye estándares del programa de estudio, que no son compatibles con Canvas y no se han incluido en la importación."
@@ -19634,10 +19634,10 @@ es-ES:
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Este paquete incluye el tipo de pregunta, la coincidencia de patrón, que no es compatible con Canvas. Hemos convertido el tipo de pregunta en Rellena el espacio en blanco"
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Este panel enumera los usuarios listos para ser añadidos a esta asignatura."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Este permiso solamente afecta los anuncios de la asignatura; para administrar los anuncios globales, debe estar habilitado Anuncios globales: añadir/editar/eliminar."
-  this_permission_requires_the_account_and_course_le_618da734: "Este permiso requiere la opción de la funcionalidad de Escalas de Dominio de Resultados a Nivel del Usuario y de la Asignatura, la cual no debe habilitarse por el Gestor de Clientes."
+  this_permission_requires_the_account_and_course_le_618da734: "Este permiso requiere la opción de la funcionalidad de Escalas de Dominio de Competencias a Nivel del Usuario y de la Asignatura, la cual no debe habilitarse por el Gestor de Clientes."
   this_permission_requires_the_account_and_course_le_b09106c: "Este permiso requiere la funcionalidad vista previa de Escalas de Dominio de Competencias a Nivel de la Cuenta y del Curso, la cual no puede habilitarse a nivel de la cuenta."
   this_permission_requires_the_account_and_course_le_b2b8d826: "Este permiso requiere la funcionalidad vista previa de Escalas de Dominio de Competencias a Nivel de la Cuenta y del Curso, la cual no debe habilitarse por el Gestor de Clientes."
-  this_permission_requires_the_account_and_course_le_bdeefd51: "Este permiso requiere la opción de la funcionalidad de Escalas de Dominio de Resultados a Nivel del Usuario y de la Asignatura, la cual no puede habilitarse a nivel de la cuenta."
+  this_permission_requires_the_account_and_course_le_bdeefd51: "Este permiso requiere la opción de la funcionalidad de Escalas de Dominio de Competencias a Nivel del Usuario y de la Asignatura, la cual no puede habilitarse a nivel de la cuenta."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Este permiso solo debería asignarse a los usuarios que la institución haya autorizado para actuar en lugar de otros usuarios en toda su cuenta de Canvas."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Esta ubicación requiere que el proveedor sea compatible con Deep Link Compruebe con el proveedor de la herramienta que sea compatible esta con funcionalidad"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Cuando esté habilitado, este pronombre aparecerá después del nombre"
@@ -19660,7 +19660,7 @@ es-ES:
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Este informe muestra conferencias de botón azul Big para una cuenta."
   this_report_gets_the_submissions_for_courses_d83bb449: "Este informe muestra las entregas de las asignaturas."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Este informe brinda todos los ePortfolios activos de la institución actual. De manera opcional, seleccione “Solo incluir ePortfolios de usuarios sin inscripciones” para reducir el alcance de los resultados de ePortfolio a solo aquellos usuarios que no tengan inscripciones. También puede ejecutar el informe con “Incluir objetos eliminados” para incluir solo aquellos ePortfolios que hayan sido eliminados."
-  this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Este informe muestra todos los resultados del aprendizaje que existen en esta cuenta. El archivo CSV resultante tendrá una fila por resultado, y mostrará los detalles de todos los atributos asociados con cada resultado."
+  this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Este informe muestra todas las competencias del aprendizaje que existen en esta cuenta. El archivo CSV resultante tendrá una fila por competencia, y mostrará los detalles de todos los atributos asociados con cada competencia."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
       Este informe muestra toda la actividad de los usuarios inscritos en
         un curso dado o todos las asignaturas en un período en concreto. El archivo CSV que se genere tendrá una fila por actividad del alumno
@@ -19713,7 +19713,7 @@ es-ES:
   this_will_remove_the_mastery_level_from_your_maste_1f4130ea: "Esta acción eliminará el nivel de dominio de su escala de dominio."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Esta acción actualizará todas las rúbricas a nivel de la cuenta y de la asignatura que están vinculadas a la escala de dominio a nivel de la cuenta y aún no han sido evaluadas."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Esta acción actualizará todas las rúbricas alineadas con las competencias dentro de esta asignatura que aún no han sido evaluadas."
-  this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Esta acción actualizará todas las rúbricas que usan este resultado y que aún no han sido evaluadas"
+  this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Esta acción actualizará todas las rúbricas que usan esta competencia y que aún no han sido evaluadas"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Esta acción actualizará todos los resultados de dominio del alumno vinculados al cálculo de dominio a nivel de la cuenta."
   this_will_update_all_student_mastery_results_withi_934580d1: "Esta acción actualizará todos los resultados de dominio del alumno dentro de esta asignatura."
   threshold_pts_45f0e5d8: "umbral: %{pts}"
@@ -19950,7 +19950,7 @@ es-ES:
   title_is_too_long_must_be_under_length_characters_ab694ae4: "El título es demasiado largo, debe tener menos de %{length} caracteres"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} está desbloqueado. Haga clic para bloquear."
   title_no_due_date_bbbd3b53: "%{title}: No hay fecha de entrega"
-  title_outcomes_7adbd9cc: "%{title} Resultados"
+  title_outcomes_7adbd9cc: "%{title} Competencias"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} bandeja"
   title_was_successfully_created_f2a07c56: "\"%{title}\" se ha creado correctamente."
@@ -19964,9 +19964,9 @@ es-ES:
     discussion: "Foro de discusión"
     discussions: Foros
     error_reports: "Informes del error"
-    learning_outcomes: "Resultados del aprendizaje"
+    learning_outcomes: "Competencias del aprendizaje"
     messages: Mensajes
-    outcome_artifacts: "Artefactos de resultados"
+    outcome_artifacts: "Artefactos de competencias"
     view_in_separate_window: "Ver en una ventana separada"
   tls_7a2eaba5: TLS
   to_1126ab55: " hasta"
@@ -20232,7 +20232,7 @@ es-ES:
   toggle_editing_answer_text_as_html_9a93fe6: "Cambiar a editar el texto de respuesta como HTML"
   toggle_module_visibility_781a2f6c: "activar o desactivar visibilidad del contenido"
   toggle_name_c0ab332b: "Activar/Desactivar %{name}"
-  toggle_outcomes_for_title_6994b198: "Activar/Desactivar resultados para %{title}"
+  toggle_outcomes_for_title_6994b198: "Activar/Desactivar competencias para %{title}"
   toggle_select_course_name_310fdee4: "Activar/Desactivar seleccionar curso %{name}"
   toggle_title_grading_period_visibility_462b2136: "Activar/Desactivar la visibilidad del período de evaluación de %{title}"
   toggle_tooltip_1ed3b35e: "Activar/desactivar descripción emergente"
@@ -20642,7 +20642,7 @@ es-ES:
   upload_not_available_for_this_folder_8f8623c6: "Carga no disponible para esta carpeta"
   upload_progress_for_name_39f03acf: "Progreso de carga para %{name}"
   upload_successful_ca47465f: "Se ha realizado la carga"
-  upload_your_outcomes_bceeadbe: "Cargue sus resultados"
+  upload_your_outcomes_bceeadbe: "Cargue sus competencias"
   uploaded_285a2bfb: Cargado
   uploaded_files_11f11564: "Archivos cargados"
   uploaded_media_bc29db35: "Contenido multimedia cargado"
@@ -21065,7 +21065,7 @@ es-ES:
       none_yet: "Nada aún."
       page_header_title: "Perfil de usuario"
       page_views: "Vistas de la página"
-      see_outcomes: "Ver los resultados para %{user}"
+      see_outcomes: "Ver las competencias para %{user}"
     teacher_activity: 
       crumbs: 
         interaction_report: "Informe de las interacciones entre alumnos"
@@ -21686,8 +21686,8 @@ es-ES:
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "No tiene ninguna aplicación de colaboración configurada. Hable con su profesor para configurar algunas."
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "No ha añadido cursos a favoritos. Cuando recargue esta página, se mostrarán todos\n\
       \x20     sus cursos activos. Para añadir favoritos, vaya a "
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "No tiene resultados. *Haga clic aquí* para crear uno."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "No tiene resultados. Haga clic aquí para ir a la página de resultados."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "No tiene competencias. *Haga clic aquí* para crear una."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "No tiene competencias. Haga clic aquí para ir a la página de competencias."
   you_have_reached_the_domain_limit_you_can_add_more_1143333a: "Ha alcanzado el límite de dominios. Para añadir más dominios, elimine los existentes en su lista de permitidos."
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: "Ha alcanzado el límite de %{len} caracteres en el mensaje de notificación"
   you_have_reported_this_reply_4b21b6ce: "Ha informado sobre esta respuesta."
@@ -21829,7 +21829,7 @@ es-ES:
   your_message_was_sent_977f6583: "El mensaje ha sido enviado"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "Sus contenidos aparecerán aquí después de que se hayan montado."
   your_name_7665e1d8: "Su nombre"
-  your_outcomes_were_successfully_imported_c5de884: "Se han importado los resultados."
+  your_outcomes_were_successfully_imported_c5de884: "Se han importado las competencias."
   your_password_has_been_changed_df0e72aa: "Se ha cambiado la contraseña."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Las instrucciones para que recupere su contraseña se enviarán a *%{email_address}*. Esta acción podría tardar hasta 30 minutos. Asegúrese de verificar la bandeja de correo no deseado."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "No se ha podido cargar su foto de perfil. Es posible que haya superado el límite de carga."
