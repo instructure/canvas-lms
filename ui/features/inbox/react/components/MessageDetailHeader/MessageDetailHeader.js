@@ -59,6 +59,7 @@ export const MessageDetailHeader = ({...props}) => {
           <Flex.Item>
             <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
               <IconButton
+                data-testid="message-detail-header-reply-btn"
                 margin="0 x-small 0 0"
                 screenReaderLabel={I18n.t('Reply')}
                 onClick={() => props.onReply()}
