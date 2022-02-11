@@ -69,6 +69,19 @@ describe "outcome gradebook" do
       ff(".outcome-gradebook-container .headerRow_1 .outcome-score").map(&:text)
     end
 
+    def selected_values_colors
+      ff(".outcome-gradebook-container .headerRow_1 .outcome-result").map do |r|
+        CanvasColor::Color.parse(
+          *
+            r
+              .style("background-color")
+              .match(/rgba\((.*), (.*), (.*), .*/)
+              .captures
+              .map(&:to_i)
+        ).to_s
+      end
+    end
+
     it "is not visible by default" do
       Gradebook.visit(@course)
       f(".assignment-gradebook-container .gradebook-menus button").click
@@ -421,6 +434,57 @@ describe "outcome gradebook" do
             medians = median_values
             expect(medians).to contain_exactly("1.7", "2")
           end
+        end
+      end
+
+      context "with individual outcome rating and calculation method" do
+        before(:once) do
+          outcome_criterion = LearningOutcome.default_rubric_criterion
+          outcome_criterion[:ratings][1][:points] = 4
+          outcome_criterion[:mastery_points] = 4
+
+          outcome = LearningOutcome.create!(context: @course, title: "Outcome with IORCM", rubric_criterion: outcome_criterion)
+
+          proficiency = OutcomeProficiency.new(context: @course)
+          proficiency.replace_ratings(OutcomeProficiency.default_ratings)
+          proficiency.save!
+
+          OutcomeCalculationMethod.create!(context: @course, calculation_method: "highest")
+
+          assignment = @course.assignments.create!(
+            title: "Outcome Assignment",
+            grading_type: "points",
+            points_possible: 4,
+            submission_types: "online_text_entry",
+            due_at: 2.days.ago
+          )
+
+          alignment = outcome.align(assignment, @course)
+          result(@student_1, alignment, 3)
+        end
+
+        it "Displays mastery achieved if IORCM is disabled" do
+          Account.default.set_feature_flag!("account_level_mastery_scales", "on")
+          Account.default.set_feature_flag!("improved_outcomes_management", "on")
+          Account.default.set_feature_flag!("individual_outcome_rating_and_calculation", "off")
+
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          expect(selected_values_colors).to contain_exactly("#0B874B")
+        end
+
+        it "Displays mastery not achieved if IORCM is enabled" do
+          Account.default.set_feature_flag!("account_level_mastery_scales", "off")
+          Account.default.set_feature_flag!("improved_outcomes_management", "on")
+          Account.default.set_feature_flag!("individual_outcome_rating_and_calculation", "on")
+
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          expect(selected_values_colors).to contain_exactly("#FC5E13")
         end
       end
 
