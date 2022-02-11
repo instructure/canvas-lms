@@ -16,64 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useReducer} from 'react'
-import {Table} from '@instructure/ui-table'
+import I18n from 'i18n!jobs_v2'
+import React, {useCallback, useReducer, useMemo} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import JobsHeader from './components/JobsHeader'
+import JobsTable from './components/JobsTable'
 
 function jobsReducer(prevState, action) {
   if (action.type === 'FETCH_SUCCESS') {
-    return {...prevState, jobs: action.payload.jobs}
+    return {...prevState, jobs: action.payload}
+  } else if (action.type === 'CHANGE_FLAVOR') {
+    return {...prevState, flavor: action.payload}
   }
-}
-
-function renderJobRow(job) {
-  const cellTheme = {fontSize: '0.75rem'}
-
-  return (
-    <Table.Row key={job.id}>
-      <Table.RowHeader>{job.id}</Table.RowHeader>
-      <Table.Cell theme={cellTheme}>{job.tag}</Table.Cell>
-      <Table.Cell theme={cellTheme}>{job.strand}</Table.Cell>
-      <Table.Cell theme={cellTheme}>{job.singleton}</Table.Cell>
-      <Table.Cell theme={cellTheme}>{job.run_at}</Table.Cell>
-    </Table.Row>
-  )
 }
 
 export default function JobsIndex() {
   const [state, dispatch] = useReducer(jobsReducer, {
+    flavor: 'running',
     jobs: []
   })
+
+  const captions = useMemo(() => {
+    return {
+      running: I18n.t('Running jobs'),
+      current: I18n.t('Current jobs'),
+      future: I18n.t('Future jobs'),
+      failed: I18n.t('Failed jobs')
+    }
+  }, [])
+
+  const jobKey = useCallback(() => {
+    return state.flavor === 'running' ? 'running' : 'jobs'
+  }, [state.flavor])
 
   useFetchApi({
     path: '/jobs',
     params: {
-      flavor: 'future',
-      only: 'jobs'
+      flavor: state.flavor === 'running' ? 'current' : state.flavor,
+      only: jobKey()
     },
-    success: useCallback(response => {
-      dispatch({type: 'FETCH_SUCCESS', payload: response})
-    }, [])
+    success: useCallback(
+      response => {
+        dispatch({type: 'FETCH_SUCCESS', payload: response[jobKey()]})
+      },
+      [jobKey]
+    )
   })
 
   return (
-    <div>
-      <Table caption="Future Jobs">
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader>ID</Table.ColHeader>
-            <Table.ColHeader>Tag</Table.ColHeader>
-            <Table.ColHeader>Strand</Table.ColHeader>
-            <Table.ColHeader>Singleton</Table.ColHeader>
-            <Table.ColHeader>Run At</Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {state.jobs.map(job => {
-            return renderJobRow(job)
-          })}
-        </Table.Body>
-      </Table>
-    </div>
+    <>
+      <JobsHeader
+        jobFlavor={state.flavor}
+        onChange={event => dispatch({type: 'CHANGE_FLAVOR', payload: event.target.value})}
+      />
+      <JobsTable jobs={state.jobs} caption={captions[state.flavor]} />
+    </>
   )
 }
