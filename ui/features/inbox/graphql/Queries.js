@@ -147,6 +147,7 @@ export const REPLY_CONVERSATION_QUERY = gql`
   ) {
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
+        id
         _id
         contextName
         subject
