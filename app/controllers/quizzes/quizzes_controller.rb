@@ -461,7 +461,11 @@ class Quizzes::QuizzesController < ApplicationController
       quiz_params[:title] = t("New Quiz") if quiz_params[:title] == "undefined"
       quiz_params[:description] = process_incoming_html_content(quiz_params[:description]) if quiz_params.key?(:description)
 
-      quiz_params.delete(:points_possible) unless quiz_params[:quiz_type] == "graded_survey"
+      if quiz_params[:quiz_type] == "survey"
+        quiz_params[:points_possible] = ""
+      elsif quiz_params[:quiz_type] != "graded_survey"
+        quiz_params.delete(:points_possible)
+      end
       quiz_params[:disable_timer_autosubmission] = false if quiz_params[:time_limit].blank?
       quiz_params[:access_code] = nil if quiz_params[:access_code] == ""
       if quiz_params[:quiz_type] == "assignment" || quiz_params[:quiz_type] == "graded_survey" # 'new' && params[:quiz][:assignment_group_id]
