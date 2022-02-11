@@ -20,10 +20,6 @@
 class SpeedUpMaxConcurrentTriggers < ActiveRecord::Migration[5.1]
   tag :predeploy
 
-  def connection
-    Delayed::Backend::ActiveRecord::Job.connection
-  end
-
   def up
     if connection.adapter_name == "PostgreSQL"
       search_path = Shard.current.name

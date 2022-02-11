@@ -345,7 +345,7 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def add_to_transaction
+  def add_to_transaction(...)
     super unless PageView.cassandra?
   end
 

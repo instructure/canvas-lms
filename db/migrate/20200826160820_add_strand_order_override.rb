@@ -4,10 +4,6 @@ class AddStrandOrderOverride < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 
-  def connection
-    Delayed::Job.connection
-  end
-
   def up
     add_column :delayed_jobs, :strand_order_override, :integer, default: 0, null: false, if_not_exists: true
     add_column :failed_jobs, :strand_order_override, :integer, default: 0, null: false, if_not_exists: true

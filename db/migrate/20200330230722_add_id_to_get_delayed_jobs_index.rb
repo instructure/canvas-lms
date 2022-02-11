@@ -21,10 +21,6 @@ class AddIdToGetDelayedJobsIndex < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 
-  def connection
-    Delayed::Job.connection
-  end
-
   def up
     rename_index :delayed_jobs, "get_delayed_jobs_index", "get_delayed_jobs_index_old"
     add_index :delayed_jobs, %i[priority run_at id],

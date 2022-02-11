@@ -33,7 +33,7 @@ class AddDeleteConflictingSingletonsBeforeUnlockTrigger < ActiveRecord::Migratio
       $$ LANGUAGE plpgsql SET search_path TO #{::Switchman::Shard.current.name};
     SQL
     execute(<<~SQL)
-      CREATE TRIGGER delayed_jobs_before_unlock_delete_conflicting_singletons_row_tr BEFORE UPDATE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (
+      CREATE TRIGGER delayed_jobs_before_unlock_delete_conflicting_singletons_row_tr BEFORE UPDATE ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (
         OLD.singleton IS NOT NULL AND
         OLD.singleton=NEW.singleton AND
         OLD.locked_by IS NOT NULL AND

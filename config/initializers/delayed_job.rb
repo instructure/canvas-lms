@@ -69,7 +69,7 @@ Delayed::Settings.queue                      = "canvas_queue"
 Delayed::Settings.select_random_from_batch   = -> { Setting.get("jobs_select_random", "false") == "true" }
 Delayed::Settings.sleep_delay                = -> { Setting.get("delayed_jobs_sleep_delay", "2.0").to_f }
 Delayed::Settings.sleep_delay_stagger        = -> { Setting.get("delayed_jobs_sleep_delay_stagger", "2.0").to_f }
-Delayed::Settings.worker_procname_prefix     = -> { "#{Shard.current(:delayed_jobs).id}~" }
+Delayed::Settings.worker_procname_prefix     = -> { "#{Shard.current(CANVAS_RAILS6_0 ? :delayed_jobs : Delayed::Backend::ActiveRecord::AbstractJob).id}~" }
 Delayed::Settings.worker_health_check_type   = Delayed::CLI.instance&.config&.dig("health_check", "type")&.to_sym || :none
 Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]("health_check")
 # transitional
@@ -77,10 +77,6 @@ Delayed::Settings.infer_strand_from_singleton = -> { Setting.get("infer_strand_f
 
 # load our periodic_jobs.yml (cron overrides config file)
 Delayed::Periodic.add_overrides(ConfigFile.load("periodic_jobs").dup || {})
-
-if ActiveRecord::Base.configurations[Rails.env]["queue"]
-  ActiveSupport::Deprecation.warn("A queue section in database.yml is no longer supported. Please run migrations, then remove it.")
-end
 
 Rails.application.config.after_initialize do
   # configure autoscaling plugin

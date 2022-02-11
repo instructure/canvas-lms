@@ -26,20 +26,20 @@ if CANVAS_RAILS6_0
     gem "guardrail", "2.0.1"
   gem "switchman-inst-jobs", "3.2.8"
 else
-  gem "rails", "6.1.4.2"
+  gem "rails", "6.1.4.6"
     gem "tzinfo", "2.0.4"
-  gem "switchman", "3.0.5"
+  gem "switchman", "3.0.6"
     gem "guardrail", "3.0.0"
   gem "switchman-inst-jobs", "4.0.4"
 end
-  gem "irb", "1.3.5"
+  gem "irb", "1.4.1"
   gem "open4", "1.3.4", require: false
 
 gem "academic_benchmarks", "1.1.1", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "0.9.0alpha1",
     github: "rails-api/active_model_serializers", ref: "61882e1e4127facfe92e49057aec71edbe981829"
-gem "activerecord-pg-extensions", "0.4.2"
+gem "activerecord-pg-extensions", "0.4.3"
 gem "addressable", "2.7.0", require: false
 gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.1"
@@ -103,7 +103,7 @@ gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a8
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
-  gem "mini_mime", "1.0.2", require: false
+  gem "mini_mime", "1.1.2", require: false
 gem "marginalia", "1.9.0", require: false
 gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"

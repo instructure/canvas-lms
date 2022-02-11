@@ -25,7 +25,7 @@ class HostUrl
 
     # See ActionDispatch::HostAuthorization; HostUrl is added as an object to config.hosts
     def ===(host)
-      host == default_host || host == file_host
+      host == default_host || host == file_host(Account.default)
     end
 
     @@default_host = nil

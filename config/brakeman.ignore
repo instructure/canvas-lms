@@ -1212,6 +1212,26 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "b7c9d38286006de6cec6c394b56539441c1fcff05b2fd66c311665f4efa50df5",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 471,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "find_by_sql((((+\"\" << \"SELECT NULL AS #{column.to_s} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column.to_s} IS NULL) UNION ALL (\") << \"WITH RECURSIVE t AS (\\n  SELECT MIN(#{column.to_s}) AS #{column.to_s} FROM #{quoted_table_name}\\n  UNION ALL\\n  SELECT (SELECT MIN(#{column.to_s}) FROM #{quoted_table_name} WHERE #{column.to_s} > t.#{column.to_s})\\n  FROM t\\n  WHERE t.#{column.to_s} IS NOT NULL\\n)\\nSELECT #{column.to_s} FROM t WHERE #{column.to_s} IS NOT NULL\\n\".squish) << \")\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "distinct_values"
+      },
+      "user_input": "column",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "bfc5aa37d94de3fb455b8e59b7711d52a2b537fc8f4b183c459ad3dcb41aecea",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1236,7 +1256,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 475,
+      "line": 446,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql((ary.each_with_index.inject(+\"CASE \") do\n (((string << \"WHEN #{col} IN (\") << Array(values).map do\n connection.quote(value)\n end.join(\", \")) << \") THEN #{i} \")\n end << \"ELSE #{ary.size} END\"))",
       "render_path": null,
@@ -1372,7 +1392,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 519,
+      "line": 483,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"#{column} #{direction.to_s.upcase}#{(\" NULLS FIRST\" or \" NULLS LAST\" if (first_or_last == :last) and (direction == :desc))}\".strip)",
       "render_path": null,
@@ -1448,7 +1468,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 861,
+      "line": 847,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.execute(\"CLOSE #{cursor}\")",
       "render_path": null,
@@ -1480,11 +1500,31 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "e21673cdfc25cca379c03359be1119e5453a3736d403819b522b7d39c7f3e859",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 417,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql((unless @collkey.key?(Shard.current.database_server.id) then\n  @collkey ||= {}\n  @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey).schema\nend\nif collation = (Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false) then\n  \"(#{col} COLLATE #{(Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false)})\"\nelse\n  if schema = connection.extension(:pg_collkey).schema then\n    \"#{connection.extension(:pg_collkey).schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)\"\n  else\n    \"CAST(LOWER(replace(#{col}, '\\\\', '\\\\\\\\')) AS bytea)\"\n  end\nend))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "best_unicode_collation_key"
+      },
+      "user_input": "col",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "e237e4c3b49f118040123823a48d1367eb64a6bdf7e2719f43dc9f8b978ae1fb",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 728,
+      "line": 688,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"#{key}<=? AND #{key}>?\", Shard::IDS_PER_SHARD, 0)",
       "render_path": null,
@@ -1524,7 +1564,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 1524,
+      "line": 1516,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.select_value(\"SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'\")",
       "render_path": null,
@@ -1618,6 +1658,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-10-19 12:11:37 -0500",
-  "brakeman_version": "5.1.1"
+  "updated": "2022-02-16 09:17:28 -0600",
+  "brakeman_version": "5.2.1"
 }

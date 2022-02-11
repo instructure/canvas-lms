@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class AddPriorityToNotification < ActiveRecord::Migration[5.2]
+  disable_ddl_transaction!
   tag :predeploy
 
   PRIORITY_MESSAGE_LIST = ["Account User Registration",
@@ -19,7 +20,7 @@ class AddPriorityToNotification < ActiveRecord::Migration[5.2]
   # Generally we don't want to add a default to a new column, but we know this
   # is a very small table and it is ok
   def change
-    add_column :notifications, :priority, :boolean, default: false, null: false
+    add_column :notifications, :priority, :boolean, default: false, null: false, if_not_exists: true
     Notification.where(name: PRIORITY_MESSAGE_LIST).update_all(priority: true) if Shard.current.default?
   end
 end
