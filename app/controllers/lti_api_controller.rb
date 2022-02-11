@@ -41,6 +41,18 @@ class LtiApiController < ApplicationController
     @xml = Nokogiri::XML.parse(request.body)
 
     lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
+
+    # Data around New Quizzes submissions are not being propagated to the Apache logs.
+    # Adding this sourced_id and quiz submission time to header so that they can be
+    # parsed by TurboLogParser and used in the data/analytics pipeline owned by the OREO team.
+    if lti_response
+      RequestContext::Generator.add_meta_header("si", lti_response.sourcedid)
+
+      if lti_response.operation_ref_identifier == "replaceResult"
+        RequestContext::Generator.add_meta_header("sa", lti_response.submission_submitted_at)
+      end
+    end
+
     render body: lti_response.to_xml, content_type: "application/xml", status: status
   end
 

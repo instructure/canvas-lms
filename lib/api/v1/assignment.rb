@@ -830,7 +830,7 @@ module Api::V1::Assignment
       update_params.delete("allowed_attempts")
     end
 
-    if update_params.key?("important_dates") && Account.site_admin.feature_enabled?(:important_dates)
+    if update_params.key?("important_dates")
       update_params["important_dates"] = value_to_boolean(update_params["important_dates"])
     end
 

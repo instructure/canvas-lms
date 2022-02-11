@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 
 class InstAccess {
   // This class is intended to be used in combination with our

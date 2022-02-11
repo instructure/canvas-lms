@@ -940,4 +940,58 @@ describe SIS::CSV::CourseImporter do
       expect(course.assignments.first.title).to eq "my assignment"
     end
   end
+
+  it "imports friendly name for elementary account" do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active"
+    )
+
+    account = @account.sub_accounts.where(sis_source_id: "A001").first
+    account.enable_as_k5_account!
+
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status,friendly_name",
+      "test_1,TC 101,Test Course 101,A001,,active,george"
+    )
+
+    course = @account.all_courses.where(sis_source_id: "test_1").first
+    expect(course.name).to eq "Test Course 101"
+    expect(course.friendly_name).to eq "george"
+  end
+
+  it "does not import friendly name if it's blank" do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active"
+    )
+
+    account = @account.sub_accounts.where(sis_source_id: "A001").first
+    account.enable_as_k5_account!
+
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,A001,,active"
+    )
+
+    course = @account.all_courses.where(sis_source_id: "test_1").first
+    expect(course.name).to eq "Test Course 101"
+    expect(course.friendly_name).to eq nil
+  end
+
+  it "does not import friendly name for not elementary account" do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active"
+    )
+
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status,friendly_name",
+      "test_1,TC 101,Test Course 101,A001,,active,george"
+    )
+
+    course = @account.all_courses.where(sis_source_id: "test_1").first
+    expect(course.name).to eq "Test Course 101"
+    expect(course.friendly_name).to eq nil
+  end
 end

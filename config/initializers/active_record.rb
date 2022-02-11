@@ -248,8 +248,8 @@ class ActiveRecord::Base
   def touch_context
     return if @@skip_touch_context ||= false || @skip_touch_context ||= false
 
-    if respond_to?(:context_type) && respond_to?(:context_id) && context_type && context_id
-      self.class.connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
+      if respond_to?(:context_type) && respond_to?(:context_id) && context_type && context_id
         context_type.constantize.where(id: context_id).update_all(updated_at: Time.now.utc)
       end
     end

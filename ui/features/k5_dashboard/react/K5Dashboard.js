@@ -59,7 +59,7 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {ObserverListShape} from '@canvas/observer-picker'
+import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const DASHBOARD_TABS = [
@@ -136,16 +136,15 @@ export const K5Dashboard = ({
   plannerEnabled = false,
   responsiveSize = 'large',
   hideGradesTabForStudents = false,
-  showImportantDates,
   selectedContextCodes,
   selectedContextsLimit,
   parentSupportEnabled,
-  observerList,
+  observedUsersList,
   canAddObservee,
   openTodosInNewTab,
   loadingOpportunities
 }) => {
-  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
+  const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
     : undefined
 
@@ -246,8 +245,7 @@ export const K5Dashboard = ({
   }
 
   const renderDashboardHeader = sticky => {
-    const showingIcons =
-      (useImportantDatesTray && showImportantDates) || canDisableElementaryDashboard
+    const showingIcons = useImportantDatesTray || canDisableElementaryDashboard
     return (
       <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
         <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
@@ -255,7 +253,7 @@ export const K5Dashboard = ({
             {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
           </Heading>
         </Flex.Item>
-        {useImportantDatesTray && showImportantDates && (
+        {useImportantDatesTray && (
           <Flex.Item align="start">
             <IconButton
               screenReaderLabel={I18n.t('View Important Dates')}
@@ -303,7 +301,7 @@ export const K5Dashboard = ({
                 </Heading>
               </ScreenReaderContent>
               <ObserverOptions
-                observerList={observerList}
+                observedUsersList={observedUsersList}
                 currentUser={currentUser}
                 handleChangeObservedUser={handleChangeObservedUser}
                 margin="medium 0 xx-small 0"
@@ -377,13 +375,13 @@ export const K5Dashboard = ({
             )}
           </K5DashboardContext.Provider>
         </Flex.Item>
-        {!useImportantDatesTray && showImportantDates && (
+        {!useImportantDatesTray && (
           <Flex.Item as="div" size="18rem" id="important-dates-sidebar">
             {importantDates}
           </Flex.Item>
         )}
       </Flex>
-      {useImportantDatesTray && showImportantDates && (
+      {useImportantDatesTray && (
         <Tray
           label={I18n.t('Important Dates Tray')}
           open={trayOpen}
@@ -418,11 +416,10 @@ K5Dashboard.propTypes = {
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string,
   hideGradesTabForStudents: PropTypes.bool,
-  showImportantDates: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
-  observerList: ObserverListShape.isRequired,
+  observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired
 }
