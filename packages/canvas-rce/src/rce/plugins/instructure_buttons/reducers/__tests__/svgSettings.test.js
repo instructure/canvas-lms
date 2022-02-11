@@ -57,6 +57,68 @@ describe('svgSettings()', () => {
     expect(nextState.encodedImageName).toEqual(name)
   })
 
+  it('handles "SetX"', () => {
+    const x = 22
+
+    const nextState = subject({
+      type: 'SetX',
+      payload: x
+    })
+
+    expect(nextState.x).toEqual(x)
+  })
+
+  it('handles "SetY"', () => {
+    const y = 22
+
+    const nextState = subject({
+      type: 'SetY',
+      payload: y
+    })
+
+    expect(nextState.y).toEqual(y)
+  })
+
+  it('handles "SetWidth"', () => {
+    const width = 100
+
+    const nextState = subject({
+      type: 'SetWidth',
+      payload: width
+    })
+
+    expect(nextState.width).toEqual(width)
+  })
+
+  it('handles "SetHeight"', () => {
+    const height = 10
+
+    const nextState = subject({
+      type: 'SetHeight',
+      payload: height
+    })
+
+    expect(nextState.height).toEqual(height)
+  })
+
+  it('handles "SetTranslateX"', () => {
+    const nextState = subject({
+      type: 'SetTranslateX',
+      payload: 25
+    })
+
+    expect(nextState.transform).toMatchInlineSnapshot(`"translate(25,undefined)"`)
+  })
+
+  it('handles "SetTranslateY"', () => {
+    const nextState = subject({
+      type: 'SetTranslateY',
+      payload: 50
+    })
+
+    expect(nextState.transform).toMatchInlineSnapshot(`"translate(undefined,50)"`)
+  })
+
   describe('with an unrecognized action', () => {
     const type = 'FooBar'
 

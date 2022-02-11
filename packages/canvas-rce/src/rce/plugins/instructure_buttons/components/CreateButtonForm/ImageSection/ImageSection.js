@@ -48,6 +48,40 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
   }
 
   useEffect(() => {
+    // Set Q1 crop defaults
+    // TODO: Set these properties based on cropper
+    onChange({
+      type: svgActions.SET_X,
+      payload: '50%'
+    })
+
+    onChange({
+      type: svgActions.SET_Y,
+      payload: '50%'
+    })
+
+    onChange({
+      type: svgActions.SET_WIDTH,
+      payload: 75
+    })
+
+    onChange({
+      type: svgActions.SET_HEIGHT,
+      payload: 75
+    })
+
+    onChange({
+      type: svgActions.SET_TRANSLATE_X,
+      payload: -37.5 // Width / 2
+    })
+
+    onChange({
+      type: svgActions.SET_TRANSLATE_Y,
+      payload: -37.5 // Height / 2
+    })
+  }, [])
+
+  useEffect(() => {
     if (editing) {
       dispatch({
         type: actions.SET_IMAGE.type,
