@@ -22,7 +22,7 @@ import ComposeModalContainer from './ComposeModalContainer'
 import {Conversation} from '../../../graphql/Conversation'
 import {ConversationMessage} from '../../../graphql/ConversationMessage'
 import {
-  CONVERSATIONS_QUERY,
+  CONVERSATION_MESSAGES_QUERY,
   COURSES_QUERY,
   REPLY_CONVERSATION_QUERY
 } from '../../../graphql/Queries'
@@ -71,15 +71,7 @@ const ComposeModalManager = props => {
     let legacyNode
     try {
       const queryResult = JSON.parse(
-        JSON.stringify(
-          cache.readQuery({
-            query: CONVERSATIONS_QUERY,
-            variables: {
-              scope: props.isReply || props.isReplyAll || props.isForward ? 'inbox' : 'sent',
-              userID: ENV.current_user_id?.toString()
-            }
-          })
-        )
+        JSON.stringify(cache.readQuery(props.conversationsQueryOption))
       )
       legacyNode = queryResult.legacyNode
     } catch (e) {
@@ -101,11 +93,7 @@ const ComposeModalManager = props => {
     }
 
     cache.writeQuery({
-      query: CONVERSATIONS_QUERY,
-      variables: {
-        scope: props.isReply || props.isReplyAll || props.isForward ? 'inbox' : 'sent',
-        userID: ENV.current_user_id?.toString()
-      },
+      ...props.conversationsQueryOption,
       data: {legacyNode}
     })
   }
@@ -141,6 +129,25 @@ const ComposeModalManager = props => {
     }
   }
 
+  const updateConversationMessagesCache = (cache, result) => {
+    if (props?.conversation) {
+      const querytoUpdate = {
+        query: CONVERSATION_MESSAGES_QUERY,
+        variables: {
+          conversationID: props.conversation._id
+        }
+      }
+      const data = JSON.parse(JSON.stringify(cache.readQuery(querytoUpdate)))
+
+      data.legacyNode.conversationMessagesConnection.nodes = [
+        result.data.addConversationMessage.conversationMessage,
+        ...data.legacyNode.conversationMessagesConnection.nodes
+      ]
+
+      cache.writeQuery({...querytoUpdate, data})
+    }
+  }
+
   const updateCache = (cache, result) => {
     if (props.isReply || props.isReplyAll || props.isForward) {
       if (result.data.addConversationMessage.errors) {
@@ -152,6 +159,7 @@ const ComposeModalManager = props => {
       return
     }
 
+    updateConversationMessagesCache(cache, result)
     updateConversationsCache(cache, result)
     updateReplyConversationsCache(cache, result)
   }
@@ -228,7 +236,8 @@ ComposeModalManager.propTypes = {
   isReplyAll: PropTypes.bool,
   isForward: PropTypes.bool,
   onDismiss: PropTypes.func,
-  open: PropTypes.bool
+  open: PropTypes.bool,
+  conversationsQueryOption: PropTypes.object
 }
 
 export default ComposeModalManager

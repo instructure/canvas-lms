@@ -240,6 +240,7 @@ const CanvasInbox = () => {
           setSelectedConversationMessage(null)
         }}
         open={composeModal}
+        conversationsQueryOption={conversationsQueryOption}
       />
     </div>
   )
