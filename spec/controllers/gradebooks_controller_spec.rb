@@ -3353,7 +3353,7 @@ describe GradebooksController do
         end
 
         it "accepts a valid student_group_id that is part of the course" do
-          make_request(percent: 50.0, group_id: student_group.id)
+          make_request(percent: 50.0, student_group_id: student_group.id)
           expect(response).to be_successful
         end
 
@@ -3362,7 +3362,7 @@ describe GradebooksController do
           other_category.create_groups(1)
           other_group = other_category.groups.first
 
-          make_request(percent: 50.0, group_id: other_group.id)
+          make_request(percent: 50.0, student_group_id: other_group.id)
           expect(response).to be_not_found
         end
       end
