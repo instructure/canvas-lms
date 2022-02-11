@@ -58,7 +58,7 @@ export function ButtonsTray({editor, onUnmount, editing}) {
           </Flex>
         </Flex.Item>
 
-        <Flex.Item as="slot" padding="small">
+        <Flex.Item as="form">
           <CreateButtonForm editor={editor} editing={editing} onClose={() => setIsOpen(false)} />
         </Flex.Item>
       </Flex>

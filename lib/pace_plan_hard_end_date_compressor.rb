@@ -35,6 +35,7 @@ class PacePlanHardEndDateCompressor
     return items if items.empty?
 
     start_date_of_item_group = start_date || enrollment&.start_at || pace_plan.start_date
+    end_date = pace_plan.end_date || pace_plan.course.end_at&.to_date || pace_plan.course.enrollment_term&.end_at&.to_date
     due_dates = PacePlanDueDatesCalculator.new(pace_plan).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
 
     if compress_items_after
@@ -52,7 +53,7 @@ class PacePlanHardEndDateCompressor
     # This is how much time the Hard End Date plan should take up
     actual_plan_length = PacePlansDateHelpers.days_between(
       start_date_of_item_group,
-      pace_plan.end_date,
+      end_date,
       pace_plan.exclude_weekends,
       blackout_dates: pace_plan.course.blackout_dates
     )
@@ -63,7 +64,7 @@ class PacePlanHardEndDateCompressor
     final_item_due_date = due_dates[key]
 
     # Return if we are already within the end of the pace plan
-    return items if pace_plan.end_date.blank? || final_item_due_date < pace_plan.end_date
+    return items if end_date.blank? || final_item_due_date < end_date
 
     # This is how much time we're currently using
     plan_length_with_items = PacePlansDateHelpers.days_between(
@@ -87,9 +88,9 @@ class PacePlanHardEndDateCompressor
     # If the pace plan hasn't been committed yet we are grouping the items by their module_item_id since the item.id is
     # not set yet.
     key = pace_plan.persisted? ? items[-1].id : items[-1].module_item_id
-    if new_due_dates[key] > pace_plan.end_date
+    if new_due_dates[key] > end_date
       days_over = PacePlansDateHelpers.days_between(
-        pace_plan.end_date,
+        end_date,
         new_due_dates[key],
         pace_plan.exclude_weekends,
         inclusive_end: false,

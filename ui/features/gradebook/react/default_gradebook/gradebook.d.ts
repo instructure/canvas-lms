@@ -66,6 +66,7 @@ export type GradebookOptions = {
   gradebook_column_size_settings: ColumnSizeSettings
   gradebook_csv_progress: ProgressData
   gradebook_import_url: string
+  gradebook_score_to_ungraded_progress: ProgressData
   gradebook_is_editable: boolean
   graded_late_submissions_exist: boolean
   grading_period_set: GradingPeriodSet
@@ -283,7 +284,7 @@ export type Filter = {
   created_at: string
 }
 
-export type PartialFilter = Omit<Filter, 'id'>
+export type PartialFilter = Omit<Filter, 'id'> & {id?: string}
 
 export type AppliedFilter = Omit<Filter, 'id'> & {is_applied: true}
 

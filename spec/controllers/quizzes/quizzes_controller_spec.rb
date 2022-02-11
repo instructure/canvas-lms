@@ -339,6 +339,38 @@ describe Quizzes::QuizzesController do
                     [course_quizzes[1].id, nil, "quiz 2"]
                   ])
         end
+
+        describe "quiz options" do
+          it "includes 'can_unpublish' true when the assignment can be unpublished" do
+            allow_any_instance_of(Assignment).to receive(:can_unpublish?).and_return(true)
+            allow_any_instance_of(Quizzes::Quiz).to receive(:can_unpublish?).and_return(true)
+
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+
+            expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
+            expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
+
+            controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
+              expect(assignment_options[:can_unpublish]).to eq true
+            end
+          end
+
+          it "includes `can_unpublish` false when the assignment cannot be unpublished" do
+            allow_any_instance_of(Assignment).to receive(:can_unpublish?).and_return(false)
+            allow_any_instance_of(Quizzes::Quiz).to receive(:can_unpublish?).and_return(false)
+
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+
+            expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
+            expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
+
+            controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
+              expect(assignment_options[:can_unpublish]).to eq false
+            end
+          end
+        end
       end
 
       context "student interface" do
@@ -1665,9 +1697,7 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    it "creates assignment with important dates when site admin flag enabled" do
-      Account.site_admin.enable_feature!(:important_dates)
-
+    it "creates assignment with important dates" do
       user_session(@teacher)
       ag = @course.assignment_groups.create! name: "teh group"
       post "create", params: {
@@ -1811,9 +1841,7 @@ describe Quizzes::QuizzesController do
             expect(@quiz.reload.title).not_to eq "overrides"
           end
 
-          it "saves important dates with site admin flag enabled" do
-            Account.site_admin.enable_feature!(:important_dates)
-
+          it "saves important dates" do
             post "update", params: {
               course_id: @course.id,
               id: @quiz.id,

@@ -44,6 +44,13 @@ module Services
         context &&
         context.grants_right?(user, :manage_files_add)
       ) || false
+
+      env_hash[:RICH_CONTENT_CAN_EDIT_FILES] = (
+        user &&
+        context &&
+        context.grants_right?(user, :manage_files_edit)
+      ) || false
+
       env_hash
     end
 
@@ -53,8 +60,7 @@ module Services
       def service_settings
         settings = DynamicSettings.find("rich-content-service", default_ttl: 5.minutes)
         {
-          RICH_CONTENT_APP_HOST: settings["app-host", failsafe: "error"],
-          RICH_CONTENT_SKIP_SIDEBAR: settings["skip-sidebar", failsafe: nil]
+          RICH_CONTENT_APP_HOST: settings["app-host", failsafe: "error"]
         }
       end
     end

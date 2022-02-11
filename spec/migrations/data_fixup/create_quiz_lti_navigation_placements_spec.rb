@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
+require "spec_helper"
 
 describe DataFixup::CreateQuizLtiNavigationPlacements do
   context "when there are no Quiz LTI tools" do
@@ -117,7 +117,8 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
 
     it "does not create navigation placements for Quiz LTI tools where context_type is not Account" do
       quiz_tool = ContextExternalTool.quiz_lti.last
-      quiz_tool.update!(context_type: "Course")
+      quiz_tool.context = course_model
+      quiz_tool.save
 
       expect do
         DataFixup::CreateQuizLtiNavigationPlacements.run

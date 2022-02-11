@@ -23,7 +23,8 @@ import uuid from 'uuid'
 // @ts-ignore
 import I18n from 'i18n!gradebook'
 import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
-import {View} from '@instructure/ui-view'
+import {TextInput} from '@instructure/ui-text-input'
+import {View, ContextView} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {Tray} from '@instructure/ui-tray'
@@ -40,7 +41,7 @@ import type {
 } from '../gradebook.d'
 import useStore from '../stores/index'
 
-const {Item} = Flex as any
+const {Item: FlexItem} = Flex as any
 
 export type FilterNavProps = {
   modules: Module[]
@@ -50,7 +51,7 @@ export type FilterNavProps = {
 }
 
 const newFilter = (): PartialFilter => ({
-  name: I18n.t('Unnamed Filter'),
+  name: '',
   conditions: [
     {
       id: uuid(),
@@ -91,26 +92,26 @@ export default function FilterNav({
 
   return (
     <Flex justifyItems="space-between" padding="0 0 small 0">
-      <Item>
+      <FlexItem>
         <Flex>
-          <Item padding="0 x-small 0 0">
+          <FlexItem padding="0 x-small 0 0">
             <IconFilterLine /> <Text weight="bold">{I18n.t('Applied Filters:')}</Text>
-          </Item>
-          <Item>
+          </FlexItem>
+          <FlexItem>
             {filterComponents.length > 0 && filterComponents}
             {!filterComponents.length && !stagedFilter && (
               <Text color="secondary" weight="bold">
                 {I18n.t('None')}
               </Text>
             )}
-          </Item>
+          </FlexItem>
         </Flex>
-      </Item>
-      <Item>
+      </FlexItem>
+      <FlexItem>
         <Button renderIcon={IconFilterSolid} color="secondary" onClick={() => setIsTrayOpen(true)}>
           {I18n.t('Filters')}
         </Button>
-      </Item>
+      </FlexItem>
       <Tray
         placement="end"
         label="Tray Example"
@@ -120,20 +121,47 @@ export default function FilterNav({
       >
         <View as="div" padding="medium">
           <Flex>
-            <Item shouldGrow shouldShrink>
+            <FlexItem shouldGrow shouldShrink>
               <Heading level="h3" as="h3" margin="0 0 x-small">
                 {I18n.t('Gradebook Filters')}
               </Heading>
-            </Item>
-            <Item>
+            </FlexItem>
+            <FlexItem>
               <CloseButton
                 placement="end"
                 offset="small"
                 screenReaderLabel="Close"
                 onClick={() => setIsTrayOpen(false)}
               />
-            </Item>
+            </FlexItem>
           </Flex>
+
+          {filters.length === 0 && !stagedFilter && (
+            <Flex as="div" margin="small">
+              <FlexItem display="inline-block" width="100px" height="128px">
+                <img
+                  src="/images/tutorial-tray-images/Panda_People.svg"
+                  alt={I18n.t('Friendly panda')}
+                  style={{
+                    width: '100px',
+                    height: '128px'
+                  }}
+                />
+              </FlexItem>
+              <FlexItem shouldShrink>
+                <ContextView
+                  padding="x-small small"
+                  margin="small"
+                  placement="end top"
+                  shadow="resting"
+                >
+                  {I18n.t(
+                    'Did you know you can now create detailed filters and save them for future use?'
+                  )}
+                </ContextView>
+              </FlexItem>
+            </Flex>
+          )}
 
           {filters.map(filter => (
             <FilterNavFilter
@@ -166,14 +194,37 @@ export default function FilterNav({
                   sections={sections}
                   gradingPeriods={gradingPeriods}
                 />
-                <Button
-                  color="secondary"
-                  onClick={saveStagedFilter}
-                  margin="small 0 0 0"
-                  data-testid="save-filter-button"
-                >
-                  Save
-                </Button>
+                <View as="div" padding="small" background="secondary" borderRadius="medium">
+                  <Flex alignItems="end">
+                    <FlexItem shouldGrow>
+                      <TextInput
+                        width="100%"
+                        renderLabel={I18n.t('Save these conditions as a filter')}
+                        placeholder={I18n.t('Give this filter a name')}
+                        value={stagedFilter.name}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                          useStore.setState({
+                            stagedFilter: {
+                              ...stagedFilter,
+                              name: event.target.value
+                            }
+                          })
+                        }
+                      />
+                    </FlexItem>
+                    <FlexItem margin="0 0 0 small">
+                      <Button
+                        color="secondary"
+                        data-testid="save-filter-button"
+                        margin="small 0 0 0"
+                        onClick={saveStagedFilter}
+                        interaction={stagedFilter.name.trim().length > 0 ? 'enabled' : 'disabled'}
+                      >
+                        {I18n.t('Save')}
+                      </Button>
+                    </FlexItem>
+                  </Flex>
+                </View>
               </>
             ) : (
               <Button

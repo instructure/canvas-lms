@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const TYPE = 'image/svg+xml-buttons-and-icons'
+
 export const DEFAULT_SETTINGS = {
+  // Basic button & icon settings
+  type: TYPE,
   name: '',
   alt: '',
   shape: 'square',
@@ -26,12 +30,20 @@ export const DEFAULT_SETTINGS = {
   outlineSize: 'none',
   text: '',
   textSize: 'small',
-  textColor: null,
+  textColor: '#000000',
   textBackgroundColor: null,
   textPosition: 'middle',
   encodedImage: '',
   encodedImageType: '',
-  encodedImageName: ''
+  encodedImageName: '',
+  // Embedded image crop settings
+  x: 0,
+  y: 0,
+  translateX: 0,
+  translateY: 0,
+  width: 0,
+  height: 0,
+  transform: ''
 }
 
 export const DEFAULT_OPTIONS = {

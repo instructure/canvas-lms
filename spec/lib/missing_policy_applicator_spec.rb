@@ -98,16 +98,6 @@ describe MissingPolicyApplicator do
       @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
     end
 
-    it "removes the grader_id when grading submissions" do
-      late_policy_missing_enabled
-      assignment = create_recent_assignment
-      assignment.grade_student(@student, score: 5, grader: @teacher)
-      assignment.grade_student(@student, score: nil, grader: @teacher)
-      expect { applicator.apply_missing_deductions }.to change {
-        assignment.reload.submissions.find_by(user: @student).grader_id
-      }.from(@teacher.id).to(nil)
-    end
-
     it "applies deductions to assignments in a course with a LatePolicy with missing submission deductions enabled" do
       late_policy_missing_enabled
       create_recent_assignment

@@ -2206,6 +2206,7 @@ ko:
   authnrequest_sent_to_idp_74e030fc: "IdP로 전송된 AuthnRequest"
   authnresponse_from_idp_185037e9: "IdP에서 반환된 AuthnResponse"
   author_215203d2: 작성자
+  availability_8942cde6: "이용 가능"
   available_from_587ce92f: "다음부터 사용 가능"
   available_from_f84e4611: "다음부터 사용 가능"
   avatar_8a8aa935: 아바타
@@ -7221,6 +7222,7 @@ ko:
   mark_all_as_unread_a435be3d: "모두 읽지 않음으로 표시"
   mark_as_read_47ec83dd: "읽음으로 표시"
   mark_as_unread_4ded3977: "읽지 않음으로 표시"
+  mastery_at_cf0c477b: "숙달 점수"
   mathquill: 
     tabs: 
       arrows: 화살표

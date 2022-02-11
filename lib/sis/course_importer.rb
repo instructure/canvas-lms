@@ -61,7 +61,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting, homeroom_course)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting, homeroom_course, friendly_name)
         state_changes = []
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
@@ -102,6 +102,10 @@ module SIS
           course.account ||= @root_account
 
           update_account_associations = course.account_id_changed? || course.root_account_id_changed?
+
+          if account&.enable_as_k5_account? && friendly_name.present?
+            course.friendly_name = friendly_name
+          end
 
           course.integration_id = integration_id
           course.sis_source_id = course_id

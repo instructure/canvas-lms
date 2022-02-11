@@ -15,7 +15,7 @@ push() {
 }
 
 git checkout -B sync-translations-rce && \
-  git add -A src/translations && \
+  git add -A src && \
   git commit -m "[i18n] Update RCE translations." && \
   push
   
@@ -38,7 +38,6 @@ if [ ! -z "$OUTPUT" ]; then
   else
     (
       aws --region us-east-1 sqs send-message \
-        --no-cli-pager \
         --queue-url https://sqs.us-east-1.amazonaws.com/636161780776/slack-lambda \
         --message-body "{\"channel\":\"#mat-bots\",\"username\":\"Package Translations\",\"text\":\"$SLACK_MESSAGE\"}"
     ) || echo "Failed to send Slack message."

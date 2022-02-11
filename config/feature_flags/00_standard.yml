@@ -185,11 +185,6 @@ high_contrast_course_colors:
       High Contrast Course Colors darkens system provided and color picker course colors
       (not manually defined ones) to improve contrast ratio
   applies_to: SiteAdmin
-important_dates:
-  state: hidden
-  display_name: Important Dates
-  description: Enables important dates to be applied to assignments, calendar events, and others.
-  applies_to: SiteAdmin
 include_byte_order_mark_in_gradebook_exports:
   type: setting
   state: allowed

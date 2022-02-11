@@ -28,7 +28,7 @@ import submitHtmlForm from '@canvas/theme-editor/submitHtmlForm'
 import SaveThemeButton from './SaveThemeButton'
 import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 
 /* eslint no-alert:0 */
 const TABS = [
@@ -419,8 +419,9 @@ export default class ThemeEditor extends React.Component {
   renderHeader(tooltipForWhyApplyIsDisabled) {
     return (
       <header
-        className={`Theme__header ${!this.props.hasUnsavedChanges &&
-          'Theme__header--is-active-theme'}`}
+        className={`Theme__header ${
+          !this.props.hasUnsavedChanges && 'Theme__header--is-active-theme'
+        }`}
       >
         <div className="Theme__header-layout">
           <div className="Theme__header-primary">
@@ -516,8 +517,9 @@ export default class ThemeEditor extends React.Component {
           <input name="authenticity_token" type="hidden" value={getCookie('_csrf_token')} />
 
           <div
-            className={`Theme__layout ${!this.props.hasUnsavedChanges &&
-              'Theme__layout--is-active-theme'}`}
+            className={`Theme__layout ${
+              !this.props.hasUnsavedChanges && 'Theme__layout--is-active-theme'
+            }`}
           >
             <div className="Theme__editor">
               <ThemeEditorSidebar

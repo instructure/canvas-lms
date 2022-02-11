@@ -43,12 +43,24 @@ class FileInContext
 
     def attach(context, filename, display_name: nil, folder: nil, explicit_filename: nil, allow_rename: false, md5: nil, migration_id: nil)
       display_name ||= File.split(filename).last
+
       if md5 && folder && !allow_rename
-        scope = context.attachments.where(display_name: display_name, folder: folder, md5: md5).not_deleted
-        if migration_id
-          scope = scope.where(migration_id: [migration_id, nil]) # either find a previous copy or an unassociated match
+        scope = context.attachments.where(display_name: display_name, folder: folder).not_deleted
+        scope = scope.where(migration_id: [migration_id, nil]) if migration_id # either find a previous copy or an unassociated match
+        existing_att = false
+
+        # only engage in hash comparison if there are possible duplicates
+        if scope.take
+          existing_att = scope.where(md5: md5).take
+
+          # Hashing an alternative digest to check the possible duplicate that didn't match the previous hash
+          # Keep in mind that the md5 argument isn't necessarily an actual md5 hash, it may be a sha512 (maybe even other stuff in the future)
+          unless existing_att
+            alternative_digest = (md5.length == 32) ? Digest::SHA2.new(512).file(filename) : Digest::MD5.file(filename)
+            scope = scope.where(md5: alternative_digest.hexdigest)
+            existing_att = scope.take
+          end
         end
-        existing_att = scope.take
 
         if existing_att
           if migration_id && existing_att.migration_id.nil? # can set an existing unassociated attachment to the new migration_id

@@ -81,6 +81,8 @@ module Importers
         item.settings[:custom_fields].merge! hash[:custom_fields]
       end
 
+      return if item.new_record? && ContextExternalTool.where(identity_hash: item.calculate_identity_hash).exists?
+
       item.save! if persist
       migration&.add_imported_item(item)
       item

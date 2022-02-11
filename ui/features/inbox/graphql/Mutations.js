@@ -108,20 +108,24 @@ export const ADD_CONVERSATION_MESSAGE = gql`
   mutation AddConversationMessage(
     $attachmentIds: [ID!]
     $body: String!
+    $userNote: Boolean
     $conversationId: ID!
     $includedMessages: [ID!]
     $mediaCommentId: ID
     $mediaCommentType: String
+    $contextCode: String
     $recipients: [String!]!
   ) {
     addConversationMessage(
       input: {
         attachmentIds: $attachmentIds
         body: $body
+        userNote: $userNote
         conversationId: $conversationId
         includedMessages: $includedMessages
         mediaCommentId: $mediaCommentId
         mediaCommentType: $mediaCommentType
+        contextCode: $contextCode
         recipients: $recipients
       }
     ) {

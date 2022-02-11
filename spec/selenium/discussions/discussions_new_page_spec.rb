@@ -265,7 +265,7 @@ describe "discussions" do
           expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Show to everyone"
 
           expect_new_page_load { submit_form(".form-actions") }
-          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion |"
+          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion"
           expect(f("span[data-testid='author_name']")).to include_text @student.name
         end
 
@@ -282,7 +282,7 @@ describe "discussions" do
           expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Hide from everyone"
 
           expect_new_page_load { submit_form(".form-actions") }
-          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion |"
+          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion"
           expect(f("span[data-testid='author_name']")).to include_text "Anonymous"
         end
       end

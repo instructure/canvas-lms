@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const MOCK_OBSERVER_LIST = [
+export const MOCK_OBSERVED_USERS_LIST = [
   {
     id: '13',
     name: 'Zelda',

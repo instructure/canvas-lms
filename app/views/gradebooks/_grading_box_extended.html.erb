@@ -34,7 +34,7 @@
 
   <% case assignment.grading_type %>
   <% when "points", "percent", "letter_grade", "gpa_scale" %>
-    <input type="text" id="grading-box-extended" maxlength="254"/>
+    <input type="text" id="grading-box-extended" autocomplete="off" maxlength="254"/>
   <% when "pass_fail" %>
     <select id="grading-box-extended" class="pass_fail_grading_type">
       <option value="">---</option>

@@ -1455,14 +1455,14 @@ class Assignment < ActiveRecord::Base
     round_if_whole(result).to_s
   end
 
-  def interpret_grade(grade)
+  def interpret_grade(grade, prefer_points_over_scheme: false)
     case grade.to_s
     when /^[+-]?\d*\.?\d+%$/
       # interpret as a percentage
       percentage = grade.to_f / 100.0.to_d
       points_possible.to_f * percentage
     when /^[+-]?\d*\.?\d+$/
-      if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
+      if !prefer_points_over_scheme && uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
         (points_possible || 0.0) * standard_based_score / 100.0
       else
         grade.to_f
@@ -1481,10 +1481,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def grade_to_score(grade = nil)
+  def grade_to_score(grade = nil, prefer_points_over_scheme: false)
     return nil if grade.blank?
 
-    parsed_grade = interpret_grade(grade)
+    parsed_grade = interpret_grade(grade, prefer_points_over_scheme: prefer_points_over_scheme)
     case self.grading_type
     when "points", "percent", "letter_grade", "gpa_scale"
       score = parsed_grade
@@ -1900,11 +1900,11 @@ class Assignment < ActiveRecord::Base
     all_submissions.where(user_id: user_id).first_or_initialize
   end
 
-  def compute_grade_and_score(grade, score)
+  def compute_grade_and_score(grade, score, prefer_points_over_scheme: false)
     grade = nil if grade == ""
 
     if grade
-      score = grade_to_score(grade)
+      score = grade_to_score(grade, prefer_points_over_scheme: prefer_points_over_scheme)
     end
     if score
       grade = score_to_grade(score, grade)
@@ -2021,7 +2021,7 @@ class Assignment < ActiveRecord::Base
     return if submission.user != original_student && submission.excused?
 
     grader = opts[:grader]
-    grade, score = compute_grade_and_score(opts[:grade], opts[:score])
+    grade, score = compute_grade_and_score(opts[:grade], opts[:score], prefer_points_over_scheme: opts[:prefer_points_over_scheme])
 
     did_grade = false
     submission.attributes = opts.slice(:submission_type, :url, :body)

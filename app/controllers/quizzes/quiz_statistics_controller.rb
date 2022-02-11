@@ -257,8 +257,7 @@ class Quizzes::QuizStatisticsController < ApplicationController
   #  }
   def index
     if authorized_action(@quiz, @current_user, :read_statistics)
-      scope = @quiz.quiz_submissions.not_settings_only.completed
-      updated = scope.order("updated_at DESC").limit(1).pluck(:updated_at).first
+      updated = @quiz.quiz_submissions.not_settings_only.completed.order(updated_at: :desc).limit(1).pick(:updated_at)
       cache_key = [
         "quiz_statistics_1",
         @quiz.id,

@@ -33,7 +33,6 @@ describe "teacher k5 dashboard important dates" do
 
   before :once do
     teacher_setup
-    Account.site_admin.enable_feature!(:important_dates)
   end
 
   before do
