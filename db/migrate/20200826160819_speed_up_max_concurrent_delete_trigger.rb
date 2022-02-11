@@ -3,10 +3,6 @@
 class SpeedUpMaxConcurrentDeleteTrigger < ActiveRecord::Migration[4.2]
   tag :predeploy
 
-  def connection
-    Delayed::Job.connection
-  end
-
   def up
     if connection.adapter_name == "PostgreSQL"
       search_path = Shard.current.name

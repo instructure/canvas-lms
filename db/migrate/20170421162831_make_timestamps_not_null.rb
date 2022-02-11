@@ -36,7 +36,6 @@ class MakeTimestampsNotNull < ActiveRecord::Migration[4.2]
     conversation_batches
     custom_data
     custom_gradebook_columns
-    delayed_jobs
     discussion_topic_materialized_views
     epub_exports
     event_stream_failures

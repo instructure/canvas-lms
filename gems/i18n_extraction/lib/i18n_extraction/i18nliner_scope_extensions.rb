@@ -23,6 +23,8 @@ class I18nliner::Scope
   ABSOLUTE_KEY = /\A#/.freeze
 
   def normalize_key(key, inferred_key, explicit_scope_option)
+    return nil if key.nil?
+
     key = key.to_s
     key = key.dup if key.frozen?
     return key if key.sub!(ABSOLUTE_KEY, "") || !scope || inferred_key || explicit_scope_option

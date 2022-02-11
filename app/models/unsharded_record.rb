@@ -19,10 +19,8 @@
 #
 
 # TODO: CANVAS_RAILS6_0 remove this whole class since we will always get it from switchman
-module Switchman
-  class UnshardedRecord < ::ActiveRecord::Base
-    self.abstract_class = true
+class UnshardedRecord < ::ActiveRecord::Base
+  self.abstract_class = true
 
-    self.shard_category = :unsharded if CANVAS_RAILS6_0
-  end
+  self.shard_category = :unsharded
 end

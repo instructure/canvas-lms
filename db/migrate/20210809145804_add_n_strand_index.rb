@@ -21,10 +21,6 @@ class AddNStrandIndex < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
   tag :predeploy
 
-  def connection
-    Delayed::Job.connection
-  end
-
   def change
     add_index :delayed_jobs, %i[strand next_in_strand id],
               name: "n_strand_index",

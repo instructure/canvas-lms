@@ -201,21 +201,21 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
       reversible do |direction|
         direction.up do
           drop_triggers
-          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL OR NEW.singleton IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
-          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN ((OLD.strand IS NOT NULL OR OLD.singleton IS NOT NULL) AND OLD.next_in_strand=true) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
+          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (NEW.strand IS NOT NULL OR NEW.singleton IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
+          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN ((OLD.strand IS NOT NULL OR OLD.singleton IS NOT NULL) AND OLD.next_in_strand=true) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
         end
         direction.down do
           drop_triggers
-          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
-          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn()")}")
+          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
+          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn()")}")
         end
       end
     end
   end
 
   def drop_triggers
-    execute("DROP TRIGGER IF EXISTS delayed_jobs_before_insert_row_tr ON #{::Delayed::Job.quoted_table_name}")
-    execute("DROP TRIGGER IF EXISTS delayed_jobs_after_delete_row_tr ON #{::Delayed::Job.quoted_table_name}")
+    execute("DROP TRIGGER IF EXISTS delayed_jobs_before_insert_row_tr ON #{connection.quote_table_name(Delayed::Job.table_name)}")
+    execute("DROP TRIGGER IF EXISTS delayed_jobs_after_delete_row_tr ON #{connection.quote_table_name(Delayed::Job.table_name)}")
   end
 end
 # rubocop:enable Rails/SquishedSQLHeredocs

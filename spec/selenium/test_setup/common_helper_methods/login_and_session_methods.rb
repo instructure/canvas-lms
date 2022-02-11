@@ -114,7 +114,7 @@ module LoginAndSessionMethods
   # process; instead prefer create_session or the various *_logged_in
   # methods above
   def login_as(username = "nobody@example.com", password = "asdfasdf")
-    if Onceler.open_transactions > 0
+    if Onceler.recording
       raise "don't use real logins with once-ler, since a session cookie could be valid across specs if the pseudonym is shared"
     end
 

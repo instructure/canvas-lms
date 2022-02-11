@@ -146,7 +146,7 @@ class Enrollment < ActiveRecord::Base
     role
   end
 
-  def default_role
+  def default_canvas_role
     Enrollment.get_built_in_role_for_type(type, root_account_id: course.root_account_id)
   end
 

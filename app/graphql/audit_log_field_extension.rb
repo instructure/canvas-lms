@@ -105,7 +105,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     private
 
     def process_arguments(arguments)
-      params = ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h)
+      params = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h)
       truncate_params!(params)
     end
 

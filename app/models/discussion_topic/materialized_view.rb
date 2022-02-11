@@ -35,9 +35,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
 
   belongs_to :discussion_topic
 
-  def self.primary_key
-    :discussion_topic_id
-  end
+  self.primary_key = :discussion_topic_id
 
   def self.for(discussion_topic)
     discussion_topic.shard.activate do
