@@ -261,14 +261,20 @@ class Attachment < ActiveRecord::Base
     READ_FILE_CHUNK_SIZE
   end
 
-  def self.valid_utf8?(file)
+  def self.valid_utf8?(file, encoding = Encoding::UTF_8.name)
     # validate UTF-8
     chunk = file.read(read_file_chunk_size)
     error_count = 0
 
+    encoding_converter = /utf.?8/i.match?(encoding) ? nil : Encoding::Converter.new(encoding, Encoding::UTF_8)
+
     while chunk
       begin
-        raise EncodingError unless chunk.dup.force_encoding("UTF-8").valid_encoding?
+        if encoding_converter
+          raise EncodingError unless encoding_converter.convert(chunk.dup).valid_encoding?
+        else
+          raise EncodingError unless chunk.dup.force_encoding(Encoding::UTF_8).valid_encoding?
+        end
       rescue EncodingError
         error_count += 1
         if !file.eof? && error_count <= 4
