@@ -56,6 +56,7 @@ class ApplicationController < ActionController::Base
   around_action :compute_http_cost
 
   before_action :clear_idle_connections
+  before_action :set_sentry_trace
   before_action :annotate_apm
   before_action :annotate_sentry
   before_action :check_pending_otp
@@ -746,7 +747,7 @@ class ApplicationController < ActionController::Base
       append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{equivalent_domains.join(" ")};")
     end
     headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
-    RequestContext::Generator.store_request_meta(request, @context)
+    RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
     true
   end
 
@@ -2368,7 +2369,6 @@ class ApplicationController < ActionController::Base
 
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
-    set_sentry_trace
     if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
