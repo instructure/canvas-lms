@@ -69,6 +69,7 @@ module Lti::Messages
       add_i18n_claims! if include_claims?(:i18n)
       add_roles_claims! if include_claims?(:roles)
       add_custom_params_claims! if include_claims?(:custom_params)
+      add_assignment_and_grade_service_claims! if include_assignment_and_grade_service_claims?
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
       add_lti11_legacy_user_id!
       add_lti1p1_claims! if include_lti1p1_claims?
@@ -177,6 +178,27 @@ module Lti::Messages
     # platform MAY omit that attribute.
     def include_lti1p1_claims?
       @user&.lti_context_id && @user.lti_context_id != @user.lti_id
+    end
+
+    # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
+    # and only adds this claim if the tool has the right scopes, and not for account-level launches.
+    def include_assignment_and_grade_service_claims?
+      include_claims?(:assignment_and_grade_service) &&
+        (@context.is_a?(Course) || @context.is_a?(Group)) &&
+        (@tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES).present?
+    end
+
+    # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
+    # see ResourceLinkRequest#add_line_item_url_to_ags_claim! for adding the 'lineitem' propertys
+    def add_assignment_and_grade_service_claims!
+      @message.assignment_and_grade_service.scope = @tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES
+      @message.assignment_and_grade_service.lineitems = @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
+    end
+
+    # Used to construct URLs for AGS endpoints like line item index, or line item show
+    # assumes @context is either Group or Course, per #include_assignment_and_grade_service_claims?
+    def course_id_for_ags_url
+      @context.is_a?(Group) ? @context.context_id : @context.id
     end
 
     def include_names_and_roles_service_claims?
