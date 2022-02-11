@@ -16,7 +16,7 @@
   </a>
 <% end %>
 
-<% m = (Coursewared_messages || []).find{|m| m.frequency == Notification::FREQ_WEEKLY} || delayed_messages.first %>
+<% m = (delayed_messages || []).find{|m| m.frequency == Notification::FREQ_WEEKLY} || delayed_messages.first %>
 <% if !m || m.frequency == Notification::FREQ_DAILY %>
   <p><%= t :daily_body, "You're signed up to receive a daily report of some notifications from your Courseware account.  Below is the report for %{date}:",
            :date => content(:report_date) %></p>
