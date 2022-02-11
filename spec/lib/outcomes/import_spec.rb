@@ -525,6 +525,26 @@ RSpec.describe Outcomes::Import do
       end
     end
 
+    context "with friendly_description" do
+      fd = "A friendly description"
+      it "creates an OutcomeFriendlyDescription if the imported outcome has a friendly_description" do
+        expect(OutcomeFriendlyDescription.find_by(description: fd)).to be_nil
+        importer.import_outcome(**outcome_attributes, friendly_description: fd)
+        expect(OutcomeFriendlyDescription.find_by(description: fd).workflow_state).to eq "active"
+      end
+
+      it "removes the friendly_description for an existing outcome if the imported outcome has no friendly_description" do
+        OutcomeFriendlyDescription.create!({
+                                             learning_outcome: existing_outcome,
+                                             context: existing_outcome.context,
+                                             description: fd
+                                           })
+        expect(OutcomeFriendlyDescription.find_by(description: fd).workflow_state).to eq "active"
+        importer.import_outcome(**outcome_attributes)
+        expect(OutcomeFriendlyDescription.find_by(description: fd).workflow_state).to eq "deleted"
+      end
+    end
+
     it "calls destroy on content tag if workflow state is deleted" do
       # deleting last content tag will delete outcome
       importer.import_outcome(**outcome_attributes, workflow_state: "deleted")

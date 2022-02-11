@@ -72,6 +72,12 @@ indicates this is a learning outcome group</td>
 <td>The description of the learning outcome or learning outcome group (optional, defaults to blank).</td>
 </tr>
 <tr>
+<td>friendly_description</td>
+<td>text</td>
+<td></td>
+<td>Learning outcome display description in "friendly" language for students and parents (optional, defaults to blank).</td>
+</tr>
+<tr>
 <td>display_name</td>
 <td>text</td>
 <td></td>
