@@ -31,29 +31,24 @@ import {View} from '@instructure/ui-view'
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const variables = {
+    conversationID: props.conversation._id
+  }
 
   const removeConversationMessagesFromCache = (cache, result) => {
-    const data = JSON.parse(
-      JSON.stringify(
-        cache.readFragment({
-          id: props.conversation.id,
-          fragment: Conversation.fragment,
-          fragmentName: 'Conversation'
-        })
+    const options = {
+      query: CONVERSATION_MESSAGES_QUERY,
+      variables
+    }
+    const data = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+    data.legacyNode.conversationMessagesConnection.nodes =
+      data.legacyNode.conversationMessagesConnection.nodes.filter(
+        message =>
+          !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id)
       )
-    )
 
-    data.conversationMessagesConnection.nodes = data.conversationMessagesConnection.nodes.filter(
-      message =>
-        !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id)
-    )
-
-    cache.writeFragment({
-      id: props.conversation.id,
-      fragment: Conversation.fragment,
-      fragmentName: 'Conversation',
-      data
-    })
+    cache.writeQuery({...options, data})
   }
 
   const [deleteConversationMessages] = useMutation(DELETE_CONVERSATION_MESSAGES, {
@@ -67,9 +62,7 @@ export const MessageDetailContainer = props => {
   })
 
   const {loading, error, data} = useQuery(CONVERSATION_MESSAGES_QUERY, {
-    variables: {
-      conversationID: props.conversation._id
-    }
+    variables
   })
 
   if (loading) {
