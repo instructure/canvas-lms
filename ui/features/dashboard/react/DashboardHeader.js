@@ -98,7 +98,8 @@ class DashboardHeader extends React.Component {
       .includes(this.props.dashboard_view)
       ? this.props.dashboard_view
       : 'cards',
-    loadedViews: []
+    loadedViews: [],
+    selectedObserveeId: null
   }
 
   componentDidMount() {
@@ -127,33 +128,45 @@ class DashboardHeader extends React.Component {
     loadPlannerDashboard()
   }
 
-  loadCardDashboard() {
+  loadCardDashboard(observedUserId) {
     // I put this in so I can spy on the imported function in a spec :'(
-    if (!observerMode()) {
-      loadCardDashboard()
-    }
-    // if in observer mode, ObserverOptions will handle loading the cards for the right user
+    loadCardDashboard(undefined, observedUserId)
   }
 
-  loadStreamItemDashboard() {
+  loadStreamItemDashboard(observedUserId) {
     // populates the stream items via ajax when the toggle is switched
+    const streamItemsUrl =
+      observedUserId && observerMode()
+        ? `/dashboard/stream_items?observed_user=${observedUserId}`
+        : '/dashboard/stream_items'
+
     const $dashboardActivity = $('#dashboard-activity')
-    if ($dashboardActivity.text().trim()) return // don't do anything if it is already populated
+    // don't do anything if it is already populated and user isn't an observer
+    if (!observerMode() && $dashboardActivity.text().trim()) return
+
+    // unbind any existing callbacks on stream item dashboard
+    if (this.streamItemDashboard) {
+      this.streamItemDashboard.undelegateEvents()
+      this.streamItemDashboard = undefined
+    }
 
     const promiseToGetCode = import('../backbone/views/DashboardView')
-    const promiseToGetHtml = axios.get('/dashboard/stream_items')
+    const promiseToGetHtml = axios.get(streamItemsUrl)
     $dashboardActivity.show().disableWhileLoading(
       Promise.all([promiseToGetCode, promiseToGetHtml])
         .then(([{default: DashboardView}, axiosResponse]) => {
           // xsslint safeString.property data
           $dashboardActivity.html(axiosResponse.data)
-          new DashboardView()
+          this.streamItemDashboard = new DashboardView()
         })
         .catch(showFlashError(I18n.t('Failed to load recent activity')))
     )
   }
 
   loadDashboard(newView) {
+    // if user is an observer, wait until we have an id to load
+    // (this might be the observer's id, and is available as soon as the observer picker loads)
+    if (observerMode() && !this.state.selectedObserveeId) return
     if (this.state.loadedViews.includes(newView)) return
 
     if (newView === 'planner' && this.props.planner_enabled) {
@@ -165,15 +178,15 @@ class DashboardHeader extends React.Component {
           showFlashAlert({message: I18n.t('Failed initializing dashboard'), type: 'error'})
         )
     } else if (newView === 'cards') {
-      this.loadCardDashboard()
+      this.loadCardDashboard(this.state.selectedObserveeId)
     } else if (newView === 'activity') {
-      this.loadStreamItemDashboard()
+      this.loadStreamItemDashboard(this.state.selectedObserveeId)
     }
 
     // also load the sidebar if we need to
-    // (no sidebar is shown in planner dashboard; ObserverOptions loads sidebar for observers)
-    if (newView !== 'planner' && !this.sidebarHasLoaded && !observerMode()) {
-      this.props.loadDashboardSidebar()
+    // (no sidebar is shown in planner dashboard)
+    if (newView !== 'planner' && !this.sidebarHasLoaded) {
+      this.props.loadDashboardSidebar(this.state.selectedObserveeId)
       this.sidebarHasLoaded = true
     }
 
@@ -239,9 +252,11 @@ class DashboardHeader extends React.Component {
   }
 
   reloadDashboardForObserver = userId => {
+    this.sidebarHasLoaded = false
     resetDashboardCards()
-    loadCardDashboard(undefined, userId)
-    this.props.loadDashboardSidebar(userId)
+    this.setState({selectedObserveeId: userId, loadedViews: []}, () => {
+      this.loadDashboard(this.state.currentDashboard)
+    })
   }
 
   render() {
@@ -251,7 +266,7 @@ class DashboardHeader extends React.Component {
           <span className="hidden-phone">{I18n.t('Dashboard')}</span>
         </h1>
         <div className="ic-Dashboard-header__actions">
-          {ENV.FEATURES?.observer_picker && ENV.current_user_roles?.includes('observer') && (
+          {observerMode() && (
             <View as="div" maxWidth="16em" margin="0 small">
               <ObserverOptions
                 currentUser={ENV.current_user}
