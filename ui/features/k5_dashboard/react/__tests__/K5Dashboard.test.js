@@ -172,9 +172,6 @@ const defaultEnv = {
   current_user: currentUser,
   current_user_id: '1',
   K5_USER: true,
-  FEATURES: {
-    important_dates: true
-  },
   PREFERENCES: {
     hide_dashcard_color_overlays: false
   },
@@ -192,7 +189,6 @@ const defaultProps = {
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
   hideGradesTabForStudents: false,
-  showImportantDates: true,
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
   parentSupportEnabled: false,
@@ -750,15 +746,6 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Important Dates', () => {
-    it('does not render any important dates if the flag is off', async () => {
-      const {findByText, queryByText} = render(
-        <K5Dashboard {...defaultProps} showImportantDates={false} />
-      )
-      expect(await findByText('My Subjects')).toBeInTheDocument()
-      expect(queryByText('Important Dates')).not.toBeInTheDocument()
-      expect(queryByText('View Important Dates')).not.toBeInTheDocument()
-    })
-
     it('renders a sidebar with important dates and no tray buttons on large screens', async () => {
       const {getByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
       await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
