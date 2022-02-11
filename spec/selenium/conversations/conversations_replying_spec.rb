@@ -62,6 +62,20 @@ describe "conversations new" do
         # make sure upload input exists
         expect(f("input[type='file']")).to be_truthy
       end
+
+      it "reply from mobile detail message view", ignore_js_errors: true do
+        driver.manage.window.resize_to(565, 836)
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        expect(f("button[data-testid='message-detail-back-button']")).to be_present
+        f("button[data-testid='message-detail-header-reply-btn']").click
+        f("textarea[data-testid='message-body']").send_keys("hello friends")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        expect(ConversationMessage.last.body).to eq "hello friends"
+        resize_screen_to_standard
+      end
     end
 
     context "when react_inbox feature flag is off" do
