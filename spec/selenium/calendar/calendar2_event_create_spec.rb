@@ -209,6 +209,7 @@ describe "calendar2" do
       end
 
       it "creates an event with an important date in a k5 subject" do
+        Account.site_admin.enable_feature!(:important_dates)
         toggle_k5_setting(@course.account)
 
         get "/calendar2"

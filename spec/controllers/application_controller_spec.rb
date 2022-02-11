@@ -2569,13 +2569,6 @@ describe CoursesController do
     end
   end
 
-  describe "annotate_sentry" do
-    it "sets the db_cluster tag correctly" do
-      expect(Sentry).to receive(:set_tags).with({ db_cluster: Account.default.shard.database_server.id })
-      get "index"
-    end
-  end
-
   context "validate_scopes" do
     let(:account) { double }
 

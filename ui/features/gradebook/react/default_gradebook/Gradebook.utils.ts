@@ -226,6 +226,3 @@ export const serializeFilter = (filter: PartialFilter): GradebookFilterApiReques
     }
   }
 }
-
-export const compareFilterByDate = (a: Filter, b: Filter) =>
-  new Date(a.created_at).getTime() - new Date(b.created_at).getTime()

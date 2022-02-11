@@ -17,20 +17,19 @@
  */
 
 import React, {PropsWithChildren, ReactElement} from 'react'
-import * as Sentry from '@sentry/react'
-import {FallbackRender} from '@sentry/react/dist/errorboundary'
 
 export type ErrorBoundaryProps = PropsWithChildren<{
-  errorComponent: FallbackRender | ReactElement
+  errorComponent: ReactElement
 }>
 
 type ErrorBoundaryState = {
   error: Error | null
+  hasError: boolean
 }
 
 export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  static getDerivedStateFromError(error: Error) {
-    return {error}
+  static getDerivedStateFromError(error) {
+    return {hasError: true, error}
   }
 
   componentDidCatch(error, errorInfo) {
@@ -38,28 +37,15 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
     console.error(error, errorInfo)
   }
 
-  state: ErrorBoundaryState = {error: null}
+  state: ErrorBoundaryState = {hasError: false, error: null}
 
   render() {
-    // If the <Sentry.ErrorBoundary> threw an error, handle it ourselves
-    if (this.state.error) {
-      if (typeof this.props.errorComponent === 'function') {
-        // `componentStack` and `eventId` are only used by Sentry's ErrorBoundary, but we need to pass in `null` to comply with the unnecessarily strict type
-        return this.props.errorComponent({
-          error: this.state.error,
-          componentStack: null,
-          eventId: null,
-          resetError: () => this.setState({error: null})
-        })
-      } else {
-        return this.props.errorComponent
-      }
+    if (this.state.hasError) {
+      return React.cloneElement(this.props.errorComponent, {
+        errorSubject: this.state.error?.message
+      })
     }
 
-    return (
-      <Sentry.ErrorBoundary fallback={this.props.errorComponent}>
-        {this.props.children}
-      </Sentry.ErrorBoundary>
-    )
+    return this.props.children
   }
 }

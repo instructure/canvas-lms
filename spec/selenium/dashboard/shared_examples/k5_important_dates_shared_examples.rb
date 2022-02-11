@@ -31,6 +31,10 @@ shared_examples_for "k5 important dates" do
   include SharedExamplesCommon
   include K5ImportantDatesSectionPageObject
 
+  before :once do
+    Account.site_admin.enable_feature!(:important_dates)
+  end
+
   it "shows the important dates section on the dashboard" do
     get "/"
 
@@ -155,6 +159,8 @@ shared_examples_for "k5 important dates calendar picker" do |context|
   include K5ImportantDatesSectionPageObject
 
   before :once do
+    Account.site_admin.enable_feature!(:important_dates)
+
     @account.settings[:calendar_contexts_limit] = 2
     @account.save!
   end

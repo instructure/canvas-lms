@@ -951,8 +951,6 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  resources :jobs_v2, only: [:index]
-
   get "equation_images/:id" => "equation_images#show", :as => :equation_images, :id => /.+/
 
   # assignments at the top level (without a context) -- we have some specs that

@@ -19,7 +19,6 @@
 import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import axios from '@canvas/axios'
-import LazyLoad from '@canvas/lazy-load'
 import {bool, func, string} from 'prop-types'
 import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
@@ -36,7 +35,7 @@ import {
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
-import React, {Component} from 'react'
+import React, {Component, lazy, Suspense} from 'react'
 import StudentViewContext from './Context'
 import SubmissionTypeButton from './SubmissionTypeButton'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -45,13 +44,13 @@ import {uploadFile} from '@canvas/upload-file'
 import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const ExternalToolSubmission = React.lazy(() => import('./AttemptType/ExternalToolSubmission'))
-const FilePreview = React.lazy(() => import('./AttemptType/FilePreview'))
-const FileUpload = React.lazy(() => import('./AttemptType/FileUpload'))
-const MediaAttempt = React.lazy(() => import('./AttemptType/MediaAttempt'))
-const TextEntry = React.lazy(() => import('./AttemptType/TextEntry'))
-const UrlEntry = React.lazy(() => import('./AttemptType/UrlEntry'))
-const StudentAnnotationAttempt = React.lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
+const ExternalToolSubmission = lazy(() => import('./AttemptType/ExternalToolSubmission'))
+const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
+const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
+const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
+const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
+const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
+const StudentAnnotationAttempt = lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
 
 const iconsByType = {
   media_recording: IconAttachMediaLine,
@@ -156,7 +155,7 @@ export default class AttemptTab extends Component {
 
   renderFileUpload = () => {
     return (
-      <LazyLoad errorCategory="Assignments 2 FileUpload on AttemptTab">
+      <Suspense fallback={<LoadingIndicator />}>
         <FileUpload
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
@@ -166,7 +165,7 @@ export default class AttemptTab extends Component {
           onCanvasFileRequested={this.onCanvasFileRequested}
           onUploadRequested={this.onUploadRequested}
         />
-      </LazyLoad>
+      </Suspense>
     )
   }
 
@@ -286,12 +285,12 @@ export default class AttemptTab extends Component {
 
   renderFileAttempt = () => {
     return isSubmitted(this.props.submission) ? (
-      <LazyLoad errorCategory="Assignments 2 FilePreview on AttemptTab">
+      <Suspense fallback={<LoadingIndicator />}>
         <FilePreview
           key={this.props.submission.attempt}
           files={this.props.submission.attachments}
         />
-      </LazyLoad>
+      </Suspense>
     ) : (
       this.renderFileUpload()
     )
@@ -302,7 +301,7 @@ export default class AttemptTab extends Component {
       (!context.allowChangesToSubmission && !context.isObserver) ||
       isSubmitted(this.props.submission)
     return (
-      <LazyLoad errorCategory="Assignments 2 TextEntry on AttemptTab">
+      <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
           createSubmissionDraft={this.props.createSubmissionDraft}
           focusOnInit={this.props.focusAttemptOnInit}
@@ -311,13 +310,13 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
-      </LazyLoad>
+      </Suspense>
     )
   }
 
   renderUrlAttempt = () => {
     return (
-      <LazyLoad errorCategory="Assignments 2 UrlEntry on AttemptTab">
+      <Suspense fallback={<LoadingIndicator />}>
         <UrlEntry
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
@@ -325,13 +324,13 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
-      </LazyLoad>
+      </Suspense>
     )
   }
 
   renderMediaAttempt = () => {
     return (
-      <LazyLoad errorCategory="Assignments 2 MediaAttempt on AttemptTab">
+      <Suspense fallback={<LoadingIndicator />}>
         <MediaAttempt
           key={this.props.submission.attempt}
           assignment={this.props.assignment}
@@ -341,24 +340,24 @@ export default class AttemptTab extends Component {
           updateUploadingFiles={this.props.updateUploadingFiles}
           uploadingFiles={this.props.uploadingFiles}
         />
-      </LazyLoad>
+      </Suspense>
     )
   }
 
   renderStudentAnnotationAttempt = () => {
     return (
-      <LazyLoad errorCategory="Assignments 2 StudentAnnotationAttempt on AttemptTab">
+      <Suspense fallback={<LoadingIndicator />}>
         <StudentAnnotationAttempt
           submission={this.props.submission}
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
         />
-      </LazyLoad>
+      </Suspense>
     )
   }
 
   renderExternalToolAttempt = externalTool => (
-    <LazyLoad errorCategory="Assignments 2 ExternalToolSubmission on AttemptTab">
+    <Suspense fallback={<LoadingIndicator />}>
       <ExternalToolSubmission
         createSubmissionDraft={this.props.createSubmissionDraft}
         onFileUploadRequested={({files}) => {
@@ -374,7 +373,7 @@ export default class AttemptTab extends Component {
         submission={this.props.submission}
         tool={externalTool}
       />
-    </LazyLoad>
+    </Suspense>
   )
 
   renderByType(submissionType, context, externalTool) {

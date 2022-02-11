@@ -129,8 +129,10 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     this.$el
       .find('.assignment_group')
       .html(genericSelectOptionsTemplate(assignmentGroupsSelectOptionsInfo))
-    // Only show important date checkbox if selected context is k5 subject
-    this.$el.find('#important_dates').toggle(this.currentContextInfo.k5_course)
+    // Only show important date checkbox if selected context is k5 subject and the feature is enabled
+    this.$el
+      .find('#important_dates')
+      .toggle(this.currentContextInfo.k5_course && ENV.FEATURES?.important_dates)
 
     // Update the edit and more options links with the new context
     this.$el.attr('action', this.currentContextInfo.create_assignment_url)

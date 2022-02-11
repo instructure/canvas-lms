@@ -3421,33 +3421,6 @@ describe Assignment do
       expect(decimal_part.length).to be <= 3
     end
 
-    context "with numeric grading standard" do
-      before(:once) do
-        @assignment.update!(grading_type: "letter_grade", points_possible: 10.0)
-        grading_standard = @course.grading_standards.build(title: "Number Before Letter")
-        grading_standard.data = {
-          "1" => 0.9,
-          "2" => 0.8,
-          "3" => 0.7,
-          "4" => 0.6,
-          "5" => 0.5,
-          "6" => 0
-        }
-        grading_standard.assignments << @assignment
-        grading_standard.save!
-      end
-
-      it "does not match a numeric grading standard if points are preferred over grading scheme value" do
-        @assignment.points_possible = 100
-        expect(@assignment.interpret_grade("1", prefer_points_over_scheme: true)).to eq 1.0
-      end
-
-      it "matches a numeric grading standard if grading scheme value is preferred over points" do
-        @assignment.points_possible = 100
-        expect(@assignment.interpret_grade("1")).to eq 100.0
-      end
-    end
-
     context "with alphanumeric grades" do
       before(:once) do
         @assignment.update!(grading_type: "letter_grade", points_possible: 10.0)

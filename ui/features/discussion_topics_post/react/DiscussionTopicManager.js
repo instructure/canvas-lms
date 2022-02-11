@@ -72,8 +72,6 @@ const DiscussionTopicManager = props => {
   const [highlightEntryId, setHighlightEntryId] = useState(ENV.discussions_deep_link?.entry_id)
   const [relativeEntryId, setRelativeEntryId] = useState(null)
 
-  const [isUserMissingInitialPost, setIsUserMissingInitialPost] = useState(null)
-
   // Reset search to 0 when inactive
   useEffect(() => {
     if (searchTerm && pageNumber !== 0) {
@@ -123,11 +121,9 @@ const DiscussionTopicManager = props => {
     courseID: window.ENV?.course_id
   }
 
-  // in some cases, we want to refresh the results rather that use the current cache:
-  // in the case: 'isUserMissingInitialPost' the cache is empty so we need to get the entries.
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: isUserMissingInitialPost || searchTerm ? 'network-only' : 'cache-and-network'
+    fetchPolicy: searchTerm ? 'network-only' : 'cache-and-network'
   })
 
   const updateDraftCache = (cache, result) => {
@@ -185,23 +181,15 @@ const DiscussionTopicManager = props => {
       const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
 
-      // if the current user hasn't made the required inital post, then this entry will be it.
-      // In that case, we are required to do a page refresh to get all the entries (implemented with isUserMissingInitialPost)
-      // thus we bascially want to not do 'else if (currentDiscussion && newDiscussionEntry)' which contains updateCache logic.
-      // Discussion.initialPostRequiredForCurrentUser is based on user and topic so if the user meets this reuqire, then
-      // this doesnt run and cacheing resumes as normal.
-      if (currentDiscussion.legacyNode.initialPostRequiredForCurrentUser) {
-        setIsUserMissingInitialPost(currentDiscussion.legacyNode.initialPostRequiredForCurrentUser)
-      } else if (currentDiscussion && newDiscussionEntry) {
-        // if we have a new entry update the counts, because we are about to add to the cache (something useMutation dont do, that useQuery does)
+      if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
         removeDraftFromDiscussionCache(cache, result)
-        // add the new entry to the current entries in the cache
         if (variables.sort === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
         } else {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
         }
+
         cache.writeQuery({...options, data: currentDiscussion})
       }
     } catch (e) {
@@ -236,7 +224,6 @@ const DiscussionTopicManager = props => {
       />
     )
   }
-
   return (
     <SearchContext.Provider value={searchContext}>
       <DiscussionTopicToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />

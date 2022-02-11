@@ -176,12 +176,11 @@ module Importers
         Importers::CalendarEventImporter.process_migration(data, migration)
         Importers::LtiResourceLinkImporter.process_migration(data, migration)
         Importers::PacePlanImporter.process_migration(data, migration)
+        Importers::LatePolicyImporter.process_migration(data, migration) if migration.copy_options && (migration.is_set?(migration.copy_options[:everything]) || migration.is_set?(migration.copy_options[:all_course_settings]))
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
-
         if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
           import_settings_from_migration(course, data, migration)
-          Importers::LatePolicyImporter.process_migration(data, migration) unless migration.should_skip_import? "LatePolicy"
         end
         migration.update_import_progress(90)
 

@@ -181,8 +181,7 @@ function getProps(column, gradebook, options) {
       settingKey: sortRowsBySetting.settingKey
     },
 
-    submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded,
-    messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id
+    submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded
   }
 }
 

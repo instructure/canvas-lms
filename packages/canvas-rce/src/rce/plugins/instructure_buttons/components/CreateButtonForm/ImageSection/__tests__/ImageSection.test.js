@@ -123,29 +123,6 @@ describe('ImageSection', () => {
     expect(getByTestId('selected-image-preview')).toBeInTheDocument()
   })
 
-  describe('when the cropper FF is off', () => {
-    let rendered
-
-    beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = false
-
-      fetchMock.mock('/api/session', '{}')
-
-      rendered = subject({editor: new FakeEditor()})
-      fireEvent.click(rendered.getByText('Add Image'))
-    })
-
-    afterEach(() => fetchMock.restore())
-
-    it('does not render the "Upload Image" button', () => {
-      expect(rendered.queryByText('Upload Image')).not.toBeInTheDocument()
-    })
-
-    it('does not render the "Course Images" button', () => {
-      expect(rendered.queryByText('Course Images')).not.toBeInTheDocument()
-    })
-  })
-
   describe('when no image is selected', () => {
     it('renders a "None Selected" message', () => {
       const {getByText} = subject()
@@ -157,8 +134,6 @@ describe('ImageSection', () => {
     let rendered
 
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = true
-
       fetchMock.mock('/api/session', '{}')
 
       rendered = subject({editor: new FakeEditor()})
@@ -191,8 +166,6 @@ describe('ImageSection', () => {
     let getByTestId, getByText, getByTitle
 
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = true
-
       const rendered = subject()
 
       getByTestId = rendered.getByTestId
@@ -231,6 +204,17 @@ describe('ImageSection', () => {
         fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
       })
 
+      it('sets the image name', () => {
+        expect(getByText('grid.png')).toBeInTheDocument()
+      })
+
+      it('updates the image preview', async () => {
+        await flushPromises()
+        expect(getByTestId('selected-image-preview')).toHaveStyle(
+          'backgroundImage: url(data:image/png;base64,asdfasdfjksdf==)'
+        )
+      })
+
       it('dispatches an action to update parent state image', async () => {
         await flushPromises()
         expect(defaultProps.onChange).toHaveBeenCalledWith({
@@ -254,24 +238,6 @@ describe('ImageSection', () => {
           payload: 'grid.png'
         })
       })
-    })
-  })
-
-  describe('when the "Multi Color Image" mode is selected', () => {
-    let getByTestId, getByText
-
-    beforeEach(() => {
-      const rendered = subject()
-
-      getByTestId = rendered.getByTestId
-      getByText = rendered.getByText
-
-      fireEvent.click(getByText('Add Image'))
-      fireEvent.click(getByText('Multi Color Image'))
-    })
-
-    it('renders the course images component', async () => {
-      await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
     })
   })
 

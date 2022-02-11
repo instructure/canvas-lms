@@ -427,7 +427,7 @@ class Quizzes::QuizzesController < ApplicationController
         @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
       end
 
-      if params.include?(:important_dates)
+      if Account.site_admin.feature_enabled?(:important_dates)
         @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
       end
 
@@ -499,7 +499,9 @@ class Quizzes::QuizzesController < ApplicationController
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
               @quiz.assignment.validate_overrides_for_sis(overrides) unless overrides.nil?
 
-              @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
+              if Account.site_admin.feature_enabled?(:important_dates)
+                @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
+              end
             end
 
             auto_publish = @quiz.published?

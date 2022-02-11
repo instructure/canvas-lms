@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useContext} from 'react'
+import React, {useState} from 'react'
 import I18n from 'i18n!public_message_students_who'
-
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
+import {IconArrowOpenDownLine, IconArrowOpenUpLine, IconPaperclipLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -34,15 +33,6 @@ import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {
-  FileAttachmentUpload,
-  AttachmentUploadSpinner,
-  AttachmentDisplay,
-  addAttachmentsFn,
-  removeAttachmentFn
-} from '@canvas/message-attachments'
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item} = Flex as any
@@ -67,8 +57,6 @@ export type Props = {
   assignment: Assignment
   onClose: () => void
   students: Student[]
-  onSend: () => void
-  messageAttachmentUploadFolderId: string
 }
 
 type FilterCriterion = {
@@ -120,18 +108,8 @@ const filterCriteria: FilterCriterion[] = [
   }
 ]
 
-const MessageStudentsWhoDialog: React.FC<Props> = ({
-  assignment,
-  onClose,
-  students,
-  onSend,
-  messageAttachmentUploadFolderId
-}) => {
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-
+const MessageStudentsWhoDialog: React.FC<Props> = ({assignment, onClose, students}) => {
   const [open, setOpen] = useState(true)
-  const [sending, setSending] = useState(false)
-
   const close = () => setOpen(false)
 
   const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
@@ -151,181 +129,146 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   // TODO: get observers from GraphQL eventually
   const observers = []
 
-  const [attachments, setAttachments] = useState([])
-  const [pendingUploads, setPendingUploads] = useState([])
-
-  const handleSendButton = () => {
-    if (pendingUploads.length) {
-      // This notifies the AttachmentUploadSpinner to start spinning
-      // which then calls onSend() when pendingUploads are complete.
-      setSending(true)
-    } else {
-      onSend()
-    }
-  }
-
-  const onAddAttachment = addAttachmentsFn(
-    setAttachments,
-    setPendingUploads,
-    messageAttachmentUploadFolderId,
-    setOnFailure,
-    setOnSuccess
-  )
-  const onDeleteAttachment = removeAttachmentFn(setAttachments)
-  const onReplaceAttachment = (id, e) => {
-    onDeleteAttachment(id)
-    onAddAttachment(e)
-  }
-
   return (
-    <>
-      <Modal
-        open={open}
-        label={I18n.t('Compose Message')}
-        onDismiss={close}
-        onExited={onClose}
-        overflow="scroll"
-        shouldCloseOnDocumentClick={false}
-        size="large"
-      >
-        <ModalHeader>
-          <CloseButton
-            placement="end"
-            offset="small"
-            onClick={close}
-            screenReaderLabel={I18n.t('Close')}
-          />
-          <Heading>{I18n.t('Compose Message')}</Heading>
-        </ModalHeader>
+    <Modal
+      open={open}
+      label={I18n.t('Compose Message')}
+      onDismiss={close}
+      onExited={onClose}
+      overflow="scroll"
+      shouldCloseOnDocumentClick={false}
+      size="large"
+    >
+      <ModalHeader>
+        <CloseButton
+          placement="end"
+          offset="small"
+          onClick={close}
+          screenReaderLabel={I18n.t('Close')}
+        />
+        <Heading>{I18n.t('Compose Message')}</Heading>
+      </ModalHeader>
 
-        <ModalBody>
-          <Flex alignItems="end">
-            <Item>
-              <SimpleSelect
-                renderLabel={I18n.t('For students who…')}
-                onChange={handleCriterionSelected}
-                value={selectedCriterion.value}
-              >
-                {availableCriteria.map(criterion => (
-                  <Option id={criterion.value} key={criterion.value} value={criterion.value}>
-                    {criterion.title}
-                  </Option>
-                ))}
-              </SimpleSelect>
-            </Item>
-            {selectedCriterion.requiresCutoff && (
-              <Item margin="0 0 0 small">
-                <NumberInput
-                  value={cutoff}
-                  onChange={(_e, value) => {
-                    setCutoff(value)
-                  }}
-                  showArrows={false}
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Enter score cutoff')}</ScreenReaderContent>
-                  }
-                  width="5em"
-                />
-              </Item>
-            )}
-          </Flex>
-          <br />
-          <Flex>
-            <Item>
-              <Text weight="bold">{I18n.t('Send Message To:')}</Text>
-            </Item>
-            <Item margin="0 0 0 medium">
-              <Checkbox
-                label={
-                  <Text weight="bold">
-                    {I18n.t('%{studentCount} Students', {studentCount: students.length})}
-                  </Text>
+      <ModalBody>
+        <Flex alignItems="end">
+          <Item>
+            <SimpleSelect
+              renderLabel={I18n.t('For students who…')}
+              onChange={handleCriterionSelected}
+              value={selectedCriterion.value}
+            >
+              {availableCriteria.map(criterion => (
+                <Option id={criterion.value} key={criterion.value} value={criterion.value}>
+                  {criterion.title}
+                </Option>
+              ))}
+            </SimpleSelect>
+          </Item>
+          {selectedCriterion.requiresCutoff && (
+            <Item margin="0 0 0 small">
+              <NumberInput
+                value={cutoff}
+                onChange={(_e, value) => {
+                  setCutoff(value)
+                }}
+                showArrows={false}
+                renderLabel={
+                  <ScreenReaderContent>{I18n.t('Enter score cutoff')}</ScreenReaderContent>
                 }
+                width="5em"
               />
             </Item>
-            <Item margin="0 0 0 medium">
-              <Checkbox
-                label={
-                  <Text weight="bold">
-                    {I18n.t('%{observerCount} Observers', {observerCount: observers.length})}
-                  </Text>
-                }
-              />
-            </Item>
-            <Item as="div" shouldGrow textAlign="end">
-              <Link
-                onClick={() => setShowTable(!showTable)}
-                renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
-                iconPlacement="end"
-              >
-                {showTable ? I18n.t('Hide all recipients') : I18n.t('Show all recipients')}
-              </Link>
-            </Item>
-          </Flex>
-          {showTable && (
-            <Table caption={I18n.t('List of students and observers')}>
-              <TableHead>
-                <Row>
-                  <ColHeader id="students">{I18n.t('Students')}</ColHeader>
-                  <ColHeader id="observers">{I18n.t('Observers')}</ColHeader>
-                </Row>
-              </TableHead>
-              <TableBody>
-                {sortedStudents.map(student => (
-                  <Row key={student.id}>
-                    <Cell>
-                      <Tag text={student.name} />
-                    </Cell>
-                    <Cell>{/* observers will go here */}</Cell>
-                  </Row>
-                ))}
-              </TableBody>
-            </Table>
           )}
+        </Flex>
+        <br />
+        <Flex>
+          <Item>
+            <Text weight="bold">{I18n.t('Send Message To:')}</Text>
+          </Item>
+          <Item margin="0 0 0 medium">
+            <Checkbox
+              label={
+                <Text weight="bold">
+                  {I18n.t('%{studentCount} Students', {studentCount: students.length})}
+                </Text>
+              }
+            />
+          </Item>
+          <Item margin="0 0 0 medium">
+            <Checkbox
+              label={
+                <Text weight="bold">
+                  {I18n.t('%{observerCount} Observers', {observerCount: observers.length})}
+                </Text>
+              }
+            />
+          </Item>
+          <Item as="div" shouldGrow textAlign="end">
+            <Link
+              onClick={() => setShowTable(!showTable)}
+              renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
+              iconPlacement="end"
+            >
+              {showTable ? I18n.t('Hide all recipients') : I18n.t('Show all recipients')}
+            </Link>
+          </Item>
+        </Flex>
+        {showTable && (
+          <Table caption={I18n.t('List of students and observers')}>
+            <TableHead>
+              <Row>
+                <ColHeader id="students">{I18n.t('Students')}</ColHeader>
+                <ColHeader id="observers">{I18n.t('Observers')}</ColHeader>
+              </Row>
+            </TableHead>
+            <TableBody>
+              {sortedStudents.map(student => (
+                <Row key={student.id}>
+                  <Cell>
+                    <Tag text={student.name} />
+                  </Cell>
+                  <Cell>{/* observers will go here */}</Cell>
+                </Row>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
-          <br />
-          <TextInput renderLabel={I18n.t('Subject')} placeholder={I18n.t('Type Something…')} />
-          <br />
-          <TextArea
-            height="200px"
-            label={I18n.t('Message')}
-            placeholder={I18n.t('Type your message here…')}
-          />
-          <AttachmentDisplay
-            attachments={[...attachments, ...pendingUploads]}
-            onDeleteItem={onDeleteAttachment}
-            onReplaceItem={onReplaceAttachment}
-          />
-        </ModalBody>
+        <br />
+        <TextInput renderLabel={I18n.t('Subject')} placeholder={I18n.t('Type Something…')} />
+        <br />
+        <TextArea
+          height="200px"
+          label={I18n.t('Message')}
+          placeholder={I18n.t('Type your message here…')}
+        />
+      </ModalBody>
 
-        <ModalFooter>
-          <Flex justifyItems="space-between" width="100%">
-            <Item>
-              <FileAttachmentUpload onAddItem={onAddAttachment} />
-            </Item>
-            <Item>
-              <Flex>
-                <Item>
-                  <Button focusColor="info" color="primary-inverse" onClick={close}>
-                    {I18n.t('Cancel')}
-                  </Button>
-                </Item>
-                <Item margin="0 0 0 x-small">
-                  <Button color="primary" onClick={handleSendButton}>
-                    {I18n.t('Send')}
-                  </Button>
-                </Item>
-              </Flex>
-            </Item>
-          </Flex>
-        </ModalFooter>
-      </Modal>
-      <AttachmentUploadSpinner
-        sendMessage={onSend}
-        isMessageSending={sending}
-        pendingUploads={pendingUploads}
-      />
-    </>
+      <ModalFooter>
+        <Flex justifyItems="space-between" width="100%">
+          <Item>
+            <IconButton screenReaderLabel={I18n.t('Add attachment')}>
+              <IconPaperclipLine />
+            </IconButton>
+          </Item>
+
+          <Item>
+            <Flex>
+              <Item>
+                <Button focusColor="info" color="primary-inverse" onClick={close}>
+                  {I18n.t('Cancel')}
+                </Button>
+              </Item>
+              <Item margin="0 0 0 x-small">
+                <Button color="primary" onClick={close}>
+                  {I18n.t('Send')}
+                </Button>
+              </Item>
+            </Flex>
+          </Item>
+        </Flex>
+      </ModalFooter>
+    </Modal>
   )
 }
 

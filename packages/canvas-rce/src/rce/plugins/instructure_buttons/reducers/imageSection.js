@@ -29,7 +29,6 @@ export const initialState = {
 export const actions = {
   SET_IMAGE: {type: 'SetImage'},
   SET_IMAGE_NAME: {type: 'SetImageName'},
-  CLEAR_IMAGE: {type: 'ClearImage'},
   START_LOADING: {type: 'StartLoading'},
   STOP_LOADING: {type: 'StopLoading'},
   CLEAR_MODE: {type: 'ClearMode'}
@@ -52,8 +51,6 @@ const imageSection = (state, action) => {
       return {...state, image: action.payload}
     case actions.SET_IMAGE_NAME.type:
       return {...state, imageName: action.payload}
-    case actions.CLEAR_IMAGE.type:
-      return {...state, image: '', imageName: ''}
     case actions.CLEAR_MODE.type:
       return {...state, mode: ''}
     case modes.uploadImages.type:
