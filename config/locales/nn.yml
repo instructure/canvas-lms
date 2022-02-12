@@ -200,7 +200,7 @@ nn:
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye fagfellevurderarar blei lagt til."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Eit offentleg personvernnivå vil sende brukarane sine personopplysningar til tenestetilbyderen. Ved å sette den til privat kan ein i motsett fall hindre at slik informasjon kjem fram til tenester som er avhengig av den."
   a_redirect_uri_is_required_please_supply_one_471908db: "Krav om omdirigerings_URL. Legg til ein."
-  a_role_name_is_required_47efd33: "Eit rollenamn er krevjast"
+  a_role_name_is_required_47efd33: "Eit rollenamn er obligatorisk"
   a_section_is_required_64103992: "Seksjon er obligatorisk"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "SIS-integrasjon er ikkje satt opp og dei nye integrasjonsinnstillingane for Enable er ikkje aktivert"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Ein student har akkurat levert inn ein oppgåve for seint til %{assignment_name} i emnet %{course_name}"
@@ -250,7 +250,7 @@ nn:
   access_canvas_training_videos_and_courses_ea43173a: "Gå til Canvas sine opplæringsvideoar og -emne"
   access_denied_f922a9ff: "Ingen tilgang"
   access_report_80d28095: Tilgangsrapport
-  access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Tilgang til desse fanene krev Duglegsberekningar for læringsmål - legg til/rediger og Meistringsskalaer for læringsmål - legg til/rediger rettigheter."
+  access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Tilgang til desse fanene krev Ferdigheitsberekningar for læringsmål - legg til/rediger og Meistringsskalaer for læringsmål - legg til/rediger rettigheter."
   access_token_3be22221: Tilgangstoken
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Tilgangstoken er laga eller regenerert."
@@ -1897,7 +1897,7 @@ nn:
   add_criterion_eb9587ef: "Legg til kriterium"
   add_custom_link_22059c0: "Legg til eigendefinert lenke"
   add_delete_edit_7dbc9c5b: "legg til / slett / rediger"
-  add_delete_manage_d65e235: "legg til / slett / rediger"
+  add_delete_manage_d65e235: "legg til / slett / administrer"
   add_designers_to_courses_9588820b: "Legg designarar til emner"
   add_discussion_653dab4c: "Legg til diskusjon"
   add_domain_f15bc6c1: "Legg til domene"
@@ -1947,7 +1947,7 @@ nn:
   add_outcomes_36272787: "Legg til læringsmål"
   add_outcomes_to_account_4647776f: "Legg til Læringsmål til Konto"
   add_outcomes_to_course_88ba09be: "Legg til Læringsmål til Emne"
-  add_outcomes_to_groupname_8c33d118: "Legg til læringsmål til \\\"%{groupName}\\\""
+  add_outcomes_to_groupname_8c33d118: "Legg til læringsmål til \"%{groupName}\""
   add_override_da70f198: "Legg til overstyring"
   add_people_7948b7da: "Legg til personar"
   add_people_7ee4b2ec: "Legg til personar"
@@ -1958,7 +1958,7 @@ nn:
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for quizar"
   add_rating_89d7fbde: "Legg til vurdering"
   add_recipient_ff135ed7: "Legg til mottakar"
-  add_remove_in_courses_d65aaee3: "legg til/fjern i emne"
+  add_remove_in_courses_d65aaee3: "legg til / fjern i emne"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legg til, fjerne eller ordne seksjon på nytt for porteføljen"
   add_review_2fb1590c: "Legg til gjennomgang"
   add_role_3dc4d273: "Legg til rolle"
@@ -2008,7 +2008,7 @@ nn:
   additional_settings_20362654: "Fleire innstillingar"
   additional_settings_for_sis_syncing_f926973e: "Tilleggsinnstillingar for SIS-synkronisering"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, quizar og diskusjonar"
-  additionally_if_this_permission_is_disabled_users__6acf5d08: "Brukarar kan heller ikkje slette eksterne appar som er lagt til manuelt dersom dette løyvet er deaktivert."
+  additionally_if_this_permission_is_disabled_users__6acf5d08: "Brukarar kan ikkje slette eksterne appar som er lagt til manuelt dersom dette løyvet er deaktivert."
   address_book_dbecc4a3: Adressebok
   address_book_input_a0d8e76f: "Adressebok inndata"
   address_book_menu_c986b615: "Adressebok meny"
@@ -3029,7 +3029,7 @@ nn:
     buttons: 
       select_url: Vel
     name_is_required: "Namn er obligatorisk!"
-    points_possible_number: "Moglege poeng må vere eit tal\""
+    points_possible_number: "Moglege poeng må vere eit tal"
     select_external_tool_dialog_title: "Konfigurer eksternt verktøy"
     vericite_submission_types_validation: "VeriCite støttar kun filinnleveringar og tekstinnlegging i editor"
   assignment_enhancements_student_557372ab: "Oppgåveforbetringar - Student"
