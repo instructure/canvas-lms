@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../api_spec_helper"
+require "apis/api_spec_helper"
 
 require "nokogiri"
 
@@ -31,6 +31,16 @@ describe ExternalToolsController, type: :request do
 
     it "shows an external tool" do
       show_call(@course)
+    end
+
+    it "shows prefer_sis_email when saved in settings" do
+      et = tool_with_everything(@course, allow_membership_service_access: true)
+      et.settings = { "prefer_sis_email" => "true" }
+      et.save
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
+                      { controller: "external_tools", action: "show", format: "json",
+                        course_id: @course.id.to_s, external_tool_id: et.id.to_s })
+      expect(json["prefer_sis_email"]).to eq "true"
     end
 
     it "includes allow_membership_service_access if feature flag enabled" do
