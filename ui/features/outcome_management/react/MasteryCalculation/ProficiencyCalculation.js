@@ -27,7 +27,6 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
-import {TextInput} from '@instructure/ui-text-input'
 import {NumberInput} from '@instructure/ui-number-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -49,18 +48,15 @@ const validInt = (method, value) => {
   }
 }
 
-const CalculationIntInput = ({
-  updateCalculationInt,
-  calculationMethod,
-  calculationInt,
-  individualOutcomeDisplay
-}) => {
+const CalculationIntInput = ({updateCalculationInt, calculationMethod, calculationInt}) => {
   const handleChange = (_event, data) => {
     if (data === '') {
       updateCalculationInt('')
     } else {
       const parsed = numberHelper.parse(data)
-      updateCalculationInt(!Number.isNaN(parsed) ? parsed : '')
+      if (!Number.isNaN(parsed)) {
+        updateCalculationInt(parsed)
+      }
     }
   }
 
@@ -85,50 +81,16 @@ const CalculationIntInput = ({
     })
   }
 
-  if (individualOutcomeDisplay) {
-    return (
-      <View as="div" display="flex">
-        <View as="div" padding="0" className="points">
-          <TextInput
-            isRequired
-            messages={errorMessages}
-            onChange={handleChange}
-            renderLabel={
-              <ScreenReaderContent>{I18n.t('Proficiency Calculation')}</ScreenReaderContent>
-            }
-            value={I18n.n(calculationInt) || ''}
-            shouldNotWrap
-            textAlign="center"
-            width="3rem"
-            data-testid="proficiency-calculation-method-input"
-          />
-        </View>
-        <View as="div" padding="none none none x-small">
-          <View as="div">
-            <Text color="primary" size="small" weight="normal">
-              {calculationMethod.calculationIntLabel}
-            </Text>
-          </View>
-          <View as="div">
-            <Text color="secondary" size="x-small" weight="normal">
-              {calculationMethod.calculationIntDescription}
-            </Text>
-          </View>
-        </View>
-      </View>
-    )
-  } else {
-    return (
-      <NumberInput
-        renderLabel={() => I18n.t('Parameter')}
-        value={typeof calculationInt === 'number' ? calculationInt : ''}
-        messages={errorMessages}
-        onIncrement={handleIncrement}
-        onDecrement={handleDecrement}
-        onChange={handleChange}
-      />
-    )
-  }
+  return (
+    <NumberInput
+      renderLabel={() => I18n.t('Parameter')}
+      value={typeof calculationInt === 'number' ? calculationInt : ''}
+      messages={errorMessages}
+      onIncrement={handleIncrement}
+      onDecrement={handleDecrement}
+      onChange={handleChange}
+    />
+  )
 }
 
 const Display = ({calculationInt, currentMethod, individualOutcomeDisplay}) => (
@@ -144,33 +106,31 @@ const Display = ({calculationInt, currentMethod, individualOutcomeDisplay}) => (
         data-testid="read-only-calculation-method"
       >
         {individualOutcomeDisplay ? (
-          <View as="div">
-            <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
-            &nbsp;
-            <Text weight="normal">{currentMethod.method}</Text>
-          </View>
+          <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
         ) : (
           <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
         )}
       </Flex.Item>
-      {!individualOutcomeDisplay && (
-        <Flex.Item>
-          <Text color="primary" weight="normal">
-            {currentMethod.friendlyCalculationMethod}
-          </Text>
-        </Flex.Item>
-      )}
+      <Flex.Item>
+        <Text color="primary" weight="normal">
+          {currentMethod.friendlyCalculationMethod}
+        </Text>
+      </Flex.Item>
     </Flex>
-    {currentMethod.validRange && !individualOutcomeDisplay && (
+    {currentMethod.validRange && (
       <Flex
         wrap="wrap"
         direction={individualOutcomeDisplay ? 'row' : 'column'}
         padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
       >
         <Flex.Item as="div" padding="none xx-small none none">
-          <Heading margin="medium none none" level="h4">
-            {I18n.t('Parameter')}
-          </Heading>
+          {individualOutcomeDisplay ? (
+            <Text weight="bold">{I18n.t('Parameter:')}</Text>
+          ) : (
+            <Heading margin="medium none none" level="h4">
+              {I18n.t('Parameter')}
+            </Heading>
+          )}
         </Flex.Item>
         <Flex.Item>
           <Text color="primary" weight="normal">
@@ -219,7 +179,6 @@ const Form = ({
         calculationInt={calculationInt}
         calculationMethod={currentMethod}
         updateCalculationInt={setCalculationInt}
-        individualOutcomeDisplay={individualOutcomeForm}
       />
     )}
   </FormFieldGroup>
@@ -234,17 +193,11 @@ const Example = ({currentMethod, individualOutcomeExample}) => {
           {currentMethod.exampleText}
         </View>
         <View as="div" padding="x-small 0">
-          {individualOutcomeExample
-            ? I18n.t('1- Item Scores: Example item scores:')
-            : I18n.t('Item Scores:')}
-          &nbsp;
+          {I18n.t('Item Scores:')}&nbsp;
           <Text weight="bold"> {currentMethod.exampleScores}</Text>
         </View>
         <View as="div" padding="x-small 0">
-          {individualOutcomeExample
-            ? I18n.t('2- Final Score: Example final score:')
-            : I18n.t('Final Score:')}
-          &nbsp;
+          {I18n.t('Final Score:')}&nbsp;
           <Text weight="bold">{currentMethod.exampleResult}</Text>
         </View>
       </Text>
@@ -310,8 +263,7 @@ const ProficiencyCalculation = ({
 
   const calculationMethods = new CalculationMethodContent({
     calculation_method: calculationMethodKey,
-    calculation_int: calculationInt,
-    is_individual_outcome: true
+    calculation_int: calculationInt
   }).toJSON()
   const currentMethod = calculationMethods[calculationMethodKey]
 

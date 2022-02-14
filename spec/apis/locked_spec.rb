@@ -47,13 +47,6 @@ shared_examples_for "a locked api item" do
     expect(json.keys & prohibited_fields).to be_empty
   end
 
-  def verify_unauthorized
-    json = api_get_json
-    expect(json["errors"]).to be_truthy, "expected response to be an error"
-    expect(json["locked_for_user"]).to be_nil
-    expect(json["locked_explanation"]).to be_nil
-  end
-
   before(:once) do
     course_with_student(active_all: true)
   end
@@ -72,11 +65,7 @@ shared_examples_for "a locked api item" do
       locked_item.unlock_at = 1.day.from_now if locked_item.respond_to?(:unlock_at)
       locked_item.save!
 
-      if item_type == "file"
-        verify_unauthorized
-      else
-        verify_locked :unlock_at
-      end
+      verify_locked :unlock_at
     end
   end
 
@@ -87,11 +76,7 @@ shared_examples_for "a locked api item" do
       locked_item.lock_at = 1.day.ago
       locked_item.save!
 
-      if item_type == "file"
-        verify_unauthorized
-      else
-        verify_locked :lock_at
-      end
+      verify_locked :lock_at
     end
   end
 
@@ -111,11 +96,7 @@ shared_examples_for "a locked api item" do
       locked_module.prerequisites = "module_#{pre_module.id}"
       locked_module.save!
 
-      if item_type == "file"
-        verify_unauthorized
-      else
-        verify_locked :context_module
-      end
+      verify_locked :context_module
     end
   end
 
@@ -126,11 +107,7 @@ shared_examples_for "a locked api item" do
       locked_module = @course.context_modules.create!(name: "locked_module", unlock_at: 1.day.from_now)
       locked_module.add_item(id: locked_item.id, type: item_type)
 
-      if item_type == "file"
-        verify_unauthorized
-      else
-        verify_locked :context_module
-      end
+      verify_locked :context_module
     end
   end
 end

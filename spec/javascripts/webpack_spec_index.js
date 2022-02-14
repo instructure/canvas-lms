@@ -116,10 +116,6 @@ if (process.env.JSPEC_PATH) {
   if (isFile) {
     // eslint-disable-next-line import/no-dynamic-require
     require(`../../${process.env.JSPEC_PATH}`)
-  } else {
-    requireAll(
-      require.context(`../../${process.env.JSPEC_PATH}`, process.env.JSPEC_RECURSE !== '0', /\.js$/)
-    )
   }
 } else {
   requireAll(

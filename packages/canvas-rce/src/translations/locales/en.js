@@ -53,7 +53,6 @@ const locale = {
   },
   "apps_54d24a47": { "message": "Apps" },
   "arrows_464a3e54": { "message": "Arrows" },
-  "art_icon_8e1daad": { "message": "Art Icon" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
   },
@@ -85,7 +84,6 @@ const locale = {
   "circle_484abe63": { "message": "Circle" },
   "circle_unordered_list_9e3a0763": { "message": "circle unordered list" },
   "clear_2084585f": { "message": "Clear" },
-  "clear_image_3213fe62": { "message": "Clear image" },
   "clear_selected_file_82388e50": { "message": "Clear selected file" },
   "clear_selected_file_filename_2fe8a58e": {
     "message": "Clear selected file: { filename }"
@@ -141,7 +139,6 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
   },
-  "crop_image_41bf940c": { "message": "Crop image" },
   "crop_image_807ebb08": { "message": "Crop Image" },
   "current_image_f16c249c": { "message": "Current Image" },
   "custom_6979cd81": { "message": "Custom" },
@@ -195,8 +192,6 @@ const locale = {
   "embed_preview_2d741e1f": { "message": "Embed Preview" },
   "embed_video_a97a64af": { "message": "Embed Video" },
   "embedded_content_aaeb4d3d": { "message": "embedded content" },
-  "engineering_icon_f8f3cf43": { "message": "Engineering Icon" },
-  "english_icon_25bfe845": { "message": "English Icon" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Enter at least 3 characters to search"
   },
@@ -250,7 +245,6 @@ const locale = {
   "heading_2_5b84eed2": { "message": "Heading 2" },
   "heading_3_2c83de44": { "message": "Heading 3" },
   "heading_4_b2e74be7": { "message": "Heading 4" },
-  "health_icon_8d292eb5": { "message": "Health Icon" },
   "height_69b03e15": { "message": "Height" },
   "hexagon_d8468e0d": { "message": "Hexagon" },
   "hide_description_bfb5502e": { "message": "Hide description" },
@@ -287,11 +281,8 @@ const locale = {
   "invalid_file_type_881cc9b2": { "message": "Invalid file type" },
   "invalid_url_cbde79f": { "message": "Invalid URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Keyboard Shortcuts" },
-  "language_arts_35b79a8b": { "message": "Language Arts" },
-  "languages_835813f0": { "message": "Languages" },
   "large_9c5e80e7": { "message": "Large" },
   "left_to_right_e9b4fd06": { "message": "Left-to-Right" },
-  "library_4b05885e": { "message": "Library" },
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link Options" },
   "links_14b70841": { "message": "Links" },
@@ -305,7 +296,6 @@ const locale = {
   "loading_please_wait_d276220a": { "message": "Loading, please wait" },
   "loading_preview_9f077aa1": { "message": "Loading preview" },
   "locked_762f138b": { "message": "Locked" },
-  "math_ede93050": { "message": "Math" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Middle" },
@@ -313,7 +303,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Miscellaneous" },
   "modules_c4325335": { "message": "Modules" },
   "multi_color_image_63d7372f": { "message": "Multi Color Image" },
-  "music_8678b13": { "message": "Music" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Must be at least { percentage }%"
   },
@@ -366,8 +355,6 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
-  "performing_arts_258f265": { "message": "Performing Arts" },
-  "physical_education_b1031a43": { "message": "Physical Education" },
   "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Posted: { when }" },
   "preformatted_d0670862": { "message": "Preformatted" },
@@ -386,7 +373,6 @@ const locale = {
   "record_7c9448b": { "message": "Record" },
   "record_upload_media_5fdce166": { "message": "Record/Upload Media" },
   "relationships_6602af70": { "message": "Relationships" },
-  "religion_afb0a930": { "message": "Religion" },
   "remove_link_d1f2f4d0": { "message": "Remove Link" },
   "resize_ec83d538": { "message": "Resize" },
   "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },
@@ -558,9 +544,7 @@ const locale = {
   "yes_dde87d5": { "message": "Yes" },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "You may not upload an empty file."
-  },
-  "zoom_in_image_bb97d4f": { "message": "Zoom in image" },
-  "zoom_out_image_d0a0a2ec": { "message": "Zoom out image" }
+  }
 }
 
 

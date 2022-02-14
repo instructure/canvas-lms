@@ -288,51 +288,6 @@ describe WikiPage do
       user_factory(active_all: true)
       expect(page.can_edit_page?(@user)).to be_truthy
     end
-
-    context "when the page's course is concluded" do
-      subject { page.can_edit_page? teacher }
-
-      let(:editing_roles) { "" }
-      let(:teacher) { course.teachers.first }
-
-      let(:course) do
-        course_with_teacher(active_all: true)
-        @course.update!(workflow_state: "completed")
-        @course
-      end
-
-      let(:page) do
-        course.wiki_pages.create(
-          title: "A Page",
-          editing_roles: editing_roles,
-          workflow_state: "published"
-        )
-      end
-
-      context "with 'teachers' as the editing role" do
-        let(:editing_roles) { "teachers" }
-
-        it "returns false for a teacher" do
-          expect(subject).to eq false
-        end
-      end
-
-      context "with 'teachers,students' as the editing role" do
-        let(:editing_roles) { "teachers,students" }
-
-        it "returns false for a teacher" do
-          expect(subject).to eq false
-        end
-      end
-
-      context "with 'teachers,students,public' as the editing role" do
-        let(:editing_roles) { "teachers,students,public" }
-
-        it "returns false for a teacher" do
-          expect(subject).to eq false
-        end
-      end
-    end
   end
 
   context "initialize_wiki_page" do

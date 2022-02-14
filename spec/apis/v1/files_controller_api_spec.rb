@@ -1139,21 +1139,24 @@ describe "Files API", type: :request do
       expect(json.keys & prohibited_fields).to be_empty
     end
 
-    it "returns not found for a student when locked" do
+    it "is locked/hidden for a student" do
       course_with_student(course: @course)
       att2 = Attachment.create!(filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("file"), folder: @root, context: @course, locked: true)
       att2.hidden = true
       att2.save!
-      api_call(:get, "/api/v1/files/#{att2.id}", { controller: "files", action: "api_show", format: "json", id: att2.id.to_param }, { include: ["enhanced_preview_url"] }, expected_status: 404)
+      json = api_call(:get, "/api/v1/files/#{att2.id}", { controller: "files", action: "api_show", format: "json", id: att2.id.to_param }, { include: ["enhanced_preview_url"] })
+      expect(json["locked"]).to be_truthy
+      should_be_locked(json)
 
       att2.locked = false
       att2.unlock_at = 2.days.from_now
       att2.lock_at = 2.days.ago
       att2.save!
-      api_call(:get, "/api/v1/files/#{att2.id}", { controller: "files", action: "api_show", format: "json", id: att2.id.to_param }, { include: ["enhanced_preview_url"] }, expected_status: 404)
+      json = api_call(:get, "/api/v1/files/#{att2.id}", { controller: "files", action: "api_show", format: "json", id: att2.id.to_param }, { include: ["enhanced_preview_url"] })
+      expect(json["locked"]).to be_falsey
+      should_be_locked(json)
 
       att2.lock_at = att2.unlock_at = nil
-      att2.hidden = false
       att2.save!
       json = api_call(:get, "/api/v1/files/#{att2.id}", { controller: "files", action: "api_show", format: "json", id: att2.id.to_param }, { include: ["enhanced_preview_url"] })
       expect(json["url"]).to eq file_download_url(att2, verifier: att2.uuid, download: "1", download_frd: "1")
@@ -1176,11 +1179,11 @@ describe "Files API", type: :request do
       api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 401)
     end
 
-    it "returns not found for a student when hidden" do
+    it "returns a hidden file" do
       course_with_student(course: @course)
       @att.hidden = true
       @att.save!
-      api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 404)
+      api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 200)
     end
 
     it "returns user if requested" do

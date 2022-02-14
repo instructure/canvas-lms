@@ -544,7 +544,6 @@ class ContentMigrationsController < ApplicationController
       copy_options = ContentMigration.process_copy_params(params[:select]&.to_unsafe_h,
                                                           global_identifiers: @content_migration.use_global_identifiers?,
                                                           for_content_export: true)
-
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options

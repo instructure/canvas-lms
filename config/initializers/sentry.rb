@@ -23,65 +23,63 @@
 # nothing happens.  If it *does*, we register a callback with Canvas::Errors
 # so that every time an exception is reported, we can fire off a sentry
 # call to track it and aggregate it for us.
+settings = ConfigFile.load("sentry")
 
-settings = Rails.env.test? ? {} : SentryExtensions::Settings.settings
+if settings.present?
+  return if Canvas::Plugin.value_to_boolean(Setting.get("sentry_disabled", "false"))
 
-Sentry.init do |config|
-  config.dsn = settings[:dsn]
-  config.environment = Canvas.environment
-  config.release = Canvas.revision
-  config.sample_rate = SentryExtensions::Settings.get("sentry_backend_errors_sample_rate", "1.0").to_f
+  Sentry.init do |config|
+    config.traces_sampler = lambda do |_|
+      Setting.get("sentry_backend_traces_sample_rate", "0.0").to_f
+    end
+    config.rails.tracing_subscribers = [
+      Sentry::Rails::Tracing::ActionControllerSubscriber,
+      Sentry::Rails::Tracing::ActionViewSubscriber,
+      Sentry::Rails::Tracing::ActiveStorageSubscriber,
+      SentryExtensions::Tracing::ActiveRecordSubscriber # overridden from the Sentry-provided one
+    ]
 
-  config.traces_sampler = lambda do |_|
-    SentryExtensions::Settings.get("sentry_backend_traces_sample_rate", "0.0").to_f
-  end
-  config.rails.tracing_subscribers = [
-    Sentry::Rails::Tracing::ActionControllerSubscriber,
-    Sentry::Rails::Tracing::ActionViewSubscriber,
-    Sentry::Rails::Tracing::ActiveStorageSubscriber,
-    SentryExtensions::Tracing::ActiveRecordSubscriber # overridden from the Sentry-provided one
-  ]
+    config.dsn = settings[:dsn]
+    config.environment = Canvas.environment
+    config.release = Canvas.revision
 
-  # sentry_logger would be nice here (it records log messages), but it currently includes raw SQL logs
-  config.breadcrumbs_logger = [:http_logger] if Canvas::Plugin.value_to_boolean(SentryExtensions::Settings.get("sentry_backend_breadcrumbs_enabled", "false"))
+    # sentry_logger would be nice here (it records log messages), but it currently includes raw SQL logs
+    config.breadcrumbs_logger = [:http_logger] if Canvas::Plugin.value_to_boolean(Setting.get("sentry_backend_breadcrumbs_enabled", "false"))
 
-  filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-  config.before_send = lambda do |event, _|
-    filter.filter(event.to_hash)
-  end
+    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+    config.before_send = lambda do |event, _|
+      filter.filter(event.to_hash)
+    end
 
-  # this array should only contain exceptions that are intentionally
-  # thrown to drive client facing behavior.  A good example
-  # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
-  # should probably be caught and solved...
-  config.excluded_exceptions += %w[
-    AuthenticationMethods::AccessTokenError
-    AuthenticationMethods::AccessTokenScopeError
-    AuthenticationMethods::LoggedOutError
-    ActionController::InvalidAuthenticityToken
-    Folio::InvalidPage
-    Turnitin::Errors::SubmissionNotScoredError
-    Rack::QueryParser::InvalidParameterError
-    PG::UnableToSend
-  ]
-end
-
-Sentry.set_tags(settings.fetch(:tags, {}))
-
-Rails.configuration.to_prepare do
-  Canvas::Reloader.on_reload do
-    Sentry.configuration&.sample_rate = SentryExtensions::Settings.get("sentry_backend_errors_sample_rate", "1.0").to_f
+    # this array should only contain exceptions that are intentionally
+    # thrown to drive client facing behavior.  A good example
+    # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
+    # should probably be caught and solved...
+    config.excluded_exceptions += %w[
+      AuthenticationMethods::AccessTokenError
+      AuthenticationMethods::AccessTokenScopeError
+      AuthenticationMethods::LoggedOutError
+      ActionController::InvalidAuthenticityToken
+      Folio::InvalidPage
+      Turnitin::Errors::SubmissionNotScoredError
+      Rack::QueryParser::InvalidParameterError
+      PG::UnableToSend
+    ]
   end
 
-  SentryExtensions::Settings.get("ignorable_errors", "").split(",").each do |error|
-    SentryProxy.register_ignorable_error(error)
-  end
+  Sentry.set_tags(settings.fetch(:tags, {}))
 
-  # This error can be caused by LTI tools.
-  SentryProxy.register_ignorable_error("Grade pass back failure")
+  Rails.configuration.to_prepare do
+    Setting.get("ignorable_errors", "").split(",").each do |error|
+      SentryProxy.register_ignorable_error(error)
+    end
 
-  CanvasErrors.register!(:sentry_notification) do |exception, data, level|
-    setting = SentryExtensions::Settings.get("sentry_error_logging_enabled", "true")
-    SentryProxy.capture(exception, data, level) if setting == "true"
+    # This error can be caused by LTI tools.
+    SentryProxy.register_ignorable_error("Grade pass back failure")
+
+    CanvasErrors.register!(:sentry_notification) do |exception, data, level|
+      setting = Setting.get("sentry_error_logging_enabled", "true")
+      SentryProxy.capture(exception, data, level) if setting == "true"
+    end
   end
 end

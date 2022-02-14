@@ -284,7 +284,7 @@ export type Filter = {
   created_at: string
 }
 
-export type PartialFilter = Omit<Filter, 'id'> & {id?: string}
+export type PartialFilter = Omit<Filter, 'id'>
 
 export type AppliedFilter = Omit<Filter, 'id'> & {is_applied: true}
 

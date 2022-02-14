@@ -36,7 +36,9 @@ module Api::V1::ExternalTools
                     only: only,
                     methods: methods)
     json["is_rce_favorite"] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?
-    json.merge!(tool.settings.with_indifferent_access.slice("selection_width", "selection_height", "icon_url", "prefer_sis_email"))
+    json["selection_width"] = tool.settings[:selection_width] if tool.settings.key? :selection_width
+    json["selection_height"] = tool.settings[:selection_height] if tool.settings.key? :selection_height
+    json["icon_url"] = tool.settings[:icon_url] if tool.settings.key? :icon_url
     json["not_selectable"] = tool.not_selectable
     json["version"] = tool.use_1_3? ? "1.3" : "1.1"
     json["developer_key_id"] = tool.developer_key_id if tool.developer_key_id

@@ -47,9 +47,6 @@ export function AssignmentAvailabilityWindow({...props}) {
     })
   }
 
-  const isAnonymous =
-    props.anonymousState === 'full_anonymity' || props.anonymousState === 'partial_anonymity'
-
   return (
     <Responsive
       match="media"
@@ -67,9 +64,7 @@ export function AssignmentAvailabilityWindow({...props}) {
       render={responsiveProps => {
         return responsiveProps.displayText ? (
           <Text weight="normal" size={responsiveProps.textSize}>
-            {`${props.anonymousState !== null ? ' | ' : ''}${props.availabilityWindowName} ${
-              responsiveProps.displayText
-            }`}
+            {`${props.availabilityWindowName} ${responsiveProps.displayText}`}
           </Text>
         ) : null
       }}
@@ -82,13 +77,11 @@ AssignmentAvailabilityWindow.prototypes = {
   availabilityWindowName: PropTypes.string,
   untilDate: PropTypes.string,
   showOnMobile: PropTypes.bool,
-  showDateWithTime: PropTypes.bool,
-  anonymousState: PropTypes.string
+  showDateWithTime: PropTypes.bool
 }
 
 AssignmentAvailabilityWindow.defaultProps = {
   availabilityWindowName: '',
   showOnMobile: false,
-  showDateWithTime: false,
-  anonymousState: null
+  showDateWithTime: false
 }

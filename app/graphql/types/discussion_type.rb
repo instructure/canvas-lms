@@ -142,9 +142,7 @@ module Types
 
     field :child_topics, [Types::DiscussionType], null: true
     def child_topics
-      load_association(:child_topics).then do |child_topics|
-        child_topics.select { |topic| topic.context.active? }
-      end
+      load_association(:child_topics)
     end
 
     field :context_name, String, null: true

@@ -22,7 +22,6 @@ import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
 
 import {PARTICIPANT_EXPANSION_THRESHOLD} from '../../../util/constants'
 
@@ -49,27 +48,25 @@ export const MessageDetailParticipants = ({...props}) => {
       })
 
   return (
-    <Flex width="100%">
-      <Flex.Item shouldShrink shouldGrow>
-        <View overflowX="hidden" overflowY="hidden" width="100%" display="block">
-          <Text weight="bold" size={props.participantsSize}>
-            {props.conversationMessage.author.name}
-          </Text>
-          <Text size={props.participantsSize}>
-            {participantStr}
-            {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
-              <Link
-                margin="0 0 0 x-small"
-                data-testid="expand-participants-button"
-                onClick={() => {
-                  setParticipantsExpanded(!participantsExpanded)
-                }}
-              >
-                {participantExpansionButtonText}
-              </Link>
-            )}
-          </Text>
-        </View>
+    <Flex>
+      <Flex.Item shouldShrink>
+        <Text weight="bold" size={props.participantsSize}>
+          {props.conversationMessage.author.name}
+        </Text>
+        <Text size={props.participantsSize}>
+          {participantStr}
+          {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
+            <Link
+              margin="0 0 0 x-small"
+              data-testid="expand-participants-button"
+              onClick={() => {
+                setParticipantsExpanded(!participantsExpanded)
+              }}
+            >
+              {participantExpansionButtonText}
+            </Link>
+          )}
+        </Text>
       </Flex.Item>
     </Flex>
   )

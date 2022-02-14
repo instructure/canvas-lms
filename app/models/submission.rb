@@ -203,10 +203,6 @@ class Submission < ActiveRecord::Base
               assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
             )
             AND assignments.submission_types IS NOT NULL
-            AND NOT (
-              late_policy_status IS NULL
-              AND grader_id IS NOT NULL
-            )
           )
         )
       SQL
@@ -2847,12 +2843,10 @@ class Submission < ActiveRecord::Base
   end
 
   def word_count
-    if body && submission_type != "online_quiz"
-      tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
-      ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
-    elsif versioned_attachments.present?
-      Attachment.where(id: versioned_attachments.pluck(:id)).sum(:word_count)
-    end
+    return nil unless body && submission_type != "online_quiz"
+
+    tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
+    @word_count ||= ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
   end
 
   private

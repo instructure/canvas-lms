@@ -161,9 +161,6 @@ export default function getTranslations(locale) {
           case 'uk-UA':
             p = import('./translations/locales/uk_UA')
             break
-          case 'vi':
-            p = import('./translations/locales/vi')
-            break
           case 'zh':
             p = import('./translations/locales/zh')
             break
@@ -234,7 +231,6 @@ export function getLocaleList() {
     'th',
     'tr',
     'uk-UA',
-    'vi',
     'zh',
     'zh-Hans',
     'zh-Hant',

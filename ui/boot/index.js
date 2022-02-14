@@ -23,14 +23,6 @@ import './initializers/fakeRequireJSFallback'
 import {up as configureDateTimeMomentParser} from './initializers/configureDateTimeMomentParser'
 import {up as configureDateTime} from './initializers/configureDateTime'
 import {up as enableDTNPI} from './initializers/enableDTNPI'
-import {initSentry} from './initializers/initSentry'
-
-try {
-  initSentry()
-} catch (e) {
-  // eslint-disable-next-line no-console
-  console.error('Failed to init Sentry, errors will not be captured', e)
-}
 
 // we already put a <script> tag for the locale corresponding ENV.MOMENT_LOCALE
 // on the page from rails, so this should not cause a new network request.

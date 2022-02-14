@@ -75,7 +75,7 @@ describe('<CreateButtonForm />', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-37.5,"translateY":-37.5,"width":75,"height":75,"transform":"translate(-37.5,-37.5)"}
+                {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":""}
               </metadata>
               <svg
                 fill="none"
@@ -87,16 +87,6 @@ describe('<CreateButtonForm />', () => {
                 <g
                   fill="none"
                 >
-                  <clippath
-                    id="clip-path-for-embed"
-                  >
-                    <rect
-                      height="114"
-                      width="114"
-                      x="4"
-                      y="4"
-                    />
-                  </clippath>
                   <rect
                     height="114"
                     width="114"

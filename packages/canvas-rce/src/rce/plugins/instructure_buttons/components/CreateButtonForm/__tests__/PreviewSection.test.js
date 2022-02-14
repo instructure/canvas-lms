@@ -78,13 +78,6 @@ describe('<Preview />', () => {
             stroke="#0f0"
             stroke-width="4"
           >
-            <clippath
-              id="clip-path-for-embed"
-            >
-              <path
-                d="M109 8L210 210H8L109 8Z"
-              />
-            </clippath>
             <path
               d="M109 8L210 210H8L109 8Z"
             />

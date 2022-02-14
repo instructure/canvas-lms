@@ -24,7 +24,6 @@ import {Enrollment} from './Enrollment'
 import {graphql} from 'msw'
 import {Group} from './Group'
 import {User} from './User'
-import {PageInfo} from './PageInfo'
 
 // helper function that filters out undefined values in objects before assigning
 const mswAssign = (target, ...objects) => {
@@ -233,7 +232,6 @@ export const handlers = [
       const recipients = {
         contextsConnection: {
           nodes: [],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'MessageableContextConnection'
         },
         usersConnection: {
@@ -245,7 +243,6 @@ export const handlers = [
               __typename: 'MessageableUser'
             }
           ],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'MessageableUserConnection'
         },
         __typename: 'Recipients'
@@ -255,7 +252,6 @@ export const handlers = [
       const recipients = {
         contextsConnection: {
           nodes: [],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'MessageableContextConnection'
         },
         usersConnection: {
@@ -267,7 +263,6 @@ export const handlers = [
               __typename: 'MessageableUser'
             }
           ],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'MessageableUserConnection'
         },
         __typename: 'Recipients'
@@ -283,7 +278,6 @@ export const handlers = [
               __typename: 'MessageableUser'
             }
           ],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'MessageableContextConnection'
         },
         usersConnection: {
@@ -307,13 +301,13 @@ export const handlers = [
               __typename: 'MessageableUser'
             }
           ],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'MessageableUserConnection'
         },
         __typename: 'Recipients'
       }
       data.legacyNode.recipients = recipients
     }
+
     return res(ctx.data(data))
   }),
 

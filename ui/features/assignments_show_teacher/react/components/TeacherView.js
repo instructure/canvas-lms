@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, string} from 'prop-types'
+import {bool} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {Mutation} from 'react-apollo'
 import classnames from 'classnames'
@@ -52,7 +52,6 @@ const pathToOverrides = /assignmentOverrides\.nodes\.\d+/
 export default class TeacherView extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape,
-    messageAttachmentUploadFolderId: string,
     readOnly: bool
   }
 
@@ -155,9 +154,6 @@ export default class TeacherView extends React.Component {
   handleCloseMessageStudentsWho = () => {
     this.setState({messageStudentsWhoOpen: false, sendingMessageStudentsWhoNow: false})
   }
-
-  // TODO(EVAL): This needs to be implemented in EVAL-2064.
-  handleSendMessageStudentsWho = () => {}
 
   handleDeleteButtonPressed = () => {
     this.setState({confirmDelete: true})
@@ -384,7 +380,6 @@ export default class TeacherView extends React.Component {
       busy={this.state.sendingMessageStudentsWhoNow}
       onClose={this.handleCloseMessageStudentsWho}
       onSend={this.handleSendMessageStudentsWho}
-      messageAttachmentUploadFolderId={this.props.messageAttachmentUploadFolderId}
     />
   )
 

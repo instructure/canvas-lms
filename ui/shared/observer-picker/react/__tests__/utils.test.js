@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {parseObservedUsersList} from '../utils'
+import {parseObserverList} from '../utils'
 
-describe('parseObservedUsersList', () => {
+describe('parseObserverList', () => {
   it('transforms attribute names', () => {
-    const users = parseObservedUsersList([
+    const users = parseObserverList([
       {id: '4', name: 'Student 4', avatar_url: 'https://url_here'},
       {id: '6', name: 'Student 6'}
     ])
@@ -33,7 +33,7 @@ describe('parseObservedUsersList', () => {
   })
 
   it('returns empty list if no observers passed', () => {
-    const users = parseObservedUsersList([])
+    const users = parseObserverList([])
     expect(users.length).toBe(0)
   })
 })

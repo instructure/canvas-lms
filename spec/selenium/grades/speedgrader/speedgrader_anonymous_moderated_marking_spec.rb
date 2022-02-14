@@ -113,7 +113,7 @@ describe "SpeedGrader" do
 
       user_session(@teacher1)
       ModeratePage.visit(@course.id, @moderated_assignment.id)
-      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
 
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
@@ -127,10 +127,10 @@ describe "SpeedGrader" do
 
       user_session(@teacher1)
       ModeratePage.visit(@course.id, @moderated_assignment.id)
-      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
 
       ModeratePage.click_release_grades_button
-      accept_alert
+      driver.switch_to.alert.accept
       wait_for_ajaximations
 
       Speedgrader.visit(@course.id, @moderated_assignment.id)

@@ -221,7 +221,6 @@ export default class PublishButton extends Backbone.View
     # unpublishable (i.e., able to be unpublished)
     else if !@model.get('unpublishable')? or @model.get('unpublishable')
       @enable()
-      @$el.data 'tooltip', 'left'
       @$el.attr 'title', options.text
 
       # label for screen readers
@@ -236,5 +235,4 @@ export default class PublishButton extends Backbone.View
     @disable()
     @$el.attr 'aria-disabled', true
     @$el.attr 'title', message
-    @$el.data 'tooltip', 'left'
     @addAriaLabel(message)

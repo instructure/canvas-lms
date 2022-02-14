@@ -34,7 +34,7 @@ import {
   MOCK_GROUPS
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
-import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
+import {MOCK_OBSERVER_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import sinon from 'sinon'
 import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
 
@@ -106,7 +106,7 @@ const defaultProps = {
   hasWikiPages: true,
   hasSyllabusBody: true,
   parentSupportEnabled: false,
-  observedUsersList: MOCK_OBSERVED_USERS_LIST,
+  observerList: MOCK_OBSERVER_LIST,
   selfEnrollment: {
     option: null,
     url: null

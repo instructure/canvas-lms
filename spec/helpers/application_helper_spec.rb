@@ -826,7 +826,6 @@ describe ApplicationHelper do
     end
 
     it "returns false with no user" do
-      Account.site_admin.enable_feature!(:observer_picker)
       expect(planner_enabled?).to be false
     end
 
@@ -870,15 +869,9 @@ describe ApplicationHelper do
       end
 
       context "with the k5_parent_support flag disabled" do
-        it "returns false as an observer" do
+        it "returns false as an observer with k5_parent_support enabled" do
           @current_user = @observer
           expect(planner_enabled?).to be false
-        end
-
-        it "returns true as an observer with observer_picker flag enabled" do
-          Account.site_admin.enable_feature! :observer_picker
-          @current_user = @observer
-          expect(planner_enabled?).to be true
         end
       end
     end

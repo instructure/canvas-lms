@@ -20,7 +20,7 @@ import React from 'react'
 import FilterNavFilter from '../FilterNavFilter'
 import type {FilterNavFilterProps} from '../FilterNavFilter'
 import type {Filter} from '../../gradebook.d'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
@@ -75,7 +75,7 @@ describe('FilterNavFilter', () => {
   it('clicking delete triggers onDelete', () => {
     const onDelete = jest.fn()
     const {getByRole} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
-    userEvent.click(getByRole('button', {name: /Delete filter/}))
+    fireEvent.click(getByRole('button', {name: /Delete filter/}))
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 

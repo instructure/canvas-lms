@@ -18,14 +18,12 @@
 
 import natcompare from '@canvas/util/natcompare'
 
-export const parseObservedUsersList = users =>
-  users
-    ? users.map(u => ({
-        id: u.id,
-        name: u.name,
-        avatarUrl: u.avatar_url
-      }))
-    : []
+export const parseObserverList = users =>
+  users.map(u => ({
+    id: u.id,
+    name: u.name,
+    avatarUrl: u.avatar_url
+  }))
 
 export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentUser) => {
   const users = enrollments

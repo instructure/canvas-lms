@@ -25,7 +25,7 @@ import {Link} from '@instructure/ui-link'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
-import getCookie from '@instructure/get-cookie'
+import getCookie from 'get-cookie'
 
 const CLASSIC = 'classic'
 const NEW = 'new'
