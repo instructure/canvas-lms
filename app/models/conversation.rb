@@ -761,14 +761,14 @@ class Conversation < ActiveRecord::Base
     conversation_participants.shard(self).delete_all
   end
 
-  def replies_locked_for?(user)
+  def replies_locked_for?(user, participants_user_ids = [])
     return false unless %w[Course Group].include?(context_type)
     return true if context.nil?
 
     course = context.is_a?(Course) ? context : context.context
 
     # can still reply if a teacher is involved
-    if (course.is_a?(Course) && conversation_participants.where(user_id: course.admin_enrollments.active.select(:user_id)).exists?) ||
+    if (course.is_a?(Course) && conversation_participants.where(user_id: participants_user_ids).where(user_id: course.admin_enrollments.active.select(:user_id)).exists?) ||
        # can still reply if observing all the other participants
        (course.is_a?(Course) && observing_all_other_participants(user, course))
       false
