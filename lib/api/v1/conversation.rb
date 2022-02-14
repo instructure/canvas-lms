@@ -63,7 +63,7 @@ module Api::V1::Conversation
         conversation.conversation.context_code
       end
 
-    if options[:include_reply_permission_check] && conversation.conversation.replies_locked_for?(current_user)
+    if options[:include_reply_permission_check] && conversation.conversation.replies_locked_for?(current_user, result[:audience])
       result[:cannot_reply] = true
     end
     if options[:include_beta]
