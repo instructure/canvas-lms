@@ -185,7 +185,7 @@ pipeline {
 
           def postBuildHandler = [
             onNodeReleasing: {
-              if (!configuration.isChangeMerged() && (env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SPEC != '.')) {
+              if (!configuration.isChangeMerged() && env.ENABLE_CRYSTALBALL == '1') {
                 sendCrystalballMetrics()
               }
             }
@@ -209,7 +209,7 @@ pipeline {
                 }
               }
 
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).required(env.ENABLE_CRYSTALBALL != '1' || env.CRYSTALBALL_SPEC != '.').execute { stageConfig, buildConfig ->
+              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                 def rspecqStages = [:]
 
                 extendedStage('RSpecQ Reporter').timeout(30).queue(rspecqStages) {
