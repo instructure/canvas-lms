@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
           }
         }
 
-        unless SentryExtensions::Settings.disabled? || SentryExtensions::Settings.settings.blank?
+        unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
             error_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),

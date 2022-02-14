@@ -17,18 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe SentryExtensions::Settings do
-  describe ".disabled?" do
-    it "returns the correct value" do
-      expect(described_class.disabled?).to eq(false)
-
-      Setting.set("sentry_disabled", true)
-      expect(described_class.disabled?).to eq(true)
-
-      Setting.set("sentry_disabled", false)
-      expect(described_class.disabled?).to eq(false)
-    end
-  end
-
   describe ".settings" do
     context "when the config file is present" do
       before do
