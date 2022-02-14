@@ -146,6 +146,7 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
       size="medium"
       shape="circle"
       screenReaderLabel={I18n.t('Add Mastery Level')}
+      data-testid="add-individual-rating-btn"
     >
       <IconPlusLine />
     </IconButton>

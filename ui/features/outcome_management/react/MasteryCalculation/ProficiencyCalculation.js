@@ -100,7 +100,7 @@ const CalculationIntInput = ({
             shouldNotWrap
             textAlign="center"
             width="3rem"
-            data-testid="proficiency-calculation-method-input"
+            data-testid="calculation-int-input"
           />
         </View>
         <View as="div" padding="none none none x-small">
@@ -207,6 +207,7 @@ const Form = ({
       }
       value={calculationMethodKey}
       onChange={updateCalculationMethod}
+      data-testid="calculation-method-input"
     >
       {Object.keys(calculationMethods).map(key => (
         <SimpleSelect.Option key={key} id={key} value={key}>

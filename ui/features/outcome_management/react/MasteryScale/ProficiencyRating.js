@@ -166,6 +166,7 @@ class ProficiencyRating extends React.Component {
             onChange={this.handleDescriptionChange}
             inputRef={element => this.setDescriptionRef(element)}
             defaultValue={description}
+            data-testid="rating-description-input"
           />
         ) : (
           <Text>
@@ -225,6 +226,7 @@ class ProficiencyRating extends React.Component {
               onChange={this.handlePointChange}
               defaultValue={I18n.n(points)}
               width={isMobileView ? (individualOutcome ? '3rem' : '7rem') : '4rem'}
+              data-testid="rating-points-input"
             />
 
             <div className="pointsDescription" aria-hidden="true">
@@ -343,6 +345,7 @@ class ProficiencyRating extends React.Component {
           onClick={individualOutcome ? this.handleRealDelete : this.handleDelete}
           renderIcon={<IconTrashLine />}
           screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
+          data-testid="rating-delete-btn"
         />
         {!individualOutcome && (
           <ConfirmMasteryModal

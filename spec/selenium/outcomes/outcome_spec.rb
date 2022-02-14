@@ -363,6 +363,98 @@ describe "outcomes" do
           expect(nth_individual_outcome_text(0)).to match(/Friendly Description.*FD - Edited/m)
         end
       end
+
+      describe "with individual_ratings_and_calculation_method enabled" do
+        before do
+          enable_improved_outcomes_management_with_individual_ratings(Account.default)
+        end
+
+        it "creates an outcome with default ratings and calculation method" do
+          get outcome_url
+          create_outcome("Outcome with Individual Ratings")
+          # Verify through AR to save time
+          outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome with Individual Ratings")
+          ratings = outcome.data[:rubric_criterion][:ratings]
+          mastery_points = outcome.data[:rubric_criterion][:mastery_points]
+          points_possible = outcome.data[:rubric_criterion][:points_possible]
+          expect(outcome.nil?).to eq(false)
+          expect(ratings.length).to eq(5)
+          expect(ratings[0][:description]).to eq("Exceeds Mastery")
+          expect(ratings[0][:points]).to eq(4)
+          expect(ratings[1][:description]).to eq("Mastery")
+          expect(ratings[1][:points]).to eq(3)
+          expect(ratings[2][:description]).to eq("Near Mastery")
+          expect(ratings[2][:points]).to eq(2)
+          expect(ratings[3][:description]).to eq("Below Mastery")
+          expect(ratings[3][:points]).to eq(1)
+          expect(ratings[4][:description]).to eq("No Evidence")
+          expect(ratings[4][:points]).to eq(0)
+          expect(mastery_points).to eq(3)
+          expect(points_possible).to eq(4)
+          expect(outcome.calculation_method).to eq("decaying_average")
+          expect(outcome.calculation_int).to eq(65)
+        end
+
+        it "edits an outcome and changes calculation method" do
+          create_bulk_outcomes_groups(@course, 1, 1, valid_outcome_data)
+          get outcome_url
+          select_outcome_group_with_text(@course.name, 1).click
+          individual_outcome_kabob_menu(0).click
+          edit_outcome_button.click
+          # change calculation method
+          edit_individual_outcome_calculation_method("n Number of Times")
+          click_save_edit_modal
+          # Verify through AR to save time
+          outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")
+          expect(outcome.calculation_method).to eq("n_mastery")
+        end
+
+        it "edits an outcome and changes calculation int" do
+          create_bulk_outcomes_groups(@course, 1, 1, valid_outcome_data)
+          get outcome_url
+          select_outcome_group_with_text(@course.name, 1).click
+          individual_outcome_kabob_menu(0).click
+          edit_outcome_button.click
+          # change calculation int
+          edit_individual_outcome_calculation_int(55)
+          click_save_edit_modal
+          # Verify through AR to save time
+          outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")
+          expect(outcome.calculation_int).to eq(55)
+        end
+
+        it "edits an outcome and adds individual rating" do
+          create_bulk_outcomes_groups(@course, 1, 1, valid_outcome_data)
+          get outcome_url
+          select_outcome_group_with_text(@course.name, 1).click
+          individual_outcome_kabob_menu(0).click
+          edit_outcome_button.click
+          # add new rating
+          add_individual_outcome_rating("new", 5)
+          click_save_edit_modal
+          # Verify through AR to save time
+          outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")
+          ratings = outcome.data[:rubric_criterion][:ratings]
+          expect(ratings.length).to eq(3)
+          expect(ratings[0][:description]).to eq("new")
+          expect(ratings[0][:points]).to eq(5)
+        end
+
+        it "edits an outcome and deletes individual rating" do
+          create_bulk_outcomes_groups(@course, 1, 1, valid_outcome_data)
+          get outcome_url
+          select_outcome_group_with_text(@course.name, 1).click
+          individual_outcome_kabob_menu(0).click
+          edit_outcome_button.click
+          # delete last rating
+          delete_nth_individual_outcome_rating
+          click_save_edit_modal
+          # Verify through AR to save time
+          outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")
+          ratings = outcome.data[:rubric_criterion][:ratings]
+          expect(ratings.length).to eq(1)
+        end
+      end
     end
   end
 end

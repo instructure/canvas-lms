@@ -380,7 +380,7 @@ describe('ProficiencyCalculation', () => {
         />
       )
       expect(getByText('Most Recent Score')).toBeInTheDocument()
-      expect(queryByTestId('proficiency-calculation-method-input')).not.toBeInTheDocument()
+      expect(queryByTestId('calculation-int-input')).not.toBeInTheDocument()
     })
 
     it('does not render example', () => {
@@ -406,7 +406,7 @@ describe('ProficiencyCalculation', () => {
       )
 
       expect(getByDisplayValue('Decaying Average')).toBeInTheDocument()
-      expect(queryByTestId('proficiency-calculation-method-input')).toBeInTheDocument()
+      expect(queryByTestId('calculation-int-input')).toBeInTheDocument()
       expect(getByText('% weighting for last item')).toBeInTheDocument()
       expect(getByText('must be between 1 and 99')).toBeInTheDocument()
     })
@@ -421,7 +421,7 @@ describe('ProficiencyCalculation', () => {
         />
       )
       expect(getByDisplayValue('Most Recent Score')).toBeInTheDocument()
-      expect(queryByTestId('proficiency-calculation-method-input')).not.toBeInTheDocument()
+      expect(queryByTestId('calculation-int-input')).not.toBeInTheDocument()
     })
 
     it('clears int if changing from method with int to one without', () => {
@@ -468,7 +468,7 @@ describe('ProficiencyCalculation', () => {
       fireEvent.click(getByDisplayValue('Decaying Average'))
       fireEvent.click(getByText('n Number of Times'))
       expect(update).toHaveBeenCalledWith('n_mastery', 5)
-      fireEvent.input(queryByTestId('proficiency-calculation-method-input'), {target: {value: '4'}})
+      fireEvent.input(queryByTestId('calculation-int-input'), {target: {value: '4'}})
       expect(update).toHaveBeenCalledWith('n_mastery', 4)
       expect(update).toHaveBeenCalledTimes(2)
     })
@@ -479,7 +479,7 @@ describe('ProficiencyCalculation', () => {
       const {queryByTestId} = render(
         <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />
       )
-      fireEvent.input(queryByTestId('proficiency-calculation-method-input'), {target: {value: '0'}})
+      fireEvent.input(queryByTestId('calculation-int-input'), {target: {value: '0'}})
       expect(setError).toHaveBeenCalledWith(true)
     })
   })

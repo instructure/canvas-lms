@@ -187,6 +187,32 @@ module ImprovedOutcomeManagementPage
     ff("button[data-testid='manage-outcome-item-expand-toggle']")[index]
   end
 
+  def add_individual_rating_button
+    f("button[data-testid='add-individual-rating-btn']")
+  end
+
+  def nth_individual_rating_description_input(index = nil)
+    rating_descriptions = ff("input[data-testid='rating-description-input']")
+    rating_descriptions[index.nil? ? rating_descriptions.length - 1 : index]
+  end
+
+  def nth_individual_rating_points_input(index = nil)
+    rating_points = ff("input[data-testid='rating-points-input']")
+    rating_points[index.nil? ? rating_points.length - 1 : index]
+  end
+
+  def nth_individual_rating_delete_button(index = nil)
+    rating_delete_buttons = ff("button[data-testid='rating-delete-btn']")
+    rating_delete_buttons[index.nil? ? rating_delete_buttons.length - 1 : index]
+  end
+
+  def calculation_int_input
+    f("input[data-testid='calculation-int-input']")
+  end
+
+  def calculation_method_input
+    f("input[data-testid='calculation-method-input']")
+  end
   # ---------------------- Actions -----------------------
 
   def goto_improved_state_outcomes(outcome_url = "/accounts/self/outcomes")
@@ -292,12 +318,36 @@ module ImprovedOutcomeManagementPage
     outcome_group_container.text.split("\n")[0]
   end
 
-  def select_outcome_group_with_text(text)
-    wait_for(method: nil, timeout: 2) { tree_browser.present? }
+  def select_outcome_group_with_text(text, timeout = 2)
+    wait_for(method: nil, timeout: timeout) { tree_browser.present? }
     tree_browser_outcome_groups.find { |group| group.text.split("\n")[0] == text }
   end
 
   def select_drilldown_outcome_group_with_text(text)
     drilldown_outcome_groups.find { |group| group.text.split("\n")[0] == text }
+  end
+
+  def enable_improved_outcomes_management_with_individual_ratings(account)
+    account.enable_feature!(:improved_outcomes_management)
+    account.enable_feature!(:individual_outcome_rating_and_calculation)
+    account.disable_feature!(:account_level_mastery_scales)
+  end
+
+  def edit_individual_outcome_calculation_int(int)
+    replace_content(calculation_int_input, int)
+  end
+
+  def edit_individual_outcome_calculation_method(method)
+    click_option(calculation_method_input, method)
+  end
+
+  def add_individual_outcome_rating(description, points)
+    add_individual_rating_button.click
+    replace_content(nth_individual_rating_description_input, description)
+    replace_content(nth_individual_rating_points_input, points)
+  end
+
+  def delete_nth_individual_outcome_rating(index = nil)
+    nth_individual_rating_delete_button(index).click
   end
 end
