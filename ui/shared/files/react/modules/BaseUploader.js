@@ -45,7 +45,8 @@ export default class BaseUploader {
       content_type: this.file.type,
       on_duplicate: this.options.dup || 'rename',
       parent_folder_id: this.folder.id,
-      no_redirect: true
+      no_redirect: true,
+      category: this.options.category
     }
   }
 

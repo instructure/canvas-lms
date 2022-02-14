@@ -578,6 +578,29 @@ describe ConversationsController do
       assert_unauthorized
     end
 
+    it "is not able to add message if no teacher is included and has no permission" do
+      course_with_student_logged_in(active_all: true)
+      conversation
+      message1 = @conversation.add_message("another one 1")
+      message2 = @conversation.add_message("another one 2")
+
+      @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
+      @course.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: false)
+
+      new_user1 = User.create
+      enrollment = @course.enroll_student(new_user1)
+      enrollment.workflow_state = "active"
+      enrollment.save
+
+      new_user2 = User.create
+      enrollment = @course.enroll_student(new_user2)
+      enrollment.workflow_state = "active"
+      enrollment.save
+
+      post "add_message", params: { context_code: @course.asset_string, conversation_id: @conversation.conversation_id, group_conversation: true, included_messages: [message1.id.to_s, message2.id.to_s], recipients: [new_user1.id.to_s, new_user2.id.to_s], body: "hello world" }
+      assert_unauthorized
+    end
+
     it "queues a job if needed" do
       course_with_student_logged_in(active_all: true)
       conversation
@@ -627,7 +650,7 @@ describe ConversationsController do
       conversation
       @course.update!({ workflow_state: "completed" })
 
-      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end

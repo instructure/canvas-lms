@@ -20,6 +20,8 @@ import {BASE_SIZE, DEFAULT_OPTIONS, DEFAULT_SETTINGS, STROKE_WIDTH} from './cons
 import {createSvgElement, convertFileToBase64} from './utils'
 import {buildMetadata} from './metadata'
 import {buildShape} from './shape'
+import {buildImage} from './image'
+import {buildClipPath} from './clipPath'
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from './text'
 
 export function buildSvg(settings, options = DEFAULT_OPTIONS) {
@@ -36,9 +38,20 @@ export function buildSvg(settings, options = DEFAULT_OPTIONS) {
     mainContainer.appendChild(metadata)
   }
 
-  const g = buildGroup(settings, options)
-  const shape = buildShape(settings)
-  g.appendChild(shape)
+  const g = buildGroup(settings, options) // The shape group. Sets the controls the fill color
+  const clipPath = buildClipPath(settings) // A clip path used to crop the image
+  const shape = buildShape(settings) // The actual path of the shape being built
+  const image = buildImage(settings) // The embedded image. Cropped by clipPath
+
+  clipPath.appendChild(shape)
+  g.appendChild(clipPath)
+  g.appendChild(shape.cloneNode(true))
+
+  // Don't append an image if none has been selected
+  if (image) {
+    g.appendChild(image)
+  }
+
   shapeWrapper.appendChild(g)
   mainContainer.appendChild(shapeWrapper)
 

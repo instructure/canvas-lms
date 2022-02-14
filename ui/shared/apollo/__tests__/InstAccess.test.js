@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import getCookie from 'get-cookie'
+import getCookie from '@instructure/get-cookie'
 import InstAccess from '../InstAccess'
 
-jest.mock('get-cookie', () => {
+jest.mock('@instructure/get-cookie', () => {
   return jest.fn().mockImplementation(cookieName => {
     if (cookieName === '_csrf_token') {
       return 'myVerySafeCsrfToken'

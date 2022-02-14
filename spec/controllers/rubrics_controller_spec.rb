@@ -505,6 +505,101 @@ describe RubricsController do
       expect(@rubric.reload.learning_outcome_alignments.count).to eq 1
     end
 
+    it "returns an error if an outcome is aligned more than once" do
+      # TODO: refactor copy-pasted updated_params
+      course_with_teacher_logged_in(active_all: true)
+      assignment = @course.assignments.create!(assignment_valid_attributes)
+      rubric_association_model(user: @user, context: @course)
+      outcome_group = @course.root_outcome_group
+      outcome = @course.created_learning_outcomes.create!(
+        description: "hi",
+        short_description: "hi"
+      )
+      outcome_group.add_outcome(outcome)
+      outcome_group.save!
+
+      update_params = {
+        "course_id" => @course.id,
+        "id" => @rubric.id,
+        "points_possible" => "5",
+        "rubric" => {
+          "criteria" => {
+            "0" => {
+              "description" => "hi",
+              "id" => "",
+              "learning_outcome_id" => outcome.id,
+              "long_description" => "",
+              "points" => "5",
+              "ratings" => {
+                "0" => {
+                  "description" => "Exceeds Expectations",
+                  "id" => "blank",
+                  "points" => "5"
+                },
+                "1" => {
+                  "description" => "Meets Expectations",
+                  "id" => "blank",
+                  "points" => "3"
+                },
+                "2" => {
+                  "description" => "Does Not Meet Expectations",
+                  "id" => "blank_2",
+                  "points" => "0"
+                }
+              }
+            },
+            "1" => {
+              "description" => "hi",
+              "id" => "",
+              "learning_outcome_id" => outcome.id,
+              "long_description" => "",
+              "points" => "5",
+              "ratings" => {
+                "0" => {
+                  "description" => "Exceeds Expectations",
+                  "id" => "blank",
+                  "points" => "5"
+                },
+                "1" => {
+                  "description" => "Meets Expectations",
+                  "id" => "blank",
+                  "points" => "3"
+                },
+                "2" => {
+                  "description" => "Does Not Meet Expectations",
+                  "id" => "blank_2",
+                  "points" => "0"
+                }
+              }
+            }
+          },
+          "free_form_criterion_comments" => "0",
+          "points_possible" => "5",
+          "title" => "Some Rubric"
+        },
+        "rubric_association" => {
+          "association_id" => assignment.id,
+          "association_type" => "Assignment",
+          "hide_score_total" => "0",
+          "id" => @rubric_association.id,
+          "purpose" => "grading",
+          "use_for_grading" => "1"
+        },
+        "rubric_association_id" => @rubric_association.id,
+        "rubric_id" => @rubric.id,
+        "skip_updating_points_possible" => "false",
+        "title" => "Some Rubric"
+      }
+
+      expect(assignment.reload.learning_outcome_alignments.count).to eq 0
+      expect(@rubric.reload.learning_outcome_alignments.count).to eq 0
+
+      response = JSON.parse(put("update", params: update_params).body).symbolize_keys
+
+      expect(response[:error]).to be_truthy
+      expect(response[:messages]).to include I18n.t("rubric.alignments.duplicated_outcome", "This rubric has Outcomes aligned more than once")
+    end
+
     it "removes an outcome association if one is removed" do
       course_with_teacher_logged_in(active_all: true)
       outcome_with_rubric

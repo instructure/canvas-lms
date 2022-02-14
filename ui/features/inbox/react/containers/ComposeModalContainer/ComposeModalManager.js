@@ -40,7 +40,7 @@ const ComposeModalManager = props => {
     variables: {
       userID: ENV.current_user_id?.toString()
     },
-    skip: props.isReply || props.isReplyAll
+    skip: props.isReply || props.isReplyAll || props.isForward
   })
 
   const getParticipants = () => {
@@ -64,7 +64,7 @@ const ComposeModalManager = props => {
       participants: getParticipants(),
       ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
     },
-    skip: !(props.isReply || props.isReplyAll)
+    skip: !(props.isReply || props.isReplyAll || props.isForward)
   })
 
   const updateConversationsCache = (cache, result) => {
@@ -75,7 +75,7 @@ const ComposeModalManager = props => {
           cache.readQuery({
             query: CONVERSATIONS_QUERY,
             variables: {
-              scope: props.isReply || props.isReplyAll ? 'inbox' : 'sent',
+              scope: props.isReply || props.isReplyAll || props.isForward ? 'inbox' : 'sent',
               userID: ENV.current_user_id?.toString()
             }
           })
@@ -88,7 +88,7 @@ const ComposeModalManager = props => {
       return
     }
 
-    if (props.isReply || props.isReplyAll) {
+    if (props.isReply || props.isReplyAll || props.isForward) {
       legacyNode.conversationsConnection.nodes
         .find(c => c.conversation._id === props.conversation._id)
         .conversation.conversationMessagesConnection.nodes.unshift(
@@ -103,7 +103,7 @@ const ComposeModalManager = props => {
     cache.writeQuery({
       query: CONVERSATIONS_QUERY,
       variables: {
-        scope: props.isReply || props.isReplyAll ? 'inbox' : 'sent',
+        scope: props.isReply || props.isReplyAll || props.isForward ? 'inbox' : 'sent',
         userID: ENV.current_user_id?.toString()
       },
       data: {legacyNode}
@@ -111,7 +111,7 @@ const ComposeModalManager = props => {
   }
 
   const updateReplyConversationsCache = (cache, result) => {
-    if (props.isReply || props.isReplyAll) {
+    if (props.isReply || props.isReplyAll || props.isForward) {
       const replyQueryResult = JSON.parse(
         JSON.stringify(
           cache.readQuery({
@@ -142,7 +142,7 @@ const ComposeModalManager = props => {
   }
 
   const updateCache = (cache, result) => {
-    if (props.isReply || props.isReplyAll) {
+    if (props.isReply || props.isReplyAll || props.isForward) {
       if (result.data.addConversationMessage.errors) {
         setOnFailure(I18n.t('Error occurred while adding message to conversation'))
         return
@@ -204,13 +204,14 @@ const ComposeModalManager = props => {
           variables: {
             ...data.variables,
             conversationId: props.conversation?._id,
-            recipients: getParticipants()
+            recipients: data.variables.recipients ? data.variables.recipients : getParticipants()
           }
         })
       }}
       courses={coursesQuery?.data?.legacyNode}
       createConversation={createConversation}
       isReply={props.isReply || props.isReplyAll}
+      isForward={props.isForward}
       onDismiss={props.onDismiss}
       open={props.open}
       pastConversation={replyConversationQuery?.data?.legacyNode}
@@ -225,6 +226,7 @@ ComposeModalManager.propTypes = {
   conversationMessage: ConversationMessage.shape,
   isReply: PropTypes.bool,
   isReplyAll: PropTypes.bool,
+  isForward: PropTypes.bool,
   onDismiss: PropTypes.func,
   open: PropTypes.bool
 }

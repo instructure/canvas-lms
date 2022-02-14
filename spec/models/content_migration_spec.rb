@@ -280,6 +280,148 @@ describe ContentMigration do
     worker.perform(cm)
   end
 
+  context "copying only some content" do
+    let(:content_migration) do
+      ContentMigration.create(context: destination_course, user: user_model, source_course: course,
+                              migration_type: "course_copy_importer", copy_options: copy_options,
+                              migration_settings: {
+                                import_immediately: true,
+                                migration_ids_to_import: {
+                                  copy: copy_options
+                                }
+                              })
+    end
+    let(:course) { course_model }
+    let(:destination_course) { course_model }
+
+    shared_examples_for "a migration that automatically copies over tools" do |num_tools_copied: 1|
+      it "copies over tools without issues" do
+        content_migration.queue_migration
+        expect { run_jobs }.to change { destination_course.context_external_tools.count }.by(num_tools_copied)
+        expect(content_migration.migration_issues.count).to be(0)
+      end
+    end
+
+    shared_examples_for "a migration that doesn't copy any tools" do
+      it "doesn't copy any tools" do
+        content_migration.queue_migration
+        expect { run_jobs }.not_to change { destination_course.context_external_tools.count }
+      end
+    end
+
+    context "and we're copying an assignment that uses an LTI tool" do
+      let(:copy_options) do
+        ContentMigration.process_copy_params({ "assignments" => [assignment.id] },
+                                             global_identifiers: true,
+                                             for_content_export: true)
+      end
+      let(:dev_key) { DeveloperKey.create! }
+      let(:tool) do
+        # ContentMigrations change things that were nil to their default values,
+        # like an empty array or hash. This changes the identity hash, so we
+        # have to make everything *exactly* the same, very explicitly >:(
+        tool = external_tool_model(context: course,
+                                   opts: {
+                                     settings: { use_1_3: true, vendor_extensions: [], custom_fields: {},
+                                                 client_id: dev_key.global_id.to_s },
+                                     developer_key: dev_key,
+                                     name: "first tool"
+                                   })
+        tool.update!(description: "")
+        tool
+      end
+      let(:assignment) do
+        assignment_model({ course: course,
+                           submission_types: "external_tool",
+                           external_tool_tag_attributes: { content: tool, url: tool.url } })
+      end
+
+      it_behaves_like "a migration that automatically copies over tools"
+
+      context "the tool uses custom params" do
+        let(:custom_params) { { "custom" => "params" } }
+        let(:assignment) do
+          a = super()
+          a.primary_resource_link.update!(custom: custom_params)
+          a
+        end
+
+        it "copies them over" do
+          content_migration.queue_migration
+          run_jobs
+          expect(destination_course.assignments.last.primary_resource_link.custom).to eq(custom_params)
+        end
+      end
+
+      context "but the destination course already has an identical tool installed" do
+        before do
+          dup = tool.dup
+          dup.context = destination_course
+          dup.save!
+        end
+
+        it_behaves_like "a migration that doesn't copy any tools"
+      end
+
+      context "and the destination course has a similar tool installed" do
+        let(:other_tool) do
+          external_tool_model(context: destination_course,
+                              opts: {
+                                settings: { use_1_3: true, icon_url: "icon.com", other_setting: "foobar" },
+                                developer_key: dev_key,
+                                name: "other tool"
+                              })
+        end
+
+        it_behaves_like "a migration that automatically copies over tools"
+
+        it "doesn't change the existing tool" do
+          other_tool
+          content_migration.queue_migration
+          expect { run_jobs }.not_to change { other_tool.reload.settings }
+        end
+      end
+    end
+
+    context "we're copying multiple assignments" do
+      let(:assignments) do
+        assignments = []
+        3.times do
+          assignments << assignment_model({ course: course })
+        end
+        assignments
+      end
+      let(:copy_options) do
+        ContentMigration.process_copy_params({ "assignments" => assignments.map { |a| a.id.to_i } },
+                                             global_identifiers: true,
+                                             for_content_export: true)
+      end
+
+      it_behaves_like "a migration that doesn't copy any tools"
+
+      context "that all use an LTI tool" do
+        let(:assignments) do
+          assignments = []
+          3.times do |i|
+            dev_key = DeveloperKey.create!
+            tool = external_tool_model(context: course,
+                                       opts: {
+                                         settings: { use_1_3: true },
+                                         developer_key: dev_key,
+                                         name: "tool #{i}"
+                                       })
+            assignments << assignment_model({ course: course,
+                                              submission_types: "external_tool",
+                                              external_tool_tag_attributes: { content: tool, url: tool.url } })
+          end
+          assignments
+        end
+
+        it_behaves_like "a migration that automatically copies over tools", num_tools_copied: 3
+      end
+    end
+  end
+
   context "account-level import" do
     it "imports question banks from qti migrations" do
       skip unless Qti.qti_enabled?
@@ -537,9 +679,9 @@ describe ContentMigration do
     cm.queue_migration
     run_jobs
 
-    html_text = @course.quiz_questions.where(migration_id: "ID_5eb2ac5ba1c19_100").first.question_data[:question_text]
+    html_text = @course.quiz_questions.where(migration_id: "5eb2ac5ba1c19_100").first.question_data[:question_text]
     expect(html_text).to eq "This is <b>Bold</b>"
-    plain_text = @course.quiz_questions.where(migration_id: "ID_5eb2ac5ba1c19_104").first.question_data[:question_text]
+    plain_text = @course.quiz_questions.where(migration_id: "5eb2ac5ba1c19_104").first.question_data[:question_text]
     expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 

@@ -104,6 +104,9 @@
   "arrows_464a3e54": {
     "message": "Arrows"
   },
+  "art_icon_8e1daad": {
+    "message": "Art Icon"
+  },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
   },
@@ -227,6 +230,9 @@
   "clear_2084585f": {
     "message": "Clear"
   },
+  "clear_image_3213fe62": {
+    "message": "Clear image"
+  },
   "clear_selected_file_82388e50": {
     "message": "Clear selected file"
   },
@@ -340,6 +346,9 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
+  },
+  "crop_image_41bf940c": {
+    "message": "Crop image"
   },
   "crop_image_807ebb08": {
     "message": "Crop Image"
@@ -508,6 +517,12 @@
   },
   "embedded_content_aaeb4d3d": {
     "message": "embedded content"
+  },
+  "engineering_icon_f8f3cf43": {
+    "message": "Engineering Icon"
+  },
+  "english_icon_25bfe845": {
+    "message": "English Icon"
   },
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Enter at least 3 characters to search"
@@ -683,6 +698,9 @@
   "heading_4_b2e74be7": {
     "message": "Heading 4"
   },
+  "health_icon_8d292eb5": {
+    "message": "Health Icon"
+  },
   "height_69b03e15": {
     "message": "Height"
   },
@@ -778,6 +796,9 @@
   "language_arts_35b79a8b": {
     "message": "Language Arts"
   },
+  "languages_835813f0": {
+    "message": "Languages"
+  },
   "large_9c5e80e7": {
     "message": "Large"
   },
@@ -786,6 +807,9 @@
   },
   "left_to_right_e9b4fd06": {
     "message": "Left-to-Right"
+  },
+  "library_4b05885e": {
+    "message": "Library"
   },
   "link_7262adec": {
     "message": "Link"
@@ -882,6 +906,9 @@
   },
   "multi_color_image_63d7372f": {
     "message": "Multi Color Image"
+  },
+  "music_8678b13": {
+    "message": "Music"
   },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Must be at least { percentage }%"
@@ -1036,6 +1063,12 @@
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
+  "performing_arts_258f265": {
+    "message": "Performing Arts"
+  },
+  "physical_education_b1031a43": {
+    "message": "Physical Education"
+  },
   "pixels_52ece7d1": {
     "message": "Pixels"
   },
@@ -1101,6 +1134,9 @@
   },
   "relationships_6602af70": {
     "message": "Relationships"
+  },
+  "religion_afb0a930": {
+    "message": "Religion"
   },
   "reminder_date_4564d12d": {
     "message": "Reminder: { date }"
@@ -1527,5 +1563,11 @@
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "You''ve scrolled back to your very first To-Do!"
+  },
+  "zoom_in_image_bb97d4f": {
+    "message": "Zoom in image"
+  },
+  "zoom_out_image_d0a0a2ec": {
+    "message": "Zoom out image"
   }
 }

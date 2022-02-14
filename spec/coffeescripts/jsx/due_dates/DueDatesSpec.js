@@ -519,7 +519,6 @@ test('fetchAdhocStudents does not fire until state is set', function () {
 QUnit.module('DueDates important dates', {
   setup() {
     fakeENV.setup()
-    ENV.FEATURES.important_dates = true
     ENV.K5_SUBJECT_COURSE = true
     ENV.context_asset_string = 'course_1'
     this.server = sinon.fakeServer.create()

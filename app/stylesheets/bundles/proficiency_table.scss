@@ -7,14 +7,14 @@
   width: 18px;
   @include desktop-only {
     margin-#{direction(left)}: 10px;
-  }  
+  }
   margin-#{direction(right)}: 10px;
   vertical-align: text-top;
 }
 
 .mastery {
   padding-#{direction(left)}: 20px;
-  
+
   @include desktop-only {
     padding-top: 10px;
   }
@@ -31,7 +31,6 @@
   margin-#{direction(left)}: 20px;
   @include mobile-only {
     margin-#{direction(left)}: 0px;
-
   }
 }
 
@@ -53,6 +52,9 @@
       // to not wrap
       white-space: nowrap;
     }
+  }
+  &.individualOutcome * {
+    white-space: nowrap;
   }
 }
 

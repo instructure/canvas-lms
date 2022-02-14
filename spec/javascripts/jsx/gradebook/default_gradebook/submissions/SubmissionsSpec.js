@@ -549,8 +549,6 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
 
       gradebook = createGradebook()
 
-      gradebook.initialize()
-
       gradebook.courseContent.students.setStudentIds(['1101', '1102'])
       gradebook.buildRows()
 

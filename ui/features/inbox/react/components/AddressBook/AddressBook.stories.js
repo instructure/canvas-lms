@@ -24,10 +24,10 @@ const demoData = [
   {id: 'course_11', name: 'Test 101'},
   {id: 'course_12', name: 'History 101'},
   {id: 'course_13', name: 'English 101'},
-  {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronounds: null},
-  {id: '2', name: 'Matthew Lemon', full_name: 'Matthew Lemon', pronounds: null},
-  {id: '3', name: 'Drake Harper', full_name: 'Drake Harpert', pronounds: null},
-  {id: '4', name: 'Davis Hyer', full_name: 'Davis Hyer', pronounds: null}
+  {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronouns: null},
+  {id: '2', name: 'Matthew Lemon', full_name: 'Matthew Lemon', pronouns: null},
+  {id: '3', name: 'Drake Harper', full_name: 'Drake Harpert', pronouns: null},
+  {id: '4', name: 'Davis Hyer', full_name: 'Davis Hyer', pronouns: null}
 ]
 
 export default {

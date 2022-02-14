@@ -170,7 +170,7 @@ RSpec.describe Mutations::AddConversationMessage do
     conversation(users: [@teacher])
     @course.update!(workflow_state: "completed")
 
-    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "I have the power", recipients: [@student.id.to_s] }, @teacher)
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "I have the power", recipients: [@teacher.id.to_s, @student.id.to_s] }, @teacher)
     expect(result["errors"]).to be nil
     expect(
       result.dig("data", "addConversationMessage", "conversationMessage", "body")

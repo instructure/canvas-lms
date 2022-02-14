@@ -20,8 +20,12 @@ import $ from 'jquery'
 import _ from 'underscore'
 import {intersection} from 'lodash'
 import tz from '@canvas/timezone'
-import React from 'react'
+import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
+import GenericErrorPage from '@canvas/generic-error-page'
+import ErrorBoundary from '@canvas/error-boundary'
+// @ts-ignore
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from './PerformanceControls'
 import type {ActionMenuProps} from './components/ActionMenu'
@@ -56,6 +60,8 @@ import type {
   UserSubmissionGroup
 } from './gradebook.d'
 import type {GridColumn, GridData, GridDisplaySettings} from './grid.d'
+import type GradebookGridType from './GradebookGrid/index'
+import type {StatusColors} from './constants/colors'
 
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 // @ts-ignore
@@ -89,7 +95,6 @@ import SubmissionCommentApi from './apis/SubmissionCommentApi'
 import CourseSettings from './CourseSettings/index'
 import DataLoader from './DataLoader/index'
 import FinalGradeOverrides from './FinalGradeOverrides/index'
-import GradebookGrid from './GradebookGrid/index'
 import AssignmentRowCellPropFactory from './GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
 import TotalGradeOverrideCellPropFactory from './GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
 import PostPolicies from './PostPolicies/index'
@@ -107,7 +112,6 @@ import GridColor from './components/GridColor'
 import StatusesModal from './components/StatusesModal'
 import AnonymousSpeedGraderAlert from './components/AnonymousSpeedGraderAlert'
 import {statusColors} from './constants/colors'
-import type {StatusColors} from './constants/colors'
 import StudentDatastore from './stores/StudentDatastore'
 import PostGradesStore from '../SISGradePassback/PostGradesStore'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
@@ -124,7 +128,6 @@ import {Button} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import {deferPromise} from 'defer-promise'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
 import ScoreToUngradedManager from '../shared/ScoreToUngradedManager'
@@ -178,6 +181,8 @@ import {
   columnWidths
 } from './initialState'
 
+const GradebookGrid = React.lazy(() => import('./components/GradebookGrid'))
+
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
 const HEADER_START_AND_END_WIDTHS_IN_PIXELS = 36
@@ -204,9 +209,11 @@ type GradebookProps = {
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
   gradebookEnv: any
+  gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
+  hideGrid?: false
   isFiltersLoading: boolean
   isModulesLoading: boolean
   modules: Module[]
@@ -217,11 +224,12 @@ type GradebookProps = {
 
 type GradebookState = {
   assignmentGroups: AssignmentGroup[]
+  gradingPeriodId: string
   gridColors: StatusColors
   isEssentialDataLoaded: boolean
+  isGridLoaded: boolean
   modules: Module[]
   sections: Section[]
-  gradingPeriodId: string
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
@@ -322,15 +330,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     rows: []
   }
 
-  gradebookGrid: GradebookGrid
+  gradebookGrid: null | GradebookGridType = null
 
   finalGradeOverrides: FinalGradeOverrides | null
 
   postPolicies: PostPolicies
 
   gridReady: any = $.Deferred()
-
-  _essentialDataLoaded: any = deferPromise()
 
   courseContent: CourseContent
 
@@ -376,12 +382,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.gradingPeriodId = this.getCurrentGradingPeriod()
 
     this.state = {
-      gridColors: statusColors(this.options.colors),
-      modules: [],
       assignmentGroups: [],
-      sections: this.options.sections.length > 1 ? this.options.sections : [],
+      gradingPeriodId: this.getCurrentGradingPeriod(),
+      gridColors: statusColors(this.options.colors),
       isEssentialDataLoaded: false,
-      gradingPeriodId: this.getCurrentGradingPeriod()
+      isGridLoaded: false,
+      modules: [],
+      sections: this.options.sections.length > 1 ? this.options.sections : []
     }
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
@@ -393,13 +400,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       dispatch: props.dispatch,
       performanceControls: props.performanceControls,
       loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
-    })
-    this.gradebookGrid = new GradebookGrid({
-      $container: document.getElementById('gradebook_grid'),
-      activeBorderColor: '#1790DF', // $active-border-color
-      data: this.gridData,
-      editable: this.options.gradebook_is_editable,
-      gradebook: this
     })
     if (this.courseFeatures.finalGradeOverrideEnabled) {
       this.finalGradeOverrides = new FinalGradeOverrides(this)
@@ -481,11 +481,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
     })
     this.setStudentGroups(this.options.student_groups)
-
-    this.bindGridEvents()
   }
 
   bindGridEvents = () => {
+    if (!this.gradebookGrid) throw new Error('gradebookGrid not initialized')
     this.gradebookGrid.events.onColumnsReordered.subscribe((_event, columns) => {
       let currentCustomColumnIds: string[]
       let currentFrozenColumns: GridColumn[]
@@ -552,26 +551,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return columns.forEach(column => {
         return this.saveColumnWidthPreference(column.id, column.width)
       })
-    })
-  }
-
-  initialize = () => {
-    this.dataLoader.loadInitialData()
-    // Until GradebookGrid is rendered reactively, it will need to be rendered
-    // once and only once. It depends on all essential data from the initial
-    // data load. When all of that data has loaded, this deferred promise will
-    // resolve and render the grid. As a promise, it only resolves once.
-
-    // eslint-disable-next-line promise/catch-or-return
-    this._essentialDataLoaded.promise.then(() => {
-      return this.finishRenderingUI()
-    })
-    return this.gridReady.then(() => {
-      // Preload the Grade Detail Tray
-      AsyncComponents.loadGradeDetailTray()
-      this.renderViewOptionsMenu()
-      this.renderGradebookSettingsModal()
-      this.renderSearchFilters()
     })
   }
 
@@ -807,7 +786,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       // be re-rendered more aggressively to ensure new rows are inserted.
       this.buildRows()
     } else {
-      this.gradebookGrid.render()
+      this.gradebookGrid?.render()
     }
 
     const searchFilterStudents = this.courseContent.students.listStudents({
@@ -823,7 +802,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.initGrid()
     this.initHeader()
     this.gridReady.resolve()
-    return this.loadOverridesForSIS()
+    this.loadOverridesForSIS()
   }
 
   setupGrading = students => {
@@ -1265,7 +1244,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.setSortRowsBySetting('student', 'sortable_name', 'ascending')
       }
     }
-    this.gradebookGrid.gridSupport?.columns.updateColumnHeaders([
+    this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders([
       getAssignmentColumnId(assignment.id)
     ])
     this.updateFilteredContentInfo()
@@ -1274,7 +1253,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   handleSubmissionsDownloading = (assignmentId: string) => {
     this.getAssignment(assignmentId).hasDownloadedSubmissions = true
-    return this.gradebookGrid.gridSupport?.columns.updateColumnHeaders([
+    return this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders([
       getAssignmentColumnId(assignmentId)
     ])
   }
@@ -1292,7 +1271,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.calculateStudentGrade(student) // TODO: this may not be necessary
       }
     }
-    return this.gradebookGrid.invalidate()
+    return this.gradebookGrid?.invalidate()
   }
 
   buildRow = (student: Student) => {
@@ -1372,7 +1351,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // they are not grouped by student.
   updateSubmissionsFromExternal = (submissions: Submission[]) => {
     let cell, column, idToMatch, index, k, len1, student, submissionState
-    const columns = this.gradebookGrid.grid.getColumns()
+    const columns = this.gradebookGrid?.grid.getColumns()
     const changedColumnHeaders = {}
     const changedStudentIds: string[] = []
     for (let j = 0, len = submissions.length; j < len; j++) {
@@ -1409,7 +1388,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       changedStudentIds.push(student.id)
     }
     const changedColumnIds = Object.keys(changedColumnHeaders).map(getAssignmentColumnId)
-    this.gradebookGrid.gridSupport?.columns.updateColumnHeaders(changedColumnIds)
+    this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(changedColumnIds)
     return this.updateRowCellsForStudentIds(_.uniq(changedStudentIds))
   }
 
@@ -1504,17 +1483,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.closeSubmissionTray()
     }
     // Prevent exiting the cell editor when clicking in the cell being edited.
-    const editingNode = this.gradebookGrid.gridSupport?.state.getEditingNode()
+    const editingNode = this.gradebookGrid?.gridSupport?.state.getEditingNode()
     if (editingNode != null ? editingNode.contains(e.target) : undefined) {
       return
     }
-    const activeNode = this.gradebookGrid.gridSupport?.state.getActiveNode()
+    const activeNode = this.gradebookGrid?.gridSupport?.state.getActiveNode()
     if (!activeNode) {
       return
     }
     if (activeNode.contains(e.target)) {
       // SlickGrid does not re-engage the editor for the active cell upon single click
-      this.gradebookGrid.gridSupport?.helper.beginEdit()
+      this.gradebookGrid?.gridSupport?.helper.beginEdit()
       return
     }
     className = e.target.className
@@ -1531,7 +1510,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (className.match(/cell|slick/)) {
       return
     }
-    return this.gradebookGrid.gridSupport?.state.blur()
+    return this.gradebookGrid?.gridSupport?.state.blur()
   }
 
   updateSectionFilterVisibility = () => {
@@ -2315,14 +2294,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     $.ajaxJSON(this.options.setting_update_url, 'PUT', {
       show_total_grade_as_points: this.options.show_total_grade_as_points
     })
-    this.gradebookGrid.invalidate()
+    this.gradebookGrid?.invalidate()
     if (this.courseSettings.allowFinalGradeOverride) {
-      return this.gradebookGrid.gridSupport?.columns.updateColumnHeaders([
+      return this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders([
         'total_grade',
         'total_grade_override'
       ])
     } else {
-      return this.gradebookGrid.gridSupport?.columns.updateColumnHeaders(['total_grade'])
+      return this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(['total_grade'])
     }
   }
 
@@ -2482,8 +2461,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   updateGrid = () => {
-    this.gradebookGrid.updateColumns()
-    return this.gradebookGrid.invalidate()
+    this.gradebookGrid?.updateColumns()
+    return this.gradebookGrid?.invalidate()
   }
 
   // # Grid Column Definitions
@@ -2543,7 +2522,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       field: fieldName,
       object: assignment,
       getGridSupport: () => {
-        return this.gradebookGrid.gridSupport
+        return this.gradebookGrid?.gridSupport
       },
       propFactory: new AssignmentRowCellPropFactory(this),
       minWidth: columnWidths.assignment.min,
@@ -2626,7 +2605,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return {
       cssClass: 'total-grade-override',
       getGridSupport: () => {
-        return this.gradebookGrid.gridSupport
+        return this.gradebookGrid?.gridSupport
       },
       headerCssClass: 'total-grade-override',
       id: 'total_grade_override',
@@ -2687,8 +2666,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   createGrid = () => {
     this.setVisibleGridColumns()
-    this.gradebookGrid.initialize()
-    if (!this.gradebookGrid.gridSupport) throw new Error('grid did not initialize')
+    this.gradebookGrid?.initialize()
+    if (!this.gradebookGrid?.gridSupport) throw new Error('grid did not initialize')
     // This is a faux blur event for SlickGrid.
     // Use capture to preempt SlickGrid's internal handlers.
     document.getElementById('application')?.addEventListener('click', this.onGridBlur, true)
@@ -2714,8 +2693,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         // instead of the grades link.  Delaying the call (even with no actual
         // delay) fixes the issue.
         return setTimeout(() => {
-          if (!this.gradebookGrid.gridSupport) throw new Error('grid is not initialized')
-          const ref1 = this.gradebookGrid.gridSupport.state
+          if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
+          const ref1 = this.gradebookGrid?.gridSupport.state
             .getActiveNode()
             .querySelector('.student-grades-link')
           return ref1 != null ? ref1.focus() : undefined
@@ -2786,7 +2765,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       $(this.spinner.el).remove()
     }
     $('#gradebook-grid-wrapper').show()
-    this.uid = this.gradebookGrid.grid.getUID()
+    this.uid = this.gradebookGrid?.grid.getUID()
     $('#accessibility_warning').focus(function () {
       $('#accessibility_warning').removeClass('screenreader-only')
       return $('#accessibility_warning').blur(function () {
@@ -2795,7 +2774,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
     this.$grid = $('#gradebook_grid').fillWindowWithMe({
       onResize: () => {
-        return this.gradebookGrid.grid.resizeCanvas()
+        return this.gradebookGrid?.grid.resizeCanvas()
       }
     })
     if (this.options.gradebook_is_editable) {
@@ -2841,7 +2820,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     } else {
       // this is the magic that actually updates group and final grades when you edit a cell
       this.calculateStudentGrade(item)
-      return this.gradebookGrid.invalidate()
+      return this.gradebookGrid?.invalidate()
     }
   }
 
@@ -2917,7 +2896,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     this.gridData.rows.sort(respectorOfPersonsSort())
     this.courseContent.students.setStudentIds(_.map(this.gridData.rows, 'id'))
-    return this.gradebookGrid.invalidate()
+    return this.gradebookGrid?.invalidate()
   }
 
   getColumnTypeForColumnId = (columnId: string) => {
@@ -3096,7 +3075,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
     if (index !== -1) {
       this.gridData.rows[index] = this.buildRow(student)
-      return this.gradebookGrid.invalidateRow(index)
+      return this.gradebookGrid?.invalidateRow(index)
     }
   }
 
@@ -3215,17 +3194,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // SlickGrid Update Methods
   updateRowCellsForStudentIds = studentIds => {
     let columnIndex, j, k, len, len1, rowIndex
-    if (!this.gradebookGrid.grid) {
+    if (!this.gradebookGrid?.grid) {
       return
     }
     // Update each row without entirely replacing the DOM elements.
     // This is needed to preserve the editor for the active cell, when present.
     const rowIndices = this.listRowIndicesForStudentIds(studentIds)
-    const columns = this.gradebookGrid.grid.getColumns()
+    const columns = this.gradebookGrid?.grid.getColumns()
     for (j = 0, len = rowIndices.length; j < len; j++) {
       rowIndex = rowIndices[j]
       for (columnIndex = k = 0, len1 = columns.length; k < len1; columnIndex = ++k) {
-        this.gradebookGrid.grid.updateCell(rowIndex, columnIndex)
+        this.gradebookGrid?.grid.updateCell(rowIndex, columnIndex)
       }
     }
     return null // skip building an unused array return value
@@ -3237,10 +3216,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     for (j = 0, len = rowIndices.length; j < len; j++) {
       rowIndex = rowIndices[j]
       if (rowIndex != null) {
-        this.gradebookGrid.invalidateRow(rowIndex)
+        this.gradebookGrid?.invalidateRow(rowIndex)
       }
     }
-    this.gradebookGrid.render()
+    this.gradebookGrid?.render()
     return null // skip building an unused array return value
   }
 
@@ -3258,10 +3237,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   updateColumnWithId = (id: string) => {
     let j, len, rowIndex
-    if (this.gradebookGrid.grid == null) {
+    if (this.gradebookGrid?.grid == null) {
       return
     }
-    const columnIndex = this.gradebookGrid.grid.getColumns().findIndex(column => column.id === id)
+    const columnIndex = this.gradebookGrid?.grid.getColumns().findIndex(column => column.id === id)
     if (columnIndex === -1) {
       return
     }
@@ -3269,7 +3248,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     for (j = 0, len = ref1.length; j < len; j++) {
       rowIndex = ref1[j]
       if (rowIndex != null) {
-        this.gradebookGrid.grid.updateCell(rowIndex, columnIndex)
+        this.gradebookGrid?.grid.updateCell(rowIndex, columnIndex)
       }
     }
     return null // skip building an unused array return value
@@ -3278,7 +3257,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Gradebook Bulk UI Update Methods
   updateColumns = () => {
     this.setVisibleGridColumns()
-    this.gradebookGrid.updateColumns()
+    this.gradebookGrid?.updateColumns()
     return this.updateColumnHeaders()
   }
 
@@ -3307,7 +3286,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // React Grid Component Rendering Methods
   updateColumnHeaders = (columnIds: string[] = []) => {
-    const ref1 = this.gradebookGrid.gridSupport
+    const ref1 = this.gradebookGrid?.gridSupport
     return ref1 != null ? ref1.columns.updateColumnHeaders(columnIds) : undefined
   }
 
@@ -3320,9 +3299,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // Column Header Helpers
   handleHeaderKeyDown = (e, columnId: string) => {
-    this.gradebookGrid.gridSupport?.navigation.handleHeaderKeyDown(e, {
+    this.gradebookGrid?.gridSupport?.navigation.handleHeaderKeyDown(e, {
       region: 'header',
-      cell: this.gradebookGrid.grid.getColumnIndex(columnId),
+      cell: this.gradebookGrid?.grid.getColumnIndex(columnId),
       columnId
     })
   }
@@ -3340,7 +3319,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.saveColumnOrder()
     this.updateGrid()
     this.updateColumnHeaders()
-    this.gradebookGrid.gridSupport?.columns.scrollToStart()
+    this.gradebookGrid?.gridSupport?.columns.scrollToStart()
   }
 
   moveTotalGradeColumnToEnd = () => {
@@ -3361,7 +3340,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     this.updateGrid()
     this.updateColumnHeaders()
-    return this.gradebookGrid.gridSupport?.columns.scrollToEnd()
+    return this.gradebookGrid?.gridSupport?.columns.scrollToEnd()
   }
 
   totalColumnShouldFocus = () => {
@@ -3375,8 +3354,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // Submission Tray
   assignmentColumns = () => {
-    if (!this.gradebookGrid.gridSupport) throw new Error('grid not initialized')
-    return this.gradebookGrid.gridSupport.grid.getColumns().filter(column => {
+    if (!this.gradebookGrid?.gridSupport) throw new Error('grid not initialized')
+    return this.gradebookGrid?.gridSupport.grid.getColumns().filter(column => {
       return column.type === 'assignment'
     })
   }
@@ -3427,8 +3406,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   loadTrayStudent = direction => {
-    if (!this.gradebookGrid.gridSupport) throw new Error('grid is not initialized')
-    const location = this.gradebookGrid.gridSupport.state.getActiveLocation()
+    if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
+    const location = this.gradebookGrid?.gridSupport.state.getActiveLocation()
     const rowDelta = direction === 'next' ? 1 : -1
     const newRowIdx = location.row + rowDelta
     const student = this.listRows()[newRowIdx]
@@ -3457,7 +3436,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   getSubmissionTrayProps = (student: null | Student = null) => {
-    if (!this.gradebookGrid.gridSupport) throw new Error('grid is not initialized')
+    if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
     const {open, studentId, assignmentId, comments, editedCommentId} = this.getSubmissionTrayState()
     if (!studentId) {
       throw new Error('studentId missing')
@@ -3481,7 +3460,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const assignment = this.getAssignment(assignmentId)
     const activeLocation = this.gradebookGrid.gridSupport.state.getActiveLocation()
     const cell = activeLocation.cell
-    const columns = this.gradebookGrid.gridSupport.grid.getColumns()
+    const columns = this.gradebookGrid?.gridSupport.grid.getColumns()
     const currentColumn = columns[cell]
     const assignmentColumns = this.assignmentColumns()
     const currentAssignmentIdx = assignmentColumns.indexOf(currentColumn)
@@ -3527,7 +3506,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       locale: this.options.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
       onClose: () => {
-        return this.gradebookGrid.gridSupport?.helper.focus()
+        return this.gradebookGrid?.gridSupport?.helper.focus()
       },
       onGradeSubmission: this.gradeSubmission,
       onRequestClose: this.closeSubmissionTray,
@@ -3618,10 +3597,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   closeSubmissionTray = () => {
     this.setSubmissionTrayState(false)
-    const rowIndex = this.gradebookGrid.grid.getActiveCell().row
+    const rowIndex = this.gradebookGrid?.grid.getActiveCell().row
     const studentId = this.gridData.rows[rowIndex].id
     this.updateRowAndRenderSubmissionTray(studentId)
-    return this.gradebookGrid.gridSupport?.helper.beginEdit()
+    return this.gradebookGrid?.gridSupport?.helper.beginEdit()
   }
 
   getSubmissionTrayState = () => {
@@ -3641,7 +3620,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.gridDisplaySettings.submissionTray.assignmentId = assignmentId
     }
     if (open) {
-      return this.gradebookGrid.gridSupport?.helper.commitCurrentEdit()
+      return this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
     }
   }
 
@@ -4168,7 +4147,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   updateEnterGradesAsSetting = (assignmentId: string, value) => {
     this.setEnterGradesAsSetting(assignmentId, value)
     return this.saveSettings({}).then(() => {
-      if (!this.gradebookGrid.gridSupport) {
+      if (!this.gradebookGrid?.gridSupport) {
         throw new Error('grid not initialized')
       }
       this.gradebookGrid.gridSupport.columns.updateColumnHeaders([
@@ -4447,14 +4426,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  apiUpdateSubmission = (submission, gradeInfo) => {
+  apiUpdateSubmission(submission, gradeInfo, enterGradesAs) {
     const {userId, assignmentId} = submission
     const student = this.student(userId)
     this.addPendingGradeInfo(submission, gradeInfo)
     if (this.getSubmissionTrayState().open) {
       this.renderSubmissionTray(student)
     }
-    return GradebookApi.updateSubmission(this.options.context_id, assignmentId, userId, submission)
+    return GradebookApi.updateSubmission(
+      this.options.context_id,
+      assignmentId,
+      userId,
+      submission,
+      enterGradesAs
+    )
       .then(response => {
         this.removePendingGradeInfo(submission)
         this.updateSubmissionsFromExternal(response.data.all_submissions)
@@ -4497,7 +4482,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         } else {
           submissionData.posted_grade = gradeInfo.score
         }
-        return this.apiUpdateSubmission(submissionData, gradeInfo).then(response => {
+        return this.apiUpdateSubmission(
+          submissionData,
+          gradeInfo,
+          gradeChangeOptions.enterGradesAs
+        ).then(response => {
           const assignment = this.getAssignment(submission.assignmentId)
           const outlierScoreHelper = new OutlierScoreHelper(
             response.data.score,
@@ -4621,7 +4610,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       assignmentGroupId => `assignment_group_${assignmentGroupId}`
     )
     columnIds.push('total_grade')
-    this.gradebookGrid.gridSupport?.columns.updateColumnHeaders(columnIds)
+    this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(columnIds)
   }
 
   executeApplyScoreToUngraded = args => {
@@ -4672,7 +4661,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   destroy = () => {
     $(window).unbind('resize.fillWindowWithMe')
     $(document).unbind('gridready')
-    this.gradebookGrid.destroy()
+    this.gradebookGrid?.destroy()
     this.scoreToUngradedManager?.clearMonitor()
     return this.postPolicies?.destroy()
   }
@@ -4697,16 +4686,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       (!this.gradingPeriodSet || this.contentLoadStates.gradingPeriodAssignmentsLoaded)
     ) {
       this.setState({isEssentialDataLoaded: true})
-      return this._essentialDataLoaded.resolve()
     }
   }
 
   componentDidMount() {
-    this.initialize()
     this.onShow()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
+    // Until GradebookGrid is rendered reactively, it will need to be rendered
+    // once and only once. It depends on all essential data from the initial
+    // data load. When all of that data has loaded, this deferred promise will
+    // resolve and render the grid. As a promise, it only resolves once.
+    if (
+      !(prevState.isEssentialDataLoaded && prevState.isGridLoaded) &&
+      this.state.isEssentialDataLoaded &&
+      this.state.isGridLoaded
+    ) {
+      this.finishRenderingUI()
+    }
+
     // Here we keep track of data loading states
     //   and filter changes until we use hooks
     if (
@@ -4749,6 +4748,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
+  handleGridLoad = (gradebookGrid: GradebookGridType) => {
+    this.gradebookGrid = gradebookGrid
+    this.bindGridEvents()
+
+    this.setState({isGridLoaded: true})
+
+    this.dataLoader.loadInitialData().catch(() => {
+      FlashAlert.showFlashError(I18n.t('There was an error fetching data for Gradebook'))
+    })
+
+    // eslint-disable-next-line promise/catch-or-return
+    this.gridReady.then(() => {
+      // Preload the Grade Detail Tray
+      AsyncComponents.loadGradeDetailTray()
+      this.renderViewOptionsMenu()
+      this.renderGradebookSettingsModal()
+      this.renderSearchFilters()
+    })
+  }
+
   render() {
     return (
       <>
@@ -4783,6 +4802,23 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             variant="DefaultGradebook"
           />
         </Portal>
+        {!this.props.hideGrid && (
+          <ErrorBoundary
+            errorComponent={
+              <GenericErrorPage imageUrl={errorShipUrl} errorCategory="GradebookGrid" />
+            }
+          >
+            <Suspense fallback={<></>}>
+              <GradebookGrid
+                gradebook={this}
+                gridData={this.gridData}
+                gradebookGridNode={this.props.gradebookGridNode}
+                gradebookIsEditable={this.options.gradebook_is_editable}
+                onLoad={this.handleGridLoad}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>

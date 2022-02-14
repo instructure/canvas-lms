@@ -128,7 +128,6 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
       grading_standard: gradingScheme.data,
       ...options
     })
-    gradebook.initialize()
     gradebook.setAssignments({
       2301: {
         grading_standard_id: '2801',

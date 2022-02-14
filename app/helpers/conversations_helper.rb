@@ -33,7 +33,7 @@ module ConversationsHelper
     media_comment_type:,
     user_note:
   )
-    if conversation.conversation.replies_locked_for?(current_user)
+    if conversation.conversation.replies_locked_for?(current_user, recipients)
       raise ConversationsHelper::RepliesLockedForUser.new(message: I18n.t("Unauthorized, unable to add messages to conversation"), status: :unauthorized, attribute: "workflow_state")
     end
 

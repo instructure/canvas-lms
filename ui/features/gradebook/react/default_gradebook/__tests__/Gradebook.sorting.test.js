@@ -20,7 +20,9 @@ import {createGradebook} from './GradebookSpecHelper'
 import {
   compareAssignmentPositions,
   compareAssignmentPointsPossible,
-  wrapColumnSortFn
+  wrapColumnSortFn,
+  isDefaultSortOrder,
+  localeSort
 } from '../Gradebook.sorting'
 
 const assignments = [
@@ -373,5 +375,62 @@ describe('wrapColumnSortFn', () => {
 
     expect(wrappedFn).toHaveBeenCalled()
     expect(wrappedFn.mock.calls[0]).toEqual(expectedArgs)
+  })
+})
+
+describe('getDefaultSettingKeyForColumnType', () => {
+  it('relies on localeSort when rows have equal sorting criteria results', () => {
+    const gradebook = createGradebook()
+    gradebook.gridData.rows = [
+      {id: '3', sortable_name: 'Z Lastington', someProperty: false},
+      {id: '4', sortable_name: 'A Firstington', someProperty: true}
+    ]
+
+    const value = 0
+    gradebook.gridData.rows[0].someProperty = value
+    gradebook.gridData.rows[1].someProperty = value
+    const sortFn = row => row.someProperty
+    gradebook.sortRowsWithFunction(sortFn)
+    const [firstRow, secondRow] = gradebook.gridData.rows
+
+    expect(firstRow.sortable_name).toStrictEqual('A Firstington', 'A Firstington sorts first')
+    expect(secondRow.sortable_name).toStrictEqual('Z Lastington', 'Z Lastington sorts second')
+  })
+})
+
+describe('isDefaultSortOrder', () => {
+  it('returns false if called with due_date', () => {
+    expect(isDefaultSortOrder('due_date')).toStrictEqual(false)
+  })
+
+  it('returns false if called with name', () => {
+    expect(isDefaultSortOrder('name')).toStrictEqual(false)
+  })
+
+  it('returns false if called with points', () => {
+    expect(isDefaultSortOrder('points')).toStrictEqual(false)
+  })
+
+  it('returns false if called with custom', () => {
+    expect(isDefaultSortOrder('custom')).toStrictEqual(false)
+  })
+
+  it('returns false if called with module_position', () => {
+    expect(isDefaultSortOrder('module_position')).toStrictEqual(false)
+  })
+
+  it('returns true if called with anything else', () => {
+    expect(isDefaultSortOrder('alpha')).toStrictEqual(true)
+    expect(isDefaultSortOrder('assignment_group')).toStrictEqual(true)
+  })
+})
+
+describe('localeSort', () => {
+  it('returns 1 if nullsLast is true and only first item is null', function () {
+    expect(localeSort(null, 'fred', {nullsLast: true})).toStrictEqual(1)
+  })
+
+  it('returns -1 if nullsLast is true and only second item is null', function () {
+    expect(localeSort('fred', null, {nullsLast: true})).toStrictEqual(-1)
   })
 })

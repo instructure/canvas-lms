@@ -72,7 +72,7 @@ export default class CalculationMethodContent {
   constructor(model) {
     // We can pass in a straight object or a backbone model
     _.each(
-      ['calculation_method', 'calculation_int', 'mastery_points'],
+      ['calculation_method', 'calculation_int', 'mastery_points', 'is_individual_outcome'],
       attr => (this[attr] = model.get != null ? model.get(attr) : model[attr])
     )
   }
@@ -98,15 +98,57 @@ export default class CalculationMethodContent {
   }
 
   toJSON() {
+    const alternativeCalculationValues = this.is_individual_outcome
+      ? {
+          decaying_average: {
+            method: I18n.t('Decaying Average - %{recentInt}%/%{remainderInt}%', {
+              recentInt: this.calculation_int,
+              remainderInt: 100 - this.calculation_int
+            }),
+            calculationIntLabel: I18n.t('% weighting for last item'),
+            calculationIntDescription: I18n.t('must be between 1 and 99')
+          },
+          n_mastery: {
+            calculationIntLabel: I18n.t('# of times'),
+            calculationIntDescription: I18n.t('must be between 1 and 5')
+          },
+          lastest: {
+            method: I18n.t('Most Recent Score')
+          },
+          highest: {
+            exampleScores: this.exampleScoreIntegers().join(', '),
+            exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers()))
+          }
+        }
+      : {
+          decaying_average: {
+            method: I18n.t('%{recentInt}/%{remainderInt} Decaying Average', {
+              recentInt: this.calculation_int,
+              remainderInt: 100 - this.calculation_int
+            }),
+            calculationIntLabel: I18n.t('Last Item: '),
+            calculationIntDescription: I18n.t('Between 1% and 99%')
+          },
+          n_mastery: {
+            calculationIntLabel: I18n.t('Items: '),
+            calculationIntDescription: I18n.t('Between 1 and 5')
+          },
+          lastest: {
+            method: I18n.t('Latest Score')
+          },
+          highest: {
+            exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
+            exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers().slice(0, 4)))
+          }
+        }
+
     return {
       decaying_average: {
-        method: I18n.t('%{recentInt}/%{remainderInt} Decaying Average', {
-          recentInt: this.calculation_int,
-          remainderInt: 100 - this.calculation_int
-        }),
+        method: alternativeCalculationValues.decaying_average.method,
         friendlyCalculationMethod: I18n.t('Decaying Average'),
-        calculationIntLabel: I18n.t('Last Item: '),
-        calculationIntDescription: I18n.t('Between 1% and 99%'),
+        calculationIntLabel: alternativeCalculationValues.decaying_average.calculationIntLabel,
+        calculationIntDescription:
+          alternativeCalculationValues.decaying_average.calculationIntDescription,
         exampleText: I18n.t(
           'Most recent result counts as %{calculation_int} of mastery weight, average of all other results count as %{remainder} of weight. If there is only one result, the single score will be returned.',
           {
@@ -130,12 +172,11 @@ export default class CalculationMethodContent {
           }
         ),
         friendlyCalculationMethod: I18n.t('n Number of Times'),
-        calculationIntLabel: I18n.t('Items: '),
-        calculationIntDescription: I18n.t('Between 1 and 5'),
+        calculationIntLabel: alternativeCalculationValues.n_mastery.calculationIntLabel,
+        calculationIntDescription: alternativeCalculationValues.n_mastery.calculationIntDescription,
         exampleText: I18n.t(
           {
-            one:
-              'Must achieve mastery at least one time. Scores above mastery will be averaged to calculate final score.',
+            one: 'Must achieve mastery at least one time. Scores above mastery will be averaged to calculate final score.',
             other:
               'Must achieve mastery at least %{count} times. Scores above mastery will be averaged to calculate final score.'
           },
@@ -149,12 +190,10 @@ export default class CalculationMethodContent {
         validRange: [1, 5]
       },
       latest: {
-        method: I18n.t('Latest Score'),
+        method: alternativeCalculationValues.lastest.method,
         friendlyCalculationMethod: I18n.t('Most Recent Score'),
         exampleText: I18n.t('Mastery score reflects the most recent graded assignment or quiz.'),
-        exampleScores: this.exampleScoreIntegers()
-          .slice(0, 4)
-          .join(', '),
+        exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
         exampleResult: numberFormat.outcomeScore(_.last(this.exampleScoreIntegers().slice(0, 4)))
       },
       highest: {
@@ -163,10 +202,8 @@ export default class CalculationMethodContent {
         exampleText: I18n.t(
           'Mastery score reflects the highest score of a graded assignment or quiz.'
         ),
-        exampleScores: this.exampleScoreIntegers()
-          .slice(0, 4)
-          .join(', '),
-        exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers().slice(0, 4)))
+        exampleScores: alternativeCalculationValues.highest.exampleScores,
+        exampleResult: alternativeCalculationValues.highest.exampleResult
       }
     }
   }

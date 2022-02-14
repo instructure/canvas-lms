@@ -3742,7 +3742,8 @@ describe Submission do
         @submission.assignment.update!(submission_types: "online_upload")
       end
 
-      it "includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil" do
+      it "includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil and grader is nil" do
+        @submission.update(grader_id: nil)
         expect(Submission.missing).to include @submission
       end
 
@@ -3753,7 +3754,7 @@ describe Submission do
       end
 
       it "includes submission when late_policy_status is not nil, not missing" do
-        @submission.update(late_policy_status: "foo")
+        @submission.update(late_policy_status: "none")
 
         expect(Submission.missing).to include @submission
       end
@@ -3801,6 +3802,7 @@ describe Submission do
         @assignment.due_at = 1.day.ago(@now)
         @assignment.save!
 
+        @submission.update(grader_id: nil)
         expect(Submission.missing).to include @submission
       end
     end
@@ -7898,6 +7900,10 @@ describe Submission do
   end
 
   describe "word_count" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:word_count_in_speed_grader)
+    end
+
     it "returns the word count" do
       submission.update(body: "test submission")
       expect(submission.word_count).to eq 2
@@ -7927,6 +7933,17 @@ describe Submission do
       submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
         <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
       expect(submission.word_count).to eq 18
+    end
+
+    it "sums word counts of attachments if there are any" do
+      student_in_course(active_all: true)
+      submission_text = "Text based submission with some words"
+      attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      attachment1.update_word_count
+      attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      attachment2.update_word_count
+      sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
+      expect(sub.word_count).to eq 12
     end
   end
 

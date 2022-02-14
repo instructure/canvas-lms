@@ -34,6 +34,7 @@ describe('useSvgSettings()', () => {
       const [settings, _status, _dispatch] = subject().current
 
       expect(settings).toEqual({
+        type: 'image/svg+xml-buttons-and-icons',
         name: '',
         alt: '',
         shape: 'square',
@@ -46,9 +47,16 @@ describe('useSvgSettings()', () => {
         outlineSize: 'none',
         text: '',
         textSize: 'small',
-        textColor: null,
+        textColor: '#000000',
         textBackgroundColor: null,
-        textPosition: 'middle'
+        textPosition: 'middle',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        width: 0,
+        height: 0,
+        transform: ''
       })
     })
 
@@ -73,6 +81,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: 'Banana',
           alt: '',
           shape: 'square',
@@ -85,9 +94,16 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })
@@ -145,6 +161,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toEqual({
+        type: 'image/svg+xml-buttons-and-icons',
         name: 'Test Image',
         alt: 'a test image',
         shape: 'triangle',
@@ -159,7 +176,14 @@ describe('useSvgSettings()', () => {
         textSize: 'medium',
         textColor: '#009606',
         textBackgroundColor: '#06A3B7',
-        textPosition: 'middle'
+        textPosition: 'middle',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        width: 0,
+        height: 0,
+        transform: ''
       })
     })
 
@@ -191,6 +215,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: '',
           alt: '',
           shape: 'square',
@@ -203,9 +228,16 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })
@@ -216,6 +248,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: '',
           alt: '',
           shape: 'square',
@@ -228,9 +261,16 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })

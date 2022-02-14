@@ -75,7 +75,7 @@ if Qti.migration_executable
     end
 
     it "converts multiple choice" do
-      hash = get_question("ID_4609865476341")
+      hash = get_question("4609865476341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::MULTIPLE_CHOICE
     end
 
@@ -105,27 +105,27 @@ if Qti.migration_executable
     end
 
     it "converts true/false questions" do
-      hash = get_question("ID_4609865577341")
+      hash = get_question("4609865577341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::TRUE_FALSE
     end
 
     it "converts multiple choice questions with multiple correct answers (multiple answer)" do
-      hash = get_question("ID_4609865392341")
+      hash = get_question("4609865392341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::MULTIPLE_ANSWER
     end
 
     it "converts essay questions" do
-      hash = get_question("ID_4609842537341")
+      hash = get_question("4609842537341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::ESSAY
     end
 
     it "converts short answer questions" do
-      hash = get_question("ID_4609865550341")
+      hash = get_question("4609865550341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::SHORT_ANSWER
     end
 
     it "converts matching questions" do
-      hash = get_question("ID_4609865194341", false)
+      hash = get_question("4609865194341", false)
       # make sure the ids are correctly referencing each other
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
@@ -147,34 +147,34 @@ if Qti.migration_executable
     end
 
     it "converts simple calculated questions" do
-      hash = get_question("ID_4609842344341")
+      hash = get_question("4609842344341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::CALCULATED_SIMPLE
     end
 
     it "converts complex calculated questions" do
-      hash = get_question("ID_4609823478341")
+      hash = get_question("4609823478341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::CALCULATED_COMPLEX
     end
 
     it "converts combination to multiple choice" do
-      hash = get_question("ID_4609885376341")
+      hash = get_question("4609885376341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::COMBINATION
     end
 
     it "converts fill in multiple blanks questions" do
-      hash = get_question("ID_4609842630341")
+      hash = get_question("4609842630341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
     end
 
     it "marks jumbled sentence as not supported" do
-      hash = get_question("ID_4609842882341")
+      hash = get_question("4609842882341")
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::JUMBLED_SENTENCE
     end
 
     it "references associated files correctly" do
       import_into_course
 
-      q = @course.assessment_questions.where(migration_id: "ID_81847332876966484848484950729496134337732113114455").first
+      q = @course.assessment_questions.where(migration_id: "81847332876966484848484950729496134337732113114455").first
       expect(q).not_to be_nil
       expect(q.attachments.count).to eq 3
 
@@ -202,7 +202,7 @@ if Qti.migration_executable
                                   { text: "ear", weight: 0, migration_id: "MC1" },
                                   { text: "eye", weight: 0, migration_id: "MC2" },
                                   { text: "mouth", weight: 0, migration_id: "MC3" }],
-                        migration_id: "ID_4609865476341",
+                        migration_id: "4609865476341",
                         correct_comments: "",
                         question_name: "Multiple Choice",
                         incorrect_comments: "" }.with_indifferent_access
@@ -216,7 +216,7 @@ if Qti.migration_executable
                    answers: [{ text: "True", weight: 100, migration_id: "true" },
                              { text: "False", weight: 0, migration_id: "false" }],
                    question_type: "true_false_question",
-                   migration_id: "ID_4609865577341" }.with_indifferent_access
+                   migration_id: "4609865577341" }.with_indifferent_access
 
     TRUE_FALSE2 = { correct_comments: "",
                     points_possible: 1,
@@ -229,7 +229,7 @@ if Qti.migration_executable
                     migration_id: "4609865577341" }.with_indifferent_access
 
     # removed ids on the answers
-    MULTIPLE_ANSWER = { migration_id: "ID_4609865392341",
+    MULTIPLE_ANSWER = { migration_id: "4609865392341",
                         correct_comments: "",
                         points_possible: 1,
                         question_bank_name: "Export Test",
@@ -258,7 +258,7 @@ if Qti.migration_executable
               incorrect_comments: "",
               question_type: "essay_question",
               answers: [],
-              migration_id: "ID_4609842537341",
+              migration_id: "4609842537341",
               correct_comments: "",
               example_solution: "Nobody.",
               points_possible: 1,
@@ -270,7 +270,7 @@ if Qti.migration_executable
                      incorrect_comments: "",
                      question_type: "short_answer_question",
                      answers: [{ text: "A yellow submarine.", comments: "", weight: 100 }],
-                     migration_id: "ID_4609865550341",
+                     migration_id: "4609865550341",
                      correct_comments: "",
                      points_possible: 1,
                      question_bank_name: "Export Test",
@@ -292,7 +292,7 @@ if Qti.migration_executable
                            { text: "right 2" },
                            { text: "right 3" },
                            { text: "right 4" }],
-                 migration_id: "ID_4609865194341" }.with_indifferent_access
+                 migration_id: "4609865194341" }.with_indifferent_access
 
     ASSESSMENT = { time_limit: 60,
                    question_count: 11,
@@ -301,42 +301,42 @@ if Qti.migration_executable
                    show_score: true,
                    quiz_type: "assignment",
                    allowed_attempts: 1,
-                   migration_id: "ID_4609765292341",
+                   migration_id: "4609765292341",
                    questions: [{ question_type: "question_reference",
-                                 migration_id: "ID_4609823478341",
+                                 migration_id: "4609823478341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609842344341",
+                                 migration_id: "4609842344341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609842537341",
+                                 migration_id: "4609842537341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609842630341",
+                                 migration_id: "4609842630341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609842882341",
+                                 migration_id: "4609842882341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609865194341",
+                                 migration_id: "4609865194341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609865392341",
+                                 migration_id: "4609865392341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609865476341",
+                                 migration_id: "4609865476341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609865550341",
+                                 migration_id: "4609865550341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609865577341",
+                                 migration_id: "4609865577341",
                                  points_possible: 10.0 },
                                { question_type: "question_reference",
-                                 migration_id: "ID_4609885376341",
+                                 migration_id: "4609885376341",
                                  points_possible: 10.0 }],
                    grading: {
-                     migration_id: "ID_4609765292341",
+                     migration_id: "4609765292341",
                      title: "Blackboard Vista Export Test",
                      points_possible: nil,
                      due_date: nil,
@@ -344,7 +344,7 @@ if Qti.migration_executable
                    } }.with_indifferent_access
 
     CALCULATED_SIMPLE = { answer_tolerance: 0,
-                          migration_id: "ID_4609842344341",
+                          migration_id: "4609842344341",
                           imported_formula: "10-[x]",
                           correct_comments: "",
                           answers: [{ weight: 100, answer: 1, variables: [{ value: 9, name: "x" }] },
@@ -370,7 +370,7 @@ if Qti.migration_executable
     CALCULATED_COMPLEX = { neutral_comments: "Right answer.",
                            question_type: "calculated_question",
                            imported_formula: "(10*[F])**(-1) * (1000*[F]*[r]*[i]**(-1) * (1-(1 ([i]/200))**(-2*([Y]-10)))   1000*[F]*(1 ([i]/200))**(-2*([Y]-10))) * (1 ([i]/100)*([n]/360))",
-                           migration_id: "ID_4609823478341",
+                           migration_id: "4609823478341",
                            answers: [{ weight: 100,
                                        answer: 96.29,
                                        variables: [{ value: 5.43, name: "i" },
@@ -455,7 +455,7 @@ if Qti.migration_executable
                            answer_tolerance: 0.1,
                            incorrect_comments: "" }.with_indifferent_access
 
-    COMBINATION = { migration_id: "ID_4609885376341",
+    COMBINATION = { migration_id: "4609885376341",
                     correct_comments: "",
                     answers: [{ weight: 100, text: "B, C", migration_id: "MC0" }],
                     points_possible: 1,
@@ -466,7 +466,7 @@ if Qti.migration_executable
                     question_type: "multiple_choice_question" }.with_indifferent_access
 
     FILL_IN_MULTIPLE_BLANKS = { question_type: "fill_in_multiple_blanks_question",
-                                migration_id: "ID_4609842630341",
+                                migration_id: "4609842630341",
                                 answers: [{ comments: "", text: "family", weight: 100, blank_id: "family" },
                                           { comments: "", text: "poor", weight: 100, blank_id: "poor" },
                                           { comments: "", text: "sad", weight: 100, blank_id: "poor" }],
@@ -481,7 +481,7 @@ if Qti.migration_executable
                          incorrect_comments: "",
                          question_type: "WCT_JumbledSentence",
                          answers: [],
-                         migration_id: "ID_4609842882341",
+                         migration_id: "4609842882341",
                          correct_comments: "",
                          unsupported: true,
                          points_possible: 1,

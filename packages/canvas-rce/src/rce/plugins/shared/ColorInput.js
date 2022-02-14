@@ -52,7 +52,15 @@ const COLORS = [
   null
 ]
 
-export const ColorInput = ({color, label, name, onChange, popoverMountNode, width = '11rem'}) => {
+export const ColorInput = ({
+  color,
+  label,
+  name,
+  onChange,
+  popoverMountNode,
+  width = '11rem',
+  readonly = false
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [inputValue, setInputValue] = useState(color)
 
@@ -94,6 +102,7 @@ export const ColorInput = ({color, label, name, onChange, popoverMountNode, widt
             size="small"
             withBackground={false}
             withBorder={false}
+            interaction="enabled"
           >
             {isOpen ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
           </IconButton>
@@ -137,6 +146,7 @@ export const ColorInput = ({color, label, name, onChange, popoverMountNode, widt
         shouldNotWrap
         value={inputValue || ''}
         width={width}
+        interaction={readonly ? 'readonly' : undefined}
       />
     </View>
   )

@@ -22,7 +22,8 @@ import fetchMock from 'fetch-mock'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {Filter} from '../../gradebook.d'
-import {render, fireEvent} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
@@ -53,7 +54,7 @@ const defaultProps: FilterNavProps = {
 const defaultFilters: Filter[] = [
   {
     id: '1',
-    name: 'Unnamed Filter',
+    name: 'Filter 1',
     conditions: [
       {
         id: '2',
@@ -62,9 +63,44 @@ const defaultFilters: Filter[] = [
       }
     ],
     is_applied: true,
-    created_at: new Date().toISOString()
+    created_at: '2022-02-05T10:18:34-07:00'
+  },
+  {
+    id: '2',
+    name: 'Filter 2',
+    conditions: [
+      {
+        id: '3',
+        type: 'section',
+        created_at: new Date().toISOString()
+      }
+    ],
+    is_applied: true,
+    created_at: '2022-02-06T10:18:34-07:00'
   }
 ]
+
+const mockPostResponse = {
+  gradebook_filter: {
+    id: '25',
+    course_id: '0',
+    user_id: '1',
+    name: 'test',
+    payload: {
+      is_applied: false,
+      conditions: [
+        {
+          id: 'f783e528-dbb5-4474-972a-0f1a19c29551',
+          type: 'section',
+          value: '2',
+          created_at: '2022-02-08T17:18:13.190Z'
+        }
+      ]
+    },
+    created_at: '2022-02-08T10:18:34-07:00',
+    updated_at: '2022-02-08T10:18:34-07:00'
+  }
+}
 
 describe('FilterNav', () => {
   beforeEach(() => {
@@ -88,13 +124,26 @@ describe('FilterNav', () => {
 
   it('opens tray', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(getByText('Filters'))
+    userEvent.click(getByText('Filters'))
     expect(getByRole('heading')).toHaveTextContent('Gradebook Filters')
+  })
+
+  it('shows friendly panda image when there are no filters', async () => {
+    store.setState({filters: [], stagedFilter: null})
+    const {getByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Filters'))
+    expect(await getByAltText('Friendly panda')).toBeInTheDocument()
+  })
+
+  it('hides friendly panda image when there are filters', async () => {
+    const {queryByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Filters'))
+    expect(await queryByAltText('Friendly panda')).toBeNull()
   })
 
   it('renders new filter button', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(getByText('Filters'))
+    userEvent.click(getByText('Filters'))
     expect(getByRole('button', {name: /Create New Filter/})).toBeInTheDocument()
   })
 
@@ -102,55 +151,90 @@ describe('FilterNav', () => {
     store.setState({filters: []})
     const {getByText, queryByRole, getByRole} = render(<FilterNav {...defaultProps} />)
     expect(queryByRole('button', {name: /Save/})).toBeNull()
-    fireEvent.click(getByText('Filters'))
-    fireEvent.click(getByRole('button', {name: /Create New Filter/}))
+    userEvent.click(getByText('Filters'))
+    userEvent.click(getByRole('button', {name: /Create New Filter/}))
     expect(getByRole('button', {name: /Save/})).toBeVisible()
   })
 
   it('Shows condition type placeholder', () => {
-    const {getByText, getByPlaceholderText} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(getByText('Filters'))
-    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
+    const {getByText, getAllByPlaceholderText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Filters'))
+    expect(getAllByPlaceholderText(/Select condition type/)[0]).toBeInTheDocument()
   })
 
   it('Shows condition placeholder; selection triggers change', async () => {
-    const {getByText, getByRole, getByLabelText} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(getByText('Filters'))
-    expect(getByRole('button', {name: 'Condition'})).not.toHaveValue('Module 2')
-    fireEvent.click(getByLabelText('Condition'))
-    fireEvent.click(getByRole('option', {name: 'Module 2'}))
-    expect(getByRole('button', {name: 'Condition'})).toHaveValue('Module 2')
+    const {getByText, getByRole, getAllByRole, getAllByLabelText} = render(
+      <FilterNav {...defaultProps} />
+    )
+    userEvent.click(getByText('Filters'))
+    expect(getAllByRole('button', {name: 'Condition'})[0]).not.toHaveValue('Module 2')
+    userEvent.click(getAllByLabelText('Condition')[0])
+    userEvent.click(getByRole('option', {name: 'Module 2'}))
+    expect(getAllByRole('button', {name: 'Condition'})[0]).toHaveValue('Module 2')
   })
 
   it('Deletes condition', () => {
-    const {getByText, getByRole, queryByRole, getByPlaceholderText} = render(
+    const {getByText, getAllByRole, queryAllByRole, getAllByPlaceholderText} = render(
       <FilterNav {...defaultProps} />
     )
-    fireEvent.click(getByText('Filters'))
-    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
-    expect(queryByRole('button', {name: /Delete condition/})).toBeVisible()
-    fireEvent.click(getByRole('button', {name: /Delete condition/}))
-    expect(queryByRole('button', {name: /Delete condition/})).toBeNull()
+    userEvent.click(getByText('Filters'))
+    expect(getAllByPlaceholderText(/Select condition type/)[1]).toBeInTheDocument()
+    expect(queryAllByRole('button', {name: /Delete condition/})[1]).toBeVisible()
+    expect(queryAllByRole('button', {name: /Delete condition/}).length).toStrictEqual(2)
+    userEvent.click(getAllByRole('button', {name: /Delete condition/})[1])
+    expect(queryAllByRole('button', {name: /Delete condition/}).length).toStrictEqual(1)
   })
 
   it('Disables filter', () => {
-    const {getByPlaceholderText, getByRole, getByText} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(getByText('Filters'))
-    expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
-    const checkbox = getByRole('checkbox', {name: /Apply filter/})
+    const {getAllByPlaceholderText, getAllByRole, getByText} = render(
+      <FilterNav {...defaultProps} />
+    )
+    userEvent.click(getByText('Filters'))
+    expect(getAllByPlaceholderText(/Select condition type/)[0]).toBeInTheDocument()
+    const checkbox = getAllByRole('checkbox', {name: /Apply filter/})[0]
     expect(checkbox).toBeChecked()
-    fireEvent.click(checkbox)
+    userEvent.click(checkbox)
     expect(checkbox).not.toBeChecked()
   })
 
   it('Enables filter', () => {
     store.setState({filters: [{...defaultFilters[0], is_applied: false}]})
     const {getByText, getByRole, getByPlaceholderText} = render(<FilterNav {...defaultProps} />)
-    fireEvent.click(getByText('Filters'))
+    userEvent.click(getByText('Filters'))
     expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
     const checkbox = getByRole('checkbox', {name: /Apply filter/})
     expect(checkbox).not.toBeChecked()
-    fireEvent.click(checkbox)
+    userEvent.click(checkbox)
     expect(checkbox).toBeChecked()
+  })
+})
+
+describe('FilterNav (save)', () => {
+  beforeEach(() => {
+    store.setState({filters: defaultFilters})
+    fetchMock.post('/api/v1/courses/0/gradebook_filters', mockPostResponse)
+  })
+  afterEach(() => {
+    store.setState(originalState, true)
+    fetchMock.restore()
+  })
+
+  it('Save button is disabled if filter name is blank', async () => {
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Filters'))
+    userEvent.click(getByRole('button', {name: /Create New Filter/}))
+    expect(getByRole('button', {name: /Save/})).toBeDisabled()
+  })
+
+  it('clicking Save saves new filter', async () => {
+    const {getByText, queryByRole, getByPlaceholderText, getByRole} = render(
+      <FilterNav {...defaultProps} />
+    )
+    userEvent.click(getByText('Filters'))
+    userEvent.click(getByRole('button', {name: /Create New Filter/}))
+    userEvent.type(getByPlaceholderText('Give this filter a name'), 'Sample filter name')
+    expect(getByRole('button', {name: /Save/})).toBeVisible()
+    userEvent.click(getByRole('button', {name: /Save/}))
+    await waitFor(() => expect(queryByRole('button', {name: /Save/})).toBeNull())
   })
 })

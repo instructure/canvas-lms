@@ -34,11 +34,7 @@ final SYNC_IMAGES = [
   'instructure/ruby-passenger:2.7-bionic': [
     job: null,
     target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.7-bionic',
-  ],
-  'selenium/standalone-chrome:4.1.1-20220121': [
-    job: null,
-    target: 'starlord.inscloudgate.net/jenkins/selenium-chrome:4.1.1-20220121',
-  ],
+  ]
 ]
 
 pipeline {

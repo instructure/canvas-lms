@@ -48,7 +48,8 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
             content_export_id: contentShare.content_export.id,
             insert_into_module_id: selectedModule?.id || null,
             insert_into_module_type: contentShare.content_type,
-            insert_into_module_position: selectedPosition
+            insert_into_module_position: selectedPosition,
+            importer_skips: ['LatePolicy']
           }
         }
       })

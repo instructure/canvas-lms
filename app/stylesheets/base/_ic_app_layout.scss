@@ -71,6 +71,19 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 
   body.ic-framed-lti-tool & {
     padding: 0 $ic-sp*2;
+
+    @include lti-min-size {
+      .ic-framed-lti-content {
+        overflow-x: visible;
+
+        div.ic-framed-lti-embed-container {
+          width: 100vw;
+          min-width: 100vw;
+          margin-#{direction(left)}: - 2 * $ic-sp;
+          overflow-x: auto;
+        }
+      }
+    }
   }
 
   body.ic-full-screen-lti-tool & {

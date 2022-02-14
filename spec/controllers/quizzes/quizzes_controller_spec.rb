@@ -1697,9 +1697,7 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    it "creates assignment with important dates when site admin flag enabled" do
-      Account.site_admin.enable_feature!(:important_dates)
-
+    it "creates assignment with important dates" do
       user_session(@teacher)
       ag = @course.assignment_groups.create! name: "teh group"
       post "create", params: {
@@ -1843,9 +1841,7 @@ describe Quizzes::QuizzesController do
             expect(@quiz.reload.title).not_to eq "overrides"
           end
 
-          it "saves important dates with site admin flag enabled" do
-            Account.site_admin.enable_feature!(:important_dates)
-
+          it "saves important dates" do
             post "update", params: {
               course_id: @course.id,
               id: @quiz.id,
