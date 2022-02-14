@@ -48,7 +48,17 @@ const defaultProps: FilterNavProps = {
     {id: '1', title: 'Grading Period 1', startDate: 1},
     {id: '2', title: 'Grading Period 2', startDate: 2},
     {id: '3', title: 'Grading Period 3', startDate: 3}
-  ]
+  ],
+  studentGroupCategories: {
+    '1': {
+      id: '1',
+      name: 'Student Group Category 1',
+      groups: [
+        {id: '1', name: 'Student Group 1'},
+        {id: '2', name: 'Student Group 2'}
+      ]
+    }
+  }
 }
 
 const defaultFilters: Filter[] = [

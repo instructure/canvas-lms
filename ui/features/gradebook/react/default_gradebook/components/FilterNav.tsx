@@ -37,7 +37,8 @@ import type {
   GradingPeriod,
   Module,
   PartialFilter,
-  Section
+  Section,
+  StudentGroupCategoryMap
 } from '../gradebook.d'
 import useStore from '../stores/index'
 
@@ -48,6 +49,7 @@ export type FilterNavProps = {
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
   gradingPeriods: GradingPeriod[]
+  studentGroupCategories: StudentGroupCategoryMap
 }
 
 const newFilter = (): PartialFilter => ({
@@ -65,10 +67,11 @@ const newFilter = (): PartialFilter => ({
 })
 
 export default function FilterNav({
-  modules,
   assignmentGroups,
   gradingPeriods,
-  sections
+  modules,
+  sections,
+  studentGroupCategories
 }: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const filters = useStore(state => state.filters)
@@ -165,14 +168,15 @@ export default function FilterNav({
 
           {filters.map(filter => (
             <FilterNavFilter
-              key={filter.id}
+              assignmentGroups={assignmentGroups}
               filter={filter}
+              gradingPeriods={gradingPeriods}
+              key={filter.id}
+              modules={modules}
               onChange={(f: Filter) => updateFilter(f)}
               onDelete={() => deleteFilter(filter)}
-              modules={modules}
-              assignmentGroups={assignmentGroups}
               sections={sections}
-              gradingPeriods={gradingPeriods}
+              studentGroupCategories={studentGroupCategories}
             />
           ))}
 
@@ -185,14 +189,15 @@ export default function FilterNav({
             {stagedFilter ? (
               <>
                 <FilterNavFilter
-                  key="staged"
+                  assignmentGroups={assignmentGroups}
                   filter={stagedFilter}
+                  gradingPeriods={gradingPeriods}
+                  key="staged"
+                  modules={modules}
                   onChange={(f: PartialFilter) => useStore.setState({stagedFilter: f})}
                   onDelete={() => useStore.setState({stagedFilter: null})}
-                  modules={modules}
-                  assignmentGroups={assignmentGroups}
                   sections={sections}
-                  gradingPeriods={gradingPeriods}
+                  studentGroupCategories={studentGroupCategories}
                 />
                 <View as="div" padding="small" background="secondary" borderRadius="medium">
                   <Flex alignItems="end">
