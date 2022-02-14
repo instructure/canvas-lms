@@ -1,0 +1,4 @@
+{
+  "initializeCommand": "./script/codespace_setup.sh",
+  "postStartCommand": "./script/codespace_start.sh"
+}
