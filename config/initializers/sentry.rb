@@ -33,7 +33,12 @@ Rails.configuration.to_prepare do
     config.release = Canvas.revision
     config.sample_rate = SentryExtensions::Settings.get("sentry_backend_errors_sample_rate", "1.0").to_f
 
-    config.traces_sampler = lambda do |_|
+    config.traces_sampler = lambda do |sampling_context|
+      unless sampling_context[:parent_sampled].nil?
+        # If there is a parent transaction, abide by its sampling decision
+        next sampling_context[:parent_sampled]
+      end
+
       SentryExtensions::Settings.get("sentry_backend_traces_sample_rate", "0.0").to_f
     end
     config.rails.tracing_subscribers = [

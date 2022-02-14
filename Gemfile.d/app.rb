@@ -135,9 +135,9 @@ gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.1"
   gem "nokogiri-xmlsec-instructure", "0.10.1", require: false
 gem "sanitize", "6.0.0", require: false
-gem "sentry-ruby", "5.0.2"
-gem "sentry-rails", "5.0.2"
-gem "sentry-inst_jobs", "1.0.1"
+gem "sentry-ruby", "5.1.0"
+gem "sentry-rails", "5.1.0"
+gem "sentry-inst_jobs", "1.0.2"
 gem "simple_oauth", "0.3.1", require: false
 gem "twilio-ruby", "5.36.0", require: false
 gem "vault", "0.15.0", require: false
