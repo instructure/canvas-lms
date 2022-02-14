@@ -11,13 +11,14 @@ describe("test", () => {
     expect(rule.test(document.createElement("div"))).toBeTruthy()
   })
 
-  test("return true if H? length is less than max", () => {
-    const moreThanMaxString = Array(rule["max-heading-length"] + 2).join("x")
+  test("returns false if the heading is > 120 characters", () => {
+    const moreThanMaxString = Array(122).join("x")
+
     el.appendChild(document.createTextNode(moreThanMaxString))
     expect(rule.test(el)).toBeFalsy()
   })
 
-  test("return false if H? length is more than max", () => {
+  test("return true if the heading is less than the max", () => {
     const lessThanMaxString = "x"
     el.appendChild(document.createTextNode(lessThanMaxString))
     expect(rule.test(el)).toBeTruthy()
