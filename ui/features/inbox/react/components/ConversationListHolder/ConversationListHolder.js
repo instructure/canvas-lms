@@ -66,8 +66,14 @@ export const ConversationListHolder = ({...props}) => {
     provideConversationsForOnSelect([...updatedSelectedMessage])
   }
 
+  const removeFromSelectedConversations = _id => {
+    const updatedSelectedMessage = selectedMessages.filter(id => id !== _id)
+    setSelectedMessages([...updatedSelectedMessage])
+    provideConversationsForOnSelect([...updatedSelectedMessage])
+  }
+
   // Key handler for MessageListItems
-  const handleItemSelection = (e, _id, conversation, multiple) => {
+  const handleItemSelection = async (e, _id, conversation, multiple) => {
     // Prevents selecting text when shift clicking to select range
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
@@ -170,6 +176,7 @@ export const ConversationListHolder = ({...props}) => {
                 : conversation.workflowState === 'unread'
             }
             onOpen={props.onOpen}
+            onRemoveFromSelectedConversations={removeFromSelectedConversations}
             onSelect={handleItemSelection}
             onStar={props.isSubmissionComments ? () => {} : props.onStar}
             key={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
