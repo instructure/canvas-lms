@@ -91,8 +91,7 @@ module Crystalball
         attr_writer :config, :prediction_builder
 
         def config_file
-          file = Pathname.new(ENV.fetch("CRYSTALBALL_CONFIG", "crystalball.yml"))
-          file = Pathname.new("config/crystalball.yml") unless file.exist?
+          file = Pathname.new(ENV.fetch("CRYSTALBALL_CONFIG", "config/crystalball.yml"))
           file.exist? ? file : nil
         end
 
@@ -136,7 +135,7 @@ module Crystalball
         super do |p|
           p.use Crystalball::Predictor::ModifiedSpecs.new
           p.use Crystalball::Predictor::ModifiedExecutionPaths.new
-          p.use Crystalball::Predictor::NewFiles.new
+          p.use Crystalball::Predictor::ChangedFiles.new
         end
       end
     end
@@ -145,7 +144,7 @@ module Crystalball
   class Predictor
     # Queues a total re-run if any files are added. If no new files, don't add any predictions
     # Possible git operation types for SourceDiff include: ['new', 'modified', 'moved', 'deleted]
-    class NewFiles
+    class ChangedFiles
       include Helpers::AffectedExampleGroupsDetector
       include Strategy
 
@@ -161,13 +160,18 @@ module Crystalball
           # Hash["new"] = ["new_file1.rb", "new_file2.rb"]
           # Hash["modified"] = ["modified_file1.rb", "modified_file2.rb"]
           # etc...
-          new_files = file_change_types.each_with_object(Hash.new { |h, k| h[k] = [] }) do |arr, change_map|
+          file_changes = file_change_types.each_with_object(Hash.new { |h, k| h[k] = [] }) do |arr, change_map|
             change_path = arr[0]
             change_type = arr[1]
             change_map[change_type] << change_path
           end
-          if new_files["new"].count.positive?
+          Crystalball.log :warn, "Crystalball changes: #{file_changes.slice("new", "modified")}"
+          if file_changes["new"].count.positive?
             Crystalball.log :warn, "Crystalball detected new .git files: #{new_files["new"]}"
+            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
+            ["."]
+          elsif file_changes["modified"].find { |path| path =~ %r{config/.*.rb$} }
+            Crystalball.log :warn, "Crystalball detected ruby config/ file changes!"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
           else
@@ -178,7 +182,7 @@ module Crystalball
     end
   end
 
-  # Override prediction mechanism based on NewFiles predictor. If we requeue an entire suite re-run
+  # Override prediction mechanism based on ChangedFiles predictor. If we requeue an entire suite re-run
   # ENV["CRYSTALBALL_TEST_SUITE_ROOT"] should point to the root of selenium specs or whatever is deemed
   #  relevant for a "complete crystalball-predicted run"
   class Predictor
