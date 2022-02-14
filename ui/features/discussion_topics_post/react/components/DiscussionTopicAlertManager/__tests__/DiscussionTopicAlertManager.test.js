@@ -97,10 +97,25 @@ describe('DiscussionTopicAlertManager', () => {
         'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
       )
     })
+
+    it('should render correct alert when user is an observer', async () => {
+      window.ENV.current_user_roles = ['User', 'observer']
+      const {findByTestId} = setup({
+        discussionTopic: Discussion.mock({
+          anonymousState: 'full_anonymity',
+          canReplyAnonymously: false
+        })
+      })
+      const anonAlert = await findByTestId('anon-conversation')
+      expect(anonAlert.textContent).toEqual(
+        'This is an anonymous Discussion. Student names and profile pictures are hidden.'
+      )
+    })
   })
 
   describe('Partial anonymous discussion', () => {
     it('should render partial anon alert when status is present', async () => {
+      window.ENV.current_user_roles = ['User', 'student']
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
@@ -124,6 +139,20 @@ describe('DiscussionTopicAlertManager', () => {
       const anonAlert = await findByTestId('anon-conversation')
       expect(anonAlert.textContent).toEqual(
         'When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members.'
+      )
+    })
+
+    it('should render correct alert when user is an observer', async () => {
+      window.ENV.current_user_roles = ['User', 'observer']
+      const {findByTestId} = setup({
+        discussionTopic: Discussion.mock({
+          anonymousState: 'partial_anonymity',
+          canReplyAnonymously: false
+        })
+      })
+      const anonAlert = await findByTestId('anon-conversation')
+      expect(anonAlert.textContent).toEqual(
+        'Students have the option to reply anonymously. Some names and profile pictures may be hidden.'
       )
     })
   })
