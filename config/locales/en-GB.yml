@@ -204,6 +204,7 @@ en-GB:
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "A partner key is required to use academic benchmarks"
   a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "A premium version of BigBlueButton is available that offers concurrent conferences based on purchased amount (each with 1 host and up to 99 attendees), no recorded storage limitations, and dedicated infrastructure for better performance."
   a_problem_occurred_adding_reviewers_57b083d9: "A problem occurred adding reviewers."
+  a_process_is_already_in_progress_f4495f5e: "A process is already in progress."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "A Public privacy level will send the launching user's personally identifying information to the tool provider. Setting this to Private may adversely affect tools that depend on that information."
   a_redirect_uri_is_required_please_supply_one_471908db: "A redirect_uri is required, please supply one."
   a_role_name_is_required_47efd33: "A role name is required"
@@ -234,6 +235,7 @@ en-GB:
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Ability to submit annotatable document assignments."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Ability to submit student annotation assignments."
   about_this_service_b10bc808: "About this service"
+  above_max_rating_64b29915: "Above max rating"
   academic_benchmark: 
     api_error: "Couldn't update standards for authority %{auth}."
     bad_ab_file: "The provided Academic Benchmark file has an error."
@@ -2711,6 +2713,7 @@ en-GB:
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Allows user to randomly assign users to an account or course group."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Allows user to remove a course as a course template in Course Settings."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "Allows user to remove a course as a course template in Course Settings. Allows user to set an account to not use a template."
+  allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Allows user to remove a student’s section enrolment or role."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Allows user to remove and merge users in an account."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "Allows user to remove designers from a course."
   allows_user_to_remove_designers_to_the_course_from_1053d170: "Allows user to remove designers to the course from the account Courses page. Allows user to remove designers from the course."
@@ -2785,6 +2788,7 @@ en-GB:
               Allows user to access the Navigation tab in Course Settings. Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.
               Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons. Allows user to view student context cards in announcement and discussion replies.
   allows_user_to_sync_blueprint_courses_db4fcc03: "Allows user to sync Blueprint Courses."
+  allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Allows user to update a student’s section enrolment or role."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Allows user to view a course’s SIS ID."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Allows user to view a link to SpeedGrader from assignments."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -3407,6 +3411,7 @@ en-GB:
   apply_to_92f70c8c: "Apply to:"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applying new styles to subaccounts"
   applying_please_be_patient_f7b5f244: "Applying. Please be patient"
+  applying_score_to_ungraded_7311df9a: "Applying Score to Ungraded"
   appointment_group: 
     errors: 
       invalid_end_at: "Appointment end time precedes start time"
@@ -4706,6 +4711,7 @@ en-GB:
       Automatically show closed captions in the user's current
       language (if available) when playing canvas media.
   avaible_daec2e57: Available
+  availability_8942cde6: Availability
   availability_dates_438d71e0: "Availability dates"
   availability_dates_changed_exceptions_465ba375: "Availability Dates changed exceptions:"
   available_2ed9f226: "Available:"
@@ -4799,6 +4805,7 @@ en-GB:
   belgium_32_e5f5b598: "Belgium (+32)"
   belgium_ef8739b6: Belgium
   below_mastery_abd1dca5: "Below Mastery"
+  below_min_rating_78a742c3: "Below min rating"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Below this search field is a list of %{content_type}. As you type, the list will be filtered to match your query. Conversation messages will be filtered by whichever option you select."
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: "Beta LTI Launch:"
@@ -5769,6 +5776,7 @@ en-GB:
   change_image_14ad465b: "Change image"
   change_image_d56c695f: "Change image"
   change_mastery_f4d43c07: "Change mastery"
+  change_mastery_points_c4f68a36: "Change mastery points"
   change_name_c8cce76c: "Change Name"
   change_name_to_568374c8: "Change \"%{name}\" to"
   change_points_9e5104ac: "Change points"
@@ -8410,7 +8418,7 @@ en-GB:
         toggle_navigation_dragging: Space
       labels: 
         account_id: "Sub account"
-        allow_student_discussion_editing: "Let students edit or delete their own discussion posts"
+        allow_student_discussion_editing: "Let students edit or delete their own discussion replies"
         allow_student_discussion_topics: "Let students create discussion topics"
         allow_student_forum_attachments: "Let students attach files to discussions"
         allow_student_organized_groups: "Let Students organise their own groups"
@@ -9101,8 +9109,11 @@ en-GB:
   date_is_after_course_end_date_94a2f4e3: "Date is after course end date"
   date_is_after_the_course_end_date_95bf9b6a: "Date is after the course end date"
   date_is_after_the_specified_end_date_ae34a72f: "Date is after the specified end date"
+  date_is_after_the_term_end_date_4ab01e5d: "Date is after the term end date"
   date_is_before_course_start_date_16c9d531: "Date is before course start date"
+  date_is_before_student_enrollment_date_a380a177: "Date is before student enrolment date"
   date_is_before_the_course_start_date_431ba0ff: "Date is before the course start date"
+  date_is_before_the_term_start_date_10104b92: "Date is before the term start date"
   date_is_required_9c6f5e83: "Date is required"
   date_modified_4d065406: ", date modified: "
   date_modified_e1c8ac8f: "Date modified"
@@ -9117,6 +9128,7 @@ en-GB:
   dates: 
     no_date: "No date"
   dates_6e416047: Dates
+  dates_shown_in_course_time_zone_da2f77d5: "Dates shown in course time zone"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -10641,6 +10653,7 @@ en-GB:
   enter_name_or_code_b4c103f6: "Enter name or code"
   enter_new_group_name_b97d5819: "Enter new group name"
   enter_one_or_more_external_tool_ids_comma_separate_9a758cd: "Enter one or more external tool IDs, comma-separated"
+  enter_one_or_more_external_tool_url_domains_comma__7c2d4fe8: "Enter one or more external tool URL domains, comma-separated"
   enter_or_find_an_external_tool_url_6aebbd0d: "Enter or find an external tool URL"
   enter_score_cutoff_3ff8ad22: "Enter score cut-off"
   enter_specific_phrase_9b686755: "Enter specific phrase"
@@ -11097,6 +11110,7 @@ en-GB:
   exceeds_mastery_1f995dce: "Exceeds Mastery"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior Student Activity Tracking"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Exclude any data that hasn't been updated since the given date"
+  exclude_assignments_graded_with_a_0_score_5c853dc4: "Exclude assignments graded with a 0 score."
   excuse_this_assignment_for_the_selected_student_af04e132: "Excuse this assignment for the selected student"
   excused_3aab77: excused
   excused_5877183c: Excused!
@@ -13343,8 +13357,10 @@ en-GB:
       event: "%{date} at %{time}"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "has been automatically selected based upon where this account's Canvas instance resides. In some cases it can be a different region."
   has_similarity_score_d5f332b4: "Has similarity score"
+  has_submissions_6c12ef4c: "Has submissions"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Has Turnitin score"
+  has_ungraded_submissions_2bff87df: "Has ungraded submissions"
   have_not_been_graded_df2a5fd2: "Have not been graded"
   have_not_yet_submitted_57e6a58b: "Have not yet submitted"
   haven_t_been_graded_d7dee5bb: "Haven't been graded"
@@ -14151,6 +14167,7 @@ en-GB:
     welcome_to_canvas: "Welcome to Canvas!"
   incorrect_answer_7c17e63b: "Incorrect answer"
   incorrect_username_and_or_password_2de73abb: "Incorrect username and/or password"
+  increase_calendar_context_limit_575ad9ff: "Increase calendar context limit"
   increase_indent_6af90f7c: "Increase indent"
   increase_indent_6d550a4a: "Increase indent"
   incremental_update_successfully_generated_against__db3f3f06: "Incremental update successfully generated against a previous SIS Import."
@@ -15411,6 +15428,8 @@ en-GB:
   master_lock_590266b6: "Master lock"
   mastered_34d4c857: Mastered
   mastery_7ec348b5: Mastery
+  mastery_at_cf0c477b: "Mastery at"
+  mastery_at_e804b49: "Mastery at:"
   mastery_calculation_5fd5f5fe: "Mastery Calculation"
   mastery_calculation_parameters_f072c3: "Mastery calculation parameters"
   mastery_calculation_saved_df378fdd: "Mastery calculation saved"
@@ -17841,6 +17860,7 @@ en-GB:
   moving_a4d552df: moving...
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
+  msg_680333e2: "%{msg}"
   multi_factor_authentication_backup_codes_4d781044: "Multi-factor Authentication Backup Codes"
   multi_factor_authentication_configured_865b1bde: "Multi-factor authentication configured"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Multiple are marked \"Current theme\" because the same values have been saved under multiple names—i.e., they're each the same as what's currently applied"
@@ -18265,6 +18285,7 @@ en-GB:
   no_violations_have_been_reported_977a08d1: "No violations have been reported."
   no_way_to_export_gradebooks_provided_b4c2939d: "No way to export gradebooks provided."
   no_way_to_monitor_gradebook_exports_provided_b451236a: "No way to monitor gradebook exports provided."
+  no_way_to_monitor_score_to_ungraded_provided_9258253f: "No way to monitor score to ungraded provided!"
   non_canvas_11f36d4a: "Non Canvas"
   non_existent_content_referenced_in_this_resource_d86c6bcb: "Non-existent content referenced in this resource:"
   non_prod_settings_9b39c6c9: "Non-prod settings"
@@ -19964,6 +19985,7 @@ en-GB:
   points_n_e0b20623: "Points %{n}"
   points_out_of_total_24f61148: "*%{points}* out of **%{total}**"
   points_points_b6b422e2: "Points: %{points}"
+  points_points_d70ced4f: "%{points} points"
   points_possible_1c0b3445: "Points possible"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
@@ -23009,6 +23031,9 @@ en-GB:
   score_similarity_score_2c25b94b: "%{score}% similarity score"
   score_student_points_possible_points_78360e86: "Score {{student_points}}/{{possible_points}}"
   score_to_keep_e89e4fa5: "Score to keep"
+  score_to_ungraded_process_failed_e143fd1b: "Score to ungraded process failed"
+  score_to_ungraded_process_failed_reason_788f9030: "Score to ungraded process failed: %{reason}"
+  score_to_ungraded_process_finished_successfully_6689b418: "Score to ungraded process finished successfully"
   scored_less_than_2427896c: "Scored less than"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Scored less than %{cutoff} on %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Scored less than %{score} on %{assignmentTitle}"
@@ -25176,6 +25201,7 @@ en-GB:
   submission_in_another_grading_period_e754b329: "Submission in another grading period"
   submission_index_e960f9bf: "Submission %{index}"
   submission_is_being_processed_by_plagiarism_servic_df4aa603: "Submission is being processed by plagiarism service."
+  submission_is_deleted_and_cannot_be_modified_2581e73c: "Submission is deleted and cannot be modified."
   submission_items_b2db1b8d: "Submission Items"
   submission_locked_a6074f8b: "Submission Locked"
   submission_locked_image_93aced38: "Submission Locked Image"
@@ -26054,6 +26080,8 @@ en-GB:
   there_was_a_problem_updating_the_grade_1b6c8b4c: "There was a problem updating the grade."
   there_was_a_problem_updating_the_submission_6e5280a1: "There was a problem updating the submission."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "There was an error checking plan publishing status."
+  there_was_an_error_creating_a_new_filter_e93bb765: "There was an error creating a new filter."
+  there_was_an_error_deleting_name_aa3050e5: "There was an error deleting \"%{name}\"."
   there_was_an_error_fetching_course_statistics_96e9dbad: "There was an error fetching course statistics"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "There was an error fetching gradebook filters."
   there_was_an_error_fetching_modules_8ee451bb: "There was an error fetching modules."
@@ -26083,6 +26111,7 @@ en-GB:
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "There was an error starting the save assignment dates job"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support."
   there_was_an_error_submitting_your_attempt_fdbe9259: "There was an error submitting your attempt."
+  there_was_an_error_updating_a_filter_2a5ebc87: "There was an error updating a filter."
   there_was_an_error_updating_this_assignment_please_59fc608d: "There was an error updating this assignment. Please refresh the page and try again."
   there_was_an_error_updating_view_options_d024a3ec: "There was an error updating view options."
   there_was_an_error_uploading_the_image_932fc4ce: "There was an error uploading image"
@@ -26799,6 +26828,7 @@ en-GB:
   to_add_individual_courses_click_courses_c5355180: "To add individual courses, click Courses."
   to_add_individual_users_click_people_4d6de56a: "To add individual users, click People."
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "To add or remove a student to or from a course, the Users - Student permission must be enabled."
+  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "To add or remove a student to or from a course, the Users - Students permissions must be enabled."
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers)."
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers). To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled."
   to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "To add or remove users to a course via SIS, the appropriate Users permission must be enabled (e.g. Users - Teachers)."
@@ -28456,6 +28486,7 @@ en-GB:
   view_app_configurations_52b52441: "View App Configurations"
   view_assignment_group_totals_c8db16b2: "View Assignment Group Totals"
   view_audit_trail_12f774b6: "View audit trail"
+  view_availability_963f62ff: "View Availability"
   view_ba339f93: View
   view_blackout_dates_1723673a: "View Blackout Dates"
   view_canvas_insights_beta_fe446d71: "View Canvas Insights (Beta)"
@@ -28671,6 +28702,8 @@ en-GB:
       load in a new tab. When this flag is enabled, that checkbox will be selected by default
       if the user checked it last time they added an external link.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "When adding multiple users, use a comma or line break to separate users."
+  when_creating_a_reply_students_will_have_the_optio_716eb2f4: "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members."
+  when_creating_a_reply_you_will_have_the_option_to__8607ac10: "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
   when_disabled_students_can_still_send_individual_m_3bf396f2: "When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups."
   when_disabled_students_can_still_send_individual_m_567a911c: "When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "When enabled, global JavaScript and CSS files can be uploaded in the *%{t_theme_editor}*."
