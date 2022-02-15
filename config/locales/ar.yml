@@ -227,6 +227,7 @@ ar:
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "يتطلب وجود مفتاح شريك لاستخدام المعايير الأكاديمية"
   a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "يتوفر إصدار مميز من BigBlueButton يقدم مؤتمرات متزامنة بناءً على الكم المشترى (كل منها بمضيف واحد وحتى 99 من الحضور)، وبدون قيود على تخزين التسجيل، وبنية تحتية مخصصة لأداء أفضل."
   a_problem_occurred_adding_reviewers_57b083d9: "حدث خطأ أثناء إضافة المراجعين."
+  a_process_is_already_in_progress_f4495f5e: "توجد عملية قيد التقدم بالفعل."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "سيقوم مستوى الخصوصية العمومي بإرسال معلومات التعرف على الشخصية للمستخدم المشغل إلى مزود الأداة. قد يؤثر إعداد هذا إلى \"خاص\" على الأدوات التي تعتمد على تلك المعلومات على نطاق واسع."
   a_redirect_uri_is_required_please_supply_one_471908db: "redirect_uri مطلوب، يرجى تزويد واحدًا."
   a_role_name_is_required_47efd33: "اسم الدور مطلوب"
@@ -257,6 +258,7 @@ ar:
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "القدرة لإرسال مهام المستندات القابلة للتعليق التوضيحي."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "القدرة لإرسال مهام التعليق التوضيحي الخاصة بالطلاب."
   about_this_service_b10bc808: "حول هذه الخدمة"
+  above_max_rating_64b29915: "تقييم أعلى من الحد الأقصى"
   academic_benchmark: 
     api_error: "تعذر تحديث المعايير للتفويض %{auth}."
     bad_ab_file: "حدث خطأ في ملف المعيار الأكاديمي المتوفر."
@@ -2757,6 +2759,7 @@ ar:
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "للسماح للمستخدم بتعيين مستخدمين عشوائيًا إلى مجموعة حسابات أو مساقات."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "للسماح للمستخدم بإزالة المساق كقالب مساق في إعدادات المساق."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "للسماح للمستخدم بإزالة المساق كقالب مساق في إعدادات المساق. للسماح للمستخدم بتعيين حساب لعدم استخدام قالب."
+  allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "للسماح للمستخدم بإزالة تسجيل قسم طالب أو دوره."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "للسماح للمستخدم بإزالة المستخدمين ودمجهم في الحسابات."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "يسمح للمستخدم بإزالة مصممين من المساق."
   allows_user_to_remove_designers_to_the_course_from_1053d170: "يسمح للمستخدم بإزالة مصممين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإزالة مصممين في المساق."
@@ -2831,6 +2834,7 @@ ar:
               للسماح للمستخدم بالوصول إلى علامة تبويب لوحة التنقل في إعدادات المساق. للسماح للمستخدم بتحرير صورة المساق والاسم ورمز المساق والمنطقة الزمنية والحساب الفرعي والفصل الدراسي والخيارات الأخرى في علامة تبويب تفاصيل المساق.
               للسماح للمستخدم بالوصول إلى طريقة عرض الطالب (طالب الاختبار)، أزرار نسخ هذا المساق، وإعادة تعيين محتوى المساق، والحذف الدائم للمساق. للسماح للمستخدم بعرض بطاقات سياق الطلاب في الإعلانات وردود النقاشات.
   allows_user_to_sync_blueprint_courses_db4fcc03: "للسماح للمستخدم بمزامنة المساقات المخططة."
+  allows_user_to_update_a_student_s_section_enrollme_80420ac9: "للسماح للمستخدم بتحديث تسجيل قسم طالب أو دوره."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "يسمح للمستخدم بعرض معرف SIS للمساق."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "يسمح للمستخدم بعرض ارتباط على SpeedGrader من المهام."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -3477,6 +3481,7 @@ ar:
   apply_to_92f70c8c: "تطبيق على:"
   applying_new_styles_to_subaccounts_e8aeeef2: "تطبيق الأنماط الجديدة على الحسابات الفرعية"
   applying_please_be_patient_f7b5f244: "يتم التطبيق، يرجى الانتظار"
+  applying_score_to_ungraded_7311df9a: "جارٍ تطبيق الدرجة على الإرسالات غير المقيّمة"
   appointment_group: 
     errors: 
       invalid_end_at: "وقت نهاية الموعد يسبق وقت البدء"
@@ -4855,6 +4860,7 @@ ar:
       يظهر تلقائيًا التسميات التوضيحية المغلقة باللغة الحالية
       للمستخدم (إذا كانت متاحة) عند تشغيل وسائط Canvas.
   avaible_daec2e57: متوفر
+  availability_8942cde6: الإتاحة
   availability_dates_438d71e0: "تواريخ الإتاحة"
   availability_dates_changed_exceptions_465ba375: "استثناءات تواريخ الإتاحة التي تغيرت:"
   available_2ed9f226: "متوفر:"
@@ -4948,6 +4954,7 @@ ar:
   belgium_32_e5f5b598: "بلجيكا (+32)"
   belgium_ef8739b6: بلجيكا
   below_mastery_abd1dca5: "دون الإتقان"
+  below_min_rating_78a742c3: "تقييم أقل من الحد الأدنى"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "يوجد أسفل حقل البحث هذا قائمة من نوع %{content_type}. أثناء الكتابة، تتم تصفية القائمة لمطابقة الاستعلام. ستتم تصفية رسائل المحادثات حسب الاختيار الذي تحدده."
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: "تشغيل LTI بيتا:"
@@ -5920,6 +5927,7 @@ ar:
   change_image_14ad465b: "تغيير الصورة"
   change_image_d56c695f: "تغيير الصورة"
   change_mastery_f4d43c07: "تغيير الإتقان"
+  change_mastery_points_c4f68a36: "تغيير نقاط الإتقان"
   change_name_c8cce76c: "تغيير الاسم"
   change_name_to_568374c8: "تغيير \"%{name}\" إلى"
   change_points_9e5104ac: "تغيير النقاط"
@@ -8820,7 +8828,7 @@ ar:
         toggle_navigation_dragging: مسافة
       labels: 
         account_id: "حساب فرعي"
-        allow_student_discussion_editing: "السماح للطلاب بتحرير أو حذف منشورات المناقشة خاصتهم"
+        allow_student_discussion_editing: "السماح للطلاب بتحرير أو حذف ردود مناقشاتهم الخاصة"
         allow_student_discussion_topics: "السماح للطلاب بإنشاء موضوعات مناقشة"
         allow_student_forum_attachments: "السماح للطلاب بإرفاق ملفات إلى المناقشات"
         allow_student_organized_groups: "السماح للطلاب بتنظيم المجموعات الخاصة بهم"
@@ -9544,8 +9552,11 @@ ar:
   date_is_after_course_end_date_94a2f4e3: "التاريخ لاحق على تاريخ نهاية المساق"
   date_is_after_the_course_end_date_95bf9b6a: "التاريخ لاحق على تاريخ نهاية المساق"
   date_is_after_the_specified_end_date_ae34a72f: "التاريخ لاحق على تاريخ النهاية المحدد"
+  date_is_after_the_term_end_date_4ab01e5d: "التاريخ لاحق على تاريخ نهاية الفصل الدراسي"
   date_is_before_course_start_date_16c9d531: "التاريخ سابق على تاريخ بدء المساق"
+  date_is_before_student_enrollment_date_a380a177: "التاريخ سابق على تاريخ تسجيل الطالب"
   date_is_before_the_course_start_date_431ba0ff: "التاريخ سابق على تاريخ بدء المساق"
+  date_is_before_the_term_start_date_10104b92: "التاريخ سابق على تاريخ بدء الفصل الدراسي"
   date_is_required_9c6f5e83: "التاريخ مطلوب!"
   date_modified_4d065406: "، تاريخ التعديل: "
   date_modified_e1c8ac8f: "تاريخ التعديل"
@@ -9560,6 +9571,7 @@ ar:
   dates: 
     no_date: "بلا تاريخ"
   dates_6e416047: التواريخ
+  dates_shown_in_course_time_zone_da2f77d5: "تظهر التواريخ حسب المنطقة الزمنية للمساق"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -11162,6 +11174,7 @@ ar:
   enter_name_or_code_b4c103f6: "أدخل اسمًا أو رمزًا"
   enter_new_group_name_b97d5819: "أدخل اسمًا جديدًا للمجموعة"
   enter_one_or_more_external_tool_ids_comma_separate_9a758cd: "أدخل معرف أداة خارجية أو أكثر، مفصولة بفاصلة"
+  enter_one_or_more_external_tool_url_domains_comma__7c2d4fe8: "أدخل مجالات URL لأداة خارجية أو أكثر، مفصولة بفاصلة"
   enter_or_find_an_external_tool_url_6aebbd0d: "إدخال عنوان URL لأداة خارجية أو البحث عنه"
   enter_score_cutoff_3ff8ad22: "أدخل درجة الحد الأدنى"
   enter_specific_phrase_9b686755: "إدخال عبارة محددة"
@@ -11642,6 +11655,7 @@ ar:
   exceeds_mastery_1f995dce: "تجاوز الإتقان"
   excelsior_student_activity_tracking_7a1ba44d: "تعقب نشاط طلاب Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "استثناء أي بيانات لم يتم تحديثها منذ التاريخ المحدد"
+  exclude_assignments_graded_with_a_0_score_5c853dc4: "استبعاد المهام المقيّمة بدرجة 0."
   excuse_this_assignment_for_the_selected_student_af04e132: "إعفاء الطالب المحدد من القيام بهذه المهمة"
   excused_3aab77: معفاة
   excused_5877183c: "ليس إجباري!"
@@ -13957,8 +13971,10 @@ ar:
       event: "%{date} في %{time}"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "تم تحديدها تلقائيًا بناءً على مكان وجود مثيل Canvas لهذا الحساب. في بعض الحالات، قد تكون منطقة مختلفة."
   has_similarity_score_d5f332b4: "به درجة تشابه"
+  has_submissions_6c12ef4c: "يحتوي على إرسالات"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "لديه نتائج في Turnitin"
+  has_ungraded_submissions_2bff87df: "يحتوي على إرسالات غير مقيّمة"
   have_not_been_graded_df2a5fd2: "لم يتم تقييمها"
   have_not_yet_submitted_57e6a58b: "لم يتم إرسالها بعد"
   haven_t_been_graded_d7dee5bb: "لم يتم تصحيحها"
@@ -14783,6 +14799,7 @@ ar:
     welcome_to_canvas: "مرحبًا بك في Canvas!"
   incorrect_answer_7c17e63b: "إجابة خاطئة"
   incorrect_username_and_or_password_2de73abb: "اسم مستخدم و/أو كلمة مرور غير صحيحة"
+  increase_calendar_context_limit_575ad9ff: "زيادة حد سياق التقويم"
   increase_indent_6af90f7c: "زيادة المسافة البادئة"
   increase_indent_6d550a4a: "زيادة المسافة البادئة"
   incremental_update_successfully_generated_against__db3f3f06: "تم إنشاء التحديث التزايدي بنجاح مقابل تصدير SIS."
@@ -16045,6 +16062,8 @@ ar:
   master_lock_590266b6: "القفل الرئيسي"
   mastered_34d4c857: "تم إتقان"
   mastery_7ec348b5: الإتقان
+  mastery_at_cf0c477b: "الإتقان عند"
+  mastery_at_e804b49: "الإتقان عند:"
   mastery_calculation_5fd5f5fe: "حساب الإجادة"
   mastery_calculation_parameters_f072c3: "معلمات حساب الإجادة"
   mastery_calculation_saved_df378fdd: "تم حفظ حساب الإجادة"
@@ -18546,6 +18565,7 @@ ar:
   moving_a4d552df: "يتم الآن النقل..."
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
+  msg_680333e2: "%{msg}"
   multi_factor_authentication_backup_codes_4d781044: "الرموز الاحتياطية للمصادقة متعددة العوامل"
   multi_factor_authentication_configured_865b1bde: "تم تكوين المصادقة متعددة العوامل"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "تم وضع علامة على عدة سمات \"كسمة حالية\" لأنه تم حفظ القيم نفسها تحت عدة أسماء؛ أي، كل منها يطابق ما تم تطبيقه حاليًا."
@@ -18974,6 +18994,7 @@ ar:
   no_violations_have_been_reported_977a08d1: "لم يتم الإبلاغ عن أي مخالفات"
   no_way_to_export_gradebooks_provided_b4c2939d: "لا توجد طريقة متاحة لتصدير دفاتر الدرجات!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "لا توجد طريقة متاحة لمراقبة دفاتر الدرجات!"
+  no_way_to_monitor_score_to_ungraded_provided_9258253f: "لا توجد طريقة متاحة لمراقبة تحويل الدرجة إلى غير مقيّمة!"
   non_canvas_11f36d4a: "ليس Canvas"
   non_existent_content_referenced_in_this_resource_d86c6bcb: "تمت الإشارة إلى محتوى غير موجود في هذا المورد:"
   non_prod_settings_9b39c6c9: "إعدادات غير إنتاجية"
@@ -20688,6 +20709,7 @@ ar:
   points_n_e0b20623: "النقاط %{n}"
   points_out_of_total_24f61148: "*%{points}* من إجمالي **%{total}**"
   points_points_b6b422e2: "النقاط: %{points}"
+  points_points_d70ced4f: "%{points} من النقاط"
   points_possible_1c0b3445: "النقاط الممكنة"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
@@ -23957,6 +23979,9 @@ ar:
   score_similarity_score_2c25b94b: "%{score}% درجة تشابه"
   score_student_points_possible_points_78360e86: "قم بتسجيل {{student_points}}/{{possible_points}}"
   score_to_keep_e89e4fa5: "الدرجة التي يتعين الاحتفاظ بها"
+  score_to_ungraded_process_failed_e143fd1b: "فشلت عملية تحويل الدرجة إلى غير مقيّمة"
+  score_to_ungraded_process_failed_reason_788f9030: "فشلت عملية تحويل الدرجة إلى غير مقيّمة: %{reason}"
+  score_to_ungraded_process_finished_successfully_6689b418: "انتهت عملية تحويل الدرجة إلى غير مقيّمة بنجاح"
   scored_less_than_2427896c: "تم إحراز نقاط أقل من"
   scored_less_than_cutoff_on_assignment_5f5c4303: "تم إحراز نقاط أقل من %{cutoff} في %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "تم إحراز نقاط أقل من %{score} في %{assignmentTitle}"
@@ -26188,6 +26213,7 @@ ar:
   submission_in_another_grading_period_e754b329: "الإرسال في مرحلة تقييم أخرى"
   submission_index_e960f9bf: "إرسال %{index}"
   submission_is_being_processed_by_plagiarism_servic_df4aa603: "جارٍ معالجة الإرسال بواسطة خدمة الانتحال."
+  submission_is_deleted_and_cannot_be_modified_2581e73c: "تم حذف الإرسال ولا يمكن تعديله."
   submission_items_b2db1b8d: "عناصر الإرسال"
   submission_locked_a6074f8b: "مقفلة على الإرسال"
   submission_locked_image_93aced38: "الصورة المقفلة على الإرسال"
@@ -27107,6 +27133,8 @@ ar:
   there_was_a_problem_updating_the_grade_1b6c8b4c: "حدثت مشكلة أثناء تحديث الدرجة."
   there_was_a_problem_updating_the_submission_6e5280a1: "حدثت مشكلة أثناء تحديث الإرسال."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "حدث خطأ أثناء التحقق من حالة نشر الخطة."
+  there_was_an_error_creating_a_new_filter_e93bb765: "حدث خطأ أثناء إنشاء عامل تصفية جديد."
+  there_was_an_error_deleting_name_aa3050e5: "حدث خطأ أثناء حذف \"%{name}\"."
   there_was_an_error_fetching_course_statistics_96e9dbad: "حدث خطأ أثناء إحضار إحصائيات المساق"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "حدث خطأ أثناء إحضار عوامل تصفية دفتر الدرجات."
   there_was_an_error_fetching_modules_8ee451bb: "حدث خطأ أثناء إحضار الوحدات النمطية."
@@ -27136,6 +27164,7 @@ ar:
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "حدث خطأ أثناء بدء مهمة حفظ تواريخ المهمة"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "تم العثور على خطأ أثناء الإرسال إلى خدمة اكتشاف التشابه. يُرجى محاولة إعادة إرسال الملف قبل الاتصال بالدعم."
   there_was_an_error_submitting_your_attempt_fdbe9259: "حدث خطأ أثناء إرسال محاولتك."
+  there_was_an_error_updating_a_filter_2a5ebc87: "حدث خطأ أثناء تحديث عامل تصفية."
   there_was_an_error_updating_this_assignment_please_59fc608d: "حدث خطأ أثناء تحديث هذه المهمة. يرجى تحديث الصفحة وإعادة المحاولة."
   there_was_an_error_updating_view_options_d024a3ec: "حدث خطأ أثناء تحديث خيارات العرض."
   there_was_an_error_uploading_the_image_932fc4ce: "حدث خطأ أثناء تحميل الصورة"
@@ -27868,6 +27897,7 @@ ar:
   to_add_individual_courses_click_courses_c5355180: "لإضافة مساق فردي، انقر فوق المساقات."
   to_add_individual_users_click_people_4d6de56a: "لإضافة مستخدم فردي، انقر فوق الأشخاص."
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "لإضافة طالب إلى مساق أو إزالته منه، يجب تمكين إذن المستخدمين - الطالب."
+  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "لإضافة طالب إلى مساق أو إزالته منه، يجب تمكين أذونات المستخدمين - الطلاب."
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "لإضافة مستخدمين لمساق أو إزالته منه، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون)."
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "لإضافة مستخدمين لمساق أو إزالته منه، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون). لتحرير تحديد المستخدم، يجب أيضًا تمكين المستخدمون - السماح بإجراءات إدارية في المساقات والمستخدمون - عرض القائمة."
   to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "لإضافة مستخدمين لمساق أو إزالته منه عبر SIS، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون)."
@@ -29568,6 +29598,7 @@ ar:
   view_app_configurations_52b52441: "عرض تكوينات التطبيقات"
   view_assignment_group_totals_c8db16b2: "عرض إجماليات مجموعة المهام"
   view_audit_trail_12f774b6: "عرض مسار المراجعة"
+  view_availability_963f62ff: "عرض الإتاحة"
   view_ba339f93: عرض
   view_blackout_dates_1723673a: "عرض تواريخ عدم الإتاحة"
   view_canvas_insights_beta_fe446d71: "عرض Canvas Insights (تجريبي)"
@@ -29795,6 +29826,8 @@ ar:
       في علامة تبويب جديدة. عند تمكين هذه العلامة، سيتم تحديد مربع التحديد هذا بشكل افتراضي
       إذا حدده المستخدم في آخر مرة أضاف فيها رابط خارجي.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "عند إضافة عدة مستخدمين، استخدم علامة الفاصلة أو فاصل أسطر للفصل بين المستخدمين."
+  when_creating_a_reply_students_will_have_the_optio_716eb2f4: "عند إنشاء رد، سيكون أمام الطلاب خيار إظهار أسمائهم وصور ملفاتهم التعريفية أو البقاء مجهولين. سيظهر اسمك وصورة ملفك التعريفي لجميع أعضاء المساق."
+  when_creating_a_reply_you_will_have_the_option_to__8607ac10: "عند إنشاء رد، سيكون أمامك خيار إظهار اسمك وصور ملفك التعريفي لأعضاء المساق الآخرين أو البقاء مجهولًا."
   when_disabled_students_can_still_send_individual_m_3bf396f2: "في حالة التعطيل، لا يزال بإمكان الطلاب إرسال رسائل فردية إلى معلمي المساق ومعلمي المساق المساعدين والطلاب الذين يتبعون نفس المجموعات على مستوى الحسابات."
   when_disabled_students_can_still_send_individual_m_567a911c: "في حالة التعطيل، لا يزال بإمكان الطلاب إرسال رسائل فردية إلى معلمي المساق ومعلمي المساق المساعدين والطلاب الذين يتبعون نفس المجموعات على مستوى الحسابات."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "عند التمكين، يمكن تحميل كامل ملفات JavaScript و CSS إلى *%{t_theme_editor}*."
