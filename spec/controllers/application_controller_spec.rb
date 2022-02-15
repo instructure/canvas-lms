@@ -122,10 +122,10 @@ RSpec.describe ApplicationController do
         expect(controller.js_env[:files_domain]).to eq "files.example.com"
       end
 
-      it "auto-sets timezone and locale" do
+      it "auto-sets timezone and locales" do
         I18n.with_locale(:fr) do
           Time.use_zone("Alaska") do
-            expect(@controller.js_env[:LOCALE]).to eq "fr"
+            expect(@controller.js_env[:LOCALES]).to eq ["fr", "en"] # 'en' is always the last fallback
             expect(@controller.js_env[:BIGEASY_LOCALE]).to eq "fr_FR"
             expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq "fr"
             expect(@controller.js_env[:MOMENT_LOCALE]).to eq "fr"

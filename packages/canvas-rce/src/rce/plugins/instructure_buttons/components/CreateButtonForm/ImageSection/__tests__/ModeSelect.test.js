@@ -20,6 +20,7 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 
 import ModeSelect from '../ModeSelect'
+import {actions} from '../../../../reducers/imageSection'
 
 describe('ModeSelect', () => {
   const defaultProps = {dispatch: jest.fn()}
@@ -61,6 +62,10 @@ describe('ModeSelect', () => {
     const sharedExamplesForMenuItemClick = type => {
       it('dispatches the correct action', () => {
         expect(defaultProps.dispatch).toHaveBeenCalledWith({type})
+        expect(defaultProps.dispatch).toHaveBeenCalledWith({
+          ...actions.SET_IMAGE_COLLECTION_OPEN,
+          payload: true
+        })
       })
     }
 

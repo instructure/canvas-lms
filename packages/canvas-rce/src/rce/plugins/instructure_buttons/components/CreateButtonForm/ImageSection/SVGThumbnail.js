@@ -20,12 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {SVGIcon} from '@instructure/ui-svg-images'
 
-const SVGThumbnail = ({name, source, size = '4rem'}) => {
+const SVGThumbnail = ({name, source, size, fillColor}) => {
   return (
     <div style={{fontSize: size}}>
       <SVGIcon
-        src={source[name]?.source()}
-        title={source[name]?.title}
+        src={source[name]?.source(fillColor)}
+        title={source[name]?.label}
         data-testid={`icon-${name}`}
       />
     </div>
@@ -34,6 +34,7 @@ const SVGThumbnail = ({name, source, size = '4rem'}) => {
 
 SVGThumbnail.propTypes = {
   size: PropTypes.string,
+  fillColor: PropTypes.string,
   name: PropTypes.string.isRequired,
   source: PropTypes.objectOf(
     PropTypes.shape({
@@ -41,6 +42,11 @@ SVGThumbnail.propTypes = {
       label: PropTypes.string.isRequired
     }).isRequired
   ).isRequired
+}
+
+SVGThumbnail.defaultProps = {
+  size: '4rem',
+  fillColor: '#000000'
 }
 
 export default SVGThumbnail

@@ -38,9 +38,9 @@ describe('MultiColor', () => {
 
   describe('when an entry is clicked', () => {
     it('sets the selected image with loading states', async () => {
-      const {getByTitle} = subject()
+      const {getByTestId} = subject()
 
-      fireEvent.click(getByTitle('Art Icon'))
+      fireEvent.click(getByTestId('button-icon-art'))
 
       expect(dispatch).toHaveBeenNthCalledWith(1, {
         ...actions.START_LOADING
@@ -59,19 +59,20 @@ describe('MultiColor', () => {
         })
 
         expect(dispatch).toHaveBeenNthCalledWith(4, {
-          ...actions.STOP_LOADING
+          ...actions.SET_IMAGE_COLLECTION_OPEN,
+          payload: false
         })
 
         expect(dispatch).toHaveBeenNthCalledWith(5, {
-          ...actions.CLEAR_MODE
+          ...actions.STOP_LOADING
         })
       })
     })
 
     it('converts the selected icon to base64', async () => {
-      const {getByTitle} = subject()
+      const {getByTestId} = subject()
 
-      fireEvent.click(getByTitle('Art Icon'))
+      fireEvent.click(getByTestId('button-icon-art'))
 
       await waitFor(() => {
         expect(dispatch.mock.calls[2][0].payload).toMatchInlineSnapshot(
