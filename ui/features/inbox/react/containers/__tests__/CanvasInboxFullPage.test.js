@@ -115,104 +115,134 @@ describe('CanvasInbox Full Page', () => {
     expect(sentConversationNodes[1]).toHaveTextContent('this is the second reply message')
   })
 
-  it('renders the conversation messages', async () => {
-    const container = setup()
+  describe('Desktop', () => {
+    beforeAll(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        desktop: {minWidth: '768px'}
+      }))
+    })
 
-    const conversation = await container.findByTestId('conversationListItem-Checkbox')
-    fireEvent.click(conversation)
+    it('renders the conversation messages', async () => {
+      const container = setup()
 
-    expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
-    expect(await container.findByText('this is a reply all')).toBeInTheDocument()
-    expect(await container.findByText('testing 123')).toBeInTheDocument()
-  })
+      const conversation = await container.findByTestId('conversationListItem-Checkbox')
+      fireEvent.click(conversation)
 
-  // TODO: will be fixed with VICE-2077
-  it.skip('should change the read state of a conversation', async () => {
-    const container = setup()
-    const conversation = await container.findByTestId('conversationListItem-Checkbox')
-    fireEvent.click(conversation)
-    await container.findByText('Watch out for that Magneto guy')
-    expect(container.queryByTestId('unread-badge')).toBeTruthy()
-    const settings = await container.findByTestId('settings')
-    fireEvent.click(settings)
-    const markAsReadButton = await container.findByText('Mark as read')
-    fireEvent.click(markAsReadButton)
-    expect(container.queryByTestId('unread-badge')).toBeFalsy()
-  })
+      expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
+      expect(await container.findByText('this is a reply all')).toBeInTheDocument()
+      expect(await container.findByText('testing 123')).toBeInTheDocument()
+    })
 
-  it('Successfully star selected conversation', async () => {
-    const {findAllByTestId, findByTestId, getByText} = setup()
+    // TODO: will be fixed with VICE-2077
+    it.skip('should change the read state of a conversation', async () => {
+      const container = setup()
+      const conversation = await container.findByTestId('conversationListItem-Checkbox')
+      fireEvent.click(conversation)
+      await container.findByText('Watch out for that Magneto guy')
+      expect(container.queryByTestId('unread-badge')).toBeTruthy()
+      const settings = await container.findByTestId('settings')
+      fireEvent.click(settings)
+      const markAsReadButton = await container.findByText('Mark as read')
+      fireEvent.click(markAsReadButton)
+      expect(container.queryByTestId('unread-badge')).toBeFalsy()
+    })
 
-    const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.length).toBe(1)
-    fireEvent.click(checkboxes[0])
+    it('Successfully star selected conversation', async () => {
+      const {findAllByTestId, findByTestId, getByText} = setup()
 
-    const settingsCog = await findByTestId('settings')
-    fireEvent.click(settingsCog)
+      const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+      expect(checkboxes.length).toBe(1)
+      fireEvent.click(checkboxes[0])
 
-    const star = getByText('Star')
-    fireEvent.click(star)
+      const settingsCog = await findByTestId('settings')
+      fireEvent.click(settingsCog)
 
-    await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The conversation has been successfully starred.')
-    )
-  })
+      const star = getByText('Star')
+      fireEvent.click(star)
 
-  it('Successfully star selected conversations', async () => {
-    server.use(
-      graphql.query('GetConversationsQuery', (req, res, ctx) => {
-        const data = {
-          legacyNode: {
-            _id: '9',
-            id: 'VXNlci05',
-            conversationsConnection: {
-              nodes: [
-                {
-                  ...ConversationParticipant.mock({_id: 251}),
-                  conversation: Conversation.mock()
-                },
-                {
-                  ...ConversationParticipant.mock({_id: 252}),
-                  conversation: Conversation.mock()
-                }
-              ],
-              __typename: 'ConversationParticipantConnection'
-            },
-            __typename: 'User'
+      await waitFor(() =>
+        expect(setOnSuccess).toHaveBeenCalledWith('The conversation has been successfully starred.')
+      )
+    })
+
+    it('Successfully star selected conversations', async () => {
+      server.use(
+        graphql.query('GetConversationsQuery', (req, res, ctx) => {
+          const data = {
+            legacyNode: {
+              _id: '9',
+              id: 'VXNlci05',
+              conversationsConnection: {
+                nodes: [
+                  {
+                    ...ConversationParticipant.mock({_id: 251}),
+                    conversation: Conversation.mock()
+                  },
+                  {
+                    ...ConversationParticipant.mock({_id: 252}),
+                    conversation: Conversation.mock()
+                  }
+                ],
+                __typename: 'ConversationParticipantConnection'
+              },
+              __typename: 'User'
+            }
           }
-        }
 
-        return res.once(ctx.data(data))
-      })
-    )
+          return res.once(ctx.data(data))
+        })
+      )
 
-    const {findAllByTestId, findByTestId, getByText} = setup()
+      const {findAllByTestId, findByTestId, getByText} = setup()
 
-    const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.length).toBe(2)
-    fireEvent.click(checkboxes[0])
-    fireEvent.click(checkboxes[1])
+      const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+      expect(checkboxes.length).toBe(2)
+      fireEvent.click(checkboxes[0])
+      fireEvent.click(checkboxes[1])
 
-    const settingsCog = await findByTestId('settings')
-    fireEvent.click(settingsCog)
+      const settingsCog = await findByTestId('settings')
+      fireEvent.click(settingsCog)
 
-    const star = getByText('Star')
-    fireEvent.click(star)
+      const star = getByText('Star')
+      fireEvent.click(star)
 
-    await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The conversations has been successfully starred.')
-    )
+      await waitFor(() =>
+        expect(setOnSuccess).toHaveBeenCalledWith(
+          'The conversations has been successfully starred.'
+        )
+      )
+    })
+
+    it('should trigger confirm when deleting', async () => {
+      window.confirm = jest.fn(() => true)
+      const container = setup()
+
+      const conversation = await container.findByTestId('conversationListItem-Checkbox')
+      fireEvent.click(conversation)
+
+      const deleteBtn = await container.findByTestId('delete')
+      fireEvent.click(deleteBtn)
+      expect(window.confirm).toHaveBeenCalled()
+    })
+
+    it('should find desktop message list container', () => {
+      const container = setup()
+
+      expect(container.queryByTestId('desktop-message-action-header')).toBeInTheDocument()
+    })
   })
 
-  it('should trigger confirm when deleting', async () => {
-    window.confirm = jest.fn(() => true)
-    const container = setup()
+  describe('Mobile', () => {
+    beforeAll(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {minWidth: '0px'}
+      }))
+    })
 
-    const conversation = await container.findByTestId('conversationListItem-Checkbox')
-    fireEvent.click(conversation)
+    it('should find mobile message action header', () => {
+      const container = setup()
 
-    const deleteBtn = await container.findByTestId('delete')
-    fireEvent.click(deleteBtn)
-    expect(window.confirm).toHaveBeenCalled()
+      expect(container.queryByTestId('mobile-message-action-header')).toBeInTheDocument()
+    })
   })
 })
