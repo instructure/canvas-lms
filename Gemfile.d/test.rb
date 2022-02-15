@@ -22,7 +22,6 @@ group :test do
   gem "rails-controller-testing", "1.0.5"
 
   gem "dotenv", "2.7.5", require: false
-  gem "testingbot", require: false
   gem "brakeman", require: false
   gem "simplecov", "0.21.2", require: false
     gem "docile", "1.1.5", require: false
