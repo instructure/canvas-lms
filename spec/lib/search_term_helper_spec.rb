@@ -19,12 +19,22 @@
 
 describe "search_term_helper" do
   describe "#search_by_attribute" do
-    subject { Attachment.search_by_attribute(scope, attr, search_term) }
+    subject do
+      Attachment.search_by_attribute(
+        scope,
+        attr,
+        search_term,
+        normalize_unicode: normalize_unicode
+      )
+    end
 
     let_once(:matching_record) { attachment_model(display_name: "something_#{search_term}") }
     let_once(:non_matching_record) { attachment_model(display_name: "banana") }
+    let_once(:nfc_record) { attachment_model(display_name: "café".unicode_normalize) }
+    let_once(:nfd_record) { attachment_model(display_name: "café".unicode_normalize(:nfd)) }
 
     let(:search_term) { "foo" }
+    let(:normalize_unicode) { false }
 
     shared_examples_for "methods that filter by search term" do
       it "returns records that match the search term" do
@@ -36,18 +46,46 @@ describe "search_term_helper" do
       end
     end
 
-    context "when the scope responds to 'where'" do
-      it_behaves_like "methods that filter by search term" do
-        let(:scope) { Attachment.active }
-        let(:attr) { :display_name }
+    shared_examples_for "search methods that do basic unicode normalization" do
+      let(:normalize_unicode) { true }
+
+      context "with an NFC search term" do
+        let(:search_term) { "café".unicode_normalize }
+
+        it "returns matching NFC and NFD records" do
+          expect(subject).to match_array [
+            nfc_record,
+            nfd_record
+          ]
+        end
+      end
+
+      context "with an NFD search term" do
+        let(:search_term) { "café".unicode_normalize(:nfd) }
+
+        it "returns matching NFC and NFD records" do
+          expect(subject).to match_array [
+            nfc_record,
+            nfd_record
+          ]
+        end
       end
     end
 
+    context "when the scope responds to 'where'" do
+      let(:scope) { Attachment.active }
+      let(:attr) { :display_name }
+
+      it_behaves_like "methods that filter by search term"
+      it_behaves_like "search methods that do basic unicode normalization"
+    end
+
     context "when the scope does not respond to 'where'" do
-      it_behaves_like "methods that filter by search term" do
-        let(:scope) { Attachment.active.to_a }
-        let(:attr) { :display_name }
-      end
+      let(:scope) { Attachment.active.to_a }
+      let(:attr) { :display_name }
+
+      it_behaves_like "methods that filter by search term"
+      it_behaves_like "search methods that do basic unicode normalization"
     end
   end
 end
