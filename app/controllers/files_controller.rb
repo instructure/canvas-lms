@@ -301,7 +301,7 @@ class FilesController < ApplicationController
         scope = Attachments::ScopedToUser.new(@context || @folder, @current_user).scope
         scope = scope.preload(:user) if params[:include].include?("user") && params[:sort] != "user"
         scope = scope.preload(:usage_rights) if params[:include].include?("usage_rights")
-        scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
+        scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term], normalize_unicode: true)
 
         order_clause = case params[:sort]
                        when "position" # undocumented; kept for compatibility
