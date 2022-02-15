@@ -167,7 +167,7 @@ module Crystalball
           end
           Crystalball.log :warn, "Crystalball changes: #{file_changes.slice("new", "modified")}"
           if file_changes["new"].count.positive?
-            Crystalball.log :warn, "Crystalball detected new .git files: #{new_files["new"]}"
+            Crystalball.log :warn, "Crystalball detected new .git files: #{file_changes["new"]}"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
           elsif file_changes["modified"].find { |path| path =~ %r{config/.*.rb$} }
