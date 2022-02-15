@@ -4244,7 +4244,7 @@ nn:
     update: Oppdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursliste"
-  buttons_and_icons_e66ee12c: "Knappar og ikonar"
+  buttons_and_icons_e66ee12c: "Knappar og ikon"
   by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Av klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til seksjonar som er utan innhald.  Dersom du f.eks. ikkje har oppretta quizar, er ikkje koplinga til quizar synleg. Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
@@ -6810,7 +6810,7 @@ nn:
         copy_course: "Kopier emne"
     course_show_secondary: 
       details: 
-        confirm_unenroll: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikkje lenger kunne sjå emnelista eller kommunisere direkte med faglærarar, og heller ikkje sjå emnehendingar i straumen eller som meldingar."
+        confirm_unenroll: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikkje lenger kunne sjå emnelista eller kommunisere direkte med faglærarane, og heller ikkje sjå emnehendingar i straumen eller som meldingar."
       headers: 
         course_status: Emnestatus
       headings: 
