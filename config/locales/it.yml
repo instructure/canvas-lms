@@ -200,6 +200,7 @@ it:
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Per utilizzare Academic Benchmarks, è necessaria una chiave partner"
   a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "È disponibile una versione premium di BigBlueButton che consente conferenze contemporanee sulla base dell’acquisto effettuato (ognuna con 1 host e fino a 99 partecipanti), nessuna limitazione alle registrazioni archiviate e un’infrastruttura dedicata per prestazioni migliori."
   a_problem_occurred_adding_reviewers_57b083d9: "Si è verificato un errore durante l'aggiunta dei revisori."
+  a_process_is_already_in_progress_f4495f5e: "Un processo è già in corso."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Un livello di privacy pubblico invierà al provider dello strumento le informazioni di identificazione personale dell’utente che esegue l’avvio. Impostare questa opzione su Privato può influire negativamente sugli strumenti che dipendono da tali informazioni."
   a_redirect_uri_is_required_please_supply_one_471908db: "È necessario fornire un redirect_uri."
   a_role_name_is_required_47efd33: "Il nome ruolo è obbligatorio"
@@ -228,6 +229,7 @@ it:
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Capacità di inviare compiti con documenti annotabili."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Capacità di inviare annotazioni compiti studente."
   about_this_service_b10bc808: "Informazioni su questo servizio"
+  above_max_rating_64b29915: "Sopra valutazione massima"
   academic_benchmark: 
     plugin_settings: 
       api_url_description: "(es. %{url})"
@@ -2554,6 +2556,7 @@ it:
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Consente all’utente di assegnare in maniera casuale gli utenti ad un gruppo dell’account o del corso."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Consente all’utente di rimuovere un corso come modello di corso nelle Impostazioni corso."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "Consente all’utente di rimuovere un corso come modello di corso nelle Impostazioni corso. Consente all’utente di impostare un account per non utilizzare un modello."
+  allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Consente all'utente di rimuovere l’iscrizione alla sezione o il ruolo di uno studente."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Consente all'utente di rimuovere e unire utenti in un account."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "Permette all'utente di rimuovere i designer da un corso."
   allows_user_to_remove_designers_to_the_course_from_1053d170: "Consente all'utente di rimuovere dei progettisti del corso dalla pagina Corsi dell'account. Consente all’utente di rimuovere dei progettisti dal corso."
@@ -2628,6 +2631,7 @@ it:
               Consente all’utente di accedere alla scheda Navigazione in Impostazioni corso. Consente all’utente di modificare immagine, nome, codice, fuso orario, subaccount, trimestre e altre opzioni del corso nella scheda Dettagli corso.
               Consente all’utente di accedere ai pulsanti Visualizzazione studente (test studente), Copia questo corso, Ripristina contenuto corso ed Elimina corso definitivamente. Consente all’utente di visualizzare le schede del contesto dello studente nelle risposte agli annunci e alle discussioni.
   allows_user_to_sync_blueprint_courses_db4fcc03: "Consente all'utente di sincronizzare i modelli di corso di base."
+  allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Consente all'utente di aggiornare l’iscrizione alla sezione o il ruolo di uno studente."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Consente all'utente di visualizzare un ID SIS del corso."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Consente all'utente di visualizzare un link in SpeedGrader dai compiti."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -3233,6 +3237,7 @@ it:
   apply_to_92f70c8c: "Applica a:"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applicazione di nuovi stile ai subaccount"
   applying_please_be_patient_f7b5f244: "Attendi. Applicazione in corso"
+  applying_score_to_ungraded_7311df9a: "Applicazione del punteggio ai non valutati"
   appointment_group: 
     errors: 
       invalid_end_at: "L'ora di fine dell'appuntamento precede l'ora di inizio"
@@ -4379,6 +4384,7 @@ it:
       Mostra automaticamente le didascalie chiuse nella lingua attuale
       dell’utente (se disponibile) quando si utilizzano i supporti canvas.
   avaible_daec2e57: Disponibile
+  availability_8942cde6: Disponibilità
   availability_dates_438d71e0: "Date di disponibilità"
   availability_dates_changed_exceptions_465ba375: "Eccezioni date di disponibilità modificate:"
   available_2ed9f226: "Disponibile:"
@@ -4463,6 +4469,7 @@ it:
   belarusian_b2f19c76: Bielorusso
   belgium_32_e5f5b598: "Belgio (+32)"
   below_mastery_abd1dca5: "Al di sotto del livello di padronanza"
+  below_min_rating_78a742c3: "Sotto valutazione minima"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Sotto questo campo di ricerca c'è un elenco di %{content_type}. Mentre digiti, l'elenco verrà filtrato in base alla tua query. I messaggi delle conversazioni verranno filtrati in base alle opzioni selezionate."
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: "Avvio Beta LTI:"
@@ -5371,6 +5378,7 @@ it:
   change_image_14ad465b: "Modifica immagine"
   change_image_d56c695f: "Modifica immagine"
   change_mastery_f4d43c07: "Modifica padronanza"
+  change_mastery_points_c4f68a36: "Modifica punti padronanza"
   change_name_c8cce76c: "Modifica nome"
   change_name_to_568374c8: "Modifica \"%{name}\" in"
   change_points_9e5104ac: "Modifica punti"
@@ -7723,7 +7731,7 @@ it:
         toggle_navigation_dragging: Spazio
       labels: 
         account_id: Subaccount
-        allow_student_discussion_editing: "Consenti agli studenti di modificare o eliminare i loro post di discussione"
+        allow_student_discussion_editing: "Consenti agli studenti di modificare o eliminare le loro risposte di discussione"
         allow_student_discussion_topics: "Consenti agli studenti di creare argomenti di discussione"
         allow_student_forum_attachments: "Consenti agli studenti di allegare i file alle discussioni"
         allow_student_organized_groups: "Consenti agli studenti di organizzare gruppi personali"
@@ -8343,8 +8351,11 @@ it:
   date_is_after_course_end_date_94a2f4e3: "La data è successiva a data di fine corso"
   date_is_after_the_course_end_date_95bf9b6a: "La data è successiva alla data di fine corso"
   date_is_after_the_specified_end_date_ae34a72f: "La data è successiva alla data finale specificata"
+  date_is_after_the_term_end_date_4ab01e5d: "La data è dopo la data di fine trimestre"
   date_is_before_course_start_date_16c9d531: "La data è precedente alla data di inizio del corso"
+  date_is_before_student_enrollment_date_a380a177: "La data è prima della data di iscrizione studente"
   date_is_before_the_course_start_date_431ba0ff: "La data è precedente alla data di inizio del corso"
+  date_is_before_the_term_start_date_10104b92: "La data è prima della data di inizio trimestre"
   date_is_required_9c6f5e83: "Data obbligatoria."
   date_modified_4d065406: ", data di modifica: "
   date_modified_e1c8ac8f: "Data di modifica"
@@ -8359,6 +8370,7 @@ it:
   dates: 
     no_date: "Nessuna data"
   dates_6e416047: Date
+  dates_shown_in_course_time_zone_da2f77d5: "Date mostrate nel fuso orario del corso"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9771,6 +9783,7 @@ it:
   enter_name_or_code_b4c103f6: "Inserisci nome o codice"
   enter_new_group_name_b97d5819: "Inserisci nuovo nome gruppo"
   enter_one_or_more_external_tool_ids_comma_separate_9a758cd: "Inserisci uno o più ID strumento esterno, separati da virgola"
+  enter_one_or_more_external_tool_url_domains_comma__7c2d4fe8: "Inserisci uno o più domini URL strumento esterno, separati da virgola"
   enter_or_find_an_external_tool_url_6aebbd0d: "Inserisci o trova un URL strumento esterno"
   enter_score_cutoff_3ff8ad22: "Inserisci limite minimo punteggio"
   enter_specific_phrase_9b686755: "Inserisci una frase specifica"
@@ -10204,6 +10217,7 @@ it:
   exceeds_mastery_1f995dce: "Supera il livello di padronanza"
   excelsior_student_activity_tracking_7a1ba44d: "Monitoraggio delle attività studenti Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Escludi qualsiasi dato che non è stato aggiornato dalla data specificata"
+  exclude_assignments_graded_with_a_0_score_5c853dc4: "Escludi compiti valutati con un punteggio 0."
   excuse_this_assignment_for_the_selected_student_af04e132: "Giustifica questo compito per lo studente selezionato"
   excused_3aab77: giustificato
   excused_5877183c: Giustificato.
@@ -11802,7 +11816,9 @@ it:
       event: "%{date} alle %{time}"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "è stato selezionato automaticamente in base a dove si trova l’istanza Canvas di questo account. In alcuni casi può essere una regione diversa."
   has_similarity_score_d5f332b4: "Ha un punteggio di similarità"
+  has_submissions_6c12ef4c: "Ha delle consegne"
   has_syllabus_body_6f250277: has_syllabus_body
+  has_ungraded_submissions_2bff87df: "Ha delle consegne non valutate"
   have_not_been_graded_df2a5fd2: "Non sono stati valutati"
   have_not_yet_submitted_57e6a58b: "Non sono ancora stati inviati"
   haven_t_been_graded_d7dee5bb: "Non è stato valutato"
@@ -12566,6 +12582,7 @@ it:
     get_started: Inizia
     welcome_to_canvas: "Benvenuto in Canvas."
   incorrect_answer_7c17e63b: "Risposta errata"
+  increase_calendar_context_limit_575ad9ff: "Aumenta limite di contesto calendario"
   increase_indent_6af90f7c: "Aumenta rientro"
   increase_indent_6d550a4a: "Aumenta rientro"
   incremental_update_successfully_generated_against__db3f3f06: "Aggiornamento incrementale generato correttamente in base a un'importazione SIS precedente."
@@ -13728,6 +13745,8 @@ it:
   master_lock_590266b6: "Master Lock"
   mastered_34d4c857: "Padronanza acquisita"
   mastery_7ec348b5: Padronanza
+  mastery_at_cf0c477b: "Livello di padronanza su"
+  mastery_at_e804b49: "Livello di padronanza su:"
   mastery_calculation_5fd5f5fe: "Calcolo padronanza"
   mastery_calculation_parameters_f072c3: "Parametri calcolo padronanza"
   mastery_calculation_saved_df378fdd: "Calcolo padronanza salvato"
@@ -15848,6 +15867,7 @@ it:
   moving_a4d552df: "Spostamento in corso..."
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
+  msg_680333e2: "%{msg}"
   multi_factor_authentication_backup_codes_4d781044: "Codici backup autenticazione a più fattori"
   multi_factor_authentication_configured_865b1bde: "Autenticazione a più fattori configurata"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "I multipli sono contrassegnati come \"Tema corrente\" perché gli stessi valori sono stati salvati con più nomi, ovvero sono identici a quelli correntemente applicati"
@@ -16251,6 +16271,7 @@ it:
   no_violations_have_been_reported_977a08d1: "Non sono state riportate violazioni."
   no_way_to_export_gradebooks_provided_b4c2939d: "Non è stato fornito alcun modo per esportare i registri dei voti."
   no_way_to_monitor_gradebook_exports_provided_b451236a: "Non è stato fornito alcun modo per monitorare le esportazioni dei registri dei voti."
+  no_way_to_monitor_score_to_ungraded_provided_9258253f: "Non è stato fornito alcun modo per monitorare il punteggio ai non valutati."
   non_canvas_11f36d4a: "Non Canvas"
   non_existent_content_referenced_in_this_resource_d86c6bcb: "Nessun contenuto esistente che fa riferimento a questa risorsa:"
   non_prod_settings_9b39c6c9: "Impostazioni non di produzione"
@@ -17860,6 +17881,7 @@ it:
   points_n_e0b20623: "Punti %{n}"
   points_out_of_total_24f61148: "*%{points}* su **%{total}**"
   points_points_b6b422e2: "Punti: %{points}"
+  points_points_d70ced4f: "%{points} punti"
   points_possible_1c0b3445: "Punti possibili"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
@@ -20536,6 +20558,9 @@ it:
   score_similarity_score_2c25b94b: "%{score}% punteggio di similarità"
   score_student_points_possible_points_78360e86: "Punteggio {{ student_points}}/{{possible_points}}"
   score_to_keep_e89e4fa5: "Punteggio da mantenere"
+  score_to_ungraded_process_failed_e143fd1b: "Processo di punteggio ai non valutati non riuscito"
+  score_to_ungraded_process_failed_reason_788f9030: "Processo di punteggio ai non valutati non riuscito: %{reason}"
+  score_to_ungraded_process_finished_successfully_6689b418: "Processo di punteggio ai non valutati finito correttamente"
   scored_less_than_2427896c: "Punteggio ottenuto inferiore a"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Punteggio ottenuto inferiore a %{cutoff} in %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Punteggio ottenuto inferiore a %{score} in %{assignmentTitle}"
@@ -22456,6 +22481,7 @@ it:
   submission_feedback_indicators_eb1d31ec: "Indicatori di feedback invio"
   submission_index_e960f9bf: "Consegna %{index}"
   submission_is_being_processed_by_plagiarism_servic_df4aa603: "L'invio è in corso di elaborazione da parte del servizio antiplagio."
+  submission_is_deleted_and_cannot_be_modified_2581e73c: "La consegna è stata eliminata e non può essere modificata."
   submission_items_b2db1b8d: "Elementi di invio"
   submission_locked_a6074f8b: "Consegna bloccata"
   submission_locked_image_93aced38: "Immagine consegna bloccata"
@@ -23286,6 +23312,8 @@ it:
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Si è verificato un problema durante l'aggiornamento del voto."
   there_was_a_problem_updating_the_submission_6e5280a1: "Si è verificato un problema durante l'aggiornamento della consegna."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Si è verificato un errore di controllo dello stato di pubblicazione piano."
+  there_was_an_error_creating_a_new_filter_e93bb765: "Si è verificato un errore durante la creazione di un nuovo filtro."
+  there_was_an_error_deleting_name_aa3050e5: "Si è verificato un errore durante l'eliminazione di “%{name}”."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Si è verificato un errore durante il riporto delle statistiche del corso"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Si è verificato un errore durante il riporto dei filtri per registro dei voti."
   there_was_an_error_fetching_modules_8ee451bb: "Si è verificato un errore durante il riporto dei moduli."
@@ -23314,6 +23342,7 @@ it:
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Si è verificato un errore di avvio del lavoro di salvataggio date compito"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Si è verificato un errore durante l'invio al servizio di rilevamento similarità. Prova a inviare nuovamente il file prima di contattare l'assistenza."
   there_was_an_error_submitting_your_attempt_fdbe9259: "Si è verificato un errore durante l’invio del tentativo."
+  there_was_an_error_updating_a_filter_2a5ebc87: "Si è verificato un errore durante l'aggiornamento di un filtro."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Si è verificato un errore durante l'aggiornamento di questo compito. Aggiorna la pagina e riprova."
   there_was_an_error_updating_view_options_d024a3ec: "Si è verificato un errore di aggiornamento opzioni di visualizzazione."
   there_was_an_error_uploading_the_image_932fc4ce: "Si è verificato un errore durante il caricamento dell'immagine"
@@ -24019,6 +24048,7 @@ it:
   to_add_individual_courses_click_courses_c5355180: "Per aggiungere corsi individuali, fai clic su Corsi."
   to_add_individual_users_click_people_4d6de56a: "Per aggiungere utenti individuali, fai clic su Persone."
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "Per aggiungere o rimuovere uno studente in o da un corso, l’autorizzazione Utenti - Studente deve essere abilitata."
+  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "Per aggiungere o rimuovere uno studente in o da un corso, devono essere abilitate le autorizzazioni Utenti - Studenti."
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "Per aggiungere o rimuovere utenti da un corso, dev’essere abilitata l'autorizzazione Utenti appropriata (per esempio Utenti - Docenti)."
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "Per aggiungere o rimuovere utenti da un corso, dev’essere abilitata l'autorizzazione Utenti appropriata (per esempio Utenti - Docenti). Per modificare la sezione di un utente, devono essere abilitati anche Utenti - permetti azioni amministrative in corsi e Utenti - visualizza elenco."
   to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "Per aggiungere o rimuovere utenti a/da un corso tramite SIS, dev’essere abilitata l'autorizzazione Utenti adatta (per esempio Utenti - Docenti)."
@@ -25575,6 +25605,7 @@ it:
   view_app_configurations_52b52441: "Visualizza configurazioni app"
   view_assignment_group_totals_c8db16b2: "Visualizza totali gruppo di compiti"
   view_audit_trail_12f774b6: "Visualizza audit trail"
+  view_availability_963f62ff: "Visualizza disponibilità"
   view_ba339f93: Visualizza
   view_blackout_dates_1723673a: "Visualizza date blackout"
   view_canvas_insights_beta_fe446d71: "Visualizza informazioni dettagliate Canvas (Beta)"
@@ -25775,6 +25806,8 @@ it:
       essere caricati in una nuova scheda. Quando questo flag è attivato, quella casella di controllo sarà selezionata per impostazione predefinita
       se l’utente l’ha selezionata l’ultima volta che ha aggiunto un link esterno.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Quando aggiungi più utenti, utilizza una virgola o un'interruzione di linea per separare gli utenti."
+  when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Quando si crea una risposta, gli studenti avranno la possibilità di mostrare il loro nome e l’immagine del profilo o rimanere anonimi. Il tuo nome e la tua immagine profilo saranno visibili a tutti i membri del corso."
+  when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Quando si crea una risposta, avrai la possibilità di mostrare il tuo nome e l’immagine del profilo agli altri membri del corso o rimanere anonimo."
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Quando è disattivato, gli studenti possono comunque inviare messaggi individuali ai docenti del corso, agli assistenti dei docenti del corso e agli studenti che appartengono agli stessi gruppi a livello di account."
   when_disabled_students_can_still_send_individual_m_567a911c: "Se l'opzione è disattivata, gli utenti possono comunque inviare singoli messaggi a insegnanti del corso, assistenti del corso e studenti che appartengono agli stessi gruppi a livello di account."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Se abilitato, ritira il servizio di messaggio breve (SMS)."
