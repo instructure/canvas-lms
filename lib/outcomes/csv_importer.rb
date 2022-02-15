@@ -34,6 +34,7 @@ module Outcomes
 
     OPTIONAL_FIELDS = %i[
       canvas_id
+      course_id
       description
       display_name
       parent_guids
