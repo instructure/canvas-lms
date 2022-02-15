@@ -528,7 +528,7 @@
                     <div>
                       <%= f.fields_for :settings do |settings| %>
                         <%= settings.check_box :include_integration_ids_in_gradebook_exports, :checked => @account.settings[:include_integration_ids_in_gradebook_exports] == true %>
-                        <%= settings.label :include_integration_ids_in_gradebook_exports, t("Include Integration IDs in the gradebook exports.") %>
+                        <%= settings.label :include_integration_ids_in_gradebook_exports, t("Include Integration IDs in the gradebook exports") %>
                       <% end %>
                     </div>
                   <% end %>
