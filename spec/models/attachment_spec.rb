@@ -1944,7 +1944,19 @@ describe Attachment do
 
       Attachment.where(id: @attachment).update_all(need_notify: true)
 
-      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      Timecop.freeze(10.minutes.from_now) do
+        expect { Attachment.do_notifications }.not_to raise_error
+      end
+    end
+
+    it "does not fail if the attachment context is a User" do
+      attachment_model(context: user_factory, uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
+
+      Attachment.where(id: @attachment).update_all(need_notify: true)
+
+      Timecop.freeze(10.minutes.from_now) do
+        expect { Attachment.do_notifications }.not_to raise_error
+      end
     end
 
     it "doesn't send notifications for a concluded course" do
