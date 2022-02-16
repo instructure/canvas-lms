@@ -794,7 +794,7 @@ class User < ActiveRecord::Base
     true
   end
 
-  def participants
+  def participants(_opts = {})
     []
   end
 
