@@ -81,7 +81,7 @@ def computeTestCount() {
   summaryMessage = "Map: $mapVersion\n"
   // Crystalball predictor returned empty text file
   if (specUnique.size() == 0) {
-    summaryMessage += "No App Code Detected! - Running everything!"
+    summaryMessage += "Configuration Changes Detected! - Running everything!"
     crystalballColor = 'danger'
     env.CRYSTALBALL_SPEC = '.'
     return
