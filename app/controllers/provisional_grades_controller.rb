@@ -163,7 +163,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
   #       { "needs_provisional_grade": false }
   #
   def status
-    @student = @context.students.find(params.fetch(:student_id))
+    @student = @assignment.submissions.find_by!(user_id: params.fetch(:student_id)).user
     super
   end
 

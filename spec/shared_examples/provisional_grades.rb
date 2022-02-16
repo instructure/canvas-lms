@@ -93,6 +93,16 @@ RSpec.shared_examples "a provisional grades status action" do |controller|
         @assignment.update!(grader_names_visible_to_final_grader: true)
         expect(provisional_grades_json.first["scorer_name"]).to eq "Nobody Important"
       end
+
+      it "returns results for deactivated students" do
+        @course.enrollments.find_by(user: @student).deactivate
+        expect(provisional_grades_json.first["scorer_name"]).to eq "Nobody Important"
+      end
+
+      it "returns results for concluded students" do
+        @course.enrollments.find_by(user: @student).conclude
+        expect(provisional_grades_json.first["scorer_name"]).to eq "Nobody Important"
+      end
     end
   end
 end
