@@ -820,6 +820,7 @@ export const quiz = (window.quiz = {
       .find('.question_points_holder')
       .showIf(
         !$question.closest('.question_holder').hasClass('group') &&
+          !$('#questions').hasClass('survey_quiz') &&
           question.question_type != 'text_only_question'
       )
     $question.find('.unsupported_question_type_message').remove()
@@ -910,6 +911,7 @@ export const quiz = (window.quiz = {
       .find('.question_points_holder')
       .showIf(
         !$formQuestion.closest('.question_holder').hasClass('group') &&
+          !$('#questions').hasClass('survey_quiz') &&
           question_type !== 'text_only_question'
       )
 

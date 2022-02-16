@@ -260,7 +260,7 @@ module DatesOverridable
       end
       hash
     end
-    tag_info[:points_possible] = points_possible
+    tag_info[:points_possible] = points_possible unless try(:quiz_type) == "survey"
 
     if user && tag_info[:due_date]
       if tag_info[:due_date] < Time.now &&
