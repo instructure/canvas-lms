@@ -569,6 +569,9 @@
   "extra_small_9ae33252": {
     "message": "Extra Small"
   },
+  "extracurricular_icon_67c8ca42": {
+    "message": "Extracurricular Icon"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Failed peeking into your future"
   },
@@ -728,6 +731,9 @@
   "i_hold_the_copyright_71ee91b1": {
     "message": "I hold the copyright"
   },
+  "icon_color_b86dd6d6": {
+    "message": "Icon Color"
+  },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
   },
@@ -796,8 +802,11 @@
   "language_arts_35b79a8b": {
     "message": "Language Arts"
   },
-  "languages_835813f0": {
-    "message": "Languages"
+  "language_arts_icon_a798b0f8": {
+    "message": "Language Arts Icon"
+  },
+  "languages_icon_9d20539": {
+    "message": "Languages Icon"
   },
   "large_9c5e80e7": {
     "message": "Large"
@@ -808,8 +817,8 @@
   "left_to_right_e9b4fd06": {
     "message": "Left-to-Right"
   },
-  "library_4b05885e": {
-    "message": "Library"
+  "library_icon_ae1e54cf": {
+    "message": "Library Icon"
   },
   "link_7262adec": {
     "message": "Link"
@@ -880,6 +889,9 @@
   "math_ede93050": {
     "message": "Math"
   },
+  "math_icon_ad4e9d03": {
+    "message": "Math Icon"
+  },
   "media_af190855": {
     "message": "Media"
   },
@@ -907,8 +919,8 @@
   "multi_color_image_63d7372f": {
     "message": "Multi Color Image"
   },
-  "music_8678b13": {
-    "message": "Music"
+  "music_icon_4db5c972": {
+    "message": "Music Icon"
   },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Must be at least { percentage }%"
@@ -1063,11 +1075,11 @@
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
-  "performing_arts_258f265": {
-    "message": "Performing Arts"
+  "performing_arts_icon_f3497486": {
+    "message": "Performing Arts Icon"
   },
-  "physical_education_b1031a43": {
-    "message": "Physical Education"
+  "physical_education_icon_d7dffd3e": {
+    "message": "Physical Education Icon"
   },
   "pixels_52ece7d1": {
     "message": "Pixels"
@@ -1135,8 +1147,8 @@
   "relationships_6602af70": {
     "message": "Relationships"
   },
-  "religion_afb0a930": {
-    "message": "Religion"
+  "religion_icon_246e0be1": {
+    "message": "Religion Icon"
   },
   "reminder_date_4564d12d": {
     "message": "Reminder: { date }"
