@@ -21,10 +21,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
 
-import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader.js'
-import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts.js'
-import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
-import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache.js'
+import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader'
+import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts'
+import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
+import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
 import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -2252,7 +2252,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     equal(result, 'A')
   })
 
-  QUnit.module('SpeedGrader', suiteHooks => {
+  QUnit.module('SpeedGrader (2)', suiteHooks => {
     suiteHooks.beforeEach(() => {
       setupFixtures(`
       <div id="combo_box_container"></div>
@@ -3076,8 +3076,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     SpeedGrader.teardown()
   })
 
-  QUnit.module('SpeedGrader', function (suiteHooks) {
-    /* eslint-disable-line qunit/no-identical-names */
+  QUnit.module('SpeedGrader (3)', function (suiteHooks) {
     suiteHooks.beforeEach(() => {
       fakeENV.setup({
         assignment_id: '2',
@@ -3846,8 +3845,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           fakeENV.teardown()
         })
 
-        QUnit.module('given a non-concluded enrollment', () => {
-          /* eslint-disable-line qunit/no-identical-names */
+        QUnit.module('given a non-concluded enrollment (2)', () => {
           test('button is shown when comment is publishable', () => {
             SpeedGrader.EG.addCommentSubmissionHandler(commentElement, {publishable: true})
             const submitButtons = document.querySelectorAll('.submit_comment_button')
@@ -3861,8 +3859,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
         })
 
-        QUnit.module('given a concluded enrollment', concludedHooks => {
-          /* eslint-disable-line qunit/no-identical-names */
+        QUnit.module('given a concluded enrollment (2)', concludedHooks => {
           concludedHooks.beforeEach(() => {
             originalWorkflowState =
               window.jsonData.studentMap[alphaAnonymousStudent.anonymous_id].enrollments[0]
@@ -4947,9 +4944,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       QUnit.module('#setOrUpdateSubmission', hooks => {
         function getPostOrHideGradesButton() {
-          return document.querySelector(
-            '#speed_grader_post_grades_menu_mount_point button[title="Post or Hide Grades"]'
-          )
+          return document.querySelector('#speed_grader_post_grades_menu_mount_point button')
         }
 
         hooks.beforeEach(() => {
@@ -5476,8 +5471,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         })
       })
 
-      QUnit.module('#renderSubmissionPreview', hooks => {
-        /* eslint-disable-line qunit/no-identical-names */
+      QUnit.module('#renderSubmissionPreview (2)', hooks => {
         let anonymousId
         let assignmentId
         let courseId
@@ -7207,7 +7201,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           SpeedGrader.EG.jsonReady()
         })
 
-        QUnit.module('with new plagiarism icons active', newPlagiarismIconHooks => {
+        QUnit.module('with new plagiarism icons active (2)', newPlagiarismIconHooks => {
           // This is the inner "container" that holds both the icon and (if present) score text,
           // and may be rendered as a link if the a valid report URL exists
           const similarityContainerSelector =
@@ -7330,7 +7324,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
         })
 
-        QUnit.module('with old plagiarism icons active', () => {
+        QUnit.module('with old plagiarism icons active (2)', () => {
           const similarityScoreSelector =
             '#submission_files_list .submission-file .turnitin_score_container .turnitin_similarity_score'
 
@@ -7414,8 +7408,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         })
       })
 
-      QUnit.module('when anonymous grading is active', hooks => {
-        /* eslint-disable-line qunit/no-identical-names */
+      QUnit.module('when anonymous grading is active (2)', hooks => {
         hooks.beforeEach(() => {
           const reportURL = document.querySelector('#assignment_submission_turnitin_report_url')
           reportURL.href = reportURL.href.replace('user_id', 'anonymous_id')
@@ -7609,12 +7602,12 @@ QUnit.module('SpeedGrader', rootHooks => {
             let originalWorkflowState
             let originalConcluded
 
-            function isPresent(mountPoint) {
-              strictEqual(mountPoint.innerText, 'HIDDEN')
+            function isPresent(mountPoint_) {
+              strictEqual(mountPoint_.innerText, 'HIDDEN')
             }
 
-            function isNotPresent(mountPoint) {
-              strictEqual(mountPoint.innerText, '')
+            function isNotPresent(mountPoint_) {
+              strictEqual(mountPoint_.innerText, '')
             }
 
             function pill() {

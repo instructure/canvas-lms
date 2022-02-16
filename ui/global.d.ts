@@ -24,12 +24,19 @@ declare global {
   interface Window {
     readonly ENV?: any
     external_tool_redirect: any
+    webkitSpeechRecognition: any
+    jsonData: any
   }
 
   const ENV: any
 
   declare interface JQuery {
+    confirmDelete: any
     fillWindowWithMe: (options?: {onResize: () => void}) => void
+    fixDialogButtons: () => void
+    live: any
+    mediaComment: any
+    showIf: (boolean) => void
   }
 
   declare interface JQueryStatic {
@@ -45,7 +52,12 @@ declare global {
     ) => JQuery.JQueryXHR
     flashWarning: any
     flashMessage: any
-    replaceTags: (string, string, string) => string
+    replaceTags: (string, string, string?) => string
+    raw: any
+    getScrollbarWidth: any
+    datetimeString: any
+    ajaxJSONFiles: any
+    isPreviewable: any
   }
 
   declare interface Array<T> {

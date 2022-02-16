@@ -325,7 +325,7 @@ describe('contentInsertion', () => {
     it('builds image html from LaTeX', () => {
       const tex = 'y = x^2'
       const dblEncodedTex = window.encodeURIComponent(window.encodeURIComponent(tex))
-      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="http://canvas.docker/equation_images/${dblEncodedTex}?scale=1">`
+      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="http://canvas.docker/equation_images/${dblEncodedTex}?scale=1" data-ignore-a11y-check="">`
       contentInsertion.insertEquation(editor, tex, 'http://canvas.docker')
       expect(editor.content).toEqual(imgHtml)
     })
@@ -333,7 +333,7 @@ describe('contentInsertion', () => {
     it('uses relative URL if no base is provided', () => {
       const tex = 'y = x^2'
       const dblEncodedTex = window.encodeURIComponent(window.encodeURIComponent(tex))
-      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dblEncodedTex}?scale=1">`
+      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dblEncodedTex}?scale=1" data-ignore-a11y-check="">`
       contentInsertion.insertEquation(editor, tex)
       expect(editor.content).toEqual(imgHtml)
     })
