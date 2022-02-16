@@ -48,6 +48,7 @@ if (!ENV.LOCALE && ENV.LOCALES instanceof Array) ENV.LOCALE = ENV.LOCALES[0]
 const readinessTargets = [
   ['asyncInitializers', false],
   ['deferredBundles', false],
+  ['localeFiles', false],
   ['localePolyfills', false]
 ]
 const advanceReadiness = target => {
@@ -60,6 +61,7 @@ const advanceReadiness = target => {
   }
 
   entry[1] = true
+  window.dispatchEvent(new CustomEvent('canvasReadyStateChange', { detail: target }))
 
   if (readinessTargets.every(x => x[1])) {
     window.canvasReadyState = 'complete'
@@ -138,7 +140,6 @@ function afterDocumentReady() {
 require.include('./features/navigation_header')
 
 if (!window.bundles) window.bundles = []
-window.bundles.push = loadBundle
 
 // If you add to this be sure there is support for it in the intl-polyfills package!
 const intlSubsystemsInUse = ['DateTimeFormat', 'RelativeTimeFormat', 'NumberFormat']
@@ -159,6 +160,9 @@ function noNativeSupport(sys) {
 }
 
 async function maybePolyfillLocaleThenGo() {
+  await import(`../public/javascripts/translations/${ENV.LOCALE}`)
+  advanceReadiness('localeFiles')
+
   // If any Intl subsystem has no native support for the current locale, start
   // trying to polyfill that locale from @formatjs. Note that this (possibly slow)
   // process only executes at all if polyfilling was detected to be necessary.
@@ -178,10 +182,13 @@ async function maybePolyfillLocaleThenGo() {
     }
     /* eslint-enable no-console */
   }
+
   // After possible polyfilling has completed, now we can start evaluating any
   // queueud JS bundles, arrange for tasks to run after the document is fully ready,
   // and advance the readiness state.
   advanceReadiness('localePolyfills')
+
+  window.bundles.push = loadBundle
   window.bundles.forEach(loadBundle)
   ready(afterDocumentReady)
 }

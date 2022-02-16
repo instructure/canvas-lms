@@ -40,7 +40,8 @@ mkmf.log
 npm-debug.log
 /public/dist/
 /public/doc/api/
-/public/javascripts/translations/
+/public/javascripts/translations/*
+!/public/javascripts/translations/_core_en.js
 /storybook-static/
 /tmp/*
 !/tmp/.keep
