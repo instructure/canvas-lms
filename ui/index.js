@@ -32,6 +32,7 @@ import loadBundle from 'bundles-generated'
 // these are all things that either define global $.whatever or $.fn.blah
 // methods or set something up that other code expects to exist at runtime.
 // so they have to be ran before any other app code runs.
+import 'translations/_core_en'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import './boot/initializers/ajax_errors'
