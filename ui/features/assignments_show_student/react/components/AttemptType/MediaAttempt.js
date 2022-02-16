@@ -171,7 +171,7 @@ class MediaAttempt extends React.Component {
           {renderTrashIcon && (
             <Button
               data-testid="remove-media-recording"
-              icon={IconTrashLine}
+              renderIcon={IconTrashLine}
               id={mediaObject.id}
               margin="0 0 0 x-small"
               onClick={this.handleRemoveFile}

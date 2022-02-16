@@ -95,7 +95,7 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
+      wrapper.findWhere(n => n.prop('shape') === 'circle').simulate('click')
       expect(findProficiencyRatings(wrapper)).toHaveLength(6)
       done()
     }, 1)
@@ -106,7 +106,7 @@ describe('default proficiency', () => {
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
+      wrapper.findWhere(n => n.prop('shape') === 'circle').simulate('click')
       expect(flashMock).toHaveBeenCalledTimes(1)
       flashMock.mockRestore()
       done()

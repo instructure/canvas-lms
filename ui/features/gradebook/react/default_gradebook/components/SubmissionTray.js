@@ -39,6 +39,8 @@ import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 
+import {Link} from '@instructure/ui-link'
+
 function renderAvatar(name, avatarUrl) {
   return (
     <div id="SubmissionTray__Avatar">
@@ -322,9 +324,11 @@ export default class SubmissionTray extends React.Component {
         onDismiss={this.props.onRequestClose}
         onClose={this.props.onClose}
       >
-        <CloseButton placement="start" onClick={this.props.onRequestClose}>
-          {I18n.t('Close submission tray')}
-        </CloseButton>
+        <CloseButton
+          placement="start"
+          onClick={this.props.onRequestClose}
+          screenReaderLabel={I18n.t('Close submission tray')}
+        />
         <div className="SubmissionTray__Container">
           <div id="SubmissionTray__Content" style={{display: 'flex', flexDirection: 'column'}}>
             <View as="div" padding={carouselContainerStyleOverride}>
@@ -340,13 +344,13 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextStudent}
                 rightArrowDescription={I18n.t('Next student')}
               >
-                <Button
+                <Link
                   href={this.props.student.gradesUrl}
-                  variant="link"
+                  isWithinText={false}
                   theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                 >
                   {name}
-                </Button>
+                </Link>
               </Carousel>
 
               <View as="div" margin="small 0" className="hr" />
@@ -361,13 +365,13 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextAssignment}
                 rightArrowDescription={I18n.t('Next assignment')}
               >
-                <Button
+                <Link
                   href={this.props.assignment.htmlUrl}
-                  variant="link"
+                  isWithinText={false}
                   theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                 >
                   {this.props.assignment.name}
-                </Button>
+                </Link>
               </Carousel>
 
               {this.props.speedGraderEnabled && this.renderSpeedGraderLink(speedGraderProps)}

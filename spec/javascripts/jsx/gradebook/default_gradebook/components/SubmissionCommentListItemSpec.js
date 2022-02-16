@@ -17,8 +17,8 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SubmissionCommentListItem from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentListItem.js'
-import SubmissionCommentUpdateForm from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentUpdateForm.js'
+import SubmissionCommentListItem from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentListItem'
+import SubmissionCommentUpdateForm from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentUpdateForm'
 import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
 
 QUnit.module('SubmissionCommentListItem', {
@@ -50,167 +50,137 @@ QUnit.module('SubmissionCommentListItem', {
   }
 })
 
-test('it has an Avatar', function() {
+test('it has an Avatar', function () {
   this.wrapper = this.mountComponent()
   strictEqual(this.wrapper.find('Avatar').length, 1)
 })
 
-test('the avatar names the author', function() {
+test('the avatar names the author', function () {
   this.wrapper = this.mountComponent()
   strictEqual(this.wrapper.find('Avatar').prop('name'), this.defaultProps().author)
 })
 
-test('the avatar has alt text', function() {
+test('the avatar has alt text', function () {
   this.wrapper = this.mountComponent()
   const expectedAltText = `Avatar for ${this.defaultProps().author}`
   strictEqual(this.wrapper.find('Avatar').prop('alt'), expectedAltText)
 })
 
-test("the avatar soruce is the author's avatar url", function() {
+test("the avatar soruce is the author's avatar url", function () {
   this.wrapper = this.mountComponent()
   strictEqual(this.wrapper.find('Avatar').prop('src'), this.defaultProps().authorAvatarUrl)
 })
 
-test("links the avatar to the author's url", function() {
+test("links the avatar to the author's url", function () {
   this.wrapper = this.mountComponent()
-  strictEqual(
-    this.wrapper
-      .find('Link')
-      .at(0)
-      .prop('href'),
-    this.defaultProps().authorUrl
-  )
+  strictEqual(this.wrapper.find('Link').at(0).prop('href'), this.defaultProps().authorUrl)
 })
 
-test("links the author's name to the author's url", function() {
+test("links the author's name to the author's url", function () {
   this.wrapper = this.mountComponent()
-  strictEqual(
-    this.wrapper
-      .find('Button')
-      .at(0)
-      .prop('href'),
-    this.defaultProps().authorUrl
-  )
+  strictEqual(this.wrapper.find('Link').at(0).prop('href'), this.defaultProps().authorUrl)
 })
 
-test("include the author's names", function() {
+test("include the author's names", function () {
   this.wrapper = this.mountComponent()
   ok(this.wrapper.text().includes(this.defaultProps().author))
 })
 
-test('trucates long author names', function() {
+test('trucates long author names', function () {
   this.wrapper = this.mountComponent()
   ok(this.wrapper.text().includes(this.defaultProps().author))
 })
 
-test('include the comment', function() {
+test('include the comment', function () {
   this.wrapper = this.mountComponent()
   ok(this.wrapper.text().includes(this.defaultProps().comment))
 })
 
-test('clicking the edit icon calls editSubmissionComment', function() {
+test('clicking the edit icon calls editSubmissionComment', function () {
   const editSubmissionComment = sinon.stub()
   this.wrapper = this.mountComponent({editSubmissionComment})
   this.wrapper.find(IconEditLine).simulate('click')
   strictEqual(editSubmissionComment.callCount, 1)
 })
 
-test('clicking the edit icon calls editSubmissionComment with the comment id', function() {
+test('clicking the edit icon calls editSubmissionComment with the comment id', function () {
   const editSubmissionComment = sinon.stub()
   this.wrapper = this.mountComponent({editSubmissionComment})
   this.wrapper.find(IconEditLine).simulate('click')
   strictEqual(editSubmissionComment.firstCall.args[0], this.defaultProps().id)
 })
 
-test('renders a SubmissionCommentUpdateForm if editing', function() {
+test('renders a SubmissionCommentUpdateForm if editing', function () {
   this.wrapper = this.mountComponent({editing: true})
   strictEqual(this.wrapper.find(SubmissionCommentUpdateForm).length, 1)
 })
 
-test('does not render a SubmissionCommentUpdateForm if not editing', function() {
+test('does not render a SubmissionCommentUpdateForm if not editing', function () {
   this.wrapper = this.mountComponent()
   strictEqual(this.wrapper.find(SubmissionCommentUpdateForm).length, 0)
 })
 
-test('renders an edit icon if the current user is the author', function() {
+test('renders an edit icon if the current user is the author', function () {
   this.wrapper = this.mountComponent()
   strictEqual(this.wrapper.find(IconEditLine).length, 1)
 })
 
-test('does not render an edit icon if the current user is not the author', function() {
+test('does not render an edit icon if the current user is not the author', function () {
   this.wrapper = this.mountComponent({currentUserIsAuthor: false})
   strictEqual(this.wrapper.find(IconEditLine).length, 0)
 })
 
-test('focuses on the edit icon if the component is updated to no longer be editin', function() {
+test('focuses on the edit icon if the component is updated to no longer be editin', function () {
   this.wrapper = this.mountComponent({editing: true})
   const focusOnEditIcon = sinon.stub(this.wrapper.instance().editButton, 'focus')
   this.wrapper.setProps({editing: false})
   strictEqual(focusOnEditIcon.callCount, 1)
 })
 
-test('the comment timestamp includes the year if it does not match the current year', function() {
+test('the comment timestamp includes the year if it does not match the current year', function () {
   this.wrapper = this.mountComponent({createdAt: new Date('Jan 8, 2003')})
-  const dateText = this.wrapper
-    .find('Text')
-    .at(0)
-    .text()
+  const dateText = this.wrapper.find('Text').at(0).text()
   strictEqual(dateText.includes(', 2003'), true)
 })
 
-test('the comment timestamp excludes the year if it matches the current year', function() {
+test('the comment timestamp excludes the year if it matches the current year', function () {
   this.wrapper = this.mountComponent()
-  const dateText = this.wrapper
-    .find('Text')
-    .at(0)
-    .text()
+  const dateText = this.wrapper.find('Text').at(0).text()
   const year = this.wrapper.instance().props.createdAt.getFullYear()
   strictEqual(dateText.includes(`, ${year}`), false)
 })
 
-test('uses the edited_at for the timestamp, if one exists', function() {
+test('uses the edited_at for the timestamp, if one exists', function () {
   this.wrapper = this.mountComponent({
     createdAt: new Date('Jan 8, 2003'),
     editedAt: new Date('Feb 12, 2003')
   })
 
-  const dateText = this.wrapper
-    .find('Text')
-    .at(0)
-    .text()
+  const dateText = this.wrapper.find('Text').at(0).text()
   strictEqual(dateText.includes('Feb 12'), true)
 })
 
-test("starts with the text '(Edited)' if the comment has an edited_at", function() {
+test("starts with the text '(Edited)' if the comment has an edited_at", function () {
   this.wrapper = this.mountComponent({
     createdAt: new Date('Jan 8, 2003'),
     editedAt: new Date('Feb 12, 2003')
   })
 
-  const dateText = this.wrapper
-    .find('Text')
-    .at(0)
-    .text()
+  const dateText = this.wrapper.find('Text').at(0).text()
   strictEqual(/^\(Edited\)/.test(dateText), true)
 })
 
-test('uses the created_at for the timestamp if edited_at is null', function() {
+test('uses the created_at for the timestamp if edited_at is null', function () {
   this.wrapper = this.mountComponent({createdAt: new Date('Jan 8, 2003')})
 
-  const dateText = this.wrapper
-    .find('Text')
-    .at(0)
-    .text()
+  const dateText = this.wrapper.find('Text').at(0).text()
   strictEqual(dateText.includes('Jan 8'), true)
 })
 
-test("does not start with the text '(Edited)' if the comment has a null edited_at", function() {
+test("does not start with the text '(Edited)' if the comment has a null edited_at", function () {
   this.wrapper = this.mountComponent({createdAt: new Date('Jan 8, 2003')})
 
-  const dateText = this.wrapper
-    .find('Text')
-    .at(0)
-    .text()
+  const dateText = this.wrapper.find('Text').at(0).text()
   strictEqual(/^\(Edited\)/.test(dateText), false)
 })
 
@@ -243,7 +213,7 @@ QUnit.module('SubmissionCommentListItem#deleteSubmissionComment', {
   }
 })
 
-test('clicking the trash icon calls deleteSubmissionComment', function() {
+test('clicking the trash icon calls deleteSubmissionComment', function () {
   const confirmStub = sandbox.stub(window, 'confirm').returns(true)
   const deleteSubmissionComment = sinon.stub()
   this.mountComponent({deleteSubmissionComment})
@@ -252,7 +222,7 @@ test('clicking the trash icon calls deleteSubmissionComment', function() {
   confirmStub.restore()
 })
 
-test('clicking the trash icon calls deleteSubmissionComment with the id', function() {
+test('clicking the trash icon calls deleteSubmissionComment with the id', function () {
   const confirmStub = sandbox.stub(window, 'confirm').returns(true)
   const deleteSubmissionComment = sinon.stub()
   const id = '42'
@@ -262,7 +232,7 @@ test('clicking the trash icon calls deleteSubmissionComment with the id', functi
   confirmStub.restore()
 })
 
-test('clicking the trash icon prompts for confirmation', function() {
+test('clicking the trash icon prompts for confirmation', function () {
   const confirmStub = sandbox.stub(window, 'confirm').returns(true)
   this.mountComponent()
   this.wrapper.find(IconTrashLine).simulate('click')
@@ -270,7 +240,7 @@ test('clicking the trash icon prompts for confirmation', function() {
   confirmStub.restore()
 })
 
-test('confirm is called with a message', function() {
+test('confirm is called with a message', function () {
   const confirmStub = sandbox.stub(window, 'confirm').returns(true)
   this.mountComponent()
   this.wrapper.find(IconTrashLine).simulate('click')
@@ -278,7 +248,7 @@ test('confirm is called with a message', function() {
   confirmStub.restore()
 })
 
-test('when confirm is false, deleteSubmissionComment is not called', function() {
+test('when confirm is false, deleteSubmissionComment is not called', function () {
   const confirmStub = sandbox.stub(window, 'confirm').returns(false)
   const deleteSubmissionComment = sinon.stub()
   this.mountComponent({deleteSubmissionComment})

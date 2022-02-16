@@ -386,7 +386,7 @@ class SearchFormComponent extends Component {
                 <Button
                   onClick={this.handleSubmit}
                   type="submit"
-                  variant="primary"
+                  color="primary"
                   disabled={this.hasDateInputErrors()}
                 >
                   {I18n.t('Filter')}

@@ -29,6 +29,8 @@ import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
+import {TruncateText} from '@instructure/ui-truncate-text'
+
 /**
 This is a wrapper around an InstUi Tray component that provides:
  * A header with the specified label as a header and a close button
@@ -86,12 +88,12 @@ export default function CanvasTray({
     return (
       <Flex as="div" padding={headerPadding}>
         <Flex.Item grow>
-          <Heading ellipsis>{title}</Heading>
+          <Heading>
+            <TruncateText>{title}</TruncateText>
+          </Heading>
         </Flex.Item>
         <Flex.Item>
-          <CloseButton onClick={onDismiss} size="small">
-            {I18n.t('Close')}
-          </CloseButton>
+          <CloseButton onClick={onDismiss} size="small" screenReaderLabel={I18n.t('Close')} />
         </Flex.Item>
       </Flex>
     )

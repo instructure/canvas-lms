@@ -240,7 +240,7 @@ export default class OverrideSubmissionTypes extends React.Component {
             <div>
               {I18n.t('And')}
               <View margin="0 0 0 small">
-                <Pill variant="primary" text={I18n.t('COMING SOON')} />
+                <Pill color="info">{I18n.t('COMING SOON')}</Pill>
               </View>
             </div>
           </Menu.Item>

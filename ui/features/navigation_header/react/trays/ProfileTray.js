@@ -78,7 +78,7 @@ export default function ProfileTray(props) {
           src={userAvatarURL}
           alt={I18n.t('User profile picture')}
           size="x-large"
-          inline={false}
+          display="block"
           margin="auto"
           data-fs-exclude
         />

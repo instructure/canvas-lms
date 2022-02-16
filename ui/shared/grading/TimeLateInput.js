@@ -80,7 +80,7 @@ export default function TimeLateInput(props) {
           <NumberInput
             value={numberInputValue.toString()}
             disabled={props.disabled}
-            inline
+            display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
             locale={props.locale}
             min="0"

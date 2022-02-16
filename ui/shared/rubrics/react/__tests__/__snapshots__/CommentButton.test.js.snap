@@ -2,25 +2,20 @@
 
 exports[`The CommentButton component renders the root component as expected 1`] = `
 <div>
-  <Button
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={<IconFeedbackLine />}
     margin="0 x-small 0 0"
     onClick={[Function]}
+    renderIcon={<IconFeedbackLine />}
+    screenReaderLabel="Add Additional Comments"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Add Additional Comments
-    </ScreenReaderContent>
-  </Button>
+    withBackground={false}
+    withBorder={false}
+  />
 </div>
 `;

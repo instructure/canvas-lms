@@ -28,7 +28,7 @@ export default function submitHtmlForm(action, method, md5) {
         $.cookie('_csrf_token')
       )}" />
       <input name="${htmlEscape(
-        md5 == undefined ? 'ignorethis' : 'brand_config_md5'
+        md5 === undefined ? 'ignorethis' : 'brand_config_md5'
       )}" value="${htmlEscape(md5 || '')}" />
     </form>
   `)

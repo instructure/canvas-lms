@@ -40,8 +40,8 @@ export default function SimilarityIndicator({elementRef, similarityInfo}) {
 
   return (
     <div className="Grid__GradeCell__OriginalityScore">
-      <Tooltip placement="bottom" tip={tooltipText(similarityInfo)} variant="inverse">
-        <Button buttonRef={elementRef} size="small" variant="icon">
+      <Tooltip placement="bottom" renderTip={tooltipText(similarityInfo)} color="primary">
+        <Button elementRef={elementRef} size="small" variant="icon">
           <SimilarityIcon similarityScore={similarityScore} status={status} />
         </Button>
       </Tooltip>

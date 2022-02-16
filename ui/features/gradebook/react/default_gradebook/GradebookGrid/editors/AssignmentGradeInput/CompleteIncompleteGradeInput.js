@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -153,15 +153,15 @@ export default class CompleteIncompleteGradeInput extends Component {
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
-              <Button
-                buttonRef={this.bindButton}
+              <IconButton
+                elementRef={this.bindButton}
                 disabled={this.props.disabled}
                 size="small"
-                variant="icon"
-                icon={IconArrowOpenDownLine}
-              >
-                <ScreenReaderContent>{I18n.t('Open Complete/Incomplete menu')}</ScreenReaderContent>
-              </Button>
+                renderIcon={IconArrowOpenDownLine}
+                withBackground={false}
+                withBorder={false}
+                screenReaderLabel={I18n.t('Open Complete/Incomplete menu')}
+              />
             }
           >
             {menuItems.map(menuItem => (

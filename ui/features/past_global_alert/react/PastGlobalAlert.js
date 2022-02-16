@@ -49,7 +49,7 @@ export default class PastGlobalAlert extends React.Component {
           <Button
             data-testid="globalAnnouncementsButton"
             href="/account_notifications"
-            variant="primary"
+            color="primary"
             margin="small 0 0 0"
           >
             {I18n.t('View')}

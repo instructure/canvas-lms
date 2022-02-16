@@ -39,12 +39,10 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -204,12 +202,10 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -369,12 +365,10 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -468,19 +462,13 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
-<Button
-  as="button"
-  cursor="pointer"
-  display="inline-block"
-  elementRef={[Function]}
-  fluidWidth={true}
-  margin="0"
+<Link
+  color="link"
+  display="block"
+  iconPlacement="start"
+  isWithinText={true}
   onClick={[Function]}
-  size="medium"
-  textAlign="center"
-  type="button"
-  variant="link"
-  withBackground={true}
+  textAlign="start"
 >
   <Text
     as="span"
@@ -490,7 +478,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
   >
     view longer description
   </Text>
-</Button>
+</Link>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -530,12 +518,10 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -692,19 +678,13 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
-<Button
-  as="button"
-  cursor="pointer"
-  display="inline-block"
-  elementRef={[Function]}
-  fluidWidth={true}
-  margin="0"
+<Link
+  color="link"
+  display="block"
+  iconPlacement="start"
+  isWithinText={true}
   onClick={[Function]}
-  size="medium"
-  textAlign="center"
-  type="button"
-  variant="link"
-  withBackground={true}
+  textAlign="start"
 >
   <Text
     as="span"
@@ -714,7 +694,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
   >
     view longer description
   </Text>
-</Button>
+</Link>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -754,12 +734,10 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -916,19 +894,13 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
-<Button
-  as="button"
-  cursor="pointer"
-  display="inline-block"
-  elementRef={[Function]}
-  fluidWidth={true}
-  margin="0"
+<Link
+  color="link"
+  display="block"
+  iconPlacement="start"
+  isWithinText={true}
   onClick={[Function]}
-  size="medium"
-  textAlign="center"
-  type="button"
-  variant="link"
-  withBackground={true}
+  textAlign="start"
 >
   <Text
     as="span"
@@ -938,7 +910,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   >
     view longer description
   </Text>
-</Button>
+</Link>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -978,12 +950,10 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -1144,12 +1114,10 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -1348,12 +1316,10 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -1552,12 +1518,10 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -1677,19 +1641,13 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
-<Button
-  as="button"
-  cursor="pointer"
-  display="inline-block"
-  elementRef={[Function]}
-  fluidWidth={true}
-  margin="0"
+<Link
+  color="link"
+  display="block"
+  iconPlacement="start"
+  isWithinText={true}
   onClick={[Function]}
-  size="medium"
-  textAlign="center"
-  type="button"
-  variant="link"
-  withBackground={true}
+  textAlign="start"
 >
   <Text
     as="span"
@@ -1699,7 +1657,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
   >
     view longer description
   </Text>
-</Button>
+</Link>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1739,12 +1697,10 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -1940,19 +1896,13 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
-<Button
-  as="button"
-  cursor="pointer"
-  display="inline-block"
-  elementRef={[Function]}
-  fluidWidth={true}
-  margin="0"
+<Link
+  color="link"
+  display="block"
+  iconPlacement="start"
+  isWithinText={true}
   onClick={[Function]}
-  size="medium"
-  textAlign="center"
-  type="button"
-  variant="link"
-  withBackground={true}
+  textAlign="start"
 >
   <Text
     as="span"
@@ -1962,7 +1912,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
   >
     view longer description
   </Text>
-</Button>
+</Link>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -2002,12 +1952,10 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"
@@ -2203,19 +2151,13 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
-<Button
-  as="button"
-  cursor="pointer"
-  display="inline-block"
-  elementRef={[Function]}
-  fluidWidth={true}
-  margin="0"
+<Link
+  color="link"
+  display="block"
+  iconPlacement="start"
+  isWithinText={true}
   onClick={[Function]}
-  size="medium"
-  textAlign="center"
-  type="button"
-  variant="link"
-  withBackground={true}
+  textAlign="start"
 >
   <Text
     as="span"
@@ -2225,7 +2167,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   >
     view longer description
   </Text>
-</Button>
+</Link>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -2265,12 +2207,10 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       offset="medium"
       onClick={[Function]}
       placement="end"
+      screenReaderLabel="\\\\n          Close\\\\n        "
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <Heading
       border="none"
       color="inherit"

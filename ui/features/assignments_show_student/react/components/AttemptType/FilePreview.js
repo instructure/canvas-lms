@@ -24,7 +24,7 @@ import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {SubmissionFile} from '@canvas/assignments/graphql/student/File'
 
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconDownloadLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -101,14 +101,14 @@ export default class FilePreview extends Component {
 
   renderIcon = (file, index) => {
     return (
-      <Button
-        variant="icon"
+      <IconButton
         size="large"
+        withBackground={false}
+        withBorder={false}
         onClick={() => this.selectFile(index)}
-        icon={getIconByType(file.mimeClass)}
-      >
-        <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
-      </Button>
+        renderIcon={getIconByType(file.mimeClass)}
+        screenReaderLabel={file.displayName}
+      />
     )
   }
 
@@ -129,7 +129,7 @@ export default class FilePreview extends Component {
       <div data-testid="assignments_2_file_icons" style={iconsContainerStyle}>
         {this.props.files.map((file, index) => (
           <div key={file.id} style={iconsStyle}>
-            <Tooltip tip={file.displayName} placement="bottom" variant="inverse">
+            <Tooltip renderTip={file.displayName} placement="bottom" color="primary">
               {this.shouldDisplayThumbnail(file)
                 ? this.renderThumbnail(file, index)
                 : this.renderIcon(file, index)}
@@ -196,7 +196,7 @@ export default class FilePreview extends Component {
             <div style={{display: 'block'}}>
               <Button
                 margin="medium auto"
-                icon={IconDownloadLine}
+                renderIcon={IconDownloadLine}
                 href={selectedFile.url}
                 disabled={!selectedFile.url}
               >

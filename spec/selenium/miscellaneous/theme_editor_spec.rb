@@ -241,7 +241,7 @@ describe "Theme Editor" do
     wait_for_ajaximations
     run_jobs
 
-    expect(fj('button:contains("Theme")').css_value("background-color")).to eq("rgba(102, 51, 153, 1)")
+    expect(fj('button:contains("Theme") span').css_value("background-color")).to eq("rgba(102, 51, 153, 1)")
 
     # also make sure instUI stuff picks up the theme variables
     f("#global_nav_accounts_link").click

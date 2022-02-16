@@ -47,7 +47,7 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-missin
 
   calls.forEach((call, idx) => {
     equal(call.args[0].type, Pill)
-    equal(call.args[0].props.text, 'missing')
+    equal(call.args[0].props.children, 'missing')
     equal(call.args[1], spans[idx])
   })
 })
@@ -61,7 +61,7 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-late-p
 
   calls.forEach((call, idx) => {
     equal(call.args[0].type, Pill)
-    equal(call.args[0].props.text, 'late')
+    equal(call.args[0].props.children, 'late')
     equal(call.args[1], spans[idx])
   })
 })
@@ -75,7 +75,7 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-excuse
 
   calls.forEach((call, idx) => {
     equal(call.args[0].type, Pill)
-    equal(call.args[0].props.text, 'excused')
+    equal(call.args[0].props.children, 'excused')
     equal(call.args[1], spans[idx])
   })
 })
