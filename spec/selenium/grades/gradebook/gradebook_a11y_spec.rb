@@ -74,7 +74,7 @@ describe "Gradebook" do
 
   context "export options with enhanced filters enabled" do
     before do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+      @course.root_account.enable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
     end
 
