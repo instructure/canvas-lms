@@ -103,8 +103,8 @@ module Lti::Messages
     end
 
     def target_link_uri
-      @opts[:target_link_uri] ||
-        @tool.extension_setting(@opts[:resource_type], :target_link_uri) ||
+      @opts[:target_link_uri].presence ||
+        @tool.extension_setting(@opts[:resource_type], :target_link_uri).presence ||
         @tool.url
     end
 
