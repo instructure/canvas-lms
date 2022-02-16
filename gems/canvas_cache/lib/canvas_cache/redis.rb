@@ -334,7 +334,6 @@ module CanvasCache
         randomkey
         rename
         renamenx
-        scan
         bitop
         msetnx
         blpop

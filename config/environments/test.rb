@@ -48,6 +48,7 @@ environment_configuration(defined?(config) && config) do |config|
 
   # hairtrigger parallelized runtime race conditions
   config.active_record.schema_format = :sql
+  config.active_record.dump_schema_after_migration = false
 
   config.cache_store = :null_store
 

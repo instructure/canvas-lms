@@ -227,7 +227,7 @@ unless $canvas_tasks_loaded
   end
 
   %w[db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged].each do |task_name|
-    Switchman::Rake.shardify_task(task_name, categories: -> { Shard.categories })
+    Switchman::Rake.shardify_task(task_name)
   end
 
 end

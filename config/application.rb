@@ -136,7 +136,6 @@ module CanvasRails
 
     # Activate observers that should always be running
     config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
-    config.active_record.allow_unsafe_raw_sql = :disabled
 
     config.active_support.encode_big_decimal_as_string = false
 
@@ -164,6 +163,10 @@ module CanvasRails
       require_dependency "canvas/plugins/default_plugins"
       Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
+
+      # On rails 6.1, this comes from switchman; on rails 6.0 canvas provides it
+      require_relative "#{__dir__}/../app/models/unsharded_record.rb"
+      Switchman::UnshardedRecord = UnshardedRecord
     end
 
     module PostgreSQLEarlyExtensions

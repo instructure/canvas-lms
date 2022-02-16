@@ -390,32 +390,30 @@ class ActiveRecord::Base
   end
 
   def self.best_unicode_collation_key(col)
-    val = if ActiveRecord::Base.configurations[Rails.env]["adapter"] == "postgresql"
-            # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
-            # Postgres just defers to the C library which is different for each platform. The best
-            # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
-            # If that extension isn't around, casting to a bytea sucks for international characters,
-            # but at least it's consistent, and orders commas before letters so you don't end up with
-            # Johnson, Bob sorting before Johns, Jimmy
-            unless @collkey&.key?(Shard.current.database_server.id)
-              @collkey ||= {}
-              @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey)&.schema
-            end
-            if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
-              "(#{col} COLLATE #{collation})"
-            elsif (schema = @collkey[Shard.current.database_server.id])
-              # The collation level of 3 is the default, but is explicitly specified here and means that
-              # case, accents and base characters are all taken into account when creating a collation key
-              # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
-              # if you change these arguments, you need to rebuild all db indexes that use them,
-              # and you should also match the settings with Canvas::ICU::Collator and natcompare.js
-              "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
-            else
-              "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
-            end
-          else
-            col
-          end
+    val = begin
+      # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
+      # Postgres just defers to the C library which is different for each platform. The best
+      # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
+      # If that extension isn't around, casting to a bytea sucks for international characters,
+      # but at least it's consistent, and orders commas before letters so you don't end up with
+      # Johnson, Bob sorting before Johns, Jimmy
+      unless @collkey&.key?(Shard.current.database_server.id)
+        @collkey ||= {}
+        @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey)&.schema
+      end
+      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
+        "(#{col} COLLATE #{collation})"
+      elsif (schema = @collkey[Shard.current.database_server.id])
+        # The collation level of 3 is the default, but is explicitly specified here and means that
+        # case, accents and base characters are all taken into account when creating a collation key
+        # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
+        # if you change these arguments, you need to rebuild all db indexes that use them,
+        # and you should also match the settings with Canvas::ICU::Collator and natcompare.js
+        "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
+      else
+        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
+      end
+    end
     Arel.sql(val)
   end
 
@@ -457,41 +455,32 @@ class ActiveRecord::Base
   def self.distinct_values(column, include_nil: false)
     column = column.to_s
 
-    result = if ActiveRecord::Base.configurations[Rails.env]["adapter"] == "postgresql"
-               sql = +""
-               sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
-               sql << <<~SQL.squish
-                 WITH RECURSIVE t AS (
-                   SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
-                   UNION ALL
-                   SELECT (SELECT MIN(#{column}) FROM #{quoted_table_name} WHERE #{column} > t.#{column})
-                   FROM t
-                   WHERE t.#{column} IS NOT NULL
-                 )
-                 SELECT #{column} FROM t WHERE #{column} IS NOT NULL
-               SQL
-               sql << ")" if include_nil
-               find_by_sql(sql)
-             else
-               conditions = "#{column} IS NOT NULL" unless include_nil
-               find(:all, select: "DISTINCT #{column}", conditions: conditions, order: column)
-             end
+    sql = +""
+    sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
+    sql << <<~SQL.squish
+      WITH RECURSIVE t AS (
+        SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
+        UNION ALL
+        SELECT (SELECT MIN(#{column}) FROM #{quoted_table_name} WHERE #{column} > t.#{column})
+        FROM t
+        WHERE t.#{column} IS NOT NULL
+      )
+      SELECT #{column} FROM t WHERE #{column} IS NOT NULL
+    SQL
+    sql << ")" if include_nil
+    result = find_by_sql(sql)
     result.map(&column.to_sym)
   end
 
   # direction is nil, :asc, or :desc
   def self.nulls(first_or_last, column, direction = nil)
-    if connection.adapter_name == "PostgreSQL"
-      clause = if first_or_last == :first && direction != :desc
-                 " NULLS FIRST"
-               elsif first_or_last == :last && direction == :desc
-                 " NULLS LAST"
-               end
+    clause = if first_or_last == :first && direction != :desc
+               " NULLS FIRST"
+             elsif first_or_last == :last && direction == :desc
+               " NULLS LAST"
+             end
 
-      Arel.sql("#{column} #{direction.to_s.upcase}#{clause}".strip)
-    else
-      Arel.sql("#{column} IS#{" NOT" unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip)
-    end
+    Arel.sql("#{column} #{direction.to_s.upcase}#{clause}".strip)
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
@@ -617,7 +606,7 @@ class ActiveRecord::Base
   end
 
   def self.current_xlog_location
-    Shard.current(shard_category).database_server.unguard do
+    Shard.current(send(CANVAS_RAILS6_0 ? :shard_category : :connection_classes)).database_server.unguard do
       GuardRail.activate(:primary) do
         if Rails.env.test? ? in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
@@ -719,50 +708,68 @@ end
 
 module UsefulFindInBatches
   # add the strategy param
-  def find_each(start: nil, finish: nil, **kwargs, &block)
+  def find_each(start: nil, finish: nil, order: :asc, **kwargs, &block)
     if block
-      find_in_batches(start: start, finish: finish, **kwargs) do |records|
+      find_in_batches(start: start, finish: finish, order: order, **kwargs) do |records|
         records.each(&block)
       end
     else
-      enum_for(:find_each, start: start, finish: finish, **kwargs) do
+      enum_for(:find_each, start: start, finish: finish, order: order, **kwargs) do
         relation = self
-        apply_limits(relation, start, finish).size
+        if CANVAS_RAILS6_0
+          apply_limits(relation, start, finish).size
+        else
+          apply_limits(relation, start, finish, order).size
+        end
       end
     end
   end
 
   # add the strategy param
-  def find_in_batches(batch_size: 1000, start: nil, finish: nil, **kwargs)
+  def find_in_batches(batch_size: 1000, start: nil, finish: nil, order: :asc, **kwargs)
     relation = self
     unless block_given?
-      return to_enum(:find_in_batches, start: start, finish: finish, batch_size: batch_size, **kwargs) do
-        total = apply_limits(relation, start, finish).size
+      return to_enum(:find_in_batches, start: start, finish: finish, order: order, batch_size: batch_size, **kwargs) do
+        total = if CANVAS_RAILS6_0
+                  apply_limits(relation, start, finish).size
+                else
+                  apply_limits(relation, start, finish, order).size
+                end
         (total - 1).div(batch_size) + 1
       end
     end
 
-    in_batches(of: batch_size, start: start, finish: finish, load: true, **kwargs) do |batch|
+    in_batches(of: batch_size, start: start, finish: finish, order: order, load: true, **kwargs) do |batch|
       yield batch.to_a
     end
   end
 
-  def in_batches(strategy: nil, start: nil, finish: nil, **kwargs, &block)
+  def in_batches(strategy: nil, start: nil, finish: nil, order: :asc, **kwargs, &block)
     unless block
       return ActiveRecord::Batches::BatchEnumerator.new(strategy: strategy, start: start, relation: self, **kwargs)
     end
 
+    unless [:asc, :desc].include?(order)
+      raise ArgumentError, ":order must be :asc or :desc, got #{order.inspect}"
+    end
+
     strategy ||= infer_in_batches_strategy
+
+    # TODO: should we add the `act_on_ignored_order(error_on_ignore)` snippet
 
     if strategy == :id
       raise ArgumentError, "GROUP BY is incompatible with :id batches strategy" unless group_values.empty?
 
-      return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, **kwargs, &block) }
+      if CANVAS_RAILS6_0
+        return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, **kwargs, &block) }
+      else
+        return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, order: order, **kwargs, &block) }
+      end
     end
 
     kwargs.delete(:error_on_ignore)
     activate do |r|
-      r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block)
+      r.send("in_batches_with_#{strategy}", start: start, finish: finish, order: order, **kwargs, &block)
       nil
     end
   end
@@ -800,9 +807,14 @@ module UsefulFindInBatches
     id_keys.all? { |k| !selects.include?(k) }
   end
 
-  def in_batches_with_cursor(of: 1000, start: nil, finish: nil, load: false)
+  def in_batches_with_cursor(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     klass.transaction do
-      relation = apply_limits(clone, start, finish)
+      relation = if CANVAS_RAILS6_0
+                   apply_limits(clone, start, finish)
+                 else
+                   apply_limits(clone, start, finish, order)
+                 end
+
       relation.skip_query_cache!
       unless load
         relation = relation.except(:select).select(primary_key)
@@ -837,11 +849,15 @@ module UsefulFindInBatches
     end
   end
 
-  def in_batches_with_copy(of: 1000, start: nil, finish: nil, load: false)
+  def in_batches_with_copy(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     limited_query = limit(0).to_sql
 
     relation = self
-    relation_for_copy = apply_limits(relation, start, finish)
+    relation_for_copy = if CANVAS_RAILS6_0
+                          apply_limits(relation, start, finish)
+                        else
+                          apply_limits(relation, start, finish, order)
+                        end
     unless load
       relation_for_copy = relation_for_copy.except(:select).select(primary_key)
     end
@@ -934,8 +950,12 @@ module UsefulFindInBatches
   # iteration (make sure they'll fit in memory, or you could be sad)
   # and yields the objects in batches in the same order as the scope specified
   # so the DB connection can be fully recycled during each block.
-  def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, load: false)
-    relation = apply_limits(self, start, finish)
+  def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, order: :asc, load: false)
+    relation = if CANVAS_RAILS6_0
+                 apply_limits(self, start, finish)
+               else
+                 apply_limits(self, start, finish, order)
+               end
     all_object_ids = relation.pluck(:id)
     current_order_values = order_values
     all_object_ids.in_groups_of(of) do |id_batch|
@@ -944,7 +964,7 @@ module UsefulFindInBatches
     end
   end
 
-  def in_batches_with_temp_table(of: 1000, start: nil, finish: nil, load: false, ignore_transaction: false)
+  def in_batches_with_temp_table(of: 1000, start: nil, finish: nil, load: false, order: :asc, ignore_transaction: false)
     Shard.current.database_server.unguard do
       can_do_it = ignore_transaction ||
                   Rails.env.production? ||
@@ -963,7 +983,11 @@ module UsefulFindInBatches
              group, or order)."
       end
 
-      relation = apply_limits(self, start, finish)
+      relation = if CANVAS_RAILS6_0
+                   apply_limits(self, start, finish)
+                 else
+                   apply_limits(self, start, finish, order)
+                 end
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
       table = table[-63..] if table.length > 63
@@ -1306,7 +1330,7 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    db = Shard.current(klass.shard_category).database_server
+    db = Shard.current(klass.send(CANVAS_RAILS6_0 ? :shard_category : :connection_classes)).database_server
     if joins_values.empty?
       if ::GuardRail.environment == db.guard_rail_environment
         return super
@@ -1556,24 +1580,46 @@ module Migrator
     super.select(&:runnable?)
   end
 
-  def execute_migration_in_transaction(migration, direct)
-    old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
-    if defined?(Marginalia)
-      old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
-    end
-    if down? && !Rails.env.test? && !$confirmed_migrate_down
-      require "highline"
-      if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
-        raise("Revert not confirmed")
+  if CANVAS_RAILS6_0
+    def execute_migration_in_transaction(migration, direct)
+      old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+      if defined?(Marginalia)
+        old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
+      end
+      if down? && !Rails.env.test? && !$confirmed_migrate_down
+        require "highline"
+        if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+          raise("Revert not confirmed")
+        end
+
+        $confirmed_migrate_down = true if $1.casecmp?("a")
       end
 
-      $confirmed_migrate_down = true if $1.casecmp?("a")
+      super
+    ensure
+      ActiveRecord::Base.in_migration = old_in_migration
+      Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
     end
+  else
+    def execute_migration_in_transaction(migration)
+      old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+      if defined?(Marginalia)
+        old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
+      end
+      if down? && !Rails.env.test? && !$confirmed_migrate_down
+        require "highline"
+        if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+          raise("Revert not confirmed")
+        end
 
-    super
-  ensure
-    ActiveRecord::Base.in_migration = old_in_migration
-    Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
+        $confirmed_migrate_down = true if $1.casecmp?("a")
+      end
+
+      super
+    ensure
+      ActiveRecord::Base.in_migration = old_in_migration
+      Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
+    end
   end
 end
 ActiveRecord::Migrator.prepend(Migrator)
@@ -1667,7 +1713,7 @@ module ExistenceInversions
     # passed through. and sometimes they even modify args.
     class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def invert_add_#{type}(args)
-        orig_args = args.dup
+        orig_args = args.map(&:dup)
         result = super
         if orig_args.last.is_a?(Hash) && orig_args.last[:if_not_exists]
           result[1] << {} unless result[1].last.is_a?(Hash)
@@ -1678,7 +1724,7 @@ module ExistenceInversions
       end
 
       def invert_remove_#{type}(args)
-        orig_args = args.dup
+        orig_args = args.map(&:dup)
         result = super
         if orig_args.last.is_a?(Hash) && orig_args.last[:if_exists]
           result[1] << {} unless result[1].last.is_a?(Hash)
@@ -1918,7 +1964,7 @@ ActiveRecord::Relation.prepend(DontExplicitlyNameColumnsBecauseOfIgnores)
 module PreserveShardAfterTransaction
   def after_transaction_commit(&block)
     shards = Shard.send(:active_shards)
-    shards[:delayed_jobs] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
+    shards[CANVAS_RAILS6_0 ? :delayed_jobs : Delayed::Backend::ActiveRecord::AbstractJob] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
     super { Shard.activate(shards, &block) }
   end
 end
