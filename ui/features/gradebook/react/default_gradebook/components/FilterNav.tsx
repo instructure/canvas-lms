@@ -92,6 +92,21 @@ export default function FilterNav({
         />
       )
     })
+  if (stagedFilter) {
+    filterComponents.push(
+      <Tag
+        key="staged-filter"
+        text={
+          <AccessibleContent alt={I18n.t('Remove filter')}>
+            {stagedFilter.name || I18n.t('Unnamed Filter')}
+          </AccessibleContent>
+        }
+        dismissible
+        onClick={() => useStore.setState({stagedFilter: null})}
+        margin="0 xx-small 0 0"
+      />
+    )
+  }
 
   return (
     <Flex justifyItems="space-between" padding="0 0 small 0">
@@ -102,7 +117,7 @@ export default function FilterNav({
           </FlexItem>
           <FlexItem>
             {filterComponents.length > 0 && filterComponents}
-            {!filterComponents.length && !stagedFilter && (
+            {!filterComponents.length && (
               <Text color="secondary" weight="bold">
                 {I18n.t('None')}
               </Text>
