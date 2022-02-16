@@ -289,6 +289,7 @@ const locale = {
   "image_8ad06": { "message": "Imatge" },
   "image_options_5412d02c": { "message": "Opcions d''imatge" },
   "image_options_tray_90a46006": { "message": "Safata d''opcions d''imatge" },
+  "image_to_crop_3a34487d": { "message": "Imatge que cal retallar" },
   "images_7ce26570": { "message": "Imatges" },
   "increase_indent_6d550a4a": { "message": "Augmenta la sagnia" },
   "insert_593145ef": { "message": "Insereix" },
@@ -301,7 +302,6 @@ const locale = {
   "invalid_file_type_881cc9b2": { "message": "Tipus de fitxer no vàlid" },
   "invalid_url_cbde79f": { "message": "URL no vàlida" },
   "keyboard_shortcuts_ed1844bd": { "message": "Dreceres del teclat" },
-  "language_arts_35b79a8b": { "message": "Arts lingüístiques" },
   "large_9c5e80e7": { "message": "Gran" },
   "left_to_right_e9b4fd06": { "message": "Esquerra a dreta" },
   "link_7262adec": { "message": "Enllaç" },
@@ -319,7 +319,6 @@ const locale = {
     "message": "S’està carregant la visualització prèvia"
   },
   "locked_762f138b": { "message": "Bloquejat" },
-  "math_ede93050": { "message": "Matemàtiques" },
   "media_af190855": { "message": "Element multimèdia" },
   "medium_5a8e9ead": { "message": "Mitjà" },
   "middle_27dc1d5": { "message": "Centre" },

@@ -101,6 +101,9 @@
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Bạn có chắc chắn muốn xóa mục trình hoạch định này không?"
     },
+    "arrows_464a3e54": {
+        "message": "Các phím mũi tên"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Tỷ lệ khung hình sẽ được giữ nguyên"
     },
@@ -146,6 +149,12 @@
     "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
         "message": "Chức năng ghi âm và quay video không được hỗ trợ; vui lòng sử dụng trình duyệt khác."
     },
+    "audio_options_feb58e2c": {
+        "message": "Các Tùy Chọn Âm Thanh"
+    },
+    "audio_options_tray_33a90711": {
+        "message": "Khay Tùy Chọn Âm Thanh"
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Trình phát âm thanh cho { title }"
     },
@@ -154,6 +163,9 @@
     },
     "available_folders_694d0436": {
         "message": "Thư Mục Khả Dụng"
+    },
+    "basic_554cdc0a": {
+        "message": "Cơ Bản"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Bắt Đầu Lịch Sử Danh Sách Việc Cần Làm Của Bạn"
@@ -371,6 +383,9 @@
     "delete_a6efa79d": {
         "message": "Xóa"
     },
+    "delimiters_4db4840d": {
+        "message": "Dấu Phân Cách"
+    },
     "describe_the_image_e65d2e32": {
         "message": "(Mô tả hình ảnh"
     },
@@ -383,11 +398,20 @@
     "details_a6f427c3": {
         "message": "Chi tiết:"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Hình Thoi"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Loại kích thước"
+    },
     "dimensions_45ddb7b7": {
         "message": "Kích Thước"
     },
     "directionality_26ae9e08": {
         "message": "Định Hướng"
+    },
+    "directly_edit_latex_b7e9235b": {
+        "message": "Chỉnh Sửa LaTeX Trực Tiếp"
     },
     "discussion_6719c51d": {
         "message": "Thảo Luận"
@@ -491,6 +515,9 @@
     "equation_1c5ac93c": {
         "message": "Phương Trình"
     },
+    "equation_editor_39fbc3f1": {
+        "message": "Trình Chỉnh Sửa Phương Trình"
+    },
     "error_loading_grades_e0b38f4d": {
         "message": "Lỗi tải điểm"
     },
@@ -553,6 +580,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Ý Kiến Phản Hồi"
+    },
+    "file_name_8fd421ff": {
+        "message": "Tên tập tin"
     },
     "file_url_c12b64be": {
         "message": "URL Tập Tin"
@@ -619,6 +649,9 @@
     },
     "grades_loaded_5056277c": {
         "message": "Đã Tải Điểm"
+    },
+    "greek_65c5b3f7": {
+        "message": "Hy Lạp"
     },
     "group_documents_8bfd6ae6": {
         "message": "Tài Liệu Nhóm"
@@ -688,6 +721,9 @@
     },
     "image_options_tray_90a46006": {
         "message": "Khay Tùy Chọn Hình Ảnh"
+    },
+    "image_to_crop_3a34487d": {
+        "message": "Hình ảnh để cắt gọt"
     },
     "images_7ce26570": {
         "message": "Hình Ảnh"
@@ -803,6 +839,9 @@
     "loading_please_wait_d276220a": {
         "message": "Đang tải, vui lòng chờ"
     },
+    "loading_preview_9f077aa1": {
+        "message": "Đang tải bản xem trước"
+    },
     "location_3b6ff307": {
         "message": "Vị Trí:"
     },
@@ -824,6 +863,9 @@
     "middle_27dc1d5": {
         "message": "Giữa"
     },
+    "misc_3b692ea7": {
+        "message": "Hỗn hợp"
+    },
     "miscellaneous_e9818229": {
         "message": "Tổng Hợp"
     },
@@ -838,6 +880,9 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Ảnh Nhiều Màu"
+    },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Ít nhất phải bằng { percentage }%"
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Phải ít nhất { width } x { height }px"
@@ -941,6 +986,9 @@
     "open_title_application_fd624fc5": {
         "message": "Mở ứng dụng { title }"
     },
+    "operators_a2ef9a93": {
+        "message": "Toán Tử"
+    },
     "opportunities_popup_f6703842": {
         "message": "cửa sổ bật lên cơ hội"
     },
@@ -974,8 +1022,20 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Bình Duyệt cho { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Hình Ngũ Giác"
+    },
     "people_b4ebb13c": {
         "message": "Mọi Người"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Phần Trăm"
+    },
+    "percentage_must_be_a_number_8033c341": {
+        "message": "Phần trăm phải là số"
+    },
+    "pixels_52ece7d1": {
+        "message": "Pixel"
     },
     "points_bceb5005": {
         "message": "điểm"
@@ -1036,6 +1096,9 @@
     },
     "redo_363c58b7": {
         "message": "Làm lại"
+    },
+    "relationships_6602af70": {
+        "message": "Mối Quan Hệ"
     },
     "reminder_date_4564d12d": {
         "message": "Lời nhắc nhở: { date }"
@@ -1099,6 +1162,9 @@
     },
     "show_all_ae37d610": {
         "message": "Hiển Thị Tất Cả"
+    },
+    "show_audio_options_b489926b": {
+        "message": "Hiển thị tùy chọn âm thanh"
     },
     "show_embed_options_ef8d7ef": {
         "message": "Hiển thị tùy chọn nhúng"
