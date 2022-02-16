@@ -121,7 +121,7 @@ export default class Filters extends React.Component {
 
   render() {
     return (
-      <Flex as="div" margin="medium 0 0 0" wrapItems>
+      <Flex as="div" margin="medium 0 0 0" wrap="wrap">
         <Flex.Item>
           <Select
             label={I18n.t('Assign To')}

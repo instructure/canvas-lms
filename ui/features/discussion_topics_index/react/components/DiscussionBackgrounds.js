@@ -30,6 +30,8 @@ import pinnedUrl from '../../images/pinned.svg'
 import unpinnedUrl from '../../images/unpinned.svg'
 import closedForCommentsUrl from '../../images/closed-comments.svg'
 
+import {Link} from '@instructure/ui-link'
+
 const BackgroundSVG = props => (
   <View margin="small auto" maxWidth="16rem" display="block">
     <img alt="" src={props.url} />
@@ -67,12 +69,12 @@ export const unpinnedDiscussionsBackground = props => (
       {I18n.t('There are no discussions to show in this section')}
     </Text>
     {props.permissions.create && (
-      <Button
-        variant="link"
+      <Link
         href={`/${props.contextType}s/${props.contextID}/discussion_topics/new`}
+        isWithinText={false}
       >
         {I18n.t('Click here to add a discussion')}
-      </Button>
+      </Link>
     )}
   </View>
 )

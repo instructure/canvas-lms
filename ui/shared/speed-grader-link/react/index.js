@@ -52,7 +52,7 @@ function SpeedGraderLink(props) {
   }
 
   return props.disabled ? (
-    <Tooltip placement="bottom" tip={props.disabledTip} variant="inverse">
+    <Tooltip placement="bottom" renderTip={props.disabledTip} color="primary">
       {renderLink(anchorProps)}
     </Tooltip>
   ) : (

@@ -134,7 +134,7 @@ export default class StudentsSearcher extends React.Component {
         margin="0 small 0 0"
         formatOutput={this.readGradeableSubmissionsCount}
       >
-        <Button icon={IconSpeedGraderLine} href={speedgraderLink} target="_blank">
+        <Button renderIcon={IconSpeedGraderLine} href={speedgraderLink} target="_blank">
           {I18n.t('Speedgrader')}
         </Button>
       </Badge>
@@ -145,7 +145,7 @@ export default class StudentsSearcher extends React.Component {
     return (
       <Button
         disabled={this.props.assignment.anonymizeStudents}
-        icon={IconEmailLine}
+        renderIcon={IconEmailLine}
         key="messageStudentsWho"
         onClick={this.props.onMessageStudentsClick}
       >
@@ -200,7 +200,7 @@ export default class StudentsSearcher extends React.Component {
 
     return (
       <>
-        <Flex as="div" margin="0 0 medium 0" wrapItems>
+        <Flex as="div" margin="0 0 medium 0" wrap="wrap">
           <Flex.Item grow size="60%" margin="small 0 0 0">
             <TextInput
               renderLabel={
@@ -215,7 +215,7 @@ export default class StudentsSearcher extends React.Component {
               value={this.state.searchValue}
               renderAfterInput={<IconSearchLine />}
             />
-            <Button icon={IconFilterLine} margin="0 small" onClick={this.toggleFilters}>
+            <Button renderIcon={IconFilterLine} margin="0 small" onClick={this.toggleFilters}>
               <PresentationContent>{I18n.t('Filter')}</PresentationContent>
               <ScreenReaderContent>
                 {this.state.showFilters

@@ -93,7 +93,7 @@ class CourseNicknameEdit extends React.Component {
     return (
       <TextInput
         id="NicknameInput"
-        label={I18n.t('Nickname')}
+        renderLabel={I18n.t('Nickname')}
         placeholder={this.props.nicknameInfo.originalName}
         value={this.state.nickname}
         onChange={this.handleChange}

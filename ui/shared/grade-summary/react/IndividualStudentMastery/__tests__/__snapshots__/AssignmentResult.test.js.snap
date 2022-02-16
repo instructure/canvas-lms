@@ -18,16 +18,12 @@ exports[`renders the AlignmentResult component 1`] = `
     shouldGrow={false}
     shouldShrink={false}
   >
-    <Button
-      as="button"
-      cursor="pointer"
-      display="inline-block"
-      elementRef={[Function]}
+    <Link
+      color="link"
       href="http://foo"
-      icon={[Function]}
-      margin="0"
-      size="medium"
-      textAlign="center"
+      iconPlacement="start"
+      isWithinText={false}
+      renderIcon={[Function]}
       theme={
         Object {
           "fontWeight": "700",
@@ -35,12 +31,9 @@ exports[`renders the AlignmentResult component 1`] = `
           "mediumPaddingHorizontal": "0",
         }
       }
-      type="button"
-      variant="link"
-      withBackground={true}
     >
       My assignment
-    </Button>
+    </Link>
   </Item>
   <Item
     as="span"

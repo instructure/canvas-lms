@@ -28,7 +28,7 @@ describe('CanvasTray', () => {
         Tray Content
       </CanvasTray>
     )
-    expect(getByText('Do the thing').tagName).toBe('H2')
+    expect(getByText('Do the thing').tagName).toBe('SPAN')
     expect(getByText('Tray Content')).toBeInTheDocument()
     const closeButton = getByText('Close').closest('button')
     expect(closeButton).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe('CanvasTray', () => {
       )
       expect(getByText(/something broke/i)).toBeInTheDocument()
       // Header and close button should still be there
-      expect(getByText('Do the thing').tagName).toBe('H2')
+      expect(getByText('Do the thing').tagName).toBe('SPAN')
       expect(getByText('Close').closest('button')).toBeInTheDocument()
     })
   })

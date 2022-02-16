@@ -64,7 +64,7 @@ export default class ExternalToolType extends React.Component {
             </Flex.Item>
             {this.props.readOnly ? null : (
               <Flex.Item margin="0 0 0 small" grow textAlign="end">
-                <Button icon={IconTrashLine} onClick={this.onDelete}>
+                <Button renderIcon={IconTrashLine} onClick={this.onDelete}>
                   <ScreenReaderContent>{I18n.t('Delete this submission type')}</ScreenReaderContent>
                 </Button>
               </Flex.Item>

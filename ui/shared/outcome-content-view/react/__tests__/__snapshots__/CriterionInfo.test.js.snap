@@ -2,51 +2,41 @@
 
 exports[`The CriterionInfo component renders the root component as expected 1`] = `
 <span>
-  <Button
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={<IconQuestionLine />}
     margin="0"
     onClick={[Function]}
+    renderIcon={<IconQuestionLine />}
+    screenReaderLabel="More Information About Ratings"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      More Information About Ratings
-    </ScreenReaderContent>
-  </Button>
+    withBackground={false}
+    withBorder={false}
+  />
 </span>
 `;
 
 exports[`The CriterionInfo component renders the root component as expected 2`] = `
 <span>
-  <Button
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={<IconQuestionLine />}
     margin="0"
     onClick={[Function]}
+    renderIcon={<IconQuestionLine />}
+    screenReaderLabel="More Information About Ratings"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      More Information About Ratings
-    </ScreenReaderContent>
-  </Button>
+    withBackground={false}
+    withBorder={false}
+  />
   <Modal
     as="form"
     constrain="window"
@@ -84,12 +74,10 @@ exports[`The CriterionInfo component renders the root component as expected 2`] 
         offset="medium"
         onClick={[Function]}
         placement="end"
+        screenReaderLabel="Close"
         size="small"
         type="button"
-        variant="icon"
-      >
-        Close
-      </CloseButton>
+      />
       <Heading
         border="none"
         color="inherit"

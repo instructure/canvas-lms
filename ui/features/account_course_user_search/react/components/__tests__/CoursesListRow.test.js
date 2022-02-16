@@ -42,7 +42,7 @@ const props = {
 }
 
 it('indicates if a course is a blueprint course', () => {
-  const tooltip = 'Tooltip[tip="This is a blueprint course"] IconBlueprintLine'
+  const tooltip = 'Tooltip[renderTip="This is a blueprint course"] IconBlueprintLine'
   expect(
     shallow(<CoursesListRow {...props} />)
       .find(tooltip)
@@ -57,7 +57,7 @@ it('indicates if a course is a blueprint course', () => {
 })
 
 it('indicates if a course is a course template', () => {
-  const tooltip = 'Tooltip[tip="This is a course template"] IconCollectionSolid'
+  const tooltip = 'Tooltip[renderTip="This is a course template"] IconCollectionSolid'
   expect(
     shallow(<CoursesListRow {...props} />)
       .find(tooltip)
@@ -72,7 +72,7 @@ it('indicates if a course is a course template', () => {
 })
 
 it('shows add-enrollment if it makes sense', () => {
-  const tooltip = 'Tooltip[tip="Add Users to A"] IconPlusLine'
+  const tooltip = 'Tooltip[renderTip="Add Users to A"] IconPlusLine'
   expect(
     shallow(<CoursesListRow {...props} can_create_enrollments concluded={false} />)
       .find(tooltip)
@@ -81,7 +81,7 @@ it('shows add-enrollment if it makes sense', () => {
 })
 
 it('does not show add-enrollment when not allowed', () => {
-  const tooltip = 'Tooltip[tip="Add Users to A"] IconPlusLine'
+  const tooltip = 'Tooltip[renderTip="Add Users to A"] IconPlusLine'
   expect(
     shallow(
       <CoursesListRow

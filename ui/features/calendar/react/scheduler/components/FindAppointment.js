@@ -105,7 +105,7 @@ export default class FindAppointment extends React.Component {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" type="submit">
+            <Button color="primary" type="submit">
               {I18n.t('Submit')}
             </Button>
           </Modal.Footer>

@@ -69,7 +69,8 @@ export default class FlickrSearch extends React.Component {
 
   render() {
     const photos = this.state.searchResults.photos
-    const safetyMessage = I18n.t(`Flickr displays SafeSearch images within the Creative Commons Public Domain.
+    const safetyMessage =
+      I18n.t(`Flickr displays SafeSearch images within the Creative Commons Public Domain.
               However, safe search results are not guaranteed, as some images may not include a
               specified safety level by their owners.`)
 

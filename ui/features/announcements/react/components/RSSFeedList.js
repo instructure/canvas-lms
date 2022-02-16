@@ -33,6 +33,8 @@ import actions from '../actions'
 import propTypes from '../propTypes'
 import select from 'obj-select'
 
+import {Link} from '@instructure/ui-link'
+
 export default class RSSFeedList extends React.Component {
   static propTypes = {
     feeds: arrayOf(propTypes.rssFeed),
@@ -91,15 +93,15 @@ export default class RSSFeedList extends React.Component {
           >
             <Grid.Row>
               <Grid.Col>
-                <Button
-                  variant="link"
+                <Link
                   margin="0 small"
                   size="small"
                   href={url}
+                  isWithinText={false}
                   theme={{smallPadding: '0', smallHeight: '1rem'}}
                 >
                   {display_name}
-                </Button>
+                </Link>
                 <Text size="small" margin="0 small" color="secondary">
                   {this.renderPostAddedText(external_feed_entries_count)}
                 </Text>

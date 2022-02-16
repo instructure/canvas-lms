@@ -30,6 +30,8 @@ import {IconRssLine} from '@instructure/ui-icons'
 import {ConnectedAddExternalFeed} from './AddExternalFeed'
 import propTypes from '../propTypes'
 
+import {Link} from '@instructure/ui-link'
+
 export default class ExternalFeedsTray extends Component {
   static propTypes = {
     atomFeedUrl: string,
@@ -68,18 +70,18 @@ export default class ExternalFeedsTray extends Component {
     if (this.props.atomFeedUrl) {
       return (
         <View margin="medium" as="div" textAlign="start">
-          <Button
-            variant="link"
+          <Link
             id="rss-feed-link"
             linkRef={link => {
               this.rssFeedLink = link
             }}
             href={this.props.atomFeedUrl}
-            icon={IconRssLine}
+            isWithinText={false}
+            renderIcon={IconRssLine}
             theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
           >
             {I18n.t('RSS Feed')}
-          </Button>
+          </Link>
         </View>
       )
     }
@@ -113,7 +115,7 @@ export default class ExternalFeedsTray extends Component {
         <Button
           id="external_feed"
           aria-haspopup="dialog"
-          buttonRef={link => (this.externalFeedRef = link)}
+          elementRef={link => (this.externalFeedRef = link)}
           onClick={() => this.setState({open: !this.state.open})}
           variant="link"
         >
@@ -126,9 +128,11 @@ export default class ExternalFeedsTray extends Component {
           onDismiss={() => this.setState({open: false})}
           placement="end"
         >
-          <CloseButton placement="end" onClick={() => this.setState({open: false})}>
-            {I18n.t('Close')}
-          </CloseButton>
+          <CloseButton
+            placement="end"
+            onClick={() => this.setState({open: false})}
+            screenReaderLabel={I18n.t('Close')}
+          />
           {this.renderTrayContent()}
         </Tray>
       </View>

@@ -49,7 +49,7 @@ class BreadcrumbLinkWithTip extends Breadcrumb.Link {
     const props = omitProps(this.props, Breadcrumb.Link.propTypes)
 
     return (
-      <Tooltip variant="inverse" as="div" tip={props.tip}>
+      <Tooltip color="primary" as="div" renderTip={props.tip}>
         {onClick ? this.renderLink() : <Text>{this.renderLink()}</Text>}
       </Tooltip>
     )

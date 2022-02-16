@@ -183,7 +183,7 @@ class UrlEntry extends React.Component {
                   <Flex.Item>
                     {this.state.valid && (
                       <Button
-                        icon={IconEyeLine}
+                        renderIcon={IconEyeLine}
                         margin="0 0 0 x-small"
                         onClick={() => window.open(this.state.url)}
                         data-testid="preview-button"

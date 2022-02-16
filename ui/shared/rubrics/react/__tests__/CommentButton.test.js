@@ -34,7 +34,7 @@ describe('The CommentButton component', () => {
   it('passes through onClick', () => {
     const onClick = sinon.spy()
     const el = component({onClick})
-    el.find('Button[variant="icon"]').prop('onClick')()
+    el.find('IconButton').prop('onClick')()
     expect(onClick.calledOnce).toEqual(true)
   })
 })

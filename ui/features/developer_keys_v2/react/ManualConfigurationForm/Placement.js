@@ -158,7 +158,7 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_target_link_uri`}
                   value={placement.target_link_uri}
-                  label={I18n.t('Target Link URI')}
+                  renderLabel={I18n.t('Target Link URI')}
                   onChange={this.handleTargetLinkUriChange}
                 />
                 <RadioInputGroup
@@ -180,13 +180,13 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_icon_url`}
                   value={placement.icon_url}
-                  label={I18n.t('Icon Url')}
+                  renderLabel={I18n.t('Icon Url')}
                   onChange={this.handleIconUrlChange}
                 />
                 <TextInput
                   name={`${placementName}_text`}
                   value={placement.text}
-                  label={I18n.t('Text')}
+                  renderLabel={I18n.t('Text')}
                   onChange={this.handleTextChange}
                 />
               </FormFieldGroup>
@@ -197,13 +197,13 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_selection_height`}
                   value={placement.selection_height && placement.selection_height.toString()}
-                  label={I18n.t('Selection Height')}
+                  renderLabel={I18n.t('Selection Height')}
                   onChange={this.handleSelectionHeightChange}
                 />
                 <TextInput
                   name={`${placementName}_selection_width`}
                   value={placement.selection_width && placement.selection_width.toString()}
-                  label={I18n.t('Selection Width')}
+                  renderLabel={I18n.t('Selection Width')}
                   onChange={this.handleSelectionWidthChange}
                 />
               </FormFieldGroup>

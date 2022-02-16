@@ -111,7 +111,7 @@ export default class IndexHeader extends Component {
     return (
       <View>
         <View margin="0 0 medium" display="block">
-          <Flex wrapItems wrap="wrap" justifyItems="end">
+          <Flex wrap="wrap" justifyItems="end">
             <Flex.Item grow>
               <FormField
                 id="announcement-filter"
@@ -137,13 +137,13 @@ export default class IndexHeader extends Component {
 
             <Flex.Item grow margin="0 0 0 small">
               <TextInput
-                label={
+                renderLabel={
                   <ScreenReaderContent>
                     {I18n.t('Search announcements by title')}
                   </ScreenReaderContent>
                 }
                 placeholder={I18n.t('Search')}
-                icon={() => <IconSearchLine />}
+                renderAfterInput={() => <IconSearchLine />}
                 ref={this.searchInputRef}
                 onChange={this.onSearch}
                 name="announcements_search"
@@ -199,7 +199,7 @@ export default class IndexHeader extends Component {
               {this.props.permissions.create && (
                 <Button
                   href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
-                  variant="primary"
+                  color="primary"
                   id="add_announcement"
                 >
                   <IconPlusLine />

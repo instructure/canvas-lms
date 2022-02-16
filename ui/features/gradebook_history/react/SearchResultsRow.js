@@ -35,7 +35,7 @@ import {Text} from '@instructure/ui-text'
 function anonymouslyGraded(gradedAnonymously) {
   return gradedAnonymously ? (
     <div>
-      <Tooltip tip={I18n.t('Anonymously graded')} on={['focus', 'hover']}>
+      <Tooltip renderTip={I18n.t('Anonymously graded')} on={['focus', 'hover']}>
         <span role="presentation" tabIndex="0">
           <IconOffLine />
           <ScreenReaderContent>{I18n.t('Anonymously graded')}</ScreenReaderContent>

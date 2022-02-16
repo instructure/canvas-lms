@@ -73,7 +73,7 @@ function FeatureFlagFilterTable({title, rows, disableDefaults}) {
                         </View>
                       }
                     >
-                      <Pill margin="0 x-small" text={I18n.t('Hidden')} />
+                      <Pill margin="0 x-small">{I18n.t('Hidden')}</Pill>
                     </Tooltip>
                   )}
                   {feature.beta && (
@@ -82,11 +82,9 @@ function FeatureFlagFilterTable({title, rows, disableDefaults}) {
                         'Feature preview — opting in includes ongoing updates outside the regular release schedule'
                       )}
                     >
-                      <Pill
-                        variant="primary"
-                        margin="0 0 0 x-small"
-                        text={I18n.t('Feature Preview')}
-                      />
+                      <Pill color="info" margin="0 0 0 x-small">
+                        {I18n.t('Feature Preview')}
+                      </Pill>
                     </Tooltip>
                   )}
                 </>
@@ -134,10 +132,12 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                     <>
                       {feature.display_name}
                       {feature.feature_flag.hidden && (
-                        <Pill margin="0 x-small" text={I18n.t('Hidden')} />
+                        <Pill margin="0 x-small">{I18n.t('Hidden')}</Pill>
                       )}
                       {feature.beta && (
-                        <Pill variant="primary" margin="0 0 0 x-small" text={I18n.t('Beta')} />
+                        <Pill color="info" margin="0 0 0 x-small">
+                          {I18n.t('Beta')}
+                        </Pill>
                       )}
                     </>
                   }
