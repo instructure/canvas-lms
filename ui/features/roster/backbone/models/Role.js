@@ -32,7 +32,7 @@ export default class Role extends Model {
   //
   // @api override backbone
   urlRoot() {
-    return `/api/v1/accounts/${ENV.CURRENT_ACCOUNT.account.id}/roles`
+    return `/api/v1/accounts/${ENV.ACCOUNT_ID}/roles`
   }
 
   // Method Summary

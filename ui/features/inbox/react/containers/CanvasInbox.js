@@ -16,18 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useState, useEffect, useContext} from 'react'
 import ComposeModalManager from './ComposeModalContainer/ComposeModalManager'
-import {Flex} from '@instructure/ui-flex'
 import {MessageDetailContainer} from './MessageDetailContainer/MessageDetailContainer'
 import MessageListActionContainer from './MessageListActionContainer'
 import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
-import React, {useState, useEffect} from 'react'
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import I18n from 'i18n!conversations_2'
+import {useMutation} from 'react-apollo'
+import {DELETE_CONVERSATIONS} from '../../graphql/Mutations'
+import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
 
 const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
+  const [userFilter, setUserFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
   const [selectedConversationMessage, setSelectedConversationMessage] = useState()
   const [composeModal, setComposeModal] = useState(false)
@@ -45,8 +51,60 @@ const CanvasInbox = () => {
     setSelectedConversationMessage(null)
   }
 
-  const removeFromSelectedConversations = conversations => {
-    const conversationIds = conversations.map(convo => convo._id)
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
+  const conversationsQueryOption = {
+    query: CONVERSATIONS_QUERY,
+    variables: {
+      userID: ENV.current_user_id?.toString(),
+      scope,
+      filter: [userFilter, courseFilter]
+    }
+  }
+
+  const handleDelete = individualConversation => {
+    const conversationsToDeleteByID =
+      individualConversation || selectedConversations.map(convo => convo._id)
+
+    const delMsg = I18n.t(
+      {
+        one: 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
+        other:
+          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
+      },
+      {count: conversationsToDeleteByID.length}
+    )
+    const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
+    if (confirmResult) {
+      deleteConversations({variables: {ids: conversationsToDeleteByID}})
+    } else {
+      // confirm message was cancelled by user
+      setDeleteDisabled(false)
+    }
+  }
+
+  const handleDeleteComplete = data => {
+    const deletedConversationIDs = data.deleteConversations.conversationIds
+    const deletedSuccessMsg = I18n.t(
+      {
+        one: 'Message Deleted!',
+        other: 'Messages Deleted!'
+      },
+      {count: deletedConversationIDs.length}
+    )
+
+    if (data.deleteConversations.errors) {
+      // keep delete button enabled since deletion returned errors
+      setDeleteDisabled(false)
+      setOnFailure(I18n.t('Delete operation failed'))
+    } else {
+      setDeleteDisabled(true)
+      removeFromSelectedConversations(deletedConversationIDs)
+      setOnSuccess(deletedSuccessMsg, false)
+    }
+  }
+
+  const removeFromSelectedConversations = conversationIds => {
     setSelectedConversations(prev => {
       const updated = prev.filter(selectedConvo => !conversationIds.includes(selectedConvo._id))
       setDeleteDisabled(updated.length === 0)
@@ -54,6 +112,33 @@ const CanvasInbox = () => {
       return updated
     })
   }
+
+  const removeDeletedConversationsFromCache = (cache, result) => {
+    const conversationsFromCache = JSON.parse(
+      JSON.stringify(cache.readQuery(conversationsQueryOption))
+    )
+
+    const conversationIDsFromResult = result.data.deleteConversations.conversationIds
+
+    const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
+      conversationParticipant => {
+        return !conversationIDsFromResult.includes(conversationParticipant.conversation._id)
+      }
+    )
+
+    conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
+    cache.writeQuery({...conversationsQueryOption, data: conversationsFromCache})
+  }
+
+  const [deleteConversations] = useMutation(DELETE_CONVERSATIONS, {
+    update: removeDeletedConversationsFromCache,
+    onCompleted(data) {
+      handleDeleteComplete(data)
+    },
+    onError() {
+      setOnFailure(I18n.t('Delete operation failed'))
+    }
+  })
 
   const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
     setSelectedConversationMessage(conversationMessage)
@@ -82,8 +167,6 @@ const CanvasInbox = () => {
         <Flex.Item>
           <MessageListActionContainer
             activeMailbox={scope}
-            course={courseFilter}
-            scope={scope}
             onSelectMailbox={newScope => {
               setSelectedConversations([])
               setScope(newScope)
@@ -91,6 +174,9 @@ const CanvasInbox = () => {
             onCourseFilterSelect={course => {
               setSelectedConversations([])
               setCourseFilter(course)
+            }}
+            onUserFilterSelect={userIDFilter => {
+              setUserFilter(userIDFilter)
             }}
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
@@ -102,6 +188,8 @@ const CanvasInbox = () => {
             archiveToggler={setArchiveDisabled}
             onConversationRemove={removeFromSelectedConversations}
             displayUnarchiveButton={displayUnarchiveButton}
+            conversationsQueryOptions={conversationsQueryOption}
+            onDelete={handleDelete}
           />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
@@ -109,6 +197,7 @@ const CanvasInbox = () => {
             <Flex.Item width="400px" height="100%">
               <ConversationListContainer
                 course={courseFilter}
+                userFilter={userFilter}
                 scope={scope}
                 onSelectConversation={updateSelectedConversations}
               />

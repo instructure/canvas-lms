@@ -177,6 +177,7 @@ en:
   a_new_assignment_has_been_created_for_your_course__12b72639: A new assignment has been created for your course, %{course_name}
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: A partner ID is required to use Academic Benchmarks
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: A partner key is required to use Academic Benchmarks
+  a_process_is_already_in_progress_f4495f5e: A process is already in progress.
   a_redirect_uri_is_required_please_supply_one_471908db: A redirect_uri is required, please supply one.
   a_role_name_is_required_47efd33: A role name is required
   a_section_is_required_64103992: A section is required
@@ -193,6 +194,7 @@ en:
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.
   a_z_243c3301: A–Z
   about_this_service_b10bc808: About this service
+  above_max_rating_64b29915: Above max rating
   academic_benchmark:
     plugin_settings:
       description: You will need access to an [Academic Benchmark](%{url}) account.
@@ -1916,7 +1918,6 @@ en:
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: Allows user to differentiate assignments to individual students.
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: Allows user to duplicate assignments in a course.
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: Allows user to duplicate quizzes in a course.
-  allows_user_to_edit_a_student_s_section_or_role_d2b312ad: Allows user to edit a student’s section or role.
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: Allows user to edit a user’s section or role (if not added via SIS).
   allows_user_to_edit_account_and_course_groups_259139c0: Allows user to edit account and course groups.
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: Allows user to edit and publish/unpublish assignments.
@@ -1974,6 +1975,7 @@ en:
   allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: Allows user to randomly assign users to a course group.
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: Allows user to randomly assign users to an account or course group.
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: Allows user to remove a course as a course template in Course Settings.
+  allows_user_to_remove_a_student_s_section_enrollme_78d1916e: Allows user to remove a student’s section enrollment or role.
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: Allows user to remove and merge users in an account.
   allows_user_to_remove_designers_from_a_course_fa9e887e: Allows user to remove designers from a course.
   allows_user_to_remove_group_members_from_course_gr_4f745b58: Allows user to remove group members from course groups.
@@ -2011,6 +2013,7 @@ en:
   allows_user_to_share_course_items_directly_with_ot_e5793d35: Allows user to share course items directly with other users.
   allows_user_to_start_conferences_they_created_281b03ea: Allows user to start conferences they created.
   allows_user_to_sync_blueprint_courses_db4fcc03: Allows user to sync Blueprint Courses.
+  allows_user_to_update_a_student_s_section_enrollme_80420ac9: Allows user to update a student’s section enrollment or role.
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: Allows user to view a course’s SIS ID.
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: Allows user to view a link to SpeedGrader from assignments.
   allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: Allows user to view a link to the Faculty Journal in the User Details page sidebar.
@@ -2417,6 +2420,7 @@ en:
   apply_to_92f70c8c: 'Apply to:'
   applying_new_styles_to_subaccounts_e8aeeef2: Applying new styles to subaccounts
   applying_please_be_patient_f7b5f244: Applying, please be patient
+  applying_score_to_ungraded_7311df9a: Applying Score to Ungraded
   appointment_group:
     errors:
       invalid_end_at: Appointment end time precedes start time
@@ -3175,7 +3179,6 @@ en:
   at_least_one_section_must_be_selected_to_post_grad_2c140f52: At least one section must be selected to post grades by section.
   at_the_bottom_a6a5f0fe: At the Bottom
   at_the_top_fa836591: At the Top
-  attach_4234a79b: Attach
   attach_a_file_86a4fc00: Attach a File
   attach_files_to_discussions_bd16c245: Attach files to discussions
   attach_terms_2b8770a5: Attach terms
@@ -3332,6 +3335,7 @@ en:
   automatically_show_closed_captions_in_the_user_s_c_f290a22f: |-
     Automatically show closed captions in the user's current
     language (if available) when playing canvas media.
+  availability_8942cde6: Availability
   availability_dates_438d71e0: Availability Dates
   availability_dates_changed_exceptions_465ba375: 'Availability Dates changed exceptions:'
   available_2ed9f226: 'Available:'
@@ -3410,6 +3414,7 @@ en:
   belarusian_b2f19c76: Belarusian
   belgium_32_e5f5b598: Belgium (+32)
   below_mastery_abd1dca5: Below Mastery
+  below_min_rating_78a742c3: Below min rating
   below_this_search_field_is_a_list_of_content_type__58aaa03f: Below this search field is a list of %{content_type}. As you type, the list will be filtered to match your query. Conversation messages will be filtered by whichever option you select.
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: 'Beta LTI Launch:'
@@ -4112,6 +4117,7 @@ en:
   change_ending_date_to_d2cebd54: Change ending date to
   change_existing_group_2c91a32b: Change Existing Group
   change_mastery_f4d43c07: Change mastery
+  change_mastery_points_c4f68a36: Change mastery points
   change_name_c8cce76c: Change Name
   change_name_to_568374c8: Change "%{name}" to
   change_points_9e5104ac: Change points
@@ -6158,7 +6164,7 @@ en:
         edit_navigation_k5: Drag and drop items to reorder them in the subject navigation.
       labels:
         account_id: Subaccount
-        allow_student_discussion_editing: Let students edit or delete their own discussion posts
+        allow_student_discussion_editing: Let students edit or delete their own discussion replies
         allow_student_discussion_topics: Let students create discussion topics
         allow_student_forum_attachments: Let students attach files to discussions
         allow_student_organized_groups: Let students organize their own groups
@@ -6668,8 +6674,11 @@ en:
   date_is_after_course_end_date_94a2f4e3: Date is after course end date
   date_is_after_the_course_end_date_95bf9b6a: Date is after the course end date
   date_is_after_the_specified_end_date_ae34a72f: Date is after the specified end date
+  date_is_after_the_term_end_date_4ab01e5d: Date is after the term end date
   date_is_before_course_start_date_16c9d531: Date is before course start date
+  date_is_before_student_enrollment_date_a380a177: Date is before student enrollment date
   date_is_before_the_course_start_date_431ba0ff: Date is before the course start date
+  date_is_before_the_term_start_date_10104b92: Date is before the term start date
   date_is_required_9c6f5e83: Date is required!
   date_modified_e1c8ac8f: Date Modified
   date_modified_modifiedat_b839cc8b: 'date modified: %{modifiedAt}'
@@ -6683,6 +6692,7 @@ en:
   dates:
     no_date: No Date
   dates_6e416047: Dates
+  dates_shown_in_course_time_zone_da2f77d5: Dates shown in course time zone
   datetime:
     distance_in_words:
       about_x_hours:
@@ -7677,6 +7687,7 @@ en:
   enter_name_or_code_b4c103f6: Enter name or code
   enter_new_group_name_b97d5819: Enter new group name
   enter_one_or_more_external_tool_ids_comma_separate_9a758cd: Enter one or more external tool IDs, comma-separated
+  enter_one_or_more_external_tool_url_domains_comma__7c2d4fe8: Enter one or more external tool URL domains, comma-separated
   enter_or_find_an_external_tool_url_6aebbd0d: Enter or find an External Tool URL
   enter_score_cutoff_3ff8ad22: Enter score cutoff
   enter_specific_phrase_9b686755: Enter specific phrase
@@ -7945,7 +7956,6 @@ en:
   error_59293a2c: error
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: Error adding canvas file to submission draft
-  error_adding_file_to_discussion_message_16feef3f: Error adding file to discussion message
   error_adding_files_to_conversation_message_58e83876: Error adding files to conversation message
   error_adding_files_to_submission_draft_6acac337: Error adding files to submission draft
   error_associating_assignment_assignment_name_with__d92e9acf: Error associating assignment "%{assignment_name}" with an LTI tool.
@@ -7997,7 +8007,6 @@ en:
   error_updating_comment_4b80c76d: Error updating comment
   error_updating_status_of_module_item_80336274: Error updating status of module item
   error_updating_submission_draft_1d40ade7: Error updating submission draft
-  error_uploading_file_73235601: Error uploading file
   error_uploading_file_e2d31b56: Error uploading file.
   error_uploading_files_f709361f: Error uploading files
   error_uploading_video_audio_recording_16d9730a: Error uploading video/audio recording
@@ -8091,6 +8100,7 @@ en:
   exceeds_mastery_1f995dce: Exceeds Mastery
   excelsior_student_activity_tracking_7a1ba44d: Excelsior Student Activity Tracking
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: Exclude any data that hasn't been updated since the given date
+  exclude_assignments_graded_with_a_0_score_5c853dc4: Exclude assignments graded with a 0 score.
   excuse_this_assignment_for_the_selected_student_af04e132: Excuse This Assignment for the Selected Student
   excused_3aab77: excused
   excused_5877183c: Excused!
@@ -9282,7 +9292,9 @@ en:
   haitian_creole_7eb4195b: Haitian Creole
   has_been_automatically_selected_based_upon_where_t_61f805c5: has been automatically selected based upon where this account's Canvas instance resides. In some cases it can be a different region.
   has_similarity_score_d5f332b4: Has similarity score
+  has_submissions_6c12ef4c: Has submissions
   has_syllabus_body_6f250277: has_syllabus_body
+  has_ungraded_submissions_2bff87df: Has ungraded submissions
   have_not_been_graded_df2a5fd2: Have not been graded
   have_not_yet_submitted_57e6a58b: Have not yet submitted
   haven_t_been_graded_d7dee5bb: Haven't been graded
@@ -9669,7 +9681,6 @@ en:
   if_provided_this_name_will_be_used_in_preference_t_4079100a: If provided, this name will be used in preference to the course's actual name on the dashboard and in notifications.
   if_set_allows_submission_status_to_be_changed_from_156f57f: If set, allows submission status to be changed from inside of Speedgrader
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: If set, removes the delay that normally occurs when searching for students.
-  if_set_removes_the_missing_status_from_submissions_43fba750: If set, removes the missing status from submissions when graded
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: If set, the grade calculator will ignore unposted anonymous assignments when calculating totals.
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: If set, the Gradebook will chunk out loading of assignments, loading those for the selected grading period first.
   if_set_the_order_of_assignments_in_gradebook_csv_e_bf5c663e: If set, the order of assignments in Gradebook CSV exports will match the order in the Gradebook grid.
@@ -9857,6 +9868,7 @@ en:
     get_started: Get Started
     welcome_to_canvas: Welcome to Canvas!
   incorrect_answer_7c17e63b: Incorrect Answer
+  increase_calendar_context_limit_575ad9ff: Increase calendar context limit
   increase_indent_6af90f7c: Increase Indent
   increase_indent_6d550a4a: Increase indent
   incremental_update_successfully_generated_against__db3f3f06: Incremental update successfully generated against a previous SIS Import.
@@ -10861,6 +10873,8 @@ en:
   master_lock_590266b6: Master Lock
   mastered_34d4c857: Mastered
   mastery_7ec348b5: Mastery
+  mastery_at_cf0c477b: Mastery at
+  mastery_at_e804b49: 'Mastery at:'
   mastery_calculation_5fd5f5fe: Mastery Calculation
   mastery_calculation_parameters_f072c3: Mastery calculation parameters
   mastery_calculation_saved_df378fdd: Mastery calculation saved
@@ -12763,6 +12777,7 @@ en:
   moving_a4d552df: Moving...
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
+  msg_680333e2: "%{msg}"
   multi_factor_authentication_backup_codes_4d781044: Multi-factor Authentication Backup Codes
   multi_factor_authentication_configured_865b1bde: Multi-factor authentication configured
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: Multiple are marked "Current theme" because the same values have been saved under multiple names—i.e., they're each the same as what's currently applied
@@ -13125,6 +13140,7 @@ en:
   no_violations_have_been_reported_977a08d1: No violations have been reported.
   no_way_to_export_gradebooks_provided_b4c2939d: No way to export gradebooks provided!
   no_way_to_monitor_gradebook_exports_provided_b451236a: No way to monitor gradebook exports provided!
+  no_way_to_monitor_score_to_ungraded_provided_9258253f: No way to monitor score to ungraded provided!
   non_canvas_11f36d4a: Non Canvas
   non_existent_content_referenced_in_this_resource_d86c6bcb: 'Non-existent content referenced in this resource:'
   non_prod_settings_9b39c6c9: Non-prod settings
@@ -14495,6 +14511,7 @@ en:
   points_n_e0b20623: Points %{n}
   points_out_of_total_24f61148: "*%{points}* out of **%{total}**"
   points_points_b6b422e2: 'Points: %{points}'
+  points_points_d70ced4f: "%{points} points"
   points_possible_1c0b3445: Points Possible
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
@@ -16366,7 +16383,6 @@ en:
   remove_linked_student_name_52dc7fce: Remove linked student %{name}
   remove_mastery_level_b1e8dcb0: Remove Mastery Level
   remove_media_attachment_d2926f1e: Remove Media Attachment
-  remove_missing_status_when_graded_d0755cc7: Remove Missing Status When Graded
   remove_name_624e06be: Remove %{name}
   remove_name_as_an_admin_c296cf49: Remove %{name} as an admin
   remove_null_values_from_live_event_payloads_3c826f: Remove null values from live event payloads
@@ -16542,7 +16558,6 @@ en:
   return_to_parent_folder_4ece2184: return to parent folder
   revert_date_changes_5105ce5: Revert date changes
   revert_to_actual_score_f665eea9: Revert to Actual Score
-  reverts_the_visible_assignments_scope_to_its_origi_87eb35d: Reverts the visible assignments scope to its original form
   review_feedback_4b4abb38: Review Feedback
   review_now_318a6a3e: Review Now
   right_sidebar_logo_5483dc0a: Right Sidebar Logo
@@ -16800,6 +16815,9 @@ en:
   score_score_6f81e8c8: 'Score: %{score}'
   score_similarity_score_2c25b94b: "%{score}% similarity score"
   score_student_points_possible_points_78360e86: Score {{student_points}}/{{possible_points}}
+  score_to_ungraded_process_failed_e143fd1b: Score to ungraded process failed
+  score_to_ungraded_process_failed_reason_788f9030: 'Score to ungraded process failed: %{reason}'
+  score_to_ungraded_process_finished_successfully_6689b418: Score to ungraded process finished successfully
   scored_less_than_2427896c: Scored less than
   scored_less_than_cutoff_on_assignment_5f5c4303: Scored less than %{cutoff} on %{assignment}
   scored_less_than_score_on_assignmenttitle_5a011033: Scored less than %{score} on %{assignmentTitle}
@@ -18397,6 +18415,7 @@ en:
   submission_feedback_indicators_eb1d31ec: Submission feedback indicators
   submission_index_e960f9bf: Submission %{index}
   submission_is_being_processed_by_plagiarism_servic_df4aa603: Submission is being processed by plagiarism service.
+  submission_is_deleted_and_cannot_be_modified_2581e73c: Submission is deleted and cannot be modified.
   submission_items_b2db1b8d: Submission Items
   submission_locked_a6074f8b: Submission Locked
   submission_locked_image_93aced38: Submission Locked Image
@@ -19063,7 +19082,6 @@ en:
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: There is a 2 app limit for placement within the RCE toolbar.
   there_is_currently_1_available_grader_758e4a21: There is currently 1 available grader
   there_was_a_failure_logging_out_at_your_idp_30070527: There was a failure logging out at your IdP
-  there_was_a_problem_applying_scores_7baaeea7: There was a problem applying scores.
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: There was a problem creating the teacher notes column.
   there_was_a_problem_deleting_the_comment_93053aa9: There was a problem deleting the comment
   there_was_a_problem_deleting_the_grading_period_50ce07c5: There was a problem deleting the grading period
@@ -19098,6 +19116,8 @@ en:
   there_was_a_problem_updating_the_grade_1b6c8b4c: There was a problem updating the grade.
   there_was_a_problem_updating_the_submission_6e5280a1: There was a problem updating the submission.
   there_was_an_error_checking_plan_publishing_status_e7edfd25: There was an error checking plan publishing status.
+  there_was_an_error_creating_a_new_filter_e93bb765: There was an error creating a new filter.
+  there_was_an_error_deleting_name_aa3050e5: There was an error deleting "%{name}".
   there_was_an_error_fetching_course_statistics_96e9dbad: There was an error fetching course statistics
   there_was_an_error_fetching_gradebook_filters_3b4607ac: There was an error fetching gradebook filters.
   there_was_an_error_fetching_modules_8ee451bb: There was an error fetching modules.
@@ -19125,6 +19145,7 @@ en:
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: There was an error starting the save assignment dates job
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.
   there_was_an_error_submitting_your_attempt_fdbe9259: There was an error submitting your attempt.
+  there_was_an_error_updating_a_filter_2a5ebc87: There was an error updating a filter.
   there_was_an_error_updating_this_assignment_please_59fc608d: There was an error updating this assignment. Please refresh the page and try again.
   there_was_an_error_updating_view_options_d024a3ec: There was an error updating view options.
   there_was_an_error_uploading_the_image_932fc4ce: There was an error uploading the image
@@ -19637,6 +19658,7 @@ en:
   to_add_individual_courses_click_courses_c5355180: To add individual courses, click Courses.
   to_add_individual_users_click_people_4d6de56a: To add individual users, click People.
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: To add or remove a student to or from a course, the Users - Student permission must be enabled.
+  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: To add or remove a student to or from a course, the Users - Students permissions must be enabled.
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).
   to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: To add or remove users to a course via SIS, the appropriate Users permission must be enabled (e.g. Users - Teachers).
   to_add_students_to_a_collaboration_users_view_list_806a5935: To add students to a collaboration, Users - view list must also be enabled.
@@ -20176,8 +20198,6 @@ en:
   uploaded_media_bc29db35: Uploaded Media
   uploaded_over_time_d59abb68: uploaded over time
   uploading_ee585874: Uploading...
-  uploading_file_5c7e14fd: Uploading file
-  uploading_file_in_progress_5c09e0c9: Uploading file in progress
   uploading_files_5ff8f4fd: Uploading files
   uploading_files_9e39dbf9: Uploading Files
   uploading_media_progress_c23a953b: Uploading media Progress
@@ -20693,6 +20713,7 @@ en:
   view_app_center_6c89a3fe: View App Center
   view_app_configurations_52b52441: View App Configurations
   view_assignment_group_totals_c8db16b2: View Assignment Group Totals
+  view_availability_963f62ff: View Availability
   view_ba339f93: View
   view_count_outcomes_9609792:
     one: View 1 Outcome
@@ -20751,7 +20772,6 @@ en:
       publish: Publish
   violation_log_491edd84: Violation Log
   violation_log_tray_d4eff9f4: Violation Log Tray
-  visible_assignments_scope_change_dbb84ebb: Visible Assignments Scope Change
   visit_864b4060: Visit
   visit_canvas_guides_to_learn_more_8c7361ad: Visit *Canvas Guides* to learn more.
   visit_google_meet_ebdaf94f: Visit Google Meet
@@ -20866,6 +20886,8 @@ en:
     load in a new tab. When this flag is enabled, that checkbox will be selected by default
     if the user checked it last time they added an external link.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: When adding multiple users, use a comma or line break to separate users.
+  when_creating_a_reply_students_will_have_the_optio_716eb2f4: When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members.
+  when_creating_a_reply_you_will_have_the_option_to__8607ac10: When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous.
   when_disabled_students_can_still_send_individual_m_3bf396f2: When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups.
   when_disabled_students_can_still_send_individual_m_567a911c: When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups.
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-

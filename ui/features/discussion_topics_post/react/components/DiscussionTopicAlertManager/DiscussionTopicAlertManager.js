@@ -28,6 +28,29 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 export const DiscussionTopicAlertManager = props => {
+  const getAnonymousAlertText = () => {
+    const teacherFullAnonAlert = I18n.t(
+      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
+    )
+    const studentFullAnonAlert = I18n.t(
+      'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
+    )
+    const teacherPartialAnonAlert = I18n.t(
+      'When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members.'
+    )
+    const studentPartialAnonAlert = I18n.t(
+      'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous.'
+    )
+
+    if (props.discussionTopic.anonymousState === 'full_anonymity') {
+      return props.discussionTopic.canReplyAnonymously ? studentFullAnonAlert : teacherFullAnonAlert
+    } else {
+      return props.discussionTopic.canReplyAnonymously
+        ? studentPartialAnonAlert
+        : teacherPartialAnonAlert
+    }
+  }
+
   return (
     <Responsive
       match="media"
@@ -118,14 +141,7 @@ export const DiscussionTopicAlertManager = props => {
           applicableAlerts.push(
             <Alert key="anon-conversation" variant="info" margin="0 0 x-small">
               <Text data-testid="anon-conversation" size={responsiveProps?.alert?.textSize}>
-                {/* teachers, tas and designers are assigned the teacher roles in current_user_roles */}
-                {ENV.current_user_roles?.includes('teacher')
-                  ? I18n.t(
-                      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
-                    )
-                  : I18n.t(
-                      'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
-                    )}
+                {getAnonymousAlertText()}
               </Text>
             </Alert>
           )

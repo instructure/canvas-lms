@@ -29,6 +29,8 @@ const Course = ({dispatch}) => {
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataError} = useDataUrl()
 
+  const category = 'uncategorized'
+
   // Handle image selection
   useEffect(() => {
     // Don't clear the current image on re-render
@@ -37,19 +39,16 @@ const Course = ({dispatch}) => {
     dispatch({...actions.SET_IMAGE, payload: dataUrl})
   }, [dataUrl])
 
-
   // Handle loading states
   useEffect(() => {
-    dispatch(
-      dataLoading ? actions.START_LOADING : actions.STOP_LOADING
-    )
+    dispatch(dataLoading ? actions.START_LOADING : actions.STOP_LOADING)
   }, [dataLoading])
 
   return (
     <View>
       <ImageList
-        fetchInitialImages={storeProps.fetchInitialImages}
-        fetchNextImages={storeProps.fetchNextImages}
+        fetchInitialImages={() => storeProps.fetchInitialImages({category})}
+        fetchNextImages={() => storeProps.fetchNextImages({category})}
         contextType={storeProps.contextType}
         images={{
           [storeProps.contextType]: {

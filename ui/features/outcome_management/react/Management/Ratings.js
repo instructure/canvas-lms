@@ -23,17 +23,27 @@ import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!OutcomeManagement'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {TextInput} from '@instructure/ui-text-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {createRating} from '@canvas/outcomes/react/hooks/useRatings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyRating from '../MasteryScale/ProficiencyRating'
 
 const ratingsShape = PropTypes.shape({
+  key: PropTypes.string,
   description: PropTypes.string,
-  points: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  mastery: PropTypes.bool
+  points: PropTypes.number,
+  descriptionError: PropTypes.string,
+  pointsError: PropTypes.string
 })
 
-const Ratings = ({ratings, onChangeRatings, canManage}) => {
+const masteryPointsShape = PropTypes.shape({
+  value: PropTypes.number,
+  error: PropTypes.string
+})
+
+const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints, canManage}) => {
   const {isMobileView} = useCanvasContext()
 
   const addRow = () => {
@@ -99,30 +109,34 @@ const Ratings = ({ratings, onChangeRatings, canManage}) => {
     [onChangeRatings]
   )
 
-  const renderBorder = () => (
-    <View
-      width="100%"
-      textAlign="start"
-      margin="0 0 small 0"
-      as="div"
-      borderWidth="none none small none"
-    />
+  const handleMasteryPointsChange = e => onChangeMasteryPoints(e.target.value)
+
+  const renderDisplayMasteryPoints = () => (
+    <View as="div" padding="small none none">
+      <Flex wrap="wrap" direction="row" padding="none small small none">
+        <Flex.Item
+          as="div"
+          padding="none xx-small none none"
+          data-testid="read-only-mastery-points"
+        >
+          <Text weight="bold">{I18n.t('Mastery at:')}</Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Text color="primary">{I18n.t('%{points} points', {points: masteryPoints.value})}</Text>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 
   return (
     <>
       <Flex
         width="100%"
-        padding={isMobileView ? '0 0 small 0' : '0 small small small'}
+        padding={isMobileView ? '0 0 small 0' : '0 small small 0'}
         margin="medium none none"
         data-testid="outcome-management-ratings"
       >
-        <Flex.Item size={isMobileView ? '25%' : '15%'} padding="0 medium 0 0">
-          <div aria-hidden="true" className="header">
-            {I18n.t('Mastery')}
-          </div>
-        </Flex.Item>
-        <Flex.Item size={isMobileView ? '75%' : '65%'}>
+        <Flex.Item size={isMobileView ? '75%' : canManage ? '80%' : '60%'}>
           <div aria-hidden="true" className="header">
             {I18n.t('Proficiency Rating')}
           </div>
@@ -135,41 +149,73 @@ const Ratings = ({ratings, onChangeRatings, canManage}) => {
           </Flex.Item>
         )}
       </Flex>
-      {renderBorder()}
-      {ratings.map(({key, description, descriptionError, pointsError, mastery, points}, index) => (
-        <React.Fragment key={key}>
-          <ProficiencyRating
-            description={description}
-            descriptionError={descriptionError}
-            disableDelete={ratings.length === 1}
-            mastery={mastery}
-            onDelete={() => handleDelete(index)}
-            onDescriptionChange={value => onRatingFieldChange('description', value, index)}
-            onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
-            onPointsChange={value => onRatingFieldChange('points', value, index)}
-            points={points?.toString()}
-            pointsError={pointsError}
-            isMobileView={isMobileView}
-            position={index + 1}
-            canManage={canManage}
-            individualOutcome
-          />
-          {renderBorder()}
-        </React.Fragment>
+      {ratings.map(({key, description, descriptionError, pointsError, points}, index) => (
+        <ProficiencyRating
+          key={key}
+          description={description}
+          descriptionError={descriptionError}
+          disableDelete={ratings.length === 1}
+          onDelete={() => handleDelete(index)}
+          onDescriptionChange={value => onRatingFieldChange('description', value, index)}
+          onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
+          onPointsChange={value => onRatingFieldChange('points', value, index)}
+          points={points?.toString()}
+          pointsError={pointsError}
+          isMobileView={isMobileView}
+          position={index + 1}
+          canManage={canManage}
+          individualOutcome
+        />
       ))}
-      {canManage && (
-        <View textAlign="center" padding="small" as="div">
-          <IconButton
-            onClick={addRow}
-            withBorder={false}
-            color="primary"
-            size="large"
-            shape="circle"
-            screenReaderLabel={I18n.t('Add Mastery Level')}
-          >
-            <IconPlusLine />
-          </IconButton>
-        </View>
+      {canManage ? (
+        <Flex width="100%" padding="small" alignItems="start">
+          <Flex.Item size="80%">
+            <Flex padding="0 small 0 0" textAlign="end">
+              <Flex.Item size="60%">
+                <IconButton
+                  onClick={addRow}
+                  withBorder={false}
+                  color="primary"
+                  size="medium"
+                  shape="circle"
+                  screenReaderLabel={I18n.t('Add Mastery Level')}
+                >
+                  <IconPlusLine />
+                </IconButton>
+              </Flex.Item>
+              <Flex.Item size="40%">
+                <Text weight="bold">{I18n.t('Mastery at')}</Text>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item size="20%">
+            <Flex alignItems="start">
+              <Flex.Item>
+                <div className="points" data-testid="mastery-points-input">
+                  <TextInput
+                    type="text"
+                    messages={
+                      masteryPoints.error ? [{text: masteryPoints.error, type: 'error'}] : null
+                    }
+                    renderLabel={
+                      <ScreenReaderContent>{I18n.t('Change mastery points')}</ScreenReaderContent>
+                    }
+                    onChange={handleMasteryPointsChange}
+                    defaultValue={I18n.n(masteryPoints.value)}
+                    width="4rem"
+                  />
+                </div>
+              </Flex.Item>
+              <Flex.Item>
+                <div style={{paddingTop: '0.45rem', paddingLeft: '0.60rem'}}>
+                  {I18n.t('points')}
+                </div>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        </Flex>
+      ) : (
+        renderDisplayMasteryPoints()
       )}
     </>
   )
@@ -177,12 +223,20 @@ const Ratings = ({ratings, onChangeRatings, canManage}) => {
 
 Ratings.propTypes = {
   ratings: PropTypes.arrayOf(ratingsShape).isRequired,
+  masteryPoints: masteryPointsShape.isRequired,
   canManage: PropTypes.bool,
-  onChangeRatings: PropTypes.func
+  onChangeRatings: PropTypes.func,
+  onChangeMasteryPoints: PropTypes.func
 }
 
 Ratings.defaultProps = {
-  onChangeRatings: () => {}
+  onChangeRatings: () => {},
+  onChangeMasteryPoints: () => {},
+  ratings: [],
+  masteryPoints: {
+    value: null,
+    error: null
+  }
 }
 
 export default Ratings

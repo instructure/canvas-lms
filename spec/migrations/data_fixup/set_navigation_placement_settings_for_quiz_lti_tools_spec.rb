@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
+require "spec_helper"
 
 describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
   let_once(:root_account) { Account.default }
@@ -116,7 +116,8 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
 
   it "does not set navigation placement settings for Quiz LTI tools where context_type is not Account" do
     quiz_tool = ContextExternalTool.quiz_lti.last
-    quiz_tool.update!(context_type: "Course")
+    quiz_tool.context = course_model
+    quiz_tool.save
 
     expect do
       DataFixup::SetNavigationPlacementSettingsForQuizLtiTools.run

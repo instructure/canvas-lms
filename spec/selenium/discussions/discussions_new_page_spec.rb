@@ -185,6 +185,17 @@ describe "discussions" do
             )
             expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
           end
+
+          it "disallows full_anonymity along with graded" do
+            get url
+            replace_content(f("input[name=title]"), "my anonymous title")
+            f("input[value='full_anonymity']").click
+            f("input[id='use_for_grading']").click
+            submit_form(".form-actions")
+            expect(
+              fj("div.error_text:contains('You are not allowed to create an anonymous graded discussion')")
+            ).to be_present
+          end
         end
 
         context "when react_discussions_post feature_flag is off" do
@@ -210,6 +221,7 @@ describe "discussions" do
       context "when all discussion anonymity feature flags are ON" do
         before do
           Account.site_admin.enable_feature! :discussion_anonymity
+          Account.site_admin.enable_feature! :partial_anonymity
           course.enable_feature! :react_discussions_post
         end
 
@@ -238,6 +250,40 @@ describe "discussions" do
           get url
           expect(course.allow_student_anonymous_discussion_topics).to be false
           expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+        end
+
+        it "lets students choose to make topics as themselves" do
+          course.allow_student_anonymous_discussion_topics = true
+          course.save!
+          get url
+          replace_content(f("input[name=title]"), "Student Partial Discussion")
+          f("input[value='partial_anonymity']").click
+
+          # verify default anonymous post selector
+          expect(f("span[data-testid='current_user_avatar']")).to be_present
+          expect(fj("div#sections_anonymous_post_selector span:contains('#{@student.name}')")).to be_truthy
+          expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Show to everyone"
+
+          expect_new_page_load { submit_form(".form-actions") }
+          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion |"
+          expect(f("span[data-testid='author_name']")).to include_text @student.name
+        end
+
+        it "lets students choose to make topics anonymously" do
+          course.allow_student_anonymous_discussion_topics = true
+          course.save!
+          get url
+          replace_content(f("input[name=title]"), "Student Partial Discussion (student anonymous)")
+          f("input[value='partial_anonymity']").click
+          f("input[data-component='anonymous_post_selector']").click
+          fj("li:contains('Hide from everyone')").click
+          expect(f("span[data-testid='anonymous_avatar']")).to be_present
+          expect(fj("div#sections_anonymous_post_selector span:contains('Anonymous')")).to be_truthy
+          expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Hide from everyone"
+
+          expect_new_page_load { submit_form(".form-actions") }
+          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion |"
+          expect(f("span[data-testid='author_name']")).to include_text "Anonymous"
         end
       end
 

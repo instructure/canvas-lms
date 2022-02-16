@@ -599,9 +599,12 @@ describe Course do
       course_factory
       @course.require_assignment_group
       @new_group = @course.assignment_groups.create!(name: "new group")
-      @params = { "copy" => { "assignments" => { "1865116014002" => true } } }
-      json = File.open(File.join(IMPORT_JSON_DIR, "assignment.json")).read
-      @data = { "assignments" => JSON.parse(json) }.with_indifferent_access
+      @params = { copy: {
+        assignments: { "1865116014002" => true },
+        quizzes: { "1865116160002" => true }
+      } }.with_indifferent_access
+      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      @data = JSON.parse(json).with_indifferent_access
       @migration = @course.content_migrations.build
       @migration.migration_settings[:migration_ids_to_import] = @params
       @migration.migration_settings[:move_to_assignment_group_id] = @new_group.id
@@ -620,6 +623,13 @@ describe Course do
       expect(existing_assign.assignment_group_id).not_to eq @new_group.id
       Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
       expect(existing_assign.reload.assignment_group_id).to eq @new_group.id
+    end
+
+    it "moves classic quiz assignment into new group" do
+      Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
+      quiz = @course.quizzes.where(migration_id: "1865116160002").take
+      expect(quiz.reload.assignment_group_id).to eq @new_group.id
+      expect(quiz.assignment.reload.assignment_group_id).to eq @new_group.id
     end
   end
 

@@ -40,6 +40,7 @@ describe Types::GroupType do
     expect(group_type.resolve("name")).to eq @group.name
     expect(group_type.resolve("membersConnection { edges { node { _id } } }"))
       .to eq @group.group_memberships.map(&:to_param)
+    expect(group_type.resolve("membersCount")).to eq @group.members_count
   end
 
   it "requires read permission" do

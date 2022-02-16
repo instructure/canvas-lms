@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
 // @ts-ignore: TS doesn't understand i18n scoped imports
@@ -67,6 +67,11 @@ type DispatchProps = {
 
 type ComponentProps = StoreProps & DispatchProps
 
+const enum WHICH_DATE {
+  START = 0,
+  END = 1
+}
+
 export const ProjectedDates: React.FC<ComponentProps> = ({
   pacePlan,
   assignments,
@@ -82,44 +87,57 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   blackoutDates,
   weekendsDisabled
 }) => {
-  const [startMessage, setStartMessage] = useState<PacePlansDateInputProps['message'] | undefined>(
-    undefined
-  )
-
   // PacePlanDateInput.validateDay plays 2 roles
   // 1. validate the new date in response to a date change
   // 2. to determine valid dates in the INSTUI DateInput's popup calendar
   // so we can only return an error message when the input date
   // is invalid and can't do any cross-field validation.
   // See useEffect for that
-  const validateStart = useCallback(
-    (date: moment.Moment) => {
+  const validateDate = useCallback(
+    (date: moment.Moment, which = WHICH_DATE.START) => {
+      if (which === WHICH_DATE.END && date.isBefore(pacePlan.start_date)) {
+        return I18n.t('Date is before student enrollment date')
+      }
+
       if (
         ENV.VALID_DATE_RANGE.start_at.date &&
         date.isBefore(moment(ENV.VALID_DATE_RANGE.start_at.date), 'day')
       ) {
-        return I18n.t('Date is before the course start date')
+        return ENV.VALID_DATE_RANGE.start_at.date_context === 'course'
+          ? I18n.t('Date is before the course start date')
+          : I18n.t('Date is before the term start date')
       }
 
-      if (pacePlan.hard_end_dates && date.isAfter(moment(pacePlan.end_date), 'day')) {
+      if (
+        which === WHICH_DATE.START &&
+        pacePlan.hard_end_dates &&
+        date.isAfter(moment(pacePlan.end_date), 'day')
+      ) {
         return I18n.t('Date is after the specified end date')
       }
 
       if (
-        !pacePlan.hard_end_dates &&
+        (which === WHICH_DATE.END || !pacePlan.hard_end_dates) &&
         ENV.VALID_DATE_RANGE.end_at.date &&
         date.isAfter(moment(ENV.VALID_DATE_RANGE.end_at.date), 'day')
       ) {
-        return I18n.t('Date is after the course end date')
+        return ENV.VALID_DATE_RANGE.start_at.date_context === 'course'
+          ? I18n.t('Date is after the course end date')
+          : I18n.t('Date is after the term end date')
       }
     },
-    [pacePlan.end_date, pacePlan.hard_end_dates]
+    [pacePlan.end_date, pacePlan.hard_end_dates, pacePlan.start_date]
   )
 
   useEffect(() => {
+    if (moment(pacePlan.end_date).isBefore(moment(pacePlan.start_date), 'day')) {
+      // an invalid state
+      return
+    }
+
     // If the projected start date pushes the projected end date out of
     // bounds, we show the error message on projected start date.
-    // Since we may not have a new projected end date yet when validateStart
+    // Since we may not have a new projected end date yet when validateDate
     // is called, do it here.
     if (
       (pacePlan.hard_end_dates && pacePlan.end_date && projectedEndDate > pacePlan.end_date) ||
@@ -128,9 +146,15 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
       compressDates()
     } else {
       uncompressDates()
-      setStartMessage(undefined)
     }
-  }, [compressDates, pacePlan.end_date, pacePlan.hard_end_dates, projectedEndDate, uncompressDates])
+  }, [
+    compressDates,
+    pacePlan.end_date,
+    pacePlan.hard_end_dates,
+    pacePlan.start_date,
+    projectedEndDate,
+    uncompressDates
+  ])
 
   const enrollmentType = pacePlan.context_type === 'Enrollment'
 
@@ -166,22 +190,23 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   }
 
   return (
-    <SlideTransition expanded={showProjections} direction="vertical" size="12rem">
+    <SlideTransition expanded={showProjections} direction="vertical" size="30rem">
       <View as="div">
-        <Flex as="section" alignItems="start" margin="0 0 small">
-          <PacePlanDateInput
-            label={I18n.t('Start Date')}
-            helpText={startHelpText}
-            message={startMessage}
-            interaction={startInteraction}
-            dateValue={startDateValue}
-            onDateChange={setStartDate}
-            weekendsDisabled={weekendsDisabled}
-            blackoutDates={blackoutDates}
-            validateDay={validateStart}
-            width="14rem"
-          />
-          <View margin="0 0 0 medium">
+        <Flex as="section" alignItems="center" margin="0" wrap="wrap">
+          <Flex.Item margin="0 medium medium 0" shouldGrow>
+            <PacePlanDateInput
+              label={I18n.t('Start Date')}
+              helpText={startHelpText}
+              interaction={startInteraction}
+              dateValue={startDateValue}
+              onDateChange={setStartDate}
+              weekendsDisabled={weekendsDisabled}
+              blackoutDates={blackoutDates}
+              validateDay={validateDate}
+              width="15rem"
+            />
+          </Flex.Item>
+          <Flex.Item margin="0 medium medium 0" shouldGrow>
             <PacePlanDateInput
               id="pace-plans-required-end-date-input"
               label={I18n.t('End Date')}
@@ -189,9 +214,13 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
               interaction={endDateInteraction}
               dateValue={endDateValue}
               onDateChange={setEndDate}
+              weekendsDisabled={weekendsDisabled}
+              blackoutDates={blackoutDates}
+              validateDay={date => validateDate(date, WHICH_DATE.END)}
+              width="15rem"
             />
-          </View>
-          <Flex.Item margin="0 0 0 medium" align="center">
+          </Flex.Item>
+          <Flex.Item margin="0 medium medium 0">
             <Checkbox
               data-testid="require-end-date-toggle"
               label={I18n.t('Require Completion by Specified End Date')}
@@ -203,36 +232,43 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
             />
           </Flex.Item>
         </Flex>
-        <Flex as="section" margin="0 0 small">
-          <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
-            <Text>
-              <i>
-                {I18n.t(
-                  {
-                    one: '1 assignment',
-                    other: '%{count} assignments'
-                  },
-                  {count: assignments}
-                )}
-              </i>
+        <Flex as="section" justifyItems="space-between" wrap="wrap" margin="0 0 x-small">
+          <Flex.Item margin="0 x-small x-small 0">
+            <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
+              <Text data-testid="number-of-assignments">
+                <i>
+                  {I18n.t(
+                    {
+                      one: '1 assignment',
+                      other: '%{count} assignments'
+                    },
+                    {count: assignments}
+                  )}
+                </i>
+              </Text>
+            </View>
+            <PresentationContent>
+              <Text color="secondary">|</Text>
+            </PresentationContent>
+            <View margin="0 0 0 x-small">
+              <Text data-testid="number-of-weeks">
+                <i>
+                  {I18n.t(
+                    {
+                      one: '1 week',
+                      other: '%{count} weeks'
+                    },
+                    {count: planWeeks}
+                  )}
+                </i>
+              </Text>
+            </View>
+          </Flex.Item>
+          <Flex.Item margin="0 0 x-small">
+            <Text data-testid="dates-shown-time-zone" fontStyle="italic">
+              {I18n.t('Dates shown in course time zone')}
             </Text>
-          </View>
-          <PresentationContent>
-            <Text color="secondary">|</Text>
-          </PresentationContent>
-          <View margin="0 0 0 x-small">
-            <Text>
-              <i>
-                {I18n.t(
-                  {
-                    one: '1 week',
-                    other: '%{count} weeks'
-                  },
-                  {count: planWeeks}
-                )}
-              </i>
-            </Text>
-          </View>
+          </Flex.Item>
         </Flex>
       </View>
     </SlideTransition>

@@ -46,8 +46,12 @@ module MicrosoftSync
     class << self
       # Returns a JSONified hash with class, message, public_message, and
       # public_interpolated_values. class and message are for internal debugging only.
-      def serialize(error)
-        result = { class: error.class.name, message: error.message&.truncate(1000) }
+      def serialize(error, **extra_metadata)
+        result = {
+          class: error.class.name,
+          message: error.message&.truncate(1000),
+          extra_metadata: extra_metadata
+        }
 
         if error.is_a?(MicrosoftSync::Errors::PublicError)
           locale_was = I18n.locale
@@ -63,6 +67,12 @@ module MicrosoftSync
         end
 
         result.compact.to_json
+      end
+
+      def extra_metadata_from_serialized(serialized_error)
+        return {} unless serialized_error
+
+        deserialize(serialized_error)[:extra_metadata] || {}
       end
 
       # Takes an string returned by serialize() and returns the error

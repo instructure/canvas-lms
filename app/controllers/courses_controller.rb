@@ -1590,7 +1590,7 @@ class CoursesController < ApplicationController
   #   Let students attach files to discussions
   #
   # @argument allow_student_discussion_editing [Boolean]
-  #   Let students edit or delete their own discussion posts
+  #   Let students edit or delete their own discussion replies
   #
   # @argument allow_student_organized_groups [Boolean]
   #   Let students organize their own groups

@@ -132,7 +132,7 @@ and secret in the Site Admin account of your Canvas install.
 A basic request looks like:
 
 <div class="method_details">
-<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&state=YYY&redirect_uri=https://example.com/oauth_complete</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&state=YYY&redirect_uri=https://example.com/oauth2response</h3>
 </div>
 
 See [GET login/oauth2/auth](file.oauth_endpoints.html#get-login-oauth2-auth) for details.
@@ -154,17 +154,18 @@ client_id and client_secret to obtain the final access_key.
 
 If your application passed a state parameter in step 1, it will be
 returned here in step 2 so that your app can tie the request and
-response together.
+response together, whether the response was successful or an error
+occurred.
 
 If the user doesn't accept the request for access, or if another error
 occurs, Canvas redirects back to your request\_uri with an `error`
 parameter, rather than a `code` parameter, in the query string.
 
 <div class="method_details">
-<h3 class="endpoint">http://www.example.com/oauth2response?error=access_denied</h3>
+<h3 class="endpoint">http://www.example.com/oauth2response?error=access_denied&error_description=a_description&state=YYY</h3>
 </div>
 
-`access_denied` is the only currently implemented error code.
+A list of possible error codes is found in the [RFC-7649 spec](https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1).
 
 <a name="oauth2-flow-2.1"></a>
 #### [Note for native apps](#oauth2-flow-2.1)

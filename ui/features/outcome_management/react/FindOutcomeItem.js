@@ -37,11 +37,16 @@ import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {Spinner} from '@instructure/ui-spinner'
 import {IMPORT_PENDING, IMPORT_COMPLETED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import {ratingsShape} from './Management/shapes'
 
 const FindOutcomeItem = ({
   id,
   title,
   description,
+  calculationMethod,
+  calculationInt,
+  masteryPoints,
+  ratings,
   isImported,
   importGroupStatus,
   importOutcomeStatus,
@@ -163,8 +168,12 @@ const FindOutcomeItem = ({
             <div style={{paddingBottom: '0.75rem'}}>
               <OutcomeDescription
                 description={description}
-                truncated={truncated}
                 friendlyDescription={friendlyDescription}
+                calculationMethod={calculationMethod}
+                calculationInt={calculationInt}
+                masteryPoints={masteryPoints}
+                ratings={ratings}
+                truncated={truncated}
               />
             </div>
           )}
@@ -179,6 +188,10 @@ FindOutcomeItem.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string,
   description: PropTypes.string,
+  calculationMethod: PropTypes.string,
+  calculationInt: PropTypes.number,
+  masteryPoints: PropTypes.number,
+  ratings: ratingsShape,
   friendlyDescription: PropTypes.string,
   isImported: PropTypes.bool.isRequired,
   importGroupStatus: PropTypes.string.isRequired,

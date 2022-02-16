@@ -17,6 +17,84 @@
  */
 
 import StudentDatastore from './stores/StudentDatastore'
+import type {StatusColors} from './constants/colors'
+
+export type CourseSettingsType = {
+  filter_speed_grader_by_student_group: boolean
+  allow_final_grade_override: boolean
+}
+
+export type GradebookSettings = {
+  show_separate_first_last_names: string
+  show_unpublished_assignments: string
+  show_concluded_enrollments: string
+  show_inactive_enrollments: string
+}
+
+export type GradebookOptions = {
+  active_grading_periods: GradingPeriod[]
+  allow_apply_score_to_ungraded: boolean
+  allow_separate_first_last_names: boolean
+  allow_view_ungraded_as_zero: boolean
+  applyScoreToUngradedModalNode: HTMLElement
+  attachment_url: string
+  attachment: AttachmentData
+  change_gradebook_version_url: string
+  colors: StatusColors
+  context_allows_gradebook_uploads: boolean
+  context_code: string
+  context_id: string
+  context_sis_id: string | null
+  context_url: string
+  course_is_concluded: boolean
+  course_name: string
+  course_settings: CourseSettingsType
+  course_url: string
+  current_grading_period_id: string
+  currentUserId: string
+  custom_column_datum_url: string
+  default_grading_standard: string
+  download_assignment_submissions_url: string
+  enhanced_gradebook_filters: boolean
+  export_gradebook_csv_url: string
+  filterNavNode: HTMLElement
+  grade_calc_ignore_unposted_anonymous_enabled: boolean
+  gradebook_assignment_search_and_redesign: boolean
+  gradebook_column_order_settings_url: string
+  gradebook_column_order_settings: ColumnOrderSettings
+  gradebook_column_size_settings_url: string
+  gradebook_column_size_settings: ColumnSizeSettings
+  gradebook_csv_progress: ProgressData
+  gradebook_import_url: string
+  gradebook_score_to_ungraded_progress: ProgressData
+  gradebook_is_editable: boolean
+  graded_late_submissions_exist: boolean
+  grading_period_set: GradingPeriodSet
+  grading_standard: boolean
+  group_weighting_scheme: string
+  load_assignments_by_grading_period_enabled: boolean
+  locale: string
+  outcome_gradebook_enabled: boolean
+  post_grades_feature: string
+  post_grades_ltis: Lti[]
+  publish_to_sis_enabled: boolean
+  publish_to_sis_url: string
+  re_upload_submissions_url: string
+  remove_gradebook_student_search_delay_enabled: boolean
+  reorder_custom_columns_url: string
+  sections: Section[]
+  setting_update_url: string
+  settings_update_url: string
+  settings: GradebookSettings
+  show_concluded_enrollments: string
+  show_inactive_enrollments: string
+  show_similarity_score: boolean
+  show_total_grade_as_points: boolean
+  sis_name: string
+  speed_grader_enabled: boolean
+  student_groups: StudentGroupCategoryMap
+  user_asset_string: string
+}
 
 export type Course = {
   id: string
@@ -34,6 +112,7 @@ export type Student = {
   id: string
   name: string
   displayName: string
+  sortable_name: string
   avatar_url: string
   enrollments: Enrollment[]
   loaded: boolean
@@ -62,7 +141,7 @@ export type StudentGroupMap = {
 }
 
 export type StudentGroupCategory = {
-  id: number
+  id: string
   groups: StudentGroup[]
 }
 
@@ -87,7 +166,7 @@ export type Assignment = {
   points_possible: number
   omit_from_final_grade: boolean
   only_visible_to_overrides: boolean
-  assignment_visibility: any
+  assignment_visibility: string[]
   grading_standard_id: string | null
   hasDownloadedSubmissions: boolean
   overrides: any
@@ -194,15 +273,44 @@ export type FilterCondition = {
   id: string
   type?: string
   value?: string
-  createdAt: string
+  created_at: string
 }
 
 export type Filter = {
   id: string
-  label?: string
+  name: string
   conditions: FilterCondition[]
-  isApplied: boolean
-  createdAt: string
+  is_applied: boolean
+  created_at: string
+}
+
+export type PartialFilter = Omit<Filter, 'id'>
+
+export type AppliedFilter = Omit<Filter, 'id'> & {is_applied: true}
+
+export type GradebookFilterApiRequest = {
+  name: string
+  payload: {
+    is_applied: boolean
+    conditions: FilterCondition[]
+  }
+}
+
+export type GradebookFilterApiResponse = {
+  gradebook_filter: GradebookFilterApiResponseFilter
+}
+
+export type GradebookFilterApiResponseFilter = {
+  course_id: string
+  id: string
+  user_id: string
+  name: string
+  payload: {
+    conditions: FilterCondition[]
+    is_applied: boolean
+  }
+  created_at: string
+  updated_at: string
 }
 
 export type AssignmentDueDate = {
@@ -221,14 +329,55 @@ export type EffectiveDueDateAssignmentUserMap = {
 
 export type GradingPeriod = {
   id: string
+  title: string
   startDate: number
 }
 
 export type GradingPeriodSet = {
   gradingPeriods: GradingPeriod[]
   displayTotalsForAllGradingPeriods: boolean
+  weighted: any
 }
 
 export type ColumnSizeSettings = {
   [key: string]: string
+}
+
+export type AttachmentData = {
+  attachment: Attachment
+}
+
+export type Attachment = {
+  id: string
+  updated_at: string
+}
+
+export type Lti = {
+  id: string
+  name: string
+  data_url: string
+}
+
+export type ColumnOrderSettings = {
+  freezeTotalGrade: any
+}
+
+export type Progress = {
+  id: string
+  workflow_state: string
+}
+
+export type ProgressData = {
+  progress: Progress
+}
+
+export type FilteredContentInfo = {
+  invalidAssignmentGroups: AssignmentGroup[]
+  totalPointsPossible: number
+}
+
+export type FlashMessage = {
+  key: string
+  message: string
+  variant: string
 }

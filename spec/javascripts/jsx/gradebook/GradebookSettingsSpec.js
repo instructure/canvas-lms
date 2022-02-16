@@ -977,6 +977,7 @@ QUnit.module('Gradebook#toggleShowSeparateFirstLastNames', hooks => {
   let gradebook
 
   hooks.beforeEach(() => {
+    setFixtureHtml($fixtures)
     gradebook = createGradebook({
       grid: {
         getColumns: () => [],
