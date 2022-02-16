@@ -1279,7 +1279,7 @@ class User < ActiveRecord::Base
     can :view_statistics
 
     given { |user| check_accounts_right?(user, :manage_students) }
-    can :read_profile and can :view_statistics and can :read_reports and can :read_grades
+    can :read_profile and can :read_reports and can :read_grades
 
     given { |user| check_accounts_right?(user, :manage_user_logins) }
     can :read and can :read_reports and can :read_profile and can :api_show_user and can :terminate_sessions

@@ -1317,6 +1317,8 @@ class UsersController < ApplicationController
       # pre-populate the reverse association
       @enrollments.each { |e| e.user = @user }
 
+      @show_page_views = !!(page_views_enabled? && @user.grants_right?(@current_user, session, :view_statistics))
+
       status = @user.deleted? ? 404 : 200
       respond_to do |format|
         format.html do
