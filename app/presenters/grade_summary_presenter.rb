@@ -141,19 +141,31 @@ class GradeSummaryPresenter
 
   def assignments
     @assignments ||= begin
-      visible_assignments = assignments_visible_to_student
+      visible_assignments = assignments_for_student
       overridden_assignments = assignments_overridden_for_student(visible_assignments)
       sorted_assignments(overridden_assignments)
     end
   end
 
-  def assignments_visible_to_student
+  def assignments_for_student
     includes = [:assignment_overrides, :post_policy]
     includes << :assignment_group if @assignment_order == :assignment_group
-    AssignmentGroup
-      .visible_assignments(student, @context, all_groups, includes: includes)
-      .where.not(submission_types: %w[not_graded wiki_page])
-      .except(:order)
+
+    # AssignmentGroup#visible_assignments returns all published assignments if you pass it
+    # a nil user. On the other hand, if you pass it a student, it returns only assignments
+    # visible to that student.
+    #
+    # The logic here is needed in order to ensure that teachers can view assignment grades
+    # for deactivated students (who themselves can not view those assignments).
+    assignments = if user_has_elevated_permissions?
+                    AssignmentGroup
+                      .visible_assignments(nil, @context, all_groups, includes: includes)
+                      .assigned_to_student(student.id)
+                  else
+                    AssignmentGroup.visible_assignments(student, @context, all_groups, includes: includes)
+                  end
+
+    assignments.where.not(submission_types: %w[not_graded wiki_page]).except(:order)
   end
 
   def assignments_overridden_for_student(assignments)
