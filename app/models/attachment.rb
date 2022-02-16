@@ -539,7 +539,9 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_word_count
-    delay.update_word_count if file_state == "available" && Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
+    if word_count.nil? && !deleted? && file_state != "broken" && Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
+      delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
+    end
   end
 
   def update_word_count
@@ -2288,11 +2290,13 @@ class Attachment < ActiveRecord::Base
                       end
                     elsif mime_class == "text"
                       open.read.scan(word_count_regex).count
+                    else
+                      0
                     end
   rescue => e
-    # If there is an error processing the file just log the error and return nil
+    # If there is an error processing the file just log the error and return 0
     Canvas::Errors.capture_exception(:word_count, e, :info)
-    nil
+    0
   end
 
   def word_count_supported?
