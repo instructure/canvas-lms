@@ -153,8 +153,7 @@ export default class AssignmentGroupListItemView extends DraggableCollectionView
       @cache.set(key, true)
 
   initSort: ->
-    opts = if ENV?.FEATURES?.responsive_misc then {handle: '.draggable-handle'} else {}
-    super(opts)
+    super({handle: '.draggable-handle'})
     @$list.on('sortactivate', @startSort)
       .on('sortdeactivate', @endSort)
 

@@ -70,7 +70,6 @@ export default class Message extends Model
         message.has_attachments = message.media_comment || message.attachments.length
         message.bodyHTML = TextHelper.formatMessage(message.body)
         message.text = TextHelper.plainText(message.body)
-        message.responsive_awareness = !!window.ENV?.FEATURES?.responsive_awareness
     data
 
   handleMessages: ->

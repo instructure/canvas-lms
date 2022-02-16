@@ -159,23 +159,16 @@ body:not(.course-menu-expanded) {
     color: $ic-font-color--subdued;
     margin-#{direction(right)}: $ic-sp;
     @include fontSize($ic-font-size--xsmall);
+    @include mobile-only {
+      display: inline-block;
+      width: 100%;
+    }
   }
   @include breakpoint(desktop) {
     justify-content: flex-end;
     a { margin-#{direction(right)}: 0; margin-#{direction(left)}: $ic-sp; }
   }
-
-  body.responsive_awareness & {
-    a {
-      @include mobile-only {
-        display: inline-block;
-        width: 100%;
-      }
-    }
-    @include mobile-only {
-      display: block;
-    }
-  }
+  @include mobile-only { display: block; }
 }
 
 .ic-app {
