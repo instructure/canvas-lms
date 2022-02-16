@@ -227,7 +227,7 @@ $(document).ready(function () {
         .addClass('option_for_section_' + section.id)
       $('#sections .section_blank').before($section)
       $section.slideDown()
-      $('#course_section_name').val()
+      $('#course_section_name').val('')
       $('#add_section_form button[type="submit"]').focus()
     },
     error(data) {
