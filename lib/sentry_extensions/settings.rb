@@ -17,21 +17,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SentryExtensions
-  class Settings
-    def self.settings
-      @sentry_settings ||= ConfigFile.load("sentry")
+  module Settings
+    class << self
+      def settings
+        @sentry_settings ||= ConfigFile.load("sentry")
 
-      @sentry_settings.presence || {}
-    end
+        @sentry_settings.presence || {}
+      end
 
-    def self.get(name, default = nil)
-      settings[name.to_sym] || Setting.get(name, default)
-    rescue PG::ConnectionBad
-      default
-    end
+      def get(name, default = nil)
+        settings[name.to_sym] || Setting.get(name, default)
+      rescue PG::ConnectionBad
+        default
+      end
 
-    def self.reset_settings
-      @sentry_settings = nil
+      def reset_settings
+        @sentry_settings = nil
+      end
     end
   end
 end
