@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this file is so app/views/jst/courses/Syllabus.handlebars pulls in
-// the app/bundles/syllabus.scss bundle without also having to add
-// a css_bundle to the page somwhere.
-@import "bundles/syllabus";
+import 'fullcalendar'
+import 'fullcalendar/dist/lang-all'
+
+// fullcalendar's locale bundle configures moment's locales too and overrides
+// ours..
+//
+// Since such a workaround did not exist prior to introducing the Catalan
+// language support, I'm assuming it's not affecting other languages. If that
+// turns out not to be the case, though, either extend this or revisit the
+// whole approach (e.g. import fullcalendar's locales earlier in the build)
+import reconfigureMomentCALocale from '../../../ext/custom_moment_locales/ca.js'
+
+reconfigureMomentCALocale()
