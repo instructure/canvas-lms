@@ -70,20 +70,6 @@ conferencing_in_planner:
   environments:
     beta:
       enable_at: "2021-10-18"
-remember_settings_tab:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Remember your settings page tab
-  description: |-
-    Keep track of which Settings page tab you are on
-    so the browser's back button takes you to your previous
-    tab, and that refreshing the page will return you to
-    the current active tab.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 submission_feedback_indicators:
   state: allowed
   applies_to: RootAccount
