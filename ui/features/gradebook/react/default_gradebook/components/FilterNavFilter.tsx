@@ -83,7 +83,7 @@ export default function FilterNavFilter({
   }, [isRenaming, wasRenaming])
 
   const onAddCondition = () => {
-    const id: string = uuid()
+    const id: string = uuid.v4()
     onChange({
       ...filter,
       conditions: filter.conditions.concat({
