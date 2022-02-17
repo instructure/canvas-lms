@@ -81,7 +81,6 @@ export const TextSection = ({settings, onChange}) => (
           id="button-text-color"
           onChange={textColor => onChange({textColor})}
           popoverMountNode={getTextSection}
-          readonly
         />
       </Flex.Item>
 
@@ -92,7 +91,6 @@ export const TextSection = ({settings, onChange}) => (
           id="button-text-background-color"
           onChange={textBackgroundColor => onChange({textBackgroundColor})}
           popoverMountNode={getTextSection}
-          readonly
         />
       </Flex.Item>
 
