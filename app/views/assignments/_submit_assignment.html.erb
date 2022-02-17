@@ -23,10 +23,10 @@
       action: :create,
       assignment_id: @assignment.id
     )
-    show_google_docs = @assignment.allow_google_docs_submission? &&
-                       @real_current_user.blank? &&
-                       @domain_root_account &&
-                       feature_and_service_enabled?(:google_drive)
+    # Force this plugin to be unusable for now.
+    # This plugin is deprecated and all related
+    # code will be removed soon.
+    show_google_docs = false
 -%>
 <%
   js_bundle :submit_assignment

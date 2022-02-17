@@ -256,69 +256,15 @@ describe "assignments" do
         click_away_accept_alert
       end
 
-      it "has a google doc tab if google docs is enabled", priority: "1" do
+      # This plugin is deprecated and all associated code will soon be removed.
+      # Just make sure the user can't access the form even if it is enabled for now.
+      it "has no google doc tab even if google docs is enabled", priority: "1" do
         @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f(".submit_assignment_link").click
         wait_for_animations
 
-        expect(f("a[href*='submit_google_doc_form']")).to_not be_nil
-      end
-
-      context "select file or folder" do
-        before do
-          # double out function calls
-          google_drive_connection = double
-          allow(google_drive_connection).to receive(:service_type).and_return("google_drive")
-          allow(google_drive_connection).to receive(:retrieve_access_token).and_return("access_token")
-          allow(google_drive_connection).to receive(:authorized?).and_return(true)
-
-          # double files to show up from "google drive"
-          file_list = create_file_list
-          allow(google_drive_connection).to receive(:list_with_extension_filter).and_return(file_list)
-
-          allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
-
-          # create assignment
-          @assignment.update(submission_types: "online_upload")
-          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          f(".submit_assignment_link").click
-          f("a[href*='submit_google_doc_form']").click
-          wait_for_animations
-        end
-
-        it "selects a file from google drive", priority: "1" do
-          # find file in list
-          # the file we are looking for is created as the second file in the list
-          expect(ff(".filename")[1]).to include_text("test.mydoc")
-        end
-
-        it "selects a file in a folder from google drive", priority: "1" do
-          # open folder
-          f(".folder").click
-          wait_for_animations
-
-          # find file in list
-          expect(f(".filename")).to include_text("nested.mydoc")
-        end
-      end
-
-      it "forces users to authenticate", priority: "1" do
-        # double out google drive
-        google_drive_connection = double
-        allow(google_drive_connection).to receive(:service_type).and_return("google_drive")
-        allow(google_drive_connection).to receive(:retrieve_access_token).and_return(nil)
-        allow(google_drive_connection).to receive(:authorized?).and_return(nil)
-        allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
-
-        @assignment.update(submission_types: "online_upload")
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f(".submit_assignment_link").click
-        f("a[href*='submit_google_doc_form']").click
-        wait_for_animations
-
-        # button that forces users to authenticate if they want to use google drive
-        expect(fln("Authorize Google Drive Access")).to be_truthy
+        expect(f("#content")).not_to contain_css("a[href*='submit_google_doc_form']")
       end
     end
 

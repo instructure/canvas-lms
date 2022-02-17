@@ -4244,7 +4244,7 @@ nn:
     update: Oppdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursliste"
-  buttons_and_icons_e66ee12c: "Knappar og ikonar"
+  buttons_and_icons_e66ee12c: "Knappar og ikon"
   by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Av klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til seksjonar som er utan innhald.  Dersom du f.eks. ikkje har oppretta quizar, er ikkje koplinga til quizar synleg. Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
@@ -6810,7 +6810,7 @@ nn:
         copy_course: "Kopier emne"
     course_show_secondary: 
       details: 
-        confirm_unenroll: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikkje lenger kunne sjå emnelista eller kommunisere direkte med faglærarar, og heller ikkje sjå emnehendingar i straumen eller som meldingar."
+        confirm_unenroll: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikkje lenger kunne sjå emnelista eller kommunisere direkte med faglærarane, og heller ikkje sjå emnehendingar i straumen eller som meldingar."
       headers: 
         course_status: Emnestatus
       headings: 
@@ -20291,7 +20291,7 @@ nn:
         wiki_page_name: Sidenamn
         wiki_page_namem: Oppgåvenamn
       loading: Lastar...
-      new_assignment_notice: "Vel oppgåva du vil ha knyte til *modulen*, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
+      new_assignment_notice: "Vel oppgåva du vil ha knytt til *modulen*, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
       new_assignment_option: "[ Ny oppgåve ]"
       new_page_option: "[ Ny side ]"
       new_quiz_notice: "Vel quizen du vil knyte til denne *modulen*, eller legg til ein ny quiz ved å velje \"Ny quiz\"."
@@ -21559,7 +21559,7 @@ nn:
       og tel ikkje i maksimumstalet på 50 domener.
   the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
       Retningslinjene for innhaldstryggleik tillet å vere restriktiv med eigendefinerte
-      JavaScript som kjørar i din Canvas-installasjon. Du kan manuelt legge til
+      JavaScript som køyrer i din Canvas-installasjon. Du kan manuelt legge til
       opp til %{max_domains} tillatne domener. Jokernotasjon er tilrådd
       (f.eks. *.instructure.com). Canvas- og Instructure-domener er automatisk inkludert
       og tel ikkje i maksimumstalet på 50 domener.
@@ -21972,7 +21972,7 @@ nn:
       Denne rapporten får eit antal på kor mange innleveringar som vart levert på ein gitt dag.
       Antal innleveringar kan endre seg over tid, sidan dette sjekker submitted_at attributten i databasen.
       Dersom ein brukar leverer ei eldre oppgåve på nytt, vil submitted_at bli oppdatert til den nye innleveringsdatoen.
-      Antal er utrekna frå starten av dagen til slutten av dagen i tidssonen til kontoen som køyrer rapporten.
+      Antal er utrekna frå starten av dagen til slutten av dagen i tidssona til kontoen som køyrer rapporten.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Denne rapporten inneheld nylege Big blue button konferansar for ein konto"
   this_report_gets_the_submissions_for_courses_d83bb449: "Rapporten hentar innleveringar i emne."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Rapporten viser alle læringsmål som er oppretta innanfor kontoen. CSV-fila inneheld ei rad per læringsmål og viser alle  eigenskaper som høyrer til kvart læringsmål."
@@ -23683,7 +23683,7 @@ nn:
   what_storage_options_do_i_have_in_zoom_b79c738e: "Kva lagringsalternativ har eg i Zoom?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Studentar kan velje om dei vil svare anonymt. Ditt namn og profilbilete vil alltid vere synleg."
-  when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Når du svarer kan du velje om namnet og profilbiletet ditt skal vere synleg for andre studentar, eller omo du vil vere anonym."
+  when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Når du svarer kan du velje om namnet og profilbiletet ditt skal vere synleg for andre studentar, eller om du vil vere anonym."
   when_disabled_students_can_still_send_individual_m_567a911c: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når vurderingsresultat vert skjult for anonyme oppgåver, vil resultata bli skjult for alle i emnet. Anonymitet innførast på nytt."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker emnet. Du kan la sida vise aktivitetsstraum, liste over emnemodular, emneoversikt eller ei tilpassa side du lagar sjølv. Standard er aktivitetsstraumen på emnet."
@@ -23897,6 +23897,7 @@ nn:
   withdrawn_4c838347: Avmeld
   withdrawn_or_enrolled_43a3f0ae: "Avmeldt eller påmeldt"
   wmv_1119d032: WMV
+  word_count_c77fe3a6: Ordtelling
   work_and_create_together_c65f358b: "Opprett og arbeid saman"
   working_b1f63edf: arbeider...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Vil du godta eller avslå oppdateringa?"
@@ -23980,8 +23981,8 @@ nn:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Du kan ikkje slette ein underkonto som inneheld emne."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Du kan ikkje slette ein underkonto som inneheld underkontoar. "
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Du kan ikkje slette %{account_name} fordi han har emne knytta til seg "
-  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Du kan ikkje endre dette vurderingsskjema, enten fordi du ikkje har løyve eller fordi det er i bruk fleire stader. Endringar du gjer vil resultere i eit nytt vurderingsskjema. Tilknytta læringsmål vil bruke emnets ekspertiseskala. Vil du halde fram likevel?"
-  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Du kan ikkje endre dette vurderingsskjema, enten fordi du ikkje har løyve eller fordi det er i bruk fleire stader. Endringar du gjer vil resultere i eit nytt vurderingsskjema. Tilknytta læringsmålkriterier vil bruke kontoens meistringsskala. Vil du halde fram likevel?"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Du kan ikkje endre dette vurderingsskjemaet, enten fordi du ikkje har løyve eller fordi det er i bruk fleire stader. Endringar du gjer vil resultere i eit nytt vurderingsskjema. Tilknytta læringsmål vil bruke emnets ekspertiseskala. Vil du halde fram likevel?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Du kan ikkje endre dette vurderingsskjemaet, enten fordi du ikkje har løyve eller fordi det er i bruk fleire stader. Endringar du gjer vil resultere i eit nytt vurderingsskjema. Tilknytta læringsmålkriterier vil bruke kontoens meistringsskala. Vil du halde fram likevel?"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Dette vurderingsskjemaet er i bruk fleire stader. Dersom du redigerer her, vil det bli oppretta ein kopi av vurderingsskjemaet og endringane vil ikkje påverka det opphavlege skjemaet. Vil du halde fram likevel?"
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge på igjen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan oppdatere noko av denne brukaren sin informasjon, men dei kan endre det om dei vil."
