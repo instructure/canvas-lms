@@ -33,7 +33,7 @@ export default class DateGroup extends Backbone.Model {
   }
 
   unlockAt() {
-    const unlockAt = this.get('unlock_at')
+    const unlockAt = this.get('unlock_at') || this.get('single_section_unlock_at')
     if (unlockAt) {
       return tz.parse(unlockAt)
     } else {
@@ -42,7 +42,7 @@ export default class DateGroup extends Backbone.Model {
   }
 
   lockAt() {
-    const lockAt = this.get('lock_at')
+    const lockAt = this.get('lock_at') || this.get('single_section_lock_at')
     if (lockAt) {
       return tz.parse(lockAt)
     } else {
