@@ -649,14 +649,14 @@ describe GradebooksController do
 
       describe "js_env enhanced_gradebook_filters" do
         it "sets enhanced_gradebook_filters in js_env as true if enabled" do
-          @course.root_account.enable_feature!(:enhanced_gradebook_filters)
+          @course.enable_feature!(:enhanced_gradebook_filters)
           user_session(@teacher)
           get :show, params: { course_id: @course.id }
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(true)
         end
 
         it "sets enhanced_gradebook_filters in js_env as false if disabled" do
-          @course.root_account.disable_feature!(:enhanced_gradebook_filters)
+          @course.disable_feature!(:enhanced_gradebook_filters)
           user_session(@teacher)
           get :show, params: { course_id: @course.id }
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(false)
