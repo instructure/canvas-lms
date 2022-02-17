@@ -221,7 +221,7 @@ export default function FilterNavFilter({
             <Item>
               <Checkbox
                 checked={filter.is_applied}
-                label={I18n.t('Apply filter')}
+                label={filter.id ? I18n.t('Apply filter') : I18n.t('Apply conditions')}
                 labelPlacement="start"
                 onChange={toggleApply}
                 size="small"
