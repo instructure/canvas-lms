@@ -110,11 +110,7 @@ export default function ({
     }
   }
 
-  const shouldShowDateOption = type => {
-    const isSelectedType = condition.type === type
-    const isTypeAlreadyInFilter = conditionsInFilter.some(condition_ => condition_.type === type)
-    return isSelectedType || !isTypeAlreadyInFilter
-  }
+  const otherConditions = conditionsInFilter.filter(condition_ => condition_.id !== condition.id)
 
   return (
     <Flex justifyItems="space-between" elementRef={el => (divRef.current = el)}>
@@ -133,47 +129,51 @@ export default function ({
             })
           }
         >
-          {assignmentGroups.length > 0 && (
-            <Option id={`${condition.id}-assignment-group`} value="assignment-group">
-              {I18n.t('Assignment Group')}
-            </Option>
-          )}
+          {assignmentGroups.length > 0 &&
+            otherConditions.every(c => c.type !== 'assignment-group') && (
+              <Option id={`${condition.id}-assignment-group`} value="assignment-group">
+                {I18n.t('Assignment Group')}
+              </Option>
+            )}
 
-          {gradingPeriods.length > 0 && (
+          {gradingPeriods.length > 0 && otherConditions.every(c => c.type !== 'grading-period') && (
             <Option id={`${condition.id}-grading-period`} value="grading-period">
               {I18n.t('Grading Period')}
             </Option>
           )}
 
-          {modules.length > 0 && (
+          {modules.length > 0 && otherConditions.every(c => c.type !== 'module') && (
             <Option id={`${condition.id}-module`} value="module">
               {I18n.t('Module')}
             </Option>
           )}
 
-          {sections.length > 0 && (
+          {sections.length > 0 && otherConditions.every(c => c.type !== 'section') && (
             <Option id={`${condition.id}-section`} value="section">
               {I18n.t('Section')}
             </Option>
           )}
 
-          {Object.keys(studentGroupCategories).length > 0 && (
-            <Option id={`${condition.id}-student-group`} value="student-group">
-              {I18n.t('Student Group')}
+          {Object.keys(studentGroupCategories).length > 0 &&
+            otherConditions.every(c => c.type !== 'student-group') && (
+              <Option id={`${condition.id}-student-group`} value="student-group">
+                {I18n.t('Student Group')}
+              </Option>
+            )}
+
+          {otherConditions.every(c => c.type !== 'submissions') && (
+            <Option id={`${condition.id}-submissions`} value="submissions">
+              {I18n.t('Submissions')}
             </Option>
           )}
 
-          <Option id={`${condition.id}-submissions`} value="submissions">
-            {I18n.t('Submissions')}
-          </Option>
-
-          {shouldShowDateOption('start-date') && (
+          {otherConditions.every(c => c.type !== 'start-date') && (
             <Option id={`${condition.id}-start-date`} value="start-date">
               {I18n.t('Start Date')}
             </Option>
           )}
 
-          {shouldShowDateOption('end-date') && (
+          {otherConditions.every(c => c.type !== 'end-date') && (
             <Option id={`${condition.id}-end-date`} value="end-date">
               {I18n.t('End Date')}
             </Option>
