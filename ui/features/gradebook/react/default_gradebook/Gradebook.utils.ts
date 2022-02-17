@@ -42,6 +42,7 @@ import type {
   StudentGroupCategoryMap,
   Submission
 } from './gradebook.d'
+import filterConditionTypes from './constants/filterConditionTypes'
 
 const I18n = useI18nScope('gradebook')
 
@@ -204,24 +205,13 @@ export function getAllAppliedFilterValues(filters: Filter[]) {
     .map(c => c.value)
 }
 
-export const conditionTypes: FilterConditionType[] = [
-  'section',
-  'module',
-  'assignment-group',
-  'grading-period',
-  'student-group',
-  'start-date',
-  'end-date',
-  'submissions'
-]
-
 // Extra normalization; comes from jsonb payload
 export const deserializeFilter = (json: GradebookFilterApiResponse): Filter => {
   const filter = json.gradebook_filter
   if (!filter.id || typeof filter.id !== 'string') throw new Error('invalid filter id')
   if (!Array.isArray(filter.payload.conditions)) throw new Error('invalid filter conditions')
   const conditions = filter.payload.conditions
-    .filter(c => c && (typeof c.type === 'undefined' || conditionTypes.includes(c.type)))
+    .filter(c => c && (typeof c.type === 'undefined' || filterConditionTypes.includes(c.type)))
     .map(c => ({
       id: c.id,
       type: c.type,
