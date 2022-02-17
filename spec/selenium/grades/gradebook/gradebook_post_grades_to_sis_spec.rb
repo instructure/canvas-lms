@@ -98,7 +98,7 @@ describe "Gradebook - post grades to SIS" do
 
   describe "Plugin with enhanced filters enabed" do
     before(:once) do
-      @course.root_account.enable_feature!(:enhanced_gradebook_filters)
+      @course.enable_feature!(:enhanced_gradebook_filters)
       export_plugin_setting.update(disabled: false)
     end
 
@@ -222,7 +222,7 @@ describe "Gradebook - post grades to SIS" do
     end
 
     before(:once) do
-      @course.root_account.enable_feature!(:enhanced_gradebook_filters)
+      @course.enable_feature!(:enhanced_gradebook_filters)
     end
 
     let!(:tool) { create_post_grades_tool }

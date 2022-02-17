@@ -69,7 +69,7 @@ describe "sync grades to sis" do
 
     before do
       if @enhanced_filters
-        Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+        @course.enable_feature!(:enhanced_gradebook_filters)
       end
       @assignment = @course.assignments.create!(name: "assignment", assignment_group: @assignment_group,
                                                 post_to_sis: true, workflow_state: "published")
