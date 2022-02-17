@@ -90,14 +90,14 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Is student group filter not represented?
     if (
       initialRowFilterSettings.student_group_id &&
-      !findAllAppliedFilterValuesOfType('student_group', get().filters).includes(
+      !findAllAppliedFilterValuesOfType('student-group', get().filters).includes(
         initialRowFilterSettings.student_group_id
       )
     ) {
       conditions.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.student_group_id,
-        type: 'student_group',
+        type: 'student-group',
         created_at: new Date().toISOString()
       })
     }
@@ -105,14 +105,14 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Is assignment group filter not represented?
     if (
       initialColumnFilterSettings.assignment_group_id &&
-      !findAllAppliedFilterValuesOfType('assignment_group', get().filters).includes(
+      !findAllAppliedFilterValuesOfType('assignment-group', get().filters).includes(
         initialColumnFilterSettings.assignment_group_id
       )
     ) {
       conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.assignment_group_id,
-        type: 'assignment_group',
+        type: 'assignment-group',
         created_at: new Date().toISOString()
       })
     }
@@ -120,14 +120,14 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Is module filter not represented?
     if (
       initialColumnFilterSettings.context_module_id &&
-      !findAllAppliedFilterValuesOfType('context_module', get().filters).includes(
+      !findAllAppliedFilterValuesOfType('module', get().filters).includes(
         initialColumnFilterSettings.context_module_id
       )
     ) {
       conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.context_module_id,
-        type: 'context_module',
+        type: 'module',
         created_at: new Date().toISOString()
       })
     }
@@ -135,14 +135,14 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Is grading period filter not represented?
     if (
       initialColumnFilterSettings.grading_period_id &&
-      !findAllAppliedFilterValuesOfType('grading_period', get().filters).includes(
+      !findAllAppliedFilterValuesOfType('grading-period', get().filters).includes(
         initialColumnFilterSettings.grading_period_id
       )
     ) {
       conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.grading_period_id,
-        type: 'grading_period',
+        type: 'grading-period',
         created_at: new Date().toISOString()
       })
     }
