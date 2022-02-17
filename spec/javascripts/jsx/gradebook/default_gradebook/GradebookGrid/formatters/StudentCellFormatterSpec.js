@@ -19,7 +19,7 @@
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 import StudentCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/StudentCellFormatter.js'
 
 QUnit.module('GradebookGrid StudentCellFormatter', hooks => {

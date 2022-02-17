@@ -22,9 +22,10 @@ import wrapper from '../../jst/DialogFormWrapper.handlebars'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 
+responsiveAwarenessEnabled = !!window.ENV?.FEATURES?.responsive_awareness
 export isSmallTablet = !window.matchMedia('(min-width: 550px)').matches
 export getResponsiveWidth = (tabletWidth, desktopWidth) ->
-  if isSmallTablet
+  if responsiveAwarenessEnabled && isSmallTablet
     return tabletWidth
   else
     return desktopWidth

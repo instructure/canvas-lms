@@ -337,13 +337,8 @@ QUnit.module('Dashboard Header', hooks => {
       ]
     })
 
-    test('it should show the observer options Select on planner dashboard', () => {
+    test('it should show the observer options Select', () => {
       ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="planner" />, container)
-      ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
-    })
-
-    test('it should show the observer options Select on recent activity dashboard', () => {
-      ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="activity" />, container)
       ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
     })
   })
