@@ -61,12 +61,13 @@ module.exports.pitch = function(remainingRequest, precedingRequest, data) {
       import 'translations/${scopeName}';
       import 'translations/_core';
     `
-    : ''
+    : `
+      import 'translations/_core_en';
+    `
 
   const scopedJavascript = `
     import I18n from '@canvas/i18n/i18nObj';
     ${translationDependency}
-    import 'translations/_core_en';
 
     export default I18n.scoped('${scopeName}');
   `
