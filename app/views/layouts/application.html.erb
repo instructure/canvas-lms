@@ -32,8 +32,6 @@
   left_side_custom = nil
   right_side = (yield :right_side).presence
 
-  sticky_enabled = Account.site_admin.feature_enabled?(:sticky_left_nav)
-
   if Account.site_admin.feature_enabled?(:remember_course_nav_collapsed_state)
     # Collapse the course menu according to user preference, unless a certain action
     # requests that it default to collapsed for that page
@@ -157,37 +155,33 @@
           end
         %>
         <div id="left-side"
-          class="ic-app-course-menu <%= 'ic-sticky-on ' if sticky_enabled %><%= list_view_class %>"
+          class="ic-app-course-menu ic-sticky-on <%= list_view_class %>"
           style="display: <%= @collapse_course_menu ? "none" : "block" %>"
           >
-          <% if sticky_enabled %>
-            <div id="sticky-container" class="ic-sticky-frame">
-          <% end %>
-            <% if left_side %>
-              <%= left_side %>
-            <% else %>
-              <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
-                <a class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
-                  <%= t("Switch Group")%>
-                  <i class="icon-mini-arrow-down"></i>
-                </a>
-                <ul class="al-options">
-                  <% @context.group_category.groups.active.by_name.each do |group| %>
-                    <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
-                  <% end %>
-                </ul>
+          <div id="sticky-container" class="ic-sticky-frame">
+          <% if left_side %>
+            <%= left_side %>
+          <% else %>
+            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
+              <a class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
+                <%= t("Switch Group")%>
+                <i class="icon-mini-arrow-down"></i>
+              </a>
+              <ul class="al-options">
+                <% @context.group_category.groups.active.by_name.each do |group| %>
+                  <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
+                <% end %>
+              </ul>
 
-                <!-- this is so if there's more than 25 groups it doesn't immediately close the "Switch Group" menu when you open it, see: KNO-38 -->
-                <script> document.getElementById('left-side').addEventListener('click', e => e.stopPropagation()) </script>
-              <% end %>
-              <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
-                <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
-              <% end %>
-              <%= section_tabs %>
+              <!-- this is so if there's more than 25 groups it doesn't immediately close the "Switch Group" menu when you open it, see: KNO-38 -->
+              <script> document.getElementById('left-side').addEventListener('click', e => e.stopPropagation()) </script>
             <% end %>
-          <% if sticky_enabled %>
-            </div>
+            <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
+              <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
+            <% end %>
+            <%= section_tabs %>
           <% end %>
+          </div>
         </div>
       <% end %>
       <div id="not_right_side" class="ic-app-main-content">
