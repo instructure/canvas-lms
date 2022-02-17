@@ -70,7 +70,7 @@ describe('filterState', () => {
         conditions: [
           {
             id: '123',
-            type: 'student_group',
+            type: 'student-group',
             value: '1',
             created_at: '2022-01-01T00:00:00Z'
           }
@@ -156,5 +156,161 @@ describe('filterState', () => {
     })
     expect(fetchMock.called(url, 'DELETE')).toBe(true)
     expect(store.getState().filters).toMatchObject([])
+  })
+
+  it('does not derive staged filter from empty gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings = {
+      section_id: null,
+      student_group_id: null
+    }
+    const initialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null
+    }
+    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    expect(store.getState().stagedFilter).toBeNull()
+  })
+
+  it('derive staged section filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings = {
+      section_id: 1,
+      student_group_id: null
+    }
+    const initialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null
+    }
+    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    expect(store.getState().stagedFilter).not.toBeNull()
+    expect(store.getState().stagedFilter).toMatchObject({
+      name: '',
+      conditions: [
+        {
+          id: expect.any(String),
+          type: 'section',
+          value: 1
+        }
+      ],
+      is_applied: true,
+      created_at: expect.any(String)
+    })
+  })
+
+  it('derive staged student group filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings = {
+      section_id: null,
+      student_group_id: 1
+    }
+    const initialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null
+    }
+    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    expect(store.getState().stagedFilter).not.toBeNull()
+    expect(store.getState().stagedFilter).toMatchObject({
+      name: '',
+      conditions: [
+        {
+          id: expect.any(String),
+          type: 'student-group',
+          value: 1
+        }
+      ],
+      is_applied: true,
+      created_at: expect.any(String)
+    })
+  })
+
+  it('derive staged assignment group filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings = {
+      section_id: null,
+      student_group_id: null
+    }
+    const initialColumnFilterSettings = {
+      assignment_group_id: 1,
+      context_module_id: null,
+      grading_period_id: null
+    }
+    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    expect(store.getState().stagedFilter).not.toBeNull()
+    expect(store.getState().stagedFilter).toMatchObject({
+      name: '',
+      conditions: [
+        {
+          id: expect.any(String),
+          type: 'assignment-group',
+          value: 1
+        }
+      ],
+      is_applied: true,
+      created_at: expect.any(String)
+    })
+  })
+
+  it('derive staged grading period filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings = {
+      section_id: null,
+      student_group_id: null
+    }
+    const initialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: 1
+    }
+    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    expect(store.getState().stagedFilter).not.toBeNull()
+    expect(store.getState().stagedFilter).toMatchObject({
+      name: '',
+      conditions: [
+        {
+          id: expect.any(String),
+          type: 'grading-period',
+          value: 1
+        }
+      ],
+      is_applied: true,
+      created_at: expect.any(String)
+    })
+  })
+
+  it('derive staged module filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings = {
+      section_id: null,
+      student_group_id: null
+    }
+    const initialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: 1,
+      grading_period_id: null
+    }
+    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    expect(store.getState().stagedFilter).not.toBeNull()
+    expect(store.getState().stagedFilter).toMatchObject({
+      name: '',
+      conditions: [
+        {
+          id: expect.any(String),
+          type: 'module',
+          value: 1
+        }
+      ],
+      is_applied: true,
+      created_at: expect.any(String)
+    })
   })
 })

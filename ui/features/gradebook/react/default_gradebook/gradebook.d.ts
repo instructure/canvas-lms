@@ -307,9 +307,19 @@ export type SectionMap = {
   [key: string]: Section
 }
 
+export type FilterConditionType =
+  | 'section'
+  | 'module'
+  | 'assignment-group'
+  | 'grading-period'
+  | 'student-group'
+  | 'start-date'
+  | 'end-date'
+  | 'submissions'
+
 export type FilterCondition = {
   id: string
-  type?: string
+  type?: FilterConditionType
   value?: string
   created_at: string
 }
