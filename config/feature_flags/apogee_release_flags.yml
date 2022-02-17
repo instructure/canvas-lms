@@ -88,8 +88,10 @@ edit_submission_status_from_speedgrader:
   description: If set, allows submission status to be changed from inside of
     Speedgrader
 enhanced_gradebook_filters:
-  state: hidden
-  applies_to: RootAccount
+  beta: true
+  state: allowed
+  applies_to: Course
+  root_opt_in: true
   display_name: Enhanced Gradebook Filters
   description:
     wrapper: <a href="https://community.canvaslms.com/t5/Gradebook-Filters/gh-p/Gradebook-Filters">\1</a>
