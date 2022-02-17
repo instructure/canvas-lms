@@ -79,6 +79,14 @@ def computeTestCount() {
   env.CRYSTALBALL_SPEC = specUnique.join(' ')
 
   summaryMessage = "Map: $mapVersion\n"
+
+  if (configuration.getBoolean('skip-crystalball', 'false')) {
+    summaryMessage += "Skip Crystalball Detected! - Running everything!"
+    crystalballColor = 'danger'
+    env.CRYSTALBALL_SPEC = '.'
+    return
+  }
+
   // Crystalball predictor returned empty text file
   if (specUnique.size() == 0) {
     summaryMessage += "Configuration Changes Detected! - Running everything!"
