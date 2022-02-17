@@ -490,10 +490,13 @@ export default class Assignment extends Model
     @isQuizLTIAssignment() && @newQuizzesAssignmentBuildButtonEnabled()
 
   defaultDates: =>
+    singleSection = @singleSection()
     group = new DateGroup
       due_at:    @get("due_at")
       unlock_at: @get("unlock_at")
       lock_at:   @get("lock_at")
+      single_section_unlock_at: singleSection?.unlockAt
+      single_section_lock_at: singleSection?.lockAt
 
   multipleDueDates: =>
     count = @get("all_dates_count")
@@ -521,6 +524,14 @@ export default class Assignment extends Model
     groups = @get("all_dates")
     models = (groups and groups.models) or []
     result = _.map models, (group) -> group.toJSON()
+
+  singleSection: =>
+    allDates = @allDates()
+    if allDates and allDates.length == 1
+      for section in allDates
+        return section
+    else
+      return null
 
   singleSectionDueDate: =>
     if !@multipleDueDates() && !@dueAt()
