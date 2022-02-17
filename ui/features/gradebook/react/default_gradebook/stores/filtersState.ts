@@ -17,11 +17,17 @@
  */
 
 import {SetState, GetState} from 'zustand'
+import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 // @ts-ignore
 import I18n from 'i18n!gradebook'
-import type {PartialFilter, AppliedFilter, Filter} from '../gradebook.d'
-import {deserializeFilter, serializeFilter, compareFilterByDate} from '../Gradebook.utils'
+import type {PartialFilter, AppliedFilter, FilterCondition, Filter} from '../gradebook.d'
+import {
+  deserializeFilter,
+  serializeFilter,
+  compareFilterByDate,
+  findAllAppliedFilterValuesOfType
+} from '../Gradebook.utils'
 import type {GradebookStore} from './index'
 
 export type FiltersState = {
@@ -30,10 +36,22 @@ export type FiltersState = {
   isFiltersLoading: boolean
 
   appliedFilters: () => AppliedFilter[]
+  initializeStagedFilter: (InitialColumnFilterSettings, InitialRowFilterSettings) => void
   fetchFilters: () => Promise<void>
   saveStagedFilter: () => Promise<void>
   updateFilter: (filter: Filter) => Promise<void>
   deleteFilter: (filter: Filter) => Promise<any>
+}
+
+type InitialColumnFilterSettings = {
+  assignment_group_id: null | string
+  context_module_id: null | string
+  grading_period_id: null | string
+}
+
+type InitialRowFilterSettings = {
+  section_id: null | string
+  student_group_id: null | string
 }
 
 export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): FiltersState => ({
@@ -46,6 +64,98 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   appliedFilters: () => {
     const allFilters = get().stagedFilter ? [...get().filters, get().stagedFilter!] : get().filters
     return allFilters.filter(filter => filter.is_applied) as AppliedFilter[]
+  },
+
+  initializeStagedFilter: (
+    initialRowFilterSettings: InitialRowFilterSettings,
+    initialColumnFilterSettings: InitialColumnFilterSettings
+  ) => {
+    const conditions: FilterCondition[] = []
+
+    // Is section filter not represented?
+    if (
+      initialRowFilterSettings.section_id &&
+      !findAllAppliedFilterValuesOfType('section', get().filters).includes(
+        initialRowFilterSettings.section_id
+      )
+    ) {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialRowFilterSettings.section_id,
+        type: 'section',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    // Is student group filter not represented?
+    if (
+      initialRowFilterSettings.student_group_id &&
+      !findAllAppliedFilterValuesOfType('student_group', get().filters).includes(
+        initialRowFilterSettings.student_group_id
+      )
+    ) {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialRowFilterSettings.student_group_id,
+        type: 'student_group',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    // Is assignment group filter not represented?
+    if (
+      initialColumnFilterSettings.assignment_group_id &&
+      !findAllAppliedFilterValuesOfType('assignment_group', get().filters).includes(
+        initialColumnFilterSettings.assignment_group_id
+      )
+    ) {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialColumnFilterSettings.assignment_group_id,
+        type: 'assignment_group',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    // Is module filter not represented?
+    if (
+      initialColumnFilterSettings.context_module_id &&
+      !findAllAppliedFilterValuesOfType('context_module', get().filters).includes(
+        initialColumnFilterSettings.context_module_id
+      )
+    ) {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialColumnFilterSettings.context_module_id,
+        type: 'context_module',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    // Is grading period filter not represented?
+    if (
+      initialColumnFilterSettings.grading_period_id &&
+      !findAllAppliedFilterValuesOfType('grading_period', get().filters).includes(
+        initialColumnFilterSettings.grading_period_id
+      )
+    ) {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialColumnFilterSettings.grading_period_id,
+        type: 'grading_period',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    if (conditions.length > 0) {
+      const stagedFilter: PartialFilter = {
+        name: '',
+        conditions,
+        is_applied: true,
+        created_at: new Date().toISOString()
+      }
+      set({stagedFilter})
+    }
   },
 
   fetchFilters: async () => {
