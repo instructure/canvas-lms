@@ -148,7 +148,7 @@ module Crystalball
       include Helpers::AffectedExampleGroupsDetector
       include Strategy
 
-      CONFIG_CHANGES = [%r{config/.*.rb$}, %r{config/feature_flags/.*yml}].freeze
+      CONFIG_CHANGES = [%r{config/.*.rb$}, %r{config/feature_flags/.*yml}, /Dockerfile/, /Jenkinsfile/, %r{build/new-jenkins/}].freeze
 
       # @param [Crystalball::SourceDiff] diff - the diff from which to predict
       #   which specs should run
