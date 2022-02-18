@@ -174,6 +174,8 @@ shared_examples_for "settings basic tests" do
     end
 
     it "changes the default language to spanish", priority: "1" do
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
+
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload

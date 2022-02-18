@@ -167,6 +167,8 @@ describe "profile" do
     end
 
     it "changes the language" do
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
+
       get "/profile/settings"
       edit_form = click_edit
       click_option("#user_locale", "Español")
@@ -175,6 +177,8 @@ describe "profile" do
     end
 
     it "changes the language even if you can't update your name" do
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
+
       a = Account.default
       a.settings[:users_can_edit_name] = false
       a.save!
