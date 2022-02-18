@@ -132,6 +132,24 @@ describe('FilterNav', () => {
     await findByText(/Applied Filters:/)
   })
 
+  it('render filter tag for saved filter', async () => {
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(await getByTestId('filter-tag-1')).toHaveTextContent('Filter 1')
+  })
+
+  it('clicking filter tag for saved filter removes the tag', async () => {
+    const {getByTestId, queryByTestId} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(await getByTestId('filter-tag-1'))
+    expect(await queryByTestId('filter-tag-1')).toBeNull()
+  })
+
+  it('clicking filter tag for saved filter does not remove the filter', async () => {
+    const {getByTestId, getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(await getByTestId('filter-tag-1'))
+    userEvent.click(getByText('Filters'))
+    expect(getByTestId('filter-name-1')).toHaveTextContent('Filter 1')
+  })
+
   it('opens tray', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Filters'))
