@@ -79,7 +79,8 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 // @ts-ignore
 import UserSettings from '@canvas/user-settings'
-import Spinner from 'spin.js'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 // @ts-ignore
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
@@ -355,8 +356,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   defaultSortType: string = 'assignment_group'
 
-  spinner?: Spinner
-
   gridDisplaySettings: GridDisplaySettings
 
   startedInitializing?: boolean
@@ -562,17 +561,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     this.startedInitializing = true
     if (this.gridReady.state() !== 'resolved') {
-      if (!this.spinner) {
-        this.spinner = new Spinner()
-      }
-      $(this.spinner.spin().el)
-        .css({
-          opacity: 0.5,
-          top: '55px',
-          left: '50%'
-        })
-        .addClass('use-css-transitions-for-show-hide')
-        .appendTo('#main')
       return $('#gradebook-grid-wrapper').hide()
     } else {
       return $('#gradebook_grid').trigger('resize.fillWindowWithMe')
@@ -2757,13 +2745,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   onGridInit = () => {
-    if (this.spinner) {
-      // TODO: this "if @spinner" crap is necessary because the outcome
-      // gradebook kicks off the gradebook (unnecessarily).  back when the
-      // gradebook was slow, this code worked, but now the spinner may never
-      // initialize.  fix the way outcome gradebook loads
-      $(this.spinner.el).remove()
-    }
     $('#gradebook-grid-wrapper').show()
     this.uid = this.gradebookGrid?.grid.getUID()
     $('#accessibility_warning').focus(function () {
@@ -4821,6 +4802,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             variant="DefaultGradebook"
           />
         </Portal>
+        {(!this.state.isGridLoaded || !this.state.isEssentialDataLoaded) && (
+          <View as="div" width="100%" textAlign="center">
+            <Spinner renderTitle={I18n.t('Loading Gradebook')} margin="large auto 0 auto" />
+          </View>
+        )}
         {!this.props.hideGrid && (
           <ErrorBoundary
             errorComponent={
