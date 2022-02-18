@@ -308,11 +308,11 @@ export default class FilePreview extends React.PureComponent {
             </div>
             <div className="ef-file-preview-stretch">
               {this.state.otherItems &&
-                this.state.otherItems.length &&
+                !!this.state.otherItems.length &&
                 this.renderArrowLink('left')}
               {this.renderPreview()}
               {this.state.otherItems &&
-                this.state.otherItems.length &&
+                !!this.state.otherItems.length &&
                 this.renderArrowLink('right')}
               {this.state.showInfoPanel && (
                 <FilePreviewInfoPanel
