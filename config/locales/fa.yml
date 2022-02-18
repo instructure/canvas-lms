@@ -1801,6 +1801,7 @@ fa:
   add_announcement_165c3b05: "افزودن اطلاعیه"
   add_another_assignment_fc5c908f: "افزودن تکلیف دیگر"
   add_app_baf540f: "افزودن برنامه"
+  add_as_a_faculty_journal_entry_55a38a30: "افزودن به عنوان ورودی ژورنال هیأت علمی"
   add_assignment_to_name_caf173b0: "افزودن تکلیف به %{name}"
   add_attachment_93868828: "افزودن پیوست"
   add_attribute_6d6d4a65: "افزودن ویژگی"
@@ -10971,6 +10972,7 @@ fa:
     online_url_submission: "ارسال نشانی اینترنتی آنلاین"
     quiz_submission: "ارسال آزمون"
     text_entry_submission: "ارسال ورودی متن"
+  id_290feb5: شناسه
   id_ac7afadf: شناسه
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "شناسه هم اکنون در حال استفاده برای این حساب و ارائه دهنده اعتبارسنجی است"
   id_del_alumno_bc4bcf8a: "حذف شناسه دانشجو"
@@ -15398,6 +15400,8 @@ fa:
   page_page_59070cd8: "صفحه %{page}"
   page_pagenum_20dbfeb8: "صفحه %{pageNum}"
   page_views: 
+    browsers: 
+      unrecognized: "مرورگر ناشناس"
     download_filename: "نماهای صفحه برای %{user}"
     table: 
       headers: 
@@ -18649,6 +18653,7 @@ fa:
   rubrics_add_edit_delete_8299eff7: "دستورالعمل های ارزیابی - افزودن / ویرایش / حذف کردن"
   rubrics_b5ef369b: "دستورالعمل های ارزیابی"
   rubrics_speedgrader_a6ebec57: "دستورالعمل‌های ارزیابی، برنامه نمره گذاری سریع"
+  run_at_759b47d: "اجرا در"
   running_c5a4998d: "درحال اجرا"
   running_totals_d6f45b6b: "در حال اجرای نمره های کل"
   russia_7_87bc99d5: "روسیه (+7)"
@@ -20224,6 +20229,9 @@ fa:
         error: "نمره تشابه VeriCite - جزئیات خطای ارسال را مشاهده کنید"
         pending: "نمره تشابه VeriCite - مورد ارسالی در انتظار"
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "برای ضبط کلیک کنید"
+      aria_stop: "برای خاتمه دادن به ضبط، روی «توقف» کلیک کنید."
     graded: "نمره گذاری شده"
     graded_then_resubmitted: "نمره گذاری شد، سپس دوباره در (%{when}) ارسال شد"
     not_graded: "نمره گذاری نشده"
@@ -20330,6 +20338,7 @@ fa:
   stop_acting_as_user_8809a97f: "متوقف کردن فعالیت به عنوان کاربر"
   storage_quotas_manage_6ca14bbb: "سهمیه ذخایر - مدیریت"
   storage_used_in_mb_c75fbd9c: "ذخیره استفاده شده بر حسب مگابایت"
+  strand_955969b1: رشته
   stream_items_api: 
     assessment_request_title: "بازبینی گروهی برای %{title}"
   strip_domain_from_login_attribute_value_bb6daa88: "حذف دامنه از مقدار ویژگی ورود"
@@ -20801,6 +20810,7 @@ fa:
     tab_location_error: "مکان این زبانه معتبر نیست"
     tab_unmanagable_error: "%{css_class} قابل مدیریت نیست"
   tabs_5605547e: زبانه‌ها
+  tag_7bb005ff: برچسب
   tagalog_74906db7: تاگالوگ
   taiwan_886_9a5b6bbf: "تایوان (+886)"
   take_a_picture_d582acf1: "گرفتن عکس"
