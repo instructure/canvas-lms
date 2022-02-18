@@ -553,36 +553,11 @@ describe "assignments" do
       wait_for_ajaximations
       # wait for jQuery UI sortable to be initialized
       expect(f(".collectionViewItems.ui-sortable")).to be_displayed
-      drag_with_js("#assignment_#{as[0].id}", 0, 50)
+      drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
       wait_for_ajaximations
 
       as.each(&:reload)
       expect(as.collect(&:position)).to eq [2, 1, 3, 4]
-    end
-
-    context "with Responsive fix" do
-      before do
-        Account.default.enable_feature!("responsive_misc")
-      end
-
-      it "reorders assignments with drag and drop", priority: "2" do
-        ag = @course.assignment_groups.first
-        as = []
-        4.times do |i|
-          as << @course.assignments.create!(name: "assignment_#{i}", assignment_group: ag)
-        end
-        expect(as.collect(&:position)).to eq [1, 2, 3, 4]
-
-        get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
-        # wait for jQuery UI sortable to be initialized
-        expect(f(".collectionViewItems.ui-sortable")).to be_displayed
-        drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
-        wait_for_ajaximations
-
-        as.each(&:reload)
-        expect(as.collect(&:position)).to eq [2, 1, 3, 4]
-      end
     end
 
     context "with modules" do

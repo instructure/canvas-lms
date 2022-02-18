@@ -18,21 +18,26 @@
 
 import I18n from './i18nObj'
 
-// this is like $.extend(true, destination, source) but much faster and it mutates
-function fastMerge(destination, source) {
-  const keys = Object.keys(source)
-  for (let i = 0, l = keys.length; i < l; i++) {
-    const key = keys[i]
-    const val = source[key]
-    if (typeof destination[key] === 'object') {
-      fastMerge(destination[key], val)
-    } else {
-      destination[key] = val
-    }
-  }
-  return destination
+export function setRootTranslations(locale, cb) {
+  I18n.translations[locale] = cb()
 }
 
-export default function mergeI18nTranslations(newStrings) {
-  fastMerge(I18n.translations, newStrings)
+export function setLazyTranslations(locale, scope, cbRoot, cbScope) {
+  const localeTranslations = I18n.translations[locale]
+
+  Object.defineProperty(localeTranslations, scope, {
+    configurable: true,
+    enumerable: true,
+    get: function() {
+      Object.assign(localeTranslations, cbRoot && cbRoot())
+      Object.defineProperty(localeTranslations, scope, {
+        configurable: false,
+        enumerable: true,
+        value: cbScope ? cbScope() : {},
+        writable: false,
+      })
+
+      return localeTranslations[scope]
+    }
+  })
 }

@@ -60,7 +60,7 @@ describe('setDefaultToolValues', () => {
   it('sends a postMessage to the window with results', () => {
     expect(window.postMessage).toHaveBeenCalledWith(
       {
-        messageType: 'defaultToolContentReady',
+        subject: 'defaultToolContentReady',
         content: result
       },
       'canvas.instructure.com'

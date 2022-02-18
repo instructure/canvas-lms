@@ -282,7 +282,7 @@ class ApplicationController < ActionController::Base
     scale_equation_images new_equation_editor buttons_and_icons_cropper
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
-    responsive_awareness responsive_misc product_tours files_dnd usage_rights_discussion_topics
+    product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
   ].freeze

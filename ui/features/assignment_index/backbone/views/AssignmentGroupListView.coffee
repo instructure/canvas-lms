@@ -79,8 +79,7 @@ export default class AssignmentGroupListView extends SortableCollectionView
     )
 
   _initSort: ->
-    opts = if ENV?.FEATURES?.responsive_misc then {handle: '.sortable-handle'} else {}
-    super(opts)
+    super({handle: '.sortable-handle'})
     @$list.on('sortstart', @collapse)
     @$list.on('sortstop', @expand)
 

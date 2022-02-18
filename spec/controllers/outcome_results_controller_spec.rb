@@ -500,6 +500,12 @@ describe OutcomeResultsController do
         expect(json["rollups"].count { |r| r["links"]["user"] == @student2.id.to_s }).to eq(0)
       end
 
+      it "does not display rollups for deleted enrollments" do
+        StudentEnrollment.find_by(user_id: @student2.id).update(workflow_state: "deleted")
+        json = parse_response(get_rollups({}))
+        expect(json["rollups"].count { |r| r["links"]["user"] == @student2.id.to_s }).to eq(0)
+      end
+
       context "users with enrollments of different enrollment states" do
         before do
           StudentEnrollment.find_by(user_id: @student2.id).deactivate

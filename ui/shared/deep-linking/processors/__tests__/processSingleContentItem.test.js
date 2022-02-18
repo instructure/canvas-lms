@@ -39,7 +39,7 @@ const data = overrides => ({
   errormsg: 'error message',
   errorlog: 'error log',
   ltiEndpoint: 'https://www.instructure.com/lti',
-  messageType: 'LtiDeepLinkingResponse',
+  subject: 'LtiDeepLinkingResponse',
   ...overrides
 })
 

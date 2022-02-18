@@ -23,11 +23,11 @@ export default function usePostMessage(expectedMessageType) {
 
   useEffect(() => {
     function handlePostMessage(postMessage) {
-      const {messageType} = postMessage.data
+      const {subject} = postMessage.data
 
       if (
         postMessage.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
-        messageType === expectedMessageType
+        subject === expectedMessageType
       ) {
         setMessageData(postMessage.data)
       }
