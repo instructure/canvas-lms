@@ -115,7 +115,7 @@ describe('useSvgSettings()', () => {
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" alt="a red circle" />'
+        '<img id="test-image" src="https://canvas.instructure.com/svg" data-download=url="https://canvas.instructure.com/download" alt="a red circle" />'
       )
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
 
@@ -150,7 +150,9 @@ describe('useSvgSettings()', () => {
 
     it('fetches the SVG file', () => {
       subject()
-      expect(global.fetch).toHaveBeenCalledWith(ed.selection.getNode().src)
+      expect(global.fetch).toHaveBeenCalledWith(
+        ed.selection.getNode().getAttribute('data-download-url')
+      )
     })
 
     it('parses the SVG settings from the SVG metadata', async () => {
