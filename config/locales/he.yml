@@ -1770,6 +1770,7 @@ he:
   add_announcement_165c3b05: "הוספת הכרזה"
   add_another_assignment_fc5c908f: "הוספת מטלה נוספת"
   add_app_baf540f: "הוספת אפליקציה"
+  add_as_a_faculty_journal_entry_55a38a30: "הוספה כמופע ביומן הפקולטה"
   add_assignment_to_name_caf173b0: "הקצאת משימה ל%{name}"
   add_attachment_93868828: "הוספת תצריף"
   add_attribute_6d6d4a65: "הוספת מאפיין"
@@ -9759,6 +9760,7 @@ he:
     online_url_submission: "הגשת קישור מקוון"
     quiz_submission: "הגשת בוחן"
     text_entry_submission: "הגשת קלט טקסט"
+  id_290feb5: מזהה
   id_ac7afadf: מזהה
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "המזהה כבר בשימוש לחשבון זה ולספק אימות ההזדהות"
   id_id_4e148481: "מזהה: %{id}"
@@ -13542,6 +13544,8 @@ he:
   page_name_is_required_d8c2736e: "נדרש שם דף"
   page_not_found_2b0d05f5: "הדף לא נמצא"
   page_views: 
+    browsers: 
+      unrecognized: "דפדפן לא מזוהה"
     download_filename: "צפיות דפים של %{user}"
     table: 
       headers: 
@@ -16505,6 +16509,7 @@ he:
         are_you_sure_remove: "בטוח/ה שרוצה להסיר רובריקה זו מהרשימה שלכם?"
       remove_rubric: "הסרת רובריקה זו מהרשימה שלי"
   rubrics_b5ef369b: רובריקות
+  run_at_759b47d: "ריצה ב-"
   running_totals_d6f45b6b: "מחשב סה\"כ"
   salesforce_account_id_eb5c78ad: "מזהה חשבון Salesforce "
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "ל Salesforce שרת התחברות אחר עבור חשבונות sanbox מאשר לחשבונות במערכת החיה, כך שאם משתמשים בחשבון ה sanbox ולא מסמנים תיבה זו לא ניתן יהיה להזדהות (והדבר עובד גם בכוון ההפוך, אם הנך בעל חשבון במערכת החיה וסימנת תיבה זו, לא ניתן יהיה להזדהות בין המערכות)"
@@ -17889,6 +17894,9 @@ he:
         error: "ניקוד תאימות של VeriCite - בבקשה לעיין בפרטי שגיאת שיגור."
         pending: "ניקוד תאימות של VeriCite - הבדיקה בהמתנה."
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "הקלק/י כדי להקליט "
+      aria_stop: "לחיצה על \"עצירה\" כדי לסיים הקלטה "
     graded: "התבצעה הערכה"
     graded_then_resubmitted: "התבצעה הערכה ואז הוגשה מחדש (%{when})"
     not_graded: "ללא ציון"
@@ -17975,6 +17983,7 @@ he:
   status_e7fdbe06: מצב
   step: שלב
   storage_used_in_mb_c75fbd9c: "יחידת המידה של איחסון הנה במגהבייט"
+  strand_955969b1: strand
   stream_items_api: 
     assessment_request_title: "ביקורת עמיתים עבור %{title}"
   student_5da6bfd1: תלמיד
@@ -18360,6 +18369,7 @@ he:
     syllabus: סילבוס
     tab_location_error: "מיקום הלשונית הזו אינו חוקי"
     tab_unmanagable_error: "%{css_class} אינו בר ניהול"
+  tag_7bb005ff: תג
   take_a_picture_d582acf1: "צילום תמונה"
   take_a_snapshot_now_5b622d85: "צור צילום מצב כעת"
   take_the_quiz_87214d7e: "בצע/י את הבוחן"
