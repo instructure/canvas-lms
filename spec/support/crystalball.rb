@@ -148,8 +148,6 @@ module Crystalball
       include Helpers::AffectedExampleGroupsDetector
       include Strategy
 
-      CONFIG_CHANGES = [%r{config/.*.rb$}, %r{config/feature_flags/.*yml}].freeze
-
       # @param [Crystalball::SourceDiff] diff - the diff from which to predict
       #   which specs should run
       # @param [Crystalball::ExampleGroupMap] map - the map with the relations of
@@ -172,7 +170,7 @@ module Crystalball
             Crystalball.log :warn, "Crystalball detected new .git files: #{file_changes["new"]}"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
-          elsif file_changes["modified"].find { |path| CONFIG_CHANGES.any? { |config_path| path =~ config_path } }
+          elsif file_changes["modified"].find { |path| path =~ %r{config/.*.rb$} }
             Crystalball.log :warn, "Crystalball detected ruby config/ file changes!"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
