@@ -20,10 +20,14 @@
 require_relative "../../common"
 require_relative "../pages/student_planner_page"
 require_relative "../../announcements/pages/announcement_index_page"
+require_relative "../../helpers/dashboard_common"
+require_relative "../pages/k5_dashboard_page"
 
 describe "dashboard" do
   include_context "in-process server selenium tests"
+  include K5DashboardPageObject
   include PlannerPageObject
+  include DashboardCommon
 
   context "as a student with announcements on dashboard" do
     before :once do
@@ -180,6 +184,31 @@ describe "dashboard" do
       refresh_page
       get "/courses/#{@course.id}"
       expect(course_recent_activity_main_content).to contain_css(".ic-notification__title.no_recent_messages")
+    end
+  end
+
+  context "as an observer" do
+    before :once do
+      dashboard_observer_setup
+      @course1.announcements.create!(title: "Course 1 Announcement", message: "Blah blah")
+      @course2.announcements.create!(title: "Course 2 Announcement", message: "Hello!")
+    end
+
+    before do
+      user_session(@observer)
+    end
+
+    it "shows observer selected student's announcements" do
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student2.id, enrollment_state: :active)
+
+      get "/"
+      go_to_recent_activity_view
+      expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Student 1")
+      expect(recent_activity_dashboard_activity).to include_text "Course 1"
+      expect(recent_activity_dashboard_activity).not_to include_text "Course 2"
+      click_observed_student_option("Student 2")
+      expect(recent_activity_dashboard_activity).not_to include_text "Course 1"
+      expect(recent_activity_dashboard_activity).to include_text "Course 2"
     end
   end
 end
