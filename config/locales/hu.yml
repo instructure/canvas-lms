@@ -1650,6 +1650,7 @@ hu:
   add_an_identity_provider_to_this_account_c2644478: "Identitásszolgáltató hozzáadása ehhez a fiókhoz:"
   add_another_assignment_fc5c908f: "További feladat hozzáadása"
   add_app_baf540f: "Alkalmazás hozzáadása"
+  add_as_a_faculty_journal_entry_55a38a30: "Intézményi hírlevél bejegyzésként való hozzáadás"
   add_assignment_to_name_caf173b0: "Feladat hozzáadása ide: %{name}"
   add_attachment_93868828: "Melléklet hozzáadása"
   add_attribute_6d6d4a65: "Tulajdonság hozzáadása"
@@ -8388,6 +8389,7 @@ hu:
     online_url_submission: "Online Url beadás"
     quiz_submission: Kvízbeadás
     text_entry_submission: Szövegesbejegyzés-beadás
+  id_290feb5: Azonosító
   id_ac7afadf: azonosító
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "Ehhez a fiókhoz és hitelesítés-szolgáltatóhoz tartozó azonosító már használatban van"
   id_id_4e148481: "Azonosító: %{id}"
@@ -12048,6 +12050,8 @@ hu:
   page_page_59070cd8: "Oldal %{page}"
   page_pagenum_20dbfeb8: "%{pageNum}. oldal"
   page_views: 
+    browsers: 
+      unrecognized: "Ismeretlen böngésző"
     download_filename: "%{user} oldalmegtekintései"
     table: 
       headers: 
@@ -14769,6 +14773,7 @@ hu:
       remove_rubric: "Értékelőtábla eltávolítása a listámról"
   rubrics_add_edit_delete_8299eff7: "Értékelőtáblák- hozzáadás / szerkesztés / törlés"
   rubrics_b5ef369b: Értékelőtáblák
+  run_at_759b47d: "Futtatás időpontja"
   running_totals_d6f45b6b: "Futó összesítések"
   russia_7_87bc99d5: "Oroszország (+7)"
   russian_1e3e197: Orosz
@@ -15972,6 +15977,9 @@ hu:
     vericite: 
       resubmitting: Újraküldés...
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "A felvétel megkezdéséhez kattintson ide"
+      aria_stop: "Kattintson a \"Stop\"-ra a felvétel befejezéséhez."
     graded: osztályozva
     graded_then_resubmitted: "értékelve, majd újra beadva (%{when})"
     not_graded: "nem értékelt"
@@ -16062,6 +16070,7 @@ hu:
   step: Lépés
   storage_quotas_manage_6ca14bbb: "Tárhely kvóták - kezelés"
   storage_used_in_mb_c75fbd9c: "tárhely használat MB-ban"
+  strand_955969b1: Szál
   stream_items_api: 
     assessment_request_title: "Társértékelés %{title} számára"
   student_5da6bfd1: Hallgató
@@ -16438,6 +16447,7 @@ hu:
     tab_location_error: "Ezen fülelhelyezés helytelen."
     tab_unmanagable_error: "%{css_class} nem kezelhető"
   tabs_5605547e: Lapok
+  tag_7bb005ff: Címke
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Tajvan (+886)"
   take_a_picture_d582acf1: "Fotó készítése"
