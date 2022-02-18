@@ -21,10 +21,6 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-def getLoadAllLocales() {
-  return configuration.isChangeMerged() ? 1 : 0
-}
-
 pipeline {
   agent none
   options {
@@ -40,7 +36,6 @@ pipeline {
     DOCKER_BUILDKIT = 1
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
-    RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
   }
 
   stages {

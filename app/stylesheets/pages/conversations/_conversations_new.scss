@@ -78,13 +78,7 @@ $conversations-headerHeightPhone: 210px;
     padding-top: 0;
   }
 
-  @media only screen and (max-width: 576px) { height: 163px; }
-
-  body.responsive_awareness & {
-    @media only screen and (max-width: 576px) {
-      height: $conversations-headerHeightPhone;
-    }
-  }
+  @media only screen and (max-width: 576px) { height: $conversations-headerHeightPhone; }
 
   .panel__primary {
     // TODO: revisit when breakpoint fixed
@@ -112,10 +106,8 @@ $conversations-headerHeightPhone: 210px;
       white-space: nowrap;
       margin-top: $ic-sp;
 
-      body.responsive_awareness & {
-        @media only screen and (min-width: 1200px) {
-          margin-top: 0;
-        }
+      @media only screen and (min-width: 1200px) {
+        margin-top: 0;
       }
     }
   }
@@ -130,7 +122,7 @@ $conversations-headerHeightPhone: 210px;
   }
 }
 
-body.responsive_awareness .conversations__filter {
+.conversations__filter {
   margin-top: $ic-sp;
 
   @media only screen and (min-width: 577px) {
@@ -230,45 +222,31 @@ body.responsive_awareness .conversations__filter {
   position: absolute;
   bottom: 0;
   top: 112px;
+  width: 100%;
   @media only screen and (min-width: 1200px) { top: 62px; }
-  @media only screen and (max-width: 576px) { top: 163px; }
-
-  body.responsive_awareness & {
-    width: 100%;
-
-    @media only screen and (max-width: 576px) {
-      top: $conversations-headerHeightPhone;
-      flex-direction: column;
-    }
-    @media only screen and (min-width: 577px) {
-      flex-direction: row;
-    }
+  @media only screen and (max-width: 576px) {
+    top: $conversations-headerHeightPhone;
+    flex-direction: column;
+  }
+  @media only screen and (min-width: 577px) {
+    flex-direction: row;
   }
 }
 
 .message-list-scroller {
   overflow: auto;
+  min-width: 1px;
+  flex: 0 0 34%;
+  border-bottom: 1px solid #bfbfbf;
 
-  body:not(.responsive_awareness) & {
+  @media only screen and (min-width: 577px) {
+    border-bottom: none;
     border-#{direction(right)}: 1px solid #bfbfbf;
     height: 100%;
-    max-width: 400px;
   }
 
-  body.responsive_awareness & {
-    min-width: 1px;
-    flex: 0 0 34%;
-    border-bottom: 1px solid #bfbfbf;
-
-    @media only screen and (min-width: 577px) {
-      border-bottom: none;
-      border-#{direction(right)}: 1px solid #bfbfbf;
-      height: 100%;
-    }
-
-    @include breakpoint(desktop) {
-      flex: 0 0 400px;
-    }
+  @include breakpoint(desktop) {
+    flex: 0 0 400px;
   }
 }
 
@@ -477,29 +455,14 @@ body.responsive_awareness .conversations__filter {
   }
 }
 
-// TODO: Delete first selector when responsive_awareness FF is on by default
 .message-detail.span8,
 .message-detail.conversations__message-detail {
   overflow: auto;
+  min-width: 1px;
+  flex: 1;
 
-  body:not(.responsive_awareness) & {
-    margin-#{direction(left)}: 0;
-    width: 68.08511%;
-    height: 100%;
-    flex-grow: 1;
-
-    .subject {
-      float: direction(left);
-    }
-  }
-
-  body.responsive_awareness & {
-    min-width: 1px;
-    flex: 1;
-
-    .subject {
-      line-height: $ic-label-line-height;
-    }
+  .subject {
+    line-height: $ic-label-line-height;
   }
 
   &:focus {
@@ -517,17 +480,9 @@ body.responsive_awareness .conversations__filter {
     i {
       display: block;
       line-height: 120px;
-
+      margin-bottom: $ic-sp;
       text-align: center;
       width: 100%;
-
-      body:not(.responsive_awareness) & {
-        margin-bottom: 120px;
-      }
-
-      body.responsive_awareness & {
-        margin-bottom: $ic-sp;
-      }
 
       &:before {
         @include fontSize(120px);
@@ -548,16 +503,8 @@ body.responsive_awareness .conversations__filter {
   }
 
   .message-detail-actions {
-    body.responsive_awareness & {
-      display: flex;
-      align-items: center;
-    }
-
-    body:not(.responsive_awareness) & {
-      li {
-        display: inline;
-      }
-    }
+    display: flex;
+    align-items: center;
   }
 
   .message-content > li {
@@ -585,20 +532,16 @@ body.responsive_awareness .conversations__filter {
   .message-info {
     margin-bottom: $ic-sp;
 
-    body.responsive_awareness & {
-      @include breakpoint(desktop) {
-        display: flex;
-        flex-wrap: wrap;
-      }
+    @include breakpoint(desktop) {
+      display: flex;
+      flex-wrap: wrap;
     }
   }
 
   .user-info {
-    body.responsive_awareness & {
-      @include breakpoint(desktop) {
-        flex: 1;
-        padding-#{direction(right)}: $ic-sp;
-      }
+    @include breakpoint(desktop) {
+      flex: 1;
+      padding-#{direction(right)}: $ic-sp;
     }
 
     .avatar {
@@ -618,46 +561,20 @@ body.responsive_awareness .conversations__filter {
 
   .message-metadata {
     position: relative;
-
-    body.responsive_awareness & {
-      @include breakpoint(desktop) {
-        text-align: direction(right);
-      }
+    @include breakpoint(desktop) {
+      text-align: direction(right);
     }
   }
 
   .date {
     color: darken($ic-color-neutral, 50);
-
-    body:not(.responsive_awareness) & {
-      position: absolute;
-      #{direction(right)}: 10px;
-      top: 0;
-    }
-  }
-
-  .actions {
-    body:not(.responsive_awareness) & {
-      #{direction(right)}: 9999em;
-      position: relative;
-      top: 0;
-      margin: direction-sides(20px 10px 0 8px);
-    }
   }
 
   .actions li {
     border: none;
+    display: inline-block;
+    margin: 0 0 0 math.div($ic-sp, 3);
     padding: 0;
-
-    body:not(.responsive_awareness) & {
-      margin: 0 0 0 8px;
-      float: direction(left);
-    }
-
-    body.responsive_awareness & {
-      margin: 0 0 0 math.div($ic-sp, 3);
-      display: inline-block;
-    }
   }
 
   .message-detail-actions li a,
@@ -672,20 +589,20 @@ body.responsive_awareness .conversations__filter {
   }
 }
 
-body.responsive_awareness {
-  .touch .message-detail .actions {
+.touch {
+  .message-detail .actions {
     #{direction(right)}: -7px;
     top: 24px;
   }
 
-  .touch .message-item-view:hover, .touch .message-metadata.hover {
+  .message-item-view:hover, .touch .message-metadata.hover {
     .date {
       #{direction(right)}: 0;
     }
   }
 }
 
-body:not(.responsive_awareness) .message-item-view:hover, body:not(.responsive_awareness) .message-item-view:focus-within, .message-metadata.hover {
+.message-metadata.hover {
   .actions {
     display: block;
     #{direction(right)}: -7px;

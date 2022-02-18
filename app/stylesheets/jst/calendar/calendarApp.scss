@@ -257,21 +257,16 @@
 
 // Prevent overflow of the "edit event" modal at narrow widths
 #edit_calendar_event_form, #edit_assignment_form {
-  body:not(.responsive_awareness) & {
-    width: 400px;
+  width: 270px;
+  td {
+    display: block;
+    label { margin-bottom: 0; }
   }
-  body.responsive_awareness & {
-    width: 270px;
+  @include breakpoint(mini-tablet) {
+    width: 400px;
     td {
-      display: block;
-      label { margin-bottom: 0; }
-    }
-    @include breakpoint(mini-tablet) {
-      width: 400px;
-      td {
-        display: table-cell;
-        label { margin-bottom: 5px; }
-      }
+      display: table-cell;
+      label { margin-bottom: 5px; }
     }
   }
 }
