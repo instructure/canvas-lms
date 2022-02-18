@@ -366,7 +366,8 @@ class OutcomeResultsController < ApplicationController
     exclude_inactive = excludes.include? "inactive_enrollments"
     return unless exclude_concluded || exclude_inactive
 
-    filters = []
+    # automatically filter out users whose enrollment was deleted
+    filters = ["deleted"]
     filters << "completed" if exclude_concluded
     filters << "inactive" if exclude_inactive
 

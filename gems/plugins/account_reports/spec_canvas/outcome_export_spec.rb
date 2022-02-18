@@ -177,6 +177,11 @@ describe "Outcome Reports" do
         @root_outcome_4 = outcome_model(
           context: account
         )
+        @outcome_2_fd = OutcomeFriendlyDescription.create!({
+                                                             learning_outcome: @root_outcome_2,
+                                                             context: account,
+                                                             description: "A friendly description"
+                                                           })
       end
 
       it "includes outcomes" do
@@ -210,6 +215,7 @@ describe "Outcome Reports" do
         expect(outcome["object_type"]).to eq "outcome"
         expect(outcome["title"]).to eq @root_outcome_1.title
         expect(outcome["description"]).to eq @root_outcome_1.description
+        expect(outcome["friendly_description"]).to eq nil
         expect(outcome["display_name"]).to eq @root_outcome_1.display_name
         expect(outcome["calculation_method"]).to eq "highest"
         expect(outcome["calculation_int"]).to eq nil
@@ -219,6 +225,7 @@ describe "Outcome Reports" do
         other = find_object(@root_outcome_2)
         expect(other["calculation_method"]).to eq "n_mastery"
         expect(other["calculation_int"]).to eq "5"
+        expect(other["friendly_description"]).to eq "A friendly description"
       end
 
       it "ignores fields when account level mastery scales are enabled" do
@@ -236,6 +243,14 @@ describe "Outcome Reports" do
         @root_outcome_2.destroy!
         expect(report.length).to eq 3
         expect(report).not_to include_outcome(@root_outcome_2)
+      end
+
+      it "includes friendly description from account-level when exporting from sub-account" do
+        subaccount = Account.create!(parent_account_id: @account.id)
+        group = outcome_group_model(context: subaccount)
+        group.add_outcome(@root_outcome_2)
+        report_options[:account] = subaccount
+        expect(find_object(@root_outcome_2)["friendly_description"]).to eq @outcome_2_fd.description
       end
 
       context "with vendor guids" do
