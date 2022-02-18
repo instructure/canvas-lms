@@ -1870,6 +1870,7 @@ nn:
   add_announcement_165c3b05: "Legg til kunngjering"
   add_another_assignment_fc5c908f: "Legg til ei ny oppgåve"
   add_app_baf540f: "Legg til app"
+  add_as_a_faculty_journal_entry_55a38a30: "Legg til som ei oppføring i faglærarprotokoll"
   add_as_allowed_e95540be: "Legg til som tillatt"
   add_assignment_to_name_caf173b0: "Legg til oppgåve til %{name}"
   add_assignments_and_quizzes_1085d2af: "Legg til oppgåver og quizar"
@@ -11488,6 +11489,7 @@ nn:
     online_url_submission: "Nettbasert URL-innlevering"
     quiz_submission: Quizinnlevering
     text_entry_submission: "Send inn teksten"
+  id_290feb5: ID
   id_ac7afadf: ID
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID er allereie i bruk for denne kontoen og identitetsleverandøren"
   id_del_alumno_bc4bcf8a: "ID del Alumno"
@@ -15970,6 +15972,8 @@ nn:
   page_title_ascending_b5df950c: "Sidetittel: Aukande"
   page_title_descending_70c1483d: "Sidetittel: sortert i fallande rekkefølge"
   page_views: 
+    browsers: 
+      unrecognized: "Ukjend nettlesar"
     download_filename: "Sidevisingar for %{user}"
     table: 
       headers: 
@@ -19139,6 +19143,7 @@ nn:
   rubrics_can_show_students_your_expectations_for_as_3382da64: "Vurderingsskjema kan vise studentane kva forventingar du har til svar på oppgåver, og korleis dei vert vurdert. Vurderingsskjema kan bli knytt til oppgåver, diskusjonar eller quizar. Vurderingsskjema kan bli brukt til å gi poeng, eller du kan opprette vurderingsskjema for å måle oppnping av læringsmål. Læringsmål kan bli satt inn som kriterier i eit vurderingsskjema."
   rubrics_speedgrader_a6ebec57: "Vurderingsskjema, SpeedGrader"
   rubrics_tutorial_tray_be65d10d: "Vurderingsskjema opplæringsmeny"
+  run_at_759b47d: Køyr
   running_c5a4998d: Køyrande
   running_totals_d6f45b6b: "Køyring totalt"
   russia_7_87bc99d5: "Russland (+7)"
@@ -20767,6 +20772,9 @@ nn:
         error: "VeriCite likskapsresultat – sjå detaljar for innsendingsfeil"
         pending: "VeriCite likskapsresultat – innsending på vent"
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "Klikk for å spele inn"
+      aria_stop: "Klikk \"Stopp\" for å avslutte innspeling."
     graded: vurdert
     graded_then_resubmitted: "vurdert og deretter levert på nytt (%{when})"
     not_graded: "ikkje vurdert"
@@ -20884,6 +20892,7 @@ nn:
   storage_quotas_manage_6ca14bbb: "Lagrinskvote - administrer"
   storage_used_in_mb_c75fbd9c: "lagringskapasitet brukt i MB"
   store_and_share_course_assets_82a9967c: "Lagre og dele emneressursar"
+  strand_955969b1: Tråd
   stream_items_api: 
     assessment_request_title: "Fagfellevurdering for %{title}"
   strip_domain_from_login_attribute_value_bb6daa88: "Ta vekk domene som innloggingsattributt"
@@ -21393,6 +21402,7 @@ nn:
     tab_unmanagable_error: "%{css_class} kan ikkje behandlast"
     trophy_case: Trofékasse
   tabs_5605547e: Faner
+  tag_7bb005ff: Merke
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
   take_a_picture_d582acf1: "Ta eit bilde"
