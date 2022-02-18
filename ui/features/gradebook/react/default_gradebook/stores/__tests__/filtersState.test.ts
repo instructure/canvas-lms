@@ -28,10 +28,24 @@ const mockResponse: GradebookFilterApiResponse[] = [
       id: '321',
       course_id: '1',
       user_id: '1',
-      name: 'filter name',
+      name: 'filter 1',
       payload: {
         conditions: [],
         is_applied: true
+      },
+      created_at: '2020-01-01T00:00:00Z',
+      updated_at: '2020-01-01T00:00:00Z'
+    }
+  },
+  {
+    gradebook_filter: {
+      id: '432',
+      course_id: '1',
+      user_id: '1',
+      name: 'filter 2',
+      payload: {
+        conditions: [],
+        is_applied: false
       },
       created_at: '2020-01-01T00:00:00Z',
       updated_at: '2020-01-01T00:00:00Z'
@@ -49,13 +63,13 @@ describe('filterState', () => {
 
   it('fetches filters', async () => {
     const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.get(url, mockResponse)
+    fetchMock.get(url, mockResponse.slice(0, 1))
     await store.getState().fetchFilters()
     expect(fetchMock.called(url, 'GET')).toBe(true)
     expect(store.getState().filters).toMatchObject([
       {
         id: '321',
-        name: 'filter name',
+        name: 'filter 1',
         conditions: [],
         is_applied: true,
         created_at: '2020-01-01T00:00:00Z'
@@ -66,7 +80,7 @@ describe('filterState', () => {
   it('saves staged filter', async () => {
     store.setState({
       stagedFilter: {
-        name: 'filter name',
+        name: 'filter 1',
         conditions: [
           {
             id: '123',
@@ -87,7 +101,7 @@ describe('filterState', () => {
     expect(store.getState().filters).toMatchObject([
       {
         id: '321',
-        name: 'filter name',
+        name: 'filter 1',
         conditions: [],
         is_applied: true,
         created_at: '2020-01-01T00:00:00Z'
@@ -100,7 +114,7 @@ describe('filterState', () => {
       filters: [
         {
           id: '321',
-          name: 'filter name',
+          name: 'filter 1',
           conditions: [],
           is_applied: true,
           created_at: '2020-01-01T00:00:00Z'
@@ -110,13 +124,13 @@ describe('filterState', () => {
     const url = `/api/v1/courses/${courseId}/gradebook_filters/321`
     fetchMock.put(url, {
       gradebook_filter: {
-        ...mockResponse[0],
-        name: 'filter name (renamed)'
+        ...mockResponse[0].gradebook_filter,
+        name: 'filter 1 (renamed)'
       }
     })
     await store.getState().updateFilter({
       id: '321',
-      name: 'filter name (renamed)',
+      name: 'filter 1 (renamed)',
       conditions: [],
       is_applied: true,
       created_at: '2020-01-01T00:00:00Z'
@@ -125,7 +139,7 @@ describe('filterState', () => {
     expect(store.getState().filters).toMatchObject([
       {
         id: '321',
-        name: 'filter name (renamed)',
+        name: 'filter 1 (renamed)',
         conditions: [],
         is_applied: true,
         created_at: '2020-01-01T00:00:00Z'
@@ -138,7 +152,7 @@ describe('filterState', () => {
       filters: [
         {
           id: '321',
-          name: 'filter name',
+          name: 'filter 1',
           conditions: [],
           is_applied: true,
           created_at: '2020-01-01T00:00:00Z'
@@ -149,7 +163,7 @@ describe('filterState', () => {
     fetchMock.delete(url, mockResponse[0])
     await store.getState().deleteFilter({
       id: '321',
-      name: 'filter name (renamed)',
+      name: 'filter 1 (renamed)',
       conditions: [],
       is_applied: true,
       created_at: '2020-01-01T00:00:00Z'
@@ -344,5 +358,52 @@ describe('filterState', () => {
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilter).toBeNull()
+  })
+
+  it('disallows multiple filters from being applied', async () => {
+    store.setState({
+      filters: [
+        {
+          id: '321',
+          name: 'filter 1',
+          conditions: [],
+          is_applied: false,
+          created_at: '2020-01-01T00:00:00Z'
+        },
+        {
+          id: '432',
+          name: 'filter 2',
+          conditions: [],
+          is_applied: true,
+          created_at: '2020-01-02T00:00:00Z'
+        }
+      ]
+    })
+    fetchMock
+      .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/321`, mockResponse[0])
+      .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/432`, mockResponse[1], {
+        overwriteRoutes: false
+      })
+    await store.getState().updateFilter({
+      id: '321',
+      name: 'filter 1',
+      conditions: [],
+      is_applied: true,
+      created_at: '2020-01-01T00:00:00Z'
+    })
+    expect(store.getState().filters[0]).toMatchObject({
+      id: '321',
+      name: 'filter 1',
+      conditions: [],
+      is_applied: true,
+      created_at: '2020-01-01T00:00:00Z'
+    })
+    expect(store.getState().filters[1]).toMatchObject({
+      id: '432',
+      name: 'filter 2',
+      conditions: [],
+      is_applied: false,
+      created_at: '2020-01-02T00:00:00Z'
+    })
   })
 })
