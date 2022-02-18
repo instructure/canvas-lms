@@ -1189,8 +1189,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   filterAssignmentsBySubmissions = (assignment: Assignment) => {
-    const submissions = this.submissionStateMap.getSubmissions(assignment.id)
     const submissionFilters = findAllAppliedFilterValuesOfType('submissions', this.props.filters)
+
+    if (submissionFilters.length === 0) {
+      return true
+    }
+
+    const submissions = this.submissionStateMap.getSubmissions(assignment.id)
     const wasSubmitted = s => !['unsubmitted', 'deleted'].includes(s.workflow_state)
     const isGraded = s => s.excused || (!!s.score && s.workflow_state === 'graded')
 
