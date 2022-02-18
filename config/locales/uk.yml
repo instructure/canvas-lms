@@ -1626,6 +1626,7 @@ uk:
   add_announcement_165c3b05: "Додати оголошення"
   add_another_assignment_fc5c908f: "Додати інше завдання"
   add_app_baf540f: "Додати застосунок"
+  add_as_a_faculty_journal_entry_55a38a30: "Додати як запис до Факультетського журналу"
   add_assignment_to_name_caf173b0: "Додати завдання до %{name}"
   add_attachment_93868828: "Додати вкладення"
   add_attribute_6d6d4a65: "Додати атрибут"
@@ -8468,6 +8469,7 @@ uk:
     online_url_submission: "Url онлайн відправлення"
     quiz_submission: "Відправлення контрольної роботи"
     text_entry_submission: "Відправлення текстового елементу "
+  id_290feb5: Ідентифікатор
   id_ac7afadf: ідентифікатор
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "Ідентифікатор вже використовується для цього облікового запису і аутентифікації провайдера"
   id_id_4e148481: "ID: %{id}"
@@ -12089,6 +12091,8 @@ uk:
   page_name_is_required_d8c2736e: "Назва сторінки обов'язкова"
   page_not_found_2b0d05f5: "Сторінку не знайдено"
   page_views: 
+    browsers: 
+      unrecognized: "Нерозпізнаний браузер"
     download_filename: "Перегляди сторінок для %{user}"
     table: 
       headers: 
@@ -14820,6 +14824,7 @@ uk:
         other: "%{count}можливих балів"
       remove_rubric: "Видалити цю категорію з мого списку"
   rubrics_b5ef369b: Категорії
+  run_at_759b47d: "працювати на"
   running_c5a4998d: Хід
   running_totals_d6f45b6b: "Нароcтаючі підсумки"
   russia_7_87bc99d5: "Росія (+7)"
@@ -16031,6 +16036,9 @@ uk:
         error: "Оцінка подібності VeriCite - Дивись деталі помилки представлення"
         pending: "Оцінка подібності VeriCite - Подача представлень"
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "Натисніть, щоб записати"
+      aria_stop: "Нажміть \"Стоп\", щоб закінчити записування."
     graded: оцінено
     graded_then_resubmitted: "оцінено, тоді повторно визначено (%{when})"
     not_graded: "оцінка відсутня"
@@ -16121,6 +16129,7 @@ uk:
   step: Крок
   stop_acting_as_user_8809a97f: "Припинити діяти як користувач"
   storage_used_in_mb_c75fbd9c: "використаний простір у МБ"
+  strand_955969b1: Рядок
   stream_items_api: 
     assessment_request_title: "Експертна оцінка для %{title}"
   student_5da6bfd1: Студент
@@ -16501,6 +16510,7 @@ uk:
     syllabus: Розклад
     tab_location_error: "Положення цієї вкладки недійсне "
     tab_unmanagable_error: "%{css_class} не керований"
+  tag_7bb005ff: Тег
   taiwan_886_9a5b6bbf: "Тайва́нь (+886)"
   take_a_picture_d582acf1: "Вибрати зображення"
   take_a_snapshot_now_5b622d85: "Зробити зараз знімок"
