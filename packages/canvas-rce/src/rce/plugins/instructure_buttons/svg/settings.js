@@ -18,6 +18,7 @@
 
 import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
+import {BTN_AND_ICON_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
 
 const TYPE = 'image/svg+xml'
 
@@ -37,7 +38,9 @@ export function useSvgSettings(editor, editing) {
         setStatus(statuses.LOADING)
 
         // Parse SVG. If no SVG found, return defaults
-        const svg = await svgFromUrl(editor.selection.getNode()?.src)
+        const svg = await svgFromUrl(
+          editor.selection.getNode()?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
+        )
         if (!svg) return
 
         // Parse metadata. If no metadata found, return defaults

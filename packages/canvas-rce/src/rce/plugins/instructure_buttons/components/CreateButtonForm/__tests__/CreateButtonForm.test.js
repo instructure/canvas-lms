@@ -37,7 +37,8 @@ const editor = {
       element.setAttribute('alt', alt)
       element.setAttribute('data-inst-buttons-and-icons', rest['data-inst-buttons-and-icons'])
       return element
-    })
+    }),
+    create: name => document.createElement(name)
   },
   insertContent: jest.fn()
 }
@@ -129,11 +130,7 @@ describe('<CreateButtonForm />', () => {
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        <img
-          alt=""
-          data-inst-buttons-and-icons="true"
-          src="https://uploaded.url"
-        />,
+        "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
       ]
     `)
 
@@ -164,7 +161,7 @@ describe('<CreateButtonForm />', () => {
     })
 
     const subject = () =>
-      render(<CreateButtonForm onClose={jest.fn()} editing={true} editor={new FakeEditor()} />)
+      render(<CreateButtonForm onClose={jest.fn()} editing editor={new FakeEditor()} />)
 
     beforeEach(() => {
       global.fetch = jest.fn().mockResolvedValue({
