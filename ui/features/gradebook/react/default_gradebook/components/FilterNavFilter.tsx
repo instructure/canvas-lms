@@ -169,7 +169,7 @@ export default function FilterNavFilter({
               </Item>
             </Flex>
           ) : (
-            <View as="div">
+            <View as="div" data-testid={`filter-name-${filter.id}`}>
               {filter.name}
               <IconButton
                 elementRef={el => (renameButtonRef.current = el)}

@@ -85,9 +85,10 @@ export default function FilterNav({
       return (
         <Tag
           key={filter.id}
+          data-testid={`filter-tag-${filter.id}`}
           text={<AccessibleContent alt={I18n.t('Remove filter')}>{filter.name}</AccessibleContent>}
           dismissible
-          onClick={() => deleteFilter(filter)}
+          onClick={() => updateFilter({...filter, is_applied: false})}
           margin="0 xx-small 0 0"
         />
       )
