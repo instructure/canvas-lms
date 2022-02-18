@@ -1783,6 +1783,7 @@ tr:
   add_an_identity_provider_to_this_account_c2644478: "Bu hesap için bir kimlik sağlayıcı ekleyin:"
   add_another_assignment_fc5c908f: "Başka ödev ekle"
   add_app_baf540f: "Uygulama Ekle"
+  add_as_a_faculty_journal_entry_55a38a30: "Öğretim Üyesi Kayıt girişi olarak ekle"
   add_assignment_to_name_caf173b0: "%{name}'a Ödev Ekle"
   add_attachment_93868828: "Dosya Ekle"
   add_attribute_6d6d4a65: "Özellik Ekle"
@@ -9787,6 +9788,7 @@ tr:
     online_url_submission: "Çevrimiçi URL Gönderimi"
     quiz_submission: "Kısa Sınav Gönderimi"
     text_entry_submission: "Metin Yazma Şeklinde Gönderim"
+  id_290feb5: ID
   id_ac7afadf: id
   id_token_fa5f144e: "ID Token"
   identifier_format_6ca23365: "Tanımlayıcı Biçimi"
@@ -13535,6 +13537,8 @@ tr:
   page_not_found_2b0d05f5: "Sayfa bulunamadı"
   page_pagenum_20dbfeb8: "Sayfa %{pageNum}"
   page_views: 
+    browsers: 
+      unrecognized: "Bilinmeyen Tarayıcı"
     download_filename: "%{user}'ın Sayfa İzlemeleri"
     table: 
       headers: 
@@ -16459,6 +16463,7 @@ tr:
   rubrics_add_edit_delete_8299eff7: "Değerlendirme Listeleri - ekle / düzenle / sil"
   rubrics_b5ef369b: "Değerlendirme Listeleri"
   rubrics_speedgrader_a6ebec57: "Değerlendirme Listeleri, SpeedGrader"
+  run_at_759b47d: "Şurada Çalıştır"
   running_totals_d6f45b6b: "Toplam Çalışan"
   russia_7_87bc99d5: "Rusya (+7)"
   rwanda_250_1a6b344b: "Ruanda (+250)"
@@ -17726,6 +17731,9 @@ tr:
     vericite: 
       resubmitting: "Yeniden gönderiliyor..."
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "Kaydetmek için tıklayın"
+      aria_stop: "Kaydı durdurmak için \"Durdur\"a tıklayın."
     graded: notlandırıldı
     graded_then_resubmitted: "notlandırılıp yeniden gönderildi (%{when})"
     not_graded: Notlandırılmamış
@@ -17801,6 +17809,7 @@ tr:
   step: Adım
   storage_quotas_manage_6ca14bbb: "Dosya Depolama Kotası - yönet"
   storage_used_in_mb_c75fbd9c: "MB olarak kullanılan depolama"
+  strand_955969b1: Dizi
   stream_items_api: 
     assessment_request_title: "%{title} için Akran İncelemesi"
   student_5da6bfd1: Öğrenci
@@ -18165,6 +18174,7 @@ tr:
     syllabus: "Ders Programı"
     tab_location_error: "Sekme konumu geçersiz"
     tab_unmanagable_error: "%{css_class} yönetilebilir değil"
+  tag_7bb005ff: Etiket
   taiwan_886_9a5b6bbf: "Tayvan (+886)"
   take_a_picture_d582acf1: "Bilgisayardan Fotoğraf Çek"
   take_the_quiz_87214d7e: "Kısa Sınava Başla"
