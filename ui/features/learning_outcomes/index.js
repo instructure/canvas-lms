@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import ready from '@instructure/ready'
 import ToolbarView from './backbone/views/ToolbarView'
 import SidebarView from '@canvas/outcome-sidebar-view'
 import ContentView from '@canvas/outcome-content-view'
@@ -31,85 +30,83 @@ import {
   showOutcomesImporterIfInProgress
 } from '@canvas/outcomes/react/OutcomesImporter'
 
-ready(() => {
-  const $el = $('#outcomes')
-  $el.html(
-    browserTemplate({
-      canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
-      canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
-      canImportOutcomes: ENV.PERMISSIONS.import_outcomes,
-      contextUrlRoot: ENV.CONTEXT_URL_ROOT
-    })
-  )
+const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
-  const renderInstructions = ENV.PERMISSIONS.manage_outcomes
-
-  const toolbar = new ToolbarView({el: $el.find('.toolbar')})
-
-  const sidebar = new SidebarView({
-    el: $el.find('.outcomes-sidebar .wrapper'),
-    rootOutcomeGroup: new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP),
-    selectFirstItem: !renderInstructions
+const $el = $('#outcomes')
+$el.html(
+  browserTemplate({
+    canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
+    canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
+    canImportOutcomes: ENV.PERMISSIONS.import_outcomes,
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
   })
-  sidebar.$el.data('view', sidebar)
+)
 
-  const content = new ContentView({
-    el: $el.find('.outcomes-content'),
-    instructionsTemplate,
-    renderInstructions
+export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
+
+export const sidebar = new SidebarView({
+  el: $el.find('.outcomes-sidebar .wrapper'),
+  rootOutcomeGroup: new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP),
+  selectFirstItem: !renderInstructions
+})
+sidebar.$el.data('view', sidebar)
+
+export const content = new ContentView({
+  el: $el.find('.outcomes-content'),
+  instructionsTemplate,
+  renderInstructions
+})
+
+// events for Outcome sync
+const disableOutcomeViews = () => {
+  sidebar.$sidebar.hide()
+  toolbar.disable()
+}
+
+const resetOutcomeViews = () => {
+  toolbar.enable()
+  sidebar.resetSidebar()
+  content.resetContent()
+  sidebar.$sidebar.show()
+}
+
+// toolbar events
+toolbar.on('goBack', sidebar.goBack.bind(sidebar))
+toolbar.on('add', sidebar.addAndSelect.bind(sidebar))
+toolbar.on('add', content.add.bind(content))
+toolbar.on('find', () => sidebar.findDialog(FindDialog))
+toolbar.on('import', () => showImportOutcomesModal({toolbar}))
+toolbar.on('start_sync', file =>
+  showOutcomesImporter({
+    file,
+    disableOutcomeViews,
+    resetOutcomeViews,
+    mount: content.$el[0],
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
   })
+)
 
-  // events for Outcome sync
-  const disableOutcomeViews = () => {
-    sidebar.$sidebar.hide()
-    toolbar.disable()
-  }
-
-  const resetOutcomeViews = () => {
-    toolbar.enable()
-    sidebar.resetSidebar()
-    content.resetContent()
-    sidebar.$sidebar.show()
-  }
-
-  // toolbar events
-  toolbar.on('goBack', sidebar.goBack.bind(sidebar))
-  toolbar.on('add', sidebar.addAndSelect.bind(sidebar))
-  toolbar.on('add', content.add.bind(content))
-  toolbar.on('find', () => sidebar.findDialog(FindDialog))
-  toolbar.on('import', () => showImportOutcomesModal({toolbar}))
-  toolbar.on('start_sync', file =>
-    showOutcomesImporter({
-      file,
+if (!ENV.IMPROVED_OUTCOMES_MANAGEMENT) {
+  showOutcomesImporterIfInProgress(
+    {
       disableOutcomeViews,
       resetOutcomeViews,
       mount: content.$el[0],
       contextUrlRoot: ENV.CONTEXT_URL_ROOT
-    })
+    },
+    ENV.current_user.id
   )
+}
 
-  if (!ENV.IMPROVED_OUTCOMES_MANAGEMENT) {
-    showOutcomesImporterIfInProgress(
-      {
-        disableOutcomeViews,
-        resetOutcomeViews,
-        mount: content.$el[0],
-        contextUrlRoot: ENV.CONTEXT_URL_ROOT
-      },
-      ENV.current_user.id
-    )
-  }
+// sidebar events
+sidebar.on('select', model => content.show(model))
+sidebar.on('select', toolbar.resetBackButton.bind(toolbar))
 
-  // sidebar events
-  sidebar.on('select', model => content.show(model))
-  sidebar.on('select', toolbar.resetBackButton.bind(toolbar))
-
-  // content events
-  content.on('addSuccess', sidebar.refreshSelection.bind(sidebar))
-  content.on('deleteSuccess', () => {
-    const view = sidebar.$el.find('.outcome-group.selected:last').data('view')
-    const model = view && view.model
-    content.show(model)
-  })
-  content.on('move', (model, newGroup) => sidebar.moveItem(model, newGroup))
+// content events
+content.on('addSuccess', sidebar.refreshSelection.bind(sidebar))
+content.on('deleteSuccess', () => {
+  const view = sidebar.$el.find('.outcome-group.selected:last').data('view')
+  const model = view && view.model
+  content.show(model)
 })
+content.on('move', (model, newGroup) => sidebar.moveItem(model, newGroup))

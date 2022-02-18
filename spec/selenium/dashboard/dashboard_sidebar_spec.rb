@@ -20,16 +20,28 @@
 require_relative "../common"
 require_relative "./pages/dashboard_page"
 require_relative "./pages/k5_dashboard_page"
-require_relative "../helpers/dashboard_common"
 
 describe "dashboard" do
   include DashboardPage
   include K5DashboardPageObject
-  include DashboardCommon
   include_context "in-process server selenium tests"
 
   before :once do
-    dashboard_observer_setup
+    Account.site_admin.enable_feature!(:observer_picker)
+
+    @course1 = course_factory(active_all: true)
+    @course2 = course_factory(active_all: true)
+
+    @teacher = user_factory(active_all: true, name: "Teacher")
+    @student1 = user_factory(active_all: true, name: "Student 1")
+    @student2 = user_factory(active_all: true, name: "Student 2")
+    @observer = user_factory(active_all: true, name: "Observer")
+
+    @course1.enroll_teacher(@teacher, enrollment_state: :active)
+    @course2.enroll_teacher(@teacher, enrollment_state: :active)
+    @course1.enroll_student(@student1, enrollment_state: :active)
+    @course2.enroll_student(@student2, enrollment_state: :active)
+    @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student1.id, enrollment_state: :active)
 
     # Create some "coming up" events for each course
     @course1.calendar_events.create!(title: "Course 1 Event", start_at: 2.days.from_now)
