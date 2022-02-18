@@ -18,13 +18,15 @@
 
 import sinon from 'sinon'
 
-import FakeServer, {paramsFromRequest} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import FakeServer, {
+  paramsFromRequest
+} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {RequestDispatch} from '@canvas/network'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
-import StudentContentDataLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/StudentContentDataLoader.js'
-import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls.js'
+import StudentContentDataLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/StudentContentDataLoader'
+import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls'
 
 QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => {
   const exampleData = {

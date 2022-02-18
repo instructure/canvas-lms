@@ -24,7 +24,7 @@ export function isValidDeepLinkingEvent(event, env) {
   return !!(
     event.origin === env.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
     event.data &&
-    event.data.messageType === deepLinkingResponseMessageType
+    event.data.subject === deepLinkingResponseMessageType
   )
 }
 

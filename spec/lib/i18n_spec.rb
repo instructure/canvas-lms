@@ -20,15 +20,23 @@
 
 describe I18n do
   context "_core_en.js" do
+
+    # HINT: if this spec fails, run `rake i18n:generate_js`...
+    # it probably means you added a format or a new language
     it "is up-to-date" do
       skip("Rails 6.0 specific") unless CANVAS_RAILS6_0
-      translations = { "en" => I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS) }
 
-      # HINT: if this spec fails, run `rake i18n:generate_js`...
-      # it probably means you added a format or a new language
-      expect(File.read("public/javascripts/translations/_core_en.js")).to eq(
-        I18nTasks::Utils.dump_js(translations)
-      )
+      file_contents = File.read("public/javascripts/translations/_core_en.js")
+      translations = I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS)
+
+      # It's really slow to actually re-generate this file through the full path due to the
+      # computations that need to happen so let's do the next best thing and just check that
+      # the expected scopes exist and are rendered correctly.
+      translations.each do |scope, scope_translations|
+        expected_translations_js = I18nTasks::Utils.lazy_translations_js('en', scope, {}, scope_translations)
+
+        expect(file_contents).to include(expected_translations_js)
+      end
     end
   end
 
