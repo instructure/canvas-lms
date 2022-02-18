@@ -2116,6 +2116,41 @@ describe UsersController do
       end
     end
 
+    context "rendering page views" do
+      before do
+        allow(PageView).to receive(:page_views_enabled?).and_return(true)
+        course_with_teacher(active_all: 1)
+      end
+
+      context "when view_statistics right is granted" do
+        before do
+          account_admin_user_with_role_changes(
+            role_changes: { view_statistics: true }
+          )
+          user_session(@user)
+        end
+
+        it "is viewable" do
+          get "show", params: { id: @teacher.id }
+          expect(assigns[:show_page_views]).to be true
+        end
+      end
+
+      context "when view_statistics right is not granted" do
+        before do
+          account_admin_user_with_role_changes(
+            role_changes: { view_statistics: false }
+          )
+          user_session(@user)
+        end
+
+        it "is not viewable" do
+          get "show", params: { id: @teacher.id }
+          expect(assigns[:show_page_views]).to be false
+        end
+      end
+    end
+
     it "does not let admins see enrollments from other accounts" do
       @enrollment1 = course_with_teacher(active_all: 1)
       @enrollment2 = course_with_teacher(active_all: 1, user: @user)
