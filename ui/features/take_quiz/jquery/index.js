@@ -337,7 +337,7 @@ const quizSubmission = (function () {
         $.flashMessage(
           I18n.t(
             'notices.due_date_one_minute_left',
-            'One Minute Left Before Quiz Will Be Marked Late'
+            'You have one minute left to complete this quiz before it is marked late.'
           )
         )
       } else if (
@@ -349,7 +349,7 @@ const quizSubmission = (function () {
         $.flashMessage(
           I18n.t(
             'notices.due_date_five_minutes_left',
-            'Five Minutes Left Before Quiz Will Be Marked Late'
+            'You have five minutes left to complete this quiz before it is marked late.'
           )
         )
       } else if (
@@ -361,7 +361,7 @@ const quizSubmission = (function () {
         $.flashMessage(
           I18n.t(
             'notices.due_date_thirty_minutes_left',
-            'Thirty Minutes Left Before Quiz Will Be Marked Late'
+            'You have thirty minutes left to complete this quiz before it is marked late.'
           )
         )
       }
@@ -370,7 +370,7 @@ const quizSubmission = (function () {
       if (currentTimeLeft > 30000 && currentTimeLeft < 60000 && !quizSubmission.oneMinuteDeadline) {
         quizSubmission.oneMinuteDeadline = true
         $.flashWarning(
-          I18n.t('notices.submission_one_minute_left', 'This Quiz Will Be Submitted In One Minute'),
+          I18n.t('notices.submission_one_minute_left', 'This quiz will be submitted in one minute'),
           5000
         )
       } else if (
@@ -382,7 +382,7 @@ const quizSubmission = (function () {
         $.flashWarning(
           I18n.t(
             'notices.submission_five_minutes_left',
-            'This Quiz Will Be Submitted In Five Minutes'
+            'This quiz will be submitte in five minutes'
           ),
           5000
         )
@@ -395,7 +395,7 @@ const quizSubmission = (function () {
         $.flashWarning(
           I18n.t(
             'notices.submission_thirty_minutes_left',
-            'This Quiz Will Be Submitted In Thirty Minutes'
+            'This quiz will be submitted in thirty minutes'
           ),
           5000
         )
