@@ -88,7 +88,7 @@ class FileUpload extends Component {
   }
 
   handleLTIFiles = async e => {
-    if (e.data.subject === 'LtiDeepLinkingResponse') {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
       if (e.data.errormsg) {
         this.context.setOnFailure(e.data.errormsg)
         return
@@ -97,7 +97,7 @@ class FileUpload extends Component {
     }
 
     // Since LTI 1.0 handles its own message alerting we don't have to
-    if (e.data.subject === 'A2ExternalContentReady') {
+    if (e.data.messageType === 'A2ExternalContentReady') {
       if (!e.data.errormsg) {
         // Content type will be set on back-end to allow for DocViewer rendering
         const files = e.data.content_items.map(file => ({...file, mediaType: ''}))

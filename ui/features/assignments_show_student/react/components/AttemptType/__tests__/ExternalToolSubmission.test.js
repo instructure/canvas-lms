@@ -126,9 +126,9 @@ describe('ExternalToolSubmission', () => {
       onFileUploadRequested = jest.fn()
     })
 
-    function postMessage(subject, contents) {
+    function postMessage(messageType, contents) {
       const data = {
-        subject,
+        messageType,
         ...contents
       }
       fireEvent(window, new MessageEvent('message', {origin: document.origin, data}))

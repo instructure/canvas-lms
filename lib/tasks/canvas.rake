@@ -107,17 +107,6 @@ unless $canvas_tasks_loaded
       Rake::Task["canvas:compile_assets"].invoke
     end
 
-    desc "Upload source maps to Sentry"
-    task :upload_sentry_sourcemaps, [:auth_token, :url, :org, :project, :version] do |_, args| # rubocop:disable Rails/RakeEnvironment
-      missing_args = %i[auth_token url org project version].select { |k| args[k].blank? }
-      raise "Arguments missing: #{missing_args}" unless missing_args.empty?
-
-      puts "--> Uploading source maps to Sentry at #{args.url}"
-      system "SENTRY_AUTH_TOKEN=#{args.auth_token} SENTRY_URL=#{args.url} SENTRY_ORG=#{args.org} yarn run sentry-cli " \
-             "releases --project #{args.project} files #{args.version} upload-sourcemaps public/dist/ --ignore-file " \
-             ".sentryignore --url-prefix '~/dist/'"
-    end
-
     desc "Load config/dynamic_settings.yml into the configured consul cluster"
     task seed_consul: [:environment] do
       def load_tree(root, tree)

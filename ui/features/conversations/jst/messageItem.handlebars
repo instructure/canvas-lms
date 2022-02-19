@@ -1,5 +1,10 @@
+{{#if responsive_awareness}}
 <div class="message-info">
   <div class="user-info">
+{{else}}
+<div class="row-fluid message-info">
+  <div class="span8 user-info">
+{{/if}}
     <div id={{avatarContainerId}} class="fs-exclude avatar"></div>
     <div class="message-author-and-participants">
       <b class="username">{{author.name}}{{#if author.pronouns}} <i>({{author.pronouns}})</i> {{/if}}</b>{{#if participants.length}},{{/if}}
@@ -28,13 +33,22 @@
 
     </div>
   </div>
+  {{#if responsive_awareness}}
   <div class="message-metadata clearfix">
     <div class="date">
+  {{else}}
+  <div class="span4 message-metadata">
+    <div class="date pull-right">
+  {{/if}}
 			{{tEventToString created_at "long" "tiny"}}
 		</div>
 
     {{#unless for_submission}}
+    {{#if responsive_awareness}}
     <ul class="actions unstyled">
+    {{else}}
+    <ul class="actions pull-right unstyled">
+    {{/if}}
       {{#unless cannot_reply}}
       <li>
         <a href="#"
