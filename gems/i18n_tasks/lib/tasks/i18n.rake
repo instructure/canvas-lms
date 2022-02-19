@@ -202,7 +202,8 @@ namespace :i18n do
     puts "Lazy-Loaded Root Keys: #{lazy_root_keys.count}"
     puts "Lazy-Loaded Nested Keys: #{lazy_nested_keys.count}"
 
-    base_translations_js = "import { setRootTranslations, setLazyTranslations } from '@canvas/i18n/mergeI18nTranslations.js';"
+    base_translations_js_start = "import { setRootTranslations, setLazyTranslations } from '@canvas/i18n/mergeI18nTranslations.js'; (function(setRootTranslations, setLazyTranslations) {"
+    base_translations_js_end = "})(setRootTranslations, setLazyTranslations)"
 
     locales.each do |locale|
       puts "Generating JS for #{locale}"
@@ -220,7 +221,7 @@ namespace :i18n do
         I18nTasks::Utils.lazy_translations_js(locale, scope, lazy_root_translations, lazy_scoped_translations)
       end
 
-      dump_translations.call locale, [base_translations_js, common_translations_js, *translations_js].compact.join("\n\n")
+      dump_translations.call locale, [base_translations_js_start, common_translations_js, *translations_js, base_translations_js_end].compact.join("\n\n")
 
       if locale == :en
         puts "Generating Default JS"
@@ -231,7 +232,7 @@ namespace :i18n do
           I18nTasks::Utils.lazy_translations_js(locale, scope, {}, lazy_scoped_translations)
         end
 
-        dump_translations.call '_core_en', [base_translations_js, core_translations_js].compact.join("\n\n")
+        dump_translations.call '_core_en', [base_translations_js_start, core_translations_js, base_translations_js_end].compact.join("\n\n")
       end
     end
   end
