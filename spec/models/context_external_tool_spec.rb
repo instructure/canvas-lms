@@ -1162,6 +1162,69 @@ describe ContextExternalTool do
         expect(external_tool).to eq tool2
       end
     end
+
+    context "with duplicate tools" do
+      let(:url) { "http://example.com/launch" }
+      let(:tool) do
+        t = @course.context_external_tools.create!(name: "test", domain: "example.com", url: url, consumer_key: "12345", shared_secret: "secret")
+        t.global_navigation = {
+          url: "http://www.example.com",
+          text: "Example URL"
+        }
+        t.save!
+        t
+      end
+      let(:duplicate) do
+        t = tool.dup
+        t.save!
+        t
+      end
+
+      context "when original tool exists" do
+        it "finds original tool" do
+          tool
+          expect(ContextExternalTool.find_external_tool(url, @course)).to eq tool
+        end
+      end
+
+      context "when original tool is gone" do
+        before do
+          duplicate
+          tool.destroy
+        end
+
+        it "finds duplicate tool" do
+          expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+        end
+      end
+
+      context "when non-duplicate tool was created later" do
+        before do
+          duplicate
+          tool.update_column :identity_hash, "duplicate"
+          # re-calculate the identity hash for the later tool
+          duplicate.update!(domain: "fake.com")
+          duplicate.update!(domain: "example.com")
+        end
+
+        it "finds tool with non-duplicate identity_hash" do
+          expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+        end
+      end
+
+      context "when duplicate is 1.3" do
+        before do
+          duplicate.use_1_3 = true
+          duplicate.developer_key = DeveloperKey.create!
+          duplicate.save!
+          duplicate.update_column :identity_hash, "duplicate"
+        end
+
+        it "finds duplicate tool" do
+          expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+        end
+      end
+    end
   end
 
   describe "find_and_order_tools" do
@@ -1327,6 +1390,7 @@ describe ContextExternalTool do
 
         lti1tool
         preferred_tool
+        dupe_tool
       end
 
       let(:account_tool) { external_tool_model(context: @course.account, opts: { name: "Account Tool" }) }
@@ -1335,6 +1399,11 @@ describe ContextExternalTool do
         t.developer_key_id = nil
         t.use_1_3 = false
         t.domain = "b.c.com"
+        t.save!
+        t
+      end
+      let(:dupe_tool) do
+        t = tool1.dup
         t.save!
         t
       end
@@ -1352,8 +1421,9 @@ describe ContextExternalTool do
           tool1,
           tool3,
           account_tool,
+          dupe_tool,
           lti1tool,
-          tool2,
+          tool2
         ].map(&:id)
       end
     end
