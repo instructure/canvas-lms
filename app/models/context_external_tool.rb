@@ -1010,6 +1010,8 @@ class ContextExternalTool < ActiveRecord::Base
       order_clauses = [
         # prefer 1.3 tools
         sort_by_sql_string("developer_key_id IS NOT NULL"),
+        # prefer tools that are not duplicates
+        sort_by_sql_string("identity_hash != 'duplicate'"),
         # prefer tools from closer contexts
         "context_order.ordering",
         # prefer tools with more subdomains
@@ -1047,9 +1049,21 @@ class ContextExternalTool < ActiveRecord::Base
     "CASE WHEN #{condition} THEN 1 ELSE 2 END"
   end
 
-  # Given a collection of tools, finds the first tool that matches the given conditions
+  # Given a collection of tools, finds the first tool that matches the given conditions.
+  #
+  # First only loads non-duplicate tools into memory for matching, then will load
+  # all tools if necessary.
   def self.find_tool_match(tool_collection, matcher, matcher_condition)
-    tool_collection.to_a.find do |tool|
+    possible_match = tool_collection.not_duplicate.find do |tool|
+      matcher_condition.call(tool) && matcher.call(tool)
+    end
+
+    # an LTI 1.1 non-duplicate match means we still need to search
+    # all tools since a 1.3 match with 'duplicate' identity_hash
+    # still takes precedence
+    return possible_match if possible_match&.use_1_3?
+
+    tool_collection.find do |tool|
       matcher_condition.call(tool) && matcher.call(tool)
     end
   end
@@ -1134,6 +1148,10 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :active, lambda {
     where.not(workflow_state: ["deleted", "disabled"])
+  }
+
+  scope :not_duplicate, lambda {
+    where.not(identity_hash: "duplicate")
   }
 
   def self.find_all_for(context, type)
