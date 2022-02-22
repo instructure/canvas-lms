@@ -93,9 +93,19 @@ export default class Placement extends React.Component {
     return true
   }
 
+  setOrDeletePlacementField = (key, value) => {
+    this.setState(state => {
+      const newPlacement = {...state.placement, [key]: value}
+      if (value === '' || value === undefined) {
+        delete newPlacement[key]
+      }
+      return {placement: newPlacement}
+    })
+  }
+
   handleTargetLinkUriChange = e => {
     const value = e.target.value
-    this.setState(state => ({placement: {...state.placement, target_link_uri: value}}))
+    this.setOrDeletePlacementField('target_link_uri', value)
   }
 
   handleMessageTypeChange = (_, value) =>
@@ -103,7 +113,7 @@ export default class Placement extends React.Component {
 
   handleIconUrlChange = e => {
     const value = e.target.value
-    this.setState(state => ({placement: {...state.placement, icon_url: value}}))
+    this.setOrDeletePlacementField('icon_url', value)
   }
 
   handleTextChange = e => {
@@ -114,17 +124,13 @@ export default class Placement extends React.Component {
   handleSelectionHeightChange = e => {
     const value = e.target.value
     const numVal = parseInt(value, 10)
-    this.setState(state => ({
-      placement: {...state.placement, selection_height: !Number.isNaN(numVal) ? numVal : ''}
-    }))
+    this.setOrDeletePlacementField('selection_height', !Number.isNaN(numVal) ? numVal : '')
   }
 
   handleSelectionWidthChange = e => {
     const value = e.target.value
     const numVal = parseInt(value, 10)
-    this.setState(state => ({
-      placement: {...state.placement, selection_width: !Number.isNaN(numVal) ? numVal : ''}
-    }))
+    this.setOrDeletePlacementField('selection_width', !Number.isNaN(numVal) ? numVal : '')
   }
 
   render() {
