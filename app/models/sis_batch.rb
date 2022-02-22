@@ -136,12 +136,10 @@ class SisBatch < ActiveRecord::Base
     self.class.queue_job_for_account(account)
   end
 
-  def enable_diffing(data_set_id, opts = {})
+  def enable_diffing(data_set_identifier, is_remaster)
     if data[:import_type] == "instructure_csv"
-      self.diffing_data_set_identifier = data_set_id
-      if opts[:remaster]
-        self.diffing_remaster = true
-      end
+      self.diffing_data_set_identifier = data_set_identifier
+      self.diffing_remaster = is_remaster
     end
   end
 
@@ -704,6 +702,7 @@ class SisBatch < ActiveRecord::Base
       "update_sis_id_if_login_claimed" => options[:update_sis_id_if_login_claimed],
       "clear_sis_stickiness" => options[:clear_sis_stickiness],
       "diffing_data_set_identifier" => diffing_data_set_identifier,
+      "diffing_remaster" => diffing_remaster,
       "diffed_against_import_id" => options[:diffed_against_sis_batch_id],
       "diffing_drop_status" => options[:diffing_drop_status],
       "skip_deletes" => options[:skip_deletes],
