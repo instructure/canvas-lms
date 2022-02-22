@@ -34,13 +34,6 @@ pace_plans:
     feedback by joining the Pace Plans User Group.
   applies_to: Account
   beta: true
-notification_settings_course_selector:
-  state: hidden
-  display_name: 'Notification settings: Course selector'
-  description: >-
-    Allows modifying notification settings for any course from within the
-    account-level notification settings page.
-  applies_to: SiteAdmin
 create_course_subaccount_picker:
   state: hidden
   applies_to: RootAccount

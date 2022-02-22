@@ -30,7 +30,6 @@ export default function NotificationSettings(options = {}) {
   return (
     <ApolloProvider client={client}>
       <AccountNotificationSettingsView
-        courseSelectorEnabled={envDict.NOTIFICATION_PREFERENCES_OPTIONS?.enable_course_selector}
         accountId={envDict.DOMAIN_ROOT_ACCOUNT_ID}
         userId={envDict.current_user_id}
       />
