@@ -44,29 +44,8 @@ module.exports.pitch = function(remainingRequest, precedingRequest, data) {
     scopeName = scopeName.replace(/-/, '_')
   }
 
-  // in development, we can save bandwidth and build time by not bothering
-  // to include translation artifacts during the build.
-  // RAILS_LOAD_ALL_LOCALES: '1' or 'true' to enable
-  // RAILS_LOAD_ALL_LOCALES: '0' to disable in production mode
-  const shouldTranslate = (
-    process.env.RAILS_LOAD_ALL_LOCALES === '1' ||
-    process.env.RAILS_LOAD_ALL_LOCALES === 'true' ||
-    process.env.RAILS_LOAD_ALL_LOCALES !== '0' && (
-      process.env.RAILS_ENV == 'production' ||
-      process.env.NODE_ENV == 'production'
-    )
-  )
-  const translationDependency = shouldTranslate
-    ? `
-      import 'translations/${scopeName}';
-      import 'translations/_core';
-    `
-    : ''
-
   const scopedJavascript = `
     import I18n from '@canvas/i18n/i18nObj';
-    ${translationDependency}
-    import 'translations/_core_en';
 
     export default I18n.scoped('${scopeName}');
   `

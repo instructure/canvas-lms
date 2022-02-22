@@ -195,7 +195,7 @@
         "message": "Knappestorleik"
     },
     "buttons_and_icons_e66ee12c": {
-        "message": "Knappar og ikonar"
+        "message": "Knappar og ikon"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -306,7 +306,7 @@
         "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte element}\n}"
     },
     "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {Vis # manglande element}\n  other {Vis  manglande element}\n}"
+        "message": "{ count, plural,\n    one {Vis # manglande element}\n  other {Vis # manglande element}\n}"
     },
     "course_8a63b4a3": {
         "message": "Emne"
@@ -699,7 +699,7 @@
         "message": "HTML-editor"
     },
     "html_editor_fb2ab713": {
-        "message": "HTML-redigeringsprogram"
+        "message": "HTML-editor"
     },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Eg har løyve til å bruke denne fila. "
@@ -756,7 +756,7 @@
         "message": "Ta del"
     },
     "join_active_online_meeting_d9d892b2": {
-        "message": "bli med på aktivt møte"
+        "message": "bli med på aktivt online møte"
     },
     "join_online_meeting_b1725843": {
         "message": "bli med på møtet"
@@ -1482,7 +1482,7 @@
         "message": "Vis { title } skildring"
     },
     "weekly_schedule_navigation_6b042645": {
-        "message": "Navigasjon for ukestimeplan"
+        "message": "Navigasjon for vekestimeplan"
     },
     "width_492fec76": {
         "message": "Vidde"

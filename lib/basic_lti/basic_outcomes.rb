@@ -281,6 +281,7 @@ module BasicLTI
         code_major == "failure"
       end
 
+      # for New Quizzes check BasicLTI::QuizzesNextLtiResponse.handle_replace_result
       def handle_replace_result(tool, assignment, user)
         text_value = result_score
         score_value = result_total_score
