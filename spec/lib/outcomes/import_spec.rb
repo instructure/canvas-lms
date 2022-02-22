@@ -200,6 +200,13 @@ RSpec.describe Outcomes::Import do
           end.to raise_error(klass::InvalidDataError, /is not a child of current account/)
         end
 
+        it "fails if the given Course is not a valid Id" do
+          group_attributes[:course_id] = Course.maximum(:id) + 1
+          expect do
+            importer.import_group(group_attributes)
+          end.to raise_error(klass::InvalidDataError, /Course with canvas id (\d+,*)+ not found/)
+        end
+
         it "creates and links groups from multiple levels" do
           cgroup = importer.import_group(group_attributes)
           agroup = importer.import_group(account_group_attributes)
