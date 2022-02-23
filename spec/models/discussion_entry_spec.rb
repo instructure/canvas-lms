@@ -345,13 +345,15 @@ describe DiscussionEntry do
       expect(fresh_topic.last_reply_at).to eq initial_last_reply_at
     end
 
-    it "still works with no last_reply_at" do
+    it "for migrated discussions, last_reply_at starts at nill but updates at update_topic" do
       @topic.saved_by = :migration
       @topic.last_reply_at = nil
       @topic.save!
-      @entry.reload
+      expect(@topic.last_reply_at).to eq nil
+
       @entry.update_topic
-      expect(@topic.last_reply_at).to be_nil
+      @topic.reload
+      expect(@topic.last_reply_at).to be >= @topic.created_at
     end
   end
 
