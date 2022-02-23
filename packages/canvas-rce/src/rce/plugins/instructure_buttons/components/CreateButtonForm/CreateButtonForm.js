@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import {useStoreProps} from '../../../shared/StoreContext'
 
 import {useSvgSettings, statuses} from '../../svg/settings'
-import {BTN_AND_ICON_ATTRIBUTE} from '../../registerEditToolbar'
+import {BTN_AND_ICON_ATTRIBUTE, BTN_AND_ICON_DOWNLOAD_URL_ATTR} from '../../registerEditToolbar'
 import {buildSvg, buildStylesheet} from '../../svg'
 import formatMessage from '../../../../../format-message'
 
@@ -62,13 +62,20 @@ export const CreateButtonForm = ({editor, onClose, editing}) => {
   }
 
   const writeButtonToRCE = ({url}) => {
-    const img = editor.dom.createHTML('img', {
-      src: url,
-      alt: settings.alt,
-      [BTN_AND_ICON_ATTRIBUTE]: true
-    })
+    const img = editor.dom.create('img')
 
-    editor.insertContent(img)
+    img.setAttribute('src', url)
+    img.setAttribute('alt', settings.alt)
+
+    // Mark the image as a button and icon.
+    img.setAttribute(BTN_AND_ICON_ATTRIBUTE, true)
+
+    // URL to fetch the SVG from when loading the Edit tray.
+    // We can't use the 'src' because Canvas will re-write the
+    // source attribute to a URL that is not cross-origin friendly.
+    img.setAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR, url)
+
+    editor.insertContent(img.outerHTML)
   }
 
   useEffect(() => {
