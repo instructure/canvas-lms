@@ -64,11 +64,41 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with some assignments and
       {assignment_id: 205, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 100,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 91,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 55,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 38,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 205,
+        points_possible: 1000,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {}, assignments}
   }
@@ -114,14 +144,30 @@ test('excludes assignment points on excused submissions', () => {
   equal(grades.final.possible, 1193)
 })
 
-test('excludes submissions "pending review" from the current grade', () => {
+test('includes "pending review" submissions for online quizzes from the current grade', () => {
+  assignments[1].submission_types = ['online_quiz']
+  submissions[1].workflow_state = 'pending_review'
+  const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
+  equal(grades.current.score, 159)
+  equal(grades.current.possible, 284)
+})
+
+test('excludes "pending review" submissions for non online quizzes from the current grade', () => {
   submissions[1].workflow_state = 'pending_review'
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
   equal(grades.current.score, 117)
   equal(grades.current.possible, 193)
 })
 
-test('includes submissions "pending review" in the final grade', () => {
+test('includes "pending review" submissions for online quizzes in the final grade', () => {
+  assignments[1].submission_types = ['online_quiz']
+  submissions[1].workflow_state = 'pending_review'
+  const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
+  equal(grades.final.score, 159)
+  equal(grades.final.possible, 1284)
+})
+
+test('includes "pending review" submissions for non online quizzes in the final grade', () => {
   submissions[1].workflow_state = 'pending_review'
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
   equal(grades.final.score, 159)
@@ -202,8 +248,20 @@ QUnit.module(
         {assignment_id: 202, score: 10}
       ]
       assignments = [
-        {id: 201, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-        {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {
+          id: 201,
+          points_possible: 0,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 202,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        }
       ]
       assignmentGroup = {id: 301, rules: {}, assignments}
     }
@@ -224,9 +282,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
       {assignment_id: 203, score: 6}
     ]
     assignments = [
-      {id: 201, points_possible: 40, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 24, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 40,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 24,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: '2201', rules: {drop_lowest: 1}, assignments}
   })
@@ -313,9 +389,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
       ]
 
       assignmentGroup.assignments = [
-        {id: '2302', points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-        {id: '2303', points_possible: 50, omit_from_final_grade: false, anonymize_students: false},
-        {id: '2301', points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {
+          id: '2302',
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: '2303',
+          points_possible: 50,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: '2301',
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        }
       ]
 
       // drop 2/10, keep 10/50, keep 2/10 = 12/60 = 50.0%
@@ -338,9 +432,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     QUnit.module('when grades have different point scores', deepHooks => {
       deepHooks.beforeEach(() => {
         assignmentGroup.assignments = [
-          {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {
+            id: '2303',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2302',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2301',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          }
         ]
 
         submissions = [
@@ -364,9 +476,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     QUnit.module('when all grades are equal', deepHooks => {
       deepHooks.beforeEach(() => {
         assignmentGroup.assignments = [
-          {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {
+            id: '2302',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2301',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2303',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          }
         ]
 
         submissions = [
@@ -399,11 +529,41 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
       {assignment_id: 205, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 100,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 91,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 55,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 38,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 205,
+        points_possible: 1000,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {drop_lowest: 2}, assignments}
   }
@@ -488,9 +648,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
       {assignment_id: 203, score: 6}
     ]
     assignments = [
-      {id: 201, points_possible: 40, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 24, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 40,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 24,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {drop_highest: 1}, assignments}
   })
@@ -559,9 +737,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
       ]
 
       assignmentGroup.assignments = [
-        {id: '2302', points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-        {id: '2303', points_possible: 50, omit_from_final_grade: false, anonymize_students: false},
-        {id: '2301', points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {
+          id: '2302',
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: '2303',
+          points_possible: 50,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: '2301',
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        }
       ]
 
       // drop 2/10, keep 10/50, keep 2/10 = 12/60 = 50.0%
@@ -584,9 +780,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
     QUnit.module('when grades have different point scores', deepHooks => {
       deepHooks.beforeEach(() => {
         assignmentGroup.assignments = [
-          {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {
+            id: '2303',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2302',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2301',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          }
         ]
 
         submissions = [
@@ -610,9 +824,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
     QUnit.module('when all grades are equal', deepHooks => {
       deepHooks.beforeEach(() => {
         assignmentGroup.assignments = [
-          {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {
+            id: '2302',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2303',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          },
+          {
+            id: '2301',
+            points_possible: 0,
+            omit_from_final_grade: false,
+            anonymize_students: false,
+            submission_types: ['online_text_entry']
+          }
         ]
 
         submissions = [
@@ -645,11 +877,41 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule', {
       {assignment_id: 205, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 100,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 91,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 55,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 38,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 205,
+        points_possible: 1000,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {drop_highest: 2}, assignments}
   }
@@ -741,11 +1003,41 @@ QUnit.module(
         {assignment_id: 205, score: null}
       ]
       assignments = [
-        {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
-        {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
-        {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
-        {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-        {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+        {
+          id: 201,
+          points_possible: 100,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 202,
+          points_possible: 91,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 203,
+          points_possible: 55,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 204,
+          points_possible: 38,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 205,
+          points_possible: 1000,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        }
       ]
       assignmentGroup = {id: 301, rules: {drop_lowest: 1, drop_highest: 1}, assignments}
     }
@@ -819,10 +1111,34 @@ QUnit.module(
         {assignment_id: 204, score: 9}
       ]
       assignments = [
-        {id: 201, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-        {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-        {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-        {id: 204, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {
+          id: 201,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 202,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 203,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 204,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          anonymize_students: false,
+          submission_types: ['online_text_entry']
+        }
       ]
       assignmentGroup = {id: 301, rules: {}, assignments}
     }
@@ -886,10 +1202,34 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with only unpointed assig
       {assignment_id: 204, score: 0}
     ]
     assignments = [
-      {id: 201, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {}, assignments}
   }
@@ -926,9 +1266,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with only ungraded submis
       {assignment_id: 203, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 5, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 20, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 5,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 20,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {}, assignments}
   }
@@ -960,10 +1318,34 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "never_drop" rule', {
       {assignment_id: 204, score: 6}
     ]
     assignments = [
-      {id: 201, points_possible: 40, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 24, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 16, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 40,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 24,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 16,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroup = {id: 301, rules: {never_drop: [204]}, assignments}
   }
@@ -1094,8 +1476,18 @@ QUnit.module('AssignmentGroupGradeCalculator', () => {
         {id: 102, assignment_id: 202, score: null}
       ]
       assignments = [
-        {id: 201, points_possible: 100, workflow_state: 'published'},
-        {id: 202, points_possible: 100, workflow_state: 'unpublished'}
+        {
+          id: 201,
+          points_possible: 100,
+          workflow_state: 'published',
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 202,
+          points_possible: 100,
+          workflow_state: 'unpublished',
+          submission_types: ['online_text_entry']
+        }
       ]
       assignmentGroup = {id: 301, rules: {}, assignments}
     })

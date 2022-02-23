@@ -372,6 +372,7 @@ describe('getAssignmentGroupTotals', () => {
             name: '1',
             points_possible: 10.0,
             grading_type: 'points',
+            submission_types: ['online_text_entry'],
             submission: {
               score: 7.0,
               grade: '7.0',
@@ -385,6 +386,7 @@ describe('getAssignmentGroupTotals', () => {
             name: '2',
             points_possible: 5.0,
             grading_type: 'points',
+            submission_types: ['online_text_entry'],
             submission: {
               score: 5.0,
               grade: '5.0',
@@ -430,6 +432,7 @@ describe('getAssignmentGroupTotals', () => {
             name: '1',
             points_possible: 10.0,
             grading_type: 'points',
+            submission_types: ['online_text_entry'],
             submission: {
               score: 7.0,
               grade: '7.0',
@@ -449,6 +452,7 @@ describe('getAssignmentGroupTotals', () => {
             name: '2',
             points_possible: 10.0,
             grading_type: 'points',
+            submission_types: ['online_text_entry'],
             submission: {
               score: 7.0,
               grade: '7.0',

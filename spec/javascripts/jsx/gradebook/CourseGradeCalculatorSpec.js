@@ -105,11 +105,41 @@ QUnit.module('CourseGradeCalculator.calculate with some assignments and submissi
       {assignment_id: 205, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
-      {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {
+        id: 201,
+        points_possible: 100,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 91,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 55,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 38,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 205,
+        points_possible: 1000,
+        omit_from_final_grade: false,
+        anonymize_students: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroups = [
       {id: 301, rules: {}, group_weight: 50, assignments: assignments.slice(0, 2)},
@@ -127,10 +157,30 @@ test('avoids floating point errors in current and final score when assignment gr
   ]
 
   assignments = [
-    {id: 201, points_possible: 200, anonymize_students: false},
-    {id: 202, points_possible: 100, anonymize_students: false},
-    {id: 203, points_possible: 100, anonymize_students: false},
-    {id: 204, points_possible: 100, anonymize_students: false}
+    {
+      id: 201,
+      points_possible: 200,
+      anonymize_students: false,
+      submission_types: ['online_text_entry']
+    },
+    {
+      id: 202,
+      points_possible: 100,
+      anonymize_students: false,
+      submission_types: ['online_text_entry']
+    },
+    {
+      id: 203,
+      points_possible: 100,
+      anonymize_students: false,
+      submission_types: ['online_text_entry']
+    },
+    {
+      id: 204,
+      points_possible: 100,
+      anonymize_students: false,
+      submission_types: ['online_text_entry']
+    }
   ]
 
   assignmentGroups = [
@@ -153,8 +203,8 @@ test('avoids floating point errors in current and final score when assignment gr
   ]
 
   assignments = [
-    {id: 201, points_possible: 120},
-    {id: 202, points_possible: 180}
+    {id: 201, points_possible: 120, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 180, submission_types: ['online_text_entry']}
   ]
 
   assignmentGroups = [
@@ -175,8 +225,8 @@ test('avoids floating point errors in points possible when assignment groups are
   ]
 
   assignments = [
-    {id: 201, points_possible: 110.1},
-    {id: 202, points_possible: 170.7}
+    {id: 201, points_possible: 110.1, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 170.7, submission_types: ['online_text_entry']}
   ]
 
   assignmentGroups = [
@@ -196,8 +246,8 @@ test('avoids floating point errors in assignment group weights', () => {
     {assignment_id: 202, score: 144.53}
   ]
   assignments = [
-    {id: 201, points_possible: 148},
-    {id: 202, points_possible: 148}
+    {id: 201, points_possible: 148, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 148, submission_types: ['online_text_entry']}
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1)},
@@ -218,8 +268,8 @@ test('avoids floating point errors when up-scaling assignment group weights', ()
     {assignment_id: 202, score: 96.08}
   ]
   assignments = [
-    {id: 201, points_possible: 100},
-    {id: 202, points_possible: 100}
+    {id: 201, points_possible: 100, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 100, submission_types: ['online_text_entry']}
   ]
   assignmentGroups = [
     {id: 301, group_weight: 40, rules: {}, assignments: assignments.slice(0, 1)},
@@ -383,10 +433,30 @@ QUnit.module('CourseGradeCalculator.calculate with zero-point assignments', {
       {assignment_id: 204, score: 0}
     ]
     assignments = [
-      {id: 201, points_possible: 0, omit_from_final_grade: false},
-      {id: 202, points_possible: 0, omit_from_final_grade: false},
-      {id: 203, points_possible: 0, omit_from_final_grade: false},
-      {id: 204, points_possible: 0, omit_from_final_grade: false}
+      {
+        id: 201,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 0,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroups = [
       {id: 301, rules: {}, group_weight: 50, assignments: assignments.slice(0, 2)},
@@ -439,9 +509,24 @@ QUnit.module('CourseGradeCalculator.calculate with only ungraded submissions', {
       {assignment_id: 203, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 5, omit_from_final_grade: false},
-      {id: 202, points_possible: 10, omit_from_final_grade: false},
-      {id: 203, points_possible: 20, omit_from_final_grade: false}
+      {
+        id: 201,
+        points_possible: 5,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 20,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroups = [{id: 301, group_weight: 100, rules: {}, assignments}]
   }
@@ -499,10 +584,30 @@ QUnit.module('CourseGradeCalculator.calculate with unweighted grading periods', 
       {assignment_id: 204, score: 16}
     ]
     assignments = [
-      {id: 201, points_possible: 10, omit_from_final_grade: false},
-      {id: 202, points_possible: 10, omit_from_final_grade: false},
-      {id: 203, points_possible: 20, omit_from_final_grade: false},
-      {id: 204, points_possible: 40, omit_from_final_grade: false}
+      {
+        id: 201,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 20,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 40,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroups = [
       {id: 301, group_weight: 60, rules: {}, assignments: assignments.slice(0, 2)},
@@ -764,10 +869,30 @@ QUnit.module('CourseGradeCalculator.calculate with weighted grading periods', {
       {assignment_id: 204, score: 16}
     ]
     assignments = [
-      {id: 201, points_possible: 10, omit_from_final_grade: false},
-      {id: 202, points_possible: 10, omit_from_final_grade: false},
-      {id: 203, points_possible: 20, omit_from_final_grade: false},
-      {id: 204, points_possible: 40, omit_from_final_grade: false}
+      {
+        id: 201,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 202,
+        points_possible: 10,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 203,
+        points_possible: 20,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      },
+      {
+        id: 204,
+        points_possible: 40,
+        omit_from_final_grade: false,
+        submission_types: ['online_text_entry']
+      }
     ]
     assignmentGroups = [
       {id: 301, group_weight: 60, rules: {}, assignments: assignments.slice(0, 2)},
@@ -1119,8 +1244,8 @@ test('avoids floating point errors in current and final score', () => {
     {assignment_id: 202, score: 38.25}
   ]
   assignments = [
-    {id: 201, points_possible: 60},
-    {id: 202, points_possible: 40}
+    {id: 201, points_possible: 60, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 40, submission_types: ['online_text_entry']}
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1)},
@@ -1161,9 +1286,24 @@ QUnit.module(
         {assignment_id: 203, score: 3}
       ]
       assignments = [
-        {id: 201, points_possible: 10, omit_from_final_grade: false},
-        {id: 202, points_possible: 10, omit_from_final_grade: false},
-        {id: 203, points_possible: 10, omit_from_final_grade: false}
+        {
+          id: 201,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 202,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          submission_types: ['online_text_entry']
+        },
+        {
+          id: 203,
+          points_possible: 10,
+          omit_from_final_grade: false,
+          submission_types: ['online_text_entry']
+        }
       ]
       assignmentGroups = [
         {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
@@ -1286,9 +1426,9 @@ test('avoids floating point errors in assignment group scores', () => {
     {assignment_id: 203, score: 103.3}
   ]
   assignments = [
-    {id: 201, points_possible: 120},
-    {id: 202, points_possible: 190},
-    {id: 203, points_possible: 120}
+    {id: 201, points_possible: 120, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 190, submission_types: ['online_text_entry']},
+    {id: 203, points_possible: 120, submission_types: ['online_text_entry']}
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
@@ -1310,9 +1450,9 @@ test('avoids floating point errors in assignment group points possible', () => {
     {assignment_id: 203, score: 90}
   ]
   assignments = [
-    {id: 201, points_possible: 110.1},
-    {id: 202, points_possible: 170.7},
-    {id: 203, points_possible: 103.3}
+    {id: 201, points_possible: 110.1, submission_types: ['online_text_entry']},
+    {id: 202, points_possible: 170.7, submission_types: ['online_text_entry']},
+    {id: 203, points_possible: 103.3, submission_types: ['online_text_entry']}
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
