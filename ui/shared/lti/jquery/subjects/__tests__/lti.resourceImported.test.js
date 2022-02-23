@@ -20,7 +20,7 @@ import handler from '../lti.resourceImported'
 import {ltiState} from '../../messages'
 
 const resourceImportedMessage = {
-  messageType: 'lti.resourceImported',
+  subject: 'lti.resourceImported',
   data: 'http://localhost/test'
 }
 

@@ -5408,8 +5408,9 @@ describe "Submissions API", type: :request do
       # This is a workaround until mobile supports new anonymous grading
       params = @params.merge(allow_new_anonymous_id: true)
       json = api_call_as_user(@ta, :get, @path, params)
+      anon_names = json.sort_by { |sub| sub["anonymous_id"] }.map { |el| el["display_name"] }
       expect(json.map { |el| el["id"] }).to match_array([nil, nil])
-      expect(json.map { |el| el["display_name"] }).to match_array([nil, nil])
+      expect(anon_names).to match_array(["Student 1", "Student 2"])
       expect(json.map { |el| el["html_url"] }).to match_array([nil, nil])
     end
 

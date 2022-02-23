@@ -29,5 +29,16 @@ describe Canvas::Plugin do
       expect(Canvas::Plugin.value_to_boolean("f")).to eq false
       expect(Canvas::Plugin.value_to_boolean("t")).to eq true
     end
+
+    it "accepts nil" do
+      expect(Canvas::Plugin.value_to_boolean(nil)).to eq false
+    end
+
+    it "does not accept unrecognized arguments" do
+      file = Tempfile.new("hello world")
+      hash = { tempfile: file }
+      value = ActionDispatch::Http::UploadedFile.new(hash)
+      expect(Canvas::Plugin.value_to_boolean(value)).to be_nil
+    end
   end
 end

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import BrandableCSS from '../'
+import BrandableCSS from '..'
 import stubEnv from '@canvas/stub-env'
 
 describe('@canvas/brandable-css#loadStylesheet', () => {
@@ -29,9 +29,7 @@ describe('@canvas/brandable-css#loadStylesheet', () => {
 
     BrandableCSS.loadStylesheet(bundleId, {combinedChecksum: fingerprint})
 
-    expect(
-      document.head.querySelector('link[rel="stylesheet"]:last-of-type').href
-    ).toEqual(
+    expect(document.head.querySelector('link[rel="stylesheet"]:last-of-type').href).toEqual(
       `http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`
     )
   })
@@ -51,14 +49,14 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
   })
 
   it('works', () => {
-    jest.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => ([
-      [ 'first_variant', 'second_variant' ],
+    jest.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => [
+      ['first_variant', 'second_variant'],
       {
-        "fa0": ['xxx']
+        fa0: ['xxx']
       }
-    ]))
+    ])
 
-    subject({ id: 'fa0', bundle: 'asdfasdf' })
+    subject({id: 'fa0', bundle: 'asdfasdf'})
 
     expect(loadStylesheet).toHaveBeenCalled()
     expect(loadStylesheet).toHaveBeenCalledWith('asdfasdf', {
@@ -69,29 +67,27 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
 
   it('resolves references', () => {
     jest.spyOn(BrandableCSS, 'getCssVariant').mockImplementation(() => 'second_variant')
-    jest.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => ([
-      [ 'first_variant', 'second_variant' ],
-      { "fa0": ['xxx', 0] }
-    ]))
+    jest
+      .spyOn(BrandableCSS, 'getHandlebarsIndex')
+      .mockImplementation(() => [['first_variant', 'second_variant'], {fa0: ['xxx', 0]}])
 
-    subject({ id: 'fa0', bundle: 'asdfasdf' })
+    subject({id: 'fa0', bundle: 'asdfasdf'})
 
     expect(loadStylesheet).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        combinedChecksum: 'xxx',
+        combinedChecksum: 'xxx'
       })
     )
   })
 
   it('marks as "includesNoVariables" if only one checksum is provided', () => {
     jest.spyOn(BrandableCSS, 'getCssVariant').mockImplementation(() => 'second_variant')
-    jest.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => ([
-      [ 'first_variant', 'second_variant' ],
-      { "fa0": ['xxx'] }
-    ]))
+    jest
+      .spyOn(BrandableCSS, 'getHandlebarsIndex')
+      .mockImplementation(() => [['first_variant', 'second_variant'], {fa0: ['xxx']}])
 
-    subject({ id: 'fa0', bundle: 'asdfasdf' })
+    subject({id: 'fa0', bundle: 'asdfasdf'})
 
     expect(loadStylesheet).toHaveBeenCalledWith(
       expect.any(String),
@@ -102,36 +98,9 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
   })
 
   it('throws if bundle has no mapping', () => {
-    expect(() => subject({ id: 'asdfasdf', bundle: 'asdfasdf' })).toThrow(
+    expect(() => subject({id: 'asdfasdf', bundle: 'asdfasdf'})).toThrow(
       /requested to load stylesheet for template.*but no mapping is available/
     )
-  })
-})
-
-describe('@canvas/brandable-css#getCssVariant', () => {
-  const subject = BrandableCSS.getCssVariant
-  const env = stubEnv({})
-
-  test('should be new_styles_normal_contrast by default', () => {
-    env.use_responsive_layout = undefined
-    expect(subject()).toEqual('new_styles_normal_contrast')
-  })
-
-  test('should be responsive_layout_normal_contrast by if env var from feature flag is set', () => {
-    env.use_responsive_layout = true
-    expect(subject()).toEqual('responsive_layout_normal_contrast')
-  })
-
-  test('should pick up ENV settings', () => {
-    env.use_responsive_layout = undefined
-    env.use_high_contrast = true
-    expect(subject()).toEqual('new_styles_high_contrast')
-  })
-
-  test('should pick up ENV & responsive_layout', () => {
-    env.use_responsive_layout = true
-    env.use_high_contrast = true
-    expect(subject()).toEqual('responsive_layout_high_contrast')
   })
 })
 
@@ -142,9 +111,7 @@ describe('@canvas/brandable-css#urlFor', () => {
   const env = stubEnv({})
 
   test('should have right default', () => {
-    expect(
-      subject(bundleId, {combinedChecksum: fingerprint})
-    ).toEqual(
+    expect(subject(bundleId, {combinedChecksum: fingerprint})).toEqual(
       `/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`
     )
   })
@@ -155,31 +122,24 @@ describe('@canvas/brandable-css#urlFor', () => {
         combinedChecksum: fingerprint,
         includesNoVariables: true
       })
-    ).toEqual(
-      `/dist/brandable_css/no_variables/${bundleId}-${fingerprint}.css`
-    )
+    ).toEqual(`/dist/brandable_css/no_variables/${bundleId}-${fingerprint}.css`)
   })
 
   test('should pick up ENV settings', () => {
     env.ASSET_HOST = 'http://cdn.example.com'
     env.use_high_contrast = false
 
-    expect(
-      subject(bundleId, {combinedChecksum: fingerprint})
-    ).toEqual(
+    expect(subject(bundleId, {combinedChecksum: fingerprint})).toEqual(
       `http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`
     )
   })
 
-  test('should pick up ENV settings & responsive layout feature flag', () => {
+  test('should pick up ENV settings & high contrast feature flag', () => {
     env.ASSET_HOST = 'http://cdn.example.com'
-    env.use_responsive_layout = true
     env.use_high_contrast = true
 
-    expect(
-      subject(bundleId, {combinedChecksum: fingerprint})
-    ).toEqual(
-      `http://cdn.example.com/dist/brandable_css/responsive_layout_high_contrast/${bundleId}-${fingerprint}.css`
+    expect(subject(bundleId, {combinedChecksum: fingerprint})).toEqual(
+      `http://cdn.example.com/dist/brandable_css/new_styles_high_contrast/${bundleId}-${fingerprint}.css`
     )
   })
 })

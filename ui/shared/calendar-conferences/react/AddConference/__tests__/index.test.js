@@ -103,7 +103,7 @@ describe('AddConference', () => {
             new MessageEvent('message', {
               origin: 'invalid://test',
               data: {
-                messageType: 'LtiDeepLinkingResponse',
+                subject: 'LtiDeepLinkingResponse',
                 content_items
               }
             })

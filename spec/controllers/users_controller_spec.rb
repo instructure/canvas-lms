@@ -2116,6 +2116,41 @@ describe UsersController do
       end
     end
 
+    context "rendering page views" do
+      before do
+        allow(PageView).to receive(:page_views_enabled?).and_return(true)
+        course_with_teacher(active_all: 1)
+      end
+
+      context "when view_statistics right is granted" do
+        before do
+          account_admin_user_with_role_changes(
+            role_changes: { view_statistics: true }
+          )
+          user_session(@user)
+        end
+
+        it "is viewable" do
+          get "show", params: { id: @teacher.id }
+          expect(assigns[:show_page_views]).to be true
+        end
+      end
+
+      context "when view_statistics right is not granted" do
+        before do
+          account_admin_user_with_role_changes(
+            role_changes: { view_statistics: false }
+          )
+          user_session(@user)
+        end
+
+        it "is not viewable" do
+          get "show", params: { id: @teacher.id }
+          expect(assigns[:show_page_views]).to be false
+        end
+      end
+    end
+
     it "does not let admins see enrollments from other accounts" do
       @enrollment1 = course_with_teacher(active_all: 1)
       @enrollment2 = course_with_teacher(active_all: 1, user: @user)
@@ -2729,6 +2764,60 @@ describe UsersController do
       get "user_dashboard"
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:teacher)
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+    end
+  end
+
+  describe "#dashboard_stream_items" do
+    before :once do
+      @course1 = course_factory(active_all: true)
+      @user1 = user_factory(active_all: true)
+    end
+
+    before do
+      user_session(@user1)
+    end
+
+    it "does not pass contexts to cached_recent_stream_items for students" do
+      @course1.enroll_student(@user1)
+      expect(@user1).to receive(:cached_recent_stream_items).with({ contexts: nil })
+
+      get "dashboard_stream_items"
+      expect(assigns[:user].id).to be(@user1.id)
+      expect(assigns[:is_observing_student]).to be(false)
+    end
+
+    context "with observers" do
+      before :once do
+        Account.site_admin.enable_feature!(:observer_picker)
+        @course2 = course_factory(active_all: true)
+        @student = user_factory(active_all: true)
+        @course1.enroll_student(@student)
+        @course1.enroll_user(@user1, "ObserverEnrollment", associated_user_id: @student.id)
+      end
+
+      it "passes context to cached_recent_stream_items for observers when observer_picker flag is on" do
+        expect_any_instance_of(User).to receive(:cached_recent_stream_items).with({ contexts: [@course1] })
+
+        get "dashboard_stream_items", params: { observed_user: @student.id }
+        expect(assigns[:user].id).to be(@student.id)
+        expect(assigns[:is_observing_student]).to be(true)
+      end
+
+      it "does not set @user to observer parameter if observer_picker flag is off" do
+        Account.site_admin.disable_feature!(:observer_picker)
+
+        get "dashboard_stream_items", params: { observed_user: @student.id }
+        expect(assigns[:user].id).to be(@user1.id)
+        expect(assigns[:is_observing_student]).to be(false)
+      end
+
+      it "returns unauthorized if user passes observed_user whom they are not observing" do
+        @another_student = user_factory(active_all: true)
+        @course1.enroll_student(@another_student)
+
+        get "dashboard_stream_items", params: { observed_user: @another_student.id }
+        expect(response).to be_unauthorized
+      end
     end
   end
 

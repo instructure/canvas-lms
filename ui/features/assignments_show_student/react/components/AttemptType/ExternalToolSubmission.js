@@ -67,7 +67,7 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
 
   useEffect(() => {
     async function handleDeepLinking(e) {
-      if (!['A2ExternalContentReady', 'LtiDeepLinkingResponse'].includes(e.data.messageType)) {
+      if (!['A2ExternalContentReady', 'LtiDeepLinkingResponse'].includes(e.data.subject)) {
         return
       }
 

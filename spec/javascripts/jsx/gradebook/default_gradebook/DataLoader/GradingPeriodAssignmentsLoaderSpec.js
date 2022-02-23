@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import GradingPeriodAssignmentsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/GradingPeriodAssignmentsLoader.js'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import GradingPeriodAssignmentsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/GradingPeriodAssignmentsLoader'
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import {RequestDispatch} from '@canvas/network'
 
