@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import AssignmentRowCellPropFactory from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory.js'
 import AssignmentCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/index.js'
 import GridEvent from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/GridEvent.js'
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
   let $container

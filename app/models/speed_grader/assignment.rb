@@ -81,10 +81,8 @@ module SpeedGrader
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
 
-      unless assignment.anonymize_students?
-        # Ensure that any test students are sorted last
-        students = students.sort_by { |r| r.preferences[:fake_student] == true ? 1 : 0 }
-      end
+      # Ensure that any test students are sorted last
+      students = students.sort_by { |r| r.preferences[:fake_student] == true ? 1 : 0 }
 
       enrollments = course.apply_enrollment_visibility(
         gradebook_enrollment_scope(user: current_user, course: course),
@@ -112,7 +110,6 @@ module SpeedGrader
         if anonymous_students?(current_user: current_user, assignment: assignment)
           anonymous_ids = student_ids_to_anonymous_ids(current_user: current_user, assignment: assignment, course: course, submissions: submissions)
           json[:anonymous_id] = anonymous_ids[student.id.to_s]
-          json[:anonymous_name] = assignment.anonymous_student_identities[student.id]
         end
         json[:needs_provisional_grade] = assignment.can_be_moderated_grader?(current_user) if provisional_grader_or_moderator?
         json[:rubric_assessments] = rubric_assessments_to_json(

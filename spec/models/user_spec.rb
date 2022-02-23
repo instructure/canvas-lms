@@ -3697,14 +3697,9 @@ describe User do
         expect(user.custom_colors.map { |_k, v| WCAGColorContrast.ratio(v.delete("#"), "ffffff") }).to all(be >= 4.5)
       end
 
-      it "doesn't break in the presence of 3 character hashes" do
-        user.preferences[:custom_colors] = { user_1: "#fff" }
-        expect(user.custom_colors[:user_1]).to eq("#717171")
-      end
-
       it "leaves colors with enough contrast alone" do
         user.preferences[:custom_colors] = { user_1: "#757777" }
-        expect(user.custom_colors[:user_1]).to eq("#757777")
+        expect(user.custom_colors[:user_1]).to be("#757777")
       end
     end
   end

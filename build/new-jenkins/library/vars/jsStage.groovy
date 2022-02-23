@@ -112,6 +112,7 @@ def queueTestStage() {
     def baseEnvVars = [
       "FORCE_FAILURE=${env.FORCE_FAILURE}",
       'RAILS_ENV=test',
+      "RAILS_LOAD_ALL_LOCALES=${env.RAILS_LOAD_ALL_LOCALES}",
       "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
     ]
 
