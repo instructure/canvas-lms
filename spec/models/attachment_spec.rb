@@ -2526,10 +2526,10 @@ describe Attachment do
         expect(@attachment.word_count).to eq 5
       end
 
-      it "sets nil if the file is not supported" do
+      it "sets 0 if the file is not supported" do
         attachment_model(filename: "test.png", uploaded_data: fixture_file_upload("files/instructure.png", "image/png"))
         @attachment.update_word_count
-        expect(@attachment.word_count).to be_nil
+        expect(@attachment.word_count).to eq 0
       end
     end
   end
