@@ -108,43 +108,6 @@ describe('Ratings', () => {
     })
   })
 
-  describe('focusField', () => {
-    it('When deleting the rating 1 out of 2, focusField is set to points', () => {
-      const {getByText} = render(<Ratings {...defaultProps()} />)
-      fireEvent.click(getByText('Delete mastery level 1'))
-      const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
-      expect(newRatings[0].focusField).toEqual('points')
-    })
-
-    it('When deleting the rating 3 out of 3, focusField of rating 2 is set to trash', () => {
-      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2)]
-      const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
-      fireEvent.click(getByText('Delete mastery level 3'))
-      const newRatings = onChangeRatingsMock.mock.calls[0][0](threeRatings)
-      expect(newRatings[0].focusField).toBeNull()
-      expect(newRatings[1].focusField).toEqual('trash')
-    })
-
-    it('When deleting the rating 1 out of 3, focusField of rating 2 is set to trash', () => {
-      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2)]
-      const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
-      fireEvent.click(getByText('Delete mastery level 2'))
-      const newRatings = onChangeRatingsMock.mock.calls[0][0](threeRatings)
-      expect(newRatings[0].focusField).toEqual('trash')
-      expect(newRatings[1].focusField).toBeNull()
-    })
-
-    it('When adding a rating, focusField should reset to null for all ratings', () => {
-      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2, 'trash')]
-      const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
-      fireEvent.click(getByText('Add Mastery Level'))
-      const newRatingsAfterAdd = onChangeRatingsMock.mock.calls[0][0]
-      newRatingsAfterAdd.forEach(r => {
-        expect(r.focusField).toBeNull()
-      })
-    })
-  })
-
   describe('Permissions', () => {
     describe('when canManage is false', () => {
       it('does not show Add Mastery Level button', () => {

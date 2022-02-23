@@ -39,6 +39,11 @@ pace_plans:
     feedback by joining the Pace Plans User Group.
   applies_to: Account
   beta: true
+sticky_left_nav:
+  state: hidden
+  display_name: 'Sticky Left Navigation'
+  description: Turns left-side navigation sidebar sticky.
+  applies_to: SiteAdmin
 notification_settings_course_selector:
   state: hidden
   display_name: 'Notification settings: Course selector'

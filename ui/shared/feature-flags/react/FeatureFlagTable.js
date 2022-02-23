@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import I18n from 'i18n!feature_flags'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Heading} from '@instructure/ui-heading'
@@ -24,12 +24,10 @@ import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pill} from '@instructure/ui-pill'
 import FeatureFlagButton from './FeatureFlagButton'
-import {View} from '@instructure/ui-view'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
 function FeatureFlagFilterTable({title, rows, disableDefaults}) {
-  const [visibleTooltip, setVisibleTooltip] = useState(null)
   return (
     <>
       <Heading as="h2" level="h3" data-testid="ff-table-heading">
@@ -58,23 +56,7 @@ function FeatureFlagFilterTable({title, rows, disableDefaults}) {
               <Cell>
                 <>
                   {feature.feature_flag.hidden && (
-                    <Tooltip
-                      isShowingContent={feature.feature === visibleTooltip}
-                      onShowContent={() => setVisibleTooltip(feature.feature)}
-                      onHideContent={() => setVisibleTooltip(null)}
-                      renderTip={
-                        <View as="div" width="600px">
-                          {I18n.t(
-                            `This feature option is only visible to users with Site Admin access.
-                            End users will not see it until enabled by a Site Admin user.
-                            Before enabling for an institution, please be sure you fully understand
-                            the functionality and possible impacts to users.`
-                          )}
-                        </View>
-                      }
-                    >
-                      <Pill margin="0 x-small" text={I18n.t('Hidden')} />
-                    </Tooltip>
+                    <Pill margin="0 x-small" text={I18n.t('Hidden')} />
                   )}
                   {feature.beta && (
                     <Tooltip

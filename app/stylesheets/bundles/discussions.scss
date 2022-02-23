@@ -118,7 +118,7 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
-.discussion-header__metadata {
+body.responsive_awareness .span4.discussion-header__metadata {
   @include mobile-only {
     width: auto;
   }
@@ -685,9 +685,17 @@ $discussion-dark-text: $ic-color-dark;
     background: $lightBackground;
     min-height: 53px;
     box-shadow: 0 2px 3px rgba(black, 0.1);
-    @include breakpoint(tablet) {
+
+    body:not(.responsive_awareness) & {
       margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
       margin-#{direction(right)}: $ic-sp*2;
+    }
+
+    body.responsive_awareness & {
+      @include breakpoint(tablet) {
+        margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
+        margin-#{direction(right)}: $ic-sp*2;
+      }
     }
   }
   [disabled] {

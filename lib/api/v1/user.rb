@@ -226,11 +226,10 @@ module Api::V1::User
     hash
   end
 
-  def anonymous_user_display_json(submission, assignment)
+  def anonymous_user_display_json(anonymous_id)
     {
-      anonymous_id: submission.anonymous_id,
-      avatar_image_url: User.default_avatar_fallback,
-      display_name: assignment.anonymous_student_identities[submission.user_id]
+      anonymous_id: anonymous_id,
+      avatar_image_url: User.default_avatar_fallback
     }
   end
 

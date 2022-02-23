@@ -213,7 +213,7 @@ testCase('reloads the page when receiving a deep linking message', async () => {
   }
   const message = overrides => ({
     origin: 'https://www.test.com',
-    data: {subject: 'LtiDeepLinkingResponse'},
+    data: {messageType: 'LtiDeepLinkingResponse'},
     ...overrides
   })
   const initialState = {modalIsOpen: true}

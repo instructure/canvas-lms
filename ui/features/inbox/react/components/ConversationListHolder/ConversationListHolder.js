@@ -28,7 +28,7 @@ import {Text} from '@instructure/ui-text'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-import {ConversationListItem} from './ConversationListItem'
+import {ConversationListItem, conversationProp} from './ConversationListItem'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../../graphql/Mutations'
 
 export const ConversationListHolder = ({...props}) => {
@@ -38,7 +38,7 @@ export const ConversationListHolder = ({...props}) => {
 
   const provideConversationsForOnSelect = conversationIds => {
     const matchedConversations = props.conversations
-      ?.filter(c => conversationIds.includes(c._id))
+      .filter(c => conversationIds.includes(c._id))
       .map(c => c.conversation)
     props.onSelect(matchedConversations)
   }
@@ -155,27 +155,16 @@ export const ConversationListHolder = ({...props}) => {
       {props.conversations?.map(conversation => {
         return (
           <ConversationListItem
-            id={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
-            conversation={props.isSubmissionComments ? undefined : conversation.conversation}
-            submissionComments={props.isSubmissionComments ? conversation : undefined}
-            isStarred={props.isSubmissionComments ? false : conversation.label === 'starred'}
-            isSelected={
-              props.isSubmissionComments
-                ? selectedMessages.includes(conversation[0].submissionId)
-                : selectedMessages.includes(conversation._id)
-            }
-            isUnread={
-              props.isSubmissionComments
-                ? !conversation[0].read
-                : conversation.workflowState === 'unread'
-            }
+            id={conversation._id}
+            conversation={conversation.conversation}
+            isStarred={conversation.label === 'starred'}
+            isSelected={selectedMessages.includes(conversation._id)}
+            isUnread={conversation.workflowState === 'unread'}
             onOpen={props.onOpen}
             onSelect={handleItemSelection}
-            onStar={props.isSubmissionComments ? () => {} : props.onStar}
-            key={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
-            readStateChangeConversationParticipants={
-              props.isSubmissionComments ? () => {} : readStateChangeConversationParticipants
-            }
+            onStar={props.onStar}
+            key={conversation._id}
+            readStateChangeConversationParticipants={readStateChangeConversationParticipants}
           />
         )
       })}
@@ -210,18 +199,24 @@ export const ConversationListHolder = ({...props}) => {
   )
 }
 
+const conversationParticipantsProp = PropTypes.shape({
+  id: PropTypes.string,
+  _id: PropTypes.string,
+  workflowState: PropTypes.string,
+  conversation: conversationProp,
+  label: PropTypes.string
+})
+
 ConversationListHolder.propTypes = {
-  conversations: PropTypes.arrayOf(PropTypes.object),
+  conversations: PropTypes.arrayOf(conversationParticipantsProp),
   id: PropTypes.string,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
-  onStar: PropTypes.func,
-  isSubmissionComments: PropTypes.bool
+  onStar: PropTypes.func
 }
 
 ConversationListHolder.defaultProps = {
   onOpen: () => {},
   onSelect: () => {},
-  onStar: () => {},
-  isSubmissionComments: false
+  onStar: () => {}
 }
