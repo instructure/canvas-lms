@@ -112,6 +112,7 @@
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
     "confetti-js": "^0.0.17",
+    "coverage-istanbul-loader": "^3.0.5",
     "create-react-class": "^15.6.3",
     "crypto-js": "^4.1.1",
     "d3": "3.5.17",
