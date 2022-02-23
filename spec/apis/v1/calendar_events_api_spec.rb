@@ -2280,18 +2280,49 @@ describe CalendarEventsApiController, type: :request do
             expect(json.first["end_at"]).to eq "2012-01-14T12:00:00Z"
           end
 
-          it "returns later override with user and section overrides" do
-            override = assignment_override_model(assignment: @default_assignment,
-                                                 due_at: DateTime.parse("2012-01-12 12:00:00"))
-            override.assignment_override_students.create!(user: @user)
-            assignment_override_model(assignment: @default_assignment, set: @section2,
-                                      due_at: DateTime.parse("2012-01-14 12:00:00"))
-            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
-                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
-                            })
-            expect(json.size).to eq 1
-            expect(json.first["end_at"]).to eq "2012-01-14T12:00:00Z"
+          context "with user and section overrides" do
+            before do
+              override = assignment_override_model(
+                assignment: @default_assignment,
+                due_at: DateTime.parse("2012-01-12 12:00:00")
+              )
+              override.assignment_override_students.create!(user: @user)
+              assignment_override_model(
+                assignment: @default_assignment,
+                set: @section2,
+                due_at: DateTime.parse("2012-01-14 12:00:00")
+              )
+            end
+
+            let(:json) do
+              api_call(
+                :get,
+                "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}",
+                controller: "calendar_events_api",
+                action: "index",
+                format: "json",
+                type: "assignment",
+                context_codes: ["course_#{@course.id}"],
+                start_date: "2012-01-07",
+                end_date: "2012-01-16",
+                per_page: "25"
+              )
+            end
+
+            it "returns later override with prioritize_individual_overrides disabled" do
+              Account.site_admin.disable_feature!(:prioritize_individual_overrides)
+              aggregate_failures do
+                expect(json.size).to eq 1
+                expect(json.first["end_at"]).to eq "2012-01-14T12:00:00Z"
+              end
+            end
+
+            it "returns user override with prioritize_individual_overrides enabled" do
+              aggregate_failures do
+                expect(json.size).to eq 1
+                expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
+              end
+            end
           end
         end
       end

@@ -990,6 +990,28 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(assignment: @assignment)
     end
 
+    context "adhoc override prioritization" do
+      before do
+        @adhoc_override = @override
+        @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+        @adhoc_override.override_due_at(6.days.from_now)
+        @section_override.override_due_at(7.days.from_now)
+      end
+
+      let(:due_at) do
+        AssignmentOverrideApplicator.overridden_due_at(@assignment, [@adhoc_override, @section_override])
+      end
+
+      it "always uses the adhoc due_at, if one exists, when prioritize_individual_overrides is enabled" do
+        expect(due_at).to eq @adhoc_override.due_at
+      end
+
+      it "prefers most lenient override when prioritize_individual_overrides is disabled" do
+        Account.site_admin.disable_feature!(:prioritize_individual_overrides)
+        expect(due_at).to eq @section_override.due_at
+      end
+    end
+
     it "uses overrides that override due_at" do
       @override.override_due_at(7.days.from_now)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
@@ -997,14 +1019,6 @@ describe AssignmentOverrideApplicator do
     end
 
     it "skips overrides that don't override due_at" do
-      @override2 = assignment_override_model(assignment: @assignment)
-      @override2.override_due_at(7.days.from_now)
-      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override, @override2])
-      expect(due_at).to eq @override2.due_at
-    end
-
-    it "prefers most lenient override" do
-      @override.override_due_at(6.days.from_now)
       @override2 = assignment_override_model(assignment: @assignment)
       @override2.override_due_at(7.days.from_now)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override, @override2])
@@ -1110,11 +1124,42 @@ describe AssignmentOverrideApplicator do
       expect(unlock_at).to eq @override.unlock_at
     end
 
-    it "does not include unlock_at for previous overrides that have already been locked" do
-      @override.override_unlock_at(10.days.ago)
-      @override.override_lock_at(5.days.ago)
-      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
-      expect(unlock_at).to eq @assignment.unlock_at
+    context "with prioritize_individual_overrides enabled" do
+      it "includes unlock_at for previous adhoc overrides that have already been locked" do
+        @override.override_unlock_at(10.days.ago)
+        @override.override_lock_at(5.days.ago)
+        unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+        expect(unlock_at).to eq @override.unlock_at
+      end
+
+      it "does not include unlock_at for previous non-adhoc overrides that have already been locked" do
+        @override.set_type = "CourseSection"
+        @override.override_unlock_at(10.days.ago)
+        @override.override_lock_at(5.days.ago)
+        unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+        expect(unlock_at).to eq @assignment.unlock_at
+      end
+    end
+
+    context "with prioritize_individual_overrides disabled" do
+      before do
+        Account.site_admin.disable_feature!(:prioritize_individual_overrides)
+      end
+
+      it "does not include unlock_at for previous adhoc overrides that have already been locked" do
+        @override.override_unlock_at(10.days.ago)
+        @override.override_lock_at(5.days.ago)
+        unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+        expect(unlock_at).to eq @assignment.unlock_at
+      end
+
+      it "does not include unlock_at for previous non-adhoc overrides that have already been locked" do
+        @override.set_type = "CourseSection"
+        @override.override_unlock_at(10.days.ago)
+        @override.override_lock_at(5.days.ago)
+        unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+        expect(unlock_at).to eq @assignment.unlock_at
+      end
     end
   end
 

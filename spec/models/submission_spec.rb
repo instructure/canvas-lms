@@ -457,7 +457,7 @@ describe Submission do
           }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
         end
 
-        it "does not change if an override is added for the student and the due date is earlier" \
+        it "changes if an individual override is added for the student, even when the due date is earlier" \
            " than an existing override that applies to the student for the assignment" do
           section = @course.course_sections.create!(name: "My Awesome Section")
           student_in_section(section, user: @student)
@@ -472,9 +472,33 @@ describe Submission do
             due_at_overridden: true
           )
 
-          expect { override.assignment_override_students.create!(user: @student) }.not_to change {
+          expect { override.assignment_override_students.create!(user: @student) }.to change {
             submission.reload.cached_due_date
-          }
+          }.from(10.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it "does not change if a non-individual-override is added for the student and the due date" \
+           " is earlier than an existing override that applies to the student for the assignment" do
+          category = @course.group_categories.create!(name: "New Group Category")
+          group = @course.groups.create!(group_category: category)
+          group.add_user(@student, "active")
+          assignment = @course.assignments.create!(group_category: category)
+
+          section = @course.course_sections.create!(name: "My Awesome Section")
+          student_in_section(section, user: @student)
+          assignment.assignment_overrides.create!(
+            due_at: 10.minutes.ago(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          expect do
+            assignment.assignment_overrides.create!(
+              due_at: 15.minutes.ago(@now),
+              due_at_overridden: true,
+              set: group
+            )
+          end.not_to change { submission.reload.cached_due_date }
         end
 
         it "changes if an override is removed for the student" do
@@ -609,7 +633,7 @@ describe Submission do
         end
       end
 
-      it "uses the most lenient due date if there are multiple overrides" do
+      it "uses the individual override date, otherwise most lenient, if there are multiple overrides" do
         category = @course.group_categories.create!(name: "New Group Category")
         group = @course.groups.create!(group_category: category)
         assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
@@ -637,13 +661,13 @@ describe Submission do
         override_student = student_override.assignment_override_students.create!(user: @student)
 
         submission = assignment.submissions.find_by!(user: @student)
-        expect { @student.enrollments.find_by(course_section: section).destroy }.to change {
-          submission.reload.cached_due_date
-        }.from(6.minutes.ago(@now)).to(14.minutes.ago(@now))
-
         expect { override_student.destroy }.to change {
           submission.reload.cached_due_date
-        }.from(14.minutes.ago(@now)).to(21.minutes.ago(@now))
+        }.from(14.minutes.ago(@now)).to(6.minutes.ago(@now))
+
+        expect { @student.enrollments.find_by(course_section: section).destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(6.minutes.ago(@now)).to(21.minutes.ago(@now))
       end
 
       it "uses override due dates instead of assignment due dates, even if the assignment due date is more lenient" do

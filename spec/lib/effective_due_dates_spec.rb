@@ -938,10 +938,62 @@ describe Course do
       end
 
       context "when multiple override types apply" do
-        it "picks the due date that gives the student the most amount of time to submit" do
+        it "picks the individual override due date, if one exists" do
           # adhoc
-          override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-          override.assignment_override_students.create!(user: @student1)
+          individual_override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          individual_override.assignment_override_students.create!(user: @student1)
+
+          # group
+          group_with_user(user: @student1, active_all: true)
+          @assignment2.assignment_overrides.create!(
+            due_at: 6.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          # everyone else
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: individual_override.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: individual_override.id,
+                override_source: "ADHOC"
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: "Everyone Else"
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: "Everyone Else"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        it "picks the due date that gives the student the most time to submit, if no individual override exists" do
+          # section
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment2.assignment_overrides.create!(
+            due_at: 3.days.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
 
           # group
           group_with_user(user: @student1, active_all: true)
@@ -960,7 +1012,7 @@ describe Course do
           expected = {
             @assignment2.id => {
               @student1.id => {
-                due_at: 6.days.from_now(@now),
+                due_at: group_override.due_at,
                 grading_period_id: nil,
                 in_closed_grading_period: false,
                 override_id: group_override.id,
@@ -986,9 +1038,14 @@ describe Course do
         end
 
         it "treats null due dates as the most permissive due date for a student" do
-          # adhoc
-          override = @assignment2.assignment_overrides.create!(due_at: nil, due_at_overridden: true)
-          override.assignment_override_students.create!(user: @student1)
+          # section
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          section_override = @assignment2.assignment_overrides.create!(
+            due_at: nil,
+            due_at_overridden: true,
+            set: section
+          )
 
           # group
           group_with_user(user: @student1, active_all: true)
@@ -1006,8 +1063,8 @@ describe Course do
                 due_at: nil,
                 grading_period_id: nil,
                 in_closed_grading_period: false,
-                override_id: override.id,
-                override_source: "ADHOC"
+                override_id: section_override.id,
+                override_source: "CourseSection"
               },
               @student2.id => {
                 due_at: 4.days.from_now(@now),

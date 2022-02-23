@@ -234,6 +234,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
   protected :default_values
 
+  def adhoc?
+    set_type == "ADHOC"
+  end
+
   def mastery_paths?
     set_type == SET_TYPE_NOOP && set_id == NOOP_MASTERY_PATHS
   end
@@ -327,6 +331,8 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def availability_expired?
+    return false if adhoc? && Account.site_admin.feature_enabled?(:prioritize_individual_overrides)
+
     lock_at_overridden &&
       lock_at.present? &&
       lock_at <= Time.zone.now
