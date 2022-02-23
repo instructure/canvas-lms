@@ -19,6 +19,7 @@
 import {createSvgElement} from './utils'
 import {CLIP_PATH_ID} from './clipPath'
 import {Shape} from './shape'
+import {Size} from './constants'
 
 export function buildImage(settings) {
   // Don't attempt to embed an image if none exist
@@ -75,13 +76,20 @@ function transformForPentagon(size) {
   }
 }
 
-function transformForDefault(_size) {
+function transformForDefault(size) {
+  const dimensions = {
+    [Size.ExtraSmall]: 60,
+    [Size.Small]: 75,
+    [Size.Medium]: 80,
+    [Size.Large]: 110
+  }
+
   return {
     x: '50%',
     y: '50%',
-    width: 75,
-    height: 75,
-    translateX: -37.5, // Width / 2
-    translateY: -37.5 // Height / 2
+    width: dimensions[size],
+    height: dimensions[size],
+    translateX: (dimensions[size] / 2) * -1,
+    translateY: (dimensions[size] / 2) * -1
   }
 }

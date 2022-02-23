@@ -23,8 +23,9 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 
 import formatMessage from '../../../../../format-message'
 import {Shape} from '../../svg/shape'
+import {Size} from '../../svg/constants'
 
-const SIZES = ['x-small', 'small', 'medium', 'large']
+const SIZES = [Size.ExtraSmall, Size.Small, Size.Medium, Size.Large]
 
 export const ShapeSection = ({settings, onChange}) => (
   <Flex as="section" direction="column" justifyItems="space-between" padding="small small 0">
@@ -74,8 +75,8 @@ const SHAPE_DESCRIPTION = {
 }
 
 const SIZE_DESCRIPTION = {
-  'x-small': formatMessage('Extra Small'),
-  small: formatMessage('Small'),
-  medium: formatMessage('Medium'),
-  large: formatMessage('Large')
+  [Size.ExtraSmall]: formatMessage('Extra Small'),
+  [Size.Small]: formatMessage('Small'),
+  [Size.Medium]: formatMessage('Medium'),
+  [Size.Large]: formatMessage('Large')
 }
