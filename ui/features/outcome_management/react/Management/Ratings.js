@@ -34,7 +34,8 @@ const ratingsShape = PropTypes.shape({
   description: PropTypes.string,
   points: PropTypes.number,
   descriptionError: PropTypes.string,
-  pointsError: PropTypes.string
+  pointsError: PropTypes.string,
+  focusField: PropTypes.string
 })
 
 const masteryPointsShape = PropTypes.shape({
@@ -44,7 +45,6 @@ const masteryPointsShape = PropTypes.shape({
 
 const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints, canManage}) => {
   const {isMobileView} = useCanvasContext()
-
   const addRow = () => {
     let points = 0.0
     const last = ratings[ratings.length - 1]
@@ -56,7 +56,8 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
     if (points < 0.0 || Number.isNaN(points)) {
       points = 0.0
     }
-
+    // when a rating is added, reset the focusField value to maintain focus on the add button
+    ratings = ratings.map(r => ({...r, focusField: null}))
     onChangeRatings([...ratings, createRating('', points, null, false)])
   }
 
@@ -101,6 +102,12 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
             mastery: true
           }
         }
+
+        currentIndex === 0 && ratingsCopy.length > 1
+          ? (ratingsCopy[currentIndex].focusField = 'trash')
+          : ratingsCopy.length === 1
+          ? (ratingsCopy[0].focusField = 'points')
+          : (ratingsCopy[currentIndex - 1].focusField = 'trash')
 
         return ratingsCopy
       })
@@ -222,24 +229,27 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
           </Flex.Item>
         )}
       </Flex>
-      {ratings.map(({key, description, descriptionError, pointsError, points}, index) => (
-        <ProficiencyRating
-          key={key}
-          description={description}
-          descriptionError={descriptionError}
-          disableDelete={ratings.length === 1}
-          onDelete={() => handleDelete(index)}
-          onDescriptionChange={value => onRatingFieldChange('description', value, index)}
-          onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
-          onPointsChange={value => onRatingFieldChange('points', value, index)}
-          points={points?.toString()}
-          pointsError={pointsError}
-          isMobileView={isMobileView}
-          position={index + 1}
-          canManage={canManage}
-          individualOutcome
-        />
-      ))}
+      {ratings.map(
+        ({key, description, descriptionError, pointsError, points, focusField}, index) => (
+          <ProficiencyRating
+            key={key}
+            description={description}
+            descriptionError={descriptionError}
+            disableDelete={ratings.length === 1}
+            onDelete={() => handleDelete(index)}
+            onDescriptionChange={value => onRatingFieldChange('description', value, index)}
+            onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
+            onPointsChange={value => onRatingFieldChange('points', value, index)}
+            focusField={focusField}
+            points={points?.toString()}
+            pointsError={pointsError}
+            isMobileView={isMobileView}
+            position={index + 1}
+            canManage={canManage}
+            individualOutcome
+          />
+        )
+      )}
       {canManage ? renderEditMasteryPoints() : renderDisplayMasteryPoints()}
     </>
   )

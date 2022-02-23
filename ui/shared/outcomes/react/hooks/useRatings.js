@@ -23,9 +23,10 @@ import useBoolean from './useBoolean'
 
 const floatRegex = /^[+-]?\d+(\.\d+)?$/
 
-export const createRating = (description, points) => ({
+export const createRating = (description, points, focusField = null) => ({
   description,
   points,
+  focusField,
   key: uuid()
 })
 
@@ -40,7 +41,9 @@ export const defaultRatings = [
 export const defaultMasteryPoints = 3
 
 export const prepareRatings = ratings =>
-  (ratings || []).map(({description, points}) => createRating(description, points))
+  (ratings || []).map(({description, points, focusField}) =>
+    createRating(description, points, focusField)
+  )
 
 const invalidDescription = description => (description?.trim() || '').length === 0
 

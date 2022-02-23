@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import SisOverridesLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/SisOverridesLoader.js'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import SisOverridesLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/SisOverridesLoader'
 import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
 import {RequestDispatch} from '@canvas/network'
 

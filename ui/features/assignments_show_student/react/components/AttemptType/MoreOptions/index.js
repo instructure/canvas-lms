@@ -75,8 +75,8 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
 
     const handleMessage = e => {
       if (
-        e.data.messageType === 'LtiDeepLinkingResponse' ||
-        e.data.messageType === 'A2ExternalContentReady'
+        e.data.subject === 'LtiDeepLinkingResponse' ||
+        e.data.subject === 'A2ExternalContentReady'
       ) {
         setShowModal(false)
       }

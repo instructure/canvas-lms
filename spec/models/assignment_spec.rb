@@ -21,6 +21,7 @@
 require_relative "../selenium/helpers/groups_common"
 require_relative "../lti2_spec_helper"
 
+# Please add all new instance method tests in spec/models/assignment_instance_methods_spec.rb
 describe Assignment do
   include_context "lti2_spec_helper"
 

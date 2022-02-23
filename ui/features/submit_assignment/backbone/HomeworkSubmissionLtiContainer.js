@@ -50,7 +50,7 @@ export default class HomeworkSubmissionLtiContainer {
     if (
       event.origin !== ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN ||
       !event.data ||
-      event.data.messageType !== 'LtiDeepLinkingResponse'
+      event.data.subject !== 'LtiDeepLinkingResponse'
     ) {
       return
     }
