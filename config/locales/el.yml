@@ -13630,6 +13630,7 @@ el:
     recording_expired_message: "<mrk mid=\"6293\" mtype=\"seg\">Η φωνητική αναγνώριση έχει λήξει λόγω αδράνειας.</mrk> <mrk mid=\"6294\" mtype=\"seg\">Κάντε κλικ στο κουμπί «Τερματισμός» για να χρησιμοποιήσετε το τρέχον κείμενο ως σχόλιο ή στην «Ακύρωση» για απόρριψη.</mrk>"
     recording_message: Ηχογράφηση...
     student: "Μαθητής "
+    student_index: "%{Index} Σπουδαστή"
     submissions_dropdown: 
       grade: "<mrk mid=\"32\" mtype=\"seg\">(βαθμός:</mrk> <mrk mid=\"33\" mtype=\"seg\">%{grade})</mrk>"
       see_all_quiz_attempts: "Δείτε όλες τις προσπάθειες για την λύση των quiz"
