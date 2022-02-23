@@ -132,6 +132,12 @@ class EffectiveDueDates
 
   private
 
+  def prioritize_individual_overrides?
+    return @prioritize_individual_overrides if defined?(@prioritize_individual_overrides)
+
+    @prioritize_individual_overrides = Account.site_admin.feature_enabled?(:prioritize_individual_overrides)
+  end
+
   def any_student_in_closed_grading_period?(assignment_due_dates)
     return false unless assignment_due_dates
 
@@ -226,7 +232,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
-              1 AS priority
+              #{prioritize_individual_overrides? ? 1 : 2} AS priority
             FROM
               overrides o
             INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND
@@ -246,7 +252,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
-              1 AS priority
+              2 AS priority
             FROM
               overrides o
             INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id
@@ -268,7 +274,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
-              1 AS priority
+              2 AS priority
             FROM
               overrides o
             INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id
@@ -292,7 +298,7 @@ class EffectiveDueDates
               a.due_at,
               'Everyone Else'::varchar AS override_type,
               FALSE AS due_at_overridden,
-              2 AS priority
+              3 AS priority
             FROM
               models a
             INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id
@@ -319,7 +325,7 @@ class EffectiveDueDates
             SELECT DISTINCT ON (student_id, assignment_id)
               *
             FROM override_all_students
-            ORDER BY student_id ASC, assignment_id ASC, priority ASC, due_at_overridden DESC, due_at DESC NULLS FIRST
+            ORDER BY student_id ASC, assignment_id ASC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
           ),
 
           /* now find all grading periods, including both
