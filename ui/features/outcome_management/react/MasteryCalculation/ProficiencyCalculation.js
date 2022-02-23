@@ -233,17 +233,11 @@ const Example = ({currentMethod, individualOutcomeExample}) => {
           {currentMethod.exampleText}
         </View>
         <View as="div" padding="x-small 0">
-          {individualOutcomeExample
-            ? I18n.t('1- Item Scores: Example item scores:')
-            : I18n.t('Item Scores:')}
-          &nbsp;
-          <Text weight="bold"> {currentMethod.exampleScores}</Text>
+          {I18n.t('Item Scores:')}&nbsp;
+          <Text weight="bold">{currentMethod.exampleScores}</Text>
         </View>
         <View as="div" padding="x-small 0">
-          {individualOutcomeExample
-            ? I18n.t('2- Final Score: Example final score:')
-            : I18n.t('Final Score:')}
-          &nbsp;
+          {I18n.t('Final Score:')}&nbsp;
           <Text weight="bold">{currentMethod.exampleResult}</Text>
         </View>
       </Text>
