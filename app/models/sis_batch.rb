@@ -329,6 +329,7 @@ class SisBatch < ActiveRecord::Base
     current_file_size = compute_file_size(@data_file)
     previous_zip_size = compute_file_size(previous_zip)
     if change_threshold && file_diff_percent(current_file_size, previous_zip_size) > change_threshold
+      self.diffing_threshold_exceeded = true
       SisBatch.add_error(nil, "Diffing not performed because file size difference exceeded threshold", sis_batch: self)
       return
     end
@@ -340,9 +341,12 @@ class SisBatch < ActiveRecord::Base
 
     if diff_row_count_threshold && diff[:row_count] > diff_row_count_threshold
       diffed_data_file.close
+      self.diffing_threshold_exceeded = true
       SisBatch.add_error(nil, "Diffing not performed because difference row count exceeded threshold", sis_batch: self)
       return
     end
+
+    self.diffing_threshold_exceeded = false
 
     self.data[:diffed_against_sis_batch_id] = previous_batch.id
 
@@ -711,6 +715,7 @@ class SisBatch < ActiveRecord::Base
     }
     data["processing_errors"] = processing_errors if processing_errors.present?
     data["processing_warnings"] = processing_warnings if processing_warnings.present?
+    data["diffing_threshold_exceeded"] = diffing_threshold_exceeded if diffing_data_set_identifier
     data
   end
 
