@@ -1279,7 +1279,7 @@ class User < ActiveRecord::Base
     can :view_statistics
 
     given { |user| check_accounts_right?(user, :manage_students) }
-    can :read_profile and can :read_reports and can :read_grades
+    can :read_profile and can :view_statistics and can :read_reports and can :read_grades
 
     given { |user| check_accounts_right?(user, :manage_user_logins) }
     can :read and can :read_reports and can :read_profile and can :api_show_user and can :terminate_sessions
@@ -1607,17 +1607,9 @@ class User < ActiveRecord::Base
 
   def apply_contrast(colors)
     colors.each do |key, _v|
-      darkened_color = colors[key]
-      begin
-        until WCAGColorContrast.ratio(darkened_color.delete("#"), "ffffff") >= 4.5
-          darkened_color = "##{darkened_color.delete("#").chars.map { |c| c + c }.join}" if darkened_color.length == 4
-          rgb = darkened_color.match(/^#(..)(..)(..)$/).captures.map { |c| (c.hex.to_i * 0.85).round }
-          darkened_color = "#%02x%02x%02x" % rgb
-        end
-      rescue => e
-        Canvas::Errors.capture(e, {}, :info)
-      else
-        colors[key] = darkened_color
+      until WCAGColorContrast.ratio(colors[key].delete("#"), "ffffff") >= 4.5
+        rgb = colors[key].match(/^#(..)(..)(..)$/).captures.map { |c| (c.hex.to_i * 0.85).round }
+        colors[key] = "#%02x%02x%02x" % rgb
       end
     end
   end

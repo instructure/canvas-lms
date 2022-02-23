@@ -178,7 +178,11 @@ export default class DashboardView extends View {
     // needed so that the screenreader will read target element before points possible on focus
     setTimeout(
       () =>
-        $.screenReaderFlashMessage($(event.target).find('.screenreader_points_possible').text()),
+        $.screenReaderFlashMessage(
+          $(event.target)
+            .find('.screenreader_points_possible')
+            .text()
+        ),
       6000
     )
   }

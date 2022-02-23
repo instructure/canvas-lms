@@ -37,11 +37,7 @@ try {
 moment().locale(ENV.MOMENT_LOCALE)
 
 configureDateTimeMomentParser()
-window.addEventListener('canvasReadyStateChange', function({ detail }) {
-  if(detail === 'localeFiles') {
-    configureDateTime()
-  }
-})
+configureDateTime()
 enableDTNPI()
 
 async function setupSentry() {

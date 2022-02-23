@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
+import I18n from 'i18n!gradebook'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
 import {
   getSecondaryDisplayInfo,
   getEnrollmentLabel,
   getOptions,
-  renderCell
-} from './StudentCellFormatter.utils'
+  renderCell} from './StudentCellFormatter.utils'
 
 export default class StudentCellFormatter {
   constructor(gradebook) {

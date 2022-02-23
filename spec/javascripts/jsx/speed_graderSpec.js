@@ -1467,14 +1467,12 @@ QUnit.module('SpeedGrader', rootHooks => {
           index: 0,
           id: 4,
           name: 'Guy B. Studying',
-          anonymous_name: 'Student 1',
           submission_state: 'not_graded'
         },
         {
           index: 1,
           id: 12,
           name: 'Sil E. Bus',
-          anonymous_name: 'Student 2',
           submission_state: 'graded'
         }
       ]
@@ -3913,8 +3911,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       anonymousHooks.beforeEach(() => {
         assignment = {anonymize_students: true}
         originalJsonData = window.jsonData
-        alpha = {anonymous_id: '00000', anonymous_name: 'Student 1'}
-        omega = {anonymous_id: 'zzzzz', anonymous_name: 'Student 2'}
+        alpha = {anonymous_id: '00000'}
+        omega = {anonymous_id: 'zzzzz'}
         alphaStudent = {
           ...alpha,
           submission_history: [],

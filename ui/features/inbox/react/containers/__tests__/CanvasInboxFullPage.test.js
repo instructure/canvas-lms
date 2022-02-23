@@ -68,7 +68,6 @@ describe('CanvasInbox Full Page', () => {
 
   beforeEach(() => {
     mswClient.cache.reset()
-    window.location.hash = ''
   })
 
   afterEach(() => {
@@ -116,124 +115,6 @@ describe('CanvasInbox Full Page', () => {
     expect(sentConversationNodes[1]).toHaveTextContent('this is the second reply message')
   })
 
-  describe('URL routing', () => {
-    it('should load default URL as inbox Scope', async () => {
-      const container = setup()
-      await waitForApolloLoading()
-      expect(window.location.hash).toBe('#filter=type=inbox')
-
-      const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-      expect(mailboxDropdown.getAttribute('value')).toBe('Inbox')
-    })
-    it('should respect the initial loading url hash', async () => {
-      window.location.hash = '#filter=type=sent'
-      const container = setup()
-      await waitForApolloLoading()
-      expect(window.location.hash).toBe('#filter=type=sent')
-
-      const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-      expect(mailboxDropdown.getAttribute('value')).toBe('Sent')
-    })
-
-    describe('scope select', () => {
-      it('should update filter if url filter value is updated', async () => {
-        const container = setup()
-        await waitForApolloLoading()
-
-        let mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        expect(mailboxDropdown.getAttribute('value')).toBe('Inbox')
-
-        window.location.hash = '#filter=type=archived'
-        await waitForApolloLoading()
-
-        mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        expect(mailboxDropdown.getAttribute('value')).toBe('Archived')
-      })
-      it('should update the url correctly if scope filter is changed in UI', async () => {
-        const container = setup()
-        await waitForApolloLoading()
-
-        expect(window.location.hash).toBe('#filter=type=inbox')
-
-        const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        fireEvent.click(mailboxDropdown)
-        await waitForApolloLoading()
-
-        const option = await container.findByText('Sent')
-        fireEvent.click(option)
-        await waitForApolloLoading()
-
-        expect(window.location.hash).toBe('#filter=type=sent')
-      })
-      it('should not update filter if url filter is invalid', async () => {
-        const container = setup()
-        await waitForApolloLoading()
-
-        let mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        expect(mailboxDropdown.getAttribute('value')).toBe('Inbox')
-
-        window.location.hash = '#filter=type=FAKEFILTER'
-        await waitForApolloLoading()
-
-        mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        expect(mailboxDropdown.getAttribute('value')).toBe('Inbox')
-      })
-    })
-    describe('course select', () => {
-      it('should set the filter if a valid filter option is given in the initialurl', async () => {
-        window.location.hash = '#filter=type=inbox&course=course_195'
-        const container = setup()
-        await waitForApolloLoading()
-
-        const mailboxDropdown = await container.findByTestId('course-select')
-        expect(window.location.hash).toBe('#filter=type=inbox&course=course_195')
-        expect(mailboxDropdown.getAttribute('value')).toBe('XavierSchool')
-      })
-      it('should update filter if url filter value is updated', async () => {
-        window.location.hash = '#filter=type=inbox'
-        const container = setup()
-        await waitForApolloLoading()
-
-        let mailboxDropdown = await container.findByTestId('course-select')
-        expect(window.location.hash).toBe('#filter=type=inbox')
-        expect(mailboxDropdown.getAttribute('value')).toBe('')
-
-        window.location.hash = '#filter=type=inbox&course=course_195'
-        await waitForApolloLoading()
-
-        mailboxDropdown = await container.findByTestId('course-select')
-        expect(mailboxDropdown.getAttribute('value')).toBe('XavierSchool')
-      })
-      it('should update the url correctly if scope filter is changed in UI', async () => {
-        const container = setup()
-        await waitForApolloLoading()
-
-        expect(window.location.hash).toBe('#filter=type=inbox')
-
-        const courseDropdown = await container.findByTestId('course-select')
-        fireEvent.click(courseDropdown)
-        await waitForApolloLoading()
-
-        const option = await container.findByText('XavierSchool')
-        fireEvent.click(option)
-        await waitForApolloLoading()
-
-        expect(window.location.hash).toBe('#filter=type=inbox&course=course_195')
-      })
-      it('should remove the courseFilter if the url filter is invalid', async () => {
-        const container = setup()
-        await waitForApolloLoading()
-
-        window.location.hash = '#filter=type=inbox&course=FAKE_COURSE'
-        await waitForApolloLoading()
-
-        const mailboxDropdown = await container.findByTestId('course-select')
-        expect(window.location.hash).toBe('#filter=type=inbox')
-        expect(mailboxDropdown.getAttribute('value')).toBe('')
-      })
-    })
-  })
-
   describe('Desktop', () => {
     beforeAll(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -243,11 +124,9 @@ describe('CanvasInbox Full Page', () => {
 
     it('renders the conversation messages', async () => {
       const container = setup()
-      await waitForApolloLoading()
 
       const conversation = await container.findByTestId('conversationListItem-Checkbox')
       fireEvent.click(conversation)
-      await waitForApolloLoading()
 
       expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
       expect(await container.findByText('this is a reply all')).toBeInTheDocument()

@@ -881,7 +881,7 @@ describe('ContentTabs', () => {
         window,
         new MessageEvent('message', {
           data: {
-            subject: 'LtiDeepLinkingResponse',
+            messageType: 'LtiDeepLinkingResponse',
             content_items: [
               {
                 url: 'http://localhost/some-lti-file',
