@@ -31,7 +31,6 @@ import numberFormat from '@canvas/i18n/numberFormat'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
-import 'translations/_core_en'
 import I18n from 'i18n!handlebars_helpers' # 'i18n!handlebars_helpers' sets the scope for the I18n.t calls
 
 Handlebars = _Handlebars.default

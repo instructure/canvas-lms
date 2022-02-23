@@ -201,6 +201,15 @@ module Outcomes
       parents = [] if outcome[:workflow_state] == "deleted"
       update_outcome_parents(model, parents)
 
+      if outcome[:friendly_description].present?
+        fd = OutcomeFriendlyDescription.find_or_create_by(context: model.context, learning_outcome: model)
+        fd.update(description: outcome[:friendly_description])
+        fd.update(workflow_state: "active")
+      else
+        fd = OutcomeFriendlyDescription.find_by(context: model.context, learning_outcome: model)
+        fd&.update(workflow_state: "deleted")
+      end
+
       model
     end
 

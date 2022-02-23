@@ -29,7 +29,7 @@ module StreamItemsHelper
     attr_accessor :id, :type, :name, :linked_to, :time_zone
   end
 
-  def categorize_stream_items(stream_items, user = @current_user)
+  def categorize_stream_items(stream_items, user = @user || @current_user)
     categorized_items = {}
     return categorized_items unless stream_items.present? # if we have no items (possibly because we have no user), don't try to activate the user's shard
 

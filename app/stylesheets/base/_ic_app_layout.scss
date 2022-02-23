@@ -71,6 +71,15 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 
   body.ic-framed-lti-tool & {
     padding: 0 $ic-sp*2;
+
+    @include lti-min-size {
+      iframe.tool_launch {
+        width: 100vw;
+        min-width: 100vw;
+        margin-#{direction(left)}: - 2 * $ic-sp;
+        overflow-x: auto;
+      }
+    }
   }
 
   body.ic-full-screen-lti-tool & {
@@ -159,23 +168,16 @@ body:not(.course-menu-expanded) {
     color: $ic-font-color--subdued;
     margin-#{direction(right)}: $ic-sp;
     @include fontSize($ic-font-size--xsmall);
+    @include mobile-only {
+      display: inline-block;
+      width: 100%;
+    }
   }
   @include breakpoint(desktop) {
     justify-content: flex-end;
     a { margin-#{direction(right)}: 0; margin-#{direction(left)}: $ic-sp; }
   }
-
-  body.responsive_awareness & {
-    a {
-      @include mobile-only {
-        display: inline-block;
-        width: 100%;
-      }
-    }
-    @include mobile-only {
-      display: block;
-    }
-  }
+  @include mobile-only { display: block; }
 }
 
 .ic-app {

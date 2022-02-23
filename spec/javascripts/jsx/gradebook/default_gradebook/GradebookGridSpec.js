@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import GradebookGrid from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/index.js'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import GradebookGrid from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/index'
 
 QUnit.module('GradebookGrid', suiteHooks => {
   let $container

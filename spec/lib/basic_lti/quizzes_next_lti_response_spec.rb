@@ -53,8 +53,10 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
   let(:text) { "" }
 
+  let(:grade) { "0.12" }
+
   let(:xml) do
-    request_xml(source_id, launch_url, "0.12")
+    request_xml(source_id, launch_url, grade)
   end
 
   def gen_source_id(t: tool, c: @course, a: assignment, u: @user)
@@ -109,6 +111,45 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.grade).to eq((assignment.points_possible * 0.12).to_s)
+    end
+
+    context "when the assignment is set to displays grade as complete/incomplete" do
+      let(:assignment) do
+        @course.assignments.create!(
+          {
+            title: "value for title",
+            description: "value for description",
+            due_at: Time.zone.now,
+            points_possible: "1.5",
+            submission_types: "external_tool",
+            grading_type: "pass_fail",
+            external_tool_tag_attributes: { url: tool.url }
+          }
+        )
+      end
+
+      it "shows complete when it receives a grade > 0" do
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq "success"
+        expect(request.body).to eq "<replaceResultResponse />"
+        expect(request.handle_request(tool)).to be_truthy
+        submission = assignment.submissions.where(user_id: @user.id).first
+        expect(submission.grade).to eq "complete"
+      end
+
+      it "shows incomplete when it receives a grade = 0" do
+        grade = 0
+        xml = request_xml(source_id, launch_url, grade)
+
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq "success"
+        expect(request.body).to eq "<replaceResultResponse />"
+        expect(request.handle_request(tool)).to be_truthy
+        submission = assignment.submissions.where(user_id: @user.id).first
+        expect(submission.grade).to eq "incomplete"
+      end
     end
 
     it "rejects a grade for an assignment with no points possible" do

@@ -27,6 +27,8 @@ export const SubmissionComment = {
     fragment SubmissionComment on SubmissionComment {
       _id
       id
+      submissionId
+      createdAt
       attempt
       author {
         ...User
@@ -48,11 +50,38 @@ export const SubmissionComment = {
   shape: shape({
     _id: string,
     id: string,
+    submissionId: string,
+    createdAt: string,
     attempt: number,
     author: User.shape,
     assignment: Assignment.shape,
     comment: string,
     course: Course.shape,
     read: bool
+  }),
+
+  mock: ({
+    _id = '9',
+    id = 'U3VibWlzc2lvbkNvbW1lbnQtOQ==',
+    submissionId = '15',
+    createdAt = '2022-02-15T06:50:54-07:00',
+    attempt = 0,
+    author = User.mock(),
+    assignment = Assignment.mock(),
+    comment = 'Hey!',
+    course = Course.mock(),
+    read = true
+  } = {}) => ({
+    _id,
+    id,
+    submissionId,
+    createdAt,
+    attempt,
+    author,
+    assignment,
+    comment,
+    course,
+    read,
+    __typename: 'SubmissionComment'
   })
 }

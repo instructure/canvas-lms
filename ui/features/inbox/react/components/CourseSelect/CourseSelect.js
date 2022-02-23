@@ -41,6 +41,21 @@ const filterOptions = (value, options) => {
   return filteredOptions
 }
 
+const getOptionById = (id, options) => {
+  return Object.values(options)
+    .flat()
+    .find(({assetString}) => id === assetString)
+}
+
+const getCourseName = (courseAssetString, options) => {
+  if (courseAssetString) {
+    const courseInfo = getOptionById(courseAssetString, options)
+    return courseInfo ? courseInfo.contextName : ''
+  } else {
+    return ''
+  }
+}
+
 export class CourseSelect extends React.Component {
   static propTypes = {
     mainPage: PropTypes.bool.isRequired,
@@ -81,13 +96,17 @@ export class CourseSelect extends React.Component {
         })
       )
     }).isRequired,
-    onCourseFilterSelect: PropTypes.func
+    onCourseFilterSelect: PropTypes.func,
+    activeCourseFilter: PropTypes.string
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.options !== state.options) {
+      const activeCourseInputValue = getCourseName(props.activeCourseFilter, props.options)
       return {
-        filteredOptions: filterOptions(state.inputValue, props.options)
+        filteredOptions: filterOptions(activeCourseInputValue, props.options),
+        inputValue: activeCourseInputValue,
+        selectedOptionId: props.activeCourseFilter ? props.activeCourseFilter : null
       }
     }
     return null
@@ -108,7 +127,7 @@ export class CourseSelect extends React.Component {
   }
 
   getGroupChangedMessage = newOption => {
-    const currentOption = this.getOptionById(this.state.highlightedOptionId)
+    const currentOption = getOptionById(this.state.highlightedOptionId, this.props.options)
     const currentOptionGroup = this.getOptionGroup(currentOption)
     const newOptionGroup = this.getOptionGroup(newOption)
 
@@ -132,19 +151,13 @@ export class CourseSelect extends React.Component {
     )
   }
 
-  getOptionById = id => {
-    return Object.values(this.props.options)
-      .flat()
-      .find(({assetString}) => id === assetString)
-  }
-
   handleBlur = () => {
     this.setState({highlightedOptionId: null})
   }
 
   handleHighlightOption = (event, {id}) => {
     event.persist()
-    const option = this.getOptionById(id)
+    const option = getOptionById(id, this.props.options)
     if (!option) return // prevent highlighting of empty options
     if (event.key) {
       this.setState({
@@ -164,7 +177,7 @@ export class CourseSelect extends React.Component {
   }
 
   handleSelectOption = (event, {id}) => {
-    const option = this.getOptionById(id)
+    const option = getOptionById(id, this.props.options)
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
     if (id === 'all_courses') id = null

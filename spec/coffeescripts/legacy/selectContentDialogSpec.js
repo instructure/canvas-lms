@@ -89,7 +89,7 @@ const customParams = {
 
 const deepLinkingEvent = {
   data: {
-    messageType: 'LtiDeepLinkingResponse',
+    subject: 'LtiDeepLinkingResponse',
     content_items: [
       {
         type: 'ltiResourceLink',
@@ -110,7 +110,7 @@ const deepLinkingEvent = {
 const assignmentId = '42'
 const deepLinkingEventWithAssignmentId = {
   data: {
-    messageType: 'LtiDeepLinkingResponse',
+    subject: 'LtiDeepLinkingResponse',
     content_items: [
       {
         type: 'ltiResourceLink',
@@ -208,7 +208,7 @@ test('reset external tool fields', async () => {
 test('close all dialogs when content items attribute is empty', async () => {
   const deepLinkingEvent = {
     data: {
-      messageType: 'LtiDeepLinkingResponse',
+      subject: 'LtiDeepLinkingResponse',
       content_items: [],
       ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
     }

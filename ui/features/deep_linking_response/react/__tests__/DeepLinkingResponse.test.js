@@ -123,8 +123,8 @@ describe('RetrievingContent', () => {
       expect(messageData().content_items).toMatchObject(env().deep_link_response.content_items)
     })
 
-    it('sends the correct message type', () => {
-      expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
+    it('sends the correct subject', () => {
+      expect(messageData().subject).toEqual('LtiDeepLinkingResponse')
     })
   })
 })

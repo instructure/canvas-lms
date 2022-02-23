@@ -84,8 +84,9 @@
   box-sizing: border-box;
   padding: direction-sides($ic-sp*0.5 40px $ic-sp*0.5 $ic-sp*4);
   margin: 0 auto;
-  width: 475px;
   min-height: 20px;
+  min-width: 17rem; // designs minimum width minus the spacing they want
+  max-width: 32rem; // design has a max-width they want alerts to display
   line-height: 1.3;
   z-index: 2;
   vertical-align: middle;
@@ -130,12 +131,6 @@
     width: auto;
     border-radius: 0; // corners look bad when msg is full-width
   }
-}
-
-.responsive_awareness .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
-  width: auto; // purely to override the 475 in the original class
-  min-width: 17rem; // designs minimum width minus the spacing they want
-  max-width: 32rem; // design has a max-width they want alerts to display
 }
 
 .ic-flash-info {

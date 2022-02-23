@@ -17,19 +17,20 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
+import {CONVERSATIONS_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
 import I18n from 'i18n!conversations_2'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const [submissionComments, setSubmissionComments] = useState([])
   const userID = ENV.current_user_id?.toString()
 
   const [starChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -61,12 +62,44 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     })
   }
 
-  const {loading, error, data} = useQuery(CONVERSATIONS_QUERY, {
+  const scopeIsSubmissionComments = scope === 'submission_comments'
+
+  const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
     variables: {userID, scope, filter: [userFilter, course]},
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network',
+    skip: scopeIsSubmissionComments
   })
 
-  if (loading) {
+  const submissionCommentsQuery = useQuery(SUBMISSION_COMMENTS_QUERY, {
+    variables: {userID},
+    skip: !scopeIsSubmissionComments
+  })
+
+  useEffect(() => {
+    if (
+      scopeIsSubmissionComments &&
+      submissionCommentsQuery.data &&
+      !submissionCommentsQuery.loading
+    ) {
+      const groupedSubmissionComments = {}
+      const submissionComments =
+        submissionCommentsQuery.data.legacyNode.submissionCommentsConnection.nodes
+
+      submissionComments.forEach(submissionComment => {
+        const key = submissionComment.submissionId + '-' + submissionComment.attempt
+
+        if (!groupedSubmissionComments[key]) {
+          groupedSubmissionComments[key] = []
+        }
+
+        groupedSubmissionComments[key].push(submissionComment)
+      })
+
+      setSubmissionComments(Object.entries(groupedSubmissionComments).map(e => e[1]))
+    }
+  }, [scopeIsSubmissionComments, submissionCommentsQuery.data, submissionCommentsQuery.loading])
+
+  if (conversationsQuery.loading || submissionCommentsQuery.loading) {
     return (
       <View as="div" style={{position: 'relative'}} height="100%">
         <Mask>
@@ -76,16 +109,21 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     )
   }
 
-  if (error) {
+  if (conversationsQuery.error || submissionCommentsQuery.error) {
     setOnFailure(I18n.t('Unable to load messages.'))
   }
 
   return (
     <ConversationListHolder
-      conversations={data?.legacyNode?.conversationsConnection?.nodes}
+      conversations={
+        !scopeIsSubmissionComments
+          ? conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
+          : submissionComments
+      }
       onOpen={() => {}}
       onSelect={onSelectConversation}
       onStar={handleStar}
+      isSubmissionComments={scopeIsSubmissionComments}
     />
   )
 }
