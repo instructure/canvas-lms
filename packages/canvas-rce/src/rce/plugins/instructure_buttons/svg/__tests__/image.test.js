@@ -18,6 +18,7 @@
 
 import {transformForShape} from '../image'
 import {Shape} from '../shape'
+import {Size} from '../constants'
 
 describe('transformShape()', () => {
   let shape, size
@@ -35,31 +36,118 @@ describe('transformShape()', () => {
   describe('when no transform overrides are set (default case)', () => {
     beforeEach(() => {
       shape = 'default'
-      size = 'small'
     })
 
-    it('sets the x position', () => {
-      expect(subject().x).toEqual('50%')
+    describe('with x-small button size', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the x position', () => {
+        expect(subject().x).toEqual('50%')
+      })
+
+      it('sets the y position', () => {
+        expect(subject().y).toEqual('50%')
+      })
+
+      it('sets the width', () => {
+        expect(subject().width).toEqual(60)
+      })
+
+      it('sets the height', () => {
+        expect(subject().height).toEqual(60)
+      })
+
+      it('sets the translation in the X direction', () => {
+        expect(subject().translateX).toEqual(-30)
+      })
+
+      it('sets the translation in the Y direction', () => {
+        expect(subject().translateY).toEqual(-30)
+      })
     })
 
-    it('sets the y position', () => {
-      expect(subject().y).toEqual('50%')
+    describe('with small button size', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the x position', () => {
+        expect(subject().x).toEqual('50%')
+      })
+
+      it('sets the y position', () => {
+        expect(subject().y).toEqual('50%')
+      })
+
+      it('sets the width', () => {
+        expect(subject().width).toEqual(75)
+      })
+
+      it('sets the height', () => {
+        expect(subject().height).toEqual(75)
+      })
+
+      it('sets the translation in the X direction', () => {
+        expect(subject().translateX).toEqual(-37.5)
+      })
+
+      it('sets the translation in the Y direction', () => {
+        expect(subject().translateY).toEqual(-37.5)
+      })
     })
 
-    it('sets the width', () => {
-      expect(subject().width).toEqual(75)
+    describe('with medium button size', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the x position', () => {
+        expect(subject().x).toEqual('50%')
+      })
+
+      it('sets the y position', () => {
+        expect(subject().y).toEqual('50%')
+      })
+
+      it('sets the width', () => {
+        expect(subject().width).toEqual(80)
+      })
+
+      it('sets the height', () => {
+        expect(subject().height).toEqual(80)
+      })
+
+      it('sets the translation in the X direction', () => {
+        expect(subject().translateX).toEqual(-40)
+      })
+
+      it('sets the translation in the Y direction', () => {
+        expect(subject().translateY).toEqual(-40)
+      })
     })
 
-    it('sets the height', () => {
-      expect(subject().height).toEqual(75)
-    })
+    describe('with large button size', () => {
+      beforeEach(() => (size = Size.Large))
 
-    it('sets the translation in the X direction', () => {
-      expect(subject().translateX).toEqual(-37.5)
-    })
+      it('sets the x position', () => {
+        expect(subject().x).toEqual('50%')
+      })
 
-    it('sets the translation in the Y direction', () => {
-      expect(subject().translateY).toEqual(-37.5)
+      it('sets the y position', () => {
+        expect(subject().y).toEqual('50%')
+      })
+
+      it('sets the width', () => {
+        expect(subject().width).toEqual(110)
+      })
+
+      it('sets the height', () => {
+        expect(subject().height).toEqual(110)
+      })
+
+      it('sets the translation in the X direction', () => {
+        expect(subject().translateX).toEqual(-55)
+      })
+
+      it('sets the translation in the Y direction', () => {
+        expect(subject().translateY).toEqual(-55)
+      })
     })
   })
 })
