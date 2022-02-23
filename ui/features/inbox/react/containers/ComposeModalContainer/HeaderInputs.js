@@ -68,6 +68,7 @@ const HeaderInputs = props => {
                   groups: props.courses?.favoriteGroupsConnection.nodes
                 }}
                 onCourseFilterSelect={props.onContextSelect}
+                activeCourseFilter={props.activeCourseFilter}
               />
             )
           }
@@ -160,6 +161,7 @@ HeaderInputs.propTypes = {
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   mediaAttachmentTitle: PropTypes.string,
+  activeCourseFilter: PropTypes.string,
   onRemoveMediaComment: PropTypes.func,
   /**
    * Bool to control open/closed state of the AddressBookContainer menu for testing
