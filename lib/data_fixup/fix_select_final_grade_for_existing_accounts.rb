@@ -20,6 +20,9 @@
 module DataFixup
   module FixSelectFinalGradeForExistingAccounts
     def self.run
+      # Skip if we are creating a new shard so we don't hydrate site admin from inside a migration on another shard
+      return unless Account.active.exists?
+
       # moderate_grades and select_final_grades are available to the same
       # roles, but moderate_grades defaults to disabled for ta roles while
       # select_final_grade defaults to true. That is the only difference.

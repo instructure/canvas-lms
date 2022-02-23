@@ -24,7 +24,8 @@ describe DataFixup::SetPostingNotificationFrequency do
   let_once(:now) { Time.zone.now }
   let_once(:student) { course.enroll_student(User.create!).user }
 
-  let(:grading_notifications) { Notification.where(category: "Grading") }
+  # Materialize this into memory so we don't try to cross shard categories in a single query
+  let(:grading_notifications) { Notification.where(category: "Grading").to_a }
   let(:submission_posted_notification) { Notification.find_by(name: "Submission Posted") }
   let(:submissions_posted_notification) { Notification.find_by(name: "Submissions Posted") }
 
