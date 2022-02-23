@@ -37,11 +37,11 @@ function createAssignmentGroups() {
     {
       id: '301',
       assignments: [
-        {id: '201', muted: false},
-        {id: '202', muted: true}
+        {id: '201', muted: false, submission_types: ['online_text_entry']},
+        {id: '202', muted: true, submission_types: ['online_text_entry']}
       ]
     },
-    {id: '302', assignments: [{id: '203', muted: true}]}
+    {id: '302', assignments: [{id: '203', muted: true, submission_types: ['online_text_entry']}]}
   ]
 }
 
