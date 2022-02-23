@@ -338,6 +338,11 @@
 #           "example": "false",
 #           "type": "boolean"
 #         },
+#         "diffing_threshold_exceeded": {
+#           "description": "Whether a diffing job failed because the threshold limit got exceeded.",
+#           "example": "true",
+#           "type": "boolean"
+#         },
 #         "diffing_data_set_identifier": {
 #           "description": "The identifier of the data set that this SIS batch diffs against",
 #           "example": "account-5-enrollments",
