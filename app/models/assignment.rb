@@ -476,6 +476,7 @@ class Assignment < ActiveRecord::Base
     grading_type
     due_at
     description
+    duplicate_of_id
     lock_at
     unlock_at
     assignment_group_id
@@ -514,6 +515,8 @@ class Assignment < ActiveRecord::Base
     grader_comments_visible_to_graders
     grader_names_visible_to_final_grader
     grader_count
+    important_dates
+    muted
   ].freeze
 
   def external_tool?

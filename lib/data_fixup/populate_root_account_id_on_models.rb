@@ -501,16 +501,15 @@ module DataFixup::PopulateRootAccountIdOnModels
   # source). It cannot be a general polymorphic association ("context")
   def self.scope_for_association_does_not_exist(table, assoc)
     reflection = table.reflections[assoc.to_s]
-    join_keys = reflection.join_keys
     foreign_table = reflection.options[:class_name].constantize
 
     # Polymorphic associations: add scope, e.g. "context_type = Course":
     scope = reflection.scope ? table.class_eval(&reflection.scope) : table
     # cross-shard could actually exist so ignore:
-    scope = scope.where("#{join_keys.foreign_key} < #{Shard::IDS_PER_SHARD}")
+    scope = scope.where("#{reflection.join_foreign_key} < #{Shard::IDS_PER_SHARD}")
 
     scope.where("NOT EXISTS (?)", foreign_table.where(
-                                    "#{foreign_table.quoted_table_name}.#{join_keys.key}=#{table.quoted_table_name}.#{join_keys.foreign_key}"
+                                    "#{foreign_table.quoted_table_name}.#{reflection.join_primary_key}=#{table.quoted_table_name}.#{reflection.join_foreign_key}"
                                   ))
   end
 
