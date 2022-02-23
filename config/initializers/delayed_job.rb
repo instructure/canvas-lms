@@ -33,7 +33,7 @@ Delayed::Backend::Base.class_eval do
   end
 
   def to_log_format
-    logged_attributes = %i[tag strand singleton priority attempts created_at max_attempts source account_id]
+    logged_attributes = %i[tag strand priority attempts created_at max_attempts source account_id]
     log_hash = attributes.with_indifferent_access.slice(*logged_attributes)
     log_hash[:shard_id] = current_shard&.id
     log_hash[:jobs_cluster] = "NONE"

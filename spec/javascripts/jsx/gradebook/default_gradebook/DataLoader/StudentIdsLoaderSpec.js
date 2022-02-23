@@ -18,8 +18,8 @@
 
 import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@instructure/js-utils'
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import StudentIdsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/StudentIdsLoader'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import StudentIdsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/StudentIdsLoader.js'
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import {RequestDispatch} from '@canvas/network'
 

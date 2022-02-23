@@ -24,7 +24,10 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, 
 import '@canvas/util/templateData' /* getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
-import {addDeepLinkingListener, onExternalContentReady} from '@canvas/deep-linking/collaborations'
+import {
+  addDeepLinkingListener,
+  onExternalContentReady
+} from '@canvas/deep-linking/collaborations'
 
 const CollaborationsPage = {}
 
@@ -61,19 +64,23 @@ CollaborationsPage.Events = {
     $('#delete_collaboration_dialog .cancel_button').on('click', this.onClose)
     $('#delete_collaboration_dialog .delete_button').on('click', this.onDelete)
     $(document).fragmentChange(this.onFragmentChange)
-    $('#collaboration_collaboration_type').on('change', this.onTypeChange).change()
-    $('#collaboration_selection_row').css('display: block;')
-    $('#collaboration_selection_label').css([
-      'white-space: nowrap; text-align: left; display: block;'
-    ])
+    $('#collaboration_collaboration_type')
+      .on('change', this.onTypeChange)
+      .change()
+    if (document.body.classList.contains('responsive_misc')) {
+      $('#collaboration_selection_row').css('display: block;')
+      $('#collaboration_selection_label').css([
+        'white-space: nowrap; text-align: left; display: block;'
+      ])
+    }
     addDeepLinkingListener()
     $(window).on('externalContentReady', onExternalContentReady.bind(this))
     $('.before_external_content_info_alert, .after_external_content_info_alert')
-      .on('focus', function (e) {
+      .on('focus', function(e) {
         $(this).removeClass('screenreader-only')
         $('#lti_new_collaboration_iframe').addClass('info_alert_outline')
       })
-      .on('blur', function (e) {
+      .on('blur', function(e) {
         $(this).addClass('screenreader-only')
         $('#lti_new_collaboration_iframe').removeClass('info_alert_outline')
       })
@@ -115,13 +122,17 @@ CollaborationsPage.Events = {
   onTypeChange(e) {
     let name = $(this).val(),
       type = name,
-      launch_url = $(this).find('option:selected').data('launch-url'),
+      launch_url = $(this)
+        .find('option:selected')
+        .data('launch-url'),
       $description
 
     if (launch_url) {
       $('.collaborate_data, #google_docs_description').hide()
       $('#collaborate_authorize_google_docs').hide()
-      $('#lti_new_collaboration_iframe').attr('src', launch_url).show()
+      $('#lti_new_collaboration_iframe')
+        .attr('src', launch_url)
+        .show()
       $('.before_external_content_info_alert, .after_external_content_info_alert').show()
     } else {
       $('#lti_new_collaboration_iframe').hide()
