@@ -304,8 +304,9 @@ class DiscussionEntry < ActiveRecord::Base
   protected :infer_root_entry_id
 
   def update_topic
-    # only update last_reply_at if it is older than this entry's creation for over 60 seconds
-    if discussion_topic&.last_reply_at && ((created_at.utc - discussion_topic.last_reply_at.utc).to_i > 60)
+    # only update last_reply_at if it is nil or
+    # it is older than this entry's creation for over 60 seconds
+    if discussion_topic.last_reply_at.nil? || (discussion_topic.last_reply_at && ((created_at.utc - discussion_topic.last_reply_at.utc).to_i > 60))
       last_reply_at = [discussion_topic.last_reply_at, created_at].compact.max
       DiscussionTopic.where(id: discussion_topic_id).update_all(last_reply_at: last_reply_at, updated_at: Time.now.utc)
     end
