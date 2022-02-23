@@ -22,10 +22,9 @@ const loadedStylesheets = {}
 
 const brandableCss = {
   getCssVariant() {
-    const variant = window.ENV.use_responsive_layout ? 'responsive_layout' : 'new_styles'
     const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
     const rtl = isRTL() ? '_rtl' : ''
-    return `${variant}_${contrast}${rtl}`
+    return `new_styles_${contrast}${rtl}`
   },
 
   // see lib/brandable_css.rb#handlebars_index_json
@@ -61,12 +60,13 @@ const brandableCss = {
     document.head.appendChild(linkElement)
   },
 
-  loadStylesheetForJST({ bundle, id }) {
+  loadStylesheetForJST({bundle, id}) {
     const [variants, bundles] = brandableCss.getHandlebarsIndex()
 
-    invariant(bundles.hasOwnProperty(id),
+    invariant(
+      bundles.hasOwnProperty(id),
       `requested to load stylesheet for template "${bundle}" (${id}) but no ` +
-      `mapping is available for it!`
+        `mapping is available for it!`
     )
 
     // "includesNoVariables" true; there's only one file regardless of variant
@@ -75,8 +75,7 @@ const brandableCss = {
         combinedChecksum: bundles[id][0],
         includesNoVariables: true
       })
-    }
-    else {
+    } else {
       // this can be a bit whoozy, remember the structure:
       //
       //     [

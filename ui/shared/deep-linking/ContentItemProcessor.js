@@ -48,9 +48,9 @@ export default class ContentItemProcessor {
   }
 
   static fromEvent(event, processHandler) {
-    const {content_items, msg, log, errormsg, errorlog, ltiEndpoint, messageType} = event.data
+    const {content_items, msg, log, errormsg, errorlog, ltiEndpoint, subject} = event.data
 
-    if (messageType !== 'LtiDeepLinkingResponse') {
+    if (subject !== 'LtiDeepLinkingResponse') {
       return
     }
 
