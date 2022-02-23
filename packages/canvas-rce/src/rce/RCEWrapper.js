@@ -1546,6 +1546,7 @@ class RCEWrapper extends React.Component {
           'link',
           'directionality',
           'lists',
+          'textpattern',
           'hr',
           'fullscreen',
           'instructure-ui-icons',
@@ -1559,7 +1560,11 @@ class RCEWrapper extends React.Component {
           ...canvasPlugins
         ],
         sanitizePlugins(options.plugins)
-      )
+      ),
+      textpattern_patterns: [
+        {start: '* ', cmd: 'InsertUnorderedList'},
+        {start: '- ', cmd: 'InsertUnorderedList'}
+      ]
     }
 
     if (this.props.trayProps) {
