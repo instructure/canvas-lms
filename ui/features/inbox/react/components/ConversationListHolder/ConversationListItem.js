@@ -48,7 +48,7 @@ export const ConversationListItem = ({...props}) => {
     e.stopPropagation()
 
     // Kind of a hack since our Checkbox doesn't support onChange or swallowing
-    // events with ease. Removing aria-hidden elemnts from sending click events
+    // events with ease. Removing aria-hidden elements from sending click events
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
@@ -76,7 +76,7 @@ export const ConversationListItem = ({...props}) => {
     e.stopPropagation()
 
     // Kind of a hack since our Checkbox doesn't support onChange or swallowing
-    // events with ease. Removing aria-hidden elemnts from sending click events
+    // events with ease. Removing aria-hidden elements from sending click events
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
@@ -219,6 +219,9 @@ export const ConversationListItem = ({...props}) => {
                       checked={props.isSelected}
                       onChange={e => {
                         e.stopPropagation()
+                        if (props.isSelected) {
+                          props.onRemoveFromSelectedConversations(props.id)
+                        }
                       }}
                     />
                   </View>
@@ -403,6 +406,7 @@ ConversationListItem.propTypes = {
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
+  onRemoveFromSelectedConversations: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
   readStateChangeConversationParticipants: PropTypes.func
