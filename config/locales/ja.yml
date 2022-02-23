@@ -1391,7 +1391,7 @@ ja:
       feature_preview: 機能プレビュー
       features_title: 機能
       global_announcements_description: "グローバル アナウンスは、アカウント内の全ユーザのダッシュボードに付箋メッセージを投稿するための一手段です。それぞれのユーザのダッシュボードに、一定時間、またはユーザがアラートを無視するため \"close\" リンクをクリックするまで表示されます。**グローバル アナウンスは、慎重に利用してください。**"
-      global_announcements_title: "グローバル アナウンス"
+      global_announcements_title: "グローバル アナウンスメント"
       global_js_and_css_includes_description: ご利用のアカウントでのすべてのページ読み込みで、これらのファイルも読み込まれます。
       global_js_and_css_includes_title: "グローバル JavaScript/CSS に含まれる情報"
       google_docs_domain: "許可される Google ドキュメント ドメイン"
@@ -1565,7 +1565,7 @@ ja:
       survey_announcement: "これはサーベイ アナウンスです。アクティブな各月に有効なアカウントの 1 / %{denominator} のユーザに送信されます。"
       tab_admins: 管理者
       tab_alerts: アラート
-      tab_announcements: アナウンス
+      tab_announcements: アナウンスメント
       tab_external_tools: アプリ
       tab_integrations: インテグレーション
       tab_notifications: お知らせ
@@ -2557,11 +2557,11 @@ ja:
   allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
       ユーザーがコースグループを作成、編集、削除できるようにします。
       ユーザーが受講生が作成したコースグループを作成、編集、削除することができるようにします。
-  allows_user_to_create_edit_and_delete_course_rubri_493ac58f: ユーザーが規定を作成、編集、削除できるようにします。
+  allows_user_to_create_edit_and_delete_course_rubri_493ac58f: ユーザーがルーブリックを作成、編集、削除できるようにします。
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: ユーザーがルーブリックリンクでコースルービックを作成、編集、削除できるようにします。
   allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: ユーザーが、アカウントとコースレベルで成果と成果グループを作成、編集、および削除できるようにします。
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: ユーザーが、コースレベルで成果と成果グループを作成、編集、および削除できるようにします。
-  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: ユーザーが規定を作成、編集、削除できるようにします。
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: ユーザーがルーブリックを作成、編集、削除できるようにします。
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
       ユーザーが、コースレベルで結果と成果グループを作成、インポート、編集、
       および削除できるようにします。
@@ -2950,7 +2950,7 @@ ja:
   allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。ユーザーが未公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
   allows_user_to_view_the_publish_course_and_unpubli_aac98465: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。"
   allows_user_to_view_the_reset_course_content_butto_75c8c410: "ユーザーが[コースコンテンツのリセット]ボタンを表示できるようにします。"
-  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: ユーザーがコースナビゲーションに規定リンクを表示できるようにします。
+  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: ユーザーがコースナビゲーションにルーブリックリンクを表示できるようにします。
   allows_user_to_view_the_rubrics_link_in_course_nav_fc5fabff: ユーザーがコースナビゲーションに規定リンクを表示できるようにします。ユーザーが規定を作成、編集、削除できるようにします。
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "ユーザーがユーザーのログイン情報内で SIS ID を表示できるようにします。"
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "ユーザーは、クイズ項目分析 CSVファイルのユーザーSIS ID列を表示できます。"
@@ -3201,7 +3201,7 @@ ja:
   announcement_creation_failed_f7d227f5: アナウンスの作成に失敗しました
   announcement_ends_at_4ccc2a7e: アナウンスの終了は
   announcement_external_feeds_5be3f36b: アナウンス外部フィード
-  announcement_fb4cb645: アナウンス
+  announcement_fb4cb645: アナウンスメント
   announcement_filter_d35318a7: アナウンスメントフィルター
   announcement_not_found_d6d124c3: アナウンスが見つかりません
   announcement_posted_account_name_6b669e9: "アナウンス掲示：%{account_name}"
@@ -3212,7 +3212,7 @@ ja:
   announcement_type_b231573b: アナウンスタイプ
   announcement_update_failed_6a6ec9fe: アナウンスの更新に失敗しました
   announcements: 
-    announcements_crumb: アナウンス
+    announcements_crumb: アナウンスメント
     error_draft_state: このトピックはアナウンスのため、ドラフト状態に設定できません。
     external_feed: 
       alts: 
@@ -3256,7 +3256,7 @@ ja:
   announcements_cannot_be_duplicated_2de8824c: アナウンスを複製することはできません
   announcements_deleted_successfully_7d77e9e1: アナウンスメントを正常に削除しました
   announcements_from_the_past_four_months_cefbc99c: 過去4カ月の通知
-  announcements_list_c75fc413: "アナウンス リスト"
+  announcements_list_c75fc413: "アナウンスメント リスト"
   announcements_loaded_e9335d5f: アナウンスメントが読み込まれました！
   announcements_locked_successfully_43d58107: アナウンスメントを正常にロックしました
   announcements_tutorial_tray_994287d6: お知らせチュートリアルトレイ
@@ -4339,32 +4339,32 @@ ja:
       no_files: ファイルがありません
       upload_or_choose_file: ファイルをアップロードするか、アップロード済みのファイルを選択します。
     syllabus: 
-      page_title: "%{course} の要綱"
+      page_title: "%{course} のシラバス"
     syllabus_content: 
       buttons: 
-        update_syllabus: 要綱の更新
+        update_syllabus: シラバスの更新
       headers: 
         date: 日付
         details: 詳細
         due: 期限
       instructions: 
         syllabus: |-
-            要綱ページには、表形式にまとめたコース スケジュールと、採点についての基本事項が
+            シラバスページには、表形式にまとめたコース スケジュールと、採点についての基本事項が
             示されています。コースの体制、コースの方針、その他何に関することでも、コメント、補足、
             ご自分の考えなどを自由に追加できます。
             
-            コメントを追加するには、右側にある "要綱の記述の編集" リンクをクリックします。
+            コメントを追加するには、右側にある "シラバスの記述の編集" リンクをクリックします。
       labels: 
         assignments_summary: コースサマリー
         important_info_description: 重要情報の記述
         syllabus_body: 要綱の記述
         syllabus_course_summary: コースサマリーを表示
-        syllabus_description: 要綱の記述
+        syllabus_description: シラバスの記述
       links: 
         edit_syllabus_description: 編集
         jump_to_today: 本日に移動
       titles: 
-        course_syllabus: コース要綱
+        course_syllabus: コースシラバス
     syllabus_right_side: 
       links: 
         edit_syllabus_description: 要綱の記述の編集
@@ -7731,7 +7731,7 @@ ja:
     student_summary: 
       not_sorted: 受講生要約表
     student_view_student_name: 受講生をテスト
-    syllabus: 要綱
+    syllabus: シラバス
     wiki_permissions: 
       all: 全員
       only_teachers: 講師のみ
@@ -7919,7 +7919,7 @@ ja:
       old_account_id: "古いアカウント ID"
       open_enrollment: 登録を開く
       public_description: 公開の説明
-      public_syllabus: 公開の要綱
+      public_syllabus: 公開のシラバス
       replacement_course_id: "置換コース ID"
       restrict_enrollments_to_course_dates: 登録をコース日付に制限
       root_account_id: "ルート アカウント ID"
@@ -8060,7 +8060,7 @@ ja:
     unknown: 不明
   course_storage_391e1bd: コースのストレージ
   course_submission_report_data_example_95971ae4: コース提出レポートデータ例
-  course_syllabus_5de1b0af: コース要綱
+  course_syllabus_5de1b0af: コースシラバス
   course_syllabus_published_content_report_samford_21dfcb58: "コースシラバス＆公開コンテンツレポート - Samford"
   course_syllabus_report_becker_92173e15: "コースシラバスレポート - Becker"
   course_syllabus_report_johnson_county_cc_32ed83a6: "コースシラバスレポート - Johnson 郡 CC"
@@ -8827,7 +8827,7 @@ ja:
     settings: ~
     site_admin: サイト管理者
     stats: 統計
-    syllabus: 要綱
+    syllabus: シラバス
     users: ユーザ
     wiki_pages: ページ
   csp_violations_337f8529: "CSP 違反"
@@ -9406,7 +9406,7 @@ ja:
       ユーザーが、アカウントとコースレベルで成果と成果グループを作成、インポート、編集、および削除できるようにします。
   determines_visibility_and_management_of_outcomes_t_8a40bf86: アカウントのナビゲーションで成果のタブの表示と管理を決定します。ユーザーが、アカウントとコースレベルで成果と成果グループを作成、インポート、編集、および削除できるようにします。
   determines_visibility_and_management_of_rubrics_li_83a26d8e: アカウントのナビゲーションでの規定の表示と管理を決定します。ユーザーがコースナビゲーションに規定リンクを表示できるようにします。ユーザーが規定を作成、編集、削除できるようにします。
-  determines_visibility_and_management_of_rubrics_li_9b974d71: アカウントのナビゲーションでの規定の表示と管理を決定します。
+  determines_visibility_and_management_of_rubrics_li_9b974d71: アカウントのナビゲーションでのルーブリックの表示と管理を決定します。
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       アカウントのナビゲーションでルーブリックタブの表示と管理を決定します。
       ユーザーがルーブリックを管理できるようにします。
@@ -9416,7 +9416,7 @@ ja:
   determines_visibility_and_management_of_the_outcom_aace9659: アカウントナビゲーションでの成果リンクの表示と管理を決定します。
   determines_visibility_and_management_of_the_questi_c57c5b31: アカウントのナビゲーションで質問バンクリンクの表示と管理を決定します。
   determines_visibility_and_management_of_the_questi_fbf70ba9: "問題バンク アカウントのナビゲーションリンクの表示と管理を決定します。"
-  determines_visibility_and_management_of_the_rubric_533da0b8: アカウントのナビゲーションでの規定の表示と管理を決定します。
+  determines_visibility_and_management_of_the_rubric_533da0b8: アカウントのナビゲーションでのルーブリックの表示と管理を決定します。
   determines_visibility_and_management_of_the_rubric_55b55b25: アカウントのナビゲーションでの規定の表示と管理を決定します。ユーザーが規定を作成、編集、削除できるようにします。
   determines_visibility_of_sis_import_link_in_accoun_53da8632: アカウントのナビゲーションでSISインポートリンクの表示を決定します。
   determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: アカウントのナビゲーションでSISインポートリンクの表示を決定します。ユーザーが以前のSISのインポートの日付、エラー、およびインポートされた項目を表示できるようにします。
@@ -11838,11 +11838,11 @@ ja:
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "以下のグレードの値を入力して提出することによって、すべての生徒に*%{assignment.name}*への同じグレードを与えます："
   give_all_students_the_same_percent_grade_for_assig_6a008004: "以下のグレードの値を入力して提出することによって、すべての生徒に同じ*パーセント*のグレードを**%{assignment.name}**に対して与えます："
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: メディアソースの取得をあきらめる。この問題はおそらく、最終的には解決します。
-  global_announcements_a78912c8: "グローバル アナウンス"
+  global_announcements_a78912c8: "グローバル アナウンスメント"
   global_announcements_add_edit_delete_843ca4d2: "グローバルアナウンス - 追加/編集/削除"
   global_branding_df1cae12: グローバルブランディング
   global_message_icons: 
-    announcement: アナウンス
+    announcement: アナウンスメント
     calendar: カレンダー
     error: エラー
     information: 情報
@@ -13273,7 +13273,7 @@ ja:
       coming_up: 入手予定
       edit_group: グループを編集
       group_atom_feed: "グループの Atom フィード"
-      new_announcement: アナウンス
+      new_announcement: アナウンスメント
     status: 
       assigning_students: 受講生を割り当てています...
       creating_groups: カテゴリを作成しています...
@@ -13745,7 +13745,7 @@ ja:
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "有効にすると、LTI 1.3およびLTI Advantage へのアクセスが有効になります。"
   if_enabled_allows_deep_linking_from_the_module_ind_632bb221: 有効にすると、モジュールインデックスからモーダル経由でのディープリンクが可能になります。
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: 有効にすると、モジュールインデックスからのディープリンクが可能になります。
-  if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 有効にすると、結果の最大可能スコア以上が規定で許可されます。
+  if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 有効にすると、結果の最大可能スコア以上がルーブリックで許可されます。
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: 有効な場合、課題やモジュールに複数のディープリンクサポートを許可します。
   if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
       有効にすると、LTI Platform
@@ -13785,7 +13785,7 @@ ja:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       有効にすると、コース登録とMicrosoftグループを同期
       できるようになります。アカウント管理者は、アカウント設定でこれを有効にすることができます。
-  if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: このオプションを有効にすると、スコアリングされない規定が表示されます。
+  if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: このオプションを有効にすると、スコアリングされないルーブリックが表示されます。
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: 有効にすると、親のサインアップフォームでは、子のユーザー名とパスワードの代わりに受講生のペアリングコードが必要になります
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       有効になっている場合、サイト管理者の開発者キーのUIは    
@@ -14792,7 +14792,7 @@ ja:
       no_submission_created: この成果の要求では、新しい宿題の提出を作成できませんでした。
     canvas: 
       migration: 
-        announcements: アナウンス
+        announcements: アナウンスメント
         assessment_question_banks: 問題バンク
         assignments: 課題
         attachments: ファイル
@@ -14805,7 +14805,7 @@ ja:
         learning_outcomes: 学習成果
         quizzes: クイズ
         rubrics: 注釈
-        syllabus_body: 要綱本文
+        syllabus_body: シラバス本文
         tool_profiles: ツールプロファイル
         wikis: ページ
     cc: 
@@ -16795,7 +16795,7 @@ ja:
         details: "詳細は %{url} をご覧ください"
         subject: "新しいアナウンス: %{title}、%{course}"
       twitter: 
-        body: "Canvas アラート - アナウンス: %{title}、%{course}"
+        body: "Canvas アラート - アナウンスメント: %{title}、%{course}"
     new_context_group_membership: 
       email: 
         body_account: "アカウント「%{account}」の新しいグループに追加されました。グループ名は %{group_name} です。"
@@ -17430,7 +17430,7 @@ ja:
   migrate_quiz_5d0f777: クイズを移行する
   migrating_name_e05aa53e: "\"%{name}\"を移行中"
   migration: 
-    announcement_type: アナウンス
+    announcement_type: アナウンスメント
     assignment_group_type: 課題グループ
     assignment_type: 課題
     calendar_event_type: "カレンダー イベント"
@@ -18333,7 +18333,7 @@ ja:
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: 通知：この受講生の採点期間は締め切られています
   notification: 
     account_notification_description: 組織全体へのアナウンス（ダッシュボードページにも表示）
-    account_notification_display: "グローバル アナウンス"
+    account_notification_display: "グローバル アナウンスメント"
     added_to_conversation_description: 会話に追加されました
     added_to_conversation_display: 会話に追加されました
     all_submissions_description: |-
@@ -18346,7 +18346,7 @@ ja:
         * 自分が作成したアナウンスへの返信
     announcement_created_by_you_display: 自分が作成したアナウンス
     announcement_description: コースの新しいアナウンス
-    announcement_display: アナウンス
+    announcement_display: アナウンスメント
     appointment_availability_description: |-
         *インストラクタおよび管理者のみ:*
         
@@ -18366,7 +18366,7 @@ ja:
     categories: 
       account_notification: アカウント通知
       all_submissions: すべての提出物
-      announcement: アナウンス
+      announcement: アナウンスメント
       appointment_availability: 予定の設定状況
       appointment_cancelations: 予定の取り消し
       appointment_signups: 予定のサインアップ
@@ -22867,7 +22867,7 @@ ja:
   rubrics_and_speedgrader_ececaed4: ルービックスとSpeedGrader
   rubrics_assessments_export_report_6e639a7b: "ルーブリック アセスメント エクスポート レポート"
   rubrics_associations_export_report_77da1b31: ルーブリック関連エクスポート・レポート
-  rubrics_b5ef369b: 規定
+  rubrics_b5ef369b: ルーブリック
   rubrics_can_show_students_your_expectations_for_as_3382da64: |-
       ルーブリックは、課題の質に対する期待と、
           それに応じた採点方法を受講生に示すことができます。ルーブリックは、課題、ディスカッション、および
@@ -22878,7 +22878,7 @@ ja:
   rubrics_export_report_76d30288: "ルーブリック エクスポート レポート"
   rubrics_in_course_navigation_539ea536: コースナビゲーションの規定
   rubrics_speedgrader_a6ebec57: ルービック、SpeedGrader
-  rubrics_tutorial_tray_be65d10d: 規定チュートリアルトレイ
+  rubrics_tutorial_tray_be65d10d: ルーブリックチュートリアルトレイ
   running_c5a4998d: 実行中
   running_totals_d6f45b6b: 現在までの合計
   russia_7_87bc99d5: ロシア（+7）
@@ -25386,7 +25386,7 @@ ja:
   switch_to_table_view_3aae9919: 表のビューに切り替え
   switzerland_41_f861e414: "スイス (+41)"
   switzerland_f4f7137c: スイス
-  syllabus: コース要綱
+  syllabus: コースシラバス
   syllabus_course_summary_option_951a8144: シラバスコースサマリーオプション
   syllabus_f191f65b: シラバス
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
@@ -25441,7 +25441,7 @@ ja:
   table_of_contents_544d9471: コンテンツのテーブル
   table_of_contents_d2d11ba6: コンテンツのテーブル
   tabs: 
-    announcements: アナウンス
+    announcements: アナウンスメント
     assignments: 課題
     collaborations: 共同作業
     conferences: 会議
@@ -25461,15 +25461,15 @@ ja:
     outcomes: 成果
     pace_plans: ペース計画
     pages: ページ
-    past_global_announcements: "グローバル アナウンス"
+    past_global_announcements: "グローバル アナウンスメント"
     people: メンバー
     profile: プロフィール
     qr_mobile_login: "モバイルログイン用の QR"
     quizzes: クイズ
-    rubrics: 規定
+    rubrics: ルーブリック
     schedule: スケジュール
     settings: 設定
-    syllabus: 要綱
+    syllabus: シラバス
     tab_location_error: そのタブ位置は無効です
     tab_unmanagable_error: "%{css_class} は管理できません"
     trophy_case: トロフィーケース
@@ -28345,9 +28345,9 @@ ja:
       サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。サブカウント管理者は、講師の役割がアカウントレベルでSISデータを読み取る権限を持っているため、コース関連なしではSIS情報を表示することはできません。
   users_and_terms_are_located_at_the_account_so_the__6896b895: ユーザーと条件はアカウントにあるため、SISエンドポイントはアカウントに基づいてユーザーの権限を常に確認します。サブカウントはコースとセクションの所有権しか持ちません。ユーザーデータは所有していません。サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。サブカウント管理者は、講師の役割がアカウントレベルでSISデータを読み取る権限を持っているため、コース関連なしではSIS情報を表示することはできません。
   users_and_terms_are_located_at_the_account_so_the__8f3258e6: ユーザーと条件はアカウントにあるため、SISエンドポイントはアカウントに基づいてユーザーの権限を常に確認します。
-  users_can_access_and_create_but_not_edit_individua_59bcb8dd: "ユーザーは、[課題とクイズ - 追加]が有効になっているときに、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
+  users_can_access_and_create_but_not_edit_individua_59bcb8dd: "ユーザーは、[課題とクイズ - 追加]が有効になっているときに、課題を介して個々の課題のルーブリックにアクセス・作成することはできますが、編集することはできません。"
   users_can_access_and_create_but_not_edit_individua_72b88c41: "ユーザーは、コースの内容（表示と課題とクイズ） - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
-  users_can_access_and_create_but_not_edit_individua_a0b26adf: "ユーザーは、[コースの内容 - 表示]と[課題とクイズ - 追加]が有効になっているときに、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
+  users_can_access_and_create_but_not_edit_individua_a0b26adf: "ユーザーは、[コースの内容 - 表示]と[課題とクイズ - 追加]が有効になっているときに、課題を介して個々の課題のルーブリックにアクセス・作成することはできますが、編集することはできません。"
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "ユーザーは、課題とクイズ - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "ユーザーは、コース内容 - 表示、課題とクイズ - 追加/編集/削除が有効になっているときに、クイズインデックスページの問題バンクの管理リンクにアクセスできます。"
   users_d1b60cb0: ユーザー
@@ -28637,7 +28637,7 @@ ja:
   when_enabled_this_setting_automatically_opens_teac_f93c16f0: この設定を有効にすると、教師のToDoアイテムが自動的に新しいタブで開かれます。
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: 有効にすると、コースディスカッションで「@mention」（言及）機能がオンになります。
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: 匿名の課題の成績を非表示にすると、成績は、コースの人すべてに非表示になります。匿名は再適用されます。
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "メンバーがコースにアクセスすると、このページが表示されます。アクティビティ ストリーム、コース モジュールのリスト、要綱、その他のカスタム ページを表示するように設定できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。"
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "メンバーがコースにアクセスすると、このページが表示されます。アクティビティ ストリーム、コース モジュールのリスト、シラバス、その他のカスタム ページを表示するように設定できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。"
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       ユーザーがあなたのコースにアクセスするとき、これが最初に表示されるページになります。
                 ホームページをモジュールに設定しましたが、変更することもできます。
