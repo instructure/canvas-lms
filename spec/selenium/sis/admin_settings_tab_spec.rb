@@ -242,16 +242,6 @@ describe "admin settings tab" do
           it { test_checkbox_off(sis_syncing_locked) }
           it { test_checkbox_on(sis_syncing_locked) }
 
-          it "toggles require assignment due date on" do
-            set_checkbox_via_label(default_grade_export, true)
-            test_checkbox_on(require_assignment_due_date)
-          end
-
-          it "toggles require assignment due date off" do
-            set_checkbox_via_label(default_grade_export, true)
-            test_checkbox_off(require_assignment_due_date)
-          end
-
           it "toggles assignment name length on" do
             set_checkbox_via_label(default_grade_export, true)
             test_checkbox_on(assignment_name_length)
