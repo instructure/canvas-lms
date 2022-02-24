@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as rtlRender, fireEvent, waitFor} from '@testing-library/react'
+import {render as rtlRender, fireEvent, waitFor, within} from '@testing-library/react'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import ProficiencyCalculation from '../ProficiencyCalculation'
 
@@ -53,6 +53,7 @@ describe('ProficiencyCalculation', () => {
   const makeProps = (overrides = {}) => ({
     update: Function.prototype,
     canManage: true,
+    masteryPoints: null,
     ...overrides,
     method: {
       calculationMethod: 'decaying_average',
@@ -435,14 +436,51 @@ describe('ProficiencyCalculation', () => {
       expect(update).toHaveBeenCalledWith('latest', null)
     })
 
-    it('renders example', () => {
-      const {getByText, queryByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
-      )
-      expect(queryByText('Example')).toBeInTheDocument()
-      expect(getByText('Item Scores:')).toBeInTheDocument()
-      expect(getByText('Final Score:')).toBeInTheDocument()
-      expect(queryByText(/Most recent result counts as/)).toBeInTheDocument()
+    describe('example', () => {
+      it('renders example', () => {
+        const {getByText, queryByText} = render(
+          <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
+        )
+        expect(queryByText('Example')).toBeInTheDocument()
+        expect(getByText('Item Scores:')).toBeInTheDocument()
+        expect(getByText('Final Score:')).toBeInTheDocument()
+        expect(queryByText(/Most recent result counts as/)).toBeInTheDocument()
+      })
+
+      it('renders example with calculated final score when n_mastery method and mastery points provided', () => {
+        const {getByTestId} = render(
+          <ProficiencyCalculation
+            {...makeProps({
+              individualOutcome: 'edit',
+              masteryPoints: 3,
+              method: {
+                calculationMethod: 'n_mastery',
+                calculationInt: 5
+              }
+            })}
+          />
+        )
+        const exampleFinalScore = getByTestId('proficiency-calculation-example-final-score')
+        expect(exampleFinalScore).toBeInTheDocument()
+        expect(within(exampleFinalScore).getByText('4.2')).toBeInTheDocument()
+      })
+
+      it('renders example with N/A final score when n_mastery method and mastery points not provided', () => {
+        const {getByTestId} = render(
+          <ProficiencyCalculation
+            {...makeProps({
+              individualOutcome: 'edit',
+              method: {
+                calculationMethod: 'n_mastery',
+                calculationInt: 5
+              }
+            })}
+          />
+        )
+        const exampleFinalScore = getByTestId('proficiency-calculation-example-final-score')
+        expect(exampleFinalScore).toBeInTheDocument()
+        expect(within(exampleFinalScore).getByText('N/A')).toBeInTheDocument()
+      })
     })
 
     it('does not render the save button', () => {
