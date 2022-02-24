@@ -246,6 +246,7 @@ const ComposeModalContainer = props => {
                 activeCourseFilter={selectedContext}
                 contextName={props.pastConversation?.contextName}
                 courses={props.courses}
+                selectedRecipients={selectedIds}
                 isReply={props.isReply}
                 isForward={props.isForward}
                 onContextSelect={onContextSelect}
