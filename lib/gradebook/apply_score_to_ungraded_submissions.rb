@@ -22,15 +22,12 @@ module Gradebook
     MAX_ERROR_COUNT = 100
 
     Options = Struct.new(
-      :assignment_group,
-      :context_module,
-      :course_section,
       :excused,
-      :grading_period,
       :mark_as_missing,
       :only_apply_to_past_due,
       :percent,
-      :student_group,
+      :assignment_ids,
+      :student_ids,
       keyword_init: true
     )
 
@@ -73,49 +70,19 @@ module Gradebook
     end
 
     def self.matching_submissions_scope(course, grader, options)
-      students = course.students_visible_to(grader)
-      if options.course_section.present?
-        students = students.where(enrollments: { course_section: options.course_section, workflow_state: "active" })
-      end
-
-      if options.student_group.present?
-        students = students.where(
-          "EXISTS (?)",
-          options.student_group.group_memberships.active.where("user_id = users.id")
-        )
-      end
-
-      assignments = options.assignment_group.present? ? options.assignment_group.assignments : course.assignments
-
-      if options.context_module.present?
-        # TODO: this currently won't match other gradable types that a
-        # ContentTag can hold (DiscussionTopic, WikiPage, Quizzes::Quiz) since
-        # those have a separate association with their assignment
-
-        assignments = assignments.where(
-          "EXISTS (?)",
-          ContentTag.active
-            .where(content_type: "Assignment", tag_type: "context_module", context_module: options.context_module)
-            .where("content_id = assignments.id")
-        )
-      end
-
+      students = course.students_visible_to(grader).where(id: options.student_ids)
+      assignments = course.assignments.where(id: options.assignment_ids).where.not(submission_types: "not_graded")
       submissions = Submission.active
                               .joins(:assignment)
                               .preload(:assignment, :user)
-                              .where(assignment: assignments.published.gradeable)
+                              .where(assignment: assignments)
                               .where.not("assignments.moderated_grading IS TRUE AND assignments.grades_published_at IS NULL")
                               .where.not(["assignments.moderated_grading IS TRUE AND assignments.final_grader_id != ?", grader.id])
                               .where(user: students)
                               .ungraded
                               .where("submissions.excused IS NOT TRUE")
       submissions = submissions.where("cached_due_date < ?", Time.zone.now) if options.only_apply_to_past_due
-
-      if options.grading_period.present?
-        submissions.where(grading_period: options.grading_period)
-      else
-        submissions.left_joins(:grading_period).merge(GradingPeriod.open)
-      end
+      submissions
     end
     private_class_method :matching_submissions_scope
 
