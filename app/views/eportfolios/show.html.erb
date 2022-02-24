@@ -123,9 +123,7 @@
       <a
         href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>"
         id="eportfolio_share_link"
-        <% if @domain_root_account.feature_enabled?(:responsive_misc) %>
-          style="overflow-wrap: break-word;"
-        <% end %>
+        style="overflow-wrap: break-word;"
       >
         <%= eportfolio_url(@portfolio.id, :verifier => @portfolio.uuid) %>
       </a>

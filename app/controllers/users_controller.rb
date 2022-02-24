@@ -71,6 +71,11 @@ require "atom"
 #           "description": "A URL to retrieve a generic avatar.",
 #           "example": "https://en.gravatar.com/avatar/d8cb8c8cd40ddf0cd05241443a591868?s=80&r=g",
 #           "type": "string"
+#         },
+#         "display_name": {
+#           "description": "The anonymized display name for the student.",
+#           "example": "Student 2",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -189,7 +194,7 @@ class UsersController < ApplicationController
                                         user_dashboard toggle_hide_dashcard_color_overlays
                                         masquerade external_tool dashboard_sidebar settings activity_stream
                                         activity_stream_summary pandata_events_token dashboard_cards
-                                        user_graded_submissions show terminate_sessions]
+                                        user_graded_submissions show terminate_sessions dashboard_stream_items]
   before_action :require_registered_user, only: [:delete_user_service,
                                                  :create_user_service]
   before_action :reject_student_view_student, only: %i[delete_user_service
@@ -564,7 +569,16 @@ class UsersController < ApplicationController
   def dashboard_stream_items
     cancel_cache_buster
 
-    @stream_items = @current_user.try(:cached_recent_stream_items) || []
+    @user = params[:observed_user].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user]) : @current_user
+    @is_observing_student = @current_user != @user
+    course_ids = nil
+    if @is_observing_student
+      course_ids = @current_user.cached_course_ids_for_observed_user(@user)
+      return render_unauthorized_action unless course_ids.any?
+    end
+    courses = course_ids.present? ? api_find_all(Course, course_ids) : nil
+
+    @stream_items = @user.cached_recent_stream_items(contexts: courses)
     if stale?(etag: @stream_items)
       render partial: "shared/recent_activity", layout: false
     end
@@ -1307,6 +1321,8 @@ class UsersController < ApplicationController
       @enrollments = @enrollments.sort_by { |e| [e.state_sortable, e.rank_sortable, e.course.name] }
       # pre-populate the reverse association
       @enrollments.each { |e| e.user = @user }
+
+      @show_page_views = !!(page_views_enabled? && @user.grants_right?(@current_user, session, :view_statistics))
 
       status = @user.deleted? ? 404 : 200
       respond_to do |format|

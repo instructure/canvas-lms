@@ -51,12 +51,14 @@ describe "calendar2" do
     end
 
     it "shows assignment in 24-hour time", priority: "1" do
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
       create_course_assignment
       get "/calendar2"
       expect(f(".fc-time")).to include_text("21")
     end
 
     it "shows event in 24-hour time", priority: "1" do
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
       create_course_event
       get "/calendar2"
       expect(f(".fc-time")).to include_text("21")

@@ -131,56 +131,54 @@ const CalculationIntInput = ({
   }
 }
 
-const Display = ({calculationInt, currentMethod, individualOutcomeDisplay}) => (
-  <View as="div" padding="small none none">
-    <Flex
-      wrap="wrap"
-      direction={individualOutcomeDisplay ? 'row' : 'column'}
-      padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
-    >
-      <Flex.Item
-        as="div"
-        padding="none xx-small none none"
-        data-testid="read-only-calculation-method"
-      >
-        {individualOutcomeDisplay ? (
-          <View as="div">
-            <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
-            &nbsp;
-            <Text weight="normal">{currentMethod.method}</Text>
-          </View>
-        ) : (
-          <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
-        )}
-      </Flex.Item>
-      {!individualOutcomeDisplay && (
-        <Flex.Item>
-          <Text color="primary" weight="normal">
-            {currentMethod.friendlyCalculationMethod}
-          </Text>
-        </Flex.Item>
-      )}
-    </Flex>
-    {currentMethod.validRange && !individualOutcomeDisplay && (
+const Display = ({calculationInt, currentMethod, individualOutcomeDisplay}) => {
+  const {isMobileView} = useCanvasContext()
+
+  return (
+    <View as="div" padding="small none none">
       <Flex
         wrap="wrap"
-        direction={individualOutcomeDisplay ? 'row' : 'column'}
+        direction={individualOutcomeDisplay ? (isMobileView ? 'column' : 'row') : 'column'}
         padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
       >
-        <Flex.Item as="div" padding="none xx-small none none">
-          <Heading margin="medium none none" level="h4">
-            {I18n.t('Parameter')}
-          </Heading>
+        <Flex.Item
+          as="div"
+          padding="none xx-small none none"
+          data-testid="read-only-calculation-method"
+        >
+          {individualOutcomeDisplay ? (
+            <View as="div">
+              <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
+            </View>
+          ) : (
+            <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
+          )}
         </Flex.Item>
-        <Flex.Item>
+        <Flex.Item padding={isMobileView ? 'small none none' : 'none'}>
           <Text color="primary" weight="normal">
-            {calculationInt}
+            {individualOutcomeDisplay
+              ? currentMethod.method
+              : currentMethod.friendlyCalculationMethod}
           </Text>
         </Flex.Item>
       </Flex>
-    )}
-  </View>
-)
+      {currentMethod.validRange && !individualOutcomeDisplay && (
+        <Flex wrap="wrap" direction="column" padding="none small none none">
+          <Flex.Item as="div" padding="none xx-small none none">
+            <Heading margin="medium none none" level="h4">
+              {I18n.t('Parameter')}
+            </Heading>
+          </Flex.Item>
+          <Flex.Item>
+            <Text color="primary" weight="normal">
+              {calculationInt}
+            </Text>
+          </Flex.Item>
+        </Flex>
+      )}
+    </View>
+  )
+}
 
 const Form = ({
   calculationMethodKey,
@@ -235,17 +233,11 @@ const Example = ({currentMethod, individualOutcomeExample}) => {
           {currentMethod.exampleText}
         </View>
         <View as="div" padding="x-small 0">
-          {individualOutcomeExample
-            ? I18n.t('1- Item Scores: Example item scores:')
-            : I18n.t('Item Scores:')}
-          &nbsp;
-          <Text weight="bold"> {currentMethod.exampleScores}</Text>
+          {I18n.t('Item Scores:')}&nbsp;
+          <Text weight="bold">{currentMethod.exampleScores}</Text>
         </View>
         <View as="div" padding="x-small 0">
-          {individualOutcomeExample
-            ? I18n.t('2- Final Score: Example final score:')
-            : I18n.t('Final Score:')}
-          &nbsp;
+          {I18n.t('Final Score:')}&nbsp;
           <Text weight="bold">{currentMethod.exampleResult}</Text>
         </View>
       </Text>

@@ -22,7 +22,7 @@ describe('isValidDeepLinkingEvent', () => {
   let data, event, env, parameters
 
   beforeEach(() => {
-    event = {data: {messageType: 'LtiDeepLinkingResponse'}, origin: 'canvas.instructure.com'}
+    event = {data: {subject: 'LtiDeepLinkingResponse'}, origin: 'canvas.instructure.com'}
     env = {DEEP_LINKING_POST_MESSAGE_ORIGIN: 'canvas.instructure.com'}
     parameters = [event, env]
   })
@@ -55,9 +55,9 @@ describe('isValidDeepLinkingEvent', () => {
     })
   })
 
-  describe('when the messageType is incorrect', () => {
+  describe('when the subject is incorrect', () => {
     beforeEach(() => {
-      event = {data: {messageType: 'WrongMessageType'}, origin: 'canvas.instructure.com'}
+      event = {data: {subject: 'WrongMessageType'}, origin: 'canvas.instructure.com'}
       parameters = [event, env]
     })
 
@@ -78,7 +78,7 @@ describe('handleDeepLinking', () => {
 
   const event = overrides => ({
     origin: 'http://www.test.com',
-    data: {messageType: 'LtiDeepLinkingResponse', content_items},
+    data: {subject: 'LtiDeepLinkingResponse', content_items},
     ...overrides
   })
 

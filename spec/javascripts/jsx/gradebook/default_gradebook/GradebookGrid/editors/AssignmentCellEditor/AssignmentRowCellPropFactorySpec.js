@@ -20,7 +20,7 @@ import AssignmentRowCellPropFactory from 'ui/features/gradebook/react/default_gr
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
   let $container

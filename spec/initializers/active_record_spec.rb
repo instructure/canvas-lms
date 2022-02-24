@@ -346,6 +346,52 @@ module ActiveRecord
     end
   end
 
+  describe ".global_id?" do
+    specs_require_sharding
+
+    before do
+      @shard1.activate do
+        @account = Account.create!
+      end
+    end
+
+    it "returns true if passed an explicit global id" do
+      @shard1.activate do
+        expect(Account).to be_global_id(@account.global_id)
+      end
+    end
+
+    it "returns true if passed a stringified global id" do
+      @shard1.activate do
+        expect(Account).to be_global_id(@account.global_id.to_s)
+      end
+    end
+
+    it "returns true if passed an id that resolves to a global id" do
+      @shard2.activate do
+        expect(Account).to be_global_id(@account.id)
+      end
+    end
+
+    it "returns false if passed an explicit local id" do
+      @shard2.activate do
+        expect(Account).not_to be_global_id(@account.local_id)
+      end
+    end
+
+    it "returns false if passed an id that resolves to a local id" do
+      @shard1.activate do
+        expect(Account).not_to be_global_id(@account.id)
+      end
+    end
+
+    it "returns false if passed nil" do
+      @shard1.activate do
+        expect(Account).not_to be_global_id(nil)
+      end
+    end
+  end
+
   describe Relation do
     describe "lock_with_exclusive_smarts" do
       let(:scope) { User.active }

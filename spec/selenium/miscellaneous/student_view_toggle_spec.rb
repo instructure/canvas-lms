@@ -80,7 +80,6 @@ describe "student view toggle" do
   end
 
   it "is visible in the new mobile nav view" do
-    @course.root_account.enable_feature!(:responsive_layout)
     driver.manage.window.resize_to(450, 800)
     get "/courses/#{@course.id}"
     expect(f("#mobile-header")).to contain_css("#mobile-student-view")

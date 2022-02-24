@@ -265,36 +265,6 @@ RSpec.describe ApplicationController do
           end
         end
 
-        context "responsive_awareness" do
-          before do
-            controller.instance_variable_set(:@domain_root_account, Account.default)
-          end
-
-          it "is false if the feature flag is off" do
-            expect(controller.js_env[:FEATURES][:responsive_awareness]).to be_falsey
-          end
-
-          it "is true if the feature flag is on" do
-            Account.default.enable_feature!(:responsive_awareness)
-            expect(controller.js_env[:FEATURES][:responsive_awareness]).to be_truthy
-          end
-        end
-
-        context "responsive_misc" do
-          before do
-            controller.instance_variable_set(:@domain_root_account, Account.default)
-          end
-
-          it "is false if the feature flag is off" do
-            expect(controller.js_env[:FEATURES][:responsive_misc]).to be_falsey
-          end
-
-          it "is true if the feature flag is on" do
-            Account.default.enable_feature!(:responsive_misc)
-            expect(controller.js_env[:FEATURES][:responsive_misc]).to be_truthy
-          end
-        end
-
         context "files_dnd" do
           before do
             controller.instance_variable_set(:@domain_root_account, Account.default)

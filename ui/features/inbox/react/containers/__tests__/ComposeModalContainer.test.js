@@ -21,6 +21,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
@@ -208,6 +209,22 @@ describe('ComposeModalContainer', () => {
       const courseDropdown = await findByTestId('course-select')
       fireEvent.click(courseDropdown)
       expect(await queryByText('All Courses')).not.toBeInTheDocument()
+      await waitForApolloLoading()
+    })
+
+    it('displays the selected course', async () => {
+      const component = setup()
+
+      let select = await component.findByTestId('course-select')
+      fireEvent.click(select)
+
+      const selectOptions = await component.findAllByText('Fighting Magneto 101')
+      expect(selectOptions.length).toBeGreaterThan(0)
+
+      fireEvent.click(selectOptions[0])
+      select = await component.findByTestId('course-select')
+
+      expect(select.getAttribute('value')).toBe('Fighting Magneto 101')
     })
   })
 

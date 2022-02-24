@@ -28,8 +28,8 @@ import setupRavenConsoleLoggingPlugin from '../../ui/boot/initializers/setupRave
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
 import './jsx/spec-support/timezoneBackwardsCompatLayer'
 import {up as configureDateTime} from 'ui/boot/initializers/configureDateTime'
-
 import {up as configureDateTimeMomentParser} from 'ui/boot/initializers/configureDateTimeMomentParser'
+import 'translations/_core_en'
 
 filterUselessConsoleMessages(console)
 configureDateTime()
