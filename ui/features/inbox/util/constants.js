@@ -85,6 +85,8 @@ export const SelectStrings = () => ({
 
 const conversationContextDefaultValues = {
   multiselect: false,
-  setMultiselect: () => {}
+  setMultiselect: () => {},
+  messageOpenEvent: false,
+  setMessageOpenEvent: () => {}
 }
 export const ConversationContext = React.createContext(conversationContextDefaultValues)
