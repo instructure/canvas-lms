@@ -223,7 +223,7 @@
     "array-flat-polyfill": "^1.0.1",
     "axe-core": "~2.1.7",
     "babel-eslint": "^10",
-    "babel-jest": "^24",
+    "babel-jest": "^26",
     "babel-loader": "^8",
     "babel-plugin-transform-react-remove-prop-types": "^0.4",
     "babel-plugin-typescript-to-proptypes": "^1.4.2",
