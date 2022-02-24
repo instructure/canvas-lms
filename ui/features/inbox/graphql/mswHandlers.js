@@ -253,7 +253,7 @@ export const handlers = [
                     course: {
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
-                      _id: '1',
+                      _id: '196',
                       __typename: 'Course'
                     },
                     __typename: 'Enrollment'
@@ -293,7 +293,7 @@ export const handlers = [
                     course: {
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
-                      _id: '1',
+                      _id: '196',
                       __typename: 'Course'
                     },
                     __typename: 'Enrollment'
@@ -339,7 +339,7 @@ export const handlers = [
                     course: {
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
-                      _id: '1',
+                      _id: '196',
                       __typename: 'Course'
                     },
                     __typename: 'Enrollment'
@@ -363,7 +363,7 @@ export const handlers = [
                     course: {
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
-                      _id: '1',
+                      _id: '196',
                       __typename: 'Course'
                     },
                     __typename: 'Enrollment'
@@ -387,7 +387,7 @@ export const handlers = [
                     course: {
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
-                      _id: '1',
+                      _id: '196',
                       __typename: 'Course'
                     },
                     __typename: 'Enrollment'
