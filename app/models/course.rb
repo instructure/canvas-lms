@@ -339,7 +339,11 @@ class Course < ActiveRecord::Base
 
   def self.ensure_dummy_course
     EnrollmentTerm.ensure_dummy_enrollment_term
-    create_with(account_id: 0, root_account_id: 0, enrollment_term_id: 0, workflow_state: "deleted").find_or_create_by!(id: 0)
+    # pre-loading dummy account here to avoid error when finding
+    # Account 0 on a new shard before the shard is finished creation,
+    # since finding via cache switches away from the creating shard
+    a = Account.find(0)
+    create_with(account: a, root_account: a, enrollment_term_id: 0, workflow_state: "deleted").find_or_create_by!(id: 0)
   end
 
   def self.skip_updating_account_associations
