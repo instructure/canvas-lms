@@ -665,7 +665,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.setAssignmentGroupsLoaded(true)
     assignmentGroups.forEach(assignmentGroup => {
       let group = this.assignmentGroups[assignmentGroup.id]
-
       if (!group) {
         group = assignmentGroup
         this.assignmentGroups[group.id] = group
@@ -1950,15 +1949,24 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  getAssignmentOrder = () => {
+  getAssignmentOrder = (assignmentGroupId?: string) => {
     return this.gridData.columns.scrollable.reduce((acc: string[], column) => {
       const matches = column.match(/assignment_(\d+)/)
       if (matches) {
-        const assignmentId = matches[1]
-        acc.push(assignmentId)
+        if (
+          assignmentGroupId === undefined ||
+          this.assignments[parseInt(matches[1])]?.assignment_group_id === assignmentGroupId
+        ) {
+          const assignmentId = matches[1]
+          acc.push(assignmentId)
+        }
       }
       return acc
     }, []);
+  }
+
+  getStudentOrder = () => {
+    return this.gridData.rows.map(row => row.id)
   }
 
   getActionMenuProps = () => {
@@ -4583,28 +4591,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   executeApplyScoreToUngraded = args => {
     const {value, ...options} = args
 
-    // TODO: if updated Gradebook filters are enabled, we should use those
-    // instead, either by replacing the lines below with checks against the
-    // current filters or by passing the ID of the active filter (and looking up
-    // the contents of the filter on the back-end)
-
-    let moduleId = this.getFilterColumnsBySetting('contextModuleId')
-    if (moduleId === '0') {
-      moduleId = null
-    }
-
-    const optionsWithFilters = {
+    const optionsWithAssignmentsAndStudentIds = {
       ...options,
-      courseSectionId: this.getFilterRowsBySetting('sectionId'),
-      gradingPeriodId: this.getFilterColumnsBySetting('gradingPeriodId'),
-      moduleId,
-      studentGroupId: this.getFilterRowsBySetting('studentGroupId')
+      assignment_ids: this.getAssignmentOrder(args.assignmentGroupId),
+      student_ids: this.getStudentOrder()
     }
 
     if (value === 'excused') {
-      optionsWithFilters.excused = true
+      optionsWithAssignmentsAndStudentIds.excused = true
     } else {
-      optionsWithFilters.percent = value
+      optionsWithAssignmentsAndStudentIds.percent = value
     }
 
     this.isRunningScoreToUngraded = true
@@ -4619,7 +4615,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         )
       )
       .then(() => {
-        this.scoreToUngradedManager!.startProcess(this.options.context_id, optionsWithFilters)
+        this.scoreToUngradedManager!.startProcess(
+          this.options.context_id,
+          optionsWithAssignmentsAndStudentIds
+        )
           .then(
             FlashAlert.showFlashSuccess(I18n.t('Score to ungraded process finished successfully'))
           )
