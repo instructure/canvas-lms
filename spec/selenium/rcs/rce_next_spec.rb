@@ -225,7 +225,7 @@ describe "RCE next tests", ignore_js_errors: true do
         f("##{rce_page_body_ifr_id}").send_keys([:control, "a"], :backspace)
 
         in_frame rce_page_body_ifr_id do
-          expect(f("#para").text).to eql ""
+          expect(f("#tinymce").text).to eql ""
         end
       end
 
