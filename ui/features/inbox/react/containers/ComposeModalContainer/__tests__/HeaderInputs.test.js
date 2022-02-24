@@ -141,6 +141,12 @@ describe('HeaderInputs', () => {
         _id: '1',
         id: 'TWVzc2FnZWFibGVVc2VyLTQx',
         name: 'Frederick Dukes',
+        commonCoursesInfo: [
+          {
+            courseID: '1',
+            courseRole: 'StudentEnrollment'
+          }
+        ],
         isLast: true
       }
     ])
