@@ -238,7 +238,9 @@ const Example = ({currentMethod, individualOutcomeExample}) => {
         </View>
         <View as="div" padding="x-small 0">
           {I18n.t('Final Score:')}&nbsp;
-          <Text weight="bold">{currentMethod.exampleResult}</Text>
+          <Text weight="bold" data-testid="proficiency-calculation-example-final-score">
+            {currentMethod.exampleResult}
+          </Text>
         </View>
       </Text>
     </div>
@@ -260,6 +262,7 @@ const ProficiencyCalculation = ({
   updateError,
   canManage,
   onNotifyPendingChanges,
+  masteryPoints,
   individualOutcome,
   setError
 }) => {
@@ -304,7 +307,8 @@ const ProficiencyCalculation = ({
   const calculationMethods = new CalculationMethodContent({
     calculation_method: calculationMethodKey,
     calculation_int: calculationInt,
-    is_individual_outcome: true
+    is_individual_outcome: true,
+    mastery_points: masteryPoints
   }).toJSON()
   const currentMethod = calculationMethods[calculationMethodKey]
 
@@ -432,6 +436,7 @@ ProficiencyCalculation.propTypes = {
   update: PropTypes.func,
   onNotifyPendingChanges: PropTypes.func,
   updateError: PropTypes.string,
+  masteryPoints: PropTypes.number,
   individualOutcome: PropTypes.oneOf(['display', 'edit']),
   setError: PropTypes.func
 }
