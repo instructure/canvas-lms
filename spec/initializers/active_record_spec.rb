@@ -443,16 +443,50 @@ module ActiveRecord
         end
       end
 
+      shared_examples_for "query creation sharding" do
+        specs_require_sharding
+
+        it "derives the appropriate shard from its input, if they all share the same shard" do
+          expect(base_s1.union(base_s1).shard_value).to be @shard1
+
+          @shard2.activate do
+            expect(base_s1.union(base_s1).shard_value).to be @shard1
+          end
+        end
+
+        it "rejects input that are on different shards" do
+          expect { base_s1.union(base_s2) }.to raise_error(/multiple shard values passed to union/)
+        end
+      end
+
       context "directly on the table" do
         let(:base) { User.active }
+        let(:base_s1) { @shard1.activate { User.active } }
+        let(:base_s2) { @shard2.activate { User.active } }
 
         include_examples "query creation"
+        include_examples "query creation sharding"
       end
 
       context "through a relation" do
         let(:base) { Account.create.users }
+        let(:base_s1) { @shard1.activate { Account.create.users } }
+        let(:base_s2) { @shard2.activate { Account.create.users } }
 
         include_examples "query creation"
+        include_examples "query creation sharding"
+      end
+
+      context "through a where query that references multiple shards" do
+        let(:user) { User.create }
+        let(:user_s1) { @shard1.activate { User.create } }
+        let(:user_s2) { @shard2.activate { User.create } }
+
+        let(:base) { User.where(id: [user_s1, user_s2]) }
+        let(:base_s1) { @shard1.activate { User.where(id: [user_s1, user_s2]) } }
+        let(:base_s2) { @shard2.activate { User.where(id: [user_s1, user_s2]) } }
+
+        include_examples "query creation sharding"
       end
     end
   end

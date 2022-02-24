@@ -1247,8 +1247,6 @@ ActiveRecord::Relation.class_eval do
     relation
   end
 
-  # if this sql is constructed on one shard then executed on another it wont work
-  # dont use it for cross shard queries
   def union(*scopes, from: false)
     table = connection.quote_local_table_name(table_name)
     scopes.unshift(self)
@@ -1256,14 +1254,20 @@ ActiveRecord::Relation.class_eval do
     return scopes.first if scopes.length == 1
     return self if scopes.empty?
 
-    sub_query = scopes.map do |scope|
-      scope = scope.except(:select, :order).select(primary_key) unless from
-      "(#{scope.to_sql})"
-    end.join(" UNION ALL ")
-    return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
+    primary_shards = scopes.map(&:primary_shard).uniq
 
-    sub_query = +"(#{sub_query}) #{from == true ? table : from}"
-    unscoped.from(sub_query)
+    raise "multiple shard values passed to union: #{primary_shards}" if primary_shards.count > 1
+
+    primary_shards.first.activate do
+      sub_query = scopes.map do |scope|
+        scope = scope.except(:select, :order).select(primary_key) unless from
+        "(#{scope.to_sql})"
+      end.join(" UNION ALL ")
+      return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
+
+      sub_query = +"(#{sub_query}) #{from == true ? table : from}"
+      unscoped.from(sub_query)
+    end
   end
 
   # returns batch_size ids at a time, working through the primary key from
