@@ -43,7 +43,19 @@ class SecurityController < ApplicationController
                   when "/api/lti/security/jwks"
                     Lti::KeyStorage
                   end
-    response.set_header("Cache-Control", "max-age=#{key_storage.max_cache_age}")
-    render json: key_storage.public_keyset
+    public_keyset = key_storage.public_keyset
+
+    if params.include?(:rotation_check)
+      today = Time.zone.now.utc.to_date
+      reports = public_keyset.as_json[:keys].each_with_index.map do |key, i|
+        date = CanvasSecurity::JWKKeyPair.time_from_kid(key[:kid]).utc.to_date
+        this_month = [today.year, today.month] == [date.year, date.month]
+        "today is day #{today.day} and key #{i} is #{this_month ? "" : "not "}from this month"
+      end
+      render json: reports
+    else
+      response.set_header("Cache-Control", "max-age=#{key_storage.max_cache_age}")
+      render json: public_keyset
+    end
   end
 end
