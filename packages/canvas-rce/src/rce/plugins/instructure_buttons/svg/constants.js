@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS = {
   size: Size.Small,
   color: null,
   outlineColor: null,
-  outlineSize: Size.None,
+  outlineSize: Size.Small,
   text: '',
   textSize: Size.Small,
   textColor: '#000000',
