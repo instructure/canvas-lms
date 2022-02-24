@@ -283,6 +283,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                     calculationMethod: proficiencyCalculationMethod,
                     calculationInt
                   }}
+                  masteryPoints={masteryPoints.value}
                   individualOutcome={attributesEditable.calculationMethod ? 'edit' : 'display'}
                   canManage={!!attributesEditable.calculationMethod}
                   update={updateProficiencyCalculation}
