@@ -3462,7 +3462,7 @@ nn:
       locked_until: "Gi vurderingar"
       peer_reviews_assign_at_explanation: "Må kome etter innleveringsfrist. Dersom feltet er tomt, blir innleveringsfristen brukt."
       peer_reviews_header: Fagfellevurderingar
-      reviews_per_user: "Omtalar per brukar"
+      reviews_per_user: "Vurderingar per brukar"
     points_possible_number: "Moglege poeng må vere eit tal"
     positive_number: "Du må bruke eit positivt tal"
     processing_submission: "Canvas handsamar innleveringa di. Du kan forlate denne sida. Vi sender deg ein e-post hvis handsaminga feilar. "
