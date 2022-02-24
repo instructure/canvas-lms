@@ -54,6 +54,7 @@ const CanvasInbox = () => {
   const [isForward, setIsForward] = useState(false)
   const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
   const [multiselect, setMultiselect] = useState(false)
+  const [messageOpenEvent, setMessageOpenEvent] = useState(false)
   const userID = ENV.current_user_id?.toString()
 
   const setFilterStateToCurrentWindowHash = () => {
@@ -86,7 +87,9 @@ const CanvasInbox = () => {
 
   const conversationContext = {
     multiselect,
-    setMultiselect
+    setMultiselect,
+    messageOpenEvent,
+    setMessageOpenEvent
   }
 
   const updateSelectedConversations = conversations => {

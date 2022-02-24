@@ -19,6 +19,7 @@
 import {Badge} from '@instructure/ui-badge'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {ConversationContext} from '../../../util/constants'
 import {Focusable} from '@instructure/ui-focusable'
 import {Grid} from '@instructure/ui-grid'
 import {
@@ -28,7 +29,7 @@ import {
   IconEmptySolid
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -42,6 +43,7 @@ const I18n = useI18nScope('conversations_2');
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
+  const {setMessageOpenEvent} = useContext(ConversationContext)
 
   const isSubmissionComments = props.submissionComments && !props.conversation
 
@@ -357,7 +359,10 @@ export const ConversationListItem = ({...props}) => {
                           display="block"
                           textAlign="center"
                           size="small"
-                          onClick={handleConversationClick}
+                          onClick={e => {
+                            setMessageOpenEvent(true) // Required to redirect focus into message
+                            handleConversationClick(e)
+                          }}
                         >
                           {I18n.t('Open Conversation')}
                         </Button>
