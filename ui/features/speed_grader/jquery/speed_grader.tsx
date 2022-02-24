@@ -254,12 +254,6 @@ function unexcuseSubmission(grade, submission, assignment) {
   return grade === '' && submission.excused && assignment.grading_type === 'pass_fail'
 }
 
-// anonymous_name is preferred and will be available for all anonymous
-// assignments. Fall back to naming based on index for assignments that are not
-// anonymous, but the teacher has selected to 'Hide Student Names' in SpeedGrader.
-const anonymousName = student =>
-  student.anonymous_name || I18n.t('Student %{number}', {number: student.index + 1})
-
 const utils = {
   getParam(name) {
     const pathRegex = new RegExp(`${name}/([^/]+)`)
@@ -463,7 +457,7 @@ function initDropdown() {
     let {name} = student
     const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
     if (hideStudentNames || isAnonymous) {
-      name = anonymousName(student)
+      name = I18n.t('Student %{number}', {number: student.index + 1})
     }
 
     return {[anonymizableId]: student[anonymizableId], anonymizableId, name, className}
@@ -1499,7 +1493,7 @@ EG = {
   getStudentNameAndGrade: (student = EG.currentStudent) => {
     let studentName
     if (utils.shouldHideStudentNames()) {
-      studentName = anonymousName(student)
+      studentName = I18n.t('student_index', 'Student %{index}', {index: student.index + 1})
     } else {
       studentName = student.name
     }
@@ -3024,7 +3018,8 @@ EG = {
     hideStudentName =
       opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]]
     if (hideStudentName) {
-      comment.author_name = anonymousName(window.jsonData.studentMap[comment[anonymizableAuthorId]])
+      const {index} = window.jsonData.studentMap[comment[anonymizableAuthorId]]
+      comment.author_name = I18n.t('Student %{position}', {position: index + 1})
     }
     // anonymous commentors
     if (comment.author_name == null) {

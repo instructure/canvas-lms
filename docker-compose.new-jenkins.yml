@@ -17,6 +17,7 @@ services:
       RERUNS_RETRY:
       COVERAGE:
       FORCE_FAILURE:
+      CANVAS_RAILS6_1:
       CANVAS_ZEITWERK:
       TEST_CACHE_CLASSES:
 

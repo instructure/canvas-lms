@@ -440,8 +440,8 @@ describe('ProficiencyCalculation', () => {
         <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
       )
       expect(queryByText('Example')).toBeInTheDocument()
-      expect(getByText('Item Scores:')).toBeInTheDocument()
-      expect(getByText('Final Score:')).toBeInTheDocument()
+      expect(getByText('1- Item Scores: Example item scores:')).toBeInTheDocument()
+      expect(getByText('2- Final Score: Example final score:')).toBeInTheDocument()
       expect(queryByText(/Most recent result counts as/)).toBeInTheDocument()
     })
 

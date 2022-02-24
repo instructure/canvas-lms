@@ -163,7 +163,7 @@ export const REPLY_CONVERSATION_QUERY = gql`
 `
 export const SUBMISSION_COMMENTS_QUERY = gql`
   query SubmissionCommentsQuery($userID: ID!) {
-    legacyNode(_id: $userID, type: User) {
+    legacyNote(_id: $userID, type: User) {
       ... on User {
         _id
         id

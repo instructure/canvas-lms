@@ -95,10 +95,6 @@ class ActiveRecord::Base
     "#{self.class.reflection_type_name}_#{id}"
   end
 
-  def self.global_id?(id)
-    !!id && id.to_i > Shard::IDS_PER_SHARD
-  end
-
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes - 1
   end

@@ -18,34 +18,23 @@
 
 import {createSvgElement} from './utils'
 
-export const Shape = {
-  Square: 'square',
-  Circle: 'circle',
-  Triangle: 'triangle',
-  Diamond: 'diamond',
-  Pentagon: 'pentagon',
-  Hexagon: 'hexagon',
-  Octagon: 'octagon',
-  Star: 'star'
-}
-
 export function buildShape({shape, size}) {
   switch (shape) {
-    case Shape.Square:
+    case 'square':
       return buildSquare(size)
-    case Shape.Circle:
+    case 'circle':
       return buildCircle(size)
-    case Shape.Triangle:
+    case 'triangle':
       return buildTriangle(size)
-    case Shape.Diamond:
+    case 'diamond':
       return buildDiamond(size)
-    case Shape.Pentagon:
+    case 'pentagon':
       return buildPentagon(size)
-    case Shape.Hexagon:
+    case 'hexagon':
       return buildHexagon(size)
-    case Shape.Octagon:
+    case 'octagon':
       return buildOctagon(size)
-    case Shape.Star:
+    case 'star':
       return buildStar(size)
     default:
       throw new Error(`Invalid shape: ${shape}`)

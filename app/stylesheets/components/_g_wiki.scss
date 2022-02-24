@@ -94,8 +94,10 @@ $revision-button-color: $ic-color-dark;
     .header-bar-container {
       min-width: $min_main_width - 2px;
       min-height: 64px;
-      @include mobile-only {
-        min-width: 100%;
+      body.responsive_misc & {
+        @include mobile-only {
+          min-width: 100%;
+        }
       }
       .page-changed-alert {
         overflow: hidden;
@@ -385,42 +387,44 @@ $revision-button-color: $ic-color-dark;
 .pages.edit {
   .form-actions {
     padding-#{direction(left)}: 1em;
-    label {
+  }
+  &.responsive_misc {
+    .form-actions label {
       @include mobile-only {
         text-align: direction(left);
       }
     }
-  }
-  .edit-content #title {
-    @include mobile-only {
-      max-width: 90%;
+    .edit-content #title {
+      @include mobile-only {
+        max-width: 90%;
+      }
     }
-  }
-  .page-edit__action_buttons {
-    width: 100%;
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: flex-start;
-    button {
-      margin-top: 10px;
-    }
-    @include breakpoint(mini-tablet) {
-      display: inline-block;
-      width: unset;
+    .page-edit__action_buttons {
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-start;
       button {
-        margin-top: 0px;
+        margin-top: 10px;
+      }
+      @include breakpoint(mini-tablet) {
+        display: inline-block;
+        width: unset;
+        button {
+          margin-top: 0px;
+        }
       }
     }
-  }
-  .control-group.options {
-    @include mobile-only {
-      .controls {
-        margin-#{direction(left)}: 0;
-      }
-      .control-label {
-        float: none;
-        text-align: direction(left);
-        width: 100%;
+    .control-group.options {
+      @include mobile-only {
+        .controls {
+          margin-#{direction(left)}: 0;
+        }
+        .control-label {
+          float: none;
+          text-align: direction(left);
+          width: 100%;
+        }
       }
     }
   }

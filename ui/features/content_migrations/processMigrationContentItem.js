@@ -24,7 +24,7 @@ import '@canvas/rails-flash-notifications'
 export default function processMigrationContentItem(event) {
   if (
     event.origin !== ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN ||
-    event.data.subject !== 'LtiDeepLinkingResponse'
+    event.data.messageType !== 'LtiDeepLinkingResponse'
   ) {
     return
   }

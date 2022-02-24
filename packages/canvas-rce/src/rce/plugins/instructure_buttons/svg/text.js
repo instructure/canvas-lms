@@ -18,7 +18,6 @@
 
 import {createSvgElement, splitTextIntoLines} from './utils'
 import {TEXT_BACKGROUND_PADDING, BASE_SIZE, TEXT_SIZE, MAX_CHAR_COUNT} from './constants'
-import {Shape} from './shape'
 
 export function buildText({text, textPosition, textSize, textColor, shape, size}) {
   if (!text.trim()) return null
@@ -173,14 +172,14 @@ function getYBelowText(textSize, shape, size) {
 
 function getYMiddleTextForShape(getYTextSizeCallback, shape, size) {
   switch (shape) {
-    case Shape.Square:
-    case Shape.Circle:
-    case Shape.Triangle:
-    case Shape.Diamond:
-    case Shape.Pentagon:
-    case Shape.Hexagon:
-    case Shape.Octagon:
-    case Shape.Star:
+    case 'square':
+    case 'circle':
+    case 'triangle':
+    case 'diamond':
+    case 'pentagon':
+    case 'hexagon':
+    case 'octagon':
+    case 'star':
       return getYTextSizeCallback(size)
     default:
       throw new Error(`Invalid shape: ${shape}`)

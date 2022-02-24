@@ -281,60 +281,6 @@ describe AssignmentsApiController, type: :request do
           DueDateCacher.recompute_course(@course, run_immediately: true)
         end
 
-        describe "sharding" do
-          specs_require_sharding
-
-          before do
-            @shard1.activate do
-              account = Account.create!
-              @cs_course = Course.create!(account: account)
-              @cs_course.workflow_state = "available"
-              @cs_course.save!
-              @cs_course.assignments.create name: "assignment1"
-            end
-          end
-
-          it "returns assignments in the contexts' shard as a teacher" do
-            @shard1.activate do
-              @cs_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
-            end
-
-            json = api_get_assignments_index_from_course(@cs_course, order_by: "due_at")
-
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
-          end
-
-          it "returns assignments in the contexts' shard as a student" do
-            @shard1.activate do
-              @cs_course.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
-            end
-
-            json = api_get_assignments_index_from_course(@cs_course, order_by: "due_at")
-
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
-          end
-
-          it "returns user assignments in the contexts' shard as a teacher" do
-            @shard1.activate do
-              @cs_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
-            end
-
-            json = api_get_assignments_user_index(@user, @cs_course, @user, order_by: "due_at")
-
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
-          end
-
-          it "returns user assignments in the contexts' shard as a student" do
-            @shard1.activate do
-              @cs_course.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
-            end
-
-            json = api_get_assignments_user_index(@user, @cs_course, @user, order_by: "due_at")
-
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
-          end
-        end
-
         it "sorts the returned list of assignments by latest due date for teachers (nulls last)" do
           json = api_get_assignments_user_index(@teacher, @course, @teacher, order_by: "due_at")
           order = %w[assignment1 assignment7 assignment2 assignment5 assignment4 assignment3 assignment6 assignment8]

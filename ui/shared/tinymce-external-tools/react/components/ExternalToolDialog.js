@@ -128,7 +128,7 @@ export default class ExternalToolDialog extends React.Component {
     if (
       ev.origin === deepLinkingOrigin &&
       ev.data &&
-      ev.data.subject === 'LtiDeepLinkingResponse'
+      ev.data.messageType === 'LtiDeepLinkingResponse'
     ) {
       processEditorContentItems(ev, editor, this)
     }
