@@ -244,6 +244,7 @@ const ComposeModalContainer = props => {
             >
               <HeaderInputs
                 activeCourseFilter={selectedContext}
+                setUserNote={setUserNote}
                 contextName={props.pastConversation?.contextName}
                 courses={props.courses}
                 selectedRecipients={selectedIds}
