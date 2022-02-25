@@ -111,7 +111,10 @@ export function ButtonsTray({editor, onUnmount, editing}) {
     const img = editor.dom.create('img')
 
     img.setAttribute('src', url)
-    img.setAttribute('alt', settings.alt)
+
+    if (settings.alt) {
+      img.setAttribute('alt', settings.alt)
+    }
 
     // Mark the image as a button and icon.
     img.setAttribute(BTN_AND_ICON_ATTRIBUTE, true)

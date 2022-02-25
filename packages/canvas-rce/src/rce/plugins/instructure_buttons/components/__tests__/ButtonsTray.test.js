@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, fireEvent, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ButtonsTray} from '../ButtonsTray'
 import {useStoreProps} from '../../../shared/StoreContext'
@@ -142,11 +142,26 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   it('writes the content to the editor', async () => {
     render(<ButtonsTray {...defaults} />)
 
+    fireEvent.change(document.querySelector('#button-alt-text'), {target: {value: 'banana'}})
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
+        "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
+      ]
+    `)
+
+    await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
+  })
+
+  it('writes the content to the editor without alt attribute', async () => {
+    render(<ButtonsTray {...defaults} />)
+
+    userEvent.click(screen.getByRole('button', {name: /apply/i}))
+    await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
+    expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
+      Array [
+        "<img src=\\"https://uploaded.url\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
       ]
     `)
 
