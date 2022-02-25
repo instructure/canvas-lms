@@ -52,6 +52,19 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               _id
               id
               name
+              commonCoursesConnection {
+                nodes {
+                  _id
+                  id
+                  state
+                  type
+                  course {
+                    name
+                    id
+                    _id
+                  }
+                }
+              }
             }
             pageInfo {
               ...PageInfo
