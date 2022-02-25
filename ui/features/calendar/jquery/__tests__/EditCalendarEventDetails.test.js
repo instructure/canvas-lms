@@ -72,10 +72,10 @@ describe('EditCalendarEventDetails', () => {
       window.ENV.conferences = {conference_types}
     }
 
-    it('does not show conferencing options when no conference types are enabled', () => {
+    it('does not show conferencing options when no conference types are enabled', async () => {
       render()
-      const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
-      expect(conferencingRow.className).toEqual('hide')
+      const conferencingRow = await within(document.body).findByText('Conferencing:')
+      expect(conferencingRow.closest('tr').className).toEqual('hide')
     })
 
     it('shows conferencing options when some conference types are enabled', () => {
@@ -86,19 +86,19 @@ describe('EditCalendarEventDetails', () => {
     })
 
     describe('when context does not support conferences', () => {
-      it('does not show conferencing options when there is no current conference', () => {
+      it('does not show conferencing options when there is no current conference', async () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render()
-        const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
-        expect(conferencingRow.className).toEqual('hide')
+        const conferencingRow = await within(document.body).findByText('Conferencing:')
+        expect(conferencingRow.closest('tr').className).toEqual('hide')
       })
 
-      it('does show current conference when there is a current conference', () => {
+      it('does show current conference when there is a current conference', async () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
-        const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
-        expect(conferencingRow.className).not.toEqual('hide')
-        expect(getByText(conferencingRow, 'FooConf')).not.toBeNull()
+        const conferencingRow = await within(document.body).findByText('Conferencing:')
+        expect(conferencingRow.closest('tr').className).not.toEqual('hide')
+        expect(getByText(conferencingRow.closest('tr'), 'FooConf')).not.toBeNull()
       })
     })
 
@@ -143,11 +143,11 @@ describe('EditCalendarEventDetails', () => {
     })
 
     describe('when event conference cannot be updated', () => {
-      it('does not show conferencing options when there is no current conference', () => {
+      it('does not show conferencing options when there is no current conference', async () => {
         enableConferences()
         render({parent_event_id: 1000})
-        const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
-        expect(conferencingRow.className).toEqual('hide')
+        const conferencingRow = await within(document.body).findByText('Conferencing:')
+        expect(conferencingRow.closest('tr').className).toEqual('hide')
       })
 
       it('does not submit web_conference params', () => {
