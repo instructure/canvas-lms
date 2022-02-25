@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {splitTextIntoLines, convertFileToBase64} from '../utils'
+import {splitTextIntoLines, convertFileToBase64, decode} from '../utils'
 
 describe('splitTextIntoLines()', () => {
   it('returns empty list if text is empty', () => {
@@ -63,5 +63,14 @@ describe('convertFileToBase64()', () => {
     const readAsDataURLSpy = jest.spyOn(FileReader.prototype, 'readAsDataURL')
     expect(await convertFileToBase64(blob)).toEqual('data:;base64,')
     expect(readAsDataURLSpy).toHaveBeenCalledWith(blob)
+  })
+})
+
+describe('decode()', () => {
+  const stringToDecode = 'Buttons &amp; Icons are &copy;ool'
+  const subject = () => decode(stringToDecode)
+
+  it('decodes html entities', () => {
+    expect(subject()).toEqual('Buttons & Icons are ©ool')
   })
 })
