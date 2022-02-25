@@ -66,6 +66,7 @@ module Importers
         item ||= Attachment.find_from_path(hash[:path_name], context)
         if item
           item.mark_as_importing!(migration)
+          item.category = hash[:category] if hash[:category].present?
           item.context = context
           item.migration_id = hash[:migration_id]
           item.locked = true if hash[:locked]
