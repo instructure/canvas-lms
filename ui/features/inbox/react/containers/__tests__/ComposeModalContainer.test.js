@@ -212,7 +212,8 @@ describe('ComposeModalContainer', () => {
       await waitForApolloLoading()
     })
 
-    it('displays the selected course', async () => {
+    // Skipped until Flakiness is addressed
+    it.skip('displays the selected course', async () => {
       const component = setup()
 
       let select = await component.findByTestId('course-select')
