@@ -15,17 +15,22 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import _ from 'underscore'
 import rgb2hex from './rgb2hex'
+import {defaultFetchOptions} from '@instructure/js-utils'
 
 export default {
   persistContextColors(colorsByContext, userId) {
     _.each(colorsByContext, (color, contextCode) => {
-      const hexcode = color.match(/rgb/) ? rgb2hex(color) : color
+      const hexcode = (color.match(/rgb/) ? rgb2hex(color) : color).replace(/^#/, '')
 
-      const url = `/api/v1/users/${userId}/colors/${contextCode}`
-      $.ajax({url, type: 'PUT', data: {hexcode}})
+      // I don't know why, but when the hexcode was in the body, it failed to
+      // work from selenium
+      const url = `/api/v1/users/${userId}/colors/${contextCode}?hexcode=${hexcode}`
+      fetch(url, {
+        method: 'PUT',
+        ...defaultFetchOptions
+      })
     })
   }
 }
