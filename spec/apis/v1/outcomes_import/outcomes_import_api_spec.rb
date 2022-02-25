@@ -340,7 +340,7 @@ describe "Outcomes Import API", type: :request do
                                                        }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
                                                          calculation_method: "n_mastery",
-                                                         calculation_int: 3
+                                                         calculation_int: 7
                                                        }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
                                                          calculation_method: "highest"

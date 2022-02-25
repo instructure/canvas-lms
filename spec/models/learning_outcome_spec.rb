@@ -521,7 +521,7 @@ describe LearningOutcome do
       ]
       invalid_values = {
         decaying_average: [0, 100, 1000],
-        n_mastery: [0, 10]
+        n_mastery: [0, 11]
       }.with_indifferent_access
 
       calc_method.each do |method|

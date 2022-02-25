@@ -103,7 +103,7 @@ is a learning outcome, then the calculation method defaults to "decaying_average
 <td>integer</td>
 <td></td>
 <td>Valid values depend on the "calculation_method". For "decaying_average", the value must
-be between 1 and 99, inclusive. For "n_mastery", the value must be between 1 and 5, inclusive.
+be between 1 and 99, inclusive. For "n_mastery", the value must be between 1 and 10, inclusive.
 For "highest" and "latest", this field must be blank.</td>
 </tr>
 <tr>
