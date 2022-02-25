@@ -145,20 +145,36 @@ function buildTriangle(size) {
 function buildDiamond(size) {
   switch (size) {
     case Size.ExtraSmall:
-      return createSvgElement('path', {
-        d: 'M33 4L66 33L33 66L4 33L33 4Z'
+      return createSvgElement('rect', {
+        x: '6',
+        y: '37',
+        width: '44',
+        height: '44',
+        transform: 'rotate(-45 6 37)'
       })
     case Size.Small:
-      return createSvgElement('path', {
-        d: 'M57 4L114 57L57 114L4 57L57 4Z'
+      return createSvgElement('rect', {
+        x: '7',
+        y: '61',
+        width: '77',
+        height: '77',
+        transform: 'rotate(-45 7 61)'
       })
     case Size.Medium:
-      return createSvgElement('path', {
-        d: 'M75 4L150 75L75 150L4 75L75 4Z'
+      return createSvgElement('rect', {
+        x: '6',
+        y: '79',
+        width: '103',
+        height: '103',
+        transform: 'rotate(-45 6 79)'
       })
     case Size.Large:
-      return createSvgElement('path', {
-        d: 'M105 4L210 105L105 210L4 105L105 4Z'
+      return createSvgElement('rect', {
+        x: '6',
+        y: '109',
+        width: '146',
+        height: '146',
+        transform: 'rotate(-45 6 109)'
       })
     default:
       throw new Error(`Invalid size: ${size}`)
