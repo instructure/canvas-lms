@@ -167,32 +167,48 @@ describe('buildShape()', () => {
 
     it('builds the x-small <path />', () => {
       expect(buildShape({...settings, size: 'x-small'})).toMatchInlineSnapshot(`
-        <path
-          d="M33 4L66 33L33 66L4 33L33 4Z"
+        <rect
+          height="44"
+          transform="rotate(-45 6 37)"
+          width="44"
+          x="6"
+          y="37"
         />
       `)
     })
 
     it('builds the small <path />', () => {
       expect(buildShape({...settings, size: 'small'})).toMatchInlineSnapshot(`
-        <path
-          d="M57 4L114 57L57 114L4 57L57 4Z"
+        <rect
+          height="77"
+          transform="rotate(-45 7 61)"
+          width="77"
+          x="7"
+          y="61"
         />
       `)
     })
 
     it('builds the medium <path />', () => {
       expect(buildShape({...settings, size: 'medium'})).toMatchInlineSnapshot(`
-        <path
-          d="M75 4L150 75L75 150L4 75L75 4Z"
+        <rect
+          height="103"
+          transform="rotate(-45 6 79)"
+          width="103"
+          x="6"
+          y="79"
         />
       `)
     })
 
     it('builds the large <path />', () => {
       expect(buildShape({...settings, size: 'large'})).toMatchInlineSnapshot(`
-        <path
-          d="M105 4L210 105L105 210L4 105L105 4Z"
+        <rect
+          height="146"
+          transform="rotate(-45 6 109)"
+          width="146"
+          x="6"
+          y="109"
         />
       `)
     })
