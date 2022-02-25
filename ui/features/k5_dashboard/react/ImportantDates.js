@@ -54,7 +54,7 @@ const ImportantDates = ({
   const [selectedContextCodes, setSelectedContextCodes] = useState(null)
   const previousContextsRef = useRef(null)
   const [fetchEventsPath, setFetchEventsPath] = useState('/api/v1/calendar_events')
-  const observerMode = !!(ENV.FEATURES?.k5_parent_support && observedUserId)
+  const observerMode = !!observedUserId
   const isObservingUser = observerMode && observedUserId !== ENV.current_user_id
 
   useEffect(() => {

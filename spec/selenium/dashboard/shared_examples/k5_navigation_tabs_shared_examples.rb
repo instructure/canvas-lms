@@ -34,7 +34,6 @@ shared_examples_for "k5 subject navigation tabs" do
   let(:navigation_names) { ["Home", "Schedule", "Modules", "Grades", "Groups", lti_a, lti_b] }
 
   before :once do
-    Account.site_admin.enable_feature!(:k5_parent_support)
     @resource_a = "context_external_tool_#{create_lti_resource(lti_a).id}"
     @resource_b = "context_external_tool_#{create_lti_resource(lti_b).id}"
   end

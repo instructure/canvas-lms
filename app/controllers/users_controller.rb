@@ -531,7 +531,7 @@ class UsersController < ApplicationController
            })
 
     # prefetch dashboard cards with the right observer url param
-    if @current_user.roles(@domain_root_account).include?("observer") && (Account.site_admin.feature_enabled?(:k5_parent_support) || Account.site_admin.feature_enabled?(:observer_picker))
+    if @current_user.roles(@domain_root_account).include?("observer")
       @cards_prefetch_observed_param = @selected_observed_user&.id
     end
 

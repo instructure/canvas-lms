@@ -26,7 +26,7 @@
 
 <% provide :page_title do %><%= dashboard_title %><% end %>
 <%
-  is_observer = Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?('observer')
+  is_observer = @current_user&.roles(@domain_root_account)&.include?('observer')
   if show_planner?
     # fire off these `fetch` requests now so they are ready sooner
     six_months_ago = CGI.escape Time.now.utc.at_beginning_of_day.months_ago(6).iso8601(3)
