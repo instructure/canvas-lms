@@ -62,6 +62,10 @@ module CC::Importer::Canvas
           file_map[id][:hidden] = true if get_bool_val(file, "hidden", false)
           file_map[id][:locked] = true if get_bool_val(file, "locked", false)
 
+          if (category = file.at_css("category"))
+            file_map[id][:category] = category.text
+          end
+
           if (unlock_at = get_time_val(file, "unlock_at"))
             file_map[id][:unlock_at] = unlock_at
           end
