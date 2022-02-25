@@ -281,11 +281,18 @@ describe "as a student" do
         wait_for_ajaximations
       end
 
-      it "can open the media modal for submission" do
-        scroll_to(StudentAssignmentPageV2.record_upload_button)
-        StudentAssignmentPageV2.record_upload_button.click
+      it "can open the record media modal for submission" do
+        scroll_to(StudentAssignmentPageV2.open_record_media_modal_button)
+        StudentAssignmentPageV2.open_record_media_modal_button.click
 
-        expect(StudentAssignmentPageV2.media_modal).to be_displayed
+        expect(StudentAssignmentPageV2.record_media_modal_panel).to be_displayed
+      end
+
+      it "can open the upload media modal for submission" do
+        scroll_to(StudentAssignmentPageV2.open_upload_media_modal_button)
+        StudentAssignmentPageV2.open_upload_media_modal_button.click
+
+        expect(StudentAssignmentPageV2.upload_media_modal_panel).to be_displayed
       end
     end
 
