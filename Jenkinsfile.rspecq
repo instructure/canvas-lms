@@ -50,7 +50,7 @@ def exampleCount(testList) {
   sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
                                     --require './spec/formatters/example_count_formatter.rb' \
                                     --format ExampleCountRecorder \
-                                    --out spec_count.txt ${testList.join(' ')}", label: 'Get Test Count')
+                                    --out spec_count.txt --pattern ${testList.join(',')}", label: 'Get Test Count')
   return sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
 }
 
@@ -74,7 +74,7 @@ def computeTestCount() {
   def rspecPartition = (env.RSPEC_PROCESSES.toInteger() * 190) // 190 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
-  def specUnique = specs.replaceAll(/\[.*?\]/, '').tokenize(',').unique()
+  def specUnique = specs.tokenize(',').unique()
   def totalPrediction = specUnique.join('\n')
   env.CRYSTALBALL_SPEC = specUnique.join(' ')
 
