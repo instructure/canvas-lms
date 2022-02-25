@@ -20,7 +20,7 @@ import {bool, func, string} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
 import {NotificationPreferencesShape} from './Shape'
 import NotificationPreferencesTable from './Table'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -31,11 +31,18 @@ import {NotificationPreferencesContext} from './NotificationPreferencesContextPr
 import NotificationPreferencesContextSelectQuery from './NotificationPreferencesContextSelectQuery'
 
 const NotificationPreferences = props => {
-  const [enabled, setEnabled] = useState(props.enabled)
+  const {enabled} = props
+  // props.updatePreference takes some time to reflect the change
+  // let's use the component state to reflect the change faster
+  const [stagedEnabled, setStagedEnabled] = useState(enabled)
   const [sendObservedNamesEnabled, setSendObservedNames] = useState(
     props.notificationPreferences?.sendObservedNamesInNotifications
   )
   const contextSelectable = useContext(NotificationPreferencesContext) !== null
+
+  useEffect(() => {
+    setStagedEnabled(enabled)
+  }, [enabled])
 
   const renderMuteToggle = () => {
     if (props.contextType === 'course') {
@@ -49,16 +56,16 @@ const NotificationPreferences = props => {
               })}
               size="small"
               variant="toggle"
-              checked={enabled}
+              checked={stagedEnabled}
               onChange={() => {
-                setEnabled(!enabled)
-                props.updatePreference({enabled: !enabled})
+                setStagedEnabled(!stagedEnabled)
+                props.updatePreference({enabled: !stagedEnabled})
               }}
             />
           </Flex.Item>
           <Flex.Item>
             <Text>
-              {enabled
+              {stagedEnabled
                 ? I18n.t(
                     'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
                   )

@@ -19,7 +19,7 @@ import {func} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
 import NotificationPreferencesSetting from './Setting'
 import {NotificationPreferencesShape} from './Shape'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -260,6 +260,7 @@ const renderSendScoresInEmailsToggle = (
           variant="toggle"
           checked={sendScoresInEmails}
           onChange={() => {
+            // this reflects the change faster than waiting to the prop be updated by updatePreferenceCallback
             setSendScoresInEmails(!sendScoresInEmails)
             updatePreferenceCallback({sendScoresInEmails: !sendScoresInEmails})
           }}
@@ -307,7 +308,14 @@ const dropEmptyCategories = categories => {
 }
 
 const NotificationPreferencesTable = props => {
-  const [sendScoresInEmails, setSendScoresInEmails] = useState(props.preferences.sendScoresInEmails)
+  const {sendScoresInEmails} = props.preferences
+  const [stageSendScoresInEmails, setStageSendScoresInEmails] = useState(
+    props.preferences.sendScoresInEmails
+  )
+
+  useEffect(() => {
+    setStageSendScoresInEmails(sendScoresInEmails)
+  }, [sendScoresInEmails])
 
   if (ENV.discussions_reporting && ENV?.current_user_roles?.includes('teacher')) {
     notificationCategories.discussions.ReportedReply = {}
@@ -323,8 +331,8 @@ const NotificationPreferencesTable = props => {
             notificationCategory,
             props.updatePreference,
             i === 0,
-            sendScoresInEmails,
-            setSendScoresInEmails
+            stageSendScoresInEmails,
+            setStageSendScoresInEmails
           )
         )}
       </>
