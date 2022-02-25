@@ -22,7 +22,6 @@ import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 
 import formatMessage from '../../../../../format-message'
-import {Preview} from './Preview'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
@@ -55,10 +54,7 @@ export const Header = ({settings, onChange}) => {
     </Flex>
   )
   return (
-    <Flex as="header" direction="column" padding="0 small 0">
-      <Flex.Item padding="small">
-        <Preview settings={settings} />
-      </Flex.Item>
+    <Flex direction="column" padding="small small 0">
       <Flex.Item padding="small">
         <TextInput
           id="button-name"
