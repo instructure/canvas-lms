@@ -22,13 +22,11 @@ import MockDate from 'mockdate'
 
 import {moxiosRespond} from 'jest-moxios-utils'
 import * as Actions from '../sidebar-actions'
-import {findNextLink, transformApiToInternalItem} from '../../utilities/apiUtils'
 
-jest.mock('../../utilities/apiUtils')
-transformApiToInternalItem.mockImplementation(item => `transformed-${item.uniqueId}`)
-
-// unmock findNextLink
-findNextLink.mockImplementation(jest.requireActual('../../utilities/apiUtils').findNextLink)
+jest.mock('../../utilities/apiUtils', () => ({
+  ...jest.requireActual('../../utilities/apiUtils'),
+  transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`)
+}))
 
 beforeEach(() => {
   moxios.install()
@@ -75,7 +73,7 @@ describe('load items', () => {
   it('dispatches SIDEBAR_ITEMS_LOADING action initially with target moment range', () => {
     const today = moment.tz().startOf('day')
     const thunk = Actions.sidebarLoadInitialItems(today)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     thunk(fakeDispatch, mockGetState())
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADING'
@@ -90,7 +88,7 @@ describe('load items', () => {
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', done => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     thunk(fakeDispatch, mockGetState())
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
@@ -116,7 +114,7 @@ describe('load items', () => {
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', done => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     thunk(fakeDispatch, mockGetState())
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
@@ -142,7 +140,7 @@ describe('load items', () => {
   it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', done => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     thunk(fakeDispatch, mockGetState({nextUrl: null}))
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
@@ -167,7 +165,7 @@ describe('load items', () => {
   it('continues to load if there are less than 14 incomplete items loaded', done => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const fetchPromise = thunk(
       fakeDispatch,
       mockGetState({
@@ -183,10 +181,10 @@ describe('load items', () => {
         ]
       })
     )
-    return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(response => {
+    return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
       expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
-      expect(fakeDispatch).toHaveBeenCalledTimes(4)
-      const secondCallThunk = fakeDispatch.mock.calls[3][0]
+      expect(fakeDispatch).toHaveBeenCalledTimes(6)
+      const secondCallThunk = fakeDispatch.mock.calls[5][0]
       expect(secondCallThunk).toBe(Actions.sidebarLoadNextItems)
       fakeDispatch.mockReset()
       const secondFetchPromise = secondCallThunk(
@@ -228,7 +226,7 @@ describe('load items', () => {
   it('stops loading when it gets 14 incomplete items', () => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const fetchPromise = thunk(
       fakeDispatch,
       mockGetState({
@@ -258,7 +256,7 @@ describe('load items', () => {
   it('finishes loading even when there are less then 5 incomplete items', () => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const fetchPromise = thunk(
       fakeDispatch,
       mockGetState({
@@ -284,7 +282,7 @@ describe('load items', () => {
   it('dispatches SIDEBAR_ITEMS_LOADING_FAILED on failure', done => {
     expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     thunk(fakeDispatch, mockGetState())
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()

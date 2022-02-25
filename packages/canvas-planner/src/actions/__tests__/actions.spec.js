@@ -602,20 +602,22 @@ describe('api actions', () => {
       Actions.clearItems()(mockDispatch, () => ({
         weeklyDashboard: {}
       }))
-      expect(mockDispatch).toHaveBeenCalledTimes(4)
+      expect(mockDispatch).toHaveBeenCalledTimes(5)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_WEEKLY_ITEMS'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_OPPORTUNITIES'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_DAYS'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_COURSES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_SIDEBAR'})
     })
 
     it('does not dispatch clearWeeklyItems if not a weekly dashboard', () => {
       const mockDispatch = jest.fn()
       Actions.clearItems()(mockDispatch, () => ({}))
-      expect(mockDispatch).toHaveBeenCalledTimes(3)
+      expect(mockDispatch).toHaveBeenCalledTimes(4)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_OPPORTUNITIES'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_DAYS'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_COURSES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_SIDEBAR'})
     })
   })
 
