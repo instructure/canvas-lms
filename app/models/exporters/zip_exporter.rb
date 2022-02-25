@@ -52,10 +52,23 @@ module Exporters
 
       @files_in_zip = Set.new
       compute_common_folder
+      @export_dos_time = zip_dos_time
     end
 
     def archive_name
       @archive_name ||= "#{@common_folder_name.gsub(%r{[\x00-0x20/\\?:*"`\s]}, "_")}_export.zip"
+    end
+
+    def zip_dos_time
+      time_zone = @export.settings[:user_time_zone]
+      export_time =
+        if time_zone.blank?
+          Time.now.strftime("%Y-%m-%dT%H:%M:%S")
+        else
+          TZInfo::Timezone.get(time_zone).now.strftime("%Y-%m-%dT%H:%M:%S")
+        end
+
+      ::Zip::DOSTime.parse(export_time)
     end
 
     def export
@@ -127,6 +140,10 @@ module Exporters
       end
     end
 
+    def create_zip_entry(zip_io, name)
+      Zip::Entry.new(zip_io, name, nil, nil, nil, nil, nil, nil, @export_dos_time)
+    end
+
     def add_file(zipstream, file)
       path = file.full_display_path
       path = path[@common_prefix.length..] if path.starts_with?(@common_prefix)
@@ -134,7 +151,8 @@ module Exporters
       begin
         file.open do |chunk|
           unless wrote_header
-            zipstream.put_next_entry(path)
+            zip_entry = create_zip_entry(zipstream, path)
+            zipstream.put_next_entry(zip_entry)
             wrote_header = true
           end
           zipstream.write(chunk)
@@ -148,7 +166,8 @@ module Exporters
     def add_folder(zipstream, folder)
       path = folder.full_name
       path = path[@common_prefix.length..] if path.starts_with?(@common_prefix)
-      zipstream.put_next_entry(path + "/")
+      zip_entry = create_zip_entry(zipstream, path + "/")
+      zipstream.put_next_entry(zip_entry)
     end
 
     def attach_zip(zip_filename)
