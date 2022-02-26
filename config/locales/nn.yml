@@ -11261,8 +11261,8 @@ nn:
   help_with_content_licensing_a146fb0e: "Hjelp med å lisensiere innhald"
   help_with_course_visibilities_6b6e22a4: "Hjelp med å velje emnesynlegheit"
   helpers: 
-    accessible_date_format: "DD-MM-ÅÅÅÅ tt:mm"
-    accessible_date_only_format: DD-MM-ÅÅÅÅ
+    accessible_date_format: "ÅÅÅÅ-MM-DD tt:mm"
+    accessible_date_only_format: ÅÅÅÅ-MM-DD
     accessible_date_prompt: "Format som"
     accessible_time_only_format: "tt:mm"
     account_time: Konto
@@ -24181,7 +24181,7 @@ nn:
   your_submission_has_not_been_graded_yet_d6963e53: "Innleveringa di er ikkje vurdert enno"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Tida di for denne quizen er redusert."
   your_webcam_may_already_be_in_use_6cd64c25: "Ditt webkamera kan allereie være i bruk"
-  yyyy_mm_dd_hh_mm_a01b6081: "DD-MM-ÅÅÅÅ tt:mm"
+  yyyy_mm_dd_hh_mm_a01b6081: "ÅÅÅÅ-MM-DD tt:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Å–A
   zendesk: 
