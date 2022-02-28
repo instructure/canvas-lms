@@ -104,7 +104,19 @@ export default [
       {command: '\\mathbb{Q}'},
       {command: '\\mathbb{R}'},
       {command: '\\mathbb{C}'},
-      {command: '\\mathbb{H}'}
+      {command: '\\mathbb{H}'},
+      {
+        displayName: '\\overline{\u2B1A}',
+        command: '\\overline{\\placeholder{}}',
+        advancedCommand: '\\overline{ }',
+        svgCommand: '\\overline{x}'
+      },
+      {
+        displayName: '\\hat{\u2B1A}',
+        command: '\\hat{\\placeholder{}}',
+        advancedCommand: '\\hat{ }',
+        svgCommand: '\\hat{x}'
+      }
     ]
   },
 

@@ -44,7 +44,7 @@ import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import TodosPage from './TodosPage'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import loadCardDashboard, {resetDashboardCards} from '@canvas/dashboard-card'
+import {CardDashboardLoader} from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
@@ -138,7 +138,6 @@ export const K5Dashboard = ({
   hideGradesTabForStudents = false,
   selectedContextCodes,
   selectedContextsLimit,
-  parentSupportEnabled,
   observedUsersList,
   canAddObservee,
   openTodosInNewTab,
@@ -158,6 +157,7 @@ export const K5Dashboard = ({
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
+  const [cardDashboardLoader, setCardDashboardLoader] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -167,7 +167,7 @@ export const K5Dashboard = ({
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
-  const observerMode = parentSupportEnabled && currentUserRoles.includes('observer')
+  const observerMode = currentUserRoles.includes('observer')
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
@@ -189,7 +189,7 @@ export const K5Dashboard = ({
 
   const handleChangeObservedUser = id => {
     if (id !== observedUserId) {
-      resetDashboardCards()
+      setCardDashboardLoader(null)
       setCardsSettled(false)
       setObservedUserId(id)
     }
@@ -198,8 +198,11 @@ export const K5Dashboard = ({
   useEffect(() => {
     // don't call on the initial load when we know we're in observer mode but don't have the ID yet
     if (!observerMode || (observerMode && observedUserId)) {
-      loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
+      const dcl = new CardDashboardLoader()
+      dcl.loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
+      setCardDashboardLoader(dcl)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [observedUserId, observerMode])
 
   useFetchApi({
@@ -349,7 +352,6 @@ export const K5Dashboard = ({
               visible={currentTab === TAB_IDS.SCHEDULE}
               singleCourse={false}
               observedUserId={observedUserId}
-              contextCodes={cardsSettled ? cards?.map(c => c.assetString) : undefined}
             />
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
@@ -418,7 +420,6 @@ K5Dashboard.propTypes = {
   hideGradesTabForStudents: PropTypes.bool,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
-  parentSupportEnabled: PropTypes.bool.isRequired,
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired

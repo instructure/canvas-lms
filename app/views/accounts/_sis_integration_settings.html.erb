@@ -68,7 +68,6 @@
                                          "aria-controls" => "account_settings_sis_default_grade_export_value_settings" %>
                 <%= ff_default.label :value, t("Default SIS Sync for assignments, quizzes, grade discussion") %>
               </div>
-              <fieldset id="account_settings_sis_default_grade_export_value_settings" class="nested" style="display: none;">
                 <legend class="screenreader-only"><%= t("Additional SIS Sync Assignment, Quiz, and Discussion settings") %></legend>
                 <%= settings.fields_for :sis_require_assignment_due_date do |ff_due_date| %>
                   <%
@@ -76,13 +75,12 @@
                     require_due_date_disabled = sis_syncing_locked_subs ||
                         (require_due_date[:locked] && require_due_date[:inherited])
                   %>
-                  <div class="require_assignment_due_date_nested_cleanup">
+                  <div>
                     <%= ff_due_date.check_box :value, :checked => require_due_date[:value],
                                               :disabled => require_due_date_disabled %>
                     <%= ff_due_date.label :value, t("Require assignment due date") %>
                   </div>
                 <% end %>
-              </fieldset>
               <%= settings.fields_for :sis_assignment_name_length do |ff_name_length| %>
                 <%
                   name_length = @account.sis_assignment_name_length

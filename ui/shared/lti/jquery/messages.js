@@ -40,6 +40,8 @@ const SUBJECT_ALLOW_LIST = [
   'lti.showAlert',
   'lti.showModuleNavigation',
   'org.imsglobal.lti.capabilities',
+  'org.imsglobal.lti.get_data',
+  'org.imsglobal.lti.put_data',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu'
 ]

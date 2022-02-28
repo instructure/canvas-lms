@@ -42,7 +42,7 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
 
     context "if there is only one non-site-admin root account" do
       before do
-        expect(Account).to receive(:root_accounts).and_return \
+        allow(Account).to receive(:root_accounts).and_return \
           Account.where(id: [Account.site_admin.id, Account.default.id])
         course_model(account: Account.default)
       end

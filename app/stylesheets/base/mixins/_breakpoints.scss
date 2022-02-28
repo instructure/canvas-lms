@@ -45,28 +45,19 @@
 }
 
 @mixin desktop-only {
-  @if $use_responsive_layout {
-    @media (min-width: 768px) {
-      @content;
-    }
-  }
-  @else {
+  @media (min-width: 768px) {
     @content;
   }
 }
 @mixin mobile-only {
-  @if $use_responsive_layout {
-    @media (max-width: 767px) {
-      @content;
-    }
+  @media (max-width: 767px) {
+    @content;
   }
 }
 
 @mixin lti-min-size {
-  @if $use_responsive_layout {
-    // 2 container paddings (same value) * 2 sides
-    @media (max-width: 320px + ($ic-sp * 4)) {
-      @content;
-    }
+  // 2 container paddings (same value) * 2 sides
+  @media (max-width: 320px + ($ic-sp * 4)) {
+    @content;
   }
 }

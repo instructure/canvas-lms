@@ -79,6 +79,7 @@ describe SisImportsApiController, type: :request do
                          "diffing_drop_status" => nil,
                          "skip_deletes" => false,
                          "change_threshold" => nil,
+                         "diffing_remaster" => nil,
                        })
     batch.process_without_send_later
     run_jobs
@@ -124,6 +125,7 @@ describe SisImportsApiController, type: :request do
                          "update_sis_id_if_login_claimed" => false,
                          "skip_deletes" => false,
                          "change_threshold" => nil,
+                         "diffing_remaster" => nil,
                        })
 
     expect(SisBatch.count).to eq @batch_count + 1
@@ -199,7 +201,8 @@ describe SisImportsApiController, type: :request do
       "diffed_against_import_id" => nil,
       "skip_deletes" => false,
       "diffing_drop_status" => nil,
-      "change_threshold" => nil
+      "change_threshold" => nil,
+      "diffing_remaster" => nil,
     }
     expect(json).to eq expected_data
   end
@@ -379,7 +382,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:update_sis_id_if_login_claimed]).to be_truthy
   end
 
-  it "enables diffing mode" do
+  it "enables diffing mode with remaster disabled" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: "sis_imports_api", action: "create",
@@ -397,6 +400,31 @@ describe SisImportsApiController, type: :request do
     expect(json["change_threshold"]).to eq 7
     expect(batch.diffing_data_set_identifier).to eq "my-users-data"
     expect(batch.diff_row_count_threshold).to eq 4
+    expect(batch.diffing_remaster).to eq false
+    expect(json["diffing_remaster"]).to eq false
+  end
+
+  it "enables diffing mode with remaster enabled" do
+    json = api_call(:post,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api", action: "create",
+                      format: "json", account_id: @account.id.to_s },
+                    { import_type: "instructure_csv",
+                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      diffing_data_set_identifier: "my-users-data",
+                      diffing_remaster_data_set: "true",
+                      diffing_drop_status: "inactive",
+                      change_threshold: 6,
+                      diff_row_count_threshold: 3, })
+    batch = SisBatch.find(json["id"])
+    expect(batch.batch_mode).to be_falsey
+    expect(batch.change_threshold).to eq 6
+    expect(batch.options[:diffing_drop_status]).to eq "inactive"
+    expect(json["change_threshold"]).to eq 6
+    expect(batch.diffing_data_set_identifier).to eq "my-users-data"
+    expect(batch.diff_row_count_threshold).to eq 3
+    expect(batch.diffing_remaster).to eq true
+    expect(json["diffing_remaster"]).to eq true
   end
 
   it "allows for other diffing_drop_status" do
@@ -818,6 +846,7 @@ describe SisImportsApiController, type: :request do
       "skip_deletes" => false,
       "diffing_drop_status" => nil,
       "change_threshold" => nil,
+      "diffing_remaster" => nil,
     }] }
     expect(json).to eq expected_data
 

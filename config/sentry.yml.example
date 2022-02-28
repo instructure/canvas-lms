@@ -1,6 +1,10 @@
 development:
   dsn: 'your-sandbox-dsn-here'
   frontend_dsn: 'your-sandbox-frontend-dsn-here'
+  org_slug: 'your-org-slug-here'
+  base_url: 'your-base-url-here'
 production:
   dsn: 'your-real-dsn-here'
   frontend_dsn: 'your-real-frontend-dsn-here'
+  org_slug: 'your-org-slug-here' # like 'instructure'
+  base_url: 'your-base-url-here' # like https://sentry.io

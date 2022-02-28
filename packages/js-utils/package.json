@@ -6,6 +6,9 @@
   "main": "lib/index.js",
   "module": "es/index.js",
   "sideEffects": false,
+  "dependencies": {
+    "@instructure/get-cookie": "*"
+  },
   "scripts": {
     "test": "echo 'no tests yet...'",
     "build:canvas": "babel --root-mode upward src -d es & JEST_WORKER_ID=true babel --root-mode upward src -d lib"

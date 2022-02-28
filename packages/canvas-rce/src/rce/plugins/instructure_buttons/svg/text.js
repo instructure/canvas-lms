@@ -17,7 +17,8 @@
  */
 
 import {createSvgElement, splitTextIntoLines} from './utils'
-import {TEXT_BACKGROUND_PADDING, BASE_SIZE, TEXT_SIZE, MAX_CHAR_COUNT} from './constants'
+import {TEXT_BACKGROUND_PADDING, BASE_SIZE, TEXT_SIZE, MAX_CHAR_COUNT, Size} from './constants'
+import {Shape} from './shape'
 
 export function buildText({text, textPosition, textSize, textColor, shape, size}) {
   if (!text.trim()) return null
@@ -127,13 +128,13 @@ function getTextYValue(textPosition, textSize, shape, size) {
 
 function getYMiddleText(textSize, shape, size) {
   switch (textSize) {
-    case 'small':
+    case Size.Small:
       return getYMiddleTextForShape(getYMiddleSmallTextForShape, shape, size)
-    case 'medium':
+    case Size.Medium:
       return getYMiddleTextForShape(getYMiddleMediumTextForShape, shape, size)
-    case 'large':
+    case Size.Large:
       return getYMiddleTextForShape(getYMiddleLargeTextForShape, shape, size)
-    case 'x-large':
+    case Size.ExtraLarge:
       return getYMiddleTextForShape(getYMiddleXLargeTextForShape, shape, size)
     default:
       throw new Error(`Invalid text size: ${textSize}`)
@@ -142,13 +143,13 @@ function getYMiddleText(textSize, shape, size) {
 
 function getYBottomThirdText(textSize, shape, size) {
   switch (textSize) {
-    case 'small':
+    case Size.Small:
       return getYMiddleTextForShape(getYBottomThirdSmallTextForShape, shape, size)
-    case 'medium':
+    case Size.Medium:
       return getYMiddleTextForShape(getYBottomThirdMediumTextForShape, shape, size)
-    case 'large':
+    case Size.Large:
       return getYMiddleTextForShape(getYBottomThirdLargeTextForShape, shape, size)
-    case 'x-large':
+    case Size.ExtraLarge:
       return getYMiddleTextForShape(getYBottomThirdXLargeTextForShape, shape, size)
     default:
       throw new Error(`Invalid text size: ${textSize}`)
@@ -157,13 +158,13 @@ function getYBottomThirdText(textSize, shape, size) {
 
 function getYBelowText(textSize, shape, size) {
   switch (textSize) {
-    case 'small':
+    case Size.Small:
       return getYMiddleTextForShape(getYBelowSmallTextForShape, shape, size)
-    case 'medium':
+    case Size.Medium:
       return getYMiddleTextForShape(getYBelowMediumTextForShape, shape, size)
-    case 'large':
+    case Size.Large:
       return getYMiddleTextForShape(getYBelowLargeTextForShape, shape, size)
-    case 'x-large':
+    case Size.ExtraLarge:
       return getYMiddleTextForShape(getYBelowXLargeTextForShape, shape, size)
     default:
       throw new Error(`Invalid text size: ${textSize}`)
@@ -172,14 +173,14 @@ function getYBelowText(textSize, shape, size) {
 
 function getYMiddleTextForShape(getYTextSizeCallback, shape, size) {
   switch (shape) {
-    case 'square':
-    case 'circle':
-    case 'triangle':
-    case 'diamond':
-    case 'pentagon':
-    case 'hexagon':
-    case 'octagon':
-    case 'star':
+    case Shape.Square:
+    case Shape.Circle:
+    case Shape.Triangle:
+    case Shape.Diamond:
+    case Shape.Pentagon:
+    case Shape.Hexagon:
+    case Shape.Octagon:
+    case Shape.Star:
       return getYTextSizeCallback(size)
     default:
       throw new Error(`Invalid shape: ${shape}`)
@@ -188,13 +189,13 @@ function getYMiddleTextForShape(getYTextSizeCallback, shape, size) {
 
 function getYMiddleSmallTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 44
-    case 'small':
+    case Size.Small:
       return 68
-    case 'medium':
+    case Size.Medium:
       return 86
-    case 'large':
+    case Size.Large:
       return 116
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -203,13 +204,13 @@ function getYMiddleSmallTextForShape(size) {
 
 function getYMiddleMediumTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 45
-    case 'small':
+    case Size.Small:
       return 69
-    case 'medium':
+    case Size.Medium:
       return 87
-    case 'large':
+    case Size.Large:
       return 117
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -218,13 +219,13 @@ function getYMiddleMediumTextForShape(size) {
 
 function getYMiddleLargeTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 48
-    case 'small':
+    case Size.Small:
       return 72
-    case 'medium':
+    case Size.Medium:
       return 90
-    case 'large':
+    case Size.Large:
       return 120
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -233,13 +234,13 @@ function getYMiddleLargeTextForShape(size) {
 
 function getYMiddleXLargeTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 51
-    case 'small':
+    case Size.Small:
       return 75
-    case 'medium':
+    case Size.Medium:
       return 93
-    case 'large':
+    case Size.Large:
       return 123
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -248,13 +249,13 @@ function getYMiddleXLargeTextForShape(size) {
 
 function getYBottomThirdSmallTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 77
-    case 'small':
+    case Size.Small:
       return 125
-    case 'medium':
+    case Size.Medium:
       return 161
-    case 'large':
+    case Size.Large:
       return 221
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -263,13 +264,13 @@ function getYBottomThirdSmallTextForShape(size) {
 
 function getYBottomThirdMediumTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 78
-    case 'small':
+    case Size.Small:
       return 126
-    case 'medium':
+    case Size.Medium:
       return 162
-    case 'large':
+    case Size.Large:
       return 222
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -278,13 +279,13 @@ function getYBottomThirdMediumTextForShape(size) {
 
 function getYBottomThirdLargeTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 81
-    case 'small':
+    case Size.Small:
       return 129
-    case 'medium':
+    case Size.Medium:
       return 165
-    case 'large':
+    case Size.Large:
       return 225
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -293,13 +294,13 @@ function getYBottomThirdLargeTextForShape(size) {
 
 function getYBottomThirdXLargeTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 84
-    case 'small':
+    case Size.Small:
       return 132
-    case 'medium':
+    case Size.Medium:
       return 168
-    case 'large':
+    case Size.Large:
       return 228
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -308,13 +309,13 @@ function getYBottomThirdXLargeTextForShape(size) {
 
 function getYBelowSmallTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 96
-    case 'small':
+    case Size.Small:
       return 144
-    case 'medium':
+    case Size.Medium:
       return 180
-    case 'large':
+    case Size.Large:
       return 240
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -323,13 +324,13 @@ function getYBelowSmallTextForShape(size) {
 
 function getYBelowMediumTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 98
-    case 'small':
+    case Size.Small:
       return 146
-    case 'medium':
+    case Size.Medium:
       return 182
-    case 'large':
+    case Size.Large:
       return 242
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -338,13 +339,13 @@ function getYBelowMediumTextForShape(size) {
 
 function getYBelowLargeTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 104
-    case 'small':
+    case Size.Small:
       return 152
-    case 'medium':
+    case Size.Medium:
       return 188
-    case 'large':
+    case Size.Large:
       return 248
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -353,13 +354,13 @@ function getYBelowLargeTextForShape(size) {
 
 function getYBelowXLargeTextForShape(size) {
   switch (size) {
-    case 'x-small':
+    case Size.ExtraSmall:
       return 110
-    case 'small':
+    case Size.Small:
       return 158
-    case 'medium':
+    case Size.Medium:
       return 194
-    case 'large':
+    case Size.Large:
       return 254
     default:
       throw new Error(`Invalid size: ${size}`)
