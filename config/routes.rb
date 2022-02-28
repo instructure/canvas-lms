@@ -2432,10 +2432,8 @@ CanvasRails::Application.routes.draw do
     # jobs_v2 actually does do regular pagination, but the comments above
     # otherwise still apply
     scope(controller: :jobs_v2) do
-      get "jobs/tags/queued", action: :queued_tags, as: :jobs_tags_queued
-      get "jobs/tags/running", action: :running_tags, as: :jobs_tags_running
-      get "jobs/tags/future", action: :future_tags, as: :jobs_tags_future
-      get "jobs/tags/failed", action: :failed_tags, as: :jobs_tags_failed
+      get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
+      get "jobs2/:bucket", action: :list, as: :jobs_list
     end
   end
 
