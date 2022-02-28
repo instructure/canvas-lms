@@ -99,7 +99,6 @@ const ignoredWarnings = [
   /\[View|Button|Text\] .* in version 8.0.0/i,
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Exactly one focusable child is required/,
-  /is deprecated and will be removed/,
   /Missing field errors in/,
   /Missing field moduleItem in/,
   /Please update the following components: %s/,
