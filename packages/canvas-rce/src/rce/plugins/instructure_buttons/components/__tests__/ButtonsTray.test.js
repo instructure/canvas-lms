@@ -92,7 +92,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-37.5,"translateY":-37.5,"width":75,"height":75,"transform":"translate(-37.5,-37.5)"}
+                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":""}
               </metadata>
               <svg
                 fill="none"
