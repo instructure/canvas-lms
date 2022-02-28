@@ -476,7 +476,6 @@ class Assignment < ActiveRecord::Base
     grading_type
     due_at
     description
-    duplicate_of_id
     lock_at
     unlock_at
     assignment_group_id
@@ -515,8 +514,6 @@ class Assignment < ActiveRecord::Base
     grader_comments_visible_to_graders
     grader_names_visible_to_final_grader
     grader_count
-    important_dates
-    muted
   ].freeze
 
   def external_tool?
@@ -3805,15 +3802,6 @@ class Assignment < ActiveRecord::Base
       submission_types =~ /online|external_tool/
     else
       submission_types_array.include?(submission_type)
-    end
-  end
-
-  def anonymous_student_identities
-    @anonymous_student_identities ||= begin
-      assigned_submissions = all_submissions.active.order(:anonymous_id).order("md5(id::text)")
-      assigned_submissions.pluck(:user_id).each_with_object({}).with_index(1) do |(user_id, identities), student_number|
-        identities[user_id] = I18n.t("Student %{student_number}", { student_number: student_number })
-      end
     end
   end
 

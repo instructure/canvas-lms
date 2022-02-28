@@ -185,7 +185,7 @@ export default class Navigation extends React.Component {
     // only retrive the courses for my observee
     if (type === 'courses' && ENV.current_user_roles.includes('observer')) {
       let forceLoad = false
-      const k5_observed_user_id = savedObservedId(ENV.current_user_id)
+      const k5_observed_user_id = savedObservedId(ENV.current_user_id) // only returns a value if k5_parent_support is on
       if (k5_observed_user_id) {
         url = `${url}&observed_user=${k5_observed_user_id}`
         if (k5_observed_user_id !== this.state.observedUserId) {

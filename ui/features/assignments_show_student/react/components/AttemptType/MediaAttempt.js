@@ -24,27 +24,23 @@ import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import elideString from '../../helpers/elideString'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_media_attempt'
-import {IconTrashLine, IconUploadLine, IconAttachMediaSolid} from '@instructure/ui-icons'
-import {Img} from '@instructure/ui-img'
+import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
-import React from 'react'
+import React, {createRef} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import StudentViewContext from '../Context'
-import PhotographerPandaSVG from '../../../images/PhotographerPanda.svg'
-import UploadFileSVG from '../../../images/UploadFile.svg'
 import UploadMedia from '@instructure/canvas-media'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
   SelectStrings
 } from '../../helpers/UploadMediaTranslations'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
+import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {MediaPlayer} from '@instructure/ui-media-player'
-import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
@@ -53,10 +49,9 @@ const languages = Object.keys(closedCaptionLanguages).map(key => {
 
 export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 
-class MediaAttempt extends React.Component {
+export default class MediaAttempt extends React.Component {
   static propTypes = {
     assignment: Assignment.shape.isRequired,
-    breakpoints: breakpointsShape,
     createSubmissionDraft: func.isRequired,
     focusOnInit: bool.isRequired,
     submission: Submission.shape.isRequired,
@@ -66,9 +61,10 @@ class MediaAttempt extends React.Component {
 
   state = {
     mediaModalOpen: false,
-    iframeURL: '',
-    mediaModalTabs: {record: false, upload: false}
+    iframeURL: ''
   }
+
+  _mediaUploadRef = createRef()
 
   componentDidMount() {
     if (
@@ -77,7 +73,7 @@ class MediaAttempt extends React.Component {
       !isSubmitted(this.props.submission) &&
       !this.props.submission.submissionDraft?.mediaObject?._id
     ) {
-      this._mediaUploadRef.focus()
+      this._mediaUploadRef.current.focus()
     }
   }
 
@@ -197,146 +193,43 @@ class MediaAttempt extends React.Component {
     return this.renderMediaPlayer(mediaObject, false)
   }
 
-  renderMediaUpload = () => {
-    const {desktop} = this.props.breakpoints
-    return (
-      <>
-        <UploadMedia
-          onUploadComplete={this.onComplete}
-          onDismiss={this.onDismiss}
-          rcsConfig={{
-            contextId: this.props.assignment.env.courseId,
-            contextType: 'course'
-          }}
-          open={this.state.mediaModalOpen}
-          tabs={this.state.mediaModalTabs}
-          uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          languages={languages}
-        />
-        <StudentViewContext.Consumer>
-          {context => (
-            <Flex alignItems="center" justifyItems="center" direction={desktop ? 'row' : 'column'}>
-              <Flex.Item margin="small">
-                <View
-                  as="div"
-                  height="350px"
-                  width="400px"
-                  borderRadius="large"
-                  background="primary"
-                >
-                  <Flex
-                    direction="column"
-                    alignItems="center"
-                    justifyItems="space-around"
-                    height="100%"
-                    shouldShrink
-                  >
-                    <Flex.Item>
-                      <Img
-                        src={PhotographerPandaSVG}
-                        alt={I18n.t('panda taking photograph')}
-                        height="180px"
-                      />
-                    </Flex.Item>
-                    <Flex.Item overflowY="visible">
-                      <Button
-                        data-testid="open-record-media-modal-button"
-                        disabled={!context.allowChangesToSubmission}
-                        renderIcon={IconAttachMediaSolid}
-                        color="primary"
-                        elementRef={el => {
-                          this._mediaUploadRef = el
-                        }}
-                        onClick={() =>
-                          this.setState({
-                            mediaModalTabs: {record: true, upload: false},
-                            mediaModalOpen: true
-                          })
-                        }
-                      >
-                        {I18n.t('Record Media')}
-                      </Button>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </Flex.Item>
-              <Flex.Item margin="medium">
-                <Flex
-                  direction={desktop ? 'column' : 'row'}
-                  justifyItems="space-between"
-                  alignItems="center"
-                >
-                  <Flex.Item>
-                    <div
-                      style={{
-                        backgroundColor: theme.variables.colors.backgroundDark,
-                        height: desktop ? '9em' : '1px',
-                        width: desktop ? '1px' : '9em'
-                      }}
-                    />
-                  </Flex.Item>
-                  <Flex.Item color="darkgrey" margin="small">
-                    {I18n.t('or')}
-                  </Flex.Item>
-                  <Flex.Item>
-                    <div
-                      style={{
-                        backgroundColor: theme.variables.colors.backgroundDark,
-                        height: desktop ? '9em' : '1px',
-                        width: desktop ? '1px' : '9em'
-                      }}
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item margin="medium">
-                <View
-                  as="div"
-                  height="350px"
-                  width="400px"
-                  borderRadius="large"
-                  background="primary"
-                >
-                  <Flex
-                    direction="column"
-                    alignItems="center"
-                    justifyItems="space-around"
-                    height="100%"
-                    shouldShrink
-                  >
-                    <Flex.Item>
-                      <Img
-                        src={UploadFileSVG}
-                        alt={I18n.t('rocketship on launchpad')}
-                        height="180px"
-                      />
-                    </Flex.Item>
-                    <Flex.Item overflowY="visible">
-                      <Button
-                        data-testid="open-upload-media-modal-button"
-                        disabled={!context.allowChangesToSubmission}
-                        renderIcon={IconUploadLine}
-                        color="primary"
-                        onClick={() =>
-                          this.setState({
-                            mediaModalTabs: {record: false, upload: true},
-                            mediaModalOpen: true
-                          })
-                        }
-                      >
-                        {I18n.t('Upload Media')}
-                      </Button>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </Flex.Item>
-            </Flex>
-          )}
-        </StudentViewContext.Consumer>
-      </>
-    )
-  }
+  renderMediaUpload = () => (
+    <View as="div" borderWidth="small">
+      <UploadMedia
+        onUploadComplete={this.onComplete}
+        onDismiss={this.onDismiss}
+        rcsConfig={{
+          contextId: this.props.assignment.env.courseId,
+          contextType: 'course'
+        }}
+        open={this.state.mediaModalOpen}
+        tabs={{embed: false, record: true, upload: true}}
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        languages={languages}
+      />
+      <StudentViewContext.Consumer>
+        {context => (
+          <Billboard
+            heading={I18n.t('Add Media')}
+            hero={<IconAttachMediaLine color="brand" />}
+            message={
+              <Button
+                size="small"
+                data-testid="media-modal-launch-button"
+                variant="primary"
+                onClick={() => this.setState({mediaModalOpen: true})}
+                ref={this._mediaUploadRef}
+                interaction={!context.allowChangesToSubmission ? 'readonly' : 'enabled'}
+              >
+                {I18n.t('Record/Upload')}
+              </Button>
+            }
+          />
+        )}
+      </StudentViewContext.Consumer>
+    </View>
+  )
 
   render() {
     if (this.props.uploadingFiles) {
@@ -356,5 +249,3 @@ class MediaAttempt extends React.Component {
 }
 
 MediaAttempt.contextType = AlertManagerContext
-
-export default WithBreakpoints(MediaAttempt)

@@ -297,7 +297,7 @@ export const transformAnnouncement = announcement => {
   if (!announcement) return undefined
 
   let attachment
-  if (announcement?.attachments[0]) {
+  if (announcement.attachments[0]) {
     attachment = {
       display_name: announcement.attachments[0].display_name,
       url: announcement.attachments[0].url,
@@ -345,7 +345,6 @@ export const ignoreTodo = ignoreUrl =>
   })
 
 export const groupImportantDates = (assignments, events, timeZone) => {
-  if (!assignments) return []
   const groups = assignments.concat(events).reduce((acc, item) => {
     const parsedItem = {
       id: item.id,

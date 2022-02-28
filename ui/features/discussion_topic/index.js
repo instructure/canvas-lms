@@ -216,15 +216,7 @@ ready(() => {
       $container.one('scroll', () => router.navigate(''))
     }, 10)
   })
-  router.route('entry-:id', 'id', () => {
-    // Interval to deffer scrollng until page is fully loaded
-    const goToEntryIntervalId = setInterval( () => {
-      if(document.readyState === 'complete') {
-        entriesView.goToEntry.bind(entriesView)
-        clearInterval(goToEntryIntervalId)
-      }
-    }, 500)
-  })
+  router.route('entry-:id', 'id', entriesView.goToEntry.bind(entriesView))
   router.route('page-:page', 'page', page => {
     entriesView.render(page)
     // TODO: can get a little bouncy when the page isn't as tall as the previous

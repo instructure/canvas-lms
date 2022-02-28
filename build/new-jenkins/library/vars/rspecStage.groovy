@@ -41,14 +41,9 @@ def createDistribution(nestedStages) {
     "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
     "RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}",
     "RSPECQ_MAX_REQUEUES=${configuration.getInteger('rspecq-max-requeues')}",
+    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
-
-  if(env.ENABLE_AXE_SELENIUM == '1') {
-    rspecqEnvVars = rspecqEnvVars + ['TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium']
-  } else {
-    rspecqEnvVars = rspecqEnvVars + ['TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/']
-  }
 
   extendedStage('RSpecQ Reporter for Rspec')
     .envVars(rspecqEnvVars)
@@ -83,7 +78,7 @@ def createLegacyDistribution(nestedStages) {
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
     "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/', // Crystalball map needs to run all specs
+    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
     'CRYSTALBALL_MAP=1'
   ]
 
