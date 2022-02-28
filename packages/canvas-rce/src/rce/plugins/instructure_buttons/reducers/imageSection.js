@@ -23,8 +23,7 @@ export const initialState = {
   image: '',
   imageName: '',
   icon: '',
-  // Black color in color selector component
-  iconFillColor: '#111111',
+  iconFillColor: '#000000',
   collectionOpen: false,
   loading: false,
   error: undefined
@@ -40,7 +39,7 @@ export const actions = {
   SET_IMAGE_COLLECTION_OPEN: {type: 'SetImageCollectionOpen'},
   START_LOADING: {type: 'StartLoading'},
   STOP_LOADING: {type: 'StopLoading'},
-  CLEAR_MODE: {type: 'ClearMode'},
+  CLEAR_MODE: {type: 'ClearMode'}
 }
 
 export const modes = {
