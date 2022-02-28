@@ -103,13 +103,21 @@ describe('OutcomeManagementPanel', () => {
       contextId = '1',
       canManage = true,
       mocks = accountMocks({childGroupsCount: 0}),
-      renderer = rtlRender
+      renderer = rtlRender,
+      treeBrowserRootGroupId = '1'
     } = {}
   ) => {
     return renderer(
       <OutcomesContext.Provider
         value={{
-          env: {contextType, contextId, canManage, isMobileView, rootIds: [ACCOUNT_GROUP_ID]}
+          env: {
+            contextType,
+            contextId,
+            canManage,
+            isMobileView,
+            rootIds: [ACCOUNT_GROUP_ID],
+            treeBrowserRootGroupId
+          }
         }}
       >
         <MockedProvider cache={cache} mocks={mocks}>
