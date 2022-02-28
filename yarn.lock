@@ -5742,6 +5742,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-dnd@2.0.36":
+  version "2.0.36"
+  resolved "https://registry.yarnpkg.com/@types/react-dnd/-/react-dnd-2.0.36.tgz#67e08a3608f112a3af27201d1fb6f79334d43214"
+  integrity sha512-jA95HjQxuHNSnr0PstVBjRwVcFJZoinxbtsS4bpi5nwAL5GUOtjrLrq1bDi4WNYxW+77KHvqSAZ2EgA2q9evdA==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-dom@>=16.9.0", "@types/react-dom@^17.0.9":
   version "17.0.9"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.9.tgz#441a981da9d7be117042e1a6fd3dac4b30f55add"
@@ -21783,9 +21790,9 @@ redux@^3.6.0, redux@^3.7.1, redux@^3.7.2:
     symbol-observable "^1.0.3"
 
 redux@^4, redux@^4.0.1:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.0.tgz#eb049679f2f523c379f1aff345c8612f294c88d4"
-  integrity sha512-uI2dQN43zqLWCt6B/BMGRMY6db7TTY4qeHHfGeKb3EOhmOKjU3KdWvNLJyqaHRksv/ErdNH7cFZWg9jXtewy4g==
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.2.tgz#140f35426d99bb4729af760afcf79eaaac407104"
+  integrity sha512-SH8PglcebESbd/shgf6mii6EIoRM0zrQyjcuQ+ojmfxjTtE0z9Y8pa62iA/OJ58qjP6j27uyW4kUF4jl/jd6sw==
   dependencies:
     "@babel/runtime" "^7.9.2"
 
