@@ -38,7 +38,7 @@ describe('Errors', () => {
   it('renders nothing when there are no errors', () => {
     const {container} = render(<Errors {...defaultProps} errors={{}} />)
 
-    expect(container.firstChild).toBeEmpty()
+    expect(container.firstChild).toBeEmptyDOMElement()
   })
 
   it('displays custom error messages for pre-defined categories, and generic error messages for unknown categories', () => {
