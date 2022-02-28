@@ -76,4 +76,12 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
       end
     end
   end
+
+  it "ignores resource links without a URL" do
+    expect(lti_resource_links).not_to include(
+      a_hash_including(
+        lookup_uuid: "567812345c1e-c0a2-42dc-88b6-c029699a7c7a"
+      )
+    )
+  end
 end

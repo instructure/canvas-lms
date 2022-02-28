@@ -180,6 +180,9 @@ class EffectiveDueDates
         assignment_collection.flatten!
         assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
         assignment_collection.compact!
+        if assignment_collection.any? { |id| Assignment.global_id?(id) }
+          assignment_collection = Assignment.where(id: assignment_collection).pluck(:id)
+        end
         assignment_collection = assignment_collection.join(",")
       end
 

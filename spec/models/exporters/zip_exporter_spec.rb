@@ -25,10 +25,29 @@ describe "Exporters::ZipExporter" do
     let(:folder) { course.folders.create! }
     let(:student) { course.enroll_student(User.create!).user }
     let(:teacher) { course.enroll_teacher(User.create!).user }
+    let(:settings) { {} }
 
     shared_examples_for "exports for users with file access" do
       it "includes the course attachment" do
         expect(Zip::File.open(subject.open).entries.map(&:to_s)).to eq ["file.txt"]
+      end
+
+      context "when the user's time zone is present in export settings" do
+        let(:settings) { { time_zone: "America/Denver" } }
+
+        it "uses the time zone to calculate the user's local time using TZInfo::Timezone" do
+          expect(TZInfo::Timezone).to receive(:get).with("America/Denver").and_return(double("LocalTime", now: Time.now))
+          subject
+        end
+      end
+
+      context "when the user's time zone is not present in export settings" do
+        let(:settings) { {} }
+
+        it "does not use TZInfo::Timezone to calculate datetime" do
+          expect(TZInfo::Timezone).not_to receive(:get)
+          subject
+        end
       end
     end
 
@@ -39,12 +58,15 @@ describe "Exporters::ZipExporter" do
     end
 
     describe "exporting attachments" do
-      def exporter_for_attachment(attachment, course, user)
+      def exporter_for_attachment(attachment, course, user, opts = {})
         content_export = course.content_exports.create!(
           user: user,
           workflow_state: "created",
           selected_content: { attachments: { "attachment_#{attachment.id}": "1" } }
         )
+
+        content_export.settings[:user_time_zone] = opts[:time_zone]
+        content_export.save!
 
         Exporters::ZipExporter.new(content_export)
       end
@@ -60,7 +82,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
+        let(:exporter) { exporter_for_attachment(@attachment, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -96,7 +118,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
+        let(:exporter) { exporter_for_attachment(@attachment, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -133,7 +155,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
+        let(:exporter) { exporter_for_attachment(@attachment, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -169,7 +191,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
+        let(:exporter) { exporter_for_attachment(@attachment, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -198,12 +220,15 @@ describe "Exporters::ZipExporter" do
     end
 
     describe "exporting folders" do
-      def exporter_for_folder(folder, course, user)
+      def exporter_for_folder(folder, course, user, opts = {})
         content_export = course.content_exports.create!(
           user: user,
           workflow_state: "created",
           selected_content: { folders: { "folder_#{folder.id}": "1" } }
         )
+
+        content_export.settings[:user_time_zone] = opts[:time_zone]
+        content_export.save!
 
         Exporters::ZipExporter.new(content_export)
       end
@@ -219,7 +244,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_folder(folder, course, @user) }
+        let(:exporter) { exporter_for_folder(folder, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -257,7 +282,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_folder(folder, course, @user) }
+        let(:exporter) { exporter_for_folder(folder, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -296,7 +321,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_folder(folder, course, @user) }
+        let(:exporter) { exporter_for_folder(folder, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -334,7 +359,7 @@ describe "Exporters::ZipExporter" do
           )
         end
 
-        let(:exporter) { exporter_for_folder(folder, course, @user) }
+        let(:exporter) { exporter_for_folder(folder, course, @user, settings) }
 
         context "when the user is an active teacher" do
           before { @user = teacher }

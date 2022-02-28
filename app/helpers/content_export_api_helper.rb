@@ -60,6 +60,10 @@ module ContentExportApiHelper
 
     opts = params.permit(:version, :failed_assignment_id).to_unsafe_h
     export.progress = 0
+
+    # Need the time zone identifier name and NOT the friendly name
+    tz_identifier = ActiveSupport::TimeZone::MAPPING[Time.zone.name]
+    export.settings[:user_time_zone] = tz_identifier if tz_identifier.present?
     if export.save
       export.queue_api_job(opts)
     end

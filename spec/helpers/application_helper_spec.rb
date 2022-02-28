@@ -839,47 +839,35 @@ describe ApplicationHelper do
         @course1.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student1.id })
       end
 
-      context "with the k5_parent_support flag enabled" do
-        before :once do
-          Account.site_admin.enable_feature! :k5_parent_support
-        end
-
-        it "still returns true for the observed student" do
-          @current_user = @student1
-          expect(planner_enabled?).to be true
-        end
-
-        it "returns false for the observer if not k5_user" do
-          allow(helper).to receive(:k5_user?).and_return(false)
-          @current_user = @observer
-          expect(helper.planner_enabled?).to be false
-        end
-
-        it "returns true for the observer if k5_user" do
-          allow(helper).to receive(:k5_user?).and_return(true)
-          @current_user = @observer
-          expect(helper.planner_enabled?).to be true
-        end
-
-        it "still returns false for a teacher" do
-          teacher = user_factory(active_all: true)
-          @course1.enroll_teacher(teacher)
-          @current_user = teacher
-          expect(planner_enabled?).to be false
-        end
+      it "still returns true for the observed student" do
+        @current_user = @student1
+        expect(planner_enabled?).to be true
       end
 
-      context "with the k5_parent_support flag disabled" do
-        it "returns false as an observer" do
-          @current_user = @observer
-          expect(planner_enabled?).to be false
-        end
+      it "returns false for the observer if not k5_user and observer_picker flag is disabled" do
+        allow(helper).to receive(:k5_user?).and_return(false)
+        @current_user = @observer
+        expect(helper.planner_enabled?).to be false
+      end
 
-        it "returns true as an observer with observer_picker flag enabled" do
-          Account.site_admin.enable_feature! :observer_picker
-          @current_user = @observer
-          expect(planner_enabled?).to be true
-        end
+      it "returns true for the observer if k5_user" do
+        allow(helper).to receive(:k5_user?).and_return(true)
+        @current_user = @observer
+        expect(helper.planner_enabled?).to be true
+      end
+
+      it "still returns false for a teacher" do
+        teacher = user_factory(active_all: true)
+        @course1.enroll_teacher(teacher)
+        @current_user = teacher
+        expect(planner_enabled?).to be false
+      end
+
+      it "returns true as an observer with observer_picker flag enabled" do
+        allow(helper).to receive(:k5_user?).and_return(false)
+        Account.site_admin.enable_feature! :observer_picker
+        @current_user = @observer
+        expect(helper.planner_enabled?).to be true
       end
     end
   end

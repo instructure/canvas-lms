@@ -24,7 +24,6 @@ import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import React, {createRef} from 'react'
-import theme from '@instructure/canvas-theme'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -88,7 +87,7 @@ class UrlEntry extends React.Component {
   }
 
   handleLTIURLs = async e => {
-    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+    if (e.data.subject === 'LtiDeepLinkingResponse') {
       if (e.data.errormsg) {
         this.context.setOnFailure(e.data.errormsg)
         return
@@ -100,7 +99,7 @@ class UrlEntry extends React.Component {
     }
 
     // Since LTI 1.0 handles its own message alerting we don't have to
-    if (e.data.messageType === 'A2ExternalContentReady') {
+    if (e.data.subject === 'A2ExternalContentReady') {
       if (!e.data.errormsg && e.data.content_items.length) {
         const url = e.data.content_items[0].url
         this.createSubmissionDraft(url)
@@ -210,13 +209,13 @@ class UrlEntry extends React.Component {
   }
 
   renderAttempt = () => (
-    <View as="div" borderWidth="small" data-testid="url-entry" margin="0 0 medium 0">
+    <View as="div" data-testid="url-entry" margin="0 0 medium 0">
       <Billboard
         heading={I18n.t('Enter Web URL')}
         headingAs="span"
         headingLevel="h4"
         message={this.renderURLInput()}
-        theme={{backgroundColor: theme.variables.colors.porcelain}}
+        theme={{backgroundColor: 'transparent'}}
       />
     </View>
   )

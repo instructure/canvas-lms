@@ -20,7 +20,7 @@ import AssignmentCellFormatter from 'ui/features/gradebook/react/default_gradebo
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
   let $fixture

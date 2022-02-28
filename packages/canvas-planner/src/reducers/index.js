@@ -18,7 +18,7 @@
 
 import moment from 'moment-timezone'
 import {combineReducers} from 'redux'
-import {handleAction, handleActions} from 'redux-actions'
+import {handleAction} from 'redux-actions'
 import days from './days-reducer'
 import loading from './loading-reducer'
 import courses from './courses-reducer'
@@ -29,6 +29,7 @@ import ui from './ui-reducer'
 import savePlannerItem from './save-item-reducer'
 import sidebar from './sidebar-reducer'
 import weeklyDashboard from './weekly-reducer'
+import selectedObservee from './selected-observee-reducer'
 
 const locale = handleAction(
   'INITIAL_OPTIONS',
@@ -83,19 +84,6 @@ const firstNewActivityDate = handleAction(
   'FOUND_FIRST_NEW_ACTIVITY_DATE',
   (state, action) => {
     return action.payload.clone()
-  },
-  null
-)
-
-const selectedObservee = handleActions(
-  {
-    SELECTED_OBSERVEE: (state, action) => ({
-      id: action.payload?.id,
-      contextCodes: action.payload?.contextCodes
-    }),
-    INITIAL_OPTIONS: (state, action) => ({
-      id: action.payload.observedUserId
-    })
   },
   null
 )

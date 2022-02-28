@@ -22,7 +22,10 @@ import {
   transformInternalToApiOverride,
   transformPlannerNoteApiToInternalItem,
   transformApiToInternalGrade,
-  observedUserId
+  observedUserId,
+  observedUserContextCodes,
+  buildURL,
+  getContextCodesFromState
 } from '../apiUtils'
 
 const courses = [
@@ -646,17 +649,95 @@ describe('observedUserId', () => {
     selectedObservee: null
   }
 
-  it('returns undefined if selectedObservee.id does not exist', () => {
-    expect(observedUserId(defaultState)).toBeUndefined()
+  it('returns null if selectedObservee does not exist', () => {
+    expect(observedUserId(defaultState)).toBeNull()
   })
 
-  it('returns undefined if the selectedObservee is the same as the current user', () => {
-    const state = {...defaultState, selectedObservee: {id: '3'}}
-    expect(observedUserId(state)).toBeUndefined()
+  it('returns null if the selectedObservee is the same as the current user', () => {
+    const state = {...defaultState, selectedObservee: '3'}
+    expect(observedUserId(state)).toBeNull()
   })
 
   it('returns the observee id if present and not the current user', () => {
-    const state = {...defaultState, selectedObservee: {id: '2'}}
+    const state = {...defaultState, selectedObservee: '2'}
     expect(observedUserId(state)).toBe('2')
+  })
+})
+
+describe('observedUserContextCodes', () => {
+  it('returns undefined if selectedObservee is the current user', () => {
+    expect(
+      observedUserContextCodes({
+        currentUser: {id: '3'},
+        selectedObservee: '3'
+      })
+    ).toBeUndefined()
+  })
+
+  it('returns the course context codes for an observee', () => {
+    expect(
+      observedUserContextCodes({
+        currentUser: {id: '3'},
+        selectedObservee: '17',
+        courses: [{id: '20'}, {id: '4'}]
+      })
+    ).toStrictEqual(['course_4', 'course_20'])
+  })
+})
+
+describe('buildURL', () => {
+  it('returns a url with params in the expected order', () => {
+    const url = buildURL('/here/there', {
+      course_ids: ['50', '7'],
+      context_codes: ['g_30', 'g_5'],
+      observed_user_id: 'f',
+      per_page: 'e',
+      order: 'd',
+      filter: 'c',
+      include: 'i',
+      end_date: 'b',
+      start_date: 'a'
+    })
+    expect(url).toStrictEqual(
+      '/here/there?start_date=a&end_date=b&include=i&filter=c&order=d&per_page=e&observed_user_id=f&context_codes%5B%5D=g_5&context_codes%5B%5D=g_30&course_ids%5B%5D=7&course_ids%5B%5D=50'
+    )
+  })
+
+  it('appends unordered params to the end', () => {
+    const url1 = buildURL('/here/there', {
+      filter: 'c',
+      start_date: 'a',
+      foo: 'bar'
+    })
+    expect(url1).toStrictEqual('/here/there?start_date=a&filter=c&foo=bar')
+    const url2 = buildURL('/here/there', {
+      filter: 'c',
+      start_date: 'a',
+      foo: ['bar', 'baz']
+    })
+    expect(url2).toStrictEqual('/here/there?start_date=a&filter=c&foo%5B%5D=bar&foo%5B%5D=baz')
+  })
+
+  it('omits undefined and null params', () => {
+    const url1 = buildURL('/here/there', {
+      filter: undefined,
+      start_date: 'a'
+    })
+    expect(url1).toStrictEqual('/here/there?start_date=a')
+    const url2 = buildURL('/here/there', {
+      foo: null,
+      start_date: 'a'
+    })
+    expect(url2).toStrictEqual('/here/there?start_date=a')
+  })
+})
+
+describe('getContextCodesFromState', () => {
+  it('returns context codes in sorted order', () => {
+    expect(
+      getContextCodesFromState({
+        courses: [{id: '20'}, {id: '4'}]
+      })
+    ).toStrictEqual(['course_4', 'course_20'])
   })
 })

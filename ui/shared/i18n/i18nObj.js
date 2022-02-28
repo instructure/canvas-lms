@@ -349,8 +349,10 @@ if (window.ENV && window.ENV.lolcalize) {
 }
 
 I18n.scoped = (scope, callback) => {
+  const preloadLocale = window.ENV && window.ENV.LOCALE ? window.ENV.LOCALE : 'en'
   const i18n_scope = new I18n.scope(scope)
   if (callback) callback(i18n_scope)
+  I18n.translations[preloadLocale] && I18n.translations[preloadLocale][scope.split('.')[0]]; // SIDE EFFECT: Actually Load Translations (incl. Root Keys)
   return i18n_scope
 }
 class Scope {

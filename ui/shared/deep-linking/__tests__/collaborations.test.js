@@ -30,7 +30,7 @@ describe('handleDeepLinking', () => {
 
   const event = overrides => ({
     origin: 'http://www.test.com',
-    data: {messageType: 'LtiDeepLinkingResponse', content_items},
+    data: {subject: 'LtiDeepLinkingResponse', content_items},
     ...overrides
   })
 
@@ -73,7 +73,7 @@ describe('handleDeepLinking', () => {
 
   describe('when there is a unhandled error parsing the content item', () => {
     const overrides = {
-      data: {messageType: 'LtiDeepLinkingResponse', content_items: 1}
+      data: {subject: 'LtiDeepLinkingResponse', content_items: 1}
     }
 
     it('does not attempt to create a collaboration', async () => {

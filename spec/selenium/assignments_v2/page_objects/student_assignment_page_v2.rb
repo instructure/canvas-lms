@@ -163,8 +163,20 @@ class StudentAssignmentPageV2
       end
     end
 
-    def record_upload_button
-      f("button[data-testid='media-modal-launch-button']")
+    def open_record_media_modal_button
+      f("button[data-testid='open-record-media-modal-button']")
+    end
+
+    def open_upload_media_modal_button
+      f("button[data-testid='open-upload-media-modal-button']")
+    end
+
+    def record_media_modal_panel
+      fxpath("//div[@role='tab' and contains(text(),'Record')]")
+    end
+
+    def upload_media_modal_panel
+      fxpath("//div[@role='tab' and contains(text(),'Computer')]")
     end
 
     def media_comment_button
