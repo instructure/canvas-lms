@@ -32,7 +32,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include LegalInformationHelper
-  include FullStoryHelper
 
   helper :all
 
@@ -197,6 +196,7 @@ class ApplicationController < ActionController::Base
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
+          use_responsive_layout: use_responsive_layout?,
           use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
@@ -212,15 +212,12 @@ class ApplicationController < ActionController::Base
             open_registration: @domain_root_account&.open_registration?,
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
-          },
-          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
+          }
         }
 
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
-            org_slug: SentryExtensions::Settings.settings[:org_slug],
-            base_url: SentryExtensions::Settings.settings[:base_url],
             error_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
 
             # these values need to correlate with the backend for Sentry features to work properly
@@ -280,11 +277,12 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links feature_flag_filters conferencing_in_planner word_count_in_speed_grader observer_picker
-    lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
+    featured_help_links feature_flag_filters k5_parent_support
+    conferencing_in_planner remember_settings_tab word_count_in_speed_grader observer_picker lti_platform_storage
+    scale_equation_images new_equation_editor buttons_and_icons_cropper
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
-    product_tours files_dnd usage_rights_discussion_topics
+    responsive_awareness responsive_misc product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
   ].freeze
@@ -419,6 +417,11 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
+
+  def use_responsive_layout?
+    @domain_root_account&.feature_enabled?(:responsive_layout)
+  end
+  helper_method :use_responsive_layout?
 
   def grading_periods?
     !!@context.try(:grading_periods?)

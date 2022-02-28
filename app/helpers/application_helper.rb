@@ -291,9 +291,10 @@ module ApplicationHelper
   end
 
   def css_variant(opts = {})
+    variant = use_responsive_layout? ? "responsive_layout" : "new_styles"
     use_high_contrast =
       @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
-    "new_styles" + + (use_high_contrast ? "_high_contrast" : "_normal_contrast") +
+    variant + (use_high_contrast ? "_high_contrast" : "_normal_contrast") +
       (I18n.rtl? ? "_rtl" : "")
   end
 
@@ -1200,7 +1201,7 @@ module ApplicationHelper
 
   def planner_enabled?
     !!@current_user&.has_student_enrollment? ||
-      (@current_user&.roles(@domain_root_account)&.include?("observer") && k5_user?) ||
+      (Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?("observer") && k5_user?) ||
       (!!@current_user&.roles(@domain_root_account)&.include?("observer") && Account.site_admin.feature_enabled?(:observer_picker)) # TODO: ensure observee is a student?
   end
 

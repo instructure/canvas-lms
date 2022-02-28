@@ -52,7 +52,6 @@ describe('HeaderInputs', () => {
     onSendIndividualMessagesChange: jest.fn(),
     onSubjectChange: jest.fn(),
     onRemoveMediaComment: jest.fn(),
-    setUserNote: jest.fn(),
     ...props
   })
 
@@ -110,136 +109,25 @@ describe('HeaderInputs', () => {
     expect(await container.queryByTestId('mediafaculty-message-checkbox')).toBeNull()
   })
 
-  describe('Faculty Journal Entry Option', () => {
-    beforeEach(() => {
-      window.ENV = {
-        CONVERSATIONS: {
-          NOTES_ENABLED: true,
-          CAN_ADD_NOTES_FOR_ACCOUNT: true,
-          CAN_ADD_NOTES_FOR_COURSES: {1: true}
-        }
-      }
-    })
-
-    const mockedRecipient = (props = {courseID: '1', courseRole: 'StudentEnrollment'}) => {
-      return {
-        _id: '6',
-        id: 'TWVzc2FnZWFibGVVc2VyLTY=',
-        name: '5',
-        commonCoursesInfo: [
-          {
-            courseID: props.courseID,
-            courseRole: props.courseRole
-          }
-        ]
+  it('calls onUserNoteChange when faculty message checkbox is toggled', async () => {
+    window.ENV = {
+      CONVERSATIONS: {
+        NOTES_ENABLED: true,
+        CAN_ADD_NOTES_FOR_ACCOUNT: true,
+        CAN_ADD_NOTES_FOR_COURSES: {1: true}
       }
     }
-
-    const defaultRecipientProps = () => ({
-      activeCourseFilter: 'course_1',
-      selectedRecipients: [mockedRecipient()]
-    })
-
-    it('does not render if no recipients are chosen', async () => {
-      const recipientPropInfo = defaultRecipientProps()
-      recipientPropInfo.selectedRecipients = []
-      const props = defaultProps(recipientPropInfo)
-
-      const container = setup(props)
-
-      expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('does not render if no course is chosen', async () => {
-      const recipientPropInfo = defaultRecipientProps()
-      recipientPropInfo.activeCourseFilter = undefined
-      const props = defaultProps(recipientPropInfo)
-      const container = setup(props)
-
-      expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('does not render if any recipient does not have a student enrollment in the shared course', async () => {
-      const recipientPropInfo = defaultRecipientProps()
-      recipientPropInfo.selectedRecipients.push(
-        mockedRecipient({courseID: '1', courseRole: 'TeacherEnrollment'})
-      )
-      const props = defaultProps(recipientPropInfo)
-      const container = setup(props)
-
-      expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('does not render if sender does not have permission to send notes in selected course', async () => {
-      window.ENV = {
-        CONVERSATIONS: {
-          NOTES_ENABLED: true,
-          CAN_ADD_NOTES_FOR_ACCOUNT: false,
-          CAN_ADD_NOTES_FOR_COURSES: {}
-        }
-      }
-      const props = defaultProps(defaultRecipientProps())
-      const container = setup(props)
-
-      expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('does not render if sender is not a teacher in the same course as the recipient', async () => {
-      window.ENV = {
-        CONVERSATIONS: {
-          NOTES_ENABLED: true,
-          CAN_ADD_NOTES_FOR_ACCOUNT: false,
-          CAN_ADD_NOTES_FOR_COURSES: {2: true}
-        }
-      }
-      const props = defaultProps(defaultRecipientProps())
-      const container = setup(props)
-
-      expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('renders if sender is account admin and recipient is a student', async () => {
-      window.ENV = {
-        CONVERSATIONS: {
-          NOTES_ENABLED: true,
-          CAN_ADD_NOTES_FOR_ACCOUNT: true,
-          CAN_ADD_NOTES_FOR_COURSES: {}
-        }
-      }
-      const props = defaultProps(defaultRecipientProps())
-      const container = setup(props)
-
-      expect(await container.findByTestId('faculty-message-checkbox')).toBeInTheDocument()
-    })
-
-    it('renders if sender is a teacher and recipient is a student', async () => {
-      window.ENV = {
-        CONVERSATIONS: {
-          NOTES_ENABLED: true,
-          CAN_ADD_NOTES_FOR_ACCOUNT: false,
-          CAN_ADD_NOTES_FOR_COURSES: {1: true}
-        }
-      }
-      const props = defaultProps(defaultRecipientProps())
-      const container = setup(props)
-
-      expect(await container.findByTestId('faculty-message-checkbox')).toBeInTheDocument()
-    })
-
-    it('calls onUserNoteChange when faculty message checkbox is toggled', async () => {
-      const props = defaultProps(defaultRecipientProps())
-      const container = setup(props)
-
-      const checkbox = await container.getByTestId('faculty-message-checkbox')
-      fireEvent.click(checkbox)
-
-      expect(props.onUserNoteChange).toHaveBeenCalled()
-    })
+    const props = defaultProps()
+    const container = setup(props)
+    const checkbox = await container.getByTestId('faculty-message-checkbox')
+    fireEvent.click(checkbox)
+    expect(props.onUserNoteChange).toHaveBeenCalled()
   })
 
   it('calls onSelectedIdsChange when using the Address Book component', async () => {
     const props = defaultProps({addressBookContainerOpen: true})
     const container = setup(props)
+
     const input = await container.findByTestId('address-book-input')
     fireEvent.change(input, {target: {value: 'Fred'}})
 
@@ -253,12 +141,6 @@ describe('HeaderInputs', () => {
         _id: '1',
         id: 'TWVzc2FnZWFibGVVc2VyLTQx',
         name: 'Frederick Dukes',
-        commonCoursesInfo: [
-          {
-            courseID: '196',
-            courseRole: 'StudentEnrollment'
-          }
-        ],
         isLast: true
       }
     ])

@@ -2410,15 +2410,6 @@ CanvasRails::Application.routes.draw do
       get "jobs/:id", action: :show
       post "jobs/batch_update", action: :batch_update
     end
-
-    # jobs_v2 actually does do regular pagination, but the comments above
-    # otherwise still apply
-    scope(controller: :jobs_v2) do
-      get "jobs/tags/queued", action: :queued_tags, as: :jobs_tags_queued
-      get "jobs/tags/running", action: :running_tags, as: :jobs_tags_running
-      get "jobs/tags/future", action: :future_tags, as: :jobs_tags_future
-      get "jobs/tags/failed", action: :failed_tags, as: :jobs_tags_failed
-    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

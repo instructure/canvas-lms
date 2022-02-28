@@ -59,9 +59,7 @@ describe('CourseActivitySummaryStore', () => {
       const spy = jest.spyOn(window, 'fetch').mockImplementation(() =>
         Promise.resolve().then(() => ({
           status: 200,
-          clone: () => ({
-            json: () => Promise.resolve().then(() => stream)
-          })
+          json: () => Promise.resolve().then(() => stream)
         }))
       )
       CourseActivitySummaryStore._fetchForCourse(1)

@@ -37,97 +37,6 @@ describe GradebooksController do
   end
 
   describe "GET 'grade_summary'" do
-    context "when logged in as a student" do
-      before do
-        user_session(@student)
-        @assignment = @course.assignments.create!(title: "Example Assignment")
-      end
-
-      it "includes muted assignments" do
-        @assignment.ensure_post_policy(post_manually: true)
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
-        expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
-      end
-
-      it "does not include score, excused, or workflow_state of unposted submissions" do
-        @assignment.ensure_post_policy(post_manually: true)
-        @assignment.grade_student(@student, grade: 10, grader: @teacher)
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-        aggregate_failures do
-          expect(submission).not_to have_key(:score)
-          expect(submission).not_to have_key(:excused)
-          expect(submission).not_to have_key(:workflow_state)
-        end
-      end
-
-      it "includes score, excused, and workflow_state of posted submissions" do
-        @assignment.grade_student(@student, grade: 10, grader: @teacher)
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-        aggregate_failures do
-          expect(submission[:score]).to be 10.0
-          expect(submission[:excused]).to be false
-          expect(submission[:workflow_state]).to eq "graded"
-        end
-      end
-    end
-
-    context "when logged in as a teacher" do
-      before do
-        user_session(@teacher)
-        @assignment = @course.assignments.create!(points_possible: 10)
-      end
-
-      it "includes muted assignments" do
-        @assignment.ensure_post_policy(post_manually: true)
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
-        expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
-      end
-
-      it "does not include score, excused, or workflow_state of unposted submissions" do
-        @assignment.ensure_post_policy(post_manually: true)
-        @assignment.grade_student(@student, grade: 10, grader: @teacher)
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-        aggregate_failures do
-          expect(submission).not_to have_key(:score)
-          expect(submission).not_to have_key(:excused)
-          expect(submission).not_to have_key(:workflow_state)
-        end
-      end
-
-      it "includes score, excused, and workflow_state of posted submissions" do
-        @assignment.grade_student(@student, grade: 10, grader: @teacher)
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-        aggregate_failures do
-          expect(submission[:score]).to be 10.0
-          expect(submission[:excused]).to be false
-          expect(submission[:workflow_state]).to eq "graded"
-        end
-      end
-
-      it "returns submissions for inactive students" do
-        @assignment.grade_student(@student, grade: 6.6, grader: @teacher)
-        enrollment = @course.enrollments.find_by(user: @student)
-        enrollment.deactivate
-        get :grade_summary, params: { course_id: @course.id, id: @student.id }
-        expect(assigns.fetch(:js_env).fetch(:submissions).first.fetch(:score)).to be 6.6
-      end
-
-      it "returns assignments for inactive students" do
-        @assignment.grade_student(@student, grade: 6.6, grader: @teacher)
-        enrollment = @course.enrollments.find_by(user: @student)
-        enrollment.deactivate
-        get :grade_summary, params: { course_id: @course.id, id: @student.id }
-        assignment_id = assigns.dig(:js_env, :assignment_groups, 0, :assignments, 0, :id)
-        expect(assignment_id).to eq @assignment.id
-      end
-    end
-
     it "redirects to the login page if the user is logged out" do
       get "grade_summary", params: { course_id: @course.id, id: @student.id }
       expect(response).to redirect_to(login_url)
@@ -374,6 +283,93 @@ describe GradebooksController do
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
         expect(assigns[:js_env]).not_to have_key(:effective_final_score)
       end
+    end
+
+    it "includes muted assignments" do
+      user_session(@student)
+      assignment = @course.assignments.create!(title: "Example Assignment")
+      assignment.ensure_post_policy(post_manually: true)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
+    end
+
+    it "does not include scores of unposted submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!
+      assignment.ensure_post_policy(post_manually: true)
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+      expect(submission).not_to have_key(:score)
+    end
+
+    it "does not include excused of unposted submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!
+      assignment.ensure_post_policy(post_manually: true)
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+      expect(submission).not_to have_key(:excused)
+    end
+
+    it "does not include workflow_state of unposted submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!
+      assignment.ensure_post_policy(post_manually: true)
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+      expect(submission).not_to have_key(:workflow_state)
+    end
+
+    it "includes scores of posted submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+      expect(submission[:score]).to be 10.0
+    end
+
+    it "includes excused of posted submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+      expect(submission[:excused]).to be false
+    end
+
+    it "includes workflow_state of posted submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      get "grade_summary", params: { course_id: @course.id, id: @student.id }
+      submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+      expect(submission[:workflow_state]).to eq "graded"
+    end
+
+    it "returns submissions for inactive students" do
+      user_session(@teacher)
+      assignment = @course.assignments.create!(points_possible: 10)
+      assignment.grade_student(@student, grade: 6.6, grader: @teacher)
+      enrollment = @course.enrollments.find_by(user: @student)
+      enrollment.deactivate
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns.fetch(:js_env).fetch(:submissions).first.fetch(:score)).to be 6.6
+    end
+
+    it "returns assignments for inactive students" do
+      user_session(@teacher)
+      assignment = @course.assignments.create!(points_possible: 10)
+      assignment.grade_student(@student, grade: 6.6, grader: @teacher)
+      enrollment = @course.enrollments.find_by(user: @student)
+      enrollment.deactivate
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      assignment_id = assigns.dig(:js_env, :assignment_groups, 0, :assignments, 0, :id)
+      expect(assignment_id).to eq assignment.id
     end
 
     context "assignment sorting" do
@@ -3353,7 +3349,7 @@ describe GradebooksController do
         end
 
         it "accepts a valid student_group_id that is part of the course" do
-          make_request(percent: 50.0, student_group_id: student_group.id)
+          make_request(percent: 50.0, group_id: student_group.id)
           expect(response).to be_successful
         end
 
@@ -3362,7 +3358,7 @@ describe GradebooksController do
           other_category.create_groups(1)
           other_group = other_category.groups.first
 
-          make_request(percent: 50.0, student_group_id: other_group.id)
+          make_request(percent: 50.0, group_id: other_group.id)
           expect(response).to be_not_found
         end
       end

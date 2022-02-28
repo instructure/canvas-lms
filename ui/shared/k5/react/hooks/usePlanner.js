@@ -52,17 +52,10 @@ export default function usePlanner({
   observedUserId,
   isObserver = false
 }) {
-  const [plannerInitializing, setPlannerInitializing] = useState(false)
   const [plannerInitialized, setPlannerInitialized] = useState(false)
 
   useEffect(() => {
-    if (
-      plannerEnabled &&
-      !plannerInitializing &&
-      !plannerInitialized &&
-      (!isObserver || !!observedUserId)
-    ) {
-      setPlannerInitializing(true)
+    if (plannerEnabled && !plannerInitialized && (!isObserver || !!observedUserId)) {
       initializePlanner({
         getActiveApp: () => (isPlannerActive() ? 'planner' : ''),
         flashError: message => showFlashAlert({message, type: 'error'}),
@@ -75,12 +68,8 @@ export default function usePlanner({
         singleCourse,
         observedUserId
       })
-        .then(val => {
-          setPlannerInitialized(val)
-        })
-        .catch(_ex => {
-          showFlashError(I18n.t('Failed to load the schedule tab'))()
-        })
+        .then(setPlannerInitialized)
+        .catch(showFlashError(I18n.t('Failed to load the schedule tab')))
     }
     // The rest of the dependencies don't change
     // eslint-disable-next-line react-hooks/exhaustive-deps

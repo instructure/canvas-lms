@@ -101,6 +101,7 @@ describe "dashboard" do
 
   context "as an observer" do
     before :once do
+      Account.site_admin.enable_feature!(:k5_parent_support)
       course_with_student(active_all: true)
       @student = @user
       @observer = user_factory(active_all: true)

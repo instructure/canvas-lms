@@ -150,32 +150,6 @@ describe('FilterNav', () => {
     expect(getByTestId('filter-name-1')).toHaveTextContent('Filter 1')
   })
 
-  it('render condition tag for applied staged filter', async () => {
-    store.setState({
-      stagedFilter: {
-        name: '',
-        conditions: [
-          {
-            id: '4',
-            type: 'module',
-            value: '1',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '5',
-            type: undefined,
-            value: undefined,
-            created_at: new Date().toISOString()
-          }
-        ],
-        is_applied: true,
-        created_at: new Date().toISOString()
-      }
-    })
-    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
-    expect(await getAllByTestId('staged-filter-condition-tag')[0]).toHaveTextContent('Module 1')
-  })
-
   it('opens tray', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Filters'))

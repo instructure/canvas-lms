@@ -113,7 +113,7 @@
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/ui-babel-preset": "^6",
     "@sheerun/mutationobserver-shim": "^0.3.2",
-    "babel-jest": "^26",
+    "babel-jest": "^24",
     "enzyme": "^3",
     "enzyme-adapter-react-16": "^1",
     "enzyme-to-json": "^3",

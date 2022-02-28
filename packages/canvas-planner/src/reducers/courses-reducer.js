@@ -17,8 +17,6 @@
  */
 import {handleActions} from 'redux-actions'
 
-const defaultState = []
-
 function mergeGradesIntoCourses(courses, action) {
   const grades = action.payload
   return courses.map(course => {
@@ -28,22 +26,21 @@ function mergeGradesIntoCourses(courses, action) {
   })
 }
 
+const getPlannerCourses = ({
+  payload: {
+    env: {COURSE, STUDENT_PLANNER_COURSES}
+  }
+}) => {
+  if (!STUDENT_PLANNER_COURSES.length && COURSE) {
+    return [COURSE]
+  }
+  return STUDENT_PLANNER_COURSES
+}
+
 export default handleActions(
   {
-    INITIAL_OPTIONS: (state, action) => {
-      if (action.payload.singleCourse) {
-        return [action.payload.env.COURSE]
-      }
-      return []
-    },
-    GOT_COURSE_LIST: (state, action) => {
-      return action.payload
-    },
-    GOT_GRADES_SUCCESS: mergeGradesIntoCourses,
-    CLEAR_COURSES: (state, action) => {
-      if (action.payload) return state
-      return defaultState
-    }
+    INITIAL_OPTIONS: (state, action) => getPlannerCourses(action),
+    GOT_GRADES_SUCCESS: mergeGradesIntoCourses
   },
-  defaultState
+  []
 )

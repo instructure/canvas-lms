@@ -174,16 +174,14 @@ module Lti
       message_hint = cache_payload(lti_params)
       login_hint = Lti::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
 
-      req = LtiAdvantage::Messages::LoginRequest.new(
+      LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config["lti_iss"],
         login_hint: login_hint,
         client_id: @tool.global_developer_key_id,
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,
         canvas_region: @context.shard.database_server.config[:region] || "not_configured"
-      )
-      req.lti_storage_target = "_parent" if Account.site_admin.feature_enabled?(:lti_platform_storage)
-      req.as_json
+      ).as_json
     end
 
     def cache_payload(lti_params)

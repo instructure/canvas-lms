@@ -42,7 +42,7 @@ const {Option, Group: OptionGroup} = SimpleSelect as any
 const formatDate = date => tz.format(date, 'date.formats.medium')
 const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 
-type SubmissionTypeOption = ['has-ungraded-submissions' | 'has-submissions', string]
+type SubmissionTypeOption = [string, string]
 
 const submissionTypeOptions: SubmissionTypeOption[] = [
   ['has-ungraded-submissions', I18n.t('Has ungraded submissions')],
