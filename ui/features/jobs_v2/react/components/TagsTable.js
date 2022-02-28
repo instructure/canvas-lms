@@ -18,32 +18,14 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import React, {useCallback} from 'react'
+import React from 'react'
 import {Responsive} from '@instructure/ui-responsive'
-import {InfoColumn, InfoColumnHeader} from './InfoColumn'
+import {Link} from '@instructure/ui-link'
+import {InfoColumn, GroupedInfoColumnHeader} from './InfoColumn'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function JobsTable({bucket, jobs, caption}) {
-  const renderJobRow = useCallback(
-    job => {
-      const cellTheme = {fontSize: '0.75rem'}
-
-      return (
-        <Table.Row key={job.id}>
-          <Table.RowHeader>{job.id}</Table.RowHeader>
-          <Table.Cell theme={cellTheme}>{job.tag}</Table.Cell>
-          <Table.Cell theme={cellTheme}>{job.strand}</Table.Cell>
-          <Table.Cell theme={cellTheme}>{job.singleton}</Table.Cell>
-          <Table.Cell>
-            <InfoColumn bucket={bucket} info={job.info} />
-          </Table.Cell>
-        </Table.Row>
-      )
-    },
-    [bucket]
-  )
-
+export default function TagsTable({tags, bucket, caption, onClickTag}) {
   return (
     <div>
       <Responsive
@@ -60,18 +42,26 @@ export default function JobsTable({bucket, jobs, caption}) {
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                <Table.ColHeader id="id">{I18n.t('ID')}</Table.ColHeader>
                 <Table.ColHeader id="tag">{I18n.t('Tag')}</Table.ColHeader>
-                <Table.ColHeader id="strand">{I18n.t('Strand')}</Table.ColHeader>
-                <Table.ColHeader id="singleton">{I18n.t('Singleton')}</Table.ColHeader>
+                <Table.ColHeader id="count">{I18n.t('Count')}</Table.ColHeader>
                 <Table.ColHeader id="info">
-                  <InfoColumnHeader bucket={bucket} />
+                  <GroupedInfoColumnHeader bucket={bucket} />
                 </Table.ColHeader>
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {jobs.map(job => {
-                return renderJobRow(job)
+              {tags.map(tag_info => {
+                return (
+                  <Table.Row key={tag_info.tag}>
+                    <Table.Cell>
+                      <Link onClick={() => onClickTag(tag_info.tag)}>{tag_info.tag}</Link>
+                    </Table.Cell>
+                    <Table.Cell>{tag_info.count}</Table.Cell>
+                    <Table.Cell>
+                      <InfoColumn bucket={bucket} info={tag_info.info} />
+                    </Table.Cell>
+                  </Table.Row>
+                )
               })}
             </Table.Body>
           </Table>
