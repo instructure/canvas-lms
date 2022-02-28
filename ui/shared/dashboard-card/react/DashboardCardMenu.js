@@ -158,50 +158,47 @@ export default class DashboardCardMenu extends React.Component {
     return (
       <Popover
         on="click"
-        show={this.state.show}
+        isShowingContent={this.state.show}
         onToggle={this.handleMenuToggle}
         shouldContainFocus
         shouldReturnFocus
         defaultFocusElement={() => this._colorTab}
-        onShow={handleShow}
+        onPositioned={handleShow}
         contentRef={popoverContentRef}
+        renderTrigger={trigger}
       >
-        <Popover.Trigger>{trigger}</Popover.Trigger>
-        <Popover.Content>
-          <CloseButton
-            buttonRef={c => (this._closeButton = c)}
-            placement="end"
-            onClick={() => this.setState({show: false})}
-          >
-            {I18n.t('Close')}
-          </CloseButton>
-          <div style={menuStyles}>
-            <div>
-              <Tabs
-                ref={c => (this._tabList = c)}
+        <CloseButton
+          elementRef={c => (this._closeButton = c)}
+          placement="end"
+          onClick={() => this.setState({show: false})}
+          screenReaderLabel={I18n.t('Close')}
+        />
+        <div style={menuStyles}>
+          <div>
+            <Tabs
+              ref={c => (this._tabList = c)}
+              padding="none"
+              variant="secondary"
+              onRequestTabChange={this.handleTabChange}
+            >
+              <Tabs.Panel
                 padding="none"
-                variant="secondary"
-                onRequestTabChange={this.handleTabChange}
+                renderTitle={I18n.t('Color')}
+                isSelected={selectedIndex === 0}
+                tabRef={c => (this._colorTab = c)}
               >
-                <Tabs.Panel
-                  padding="none"
-                  renderTitle={I18n.t('Color')}
-                  isSelected={selectedIndex === 0}
-                  tabRef={c => (this._colorTab = c)}
-                >
-                  {colorPicker}
-                </Tabs.Panel>
-                <Tabs.Panel
-                  padding="none"
-                  renderTitle={I18n.t('Move')}
-                  isSelected={selectedIndex === 1}
-                >
-                  {movementMenu}
-                </Tabs.Panel>
-              </Tabs>
-            </div>
+                {colorPicker}
+              </Tabs.Panel>
+              <Tabs.Panel
+                padding="none"
+                renderTitle={I18n.t('Move')}
+                isSelected={selectedIndex === 1}
+              >
+                {movementMenu}
+              </Tabs.Panel>
+            </Tabs>
           </div>
-        </Popover.Content>
+        </div>
       </Popover>
     )
   }

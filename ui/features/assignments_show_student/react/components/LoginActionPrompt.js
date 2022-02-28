@@ -67,7 +67,7 @@ function LoginActionButton(props) {
   }
 
   return (
-    <Button variant="primary" onClick={navigateToLogin} data-testid="login-action-button">
+    <Button color="primary" onClick={navigateToLogin} data-testid="login-action-button">
       {I18n.t('Log in')}
     </Button>
   )

@@ -17,8 +17,7 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {IconQuestionLine} from '@instructure/ui-icons'
@@ -49,9 +48,12 @@ export default class CriterionInfo extends React.Component {
 
   renderCloseButton() {
     return (
-      <CloseButton placement="end" offset="medium" variant="icon" onClick={this.handleButtonClick}>
-        {I18n.t('Close')}
-      </CloseButton>
+      <CloseButton
+        placement="end"
+        offset="medium"
+        onClick={this.handleButtonClick}
+        screenReaderLabel={I18n.t('Close')}
+      />
     )
   }
 
@@ -83,9 +85,13 @@ export default class CriterionInfo extends React.Component {
   render() {
     return (
       <span>
-        <Button variant="icon" icon={<IconQuestionLine />} onClick={this.handleButtonClick}>
-          <ScreenReaderContent>{I18n.t('More Information About Ratings')}</ScreenReaderContent>
-        </Button>
+        <IconButton
+          renderIcon={<IconQuestionLine />}
+          withBackground={false}
+          withBorder={false}
+          onClick={this.handleButtonClick}
+          screenReaderLabel={I18n.t('More Information About Ratings')}
+        />
         {this.renderModal()}
       </span>
     )

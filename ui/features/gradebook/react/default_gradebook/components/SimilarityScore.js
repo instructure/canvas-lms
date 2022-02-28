@@ -26,6 +26,8 @@ import SimilarityIcon from './SimilarityIcon'
 
 import I18n from 'i18n!gradebook'
 
+import {Link} from '@instructure/ui-link'
+
 export default class SimilarityScore extends PureComponent {
   static propTypes = {
     hasAdditionalData: bool,
@@ -58,16 +60,16 @@ export default class SimilarityScore extends PureComponent {
         ) : (
           <Grid.Row>
             <Grid.Col>
-              <Button
-                variant="link"
-                icon={statusIcon}
+              <Link
+                renderIcon={statusIcon}
                 href={reportUrl}
+                isWithinText={false}
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
                 <Text margin="auto auto auto small">
                   {I18n.t('%{score}% similarity score', {score: displayScore})}
                 </Text>
-              </Button>
+              </Link>
             </Grid.Col>
           </Grid.Row>
         )}

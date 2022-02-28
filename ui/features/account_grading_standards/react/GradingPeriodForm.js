@@ -148,7 +148,7 @@ class GradingPeriodForm extends React.Component {
       </Button>
       &nbsp;
       <Button
-        variant="primary"
+        color="primary"
         aria-label={I18n.t('Save Grading Period')}
         disabled={this.props.disabled}
         onClick={this.triggerSave}

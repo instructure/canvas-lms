@@ -110,7 +110,7 @@ Object.entries({
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
       const header = icons.closest('[data-testid="UsersListHeader"]')
       ok(
-        header.find('Tooltip').first().prop('tip').match(RegExp(expectedTip, 'i')),
+        header.find('Tooltip').first().prop('renderTip').match(RegExp(expectedTip, 'i')),
         'has right tooltip'
       )
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)

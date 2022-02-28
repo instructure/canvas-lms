@@ -177,9 +177,9 @@ export default class ImageSearch extends React.Component {
           {this.state.prevUrl && (
             <Button
               variant="link"
-              buttonRef={e => (this._imageSearchControlPrev = e)}
+              elementRef={e => (this._imageSearchControlPrev = e)}
               onClick={this.loadPreviousPage}
-              icon={IconArrowOpenStartLine}
+              renderIcon={IconArrowOpenStartLine}
             >
               {I18n.t('Previous Page')}
             </Button>
@@ -189,7 +189,7 @@ export default class ImageSearch extends React.Component {
           {this.state.nextUrl && (
             <Button
               variant="link"
-              buttonRef={e => (this._imageSearchControlNext = e)}
+              elementRef={e => (this._imageSearchControlNext = e)}
               onClick={this.loadNextPage}
               iconPlacement="end"
             >

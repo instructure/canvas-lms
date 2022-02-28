@@ -19,7 +19,7 @@
 import React from 'react'
 import {func, string} from 'prop-types'
 
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconPlusLine} from '@instructure/ui-icons'
 import theme from '@instructure/canvas-theme'
@@ -57,9 +57,13 @@ export default function AddHorizontalRuleButton(props) {
       <span style={layoutStyle} aria-hidden="true">
         <hr style={ruleStyle} />
       </span>
-      <Button variant="circle-default" icon={IconPlusLine} onClick={props.onClick}>
-        <ScreenReaderContent>{props.label}</ScreenReaderContent>
-      </Button>
+      <IconButton
+        color="secondary"
+        shape="circle"
+        renderIcon={IconPlusLine}
+        onClick={props.onClick}
+        screenReaderLabel={props.label}
+      />
     </div>
   )
 }

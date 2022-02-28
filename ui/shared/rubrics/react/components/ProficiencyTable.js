@@ -25,10 +25,10 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Billboard} from '@instructure/ui-billboard'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import ProficiencyRating from './ProficiencyRating'
@@ -318,7 +318,7 @@ export default class ProficiencyTable extends React.Component {
           `
           ).trim()}
         />
-        <Button variant="primary" onClick={this.removeBillboard}>
+        <Button color="primary" onClick={this.removeBillboard}>
           {I18n.t('Get Started')}
         </Button>
       </div>
@@ -365,15 +365,19 @@ export default class ProficiencyTable extends React.Component {
             ))}
             <Table.Row>
               <Table.Cell colSpan="4" textAlign="center">
-                <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
-                  <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
-                </Button>
+                <IconButton
+                  onClick={this.addRow}
+                  renderIcon={<IconPlusLine />}
+                  color="primary"
+                  shape="circle"
+                  screenReaderLabel={I18n.t('Add proficiency rating')}
+                />
               </Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table>
         <div className="save">
-          <Button variant="primary" onClick={this.handleSubmit}>
+          <Button color="primary" onClick={this.handleSubmit}>
             {I18n.t('Save Learning Mastery')}
           </Button>
         </div>

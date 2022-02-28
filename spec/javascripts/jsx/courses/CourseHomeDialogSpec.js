@@ -90,7 +90,7 @@ test('calls onRequestClose when cancel is clicked', () => {
   const dialog = shallow(
     <CourseHomeDialog {...getDefaultProps()} onRequestClose={onRequestClose} />
   )
-  const cancelBtn = dialog.find('Button').at(1)
+  const cancelBtn = dialog.find('Button').at(0)
   equal(cancelBtn.props().children, 'Cancel')
   cancelBtn.simulate('click')
   ok(onRequestClose.called)

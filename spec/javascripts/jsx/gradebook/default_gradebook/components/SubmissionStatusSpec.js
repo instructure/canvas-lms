@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import SubmissionStatus from 'ui/features/gradebook/react/default_gradebook/components/SubmissionStatus.js'
+import SubmissionStatus from 'ui/features/gradebook/react/default_gradebook/components/SubmissionStatus'
 
 QUnit.module('SubmissionStatus - Pills', hooks => {
   let props
@@ -57,7 +57,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     return wrapper
       .find('Pill')
       .getElements()
-      .filter(node => node.props.text === 'Hidden')
+      .filter(node => node.props.children === 'Hidden')
   }
 
   function mountComponent() {
@@ -70,7 +70,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const unpublishedPills = wrapper
       .find('Pill')
       .getElements()
-      .filter(node => node.props.text === 'Unpublished')
+      .filter(node => node.props.children === 'Unpublished')
 
     strictEqual(unpublishedPills.length, 1)
   })
@@ -81,7 +81,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const pills = wrapper
       .find('Pill')
       .getElements()
-      .map(node => node.props.text)
+      .map(node => node.props.children)
 
     strictEqual(pills.length, 0)
   })
@@ -92,7 +92,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const droppedPills = wrapper
       .find('Pill')
       .getElements()
-      .filter(node => node.props.text === 'Dropped')
+      .filter(node => node.props.children === 'Dropped')
 
     strictEqual(droppedPills.length, 1)
   })
@@ -104,7 +104,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const droppedPills = wrapper
       .find('Pill')
       .getElements()
-      .filter(node => node.props.text === 'Dropped')
+      .filter(node => node.props.children === 'Dropped')
 
     strictEqual(droppedPills.length, 0)
   })
@@ -115,7 +115,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const pills = wrapper
       .find('Pill')
       .getElements()
-      .map(node => node.props.text)
+      .map(node => node.props.children)
 
     strictEqual(pills.length, 0)
   })
@@ -126,7 +126,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const excusedPills = wrapper
       .find('Pill')
       .getElements()
-      .filter(node => node.props.text === 'Excused')
+      .filter(node => node.props.children === 'Excused')
 
     strictEqual(excusedPills.length, 1)
   })
@@ -138,7 +138,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const excusedPills = wrapper
       .find('Pill')
       .getElements()
-      .filter(node => node.props.text === 'Excused')
+      .filter(node => node.props.children === 'Excused')
 
     strictEqual(excusedPills.length, 0)
   })
@@ -149,7 +149,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     const pills = wrapper
       .find('Pill')
       .getElements()
-      .map(node => node.props.text)
+      .map(node => node.props.children)
 
     strictEqual(pills.length, 0)
   })

@@ -121,11 +121,11 @@ class FileUpload extends React.Component {
     const isEmpty = this.props.currentFolder.isEmpty()
     return (
       <FileDrop
-        allowMultiple
+        shouldAllowMultiple
         // Called when dropping files or when clicking,
         // after the file dialog window exits successfully
         onDrop={this.handleDrop}
-        label={
+        renderLabel={
           <Billboard
             size="small"
             hero={<IconUploadLine color={isDragging ? `brand` : `primary`} />}

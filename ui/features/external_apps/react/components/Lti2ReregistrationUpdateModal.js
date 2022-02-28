@@ -72,11 +72,11 @@ export default class Lti2ReregistrationUpdateModal extends React.Component {
         <Modal.Footer>
           <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
           &nbsp;
-          <Button onClick={this.dismissUpdate} variant="danger">
+          <Button onClick={this.dismissUpdate} color="danger">
             {I18n.t('Dismiss')}
           </Button>
           &nbsp;
-          <Button onClick={this.acceptUpdate} variant="primary">
+          <Button onClick={this.acceptUpdate} color="primary">
             {I18n.t('Accept')}
           </Button>
         </Modal.Footer>

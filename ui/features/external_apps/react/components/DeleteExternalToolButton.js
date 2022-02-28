@@ -89,7 +89,7 @@ export default class DeleteExternalToolButton extends React.Component {
             <Modal.Footer>
               <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
               &nbsp;
-              <Button onClick={this.deleteTool} variant="danger">
+              <Button onClick={this.deleteTool} color="danger">
                 {I18n.t('Delete')}
               </Button>
             </Modal.Footer>

@@ -123,7 +123,7 @@ export default class ConfirmDeleteModal extends Component {
             }}
             id="confirm_delete_announcements"
             onClick={this.onConfirm}
-            variant="danger"
+            color="danger"
           >
             {I18n.t('Delete')}
           </Button>

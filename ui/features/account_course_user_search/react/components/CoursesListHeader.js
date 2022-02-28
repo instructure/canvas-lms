@@ -25,7 +25,7 @@ import preventDefault from 'prevent-default'
 
 export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   return (
-    <Tooltip tip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
+    <Tooltip renderTip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
       <Button
         variant="link"
         onClick={preventDefault(() => onChangeSort(id))}

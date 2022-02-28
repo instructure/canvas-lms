@@ -436,9 +436,11 @@ export default class Navigation extends React.Component {
           }}
         >
           <div className={`navigation-tray-container ${this.state.type}-tray`}>
-            <CloseButton placement="end" onClick={this.closeTray}>
-              {I18n.t('Close')}
-            </CloseButton>
+            <CloseButton
+              placement="end"
+              onClick={this.closeTray}
+              screenReaderLabel={I18n.t('Close')}
+            />
             <div className="tray-with-space-for-global-nav">
               <React.Suspense
                 fallback={

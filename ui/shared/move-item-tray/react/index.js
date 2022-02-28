@@ -95,9 +95,11 @@ export default class MoveItemTray extends React.Component {
         placement="end"
         shouldContainFocus
       >
-        <CloseButton placement="start" onClick={this.close}>
-          {I18n.t('close move tray')}
-        </CloseButton>
+        <CloseButton
+          placement="start"
+          onClick={this.close}
+          screenReaderLabel={I18n.t('close move tray')}
+        />
         <Heading margin="small xx-large" level="h4" as="h2">
           {this.props.title}
         </Heading>
