@@ -72,7 +72,7 @@ describe('mimeClass', () => {
     assert.strictEqual(mimeClass({'content-type': 'audio/*'}), 'audio')
     assert.strictEqual(mimeClass({'content-type': 'audio'}), 'audio')
     assert.strictEqual(mimeClass({'content-type': 'image/svg+xml'}), 'image')
-    assert.strictEqual(mimeClass({'content-type': 'image/webp'}), 'file')
+    assert.strictEqual(mimeClass({'content-type': 'image/webp'}), 'image')
     assert.strictEqual(mimeClass({'content-type': 'application/vnd.ms-powerpoint'}), 'ppt')
   })
 
@@ -80,7 +80,7 @@ describe('mimeClass', () => {
     assert.strictEqual(mimeClass({type: 'video/mp4'}), 'video')
     assert.strictEqual(mimeClass({type: 'audio/webm'}), 'audio')
     assert.strictEqual(mimeClass({type: 'image/svg+xml'}), 'image')
-    assert.strictEqual(mimeClass({type: 'image/webp'}), 'file')
+    assert.strictEqual(mimeClass({type: 'image/webp'}), 'image')
     assert.strictEqual(mimeClass({type: 'application/vnd.ms-powerpoint'}), 'ppt')
   })
 })
