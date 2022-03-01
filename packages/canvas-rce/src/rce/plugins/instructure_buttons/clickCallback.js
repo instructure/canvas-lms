@@ -49,7 +49,14 @@ export default function (ed, document, type) {
 
     ReactDOM.render(
       <StoreProvider {...trayProps}>
-        {() => <ButtonsTray editor={ed} editing={type === EDIT_BUTTON} onUnmount={handleUnmount} />}
+        {() => (
+          <ButtonsTray
+            editor={ed}
+            editing={type === EDIT_BUTTON}
+            onUnmount={handleUnmount}
+            rcsConfig={trayProps}
+          />
+        )}
       </StoreProvider>,
       container
     )

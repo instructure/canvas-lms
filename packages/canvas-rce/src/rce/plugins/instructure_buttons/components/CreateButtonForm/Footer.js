@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -25,9 +25,14 @@ import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'
 
-export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
-  const [replaceAll, setReplaceAll] = useState(false)
-
+export const Footer = ({
+  disabled,
+  onCancel,
+  onSubmit,
+  replaceAll,
+  onReplaceAllChanged,
+  editing
+}) => {
   return (
     <>
       {editing && (
@@ -38,8 +43,8 @@ export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
             )}
             data-testid="cb-replace-all"
             checked={replaceAll}
-            onChange={() => {
-              setReplaceAll(prev => !prev)
+            onChange={e => {
+              onReplaceAllChanged && onReplaceAllChanged(e.target.checked)
             }}
           />
         </View>
@@ -57,12 +62,7 @@ export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
               {formatMessage('Cancel')}
             </Button>
             {editing ? (
-              <Button
-                disabled={disabled}
-                color="primary"
-                onClick={replaceAll ? onReplace : onSubmit}
-                margin="0 0 0 x-small"
-              >
+              <Button disabled={disabled} color="primary" onClick={onSubmit} margin="0 0 0 x-small">
                 {formatMessage('Save')}
               </Button>
             ) : (

@@ -17,12 +17,15 @@
  */
 
 import React from 'react'
-import {render, fireEvent, screen, waitFor} from '@testing-library/react'
+import {render, fireEvent, screen, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
 import {ButtonsTray} from '../ButtonsTray'
 import {useStoreProps} from '../../../shared/StoreContext'
 import FakeEditor from '../../../shared/__tests__/FakeEditor'
+import RceApiSource from '../../../../../rcs/api'
 
+jest.mock('../../../../../rcs/api')
 jest.mock('../../../shared/StoreContext')
 
 const startButtonsAndIconsUpload = jest.fn().mockResolvedValue({url: 'https://uploaded.url'})
@@ -49,6 +52,8 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     editing: false
   }
 
+  let rcs
+
   const renderComponent = componentProps => {
     return render(<ButtonsTray {...componentProps} />)
   }
@@ -59,6 +64,9 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     global.fetch = jest.fn().mockResolvedValue({
       blob: () => Promise.resolve(new Blob())
     })
+
+    rcs = {getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'}))}
+    RceApiSource.mockImplementation(() => rcs)
   })
 
   beforeEach(() => {
@@ -77,68 +85,90 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })
 
-  it('uploads the svg', async () => {
-    render(<ButtonsTray {...defaults} />)
+  describe('uploads the svg', () => {
+    it('with correct content', async () => {
+      render(<ButtonsTray {...defaults} />)
 
-    userEvent.click(screen.getByRole('button', {name: /apply/i}))
-    await waitFor(() => {
-      if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
-      expect(startButtonsAndIconsUpload.mock.calls[0]).toMatchInlineSnapshot(`
-        Array [
-          Object {
-            "domElement": <svg
-              fill="none"
-              height="122px"
-              viewBox="0 0 122 122"
-              width="122px"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <metadata>
-                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)"}
-              </metadata>
-              <svg
+      userEvent.click(screen.getByRole('button', {name: /apply/i}))
+      await waitFor(() => {
+        if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
+        const result = startButtonsAndIconsUpload.mock.calls[0]
+        expect(result).toMatchInlineSnapshot(`
+          Array [
+            Object {
+              "domElement": <svg
                 fill="none"
                 height="122px"
                 viewBox="0 0 122 122"
                 width="122px"
-                x="0"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <g
+                <metadata>
+                  {"type":"image/svg+xml-buttons-and-icons","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":""}
+                </metadata>
+                <svg
                   fill="none"
+                  height="122px"
+                  viewBox="0 0 122 122"
+                  width="122px"
+                  x="0"
                 >
-                  <clippath
-                    id="clip-path-for-embed"
+                  <g
+                    fill="none"
                   >
+                    <clippath
+                      id="clip-path-for-embed"
+                    >
+                      <rect
+                        height="114"
+                        width="114"
+                        x="4"
+                        y="4"
+                      />
+                    </clippath>
                     <rect
                       height="114"
                       width="114"
                       x="4"
                       y="4"
                     />
-                  </clippath>
-                  <rect
-                    height="114"
-                    width="114"
-                    x="4"
-                    y="4"
-                  />
-                </g>
-              </svg>
-              <style
-                type="text/css"
-              >
-                @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
-              </style>
-            </svg>,
-            "name": "untitled.svg",
-          },
-          Object {
-            "onDuplicate": false,
-          },
-        ]
-      `)
+                  </g>
+                </svg>
+                <style
+                  type="text/css"
+                >
+                  @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+                </style>
+              </svg>,
+              "name": "untitled.svg",
+            },
+            Object {
+              "onDuplicate": false,
+            },
+          ]
+        `)
+        expect(result[1].onDuplicate).toBe(false)
+      })
+      await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
     })
-    await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
+
+    it('with overwrite if "replace all" is checked', async () => {
+      const {getByTestId, getByRole} = render(<ButtonsTray {...defaults} editing />)
+
+      act(() => {
+        getByTestId('cb-replace-all').click()
+      })
+
+      act(() => {
+        getByRole('button', {name: /save/i}).click()
+      })
+
+      await waitFor(() => {
+        if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
+        const result = startButtonsAndIconsUpload.mock.calls[0]
+        expect(result[1].onDuplicate).toBe('overwrite')
+      })
+    })
   })
 
   it('writes the content to the editor', async () => {
@@ -170,6 +200,28 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
   })
 
+  describe('the "replace all instances" checkbox', () => {
+    it('disables the name field when checked', async () => {
+      const {getByTestId} = render(<ButtonsTray {...defaults} editing />)
+
+      act(() => getByTestId('cb-replace-all').click())
+
+      await waitFor(() => expect(getByTestId('button-name')).toBeDisabled())
+    })
+
+    it('does not disable the name field when not checked', async () => {
+      const {getByTestId} = render(<ButtonsTray {...defaults} editing />)
+
+      await waitFor(() => expect(getByTestId('button-name')).not.toBeDisabled())
+    })
+
+    it('does not disable the name field on new buttons', async () => {
+      const {getByTestId} = render(<ButtonsTray {...defaults} />)
+
+      await waitFor(() => expect(getByTestId('button-name')).not.toBeDisabled())
+    })
+  })
+
   it('disables footer while submiting', async () => {
     render(<ButtonsTray {...defaults} />)
 
@@ -179,6 +231,28 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(button).toBeDisabled())
     await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled(), {
       timeout: 3000
+    })
+  })
+
+  describe('what a button is being created', () => {
+    let ed
+
+    beforeEach(() => {
+      ed = new FakeEditor()
+    })
+
+    const subject = () => render(<ButtonsTray onClose={jest.fn()} editor={ed} />)
+
+    it('loads the standard SVG metadata', async () => {
+      const {getByLabelText, getAllByTestId} = subject()
+
+      await waitFor(() => {
+        expect(getByLabelText('Name').value).toEqual('')
+        expect(getByLabelText('Button Shape').value).toEqual('Square')
+        expect(getByLabelText('Button Size').value).toEqual('Small')
+        expect(getAllByTestId('colorPreview-none').length).toBeGreaterThan(0)
+        expect(getByLabelText('Button Outline Size').value).toEqual('Small')
+      })
     })
   })
 
@@ -198,39 +272,39 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     const subject = () => render(<ButtonsTray onClose={jest.fn()} editing editor={ed} />)
 
     beforeEach(() => {
-      global.fetch = jest.fn().mockResolvedValue({
-        text: () =>
-          Promise.resolve(`
-            <svg height="100" width="100">
-              <metadata>
-                {
-                  "name":"Test Image",
-                  "alt":"a test image",
-                  "shape":"triangle",
-                  "size":"large",
-                  "color":"#FF2717",
-                  "outlineColor":"#06A3B7",
-                  "outlineSize":"small",
-                  "text":"Some Text",
-                  "textSize":"medium",
-                  "textColor":"#009606",
-                  "textBackgroundColor":"#E71F63",
-                  "textPosition":"middle"
-                }
-              </metadata>
-              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-            </svg>
-          `)
+      fetchMock.mock('*', {
+        body: `
+          <svg height="100" width="100">
+            <metadata>
+              {
+                "alt":"a test image",
+                "shape":"triangle",
+                "size":"large",
+                "color":"#FF2717",
+                "outlineColor":"#06A3B7",
+                "outlineSize":"small",
+                "text":"Some Text",
+                "textSize":"medium",
+                "textColor":"#009606",
+                "textBackgroundColor":"#E71F63",
+                "textPosition":"middle"
+              }
+            </metadata>
+            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+          </svg>`
       })
     })
 
-    afterEach(() => jest.restoreAllMocks())
+    afterEach(() => {
+      jest.restoreAllMocks()
+      fetchMock.restore()
+    })
 
     it('loads the standard SVG metadata', async () => {
       const {getByLabelText, getByTestId} = subject()
 
       await waitFor(() => {
-        expect(getByLabelText('Name').value).toEqual('Test Image')
+        expect(getByLabelText('Name').value).toEqual('Test Button')
         expect(getByLabelText('Button Shape').value).toEqual('Triangle')
         expect(getByLabelText('Button Size').value).toEqual('Large')
         expect(getByTestId('colorPreview-#FF2717')).toBeInTheDocument() // button color
