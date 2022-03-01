@@ -19,9 +19,21 @@
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import rceFormatMessage from '@instructure/canvas-rce/lib/format-message'
+import plannerFormatMessage from '@instructure/canvas-planner/lib/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
+
+rceFormatMessage.setup({
+  locale: 'en',
+  missingTranslation: 'ignore'
+})
+
+plannerFormatMessage.setup({
+  locale: 'en',
+  missingTranslation: 'ignore'
+})
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
@@ -97,8 +109,15 @@ const ignoredWarnings = [
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /Translation for .* is missing/,
-  /value provided is not in a recognized RFC2822 or ISO format/
+  /value provided is not in a recognized RFC2822 or ISO format/,
+  // the following warnings were not appropriately failing tests upon console.warn
+  // filtered from output, will need to be investigated within /ui/features/k5_*
+  /Unmatched GET to \/api\/v1\/announcements/,
+  /Unmatched GET to \/api\/v1\/users\/\d+\/calendar_events/,
+  /Unmatched GET to \/api\/v1\/courses\/\d+\/assignment_groups/,
+  /Unmatched GET to \/api\/v1\/courses\/\d+\/enrollments/,
+  /Unmatched GET to \/api\/v1\/courses\/\d+\/assignment_groups/
+  // end k5 console.warn investigation
 ]
 global.console = {
   log: console.log,
