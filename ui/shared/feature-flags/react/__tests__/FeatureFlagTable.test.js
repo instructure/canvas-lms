@@ -73,4 +73,15 @@ describe('feature_flags::FeatureFlagTable', () => {
       )
     ).toBeInTheDocument()
   })
+
+  it('includes tooltips for hidden pills', () => {
+    const {getAllByText} = render(<FeatureFlagTable rows={rows} title={title} />)
+    expect(
+      getAllByText(
+        'This feature option is only visible to users with Site Admin access.' +
+          ' End users will not see it until enabled by a Site Admin user. Before enabling for an institution,' +
+          ' please be sure you fully understand the functionality and possible impacts to users.'
+      ).length
+    ).toBe(2)
+  })
 })

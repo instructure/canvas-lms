@@ -109,9 +109,8 @@ class OutcomePopover extends React.Component {
         <CloseButton
           placement="end"
           onClick={() => this.setState({linkHover: false, linkClicked: false})}
-        >
-          {I18n.t('Click to close outcome details popover')}
-        </CloseButton>
+          screenReaderLabel={I18n.t('Click to close outcome details popover')}
+        />
         <Text size="small">
           <Flex alignItems="stretch" direction="row" justifyItems="space-between">
             <Flex.Item grow shrink>
@@ -161,13 +160,12 @@ class OutcomePopover extends React.Component {
     return (
       <span>
         <Popover
-          show={this.state.linkHover || this.state.linkClicked}
-          onDismiss={() => this.setState({linkHover: false, linkClicked: false})}
+          isShowingContent={this.state.linkHover || this.state.linkClicked}
+          onHideContent={() => this.setState({linkHover: false, linkClicked: false})}
           placement="bottom"
           on={['hover', 'click']}
           shouldContainFocus
-        >
-          <Popover.Trigger>
+          renderTrigger={
             <IconButton
               size="small"
               margin="xx-small"
@@ -179,8 +177,9 @@ class OutcomePopover extends React.Component {
               onMouseEnter={() => this.setState({linkHover: true})}
               onMouseLeave={() => this.setState({linkHover: false})}
             />
-          </Popover.Trigger>
-          <Popover.Content>{this.renderPopoverContent()}</Popover.Content>
+          }
+        >
+          {this.renderPopoverContent()}
         </Popover>
       </span>
     )

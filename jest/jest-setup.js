@@ -67,7 +67,6 @@ const ignoredErrors = [
   /Invalid prop `value` of type `object` supplied to `CanvasSelect`/,
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
-  /modalProps.onDismiss is not a function/,
   /Prop `children` should be supplied unless/,
   /props.setRCEOpen is not a function/,
   /React does not recognize the `%s` prop on a DOM element/,
@@ -81,13 +80,11 @@ const ignoredErrors = [
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
   /The prop `id` is marked as required in `(CanvasSelectOption|ColHeader|DashboardCard|FormField|Option)`/,
-  /The prop `isLoading` is marked as required in `LoadingWrapper`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
   /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
   /The prop `rootId` is marked as required in `GroupSelectionDrillDown`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
-  /Use the `defaultValue` or `value` props on <select> instead of setting `selected` on <option>/,
   /validateDOMNesting\(...\): %s cannot appear as a child of <%s>/,
   /WARNING: heuristic fragment matching going on!/,
   /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/,
@@ -97,15 +94,11 @@ const ignoredErrors = [
 const globalWarn = global.console.warn
 const ignoredWarnings = [
   /\[View|Button|Text\] .* in version 8.0.0/i,
-  /`waitForElement` has been deprecated/,
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Exactly one focusable child is required/,
-  /is deprecated and will be removed/,
   /Missing field errors in/,
-  /Missing field moduleItem in/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /toBeEmpty has been deprecated/,
   /Translation for .* is missing/,
   /value provided is not in a recognized RFC2822 or ISO format/
 ]

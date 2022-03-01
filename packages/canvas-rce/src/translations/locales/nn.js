@@ -77,7 +77,7 @@ const locale = {
   "button_outline_size_cc1d1df7": { "message": "Storleik på knappeomriss" },
   "button_shape_dbecb573": { "message": "Knappeform" },
   "button_size_20f5fce1": { "message": "Knappestorleik" },
-  "buttons_and_icons_e66ee12c": { "message": "Knappar og ikonar" },
+  "buttons_and_icons_e66ee12c": { "message": "Knappar og ikon" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
@@ -249,7 +249,7 @@ const locale = {
   "hide_title_description_caf092ef": { "message": "Skjul { title } skildring" },
   "home_351838cd": { "message": "Heim" },
   "html_code_editor_fd967a44": { "message": "HTML-editor" },
-  "html_editor_fb2ab713": { "message": "HTML-redigeringsprogram" },
+  "html_editor_fb2ab713": { "message": "HTML-editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Eg har løyve til å bruke denne fila. "
   },

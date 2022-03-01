@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mergeI18nTranslations from '../mergeI18nTranslations'
+import { setRootTranslations, setLazyTranslations } from '../mergeI18nTranslations'
 import i18nObj from '../i18nObj'
 
 describe('mergeI18nTranslations', () => {
@@ -33,19 +33,38 @@ describe('mergeI18nTranslations', () => {
   })
 
   it('merges onto i18n.translations', () => {
-    const newStrings = {
-      ar: {someKey: 'arabic value'},
-      en: {someKey: 'english value'}
-    }
-    mergeI18nTranslations(newStrings)
-    expect(i18nObj.translations).toEqual(newStrings)
+    const rootTranslations = { rootKeyA: 'rootKeyValueA' }
+
+    setRootTranslations('en', () => rootTranslations)
+    expect(i18nObj.translations.en).toBe(rootTranslations)
   })
 
-  it('overwrites the key that is there', () => {
-    i18nObj.translations.en.anotherKey = 'original value'
-    mergeI18nTranslations({
-      en: {anotherKey: 'new value'}
-    })
-    expect(i18nObj.translations.en.anotherKey).toEqual('new value')
+  it('creates a getter that when accessed, creates new root translations', () => {
+    const rootTranslations = { rootKeyA: 'rootKeyValueA' }
+    const lazyRootTranslations = { lazyRootKeyA: 'lazyRootKeyValueA' }
+    setRootTranslations('en', () => rootTranslations)
+    setLazyTranslations('en', 'myScope', () => lazyRootTranslations)
+
+    expect(i18nObj.translations.en.rootKeyA).toBeDefined()
+    expect(i18nObj.translations.en.lazyRootKeyA).toBeUndefined()
+
+    i18nObj.translations.en.myScope // SIDE EFFECT: Invoke Getter
+
+    expect(i18nObj.translations.en.rootKeyA).toBeDefined()
+    expect(i18nObj.translations.en.lazyRootKeyA).toBeDefined()
+  })
+
+  it('creates a getter that when accessed, memoizes the scoped translations', () => {
+    const rootTranslations = { rootKeyA: 'rootKeyValueA' }
+    const lazyScopedTranslations = { lazyScopedKeyA: 'lazyScopedKeyValueA' }
+    setRootTranslations('en', () => rootTranslations)
+    setLazyTranslations('en', 'myScope', null, () => lazyScopedTranslations)
+
+    expect(Object.getOwnPropertyDescriptor(i18nObj.translations.en, 'myScope').value).toBeUndefined()
+
+    i18nObj.translations.en.myScope // SIDE EFFECT: Invoke Getter
+
+    expect(Object.getOwnPropertyDescriptor(i18nObj.translations.en, 'myScope').value).toBeDefined()
+    expect(i18nObj.translations.en.myScope.lazyScopedKeyA).toBeDefined()
   })
 })

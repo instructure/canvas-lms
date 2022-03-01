@@ -74,7 +74,7 @@ export default function HistoryList({hasLoaded, history}) {
         ))
       ) : (
         <List.Item>
-          <Spinner size="small" title={I18n.t('Loading')} />
+          <Spinner size="small" renderTitle={I18n.t('Loading')} />
         </List.Item>
       )}
     </List>

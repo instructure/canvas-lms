@@ -70,7 +70,7 @@ describe('StaffContactInfoLayout', () => {
 
   it('renders nothing at all if staff is empty', () => {
     const {container} = render(<StaffContactInfoLayout {...getProps({staff: []})} />)
-    expect(container.firstChild).toBeEmpty()
+    expect(container.firstChild).toBeEmptyDOMElement()
   })
 
   it('renders 3 loading skeletons if isLoading set', () => {

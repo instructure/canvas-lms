@@ -251,7 +251,7 @@ describe('events', () => {
           expect(global.postMessage).toHaveBeenCalledTimes(2)
           expect(global.postMessage).toHaveBeenCalledWith(
             {
-              messageType: expectedMessageType,
+              subject: expectedMessageType,
               value: expectedValue
             },
             'https://canvas.instructure.com'
@@ -409,7 +409,7 @@ describe('events', () => {
       expect(global.postMessage).toHaveBeenCalledTimes(2)
       expect(global.postMessage).toHaveBeenCalledWith(
         {
-          messageType: 'mentions.InputChangeEvent',
+          subject: 'mentions.InputChangeEvent',
           value: 'wes'
         },
         'https://canvas.instructure.com'

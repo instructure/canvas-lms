@@ -19,24 +19,25 @@
 import round from 'round'
 import {SHAPE_CONTAINER_LENGTH} from '../constants'
 import {createSvgElement} from './utils'
+import {Shape} from '../../../../svg/shape'
 
 export function buildShapeMask({shape}) {
   switch (shape) {
-    case 'square':
+    case Shape.Square:
       return buildSquare()
-    case 'circle':
+    case Shape.Circle:
       return buildCircle()
-    case 'triangle':
+    case Shape.Triangle:
       return buildTriangle()
-    case 'diamond':
+    case Shape.Diamond:
       return buildDiamond()
-    case 'pentagon':
+    case Shape.Pentagon:
       return buildPentagon()
-    case 'hexagon':
+    case Shape.Hexagon:
       return buildHexagon()
-    case 'octagon':
+    case Shape.Octagon:
       return buildOctagon()
-    case 'star':
+    case Shape.Star:
       return buildStar()
     default:
       throw new Error(`Invalid shape: ${shape}`)

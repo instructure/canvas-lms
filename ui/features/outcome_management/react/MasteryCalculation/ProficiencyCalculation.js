@@ -404,7 +404,7 @@ const ProficiencyCalculation = ({
       {canManage && !individualOutcome && (
         <div className="save">
           <Button
-            variant="primary"
+            color="primary"
             interaction={allowSave ? 'enabled' : 'disabled'}
             onClick={() => {
               if (validInt(currentMethod, calculationInt)) {

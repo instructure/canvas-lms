@@ -138,13 +138,13 @@ export default function ValidatorResultsRow(props) {
         </Flex.Item>
         <Flex.Item margin="none none none small">
           <Heading level="h3" as="h2">
-            <Button
-              variant="link"
+            <Link
               href={props.result.content_url}
+              isWithinText={false}
               theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
             >
               {props.result.name}
-            </Button>
+            </Link>
           </Heading>
           <Text
             size="x-small"

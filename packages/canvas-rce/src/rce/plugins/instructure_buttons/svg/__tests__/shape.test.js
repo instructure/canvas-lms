@@ -167,32 +167,48 @@ describe('buildShape()', () => {
 
     it('builds the x-small <path />', () => {
       expect(buildShape({...settings, size: 'x-small'})).toMatchInlineSnapshot(`
-        <path
-          d="M33 4L66 33L33 66L4 33L33 4Z"
+        <rect
+          height="44"
+          transform="rotate(-45 6 37)"
+          width="44"
+          x="6"
+          y="37"
         />
       `)
     })
 
     it('builds the small <path />', () => {
       expect(buildShape({...settings, size: 'small'})).toMatchInlineSnapshot(`
-        <path
-          d="M57 4L114 57L57 114L4 57L57 4Z"
+        <rect
+          height="77"
+          transform="rotate(-45 7 61)"
+          width="77"
+          x="7"
+          y="61"
         />
       `)
     })
 
     it('builds the medium <path />', () => {
       expect(buildShape({...settings, size: 'medium'})).toMatchInlineSnapshot(`
-        <path
-          d="M75 4L150 75L75 150L4 75L75 4Z"
+        <rect
+          height="103"
+          transform="rotate(-45 6 79)"
+          width="103"
+          x="6"
+          y="79"
         />
       `)
     })
 
     it('builds the large <path />', () => {
       expect(buildShape({...settings, size: 'large'})).toMatchInlineSnapshot(`
-        <path
-          d="M105 4L210 105L105 210L4 105L105 4Z"
+        <rect
+          height="146"
+          transform="rotate(-45 6 109)"
+          width="146"
+          x="6"
+          y="109"
         />
       `)
     })
@@ -206,7 +222,7 @@ describe('buildShape()', () => {
     it('builds the x-small <path />', () => {
       expect(buildShape({...settings, size: 'x-small'})).toMatchInlineSnapshot(`
         <path
-          d="M37.0623 14L61 32.75L53.5195 62H21.1039L13 32.75L37.0623 14Z"
+          d="M5 28.9191L37 5L69 28.9191L55.235 68H18.8686L5 28.9191Z"
         />
       `)
     })
@@ -214,7 +230,7 @@ describe('buildShape()', () => {
     it('builds the small <path />', () => {
       expect(buildShape({...settings, size: 'small'})).toMatchInlineSnapshot(`
         <path
-          d="M61.1247 13L109 50.5L94.039 109H29.2078L13 50.5L61.1247 13Z"
+          d="M5 47.3838L61 6L117 47.3839L92.9113 115H29.27L5 47.3838Z"
         />
       `)
     })
@@ -222,7 +238,7 @@ describe('buildShape()', () => {
     it('builds the medium <path />', () => {
       expect(buildShape({...settings, size: 'medium'})).toMatchInlineSnapshot(`
         <path
-          d="M79.1714 13L145 64.56L124.429 145H35.285L13 64.5625L79.1714 13Z"
+          d="M5 61.0519L79 6L153 61.0519L121.168 151H37.0711L5 61.0519Z"
         />
       `)
     })
@@ -230,7 +246,7 @@ describe('buildShape()', () => {
     it('builds the large <path />', () => {
       expect(buildShape({...settings, size: 'large'})).toMatchInlineSnapshot(`
         <path
-          d="M109.249 13L205 88L175.078 205H45.4156L13 88L109.249 13Z"
+          d="M5 84.8319L109 7L213 84.832L168.264 212H50.0728L5 84.8319Z"
         />
       `)
     })

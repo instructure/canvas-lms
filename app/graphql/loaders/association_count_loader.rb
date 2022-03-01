@@ -30,9 +30,9 @@ class Loaders::AssociationCountLoader < GraphQL::Batch::Loader
   # uses a join, and associations will not consider sharding, and it is
   # expected that all records will be on the same shard.
   def perform(records)
-    join_keys = @model.reflections[@association.to_s].join_keys
-    quoted_table_name = @model.reflections[@association.to_s].klass.quoted_table_name
-    join_statement = "INNER JOIN #{quoted_table_name} AS some_association ON #{@model.table_name}.#{join_keys.foreign_key} = some_association.#{join_keys.key}"
+    reflection = @model.reflections[@association.to_s]
+    quoted_table_name = reflection.klass.quoted_table_name
+    join_statement = "INNER JOIN #{quoted_table_name} AS some_association ON #{@model.table_name}.#{reflection.join_foreign_key} = some_association.#{reflection.join_primary_key}"
     counts = @model.where(id: records).joins(join_statement).group("#{@model.table_name}.#{@model.primary_key}").count
     records.each { |record| fulfill(record, counts[record.id]) }
   end

@@ -86,12 +86,12 @@ const TourContainer = ({
               </Button>
             )}
             {current > 0 && current < totalSteps - 1 ? (
-              <Button variant="primary" onClick={() => gotoStep(current + 1)}>
+              <Button color="primary" onClick={() => gotoStep(current + 1)}>
                 {I18n.t('Next')}
               </Button>
             ) : null}
             {current === totalSteps - 1 && (
-              <Button variant="primary" onClick={() => close({forceClose: true})}>
+              <Button color="primary" onClick={() => close({forceClose: true})}>
                 {I18n.t('Done')}
               </Button>
             )}
@@ -101,7 +101,7 @@ const TourContainer = ({
               </Button>
             )}
             {current === 0 && totalSteps > 1 && (
-              <Button variant="primary" onClick={() => gotoStep(1)}>
+              <Button color="primary" onClick={() => gotoStep(1)}>
                 {I18n.t('Start Tour')}
               </Button>
             )}

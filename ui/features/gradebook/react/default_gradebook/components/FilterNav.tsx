@@ -22,6 +22,7 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
 // @ts-ignore
 import I18n from 'i18n!gradebook'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {View, ContextView} from '@instructure/ui-view'
@@ -40,6 +41,7 @@ import type {
   Section,
   StudentGroupCategoryMap
 } from '../gradebook.d'
+import {getLabelForFilterCondition} from '../Gradebook.utils'
 import useStore from '../stores/index'
 
 const {Item: FlexItem} = Flex as any
@@ -79,34 +81,69 @@ export default function FilterNav({
   const saveStagedFilter = useStore(state => state.saveStagedFilter)
   const updateFilter = useStore(state => state.updateFilter)
   const deleteFilter = useStore(state => state.deleteFilter)
+
   const filterComponents = filters
     .filter(f => f.is_applied)
     .map(filter => {
+      const tooltip = filter.conditions
+        .filter(c => c.value)
+        .map(condition => {
+          const label = getLabelForFilterCondition(
+            condition,
+            assignmentGroups,
+            gradingPeriods,
+            modules,
+            sections,
+            studentGroupCategories
+          )
+          return <div key={`filter-${filter.id}-condition-${condition.id}}`}>{label}</div>
+        })
+
       return (
-        <Tag
-          key={filter.id}
-          data-testid={`filter-tag-${filter.id}`}
-          text={<AccessibleContent alt={I18n.t('Remove filter')}>{filter.name}</AccessibleContent>}
-          dismissible
-          onClick={() => updateFilter({...filter, is_applied: false})}
-          margin="0 xx-small 0 0"
-        />
+        <Tooltip key={filter.id} renderTip={tooltip} placement="top" on={['hover', 'focus']}>
+          <Tag
+            data-testid={`filter-tag-${filter.id}`}
+            text={
+              <AccessibleContent alt={I18n.t('Remove filter')}>{filter.name}</AccessibleContent>
+            }
+            dismissible
+            onClick={() => updateFilter({...filter, is_applied: false})}
+            margin="0 xx-small 0 0"
+          />
+        </Tooltip>
       )
     })
-  if (stagedFilter) {
-    filterComponents.push(
-      <Tag
-        key="staged-filter"
-        text={
-          <AccessibleContent alt={I18n.t('Remove filter')}>
-            {stagedFilter.name || I18n.t('Unnamed Filter')}
-          </AccessibleContent>
-        }
-        dismissible
-        onClick={() => useStore.setState({stagedFilter: null})}
-        margin="0 xx-small 0 0"
-      />
-    )
+
+  if (stagedFilter && stagedFilter.is_applied) {
+    stagedFilter.conditions
+      .filter(c => c.value)
+      .forEach(condition => {
+        const label = getLabelForFilterCondition(
+          condition,
+          assignmentGroups,
+          gradingPeriods,
+          modules,
+          sections,
+          studentGroupCategories
+        )
+        filterComponents.push(
+          <Tag
+            data-testid="staged-filter-condition-tag"
+            key={`staged-condition-${condition.id}`}
+            text={<AccessibleContent alt={I18n.t('Remove condition')}>{label}</AccessibleContent>}
+            dismissible
+            onClick={() =>
+              useStore.setState({
+                stagedFilter: {
+                  ...stagedFilter,
+                  conditions: stagedFilter.conditions.filter(c => c.id !== condition.id)
+                }
+              })
+            }
+            margin="0 xx-small 0 0"
+          />
+        )
+      })
   }
 
   return (

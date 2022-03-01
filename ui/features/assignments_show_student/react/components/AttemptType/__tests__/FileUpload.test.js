@@ -287,7 +287,7 @@ describe('FileUpload', () => {
       window,
       new MessageEvent('message', {
         data: {
-          messageType: 'LtiDeepLinkingResponse',
+          subject: 'LtiDeepLinkingResponse',
           content_items: [
             {
               url: 'http://lemon.com',
@@ -334,7 +334,7 @@ describe('FileUpload', () => {
       window,
       new MessageEvent('message', {
         data: {
-          messageType: 'A2ExternalContentReady',
+          subject: 'A2ExternalContentReady',
           content_items: [
             {
               url: 'http://lemon.com',
@@ -377,7 +377,7 @@ describe('FileUpload', () => {
       window,
       new MessageEvent('message', {
         data: {
-          messageType: 'A2ExternalContentReady',
+          subject: 'A2ExternalContentReady',
           content_items: []
         }
       })
@@ -403,7 +403,7 @@ describe('FileUpload', () => {
       window,
       new MessageEvent('message', {
         data: {
-          messageType: 'LtiDeepLinkingResponse',
+          subject: 'LtiDeepLinkingResponse',
           errormsg
         }
       })
@@ -429,7 +429,7 @@ describe('FileUpload', () => {
       window,
       new MessageEvent('message', {
         data: {
-          messageType: 'LtiDeepLinkingResponse',
+          subject: 'LtiDeepLinkingResponse',
           content_items: [
             {
               url: 'http://lemon.com',

@@ -338,10 +338,20 @@
 #           "example": "false",
 #           "type": "boolean"
 #         },
+#         "diffing_threshold_exceeded": {
+#           "description": "Whether a diffing job failed because the threshold limit got exceeded.",
+#           "example": "true",
+#           "type": "boolean"
+#         },
 #         "diffing_data_set_identifier": {
 #           "description": "The identifier of the data set that this SIS batch diffs against",
 #           "example": "account-5-enrollments",
 #           "type": "string"
+#         },
+#         "diffing_remaster": {
+#           "description": "Whether diffing remaster data was enabled.",
+#           "example": "false",
+#           "type": "boolean"
 #         },
 #         "diffed_against_import_id": {
 #           "description": "The ID of the SIS Import that this import was diffed against",
@@ -585,6 +595,7 @@ class SisImportsApiController < ApplicationController
           @content_type = content_type
         end
 
+        # rubocop:disable Style/TrivialAccessors not a Class
         def file_obj.content_type
           @content_type
         end
@@ -592,6 +603,7 @@ class SisImportsApiController < ApplicationController
         def file_obj.original_filename
           @original_filename
         end
+        # rubocop:enable Style/TrivialAccessors not a Class
 
         if params[:extension]
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
@@ -644,7 +656,7 @@ class SisImportsApiController < ApplicationController
           end
         elsif params[:diffing_data_set_identifier].present?
           batch.enable_diffing(params[:diffing_data_set_identifier],
-                               remaster: value_to_boolean(params[:diffing_remaster_data_set]))
+                               value_to_boolean(params[:diffing_remaster_data_set]))
         end
 
         batch.options[:skip_deletes] = value_to_boolean(params[:skip_deletes])

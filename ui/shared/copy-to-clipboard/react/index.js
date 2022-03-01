@@ -25,11 +25,12 @@ import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const CopyToClipboard = props => {
+  const copyToClipboardProps = ['buttonText']
   const [inputElement, setInputElement] = useState()
 
   // Object containing props intended for the TextInput component
   const textInputProps = Object.fromEntries(
-    Object.entries(props).filter(([k]) => !CopyToClipboard.propTypes[k])
+    Object.entries(props).filter(([k]) => !copyToClipboardProps.includes(k))
   )
 
   const copyToClipboard = () => {
@@ -43,9 +44,7 @@ const CopyToClipboard = props => {
       renderAfterInput={
         <Button onClick={copyToClipboard} size="small">
           {props.buttonText}
-          <ScreenReaderContent>
-            {I18n.t('Copy the video URL')}
-          </ScreenReaderContent>
+          <ScreenReaderContent>{I18n.t('Copy the video URL')}</ScreenReaderContent>
         </Button>
       }
       inputRef={ref => setInputElement(ref)}

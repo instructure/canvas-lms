@@ -131,7 +131,7 @@ export default class CourseFilter extends React.Component {
           this.wrapper = c
         }}
       >
-        <Flex wrapItems>
+        <Flex wrap="wrap">
           <Flex.Item grow padding="0 x-small x-small 0">
             <TextInput
               ref={c => {
@@ -142,7 +142,7 @@ export default class CourseFilter extends React.Component {
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
               placeholder={I18n.t('Search by title, short name, or SIS ID')}
-              label={<ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>}
+              renderLabel={<ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>}
             />
           </Flex.Item>
           <Flex.Item padding="0 x-small x-small 0">

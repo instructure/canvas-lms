@@ -352,7 +352,7 @@ class LatePoliciesTabPanel extends React.Component {
         {this.state.showAlert && (
           <Alert
             variant="warning"
-            closeButtonLabel={I18n.t('Close')}
+            renderCloseButtonLabel={I18n.t('Close')}
             onDismiss={this.closeAlert}
             margin="small"
           >
@@ -446,7 +446,7 @@ class LatePoliciesTabPanel extends React.Component {
                         this.handleChange('lateSubmissionMinimumPercent', val)
                       }
                       placeholder="0"
-                      inline
+                      display="inline-block"
                       showArrows={false}
                     />
                   </Grid.Col>

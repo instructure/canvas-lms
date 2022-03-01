@@ -104,6 +104,9 @@
     "arrows_464a3e54": {
         "message": "Các phím mũi tên"
     },
+    "art_icon_8e1daad": {
+        "message": "Biểu Tượng Nghệ Thuật"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Tỷ lệ khung hình sẽ được giữ nguyên"
     },
@@ -227,6 +230,9 @@
     "clear_2084585f": {
         "message": "Xóa bỏ"
     },
+    "clear_image_3213fe62": {
+        "message": "Xóa hình ảnh"
+    },
     "clear_selected_file_82388e50": {
         "message": "Xóa bỏ tập tin đã chọn"
     },
@@ -340,6 +346,9 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Giấy Phép Creative Commons:"
+    },
+    "crop_image_41bf940c": {
+        "message": "Cắt gọt hình ảnh"
     },
     "crop_image_807ebb08": {
         "message": "Cắt Gọt Hình Ảnh"
@@ -509,6 +518,12 @@
     "embedded_content_aaeb4d3d": {
         "message": "nội dung nhúng"
     },
+    "engineering_icon_f8f3cf43": {
+        "message": "Biểu Tượng Kỹ Thuật"
+    },
+    "english_icon_25bfe845": {
+        "message": "Biểu Tượng Tiếng Anh"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Nhập ít nhất 3 ký tự để tìm kiếm"
     },
@@ -553,6 +568,9 @@
     },
     "extra_small_9ae33252": {
         "message": "Cực Nhỏ"
+    },
+    "extracurricular_icon_67c8ca42": {
+        "message": "Biểu Tượng Ngoại Khóa"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Hé nhìn vào tương lai của bạn thất bại"
@@ -683,6 +701,9 @@
     "heading_4_b2e74be7": {
         "message": "Đầu Đề 4"
     },
+    "health_icon_8d292eb5": {
+        "message": "Biểu Tượng Sức Khỏe"
+    },
     "height_69b03e15": {
         "message": "Chiều Cao"
     },
@@ -709,6 +730,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Tôi là bên giữ bản quyền"
+    },
+    "icon_color_b86dd6d6": {
+        "message": "Màu Biểu Tượng"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Nếu bạn không chọn quyền sử dụng lúc này thì tập tin sẽ không được công bố sau khi tải lên."
@@ -776,6 +800,12 @@
     "language_arts_35b79a8b": {
         "message": "Nghệ Thuật Ngôn Ngữ"
     },
+    "language_arts_icon_a798b0f8": {
+        "message": "Biểu Tượng Nghệ Thuật Ngôn Ngữ"
+    },
+    "languages_icon_9d20539": {
+        "message": "Biểu Tượng Ngôn Ngữ"
+    },
     "large_9c5e80e7": {
         "message": "Lớn"
     },
@@ -784,6 +814,9 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Trái Sang Phải"
+    },
+    "library_icon_ae1e54cf": {
+        "message": "Biểu Tượng Thư Viện"
     },
     "link_7262adec": {
         "message": "Liên Kết"
@@ -854,6 +887,9 @@
     "math_ede93050": {
         "message": "Toán"
     },
+    "math_icon_ad4e9d03": {
+        "message": "Biểu Tượng Toán"
+    },
     "media_af190855": {
         "message": "Phương Tiện"
     },
@@ -880,6 +916,9 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Ảnh Nhiều Màu"
+    },
+    "music_icon_4db5c972": {
+        "message": "Biểu Tượng Âm Nhạc"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Ít nhất phải bằng { percentage }%"
@@ -1034,6 +1073,12 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "Phần trăm phải là số"
     },
+    "performing_arts_icon_f3497486": {
+        "message": "Biểu Tượng Nghệ Thuật Biểu Diễn"
+    },
+    "physical_education_icon_d7dffd3e": {
+        "message": "Biểu Tượng Giáo Dục Thể Chất"
+    },
     "pixels_52ece7d1": {
         "message": "Pixel"
     },
@@ -1099,6 +1144,9 @@
     },
     "relationships_6602af70": {
         "message": "Mối Quan Hệ"
+    },
+    "religion_icon_246e0be1": {
+        "message": "Biểu Tượng Tôn Giáo"
     },
     "reminder_date_4564d12d": {
         "message": "Lời nhắc nhở: { date }"
@@ -1525,5 +1573,11 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Bạn đã cuộn về Việc Cần Làm đầu tiên của bạn!"
+    },
+    "zoom_in_image_bb97d4f": {
+        "message": "Phóng to hình ảnh"
+    },
+    "zoom_out_image_d0a0a2ec": {
+        "message": "Thu nhỏ hình ảnh"
     }
 }

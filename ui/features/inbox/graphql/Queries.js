@@ -52,6 +52,19 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               _id
               id
               name
+              commonCoursesConnection {
+                nodes {
+                  _id
+                  id
+                  state
+                  type
+                  course {
+                    name
+                    id
+                    _id
+                  }
+                }
+              }
             }
             pageInfo {
               ...PageInfo
@@ -163,7 +176,7 @@ export const REPLY_CONVERSATION_QUERY = gql`
 `
 export const SUBMISSION_COMMENTS_QUERY = gql`
   query SubmissionCommentsQuery($userID: ID!) {
-    legacyNote(_id: $userID, type: User) {
+    legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
         id

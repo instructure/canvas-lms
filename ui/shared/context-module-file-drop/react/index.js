@@ -181,7 +181,7 @@ export default class ModuleFileDrop extends React.Component {
     const {interaction, folder} = this.state
     return (
       <FileDrop
-        allowMultiple
+        shouldAllowMultiple
         renderLabel={this.renderBillboard()}
         onDragEnter={this.handleDragEnter}
         onDragLeave={this.handleDragLeave}

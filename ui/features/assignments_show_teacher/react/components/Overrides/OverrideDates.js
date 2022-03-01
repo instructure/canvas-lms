@@ -114,7 +114,7 @@ export default class OverrideDates extends React.Component {
           padding="0"
           justifyItems="space-between"
           alignItems="start"
-          wrapItems
+          wrap="wrap"
           data-testid="OverrideDates"
         >
           <Flex.Item margin="0 x-small 0 0" as="div" grow width="30%">

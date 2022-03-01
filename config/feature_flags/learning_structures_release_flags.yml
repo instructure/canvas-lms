@@ -25,11 +25,6 @@ auto_show_cc:
     Automatically show closed captions in the user's current
     language (if available) when playing canvas media.
   applies_to: User
-k5_parent_support:
-  state: hidden
-  display_name: 'Canvas for Elementary: Parent Support'
-  description: Enables support for observers within Canvas for Elementary.
-  applies_to: SiteAdmin
 pace_plans:
   state: hidden
   display_name: 'Pace Plans'
@@ -39,18 +34,6 @@ pace_plans:
     feedback by joining the Pace Plans User Group.
   applies_to: Account
   beta: true
-sticky_left_nav:
-  state: hidden
-  display_name: 'Sticky Left Navigation'
-  description: Turns left-side navigation sidebar sticky.
-  applies_to: SiteAdmin
-notification_settings_course_selector:
-  state: hidden
-  display_name: 'Notification settings: Course selector'
-  description: >-
-    Allows modifying notification settings for any course from within the
-    account-level notification settings page.
-  applies_to: SiteAdmin
 create_course_subaccount_picker:
   state: hidden
   applies_to: RootAccount
@@ -75,20 +58,6 @@ conferencing_in_planner:
   environments:
     beta:
       enable_at: "2021-10-18"
-remember_settings_tab:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Remember your settings page tab
-  description: |-
-    Keep track of which Settings page tab you are on
-    so the browser's back button takes you to your previous
-    tab, and that refreshing the page will return you to
-    the current active tab.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 submission_feedback_indicators:
   state: allowed
   applies_to: RootAccount

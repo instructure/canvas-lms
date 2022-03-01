@@ -86,7 +86,7 @@ export default function NewCourseModal({terms, children}) {
   }
 
   function onChange(field) {
-    return function(e, value) {
+    return function (e, value) {
       setData(oldState => ({...oldState, [field]: value.id || value}))
       setErrors({})
     }
@@ -151,7 +151,7 @@ export default function NewCourseModal({terms, children}) {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={closeModal}>{I18n.t('Cancel')}</Button> &nbsp;
-          <Button type="submit" variant="primary">
+          <Button type="submit" color="primary">
             {I18n.t('Add Course')}
           </Button>
         </Modal.Footer>

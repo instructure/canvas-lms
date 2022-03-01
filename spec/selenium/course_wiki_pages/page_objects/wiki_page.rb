@@ -99,7 +99,7 @@ module CourseWikiPage
   end
 
   def immersive_reader_btn
-    fj("[type='button']:contains('Immersive Reader')")
+    fj("#immersive_reader_mount_point [type='button']:contains('Immersive Reader')")
   end
 
   def edit_page_title_input

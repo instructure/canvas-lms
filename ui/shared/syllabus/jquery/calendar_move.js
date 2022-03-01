@@ -22,8 +22,6 @@ import '@canvas/util/templateData' /* fillTemplateData */
 import 'jqueryui/datepicker'
 import moment from 'moment'
 
-const monthNames = I18n.lookup('date.month_names')
-
 function makeDate(date) {
   return {
     day: date.getDate(),
@@ -33,6 +31,7 @@ function makeDate(date) {
 }
 
 export function changeMonth($month, change) {
+  const monthNames = I18n.lookup('date.month_names')
   const monthData = $month.data('calendar_objects')
   var data = {}
   var current = null
