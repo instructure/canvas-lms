@@ -36,7 +36,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 const FileButton = props => {
   return (
-    <Tooltip renderTip={props.tip} as="div" color="primary">
+    <Tooltip tip={props.tip} as="div" variant="inverse">
       <div
         className={`file-select-item ${props.selected ? 'file-select-item-selected' : ''}`}
         onClick={props.onClick}

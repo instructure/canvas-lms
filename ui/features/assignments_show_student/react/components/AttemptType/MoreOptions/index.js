@@ -75,8 +75,8 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
 
     const handleMessage = e => {
       if (
-        e.data.subject === 'LtiDeepLinkingResponse' ||
-        e.data.subject === 'A2ExternalContentReady'
+        e.data.messageType === 'LtiDeepLinkingResponse' ||
+        e.data.messageType === 'A2ExternalContentReady'
       ) {
         setShowModal(false)
       }
@@ -98,15 +98,13 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
       theme={{borderWidth: '0'}}
       withBackground={false}
     >
-      <Flex direction="row" justifyItems="center" padding="xxx-small 0">
-        <Flex.Item>{icon}</Flex.Item>
-        <Flex.Item margin="0 small">
-          <ScreenReaderContent>{I18n.t('Submit file using %{label}', {label})}</ScreenReaderContent>
-          <Text color="primary" size="large">
-            {label}
-          </Text>
-        </Flex.Item>
-      </Flex>
+      {icon}
+      <View as="div" margin="small 0 0">
+        <ScreenReaderContent>{I18n.t('Submit file using %{label}', {label})}</ScreenReaderContent>
+        <Text color="brand" weight="bold" size="medium">
+          {label}
+        </Text>
+      </View>
     </Button>
   )
 
@@ -131,12 +129,9 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
       shouldCloseOnDocumentClick
     >
       <Modal.Header>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          onClick={closeModal}
-          screenReaderLabel={I18n.t('Close')}
-        />
+        <CloseButton placement="end" offset="medium" variant="icon" onClick={closeModal}>
+          {I18n.t('Close')}
+        </CloseButton>
         <Heading>{modalTitle}</Heading>
       </Modal.Header>
       <Modal.Body padding="0 x-small">
@@ -154,9 +149,10 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
     <View
       as="div"
       background="primary"
-      borderColor="primary"
+      borderColor="brand"
       borderWidth="small"
       borderRadius="medium"
+      height="100px"
       minWidth="100px"
     >
       {button}
@@ -175,7 +171,7 @@ BaseUploadTool.propTypes = {
   title: string
 }
 
-const iconDimensions = {height: '24px', width: '24px'}
+const iconDimensions = {height: '48px', width: '48px'}
 
 function CanvasFileChooser({courseID, onFileSelect, userID}) {
   const [selectedCanvasFileID, setSelectedCanvasFileId] = useState(null)
@@ -214,7 +210,7 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
       <>
         {cancelButton}
         <Button
-          color="primary"
+          variant="primary"
           onClick={() => {
             onFileSelect(selectedCanvasFileID)
             closeModal()
@@ -229,7 +225,7 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
   return (
     <BaseUploadTool
       renderFooter={footerContents}
-      icon={<IconFolderLine size="medium" color="primary" width="24px" height="24px" />}
+      icon={<IconFolderLine size="medium" color="brand" />}
       label={I18n.t('Canvas Files')}
     >
       {() => contents}
@@ -276,7 +272,7 @@ function WebcamPhotoUpload({onPhotoTaken}) {
     <BaseUploadTool
       hideFooter
       icon={<Img alt={I18n.t('Take a Photo via Webcam')} src={TakePhotoUrl} {...iconDimensions} />}
-      label={I18n.t('Webcam Photo')}
+      label={I18n.t('Webcam')}
       title={I18n.t('Take a Photo via Webcam')}
     >
       {({close}) => (
@@ -296,17 +292,17 @@ function MoreOptions({breakpoints, courseID, handleCanvasFiles, handleWebcamPhot
     return null
   }
 
-  const itemMargin = breakpoints.desktopOnly ? 'x-small' : 'xx-small xxx-small'
+  const itemMargin = breakpoints.desktopOnly ? '0 x-small' : 'xx-small xxx-small'
 
   return (
-    <Flex direction="column" justifyItems="center">
+    <Flex direction="row" justifyItems="center" wrap="wrap">
       {handleWebcamPhotoUpload && (
-        <Flex.Item margin={itemMargin} overflowY="visible">
+        <Flex.Item margin={itemMargin}>
           <WebcamPhotoUpload onPhotoTaken={handleWebcamPhotoUpload} />
         </Flex.Item>
       )}
       {handleCanvasFiles && (
-        <Flex.Item margin={itemMargin} overflowY="visible">
+        <Flex.Item margin={itemMargin}>
           <CanvasFileChooser courseID={courseID} userID={userID} onFileSelect={handleCanvasFiles} />
         </Flex.Item>
       )}

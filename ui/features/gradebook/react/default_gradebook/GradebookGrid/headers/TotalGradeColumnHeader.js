@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 
@@ -31,15 +31,9 @@ import ColumnHeader from './ColumnHeader'
 
 function renderTrigger(ref) {
   return (
-    <IconButton
-      elementRef={ref}
-      margin="0"
-      size="small"
-      renderIcon={IconMoreSolid}
-      withBackground={false}
-      withBorder={false}
-      screenReaderLabel={I18n.t('Total Options')}
-    />
+    <Button buttonRef={ref} margin="0" size="small" variant="icon" icon={IconMoreSolid}>
+      <ScreenReaderContent>{I18n.t('Total Options')}</ScreenReaderContent>
+    </Button>
   )
 }
 

@@ -37,17 +37,4 @@ describe('<Header />', () => {
     fireEvent.change(input, {target: {value: 'A descriptive text'}})
     expect(onChange).toHaveBeenCalledWith({alt: 'A descriptive text'})
   })
-
-  describe('when the name contains html entities', () => {
-    let settings
-
-    const subject = () => render(<Header settings={settings} onChange={() => {}} />)
-
-    beforeEach(() => (settings = {...DEFAULT_SETTINGS, name: 'Button &amp; Icon'}))
-
-    it('decodes the html entities', () => {
-      const {getByTestId} = subject()
-      expect(getByTestId('button-name').value).toEqual('Button & Icon')
-    })
-  })
 })

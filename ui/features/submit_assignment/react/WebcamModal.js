@@ -120,7 +120,7 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
         <Modal.Footer>
           {!takenImage.dataURL && (
             <Focus>
-              <Button color="primary" onClick={onTakePicture}>
+              <Button variant="primary" onClick={onTakePicture}>
                 {I18n.t('Take Photo')}
               </Button>
             </Focus>
@@ -133,7 +133,7 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
               </Button>
 
               <Focus>
-                <Button color="primary" onClick={innerOnSelectImage}>
+                <Button variant="primary" onClick={innerOnSelectImage}>
                   {I18n.t('Use This Photo')}
                 </Button>
               </Focus>

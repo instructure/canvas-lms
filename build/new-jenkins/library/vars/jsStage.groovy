@@ -64,26 +64,6 @@ def tearDownNode() {
     copyToWorkspace srcBaseDir: '/usr/src/app', path: env.TEST_RESULT_OUTPUT_DIR
     archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
     junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
-
-    if (env.COVERAGE == '1') {
-      /* groovylint-disable-next-line GStringExpressionWithinString */
-      sh '''#!/bin/bash
-        rm -vrf ./coverage-report-js
-        mkdir -v coverage-report-js
-        chmod -vvR 777 coverage-report-js
-
-        counter=0
-        for coverage_file in `find . -type d -name node_modules -prune -o -name coverage*.json -print`
-        do
-          stagearray=($STAGE_NAME)
-          new_file="./coverage-report-js/coverage-"${stagearray[0]}"-"$counter".json"
-          cp $coverage_file $new_file
-          ((counter=counter+1))
-        done
-      '''
-      copyToWorkspace srcBaseDir: '/usr/src/app', path: 'coverage-report-js'
-      archiveArtifacts allowEmptyArchive: true, artifacts: 'coverage-report-js/*'
-    }
   }
 }
 
@@ -132,6 +112,7 @@ def queueTestStage() {
     def baseEnvVars = [
       "FORCE_FAILURE=${env.FORCE_FAILURE}",
       'RAILS_ENV=test',
+      "RAILS_LOAD_ALL_LOCALES=${env.RAILS_LOAD_ALL_LOCALES}",
       "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
     ]
 

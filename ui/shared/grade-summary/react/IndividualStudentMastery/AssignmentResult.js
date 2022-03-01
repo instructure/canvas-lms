@@ -27,8 +27,6 @@ import {IconAssignmentLine, IconQuizLine, IconHighlighterLine} from '@instructur
 import * as shapes from './shapes'
 import Ratings from '@canvas/rubrics/react/Ratings'
 
-import {Link} from '@instructure/ui-link'
-
 const scoreFromPercent = (percent, outcome) => {
   if (outcome.points_possible > 0) {
     return +(percent * outcome.points_possible).toFixed(2)
@@ -47,14 +45,14 @@ const scaleScore = (score, possible, outcome) => {
 }
 
 const renderLinkedResult = (name, url, isQuiz) => (
-  <Link
+  <Button
+    variant="link"
     href={url}
-    isWithinText={false}
     theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal', fontWeight: '700'}}
-    renderIcon={isQuiz ? IconQuizLine : IconAssignmentLine}
+    icon={isQuiz ? IconQuizLine : IconAssignmentLine}
   >
     {name}
-  </Link>
+  </Button>
 )
 
 const renderUnlinkedResult = name => (

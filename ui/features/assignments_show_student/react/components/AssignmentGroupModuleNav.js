@@ -22,8 +22,6 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 
-import {Link} from '@instructure/ui-link'
-
 const MAX_DISPLAYED_MODULES = 2
 
 export default function AssignmentGroupModuleNav({assignment}) {
@@ -32,39 +30,39 @@ export default function AssignmentGroupModuleNav({assignment}) {
     <Flex margin="0 0 large 0" direction="column">
       {modules.slice(0, MAX_DISPLAYED_MODULES).map(module => (
         <Flex.Item key={module.id} overflowY="visible">
-          <Link
+          <Button
             data-testid="module-link"
             href={env.moduleUrl}
-            isWithinText={false}
+            variant="link"
             theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {module.name}
-          </Link>
+          </Button>
         </Flex.Item>
       ))}
       {modules.length > MAX_DISPLAYED_MODULES && (
         <Flex.Item overflowY="visible">
-          <Link
+          <Button
             data-testid="more-module-link"
             href={env.moduleUrl}
-            isWithinText={false}
+            variant="link"
             theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {I18n.t('More Modules')}
-          </Link>
+          </Button>
         </Flex.Item>
       )}
 
       {assignmentGroup && (
         <Flex.Item overflowY="visible">
-          <Link
+          <Button
             data-testid="assignmentgroup-link"
             href={env.assignmentUrl}
-            isWithinText={false}
+            variant="link"
             theme={{mediumPadmediumPaddingHorizontalding: '0', mediumHeight: 'normal'}}
           >
             {assignmentGroup.name}
-          </Link>
+          </Button>
         </Flex.Item>
       )}
     </Flex>

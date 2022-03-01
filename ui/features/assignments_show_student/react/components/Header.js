@@ -25,7 +25,6 @@ import GradeDisplay from './GradeDisplay'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {Badge} from '@instructure/ui-badge'
 import {Heading} from '@instructure/ui-heading'
-import {Link} from '@instructure/ui-link'
 import {IconChatLine, IconQuestionLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_student_header'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
@@ -94,7 +93,7 @@ class Header extends React.Component {
           return (
             <Tooltip
               as="div"
-              renderTip={
+              tip={
                 <LatePolicyToolTipContent
                   attempt={submission.attempt}
                   grade={submission.grade}
@@ -184,9 +183,9 @@ class Header extends React.Component {
           {addCommentsDisabled && (
             <Popover
               renderTrigger={
-                <Link size="small" renderIcon={IconQuestionLine}>
+                <Button variant="link" size="small" icon={IconQuestionLine}>
                   <ScreenReaderContent>{popoverMessage}</ScreenReaderContent>
-                </Link>
+                </Button>
               }
             >
               <View display="block" padding="small" maxWidth="15rem">

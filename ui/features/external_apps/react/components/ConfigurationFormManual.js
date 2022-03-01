@@ -130,8 +130,8 @@ export default class ConfigurationFormManual extends React.Component {
           ref="name"
           id="name"
           defaultValue={this.props.name}
-          renderLabel={I18n.t('Name')}
-          isRequired
+          label={I18n.t('Name')}
+          required
           errors={this.state.errors}
         />
 
@@ -141,7 +141,7 @@ export default class ConfigurationFormManual extends React.Component {
               ref="consumerKey"
               id="consumerKey"
               defaultValue={this.props.consumerKey}
-              renderLabel={I18n.t('Consumer Key')}
+              label={I18n.t('Consumer Key')}
               errors={this.state.errors}
             />
           </div>
@@ -151,7 +151,7 @@ export default class ConfigurationFormManual extends React.Component {
               id="sharedSecret"
               defaultValue={this.props.sharedSecret}
               placeholder={this.props.consumerKey ? I18n.t('[Unchanged]') : null} // Assume that if we have a consumer key, we have a secret
-              renderLabel={I18n.t('Shared Secret')}
+              label={I18n.t('Shared Secret')}
               errors={this.state.errors}
             />
           </div>
@@ -163,8 +163,8 @@ export default class ConfigurationFormManual extends React.Component {
           ref="url"
           id="url"
           defaultValue={this.props.url ? this.props.url : ''}
-          renderLabel={I18n.t('Launch URL')}
-          isRequired
+          label={I18n.t('Launch URL')}
+          required
           errors={this.state.errors}
         />
 
@@ -174,7 +174,7 @@ export default class ConfigurationFormManual extends React.Component {
               ref="domain"
               id="domain"
               defaultValue={this.props.domain ? this.props.domain : ''}
-              renderLabel={I18n.t('Domain')}
+              label={I18n.t('Domain')}
               errors={this.state.errors}
             />
           </div>

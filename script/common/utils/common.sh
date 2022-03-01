@@ -50,15 +50,6 @@ function run_command {
     "$@"
   fi
 }
-# remove once https://github.com/docker/compose/issues/9104 is fixed
-function run_command_tty {
-  if is_running_on_jenkins; then
-    docker-compose exec -T web "$@"
-  elif is_docker; then
-    # -T needed until https://github.com/docker/compose/issues/9104 is fixed
-    $DOCKER_COMMAND exec -e TELEMETRY_OPT_IN web "$@"
-  fi
-}
 
 function _canvas_lms_track {
   command="$@"

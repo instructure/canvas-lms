@@ -19,7 +19,7 @@
 import React from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 
@@ -251,15 +251,15 @@ export default class StudentColumnHeader extends ColumnHeader {
                     contentRef={this.bindOptionsMenuContent}
                     shouldFocusTriggerOnClose={false}
                     trigger={
-                      <IconButton
-                        elementRef={e => (this.optionsMenuTrigger = e)}
+                      <Button
+                        buttonRef={e => (this.optionsMenuTrigger = e)}
                         margin="0"
                         size="small"
-                        renderIcon={IconMoreSolid}
-                        withBackground={false}
-                        withBorder={false}
-                        screenReaderLabel={this.getColumnHeaderOptions()}
-                      />
+                        variant="icon"
+                        icon={IconMoreSolid}
+                      >
+                        <ScreenReaderContent>{this.getColumnHeaderOptions()}</ScreenReaderContent>
+                      </Button>
                     }
                     onToggle={this.onToggle}
                     onDismiss={this.props.onMenuDismiss}

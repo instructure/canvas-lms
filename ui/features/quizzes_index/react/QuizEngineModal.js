@@ -62,10 +62,10 @@ function QuizEngineModal({setOpen, onDismiss}) {
   )
   const footer = (
     <div>
-      <Button onClick={onDismiss} margin="0 x-small 0 0" color="primary-inverse">
+      <Button onClick={onDismiss} margin="0 x-small 0 0" variant="light">
         {I18n.t('Cancel')}
       </Button>
-      <Button type="submit" onClick={handleSubmit} color="primary" disabled={!option}>
+      <Button type="submit" onClick={handleSubmit} variant="primary" disabled={!option}>
         {I18n.t('Submit')}
       </Button>
     </div>

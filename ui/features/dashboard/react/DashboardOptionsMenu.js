@@ -23,7 +23,7 @@ import axios from '@canvas/axios'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 
 export default class DashboardOptionsMenu extends React.Component {
@@ -83,13 +83,9 @@ export default class DashboardOptionsMenu extends React.Component {
     return (
       <Menu
         trigger={
-          <IconButton
-            renderIcon={IconMoreLine}
-            withBackground={false}
-            withBorder={false}
-            elementRef={this.props.menuButtonRef}
-            screenReaderLabel={I18n.t('Dashboard Options')}
-          />
+          <Button variant="icon" icon={IconMoreLine} buttonRef={this.props.menuButtonRef}>
+            <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
+          </Button>
         }
         contentRef={el => (this.menuContentRef = el)}
       >

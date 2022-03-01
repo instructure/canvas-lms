@@ -151,7 +151,7 @@ export const DiscussionPostToolbar = props => {
                       </ScreenReaderContent>
                     }
                     value={props.searchTerm}
-                    renderBeforeInput={<IconSearchLine display="block" />}
+                    renderBeforeInput={<IconSearchLine inline={false} />}
                     renderAfterInput={clearButton}
                     placeholder={I18n.t('Search entries or author...')}
                     shouldNotWrap

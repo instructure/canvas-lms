@@ -109,7 +109,7 @@ const buildContentItems = (items: ContentItem[]) =>
   }, [] as ContentItemDisplay[])
 
 export const RetrievingContent = ({environment, parentWindow}) => {
-  const subject = 'LtiDeepLinkingResponse'
+  const messageType = 'LtiDeepLinkingResponse'
   const deepLinkResponse = environment.deep_link_response as DeepLinkResponse
   const [hasErrors, setHasErrors] = useState(false)
   const [contentItems, setContentItems] = useState([] as ContentItemDisplay[])
@@ -117,7 +117,7 @@ export const RetrievingContent = ({environment, parentWindow}) => {
   const sendMessage = useCallback(() => {
     parentWindow.postMessage(
       {
-        subject,
+        messageType,
         ...deepLinkResponse
       },
       environment.DEEP_LINKING_POST_MESSAGE_ORIGIN

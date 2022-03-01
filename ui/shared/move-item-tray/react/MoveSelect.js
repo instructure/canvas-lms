@@ -172,7 +172,7 @@ export default class MoveSelect extends React.Component {
               id="move-item-tray-submit-button"
               disabled={!this.isDoneSelecting()}
               type="submit"
-              color="primary"
+              variant="primary"
               onClick={this.submitSelection}
               margin="0 x-small 0 0"
             >

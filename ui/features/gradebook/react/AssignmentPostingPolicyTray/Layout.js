@@ -134,7 +134,7 @@ export default function Layout(props) {
           </Flex.Item>
 
           <Flex.Item>
-            <Button onClick={props.onSave} disabled={!props.allowSaving} color="primary">
+            <Button onClick={props.onSave} disabled={!props.allowSaving} variant="primary">
               {I18n.t('Save')}
             </Button>
           </Flex.Item>

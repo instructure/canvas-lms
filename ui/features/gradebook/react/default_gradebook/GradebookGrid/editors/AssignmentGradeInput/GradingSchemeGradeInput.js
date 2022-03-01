@@ -209,7 +209,7 @@ export default class GradingSchemeInput extends Component {
         <TextInput
           disabled={this.props.disabled}
           inputRef={this.bindTextInput}
-          renderLabel={this.props.label}
+          label={this.props.label}
           messages={this.props.messages}
           onChange={this.handleTextChange}
           size="small"
@@ -225,7 +225,7 @@ export default class GradingSchemeInput extends Component {
             placement="bottom"
             trigger={
               <Button
-                elementRef={this.bindButton}
+                buttonRef={this.bindButton}
                 disabled={this.props.disabled}
                 size="small"
                 variant="icon"

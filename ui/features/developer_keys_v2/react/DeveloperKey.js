@@ -23,7 +23,7 @@ import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconLtiLine} from '@instructure/ui-icons'
@@ -157,30 +157,34 @@ class DeveloperKey extends React.Component {
               <div>
                 <Popover
                   placement="top"
-                  shouldAlignArrow
+                  alignArrow
                   on="click"
-                  isShowingContent={this.state.showKey}
+                  show={this.state.showKey}
                   shouldContainFocus
                   shouldReturnFocus
                   shouldCloseOnDocumentClick
-                  onHideContent={this.handleShowKey}
-                  screenReaderLabel={I18n.t('Key')}
-                  renderTrigger={
+                  onDismiss={this.handleShowKey}
+                  label={I18n.t('Key')}
+                >
+                  <Popover.Trigger>
                     <Button onClick={this.handleShowKey} size="small">
                       {this.state.showKey ? I18n.t('Hide Key') : I18n.t('Show Key')}
                       <ScreenReaderContent>{this.getToolName()}</ScreenReaderContent>
                     </Button>
-                  }
-                >
-                  <CloseButton
-                    placement="end"
-                    offset="x-small"
-                    onClick={this.handleShowKey}
-                    screenReaderLabel={I18n.t('Close')}
-                  />
-                  <View padding="large small small small" display="block">
-                    {developerKey.api_key}
-                  </View>
+                  </Popover.Trigger>
+                  <Popover.Content>
+                    <CloseButton
+                      placement="end"
+                      offset="x-small"
+                      variant="icon"
+                      onClick={this.handleShowKey}
+                    >
+                      {I18n.t('Close')}
+                    </CloseButton>
+                    <View padding="large small small small" display="block">
+                      {developerKey.api_key}
+                    </View>
+                  </Popover.Content>
                 </Popover>
               </div>
             )}
@@ -208,15 +212,12 @@ class DeveloperKey extends React.Component {
         <Table.Cell>
           {developerKey.is_lti_key ? (
             <Tooltip
-              renderTip={I18n.t('Developer key is an external tool.')}
+              tip={I18n.t('Developer key is an external tool.')}
               on={['click', 'hover', 'focus']}
             >
-              <IconButton
-                renderIcon={IconLtiLine}
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Toggle ToolTip')}
-              />
+              <Button variant="icon" icon={IconLtiLine}>
+                <ScreenReaderContent>{I18n.t('Toggle ToolTip')}</ScreenReaderContent>
+              </Button>
             </Tooltip>
           ) : null}
         </Table.Cell>

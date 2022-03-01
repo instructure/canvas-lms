@@ -104,9 +104,6 @@
     "arrows_464a3e54": {
         "message": "Flèches"
     },
-    "art_icon_8e1daad": {
-        "message": "Icône d’art"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Les proportions seront préservées"
     },
@@ -230,9 +227,6 @@
     "clear_2084585f": {
         "message": "Effacer"
     },
-    "clear_image_3213fe62": {
-        "message": "Effacer l’image"
-    },
     "clear_selected_file_82388e50": {
         "message": "Effacer le fichier sélectionné"
     },
@@ -346,9 +340,6 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Licence Creative Commons :"
-    },
-    "crop_image_41bf940c": {
-        "message": "Recadrer l’image"
     },
     "crop_image_807ebb08": {
         "message": "Recadrer l’image"
@@ -518,12 +509,6 @@
     "embedded_content_aaeb4d3d": {
         "message": "contenu incorporé"
     },
-    "engineering_icon_f8f3cf43": {
-        "message": "Icône Ingénierie"
-    },
-    "english_icon_25bfe845": {
-        "message": "Icône Anglais"
-    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Saisir au moins 3 caractères à rechercher"
     },
@@ -568,9 +553,6 @@
     },
     "extra_small_9ae33252": {
         "message": "Très petit"
-    },
-    "extracurricular_icon_67c8ca42": {
-        "message": "Icône Parascolaire"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Échec de l’examen de votre avenir"
@@ -701,9 +683,6 @@
     "heading_4_b2e74be7": {
         "message": "En-tête 4"
     },
-    "health_icon_8d292eb5": {
-        "message": "Icône Santé"
-    },
     "height_69b03e15": {
         "message": "Taille"
     },
@@ -730,9 +709,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Je détiens les droits d’auteur"
-    },
-    "icon_color_b86dd6d6": {
-        "message": "Couleur de l’icône"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Si vous ne sélectionnez pas de droits d''utilisation maintenant, ce fichier ne sera pas publié après son téléversement."
@@ -800,12 +776,6 @@
     "language_arts_35b79a8b": {
         "message": "Arts de la langue"
     },
-    "language_arts_icon_a798b0f8": {
-        "message": "Icône Arts de la langue"
-    },
-    "languages_icon_9d20539": {
-        "message": "Icône Langues"
-    },
     "large_9c5e80e7": {
         "message": "Large"
     },
@@ -814,9 +784,6 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Gauche-à-droite"
-    },
-    "library_icon_ae1e54cf": {
-        "message": "Icône Bibliothèque"
     },
     "link_7262adec": {
         "message": "Lien"
@@ -887,9 +854,6 @@
     "math_ede93050": {
         "message": "Mathématiques"
     },
-    "math_icon_ad4e9d03": {
-        "message": "Icône Mathématique"
-    },
     "media_af190855": {
         "message": "Support média"
     },
@@ -916,9 +880,6 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Image multicolore"
-    },
-    "music_icon_4db5c972": {
-        "message": "Icône Musique"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Doit être au moins { percentage }%"
@@ -1073,12 +1034,6 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "Le pourcentage doit être un chiffre"
     },
-    "performing_arts_icon_f3497486": {
-        "message": "Icône Arts de la scène"
-    },
-    "physical_education_icon_d7dffd3e": {
-        "message": "Icône Éducation physique"
-    },
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
@@ -1144,9 +1099,6 @@
     },
     "relationships_6602af70": {
         "message": "Relations"
-    },
-    "religion_icon_246e0be1": {
-        "message": "Icône Religion"
     },
     "reminder_date_4564d12d": {
         "message": "Rappel : { date }"
@@ -1573,11 +1525,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Vous êtes revenu à votre toute première tâche À faire!"
-    },
-    "zoom_in_image_bb97d4f": {
-        "message": "Zoom sur l’image"
-    },
-    "zoom_out_image_d0a0a2ec": {
-        "message": "Zoom arrière sur l’image"
     }
 }

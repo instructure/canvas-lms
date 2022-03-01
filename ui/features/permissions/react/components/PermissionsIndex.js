@@ -151,11 +151,9 @@ export default function PermissionsIndex(props) {
             <Grid.Row vAlign="middle">
               <Grid.Col width={3}>
                 <TextInput
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>
-                  }
+                  label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
-                  renderAfterInput={() => (
+                  icon={() => (
                     <span disabled>
                       <IconSearchLine focusable={false} />
                     </span>
@@ -180,7 +178,7 @@ export default function PermissionsIndex(props) {
               <Grid.Col width={2}>
                 <Button
                   id="add_role"
-                  color="primary"
+                  variant="primary"
                   margin="0 x-small 0 0"
                   onClick={props.setAndOpenAddTray}
                 >

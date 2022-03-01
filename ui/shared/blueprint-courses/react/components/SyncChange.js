@@ -125,12 +125,13 @@ class SyncChange extends Component {
                 <Grid.Col width={2}>{this.renderText(changeTypeLabels[change_type])}</Grid.Col>
                 <Grid.Col width={2}>
                   {hasExceptions ? (
-                    <Pill id="exceptionPill">
-                      {I18n.t(
+                    <Pill
+                      id="exceptionPill"
+                      text={I18n.t(
                         {one: '%{count} exception', other: '%{count} exceptions'},
                         {count: exceptions.length}
                       )}
-                    </Pill>
+                    />
                   ) : (
                     this.renderText(I18n.t('Applied'))
                   )}

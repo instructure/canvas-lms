@@ -24,7 +24,7 @@ describe('The CriterionInfo component', () => {
     const component = shallow(<CriterionInfo />)
     expect(component).toMatchSnapshot()
 
-    component.find('IconButton').prop('onClick')()
+    component.find('Button').prop('onClick')()
     component.update()
     expect(component).toMatchSnapshot()
   })

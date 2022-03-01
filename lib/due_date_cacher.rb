@@ -141,21 +141,13 @@ class DueDateCacher
 
   def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
     @course = course
+
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
-
-    # ensure we're dealing with local IDs to avoid headaches downstream
-    if @assignment_ids.present?
-      @course.shard.activate do
-        if @assignment_ids.any? { |id| Assignment.global_id?(id) }
-          @assignment_ids = Assignment.where(id: @assignment_ids).pluck(:id)
-        end
-
-        @assignments_auditable_by_id = Set.new(Assignment.auditable.where(id: @assignment_ids).pluck(:id))
-      end
-    else
-      @assignments_auditable_by_id = Set.new
-    end
-
+    @assignments_auditable_by_id = if @assignment_ids.present?
+                                     Set.new(Assignment.auditable.where(id: @assignment_ids).pluck(:id))
+                                   else
+                                     Set.new
+                                   end
     @user_ids = Array(user_ids)
     @update_grades = update_grades
     @original_caller = original_caller
@@ -267,7 +259,7 @@ class DueDateCacher
       # of student scores.  No changes to the Course record can trigger such re-calculations so
       # let's ensure this is triggered only when DueDateCacher is called for a Assignment-level
       # changes and not for Course-level changes
-      assignment = @course.shard.activate { Assignment.find(@assignment_ids.first) }
+      assignment = Assignment.find(@assignment_ids.first)
 
       LatePolicyApplicator.for_assignment(assignment)
     end

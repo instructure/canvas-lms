@@ -44,7 +44,7 @@ const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup, isVertical) => 
       </Text>
     </Flex.Item>
     <Flex.Item>
-      <Pill>{I18n.t('%{numMastered} of %{numGroup} Mastered', {numMastered, numGroup})}</Pill>
+      <Pill text={I18n.t('%{numMastered} of %{numGroup} Mastered', {numMastered, numGroup})} />
     </Flex.Item>
   </Flex>
 )

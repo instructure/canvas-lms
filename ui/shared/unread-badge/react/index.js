@@ -25,7 +25,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 export default function UnreadBadge({unreadCount, totalCount, unreadLabel, totalLabel}) {
   return (
     <span className="ic-unread-badge">
-      <Tooltip renderTip={unreadLabel} color="primary">
+      <Tooltip tip={unreadLabel} variant="inverse">
         <ScreenReaderContent>
           {I18n.t('%{unreadCount} unread replies', {unreadCount})}
         </ScreenReaderContent>
@@ -33,7 +33,7 @@ export default function UnreadBadge({unreadCount, totalCount, unreadLabel, total
           {unreadCount}
         </span>
       </Tooltip>
-      <Tooltip renderTip={totalLabel} color="primary">
+      <Tooltip tip={totalLabel} variant="inverse">
         <ScreenReaderContent>
           {I18n.t('%{totalCount} total replies', {totalCount})}
         </ScreenReaderContent>

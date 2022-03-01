@@ -59,8 +59,6 @@ import {
   IconOffLine
 } from '@instructure/ui-icons'
 
-import {Link} from '@instructure/ui-link'
-
 const icons = {
   home: IconHomeLine,
   announcements: IconAnnouncementLine,
@@ -131,10 +129,10 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
         return (
           <Grid.Row key={tab.id}>
             <Grid.Col width="auto">
-              <Link renderIcon={Icon} href={tab.html_url} isWithinText={false}>
+              <Button icon={Icon} variant="link" href={tab.html_url}>
                 <Text weight={isCurrentTab ? 'bold' : 'normal'}>{tab.label}</Text>
                 {isTabOff && <ScreenReaderContent>{'- ' + srText(tab)}</ScreenReaderContent>}
-              </Link>
+              </Button>
             </Grid.Col>
             <Grid.Col>{isTabOff && <IconOffLine />}</Grid.Col>
           </Grid.Row>

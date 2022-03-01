@@ -1,20 +1,5 @@
 # frozen_string_literal: true
 
-module CautiousTagHelper
-  def send_preload_links_header(preload_links)
-    if respond_to?(:request) && request
-      request.send_early_hints("Link" => preload_links.join("\n"))
-    end
-
-    if respond_to?(:response) && response && !response.sending?
-      response.headers["Link"] = [response.headers["Link"].presence, *preload_links].compact.join(",")
-    end
-  end
-end
-# Directly put it in ActionView::Base in case that has already been loaded
-ActionView::Helpers::AssetTagHelper.prepend(CautiousTagHelper)
-ActionView::Base.prepend(CautiousTagHelper)
-
 module MarkTemplateStreaming
   def render_to_body(options = {})
     @streaming_template = true if options[:stream]

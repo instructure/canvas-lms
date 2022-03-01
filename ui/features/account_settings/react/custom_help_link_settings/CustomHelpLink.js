@@ -73,11 +73,7 @@ export default class CustomHelpLink extends React.Component {
     const {is_featured, is_new} = this.props.link
     if (is_featured || is_new) {
       const text = is_featured ? I18n.t('Featured') : I18n.t('New')
-      return (
-        <Pill color="success" margin="0 small">
-          {text}
-        </Pill>
-      )
+      return <Pill variant="success" margin="0 small" text={text} />
     } else {
       return null
     }

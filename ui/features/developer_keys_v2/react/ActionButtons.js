@@ -92,7 +92,7 @@ class DeveloperKeyActionButtons extends React.Component {
     }
     if (visible) {
       return (
-        <Tooltip renderTip={I18n.t('Make key invisible')}>
+        <Tooltip tip={I18n.t('Make key invisible')}>
           <Button variant="icon" margin="0" size="small" onClick={this.makeInvisibleLinkHandler}>
             <ScreenReaderContent>
               {I18n.t('Make key %{developerName} invisible', {developerName})}
@@ -104,7 +104,7 @@ class DeveloperKeyActionButtons extends React.Component {
     }
 
     return (
-      <Tooltip renderTip={I18n.t('Make key visible')}>
+      <Tooltip tip={I18n.t('Make key visible')}>
         <Button variant="icon" margin="0" size="small" onClick={this.makeVisibleLinkHandler}>
           <ScreenReaderContent>
             {I18n.t('Make key %{developerName} visible', {developerName})}
@@ -119,7 +119,7 @@ class DeveloperKeyActionButtons extends React.Component {
     const {developerName} = this.props
 
     return (
-      <Tooltip renderTip={I18n.t('Edit this key')}>
+      <Tooltip tip={I18n.t('Edit this key')}>
         <Button variant="icon" margin="0" size="small" onClick={this.editLinkHandler}>
           <ScreenReaderContent>
             {I18n.t('Edit key %{developerName}', {developerName})}
@@ -137,13 +137,13 @@ class DeveloperKeyActionButtons extends React.Component {
       <div>
         {this.renderEditButton()}
         {this.renderVisibilityIcon()}
-        <Tooltip renderTip={I18n.t('Delete this key')}>
+        <Tooltip tip={I18n.t('Delete this key')}>
           <Button
             variant="icon"
             margin="0"
             size="small"
             onClick={this.deleteLinkHandler}
-            elementRef={this.refDeleteLink}
+            buttonRef={this.refDeleteLink}
           >
             <ScreenReaderContent>
               {I18n.t('Delete key %{developerName}', {developerName})}

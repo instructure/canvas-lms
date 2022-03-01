@@ -26,7 +26,7 @@ export default function TenantInput(props) {
   return (
     <>
       <TextInput
-        renderLabel={<ScreenReaderContent>{I18n.t('Tenant Name Input Area')}</ScreenReaderContent>}
+        label={<ScreenReaderContent>{I18n.t('Tenant Name Input Area')}</ScreenReaderContent>}
         type="text"
         placeholder={I18n.t('microsoft_tenant_name%{domain}', {domain: '.onmicrosoft.com'})}
         onChange={props.tenantInputHandler}

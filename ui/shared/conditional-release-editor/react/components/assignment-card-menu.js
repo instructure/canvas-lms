@@ -92,7 +92,7 @@ export class AssignmentCardMenu extends React.Component {
     return (
       <Menu
         trigger={
-          <Button renderIcon={IconMoreLine}>
+          <Button icon={IconMoreLine}>
             <ScreenReaderContent>
               {I18n.t('assignment %{name} options', {name: this.props.assignment.get('name')})}
             </ScreenReaderContent>

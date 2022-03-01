@@ -86,19 +86,6 @@ export const AddressBookContainer = props => {
     setFilterHistory([...newFilterHistory])
   }
 
-  const getCommonCoursesInformation = commonCourses => {
-    const activeEnrollments = commonCourses?.nodes.filter(
-      courseEnrollment => courseEnrollment.state === 'active'
-    )
-    return activeEnrollments.map(
-      courseEnrollment =>
-        (courseEnrollment = {
-          courseID: courseEnrollment.course._id,
-          courseRole: courseEnrollment.type
-        })
-    )
-  }
-
   const menuData = useMemo(() => {
     if (loading && !data) {
       return []
@@ -118,8 +105,7 @@ export const AddressBookContainer = props => {
       return {
         _id: u._id,
         id: u.id,
-        name: u.name,
-        commonCoursesInfo: getCommonCoursesInformation(u.commonCoursesConnection)
+        name: u.name
       }
     })
 

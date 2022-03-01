@@ -1,4 +1,3 @@
-/* eslint-disable promise/no-callback-in-promise */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,27 +17,23 @@
  */
 
 import moxios from 'moxios'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {CardDashboardLoader, resetCardCache} from '../loadCardDashboard'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+import loadCardDashboard, {resetDashboardCards} from '../loadCardDashboard'
 
 describe('loadCardDashboard', () => {
-  let cardDashboardLoader
   beforeEach(() => {
     moxios.install()
-    cardDashboardLoader = new CardDashboardLoader()
   })
 
   afterEach(() => {
     moxios.uninstall()
-    resetCardCache()
+    resetDashboardCards()
   })
 
   describe('with observer', () => {
     it('loads student cards asynchronously and calls back renderFn', done => {
       const callback = jest.fn()
-      cardDashboardLoader.loadCardDashboard(callback, 2)
+      loadCardDashboard(callback, 2)
       moxios.wait(() => {
         expect(callback).not.toHaveBeenCalled()
         moxios.requests
@@ -51,15 +46,12 @@ describe('loadCardDashboard', () => {
             expect(callback).toHaveBeenCalledWith(['card'], true)
             done()
           })
-          .catch(e => {
-            throw e
-          })
       })
     })
 
     it('saves student cards and calls back renderFn immediately if requested again', done => {
       const callback = jest.fn()
-      cardDashboardLoader.loadCardDashboard(callback, 5)
+      loadCardDashboard(callback, 5)
       moxios.wait(() => {
         moxios.requests
           .mostRecent()
@@ -68,33 +60,13 @@ describe('loadCardDashboard', () => {
             response: ['card']
           })
           .then(() => {
-            resetCardCache()
-            cardDashboardLoader.loadCardDashboard(callback, 5)
+            resetDashboardCards()
+            loadCardDashboard(callback, 5)
             moxios.wait(() => {
               expect(callback).toHaveBeenCalledWith(['card'], true)
               expect(moxios.requests.count()).toBe(1)
               done()
             })
-          })
-          .catch(e => {
-            throw e
-          })
-      })
-    })
-
-    it('fails gracefully', done => {
-      const callback = jest.fn()
-      cardDashboardLoader.loadCardDashboard(callback, 2)
-      moxios.wait(() => {
-        // eslint-disable-next-line promise/catch-or-return
-        moxios.requests
-          .mostRecent()
-          .respondWith({
-            status: 500
-          })
-          .then(() => {
-            expect(showFlashAlert).toHaveBeenCalledTimes(1)
-            done()
           })
       })
     })

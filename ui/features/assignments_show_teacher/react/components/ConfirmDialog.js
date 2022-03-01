@@ -119,9 +119,10 @@ export default class ConfirmDialog extends React.Component {
               placement="end"
               onClick={this.props.onDismiss}
               disabled={this.props.disabled}
-              elementRef={this.closeButtonRef}
-              screenReaderLabel={this.props.closeLabel}
-            />
+              buttonRef={this.closeButtonRef}
+            >
+              {this.props.closeLabel}
+            </CloseButton>
           </Modal.Header>
           <Modal.Body padding="0">
             <div style={{position: 'relative'}}>

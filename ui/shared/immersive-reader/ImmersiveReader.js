@@ -84,7 +84,7 @@ export function ImmersiveReaderButton({content, readerSDK, breakpoints}) {
       <SVGIcon src={LOGO} />
     </IconButton>
   ) : (
-    <Button onClick={() => handleClick(content, readerSDK)} renderIcon={<SVGIcon src={LOGO} />}>
+    <Button onClick={() => handleClick(content, readerSDK)} icon={<SVGIcon src={LOGO} />}>
       {I18n.t('Immersive Reader')}
     </Button>
   )

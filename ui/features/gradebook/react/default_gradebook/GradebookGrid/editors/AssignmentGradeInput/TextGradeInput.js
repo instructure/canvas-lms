@@ -171,7 +171,7 @@ export default class TextGradeInput extends Component {
       <TextInput
         disabled={this.props.disabled}
         inputRef={this.bindTextInput}
-        renderLabel={this.props.label}
+        label={this.props.label}
         messages={this.props.messages}
         onChange={this.handleTextChange}
         size="small"

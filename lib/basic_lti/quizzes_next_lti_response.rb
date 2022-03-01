@@ -48,7 +48,7 @@ module BasicLTI
       end
 
       begin
-        quiz_lti_submission.commit_history(result_url, grade(assignment.grading_type), -tool.id)
+        quiz_lti_submission.commit_history(result_url, grade, -tool.id)
       rescue ActiveRecord::RecordInvalid => e
         report_failure(:submission_save_failed, e.record.errors.full_messages.join(", "))
       end
@@ -98,8 +98,7 @@ module BasicLTI
       json[:reopened]
     end
 
-    def grade(grading_type)
-      return ((raw_score || percentage_score) > 0 ? "pass" : "fail") if grading_type == "pass_fail" && (raw_score || percentage_score)
+    def grade
       return raw_score if raw_score.present?
       return nil unless valid_percentage_score?
 

@@ -118,7 +118,7 @@ export default function CommentsTrayBody(props) {
             {isFetchingMoreComments && <LoadingIndicator />}
             {data.submissionComments.commentsConnection.pageInfo.hasPreviousPage &&
               !isFetchingMoreComments && (
-                <Button color="primary" onClick={loadMoreComments}>
+                <Button variant="primary" onClick={loadMoreComments}>
                   {I18n.t('Load Previous Comments')}
                 </Button>
               )}

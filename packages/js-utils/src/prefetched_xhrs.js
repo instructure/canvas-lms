@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import getCookie from '@instructure/get-cookie'
 
 // These are helpful methods you can use along side the ruby ApplicationHelper::prefetch_xhr helper method in canvas
 
@@ -81,16 +80,11 @@ export function clearPrefetchedXHRs() {
  * @param {Promise<Response>} fetchRequest
  * @returns {Promise<import("axios").AxiosResponse>}
  */
-export function asAxios(fetchRequest, type = 'json') {
+export function asAxios(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(checkStatus).then(res =>
-    res
-      .clone()
-      [type]()
-      .then(data => {
-        return {data, headers: {link: res.headers.get('Link')}}
-      })
-  )
+  return fetchRequest
+    .then(checkStatus)
+    .then(res => res.json().then(data => ({data, headers: {link: res.headers.get('Link')}})))
 }
 
 /**
@@ -101,7 +95,7 @@ export function asAxios(fetchRequest, type = 'json') {
  */
 export function asJson(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(checkStatus).then(res => res.clone().json())
+  return fetchRequest.then(checkStatus).then(res => res.json())
 }
 
 /**
@@ -112,7 +106,7 @@ export function asJson(fetchRequest) {
  */
 export function asText(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(checkStatus).then(res => res.clone().text())
+  return fetchRequest.then(checkStatus).then(res => res.text())
 }
 
 /**
@@ -139,7 +133,6 @@ export const defaultFetchOptions = {
   credentials: 'same-origin',
   headers: {
     Accept: 'application/json+canvas-string-ids, application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-Token': getCookie('_csrf_token')
+    'X-Requested-With': 'XMLHttpRequest'
   }
 }

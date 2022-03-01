@@ -94,7 +94,7 @@ export default class DiscussionDeleteModal extends Component {
             }}
             id="confirm_delete_discussions"
             onClick={this.confirmDelete}
-            color="danger"
+            variant="danger"
           >
             {I18n.t('Delete')}
           </Button>

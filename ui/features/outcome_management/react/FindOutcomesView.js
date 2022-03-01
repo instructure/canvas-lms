@@ -32,12 +32,7 @@ import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {outcomeGroupShape, groupCollectionShape} from './Management/shapes'
-import {
-  IMPORT_COMPLETED,
-  IMPORT_NOT_STARTED,
-  IMPORT_FAILED,
-  IMPORT_PENDING
-} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import {IMPORT_NOT_STARTED, IMPORT_FAILED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesView = ({
   outcomesGroup,
@@ -59,16 +54,11 @@ const FindOutcomesView = ({
   const isRootGroup = collection?.isRootGroup
   const outcomesCount = outcomesGroup?.outcomesCount || 0
   const outcomes = outcomesGroup?.outcomes
-  const outcomesIds = outcomes?.edges.map(out => out.node._id) || []
   const notImportedOutcomesCount = outcomesGroup?.notImportedOutcomesCount || 0
-  const importedOutcomesCount = Object.entries(importOutcomesStatus).filter(
-    ([outId, importStatus]) =>
-      outcomesIds.includes(outId) && [IMPORT_COMPLETED, IMPORT_PENDING].includes(importStatus)
-  ).length
   const enabled =
     !!outcomesCount &&
     outcomesCount > 0 &&
-    notImportedOutcomesCount - importedOutcomesCount > 0 &&
+    notImportedOutcomesCount > 0 &&
     [IMPORT_NOT_STARTED, IMPORT_FAILED].includes(importGroupStatus)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()

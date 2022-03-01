@@ -278,8 +278,7 @@ describe('loadAllOpportunitiesSaga', () => {
         course_ids: undefined,
         include: ['planner_overrides'],
         filter: ['submittable', 'current_grading_period'],
-        per_page: 100,
-        observed_user_id: null
+        per_page: 100
       })
     )
   })
@@ -342,14 +341,13 @@ describe('loadAllOpportunitiesSaga', () => {
 
   it('passes observed_user_id and course_ids to API call if observing', () => {
     const overrides = {
-      courses: [
-        {id: '1', assetString: 'course_1'},
-        {id: '569', assetString: 'course_569'}
-      ],
       currentUser: {
         id: '3'
       },
-      selectedObservee: '12'
+      selectedObservee: {
+        id: '12',
+        contextCodes: ['course_1', 'course_569']
+      }
     }
     const generator = loadAllOpportunitiesSaga()
     generator.next() // select state

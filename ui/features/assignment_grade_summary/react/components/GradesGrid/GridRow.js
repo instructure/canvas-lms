@@ -24,8 +24,6 @@ import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 import GradeIndicator from './GradeIndicator'
 import GradeSelect from './GradeSelect'
 
-import {Link} from '@instructure/ui-link'
-
 export default class GridRow extends Component {
   static propTypes = {
     disabledCustomGrade: bool.isRequired,
@@ -63,13 +61,13 @@ export default class GridRow extends Component {
     return (
       <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`} role="row">
         <th className="GradesGrid__BodyRowHeader" role="rowheader" scope="row">
-          <Link
+          <Button
+            variant="link"
             theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
             href={this.props.row.speedGraderUrl}
-            isWithinText={false}
           >
             {this.props.row.studentName}
-          </Link>
+          </Button>
         </th>
 
         {this.props.graders.map(grader => {
