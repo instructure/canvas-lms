@@ -82,7 +82,7 @@ class TeacherFeedbackForm extends React.Component {
         const value = `course_${c.id}_admins`
 
         return (
-          <option key={value} value={value} selected={window.ENV.context_id == c.id}>
+          <option key={value} value={value}>
             {c.name}
           </option>
         )
@@ -96,6 +96,10 @@ class TeacherFeedbackForm extends React.Component {
   }
 
   render() {
+    const selectedCourse = this.state.courses
+      .filter(c => !c.access_restricted_by_date)
+      .find(c => c.id === window.ENV.context_id)
+    const currentSelectValue = selectedCourse ? `course_${selectedCourse.id}_admins` : null
     return (
       <form ref={c => (this.form = c)} action="/api/v1/conversations" method="POST">
         <fieldset className="ic-Form-group ic-HelpDialog__form-fieldset">
@@ -108,6 +112,7 @@ class TeacherFeedbackForm extends React.Component {
               required
               aria-required="true"
               name="recipients[]"
+              value={currentSelectValue}
             >
               {this.renderCourseOptions()}
             </select>
