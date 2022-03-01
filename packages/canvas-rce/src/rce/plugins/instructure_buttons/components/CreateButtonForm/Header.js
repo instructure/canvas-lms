@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
@@ -29,7 +29,13 @@ import {Button} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {decode} from '../../svg/utils'
 
-export const Header = ({settings, onChange}) => {
+export const Header = ({settings, onChange, allowNameChange}) => {
+  const originalName = settings.originalName
+
+  useEffect(() => {
+    if (!allowNameChange) onChange({name: originalName})
+  }, [allowNameChange, onChange, originalName])
+
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
     <Flex alignItems="center">
@@ -58,6 +64,7 @@ export const Header = ({settings, onChange}) => {
           data-testid="button-name"
           renderLabel={formatMessage('Name')}
           placeholder={formatMessage('untitled')}
+          interaction={allowNameChange ? 'enabled' : 'disabled'}
           onChange={e => {
             const name = e.target.value
             onChange({name})
