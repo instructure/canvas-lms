@@ -785,7 +785,7 @@ export class DiscussionRow extends Component {
     const discussionId = this.props.discussion.id
     const maybeRenderMasteryPathsPill = this.props.displayMasteryPathsPill ? (
       <span display="inline-block" className="discussion-row-mastery-paths-pill">
-        <Pill>{this.props.masteryPathsPillLabel}</Pill>
+        <Pill text={this.props.masteryPathsPillLabel} />
       </span>
     ) : null
     const maybeRenderMasteryPathsLink = this.props.displayMasteryPathsLink ? (

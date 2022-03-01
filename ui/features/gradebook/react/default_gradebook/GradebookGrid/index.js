@@ -19,6 +19,8 @@
 import slickgrid from 'slickgrid'
 import 'jqueryui/sortable'
 import CellEditorFactory from './editors/CellEditorFactory'
+import CellFormatterFactory from './formatters/CellFormatterFactory'
+import ColumnHeaderRenderer from './headers/ColumnHeaderRenderer'
 import Columns from './Columns/index'
 import Events from './Events'
 import GridSupport from './GridSupport/index'

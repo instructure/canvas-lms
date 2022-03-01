@@ -108,7 +108,7 @@ export default class ToolConfigurationForm extends React.Component {
         name="tool_configuration_url"
         value={this.props.toolConfigurationUrl}
         onChange={this.updateToolConfigurationUrl}
-        renderLabel={I18n.t('JSON URL')}
+        label={I18n.t('JSON URL')}
         messages={this.props.showRequiredMessages ? validationMessageRequiredField : []}
       />
     )

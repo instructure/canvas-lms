@@ -154,7 +154,7 @@ export default class AdditionalSettings extends React.Component {
                     <TextInput
                       name="domain"
                       value={additionalSettings.domain}
-                      renderLabel={I18n.t('Domain')}
+                      label={I18n.t('Domain')}
                       onChange={this.handleDomainChange}
                     />
                   </Grid.Col>
@@ -162,7 +162,7 @@ export default class AdditionalSettings extends React.Component {
                     <TextInput
                       name="tool_id"
                       value={additionalSettings.tool_id}
-                      renderLabel={I18n.t('Tool Id')}
+                      label={I18n.t('Tool Id')}
                       onChange={this.handleToolIdChange}
                     />
                   </Grid.Col>
@@ -172,7 +172,7 @@ export default class AdditionalSettings extends React.Component {
                     <TextInput
                       name="settings_icon_url"
                       value={additionalSettings.icon_url}
-                      renderLabel={I18n.t('Icon Url')}
+                      label={I18n.t('Icon Url')}
                       onChange={this.handleIconUrlChange}
                     />
                   </Grid.Col>
@@ -180,7 +180,7 @@ export default class AdditionalSettings extends React.Component {
                     <TextInput
                       name="text"
                       value={additionalSettings.text}
-                      renderLabel={I18n.t('Text')}
+                      label={I18n.t('Text')}
                       onChange={this.handleTextChange}
                     />
                   </Grid.Col>
@@ -191,7 +191,7 @@ export default class AdditionalSettings extends React.Component {
                         additionalSettings.selection_height &&
                         additionalSettings.selection_height.toString()
                       }
-                      renderLabel={I18n.t('Selection Height')}
+                      label={I18n.t('Selection Height')}
                       onChange={this.handleSelectionHeightChange}
                     />
                   </Grid.Col>
@@ -202,7 +202,7 @@ export default class AdditionalSettings extends React.Component {
                         additionalSettings.selection_width &&
                         additionalSettings.selection_width.toString()
                       }
-                      renderLabel={I18n.t('Selection Width')}
+                      label={I18n.t('Selection Width')}
                       onChange={this.handleSelectionWidthChange}
                     />
                   </Grid.Col>

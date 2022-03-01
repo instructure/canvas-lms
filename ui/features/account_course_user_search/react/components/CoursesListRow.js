@@ -149,7 +149,7 @@ export default class CoursesListRow extends React.Component {
       const {name} = this.props
       const addUsersTip = I18n.t('Add Users to %{name}', {name})
       return (
-        <Tooltip renderTip={addUsersTip}>
+        <Tooltip tip={addUsersTip}>
           <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
             <IconPlusLine title={addUsersTip} />
           </Button>
@@ -200,13 +200,13 @@ export default class CoursesListRow extends React.Component {
           <a href={url}>
             <span style={{paddingRight: '0.5em'}}>{name}</span>
             {blueprint && (
-              <Tooltip renderTip={blueprintTip}>
+              <Tooltip tip={blueprintTip}>
                 <IconBlueprintLine />
                 <ScreenReaderContent>{blueprintTip}</ScreenReaderContent>
               </Tooltip>
             )}
             {template && (
-              <Tooltip renderTip={templateTip}>
+              <Tooltip tip={templateTip}>
                 <IconCollectionSolid />
                 <ScreenReaderContent>{templateTip}</ScreenReaderContent>
               </Tooltip>
@@ -241,12 +241,12 @@ export default class CoursesListRow extends React.Component {
         </Table.Cell>
         <Table.Cell textAlign="end">
           {this.renderAddEnrollments()}
-          <Tooltip renderTip={statsTip}>
+          <Tooltip tip={statsTip}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
               <IconStatsLine title={statsTip} />
             </Button>
           </Tooltip>
-          <Tooltip renderTip={settingsTip}>
+          <Tooltip tip={settingsTip}>
             <Button variant="icon" size="small" href={`${url}/settings`}>
               <IconSettingsLine title={settingsTip} />
             </Button>

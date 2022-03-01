@@ -80,12 +80,7 @@ export default function RoleTrayTableRow({
             </span>
           )}
 
-          <Flex
-            direction="column"
-            width="12em"
-            margin={expandable ? '0' : '0 0 0 medium'}
-            display="inline-flex"
-          >
+          <Flex direction="column" width="12em" margin={expandable ? '0' : '0 0 0 medium'} inline>
             <Flex.Item>
               <Text weight="bold" lineHeight="fit" size="small">
                 {title}

@@ -20,8 +20,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Dialog} from '@instructure/ui-dialog'
-import {CloseButton} from '@instructure/ui-buttons'
-import {Link} from '@instructure/ui-link'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
@@ -47,9 +46,9 @@ const OutcomeIcon = () => (
 )
 
 const LongDescription = ({showLongDescription}) => (
-  <Link onClick={() => showLongDescription()} display="block" textAlign="start">
+  <Button fluidWidth variant="link" onClick={() => showLongDescription()}>
     <Text size="x-small">{I18n.t('view longer description')}</Text>
-  </Link>
+  </Button>
 )
 LongDescription.propTypes = {
   showLongDescription: PropTypes.func.isRequired
@@ -66,12 +65,9 @@ const LongDescriptionDialog = ({open, close, longDescription}) => {
       shouldCloseOnDocumentClick
     >
       <Modal.Header>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          onClick={close}
-          screenReaderLabel="\n          Close\n        "
-        />
+        <CloseButton placement="end" offset="medium" variant="icon" onClick={close}>
+          Close
+        </CloseButton>
         <Heading>{modalHeader}</Heading>
       </Modal.Header>
       <Modal.Body>

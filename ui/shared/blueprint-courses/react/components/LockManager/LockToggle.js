@@ -142,7 +142,7 @@ class LockToggle extends Component {
         : I18n.t('Unlocked. Click to lock.')
 
       toggle = (
-        <Tooltip renderTip={tooltip} placement="top" color="primary" on={['hover', 'focus']}>
+        <Tooltip tip={tooltip} placement="top" variant="inverse" on={['hover', 'focus']}>
           {this.props.breakpoints.miniTablet ? (
             <Button
               id="lock-toggle-btn"

@@ -220,7 +220,7 @@ export default class DiscussionSettings extends Component {
               ref={c => {
                 this.saveBtn = c
               }}
-              color="primary"
+              variant="primary"
             >
               {I18n.t('Save Settings')}
             </Button>

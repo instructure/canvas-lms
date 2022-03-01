@@ -375,8 +375,7 @@ describe('SubmissionManager', () => {
       const successfulResponse = {
         data: {
           setModuleItemCompletion: {
-            __typename: '',
-            moduleItem: null
+            __typename: ''
           }
         },
         errors: null

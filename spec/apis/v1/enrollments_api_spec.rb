@@ -2271,24 +2271,6 @@ describe EnrollmentsApiController, type: :request do
           expect(enrollment_ids.sort).to eq(@course.enrollments.map(&:id).sort)
           expect(json.length).to eq 2
         end
-
-        it "returns enrollments from the course's shard for an observer user" do
-          @shard1.activate do
-            @enrolled_user = user_factory(active_user: true)
-
-            account = Account.create!
-            @cs_course = Course.create!(account: account)
-            @cs_course.enroll_user(@user, "ObserverEnrollment", enrollment_state: "active")
-            @cs_course.enroll_user(@enrolled_user, "StudentEnrollment", enrollment_state: "active")
-          end
-
-          @params[:course_id] = @cs_course.id
-          json = api_call(:get, "/api/v1/courses/#{@cs_course.id}/enrollments", @params)
-
-          enrollment_ids = json.collect { |e| e["id"] }
-          expect(enrollment_ids.sort).to eq(@cs_course.enrollments.map(&:id).sort)
-          expect(json.length).to eq 2
-        end
       end
 
       context "when scoped by a user" do

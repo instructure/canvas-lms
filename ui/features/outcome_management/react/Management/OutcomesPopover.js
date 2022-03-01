@@ -50,12 +50,13 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
         on="click"
         placement="top center"
         screenReaderLabel={I18n.t('Outcomes Selected')}
-        isShowingContent={showOutcomesList}
+        show={showOutcomesList}
         onToggle={setShowOutcomesList}
         shouldContainFocus
         shouldReturnFocus
         positionTarget={() => (ref?.current == null ? null : ref.current)}
-        renderTrigger={
+      >
+        <Popover.Trigger>
           <Button
             variant="link"
             size="medium"
@@ -71,44 +72,45 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
               }
             )}
           </Button>
-        }
-      >
-        <View padding="small" display="block" as="div">
-          <CloseButton
-            placement="end"
-            offset="small"
-            onClick={closeOutcomesList}
-            screenReaderLabel={I18n.t('Close')}
-          />
-          <Heading margin="x-small none small none" level="h5">
-            {I18n.t('Selected')}
-          </Heading>
-          <View
-            as="div"
-            display="block"
-            width="260px"
-            maxHeight="210px"
-            maxWidth="260px"
-            overflowY="auto"
-            overflowX="hidden"
-            tabIndex={outcomeCount > 10 ? '0' : '-1'}
-          >
-            <List isUnstyled size="small" margin="none small none none">
-              {Object.values(outcomes)
-                .sort((a, b) => a.title.localeCompare(b.title, ENV.LOCALE, {numeric: true}))
-                .map(({linkId, title}) => (
-                  <List.Item key={linkId}>
-                    <TruncateText position="middle">{title}</TruncateText>
-                  </List.Item>
-                ))}
-            </List>
+        </Popover.Trigger>
+        <Popover.Content>
+          <View padding="small" display="block" as="div">
+            <CloseButton
+              placement="end"
+              offset="small"
+              onClick={closeOutcomesList}
+              screenReaderLabel={I18n.t('Close')}
+            />
+            <Heading margin="x-small none small none" level="h5">
+              {I18n.t('Selected')}
+            </Heading>
+            <View
+              as="div"
+              display="block"
+              width="260px"
+              maxHeight="210px"
+              maxWidth="260px"
+              overflowY="auto"
+              overflowX="hidden"
+              tabIndex={outcomeCount > 10 ? '0' : '-1'}
+            >
+              <List isUnstyled size="small" margin="none small none none">
+                {Object.values(outcomes)
+                  .sort((a, b) => a.title.localeCompare(b.title, ENV.LOCALE, {numeric: true}))
+                  .map(({linkId, title}) => (
+                    <List.Item key={linkId}>
+                      <TruncateText position="middle">{title}</TruncateText>
+                    </List.Item>
+                  ))}
+              </List>
+            </View>
           </View>
-        </View>
-        <View as="div" padding="small" borderWidth="small 0 0">
-          <Button variant="link" size="medium" onClick={closeAndClear}>
-            {I18n.t('Clear all')}
-          </Button>
-        </View>
+          <View as="div" padding="small" borderWidth="small 0 0">
+            <Button variant="link" size="medium" onClick={closeAndClear}>
+              {I18n.t('Clear all')}
+            </Button>
+          </View>
+        </Popover.Content>
       </Popover>
     </ApplyTheme>
   )

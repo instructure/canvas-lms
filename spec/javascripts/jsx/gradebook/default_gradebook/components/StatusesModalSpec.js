@@ -33,7 +33,7 @@ function defaultProps(props = {}) {
   }
 }
 
-QUnit.module('StatusesModal', function (suiteHooks) {
+QUnit.module('StatusesModal', function(suiteHooks) {
   suiteHooks.beforeEach(() => {
     clock = sinon.useFakeTimers()
   })
@@ -66,8 +66,8 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     equal(modal.prop('label'), 'Statuses')
   })
 
-  test('modal has a close button label of "Done"', () => {
-    equal(modal.find('Button').prop('children'), 'Done')
+  test('modal has a close button label of "Close"', () => {
+    equal(modal.find('CloseButton').prop('children'), 'Close')
   })
 
   test('modal has an onDismiss function', () => {
@@ -83,12 +83,24 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   })
 
   test('modal has a "Done" button', () => {
-    equal(modal.find('Button').children().text(), 'Done')
+    equal(
+      modal
+        .find('Button')
+        .children()
+        .text(),
+      'Done'
+    )
   })
 
   test('modal opens', () => {
     instance.open()
-    strictEqual(wrapper.dive().find('Modal').prop('open'), true)
+    strictEqual(
+      wrapper
+        .dive()
+        .find('Modal')
+        .prop('open'),
+      true
+    )
   })
 
   test('modal closes', () => {
@@ -96,13 +108,25 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     clock.tick(50) // wait for Modal to transition open
     instance.close()
     clock.tick(50) // wait for Modal to transition closed
-    strictEqual(wrapper.dive().find('Modal').prop('open'), false)
+    strictEqual(
+      wrapper
+        .dive()
+        .find('Modal')
+        .prop('open'),
+      false
+    )
   })
 
   test('on close prop is passed to Modal onExit', () => {
     const onClose = sinon.stub()
     const wrapper = shallow(<StatusesModal {...defaultProps({onClose})} />)
-    equal(wrapper.dive().find('Modal').prop('onExited'), onClose)
+    equal(
+      wrapper
+        .dive()
+        .find('Modal')
+        .prop('onExited'),
+      onClose
+    )
   })
 
   QUnit.module('StatusesModal#isPopoverShown', {
@@ -115,13 +139,13 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     }
   })
 
-  test('it is true when statuses matches openPopover', function () {
+  test('it is true when statuses matches openPopover', function() {
     const status = 'late'
     this.instance.handleOnToggle(status)(true)
     strictEqual(this.instance.isPopoverShown(status), true)
   })
 
-  test('it is when statuses does not match openPopover', function () {
+  test('it is when statuses does not match openPopover', function() {
     this.instance.handleOnToggle('late')(true)
     strictEqual(this.instance.isPopoverShown('missing'), false)
   })
@@ -204,14 +228,20 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     }
   })
 
-  test('clicking Done closes the popover', function () {
+  test('clicking Done closes the popover', function() {
     const {wrapper, instance} = this
     instance.open()
     wrapper.find('Button').simulate('click')
-    strictEqual(wrapper.dive().find('Modal').prop('open'), false)
+    strictEqual(
+      wrapper
+        .dive()
+        .find('Modal')
+        .prop('open'),
+      false
+    )
   })
 
-  test('renders five StatusColorListItems', function () {
+  test('renders five StatusColorListItems', function() {
     const {wrapper, instance} = this
     instance.open()
     strictEqual(wrapper.find('StatusColorListItem').length, 5)
@@ -228,7 +258,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     }
   })
 
-  test('opens the color picker when clicking on a color picker trigger button', function () {
+  test('opens the color picker when clicking on a color picker trigger button', function() {
     const {wrapper, instance} = this
     instance.open()
     clock.tick(50) // wait for Modal to transition open
@@ -242,7 +272,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     strictEqual(document.querySelectorAll('.ColorPicker__Container').length, 1)
   })
 
-  test('after clicking apply in the color picker, the color picker popover is closed', function () {
+  test('after clicking apply in the color picker, the color picker popover is closed', function() {
     const {wrapper, instance} = this
     instance.open()
     clock.tick(50) // wait for Modal to transition open
@@ -262,7 +292,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     strictEqual(document.querySelectorAll('.ColorPicker__Container').length, 0)
   })
 
-  test('after clicking a color in the color picker, the status modal is not closed', function () {
+  test('after clicking a color in the color picker, the status modal is not closed', function() {
     sinon.stub(this.instance, 'close')
     this.instance.open()
     clock.tick(50) // wait for Modal to transition open
@@ -282,7 +312,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     strictEqual(this.instance.close.callCount, 0)
   })
 
-  test('after clicking cancel in the color picker, the color picker popover is closed', function () {
+  test('after clicking cancel in the color picker, the color picker popover is closed', function() {
     const {wrapper, instance} = this
     instance.open()
     clock.tick(50) // wait for Modal to transition open

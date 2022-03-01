@@ -232,12 +232,12 @@ export default class ActAsModal extends React.Component {
                     ))}
                     <View as="div" textAlign="center">
                       <Button
-                        color="primary"
+                        variant="primary"
                         href={`/users/${user.id}/masquerade`}
                         data-method="post"
                         onClick={this.handleClick}
                         margin="large 0 0 0"
-                        elementRef={el => (this.proceedButton = el)}
+                        buttonRef={el => (this.proceedButton = el)}
                       >
                         {I18n.t('Proceed')}
                       </Button>

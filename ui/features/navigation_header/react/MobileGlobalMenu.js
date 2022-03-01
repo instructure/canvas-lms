@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {
   IconXLine,
@@ -47,8 +47,6 @@ import HelpDialog from './HelpDialog/index'
 import LogoutButton from './LogoutButton'
 import HighContrastModeToggle from './trays/HighContrastModeToggle'
 import HistoryList from './HistoryList'
-
-import {Link} from '@instructure/ui-link'
 
 function ActiveText({children, url}) {
   return window.location.pathname.startsWith(url) ? <Text weight="bold">{children}</Text> : children
@@ -120,13 +118,9 @@ export default class MobileGlobalMenu extends React.Component {
       >
         <Flex direction="row-reverse" margin="0 0 large 0">
           <Flex.Item>
-            <IconButton
-              renderIcon={IconXLine}
-              withBackground={false}
-              withBorder={false}
-              onClick={this.props.onDismiss}
-              screenReaderLabel="Close"
-            />
+            <Button variant="icon" icon={IconXLine} onClick={this.props.onDismiss}>
+              <ScreenReaderContent>Close</ScreenReaderContent>
+            </Button>
           </Flex.Item>
           <Flex.Item grow shrink>
             <Heading>
@@ -140,7 +134,7 @@ export default class MobileGlobalMenu extends React.Component {
         </Flex>
         <List variant="unstyled" itemSpacing="medium">
           <List.Item>
-            <Link href="/" isWithinText={false} size="small" display="block" textAlign="start">
+            <Button variant="link" href="/" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
                   {this.props.k5User ? (
@@ -155,7 +149,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Text>
                 </Flex.Item>
               </Flex>
-            </Link>
+            </Button>
           </List.Item>
           <List.Item>
             {this.props.current_user && Object.keys(this.props.current_user).length ? (
@@ -183,14 +177,9 @@ export default class MobileGlobalMenu extends React.Component {
                   {this.props.DesktopNavComponent.state.profileAreLoaded ? (
                     this.props.DesktopNavComponent.state.profile.map(tab => (
                       <List.Item key={tab.id}>
-                        <Link
-                          href={tab.html_url}
-                          isWithinText={false}
-                          display="block"
-                          textAlign="start"
-                        >
+                        <Button variant="link" fluidWidth href={tab.html_url}>
                           <ActiveText url={tab.html_url}>{tab.label}</ActiveText>
-                        </Link>
+                        </Button>
                       </List.Item>
                     ))
                   ) : (
@@ -207,7 +196,7 @@ export default class MobileGlobalMenu extends React.Component {
                 </List>
               </ToggleDetails>
             ) : (
-              <Link href="/login" isWithinText={false} display="block" textAlign="start">
+              <Button variant="link" href="/login" fluidWidth>
                 <Flex>
                   <Flex.Item width="3rem">
                     <IconLockLine inline={false} size="small" />
@@ -216,7 +205,7 @@ export default class MobileGlobalMenu extends React.Component {
                     <Text size="medium">{I18n.t('Login')}</Text>
                   </Flex.Item>
                 </Flex>
-              </Link>
+              </Button>
             )}
           </List.Item>
 
@@ -242,26 +231,16 @@ export default class MobileGlobalMenu extends React.Component {
                     this.props.DesktopNavComponent.state.accounts
                       .map(account => (
                         <List.Item key={account.id}>
-                          <Link
-                            href={`/accounts/${account.id}`}
-                            isWithinText={false}
-                            display="block"
-                            textAlign="start"
-                          >
+                          <Button variant="link" fluidWidth href={`/accounts/${account.id}`}>
                             <ActiveText url={`/accounts/${account.id}`}>{account.name}</ActiveText>
-                          </Link>
+                          </Button>
                         </List.Item>
                       ))
                       .concat([
                         <List.Item key="all">
-                          <Link
-                            href="/accounts"
-                            isWithinText={false}
-                            display="block"
-                            textAlign="start"
-                          >
+                          <Button variant="link" fluidWidth href="/accounts">
                             {I18n.t('All Accounts')}
-                          </Link>
+                          </Button>
                         </List.Item>
                       ])
                   ) : (
@@ -296,12 +275,7 @@ export default class MobileGlobalMenu extends React.Component {
                   courses
                     .map(course => (
                       <List.Item key={course.id}>
-                        <Link
-                          href={`/courses/${course.id}`}
-                          isWithinText={false}
-                          display="block"
-                          textAlign="start"
-                        >
+                        <Button variant="link" fluidWidth href={`/courses/${course.id}`}>
                           <ActiveText url={`/courses/${course.id}`}>
                             {course.name}
                             {course.enrollment_term_id > 1 && (
@@ -310,19 +284,14 @@ export default class MobileGlobalMenu extends React.Component {
                               </Text>
                             )}
                           </ActiveText>
-                        </Link>
+                        </Button>
                       </List.Item>
                     ))
                     .concat([
                       <List.Item key="all">
-                        <Link
-                          href="/courses"
-                          isWithinText={false}
-                          display="block"
-                          textAlign="start"
-                        >
+                        <Button variant="link" fluidWidth href="/courses">
                           {this.props.k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
-                        </Link>
+                        </Button>
                       </List.Item>
                     ])
                 ) : (
@@ -355,28 +324,21 @@ export default class MobileGlobalMenu extends React.Component {
                     this.props.DesktopNavComponent.state.groups
                       .map(group => (
                         <List.Item key={group.id}>
-                          <Link
+                          <Button
+                            variant="link"
+                            fluidWidth
                             margin="0 0 0 xx-small"
                             href={`/groups/${group.id}`}
-                            isWithinText={false}
-                            display="block"
-                            textAlign="start"
                           >
                             <ActiveText url={`/groups/${group.id}`}>{group.name}</ActiveText>
-                          </Link>
+                          </Button>
                         </List.Item>
                       ))
                       .concat([
                         <List.Item key="all">
-                          <Link
-                            margin="0 0 0 xx-small"
-                            href="/groups"
-                            isWithinText={false}
-                            display="block"
-                            textAlign="start"
-                          >
+                          <Button variant="link" fluidWidth margin="0 0 0 xx-small" href="/groups">
                             {I18n.t('All Groups')}
-                          </Link>
+                          </Button>
                         </List.Item>
                       ])
                   ) : (
@@ -389,13 +351,7 @@ export default class MobileGlobalMenu extends React.Component {
             </List.Item>
           )}
           <List.Item>
-            <Link
-              href="/calendar"
-              isWithinText={false}
-              size="small"
-              display="block"
-              textAlign="start"
-            >
+            <Button variant="link" href="/calendar" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
                   <IconCalendarMonthLine inline={false} size="small" />
@@ -404,10 +360,10 @@ export default class MobileGlobalMenu extends React.Component {
                   <Text size="medium">{I18n.t('Calendar')}</Text>
                 </Flex.Item>
               </Flex>
-            </Link>
+            </Button>
           </List.Item>
           <List.Item>
-            <Link href="/inbox" isWithinText={false} size="small" display="block" textAlign="start">
+            <Button variant="link" href="/inbox" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
                   <IconInboxLine inline={false} size="small" />
@@ -423,17 +379,11 @@ export default class MobileGlobalMenu extends React.Component {
                   )}
                 </Flex.Item>
               </Flex>
-            </Link>
+            </Button>
           </List.Item>
           {this.state.externalTools.map(tool => (
             <List.Item key={tool.href}>
-              <Link
-                href={tool.href}
-                isWithinText={false}
-                size="small"
-                display="block"
-                textAlign="start"
-              >
+              <Button variant="link" href={tool.href} size="small" fluidWidth>
                 <Flex>
                   <Flex.Item width="3rem">
                     {tool.svgPath ? (
@@ -458,7 +408,7 @@ export default class MobileGlobalMenu extends React.Component {
                     <Text size="medium">{tool.label}</Text>
                   </Flex.Item>
                 </Flex>
-              </Link>
+              </Button>
             </List.Item>
           ))}
 

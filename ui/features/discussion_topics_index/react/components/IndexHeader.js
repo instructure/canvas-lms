@@ -165,7 +165,7 @@ export default class IndexHeader extends Component {
   render() {
     return (
       <View display="block">
-        <Flex wrap="wrap" justifyItems="end">
+        <Flex wrapItems wrap="wrap" justifyItems="end">
           <Flex.Item grow>
             <FormField
               id="discussion-filter"
@@ -190,11 +190,11 @@ export default class IndexHeader extends Component {
           </Flex.Item>
           <Flex.Item grow margin="0 0 0 small">
             <TextInput
-              renderLabel={
+              label={
                 <ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>
               }
               placeholder={I18n.t('Search by title or author...')}
-              renderAfterInput={() => <IconSearchLine />}
+              icon={() => <IconSearchLine />}
               onChange={this.onSearchStringChange}
               name="discussion_search"
             />
@@ -203,7 +203,7 @@ export default class IndexHeader extends Component {
             {this.props.permissions.create && (
               <Button
                 href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
-                color="primary"
+                variant="primary"
                 id="add_discussion"
               >
                 <IconPlusLine />

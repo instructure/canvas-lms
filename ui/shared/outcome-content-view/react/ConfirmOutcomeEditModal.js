@@ -120,7 +120,7 @@ export default class ConfirmOutcomeEditModal extends Component {
             {I18n.t('Cancel')}
           </Button>
           &nbsp;
-          <Button onClick={this.onConfirm} id="confirm-outcome-edit-modal" color="primary">
+          <Button onClick={this.onConfirm} id="confirm-outcome-edit-modal" variant="primary">
             {I18n.t('Save')}
           </Button>
         </Modal.Footer>

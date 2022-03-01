@@ -38,7 +38,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from '../Context'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
 
 class FileUpload extends Component {
@@ -89,7 +88,7 @@ class FileUpload extends Component {
   }
 
   handleLTIFiles = async e => {
-    if (e.data.subject === 'LtiDeepLinkingResponse') {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
       if (e.data.errormsg) {
         this.context.setOnFailure(e.data.errormsg)
         return
@@ -98,7 +97,7 @@ class FileUpload extends Component {
     }
 
     // Since LTI 1.0 handles its own message alerting we don't have to
-    if (e.data.subject === 'A2ExternalContentReady') {
+    if (e.data.messageType === 'A2ExternalContentReady') {
       if (!e.data.errormsg) {
         // Content type will be set on back-end to allow for DocViewer rendering
         const files = e.data.content_items.map(file => ({...file, mediaType: ''}))
@@ -188,21 +187,21 @@ class FileUpload extends Component {
   }
 
   renderUploadBox() {
-    const {desktopOnly, desktop, mobileOnly} = this.props.breakpoints
+    const {desktopOnly} = this.props.breakpoints
 
     const fileDropLabel = (
-      <View background="primary" as="div">
+      <>
         {desktopOnly && (
           <ScreenReaderContent>
             {I18n.t('Drag a file here, or click to select a file to upload')}
           </ScreenReaderContent>
         )}
-        <Flex direction="column" justifyItems="center" padding="large">
+        <Flex justifyItems="center" margin="small">
           <Flex.Item>
-            <Img src={UploadFileSVG} width="160px" />
+            <Img src={UploadFileSVG} size="large" />
           </Flex.Item>
-          <Flex.Item padding="medium 0 0 0">
-            <Flex direction="column" textAlign="center">
+          <Flex.Item padding="0 0 0 small">
+            <Flex direction="column" textAlign="start">
               {desktopOnly && (
                 <Flex.Item margin="0 0 small 0" overflowY="visible">
                   <Text size="x-large">{I18n.t('Drag a file here, or')}</Text>
@@ -225,7 +224,7 @@ class FileUpload extends Component {
             </Flex>
           </Flex.Item>
         </Flex>
-      </View>
+      </>
     )
 
     const {allowedExtensions} = this.props.assignment
@@ -233,50 +232,13 @@ class FileUpload extends Component {
       allowedExtensions.length === 0 ||
       allowedExtensions.some(extension => extension.toLowerCase() === 'png')
 
-    const flexLineProps = {
-      ...(desktop
-        ? {width: '120px', padding: '0 xx-small', height: '300px'}
-        : {width: '400px', height: '50px', padding: 'small'}),
-      ...(mobileOnly && {width: '100%'})
-    }
-    const lineContainerStyle = {
-      display: 'flex',
-      height: '100%',
-      position: 'relative',
-      flexDirection: desktop ? 'column' : 'row',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }
-    const textOrStyle = {
-      display: desktop ? 'block' : 'inline',
-      width: desktop ? '100%' : '60px',
-      zIndex: 99,
-      backgroundColor: theme.variables.colors.backgroundLight,
-      padding: desktop ? `${theme.variables.spacing.medium} 0` : '0'
-    }
-    const lineStyle = {
-      height: desktop ? '100%' : '1px',
-      width: desktop ? '1px' : '100%',
-      left: desktop ? '50%' : '0',
-      position: 'absolute',
-      backgroundColor: theme.variables.colors.backgroundDark
-    }
-
     return (
       <StudentViewContext.Consumer>
         {context => (
           <div data-testid="upload-box">
-            <Flex
-              justifyItems="center"
-              alignItems="center"
-              wrap={desktop ? 'no-wrap' : 'wrap'}
-              direction={desktop ? 'row' : 'column'}
-            >
+            <Flex direction="column" padding="xx-small">
               {context.allowChangesToSubmission && (
-                <Flex.Item
-                  padding="xx-small"
-                  width={mobileOnly ? '100%' : desktop ? '330px' : '400px'}
-                >
+                <Flex.Item padding="xx-small" textAlign="center">
                   <MoreOptions
                     assignmentID={this.props.assignment._id}
                     courseID={this.props.assignment.env.courseId}
@@ -289,15 +251,7 @@ class FileUpload extends Component {
                   />
                 </Flex.Item>
               )}
-              {context.allowChangesToSubmission && (
-                <Flex.Item textAlign="center" as="div" {...flexLineProps}>
-                  <div style={lineContainerStyle}>
-                    <span style={textOrStyle}>Or</span>
-                    <div style={lineStyle}>&nbsp;</div>
-                  </div>
-                </Flex.Item>
-              )}
-              <Flex.Item overflowY="visible" width={mobileOnly ? '100%' : '400px'}>
+              <Flex.Item margin="0 0 small 0" overflowY="visible">
                 <FileDrop
                   accept={
                     this.props.assignment.allowedExtensions.length
@@ -349,12 +303,11 @@ class FileUpload extends Component {
     // uploaded don't have that set yet, so use the local name (which we've set
     // to the URL for files from an LTI).
     const displayName = file.displayName || file.name
-    const cellTheme = {background: theme.variables.colors.backgroundLight}
 
     return (
       <Table.Row key={file._id}>
-        <Table.Cell theme={cellTheme}>{getFileThumbnail(file, 'small')}</Table.Cell>
-        <Table.Cell theme={cellTheme}>
+        <Table.Cell>{getFileThumbnail(file, 'small')}</Table.Cell>
+        <Table.Cell>
           {displayName && (
             <>
               <span aria-hidden title={displayName}>
@@ -364,11 +317,9 @@ class FileUpload extends Component {
             </>
           )}
         </Table.Cell>
-        <Table.Cell theme={cellTheme}>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
-        <Table.Cell theme={cellTheme}>
-          {!file.isLoading && <IconCompleteSolid color="success" />}
-        </Table.Cell>
-        <Table.Cell theme={cellTheme}>
+        <Table.Cell>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
+        <Table.Cell>{!file.isLoading && <IconCompleteSolid color="success" />}</Table.Cell>
+        <Table.Cell>
           {!file.isLoading && (
             <IconButton
               id={file._id}
@@ -387,19 +338,15 @@ class FileUpload extends Component {
   }
 
   renderUploadedFiles = files => {
-    const cellTheme = {background: theme.variables.colors.backgroundLight}
-
     return (
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
         <Table.Head>
           <Table.Row>
-            <Table.ColHeader id="thumbnail" width="1rem" theme={cellTheme} />
-            <Table.ColHeader id="filename" theme={cellTheme}>
-              {I18n.t('File Name')}
-            </Table.ColHeader>
-            <Table.ColHeader id="upload-progress" width="30%" theme={cellTheme} />
-            <Table.ColHeader id="upload-success" width="1rem" theme={cellTheme} />
-            <Table.ColHeader id="delete" width="1rem" theme={cellTheme} />
+            <Table.ColHeader id="thumbnail" width="1rem" />
+            <Table.ColHeader id="filename">{I18n.t('File Name')}</Table.ColHeader>
+            <Table.ColHeader id="upload-progress" width="30%" />
+            <Table.ColHeader id="upload-success" width="1rem" />
+            <Table.ColHeader id="delete" width="1rem" />
           </Table.Row>
         </Table.Head>
         <Table.Body>{files.map(this.renderTableRow)}</Table.Body>
@@ -414,17 +361,13 @@ class FileUpload extends Component {
     }
 
     return (
-      <View as="div" background="secondary" borderWidth="small none" padding="0 0 xx-large 0">
-        <Flex data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
-          <Flex.Item overflowY="hidden" padding="large small">
-            {this.renderUploadBox()}
-          </Flex.Item>
+      <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
+        <Flex direction="column" width="100%" alignItems="stretch">
+          <Flex.Item overflowY="visible">{this.renderUploadBox()}</Flex.Item>
 
-          {files.length > 0 && (
-            <Flex.Item padding="0 x-large">{this.renderUploadedFiles(files)}</Flex.Item>
-          )}
+          {files.length > 0 && <Flex.Item>{this.renderUploadedFiles(files)}</Flex.Item>}
         </Flex>
-      </View>
+      </div>
     )
   }
 }

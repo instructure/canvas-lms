@@ -27,7 +27,6 @@ import I18n from 'i18n!conversations_2'
 import {useMutation} from 'react-apollo'
 import {DELETE_CONVERSATIONS} from '../../graphql/Mutations'
 import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
-import {decodeQueryString} from 'query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
 import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 
@@ -51,34 +50,6 @@ const CanvasInbox = () => {
   const [isForward, setIsForward] = useState(false)
   const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
   const userID = ENV.current_user_id?.toString()
-
-  const setFilterStateToCurrentWindowHash = () => {
-    const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
-
-    const urlHash = window.location.hash
-    const hashParams = urlHash.substring('#filter='.length)
-    const hashData = decodeQueryString(hashParams)
-    const filterType = hashData.filter(i => i.type !== undefined)[0]?.type
-    const courseSelection = hashData.filter(i => i.course !== undefined)[0]?.course
-
-    const newCourseFilter = courseSelection || null
-    setCourseFilter(newCourseFilter)
-
-    const isValidFilter = filterType && validFilters.includes(filterType)
-    if (isValidFilter) setScope(filterType)
-  }
-
-  // Get initial filter settings and set listener
-  useEffect(() => {
-    setFilterStateToCurrentWindowHash()
-    window.addEventListener('hashchange', setFilterStateToCurrentWindowHash)
-  }, [])
-
-  // Keep the url updated
-  useEffect(() => {
-    const courseHash = courseFilter ? `&course=${courseFilter}` : ''
-    window.location.hash = `#filter=type=${scope}${courseHash}`
-  }, [courseFilter, scope])
 
   const updateSelectedConversations = conversations => {
     setSelectedConversations(conversations)
@@ -230,7 +201,6 @@ const CanvasInbox = () => {
               >
                 <MessageListActionContainer
                   activeMailbox={scope}
-                  activeCourseFilter={courseFilter}
                   onSelectMailbox={newScope => {
                     setSelectedConversations([])
                     setScope(newScope)

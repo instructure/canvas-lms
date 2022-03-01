@@ -23,7 +23,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import I18n from 'i18n!ProficiencyRating'
 import {IconTrashLine} from '@instructure/ui-icons'
@@ -179,46 +179,44 @@ export default class ProficiencyRating extends React.Component {
         </Table.Cell>
         <Table.Cell>
           <span style={{whiteSpace: 'nowrap'}}>
-            <Popover
-              on="click"
-              isShowingContent={this.state.showColorPopover}
-              onToggle={this.handleMenuToggle}
-              renderTrigger={
+            <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
+              <Popover.Trigger>
                 <Button ref={this.setColorRef} variant="link">
                   <div>
                     <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                     {I18n.t('Change')}
                   </div>
                 </Button>
-              }
-            >
-              <ColorPicker
-                parentComponent="ProficiencyRating"
-                colors={PREDEFINED_COLORS}
-                currentColor={formatColor(color)}
-                isOpen
-                hidePrompt
-                nonModal
-                hideOnScroll={false}
-                withAnimation={false}
-                withBorder={false}
-                withBoxShadow={false}
-                withArrow={false}
-                focusOnMount={false}
-                afterClose={this.handleMenuClose}
-                setStatusColor={this.setColor}
-              />
+              </Popover.Trigger>
+              <Popover.Content>
+                <ColorPicker
+                  parentComponent="ProficiencyRating"
+                  colors={PREDEFINED_COLORS}
+                  currentColor={formatColor(color)}
+                  isOpen
+                  hidePrompt
+                  nonModal
+                  hideOnScroll={false}
+                  withAnimation={false}
+                  withBorder={false}
+                  withBoxShadow={false}
+                  withArrow={false}
+                  focusOnMount={false}
+                  afterClose={this.handleMenuClose}
+                  setStatusColor={this.setColor}
+                />
+              </Popover.Content>
             </Popover>
             <div className="delete">
-              <IconButton
+              <Button
                 disabled={disableDelete}
-                elementRef={this.setTrashRef}
+                buttonRef={this.setTrashRef}
                 onClick={this.handleDelete}
-                renderIcon={<IconTrashLine />}
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Delete proficiency rating')}
-              />
+                variant="icon"
+                icon={<IconTrashLine />}
+              >
+                <ScreenReaderContent>{I18n.t('Delete proficiency rating')}</ScreenReaderContent>
+              </Button>
             </div>
           </span>
         </Table.Cell>

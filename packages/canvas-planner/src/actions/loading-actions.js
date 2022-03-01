@@ -18,13 +18,12 @@
 
 import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
+import buildURL from 'axios/lib/helpers/buildURL'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 import {
   getContextCodesFromState,
   transformApiToInternalItem,
-  observedUserId,
-  observedUserContextCodes,
-  buildURL
+  observedUserId
 } from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
@@ -55,8 +54,7 @@ export const {
   jumpToWeek,
   jumpToThisWeek,
   gotWayPastItemDate,
-  gotWayFutureItemDate,
-  gotCourseList
+  gotWayFutureItemDate
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -82,8 +80,7 @@ export const {
   'JUMP_TO_WEEK',
   'JUMP_TO_THIS_WEEK',
   'GOT_WAY_FUTURE_ITEM_DATE',
-  'GOT_WAY_PAST_ITEM_DATE',
-  'GOT_COURSE_LIST'
+  'GOT_WAY_PAST_ITEM_DATE'
 )
 
 export const gettingPastItems = createAction(
@@ -114,17 +111,8 @@ export function getFirstNewActivityDate(fromMoment) {
   // specifically so we know what the very oldest new activity is
   return (dispatch, getState) => {
     fromMoment = fromMoment.clone().subtract(6, 'months')
-    const observed_user_id = observedUserId(getState())
-    const context_codes = observedUserContextCodes(getState())
 
-    const url = buildURL('/api/v1/planner/items', {
-      start_date: fromMoment.toISOString(),
-      filter: 'new_activity',
-      order: 'asc',
-      observed_user_id,
-      context_codes
-    })
-
+    const url = `/api/v1/planner/items?start_date=${fromMoment.toISOString()}&filter=new_activity&order=asc`
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
 
     return request
@@ -139,7 +127,7 @@ export function getFirstNewActivityDate(fromMoment) {
           dispatch(foundFirstNewActivityDate(first.dateBucketMoment))
         }
       })
-      .catch(_ex => alert(formatMessage('Failed to get new activity'), true))
+      .catch(() => alert(formatMessage('Failed to get new activity'), true))
   }
 }
 
@@ -147,30 +135,10 @@ export function getFirstNewActivityDate(fromMoment) {
 export function getPlannerItems(fromMoment) {
   return dispatch => {
     dispatch(startLoadingItems())
-    return dispatch(getCourseList()) // classic planner never does singleCourse
-      .then(res => {
-        dispatch(gotCourseList(res.data))
-        dispatch(continueLoadingInitialItems()) // a start counts as a continue for the ContinueInitialLoad animation
-        dispatch(getFirstNewActivityDate(fromMoment))
-        dispatch(peekIntoPastSaga())
-        dispatch(startLoadingFutureSaga())
-      })
-      .catch(_ex => {
-        alert(formatMessage('Failed getting course list'))
-      })
-  }
-}
-
-export function getCourseList() {
-  return (dispatch, getState) => {
-    if (getState().singleCourse) {
-      return Promise.resolve({data: getState().courses}) // set via INITIAL_OPTIONS
-    }
-    const observeeId = observedUserId(getState())
-    const ovserveeParam = observeeId ? `?observed_user=${observeeId}` : ''
-    const url = `/api/v1/dashboard/dashboard_cards${ovserveeParam}`
-    const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
-    return request
+    dispatch(continueLoadingInitialItems()) // a start counts as a continue for the ContinueInitialLoad animation
+    dispatch(getFirstNewActivityDate(fromMoment))
+    dispatch(peekIntoPastSaga())
+    dispatch(startLoadingFutureSaga())
   }
 }
 
@@ -230,21 +198,11 @@ export const loadPastUntilToday = () => dispatch => {
 export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
     dispatch(startLoadingItems())
-    const coursesPromise = getState().singleCourse
-      ? Promise.resolve({data: getState().courses}) // set in INITIAL_OPTIONS for the singleCourse case
-      : dispatch(getCourseList())
-    return coursesPromise
-      .then(res => {
-        dispatch(gotCourseList(res.data))
-        const weeklyState = getState().weeklyDashboard
-        dispatch(gettingInitWeekItems(weeklyState))
-        dispatch(getWayFutureItem(fromMoment))
-        dispatch(getWayPastItem(fromMoment))
-        loadWeekItems(dispatch, getState)
-      })
-      .catch(_ex => {
-        alert(formatMessage('Failed getting course list'))
-      })
+    const weeklyState = getState().weeklyDashboard
+    dispatch(gettingInitWeekItems(weeklyState))
+    dispatch(getWayFutureItem(fromMoment))
+    dispatch(getWayPastItem(fromMoment))
+    loadWeekItems(dispatch, getState)
   }
 }
 
@@ -327,15 +285,15 @@ function getWayFutureItem(fromMoment) {
     const observed_user_id = observedUserId(state)
     let context_codes
     if (observed_user_id) {
-      context_codes = getContextCodesFromState(state)
+      context_codes = state.selectedObservee.contextCodes
     } else {
       context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
     }
-    const futureMoment = fromMoment.clone().tz('UTC').startOf('day').add(1, 'year')
+    const futureMoment = fromMoment.clone().add(1, 'year')
     const url = buildURL('/api/v1/planner/items', {
       observed_user_id,
       context_codes,
-      end_date: futureMoment.toISOString(),
+      end_date: futureMoment.format(),
       order: 'desc',
       per_page: 1
     })
@@ -348,7 +306,7 @@ function getWayFutureItem(fromMoment) {
           dispatch(gotWayFutureItemDate(wayFutureItemDate))
         }
       })
-      .catch(_ex => alert(formatMessage('Failed peeking into your future'), true))
+      .catch(() => alert(formatMessage('Failed peeking into your future'), true))
   }
 }
 
@@ -358,15 +316,15 @@ function getWayPastItem(fromMoment) {
     const observed_user_id = observedUserId(state)
     let context_codes
     if (observed_user_id) {
-      context_codes = getContextCodesFromState(state)
+      context_codes = state.selectedObservee.contextCodes
     } else {
       context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
     }
-    const pastMoment = fromMoment.clone().tz('UTC').startOf('day').add(-1, 'year')
+    const pastMoment = fromMoment.clone().add(-1, 'year')
     const url = buildURL('/api/v1/planner/items', {
       observed_user_id,
       context_codes,
-      start_date: pastMoment.toISOString(),
+      start_date: pastMoment.format(),
       order: 'asc',
       per_page: 1
     })
@@ -379,7 +337,7 @@ function getWayPastItem(fromMoment) {
           dispatch(gotWayPastItemDate(wayPastItemDate))
         }
       })
-      .catch(_ex => {
+      .catch(() => {
         alert(formatMessage('Failed peeking into your past'), true)
       })
   }
@@ -427,7 +385,7 @@ function fetchParams(loadingOptions) {
     const observeeId = observedUserId(loadingOptions.getState())
     if (observeeId) {
       params.observed_user_id = observeeId
-      params.context_codes = observedUserContextCodes(loadingOptions.getState())
+      params.context_codes = loadingOptions.getState().selectedObservee.contextCodes
     }
 
     return ['/api/v1/planner/items', {params}]

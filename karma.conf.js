@@ -120,7 +120,7 @@ if (process.env.COVERAGE === '1') {
   karmaConfig.webpack.module.rules.unshift({
     test: /\.(js|coffee)$/,
     use: {
-      loader: 'coverage-istanbul-loader',
+      loader: 'istanbul-instrumenter-loader',
       options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post',

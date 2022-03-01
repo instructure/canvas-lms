@@ -35,7 +35,7 @@ import {
 
 function readyButton(props) {
   return (
-    <Button {...props} color="primary">
+    <Button {...props} variant="primary">
       {I18n.t('Release Grades')}
     </Button>
   )
@@ -45,7 +45,7 @@ function startedButton(props) {
   const title = I18n.t('Releasing Grades')
 
   return (
-    <Button {...props} color="primary-inverse">
+    <Button {...props} variant="light">
       <Spinner size="x-small" renderTitle={title} />
       <PresentationContent>{title}</PresentationContent>
     </Button>
@@ -54,7 +54,7 @@ function startedButton(props) {
 
 function successButton(props) {
   return (
-    <Button {...props} renderIcon={IconCheckMarkSolid} color="primary-inverse">
+    <Button {...props} icon={IconCheckMarkSolid} variant="light">
       {I18n.t('Grades Released')}
     </Button>
   )

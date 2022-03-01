@@ -33,7 +33,7 @@ const LoginAttributeSuffixInput = ({suffixInputHandler, loginAttributeSuffix, me
   return (
     <>
       <TextInput
-        renderLabel={
+        label={
           <ScreenReaderContent>{I18n.t('Login Attribute Suffix Input Area')}</ScreenReaderContent>
         }
         type="text"

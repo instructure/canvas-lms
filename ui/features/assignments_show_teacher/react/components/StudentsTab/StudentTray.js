@@ -25,7 +25,7 @@ import {bool, func} from 'prop-types'
 import {TeacherAssignmentShape, UserShape} from '../../assignmentData'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
@@ -69,11 +69,9 @@ export default class StudentTray extends React.Component {
 
   renderTrayCloseButton() {
     return (
-      <CloseButton
-        placement="start"
-        onClick={this.props.onHideTray}
-        screenReaderLabel={I18n.t('Close student details')}
-      />
+      <CloseButton placement="start" variant="icon" onClick={this.props.onHideTray}>
+        {I18n.t('Close student details')}
+      </CloseButton>
     )
   }
 
@@ -100,17 +98,17 @@ export default class StudentTray extends React.Component {
       `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}#{"student_id":"${studentLid}"}`
     )
     return (
-      <Link
+      <Button
         href={speedgraderLink}
-        isWithinText={false}
         margin="xx-small auto xx-small auto"
-        renderIcon={IconSpeedGraderLine}
+        icon={IconSpeedGraderLine}
         target="_blank"
+        variant="link"
       >
         <Text transform="uppercase" size="small" lineHeight="fit">
           {I18n.t('SpeedGrader')}
         </Text>
-      </Link>
+      </Button>
     )
   }
 
@@ -154,8 +152,8 @@ export default class StudentTray extends React.Component {
         <View display="block" margin="x-small none">
           <Button
             variant="link"
-            renderIcon={IconEmailLine}
-            elementRef={b => (this.messageStudentsButton = b)}
+            icon={IconEmailLine}
+            buttonRef={b => (this.messageStudentsButton = b)}
             onClick={this.handleMessageButtonClick}
             theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
           >
@@ -164,7 +162,7 @@ export default class StudentTray extends React.Component {
         </View>
         <Button
           variant="link"
-          renderIcon={IconUploadLine}
+          icon={IconUploadLine}
           onClick={this.handleSubmitForStudent}
           theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
         >
@@ -241,38 +239,38 @@ export default class StudentTray extends React.Component {
           <div style={{margin: '0 auto auto -10%', width: '120%'}}>
             <Flex>
               <Flex.Item shrink textAlign="start">
-                <IconButton
+                <Button
                   size="small"
-                  renderIcon={IconArrowOpenStartLine}
-                  withBackground={false}
-                  withBorder={false}
+                  variant="icon"
+                  icon={IconArrowOpenStartLine}
                   onClick={this.props.onPreviousStudent}
-                  screenReaderLabel={I18n.t('Previous student')}
-                />
+                >
+                  <ScreenReaderContent>{I18n.t('Previous student')}</ScreenReaderContent>
+                </Button>
               </Flex.Item>
               <Flex.Item grow textAlign="center">
                 <Heading level="h3" as="h2">
-                  <Link
+                  <Button
                     size="large"
                     href={studentProfileUrl}
-                    isWithinText={false}
                     aria-label={I18n.t("Go to %{name}'s profile", {name: student.shortName})}
                     target="_blank"
+                    variant="link"
                     theme={{largePadding: '0.75rem', largeHeight: 'normal'}}
                   >
                     {student.shortName}
-                  </Link>
+                  </Button>
                 </Heading>
               </Flex.Item>
               <Flex.Item shrink textAlign="end">
-                <IconButton
+                <Button
                   size="small"
-                  renderIcon={IconArrowOpenEndLine}
-                  withBackground={false}
-                  withBorder={false}
+                  variant="icon"
+                  icon={IconArrowOpenEndLine}
                   onClick={this.props.onNextStudent}
-                  screenReaderLabel={I18n.t('Next student')}
-                />
+                >
+                  <ScreenReaderContent>{I18n.t('Next student')}</ScreenReaderContent>
+                </Button>
               </Flex.Item>
             </Flex>
           </div>

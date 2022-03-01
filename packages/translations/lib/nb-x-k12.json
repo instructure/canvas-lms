@@ -104,9 +104,6 @@
     "arrows_464a3e54": {
         "message": "Piler"
     },
-    "art_icon_8e1daad": {
-        "message": "Kunstikon"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Dimensjonene vil bli bevart"
     },
@@ -230,9 +227,6 @@
     "clear_2084585f": {
         "message": "Tøm"
     },
-    "clear_image_3213fe62": {
-        "message": "Fjern bilde"
-    },
     "clear_selected_file_82388e50": {
         "message": "Fjern valgt fil"
     },
@@ -346,9 +340,6 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-lisens:"
-    },
-    "crop_image_41bf940c": {
-        "message": "Beskjær bilde"
     },
     "crop_image_807ebb08": {
         "message": "Beskjær bilde"
@@ -518,12 +509,6 @@
     "embedded_content_aaeb4d3d": {
         "message": "inkludert innhold"
     },
-    "engineering_icon_f8f3cf43": {
-        "message": "Ingeniør-ikon"
-    },
-    "english_icon_25bfe845": {
-        "message": "Engelsk-ikon"
-    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Skriv inn minst tre tegn for å søke"
     },
@@ -568,9 +553,6 @@
     },
     "extra_small_9ae33252": {
         "message": "Ekstra liten"
-    },
-    "extracurricular_icon_67c8ca42": {
-        "message": "Utenomfaglig-ikon"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Kunne ikke kikke inn i fremtiden"
@@ -701,9 +683,6 @@
     "heading_4_b2e74be7": {
         "message": "Overskrift 4"
     },
-    "health_icon_8d292eb5": {
-        "message": "Helse-ikon"
-    },
     "height_69b03e15": {
         "message": "Høyde"
     },
@@ -730,9 +709,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Jeg har opphavsretten"
-    },
-    "icon_color_b86dd6d6": {
-        "message": "Ikonfarge"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Dersom du ikke velger bruksrettigheter nå, vil denne filen være upublisert når den lastes opp."
@@ -800,12 +776,6 @@
     "language_arts_35b79a8b": {
         "message": "Språkkunst"
     },
-    "language_arts_icon_a798b0f8": {
-        "message": "Språkkunst-ikon"
-    },
-    "languages_icon_9d20539": {
-        "message": "Språk-ikon"
-    },
     "large_9c5e80e7": {
         "message": "Stor"
     },
@@ -814,9 +784,6 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Venstre-til-høyre"
-    },
-    "library_icon_ae1e54cf": {
-        "message": "Bibliotek-ikon"
     },
     "link_7262adec": {
         "message": "Lenke"
@@ -887,9 +854,6 @@
     "math_ede93050": {
         "message": "Matte"
     },
-    "math_icon_ad4e9d03": {
-        "message": "Matte-ikon"
-    },
     "media_af190855": {
         "message": "Medie"
     },
@@ -916,9 +880,6 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Bilde i flere farger"
-    },
-    "music_icon_4db5c972": {
-        "message": "Musikk-ikon"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Må være minst { percentage }%"
@@ -1073,12 +1034,6 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "Prosent må være et tall"
     },
-    "performing_arts_icon_f3497486": {
-        "message": "Scenekunst-ikon"
-    },
-    "physical_education_icon_d7dffd3e": {
-        "message": "Gymnastikk-ikon"
-    },
     "pixels_52ece7d1": {
         "message": "Piksler"
     },
@@ -1144,9 +1099,6 @@
     },
     "relationships_6602af70": {
         "message": "Forbindelser"
-    },
-    "religion_icon_246e0be1": {
-        "message": "Religion-ikon"
     },
     "reminder_date_4564d12d": {
         "message": "Påminnelse: { date }"
@@ -1573,11 +1525,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Du har rullet tilbake til din aller første gjøremålliste!"
-    },
-    "zoom_in_image_bb97d4f": {
-        "message": "Zoom inn bildet"
-    },
-    "zoom_out_image_d0a0a2ec": {
-        "message": "Zoom ut bildet"
     }
 }

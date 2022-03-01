@@ -60,7 +60,7 @@ export default function UsersToolbar(props) {
         <TextInput
           type="search"
           value={props.search_term}
-          renderLabel={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
+          label={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
           placeholder={placeholder}
           onChange={e => props.onUpdateFilters({search_term: e.target.value})}
           onKeyUp={e => {
@@ -106,7 +106,7 @@ function renderKabobMenu(accountId) {
     return (
       <Menu
         trigger={
-          <Button renderIcon={IconMoreLine}>
+          <Button icon={IconMoreLine}>
             <ScreenReaderContent>{I18n.t('More People Options')}</ScreenReaderContent>
           </Button>
         }

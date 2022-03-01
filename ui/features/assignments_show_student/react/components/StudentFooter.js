@@ -40,7 +40,7 @@ function buildFooterStyle() {
 }
 
 const NextItem = ({compact, tooltipText, url}) => (
-  <Tooltip renderTip={tooltipText}>
+  <Tooltip tip={tooltipText}>
     <Button data-testid="next-assignment-btn" margin="0 0 0 x-small" color="secondary" href={url}>
       <ScreenReaderContent>{I18n.t('Next Module')}</ScreenReaderContent>
       {!compact && <PresentationContent>{I18n.t('Next')}</PresentationContent>}
@@ -50,7 +50,7 @@ const NextItem = ({compact, tooltipText, url}) => (
 )
 
 const PreviousItem = ({compact, tooltipText, url}) => (
-  <Tooltip renderTip={tooltipText}>
+  <Tooltip tip={tooltipText}>
     <Button data-testid="previous-assignment-btn" margin="0 small 0 0" color="secondary" href={url}>
       <ScreenReaderContent>{I18n.t('Previous Module')}</ScreenReaderContent>
       <IconArrowOpenStartSolid />

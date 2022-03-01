@@ -217,7 +217,7 @@ export default class AssignmentRowCell extends Component {
 
             <div className="Grid__GradeCell__Options">
               <Button
-                elementRef={this.bindToggleTrayButtonRef}
+                buttonRef={this.bindToggleTrayButtonRef}
                 onClick={this.handleToggleTrayButtonClick}
                 size="small"
                 variant="icon"

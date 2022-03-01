@@ -99,8 +99,8 @@ export default class ConfigurationFormUrl extends React.Component {
           ref="name"
           id="name"
           defaultValue={this.props.name}
-          renderLabel={I18n.t('Name')}
-          isRequired
+          label={I18n.t('Name')}
+          required
           errors={this.state.errors}
         />
         <div className="grid-row">
@@ -109,7 +109,7 @@ export default class ConfigurationFormUrl extends React.Component {
               ref="consumerKey"
               id="consumerKey"
               defaultValue={this.props.consumerKey}
-              renderLabel={I18n.t('Consumer Key')}
+              label={I18n.t('Consumer Key')}
               errors={this.state.errors}
             />
           </div>
@@ -118,7 +118,7 @@ export default class ConfigurationFormUrl extends React.Component {
               ref="sharedSecret"
               id="sharedSecret"
               defaultValue={this.props.sharedSecret}
-              renderLabel={I18n.t('Shared Secret')}
+              label={I18n.t('Shared Secret')}
               errors={this.state.errors}
             />
           </div>
@@ -130,9 +130,9 @@ export default class ConfigurationFormUrl extends React.Component {
           ref="configUrl"
           id="configUrl"
           defaultValue={this.props.configUrl}
-          renderLabel={I18n.t('Config URL')}
+          label={I18n.t('Config URL')}
           hintText={I18n.t('Example: https://example.com/config.xml')}
-          isRequired
+          required
           errors={this.state.errors}
         />
       </div>

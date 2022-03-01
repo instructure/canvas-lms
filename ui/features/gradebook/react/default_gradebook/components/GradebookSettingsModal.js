@@ -317,11 +317,9 @@ export default class GradebookSettingsModal extends React.Component {
               </Flex.Item>
 
               <Flex.Item>
-                <CloseButton
-                  placement="static"
-                  onClick={this.close}
-                  screenReaderLabel={I18n.t('Close')}
-                />
+                <CloseButton placement="static" variant="icon" onClick={this.close}>
+                  {I18n.t('Close')}
+                </CloseButton>
               </Flex.Item>
             </Flex>
           </Flex.Item>
@@ -439,7 +437,7 @@ export default class GradebookSettingsModal extends React.Component {
               id="gradebook-settings-update-button"
               onClick={this.handleUpdateButtonClicked}
               disabled={!this.isUpdateButtonEnabled()}
-              color="primary"
+              variant="primary"
             >
               {I18n.t('Apply Settings')}
             </Button>

@@ -59,7 +59,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
     setDatesToRemove(newValue)
   }, [])
 
-  const okDisabled = (function () {
+  const okDisabled = (function() {
     if (mode === 'shift' && shiftDaysState.numberValue === null) return true
     if (mode === 'remove' && datesToRemove.length === 0) return true
     return false
@@ -73,7 +73,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
         </Button>
         <Button
           margin="0 0 0 small"
-          color="primary"
+          variant="primary"
           onClick={handleOk}
           interaction={okDisabled ? 'disabled' : 'enabled'}
         >

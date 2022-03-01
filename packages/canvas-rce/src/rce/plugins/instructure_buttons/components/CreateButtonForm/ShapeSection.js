@@ -22,10 +22,9 @@ import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 
 import formatMessage from '../../../../../format-message'
-import {Shape} from '../../svg/shape'
-import {Size} from '../../svg/constants'
 
-const SIZES = [Size.ExtraSmall, Size.Small, Size.Medium, Size.Large]
+const SHAPES = ['square', 'circle', 'triangle', 'diamond', 'pentagon', 'hexagon', 'octagon', 'star']
+const SIZES = ['x-small', 'small', 'medium', 'large']
 
 export const ShapeSection = ({settings, onChange}) => (
   <Flex as="section" direction="column" justifyItems="space-between" padding="small small 0">
@@ -37,7 +36,7 @@ export const ShapeSection = ({settings, onChange}) => (
         renderLabel={formatMessage('Button Shape')}
         value={settings.shape}
       >
-        {Object.values(Shape).map(shape => (
+        {SHAPES.map(shape => (
           <SimpleSelect.Option id={`shape-${shape}`} key={`shape-${shape}`} value={shape}>
             {SHAPE_DESCRIPTION[shape] || ''}
           </SimpleSelect.Option>
@@ -64,19 +63,19 @@ export const ShapeSection = ({settings, onChange}) => (
 )
 
 const SHAPE_DESCRIPTION = {
-  [Shape.Square]: formatMessage('Square'),
-  [Shape.Circle]: formatMessage('Circle'),
-  [Shape.Triangle]: formatMessage('Triangle'),
-  [Shape.Diamond]: formatMessage('Diamond'),
-  [Shape.Pentagon]: formatMessage('Pentagon'),
-  [Shape.Hexagon]: formatMessage('Hexagon'),
-  [Shape.Octagon]: formatMessage('Octagon'),
-  [Shape.Star]: formatMessage('Star')
+  square: formatMessage('Square'),
+  circle: formatMessage('Circle'),
+  triangle: formatMessage('Triangle'),
+  diamond: formatMessage('Diamond'),
+  pentagon: formatMessage('Pentagon'),
+  hexagon: formatMessage('Hexagon'),
+  octagon: formatMessage('Octagon'),
+  star: formatMessage('Star')
 }
 
 const SIZE_DESCRIPTION = {
-  [Size.ExtraSmall]: formatMessage('Extra Small'),
-  [Size.Small]: formatMessage('Small'),
-  [Size.Medium]: formatMessage('Medium'),
-  [Size.Large]: formatMessage('Large')
+  'x-small': formatMessage('Extra Small'),
+  small: formatMessage('Small'),
+  medium: formatMessage('Medium'),
+  large: formatMessage('Large')
 }

@@ -161,26 +161,6 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
-    context "when the target_link_uri is specified in the tool's placement settings" do
-      it 'use the placement-specific "target_link_uri"' do
-        # Just setting tool.course_navigation[:target_link_uri] doesn't seem to
-        # set it, I have to do this
-        tool.course_navigation = tool.course_navigation.merge(
-          target_link_uri: "http://www.example.com/basic_lti?coursenav"
-        )
-        tool.save!
-        expect(decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq(
-          "http://www.example.com/basic_lti?coursenav"
-        )
-      end
-
-      it 'ignores the placement-specific "target_link_uri" if it is an empty string' do
-        tool.course_navigation = tool.course_navigation.merge(target_link_uri: "")
-        tool.save
-        expect(decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq tool.url
-      end
-    end
-
     context "when security claim group disabled" do
       let(:opts) { super().merge({ claim_group_blacklist: [:security] }) }
 
