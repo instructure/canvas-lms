@@ -80,7 +80,6 @@ const ignoredErrors = [
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
   /The prop `id` is marked as required in `(CanvasSelectOption|ColHeader|DashboardCard|FormField|Option)`/,
-  /The prop `isLoading` is marked as required in `LoadingWrapper`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
   /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
