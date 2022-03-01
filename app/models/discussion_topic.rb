@@ -1061,7 +1061,7 @@ class DiscussionTopic < ActiveRecord::Base
     else
       shard.activate do
         entry = discussion_entries.new(message: message, user: user)
-        if entry.grants_right?(user, :create)
+        if entry.grants_right?(user, :create) && !comments_disabled?
           entry.save!
           entry
         else
