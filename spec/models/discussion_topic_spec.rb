@@ -2217,6 +2217,15 @@ describe DiscussionTopic do
       expect { @topic.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
+    it "does not allow replies from students to announcements that are closed for comments" do
+      announcement = @course.announcements.create!(message: "Lock this")
+      expect(announcement.comments_disabled?).to be_falsey
+      @course.lock_all_announcements = true
+      @course.save!
+      expect(announcement.reload.comments_disabled?).to be_truthy
+      expect { announcement.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+    end
+
     it "reflects course setting for when lock_all_announcements is enabled" do
       announcement = @course.announcements.create!(message: "Lock this")
       expect(announcement.comments_disabled?).to be_falsey
