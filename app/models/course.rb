@@ -1226,7 +1226,9 @@ class Course < ActiveRecord::Base
       self.class.connection.after_transaction_commit do
         Enrollment.where(course_id: self).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
-        User.touch_and_clear_cache_keys(user_ids, :enrollments)
+        # We might get lots of database locks when lots of courses with the same users are being updated,
+        # so we can skip touching those users' updated_at stamp since another process will do it
+        User.touch_and_clear_cache_keys(user_ids, :enrollments, skip_locked: true)
       end
 
       data
