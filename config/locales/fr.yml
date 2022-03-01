@@ -3,12 +3,14 @@
 --- 
 fr: 
   1_item_scores_5512cd03: "1- Notes par élément"
+  1_item_scores_example_item_scores_7345479: "1- Score de l'élément : Exemple de score d'élément :"
   1_item_scores_examplescores_9736236: "1- Score de l'élément : %{exampleScores}"
   1_user_found_76399771: "1 utilisateur trouvé."
   1st_reviewer_3c1d0119: "1er examinateur"
   25th_75th_ile_406a67bf: "25e-75e Centile"
   25th_75th_percentile_aa4c11f2: "25e-75e Centile"
   2_final_score_7b0fd15e: "2- Note finale"
+  2_final_score_example_final_score_80199132: "2- Score final : Exemple de score final :"
   2_final_score_exampleresult_922edf9c: "2- Score final : %{exampleResult}"
   2_options_available_use_arrow_keys_to_navigate_opt_c55a8e61: "2 options disponibles : Utilisez les touches fléchées pour naviguer dans les options."
   2nd_reviewer_94fdbcd: "2ème examinateur"
@@ -302,6 +304,7 @@ fr:
     tab_faculty_journal: "Journal des enseignants"
     tab_grading_standards: Notation
     tab_jobs: Tâches
+    tab_jobs_v2: "Jobs v2"
     tab_outcomes: Acquis
     tab_permissions: Autorisations
     tab_plugins: Plug-ins
@@ -1916,6 +1919,7 @@ fr:
   add_announcement_165c3b05: "Ajouter une annonce"
   add_another_assignment_fc5c908f: "Ajouter un autre travail"
   add_app_baf540f: "Ajouter une application"
+  add_as_a_faculty_journal_entry_55a38a30: "Ajouter comme entrée du journal des enseignants"
   add_as_allowed_e95540be: "Ajouter en tant qu’autorisé"
   add_assignment_to_name_caf173b0: "Ajouter le devoir à %{name}"
   add_assignments_and_quizzes_1085d2af: "Ajouter des travaux et des quiz"
@@ -2692,9 +2696,11 @@ fr:
   allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: "Permet à l'utilisateur de gérer les ressources partagées dans le compte."
   allows_user_to_manage_the_visibility_options_in_co_e781e4e4: "Permet à l’utilisateur de gérer les options de visibilité dans les paramètres de cours ou lors de la création d’un nouveau cours."
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Permet à l'utilisateur d'ajouter manuellement une application dans les Paramètres du compte."
+  allows_user_to_manually_add_an_app_in_course_setti_cf39f581: "Permet à l'utilisateur d'ajouter manuellement une application dans les Paramètres du cours."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Permet à l'utilisateur d'ajouter et de supprimer manuellement une application dans les Paramètres du compte."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Permet à l'utilisateur d'ajouter et de supprimer manuellement une application dans les Paramètres du cours."
   allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Permet à l’utilisateur de supprimer manuellement une application dans les Paramètres de compte."
+  allows_user_to_manually_delete_an_app_in_course_se_f6015d14: "Permet à l'utilisateur de supprimer manuellement une application dans les Paramètres du cours."
   allows_user_to_moderate_a_quiz_6953d369: "Permet à l'utilisateur de modérer un questionnaire."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Permet à l'utilisateur de modérer un quiz et d'afficher la page des statistiques du quiz."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Permet à l'utilisateur de modérer un questionnaire. Paramètres : Permet à l'utilisateur de modifier les systèmes de notations."
@@ -3266,6 +3272,7 @@ fr:
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: "Les travaux anonymes sont masqués par défaut et devront être postés manuellement même si le cours est paramétré sur « Automatique »."
   anonymous_assignments_must_be_manually_posted_a13d2ca5: "Les travaux anonymes doivent être publiés manuellement."
   anonymous_discussion_1e9b981: "Discussion anonyme | "
+  anonymous_discussion_54517e84: "Discussion anonyme"
   anonymous_e1b8ad27: Anonyme
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Le classement anonyme ne peut pas être activé pour les travaux de groupe."
   anonymous_grading_ccb5045c: "Notation anonyme"
@@ -5599,6 +5606,7 @@ fr:
   cannot_grade_at_this_time_489744b0: "Impossible de noter pour le moment"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Il n’est pas possible pour un projet de cours de contenir des élèves."
   cannot_import_a_root_group_d4654def: "Impossible d'importer un groupe racine"
+  cannot_import_to_other_courses_af885742: "Impossible d'importer dans d'autres cours"
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "Impossible de modifier les champs pour les résultats d'un autre contexte : %{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Ne peut pas modifier le résultat d'un autre contexte : %{changes}; le résultat doit être modifié dans %{context}"
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Impossible de déplacer les travaux en raison des périodes de notation fermées."
@@ -5960,6 +5968,7 @@ fr:
   close_student_tray_789b656d: "Fermer le tiroir « élèves »"
   close_submission_tray_c4988fa8: "Fermer le bac des soumissions"
   close_suggestions_6fcb4985: "Fermer les suggestions"
+  close_the_window_and_try_again_7353f8e: "Fermez la fenêtre, puis réessayez."
   close_warning_d61daf2c: "Fermer l'avertissement"
   closed_for_comments_e395b42f: "Commentaires fermés"
   closes_5c6b4367: "Sera fermé :"
@@ -8084,6 +8093,7 @@ fr:
   course_view_change_logs_d62d5d9d: "Cours - voir les journaux des modifications"
   course_view_usage_reports_bbc9271d: "Cours - voir les rapports d'utilisation"
   course_visibility_options_ca8ab3a8: "Options de visibilité du cours"
+  course_with_canvas_id_id_not_found_1ff06bec: "Le cours à l’identifiant canvas %{id} est introuvable"
   course_wizard_31c87552: "Assistant de création de cours"
   coursecontext_label_d563be4c: "%{courseContext} %{label}"
   coursename_total_grade_5b3f3564: "%{courseName} Total : %{grade}"
@@ -8799,6 +8809,7 @@ fr:
   criterion_ratings_3eed22e2: "Notes du critère"
   criterion_updated_36c0b3dc: "Critère mis à jour"
   croatian_d713d655: Croate
+  cropper_associated_features_in_buttons_icons_be12ae42: "Rognage et fonctionnalités associées dans les Boutons et icônes"
   cross_listing_3318526a: "Liste croisée"
   cross_listing_course_sections_edit_2ad15f02: "Liste croisée (Sections de cours - Modifier)"
   crumbs: 
@@ -8819,6 +8830,7 @@ fr:
     grading_standards: Notation
     groups: Groupes
     jobs: Tâches
+    jobs_v2: "Jobs v2"
     media: Multimédia
     messages: Messages
     modules: Modules
@@ -8912,6 +8924,7 @@ fr:
   current_grading_period_b85226c2: "Période de notation actuelle"
   current_grading_scheme_for_this_assignment_d525463e: "Le plan de notation actuel pour ce devoir"
   current_grading_standard_for_this_assignment_64c5375e: "Critères de notation actuels pour cette évaluation"
+  current_jobs_aa571ce4: "Tâches actuelles"
   current_letter_grade_50f4ebb1: "Note actuelle (en lettre)"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Score actuel de maîtrise : %{score} sur %{mastery_points}"
   current_of_totalsteps_19d7ee37: "%{current} de %{totalSteps}"
@@ -9167,6 +9180,7 @@ fr:
   deactivate_user_86c09036: "Désactiver l'utilisateur"
   debugging_f98fcd74: Débogage
   decaying_average_8bf6a0dd: "Moyenne de décroissance"
+  decaying_average_recentint_remainderint_ab0636cc: "Moyenne glissante - %{recentInt}%/%{remainderInt}%"
   decorative_image_3c28aa7d: "Image décorative"
   decrease_indent_d9cf469d: "Diminuer le retrait"
   decrease_indent_de6343ab: "Diminuer le retrait"
@@ -9498,6 +9512,7 @@ fr:
     cancel: Annuler
     save_settings: "Enregistrer les paramètres"
     saving: Enregistrement...
+  did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: "Le saviez-vous ? Vous pouvez désormais créer des filtres détaillés et les enregistrer pour les utiliser plus tard."
   did_you_mean_id_241c900c: "Vouliez-vous dire ? *%{id}*"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Vous n’avez pas trouvé ce que vous cherchiez ? Essayez encore !"
   different_course_b875770e: "cours différent"
@@ -10284,6 +10299,9 @@ fr:
     prompts: 
       confirm_delete: "Voulez-vous vraiment supprimer ce barème ?"
       read_only_rubric: "La modification de ce barème est impossible, soit parce que vous ne possédez pas les autorisations nécessaires, soit parce qu’elle est déjà utilisée en un autre endroit. Toute modification de ce barème entraînera la création d’une nouveau barème à partir de l’ancien. Voulez-vous continuer ?"
+    rubric: 
+      import_outcome: 
+        duplicated_outcome: "Ce résultat n'a pas été ajouté car il existe déjà dans ce barème."
     titles: 
       criterion_long_description: "Description longue du critère"
       edit_rubric_rating: "Modifier les notes"
@@ -10506,6 +10524,7 @@ fr:
   enhance_color_contrast_of_content_685ddd49: "Renforcer le contraste des couleurs du contenu"
   enhanced_grade_change_auditing_2b155dfa: "Vérification améliorée des changements de notes"
   enhanced_gradebook_filters_a3be5e7d: "Filtres de carnet de notes améliorés"
+  enhanced_gradebook_filters_description: "Cette fonctionnalité apporte des options de filtrage amélioré au carnet de notes Canvas. Lorsque ce drapeau est activé, l'accès anticipé aux améliorations en cours s'affichera automatiquement à chaque nouvelle version. Pour tout savoir, veuillez consulter le *Groupe utilisateur des filtres de carnet de notes* sur Canvas Community."
   enhances_the_canvas_experience_within_the_learning_8031b650: "Améliore l'expérience Canvas dans le Relevé de notes pour la maîtrise de l’apprentissage."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Renforce le contraste des couleurs du texte, des boutons, etc."
   enroll_in_subject_9c1f1c18: "S'inscrire au sujet"
@@ -10939,6 +10958,7 @@ fr:
   error_98e81528: Erreur
   error_adding_canvas_file_to_submission_draft_de258021: "Erreur lors de l'ajout d'un fichier canvas à la version préliminaire de la soumission"
   error_adding_file_to_discussion_message_16feef3f: "Une erreur est survenue lors de l’ajout du fichier au message de discussion"
+  error_adding_files_97ba198e: "Erreur lors de l'ajout de fichiers."
   error_adding_files_to_conversation_message_58e83876: "Une erreur est survenue lors de l’ajout de fichiers au message de conversation"
   error_adding_files_to_discussion_message_8bb819e4: "Erreur lors de l’ajout de fichiers au message de discussion"
   error_adding_files_to_submission_draft_6acac337: "Erreur lors de l'ajout de fichiers à la version préliminaire de la soumission"
@@ -11000,6 +11020,7 @@ fr:
   error_updating_submission_draft_1d40ade7: "Erreur dans la mise à jour de la version préliminaire de la soumission"
   error_uploading_file_73235601: "Erreur lors de l’envoi du fichier"
   error_uploading_file_e2d31b56: "Erreur lors de la mise en ligne du fichier."
+  error_uploading_files_db354fa9: "Erreur lors de l’envoi de fichiers."
   error_uploading_files_f709361f: "Erreur lors de l’envoi des fichiers"
   error_uploading_video_audio_recording_16d9730a: "Erreur lors de l’envoi de l’enregistrement audio/vidéo"
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Erreur lors de l’importation du CSV. Contactez l’assistance technique. (Rapport d’erreur %{number})"
@@ -11312,6 +11333,7 @@ fr:
   failed_getting_file_to_preview_89fe2bf4: "Impossible d'accéder au fichier à prévisualiser"
   failed_getting_next_batch_of_announcements_1f1165a5: "Échec de la récupération du lot d'annonces suivant"
   failed_initializing_dashboard_3d967143: "Échec de l’initialisation du tableau de bord"
+  failed_jobs_b632bbf0: "Tâches échouées"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Échec du chargement du composant Associations. Votre connexion réseau fonctionne-t-elle correctement ?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Échec du chargement des sections des cours. Rafraîchissez la page pour réessayer."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Échec du chargement du composant Historique de synchronisation. Votre connexion réseau fonctionne-t-elle correctement ?"
@@ -11792,6 +11814,7 @@ fr:
   friendly_description_57f7fdde: "Description conviviale"
   friendly_description_for_parent_student_display_e608ecf3: "Description personnalisée (pour l'affichage parents/élèves)"
   friendly_name_601153fb: "Nom personnalisé"
+  friendly_panda_3a0df50e: "Panda sympathique"
   from_date_must_be_before_to_date_79f00046: "La date « À partir du » doit être antérieure à la date « Jusqu’au »"
   from_fdd4956d: De
   from_from_to_to_e31f6422: "Du %{from} au %{to}"
@@ -11807,6 +11830,7 @@ fr:
   full_name_is_required_8efbdc84: "Le nom complet est requis"
   full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Complet : les noms et images de profil des élèves seront masqués"
   future_5416ea92: Futur
+  future_jobs_cf2964a1: "Tâches futures"
   future_terms_7fba2ae6: "Trimestres à venir"
   galician_7e4508b5: Galicien
   game_over_104baa: "FIN DE PARTIE"
@@ -11845,6 +11869,7 @@ fr:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Donnez la même note à tous les élèves pour *%{assignment.name}* en indiquant et en soumettant la note de votre choix ci-dessous :"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Donnez la même note *en pourcentage* à tous les élèves pour **%{assignment.name}** en indiquant et en soumettant la note de votre choix ci-dessous :"
+  give_this_filter_a_name_36b4b03a: "Donnez un nom à ce filtre"
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Abandon de la récupération des sources multimédia Ce problème finira probablement par se résoudre de lui-même."
   global_announcements_a78912c8: "Annonces générales"
   global_announcements_add_edit_delete_843ca4d2: "Annonces globales - ajouter / modifier / supprimer"
@@ -13687,6 +13712,7 @@ fr:
     online_url_submission: "Envoi en ligne (URL)"
     quiz_submission: "Envoi de questionnaire"
     text_entry_submission: "Envoi d’une entrée de texte"
+  id_290feb5: Identifiant
   id_ac7afadf: ID
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "Cette ID est déjà utilisée pour ce compte et ce fournisseur d'authentification"
   id_del_alumno_bc4bcf8a: "ID del Alumno"
@@ -14095,6 +14121,7 @@ fr:
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inclure un lien de capture vidéo/d’écran en utilisant *Jing* par exemple."
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Inclut un lien affichant un code QR sur la page de profil pour se connecter facilement depuis un mobile."
   include_assignment_description_36e6ed1b: "Inclure la description du devoir"
+  include_assignments_graded_with_a_0_score_fb784115: "Inclure les travaux ayant reçu la note de 0."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Inclure les indicateurs d’ordre d’octet dans les exports vers les formats tableurs compatibles"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Inclure la marque d'ordre d'octet dans les exportations de relevé de notes."
   include_course_scores_e38e71da: "Inclure les notes du cours"
@@ -14105,6 +14132,7 @@ fr:
   include_deleted_objects_3cced3b5: "Inclure les objets supprimés ;"
   include_deleted_objects_4b75ef93: "Inclure les objets supprimés"
   include_fullstory_recording_of_the_user_s_session_656d131e: "Inclure l’enregistrement FullStory à la session de l’utilisateur"
+  include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Inclure les identifiants d'intégration dans les export de carnets de note."
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inclure les ID d'intégration dans les exportations du relevé de notes."
   include_last_activity_dates_4eb97ed5: "Inclure les dates de dernière activité ;"
   include_last_activity_dates_ee2d3de0: "Inclure les dates de dernière activité"
@@ -14357,6 +14385,7 @@ fr:
   invalid_fields_after_ratings_fields_815ff223: "Champs non valides après les notations : %{fields}"
   invalid_fields_fields_8698284: "Champs non valides : %{fields}"
   invalid_fields_for_a_group_invalid_f440b733: "Zones non valides pour un groupe : %{invalid}"
+  invalid_fields_for_an_outcome_invalid_fafdf0df: "Champs invalides pour un résultat : %{invalid}"
   invalid_file_type_881cc9b2: "Type de fichier non valide"
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting non valide"
   invalid_hexcode_9124519f: "Hexcode non valide"
@@ -14456,6 +14485,8 @@ fr:
   javascript_24e6a9d3: JavaScript
   javascript_file_fc27c32b: "Fichier Javascript"
   jmc_grade_export_52bedbcb: "Exportation de note JMC"
+  job_category_f8e4dfe7: "Catégorie de tâche"
+  job_flavor_51a18505: "Variété de tâche"
   jobs: 
     columns: 
       attempt: tentative
@@ -14517,6 +14548,8 @@ fr:
     titles: 
       job_handler: "Gestionnaire de tâches"
       last_error: "Dernière erreur"
+  jobs_control_panel_v2_2c59429f: "Panneau de configuration des tâches v2"
+  jobs_v2_b20a83f7: "Jobs v2"
   join_6cafecca: Rejoindre
   join_course_511e6cb3: "Rejoindre %{course}"
   join_group_group_name_871a5e3f: "Rejoindre le groupe %{group_name}"
@@ -15385,7 +15418,7 @@ fr:
   mastered_34d4c857: Maîtrisé
   mastery_7ec348b5: Maîtrise
   mastery_at_cf0c477b: "Progression à"
-  mastery_at_e804b49: "Progression à :"
+  mastery_at_e804b49: "Progression à :"
   mastery_calculation_5fd5f5fe: "Calcul de la réussite"
   mastery_calculation_parameters_f072c3: "Paramètre de calcul de la réussite"
   mastery_calculation_saved_df378fdd: "Calcul de la réussite enregistré"
@@ -17836,6 +17869,8 @@ fr:
   must_be_a_number_f6e09df7: "doit être un chiffre"
   must_be_a_valid_number_59f0069: "Doit être un nombre valide"
   must_be_after_start_date_95e251a3: "doit avoir lieu après la date de départ"
+  must_be_between_1_and_5_3b42aca1: "doit se trouver entre 1 et 5"
+  must_be_between_1_and_99_589b827d: "doit se trouver entre 1 et 99"
   must_be_between_availability_dates_ceaca984: "doit se situer entre les dates de disponibilité"
   must_be_between_lower_and_upper_1f501b2a: "Doit se situer entre %{lower} et %{upper}"
   must_be_length_characters_or_less_8c24db67: "Doit être composé de maximum %{length} caractères"
@@ -17990,6 +18025,7 @@ fr:
           quelles pages et quelles ressources, qui a participé aux travaux, et qui a besoin
           d'un peu plus d’encouragements.
   new_analytics_tutorial_tray_2511a34a: "Bac du didacticiel sur les Nouvelles analyses"
+  new_and_improved_jobs_control_panel_f8571c9a: "Nouveau panneau de configuration des tâches amélioré"
   new_annotations_66932016: "Nouvelles annotations"
   new_announcement_23af4598: "Nouvelle annonce"
   new_announcement_in_course_name_title_84607f44: "Nouvelle annonce dans %{course_name}: %{title}"
@@ -18240,7 +18276,7 @@ fr:
   no_violations_have_been_reported_977a08d1: "Aucune infraction n'a été signalée."
   no_way_to_export_gradebooks_provided_b4c2939d: "Impossible d'exporter les carnets de notes fournis !"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "Impossible de surveiller les exports de carnets de notes fournis !"
-  no_way_to_monitor_score_to_ungraded_provided_9258253f: "Impossible de surveiller la note à l’élément non-noté fourni !"
+  no_way_to_monitor_score_to_ungraded_provided_9258253f: "Impossible de surveiller la note à l’élément non-noté fourni !"
   non_canvas_11f36d4a: "Non Canvas"
   non_existent_content_referenced_in_this_resource_d86c6bcb: "Contenu inexistant référencé dans cette ressource :"
   non_prod_settings_9b39c6c9: "Paramètres hors production"
@@ -18734,6 +18770,7 @@ fr:
   observing_student_name_to_select_a_different_stude_e0466126: "Observation de %{student_name} Pour sélectionner un autre élève, revenez au tableau de bord."
   occurrence_s_c12d1aad: apparition(s)
   of_students_5d1af0d2: "Nbre d’étudiants"
+  of_times_1018baab: "# des fois"
   off_5385ef3f: Désactiver
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Désactivé - La politique ne s’appliquera pas à ce sous-compte."
   off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Désactivé : les noms et images de profil des élèves seront visibles par tous les autres membres du cours."
@@ -19168,6 +19205,8 @@ fr:
   page_title_ascending_b5df950c: "Titre de la page : Ascendant"
   page_title_descending_70c1483d: "Titre de la page : Descendant"
   page_views: 
+    browsers: 
+      unrecognized: "Navigateur non reconnu"
     download_filename: "Consultations de pages pour %{user}"
     table: 
       headers: 
@@ -19259,6 +19298,7 @@ fr:
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Partiel : les élèves peuvent choisir de révéler leur nom et leur image de profil"
   partially_anonymous_483a892d: "Partiellement anonyme"
   partially_anonymous_discussion_13ceb585: "Discussion partiellement anonyme | "
+  partially_anonymous_discussion_e821cf85: "Discussion partiellement anonyme"
   partially_enabled_and_locked_9a39d38a: "Activé partiellement et verrouillé"
   partially_enabled_cd506819: "Activé partiellement"
   participantcount_less_8d258f6: "%{participantCount} en moins"
@@ -19436,6 +19476,7 @@ fr:
   please_wait_2b646bc2: "Veuillez patienter."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Veuillez patienter pendant que nous téléchargeons et traitons votre fichier."
   please_wait_e6355980: "Veuillez patienter..."
+  please_wait_while_we_upload_attachments_59544216: "Veuillez patienter pendant que nous envoyons les pièces jointes."
   please_wait_while_we_upload_attachments_and_media_c7e7221c: "Veuillez patienter ; vos pièces jointes et fichiers multimédia sont en cours d’envoi"
   please_wait_while_we_upload_attachments_fc34efd1: "Veuillez patienter ; vos pièces jointes sont en cours d’envoi"
   plugins: 
@@ -22814,6 +22855,8 @@ fr:
   rss_feed_cf6286b3: "Flux RSS"
   rtf_9165aba5: RTF
   rubric: 
+    alignments: 
+      duplicated_outcome: "Ce barème contient des résultats alignés plusieurs fois"
     context_name_rubric: "Barème de %{course_name}"
     no_description: "Pas de description"
     unknown_details: "Informations inconnues"
@@ -22886,7 +22929,9 @@ fr:
   rubrics_in_course_navigation_539ea536: "Barèmes dans la navigation de cours"
   rubrics_speedgrader_a6ebec57: "Rubriques, SpeedGrader"
   rubrics_tutorial_tray_be65d10d: "Bac du didacticiel sur les barèmes"
+  run_at_759b47d: "Exécuter à"
   running_c5a4998d: "En cours"
+  running_jobs_9861080e: "Tâches en cours"
   running_totals_d6f45b6b: "Totaux cumulés"
   russia_7_87bc99d5: "Russie (+7)"
   russian_1e3e197: Russe
@@ -22917,6 +22962,7 @@ fr:
   save_successful_b2f64da4: "Enregistrement effectué avec succès."
   save_theme_36c73e6a: "Enregistrer le thème"
   save_theme_f706116e: "Sauvegarder le thème"
+  save_these_conditions_as_a_filter_a31bbbf8: "Enregistrer ces conditions en tant que filtre"
   save_this_comment_for_reuse_5eda0b70: "Enregistrer ce commentaire pour le réutiliser"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Sauvegarder votre %{type} pour commencer à spécifier du contenu conditionnel."
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Gagnez du temps en ajoutant seulement les résultats spécifiques au contenu de votre cours."
@@ -22977,7 +23023,7 @@ fr:
   score_student_points_possible_points_78360e86: "Note {{student_points}}/{{possible_points}}"
   score_to_keep_e89e4fa5: "Score à conserver"
   score_to_ungraded_process_failed_e143fd1b: "Échec du processus de notation de l’élément sans note"
-  score_to_ungraded_process_failed_reason_788f9030: "Échec du processus de notation de l’élément sans note. : %{reason}"
+  score_to_ungraded_process_failed_reason_788f9030: "Échec du processus de notation de l’élément sans note. : %{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: "Le processus de notation de l’élément sans note s’est terminé avec succès.."
   scored_less_than_2427896c: "A obtenu une note inférieure à"
   scored_less_than_cutoff_on_assignment_5f5c4303: "A obtenu une note inférieure à %{cutoff} sur %{assignment}"
@@ -24469,6 +24515,7 @@ fr:
   simple_tls_45df2648: "TLS simple"
   singapore_65_b4927585: "Singapour (+65)"
   singapore_a145e422: Singapour
+  singleton_46df7e3b: "Élément unique"
   sioux_city_outcomes_report_710baf47: "Rapport de résultats de Sioux City"
   sis_2164965: SIS
   sis_agent_token_authentication_2a0b29e3: "Authentification par jeton d’Agent SIS"
@@ -24741,6 +24788,9 @@ fr:
         error: "Score de similarité VeriCite – Voir les détails de l’erreur de soumission"
         pending: "Score de similarité VeriCite – Soumission en attente"
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "Cliquez pour enregistrer."
+      aria_stop: "Cliquez sur Arrêter pour mettre fin à l’enregistrement."
     graded: noté
     graded_then_resubmitted: "noté, puis soumis à nouveau (%{when})"
     not_graded: "non noté"
@@ -24877,6 +24927,7 @@ fr:
   storage_quotas_manage_6ca14bbb: "Quotas de stockage - gérer"
   storage_used_in_mb_c75fbd9c: "stockage utilisé en MB"
   store_and_share_course_assets_82a9967c: "Stocker et partager des éléments de cours"
+  strand_955969b1: Élément
   stream_items_api: 
     assessment_request_title: "Révision par les pairs pour %{title}"
   strip_domain_from_login_attribute_value_bb6daa88: "Retirer le domaine de la valeur de l'attribut de connexion"
@@ -24922,6 +24973,7 @@ fr:
   student_filters_in_lmgb_13964502: "Filtrage des élèves dans LMGB"
   student_first_name_aaa42cbc: "Prénom de l'élève"
   student_grades_4cbc59a1: "Notes de l’élève"
+  student_group_75b86a9f: "Groupe d'élèves"
   student_group_filter_185fb085: "Filtre de groupes d'élèves"
   student_groups: "Groupes d’élèves"
   student_groups_863201c1: "Groupes d’élèves"
@@ -25007,6 +25059,7 @@ fr:
   students_can_see_originality_score_797fe634: "Les élèves peuvent voir la note d'originalité"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Les étudiants ne peuvent plus voir les réponses du questionnaire après la fin du cours"
   students_have_either_already_taken_or_started_taki_a076336: "Des étudiants ont déjà commencé ou terminé ce questionnaire, soyez donc prudent lorsque vous désirez le modifier. Si vous modifiez l'une des questions d'une manière importante, pensez éventuellement à réévaluer les étudiants qui auraient complété l’ancienne version de ce questionnaire."
+  students_have_the_option_to_reply_anonymously_some_503cdf6c: "Les élèves ont la possibilité de répondre de manière anonyme Certains noms et images de profile peuvent être masqués."
   students_must_complete_all_of_these_requirements_15fa97f7: "Les étudiants doivent remplir toutes ces exigences"
   students_must_sign_up_in_groups_681206ac: "Les élèves doivent s'inscrire en groupes"
   students_over_time_7ec52f7a: "élèves dans le temps"
@@ -25482,6 +25535,7 @@ fr:
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
     trophy_case: "Armoire à trophées"
   tabs_5605547e: Onglets
+  tag_7bb005ff: Étiquette
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taïwan (+886)"
   take_a_photo_via_webcam_954f2433: "Prendre une photo via la Webcam"
@@ -25493,6 +25547,7 @@ fr:
   take_the_survey_ada59508: "Répondre au sondage"
   take_the_survey_again_24ce22c2: "Compléter à nouveau l’enquête"
   talladega_grade_and_last_date_of_attendance_be39b0c7: "Note et dernière date de participation pour Talladega"
+  target_course_course_id_is_not_a_child_of_current__185cb2f6: "Le cours cible %{course_id} n’est pas un enfant du compte actuel (%{name})"
   target_link_uri_bbed67d1: "* URI du lien cible"
   target_link_uri_d166858: "Lien cible URI"
   targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId est requis si targetContextType est fourni"
@@ -26015,8 +26070,9 @@ fr:
   there_was_a_problem_updating_the_submission_6e5280a1: "Un problème est survenu pendant la mise à jour de la soumission."
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Une erreur est survenue lors de la vérification de l’état de publication du plan."
   there_was_an_error_creating_a_new_filter_e93bb765: "Une erreur est survenue lors de la création d'un nouveau filtre."
-  there_was_an_error_deleting_name_aa3050e5: "Une erreur est survenue lors de la suppression de « %{name} »"
+  there_was_an_error_deleting_name_aa3050e5: "Une erreur est survenue lors de la suppression de « %{name} »"
   there_was_an_error_fetching_course_statistics_96e9dbad: "Une erreur est survenue en récupérant les statistiques du cours"
+  there_was_an_error_fetching_data_for_gradebook_174e82f9: "Une erreur est survenue lors de la récupération des données du carnet de notes."
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Une erreur est survenue lors de la récupération des filtres de carnet de notes"
   there_was_an_error_fetching_modules_8ee451bb: "Une erreur est survenue lors de la récupération des modules."
   there_was_an_error_fetching_outcome_results_45c57590: "Une erreur est survenue lors de l'extraction des résultats"
@@ -26203,6 +26259,11 @@ fr:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Cette fonctionnalité entraîne la vérification, par l’API d’envoi de fichiers de soumissions, du type de fichier
       par rapport aux extensions autorisées pour le travail associé.
+  this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
+      Cette option de fonctionnalité n’est visible qu’aux utilisateurs disposant d'un accès administrateur de site.
+                                  Les utilisateurs finaux ne la verront pas tant qu’elle n'aura pas été activée par un administrateur de site.
+                                  Avant d'e l'activer pour un établissement, attention à bien comprendre
+                                  la fonctionnalité et ses effets potentiels sur les utilisateurs.
   this_field_is_required_fa58c4a: "Ce champ est obligatoire."
   this_field_name_is_required_988caebc: "Le champ %{name} est obligatoire."
   this_field_name_is_required_b9196401: "Le champ « nom » est obligatoire."
@@ -26254,6 +26315,7 @@ fr:
   this_is_a_what_if_score_cbdc04f9: "Ceci est une note hypothétique"
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Il s'agit d'un paramètre de compte qui doit être activé par un Responsable succès client. Les alertes sont une fonction rarement utilisée pour envoyer une alerte aux élèves, aux enseignants ou aux administrateurs pour des déclencheurs spécifiques (par exemple, pas d'interaction élève / enseignant pendant 7 jours). Celles-ci sont vérifiées chaque jour, et des notifications sont envoyées à l’élève et / ou l’enseignant jusqu’à ce que le problème soit résolu."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Il s'agit d'un paramètre de compte qui doit être activé par votre Responsable succès client."
+  this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Ceci est une discussion anonyme. Les noms des élèves et leurs images de profil sont masqués."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Ceci est une discussion anonyme. Bien que les noms et images de profil des élèves seront masqués, votre nom et votre image de profil sera visible pour tous les membres du cours."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Ceci est une discussion anonyme. Votre nom et votre image de profil seront masqués des autres membres du cours."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "C'est juste une fonctionnalité réservée aux développeurs que vous pouvez activer pour obtenir un aperçu de l'aspect des pages dans un environnement RTL, sans avoir à changer votre langue pour une langue qui est normalement RTL."
@@ -26762,7 +26824,7 @@ fr:
   to_add_individual_courses_click_courses_c5355180: "Pour ajouter des cours individuels, cliquez sur Cours."
   to_add_individual_users_click_people_4d6de56a: "Pour ajouter des utilisateurs individuels, cliquez sur Personnes."
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "Pour ajouter ou supprimer un élève d’un cours, l’autorisation « Utilisateurs – Élèves » doit être activée."
-  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "Pour ajouter ou supprimer un élève d’un cours, l’autorisation « Utilisateurs – Permissions d'élèves » doit être activée."
+  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "Pour ajouter ou supprimer un élève d’un cours, l’autorisation « Utilisateurs – Permissions d'élèves » doit être activée."
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "Pour ajouter ou supprimer des utilisateurs à un cours, l'autorisation Utilisateurs appropriée doit être activée (par exemple, Utilisateurs - Enseignants)."
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "Pour ajouter ou supprimer des utilisateurs à un cours, l'autorisation Utilisateurs appropriée doit être activée (par exemple, Utilisateurs - Enseignants). Pour modifier la section d'un utilisateur, les autorisations Utilisateurs - Autoriser les actions administratives dans les cours et Utilisateurs - Afficher la liste doivent également être activées."
   to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "Pour ajouter ou supprimer des utilisateurs à un cours via le SIS, l'autorisation Utilisateurs appropriée doit être activée (par exemple, Utilisateurs - Enseignants)."
@@ -28591,6 +28653,7 @@ fr:
   weight_of_grade_dff535d9: "%{weight} de note"
   weight_of_grade_ungraded_as_0_44e63478: "%{weight} de note/Non noté comme étant 0 "
   weighted_grading_periods_ae4edd70: "Périodes de notation dotées de leur coefficient"
+  weighting_for_last_item_ee22ae13: "% de pondération du dernier élément"
   welcome_name_a16afa7f: "Bienvenue, %{name} !"
   welcome_to_the_canvas_theme_editor_73091d1: "Bienvenue dans l'éditeur de thème de Canvas"
   welcome_to_the_cold_dark_void_of_name_65fc9839: "Bienvenue dans le vide froid et sombre de %{name}."
@@ -28644,6 +28707,9 @@ fr:
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Lorsque ce drapeau est activé, il ajoute un sélectionneur d'élève pour les observateurs sur le tableau de bord."
   when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Lorsque ce paramètre est activé, il entraîne l’ouverture automatique des éléments à faire des enseignants dans un nouvel onglet."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Lorsque cette option est activée, elle active la fonctionnalité « @mention » dans les discussions du cours."
+  when_enabled_turns_on_the_button_icons_image_cropp_abbc3d8b: |-
+      Lorsque la fonction est activée, le rognage d'image des Boutons et icônes, la source
+      d’images de cours et la source d’envoi d'image deviennent disponibles.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Lorsque vous masquez les notes des travaux anonymes, ces notes seront masquées pour tout le monde au sein du cours. L'anonymat sera appliqué à nouveau."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un programme ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
