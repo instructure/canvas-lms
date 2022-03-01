@@ -64,6 +64,8 @@ module.exports = {
 
   testEnvironment: 'jest-environment-jsdom-fourteen',
 
+  testSequencer: '<rootDir>/jest/test-sequencer.js',
+
   transform: {
     '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
