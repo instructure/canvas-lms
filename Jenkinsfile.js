@@ -36,6 +36,7 @@ pipeline {
     DOCKER_BUILDKIT = 1
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
+    JEST_SPLIT_COUNT = 2
   }
 
   stages {
@@ -44,12 +45,15 @@ pipeline {
         script {
           def runnerStages = [:]
 
-          extendedStage('Runner - Jest').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def tests = [:]
+          for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
+            String index = i
+            extendedStage("Runner - Jest ${i}").nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+              def tests = [:]
 
-            callableWithDelegate(jsStage.queueJestDistribution())(tests)
+              callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
 
-            parallel(tests)
+              parallel(tests)
+            }
           }
 
           extendedStage('Runner - Coffee').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {

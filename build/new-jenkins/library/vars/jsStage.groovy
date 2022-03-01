@@ -20,15 +20,16 @@ import groovy.transform.Field
 
 @Field static final COFFEE_NODE_COUNT = 4
 @Field static final JSG_NODE_COUNT = 3
+@Field static final JEST_NODE_COUNT = 2
 
-def jestNodeRequirementsTemplate() {
+def jestNodeRequirementsTemplate(index) {
   def baseTestContainer = [
     image: env.KARMA_RUNNER_IMAGE,
     command: 'cat'
   ]
 
   return [
-    containers: [baseTestContainer + [name: 'jest']]
+    containers: [baseTestContainer + [name: "jest${index}"]]
   ]
 }
 
@@ -101,9 +102,14 @@ def queueCoffeeDistribution() {
   }
 }
 
-def queueJestDistribution() {
+def queueJestDistribution(index) {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'jest', [], 'bundle exec rails graphql:schema && yarn test:jest')
+    def jestEnvVars = [
+      "CI_NODE_INDEX=${index}",
+      "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
+    ]
+
+    callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'bundle exec rails graphql:schema && yarn test:jest')
   }
 }
 
