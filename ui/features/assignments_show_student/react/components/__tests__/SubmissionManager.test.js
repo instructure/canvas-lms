@@ -376,7 +376,8 @@ describe('SubmissionManager', () => {
         data: {
           setModuleItemCompletion: {
             __typename: '',
-            moduleItem: null
+            moduleItem: null,
+            errors: null
           }
         },
         errors: null
@@ -441,7 +442,9 @@ describe('SubmissionManager', () => {
         ]
 
         const {getByRole} = render(
-          <AlertManagerContext.Provider>
+          <AlertManagerContext.Provider
+            value={{...StudentViewContextDefaults, setOnFailure: jest.fn()}}
+          >
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
@@ -471,7 +474,7 @@ describe('SubmissionManager', () => {
         ]
 
         const {getByRole} = render(
-          <AlertManagerContext.Provider>
+          <AlertManagerContext.Provider value={{...StudentViewContextDefaults}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
