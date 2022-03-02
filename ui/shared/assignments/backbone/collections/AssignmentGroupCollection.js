@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import AssignmentGroup from '../models/AssignmentGroup.coffee'
-import _ from 'underscore'
-import SubmissionCollection from './SubmissionCollection'
 import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection.coffee'
+import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import _ from 'underscore'
+import AssignmentGroup from '../models/AssignmentGroup.coffee'
+import SubmissionCollection from './SubmissionCollection'
 
 const PER_PAGE_LIMIT = 50
 
@@ -53,14 +54,24 @@ export default class AssignmentGroupCollection extends PaginatedCollection {
     return ENV.PERMISSIONS.read_grades
   }
 
+  getObservedUserId() {
+    if (ENV.FEATURES?.observer_picker) {
+      // if enabled, use new observed user selection
+      return savedObservedId(ENV.current_user?.id)
+    } else if (ENV.observed_student_ids?.length === 1) {
+      // otherwise fall back to old behavior
+      return ENV.observed_student_ids[0]
+    }
+  }
+
   getGrades() {
-    if (this.canReadGrades() && ENV.observed_student_ids.length <= 1) {
+    if (this.canReadGrades()) {
       const collection = new SubmissionCollection()
-      if (ENV.observed_student_ids.length === 1) {
+      const observedUser = this.getObservedUserId()
+
+      if (observedUser) {
         collection.url = () =>
-          `${this.courseSubmissionsURL}?student_ids[]=${
-            ENV.observed_student_ids[0]
-          }&per_page=${PER_PAGE_LIMIT}`
+          `${this.courseSubmissionsURL}?student_ids[]=${observedUser}&per_page=${PER_PAGE_LIMIT}`
       } else {
         collection.url = () => `${this.courseSubmissionsURL}?per_page=${PER_PAGE_LIMIT}`
       }
@@ -84,7 +95,7 @@ export default class AssignmentGroupCollection extends PaginatedCollection {
         if (submission.get('grade') != null) {
           const grade = parseFloat(submission.get('grade'))
           // may be a letter grade like 'A-'
-          if (!isNaN(grade)) {
+          if (!Number.isNaN(grade)) {
             submission.set('grade', grade)
           }
         } else {

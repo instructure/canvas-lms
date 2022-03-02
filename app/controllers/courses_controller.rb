@@ -2101,6 +2101,7 @@ class CoursesController < ApplicationController
       end
 
       @context = api_find(Course.active, params[:id])
+
       assign_localizer
       if request.xhr?
         if authorized_action(@context, @current_user, [:read, :read_as_admin])
@@ -2110,7 +2111,22 @@ class CoursesController < ApplicationController
       end
 
       if @context && @current_user
-        @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
+        if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+          observed_users(@current_user, session, @context.id) # sets @selected_observed_user
+          @context_enrollment = @context.enrollments
+                                        .where(user_id: @current_user, associated_user_id: @selected_observed_user)
+                                        .first
+          js_env({ OBSERVER_OPTIONS: {
+                   OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                   CAN_ADD_OBSERVEE: @current_user
+                                     .profile
+                                     .tabs_available(@current_user, root_account: @domain_root_account)
+                                     .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                 } })
+        else
+          @context_enrollment = @context.enrollments.where(user_id: @current_user).first
+        end
+
         if @context_enrollment
           @context_membership = @context_enrollment # for AUA
           @context_enrollment.course = @context
