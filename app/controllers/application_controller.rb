@@ -56,7 +56,9 @@ class ApplicationController < ActionController::Base
   around_action :compute_http_cost
 
   before_action :clear_idle_connections
+  before_action :set_sentry_trace
   before_action :annotate_apm
+  before_action :annotate_sentry
   before_action :check_pending_otp
   before_action :set_user_id_header
   before_action :set_time_zone
@@ -175,14 +177,8 @@ class ApplicationController < ActionController::Base
           view_context.stylesheet_path(css_url_for("what_gets_loaded_inside_the_tinymce_editor", false, { force_high_contrast: true }))
         ]
 
-        # Cisco doesn't want to load lato extended. see LS-1559
-        if Setting.get("disable_lato_extended", "false") == "false"
-          editor_css << view_context.stylesheet_path(css_url_for("lato_extended"))
-          editor_hc_css << view_context.stylesheet_path(css_url_for("lato_extended"))
-        else
-          editor_css << view_context.stylesheet_path(css_url_for("lato"))
-          editor_hc_css << view_context.stylesheet_path(css_url_for("lato"))
-        end
+        editor_css << view_context.stylesheet_path(css_url_for("fonts"))
+        editor_hc_css << view_context.stylesheet_path(css_url_for("fonts"))
 
         @js_env_data_we_need_to_render_later = {}
         @js_env = {
@@ -191,6 +187,7 @@ class ApplicationController < ActionController::Base
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
+          current_user_global_id: @current_user&.global_id,
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_is_student: @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
@@ -215,8 +212,19 @@ class ApplicationController < ActionController::Base
             open_registration: @domain_root_account&.open_registration?,
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
-          },
+          }
         }
+
+        unless SentryExtensions::Settings.settings.blank?
+          @js_env[:SENTRY_FRONTEND] = {
+            dsn: SentryExtensions::Settings.settings[:frontend_dsn],
+            error_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
+
+            # these values need to correlate with the backend for Sentry features to work properly
+            environment: Canvas.environment,
+            revision: Canvas.revision
+          }
+        end
 
         dynamic_settings_tree = DynamicSettings.find(tree: :private)
         if dynamic_settings_tree["api_gateway_enabled"] == "true"
@@ -243,9 +251,9 @@ class ApplicationController < ActionController::Base
         @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
         @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier unless @js_env[:TIMEZONE]
         @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
-        unless @js_env[:LOCALE]
+        unless @js_env[:LOCALES]
           I18n.set_locale_with_localizer
-          @js_env[:LOCALE] = I18n.locale.to_s
+          @js_env[:LOCALES] = I18n.fallbacks[I18n.locale].map(&:to_s)
           @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
           @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
           @js_env[:MOMENT_LOCALE] = I18n.moment_locale
@@ -269,14 +277,14 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links rce_buttons_and_icons important_dates feature_flag_filters k5_parent_support
+    featured_help_links feature_flag_filters k5_parent_support
     conferencing_in_planner remember_settings_tab word_count_in_speed_grader observer_picker lti_platform_storage
-    scale_equation_images new_equation_editor
+    scale_equation_images new_equation_editor buttons_and_icons_cropper
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     responsive_awareness responsive_misc product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
-    lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking
+    lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -670,6 +678,12 @@ class ApplicationController < ActionController::Base
     )
   end
 
+  def annotate_sentry
+    Sentry.set_tags({
+                      db_cluster: @domain_root_account&.shard&.database_server&.id
+                    })
+  end
+
   def store_session_locale
     return unless (locale = params[:session_locale])
 
@@ -733,7 +747,7 @@ class ApplicationController < ActionController::Base
       append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{equivalent_domains.join(" ")};")
     end
     headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
-    RequestContext::Generator.store_request_meta(request, @context)
+    RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
     true
   end
 
@@ -2355,7 +2369,6 @@ class ApplicationController < ActionController::Base
 
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
-    set_sentry_trace
     if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)

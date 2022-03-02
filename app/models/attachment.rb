@@ -98,6 +98,8 @@ class Attachment < ActiveRecord::Base
   before_save :default_values
   before_save :set_need_notify
 
+  after_save :set_word_count
+
   before_validation :assert_attachment
   acts_as_list scope: :folder
 
@@ -259,14 +261,20 @@ class Attachment < ActiveRecord::Base
     READ_FILE_CHUNK_SIZE
   end
 
-  def self.valid_utf8?(file)
+  def self.valid_utf8?(file, encoding = Encoding::UTF_8.name)
     # validate UTF-8
     chunk = file.read(read_file_chunk_size)
     error_count = 0
 
+    encoding_converter = /utf.?8/i.match?(encoding) ? nil : Encoding::Converter.new(encoding, Encoding::UTF_8)
+
     while chunk
       begin
-        raise EncodingError unless chunk.dup.force_encoding("UTF-8").valid_encoding?
+        if encoding_converter
+          raise EncodingError unless encoding_converter.convert(chunk.dup).valid_encoding?
+        else
+          raise EncodingError unless chunk.dup.force_encoding(Encoding::UTF_8).valid_encoding?
+        end
       rescue EncodingError
         error_count += 1
         if !file.eof? && error_count <= 4
@@ -528,6 +536,16 @@ class Attachment < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id = infer_root_account_id if namespace_changed? || new_record?
+  end
+
+  def set_word_count
+    if word_count.nil? && !deleted? && file_state != "broken" && Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
+      delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
+    end
+  end
+
+  def update_word_count
+    update_column(:word_count, calculate_words)
   end
 
   def infer_root_account_id
@@ -2245,5 +2263,45 @@ class Attachment < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def calculate_words
+    word_count_regex = /\S+/
+    @word_count ||= if mime_class == "pdf"
+                      reader = PDF::Reader.new(self.open)
+                      reader.pages.sum do |page|
+                        page.text.scan(word_count_regex).count
+                      end
+                    elsif [
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                      "application/x-docx"
+                    ].include?(mimetype)
+                      doc = Docx::Document.open(self.open)
+                      doc.paragraphs.sum do |paragraph|
+                        paragraph.text.scan(word_count_regex).count
+                      end
+                    elsif [
+                      "application/rtf",
+                      "text/rtf"
+                    ].include?(mimetype)
+                      parser = RubyRTF::Parser.new(unknown_control_warning_enabled: false)
+                      parser.parse(self.open.read).sections.sum do |section|
+                        section[:text].scan(word_count_regex).count
+                      end
+                    elsif mime_class == "text"
+                      open.read.scan(word_count_regex).count
+                    else
+                      0
+                    end
+  rescue => e
+    # If there is an error processing the file just log the error and return 0
+    Canvas::Errors.capture_exception(:word_count, e, :info)
+    0
+  end
+
+  def word_count_supported?
+    ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+     "application/x-docx", "application/rtf",
+     "text/rtf"].include?(mimetype) || ["pdf", "text"].include?(mime_class)
   end
 end

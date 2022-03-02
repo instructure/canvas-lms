@@ -16,11 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this is because we have a ton of places where people spy/stub es modules
-// using sinon and that is not allowed for "real" es modules. you can ony do it
-// with babel transpiled stuff
-process.env.USE_ES_MODULES = false
-
 const karmaConfig = {
   basePath: '',
 
@@ -111,7 +106,7 @@ const karmaConfig = {
     'spec/javascripts/webpack_spec_index.js': ['webpack']
   },
 
-  webpack: require('./webpack.test.config')
+  webpack: require('./ui-build/webpack-for-karma')
 }
 
 // For faster local debugging in karma, only add istanbul cruft you've explicity set the "COVERAGE" environment variable

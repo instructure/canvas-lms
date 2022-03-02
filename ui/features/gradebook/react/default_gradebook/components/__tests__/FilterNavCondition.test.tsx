@@ -22,8 +22,17 @@ import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
+const defaultProps = {
+  conditionsInFilter: [],
+  modules: [],
+  gradingPeriods: [],
+  assignmentGroups: [],
+  sections: [],
+  studentGroupCategories: {}
+}
+
 const dateTests = (testType: string, dateFieldName: string) => {
-  let props, condition, conditionsInFilter, onChange, onDelete
+  let props, condition, onChange, onDelete
   beforeEach(() => {
     condition = {
       id: '456',
@@ -31,14 +40,9 @@ const dateTests = (testType: string, dateFieldName: string) => {
       type: testType,
       value: undefined
     }
-    conditionsInFilter = []
     props = {
-      condition,
-      conditionsInFilter,
-      modules: [],
-      gradingPeriods: [],
-      assignmentGroups: [],
-      sections: []
+      ...defaultProps,
+      condition
     }
     onChange = jest.fn()
     onDelete = jest.fn()
@@ -114,7 +118,7 @@ describe('FilterNavCondition', () => {
   })
 
   describe('submissions', () => {
-    let props, condition, conditionsInFilter, onChange, onDelete
+    let props, condition, onChange, onDelete
     beforeEach(() => {
       condition = {
         id: '456',
@@ -122,14 +126,9 @@ describe('FilterNavCondition', () => {
         type: 'submissions',
         value: undefined
       }
-      conditionsInFilter = []
       props = {
-        condition,
-        conditionsInFilter,
-        modules: [],
-        gradingPeriods: [],
-        assignmentGroups: [],
-        sections: []
+        ...defaultProps,
+        condition
       }
       onChange = jest.fn()
       onDelete = jest.fn()
@@ -168,7 +167,7 @@ describe('FilterNavCondition', () => {
   })
 
   describe('sections', () => {
-    let props, condition, conditionsInFilter, onChange, onDelete
+    let props, condition, onChange, onDelete
     beforeEach(() => {
       condition = {
         id: '456',
@@ -176,13 +175,9 @@ describe('FilterNavCondition', () => {
         type: 'section',
         value: '1'
       }
-      conditionsInFilter = []
       props = {
+        ...defaultProps,
         condition,
-        conditionsInFilter,
-        modules: [],
-        gradingPeriods: [],
-        assignmentGroups: [],
         sections: [
           {id: '1', name: 'Section 1'},
           {id: '2', name: 'Section 2'}
@@ -218,7 +213,7 @@ describe('FilterNavCondition', () => {
   })
 
   describe('grading periods', () => {
-    let props, condition, conditionsInFilter, onChange, onDelete
+    let props, condition, onChange, onDelete
     beforeEach(() => {
       condition = {
         id: '456',
@@ -226,18 +221,14 @@ describe('FilterNavCondition', () => {
         type: 'grading-period',
         value: '1'
       }
-      conditionsInFilter = []
       props = {
+        ...defaultProps,
         condition,
-        conditionsInFilter,
-        modules: [],
         gradingPeriods: [
           {id: '1', title: 'Grading Period 1', startDate: 1},
           {id: '2', title: 'Grading Period 2', startDate: 2},
           {id: '3', title: 'Grading Period 3', startDate: 3}
-        ],
-        assignmentGroups: [],
-        sections: []
+        ]
       }
       onChange = jest.fn()
       onDelete = jest.fn()
@@ -262,6 +253,66 @@ describe('FilterNavCondition', () => {
         expect.objectContaining({
           id: '456',
           type: 'grading-period',
+          value: '1'
+        })
+      )
+    })
+  })
+
+  describe('student groups', () => {
+    let props, condition, onChange, onDelete
+    beforeEach(() => {
+      condition = {
+        id: '456',
+        createdAt: '2021-11-02T20:56:23.616Z',
+        type: 'student-group',
+        value: '1'
+      }
+      props = {
+        ...defaultProps,
+        condition,
+        studentGroupCategories: {
+          '1': {
+            id: '1',
+            name: 'Student Group Category 1',
+            groups: [
+              {id: '1', name: 'Student Group 1'},
+              {id: '2', name: 'Student Group 2'}
+            ]
+          },
+          '2': {
+            id: '1',
+            name: 'Student Group Category 2',
+            groups: [
+              {id: '3', name: 'Student Group 3'},
+              {id: '4', name: 'Student Group 4'}
+            ]
+          }
+        }
+      }
+      onChange = jest.fn()
+      onDelete = jest.fn()
+    })
+
+    it('sets the student group field if value is present', () => {
+      condition.value = '1'
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      expect(button.value).toContain('Student Group 1')
+    })
+
+    it('changing value triggers onChange', async () => {
+      const {getByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('option', {name: 'Student Group 1'}))
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          id: '456',
+          type: 'student-group',
           value: '1'
         })
       )

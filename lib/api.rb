@@ -298,6 +298,7 @@ module Api
 
       args.unshift(query.join(" OR "))
       relation = relation.where(*args)
+      relation
     end
 
     relation = relation.eager_load(sis_mapping[:joins]) if sis_mapping[:joins]

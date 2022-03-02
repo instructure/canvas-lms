@@ -80,6 +80,8 @@ function makeProps(overrides: object = {}): ComponentProps {
     assignment: scoredAssignment,
     students,
     onClose: () => {},
+    onSend: () => {},
+    messageAttachmentUploadFolderId: '1',
     ...overrides
   }
 }

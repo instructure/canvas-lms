@@ -48,7 +48,8 @@ describe "conversations new" do
         Account.default.set_feature_flag! :react_inbox, "on"
       end
 
-      it "show record / upload media ui when kaltura is enabled" do
+      # the js errors caught in here are captured by VICE-2507
+      it "show record / upload media ui when kaltura is enabled", ignore_js_errors: true do
         stub_kaltura
         get "/conversations"
         f("div[data-testid='conversation']").click
@@ -60,6 +61,20 @@ describe "conversations new" do
         f("button[data-testid='media-upload']").click
         # make sure upload input exists
         expect(f("input[type='file']")).to be_truthy
+      end
+
+      it "reply from mobile detail message view", ignore_js_errors: true do
+        driver.manage.window.resize_to(565, 836)
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        expect(f("button[data-testid='message-detail-back-button']")).to be_present
+        f("button[data-testid='message-detail-header-reply-btn']").click
+        f("textarea[data-testid='message-body']").send_keys("hello friends")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        expect(ConversationMessage.last.body).to eq "hello friends"
+        resize_screen_to_standard
       end
     end
 

@@ -254,6 +254,7 @@ const locale = {
   "image_8ad06": { "message": "Imaj" },
   "image_options_5412d02c": { "message": "Opsyon Imaj" },
   "image_options_tray_90a46006": { "message": "Plato Opsyon Imaj" },
+  "image_to_crop_3a34487d": { "message": "Imaj pou koupe" },
   "images_7ce26570": { "message": "Imaj" },
   "increase_indent_6d550a4a": { "message": "Ogmante endantasyon" },
   "insert_593145ef": { "message": "Ensere" },

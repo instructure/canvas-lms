@@ -28,10 +28,11 @@ import {TEACHER_QUERY} from '../assignmentData'
 import TeacherView from './TeacherView'
 
 TeacherQuery.propTypes = {
-  assignmentLid: string
+  assignmentLid: string,
+  messageAttachmentUploadFolderId: string
 }
 
-export default function TeacherQuery({assignmentLid}) {
+export default function TeacherQuery({assignmentLid, messageAttachmentUploadFolderId}) {
   return (
     <Query query={TEACHER_QUERY} variables={{assignmentLid}}>
       {({loading, error, data}) => {
@@ -44,7 +45,12 @@ export default function TeacherQuery({assignmentLid}) {
         } else if (error) {
           return <pre>Error: {JSON.stringify(error, null, 2)}</pre>
         }
-        return <TeacherView assignment={data.assignment} />
+        return (
+          <TeacherView
+            assignment={data.assignment}
+            messageAttachmentUploadFolderId={messageAttachmentUploadFolderId}
+          />
+        )
       }}
     </Query>
   )

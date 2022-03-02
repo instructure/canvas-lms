@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
+
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import Course from '../Course'
+import {actions} from '../../../../reducers/imageSection'
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
@@ -112,29 +115,55 @@ describe('Course()', () => {
 
   describe('when an image is clicked', () => {
     beforeEach(() => {
+      const image = new Blob(['somedata'], {type: 'image/png'})
+      fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {
+        body: image,
+        sendAsJson: false
+      })
+
+      jest.spyOn(global, 'FileReader').mockImplementation(function () {
+        this.readAsDataURL = () => {
+          this.result = 'data:text/png;base64,SGVsbG8sIFdvcmxkIQ=='
+          this.onloadend()
+        }
+      })
+
       const {getByTitle} = subject()
 
       // Click the first image
       fireEvent.click(getByTitle('Click to embed image_one.png'))
     })
 
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
     it('dispatches a "loading" action', () => {
       expect(props.dispatch.mock.calls[2][0]).toEqual({
-        "type": "StartLoading"
+        type: 'StartLoading'
       })
     })
 
     it('dispatches a "stop loading" action', () => {
-      expect(props.dispatch.mock.calls[3][0]).toEqual({
-        "type": "StopLoading"
+      expect(props.dispatch.mock.calls[0][0]).toEqual({
+        type: 'StopLoading'
       })
     })
 
     it('dispatches a "set image" action', () => {
       expect(props.dispatch.mock.calls[1][0]).toEqual({
-        "type": "SetImageName",
-        "payload": "grid.png"
+        type: 'SetImageName',
+        payload: 'grid.png'
       })
+    })
+
+    it('dispatches a "set image collection open" action', async () => {
+      await waitFor(() =>
+        expect(props.dispatch).toHaveBeenCalledWith({
+          ...actions.SET_IMAGE_COLLECTION_OPEN,
+          payload: false
+        })
+      )
     })
   })
 })

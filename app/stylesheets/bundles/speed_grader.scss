@@ -35,8 +35,11 @@
 $gradebook_header_height: 3.5em;
 
 #gradebook_header_container {
-  height: $gradebook_header_height;
   overflow: hidden;
+}
+
+.speed_grader_nav_form {
+  margin: 0;
 }
 
 #speed_grader_loading {
@@ -235,15 +238,7 @@ $icon-size: 1.4rem;
 }
 
 #full_width_container {
-  position: absolute;
-  top: $gradebook_header_height + 0.0625em;
-  bottom: 0;
-  #{direction(left)}: 0;
-  #{direction(right)}: 0;
-  min-width: 960px;
-  &.with_enrollment_notice {
-    top: $gradebook_header_height + 3.3625em;
-  }
+  position: relative;
 }
 
 .full_width {
@@ -284,7 +279,6 @@ $icon-size: 1.4rem;
 }
 
 #enrollment_inactive_notice, #enrollment_concluded_notice, #closed_gp_notice {
-  width: 100%;
   border-bottom: 1px solid $ic-border-light;
   border-radius: 0;
   text-align: center;
@@ -957,4 +951,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   float: left;
   display: inline-block;
   margin-top: 1em;
+}
+
+figure {
+  margin: 0;
 }

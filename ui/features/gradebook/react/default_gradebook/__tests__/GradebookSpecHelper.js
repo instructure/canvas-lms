@@ -17,6 +17,9 @@
  */
 
 import Gradebook from '../Gradebook'
+import GradebookGrid from '../GradebookGrid/index'
+import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
+import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
 import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import {camelize} from 'convert-case'
@@ -25,19 +28,7 @@ const performance_controls = {
   students_chunk_size: 2 // students per page
 }
 
-export const defaultGradebookProps = {
-  filters: [],
-  isFiltersLoading: false,
-  onFiltersChange: () => {},
-  flashAlerts: [],
-  flashMessageContainer: document.createElement('div'),
-  gradebookMenuNode: document.createElement('div'),
-  settingsModalButtonContainer: document.createElement('div'),
-  gridColorNode: document.createElement('div'),
-  filterNavNode: document.createElement('div'),
-  viewOptionsMenuNode: document.createElement('div'),
-  gradingPeriodsFilterContainer: document.createElement('div'),
-
+export const defaultGradebookEnv = {
   allow_apply_score_to_ungraded: false,
   allow_separate_first_last_names: true,
   api_max_per_page: 50,
@@ -47,12 +38,10 @@ export const defaultGradebookProps = {
   context_allows_gradebook_uploads: true,
   context_id: '1',
   context_url: '/courses/1/',
-
   course_settings: {
     allow_final_grade_override: false,
     filter_speed_grader_by_student_group: false
   },
-
   currentUserId: '1',
   dataloader_improvements: true,
   default_grading_standard: [
@@ -83,12 +72,7 @@ export const defaultGradebookProps = {
     }
   ],
   has_modules: true,
-  isModulesLoading: false,
-  modules: [
-    {id: '1', name: 'Module 1', position: 1},
-    {id: '2', name: 'Another Module', position: 2},
-    {id: '3', name: 'Module 2', position: 3}
-  ],
+  hideGrid: true,
   latePolicyStatusDisabled: false,
   locale: 'en',
   new_gradebook_development_enabled: true,
@@ -96,15 +80,34 @@ export const defaultGradebookProps = {
   post_grades_ltis: [],
   publish_to_sis_enabled: false,
   sections: [],
-
   settings: {
     show_concluded_enrollments: 'false',
     show_inactive_enrollments: 'false'
   },
-
   settings_update_url: '/path/to/settingsUpdateUrl',
   speed_grader_enabled: true,
-  student_groups: []
+  student_groups: {}
+}
+
+export const defaultGradebookProps = {
+  filters: [],
+  isFiltersLoading: false,
+  onFiltersChange: () => {},
+  flashAlerts: [],
+  modules: [
+    {id: '1', name: 'Module 1', position: 1},
+    {id: '2', name: 'Another Module', position: 2},
+    {id: '3', name: 'Module 2', position: 3}
+  ],
+  isModulesLoading: false,
+  flashMessageContainer: document.createElement('div'),
+  gradebookMenuNode: document.createElement('div'),
+  settingsModalButtonContainer: document.createElement('div'),
+  gridColorNode: document.createElement('div'),
+  filterNavNode: document.createElement('div'),
+  viewOptionsMenuNode: document.createElement('div'),
+  gradingPeriodsFilterContainer: document.createElement('div'),
+  gradebookEnv: defaultGradebookEnv
 }
 
 export function createGradebook(options = {}) {
@@ -128,6 +131,17 @@ export function createGradebook(options = {}) {
     removeGradebookElement() {}
   }
 
+  const formatterFactory = new CellFormatterFactory(gradebook)
+  const columnHeaderRenderer = new ColumnHeaderRenderer(gradebook)
+  gradebook.gradebookGrid = new GradebookGrid({
+    $container: options.gradebookGridNode || document.getElementById('gradebook_grid'),
+    activeBorderColor: '#1790DF', // $active-border-color
+    data: gradebook.gridData,
+    editable: options.gradebook_is_editable,
+    formatterFactory,
+    columnHeaderRenderer
+  })
+
   gradebook.gradebookGrid.gridSupport = {
     columns: {
       updateColumnHeaders() {},
@@ -135,6 +149,8 @@ export function createGradebook(options = {}) {
       scrollToEnd() {}
     }
   }
+
+  gradebook.bindGridEvents()
 
   return gradebook
 }

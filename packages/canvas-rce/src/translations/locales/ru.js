@@ -285,6 +285,7 @@ const locale = {
   "image_8ad06": { "message": "Изображение" },
   "image_options_5412d02c": { "message": "Опции изображения" },
   "image_options_tray_90a46006": { "message": "Лоток опций изображения" },
+  "image_to_crop_3a34487d": { "message": "Обрезаемое изображение" },
   "images_7ce26570": { "message": "Изображения" },
   "increase_indent_6d550a4a": { "message": "Увеличить отступ" },
   "insert_593145ef": { "message": "Вставить" },

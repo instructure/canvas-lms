@@ -275,6 +275,7 @@ const locale = {
   "image_8ad06": { "message": "Zdjęcie" },
   "image_options_5412d02c": { "message": "Opcje obrazu" },
   "image_options_tray_90a46006": { "message": "Panel opcji obrazu" },
+  "image_to_crop_3a34487d": { "message": "Obraz do przycięcia" },
   "images_7ce26570": { "message": "Zdjęcia" },
   "increase_indent_6d550a4a": { "message": "Zwiększ wcięcie" },
   "insert_593145ef": { "message": "Wstaw" },

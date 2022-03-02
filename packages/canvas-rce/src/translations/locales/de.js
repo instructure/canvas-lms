@@ -273,6 +273,7 @@ const locale = {
   "image_8ad06": { "message": "Bild" },
   "image_options_5412d02c": { "message": "Bildoptionen" },
   "image_options_tray_90a46006": { "message": "Fach für Bildoptionen" },
+  "image_to_crop_3a34487d": { "message": "Bild zum Zuschneiden" },
   "images_7ce26570": { "message": "Bilder" },
   "increase_indent_6d550a4a": { "message": "Einzug vergrößern" },
   "insert_593145ef": { "message": "Einfügen" },

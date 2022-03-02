@@ -31,6 +31,18 @@
     font-weight: normal;
     font-size: 14px;
   }
+
+  @media screen and (max-width: 500px) {
+    .g-recaptcha {
+      position: relative;
+      width: 100%;
+    }
+
+    .g-recaptcha > * {
+      float: right;
+      right: 0;
+    }
+  }
 }
 
 .terms-of-service__register {

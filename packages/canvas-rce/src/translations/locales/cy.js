@@ -275,6 +275,7 @@ const locale = {
   "image_8ad06": { "message": "Delwedd" },
   "image_options_5412d02c": { "message": "Opsiynau Delwedd" },
   "image_options_tray_90a46006": { "message": "Ardal Opsiynau Delwedd" },
+  "image_to_crop_3a34487d": { "message": "Delwedd i''w thocio" },
   "images_7ce26570": { "message": "Delweddau" },
   "increase_indent_6d550a4a": { "message": "Cynyddu mewnoliad" },
   "insert_593145ef": { "message": "Mewnosod" },

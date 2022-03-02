@@ -34,6 +34,7 @@ describe('useSvgSettings()', () => {
       const [settings, _status, _dispatch] = subject().current
 
       expect(settings).toEqual({
+        type: 'image/svg+xml-buttons-and-icons',
         name: '',
         alt: '',
         shape: 'square',
@@ -46,9 +47,16 @@ describe('useSvgSettings()', () => {
         outlineSize: 'none',
         text: '',
         textSize: 'small',
-        textColor: null,
+        textColor: '#000000',
         textBackgroundColor: null,
-        textPosition: 'middle'
+        textPosition: 'middle',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        width: 0,
+        height: 0,
+        transform: ''
       })
     })
 
@@ -73,6 +81,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: 'Banana',
           alt: '',
           shape: 'square',
@@ -85,9 +94,16 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })
@@ -99,7 +115,7 @@ describe('useSvgSettings()', () => {
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" alt="a red circle" />'
+        '<img id="test-image" src="https://canvas.instructure.com/svg" data-download=url="https://canvas.instructure.com/download" alt="a red circle" />'
       )
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
 
@@ -134,7 +150,9 @@ describe('useSvgSettings()', () => {
 
     it('fetches the SVG file', () => {
       subject()
-      expect(global.fetch).toHaveBeenCalledWith(ed.selection.getNode().src)
+      expect(global.fetch).toHaveBeenCalledWith(
+        ed.selection.getNode().getAttribute('data-download-url')
+      )
     })
 
     it('parses the SVG settings from the SVG metadata', async () => {
@@ -145,6 +163,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toEqual({
+        type: 'image/svg+xml-buttons-and-icons',
         name: 'Test Image',
         alt: 'a test image',
         shape: 'triangle',
@@ -159,7 +178,14 @@ describe('useSvgSettings()', () => {
         textSize: 'medium',
         textColor: '#009606',
         textBackgroundColor: '#06A3B7',
-        textPosition: 'middle'
+        textPosition: 'middle',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        width: 0,
+        height: 0,
+        transform: ''
       })
     })
 
@@ -191,6 +217,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: '',
           alt: '',
           shape: 'square',
@@ -203,9 +230,16 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })
@@ -216,6 +250,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-buttons-and-icons',
           name: '',
           alt: '',
           shape: 'square',
@@ -228,9 +263,16 @@ describe('useSvgSettings()', () => {
           outlineSize: 'none',
           text: '',
           textSize: 'small',
-          textColor: null,
+          textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle'
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          transform: ''
         })
       })
     })

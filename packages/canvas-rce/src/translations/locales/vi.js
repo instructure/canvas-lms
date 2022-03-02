@@ -55,6 +55,7 @@ const locale = {
     "message": "Áp dụng thay đổi cho tất cả phiên bản của Nút này và Biểu Tượng trong Khóa Học"
   },
   "apps_54d24a47": { "message": "Ứng Dụng" },
+  "arrows_464a3e54": { "message": "Các phím mũi tên" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Tỷ lệ khung hình sẽ được giữ nguyên"
   },
@@ -63,6 +64,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Chức năng ghi âm và quay video không được hỗ trợ; vui lòng sử dụng trình duyệt khác."
   },
+  "audio_options_feb58e2c": { "message": "Các Tùy Chọn Âm Thanh" },
+  "audio_options_tray_33a90711": { "message": "Khay Tùy Chọn Âm Thanh" },
   "audio_player_for_title_20cc70d": {
     "message": "Trình phát âm thanh cho { title }"
   },
@@ -70,6 +73,7 @@ const locale = {
     "message": "Nội dung tự động lưu tồn tại. Bạn có muốn tải nội dung tự động lưu để thay thế không?"
   },
   "available_folders_694d0436": { "message": "Thư Mục Khả Dụng" },
+  "basic_554cdc0a": { "message": "Cơ Bản" },
   "below_81d4dceb": { "message": "Bên Dưới" },
   "bottom_third_5f5fec1d": { "message": "Một Phần Ba Dưới" },
   "button_color_608a0242": { "message": "Màu Nút" },
@@ -154,11 +158,15 @@ const locale = {
   "default_numerical_ordered_list_48dd3548": {
     "message": "danh sách theo thứ tự số mặc định"
   },
+  "delimiters_4db4840d": { "message": "Dấu Phân Cách" },
   "describe_the_image_e65d2e32": { "message": "(Mô tả hình ảnh" },
   "describe_the_video_2fe8f46a": { "message": "(Mô tả video)" },
   "details_98a31b68": { "message": "Chi Tiết" },
+  "diamond_b8dfe7ae": { "message": "Hình Thoi" },
+  "dimension_type_55c83e4e": { "message": "Loại kích thước" },
   "dimensions_45ddb7b7": { "message": "Kích Thước" },
   "directionality_26ae9e08": { "message": "Định Hướng" },
+  "directly_edit_latex_b7e9235b": { "message": "Chỉnh Sửa LaTeX Trực Tiếp" },
   "discussions_a5f96392": { "message": "Thảo Luận" },
   "discussions_index_6c36ced": { "message": "Chỉ Mục Thảo Luận" },
   "display_options_315aba85": { "message": "Tùy Chọn Hiển Thị" },
@@ -197,6 +205,7 @@ const locale = {
     "message": "Nhập ít nhất 3 ký tự để tìm kiếm"
   },
   "equation_1c5ac93c": { "message": "Phương Trình" },
+  "equation_editor_39fbc3f1": { "message": "Trình Chỉnh Sửa Phương Trình" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Mở rộng nội dung xem trước theo Mặc Định"
   },
@@ -240,6 +249,7 @@ const locale = {
     "message": "Đi đến thanh công cụ của trình chỉnh sửa"
   },
   "grades_a61eba0a": { "message": "Điểm" },
+  "greek_65c5b3f7": { "message": "Hy Lạp" },
   "group_documents_8bfd6ae6": { "message": "Tài Liệu Nhóm" },
   "group_files_4324f3df": { "message": "Các Tập Tin Nhóm" },
   "group_files_82e5dcdb": { "message": "Tập tin nhóm" },
@@ -267,6 +277,7 @@ const locale = {
   "image_8ad06": { "message": "Hình Ảnh" },
   "image_options_5412d02c": { "message": "Tùy Chọn Hình Ảnh" },
   "image_options_tray_90a46006": { "message": "Khay Tùy Chọn Hình Ảnh" },
+  "image_to_crop_3a34487d": { "message": "Hình ảnh để cắt gọt" },
   "images_7ce26570": { "message": "Hình Ảnh" },
   "increase_indent_6d550a4a": { "message": "Tăng thụt lề" },
   "insert_593145ef": { "message": "Chèn" },
@@ -290,13 +301,18 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Tải thất bại." },
   "loading_folders_d8b5869e": { "message": "Đang tải thư mục" },
   "loading_please_wait_d276220a": { "message": "Đang tải, vui lòng chờ" },
+  "loading_preview_9f077aa1": { "message": "Đang tải bản xem trước" },
   "locked_762f138b": { "message": "Bị Khóa" },
   "media_af190855": { "message": "Phương Tiện" },
   "medium_5a8e9ead": { "message": "Trung bình" },
   "middle_27dc1d5": { "message": "Giữa" },
+  "misc_3b692ea7": { "message": "Hỗn hợp" },
   "miscellaneous_e9818229": { "message": "Tổng Hợp" },
   "modules_c4325335": { "message": "Học Phần" },
   "multi_color_image_63d7372f": { "message": "Ảnh Nhiều Màu" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Ít nhất phải bằng { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Phải ít nhất { width } x { height }px"
   },
@@ -325,6 +341,7 @@ const locale = {
     "message": "Mở hộp thoại phím tắt này"
   },
   "open_title_application_fd624fc5": { "message": "Mở ứng dụng { title }" },
+  "operators_a2ef9a93": { "message": "Toán Tử" },
   "options_3ab0ea65": { "message": "Tùy Chọn" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Danh Sách Theo Thứ Tự Và Không Theo Thứ Tự"
@@ -337,7 +354,11 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Trang" },
   "paragraph_5e5ad8eb": { "message": "Đoạn" },
+  "pentagon_17d82ea3": { "message": "Hình Ngũ Giác" },
   "people_b4ebb13c": { "message": "Mọi Người" },
+  "percentage_34ab7c2c": { "message": "Phần Trăm" },
+  "percentage_must_be_a_number_8033c341": { "message": "Phần trăm phải là số" },
+  "pixels_52ece7d1": { "message": "Pixel" },
   "posted_when_a578f5ab": { "message": "Đã đăng: { when }" },
   "preformatted_d0670862": { "message": "Đã định dạng trước" },
   "pretty_html_editor_28748756": { "message": "Trình Chỉnh Sửa HTML Đẹp" },
@@ -356,6 +377,7 @@ const locale = {
   "record_upload_media_5fdce166": {
     "message": "Ghi/Tải Lên Nội Dung Phương Tiện"
   },
+  "relationships_6602af70": { "message": "Mối Quan Hệ" },
   "remove_link_d1f2f4d0": { "message": "Gỡ Liên Kết" },
   "resize_ec83d538": { "message": "Đổi Cỡ" },
   "restore_auto_save_deccd84b": { "message": "Khôi phục tự động lưu?" },
@@ -376,6 +398,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Nhấn Shift-O để mở trình chỉnh sửa html đẹp."
   },
+  "show_audio_options_b489926b": { "message": "Hiển thị tùy chọn âm thanh" },
   "show_embed_options_ef8d7ef": { "message": "Hiển thị tùy chọn nhúng" },
   "show_image_options_1e2ecc6b": { "message": "Hiển thị tùy chọn hình ảnh" },
   "show_link_options_545338fd": { "message": "Hiển thị tùy chọn liên kết" },

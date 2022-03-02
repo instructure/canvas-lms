@@ -285,6 +285,7 @@ const locale = {
   "image_8ad06": { "message": "Imagen" },
   "image_options_5412d02c": { "message": "Opciones de imagen" },
   "image_options_tray_90a46006": { "message": "Bandeja de opciones de imagen" },
+  "image_to_crop_3a34487d": { "message": "Imagen para recortar" },
   "images_7ce26570": { "message": "Imágenes" },
   "increase_indent_6d550a4a": { "message": "Aumentar sangría" },
   "insert_593145ef": { "message": "Insertar" },

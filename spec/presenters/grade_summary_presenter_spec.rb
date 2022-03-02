@@ -356,6 +356,12 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(p.assignments).to eq [published_assignment]
     end
+
+    it "includes assignments for deactivated students when a teacher is viewing" do
+      @course.enrollments.find_by(user: @student).deactivate
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.assignments).to include published_assignment
+    end
   end
 
   describe "#sort_options" do

@@ -427,7 +427,7 @@ class Quizzes::QuizzesController < ApplicationController
         @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
       end
 
-      if Account.site_admin.feature_enabled?(:important_dates)
+      if params.include?(:important_dates)
         @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
       end
 
@@ -461,7 +461,11 @@ class Quizzes::QuizzesController < ApplicationController
       quiz_params[:title] = t("New Quiz") if quiz_params[:title] == "undefined"
       quiz_params[:description] = process_incoming_html_content(quiz_params[:description]) if quiz_params.key?(:description)
 
-      quiz_params.delete(:points_possible) unless quiz_params[:quiz_type] == "graded_survey"
+      if quiz_params[:quiz_type] == "survey"
+        quiz_params[:points_possible] = ""
+      elsif quiz_params[:quiz_type] != "graded_survey"
+        quiz_params.delete(:points_possible)
+      end
       quiz_params[:disable_timer_autosubmission] = false if quiz_params[:time_limit].blank?
       quiz_params[:access_code] = nil if quiz_params[:access_code] == ""
       if quiz_params[:quiz_type] == "assignment" || quiz_params[:quiz_type] == "graded_survey" # 'new' && params[:quiz][:assignment_group_id]
@@ -499,9 +503,7 @@ class Quizzes::QuizzesController < ApplicationController
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
               @quiz.assignment.validate_overrides_for_sis(overrides) unless overrides.nil?
 
-              if Account.site_admin.feature_enabled?(:important_dates)
-                @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
-              end
+              @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
             end
 
             auto_publish = @quiz.published?

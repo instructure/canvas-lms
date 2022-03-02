@@ -38,6 +38,7 @@ export default function GradebookData(props) {
 
   const appliedFilters = useStore(state => state.appliedFilters(), shallow)
   const isFiltersLoading = useStore(state => state.isFiltersLoading)
+  const initializeStagedFilter = useStore(state => state.initializeStagedFilter)
   const fetchFilters = useStore(state => state.fetchFilters)
 
   const modules = useStore(state => state.modules)
@@ -58,6 +59,15 @@ export default function GradebookData(props) {
   useEffect(() => {
     if (props.gradebookEnv.enhanced_gradebook_filters) {
       fetchFilters()
+        .then(() => {
+          initializeStagedFilter(
+            props.gradebookEnv.settings.filter_rows_by || {},
+            props.gradebookEnv.settings.filter_columns_by || {}
+          )
+        })
+        .catch(error => {
+          throw new Error('Failed to load filters', error)
+        })
     }
     if (props.gradebookEnv.has_modules) {
       fetchModules()
@@ -66,7 +76,10 @@ export default function GradebookData(props) {
     fetchFilters,
     fetchModules,
     props.gradebookEnv.enhanced_gradebook_filters,
-    props.gradebookEnv.has_modules
+    props.gradebookEnv.has_modules,
+    initializeStagedFilter,
+    props.gradebookEnv.settings.filter_rows_by,
+    props.gradebookEnv.settings.filter_columns_by
   ])
 
   return (
@@ -74,6 +87,7 @@ export default function GradebookData(props) {
       {...props}
       flashAlerts={flashMessages}
       filters={appliedFilters}
+      hideGrid={false}
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}

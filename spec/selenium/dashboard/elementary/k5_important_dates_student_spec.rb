@@ -40,10 +40,6 @@ describe "student k5 dashboard important dates" do
   end
 
   context "important dates panel" do
-    before :once do
-      Account.site_admin.enable_feature!(:important_dates)
-    end
-
     it "shows the important date for student with override", custom_timeout: 20 do
       assignment_title = "Electricity Homework"
       due_at = 2.days.ago(Time.zone.now)

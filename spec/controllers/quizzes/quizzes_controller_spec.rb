@@ -1697,9 +1697,7 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    it "creates assignment with important dates when site admin flag enabled" do
-      Account.site_admin.enable_feature!(:important_dates)
-
+    it "creates assignment with important dates" do
       user_session(@teacher)
       ag = @course.assignment_groups.create! name: "teh group"
       post "create", params: {
@@ -1713,6 +1711,20 @@ describe Quizzes::QuizzesController do
       }
       expect(assigns[:quiz]).not_to be_nil
       expect(assigns[:quiz].assignment.important_dates).to be true
+      expect(response).to be_successful
+    end
+
+    it "sets points_possible to nil for ungraded_surveys" do
+      user_session(@teacher)
+      post "create", params: {
+        course_id: @course.id,
+        quiz: {
+          title: "ungraded survey",
+          quiz_type: "survey"
+        }
+      }
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz].points_possible).to be nil
       expect(response).to be_successful
     end
   end
@@ -1843,9 +1855,7 @@ describe Quizzes::QuizzesController do
             expect(@quiz.reload.title).not_to eq "overrides"
           end
 
-          it "saves important dates with site admin flag enabled" do
-            Account.site_admin.enable_feature!(:important_dates)
-
+          it "saves important dates" do
             post "update", params: {
               course_id: @course.id,
               id: @quiz.id,
@@ -1939,6 +1949,20 @@ describe Quizzes::QuizzesController do
       expect(quiz.reload.assignment_id).to be_nil
       expect(override.reload.assignment_id).to be_nil
       expect(override.quiz_id).to eq quiz.id
+    end
+
+    it "removes points_possible when changing from a graded quiz to ungraded" do
+      user_session(@teacher)
+      quiz_with_submission(false, true)
+      expect(@quiz.current_points_possible).to be > 0
+      post "update", params: {
+        course_id: @course.id,
+        id: @quiz.id,
+        quiz: {
+          quiz_type: "survey"
+        }
+      }
+      expect(@quiz.reload.points_possible).to be_nil
     end
 
     it "does not remove attributes when called with no description param" do

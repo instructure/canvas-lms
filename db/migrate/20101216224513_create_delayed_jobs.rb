@@ -21,10 +21,6 @@
 class CreateDelayedJobs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
-  def self.connection
-    Delayed::Backend::ActiveRecord::Job.connection
-  end
-
   def self.up
     create_table :delayed_jobs do |table|
       # Allows some jobs to jump to the front of the queue
@@ -59,7 +55,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.datetime :expires_at
     end
 
-    connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
+    connection.execute("CREATE INDEX get_delayed_jobs_index ON #{connection.quote_table_name(Delayed::Job.table_name)} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
     add_index :delayed_jobs, [:tag]
     add_index :delayed_jobs, %w[strand id], name: "index_delayed_jobs_on_strand"
     add_index :delayed_jobs, :locked_by, where: "locked_by IS NOT NULL"
@@ -104,7 +100,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       END;
       $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     SQL
-    execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
+    execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
 
     # create the delete trigger
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
@@ -126,7 +122,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       END;
       $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     SQL
-    execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
+    execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
 
     create_table :failed_jobs do |t|
       t.integer  "priority",    default: 0

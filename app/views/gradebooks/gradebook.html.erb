@@ -75,7 +75,7 @@
           <div class="gradebook-filter-container" id="student-group-filter-container"></div>
         <% end %>
 
-        <% if Account.site_admin.feature_enabled?(:enhanced_gradebook_filters) %>
+        <% if @context.feature_enabled?(:enhanced_gradebook_filters) %>
           <span data-component="EnhancedActionMenu"></span>
         <% end %>
 

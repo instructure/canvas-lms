@@ -103,8 +103,8 @@ class GradingPeriod < ActiveRecord::Base
     grading_period_group.course_id.present?
   end
 
-  def assignments_for_student(course, assignments, student)
-    assignment_ids = GradebookGradingPeriodAssignments.new(course, student: student).to_h.fetch(id, [])
+  def assignments_for_student(course, assignments, student, includes: [])
+    assignment_ids = GradebookGradingPeriodAssignments.new(course, student: student, includes: includes).to_h.fetch(id, [])
     if assignment_ids.empty?
       []
     else

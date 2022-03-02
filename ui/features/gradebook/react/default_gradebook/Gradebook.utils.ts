@@ -27,6 +27,7 @@ import htmlEscape from 'html-escape'
 import type {
   Assignment,
   Filter,
+  FilterConditionType,
   GradebookFilterApiResponse,
   GradebookFilterApiRequest,
   PartialFilter,
@@ -180,7 +181,7 @@ export function getAssignmentGroupColumnId(assignmentGroupId: string) {
   return `assignment_group_${assignmentGroupId}`
 }
 
-export function findAllAppliedFilterValuesOfType(type: string, filters: Filter[]) {
+export function findAllAppliedFilterValuesOfType(type: FilterConditionType, filters: Filter[]) {
   return filters
     .filter(f => f.is_applied)
     .flatMap(f => f.conditions.filter(c => c.type === type && c.value))
@@ -226,3 +227,6 @@ export const serializeFilter = (filter: PartialFilter): GradebookFilterApiReques
     }
   }
 }
+
+export const compareFilterByDate = (a: Filter, b: Filter) =>
+  new Date(a.created_at).getTime() - new Date(b.created_at).getTime()

@@ -31,29 +31,24 @@ import {View} from '@instructure/ui-view'
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const variables = {
+    conversationID: props.conversation._id
+  }
 
   const removeConversationMessagesFromCache = (cache, result) => {
-    const data = JSON.parse(
-      JSON.stringify(
-        cache.readFragment({
-          id: props.conversation.id,
-          fragment: Conversation.fragment,
-          fragmentName: 'Conversation'
-        })
+    const options = {
+      query: CONVERSATION_MESSAGES_QUERY,
+      variables
+    }
+    const data = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+    data.legacyNode.conversationMessagesConnection.nodes =
+      data.legacyNode.conversationMessagesConnection.nodes.filter(
+        message =>
+          !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id)
       )
-    )
 
-    data.conversationMessagesConnection.nodes = data.conversationMessagesConnection.nodes.filter(
-      message =>
-        !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id)
-    )
-
-    cache.writeFragment({
-      id: props.conversation.id,
-      fragment: Conversation.fragment,
-      fragmentName: 'Conversation',
-      data
-    })
+    cache.writeQuery({...options, data})
   }
 
   const [deleteConversationMessages] = useMutation(DELETE_CONVERSATION_MESSAGES, {
@@ -67,9 +62,7 @@ export const MessageDetailContainer = props => {
   })
 
   const {loading, error, data} = useQuery(CONVERSATION_MESSAGES_QUERY, {
-    variables: {
-      conversationID: props.conversation._id
-    }
+    variables
   })
 
   if (loading) {
@@ -91,12 +84,13 @@ export const MessageDetailContainer = props => {
         text={props.conversation.subject}
         onReply={props.onReply}
         onReplyAll={props.onReplyAll}
+        onDelete={() => props.onDelete([props.conversation._id])}
       />
       {data?.legacyNode?.conversationMessagesConnection.nodes.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
           <MessageDetailItem
             conversationMessage={message}
-            context={props.conversation.contextName}
+            contextName={data?.legacyNode?.contextName}
             onReply={() => props.onReply(message)}
             onReplyAll={() => props.onReplyAll(message)}
             onDelete={() => deleteConversationMessages({variables: {ids: [message._id]}})}
@@ -110,5 +104,6 @@ export const MessageDetailContainer = props => {
 MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
   onReply: PropTypes.func,
-  onReplyAll: PropTypes.func
+  onReplyAll: PropTypes.func,
+  onDelete: PropTypes.func
 }

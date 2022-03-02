@@ -37,7 +37,8 @@ const editor = {
       element.setAttribute('alt', alt)
       element.setAttribute('data-inst-buttons-and-icons', rest['data-inst-buttons-and-icons'])
       return element
-    })
+    }),
+    create: name => document.createElement(name)
   },
   insertContent: jest.fn()
 }
@@ -75,7 +76,7 @@ describe('<CreateButtonForm />', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":null,"textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":""}
+                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-37.5,"translateY":-37.5,"width":75,"height":75,"transform":"translate(-37.5,-37.5)"}
               </metadata>
               <svg
                 fill="none"
@@ -87,6 +88,16 @@ describe('<CreateButtonForm />', () => {
                 <g
                   fill="none"
                 >
+                  <clippath
+                    id="clip-path-for-embed"
+                  >
+                    <rect
+                      height="114"
+                      width="114"
+                      x="4"
+                      y="4"
+                    />
+                  </clippath>
                   <rect
                     height="114"
                     width="114"
@@ -119,11 +130,7 @@ describe('<CreateButtonForm />', () => {
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        <img
-          alt=""
-          data-inst-buttons-and-icons="true"
-          src="https://uploaded.url"
-        />,
+        "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
       ]
     `)
 
@@ -154,7 +161,7 @@ describe('<CreateButtonForm />', () => {
     })
 
     const subject = () =>
-      render(<CreateButtonForm onClose={jest.fn()} editing={true} editor={new FakeEditor()} />)
+      render(<CreateButtonForm onClose={jest.fn()} editing editor={new FakeEditor()} />)
 
     beforeEach(() => {
       global.fetch = jest.fn().mockResolvedValue({

@@ -32,7 +32,6 @@ describe "observer k5 dashboard important dates" do
   include K5ImportantDatesSectionPageObject
 
   before :once do
-    Account.site_admin.enable_feature!(:important_dates)
     Account.site_admin.enable_feature!(:k5_parent_support)
     student_setup
     observer_setup

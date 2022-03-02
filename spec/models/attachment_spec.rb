@@ -1944,7 +1944,19 @@ describe Attachment do
 
       Attachment.where(id: @attachment).update_all(need_notify: true)
 
-      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      Timecop.freeze(10.minutes.from_now) do
+        expect { Attachment.do_notifications }.not_to raise_error
+      end
+    end
+
+    it "does not fail if the attachment context is a User" do
+      attachment_model(context: user_factory, uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
+
+      Attachment.where(id: @attachment).update_all(need_notify: true)
+
+      Timecop.freeze(10.minutes.from_now) do
+        expect { Attachment.do_notifications }.not_to raise_error
+      end
     end
 
     it "doesn't send notifications for a concluded course" do
@@ -2483,6 +2495,42 @@ describe Attachment do
       account_model
       attachment_model filename: "test.txt", context: @account
       expect(@attachment.root_account_id).to eq @account.id
+    end
+
+    describe "word count" do
+      before(:once) do
+        Account.site_admin.enable_feature!(:word_count_in_speed_grader)
+      end
+
+      it "updates the word count for a PDF" do
+        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
+        @attachment.update_word_count
+        expect(@attachment.word_count).to eq 3320
+      end
+
+      it "updates the word count for a DOCX file" do
+        attachment_model(filename: "test.docx", uploaded_data: fixture_file_upload("files/test.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        @attachment.update_word_count
+        expect(@attachment.word_count).to eq 5
+      end
+
+      it "updates the word count for an RTF file" do
+        attachment_model(filename: "test.rtf", uploaded_data: fixture_file_upload("files/test.rtf", "application/rtf"))
+        @attachment.update_word_count
+        expect(@attachment.word_count).to eq 5
+      end
+
+      it "updates the word count for a text file" do
+        attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("files/amazing_file.txt", "text/plain"))
+        @attachment.update_word_count
+        expect(@attachment.word_count).to eq 5
+      end
+
+      it "sets 0 if the file is not supported" do
+        attachment_model(filename: "test.png", uploaded_data: fixture_file_upload("files/instructure.png", "image/png"))
+        @attachment.update_word_count
+        expect(@attachment.word_count).to eq 0
+      end
     end
   end
 

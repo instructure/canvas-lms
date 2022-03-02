@@ -25,8 +25,8 @@ describe GradebookFiltersApiController, type: :request do
 
   context "when fetching all records" do
     before :once do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
+      @course.enable_feature!(:enhanced_gradebook_filters)
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters"
@@ -63,8 +63,8 @@ describe GradebookFiltersApiController, type: :request do
 
   context "when creating a new record" do
     before do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
+      @course.enable_feature!(:enhanced_gradebook_filters)
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters"
@@ -99,8 +99,8 @@ describe GradebookFiltersApiController, type: :request do
 
   context "when updating a record" do
     before do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
+      @course.enable_feature!(:enhanced_gradebook_filters)
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{@gradebook_filter.id}"
@@ -137,8 +137,8 @@ describe GradebookFiltersApiController, type: :request do
 
   context "when getting the details of a record" do
     before do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
+      @course.enable_feature!(:enhanced_gradebook_filters)
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{@gradebook_filter.id}"
@@ -172,8 +172,8 @@ describe GradebookFiltersApiController, type: :request do
 
   context "when destroying a record" do
     before do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
+      @course.enable_feature!(:enhanced_gradebook_filters)
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{@gradebook_filter.id}"

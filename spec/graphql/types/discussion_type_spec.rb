@@ -644,6 +644,15 @@ describe Types::DiscussionType do
     end
   end
 
+  context "groups discussion" do
+    let_once(:discussion) { group_discussion_with_deleted_group }
+    include_examples "DiscussionType"
+
+    it "doesn't show child topic associated to a deleted group" do
+      expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1", "group 2"])
+    end
+  end
+
   context "announcement" do
     let(:discussion) { announcement_model(delayed_post_at: 1.day.from_now) }
     let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }

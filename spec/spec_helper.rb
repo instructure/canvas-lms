@@ -97,6 +97,7 @@ module WebMock::API
   end
 end
 
+require "delayed/testing"
 Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
 require "sharding_spec_helper"
 
@@ -437,6 +438,7 @@ RSpec.configure do |config|
   config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
   config.include PGCollkeyHelper
+  config.include ActionDispatch::TestProcess::FixtureFile
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
   if ENV["RSPEC_LOG"]
@@ -835,18 +837,11 @@ RSpec.configure do |config|
   end
 
   def run_job(job)
-    Delayed::Worker.new.perform(job)
+    Delayed::Testing.run_job(job)
   end
 
   def run_jobs
-    while (job = Delayed::Job.get_and_lock_next_available(
-      "spec run_jobs",
-      Delayed::Settings.queue,
-      0,
-      Delayed::MAX_PRIORITY
-    ))
-      run_job(job)
-    end
+    Delayed::Testing.drain
   end
 
   def track_jobs(&block)

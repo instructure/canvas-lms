@@ -524,11 +524,11 @@ describe "context modules" do
       end
 
       it "shows a tooltip when hovering over a completed icon", priority: "1" do
-        skip "flaky, LS-1297 (8/23/2020)"
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
-        driver.action.move_to(f(".ig-header-admin .completion_status .icon-check"), 0, 0).perform
-        expect(fj(".ui-tooltip:visible")).to include_text("Completed")
+        driver.action.move_to(f(".ig-header-admin .completion_status .icon-check")).perform
+        expect(f(".ig-header-admin .completion_status .icon-check").attribute("aria-describedby")).to include("ui-tooltip")
+        expect(f(".ig-header-admin .completion_status .icon-check").text).to eq "Module Completed"
       end
 
       it "shows an incomplete circle icon when module item is requirement but not complete", priority: "1" do

@@ -166,6 +166,7 @@ class ProficiencyRating extends React.Component {
             onChange={this.handleDescriptionChange}
             inputRef={element => this.setDescriptionRef(element)}
             defaultValue={description}
+            data-testid="rating-description-input"
           />
         ) : (
           <Text>
@@ -208,9 +209,9 @@ class ProficiencyRating extends React.Component {
   }
 
   renderPointsInput = () => {
-    const {points, pointsError, position, isMobileView, canManage} = this.props
+    const {points, pointsError, position, isMobileView, canManage, individualOutcome} = this.props
     return (
-      <div className="points">
+      <div className={individualOutcome ? 'points individualOutcome' : 'points'}>
         {canManage ? (
           <>
             <TextInput
@@ -224,11 +225,12 @@ class ProficiencyRating extends React.Component {
               }
               onChange={this.handlePointChange}
               defaultValue={I18n.n(points)}
-              width={isMobileView ? '3rem' : '4rem'}
+              width={isMobileView ? (individualOutcome ? '3rem' : '7rem') : '4rem'}
+              data-testid="rating-points-input"
             />
 
             <div className="pointsDescription" aria-hidden="true">
-              {isMobileView ? I18n.t('pts') : I18n.t('points')}
+              {I18n.t('points')}
             </div>
           </>
         ) : (
@@ -343,6 +345,7 @@ class ProficiencyRating extends React.Component {
           onClick={individualOutcome ? this.handleRealDelete : this.handleDelete}
           renderIcon={<IconTrashLine />}
           screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
+          data-testid="rating-delete-btn"
         />
         {!individualOutcome && (
           <ConfirmMasteryModal
@@ -373,6 +376,7 @@ class ProficiencyRating extends React.Component {
         }`}
         width="100%"
         alignItems={isMobileView ? 'center' : 'start'}
+        justifyItems={isMobileView ? 'space-between' : 'start'}
       >
         {!individualOutcome && (
           <Flex.Item textAlign="center" padding="0 medium 0 0" size={isMobileView ? '25%' : '15%'}>
@@ -390,7 +394,7 @@ class ProficiencyRating extends React.Component {
               {this.renderPointsInput()}
               <div className={`mobileRow ${canManage ? null : 'view-only'}`}>
                 {!individualOutcome && this.renderColorPicker()}
-                {canManage && this.renderDeleteButton()}
+                {canManage && !individualOutcome && this.renderDeleteButton()}
               </div>
             </>
           )}
@@ -407,6 +411,11 @@ class ProficiencyRating extends React.Component {
               </Flex.Item>
             )}
           </>
+        )}
+        {isMobileView && individualOutcome && canManage && (
+          <Flex.Item align="start" size="20%" textAlign="end">
+            {this.renderDeleteButton()}
+          </Flex.Item>
         )}
       </Flex>
     )

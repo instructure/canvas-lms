@@ -334,7 +334,6 @@ module CanvasCache
         randomkey
         rename
         renamenx
-        scan
         bitop
         msetnx
         blpop
@@ -392,6 +391,12 @@ module CanvasCache
     def self.patch
       Bundler.require "redis"
       require "redis/distributed"
+      require "sentry-ruby"
+
+      ::Sentry.register_patch do
+        patch = ::Sentry::Redis::Client
+        ::Redis::Client.prepend(patch) unless ::Redis::Client <= patch
+      end
 
       ::Redis::Client.prepend(::CanvasCache::Redis::Client)
       ::Redis::Distributed.prepend(::CanvasCache::Redis::Distributed)

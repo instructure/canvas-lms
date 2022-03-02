@@ -101,7 +101,7 @@ describe "Gradebook Controls" do
 
   context "using Actions dropdown" do
     it "navigates to upload page", priority: "1" do
-      Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
+      @course.disable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
       Gradebook.open_action_menu
       Gradebook.action_menu_item_selector("import").click
@@ -112,7 +112,7 @@ describe "Gradebook Controls" do
 
   context "using enhanced filter actions" do
     it "navigates to upload page", priority: "1" do
-      Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+      @course.enable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
       Gradebook.select_import
 

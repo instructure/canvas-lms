@@ -287,6 +287,7 @@ const locale = {
   "image_8ad06": { "message": "Immagine" },
   "image_options_5412d02c": { "message": "Opzioni immagine" },
   "image_options_tray_90a46006": { "message": "Barra opzioni immagine" },
+  "image_to_crop_3a34487d": { "message": "Immagine da ritagliare" },
   "images_7ce26570": { "message": "Immagini" },
   "increase_indent_6d550a4a": { "message": "Aumenta rientro" },
   "insert_593145ef": { "message": "Inserisci" },

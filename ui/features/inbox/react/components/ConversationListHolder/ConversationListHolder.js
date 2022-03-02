@@ -151,14 +151,7 @@ export const ConversationListHolder = ({...props}) => {
   })
 
   return (
-    <View
-      as="div"
-      maxWidth={400}
-      height="100%"
-      overflowX="hidden"
-      overflowY="auto"
-      borderWidth="small"
-    >
+    <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
       {props.conversations?.map(conversation => {
         return (
           <ConversationListItem

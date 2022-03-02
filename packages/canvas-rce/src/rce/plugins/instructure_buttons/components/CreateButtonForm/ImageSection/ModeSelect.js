@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import formatMessage from '../../../../../../format-message'
-import {modes} from '../../../reducers/imageSection'
+import {modes, actions} from '../../../reducers/imageSection'
 
 import {Button} from '@instructure/ui-buttons'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
@@ -32,17 +32,20 @@ const ModeSelect = ({dispatch}) => {
       value={mode.type}
       onSelect={() => {
         dispatch({type: mode.type})
+        dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: true})
       }}
     >
       {mode.label}
     </Menu.Item>
   )
 
+  const showNonIconImages = !!ENV.FEATURES.buttons_and_icons_cropper
+
   return (
     <Menu
       placement="bottom"
       trigger={
-        <Button color="secondary" margin="small">
+        <Button color="secondary">
           {formatMessage('Add Image')}
           <View margin="none none none x-small">
             <IconArrowOpenDownLine />
@@ -50,10 +53,10 @@ const ModeSelect = ({dispatch}) => {
         </Button>
       }
     >
-      {menuFor(modes.uploadImages)}
+      {showNonIconImages && menuFor(modes.uploadImages)}
       {menuFor(modes.singleColorImages)}
       {menuFor(modes.multiColorImages)}
-      {menuFor(modes.courseImages)}
+      {showNonIconImages && menuFor(modes.courseImages)}
     </Menu>
   )
 }

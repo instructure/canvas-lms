@@ -86,7 +86,7 @@ class Speedgrader
     end
 
     def post_or_hide_grades_button
-      fj('button[title="Post or Hide Grades"]:visible')
+      fj('button[data-testid="post-or-hide-grades-button"]:visible')
     end
 
     def all_grades_hidden_link

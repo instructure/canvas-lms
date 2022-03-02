@@ -100,6 +100,21 @@ describe "Api::V1::Assignment" do
       expect(json["planner_override"]).to be_nil
     end
 
+    it "includes the original assignment's lti_resource_link_id if the assignment is a duplicate" do
+      original_assignment = assignment_model
+      allow(original_assignment).to receive(:lti_resource_link_id).and_return("b85797748e3f0ffc2d0c21eb9865e76676cf67d0")
+      assignment.update!(duplicate_of: original_assignment)
+      json = api.assignment_json(assignment, user, session, { override_dates: false })
+
+      expect(json["original_lti_resource_link_id"]).to eq "b85797748e3f0ffc2d0c21eb9865e76676cf67d0"
+    end
+
+    it "returns nil for lti_resource_link_id if the assignment is not a duplicate" do
+      json = api.assignment_json(assignment, user, session, { override_dates: false })
+
+      expect(json["original_lti_resource_link_id"]).to be_nil
+    end
+
     describe "the allowed_attempts attribute" do
       it "returns -1 if set to nil" do
         assignment.update_attribute(:allowed_attempts, nil)
@@ -604,6 +619,99 @@ describe "Api::V1::Assignment" do
 
         expect(response).to eq :ok
         expect(assignment.name).to eq "Edited name"
+      end
+    end
+  end
+
+  describe "update with the 'duplicated_successfully' parameter" do
+    let(:user) { user_model }
+    let(:assignment) { assignment_model(workflow_state: workflow_state, duplicate_of: original_assignment) }
+
+    let(:assignment_update_params) do
+      ActionController::Parameters.new(
+        # the 'duplicated_successfully' param is provided by Quiz LTI
+        # and triggers the .finish_duplicating action on the assignment
+        duplicated_successfully: true
+      )
+    end
+
+    shared_examples "retains the original publication state" do
+      ["published", "unpublished"].each do |original_state|
+        context "the orignal assignment state is '#{original_state}'" do
+          let(:original_assignment) { assignment_model(workflow_state: original_state) }
+
+          it "sets workflow_state to '#{original_state}'" do
+            expect do
+              api.update_api_assignment(assignment, assignment_update_params, user)
+            end.to change { assignment.workflow_state }.to(original_state)
+          end
+        end
+      end
+    end
+    shared_examples "falls back to 'unpublished' state" do
+      context "when the original assignment state is other than 'published' or 'unpublished'" do
+        let(:original_assignment) { assignment_model }
+
+        before do
+          original_assignment.update!(workflow_state: "importing")
+        end
+
+        it "sets workflow_state to 'unpublished'" do
+          expect do
+            api.update_api_assignment(assignment, assignment_update_params, user)
+          end.to change { assignment.workflow_state }.to("unpublished")
+        end
+      end
+
+      context "when duplicate_of is nil" do
+        let(:original_assignment) { nil }
+
+        it "sets workflow_state to 'unpublished'" do
+          expect do
+            api.update_api_assignment(assignment, assignment_update_params, user)
+          end.to change { assignment.workflow_state }.to("unpublished")
+        end
+      end
+    end
+
+    context "when workflow_state is 'duplicating'" do
+      let(:workflow_state) { "duplicating" }
+
+      include_examples "retains the original publication state"
+      include_examples "falls back to 'unpublished' state"
+    end
+
+    context "when workflow_state is 'failed_to_duplicate'" do
+      let(:workflow_state) { "failed_to_duplicate" }
+
+      include_examples "retains the original publication state"
+      include_examples "falls back to 'unpublished' state"
+    end
+
+    context "when workflow_state is other that 'duplicating' or 'failed_to_duplicate'" do
+      let(:original_assignment) { assignment_model(workflow_state: "published") }
+      let(:workflow_state) { "failed_to_migrate" }
+
+      it "does not transition to another state" do
+        expect do
+          api.update_api_assignment(assignment, assignment_update_params, user)
+        end.to_not change { assignment.workflow_state }
+      end
+    end
+
+    context "when there are submissions for the assignment" do
+      let(:original_assignment) { assignment_model(workflow_state: "unpublished") }
+      let(:workflow_state) { "duplicating" }
+
+      before do
+        allow(assignment).to receive(:has_student_submissions?).and_return(true)
+      end
+
+      it "sets workflow_state to 'published' regardless of the original assignment state" do
+        api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(assignment.duplicate_of.workflow_state).to eq "unpublished"
+        expect(assignment.workflow_state).to eq "published"
       end
     end
   end

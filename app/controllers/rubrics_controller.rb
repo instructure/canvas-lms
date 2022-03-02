@@ -183,6 +183,9 @@ class RubricsController < ApplicationController
       end
       if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || @association&.grants_right?(@current_user, session, :update)) # authorized_action(@rubric, @current_user, :update)
         @association = @rubric.update_with_association(@current_user, params[:rubric], @context, association_params)
+
+        return render json: { error: true, messages: @association.errors.to_a } unless @association.nil? || @association.valid?
+
         @rubric = @association.rubric if @association
       end
       json_res = {}

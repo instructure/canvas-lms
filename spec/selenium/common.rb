@@ -134,7 +134,6 @@ shared_context "in-process server selenium tests" do
     @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
     allow(ActiveRecord::Base).to receive(:connection).and_return(@db_connection)
-    allow_any_instance_of(Switchman::ConnectionPoolProxy).to receive(:connection).and_return(@db_connection)
     allow(Delayed::Backend::ActiveRecord::Job).to receive(:connection).and_return(@dj_connection)
     allow(Delayed::Backend::ActiveRecord::Job::Failed).to receive(:connection).and_return(@dj_connection)
   end

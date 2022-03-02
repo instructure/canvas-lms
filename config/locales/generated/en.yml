@@ -1,10 +1,12 @@
 ---
 en:
   1_item_scores_5512cd03: 1- Item scores
+  1_item_scores_example_item_scores_7345479: '1- Item Scores: Example item scores:'
   1_item_scores_examplescores_9736236: '1- Item Scores: %{exampleScores}'
   25th_75th_ile_406a67bf: 25th-75th %ile
   25th_75th_percentile_aa4c11f2: 25th-75th Percentile
   2_final_score_7b0fd15e: 2- Final score
+  2_final_score_example_final_score_80199132: '2- Final Score: Example final score:'
   2_final_score_exampleresult_922edf9c: '2- Final Score: %{exampleResult}'
   558x270_png_jpg_gif_c3faa839: 558x270 png, jpg, gif
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: 558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)
@@ -246,6 +248,7 @@ en:
     tab_faculty_journal: Faculty Journal
     tab_grading_standards: Grading
     tab_jobs: Jobs
+    tab_jobs_v2: Jobs v2
     tab_outcomes: Outcomes
     tab_permissions: Permissions
     tab_plugins: Plugins
@@ -1482,11 +1485,11 @@ en:
   add_announcement_165c3b05: Add announcement
   add_another_assignment_fc5c908f: Add another assignment
   add_app_baf540f: Add App
+  add_as_a_faculty_journal_entry_55a38a30: Add as a Faculty Journal entry
   add_as_allowed_e95540be: Add as Allowed
   add_assignment_to_name_caf173b0: Add Assignment to %{name}
   add_assignments_and_quizzes_1085d2af: Add assignments and quizzes
   add_attachment_93868828: Add Attachment
-  add_attachment_dcdb8bf8: Add attachment
   add_attribute_6d6d4a65: Add Attribute
   add_bank:
     default_name: No Name
@@ -1964,9 +1967,12 @@ en:
   allows_user_to_manage_observers_associated_with_st_4b45f2be: Allows user to manage observers associated with students in the account.
   allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: Allows user to manage shared resources in the account.
   allows_user_to_manage_the_visibility_options_in_co_e781e4e4: Allows user to manage the Visibility options in Course Settings or when creating a new course.
+  allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: Allows user to manually add an app in Account Settings.
+  allows_user_to_manually_add_an_app_in_course_setti_cf39f581: Allows user to manually add an app in Course Settings.
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: Allows user to manually add and delete an app in Account Settings.
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: Allows user to manually add and delete an app in Course Settings.
   allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: Allows user to manually delete an app in Account Settings.
+  allows_user_to_manually_delete_an_app_in_course_se_f6015d14: Allows user to manually delete an app in Course Settings.
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: Allows user to moderate a quiz and view the quiz statistics page.
   allows_user_to_modify_user_account_details_e16fb115: Allows user to modify user account details.
   allows_user_to_move_group_members_to_another_group_697d8da9: Allows user to move group members to another group in an account or course.
@@ -2302,6 +2308,7 @@ en:
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.
   anonymous_assignments_must_be_manually_posted_a13d2ca5: Anonymous assignments must be manually posted
   anonymous_discussion_1e9b981: 'Anonymous Discussion | '
+  anonymous_discussion_54517e84: Anonymous Discussion
   anonymous_e1b8ad27: Anonymous
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: Anonymous grading cannot be enabled for group assignments
   anonymous_grading_ccb5045c: Anonymous Grading
@@ -3986,6 +3993,7 @@ en:
   cannot_grade_at_this_time_489744b0: Cannot grade at this time
   cannot_have_a_blueprint_course_with_students_248e3e76: Cannot have a blueprint course with students
   cannot_import_a_root_group_d4654def: cannot import a root group
+  cannot_import_to_other_courses_af885742: Cannot import to other courses
   cannot_modify_outcome_from_another_context_changes_a80561a4: 'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}'
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: Cannot move assignments due to closed grading periods
   cannot_relink_unsaved_plans_2ccef56a: Cannot relink unsaved plans
@@ -5976,6 +5984,7 @@ en:
   course_usage_report_2e9d9da9: Course Usage Report
   course_usage_report_florida_southwestern_8c7c1a6d: Course Usage Report - Florida Southwestern
   course_visibility_options_ca8ab3a8: Course Visibility Options
+  course_with_canvas_id_id_not_found_1ff06bec: Course with canvas id %{id} not found
   course_wizard_31c87552: Course Wizard
   coursecontext_label_d563be4c: "%{courseContext} %{label}"
   coursename_total_grade_5b3f3564: "%{courseName} Total: %{grade}"
@@ -6402,6 +6411,7 @@ en:
   criterion_ratings_3eed22e2: Criterion Ratings
   criterion_updated_36c0b3dc: Criterion Updated
   croatian_d713d655: Croatian
+  cropper_associated_features_in_buttons_icons_be12ae42: Cropper & Associated Features in Buttons & Icons
   cross_listing_3318526a: Cross-Listing
   crumbs:
     access_report: Access Report
@@ -6421,6 +6431,7 @@ en:
     grading_standards: Grading
     groups: Groups
     jobs: Jobs
+    jobs_v2: Jobs v2
     media: Media
     messages: Messages
     modules: Modules
@@ -6498,6 +6509,7 @@ en:
   current_grade_columbia_college_chicago_7f967748: Current Grade - Columbia College - Chicago
   current_grading_period_b85226c2: Current Grading Period
   current_grading_scheme_for_this_assignment_d525463e: Current grading scheme for this assignment
+  current_jobs_aa571ce4: Current jobs
   current_letter_grade_50f4ebb1: Current Letter Grade
   current_mastery_score_score_out_of_mastery_points_fedd343f: 'Current Mastery Score: %{score} out of %{mastery_points}'
   current_of_totalsteps_19d7ee37: "%{current} of %{totalSteps}"
@@ -6744,6 +6756,7 @@ en:
   deactivate_user_86c09036: Deactivate User
   debugging_f98fcd74: Debugging
   decaying_average_8bf6a0dd: Decaying Average
+  decaying_average_recentint_remainderint_ab0636cc: Decaying Average - %{recentInt}%/%{remainderInt}%
   decrease_indent_d9cf469d: Decrease Indent
   decrease_indent_de6343ab: Decrease indent
   deduction_interval_e18bd51: Deduction interval
@@ -6931,6 +6944,7 @@ en:
     cancel: Cancel
     save_settings: Save Settings
     saving: Saving...
+  did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: Did you know you can now create detailed filters and save them for future use?
   did_you_mean_id_241c900c: Did you mean? *%{id}*
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: Didn’t find what you are looking for? Keep trying!
   diigo_993c4646: Diigo
@@ -7489,6 +7503,9 @@ en:
       loading_rubrics: Loading rubrics...
     prompts:
       confirm_delete: Are you sure you want to delete this rubric?
+    rubric:
+      import_outcome:
+        duplicated_outcome: This Outcome has not been added as it already exists in this rubric.
     titles:
       edit_rubric_rating: Edit Rating
       find_existing_rubric: Find Existing Rubric
@@ -7587,7 +7604,6 @@ en:
   enabled_web_services_f620b2be: Enabled Web Services
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: Enables a redesigned Message Students Who... dialog that allows for messaging observers in addition to students.
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
-  enables_important_dates_to_be_applied_to_assignmen_5e697af6: Enables important dates to be applied to assignments, calendar events, and others.
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: Enables modal to warn user when a draft comment is left unposted in SpeedGrader.
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: Enables new API endpoints for the course and user data provided by New Analytics.
   enables_support_for_observers_within_canvas_for_el_c5e31b5b: Enables support for observers within Canvas for Elementary.
@@ -7618,6 +7634,7 @@ en:
   english_united_kingdom_a613f831: English (United Kingdom)
   enhance_color_contrast_of_content_685ddd49: Enhance color contrast of content
   enhanced_gradebook_filters_a3be5e7d: Enhanced Gradebook Filters
+  enhanced_gradebook_filters_description: This feature provides enhanced filtering options in the Canvas gradebook. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Gradebook Filters User Group* in the Canvas Community.
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: Enhances the color contrast of text, buttons, etc.
   enroll_in_subject_9c1f1c18: Enroll in Subject
   enrolled_a6a517cd: Enrolled
@@ -7956,6 +7973,7 @@ en:
   error_59293a2c: error
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: Error adding canvas file to submission draft
+  error_adding_files_97ba198e: Error adding files.
   error_adding_files_to_conversation_message_58e83876: Error adding files to conversation message
   error_adding_files_to_submission_draft_6acac337: Error adding files to submission draft
   error_associating_assignment_assignment_name_with__d92e9acf: Error associating assignment "%{assignment_name}" with an LTI tool.
@@ -8008,6 +8026,7 @@ en:
   error_updating_status_of_module_item_80336274: Error updating status of module item
   error_updating_submission_draft_1d40ade7: Error updating submission draft
   error_uploading_file_e2d31b56: Error uploading file.
+  error_uploading_files_db354fa9: Error uploading files.
   error_uploading_files_f709361f: Error uploading files
   error_uploading_video_audio_recording_16d9730a: Error uploading video/audio recording
   error_while_importing_csv_please_contact_support_e_57e6b3b: Error while importing CSV. Please contact support. (Error report %{number})
@@ -8100,7 +8119,6 @@ en:
   exceeds_mastery_1f995dce: Exceeds Mastery
   excelsior_student_activity_tracking_7a1ba44d: Excelsior Student Activity Tracking
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: Exclude any data that hasn't been updated since the given date
-  exclude_assignments_graded_with_a_0_score_5c853dc4: Exclude assignments graded with a 0 score.
   excuse_this_assignment_for_the_selected_student_af04e132: Excuse This Assignment for the Selected Student
   excused_3aab77: excused
   excused_5877183c: Excused!
@@ -8193,6 +8211,7 @@ en:
   failed_getting_file_to_preview_89fe2bf4: Failed getting file to preview
   failed_getting_next_batch_of_announcements_1f1165a5: Failed getting next batch of announcements.
   failed_initializing_dashboard_3d967143: Failed initializing dashboard
+  failed_jobs_b632bbf0: Failed jobs
   failed_loading_course_sections_refresh_page_to_try_f97160bf: Failed loading course sections. Refresh page to try again.
   failed_pairing_student_c9f0863b: Failed pairing student.
   failed_please_report_the_following_error_code_to_y_42248d60: 'Failed, please report the following error code to your system administrator: ErrorReport:%{error};'
@@ -8524,6 +8543,7 @@ en:
   friendly_description_57f7fdde: Friendly Description
   friendly_description_for_parent_student_display_e608ecf3: Friendly description (for parent/student display)
   friendly_name_601153fb: Friendly Name
+  friendly_panda_3a0df50e: Friendly panda
   from_date_must_be_before_to_date_79f00046: "'From' date must be before 'To' date"
   from_fdd4956d: From
   from_from_to_to_e31f6422: From %{from} to %{to}
@@ -8537,6 +8557,7 @@ en:
   full_name_is_required_8efbdc84: Full name is required
   full_student_names_and_profile_pictures_will_be_hi_ddfba94e: 'Full: student names and profile pictures will be hidden'
   future_5416ea92: Future
+  future_jobs_cf2964a1: Future jobs
   future_terms_7fba2ae6: Future Terms
   galician_7e4508b5: Galician
   game_over_104baa: GAME OVER
@@ -8571,6 +8592,7 @@ en:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: 'Give all students the same grade for *%{assignment.name}* by entering and submitting a grade value below:'
   give_all_students_the_same_percent_grade_for_assig_6a008004: 'Give all students the same *percent* grade for **%{assignment.name}** by entering and submitting a grade value below:'
+  give_this_filter_a_name_36b4b03a: Give this filter a name
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: Giving up on retrieving media sources. This issue will probably resolve itself eventually.
   global_announcements_a78912c8: Global Announcements
   global_announcements_add_edit_delete_843ca4d2: Global Announcements - add / edit / delete
@@ -8838,7 +8860,6 @@ en:
         remove_attachment: Remove Attachment
         show_all_sections: Show All Sections
         submit_same_score: Use this same grade for the resubmission
-      loading: loading...
       no_annotation: Annotations are not available for this document
       not_newest_notice: 'Note: This is not the most recent submission'
       page_header_title: SpeedGrader
@@ -9603,6 +9624,7 @@ en:
     online_url_submission: Online Url Submission
     quiz_submission: Quiz Submission
     text_entry_submission: Text Entry Submission
+  id_290feb5: ID
   id_ac7afadf: id
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: ID already in use for this account and authentication provider
   id_del_alumno_bc4bcf8a: ID del Alumno
@@ -9811,7 +9833,6 @@ en:
   importing_outcomes_e62a0375: importing outcomes
   importing_the_same_course_content_more_than_once_w_8b28b2c6: Importing the same course content more than once will overwrite any existing content in the course.
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: Improve discoverability of drag and drop in Files
-  improved_filtering_of_students_and_assignments_in__5c6a281: Improved filtering of students and assignments in Gradebook.
   improved_interface_with_ongoing_updates_7316bdef: Improved interface with ongoing updates
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: Improved New Quizzes support with Modules including creating New Quizzes from Modules
   improved_outcomes_management_4692f886: Improved Outcomes Management
@@ -9836,6 +9857,7 @@ en:
   inbox_bb245a60: Inbox
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: Include a link to a screencast/screenshot using something like *Jing*.
   include_assignment_description_36e6ed1b: Include Assignment Description
+  include_assignments_graded_with_a_0_score_fb784115: Include assignments graded with a 0 score.
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: Include Byte-Order Mark in compatible spreadsheet exports
   include_course_scores_e38e71da: Include course scores
   include_course_settings_c4c08764: Include Course Settings
@@ -9844,6 +9866,7 @@ en:
   include_deleted_items_in_report_c94e48b8: Include deleted items in report
   include_deleted_objects_3cced3b5: Include Deleted Objects;
   include_deleted_objects_4b75ef93: Include deleted objects
+  include_integration_ids_in_the_gradebook_exports_1b48bbdc: Include Integration IDs in the gradebook exports
   include_integration_ids_in_the_gradebook_exports_4b94c795: Include Integration IDs in the gradebook exports.
   include_last_activity_dates_4eb97ed5: Include Last Activity Dates;
   include_last_activity_dates_ee2d3de0: Include Last Activity Dates
@@ -9998,6 +10021,7 @@ en:
   invalid_fields_after_ratings_fields_815ff223: 'Invalid fields after ratings: %{fields}'
   invalid_fields_fields_8698284: 'Invalid fields: %{fields}'
   invalid_fields_for_a_group_invalid_f440b733: 'Invalid fields for a group: %{invalid}'
+  invalid_fields_for_an_outcome_invalid_fafdf0df: 'Invalid fields for an outcome: %{invalid}'
   invalid_file_type_881cc9b2: Invalid file type
   invalid_grade_passback_setting_a1d209d1: Invalid grade_passback_setting
   invalid_hexcode_9124519f: Invalid hexcode
@@ -10075,6 +10099,8 @@ en:
   japanese_b5721ca7: Japanese
   javascript_file_fc27c32b: JavaScript file
   jmc_grade_export_52bedbcb: JMC Grade Export
+  job_category_f8e4dfe7: Job category
+  job_flavor_51a18505: Job flavor
   jobs:
     columns:
       attempt: attempt
@@ -10136,6 +10162,8 @@ en:
     titles:
       job_handler: Job Handler
       last_error: Last Error
+  jobs_control_panel_v2_2c59429f: Jobs Control Panel v2
+  jobs_v2_b20a83f7: Jobs v2
   join_6cafecca: Join
   join_course_511e6cb3: Join %{course}
   join_group_group_name_871a5e3f: Join group %{group_name}
@@ -12797,6 +12825,8 @@ en:
   must_be_a_number_f6e09df7: must be a number
   must_be_a_valid_number_59f0069: Must be a valid number
   must_be_after_start_date_95e251a3: must be after start date
+  must_be_between_1_and_5_3b42aca1: must be between 1 and 5
+  must_be_between_1_and_99_589b827d: must be between 1 and 99
   must_be_between_availability_dates_ceaca984: must be between availability dates
   must_be_between_lower_and_upper_1f501b2a: Must be between %{lower} and %{upper}
   must_be_length_characters_or_less_8c24db67: Must be %{length} characters or less
@@ -12932,6 +12962,7 @@ en:
         pages and resources and participated in assignments—and which students may need a
         little more encouragement.
   new_analytics_tutorial_tray_2511a34a: New Analytics Tutorial Tray
+  new_and_improved_jobs_control_panel_f8571c9a: New and improved jobs control panel
   new_announcement_23af4598: New Announcement
   new_announcement_in_course_name_title_84607f44: 'New announcement in %{course_name}: %{title}'
   new_announcement_title_30ba7c1b: 'New announcement: %{title}'
@@ -13550,6 +13581,7 @@ en:
   observing_observee_d31d5fa2: 'Observing: %{observee}'
   observing_student_name_to_select_a_different_stude_e0466126: Observing %{student_name}. To select a different student, return to the dashboard.
   of_students_5d1af0d2: "# of students"
+  of_times_1018baab: "# of times"
   off_5385ef3f: 'Off'
   off_student_names_and_profile_pictures_will_be_vis_6891e2cf: 'Off: student names and profile pictures will be visible to other members of this course'
   offensive_abusive_c41dcb08: Offensive, abusive
@@ -13848,15 +13880,12 @@ en:
   page_title_ascending_b5df950c: 'Page title: Ascending'
   page_title_descending_70c1483d: 'Page title: Descending'
   page_views:
+    browsers:
+      unrecognized: Unrecognized Browser
     download_filename: Pageviews For %{user}
     table:
       headers:
-        date: Date
-        participated: Participated
-        time: Time
         url: URL
-        user_agent: User Agent
-  page_views_csv_9835a9f9: page views csv
   page_views_eb64cf53: Page Views
   page_views_only_312b7577: Page Views Only
   page_views_service_is_temporarily_unavailable_2eb4818: Page Views service is temporarily unavailable
@@ -13921,7 +13950,6 @@ en:
   paper_view_7405eeab: Paper View
   paraguay_595_ca58b83a: Paraguay (+595)
   parameter_91ed199: Parameter
-  parameter_ae338dd8: 'Parameter:'
   parameters_a13374ec: Parameters
   parent_assignment_is_not_selected_9efb4ac1: parent assignment is not selected
   parent_assignment_is_selected_6a2fbca8: parent assignment is selected
@@ -13933,6 +13961,7 @@ en:
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: 'Partial: students can choose to reveal their name and profile picture'
   partially_anonymous_483a892d: Partially Anonymous
   partially_anonymous_discussion_13ceb585: 'Partially Anonymous Discussion | '
+  partially_anonymous_discussion_e821cf85: Partially Anonymous Discussion
   partially_enabled_and_locked_9a39d38a: Partially enabled and Locked
   partially_enabled_cd506819: Partially enabled
   participantcount_less_8d258f6: "%{participantCount} less"
@@ -14068,6 +14097,7 @@ en:
   please_visit_your_modules_page_for_more_informatio_846c5e32: Please visit your *modules page* for more information.
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: Please wait as we upload and process your file.
   please_wait_e6355980: Please wait...
+  please_wait_while_we_upload_attachments_59544216: Please wait while we upload attachments.
   please_wait_while_we_upload_attachments_and_media_c7e7221c: Please wait while we upload attachments and media
   plugins:
     academic_benchmark_importer:
@@ -14628,6 +14658,7 @@ en:
   product_name: Canvas
   product_tours_1e19eb95: Product Tours
   production_settings_62902166: Production Settings
+  proficiency_calculation_57f0bdf: Proficiency Calculation
   proficiency_calculation_daa4fd57: 'Proficiency Calculation:'
   proficiency_rating_6346119f: Proficiency Rating
   proficiency_rating_deleted_77827473: Proficiency Rating deleted
@@ -16687,6 +16718,8 @@ en:
   rss_feed_cf6286b3: RSS Feed
   rtf_9165aba5: RTF
   rubric:
+    alignments:
+      duplicated_outcome: This rubric has Outcomes aligned more than once
     context_name_rubric: "%{course_name} Rubric"
     no_description: No Description
   rubric_assessment:
@@ -16740,7 +16773,9 @@ en:
   rubrics_export_report_76d30288: Rubrics Export Report
   rubrics_speedgrader_a6ebec57: Rubrics, SpeedGrader
   rubrics_tutorial_tray_be65d10d: Rubrics Tutorial Tray
+  run_at_759b47d: Run At
   running_c5a4998d: Running
+  running_jobs_9861080e: Running jobs
   running_totals_d6f45b6b: Running Totals
   russia_7_87bc99d5: Russia (+7)
   russian_1e3e197: Russian
@@ -16766,6 +16801,7 @@ en:
   save_successful_b2f64da4: Save successful.
   save_theme_36c73e6a: Save Theme
   save_theme_f706116e: Save theme
+  save_these_conditions_as_a_filter_a31bbbf8: Save these conditions as a filter
   save_this_comment_for_reuse_5eda0b70: Save this comment for reuse
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: Save yourself a lot of time by only adding the outcomes that are specific to your course content.
   saved_3cd67a7c: Saved
@@ -17862,6 +17898,7 @@ en:
   similarityscore_similarity_score_52236e85: "%{similarityScore}% similarity score"
   simple_tls_45df2648: Simple TLS
   singapore_65_b4927585: Singapore (+65)
+  singleton_46df7e3b: Singleton
   sioux_city_outcomes_report_710baf47: Sioux City Outcomes Report
   sis_2164965: SIS
   sis_agent_token_authentication_2a0b29e3: SIS Agent Token Authentication
@@ -18039,8 +18076,6 @@ en:
     crocodoc_expiring: Your Crocodoc session is expiring soon.  Please reload the window to avoid losing any work.
     dialog_button:
       aria_record: Click to record
-      aria_record_reset: Click to record
-      aria_stop: Hit "Stop" to end recording.
     edit_view_rubric: View Rubric
     group: Group
     mic_blocked_message: Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone
@@ -18072,6 +18107,9 @@ en:
         error: VeriCite Similarity Score - See submission error details
         pending: VeriCite Similarity Score - Submission pending
   speed_grader_helpers:
+    dialog_button:
+      aria_record_reset: Click to record
+      aria_stop: Hit "Stop" to end recording.
     graded: graded
     graded_then_resubmitted: graded, then resubmitted (%{when})
     not_graded: not graded
@@ -18192,6 +18230,7 @@ en:
   storage_quotas_manage_6ca14bbb: Storage Quotas - manage
   storage_used_in_mb_c75fbd9c: storage used in MB
   store_and_share_course_assets_82a9967c: Store and share course assets
+  strand_955969b1: Strand
   stream_items_api:
     assessment_request_title: Peer Review for %{title}
   strip_domain_from_login_attribute_value_bb6daa88: Strip Domain From Login Attribute Value
@@ -18228,6 +18267,7 @@ en:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: Student feedback required in comments above to reassign.
   student_first_name_aaa42cbc: Student First Name
   student_grades_4cbc59a1: Student Grades
+  student_group_75b86a9f: Student Group
   student_group_filter_185fb085: Student Group Filter
   student_groups: Student Groups
   student_groups_863201c1: Student Groups
@@ -18297,6 +18337,7 @@ en:
   students_can_see_originality_score_797fe634: Students can see originality score
   students_cannot_view_quiz_responses_after_course_c_88e929ed: Students cannot view quiz responses after course concludes
   students_have_either_already_taken_or_started_taki_a076336: Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz.
+  students_have_the_option_to_reply_anonymously_some_503cdf6c: Students have the option to reply anonymously. Some names and profile pictures may be hidden.
   students_must_complete_all_of_these_requirements_15fa97f7: Students must complete all of these requirements
   students_over_time_7ec52f7a: students over time
   students_remove_4b27390b: Students - remove
@@ -18690,6 +18731,7 @@ en:
     tab_location_error: That tab location is invalid
     tab_unmanagable_error: "%{css_class} is not manageable"
   tabs_5605547e: Tabs
+  tag_7bb005ff: Tag
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: Taiwan (+886)
   take_a_photo_via_webcam_954f2433: Take a Photo via Webcam
@@ -18701,6 +18743,7 @@ en:
   take_the_survey_ada59508: Take the Survey
   take_the_survey_again_24ce22c2: Take the Survey Again
   talladega_grade_and_last_date_of_attendance_be39b0c7: Talladega Grade and Last Date of Attendance
+  target_course_course_id_is_not_a_child_of_current__185cb2f6: Target course %{course_id} is not a child of current account (%{name})
   target_link_uri_bbed67d1: "* Target Link URI"
   target_link_uri_d166858: Target Link URI
   targetcontextid_required_if_targetcontexttype_prov_723fce49: targetContextId required if targetContextType provided
@@ -19119,6 +19162,7 @@ en:
   there_was_an_error_creating_a_new_filter_e93bb765: There was an error creating a new filter.
   there_was_an_error_deleting_name_aa3050e5: There was an error deleting "%{name}".
   there_was_an_error_fetching_course_statistics_96e9dbad: There was an error fetching course statistics
+  there_was_an_error_fetching_data_for_gradebook_174e82f9: There was an error fetching data for Gradebook
   there_was_an_error_fetching_gradebook_filters_3b4607ac: There was an error fetching gradebook filters.
   there_was_an_error_fetching_modules_8ee451bb: There was an error fetching modules.
   there_was_an_error_fetching_outcome_results_45c57590: There was an error fetching outcome results
@@ -19277,6 +19321,7 @@ en:
       submission.
   this_is_a_what_if_score_cbdc04f9: This is a What-If score
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: This is an account setting that must be enabled by a Customer Success Manager. Alerts are a seldom-used feature designed to send an alert to students, teachers or admins for specific triggers (e.g., no student-teacher interaction for 7 days). They are checked every day, and notifications will be sent to the student and/or the teacher until the triggering problem is resolved.
+  this_is_an_anonymous_discussion_student_names_and__bc19b64d: This is an anonymous Discussion. Student names and profile pictures are hidden.
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.
   this_is_not_a_valid_grade_9cc2cb8: This is not a valid grade
@@ -20084,7 +20129,6 @@ en:
   unmatched_login_list_283ca77: Unmatched login list
   unmute_assignment_29a49038: Unmute Assignment
   unnamed_account_id_e688ad87: Unnamed Account (%{id})
-  unnamed_filter_9ee5e654: Unnamed Filter
   unnamed_tool_961cb95b: Unnamed Tool
   unpin_a318452a: Unpin
   unpin_discussion_title_8c2a0942: Unpin discussion %{title}
@@ -20855,6 +20899,7 @@ en:
   weight_of_grade_19d9ce0f: "%{weight} of grade/"
   weight_of_grade_dff535d9: "%{weight} of grade"
   weighted_grading_periods_ae4edd70: Weighted grading periods
+  weighting_for_last_item_ee22ae13: "% weighting for last item"
   welcome_name_a16afa7f: Welcome, %{name}!
   welcome_to_the_canvas_theme_editor_73091d1: Welcome to the Canvas Theme Editor
   welcome_to_the_cold_dark_void_of_name_65fc9839: Welcome to the cold, dark void of %{name}.
@@ -20899,6 +20944,9 @@ en:
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: When enabled, this flag shows a student picker for observers on the dashboard.
   when_enabled_this_setting_automatically_opens_teac_f93c16f0: When enabled, this setting automatically opens teacher to-do items in a new tab.
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: When enabled, turns on "@mention" functionality in course discussions.
+  when_enabled_turns_on_the_button_icons_image_cropp_abbc3d8b: |-
+    When enabled, turns on the Button & Icons image cropper, course images
+    source, and upload image source.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.
   when_people_visit_the_course_this_is_the_page_they_de94acc2: When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed.

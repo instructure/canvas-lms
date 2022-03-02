@@ -20,7 +20,10 @@ const {compile} = require('coffee-script')
 const {transform} = require('@babel/core')
 
 exports.process = (coffee, path) => {
-  const amd = compile(coffee, {bare: true})
-  const cjs = transform(amd, {filename: path, plugins: ['transform-amd-to-commonjs']}).code
+  const esm = compile(coffee, {bare: true})
+  const cjs = transform(esm, {
+    filename: path,
+    plugins: ['@babel/plugin-transform-modules-commonjs']
+  }).code
   return cjs
 }

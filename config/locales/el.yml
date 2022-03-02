@@ -1457,6 +1457,7 @@ el:
   add_an_identity_provider_to_this_account_c2644478: "Προσθέστε έναν πάροχο αυθεντικοποίησης σε αυτόν τον λογαριασμό:"
   add_another_assignment_fc5c908f: "Προσθέστε άλλη μια εργασία"
   add_app_baf540f: "Πρόσθεση Εφαρμογής"
+  add_as_a_faculty_journal_entry_55a38a30: "Προσθήκη ως καταχώριση Ιστορικού Καθηγητή/ας"
   add_assignment_to_name_caf173b0: "Προσθήκη Εργασίας στον/στην %{name}"
   add_attachment_93868828: "Προσθήκη Επισύναψης"
   add_bank: 
@@ -7107,6 +7108,7 @@ el:
     online_url_submission: "Online Υποβολή Url"
     quiz_submission: "Υποβολή Κουίζ"
     text_entry_submission: "Υποβολή Καταχώρισης Κειμένου"
+  id_290feb5: ID
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "Το ID χρησιμοποιείται ήδη για αυτόν τον λογαριασμό και τον πάροχο ελέγχου ταυτότητας"
   idp_certificate_fingerprint_e530cdd1: "IdP ψηφιακό πιστοποιητιό αποτύπωμα"
   idp_entity_id_25c51837: "ID Εξωτερικού Παρόχου Ταυτότητας (ldP)"
@@ -10189,6 +10191,8 @@ el:
       create_failed: "Αποτυχία δημιουργίας σχολίου"
   page_not_found_2b0d05f5: "Η Σελίδα δεν βρέθηκε"
   page_views: 
+    browsers: 
+      unrecognized: "Μη Αναγνωρισμένος Φυλλομετρητής"
     download_filename: "Προβολές σελίδας για τον χρήστη %{user}"
     table: 
       headers: 
@@ -12654,6 +12658,7 @@ el:
       page_title: "Ρουμπρίκες Αξιολόγισης"
       remove_rubric: "Αφαίρεση αυτής της Ρουμπρίκας από τη λίστα μου"
   rubrics_b5ef369b: "Ρουμπρίκες Αξιολόγισης"
+  run_at_759b47d: "Έναρξη στις"
   running_totals_d6f45b6b: Σύνολα
   salesforce_account_id_eb5c78ad: "ID Λογαριασμού Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Η Salesforce έχει διαφορετικό διακομιστή σύνδεσης για λογαριασμούς Sanbox σε σχέση με αυτόν που έχει για λογαριασμούς παραγωγής, επομένως αν χρησιμοποιείτε λογαριασμό Sanbox από τη Salesforce και δεν τσεκάρετε αυτό το κουτάκι, δεν θα είναι δυνατή η επαλήθευση (και αντίστροφα, επίσης, αν έχετε λογαριασμό παραγωγής και ΤΣΕΚΑΡΕΤΕ αυτό το κουτάκι, δεν θα γίνει επαλήθευση)"
@@ -13625,6 +13630,7 @@ el:
     recording_expired_message: "<mrk mid=\"6293\" mtype=\"seg\">Η φωνητική αναγνώριση έχει λήξει λόγω αδράνειας.</mrk> <mrk mid=\"6294\" mtype=\"seg\">Κάντε κλικ στο κουμπί «Τερματισμός» για να χρησιμοποιήσετε το τρέχον κείμενο ως σχόλιο ή στην «Ακύρωση» για απόρριψη.</mrk>"
     recording_message: Ηχογράφηση...
     student: "Μαθητής "
+    student_index: "%{Index} Σπουδαστή"
     submissions_dropdown: 
       grade: "<mrk mid=\"32\" mtype=\"seg\">(βαθμός:</mrk> <mrk mid=\"33\" mtype=\"seg\">%{grade})</mrk>"
       see_all_quiz_attempts: "Δείτε όλες τις προσπάθειες για την λύση των quiz"
@@ -13637,6 +13643,9 @@ el:
     vericite: 
       resubmitting: Επανυποβολή...
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "Κάντε κλικ για ηχογράφηση"
+      aria_stop: "Πατήστε «Τερματισμός» για να τερματίσετε την ηχογράφηση."
     graded: βαθμολογήθηκε/αν
     graded_then_resubmitted: "βαθμολογήθηκε, κατόπιν επανυποβλήθηκε (%{when})"
     not_graded: "δεν έχει βαθμολογηθεί"
@@ -13706,6 +13715,7 @@ el:
   status_e051bb30: κατάσταση
   status_e7fdbe06: Κατάσταση
   step: Βήμα
+  strand_955969b1: Σκέλος
   stream_items_api: 
     assessment_request_title: "Ομότιμη Αξιολόγηση για %{title}"
   student_5da6bfd1: "Μαθητής "
@@ -14004,6 +14014,7 @@ el:
     syllabus: "Περίληψη Θεματολογίας Μαθήματος"
     tab_location_error: "Αυτή η τοποθεσία καρτέλας δεν είναι έγκυρη"
     tab_unmanagable_error: "Το %{css_class} δεν είναι διαχειρίσιμο"
+  tag_7bb005ff: Ετικέτα
   take_a_picture_d582acf1: "Λήψη Φωτογραφίας"
   take_the_quiz_87214d7e: "Κάντε το Κουίζ"
   take_the_quiz_again_8ea51a6c: "Κάντε ξανά το κουίζ"

@@ -29,7 +29,6 @@ import {IconPaperclipLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
 
 export const MessageDetailItem = ({...props}) => {
@@ -73,7 +72,7 @@ export const MessageDetailItem = ({...props}) => {
       }}
       render={responsiveProps => (
         <>
-          <Flex data-testid={responsiveProps.dataTestId}>
+          <Flex data-testid={responsiveProps.dataTestId} alignItems="start">
             <Flex.Item>
               <Avatar
                 size={responsiveProps.avatar}
@@ -83,22 +82,26 @@ export const MessageDetailItem = ({...props}) => {
               />
             </Flex.Item>
             <Flex.Item shouldShrink shouldGrow>
-              <MessageDetailParticipants
-                participantsSize={responsiveProps.usernames}
-                conversationMessage={props.conversationMessage}
-              />
-              <View as="div" margin="xx-small none xxx-small">
-                <Text color="secondary" weight="light" size={responsiveProps.courseNameDate}>
-                  {props.contextName}
-                </Text>
-              </View>
+              <Flex direction="column">
+                <Flex.Item>
+                  <MessageDetailParticipants
+                    participantsSize={responsiveProps.usernames}
+                    conversationMessage={props.conversationMessage}
+                  />
+                </Flex.Item>
+                <Flex.Item>
+                  <Text weight="normal" size={responsiveProps.courseNameDate}>
+                    {props.contextName}
+                  </Text>
+                </Flex.Item>
+                <Flex.Item>
+                  <Text weight="normal" size={responsiveProps.courseNameDate}>
+                    {createdAt}
+                  </Text>
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
             <Flex.Item textAlign="end">
-              <View as="div" margin="none none x-small">
-                <Text weight="light" size={responsiveProps.courseNameDate}>
-                  {createdAt}
-                </Text>
-              </View>
               <MessageDetailActions
                 onReply={props.onReply}
                 onReplyAll={props.onReplyAll}

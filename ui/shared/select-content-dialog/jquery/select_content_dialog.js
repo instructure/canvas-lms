@@ -525,6 +525,11 @@ $(document).ready(function () {
       }
     } else if (item_type == 'context_external_tool') {
       var item_data = SelectContentDialog.extractContextExternalToolItemData()
+      if (item_data['item[assignment_id]']) {
+        // don't keep fields populated after an assignment was created
+        // since assignment creation via deep link requires another tool launch
+        SelectContentDialog.resetExternalToolFields()
+      }
 
       $dialog.find('.alert-error').remove()
 

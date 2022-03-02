@@ -67,7 +67,11 @@ describe('Image dispatch shapes', () => {
       beforeEach(() => {
         buttonAndIconsResponse = {
           response: {
-            files: [{id: 1}, {id: 2}, {id: 3}]
+            files: [
+              {id: 1, download_url: 'https://canvas.instructure.com/files/1/download'},
+              {id: 2, download_url: 'https://canvas.instructure.com/files/2/download'},
+              {id: 3, download_url: 'https://canvas.instructure.com/files/3/download'}
+            ]
           },
           contextType,
           opts: {
@@ -80,6 +84,17 @@ describe('Image dispatch shapes', () => {
         assert.deepEqual(
           subject().payload.files.map(f => f['data-inst-buttons-and-icons']),
           [true, true, true]
+        )
+      })
+
+      it('applies the download url data attribute', () => {
+        assert.deepEqual(
+          subject().payload.files.map(f => f['data-download-url']),
+          [
+            'https://canvas.instructure.com/files/1/download',
+            'https://canvas.instructure.com/files/2/download',
+            'https://canvas.instructure.com/files/3/download'
+          ]
         )
       })
     })

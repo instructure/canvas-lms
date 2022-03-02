@@ -122,10 +122,10 @@ RSpec.describe ApplicationController do
         expect(controller.js_env[:files_domain]).to eq "files.example.com"
       end
 
-      it "auto-sets timezone and locale" do
+      it "auto-sets timezone and locales" do
         I18n.with_locale(:fr) do
           Time.use_zone("Alaska") do
-            expect(@controller.js_env[:LOCALE]).to eq "fr"
+            expect(@controller.js_env[:LOCALES]).to eq ["fr", "en"] # 'en' is always the last fallback
             expect(@controller.js_env[:BIGEASY_LOCALE]).to eq "fr_FR"
             expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq "fr"
             expect(@controller.js_env[:MOMENT_LOCALE]).to eq "fr"
@@ -2566,6 +2566,13 @@ describe CoursesController do
       expect(data["is_master_course_child_content"]).to be_truthy
       expect(data["restricted_by_master_course"]).to be_truthy
       expect(data["master_course_restrictions"]).to eq({ content: true })
+    end
+  end
+
+  describe "annotate_sentry" do
+    it "sets the db_cluster tag correctly" do
+      expect(Sentry).to receive(:set_tags).with({ db_cluster: Account.default.shard.database_server.id })
+      get "index"
     end
   end
 

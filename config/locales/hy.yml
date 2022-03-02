@@ -1479,6 +1479,7 @@ hy:
   add_an_attachment_b2e9092f: "Ավելացնել ներդիր"
   add_an_identity_provider_to_this_account_c2644478: "Այս հաշվին ավելացնել նույնականացման տեղեկություններ տրամադրողին՝IdP "
   add_app_baf540f: "Ավելացնել հավելված"
+  add_as_a_faculty_journal_entry_55a38a30: "Ավելացնել որպես դասավանդողների մատյանում գրառումներ"
   add_attachment_93868828: "Ավելացնել ներդիր"
   add_comment_3205529f: "Ավելացնել մեկնաբանություն"
   add_content_58b4305a: "Ավելացնել բովանդակությունը"
@@ -8058,6 +8059,7 @@ hy:
     online_url_submission: "URL-հասցեի առցանց ուղարկում"
     quiz_submission: "Թեստի ուղարկում"
     text_entry_submission: "Տեսքտային գրառման ուղարկում"
+  id_290feb5: Նույնականացուցիչ
   idp_certificate_fingerprint_e530cdd1: "Մատնահետքերի IdP սերտիֆիկատ"
   idp_entity_id_25c51837: "IdP միավորի նույնականացուցիչը"
   idp_loginresponse_decrypted_2f2674b4: "IdP մուտքի պատասխանը ապակոդավորված է"
@@ -11420,6 +11422,8 @@ hy:
       create_failed: "Մեկնաբանության ստեղծումը չհաջողվեց"
   page_not_found_2b0d05f5: "Էջը չի գտնվել"
   page_views: 
+    browsers: 
+      unrecognized: "Չճանաչված բրաուզեր"
     download_filename: "Էջերի դիտում %{user}-ի համար"
     table: 
       headers: 
@@ -14152,6 +14156,7 @@ hy:
         are_you_sure_remove: "Դուք իսկապե՞ս ցանկանում եք հանել այս ռուբրիկը Ձեր ցուցակից:"
       remove_rubric: "Հեռացնել այս ռուբրիկը իմ ցուցակից"
   rubrics_b5ef369b: Ռուբրիկներ
+  run_at_759b47d: "Կատարել _ում"
   running_totals_d6f45b6b: "Կատարվածների ընդհանուր թիվը"
   salesforce_account_id_eb5c78ad: "Salesforce հաշվի նույնականացուցիչը"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce-ը թեստային միջավայրի հաշիվների համար մուտքի այլ հանգույց ունի, որը տարբերվում է աշխատանքային հաշիվներից, ուստի եթե դուք օգտագործում եք Salesforce-ի թեստային հաշիվը և դրոշակով չեք նշում այդ դաշտը, ապա իսկության ստուգում հնարավոր չի լինի կատարել (և դա աշխատում է նաև հակառակ դեպքում, երբ ունեք աշխատանքային հաշիվ և ՆՇՈՒՄ եք դրոշակով այս դաշտը, ապա իսկության ստուգում չի կատարվի): "
@@ -15353,6 +15358,9 @@ hy:
     vericite: 
       resubmitting: "Կրկին ուղարկվում է..."
   speed_grader_helpers: 
+    dialog_button: 
+      aria_record_reset: "Սեղմեք գրանցելու համար"
+      aria_stop: "Սեղմեք \"Դադարեցնել\" կոճակը գրանցումն ավարտելու համար:"
     graded: գնահատվող
     graded_then_resubmitted: "գնահատված, հետո կրկին ուղարկված է (%{when})"
     not_graded: "գնահատականներ չկան"
@@ -15425,6 +15433,7 @@ hy:
   stats_9272cef3: Վիճակագրություն
   status_e7fdbe06: Կարգավիճակ
   step: Քայլ
+  strand_955969b1: կոնֆլիկտ
   stream_items_api: 
     assessment_request_title: "%{title} համար կարծիքի ներկայացում "
   student_5da6bfd1: Ունկնդիր
@@ -15746,6 +15755,7 @@ hy:
     syllabus: "Ուսումնական ծրագիր"
     tab_location_error: "Ներդիրի տեղը սխալ է նշված"
     tab_unmanagable_error: "%{css_class} կառավարման ենթակա չէ "
+  tag_7bb005ff: Պիտակ
   take_a_picture_d582acf1: "Օգտագործել պատկերը"
   take_the_quiz_87214d7e: "Կատարել թեստը"
   take_the_quiz_again_8ea51a6c: "Նորից կատարել թեստը"

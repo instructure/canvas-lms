@@ -16,36 +16,76 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useState, useEffect, Suspense} from 'react'
+import React, {useReducer, useEffect, Suspense} from 'react'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
 import {actions as svgActions} from '../../../reducers/svgSettings'
 
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Group} from '../Group'
-import {IconCropSolid} from '@instructure/ui-icons'
-import {ImageCropperModal} from '../ImageCropper'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
-import {View} from '@instructure/ui-view'
 
 import Course from './Course'
-import ModeSelect from './ModeSelect'
-import PreviewIcon from '../../../../shared/PreviewIcon'
+import {ImageOptions} from './ImageOptions'
+import {ColorInput} from '../../../../shared/ColorInput'
+import {convertFileToBase64} from '../../../svg/utils'
+
+const getColorSection = () => document.querySelector('#buttons-tray-color-section')
 
 export const ImageSection = ({settings, onChange, editing, editor}) => {
-  const [openCropModal, setOpenCropModal] = useState(false)
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const Upload = React.lazy(() => import('./Upload'))
+  const SingleColor = React.lazy(() => import('./SingleColor'))
+  const MultiColor = React.lazy(() => import('./MultiColor'))
 
+  // This object maps image selection modes to the
+  // component that handles that selection.
+  //
+  // The selected component is dynamically rendered
+  // in this component's returned JSX
   const allowedModes = {
     [modes.courseImages.type]: Course,
-    [modes.uploadImages.type]: Upload
+    [modes.uploadImages.type]: Upload,
+    [modes.singleColorImages.type]: SingleColor,
+    [modes.multiColorImages.type]: MultiColor
   }
+
+  useEffect(() => {
+    // Set Q1 crop defaults
+    // TODO: Set these properties based on cropper
+    onChange({
+      type: svgActions.SET_X,
+      payload: '50%'
+    })
+
+    onChange({
+      type: svgActions.SET_Y,
+      payload: '50%'
+    })
+
+    onChange({
+      type: svgActions.SET_WIDTH,
+      payload: 75
+    })
+
+    onChange({
+      type: svgActions.SET_HEIGHT,
+      payload: 75
+    })
+
+    onChange({
+      type: svgActions.SET_TRANSLATE_X,
+      payload: -37.5 // Width / 2
+    })
+
+    onChange({
+      type: svgActions.SET_TRANSLATE_Y,
+      payload: -37.5 // Height / 2
+    })
+  }, [])
 
   useEffect(() => {
     if (editing) {
@@ -54,7 +94,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
         payload: settings.encodedImage
       })
     }
-  }, [settings.encodedImage])
+  }, [editing, settings.encodedImage])
 
   useEffect(() => {
     if (editing) {
@@ -63,90 +103,91 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
         payload: settings.encodedImageName
       })
     }
-  }, [settings.encodedImageName])
+  }, [editing, settings.encodedImageName])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE,
       payload: state.image
     })
-  }, [state.image])
+  }, [onChange, state.image])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE_TYPE,
       payload: state.mode
     })
-  }, [state.mode])
+  }, [onChange, state.mode])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE_NAME,
       payload: state.imageName
     })
-  }, [state.imageName])
+  }, [onChange, state.imageName])
+
+  useEffect(() => {
+    if (state.icon) {
+      dispatch({...actions.START_LOADING})
+      // eslint-disable-next-line promise/catch-or-return
+      convertFileToBase64(
+        new Blob([state.icon.source(state.iconFillColor)], {
+          type: 'image/svg+xml'
+        })
+      ).then(base64Image => {
+        dispatch({...actions.SET_IMAGE, payload: base64Image})
+        dispatch({...actions.STOP_LOADING})
+      })
+    }
+  }, [state.icon, state.iconFillColor])
+
+  const modeIsAllowed = !!allowedModes[state.mode]
+  const ImageSelector = allowedModes[state.mode]
 
   return (
     <Group as="section" defaultExpanded summary={formatMessage('Image')}>
-      <Flex direction="column" margin="small">
+      <Flex
+        as="section"
+        justifyItems="space-between"
+        direction="column"
+        id="buttons-tray-text-section"
+      >
         <Flex.Item>
-          <Text weight="bold">{formatMessage('Current Image')}</Text>
-        </Flex.Item>
-        <Flex.Item>
-          <Flex>
-            <Flex.Item shouldGrow>
-              <Flex>
-                <Flex.Item margin="0 small 0 0">
-                  <PreviewIcon
-                    variant="large"
-                    testId="selected-image-preview"
-                    image={state.image}
-                    loading={state.loading}
-                  />
-                </Flex.Item>
-              </Flex>
+          <Flex direction="column">
+            <Flex.Item padding="small 0 0 small">
+              <Text weight="bold">{formatMessage('Current Image')}</Text>
             </Flex.Item>
             <Flex.Item>
-              <View maxWidth="200px" as="div">
-                <TruncateText>
-                  <Text>{state.imageName ? state.imageName : formatMessage('None Selected')}</Text>
-                </TruncateText>
-              </View>
-            </Flex.Item>
-            <Flex.Item>
-              <ModeSelect dispatch={dispatch} />
+              <ImageOptions state={state} dispatch={dispatch} />
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item>
-          <Suspense
-            fallback={
-              <Flex justifyItems="center">
-                <Flex.Item>
-                  <Spinner renderTitle={formatMessage('Loading')} />
-                </Flex.Item>
-              </Flex>
-            }
-          >
-            {!!allowedModes[state.mode] &&
-              React.createElement(allowedModes[state.mode], {dispatch, editor})}
-          </Suspense>
-        </Flex.Item>
-        <Flex.Item>
-          <Button
-            renderIcon={IconCropSolid}
-            onClick={() => {
-              setOpenCropModal(true)
-            }}
-          />
-          {openCropModal && (
-            <ImageCropperModal
-              open={openCropModal}
-              onClose={() => setOpenCropModal(false)}
-              image={state.image}
-            />
+        <Suspense
+          fallback={
+            <Flex justifyItems="center">
+              <Flex.Item>
+                <Spinner renderTitle={formatMessage('Loading')} />
+              </Flex.Item>
+            </Flex>
+          }
+        >
+          {modeIsAllowed && state.collectionOpen && (
+            <Flex.Item padding="small">
+              <ImageSelector dispatch={dispatch} editor={editor} data={state} />
+            </Flex.Item>
           )}
-        </Flex.Item>
+        </Suspense>
+        {state.icon && state.mode === modes.singleColorImages.type && (
+          <Flex.Item padding="small">
+            <ColorInput
+              color={state.iconFillColor}
+              label={formatMessage('Icon Color')}
+              name="single-color-image-fill"
+              onChange={color => dispatch({type: actions.SET_ICON_FILL_COLOR.type, payload: color})}
+              popoverMountNode={getColorSection}
+            />
+          </Flex.Item>
+        )}
       </Flex>
     </Group>
   )

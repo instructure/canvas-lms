@@ -37,15 +37,19 @@ function postMessageEvent(data, origin, source) {
   }
 }
 
+const expectMessage = async (data, wasProcessed, flagEnabled = true) => {
+  const wasCalled = await ltiMessageHandler(postMessageEvent(data), flagEnabled)
+  expect(wasCalled).toBe(wasProcessed)
+}
+
 describe('ltiMessageHander', () => {
   it('does not handle unparseable messages from window.postMessage', async () => {
-    const wasCalled = await ltiMessageHandler(postMessageEvent('abcdef'))
-    expect(wasCalled).toBeFalsy()
+    await expectMessage('abcdef', false)
   })
 
   it('handles parseable messages from window.postMessage', async () => {
     const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-    await ltiMessageHandler(postMessageEvent({subject: 'lti.screenReaderAlert', body: 'Hi'}))
+    await expectMessage({subject: 'lti.screenReaderAlert', body: 'Hi'}, true)
     expect(flashMessage).toHaveBeenCalledWith('Hi')
   })
 
@@ -65,31 +69,57 @@ describe('ltiMessageHander', () => {
 
     it('attempts to call the message handler', async () => {
       ENV.context_asset_string = 'account_1'
-      const wasCalled = await ltiMessageHandler(postMessageEvent(requestFullWindowLaunchMessage))
-      expect(wasCalled).toBeTruthy()
+      await expectMessage(requestFullWindowLaunchMessage, true)
     })
   })
 
   describe('when a non-whitelisted event is processed', () => {
     it('does not error nor attempt to call the message handler', async () => {
-      const wasCalled = await ltiMessageHandler(postMessageEvent({subject: 'notSupported'}))
-      expect(wasCalled).toBeFalsy()
+      await expectMessage({subject: 'notSupported'}, false)
     })
   })
 
   describe('when an ignored event is processed', () => {
     it('does not attempt to call the message handler', async () => {
-      const wasCalled = await ltiMessageHandler(
-        postMessageEvent({subject: 'LtiDeepLinkingResponse'})
-      )
-      expect(wasCalled).toBeFalsy()
+      await expectMessage({subject: 'LtiDeepLinkingResponse'}, false)
     })
   })
 
   describe('when source is react-dev-tools', () => {
     it('does not attempt to call the message handler', async () => {
-      const wasCalled = await ltiMessageHandler(postMessageEvent(reactDevToolsBridge))
-      expect(wasCalled).toBeFalsy()
+      await expectMessage(reactDevToolsBridge, false)
+    })
+  })
+
+  describe('when feature flag is disabled', () => {
+    const flagEnabled = false
+
+    describe('when subject contains org.imsglobal.lti', () => {
+      it('does not process message', async () => {
+        await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, false, flagEnabled)
+      })
+    })
+
+    describe('when subject is in allow list', () => {
+      it('processes message', async () => {
+        await expectMessage({subject: 'lti.fetchWindowSize'}, true, flagEnabled)
+      })
+    })
+  })
+
+  describe('when feature flag is enabled', () => {
+    const flagEnabled = true
+
+    describe('when subject contains org.imsglobal.lti', () => {
+      it('processes message', async () => {
+        await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, true, flagEnabled)
+      })
+    })
+
+    describe('when subject is in allow list', () => {
+      it('processes message', async () => {
+        await expectMessage({subject: 'lti.fetchWindowSize'}, true, flagEnabled)
+      })
     })
   })
 

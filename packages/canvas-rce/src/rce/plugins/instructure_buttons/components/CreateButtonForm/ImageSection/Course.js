@@ -42,6 +42,10 @@ const Course = ({dispatch}) => {
   // Handle loading states
   useEffect(() => {
     dispatch(dataLoading ? actions.START_LOADING : actions.STOP_LOADING)
+
+    if (dataUrl) {
+      dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
+    }
   }, [dataLoading])
 
   return (

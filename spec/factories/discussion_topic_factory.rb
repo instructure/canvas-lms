@@ -92,6 +92,30 @@ module Factories
     @topic
   end
 
+  def group_discussion_with_deleted_group
+    course = @course || course_factory(active_all: true)
+    group_category = course.group_categories.create!(name: "category")
+    @group1 = course.groups.create!(name: "group 1", group_category: group_category)
+    @group2 = course.groups.create!(name: "group 2", group_category: group_category)
+    @group3 = course.groups.create!(name: "group 3", group_category: group_category)
+
+    @topic = course.discussion_topics.build(title: "topic")
+    @topic.group_category = group_category
+
+    @assignment = course.assignments.build(submission_types: "discussion_topic", title: @topic.title)
+    @assignment.infer_times
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+
+    @topic.save!
+    @assignment.reload
+
+    @group3.destroy
+    @topic.reload
+
+    @topic
+  end
+
   def group_discussion_topic_model(opts = {})
     @context = opts[:context] || @context || course_factory(active_all: true)
     @group_category = @context.group_categories.create(name: "Project Group")

@@ -22,7 +22,6 @@ group :test do
   gem "rails-controller-testing", "1.0.5"
 
   gem "dotenv", "2.7.5", require: false
-  gem "testingbot", require: false
   gem "brakeman", require: false
   gem "simplecov", "0.21.2", require: false
     gem "docile", "1.1.5", require: false
@@ -39,7 +38,7 @@ group :test do
   gem "rspec-mocks", "3.10.2"
   gem "shoulda-matchers", "4.3.0"
 
-  gem "once-ler", "0.1.4"
+  gem "once-ler", "2.0.0"
   gem "sauce_whisk", "0.2.2"
 
   gem "selenium-webdriver", "3.142.7", require: false
@@ -58,7 +57,11 @@ group :test do
     gem "pact-support", "1.16.8", require: false
   gem "pact-messages", "0.2.0"
   gem "pact_broker-client", "1.40.0"
-  gem "database_cleaner", "~> 1.5", ">= 1.5.3"
+  if CANVAS_RAILS6_0
+    gem "database_cleaner", "~> 1.5", ">= 1.5.3"
+  else
+    gem "database_cleaner", "~> 2.0"
+  end
   gem "json-schema", "~> 2.8.1"
 
   gem "parallel_tests"

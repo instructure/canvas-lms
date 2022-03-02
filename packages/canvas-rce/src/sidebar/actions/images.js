@@ -18,7 +18,8 @@
 
 import {
   BUTTONS_AND_ICONS,
-  BTN_AND_ICON_ATTRIBUTE
+  BTN_AND_ICON_ATTRIBUTE,
+  BTN_AND_ICON_DOWNLOAD_URL_ATTR
 } from '../../rce/plugins/instructure_buttons/registerEditToolbar'
 
 export const ADD_IMAGE = 'action.images.add_image'
@@ -69,6 +70,7 @@ export const applyAttributes = (file, opts) => {
 
   if (opts.category === BUTTONS_AND_ICONS) {
     augmentedFile[BTN_AND_ICON_ATTRIBUTE] = true
+    augmentedFile[BTN_AND_ICON_DOWNLOAD_URL_ATTR] = file.download_url
   }
 
   return augmentedFile

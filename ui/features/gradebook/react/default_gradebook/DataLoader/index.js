@@ -50,7 +50,7 @@ export default class DataLoader {
   loadInitialData() {
     const gradebook = this._gradebook
 
-    this.__loadGradebookData({
+    return this.__loadGradebookData({
       dataLoader: this,
       gradebook,
       getAssignmentGroups: true,
@@ -94,7 +94,7 @@ export default class DataLoader {
     gradebook.updateStudentsLoaded(false)
     gradebook.updateSubmissionsLoaded(false)
 
-    this.__loadGradebookData({
+    return this.__loadGradebookData({
       dataLoader: this,
       gradebook,
 

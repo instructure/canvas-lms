@@ -281,6 +281,7 @@ const locale = {
   "image_8ad06": { "message": "Afbeelding" },
   "image_options_5412d02c": { "message": "Beeldopties" },
   "image_options_tray_90a46006": { "message": "Beeldoptiescel" },
+  "image_to_crop_3a34487d": { "message": "Afbeelding voor bijsnijden" },
   "images_7ce26570": { "message": "Afbeeldingen" },
   "increase_indent_6d550a4a": { "message": "Inspringen vergroten" },
   "insert_593145ef": { "message": "Invoegen" },

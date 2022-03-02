@@ -279,6 +279,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 <ProficiencyCalculation
                   update={updateProficiencyCalculation}
                   setError={setProficiencyCalculationError}
+                  masteryPoints={masteryPoints.value}
                   individualOutcome="edit"
                   canManage
                 />

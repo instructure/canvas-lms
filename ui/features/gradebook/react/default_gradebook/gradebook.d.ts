@@ -68,6 +68,7 @@ export type GradebookOptions = {
   gradebook_import_url: string
   gradebook_score_to_ungraded_progress: ProgressData
   gradebook_is_editable: boolean
+  gradebook_score_to_ungraded_progress: ProgressData
   graded_late_submissions_exist: boolean
   grading_period_set: GradingPeriodSet
   grading_standard: boolean
@@ -132,18 +133,55 @@ export type StudentMap = {
   [key: string]: Student
 }
 
-export type StudentGroup = {
-  id: string
-}
+export type StudentGroup = Partial<
+  {
+    avatar_url: null | string
+    concluded: boolean
+    context_type: string
+    course_id: string
+    created_at: string
+    description: null | string
+    group_category_id: string
+    has_submission: boolean
+    id: string
+    is_public: boolean
+    join_level: string
+    leader: null | string
+    max_membership: null | string
+    members_count: string
+    name: string
+    role: null | string
+    sis_group_id: null | string
+    sis_import_id: null | string
+    storage_quota_mb: string
+  },
+  'id' | 'name'
+>
 
 export type StudentGroupMap = {
   [key: string]: StudentGroup
 }
 
-export type StudentGroupCategory = {
-  id: string
-  groups: StudentGroup[]
-}
+export type StudentGroupCategory = Partial<
+  {
+    allows_multiple_memberships: boolean
+    auto_leader: null | string
+    context_type: string
+    course_id: string
+    created_at: string
+    group_limit: null
+    groups: StudentGroup[]
+    id: string
+    is_member: boolean
+    name: string
+    protected: boolean
+    role: null | string
+    self_signup: null | string
+    sis_group_category_id: null | string
+    sis_import_id: null | string
+  },
+  'id' | 'name' | 'groups'
+>
 
 export type StudentGroupCategoryMap = {
   [key: string]: StudentGroupCategory
@@ -269,9 +307,19 @@ export type SectionMap = {
   [key: string]: Section
 }
 
+export type FilterConditionType =
+  | 'section'
+  | 'module'
+  | 'assignment-group'
+  | 'grading-period'
+  | 'student-group'
+  | 'start-date'
+  | 'end-date'
+  | 'submissions'
+
 export type FilterCondition = {
   id: string
-  type?: string
+  type?: FilterConditionType
   value?: string
   created_at: string
 }
@@ -284,7 +332,7 @@ export type Filter = {
   created_at: string
 }
 
-export type PartialFilter = Omit<Filter, 'id'>
+export type PartialFilter = Omit<Filter, 'id'> & {id?: string}
 
 export type AppliedFilter = Omit<Filter, 'id'> & {is_applied: true}
 

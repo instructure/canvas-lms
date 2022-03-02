@@ -19,6 +19,7 @@
 import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import axios from '@canvas/axios'
+import LazyLoad from '@canvas/lazy-load'
 import {bool, func, string} from 'prop-types'
 import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
@@ -35,7 +36,7 @@ import {
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
-import React, {Component, lazy, Suspense} from 'react'
+import React, {Component} from 'react'
 import StudentViewContext from './Context'
 import SubmissionTypeButton from './SubmissionTypeButton'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -43,14 +44,15 @@ import {Text} from '@instructure/ui-text'
 import {uploadFile} from '@canvas/upload-file'
 import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import theme from '@instructure/canvas-theme'
 
-const ExternalToolSubmission = lazy(() => import('./AttemptType/ExternalToolSubmission'))
-const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
-const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
-const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
-const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
-const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
-const StudentAnnotationAttempt = lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
+const ExternalToolSubmission = React.lazy(() => import('./AttemptType/ExternalToolSubmission'))
+const FilePreview = React.lazy(() => import('./AttemptType/FilePreview'))
+const FileUpload = React.lazy(() => import('./AttemptType/FileUpload'))
+const MediaAttempt = React.lazy(() => import('./AttemptType/MediaAttempt'))
+const TextEntry = React.lazy(() => import('./AttemptType/TextEntry'))
+const UrlEntry = React.lazy(() => import('./AttemptType/UrlEntry'))
+const StudentAnnotationAttempt = React.lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
 
 const iconsByType = {
   media_recording: IconAttachMediaLine,
@@ -155,7 +157,7 @@ export default class AttemptTab extends Component {
 
   renderFileUpload = () => {
     return (
-      <Suspense fallback={<LoadingIndicator />}>
+      <LazyLoad errorCategory="Assignments 2 FileUpload on AttemptTab">
         <FileUpload
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
@@ -165,7 +167,7 @@ export default class AttemptTab extends Component {
           onCanvasFileRequested={this.onCanvasFileRequested}
           onUploadRequested={this.onUploadRequested}
         />
-      </Suspense>
+      </LazyLoad>
     )
   }
 
@@ -285,12 +287,12 @@ export default class AttemptTab extends Component {
 
   renderFileAttempt = () => {
     return isSubmitted(this.props.submission) ? (
-      <Suspense fallback={<LoadingIndicator />}>
+      <LazyLoad errorCategory="Assignments 2 FilePreview on AttemptTab">
         <FilePreview
           key={this.props.submission.attempt}
           files={this.props.submission.attachments}
         />
-      </Suspense>
+      </LazyLoad>
     ) : (
       this.renderFileUpload()
     )
@@ -301,7 +303,7 @@ export default class AttemptTab extends Component {
       (!context.allowChangesToSubmission && !context.isObserver) ||
       isSubmitted(this.props.submission)
     return (
-      <Suspense fallback={<LoadingIndicator />}>
+      <LazyLoad errorCategory="Assignments 2 TextEntry on AttemptTab">
         <TextEntry
           createSubmissionDraft={this.props.createSubmissionDraft}
           focusOnInit={this.props.focusAttemptOnInit}
@@ -310,13 +312,13 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
-      </Suspense>
+      </LazyLoad>
     )
   }
 
   renderUrlAttempt = () => {
     return (
-      <Suspense fallback={<LoadingIndicator />}>
+      <LazyLoad errorCategory="Assignments 2 UrlEntry on AttemptTab">
         <UrlEntry
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
@@ -324,13 +326,13 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
-      </Suspense>
+      </LazyLoad>
     )
   }
 
   renderMediaAttempt = () => {
     return (
-      <Suspense fallback={<LoadingIndicator />}>
+      <LazyLoad errorCategory="Assignments 2 MediaAttempt on AttemptTab">
         <MediaAttempt
           key={this.props.submission.attempt}
           assignment={this.props.assignment}
@@ -340,24 +342,24 @@ export default class AttemptTab extends Component {
           updateUploadingFiles={this.props.updateUploadingFiles}
           uploadingFiles={this.props.uploadingFiles}
         />
-      </Suspense>
+      </LazyLoad>
     )
   }
 
   renderStudentAnnotationAttempt = () => {
     return (
-      <Suspense fallback={<LoadingIndicator />}>
+      <LazyLoad errorCategory="Assignments 2 StudentAnnotationAttempt on AttemptTab">
         <StudentAnnotationAttempt
           submission={this.props.submission}
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
         />
-      </Suspense>
+      </LazyLoad>
     )
   }
 
   renderExternalToolAttempt = externalTool => (
-    <Suspense fallback={<LoadingIndicator />}>
+    <LazyLoad errorCategory="Assignments 2 ExternalToolSubmission on AttemptTab">
       <ExternalToolSubmission
         createSubmissionDraft={this.props.createSubmissionDraft}
         onFileUploadRequested={({files}) => {
@@ -373,7 +375,7 @@ export default class AttemptTab extends Component {
         submission={this.props.submission}
         tool={externalTool}
       />
-    </Suspense>
+    </LazyLoad>
   )
 
   renderByType(submissionType, context, externalTool) {
@@ -439,8 +441,16 @@ export default class AttemptTab extends Component {
                 />
               )}
 
-            {selectedType != null &&
-              this.renderByType(selectedType, context, this.props.selectedExternalTool)}
+            {selectedType != null && (
+              <div
+                style={{
+                  backgroundColor: theme.variables.colors.backgroundLight,
+                  borderTop: `2px solid ${theme.variables.colors.borderMedium}`
+                }}
+              >
+                {this.renderByType(selectedType, context, this.props.selectedExternalTool)}
+              </div>
+            )}
           </div>
         )}
       </StudentViewContext.Consumer>

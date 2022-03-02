@@ -568,6 +568,13 @@ To remove the Blueprint Course link you can pass 'dissociate' in place of the id
 <td></td>
 <td>Whether the course is a homeroom course. Requires the courses to be associated with a "Canvas for Elementary"-enabled account.</td>
 </tr>
+<tr>
+<td>friendly_name</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>Friendly name for course, will be shown only for the Elementary account</td>
+</tr>
 </table>
 
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will

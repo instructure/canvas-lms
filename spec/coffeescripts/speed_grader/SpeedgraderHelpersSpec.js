@@ -17,14 +17,15 @@
  */
 
 import fakeENV from 'helpers/fakeENV'
-import SpeedgraderHelpers, {
+import SpeedgraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
+import {
   setupIsAnonymous,
   setupAnonymousGraders,
   setupAnonymizableId,
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
   setupAnonymizableAuthorId
-} from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
+} from 'ui/features/speed_grader/jquery/speed_grader.utils'
 import $ from 'jquery'
 
 QUnit.module('SpeedGrader', hooks => {
@@ -43,23 +44,23 @@ QUnit.module('SpeedGrader', hooks => {
   })
 
   test('setupIsAnonymous is available on main object', () => {
-    strictEqual(SpeedgraderHelpers.setupIsAnonymous, setupIsAnonymous)
+    strictEqual(setupIsAnonymous, setupIsAnonymous)
   })
 
   test('setupAnonymizableId is available on main object', () => {
-    strictEqual(SpeedgraderHelpers.setupAnonymizableId, setupAnonymizableId)
+    strictEqual(setupAnonymizableId, setupAnonymizableId)
   })
 
   test('setupAnonymizableUserId is available on main object', () => {
-    strictEqual(SpeedgraderHelpers.setupAnonymizableUserId, setupAnonymizableUserId)
+    strictEqual(setupAnonymizableUserId, setupAnonymizableUserId)
   })
 
   test('setupAnonymizableStudentId is available on main object', () => {
-    strictEqual(SpeedgraderHelpers.setupAnonymizableStudentId, setupAnonymizableStudentId)
+    strictEqual(setupAnonymizableStudentId, setupAnonymizableStudentId)
   })
 
   test('setupAnonymizableAuthorId is available on main object', () => {
-    strictEqual(SpeedgraderHelpers.setupAnonymizableAuthorId, setupAnonymizableAuthorId)
+    strictEqual(setupAnonymizableAuthorId, setupAnonymizableAuthorId)
   })
 
   test('populateTurnitin sets correct URL for OriginalityReports', () => {
@@ -125,18 +126,18 @@ QUnit.module('SpeedgraderHelpers#buildIframe', {
   }
 })
 
-test('sets src to given src', function() {
+test('sets src to given src', function () {
   const expected = '<iframe id="speedgrader_iframe" src="some/url?with=query"></iframe>'
   equal(this.buildIframe('some/url?with=query'), expected)
 })
 
-test('applies options as tag attrs', function() {
+test('applies options as tag attrs', function () {
   const expected = '<iframe id="speedgrader_iframe" src="path" frameborder="0"></iframe>'
   const options = {frameborder: 0}
   equal(this.buildIframe('path', options), expected)
 })
 
-test('applies className options as class', function() {
+test('applies className options as class', function () {
   const expected = '<iframe id="speedgrader_iframe" src="path" class="test"></iframe>'
   const options = {className: 'test'}
   equal(this.buildIframe('path', options), expected)
@@ -154,11 +155,11 @@ QUnit.module('SpeedgraderHelpers#determineGradeToSubmit', {
   }
 })
 
-test('returns grade.val when use_existing_score is false', function() {
+test('returns grade.val when use_existing_score is false', function () {
   equal(this.determineGrade(false, this.student, this.grade), '25')
 })
 
-test('returns existing submission when use_existing_score is true', function() {
+test('returns existing submission when use_existing_score is true', function () {
   equal(this.determineGrade(true, this.student, this.grade), '89')
 })
 
@@ -168,15 +169,15 @@ QUnit.module('SpeedgraderHelpers#iframePreviewVersion', {
   }
 })
 
-test('returns empty string if submission is null', function() {
+test('returns empty string if submission is null', function () {
   equal(this.previewVersion(null), '')
 })
 
-test('returns empty string if submission contains no currentSelectedIndex', function() {
+test('returns empty string if submission contains no currentSelectedIndex', function () {
   equal(this.previewVersion({}), '')
 })
 
-test('returns currentSelectedIndex if version is null', function() {
+test('returns currentSelectedIndex if version is null', function () {
   const submission = {
     currentSelectedIndex: 0,
     submission_history: [{submission: {version: null}}, {submission: {version: 2}}]
@@ -184,7 +185,7 @@ test('returns currentSelectedIndex if version is null', function() {
   equal(this.previewVersion(submission), '&version=0')
 })
 
-test('returns currentSelectedIndex if version is the same', function() {
+test('returns currentSelectedIndex if version is the same', function () {
   const submission = {
     currentSelectedIndex: 0,
     submission_history: [{submission: {version: 0}}, {submission: {version: 1}}]
@@ -192,7 +193,7 @@ test('returns currentSelectedIndex if version is the same', function() {
   equal(this.previewVersion(submission), '&version=0')
 })
 
-test('returns version if its different', function() {
+test('returns version if its different', function () {
   const submission = {
     currentSelectedIndex: 0,
     submission_history: [{submission: {version: 1}}, {submission: {version: 2}}]
@@ -200,7 +201,7 @@ test('returns version if its different', function() {
   equal(this.previewVersion(submission), '&version=1')
 })
 
-test('returns correct version for a given index', function() {
+test('returns correct version for a given index', function () {
   const submission = {
     currentSelectedIndex: 1,
     submission_history: [{submission: {version: 1}}, {submission: {version: 2}}]
@@ -208,7 +209,7 @@ test('returns correct version for a given index', function() {
   equal(this.previewVersion(submission), '&version=2')
 })
 
-test("returns '' if a currentSelectedIndex is not a number", function() {
+test("returns '' if a currentSelectedIndex is not a number", function () {
   const submission = {
     currentSelectedIndex: 'one',
     submission_history: [{submission: {version: 1}}, {submission: {version: 2}}]
@@ -216,7 +217,7 @@ test("returns '' if a currentSelectedIndex is not a number", function() {
   equal(this.previewVersion(submission), '')
 })
 
-test('returns currentSelectedIndex if version is not a number', function() {
+test('returns currentSelectedIndex if version is not a number', function () {
   const submission = {
     currentSelectedIndex: 1,
     submission_history: [{submission: {version: 'one'}}, {submission: {version: 'two'}}]
@@ -238,7 +239,7 @@ QUnit.module('SpeedgraderHelpers#setRightBarDisabled', {
   }
 })
 
-test('it properly disables the elements we care about in the right bar', function() {
+test('it properly disables the elements we care about in the right bar', function () {
   this.testArea.innerHTML = this.startingHTML
   SpeedgraderHelpers.setRightBarDisabled(true)
   equal(
@@ -247,7 +248,7 @@ test('it properly disables the elements we care about in the right bar', functio
   )
 })
 
-test('it properly enables the elements we care about in the right bar', function() {
+test('it properly enables the elements we care about in the right bar', function () {
   this.testArea.innerHTML = this.startingHTML
   SpeedgraderHelpers.setRightBarDisabled(false)
   equal(this.testArea.innerHTML, this.startingHTML)
@@ -262,7 +263,7 @@ QUnit.module('SpeedgraderHelpers#classNameBasedOnStudent', {
   }
 })
 
-test('returns graded for graded', function() {
+test('returns graded for graded', function () {
   this.student.submission_state = 'graded'
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
@@ -271,7 +272,7 @@ test('returns graded for graded', function() {
   })
 })
 
-test("returns 'not graded' for not_graded", function() {
+test("returns 'not graded' for not_graded", function () {
   this.student.submission_state = 'not_graded'
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
@@ -280,7 +281,7 @@ test("returns 'not graded' for not_graded", function() {
   })
 })
 
-test('returns graded for not_gradeable', function() {
+test('returns graded for not_gradeable', function () {
   this.student.submission_state = 'not_gradeable'
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
@@ -289,7 +290,7 @@ test('returns graded for not_gradeable', function() {
   })
 })
 
-test("returns 'not submitted' for not_submitted", function() {
+test("returns 'not submitted' for not_submitted", function () {
   this.student.submission_state = 'not_submitted'
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
@@ -298,7 +299,7 @@ test("returns 'not submitted' for not_submitted", function() {
   })
 })
 
-test('returns resubmitted data for graded_then_resubmitted', function() {
+test('returns resubmitted data for graded_then_resubmitted', function () {
   this.student.submission_state = 'resubmitted'
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
@@ -314,27 +315,27 @@ QUnit.module('SpeedgraderHelpers#submissionState', {
   }
 })
 
-test('returns graded if grade matches current submission', function() {
+test('returns graded if grade matches current submission', function () {
   this.student.submission.grade_matches_current_submission = true
   this.student.submission.grade = 10
   const result = SpeedgraderHelpers.submissionState(this.student, this.grading_role)
   equal(result, 'graded')
 })
 
-test("returns resubmitted if grade doesn't match current submission", function() {
+test("returns resubmitted if grade doesn't match current submission", function () {
   this.student.submission.grade = 10
   this.student.submission.grade_matches_current_submission = false
   const result = SpeedgraderHelpers.submissionState(this.student, this.grading_role)
   equal(result, 'resubmitted')
 })
 
-test('returns not submitted if submission.workflow_state is unsubmitted', function() {
+test('returns not submitted if submission.workflow_state is unsubmitted', function () {
   this.student.submission.workflow_state = 'unsubmitted'
   const result = SpeedgraderHelpers.submissionState(this.student, this.grading_role)
   equal(result, 'not_submitted')
 })
 
-test("returns not_gradeable if provisional_grader and student doesn't need provision grade", function() {
+test("returns not_gradeable if provisional_grader and student doesn't need provision grade", function () {
   this.student.submission.workflow_state = 'submitted'
   this.student.submission.submitted_at = '2016-10-13 12:22:39'
   this.student.submission.provisional_grade_id = null
@@ -343,7 +344,7 @@ test("returns not_gradeable if provisional_grader and student doesn't need provi
   equal(result, 'not_gradeable')
 })
 
-test("returns not_gradeable if moderator and student doesn't need provision grade", function() {
+test("returns not_gradeable if moderator and student doesn't need provision grade", function () {
   this.student.submission.workflow_state = 'submitted'
   this.student.submission.submitted_at = '2016-10-13 12:22:39'
   this.student.submission.provisional_grade_id = null
@@ -352,14 +353,14 @@ test("returns not_gradeable if moderator and student doesn't need provision grad
   equal(result, 'not_gradeable')
 })
 
-test('returns not_graded if submitted but no grade', function() {
+test('returns not_graded if submitted but no grade', function () {
   this.student.submission.workflow_state = 'submitted'
   this.student.submission.submitted_at = '2016-10-13 12:22:39'
   const result = SpeedgraderHelpers.submissionState(this.student, this.grading_role)
   equal(result, 'not_graded')
 })
 
-test('returns not_graded if pending_review', function() {
+test('returns not_graded if pending_review', function () {
   this.student.submission.workflow_state = 'pending_review'
   this.student.submission.submitted_at = '2016-10-13 12:22:39'
   this.student.submission.grade = 123
@@ -367,14 +368,14 @@ test('returns not_graded if pending_review', function() {
   equal(result, 'not_graded')
 })
 
-test('returns graded if final_provisional_grade.grade exists', function() {
+test('returns graded if final_provisional_grade.grade exists', function () {
   this.student.submission.submitted_at = '2016-10-13 12:22:39'
   this.student.submission.final_provisional_grade = {grade: 123}
   const result = SpeedgraderHelpers.submissionState(this.student, this.grading_role)
   equal(result, 'graded')
 })
 
-test('returns graded if submission excused', function() {
+test('returns graded if submission excused', function () {
   this.student.submission.submitted_at = '2016-10-13 12:22:39'
   this.student.submission.excused = true
   const result = SpeedgraderHelpers.submissionState(this.student, this.grading_role)
@@ -448,7 +449,7 @@ test('Posts to the resubmit URL', () => {
   $.ajaxJSON = previousAjaxJson
 })
 
-QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
+QUnit.module('setupIsAnonymous', suiteHooks => {
   suiteHooks.afterEach(() => {
     fakeENV.teardown()
   })

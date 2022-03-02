@@ -133,6 +133,7 @@ export function insertEquation(editor, latex, canvasUrl) {
   img.setAttribute('class', 'equation_image')
   img.setAttribute('data-equation-content', latex)
   img.setAttribute('src', url)
+  img.setAttribute('data-ignore-a11y-check', '')
   return insertContent(editor, img.outerHTML)
 }
 

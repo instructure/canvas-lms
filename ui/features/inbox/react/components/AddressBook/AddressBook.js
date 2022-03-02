@@ -40,7 +40,7 @@ import {Tag} from '@instructure/ui-tag'
 import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
 import I18n from 'i18n!conversations_2'
-import React, {useEffect, useMemo, useState, useRef} from 'react'
+import React, {useEffect, useMemo, useState, useRef, useCallback} from 'react'
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'
@@ -59,7 +59,10 @@ export const AddressBook = ({
   headerText,
   width,
   open,
-  onUserFilterSelect
+  onUserFilterSelect,
+  fetchMoreMenuData,
+  hasMoreMenuData,
+  isLoadingMoreMenuData
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -76,6 +79,12 @@ export const AddressBook = ({
   const headerArray = headerText ? [{id: 'headerText', name: headerText, focusSkip: true}] : []
   const [data, setData] = useState([...backButtonArray, ...headerArray, ...menuData])
   const ariaAddressBookLabel = I18n.t('Address Book')
+  const [menuItemCurrent, setMenuItemCurrent] = useState(null)
+  const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
+
+  const onItemRefSet = useCallback(refCurrent => {
+    setMenuItemCurrent(refCurrent)
+  }, [])
 
   // Update width to match componetViewRef width
   useEffect(() => {
@@ -90,8 +99,8 @@ export const AddressBook = ({
 
   // Reset selected item when data changes
   useEffect(() => {
-    setSelectedItem(data[0])
-  }, [data])
+    if (isSubMenuSelection) setSelectedItem(data[0])
+  }, [data, isSubMenuSelection])
 
   // Limit amount of selected tags and close menu when limit reached
   useEffect(() => {
@@ -110,35 +119,70 @@ export const AddressBook = ({
     onSelectedIdsChange(selectedUsers)
   }, [onSelectedIdsChange, selectedUsers])
 
+  // Creates an oberserver on the last scroll item to fetch more data when it becomes visible
+  useEffect(() => {
+    if (menuItemCurrent && hasMoreMenuData) {
+      const observer = new IntersectionObserver(
+        ([menuItem]) => {
+          if (menuItem.isIntersecting) {
+            observer.unobserve(menuItemCurrent)
+            setIsSubMenuSelection(false)
+            setMenuItemCurrent(null)
+            fetchMoreMenuData()
+          }
+        },
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4
+        }
+      )
+
+      if (menuItemCurrent) {
+        observer.observe(menuItemCurrent)
+      }
+
+      return () => {}
+    }
+  }, [fetchMoreMenuData, hasMoreMenuData, menuItemCurrent])
+
   // Render individual menu items
-  const renderMenuItem = (user, isCourse, isBackButton, isHeader) => {
+  const renderMenuItem = (user, isCourse, isBackButton, isHeader, isLast) => {
     if (isHeader) {
       return renderHeaderItem(user.name)
     }
 
     return (
-      <AddressBookItem
-        iconAfter={isCourse ? <IconArrowOpenEndLine /> : null}
-        iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
-        key={`address-book-item-${user.id}`}
-        as="div"
-        isSelected={selectedItem?.id === user.id}
-        hasPopup={!!isCourse}
-        id={`address-book-menu-item-${user.id}`}
-        onSelect={() => {
-          selectHandler(user, isCourse, isBackButton)
-        }}
-        onHover={() => {
-          if (focusType !== MOUSE_FOCUS_TYPE) {
-            setFocusType(MOUSE_FOCUS_TYPE)
+      <View
+        elementRef={el => {
+          if (isLast) {
+            onItemRefSet(el)
           }
-          setSelectedItem(user)
         }}
-        menuRef={menuRef}
-        isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
       >
-        {user.name}
-      </AddressBookItem>
+        <AddressBookItem
+          iconAfter={isCourse ? <IconArrowOpenEndLine /> : null}
+          iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
+          key={`address-book-item-${user.id}`}
+          as="div"
+          isSelected={selectedItem?.id === user.id}
+          hasPopup={!!isCourse}
+          id={`address-book-menu-item-${user.id}`}
+          onSelect={() => {
+            selectHandler(user, isCourse, isBackButton)
+          }}
+          onHover={() => {
+            if (focusType !== MOUSE_FOCUS_TYPE) {
+              setFocusType(MOUSE_FOCUS_TYPE)
+            }
+            setSelectedItem(user)
+          }}
+          menuRef={menuRef}
+          isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
+        >
+          {user.name}
+        </AddressBookItem>
+      </View>
     )
   }
 
@@ -183,9 +227,9 @@ export const AddressBook = ({
     )
   }
 
-  // Memo which determines approipriate render methods to call
+  // Memo which determines appropriate render methods to call
   const renderedItems = useMemo(() => {
-    if (data.length === 0) {
+    if (data.length === 0 && !isLoading) {
       return renderNoResultsFound()
     }
 
@@ -194,7 +238,8 @@ export const AddressBook = ({
         user,
         user.id.includes(COURSE_TYPE),
         user.id.includes(BACK_BUTTON_TYPE),
-        user.id.includes(HEADER_TEXT_TYPE)
+        user.id.includes(HEADER_TEXT_TYPE),
+        user?.isLast
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -203,7 +248,7 @@ export const AddressBook = ({
   // Loading renderer
   const renderLoading = () => {
     return (
-      <View as="div" padding="xx-small">
+      <View as="div" padding="xx-small" data-testid="menu-loading-spinner">
         <Flex width="100%" margin="xxx-small none xxx-small xxx-small">
           <Flex.Item align="start" margin="0 small 0 0">
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
@@ -314,6 +359,7 @@ export const AddressBook = ({
         onUserFilterSelect(user?._id ? `user_${user?._id}` : undefined)
       }
     } else {
+      setIsSubMenuSelection(true)
       onSelect(user.id, isCourse, isBackButton)
     }
   }
@@ -400,17 +446,17 @@ export const AddressBook = ({
                 />
               }
             >
-              <View
-                elementRef={el => {
-                  menuRef.current = el
-                }}
-                as="div"
-                width={popoverWidth}
-                maxHeight="45vh"
-                overflowY="auto"
-              >
-                {isLoading && renderLoading()}
-                {!isLoading && (
+              {isLoading && !isLoadingMoreMenuData && renderLoading()}
+              {(!isLoading || isLoadingMoreMenuData) && (
+                <View
+                  elementRef={el => {
+                    menuRef.current = el
+                  }}
+                  as="div"
+                  width={popoverWidth}
+                  maxHeight="45vh"
+                  overflowY="auto"
+                >
                   <ul
                     role="menu"
                     aria-label={I18n.t('Address Book Menu')}
@@ -424,9 +470,10 @@ export const AddressBook = ({
                     data-testid="address-book-popover"
                   >
                     {renderedItems}
+                    {isLoadingMoreMenuData && renderLoading()}
                   </ul>
-                )}
-              </View>
+                </View>
+              )}
             </Popover>
           </Flex.Item>
           <Flex.Item>
@@ -485,7 +532,7 @@ AddressBook.propTypes = {
    */
   isLoading: PropTypes.bool,
   /**
-   * Number that liits selected item count
+   * Number that limits selected item count
    */
   limitTagCount: PropTypes.number,
   /**
@@ -503,7 +550,19 @@ AddressBook.propTypes = {
   /**
    * use State function to set user filter for conversations
    */
-  onUserFilterSelect: PropTypes.func
+  onUserFilterSelect: PropTypes.func,
+  /**
+   * Bool which determines if Menu can load more data
+   */
+  hasMoreMenuData: PropTypes.bool,
+  /**
+   * Function to call next page
+   */
+  fetchMoreMenuData: PropTypes.func,
+  /**
+   * Bool which determines if menu is fetching more data
+   */
+  isLoadingMoreMenuData: PropTypes.bool
 }
 
 export default AddressBook

@@ -181,7 +181,7 @@ require "atom"
 #           "type": "string"
 #         },
 #         "important_dates": {
-#           "description": "Boolean indicating whether this has important dates. Only present if the Important Dates feature flag is enabled",
+#           "description": "Boolean indicating whether this has important dates.",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -273,7 +273,7 @@ require "atom"
 #           "$ref": "AssignmentOverride"
 #         },
 #         "important_dates": {
-#           "description": "Boolean indicating whether this has important dates. Only present if the Important Dates feature flag is enabled",
+#           "description": "Boolean indicating whether this has important dates.",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -322,8 +322,7 @@ class CalendarEventsApiController < ApplicationController
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
   # @argument important_dates [Boolean]
   #   Defaults to false.
-  #   If true, only events with important dates set to true will be returned. This requires the Important Dates
-  #   feature flag to be turned on or it will be ignored.
+  #   If true, only events with important dates set to true will be returned.
   #
   # @returns [CalendarEvent]
   def index
@@ -367,8 +366,7 @@ class CalendarEventsApiController < ApplicationController
   #   assignments. Ignored if type is not "assignment".
   # @argument important_dates [Boolean]
   #   Defaults to false
-  #   If true, only events with important dates set to true will be returned. This requires the Important Dates
-  #   feature flag to be turned on or it will be ignored.
+  #   If true, only events with important dates set to true will be returned.
   #
   # @returns [CalendarEvent]
   def user_index
@@ -1086,7 +1084,7 @@ class CalendarEventsApiController < ApplicationController
   def get_options(codes, user = @current_user)
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
-    @important_dates = Account.site_admin.feature_enabled?(:important_dates) && value_to_boolean(params[:important_dates])
+    @important_dates = value_to_boolean(params[:important_dates])
     if !@all_events && !@undated
       validate_dates
       @start_date ||= Time.zone.now.beginning_of_day
