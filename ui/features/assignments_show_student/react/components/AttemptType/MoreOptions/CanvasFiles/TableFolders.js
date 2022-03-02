@@ -36,7 +36,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 const FolderButton = props => {
   return (
-    <Tooltip renderTip={props.tip} as="div" color="primary">
+    <Tooltip tip={props.tip} as="div" variant="inverse">
       <div
         className="file-select-item"
         id={props.elementId || `folder-${props.folderID}`}

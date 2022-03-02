@@ -377,34 +377,6 @@ describe DueDateCacher do
     let(:submission) { submission_model(assignment: @assignment, user: first_student) }
     let(:first_student) { @student }
 
-    context "sharding" do
-      specs_require_sharding
-
-      before do
-        @shard1.activate do
-          account = Account.create!
-          course_with_student(account: account, active_all: true)
-          assignment_model(course: @course)
-        end
-      end
-
-      it "does not soft-delete assigned submissions when the assignment ID is passed as a global ID" do
-        @shard2.activate do
-          expect { DueDateCacher.new(@course, [@assignment.id]).recompute }.not_to change {
-            @assignment.all_submissions.find_by(user: @student).workflow_state
-          }.from("unsubmitted")
-        end
-      end
-
-      it "does not soft-delete assigned submissions when the assignment ID is passed as a local ID" do
-        @shard1.activate do
-          expect { DueDateCacher.new(@course, [@assignment.id]).recompute }.not_to change {
-            @assignment.all_submissions.find_by(user: @student).workflow_state
-          }.from("unsubmitted")
-        end
-      end
-    end
-
     describe "updated_at" do
       it "updates the updated_at when the workflow_state of a submission changes" do
         submission.update!(workflow_state: "deleted")

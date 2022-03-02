@@ -12,7 +12,8 @@ exports[`The Points component renders the component when assessing with the expe
     elementRef={[Function]}
     justifyItems="start"
     withVisualDebug={false}
-    wrap="wrap"
+    wrap="no-wrap"
+    wrapItems={true}
   >
     <Item
       as="span"

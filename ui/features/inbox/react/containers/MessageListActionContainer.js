@@ -26,7 +26,7 @@ import {MailboxSelectionDropdown} from '../components/MailboxSelectionDropdown/M
 import {MessageActionButtons} from '../components/MessageActionButtons/MessageActionButtons'
 import PropTypes from 'prop-types'
 import {useQuery, useMutation} from 'react-apollo'
-import React, {useContext, useEffect} from 'react'
+import React, {useContext} from 'react'
 import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
 import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
@@ -197,42 +197,6 @@ const MessageListActionContainer = props => {
     variables: {userID}
   })
 
-  const moreCourses = reduceDuplicateCourses(
-    data?.legacyNode?.enrollments,
-    data?.legacyNode?.favoriteCoursesConnection?.nodes
-  )
-
-  const courseSelectorOptions = {
-    allCourses: [
-      {
-        _id: ALL_COURSES_ID,
-        contextName: I18n.t('All Courses'),
-        assetString: 'all_courses'
-      }
-    ],
-    favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
-    moreCourses,
-    concludedCourses: [],
-    groups: data?.legacyNode?.favoriteGroupsConnection?.nodes
-  }
-
-  const doesCourseFilterOptionExist = (id, courseOptions) => {
-    return !!Object.values(courseOptions)
-      .flat()
-      .find(({assetString}) => id === assetString)
-  }
-
-  useEffect(() => {
-    if (
-      !loading &&
-      !doesCourseFilterOptionExist(props.activeCourseFilter, courseSelectorOptions) &&
-      props.activeCourseFilter !== undefined
-    ) {
-      props.onCourseFilterSelect(null)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.activeCourseFilter])
-
   if (loading) {
     return <span />
   }
@@ -240,6 +204,11 @@ const MessageListActionContainer = props => {
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
   }
+
+  const moreCourses = reduceDuplicateCourses(
+    data?.legacyNode?.enrollments,
+    data?.legacyNode?.favoriteCoursesConnection?.nodes
+  )
 
   const handleArchive = () => {
     const archiveConfirmMsg = I18n.t(
@@ -376,8 +345,19 @@ const MessageListActionContainer = props => {
             >
               <CourseSelect
                 mainPage
-                options={courseSelectorOptions}
-                activeCourseFilter={props.activeCourseFilter}
+                options={{
+                  allCourses: [
+                    {
+                      _id: ALL_COURSES_ID,
+                      contextName: I18n.t('All Courses'),
+                      assetString: 'all_courses'
+                    }
+                  ],
+                  favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
+                  moreCourses,
+                  concludedCourses: [],
+                  groups: data?.legacyNode?.favoriteGroupsConnection?.nodes
+                }}
                 onCourseFilterSelect={props.onCourseFilterSelect}
               />
             </Flex.Item>
@@ -454,8 +434,7 @@ MessageListActionContainer.propTypes = {
   onConversationRemove: PropTypes.func,
   displayUnarchiveButton: PropTypes.bool,
   conversationsQueryOptions: PropTypes.object,
-  onDelete: PropTypes.func,
-  activeCourseFilter: PropTypes.string
+  onDelete: PropTypes.func
 }
 
 MessageListActionContainer.defaultProps = {

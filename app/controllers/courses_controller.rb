@@ -3034,16 +3034,11 @@ class CoursesController < ApplicationController
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
 
       # Remove enrollment dates if "Term" enrollment is specified
-      if params_for_update.key?(:restrict_enrollments_to_course_dates)
-        restrict_enrollments_to_course_dates =
-          value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates])
-        if restrict_enrollments_to_course_dates.nil?
-          unrecognized_message = t("The argument provided is expected to be of type boolean.")
-          @course.errors.add(:restrict_enrollments_to_course_dates, unrecognized_message)
-        end
-      else
-        restrict_enrollments_to_course_dates = @course.restrict_enrollments_to_course_dates
-      end
+      restrict_enrollments_to_course_dates = if params_for_update.key?(:restrict_enrollments_to_course_dates)
+                                               value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates])
+                                             else
+                                               @course.restrict_enrollments_to_course_dates
+                                             end
       if @course.enrollment_term && !restrict_enrollments_to_course_dates
         params_for_update[:start_at] = nil if @course.unpublished?
         params_for_update[:conclude_at] = nil

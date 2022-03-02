@@ -56,9 +56,9 @@ const renderAppointment = (appointment, participantList = '') => {
   })
 
   const statusText = isReserved ? (
-    <Pill color="success">{I18n.t('Reserved')}</Pill>
+    <Pill variant="success" text={I18n.t('Reserved')} />
   ) : (
-    <Pill>{I18n.t('Available')}</Pill>
+    <Pill text={I18n.t('Available')} />
   )
 
   return (

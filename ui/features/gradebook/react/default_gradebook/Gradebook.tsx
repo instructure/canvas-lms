@@ -4620,22 +4620,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     // instead, either by replacing the lines below with checks against the
     // current filters or by passing the ID of the active filter (and looking up
     // the contents of the filter on the back-end)
-
-    let moduleId = this.getFilterColumnsBySetting('contextModuleId')
-    if (moduleId === '0') {
-      moduleId = null
-    }
-
     const optionsWithFilters = {
       ...options,
       courseSectionId: this.getFilterRowsBySetting('sectionId'),
       gradingPeriodId: this.getFilterColumnsBySetting('gradingPeriodId'),
-      moduleId,
+      moduleId: this.getFilterColumnsBySetting('contextModuleId'),
       studentGroupId: this.getFilterRowsBySetting('studentGroupId')
     }
 
     if (value === 'excused') {
-      optionsWithFilters.excused = true
+      optionsWithFilters.excuse = true
     } else {
       optionsWithFilters.percent = value
     }

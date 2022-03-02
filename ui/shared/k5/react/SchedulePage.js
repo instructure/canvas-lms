@@ -39,7 +39,8 @@ const SchedulePage = ({
   userHasEnrollments,
   visible,
   singleCourse,
-  observedUserId
+  observedUserId,
+  contextCodes
 }) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
   const [hasPreloadedItems, setHasPreloadedItems] = useState(false)
@@ -66,9 +67,16 @@ const SchedulePage = ({
 
   useEffect(() => {
     if (plannerReady) {
-      reloadPlannerForObserver(observedUserId)
+      reloadPlannerForObserver(observedUserId, contextCodes)
     }
-  }, [plannerReady, observedUserId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    plannerReady,
+    observedUserId,
+    // contextCodes is included in the dependency array in its stringified form
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    JSON.stringify(contextCodes)
+  ])
 
   let content = <></>
   if (plannerInitialized && isPlannerCreated) {
@@ -108,7 +116,8 @@ SchedulePage.propTypes = {
   userHasEnrollments: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   singleCourse: PropTypes.bool.isRequired,
-  observedUserId: PropTypes.string
+  observedUserId: PropTypes.string,
+  contextCodes: PropTypes.arrayOf(PropTypes.string)
 }
 
 export default SchedulePage

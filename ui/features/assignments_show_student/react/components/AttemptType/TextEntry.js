@@ -50,7 +50,7 @@ export default class TextEntry extends React.Component {
 
   handleMessage = e => {
     const editor = this._rceRef.current
-    if (editor == null || e.data.subject !== 'A2ExternalContentReady') {
+    if (editor == null || e.data.messageType !== 'A2ExternalContentReady') {
       return
     }
 

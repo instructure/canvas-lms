@@ -43,7 +43,7 @@ export default function ConfirmActionButtonBar({
   const primaryButton = !primaryLabel ? null : (
     <Button
       margin="0 0 0 x-small"
-      color="primary"
+      variant="primary"
       onClick={onPrimaryClick}
       disabled={primaryDisabled}
     >

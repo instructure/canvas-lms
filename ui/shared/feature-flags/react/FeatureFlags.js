@@ -99,7 +99,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
                 display="inline-block"
                 type="search"
                 onChange={(_e, val) => handleQueryChange(val)}
-                renderBeforeInput={<IconSearchLine display="block" />}
+                renderBeforeInput={<IconSearchLine inline={false} />}
               />
             </Flex.Item>
           </View>

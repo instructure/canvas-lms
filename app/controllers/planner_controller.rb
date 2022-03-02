@@ -350,9 +350,6 @@ class PlannerController < ApplicationController
       # needed for all_ungraded_todo_items, but otherwise we don't need to load the actual
       # objects
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
-
-      # so we get user notes too if a superobserver
-      @user_ids = [params[:observed_user_id]] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
     # make IDs relative to the user's shard

@@ -117,14 +117,14 @@ export default class SubmissionCommentListItem extends React.Component {
 
             <div>
               <div style={{margin: '0 0 0 0.375rem'}}>
-                <Link
+                <Button
                   href={this.props.authorUrl}
-                  isWithinText={false}
+                  variant="link"
                   theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   margin="none none xxx-small"
                 >
                   {TextHelper.truncateText(this.props.author, {max: 22})}
-                </Link>
+                </Button>
               </div>
 
               <div style={{margin: '0 0 0 0.375rem'}}>
@@ -141,7 +141,7 @@ export default class SubmissionCommentListItem extends React.Component {
                 size="small"
                 variant="icon"
                 onClick={this.handleEditComment}
-                elementRef={this.bindEditButton}
+                buttonRef={this.bindEditButton}
               >
                 <IconEditLine
                   title={I18n.t('Edit Comment: %{comment}', {comment: this.props.comment})}

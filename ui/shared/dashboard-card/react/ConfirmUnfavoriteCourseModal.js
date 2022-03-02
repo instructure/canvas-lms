@@ -54,7 +54,7 @@ export function showNoFavoritesAlert() {
   ReactDOM.render(
     <Alert
       variant="info"
-      renderCloseButtonLabel="Close"
+      closeButtonLabel="Close"
       label={I18n.t('No courses favorited')}
       margin="small"
     >
@@ -115,12 +115,9 @@ export default class ConfirmUnfavoriteCourseModal extends React.Component {
         size="small"
       >
         <Modal.Header>
-          <CloseButton
-            placement="end"
-            offset="medium"
-            onClick={this.hide}
-            screenReaderLabel="\n            Close\n          "
-          />
+          <CloseButton placement="end" offset="medium" variant="icon" onClick={this.hide}>
+            Close
+          </CloseButton>
           <Heading>
             {I18n.t(`Unfavorite %{courseName}`, {courseName: this.props.courseName})}
           </Heading>
@@ -138,7 +135,7 @@ export default class ConfirmUnfavoriteCourseModal extends React.Component {
             {I18n.t('Close')}
           </Button>
           <Button
-            color="primary"
+            variant="primary"
             id="confirm_unfavorite_course"
             onClick={this.handleSubmitUnfavorite}
           >

@@ -109,7 +109,7 @@ export default class NonCanvasType extends React.Component {
             )}
             {this.props.readOnly ? null : (
               <Flex.Item margin="0 0 0 small" grow textAlign="end">
-                <Button renderIcon={IconTrashLine} onClick={this.onDelete}>
+                <Button icon={IconTrashLine} onClick={this.onDelete}>
                   <ScreenReaderContent>{I18n.t('Delete this submission type')}</ScreenReaderContent>
                 </Button>
               </Flex.Item>

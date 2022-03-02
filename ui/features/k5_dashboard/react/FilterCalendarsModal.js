@@ -110,8 +110,9 @@ const FilterCalendarsModal = ({
             placement="end"
             offset="medium"
             onClick={closeModal}
-            screenReaderLabel={I18n.t('Close')}
-          />
+          >
+            {I18n.t('Close')}
+          </CloseButton>
           <Heading>{modalLabel}</Heading>
         </View>
         <View as="div" margin="x-small 0 0">

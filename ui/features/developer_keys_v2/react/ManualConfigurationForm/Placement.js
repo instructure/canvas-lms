@@ -93,19 +93,9 @@ export default class Placement extends React.Component {
     return true
   }
 
-  setOrDeletePlacementField = (key, value) => {
-    this.setState(state => {
-      const newPlacement = {...state.placement, [key]: value}
-      if (value === '' || value === undefined) {
-        delete newPlacement[key]
-      }
-      return {placement: newPlacement}
-    })
-  }
-
   handleTargetLinkUriChange = e => {
     const value = e.target.value
-    this.setOrDeletePlacementField('target_link_uri', value)
+    this.setState(state => ({placement: {...state.placement, target_link_uri: value}}))
   }
 
   handleMessageTypeChange = (_, value) =>
@@ -113,7 +103,7 @@ export default class Placement extends React.Component {
 
   handleIconUrlChange = e => {
     const value = e.target.value
-    this.setOrDeletePlacementField('icon_url', value)
+    this.setState(state => ({placement: {...state.placement, icon_url: value}}))
   }
 
   handleTextChange = e => {
@@ -124,13 +114,17 @@ export default class Placement extends React.Component {
   handleSelectionHeightChange = e => {
     const value = e.target.value
     const numVal = parseInt(value, 10)
-    this.setOrDeletePlacementField('selection_height', !Number.isNaN(numVal) ? numVal : '')
+    this.setState(state => ({
+      placement: {...state.placement, selection_height: !Number.isNaN(numVal) ? numVal : ''}
+    }))
   }
 
   handleSelectionWidthChange = e => {
     const value = e.target.value
     const numVal = parseInt(value, 10)
-    this.setOrDeletePlacementField('selection_width', !Number.isNaN(numVal) ? numVal : '')
+    this.setState(state => ({
+      placement: {...state.placement, selection_width: !Number.isNaN(numVal) ? numVal : ''}
+    }))
   }
 
   render() {
@@ -158,7 +152,7 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_target_link_uri`}
                   value={placement.target_link_uri}
-                  renderLabel={I18n.t('Target Link URI')}
+                  label={I18n.t('Target Link URI')}
                   onChange={this.handleTargetLinkUriChange}
                 />
                 <RadioInputGroup
@@ -180,13 +174,13 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_icon_url`}
                   value={placement.icon_url}
-                  renderLabel={I18n.t('Icon Url')}
+                  label={I18n.t('Icon Url')}
                   onChange={this.handleIconUrlChange}
                 />
                 <TextInput
                   name={`${placementName}_text`}
                   value={placement.text}
-                  renderLabel={I18n.t('Text')}
+                  label={I18n.t('Text')}
                   onChange={this.handleTextChange}
                 />
               </FormFieldGroup>
@@ -197,13 +191,13 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_selection_height`}
                   value={placement.selection_height && placement.selection_height.toString()}
-                  renderLabel={I18n.t('Selection Height')}
+                  label={I18n.t('Selection Height')}
                   onChange={this.handleSelectionHeightChange}
                 />
                 <TextInput
                   name={`${placementName}_selection_width`}
                   value={placement.selection_width && placement.selection_width.toString()}
-                  renderLabel={I18n.t('Selection Width')}
+                  label={I18n.t('Selection Width')}
                   onChange={this.handleSelectionWidthChange}
                 />
               </FormFieldGroup>

@@ -49,13 +49,13 @@ export default function TeacherFooter(props) {
 
   return (
     <div className="assignments-teacher-footer" style={style} data-testid="TeacherFooter">
-      <Button color="primary-inverse" margin="0 x-small 0 0" onClick={props.onCancel}>
+      <Button variant="light" margin="0 x-small 0 0" onClick={props.onCancel}>
         {I18n.t('Cancel')}
       </Button>
-      <Button color="primary" margin="0 x-small 0 0" onClick={props.onSave}>
+      <Button variant="primary" margin="0 x-small 0 0" onClick={props.onSave}>
         {I18n.t('Save')}
       </Button>
-      <Button color="primary" margin="0 x-small 0 0" onClick={props.onPublish}>
+      <Button variant="primary" margin="0 x-small 0 0" onClick={props.onPublish}>
         {I18n.t('Publish')}
       </Button>
     </div>

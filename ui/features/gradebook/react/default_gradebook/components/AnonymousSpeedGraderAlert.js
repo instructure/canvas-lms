@@ -85,7 +85,7 @@ class AnonymousSpeedGraderAlert extends React.Component {
                   margin="auto auto auto small"
                   ref={this.bindOpenButton}
                   href={this.props.speedGraderUrl}
-                  color="primary"
+                  variant="primary"
                 >
                   {I18n.t('Open SpeedGrader')}
                 </Button>

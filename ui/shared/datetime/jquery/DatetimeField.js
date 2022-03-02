@@ -52,9 +52,7 @@ function formatter(zone, formatOptions = DATETIME_FORMAT_OPTIONS) {
   return new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, options)
 }
 
-let datepickerDefaults
-
-const computeDatepickerDefaults = () => ({
+const datepickerDefaults = {
   constrainInput: false,
   dateFormat: datePickerFormat(I18n.lookup('date.formats.medium')),
   showOn: 'button',
@@ -81,7 +79,7 @@ const computeDatepickerDefaults = () => ({
   get showMonthAfterYear() {
     return I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y'
   } // "month year" or "year month"
-})
+}
 
 // adds datepicker and suggest functionality to the specified $field
 export default class DatetimeField {
@@ -155,7 +153,7 @@ export default class DatetimeField {
     if (!this.isReadonly()) {
       const datepickerOptions = $.extend(
         {},
-        this.getDatepickerDefaults(),
+        this.datepickerDefaults(),
         {
           timePicker: this.allowTime,
           beforeShow: () => this.$field.trigger('detachTooltip'),
@@ -398,11 +396,7 @@ export default class DatetimeField {
     return !!this.$field.attr('readonly')
   }
 
-  getDatepickerDefaults() {
-    if (!datepickerDefaults) {
-      datepickerDefaults = computeDatepickerDefaults()
-    }
-
+  datepickerDefaults() {
     return datepickerDefaults
   }
 

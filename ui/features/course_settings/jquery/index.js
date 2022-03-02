@@ -167,32 +167,38 @@ $(document).ready(function () {
     $enrollment_dialog = $('#enrollment_dialog'),
     $tabBar = $('#course_details_tabs')
 
-  const settingsTabs = $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]')
-  // find the index of the tab whose href matches the URL's hash
-  const initialTab = Array.from(settingsTabs || []).findIndex(
-    t => `#${t.id}` === `${window.location.hash}-link`
-  )
-  // Sync the location hash with window.history, this fixes some issues with the browser back
-  // button when going back to or from the details tab
-  if (!window.location.hash) {
-    const defaultTab = settingsTabs[0]?.href
-    window.history.replaceState(null, null, defaultTab)
-  }
-  $tabBar
-    .on('tabsactivate', (event, ui) => {
-      try {
-        const hash = new URL(ui.newTab.context.href).hash
-        if (window.location.hash !== hash) {
-          window.history.pushState(null, null, hash)
+  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
+    const settingsTabs = $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]')
+    // find the index of the tab whose href matches the URL's hash
+    const initialTab = Array.from(settingsTabs || []).findIndex(
+      t => `#${t.id}` === `${window.location.hash}-link`
+    )
+    // Sync the location hash with window.history, this fixes some issues with the browser back
+    // button when going back to or from the details tab
+    if (!window.location.hash) {
+      const defaultTab = settingsTabs[0]?.href
+      window.history.replaceState(null, null, defaultTab)
+    }
+    $tabBar
+      .on('tabsactivate', (event, ui) => {
+        try {
+          const hash = new URL(ui.newTab.context.href).hash
+          if (window.location.hash !== hash) {
+            window.history.pushState(null, null, hash)
+          }
+          ui.newTab.focus(0)
+        } catch (_ignore) {
+          // if the URL can't be parsed, so be it.
         }
-        ui.newTab.focus(0)
-      } catch (_ignore) {
-        // if the URL can't be parsed, so be it.
-      }
-    })
-    .tabs({active: initialTab >= 0 ? initialTab : null})
-    .show()
-
+      })
+      .tabs({active: initialTab >= 0 ? initialTab : null})
+      .show()
+  } else {
+    // as of jqueryui 1.9, the cookie trumps the fragment :(. so we hack
+    // around that here
+    const initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash)
+    $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show()
+  }
   $add_section_form.formSubmit({
     required: ['course_section[name]'],
     beforeSubmit(data) {
@@ -621,10 +627,12 @@ $(document).ready(function () {
     })
     .trigger('change')
 
-  window.addEventListener('popstate', () => {
-    const openTab = window.location.hash
-    if (openTab) {
-      document.querySelector(`[href="${openTab}"]`)?.click()
-    }
-  })
+  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
+    window.addEventListener('popstate', () => {
+      const openTab = window.location.hash
+      if (openTab) {
+        document.querySelector(`[href="${openTab}"]`)?.click()
+      }
+    })
+  }
 })

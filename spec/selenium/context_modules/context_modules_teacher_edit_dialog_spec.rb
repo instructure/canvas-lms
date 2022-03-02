@@ -347,31 +347,5 @@ describe "context modules" do
       due_date_assertion
       points_possible_assertion(tag)
     end
-
-    it "groups quizzes and new quizzes together in dropdown" do
-      module_setup
-      @course.context_external_tools.create!(
-        tool_id: ContextExternalTool::QUIZ_LTI,
-        name: "New Quizzes",
-        consumer_key: "1",
-        shared_secret: "1",
-        domain: "quizzes.example.com"
-      )
-      new_quiz_assignment = @course.assignments.create!(title: "new quizzes assignment")
-      new_quiz_assignment.quiz_lti!
-      new_quiz_assignment.save!
-      @module.add_item(type: "assignment", id: new_quiz_assignment.id)
-
-      get "/courses/#{@course.id}/modules"
-      f(".ig-header-admin .al-trigger").click
-      wait_for_ajaximations
-      f(".edit_module_link").click
-      wait_for_ajaximations
-      f(".add_completion_criterion_link").click
-      fj(".assignment_picker:visible").click
-      quizzes_group = fj(".assignment_picker:visible optgroup[label='Quizzes']")
-      expect(quizzes_group).to include_text("quiz assignment")
-      expect(quizzes_group).to include_text("new quizzes assignment")
-    end
   end
 end

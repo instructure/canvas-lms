@@ -42,6 +42,7 @@ describe "observer k5 dashboard" do
   include ObserverEnrollmentsHelper
 
   before :once do
+    Account.site_admin.enable_feature!(:k5_parent_support)
     student_setup
     observer_setup
   end

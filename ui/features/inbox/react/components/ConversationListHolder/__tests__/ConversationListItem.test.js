@@ -20,7 +20,6 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {ConversationListItem} from '../ConversationListItem'
 import {responsiveQuerySizes} from '../../../../util/utils'
-import {SubmissionComment} from '../../../../graphql/SubmissionComment'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -208,68 +207,6 @@ describe('ConversationListItem', () => {
         const listItem = await container.findByTestId('list-item-desktop')
         expect(listItem).toBeTruthy()
       })
-    })
-  })
-
-  describe('submission comments', () => {
-    it('renders subject', () => {
-      const props = createProps({
-        conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
-      })
-      const {getByText} = render(<ConversationListItem {...props} />)
-
-      expect(getByText('XavierSchool - This is an Assignment')).toBeTruthy()
-    })
-
-    it('renders create date', () => {
-      const props = createProps({
-        conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
-      })
-      const {getByText} = render(<ConversationListItem {...props} />)
-
-      expect(getByText('Tue Feb 15 2022')).toBeTruthy()
-    })
-
-    it('renders author', () => {
-      const props = createProps({
-        conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
-      })
-      const {getByText} = render(<ConversationListItem {...props} />)
-
-      expect(getByText('Hank Mccoy')).toBeTruthy()
-    })
-
-    it('renders comment', () => {
-      const props = createProps({
-        conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
-      })
-      const {getByText} = render(<ConversationListItem {...props} />)
-
-      expect(getByText('Hey!')).toBeTruthy()
     })
   })
 })

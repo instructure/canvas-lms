@@ -90,7 +90,7 @@ export default class TextGradeInput extends PureComponent {
         inputRef={ref => {
           this.textInput = ref
         }}
-        renderLabel={this.props.label}
+        label={this.props.label}
         messages={this.props.messages}
         onChange={this.handleTextChange}
         size="small"

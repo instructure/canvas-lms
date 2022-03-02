@@ -91,7 +91,7 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
           disabled={selectedUsers.length === 0 || postStatus === 'info'}
-          color="primary"
+          variant="primary"
           margin="0 0 0 x-small"
           onClick={handleSend}
         >

@@ -1452,20 +1452,6 @@ describe CoursesController, type: :request do
           expect(@course.end_at).to be_nil
         end
 
-        it "does not accept unrecognized args for restrict_enrollments_to_course_dates param" do
-          allow_any_instance_of(Api).to receive(:value_to_boolean).and_return(nil)
-          json = api_call(
-            :put,
-            @path,
-            @params,
-            { "course" => { "restrict_enrollments_to_course_dates" => true } },
-            {},
-            { expected_status: 400 }
-          )
-          expect(json["errors"]["restrict_enrollments_to_course_dates"].first["message"])
-            .to eq "The argument provided is expected to be of type boolean."
-        end
-
         it "allows updating only the offer parameter" do
           @course.workflow_state = "claimed"
           @course.save!

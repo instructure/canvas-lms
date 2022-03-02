@@ -144,7 +144,7 @@ export default class ConfirmDeleteModal extends Component {
               this.confirmBtn = c
             }}
             onClick={this.onConfirm}
-            color="danger"
+            variant="danger"
           >
             {I18n.t('Delete')}
           </Button>

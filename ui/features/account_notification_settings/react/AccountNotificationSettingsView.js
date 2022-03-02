@@ -24,27 +24,36 @@ import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery
 import CourseNotificationSettingsQuery from '@canvas/notification-preferences-course/react/CourseNotificationSettingsQuery'
 import React from 'react'
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {string} from 'prop-types'
+import {bool, string} from 'prop-types'
 
-export default function AccountNotificationSettingsView({accountId, userId}) {
+export default function AccountNotificationSettingsView({
+  courseSelectorEnabled,
+  accountId,
+  userId
+}) {
   return (
     <AlertManager>
-      <NotificationPreferencesContextProvider>
-        <NotificationPreferencesContext.Consumer>
-          {({currentContext}) =>
-            currentContext === 'account' ? (
-              <AccountNotificationSettingsQuery accountId={accountId} userId={userId} />
-            ) : (
-              <CourseNotificationSettingsQuery courseId={currentContext} userId={userId} />
-            )
-          }
-        </NotificationPreferencesContext.Consumer>
-      </NotificationPreferencesContextProvider>
+      {courseSelectorEnabled ? (
+        <NotificationPreferencesContextProvider>
+          <NotificationPreferencesContext.Consumer>
+            {({currentContext}) =>
+              currentContext === 'account' ? (
+                <AccountNotificationSettingsQuery accountId={accountId} userId={userId} />
+              ) : (
+                <CourseNotificationSettingsQuery courseId={currentContext} userId={userId} />
+              )
+            }
+          </NotificationPreferencesContext.Consumer>
+        </NotificationPreferencesContextProvider>
+      ) : (
+        <AccountNotificationSettingsQuery accountId={accountId} userId={userId} />
+      )}
     </AlertManager>
   )
 }
 
 AccountNotificationSettingsView.propTypes = {
+  courseSelectorEnabled: bool,
   accountId: string.isRequired,
   userId: string.isRequired
 }

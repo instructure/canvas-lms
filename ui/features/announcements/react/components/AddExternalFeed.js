@@ -137,7 +137,7 @@ export default class AddExternalFeed extends React.Component {
       <View margin="small" display="block">
         <TextInput
           name={name}
-          renderLabel={<ScreenReaderContent>{text}</ScreenReaderContent>}
+          label={<ScreenReaderContent>{text}</ScreenReaderContent>}
           placeholder={text}
           onChange={onTextChange}
           value={value}
@@ -194,7 +194,7 @@ export default class AddExternalFeed extends React.Component {
           id="external-rss-feed__submit-button"
           disabled={!this.isDoneSelecting()}
           type="submit"
-          color="primary"
+          variant="primary"
           onClick={this.addRssSelection}
           margin="0 x-small 0 0"
         >

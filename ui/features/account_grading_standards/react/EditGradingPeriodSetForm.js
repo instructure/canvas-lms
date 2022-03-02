@@ -29,7 +29,7 @@ import '@canvas/rails-flash-notifications'
 
 const {array, bool, func, shape, string} = PropTypes
 
-const buildSet = function (attr = {}) {
+const buildSet = function(attr = {}) {
   return {
     id: attr.id,
     title: attr.title || '',
@@ -39,7 +39,7 @@ const buildSet = function (attr = {}) {
   }
 }
 
-const validateSet = function (set) {
+const validateSet = function(set) {
   if (!(set.title || '').trim()) {
     return [I18n.t('All grading period sets must have a title')]
   }
@@ -130,7 +130,7 @@ class GradingPeriodSetForm extends React.Component {
       </Button>
       &nbsp;
       <Button
-        color="primary"
+        variant="primary"
         disabled={this.props.disabled}
         aria-label={I18n.t('Save Grading Period Set')}
         onClick={this.triggerSave}

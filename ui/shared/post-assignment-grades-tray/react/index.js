@@ -198,7 +198,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 small 0">
             <Flex.Item>
-              <CloseButton onClick={this.dismiss} screenReaderLabel={I18n.t('Close')} />
+              <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
             </Flex.Item>
 
             <Flex.Item margin="0 0 0 small" shrink>

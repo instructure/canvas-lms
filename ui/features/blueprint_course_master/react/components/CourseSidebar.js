@@ -324,7 +324,7 @@ export default class CourseSidebar extends Component {
 
     if (isSyncing) {
       return (
-        <Tooltip color="primary" renderTip={I18n.t('Not available during sync')} placement="bottom">
+        <Tooltip variant="inverse" tip={I18n.t('Not available during sync')} placement="bottom">
           {button}
         </Tooltip>
       )

@@ -73,7 +73,7 @@ export default function ModeratedGradingCheckbox(props) {
 
   if (isDisabled) {
     return (
-      <Tooltip on={['hover']} renderTip={tooltipMessage()} color="primary">
+      <Tooltip on={['hover']} tip={tooltipMessage()} variant="inverse">
         {body}
       </Tooltip>
     )

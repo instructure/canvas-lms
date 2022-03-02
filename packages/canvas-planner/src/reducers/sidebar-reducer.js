@@ -28,8 +28,7 @@ const items = handleActions(
       sortItems(newState)
       return newState
     },
-    DELETED_PLANNER_ITEM: deleteItem,
-    CLEAR_SIDEBAR: () => []
+    DELETED_PLANNER_ITEM: deleteItem
   },
   []
 )
@@ -46,8 +45,7 @@ function deleteItem(state, action) {
 
 const nextUrl = handleActions(
   {
-    SIDEBAR_ITEMS_LOADED: (state, action) => action.payload.nextUrl,
-    CLEAR_SIDEBAR: () => null
+    SIDEBAR_ITEMS_LOADED: (state, action) => action.payload.nextUrl
   },
   null
 )
@@ -57,16 +55,14 @@ const loading = handleActions(
     SIDEBAR_ITEMS_LOADING: () => true,
     SIDEBAR_ITEMS_LOADED: () => false,
     SIDEBAR_ENOUGH_ITEMS_LOADED: () => false,
-    SIDEBAR_ITEMS_LOADING_FAILED: () => false,
-    CLEAR_SIDEBAR: () => false
+    SIDEBAR_ITEMS_LOADING_FAILED: () => false
   },
   false
 )
 
 const loaded = handleActions(
   {
-    SIDEBAR_ENOUGH_ITEMS_LOADED: () => true,
-    CLEAR_SIDEBAR: () => false
+    SIDEBAR_ENOUGH_ITEMS_LOADED: () => true
   },
   false
 )
@@ -76,8 +72,7 @@ const range = handleActions(
     SIDEBAR_ITEMS_LOADING: (state, action) => {
       if (action.payload) return {...state, ...action.payload}
       else return state
-    },
-    CLEAR_SIDEBAR: () => ({})
+    }
   },
   {}
 )

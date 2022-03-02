@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -98,14 +98,14 @@ export default class NewKeyForm extends React.Component {
                 }
               >
                 <TextInput
-                  renderLabel={I18n.t('Key Name:')}
+                  label={I18n.t('Key Name:')}
                   name="developer_key[name]"
                   value={developerKey.name}
                   onChange={e => updateDeveloperKey('name', e.target.value)}
                   placeholder="Unnamed Tool"
                 />
                 <TextInput
-                  renderLabel={I18n.t('Owner Email:')}
+                  label={I18n.t('Owner Email:')}
                   name="developer_key[email]"
                   value={developerKey.email}
                   onChange={e => updateDeveloperKey('email', e.target.value)}
@@ -123,19 +123,19 @@ export default class NewKeyForm extends React.Component {
                 {!isLtiKey && (
                   <div>
                     <TextInput
-                      renderLabel={I18n.t('Redirect URI (Legacy):')}
+                      label={I18n.t('Redirect URI (Legacy):')}
                       name="developer_key[redirect_uri]"
                       value={developerKey.redirect_uri}
                       onChange={e => updateDeveloperKey('redirect_uri', e.target.value)}
                     />
                     <TextInput
-                      renderLabel={I18n.t('Vendor Code (LTI 2):')}
+                      label={I18n.t('Vendor Code (LTI 2):')}
                       name="developer_key[vendor_code]"
                       value={developerKey.vendor_code}
                       onChange={e => updateDeveloperKey('vendor_code', e.target.value)}
                     />
                     <TextInput
-                      renderLabel={I18n.t('Icon URL:')}
+                      label={I18n.t('Icon URL:')}
                       name="developer_key[icon_url]"
                       value={developerKey.icon_url}
                       onChange={e => updateDeveloperKey('icon_url', e.target.value)}
@@ -163,16 +163,13 @@ export default class NewKeyForm extends React.Component {
                       <div>
                         <span>{I18n.t('Client Credentials Audience')}</span>
                         <Tooltip
-                          renderTip={clientCredentialsAudienceTooltip}
+                          tip={clientCredentialsAudienceTooltip}
                           on={['click', 'focus']}
-                          color="primary"
+                          variant="inverse"
                         >
-                          <IconButton
-                            renderIcon={IconInfoLine}
-                            withBackground={false}
-                            withBorder={false}
-                            screenReaderLabel={I18n.t('toggle tooltip')}
-                          />
+                          <Button variant="icon" icon={IconInfoLine}>
+                            <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
+                          </Button>
                         </Tooltip>
                       </div>
                     }

@@ -427,7 +427,7 @@ class ProficiencyTable extends React.Component {
             </View>
             <div className="save">
               <Button
-                color="primary"
+                variant="primary"
                 interaction={this.hasPendingChanges() ? 'enabled' : 'disabled'}
                 onClick={this.confirmSubmit}
               >

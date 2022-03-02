@@ -166,7 +166,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
                   onChange={(_e, v) =>
                     reducer({action: 'SET_LANG_ATTR', payload: {lang, key: 'title', value: v}})
                   }
-                  isRequired={isRequired}
+                  required={isRequired}
                   data-testid={`title_input-${lang}`}
                 />
                 <TextArea

@@ -62,7 +62,6 @@ declare global {
 
   declare interface Array<T> {
     flatMap: <Y>(callback: (value: T, index: number, array: T[]) => Y[]) => Y[]
-    flat: <Y>(depth?: number) => Y[]
   }
 
   declare interface Object {

@@ -104,9 +104,6 @@
     "arrows_464a3e54": {
         "message": "Pilar"
     },
-    "art_icon_8e1daad": {
-        "message": "Konstikon"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Bildförhållande kommer att behållas"
     },
@@ -230,9 +227,6 @@
     "clear_2084585f": {
         "message": "Rensa"
     },
-    "clear_image_3213fe62": {
-        "message": "Rensa bild"
-    },
     "clear_selected_file_82388e50": {
         "message": "Rensa vald fil"
     },
@@ -346,9 +340,6 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-licens:"
-    },
-    "crop_image_41bf940c": {
-        "message": "Beskär bild"
     },
     "crop_image_807ebb08": {
         "message": "Beskär bilden"
@@ -518,12 +509,6 @@
     "embedded_content_aaeb4d3d": {
         "message": "inbäddat innehåll"
     },
-    "engineering_icon_f8f3cf43": {
-        "message": "Ingenjörsikon"
-    },
-    "english_icon_25bfe845": {
-        "message": "Engelsk ikon"
-    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Skriv in minst 3 tecken för att söka"
     },
@@ -568,9 +553,6 @@
     },
     "extra_small_9ae33252": {
         "message": "Extra liten"
-    },
-    "extracurricular_icon_67c8ca42": {
-        "message": "Fritidsikon"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Det gick inte att titta in i din framtid"
@@ -701,9 +683,6 @@
     "heading_4_b2e74be7": {
         "message": "Rubrik 4"
     },
-    "health_icon_8d292eb5": {
-        "message": "Hälsoikon"
-    },
     "height_69b03e15": {
         "message": "Höjd"
     },
@@ -730,9 +709,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Jag är upphovsrättsinnehavare"
-    },
-    "icon_color_b86dd6d6": {
-        "message": "Ikonfärg"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Om du inte väljer användningsrättigheter nu kommer den här filen att publiceras efter att den har laddats upp."
@@ -800,12 +776,6 @@
     "language_arts_35b79a8b": {
         "message": "Språkstudier"
     },
-    "language_arts_icon_a798b0f8": {
-        "message": "Språkvetenskapsikon"
-    },
-    "languages_icon_9d20539": {
-        "message": "Språkikon"
-    },
     "large_9c5e80e7": {
         "message": "Stor"
     },
@@ -814,9 +784,6 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Vänster-till-höger"
-    },
-    "library_icon_ae1e54cf": {
-        "message": "Biblioteksikon"
     },
     "link_7262adec": {
         "message": "Länk"
@@ -887,9 +854,6 @@
     "math_ede93050": {
         "message": "Matematik"
     },
-    "math_icon_ad4e9d03": {
-        "message": "Matteikon"
-    },
     "media_af190855": {
         "message": "Media"
     },
@@ -916,9 +880,6 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Flerfärgsbild"
-    },
-    "music_icon_4db5c972": {
-        "message": "Musikikon"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Måste vara minst { percentage }%"
@@ -1073,12 +1034,6 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "Procenttalet måste vara ett tal"
     },
-    "performing_arts_icon_f3497486": {
-        "message": "Underhållningsikon"
-    },
-    "physical_education_icon_d7dffd3e": {
-        "message": "Ikon för idrott och hälsa"
-    },
     "pixels_52ece7d1": {
         "message": "Pixlar"
     },
@@ -1144,9 +1099,6 @@
     },
     "relationships_6602af70": {
         "message": "Relationer"
-    },
-    "religion_icon_246e0be1": {
-        "message": "Religiös ikon"
     },
     "reminder_date_4564d12d": {
         "message": "Påminnelse: { date }"
@@ -1573,11 +1525,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Du har bläddrat tillbaka till din allra första att göra-uppgift!"
-    },
-    "zoom_in_image_bb97d4f": {
-        "message": "Zooma in bilden"
-    },
-    "zoom_out_image_d0a0a2ec": {
-        "message": "Zooma ut bilden"
     }
 }

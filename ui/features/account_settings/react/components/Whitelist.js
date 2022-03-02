@@ -28,7 +28,7 @@ import {Table} from '@instructure/ui-table'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
 import {IconPlusSolid, IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -196,7 +196,7 @@ export class Whitelist extends Component {
           <Flex>
             <Flex.Item grow shrink padding="0 medium 0 0">
               <TextInput
-                renderLabel={I18n.t('Domain Name')}
+                label={I18n.t('Domain Name')}
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
@@ -212,7 +212,7 @@ export class Whitelist extends Component {
                 ref={c => (this.addDomainBtn = c)}
                 type="submit"
                 margin="0 x-small 0 0"
-                renderIcon={IconPlusSolid}
+                icon={IconPlusSolid}
                 disabled={(this.props.inherited && this.props.isSubAccount) || domainLimitReached}
               >
                 {I18n.t('Domain')}
@@ -239,16 +239,18 @@ export class Whitelist extends Component {
                 <Table.Row key={domain}>
                   <Table.Cell>{domain}</Table.Cell>
                   <Table.Cell textAlign="end">
-                    <IconButton
+                    <Button
                       ref={c => (this.deleteButtons[domain] = c)}
-                      renderIcon={IconTrashLine}
-                      withBackground={false}
-                      withBorder={false}
+                      variant="icon"
+                      icon={IconTrashLine}
                       onClick={() => this.handleRemoveDomain(domain)}
                       data-testid={`delete-button-${domain}`}
                       disabled={this.props.inherited && this.props.isSubAccount}
-                      screenReaderLabel={I18n.t('Remove %{domain} as an allowed domain', {domain})}
-                    />
+                    >
+                      <ScreenReaderContent>
+                        {I18n.t('Remove %{domain} as an allowed domain', {domain})}
+                      </ScreenReaderContent>
+                    </Button>
                   </Table.Cell>
                 </Table.Row>
               ))}

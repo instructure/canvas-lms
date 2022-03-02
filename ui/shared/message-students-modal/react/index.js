@@ -312,7 +312,7 @@ class MessageStudents extends React.Component {
             <Button
               disabled={this.state.sending || this.state.success}
               onClick={this.handleSubmit}
-              color="primary"
+              variant="primary"
             >
               {I18n.t('Send Message')}
             </Button>

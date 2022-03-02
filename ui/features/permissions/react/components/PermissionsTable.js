@@ -139,7 +139,7 @@ export default class PermissionsTable extends Component {
                   className="ic-permissions__header-content ic-permissions__header-content-col"
                   id={`ic-permissions__role-header-for-role-${role.id}`}
                 >
-                  <Tooltip renderTip={role.label}>
+                  <Tooltip tip={role.label}>
                     <Button
                       id={`role_${role.id}`}
                       variant="link"

@@ -26,8 +26,8 @@ module DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall
   module_function
 
   def run
-    # Don't create siteadmin if it doesn't already exist and we don't need to
-    return unless Account.root_accounts.active.exists?
+    # Don't know if this is possible, but lots of code relies on having a site admin:
+    return unless Account.site_admin
 
     return unless Account.site_admin.shard == Shard.current
 

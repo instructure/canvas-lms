@@ -36,7 +36,6 @@ module Outcomes
       canvas_id
       course_id
       description
-      friendly_description
       display_name
       parent_guids
       calculation_method

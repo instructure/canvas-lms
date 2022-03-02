@@ -34,15 +34,15 @@ export default {
     const excusedMountPoints = document.querySelectorAll('.submission-excused-pill')
 
     forEachNode(missMountPoints, mountPoint => {
-      ReactDOM.render(<Pill color="danger">{I18n.t('missing')}</Pill>, mountPoint)
+      ReactDOM.render(<Pill variant="danger" text={I18n.t('missing')} />, mountPoint)
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-      ReactDOM.render(<Pill color="danger">{I18n.t('late')}</Pill>, mountPoint)
+      ReactDOM.render(<Pill variant="danger" text={I18n.t('late')} />, mountPoint)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {
-      ReactDOM.render(<Pill color="danger">{I18n.t('excused')}</Pill>, mountPoint)
+      ReactDOM.render(<Pill variant="danger" text={I18n.t('excused')} />, mountPoint)
     })
   }
 }
