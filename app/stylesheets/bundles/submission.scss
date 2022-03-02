@@ -20,6 +20,7 @@
 
 @import "base/environment";
 @import "components/rubric";
+@import "components/emoji";
 
 .submission_details {
   .bold { font-weight: bold; }
@@ -221,4 +222,19 @@
   label.add_a_comment {
     font-size: 1rem;
   }
+}
+
+#emoji-picker-container {
+  position: absolute;
+  bottom: 0;
+  #{direction(right)}: 5px;
+}
+
+#emoji-quick-picker-container {
+  margin: 6px 0;
+}
+
+#textarea-container {
+  position: relative;
+  margin-bottom: 8px;
 }

@@ -17,8 +17,14 @@
  */
 
 .textarea-action-button-container {
-  text-align: end;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   margin: 5px 0;
+}
+
+.textarea-action-buttons {
+  text-align: end;
 }
 
 .svg-placeholder-container {

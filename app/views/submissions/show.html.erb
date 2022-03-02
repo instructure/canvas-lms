@@ -386,7 +386,11 @@
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
             <label class="add_a_comment">
               <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
-              <textarea class="ic-Input grading_comment"></textarea>
+              <div id="textarea-container">
+                <textarea class="ic-Input grading_comment"></textarea>
+                <span id="emoji-picker-container"></span>
+              </div>
+              <div id="emoji-quick-picker-container"></div>
             </label>
             <div class="comment_attachments">
             </div>

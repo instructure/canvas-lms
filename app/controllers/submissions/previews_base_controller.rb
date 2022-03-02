@@ -91,7 +91,11 @@ module Submissions
     end
 
     def prepare_js_env
-      hash = { CONTEXT_ACTION_SOURCE: :submissions }
+      hash = {
+        CONTEXT_ACTION_SOURCE: :submissions,
+        EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+        EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list]
+      }
       append_sis_data(hash)
       js_env(hash)
     end

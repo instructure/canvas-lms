@@ -18,12 +18,13 @@
 
 import React from 'react'
 import {bool, func, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default class SubmissionCommentForm extends React.Component {
   static propTypes = {
@@ -44,6 +45,7 @@ export default class SubmissionCommentForm extends React.Component {
       'handleCancel',
       'handleCommentChange',
       'handlePublishComment',
+      'insertEmoji',
       'focusTextarea'
     ]
     methodsToBind.forEach(method => {
@@ -71,6 +73,12 @@ export default class SubmissionCommentForm extends React.Component {
     this.setState({comment: event.target.value})
   }
 
+  insertEmoji(emoji) {
+    const value = this.state.comment + emoji.native
+    this.handleCommentChange({target: {value}})
+    this.focusTextarea()
+  }
+
   handlePublishComment(event) {
     event.preventDefault()
     this.props.setProcessing(true)
@@ -90,7 +98,7 @@ export default class SubmissionCommentForm extends React.Component {
     const {cancelButtonLabel, submitButtonLabel} = this.buttonLabels()
     return (
       <div>
-        <div>
+        <div id="textarea-container">
           <TextArea
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
             placeholder={I18n.t('Leave a comment')}
@@ -98,8 +106,17 @@ export default class SubmissionCommentForm extends React.Component {
             value={this.state.comment}
             textareaRef={this.bindTextarea}
           />
+          {!!ENV.EMOJIS_ENABLED && (
+            <span id="emoji-picker-container">
+              <EmojiPicker insertEmoji={this.insertEmoji} />
+            </span>
+          )}
         </div>
-
+        {!!ENV.EMOJIS_ENABLED && (
+          <div id="emoji-quick-picker-container">
+            <EmojiQuickPicker insertEmoji={this.insertEmoji} />
+          </div>
+        )}
         {this.showButtons() && (
           <div
             style={{

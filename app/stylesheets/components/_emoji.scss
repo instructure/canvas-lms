@@ -1,0 +1,75 @@
+/*
+ * Copyright (C) 2022 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+ @import "../../../node_modules/emoji-mart/css/emoji-mart";
+
+.emoji-picker {
+  input {
+    box-sizing: border-box;
+    height: 100%;
+  }
+
+  button.emoji-mart-emoji span {
+    cursor: pointer;
+  }
+
+  .emoji-mart-category-label {
+    margin-bottom: 2px;
+  }
+
+  .emoji-mart-preview-skins {
+    cursor: pointer;
+  }
+}
+
+.emoji-trigger {
+  opacity: .5;
+
+  &.opaque {
+    opacity: 1;
+  }
+
+  &:focus-within {
+    opacity: 1;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.emoji-quick-picker {
+  display: flex;
+  align-items: center;
+
+  button {
+    line-height: 1;
+    transition: all .1s ease-in-out;
+
+    &:focus-within {
+      transform: scale(1.8);
+    }
+
+    &:hover {
+      transform: scale(1.8);
+    }
+  }
+
+  span {
+    width: 20px;
+  }
+}

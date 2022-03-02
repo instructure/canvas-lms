@@ -132,3 +132,15 @@ speedgrader_dialog_for_unposted_comments:
   display_name: Draft Comment Warning Modal in SpeedGrader
   description: Enables modal to warn user when a draft comment is left unposted
     in SpeedGrader.
+submission_comment_emojis:
+  state: hidden
+  display_name: Emojis in Submission Comments
+  description: Adds an emoji picker that allows students and teachers to add emojis to
+    their submission comments.
+  applies_to: Course
+  root_opt_in: true
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development

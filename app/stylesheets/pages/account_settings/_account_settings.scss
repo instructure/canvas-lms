@@ -211,6 +211,22 @@
     margin-#{direction(left)}: -5px;
   }
 }
+
+#blocked-emojis {
+  margin-bottom: 0;
+}
+
+#emoji-deny-list-input {
+  display: none;
+}
+
+#emoji-tags {
+  .emoji-tag {
+    height: 20px;
+    margin: 4px 0;
+  }
+}
+
 #global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message,
 #k5_account_warning_message:not(.shown) {
   display: none;

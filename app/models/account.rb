@@ -366,6 +366,7 @@ class Account < ActiveRecord::Base
   add_setting :allow_last_page_on_course_users, boolean: true, root_only: true, default: false
   add_setting :allow_last_page_on_account_courses, boolean: true, root_only: true, default: false
   add_setting :allow_last_page_on_users, boolean: true, root_only: true, default: false
+  add_setting :emoji_deny_list, root_only: true
 
   add_setting :default_due_time, inheritable: true
 

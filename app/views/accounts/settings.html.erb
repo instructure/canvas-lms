@@ -768,6 +768,13 @@
           <% end %>
         <% end %>
 
+        <% if !@account.site_admin? &&
+            @account.primary_settings_root_account? &&
+            @account.feature_allowed?(:submission_comment_emojis) &&
+            @account.grants_right?(@current_user, :manage_account_settings) %>
+            <div id="emoji-deny-list"></div>
+        <% end %>
+
         <% if @account.primary_settings_root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
           <fieldset>
             <h2 class="screenreader-only"><%= t('Enabled Web Services') %></h2>
