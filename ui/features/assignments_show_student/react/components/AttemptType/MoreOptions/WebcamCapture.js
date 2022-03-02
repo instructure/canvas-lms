@@ -186,7 +186,7 @@ export default function WebcamCapture({onSelectImage}) {
       </Flex.Item>
 
       <Flex.Item margin="auto 0 auto medium">
-        <Button color="primary" onClick={handleSaveImage}>
+        <Button variant="primary" onClick={handleSaveImage}>
           {I18n.t('Save')}
         </Button>
       </Flex.Item>

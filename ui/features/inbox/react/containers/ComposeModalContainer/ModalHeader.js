@@ -24,7 +24,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
-const ModalHeader = props => (
+const ModalHeader = (props) => (
   <Modal.Header>
     <CloseButton
       placement="end"
@@ -37,7 +37,7 @@ const ModalHeader = props => (
 )
 
 ModalHeader.propTypes = {
-  onDismiss: PropTypes.func
+  onDismiss: PropTypes.func,
 }
 
 export default ModalHeader

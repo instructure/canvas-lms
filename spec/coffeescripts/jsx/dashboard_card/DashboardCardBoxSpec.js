@@ -22,12 +22,10 @@ import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
 import sinon from 'sinon'
 import {waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 
 import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
 import getDroppableDashboardCardBox from '@canvas/dashboard-card/react/getDroppableDashboardCardBox'
 import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
-import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
   let $container
@@ -35,7 +33,6 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   let server
 
   suiteHooks.beforeEach(() => {
-    fakeENV.setup()
     $container = document.createElement('div')
     document.body.appendChild($container)
 
@@ -45,23 +42,15 @@ QUnit.module('DashboardCardBox', suiteHooks => {
         {
           id: '1',
           isFavorited: true,
-          courseName: 'Bio 101',
-          assetString: 'course_1'
+          courseName: 'Bio 101'
         },
         {
           id: '2',
           isFavorited: true,
-          courseName: 'Philosophy 201',
-          assetString: 'course_1'
+          courseName: 'Philosophy 201'
         }
       ]
     }
-
-    fetchMock.put(/\/api\/v1\/users\/1\/colors\/.*/, {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: ''
-    })
 
     server = sinon.fakeServer.create({respondImmediately: true})
     return sandbox.stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
@@ -71,7 +60,6 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
     server.restore()
-    fakeENV.teardown()
   })
 
   function mountComponent() {
@@ -111,9 +99,9 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   }
 
   function getUnfavoriteButton() {
-    return [...getDashboardMenu().querySelectorAll('.DashboardCardMenu__MovementItem')].find(
-      $button => $button.textContent.includes('Unfavorite')
-    )
+    return [
+      ...getDashboardMenu().querySelectorAll('.DashboardCardMenu__MovementItem')
+    ].find($button => $button.textContent.includes('Unfavorite'))
   }
 
   function getModal() {

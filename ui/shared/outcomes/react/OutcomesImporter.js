@@ -174,7 +174,7 @@ export default class OutcomesImporter extends Component {
     }
     return (
       <div style={styles}>
-        <Spinner renderTitle={I18n.t('importing outcomes')} size="large" />
+        <Spinner title={I18n.t('importing outcomes')} size="large" />
         <Heading level="h4">
           {invokedImport && I18n.t('Please wait as we upload and process your file.')}
           {!invokedImport && I18n.t('An outcome import is currently in progress.')}

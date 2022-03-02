@@ -75,7 +75,7 @@ export default class Toolbox extends React.Component {
 
   renderDelete() {
     return (
-      <Button margin="0 0 0 x-small" renderIcon={<IconTrashLine />} onClick={this.props.onDelete}>
+      <Button margin="0 0 0 x-small" icon={<IconTrashLine />} onClick={this.props.onDelete}>
         <ScreenReaderContent>{I18n.t('delete assignment')}</ScreenReaderContent>
       </Button>
     )

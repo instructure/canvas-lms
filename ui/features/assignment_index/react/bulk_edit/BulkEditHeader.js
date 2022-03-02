@@ -118,7 +118,7 @@ export default function BulkEditHeader({
         <Flex.Item>
           <Button
             margin="0 0 0 small"
-            color="primary"
+            variant="primary"
             interaction={
               startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
                 ? 'disabled'

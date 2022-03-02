@@ -165,7 +165,7 @@ class SelectMenuGroup extends React.Component {
     return (
       <Flex
         alignItems={isVertical ? 'start' : 'end'}
-        wrap="wrap"
+        wrapItems
         margin="0 0 small 0"
         direction={isVertical ? 'column' : 'row'}
       >
@@ -232,7 +232,7 @@ class SelectMenuGroup extends React.Component {
             onClick={this.onSubmit}
             type="submit"
             size="medium"
-            color="primary"
+            variant="primary"
           >
             <PresentationContent>
               <Text>{I18n.t('Apply')}</Text>

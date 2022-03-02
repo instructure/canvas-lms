@@ -56,7 +56,6 @@ const locale = {
   },
   "apps_54d24a47": { "message": "التطبيق" },
   "arrows_464a3e54": { "message": "الأسهم" },
-  "art_icon_8e1daad": { "message": "أيقونة الفنون" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
   },
@@ -88,7 +87,6 @@ const locale = {
   "circle_484abe63": { "message": "الدائرة" },
   "circle_unordered_list_9e3a0763": { "message": "قائمة دائرية غير المرتبة" },
   "clear_2084585f": { "message": "مسح" },
-  "clear_image_3213fe62": { "message": "مسح الصورة" },
   "clear_selected_file_82388e50": { "message": "مسح الملف المحدد" },
   "clear_selected_file_filename_2fe8a58e": {
     "message": "مسح الملف المحدد: { filename }"
@@ -140,7 +138,6 @@ const locale = {
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
   "create_button_and_icon_5c089934": { "message": "إنشاء زر وأيقونة" },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
-  "crop_image_41bf940c": { "message": "قص الصورة" },
   "crop_image_807ebb08": { "message": "قص صورة" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
   "custom_6979cd81": { "message": "مخصص" },
@@ -196,8 +193,6 @@ const locale = {
   "embed_preview_2d741e1f": { "message": "معاينة التضمين" },
   "embed_video_a97a64af": { "message": "تضمين الفيديو" },
   "embedded_content_aaeb4d3d": { "message": "مضمّن آخر" },
-  "engineering_icon_f8f3cf43": { "message": "أيقونة الهندسة" },
-  "english_icon_25bfe845": { "message": "أيقونة الإنجليزية" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "أدخل 3 أحرف على الأقل للبحث"
   },
@@ -211,7 +206,6 @@ const locale = {
   "external_tools_6e77821": { "message": "الأدوات الخارجية" },
   "extra_large_b6cdf1ff": { "message": "كبير جداً" },
   "extra_small_9ae33252": { "message": "صغير للغاية" },
-  "extracurricular_icon_67c8ca42": { "message": "أيقونة الأنشطة غير الصفية" },
   "file_url_c12b64be": { "message": "عنوان URL للملف" },
   "filename_file_icon_602eb5de": { "message": "أيقونة الملف { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -252,7 +246,6 @@ const locale = {
   "heading_2_5b84eed2": { "message": "العنوان 2" },
   "heading_3_2c83de44": { "message": "العنوان 3" },
   "heading_4_b2e74be7": { "message": "العنوان 4" },
-  "health_icon_8d292eb5": { "message": "أيقونة الصحة" },
   "height_69b03e15": { "message": "الارتفاع" },
   "hexagon_d8468e0d": { "message": "سداسي" },
   "hide_description_bfb5502e": { "message": "إخفاء الوصف" },
@@ -264,7 +257,6 @@ const locale = {
     "message": "لقد حصلت على إذن لاستخدام هذا الملف."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "أمتلك حق النشر" },
-  "icon_color_b86dd6d6": { "message": "لون الأيقونة" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "إن لم تحدد الآن حقوق الاستخدام، فسيتم إلغاء نشر هذا الملف بعد تحميله."
   },
@@ -282,11 +274,8 @@ const locale = {
   "invalid_file_type_881cc9b2": { "message": "نوع ملف غير صالح" },
   "invalid_url_cbde79f": { "message": "URL غير صالح" },
   "keyboard_shortcuts_ed1844bd": { "message": "اختصارات لوحة المفاتيح" },
-  "language_arts_icon_a798b0f8": { "message": "أيقونة آداب اللغة" },
-  "languages_icon_9d20539": { "message": "أيقونة اللغات" },
   "large_9c5e80e7": { "message": "كبير" },
   "left_to_right_e9b4fd06": { "message": "‏‏من اليسار إلى اليمين" },
-  "library_icon_ae1e54cf": { "message": "أيقونة المكتبة" },
   "link_7262adec": { "message": "ارتباط" },
   "link_options_a16b758b": { "message": "خيارات الارتباط" },
   "links_14b70841": { "message": "الارتباطات" },
@@ -300,7 +289,6 @@ const locale = {
   "loading_please_wait_d276220a": { "message": "جارٍ التحميل، يرجى الانتظار" },
   "loading_preview_9f077aa1": { "message": "جارٍ تحميل المعاينة" },
   "locked_762f138b": { "message": "مؤمّن" },
-  "math_icon_ad4e9d03": { "message": "أيقونة الرياضيات" },
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
   "middle_27dc1d5": { "message": "الأوسط" },
@@ -308,7 +296,6 @@ const locale = {
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
-  "music_icon_4db5c972": { "message": "أيقونة الموسيقى" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "يجب أن يكون { percentage }% على الأقل"
   },
@@ -359,8 +346,6 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "يجب أن تكون النسبة المئوية رقمًا"
   },
-  "performing_arts_icon_f3497486": { "message": "أيقونة الفنون التعبيرية" },
-  "physical_education_icon_d7dffd3e": { "message": "أيقونة التربية البدنية" },
   "pixels_52ece7d1": { "message": "بكسل" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
@@ -379,7 +364,6 @@ const locale = {
   "record_7c9448b": { "message": "تسجيل" },
   "record_upload_media_5fdce166": { "message": "تسجيل/تحميل الوسائط" },
   "relationships_6602af70": { "message": "العلاقات" },
-  "religion_icon_246e0be1": { "message": "أيقونة الدين" },
   "remove_link_d1f2f4d0": { "message": "إزالة الارتباط" },
   "resize_ec83d538": { "message": "تغيير الحجم" },
   "restore_auto_save_deccd84b": { "message": "استعادة الحفظ التلقائي؟" },
@@ -551,9 +535,7 @@ const locale = {
   "yes_dde87d5": { "message": "نعم" },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "لا يمكنك تحميل ملف فارغ."
-  },
-  "zoom_in_image_bb97d4f": { "message": "تكبير الصورة" },
-  "zoom_out_image_d0a0a2ec": { "message": "تصغير الصورة" }
+  }
 }
 
 

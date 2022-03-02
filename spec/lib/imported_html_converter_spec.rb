@@ -47,24 +47,6 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
-    context "when course attachments exist" do
-      subject { convert_and_replace(test_string) }
-
-      let_once(:attachment) { attachment_model(context: course, migration_id: migration_id) }
-      let(:course) { @course }
-      let(:migration_id) { "migration-id-123" }
-
-      context "and a data-download-url attribute references the file" do
-        let(:test_string) do
-          %(<img src="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1" alt="" data-inst-buttons-and-icons="true" data-download-url="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1">)
-        end
-
-        it "converst data-download-url for files" do
-          expect(subject).to eq "<img src=\"/courses/#{course.id}/files/#{attachment.id}/download?download_frd=1\" alt=\"\" data-inst-buttons-and-icons=\"true\" data-download-url=\"/courses/#{course.id}/files/#{attachment.id}/download?download_frd=1\">"
-        end
-      end
-    end
-
     it "converts a wiki reference without $ escaped" do
       test_string = %(<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
       @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")

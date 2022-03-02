@@ -74,7 +74,10 @@ export default class NewGradingPeriodSetForm extends React.Component {
           displayTotalsForAllGradingPeriods: this.state.displayTotalsForAllGradingPeriods,
           enrollmentTermIDs: this.state.selectedEnrollmentTermIDs
         }
-        setsApi.create(set).then(this.submitSucceeded).catch(this.submitFailed)
+        setsApi
+          .create(set)
+          .then(this.submitSucceeded)
+          .catch(this.submitFailed)
       } else {
         this.setState({buttonsDisabled: false})
       }
@@ -164,7 +167,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
                 &nbsp;
                 <Button
                   disabled={this.state.buttonsDisabled}
-                  color="primary"
+                  variant="primary"
                   onClick={this.submit}
                   ref="createButton"
                 >

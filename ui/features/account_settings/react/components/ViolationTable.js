@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import I18n from 'i18n!csp_violation_table'
 import {Table} from '@instructure/ui-table'
 import {Alert} from '@instructure/ui-alerts'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -146,11 +146,10 @@ export default function ViolationTable({
                 />
               </Table.Cell>
               <Table.Cell textAlign="center">
-                <IconButton
+                <Button
+                  variant="icon"
                   size="small"
-                  withBackground={false}
-                  withBorder={false}
-                  renderIcon={IconAddSolid}
+                  icon={IconAddSolid}
                   onClick={() => {
                     addDomain('account', accountId, hostname, () => {
                       showAlert({
@@ -161,8 +160,11 @@ export default function ViolationTable({
                       })
                     })
                   }}
-                  screenReaderLabel={I18n.t('Add %{hostname} as an allowed domain', {hostname})}
-                />
+                >
+                  <ScreenReaderContent>
+                    {I18n.t('Add %{hostname} as an allowed domain', {hostname})}
+                  </ScreenReaderContent>
+                </Button>
               </Table.Cell>
             </Table.Row>
           )

@@ -33,8 +33,6 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
 
-import {Link} from '@instructure/ui-link'
-
 const courseShape = PropTypes.shape({
   permissions: PropTypes.shape({}).isRequired,
   submissionsConnection: PropTypes.shape({
@@ -67,15 +65,7 @@ export default class StudentContextTray extends React.Component {
   static renderQuickLink(key, label, srLabel, url, showIf) {
     return showIf() ? (
       <div className="StudentContextTray-QuickLinks__Link" key={key}>
-        <Button
-          href={url}
-          color="primary"
-          withBackground={false}
-          size="small"
-          aria-label={srLabel}
-          display="block"
-          textAlign="start"
-        >
+        <Button href={url} variant="ghost" size="small" fluidWidth aria-label={srLabel}>
           <span className="StudentContextTray-QuickLinks__Link-text">{label}</span>
         </Button>
       </div>
@@ -215,11 +205,9 @@ export default class StudentContextTray extends React.Component {
           onDismiss={this.handleRequestClose}
           placement="end"
         >
-          <CloseButton
-            placement="start"
-            onClick={this.handleRequestClose}
-            screenReaderLabel={I18n.t('Close')}
-          />
+          <CloseButton placement="start" onClick={this.handleRequestClose}>
+            {I18n.t('Close')}
+          </CloseButton>
           <aside
             className={
               user && user.avatar_url
@@ -246,10 +234,11 @@ export default class StudentContextTray extends React.Component {
                       {user.short_name ? (
                         <div className="StudentContextTray-Header__Name">
                           <Heading level="h3" as="h2">
-                            <Link
+                            <Button
+                              variant="link"
                               size="large"
+                              fluidWidth
                               href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
-                              isWithinText={false}
                               aria-label={I18n.t("Go to %{name}'s profile", {
                                 name:
                                   user.pronouns != null
@@ -257,11 +246,9 @@ export default class StudentContextTray extends React.Component {
                                     : user.short_name
                               })}
                               theme={{largePadding: '0', largeHeight: 'normal'}}
-                              display="block"
-                              textAlign="start"
                             >
                               {user.short_name} {user.pronouns ? <i>{user.pronouns}</i> : ''}
-                            </Link>
+                            </Button>
                           </Heading>
                         </div>
                       ) : null}
@@ -282,6 +269,7 @@ export default class StudentContextTray extends React.Component {
                       <div className="StudentContextTray-Header__Actions">
                         <Button
                           ref={b => (this.messageStudentsButton = b)}
+                          variant="icon"
                           size="small"
                           onClick={this.handleMessageButtonClick}
                         >

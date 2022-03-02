@@ -64,7 +64,12 @@ it('mastery checkbox receives focus', () => {
       </tbody>
     </table>
   )
-  expect(wrapper.find('RadioInput').find('input').instance()).toBe(document.activeElement)
+  expect(
+    wrapper
+      .find('RadioInput')
+      .find('input')
+      .instance()
+  ).toBe(document.activeElement)
 })
 
 it('clicking mastery checkbox triggers change', () => {
@@ -76,7 +81,10 @@ it('clicking mastery checkbox triggers change', () => {
       </tbody>
     </table>
   )
-  wrapper.find('RadioInput').find('input').simulate('change')
+  wrapper
+    .find('RadioInput')
+    .find('input')
+    .simulate('change')
   expect(onMasteryChange).toHaveBeenCalledTimes(1)
 })
 
@@ -95,7 +103,11 @@ it('changing description triggers change', () => {
       </tbody>
     </table>
   )
-  wrapper.find('TextInput').at(0).find('input').simulate('change')
+  wrapper
+    .find('TextInput')
+    .at(0)
+    .find('input')
+    .simulate('change')
   expect(onDescriptionChange).toHaveBeenCalledTimes(1)
 })
 
@@ -114,7 +126,11 @@ it('changing points triggers change', () => {
       </tbody>
     </table>
   )
-  wrapper.find('TextInput').at(1).find('input').simulate('change')
+  wrapper
+    .find('TextInput')
+    .at(1)
+    .find('input')
+    .simulate('change')
   expect(onPointsChange).toHaveBeenCalledTimes(1)
 })
 
@@ -127,7 +143,10 @@ it('clicking delete button triggers delete', () => {
       </tbody>
     </table>
   )
-  wrapper.find('IconButton').simulate('click')
+  wrapper
+    .find('Button')
+    .at(1)
+    .simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(1)
 })
 
@@ -145,6 +164,9 @@ it('clicking disabled delete button does not triggers delete', () => {
       </tbody>
     </table>
   )
-  wrapper.find('IconButton').simulate('click')
+  wrapper
+    .find('Button')
+    .at(1)
+    .simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(0)
 })

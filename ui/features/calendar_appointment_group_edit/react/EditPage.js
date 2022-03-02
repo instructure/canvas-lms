@@ -257,7 +257,7 @@ class EditPage extends React.Component {
                 &nbsp;
                 <Button href="/calendar">{I18n.t('Cancel')}</Button>
                 &nbsp;
-                <Button onClick={this.handleSave} color="primary">
+                <Button onClick={this.handleSave} variant="primary">
                   {I18n.t('Save')}
                 </Button>
               </Grid.Col>
@@ -278,7 +278,7 @@ class EditPage extends React.Component {
             />
           </FormFieldGroup>
           <TextInput
-            renderLabel={I18n.t('Title')}
+            label={I18n.t('Title')}
             name="title"
             value={this.state.formValues.title}
             onChange={this.handleChange}
@@ -292,7 +292,7 @@ class EditPage extends React.Component {
             />
           </FormFieldGroup>
           <TextInput
-            renderLabel={I18n.t('Location')}
+            label={I18n.t('Location')}
             name="location"
             value={this.state.formValues.location}
             onChange={this.handleChange}

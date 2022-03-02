@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
 import DashboardCardBackgroundStore from '@canvas/dashboard-card/react/DashboardCardBackgroundStore'
 import fakeENV from 'helpers/fakeENV'
 
@@ -25,7 +24,7 @@ const TEST_COLORS = {
   '#91349B': '#91349B',
   '#E1185C': '#E1185C'
 }
-DashboardCardBackgroundStore.reset = function () {
+DashboardCardBackgroundStore.reset = function() {
   return this.setState({
     courseColors: TEST_COLORS,
     usedDefaults: []
@@ -38,24 +37,26 @@ QUnit.module('DashboardCardBackgroundStore', {
     fakeENV.setup()
     ENV.PREFERENCES = {custom_colors: TEST_COLORS}
     ENV.current_user_id = 22
-    fetchMock.put('path:/api/v1/users/22/colors/course_1', {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: ''
-    })
-    fetchMock.put('path:/api/v1/users/22/colors/course_2', {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: ''
-    })
-    fetchMock.put('path:/api/v1/users/22/colors/course_3', {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: ''
-    })
+    this.server = sinon.fakeServer.create()
+    this.response = []
+    this.server.respondWith('POST', '/api/v1/users/22/colors/course_1', [
+      200,
+      {'Content-Type': 'application/json'},
+      ''
+    ])
+    this.server.respondWith('POST', '/api/v1/users/22/colors/course_2', [
+      200,
+      {'Content-Type': 'application/json'},
+      ''
+    ])
+    this.server.respondWith('POST', '/api/v1/users/22/colors/course_3', [
+      200,
+      {'Content-Type': 'application/json'},
+      ''
+    ])
   },
   teardown() {
-    fetchMock.restore()
+    this.server.restore()
     DashboardCardBackgroundStore.reset()
     fakeENV.teardown()
   }
@@ -83,19 +84,19 @@ test('maintains list of used defaults', () => {
   ok(DashboardCardBackgroundStore.getUsedDefaults().includes('#91349B'))
 })
 
-test('PUTs to the server when a default is set', async function () {
+test('posts to the server when a default is set', function() {
   DashboardCardBackgroundStore.setDefaultColor('course_1')
-  await fetchMock.flush()
-  ok(fetchMock.lastUrl().match(/course_1/))
-  equal(fetchMock.calls().length, 1)
+  ok(this.server.requests[0].url.match(/course_1/))
+  equal(this.server.requests.length, 1)
+  this.server.respond()
 })
 
-test('sets multiple defaults properly', async function () {
+test('sets multiple defaults properly', function() {
   DashboardCardBackgroundStore.setDefaultColors(['course_2', 'course_3'])
-  await fetchMock.flush()
-  ok(fetchMock.calls()[0][0].match(/course_2/))
-  ok(fetchMock.calls()[1][0].match(/course_3/))
-  equal(fetchMock.calls().length, 2)
+  ok(this.server.requests[0].url.match(/course_2/))
+  ok(this.server.requests[1].url.match(/course_3/))
+  equal(this.server.requests.length, 2)
+  return this.server.respond()
 })
 
 // ==========================

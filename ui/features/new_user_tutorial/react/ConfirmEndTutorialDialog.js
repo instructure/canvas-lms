@@ -45,7 +45,7 @@ export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
           onClick={() =>
             axios.put(API_URL, {state: 'off'}).then(() => ConfirmEndTutorialDialog.onSuccess())
           }
-          color="primary"
+          variant="primary"
         >
           {I18n.t('Okay')}
         </Button>

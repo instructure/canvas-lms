@@ -195,8 +195,9 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
             placement="end"
             offset="medium"
             onClick={onModalCancel}
-            screenReaderLabel={I18n.t('Cancel')}
-          />
+          >
+            {I18n.t('Cancel')}
+          </CloseButton>
           <Heading>{modalLabel()}</Heading>
         </Modal.Header>
         <Modal.Body>
@@ -224,7 +225,7 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
           </Button>
           <Button
             data-testid="qr-proceed-button"
-            color="primary"
+            variant="primary"
             margin="none x-small"
             onClick={onModalProceed}
           >

@@ -1128,7 +1128,7 @@ class SubmissionsApiController < ApplicationController
       end
       submissions = Api.paginate(submission_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
       render json: submissions.map { |submission|
-        json = can_view_student_names ? user_display_json(submission.user, @context) : anonymous_user_display_json(submission, @assignment)
+        json = can_view_student_names ? user_display_json(submission.user, @context) : anonymous_user_display_json(submission.anonymous_id)
         if include_pg
           selection = submission.provisional_grades.find(&:selection)
           json[:in_moderation_set] = selection.present?

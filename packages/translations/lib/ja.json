@@ -104,9 +104,6 @@
     "arrows_464a3e54": {
         "message": "矢印"
     },
-    "art_icon_8e1daad": {
-        "message": "アートのアイコン"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "アスペクト比は維持されます"
     },
@@ -230,9 +227,6 @@
     "clear_2084585f": {
         "message": "クリア"
     },
-    "clear_image_3213fe62": {
-        "message": "画像を消す"
-    },
     "clear_selected_file_82388e50": {
         "message": "選択したファイルを消去する"
     },
@@ -346,9 +340,6 @@
     },
     "creative_commons_license_725584ae": {
         "message": "クリエイティブ コモンズ ライセンス:"
-    },
-    "crop_image_41bf940c": {
-        "message": "画像を切り取る"
     },
     "crop_image_807ebb08": {
         "message": "画像の切り取り"
@@ -518,12 +509,6 @@
     "embedded_content_aaeb4d3d": {
         "message": "埋め込まれたコンテンツ"
     },
-    "engineering_icon_f8f3cf43": {
-        "message": "エンジニアリングのアイコン"
-    },
-    "english_icon_25bfe845": {
-        "message": "英語のアイコン"
-    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "検索する語を3文字以上入力してください"
     },
@@ -568,9 +553,6 @@
     },
     "extra_small_9ae33252": {
         "message": "超小型"
-    },
-    "extracurricular_icon_67c8ca42": {
-        "message": "課外活動のアイコン"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "あなたの未来を覗くことに失敗しました"
@@ -701,9 +683,6 @@
     "heading_4_b2e74be7": {
         "message": "見出し4"
     },
-    "health_icon_8d292eb5": {
-        "message": "健康のアイコン"
-    },
     "height_69b03e15": {
         "message": "高さ"
     },
@@ -730,9 +709,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "著作権を保有しています"
-    },
-    "icon_color_b86dd6d6": {
-        "message": "アイコンカラー"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "今すぐ使用権を選択しないと、このファイルはアップロード後に公開されません。"
@@ -800,12 +776,6 @@
     "language_arts_35b79a8b": {
         "message": "国語"
     },
-    "language_arts_icon_a798b0f8": {
-        "message": "語学のアイコン"
-    },
-    "languages_icon_9d20539": {
-        "message": "言語のアイコン"
-    },
     "large_9c5e80e7": {
         "message": "大"
     },
@@ -814,9 +784,6 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "左から右"
-    },
-    "library_icon_ae1e54cf": {
-        "message": "ライブラリーのアイコン"
     },
     "link_7262adec": {
         "message": "リンク"
@@ -887,9 +854,6 @@
     "math_ede93050": {
         "message": "数学"
     },
-    "math_icon_ad4e9d03": {
-        "message": "数学のアイコン"
-    },
     "media_af190855": {
         "message": "メディア"
     },
@@ -916,9 +880,6 @@
     },
     "multi_color_image_63d7372f": {
         "message": "マルチカラー画像"
-    },
-    "music_icon_4db5c972": {
-        "message": "音楽のアイコン"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "{ percentage }%以上でなければなりません"
@@ -1073,12 +1034,6 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "パーセンテージは数字でなければなりません"
     },
-    "performing_arts_icon_f3497486": {
-        "message": "パフォーミングアーツのアイコン"
-    },
-    "physical_education_icon_d7dffd3e": {
-        "message": "体育のアイコン"
-    },
     "pixels_52ece7d1": {
         "message": "ピクセル"
     },
@@ -1144,9 +1099,6 @@
     },
     "relationships_6602af70": {
         "message": "関係"
-    },
-    "religion_icon_246e0be1": {
-        "message": "宗教学のアイコン"
     },
     "reminder_date_4564d12d": {
         "message": "リマインダ（お知らせ）：{ date }"
@@ -1573,11 +1525,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "あなたの最初のタスクにスクロールしました！"
-    },
-    "zoom_in_image_bb97d4f": {
-        "message": "画像を拡大する"
-    },
-    "zoom_out_image_d0a0a2ec": {
-        "message": "画像を縮小する"
     }
 }

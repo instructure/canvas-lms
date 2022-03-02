@@ -25,23 +25,19 @@ import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
 
-import {Link} from '@instructure/ui-link'
-
 const UnassessedAssignment = ({assignment}) => {
   const {id, url, submission_types, title} = assignment
   return (
     <View padding="small" display="block" key={id}>
       <ApplyTheme theme={{[Button.theme]: {linkColor: '#68777D', fontWeight: '700'}}}>
-        <Link
+        <Button
           href={url}
-          isWithinText={false}
+          variant="link"
           theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-          renderIcon={
-            _.includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine
-          }
+          icon={_.includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine}
         >
           {title} ({I18n.t('Not yet assessed')})
-        </Link>
+        </Button>
       </ApplyTheme>
     </View>
   )

@@ -18,27 +18,18 @@
 
 export const TYPE = 'image/svg+xml-buttons-and-icons'
 
-export const Size = {
-  None: 'none',
-  ExtraSmall: 'x-small',
-  Small: 'small',
-  Medium: 'medium',
-  Large: 'large',
-  ExtraLarge: 'x-large'
-}
-
 export const DEFAULT_SETTINGS = {
   // Basic button & icon settings
   type: TYPE,
   name: '',
   alt: '',
   shape: 'square',
-  size: Size.Small,
+  size: 'small',
   color: null,
   outlineColor: null,
-  outlineSize: Size.Small,
+  outlineSize: 'none',
   text: '',
-  textSize: Size.Small,
+  textSize: 'small',
   textColor: '#000000',
   textBackgroundColor: null,
   textPosition: 'middle',
@@ -60,31 +51,31 @@ export const DEFAULT_OPTIONS = {
 }
 
 export const BASE_SIZE = {
-  [Size.ExtraSmall]: 74,
-  [Size.Small]: 122,
-  [Size.Medium]: 158,
-  [Size.Large]: 218
+  'x-small': 74,
+  small: 122,
+  medium: 158,
+  large: 218
 }
 
 export const STROKE_WIDTH = {
-  [Size.None]: 0,
-  [Size.Small]: 2,
-  [Size.Medium]: 4,
-  [Size.Large]: 8
+  none: 0,
+  small: 2,
+  medium: 4,
+  large: 8
 }
 
 export const TEXT_SIZE = {
-  [Size.Small]: 14,
-  [Size.Medium]: 16,
-  [Size.Large]: 22,
-  [Size.ExtraLarge]: 28
+  small: 14,
+  medium: 16,
+  large: 22,
+  'x-large': 28
 }
 
 export const MAX_CHAR_COUNT = {
-  [Size.Small]: 21,
-  [Size.Medium]: 18,
-  [Size.Large]: 13,
-  [Size.ExtraLarge]: 10
+  small: 21,
+  medium: 18,
+  large: 13,
+  'x-large': 10
 }
 
 export const MAX_TOTAL_TEXT_CHARS = 32

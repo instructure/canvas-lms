@@ -29,11 +29,7 @@ import {get, isEmpty} from 'lodash'
 import axios from '@canvas/axios'
 
 import I18n from 'i18n!account_course_user_search'
-import {
-  firstNameFirst,
-  lastNameFirst,
-  nameParts
-} from '@canvas/user-sortable-name/jquery/user_utils'
+import {firstNameFirst, lastNameFirst, nameParts} from '@canvas/user-sortable-name/jquery/user_utils'
 import preventDefault from 'prevent-default'
 import unflatten from 'obj-unflatten'
 import registrationErrors from '@canvas/normalize-registration-errors'
@@ -261,7 +257,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
-          <Button type="submit" color="primary">
+          <Button type="submit" variant="primary">
             {this.props.createOrUpdate === 'create' ? I18n.t('Add User') : I18n.t('Save')}
           </Button>
         </Modal.Footer>

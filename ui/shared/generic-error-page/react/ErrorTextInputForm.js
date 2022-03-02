@@ -44,7 +44,7 @@ export default function ErrorTextInputForm(props) {
       <View textAlign="end" display="block">
         <Button
           margin="small 0"
-          color="primary"
+          variant="primary"
           interaction={submitButtonState}
           onClick={props.handleSubmitErrorReport}
         >

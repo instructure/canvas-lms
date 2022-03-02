@@ -101,7 +101,7 @@ export default class AssessmentAuditTray extends Component {
         <View as="div" padding="small">
           <Flex as="div" margin="0 0 medium 0">
             <Flex.Item>
-              <CloseButton onClick={this.dismiss} screenReaderLabel={I18n.t('Close')} />
+              <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
             </Flex.Item>
 
             <Flex.Item margin="0 0 0 small">

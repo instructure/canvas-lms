@@ -107,9 +107,9 @@ export default class OverrideAttempts extends React.Component {
         <Flex.Item margin="small 0 0" data-testid="OverrideAttempts-Attempts">
           <NumberInput
             readOnly={this.props.readOnly}
-            display="inline-block"
+            inline
             width="5.5rem"
-            renderLabel={<ScreenReaderContent>Attempts</ScreenReaderContent>}
+            label={<ScreenReaderContent>Attempts</ScreenReaderContent>}
             min={1}
             value={`${limit}`}
             onChange={this.onChangeAttemptLimit}
@@ -130,7 +130,7 @@ export default class OverrideAttempts extends React.Component {
   renderDetail() {
     return (
       <View display="block" margin="0 0 small 0" data-testid="OverrideAttempts-Detail">
-        <Flex alignItems="end" margin="0 0 small 0" wrap="wrap">
+        <Flex alignItems="end" margin="0 0 small 0" wrapItems>
           {this.renderLimit()}
           {this.renderAttempts()}
         </Flex>

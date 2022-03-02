@@ -125,7 +125,9 @@ export default function BouncedEmailsView({accountId}) {
     setCsvReportPath(
       `/api/v1/accounts/${accountId}/bounced_communication_channels.csv?${$.param(params)}`
     )
-    doFetchApi({path, params}).then(onFetch).catch(onError)
+    doFetchApi({path, params})
+      .then(onFetch)
+      .catch(onError)
   }, [accountId, searchTerm, onFetch, onError, before, after])
 
   const renderTable = useCallback(

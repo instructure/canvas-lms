@@ -37,15 +37,14 @@ import {
   loadPastButtonClicked,
   togglePlannerItemCompletion,
   updateTodo,
-  scrollToToday,
-  reloadWithObservee
+  scrollToToday
 } from '../../actions'
 import {notifier} from '../../dynamic-ui'
 import {daysToDaysHash} from '../../utilities/daysUtils'
 import {formatDayKey, isThisWeek} from '../../utilities/dateUtils'
 import {Animator} from '../../dynamic-ui/animator'
 import responsiviser from '../responsiviser'
-import {observedUserId, observedUserContextCodes} from '../../utilities/apiUtils'
+import {observedUserId} from '../../utilities/apiUtils'
 
 export class PlannerApp extends Component {
   static propTypes = {
@@ -85,9 +84,7 @@ export class PlannerApp extends Component {
     loadingOpportunities: bool,
     opportunityCount: number,
     singleCourseView: bool,
-    isObserving: bool,
-    observedUserId: string,
-    observedUserContextCodes: arrayOf(string)
+    isObserving: bool
   }
 
   static defaultProps = {
@@ -128,11 +125,6 @@ export class PlannerApp extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.observedUserId !== this.props.observedUserId) {
-      reloadWithObservee(this.props.observedUserId, this.props.observedUserContextCodes)
-      return
-    }
-
     this.props.triggerDynamicUiUpdates()
     if (this.props.responsiveSize !== prevProps.responsiveSize) {
       this.afterLayoutChange()
@@ -531,9 +523,7 @@ export const mapStateToProps = state => {
     loadingOpportunities: !!state.loading.loadingOpportunities,
     opportunityCount: state.opportunities?.items?.length || 0,
     singleCourseView: state.singleCourse,
-    isObserving: !!observedUserId(state),
-    observeduserId: observedUserId(state),
-    observedUserContextCodes: observedUserContextCodes(state)
+    isObserving: !!observedUserId(state)
   }
 }
 

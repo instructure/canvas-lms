@@ -50,7 +50,7 @@ const LabeledRceField = ({name, validate, label}) => {
       {errorMessages.length > 0 && (
         <View as="div" margin="0 0 small">
           {errorMessages.map(err => (
-            <Text key={err} color="danger">
+            <Text key={err} color="error">
               {err}
             </Text>
           ))}

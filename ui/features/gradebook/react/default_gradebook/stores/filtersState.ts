@@ -105,7 +105,6 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Is assignment group filter not represented?
     if (
       initialColumnFilterSettings.assignment_group_id &&
-      initialColumnFilterSettings.assignment_group_id !== '0' &&
       !findAllAppliedFilterValuesOfType('assignment-group', get().filters).includes(
         initialColumnFilterSettings.assignment_group_id
       )
@@ -121,7 +120,6 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Is module filter not represented?
     if (
       initialColumnFilterSettings.context_module_id &&
-      initialColumnFilterSettings.context_module_id !== '0' &&
       !findAllAppliedFilterValuesOfType('module', get().filters).includes(
         initialColumnFilterSettings.context_module_id
       )

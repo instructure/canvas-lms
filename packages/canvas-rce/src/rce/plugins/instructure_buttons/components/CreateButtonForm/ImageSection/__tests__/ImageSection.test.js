@@ -22,7 +22,6 @@ import {ImageSection} from '../ImageSection'
 import fetchMock from 'fetch-mock'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import svg from '../SingleColor/svg'
-import {Size} from '../../../../svg/constants'
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
@@ -105,7 +104,7 @@ jest.mock('../../../../../../../bridge', () => {
 
 describe('ImageSectionc', () => {
   const defaultProps = {
-    settings: {size: Size.Small},
+    settings: {},
     editing: false,
     editor: {},
     onChange: jest.fn()

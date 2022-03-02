@@ -58,12 +58,9 @@ export default function ViolationTray({handleClose, accountId, addDomain, whitel
 
   return (
     <>
-      <CloseButton
-        placement="start"
-        offset="none"
-        onClick={handleClose}
-        screenReaderLabel={I18n.t('Close')}
-      />
+      <CloseButton placement="start" offset="none" onClick={handleClose}>
+        {I18n.t('Close')}
+      </CloseButton>
       <View as="div" padding="large x-small">
         <Heading level="h3" as="h2">
           {I18n.t('Violation Log')}

@@ -569,9 +569,9 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
     strictEqual(startProcessStub.firstCall.args[1].percent, 50.0)
   })
 
-  test('calls the startProcess method with the "excused" parameter when given a value of "excused"', async () => {
+  test('calls the startProcess method with the "excuse" parameter when given a value of "excused"', async () => {
     await gradebook.executeApplyScoreToUngraded({value: 'excused'})
-    strictEqual(startProcessStub.firstCall.args[1].excused, true)
+    strictEqual(startProcessStub.firstCall.args[1].excuse, true)
   })
 
   test('passes any additional arguments to the endpoint', async () => {

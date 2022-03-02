@@ -118,7 +118,7 @@ export default class GenericErrorPage extends React.Component {
                 <Text margin="0">{I18n.t('Help us improve by telling us what happened')}</Text>
               </View>
               <View margin="small" display="block">
-                <Button margin="0" color="primary" onClick={this.handleOpenCommentBox}>
+                <Button margin="0" variant="primary" onClick={this.handleOpenCommentBox}>
                   {I18n.t('Report Issue')}
                 </Button>
               </View>

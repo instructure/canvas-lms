@@ -31,7 +31,6 @@ import htmlEscape from 'html-escape'
 
 const MAX_FOLDERS_TO_SHOW = 2
 
-/* eslint-disable react/no-this-in-sfc */
 UsageRightsDialog.renderFileName = function () {
   const textToShow =
     this.props.itemsToManage.length > 1
@@ -158,13 +157,15 @@ UsageRightsDialog.render = function () {
     >
       <Modal.Header>
         <CloseButton
-          elementRef={e => (this.cancelXButton = e)}
+          buttonRef={e => (this.cancelXButton = e)}
           className="Button Button--icon-action"
           placement="end"
           offset="medium"
+          variant="icon"
           onClick={this.props.closeModal}
-          screenReaderLabel={I18n.t('Close')}
-        />
+        >
+          {I18n.t('Close')}
+        </CloseButton>
         <Heading level="h4">{I18n.t('Manage Usage Rights')}</Heading>
       </Modal.Header>
       <Modal.Body>
@@ -196,13 +197,13 @@ UsageRightsDialog.render = function () {
       </Modal.Body>
       <Modal.Footer>
         <span className="UsageRightsDialog__Footer-Actions">
-          <Button elementRef={e => (this.cancelButton = e)} onClick={this.props.closeModal}>
+          <Button buttonRef={e => (this.cancelButton = e)} onClick={this.props.closeModal}>
             {I18n.t('Cancel')}
           </Button>
           &nbsp;
           <Button
-            elementRef={e => (this.saveButton = e)}
-            color="primary"
+            buttonRef={e => (this.saveButton = e)}
+            variant="primary"
             type="submit"
             onClick={() => this.submit(this.props.deferSave)}
           >
@@ -213,6 +214,5 @@ UsageRightsDialog.render = function () {
     </Modal>
   )
 }
-/* eslint-enable react/no-this-in-sfc */
 
 export default createReactClass(UsageRightsDialog)

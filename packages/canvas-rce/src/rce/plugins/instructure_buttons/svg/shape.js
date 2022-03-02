@@ -17,36 +17,24 @@
  */
 
 import {createSvgElement} from './utils'
-import {Size} from './constants'
-
-export const Shape = {
-  Square: 'square',
-  Circle: 'circle',
-  Triangle: 'triangle',
-  Diamond: 'diamond',
-  Pentagon: 'pentagon',
-  Hexagon: 'hexagon',
-  Octagon: 'octagon',
-  Star: 'star'
-}
 
 export function buildShape({shape, size}) {
   switch (shape) {
-    case Shape.Square:
+    case 'square':
       return buildSquare(size)
-    case Shape.Circle:
+    case 'circle':
       return buildCircle(size)
-    case Shape.Triangle:
+    case 'triangle':
       return buildTriangle(size)
-    case Shape.Diamond:
+    case 'diamond':
       return buildDiamond(size)
-    case Shape.Pentagon:
+    case 'pentagon':
       return buildPentagon(size)
-    case Shape.Hexagon:
+    case 'hexagon':
       return buildHexagon(size)
-    case Shape.Octagon:
+    case 'octagon':
       return buildOctagon(size)
-    case Shape.Star:
+    case 'star':
       return buildStar(size)
     default:
       throw new Error(`Invalid shape: ${shape}`)
@@ -55,28 +43,28 @@ export function buildShape({shape, size}) {
 
 function buildSquare(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('rect', {
         x: '4',
         y: '4',
         width: '66',
         height: '66'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('rect', {
         x: '4',
         y: '4',
         width: '114',
         height: '114'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('rect', {
         x: '4',
         y: '4',
         width: '150',
         height: '150'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('rect', {
         x: '4',
         y: '4',
@@ -90,25 +78,25 @@ function buildSquare(size) {
 
 function buildCircle(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('circle', {
         cx: '37',
         cy: '37',
         r: '33'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('circle', {
         cx: '61',
         cy: '61',
         r: '57'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('circle', {
         cx: '79',
         cy: '79',
         r: '75'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('circle', {
         cx: '109',
         cy: '109',
@@ -121,19 +109,19 @@ function buildCircle(size) {
 
 function buildTriangle(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('path', {
         d: 'M37 8L66 66H8L37 8Z'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('path', {
         d: 'M61 8L114 114H8L61 8Z'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('path', {
         d: 'M79 8L150 150H8L79 8Z'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('path', {
         d: 'M109 8L210 210H8L109 8Z'
       })
@@ -144,37 +132,21 @@ function buildTriangle(size) {
 
 function buildDiamond(size) {
   switch (size) {
-    case Size.ExtraSmall:
-      return createSvgElement('rect', {
-        x: '6',
-        y: '37',
-        width: '44',
-        height: '44',
-        transform: 'rotate(-45 6 37)'
+    case 'x-small':
+      return createSvgElement('path', {
+        d: 'M33 4L66 33L33 66L4 33L33 4Z'
       })
-    case Size.Small:
-      return createSvgElement('rect', {
-        x: '7',
-        y: '61',
-        width: '77',
-        height: '77',
-        transform: 'rotate(-45 7 61)'
+    case 'small':
+      return createSvgElement('path', {
+        d: 'M57 4L114 57L57 114L4 57L57 4Z'
       })
-    case Size.Medium:
-      return createSvgElement('rect', {
-        x: '6',
-        y: '79',
-        width: '103',
-        height: '103',
-        transform: 'rotate(-45 6 79)'
+    case 'medium':
+      return createSvgElement('path', {
+        d: 'M75 4L150 75L75 150L4 75L75 4Z'
       })
-    case Size.Large:
-      return createSvgElement('rect', {
-        x: '6',
-        y: '109',
-        width: '146',
-        height: '146',
-        transform: 'rotate(-45 6 109)'
+    case 'large':
+      return createSvgElement('path', {
+        d: 'M105 4L210 105L105 210L4 105L105 4Z'
       })
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -183,21 +155,21 @@ function buildDiamond(size) {
 
 function buildPentagon(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('path', {
-        d: 'M5 28.9191L37 5L69 28.9191L55.235 68H18.8686L5 28.9191Z'
+        d: 'M37.0623 14L61 32.75L53.5195 62H21.1039L13 32.75L37.0623 14Z'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('path', {
-        d: 'M5 47.3838L61 6L117 47.3839L92.9113 115H29.27L5 47.3838Z'
+        d: 'M61.1247 13L109 50.5L94.039 109H29.2078L13 50.5L61.1247 13Z'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('path', {
-        d: 'M5 61.0519L79 6L153 61.0519L121.168 151H37.0711L5 61.0519Z'
+        d: 'M79.1714 13L145 64.56L124.429 145H35.285L13 64.5625L79.1714 13Z'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('path', {
-        d: 'M5 84.8319L109 7L213 84.832L168.264 212H50.0728L5 84.8319Z'
+        d: 'M109.249 13L205 88L175.078 205H45.4156L13 88L109.249 13Z'
       })
     default:
       throw new Error(`Invalid size: ${size}`)
@@ -206,19 +178,19 @@ function buildPentagon(size) {
 
 function buildHexagon(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('path', {
         d: 'M50.75 4L70 37L50.75 70H23.25L4 37L23.25 4H50.75Z'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('path', {
         d: 'M84.75 4L118 61L84.75 118H37.25L4 61L37.25 4H84.75Z'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('path', {
         d: 'M110.25 4L154 79L110.25 154H47.75L4 79L47.75 4H110.25Z'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('path', {
         d: 'M152.75 4L214 109L152.75 214H65.25L4 109L65.25 4H152.75Z'
       })
@@ -229,19 +201,19 @@ function buildHexagon(size) {
 
 function buildOctagon(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('path', {
         d: 'M4 23.25L23.25 4H50.75L70 23.25V50.75L50.75 70H23.25L4 50.75V23.25Z'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('path', {
         d: 'M4 37.25L37.25 4H84.75L118 37.25V84.75L84.75 118H37.25L4 84.75V37.25Z'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('path', {
         d: 'M4 47.75L47.75 4H110.25L154 47.75V110.25L110.25 154H47.75L4 110.25V47.75Z'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('path', {
         d: 'M4 65.25L65.25 4H152.75L214 65.25V152.75L152.75 214H65.25L4 152.75V65.25Z'
       })
@@ -252,19 +224,19 @@ function buildOctagon(size) {
 
 function buildStar(size) {
   switch (size) {
-    case Size.ExtraSmall:
+    case 'x-small':
       return createSvgElement('path', {
         d: 'M37.0623 14L42.5481 32.75H61L45.5403 43L53.5195 62L37.0623 49.25L21.1039 62L28.0857 43L13 32.75H31.5766L37.0623 14Z'
       })
-    case Size.Small:
+    case 'small':
       return createSvgElement('path', {
         d: 'M61.1247 13L72.0961 50.5H109L78.0805 71L94.039 109L61.1247 83.5L29.2078 109L43.1714 71L13 50.5H50.1532L61.1247 13Z'
       })
-    case Size.Medium:
+    case 'medium':
       return createSvgElement('path', {
         d: 'M79.1714 13L94.2571 64.5625H145L102.486 92.75L124.429 145L79.1714 109.937L35.2857 145L54.4857 92.75L13 64.5625H64.0857L79.1714 13Z'
       })
-    case Size.Large:
+    case 'large':
       return createSvgElement('path', {
         d: 'M109.249 13L131.192 88H205L143.161 129L175.078 205L109.249 154L45.4156 205L73.3429 129L13 88H87.3065L109.249 13Z'
       })

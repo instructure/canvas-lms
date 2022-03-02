@@ -145,7 +145,7 @@ class StatusesModal extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button ref={bindDoneButton} color="primary" onClick={close}>
+          <Button ref={bindDoneButton} variant="primary" onClick={close}>
             {I18n.t('Done')}
           </Button>
         </Modal.Footer>

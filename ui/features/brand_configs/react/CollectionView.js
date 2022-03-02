@@ -26,7 +26,6 @@ import ThemeCard from './ThemeCard'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
-import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'
 import {IconAddSolid, IconQuestionLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
@@ -37,7 +36,7 @@ function NewTheme({onNewTheme, bases}) {
   return (
     <Menu
       trigger={
-        <Button renderIcon={IconAddSolid} color="primary" data-testid="new-theme-button">
+        <Button icon={IconAddSolid} variant="primary" data-testid="new-theme-button">
           {I18n.t('Theme')}
         </Button>
       }
@@ -243,9 +242,9 @@ export default function CollectionView(props) {
               {I18n.t('Templates')}
               <Popover
                 renderTrigger={
-                  <Link size="small" renderIcon={IconQuestionLine}>
+                  <Button variant="link" size="small" icon={IconQuestionLine}>
                     <ScreenReaderContent>{explainerText}</ScreenReaderContent>
-                  </Link>
+                  </Button>
                 }
                 placement="top center"
               >

@@ -33,7 +33,6 @@
   },
   "apps_54d24a47": { "message": "Aplikacje" },
   "arrows_464a3e54": { "message": "Strzałki" },
-  "art_icon_8e1daad": { "message": "Ikona sztuki" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Współczynnik proporcji zostanie zachowany"
   },
@@ -71,7 +70,6 @@
     "message": "oznacz nieuporządkowaną listę"
   },
   "clear_2084585f": { "message": "Wyczyść" },
-  "clear_image_3213fe62": { "message": "Wyczyść obraz" },
   "clear_selected_file_82388e50": { "message": "Usuń wybrany plik" },
   "clear_selected_file_filename_2fe8a58e": {
     "message": "Usuń wybrany plik: { filename }"
@@ -129,7 +127,6 @@
   "creative_commons_license_725584ae": {
     "message": "Licencja Creative Commons:"
   },
-  "crop_image_41bf940c": { "message": "Przytnij obraz" },
   "crop_image_807ebb08": { "message": "Przytnij obraz" },
   "current_image_f16c249c": { "message": "Bieżący obraz" },
   "custom_6979cd81": { "message": "Niestandardowe" },
@@ -183,8 +180,6 @@
   "embed_preview_2d741e1f": { "message": "Osadź podgląd" },
   "embed_video_a97a64af": { "message": "Osadź wideo" },
   "embedded_content_aaeb4d3d": { "message": "osadzona zawartość" },
-  "engineering_icon_f8f3cf43": { "message": "Ikona inżynierii" },
-  "english_icon_25bfe845": { "message": "Ikona angielskiego" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Wpisz co najmniej 3 znaki, aby wyszukać."
   },
@@ -200,7 +195,6 @@
   "external_tools_6e77821": { "message": "Narzędzia zewnętrzne" },
   "extra_large_b6cdf1ff": { "message": "Wyjątkowo duże" },
   "extra_small_9ae33252": { "message": "Bardzo małe" },
-  "extracurricular_icon_67c8ca42": { "message": "Ikona zajęć pozalekcyjnych" },
   "file_url_c12b64be": { "message": "Adres URL pliku" },
   "filename_file_icon_602eb5de": { "message": "Ikona pliku { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -243,7 +237,6 @@
   "heading_2_5b84eed2": { "message": "Nagłówek 2" },
   "heading_3_2c83de44": { "message": "Nagłówek 3" },
   "heading_4_b2e74be7": { "message": "Nagłówek 4" },
-  "health_icon_8d292eb5": { "message": "Ikona zdrowia" },
   "height_69b03e15": { "message": "Wysokość" },
   "hexagon_d8468e0d": { "message": "Sześciobok" },
   "hide_description_bfb5502e": { "message": "Ukryj opis" },
@@ -255,7 +248,6 @@
     "message": "Mam uprawnienie do korzystania z tego pliku."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Posiadam prawa autorskie" },
-  "icon_color_b86dd6d6": { "message": "Kolor ikony" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Jeśli nie wybierzesz teraz praw do korzystania, po przesłaniu plik nie zostanie opublikowany."
   },
@@ -273,11 +265,8 @@
   "invalid_file_type_881cc9b2": { "message": "Nieprawidłowy typ pliku" },
   "invalid_url_cbde79f": { "message": "Nieprawidłowy adres URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Skróty klawiaturowe" },
-  "language_arts_icon_a798b0f8": { "message": "Ikona języków obcych" },
-  "languages_icon_9d20539": { "message": "Ikona języków" },
   "large_9c5e80e7": { "message": "Duży" },
   "left_to_right_e9b4fd06": { "message": "Lewa-prawa" },
-  "library_icon_ae1e54cf": { "message": "Ikona biblioteki" },
   "link_7262adec": { "message": "Łącze" },
   "link_options_a16b758b": { "message": "Opcje łącza" },
   "links_14b70841": { "message": "Łącza" },
@@ -291,7 +280,6 @@
   "loading_please_wait_d276220a": { "message": "Ładowanie, proszę czekać" },
   "loading_preview_9f077aa1": { "message": "Wczytywanie podglądu" },
   "locked_762f138b": { "message": "Zablokowany" },
-  "math_icon_ad4e9d03": { "message": "Ikona matematyki" },
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Średni" },
   "middle_27dc1d5": { "message": "Środkowy" },
@@ -299,7 +287,6 @@
   "miscellaneous_e9818229": { "message": "Różne" },
   "modules_c4325335": { "message": "Moduły" },
   "multi_color_image_63d7372f": { "message": "Obraz wielokolorowy" },
-  "music_icon_4db5c972": { "message": "Ikona muzyki" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Wymagane co najmniej { percentage }%"
   },
@@ -352,10 +339,6 @@
   "percentage_must_be_a_number_8033c341": {
     "message": "Odsetek musi być liczbą"
   },
-  "performing_arts_icon_f3497486": { "message": "Ikona sztuk wizualnych" },
-  "physical_education_icon_d7dffd3e": {
-    "message": "Ikona wychowania fizycznego"
-  },
   "pixels_52ece7d1": { "message": "Piksele" },
   "posted_when_a578f5ab": { "message": "Opublikował(a): { when }" },
   "preformatted_d0670862": { "message": "Wstępnie formatowane" },
@@ -376,7 +359,6 @@
     "message": "Utwórz/prześlij pliki multimedialne"
   },
   "relationships_6602af70": { "message": "Powiązania" },
-  "religion_icon_246e0be1": { "message": "Ikona religii" },
   "remove_link_d1f2f4d0": { "message": "Usuń łącze" },
   "resize_ec83d538": { "message": "Zmień rozmiar" },
   "restore_auto_save_deccd84b": {
@@ -562,7 +544,5 @@
   "yes_dde87d5": { "message": "Tak" },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "Nie można przesłać pustego pliku."
-  },
-  "zoom_in_image_bb97d4f": { "message": "Przybliż obraz" },
-  "zoom_out_image_d0a0a2ec": { "message": "Oddal obraz" }
+  }
 }

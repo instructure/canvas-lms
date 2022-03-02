@@ -26,8 +26,7 @@ import {findOutcomesMocks} from '@canvas/outcomes/mocks/Management'
 import {
   IMPORT_NOT_STARTED,
   IMPORT_FAILED,
-  IMPORT_PENDING,
-  IMPORT_COMPLETED
+  IMPORT_PENDING
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 jest.useFakeTimers()
@@ -237,81 +236,6 @@ describe('FindOutcomesView', () => {
       />
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
-  })
-
-  it('enables "Add All Outcomes" button if there are multiple outcomes that are not imported and one gets imported', () => {
-    const {getByText} = render(
-      <FindOutcomesView
-        {...defaultProps({
-          importOutcomesStatus: {11: IMPORT_COMPLETED},
-          outcomesGroup: {
-            ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 2
-          }
-        })}
-      />
-    )
-    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
-  })
-
-  it('disables "Add All Outcomes" button if the remaining outcome is getting imported', () => {
-    const {getByText} = render(
-      <FindOutcomesView
-        {...defaultProps({
-          importOutcomesStatus: {11: IMPORT_PENDING},
-          outcomesGroup: {
-            ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
-        })}
-      />
-    )
-    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
-  })
-
-  it('disables "Add All Outcomes" button if the remaining outcome is imported', () => {
-    const {getByText} = render(
-      <FindOutcomesView
-        {...defaultProps({
-          importOutcomesStatus: {11: IMPORT_COMPLETED},
-          outcomesGroup: {
-            ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
-        })}
-      />
-    )
-    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
-  })
-
-  it('enables "Add All Outcomes" button if the remaining outcome imports and fails', () => {
-    const {getByText} = render(
-      <FindOutcomesView
-        {...defaultProps({
-          importOutcomesStatus: {11: IMPORT_FAILED},
-          outcomesGroup: {
-            ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
-        })}
-      />
-    )
-    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
-  })
-
-  it('enables "Add All Outcomes" button if no outcomes from the current group were importedr', () => {
-    const {getByText} = render(
-      <FindOutcomesView
-        {...defaultProps({
-          importOutcomesStatus: {0: IMPORT_COMPLETED},
-          outcomesGroup: {
-            ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
-        })}
-      />
-    )
-    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
   })
 
   it('displays outcome as not added when outcome has not been imported', () => {
