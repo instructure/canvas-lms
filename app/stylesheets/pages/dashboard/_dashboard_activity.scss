@@ -70,10 +70,11 @@
   cursor: pointer;
   user-select: none;
   display: flex;
-  padding: $ic-sp;
+  padding: $ic-sp 0;
   .image-block {
     flex: 1;
     align-items: center;
+    padding-#{direction(right)}: $ic-sp*0.5;
   }
   .toggle-details {
     text-transform: uppercase;
@@ -87,14 +88,6 @@
       text-indent: 0;
       text-align: direction(right);
     }
-  }
-}
-
-.responsive_awareness .stream_header {
-  padding: $ic-sp 0;
-
-  .image-block {
-    padding-#{direction(right)}: $ic-sp*0.5;
   }
 }
 
@@ -117,10 +110,6 @@ $ignore-col-width: 50px;
 
 .details_container {
   display: none;
-  margin-#{direction(left)}: 62px;
-}
-
-.responsive_awareness .details_container {
   margin-#{direction(left)}: 52px;
 }
 
@@ -128,7 +117,7 @@ $ignore-col-width: 50px;
   width: 100%;
   tr {
     border-top: 1px dotted $ic-border-light;
-    line-height: 250%;
+    line-height: 2.0;
     // remove hover color on high contrast and use link underlines on hover instead (a11y)
     @if $use_high_contrast == false {
       &:hover {
@@ -138,23 +127,10 @@ $ignore-col-width: 50px;
   }
   .date {
     @include fontSize(11px);
-    width: 100px;
-    white-space: nowrap;
-    text-align: center;
-  }
-  .remove {
-    width: $ignore-col-width;
-  }
-}
-
-.responsive_awareness .stream-details {
-  tr {
-    line-height: 2.0;
-  }
-  .date {
-    width: 20%;
     line-height: 1.5;
+    width: 20%;
     white-space: normal;
+    text-align: center;
   }
   .remove {
     width: 5%;
@@ -169,7 +145,8 @@ $ignore-col-width: 50px;
 }
 
 .content_summary {
-  word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: normal;
   word-wrap: break-word;
   display: block;
   color: inherit;
@@ -186,11 +163,6 @@ $ignore-col-width: 50px;
   }
   font-weight: bold;
   @include fontSize($ic-font-size--xsmall);
-}
-
-.responsive_awareness .content_summary {
-  word-break: normal;
-  overflow-wrap: break-word;
 }
 
 .fake-link {

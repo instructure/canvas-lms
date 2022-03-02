@@ -346,6 +346,52 @@ module ActiveRecord
     end
   end
 
+  describe ".global_id?" do
+    specs_require_sharding
+
+    before do
+      @shard1.activate do
+        @account = Account.create!
+      end
+    end
+
+    it "returns true if passed an explicit global id" do
+      @shard1.activate do
+        expect(Account).to be_global_id(@account.global_id)
+      end
+    end
+
+    it "returns true if passed a stringified global id" do
+      @shard1.activate do
+        expect(Account).to be_global_id(@account.global_id.to_s)
+      end
+    end
+
+    it "returns true if passed an id that resolves to a global id" do
+      @shard2.activate do
+        expect(Account).to be_global_id(@account.id)
+      end
+    end
+
+    it "returns false if passed an explicit local id" do
+      @shard2.activate do
+        expect(Account).not_to be_global_id(@account.local_id)
+      end
+    end
+
+    it "returns false if passed an id that resolves to a local id" do
+      @shard1.activate do
+        expect(Account).not_to be_global_id(@account.id)
+      end
+    end
+
+    it "returns false if passed nil" do
+      @shard1.activate do
+        expect(Account).not_to be_global_id(nil)
+      end
+    end
+  end
+
   describe Relation do
     describe "lock_with_exclusive_smarts" do
       let(:scope) { User.active }
@@ -397,16 +443,50 @@ module ActiveRecord
         end
       end
 
+      shared_examples_for "query creation sharding" do
+        specs_require_sharding
+
+        it "derives the appropriate shard from its input, if they all share the same shard" do
+          expect(base_s1.union(base_s1).shard_value).to be @shard1
+
+          @shard2.activate do
+            expect(base_s1.union(base_s1).shard_value).to be @shard1
+          end
+        end
+
+        it "rejects input that are on different shards" do
+          expect { base_s1.union(base_s2) }.to raise_error(/multiple shard values passed to union/)
+        end
+      end
+
       context "directly on the table" do
         let(:base) { User.active }
+        let(:base_s1) { @shard1.activate { User.active } }
+        let(:base_s2) { @shard2.activate { User.active } }
 
         include_examples "query creation"
+        include_examples "query creation sharding"
       end
 
       context "through a relation" do
         let(:base) { Account.create.users }
+        let(:base_s1) { @shard1.activate { Account.create.users } }
+        let(:base_s2) { @shard2.activate { Account.create.users } }
 
         include_examples "query creation"
+        include_examples "query creation sharding"
+      end
+
+      context "through a where query that references multiple shards" do
+        let(:user) { User.create }
+        let(:user_s1) { @shard1.activate { User.create } }
+        let(:user_s2) { @shard2.activate { User.create } }
+
+        let(:base) { User.where(id: [user_s1, user_s2]) }
+        let(:base_s1) { @shard1.activate { User.where(id: [user_s1, user_s2]) } }
+        let(:base_s2) { @shard2.activate { User.where(id: [user_s1, user_s2]) } }
+
+        include_examples "query creation sharding"
       end
     end
   end

@@ -90,6 +90,32 @@ describe Course do
       @assignment_in_other_course = @other_course.assignments.create!
     end
 
+    context "sharding" do
+      specs_require_sharding
+
+      before do
+        @shard1.activate do
+          account = Account.create!
+          course_with_student(account: account, active_all: true)
+          assignment_model(course: @course)
+        end
+      end
+
+      it "handles being passed global assignment IDs" do
+        @shard1.activate do
+          edd = EffectiveDueDates.for_course(@course, @assignment.global_id)
+          expect(edd.to_hash[@assignment.id]).to have_key @student.id
+        end
+      end
+
+      it "handles being passed local assignment IDs" do
+        @shard1.activate do
+          edd = EffectiveDueDates.for_course(@course, @assignment.id)
+          expect(edd.to_hash[@assignment.id]).to have_key @student.id
+        end
+      end
+    end
+
     it "properly converts timezones" do
       Time.zone = "Alaska"
       default_due = DateTime.parse("01 Jan 2011 14:00 AKST")

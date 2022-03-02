@@ -44,25 +44,4 @@ describe "/users/show" do
     expect(response).not_to be_nil
     expect(content_for(:right_side)).to include "Message #{@user.name}" # regardless of permissions
   end
-
-  it "renders responsive accounts" do
-    @course.root_account.enable_feature!(:responsive_misc)
-    render "users/show"
-    expect(response).to have_tag("div[class='accounts'] span[class='name'][style='word-break: break-word;']")
-    expect(response).to have_tag("div[class='accounts'] span[class='name'][style='word-break: break-word;']")
-  end
-
-  it "renders responsive groups" do
-    @course.root_account.enable_feature!(:responsive_misc)
-    render "users/show"
-    expect(response).to have_tag("div[class='groups'] span[class='name'][style='word-break: break-word;']")
-    expect(response).to have_tag("div[class='groups'] span[class='name'][style='word-break: break-word;']")
-  end
-
-  it "renders responsive enrollments" do
-    @course.root_account.enable_feature!(:responsive_misc)
-    render "users/show"
-    expect(response).to have_tag("div[class='courses'] span[class='name'][style='word-break: break-word;']")
-    expect(response).to have_tag("div[class='courses'] span[class='name'][style='word-break: break-word;']")
-  end
 end

@@ -22,7 +22,7 @@ import mimeClass from '@canvas/mime/mimeClass'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -79,20 +79,18 @@ const FileList = props => {
             )}
             {canRemove && (
               <Flex.Item padding="0 small 0 x-small">
-                <Button
-                  icon={IconTrashLine}
+                <IconButton
+                  renderIcon={IconTrashLine}
                   id={file.id}
                   onClick={removeFileHandler(refsMap)}
                   ref={element => {
                     refsMap[file.id] = element
                   }}
                   size="small"
-                  variant="icon"
-                >
-                  <ScreenReaderContent>
-                    {I18n.t('Remove %{filename}', {filename: file.name})}
-                  </ScreenReaderContent>
-                </Button>
+                  screenReaderLabel={I18n.t('Remove %{filename}', {filename: file.name})}
+                  withBackground={false}
+                  withBorder={false}
+                />
               </Flex.Item>
             )}
           </Flex>

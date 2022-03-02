@@ -290,7 +290,7 @@ describe('TextEntry', () => {
     let insertCode
 
     const fakeEvent = {
-      messageType: 'ContentDefinitelyNotReady',
+      subject: 'ContentDefinitelyNotReady',
       content_items: [
         {
           '@type': 'LtiLinkItem',
@@ -302,7 +302,7 @@ describe('TextEntry', () => {
     }
 
     const realEvent = {
-      messageType: 'A2ExternalContentReady',
+      subject: 'A2ExternalContentReady',
       content_items: [
         {
           '@type': 'LtiLinkItem',

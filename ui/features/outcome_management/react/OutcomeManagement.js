@@ -202,7 +202,9 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
         </Tabs.Panel>
         {accountLevelMasteryScales && (
           <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1} id="scale">
-            <MasteryScale onNotifyPendingChanges={setHasUnsavedChanges} />
+            <div style={{paddingTop: '24px'}}>
+              <MasteryScale onNotifyPendingChanges={setHasUnsavedChanges} />
+            </div>
           </Tabs.Panel>
         )}
         {accountLevelMasteryScales && (

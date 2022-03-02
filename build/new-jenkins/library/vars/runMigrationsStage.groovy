@@ -39,9 +39,9 @@ def call() {
         export CACHE_LOAD_SCOPE=\${CACHE_LOAD_SCOPE:-}
         export CACHE_SAVE_SCOPE=\${CACHE_SAVE_SCOPE:-}
         ./build/new-jenkins/run-migrations.sh
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $CASSANDRA_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $DYNAMODB_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTGRES_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $CASSANDRA_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $DYNAMODB_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $POSTGRES_PREFIX || true
       """
     }
 

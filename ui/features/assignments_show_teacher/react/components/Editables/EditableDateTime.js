@@ -21,13 +21,12 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import {DateTime} from '@instructure/ui-i18n'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 /* import {DateTimeInput} from '@instructure/ui-forms' */
 import {IconCalendarMonthLine} from '@instructure/ui-icons'
 import {Editable} from '@instructure/ui-editable'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {FocusableView} from '@instructure/ui-focusable'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 
@@ -193,7 +192,7 @@ export default class EditableDateTime extends React.Component {
           onKeyUp={this.handleKey}
           data-testid="EditableDateTime-editor"
         >
-          <FocusableView display="block" width="100%" focused>
+          <View display="block" width="100%">
             <View display="inline-block" padding="x-small">
               <DateTimeInput
                 layout="stacked"
@@ -213,7 +212,7 @@ export default class EditableDateTime extends React.Component {
                 timezone={this.props.timeZone}
               />
             </View>
-          </FocusableView>
+          </View>
         </div>
       )
     }
@@ -226,21 +225,19 @@ export default class EditableDateTime extends React.Component {
   renderEditButton = ({onClick, onFocus, onBlur, buttonRef}) => {
     if (!this.props.readOnly && this.props.mode === 'view') {
       return (
-        <Button
+        <IconButton
           size="small"
-          variant="icon"
           margin="0 0 0 x-small"
-          icon={IconCalendarMonthLine}
+          withBackground={false}
+          withBorder={false}
+          renderIcon={IconCalendarMonthLine}
           onClick={onClick}
           onFocus={this.delayedHandler(onFocus)}
           onBlur={onBlur}
-          buttonRef={buttonRef}
+          elementRef={buttonRef}
           readOnly={this.props.readOnly}
-        >
-          <ScreenReaderContent>
-            {I18n.t('Edit %{when}', {when: this.props.label})}
-          </ScreenReaderContent>
-        </Button>
+          screenReaderLabel={I18n.t('Edit %{when}', {when: this.props.label})}
+        />
       )
     }
     return null
@@ -261,7 +258,7 @@ export default class EditableDateTime extends React.Component {
         elementRef={this.elementRef}
         {...containerProps}
       >
-        <Flex inline direction="row" justifyItems="space-between" width="100%">
+        <Flex display="inline-flex" direction="row" justifyItems="space-between" width="100%">
           <Flex.Item grow shrink>
             {this.renderEditor(getEditorProps())}
             {this.renderViewer(getViewerProps())}

@@ -79,7 +79,7 @@ export default class BlueprintCourseSidebar extends Component {
       <div className="bcs__wrapper">
         <div className="bcs__trigger">
           <Button
-            buttonRef={c => {
+            elementRef={c => {
               this.openBtn = c
             }}
             variant="icon-inverse"
@@ -105,7 +105,7 @@ export default class BlueprintCourseSidebar extends Component {
                 <Button
                   variant="icon-inverse"
                   onClick={this.close}
-                  buttonRef={c => {
+                  elementRef={c => {
                     this.closeBtn = c
                   }}
                 >

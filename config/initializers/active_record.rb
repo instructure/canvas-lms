@@ -95,6 +95,10 @@ class ActiveRecord::Base
     "#{self.class.reflection_type_name}_#{id}"
   end
 
+  def self.global_id?(id)
+    !!id && id.to_i > Shard::IDS_PER_SHARD
+  end
+
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes - 1
   end
@@ -1128,7 +1132,7 @@ module UsefulBatchEnumerator
     @relation.send(:_substitute_values, updates).any? do |(attr, update)|
       found_match = false
       predicates.any? do |pred|
-        next unless pred.is_a?(Arel::Nodes::Binary)
+        next unless pred.is_a?(Arel::Nodes::Binary) || (!CANVAS_RAILS6_0 && pred.is_a?(Arel::Nodes::HomogeneousIn))
         next unless pred.left == attr
 
         found_match = true
@@ -1154,6 +1158,13 @@ module UsefulBatchEnumerator
           pred.right.exclude?(update)
         elsif pred.instance_of?(Arel::Nodes::NotIn) && pred.right.is_a?(Array)
           pred.right.include?(update)
+        elsif !CANVAS_RAILS6_0 && pred.instance_of?(Arel::Nodes::HomogeneousIn)
+          case pred.type
+          when :in
+            pred.right.map(&:value).exclude?(update.value.value)
+          when :notin
+            pred.right.map(&:value).include?(update.value.value)
+          end
         end
       end && found_match
     end
@@ -1243,8 +1254,6 @@ ActiveRecord::Relation.class_eval do
     relation
   end
 
-  # if this sql is constructed on one shard then executed on another it wont work
-  # dont use it for cross shard queries
   def union(*scopes, from: false)
     table = connection.quote_local_table_name(table_name)
     scopes.unshift(self)
@@ -1252,14 +1261,20 @@ ActiveRecord::Relation.class_eval do
     return scopes.first if scopes.length == 1
     return self if scopes.empty?
 
-    sub_query = scopes.map do |scope|
-      scope = scope.except(:select, :order).select(primary_key) unless from
-      "(#{scope.to_sql})"
-    end.join(" UNION ALL ")
-    return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
+    primary_shards = scopes.map(&:primary_shard).uniq
 
-    sub_query = +"(#{sub_query}) #{from == true ? table : from}"
-    unscoped.from(sub_query)
+    raise "multiple shard values passed to union: #{primary_shards}" if primary_shards.count > 1
+
+    primary_shards.first.activate do
+      sub_query = scopes.map do |scope|
+        scope = scope.except(:select, :order).select(primary_key) unless from
+        "(#{scope.to_sql})"
+      end.join(" UNION ALL ")
+      return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
+
+      sub_query = +"(#{sub_query}) #{from == true ? table : from}"
+      unscoped.from(sub_query)
+    end
   end
 
   # returns batch_size ids at a time, working through the primary key from
@@ -2129,3 +2144,61 @@ module UserContentSerialization
   end
 end
 ActiveRecord::Base.include(UserContentSerialization)
+
+unless CANVAS_RAILS6_0
+  # Hopefully this can be removed with https://github.com/rails/rails/commit/6beee45c3f071c6a17149be0fabb1697609edbe8
+  # having made a released version of rails; if not bump the rails version in this comment and leave the comment to be revisited
+  # on the next rails bump
+
+  # This code is direcly copied from rails except the INST commented line, hence the rubocop disables
+  # rubocop:disable Lint/RescueException
+  # rubocop:disable Naming/RescuedExceptionsVariableName
+  require "active_record/connection_adapters/abstract/transaction"
+  module ActiveRecord
+    module ConnectionAdapters
+      class TransactionManager
+        def within_new_transaction(isolation: nil, joinable: true)
+          @connection.lock.synchronize do
+            transaction = begin_transaction(isolation: isolation, joinable: joinable)
+            ret = yield
+            completed = true
+            ret
+          rescue Exception => error
+            if transaction
+              # INST: The one functional change, since on postgres this is unnecessary, and the above-linked commit disables it
+              # transaction.state.invalidate! if error.is_a? ActiveRecord::TransactionRollbackError
+              rollback_transaction
+              after_failure_actions(transaction, error)
+            end
+
+            raise
+          ensure
+            if transaction
+              if error
+                # @connection still holds an open or invalid transaction, so we must not
+                # put it back in the pool for reuse.
+                @connection.throw_away! unless transaction.state.rolledback?
+              elsif Thread.current.status == "aborting" || (!completed && transaction.written)
+                # The transaction is still open but the block returned earlier.
+                #
+                # The block could return early because of a timeout or because the thread is aborting,
+                # so we are rolling back to make sure the timeout didn't caused the transaction to be
+                # committed incompletely.
+                rollback_transaction
+              else
+                begin
+                  commit_transaction
+                rescue Exception
+                  rollback_transaction(transaction) unless transaction.state.completed?
+                  raise
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  # rubocop:enable Lint/RescueException
+  # rubocop:enable Naming/RescuedExceptionsVariableName
+end

@@ -33,7 +33,7 @@ import SetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import TermsApi from '../enrollmentTermsApi'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const presentEnrollmentTerms = function(enrollmentTerms) {
+const presentEnrollmentTerms = function (enrollmentTerms) {
   return _.map(enrollmentTerms, term => {
     const newTerm = {...term}
 
@@ -51,7 +51,7 @@ const presentEnrollmentTerms = function(enrollmentTerms) {
   })
 }
 
-const getEditGradingPeriodSetRef = function(set) {
+const getEditGradingPeriodSetRef = function (set) {
   return `edit-grading-period-set-${set.id}`
 }
 
@@ -397,7 +397,7 @@ export default class GradingPeriodSetCollection extends React.Component {
       return (
         <Button
           ref="addSetFormButton"
-          variant="primary"
+          color="primary"
           disabled={disable}
           onClick={this.openNewSetForm}
           aria-label={I18n.t('Add Set of Grading Periods')}

@@ -30,8 +30,11 @@ describe "high_contrast" do
         get "/courses/#{@course.id}/announcements"
 
         # just using the "Add announcement" button on the announcemnts page
-        # as a random example of an instUI component
-        expect(flnpt("Add announcement")).to meet_contrast_ratio(3.5)
+        # as a random example of an instUI component. As of InstUI 7 the
+        # theme gets applied to a <span> inside the <a> so we have to dig
+        # for that.
+        childspan = flnpt("Add announcement").find_element(tag_name: "span")
+        expect(childspan).to meet_contrast_ratio(3.5)
       end
     end
 
@@ -41,7 +44,8 @@ describe "high_contrast" do
       it "meets 4.5:1 contrast for buttons" do
         get "/courses/#{@course.id}/announcements"
 
-        expect(flnpt("Add announcement")).to meet_contrast_ratio(4.5)
+        childspan = flnpt("Add announcement").find_element(tag_name: "span")
+        expect(childspan).to meet_contrast_ratio(4.5)
       end
     end
   end

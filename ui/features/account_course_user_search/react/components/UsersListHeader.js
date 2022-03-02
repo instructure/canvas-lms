@@ -35,7 +35,7 @@ export default function UsersListHeader(props) {
 
   return (
     <Table.ColHeader id={id} data-testid="UsersListHeader">
-      <Tooltip tip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
+      <Tooltip renderTip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
         <Button
           id={`${id}-button`}
           onClick={handleFilterUpdate}

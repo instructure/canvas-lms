@@ -26,7 +26,7 @@ import UploadMedia from '@instructure/canvas-media'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {DEFAULT_ICON} from '@canvas/mime/react/mimeClassIconHelper'
@@ -283,9 +283,9 @@ export default class CommentTextArea extends Component {
                   }}
                   type="file"
                 />
-                <Button
+                <IconButton
                   id="attachmentFileButton"
-                  icon={DEFAULT_ICON}
+                  renderIcon={DEFAULT_ICON}
                   margin="0 x-small 0 0"
                   onClick={() => {
                     this.fileInput.click()
@@ -294,21 +294,21 @@ export default class CommentTextArea extends Component {
                     this.attachmentFileButton = element
                   }}
                   size="small"
-                  variant="icon"
-                >
-                  <ScreenReaderContent>{I18n.t('Attach a File')}</ScreenReaderContent>
-                </Button>
-                <Button
+                  screenReaderLabel={I18n.t('Attach a File')}
+                  withBackground={false}
+                  withBorder={false}
+                />
+                <IconButton
                   id="mediaCommentButton"
                   onClick={() => this.setState({mediaModalOpen: true})}
-                  icon={IconAttachMediaLine}
+                  renderIcon={IconAttachMediaLine}
                   margin="0 x-small 0 0"
                   size="small"
-                  variant="icon"
                   disabled={this.state.mediaObject}
-                >
-                  <ScreenReaderContent>{I18n.t('Record Audio/Video')}</ScreenReaderContent>
-                </Button>
+                  withBackground={false}
+                  withBorder={false}
+                  screenReaderLabel={I18n.t('Record Audio/Video')}
+                />
                 <UploadMedia
                   contextId={this.props.assignment.env.courseId}
                   contextType="course"

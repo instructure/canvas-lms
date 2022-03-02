@@ -112,7 +112,7 @@ export default function FormContent({
           </Flex.Item>
 
           <Flex.Item>
-            <Button disabled={!gradesPublished} onClick={onPostClick} variant="primary">
+            <Button disabled={!gradesPublished} onClick={onPostClick} color="primary">
               {I18n.t('Post')}
             </Button>
           </Flex.Item>

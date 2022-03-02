@@ -1949,6 +1949,11 @@ describe SpeedGrader::Assignment do
         expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
+      it "includes anonymous names on students" do
+        anonymous_names = json.dig("context", "students").map { |student| student["anonymous_name"] }
+        expect(anonymous_names).to match_array(["Student 1", "Student 2", "Student 3"])
+      end
+
       it "excludes user ids from submissions" do
         expect(json["submissions"]).to all(not_have_key("user_id"))
       end

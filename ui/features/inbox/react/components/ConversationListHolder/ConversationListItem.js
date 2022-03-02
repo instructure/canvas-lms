@@ -41,20 +41,32 @@ import {colors} from '@instructure/canvas-theme'
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
 
+  const isSubmissionComments = props.submissionComments && !props.conversation
+
   const handleConversationClick = e => {
     e.nativeEvent.stopImmediatePropagation()
     e.stopPropagation()
 
     // Kind of a hack since our Checkbox doesn't support onChange or swallowing
-    // events with ease. Removing aria-hidden elemnts from sending click events
+    // events with ease. Removing aria-hidden elements from sending click events
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) {
-      props.onSelect(e, props.id, props.conversation, true)
+      props.onSelect(
+        e,
+        props.id,
+        isSubmissionComments ? props.submissionComments : props.conversation,
+        true
+      )
     } else {
-      props.onSelect(e, props.id, props.conversation, false)
+      props.onSelect(
+        e,
+        props.id,
+        isSubmissionComments ? props.submissionComments : props.conversation,
+        false
+      )
       props.onOpen()
     }
   }
@@ -64,7 +76,7 @@ export const ConversationListItem = ({...props}) => {
     e.stopPropagation()
 
     // Kind of a hack since our Checkbox doesn't support onChange or swallowing
-    // events with ease. Removing aria-hidden elemnts from sending click events
+    // events with ease. Removing aria-hidden elements from sending click events
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
@@ -72,13 +84,16 @@ export const ConversationListItem = ({...props}) => {
   }
 
   const formatParticipants = () => {
-    const participantsStr = props.conversation.conversationParticipantsConnection.nodes
-      .filter(
-        p => p.user.name !== props.conversation.conversationMessagesConnection.nodes[0].author.name
-      )
-      .reduce((prev, curr) => {
-        return prev + ', ' + curr.user.name
-      }, '')
+    const participantsStr = isSubmissionComments
+      ? ''
+      : props.conversation.conversationParticipantsConnection.nodes
+          .filter(
+            p =>
+              p.user.name !== props.conversation.conversationMessagesConnection.nodes[0].author.name
+          )
+          .reduce((prev, curr) => {
+            return prev + ', ' + curr.user.name
+          }, '')
 
     return (
       <Responsive
@@ -105,7 +120,11 @@ export const ConversationListItem = ({...props}) => {
             data-testid={responsiveProps.datatestid}
           >
             <TruncateText>
-              <b>{props.conversation.conversationMessagesConnection.nodes[0].author.name}</b>
+              <b>
+                {isSubmissionComments
+                  ? props.submissionComments[0].author.name
+                  : props.conversation.conversationMessagesConnection.nodes[0].author.name}
+              </b>
               {participantsStr}
             </TruncateText>
           </Text>
@@ -200,6 +219,9 @@ export const ConversationListItem = ({...props}) => {
                       checked={props.isSelected}
                       onChange={e => {
                         e.stopPropagation()
+                        if (props.isSelected) {
+                          props.onRemoveFromSelectedConversations(props.id)
+                        }
                       }}
                     />
                   </View>
@@ -207,13 +229,19 @@ export const ConversationListItem = ({...props}) => {
                 <Grid.Col>
                   <Text color="brand" size={responsiveProps.date.size}>
                     {formatDate(
-                      props.conversation.conversationMessagesConnection.nodes[0]?.createdAt
+                      isSubmissionComments
+                        ? props.submissionComments[0].createdAt
+                        : props.conversation.conversationMessagesConnection.nodes[0]?.createdAt
                     )}
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">
                   <Badge
-                    count={props.conversation.conversationMessagesConnection.nodes?.length}
+                    count={
+                      isSubmissionComments
+                        ? props.submissionComments.length
+                        : props.conversation.conversationMessagesConnection.nodes?.length
+                    }
                     countUntil={99}
                     standalone
                     theme={{
@@ -257,7 +285,13 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text weight="normal" size={responsiveProps.subject.size}>
-                    <TruncateText>{props.conversation.subject}</TruncateText>
+                    <TruncateText>
+                      {isSubmissionComments
+                        ? props.submissionComments[0].course.contextName +
+                          ' - ' +
+                          props.submissionComments[0].assignment.name
+                        : props.conversation.subject}
+                    </TruncateText>
                   </Text>
                 </Grid.Col>
               </Grid.Row>
@@ -268,30 +302,20 @@ export const ConversationListItem = ({...props}) => {
                 <Grid.Col>
                   <Text color="secondary" size={responsiveProps.message.size}>
                     <TruncateText>
-                      {props.conversation.conversationMessagesConnection?.nodes[0]?.body}
+                      {isSubmissionComments
+                        ? props.submissionComments[0].comment
+                        : props.conversation.conversationMessagesConnection?.nodes[0]?.body}
                     </TruncateText>
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">
-                  <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                    <Focusable>
-                      {({focused}) => {
-                        return (
-                          <div>
-                            {focused || isHovering || props.isStarred ? (
-                              <IconButton
-                                size="small"
-                                withBackground={false}
-                                withBorder={false}
-                                renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                screenReaderLabel={
-                                  props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                }
-                                onClick={handleConversationStarClick}
-                                data-testid="visible-star"
-                              />
-                            ) : (
-                              <ScreenReaderContent>
+                  {!isSubmissionComments && (
+                    <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
+                      <Focusable>
+                        {({focused}) => {
+                          return (
+                            <div>
+                              {focused || isHovering || props.isStarred ? (
                                 <IconButton
                                   size="small"
                                   withBackground={false}
@@ -301,14 +325,28 @@ export const ConversationListItem = ({...props}) => {
                                     props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                                   }
                                   onClick={handleConversationStarClick}
+                                  data-testid="visible-star"
                                 />
-                              </ScreenReaderContent>
-                            )}
-                          </div>
-                        )
-                      }}
-                    </Focusable>
-                  </View>
+                              ) : (
+                                <ScreenReaderContent>
+                                  <IconButton
+                                    size="small"
+                                    withBackground={false}
+                                    withBorder={false}
+                                    renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                                    screenReaderLabel={
+                                      props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                                    }
+                                    onClick={handleConversationStarClick}
+                                  />
+                                </ScreenReaderContent>
+                              )}
+                            </div>
+                          )
+                        }}
+                      </Focusable>
+                    </View>
+                  )}
                 </Grid.Col>
               </Grid.Row>
               <Grid.Row>
@@ -362,11 +400,13 @@ export const conversationProp = PropTypes.shape({
 
 ConversationListItem.propTypes = {
   conversation: conversationProp,
+  submissionComments: PropTypes.arrayOf(PropTypes.object),
   id: PropTypes.string,
   isSelected: PropTypes.bool,
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
+  onRemoveFromSelectedConversations: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
   readStateChangeConversationParticipants: PropTypes.func

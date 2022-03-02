@@ -26,11 +26,13 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {IconQuestionLine} from '@instructure/ui-icons'
 
+import {TruncateText} from '@instructure/ui-truncate-text'
+
 const TutorialTrayContent = props => (
   <div className={`NewUserTutorialTray__Content ${props.name}`}>
     <div>
-      <Heading level="h3" margin="none none medium" ellipsis>
-        {props.heading}
+      <Heading level="h3" margin="none none medium">
+        <TruncateText>{props.heading}</TruncateText>
       </Heading>
       <Text size="large">{props.subheading}</Text>
       <View as="p" margin="small none none">

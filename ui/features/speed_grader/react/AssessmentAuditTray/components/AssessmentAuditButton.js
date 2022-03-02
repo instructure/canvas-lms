@@ -32,7 +32,7 @@ const theme = {
 export default function AssessmentAuditButton(props) {
   return (
     <ApplyTheme theme={theme}>
-      <Button icon={IconClockLine} onClick={props.onClick} size="small" variant="link">
+      <Button renderIcon={IconClockLine} onClick={props.onClick} size="small" variant="link">
         {I18n.t('Assessment audit')}
       </Button>
     </ApplyTheme>

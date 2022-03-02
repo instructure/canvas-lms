@@ -47,7 +47,7 @@ export default class Header extends React.Component {
             <Link
               icon={IconExternalLinkLine}
               href="https://www.eduappcenter.com/"
-              linkRef={this.setLinkRef}
+              elementRef={this.setLinkRef}
             >
               <ScreenReaderContent>{I18n.t('Link to lti tools.')}</ScreenReaderContent>
               {I18n.t('See some LTI tools that work great with Canvas.')}

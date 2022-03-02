@@ -63,12 +63,12 @@ const Attachment = ({index, setBlob}) => {
     <>
       {!dataURL && !showFileInput && (
         <>
-          <Button icon={IconUploadLine} onClick={() => setShowFileInput(true)}>
+          <Button renderIcon={IconUploadLine} onClick={() => setShowFileInput(true)}>
             {I18n.t('Upload File')}
           </Button>
 
           <Button
-            icon={IconImageLine}
+            renderIcon={IconImageLine}
             onClick={() => setOpenWebcamModal(true)}
             margin="none small"
             ref={useWebcamRef}
@@ -97,9 +97,9 @@ const Attachment = ({index, setBlob}) => {
           >
             <Focus timeout={500}>
               <Button
-                icon={IconTrashLine}
+                renderIcon={IconTrashLine}
                 size="small"
-                variant="light"
+                color="primary-inverse"
                 data-testid="removePhotoButton"
                 onClick={() => {
                   setDataURL(null)

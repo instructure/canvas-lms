@@ -162,22 +162,22 @@ class DuplicateSection extends React.Component {
             </Table.RowHeader>
             <Table.Cell>
               <TextInput
-                required
+                isRequired
                 name="name"
                 type="text"
                 placeholder={nameLabel}
-                label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
                 value={duplicateSet.newUserInfo.name}
                 onChange={this.onNewForDuplicateChange}
               />
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                required
+                isRequired
                 name="email"
                 type="email"
                 placeholder={emailLabel}
-                label={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
                 value={duplicateSet.newUserInfo.email}
                 onChange={this.onNewForDuplicateChange}
               />

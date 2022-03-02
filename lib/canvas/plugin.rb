@@ -192,11 +192,14 @@ module Canvas
     end
 
     def self.value_to_boolean(value, ignore_unrecognized: false)
-      if value.is_a?(String) || value.is_a?(Symbol)
+      if [true, false].include?(value)
+        return value
+      elsif value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(Integer)
         return true if %w[yes y true t on 1].include?(value.to_s.downcase)
         return false if %w[no n false f off 0].include?(value.to_s.downcase)
+      else
+        ignore_unrecognized = true unless value.nil?
       end
-      return value if [true, false].include?(value)
       return nil if ignore_unrecognized
 
       value.to_i != 0

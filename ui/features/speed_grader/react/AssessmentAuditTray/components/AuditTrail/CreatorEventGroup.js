@@ -18,7 +18,7 @@
 
 import React, {PureComponent} from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconWarningLine} from '@instructure/ui-icons'
@@ -74,12 +74,16 @@ export default class CreatorEventGroup extends PureComponent {
                     <Tooltip
                       on={['click', 'focus', 'hover']}
                       placement="start"
-                      tip={message}
-                      variant="inverse"
+                      renderTip={message}
+                      color="primary"
                     >
-                      <Button icon={<IconWarningLine color="error" />} size="medium" variant="icon">
-                        <ScreenReaderContent>{I18n.t('Toggle tooltip')}</ScreenReaderContent>
-                      </Button>
+                      <IconButton
+                        renderIcon={<IconWarningLine color="error" />}
+                        size="medium"
+                        screenReaderLabel={I18n.t('Toggle tooltip')}
+                        withBackground={false}
+                        withBorder={false}
+                      />
                     </Tooltip>
                   </Flex.Item>
                 )}

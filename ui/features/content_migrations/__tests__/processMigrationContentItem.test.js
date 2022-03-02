@@ -39,14 +39,14 @@ afterAll(() => {
 function event(overrides) {
   const opts = {
     origin: 'http://www.test.com',
-    messageType: 'LtiDeepLinkingResponse',
+    subject: 'LtiDeepLinkingResponse',
     type: 'file',
     ...overrides
   }
   return {
     origin: opts.origin,
     data: {
-      messageType: opts.messageType,
+      subject: opts.subject,
       msg: 'Deep Linking Message',
       content_items: [
         {
@@ -80,7 +80,7 @@ describe('when the origin is not trusted', () => {
 
 describe('when the message type is not "LtiDeepLinkingResponse"', () => {
   beforeEach(() => {
-    processMigrationContentItem(event({messageType: 'unkown message type'}))
+    processMigrationContentItem(event({subject: 'unkown message type'}))
   })
 
   it('does not process the message', () => {

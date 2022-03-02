@@ -182,7 +182,7 @@ export default class BlueprintLockOptions extends React.Component {
     if (disabled) {
       checkBox = (
         <div className="disabled_message">
-          <Tooltip tip={this.props.disabledMessage} placement="top start" variant="inverse">
+          <Tooltip renderTip={this.props.disabledMessage} placement="top start" color="primary">
             <div>{checkBox}</div>
           </Tooltip>
         </div>

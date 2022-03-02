@@ -65,7 +65,7 @@ const Points = props => {
     } else {
       return (
         <div className="react-rubric-cell graded-points">
-          <Flex alignItems="end" wrapItems>
+          <Flex alignItems="end" wrap="wrap">
             <Flex.Item size="4rem" margin="none small none none">
               <TextInput
                 display="inline-block"

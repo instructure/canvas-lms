@@ -23,7 +23,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
 export const IconLock = () => (
-  <Tooltip placement="start" variant="inverse" tip={I18n.t('Locked')}>
+  <Tooltip placement="start" color="primary" renderTip={I18n.t('Locked')}>
     <span>
       <IconBlueprintLockSolid />
       <ScreenReaderContent>{I18n.t('Locked')}</ScreenReaderContent>
@@ -32,7 +32,7 @@ export const IconLock = () => (
 )
 
 export const IconUnlock = () => (
-  <Tooltip placement="start" variant="inverse" tip={I18n.t('Unlocked')}>
+  <Tooltip placement="start" color="primary" renderTip={I18n.t('Unlocked')}>
     <span>
       <IconBlueprintSolid />
       <ScreenReaderContent>{I18n.t('Unlocked')}</ScreenReaderContent>
