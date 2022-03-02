@@ -22,7 +22,7 @@
 @import "components/ui.selectmenu";
 @import "vendor/_xflex.scss";
 @import "components/rubric";
-
+@import "components/emoji";
 
 .ic-Layout-contentMain {
   padding: 0;
@@ -469,6 +469,8 @@ $icon-size: 1.4rem;
   }
 
   .attach_things {
+    align-self: center;
+    display: flex;
     list-style: none;
 
     //Chrome has a nice bug where clicking on block element
@@ -494,6 +496,10 @@ $icon-size: 1.4rem;
       float: direction(left);
       margin-#{direction(right)}: 5px;
     }
+
+    &.emojis {
+      flex-direction: row-reverse;
+    }
   }
   #comment_attachments {
     padding: $ic-sp*0.5 0;
@@ -502,6 +508,13 @@ $icon-size: 1.4rem;
       float: direction(right);
     }
   }
+}
+
+#emojis-attachments-container {
+  display: flex;
+  align-self: stretch;
+  flex: 1;
+  justify-content: space-between;
 }
 
 body .ui-selectmenu-dropdown {
@@ -937,6 +950,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   float: direction(right);
 }
 
+#textarea-container {
+  position: relative;
+}
+
 .secondary_mount_point_container {
   position: relative;
 
@@ -951,6 +968,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   float: left;
   display: inline-block;
   margin-top: 1em;
+}
+
+.emoji-picker-container {
+  position: absolute;
+  bottom: 0px;
+  #{direction(right)}: 0px;
 }
 
 figure {

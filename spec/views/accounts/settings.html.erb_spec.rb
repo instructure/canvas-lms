@@ -279,6 +279,7 @@ describe "accounts/settings.html.erb" do
 
         context "show old version of settings to regular admin user" do
           before do
+            allow(@account).to receive(:grants_right?).and_call_original
             allow(@account).to receive(:grants_right?).with(current_user, :manage_site_settings).and_return(true)
             do_render(current_user)
           end
@@ -466,6 +467,38 @@ describe "accounts/settings.html.erb" do
       assign(:announcements, AccountNotification.none.paginate)
       render
       expect(response).not_to have_tag "#enroll_users_form"
+    end
+  end
+
+  describe "blocked emojis" do
+    before do
+      @account = Account.default
+      @admin = account_admin_user
+      assign(:account, @account)
+      assign(:account_users, [])
+      assign(:root_account, @account)
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+      view_context(@account, @admin)
+      assign(:current_user, @admin)
+    end
+
+    it "shows the blocked emojis section when submission_comment_emojis is allowed" do
+      @account.allow_feature!(:submission_comment_emojis)
+      render
+      expect(response).to have_tag "#emoji-deny-list"
+    end
+
+    it "shows the blocked emojis section when submission_comment_emojis is enabled" do
+      @account.enable_feature!(:submission_comment_emojis)
+      render
+      expect(response).to have_tag "#emoji-deny-list"
+    end
+
+    it "hides the blocked emojis section when submission_comment_emojis disabled" do
+      @account.disable_feature!(:submission_comment_emojis)
+      render
+      expect(response).not_to have_tag "#emoji-deny-list"
     end
   end
 

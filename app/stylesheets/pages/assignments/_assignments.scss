@@ -27,8 +27,9 @@
     width: 300px;
     height: 20px;
     padding: 4px 6px;
+    margin-bottom: 0;
     &.focus_or_content {
-      width: 100%;
+      width: 450px;
       height: 72px;
     }
   }
@@ -161,6 +162,21 @@
       padding-top: 5px;
     }
   }
+}
+
+.emoji-picker-container {
+  position: absolute;
+  bottom: 6px;
+  #{direction(right)}: 6px;
+}
+
+.emoji-quick-picker-container {
+  margin: 10px 0;
+}
+
+.textarea-container {
+  display: inline-block;
+  position: relative;
 }
 
 .control-group {

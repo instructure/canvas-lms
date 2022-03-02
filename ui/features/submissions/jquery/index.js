@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import round from 'round'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONFiles */
 import '@canvas/datetime'/* datetimeString */
@@ -30,7 +33,8 @@ import '@canvas/media-comments'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rubrics/jquery/rubric_assessment'
-const I18n = useI18nScope('submissions');
+
+const I18n = useI18nScope('submissions')
 /* global rubricAssessment */
 
 const rubricAssessments = ENV.rubricAssessments
@@ -194,11 +198,27 @@ function windowResize() {
   $('.comments').height(height)
 }
 
+function insertEmoji(emoji) {
+  const $textarea = $('.grading_comment')
+  $textarea.val((_i, text) => text + emoji.native)
+  $textarea.focus()
+}
+
 // This `setup` function allows us to control when the setup is triggered.
 // submissions.coffee requires this file and then immediately triggers it,
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
   $(document).ready(function () {
+    if (ENV.EMOJIS_ENABLED) {
+      ReactDOM.render(
+        <EmojiPicker insertEmoji={insertEmoji} />,
+        document.getElementById('emoji-picker-container')
+      )
+      ReactDOM.render(
+        <EmojiQuickPicker insertEmoji={insertEmoji} />,
+        document.getElementById('emoji-quick-picker-container')
+      )
+    }
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')
     $(window).bind('resize', windowResize).triggerHandler('resize')
     $('.comments_link').click(event => {

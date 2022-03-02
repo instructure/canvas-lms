@@ -36,6 +36,20 @@ a#accessibility_warning {
   outline: 0;
 }
 
+#textarea-container {
+  position: relative;
+}
+
+#emoji-picker-container {
+  position: absolute;
+  bottom: 0;
+  #{direction(right)}: 0;
+}
+
+#emoji-quick-picker-container {
+  margin: 10px 0 6px 0;
+}
+
 $row-height: 35px;
 $cell_height: 33px;
 $cell-icon-height: 31px;

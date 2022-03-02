@@ -261,6 +261,24 @@ describe AccountsController do
       expect(@account.settings[:app_center_access_token]).to eq access_token
     end
 
+    it "updates 'emoji_deny_list'" do
+      account_with_admin_logged_in
+      @account.allow_feature!(:submission_comment_emojis)
+      post(
+        :update,
+        params: {
+          id: @account.id,
+          account: {
+            settings: {
+              emoji_deny_list: "middle_finger,eggplant"
+            }
+          }
+        }
+      )
+      @account.reload
+      expect(@account.settings[:emoji_deny_list]).to eq "middle_finger,eggplant"
+    end
+
     it "updates account with sis_assignment_name_length_input with value less than 255" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
