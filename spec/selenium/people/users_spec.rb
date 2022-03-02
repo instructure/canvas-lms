@@ -58,26 +58,26 @@ describe "users" do
     end
 
     it "validates a basic page view" do
-      page_view(user: @student, course: @course, url: "assignments", user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36", http_method: "get")
+      page_view(user: @student, course: @course, url: "assignments")
       get "/users/#{@student.id}"
       rows = ff("#page_view_results tr")
       expect(rows.count).to eq 1
       page_view = rows.first
-      expect(page_view).to include_text("Chrome")
+      expect(page_view).to include_text("Firefox")
       expect(page_view).to include_text("assignments")
-      expect(f("#page_view_results")).not_to contain_css("tr [name='IconCheckMark']") # should not have a participation
+      expect(f("#page_view_results")).not_to contain_css("tr img") # should not have a participation
     end
 
     it "validates page view with a participation" do
       page_view(user: @student, course: @course, participated: true)
       get "/users/#{@student.id}"
-      expect(f("#page_view_results [name='IconCheckMark']")).to be_displayed
+      expect(f("#page_view_results .icon-check")).to be_displayed
     end
 
     it "validates a page view url" do
       second_student_name = "test student for page views"
       get "/users/#{@student.id}"
-      page_view(user: @student, course: @course, participated: true, url: student_in_course(name: second_student_name).user.id.to_s, user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36", http_method: "get")
+      page_view(user: @student, course: @course, participated: true, url: student_in_course(name: second_student_name).user.id.to_s)
       refresh_page # in order to get the generated page view
       page_view_url = f("#page_view_results a")
       second_student = User.where(name: second_student_name).first
@@ -88,31 +88,31 @@ describe "users" do
     end
 
     it "validates all page views were loaded" do
-      page_views_count = 30
+      page_views_count = 100
       page_views_count.times { |i| page_view(user: @student, course: @course, url: ("%03d" % i).to_s) }
       get "/users/#{@student.id}"
       wait_for_ajaximations
       scroll_page_to_bottom
-      driver.execute_script("$('#scrollContainer').scrollTop($('#scrollContainer')[0].scrollHeight);")
-      wait_for(method: nil, timeout: 0.5) { f("#paginatedView-loading").displayed? }
+      driver.execute_script("$('#pageviews').scrollTop($('#pageviews')[0].scrollHeight);")
       # wait for loading spinner to finish
+      wait_for(method: nil, timeout: 0.5) { f(".paginatedView-loading").displayed? }
       wait_for_no_such_element { f(".paginatedView-loading") }
       expect(ff("#page_view_results tr").length).to eq page_views_count
     end
 
     it "filters by date" do
-      old_date = DateTime.new(2022, 2, 10).beginning_of_day
-      page_view(user: @student, course: @course, url: "recent", created_at: old_date + 1.day + 2.hours)
-      page_view(user: @student, course: @course, url: "older", created_at: old_date + 1.hour)
+      old_date = 2.days.ago.beginning_of_day
+      page_view(user: @student, course: @course, url: "recent", created_at: 5.minutes.ago)
+      page_view(user: @student, course: @course, url: "older", created_at: old_date + 1.minute)
       get "/users/#{@student.id}"
       wait_for_ajaximations
       expect(ff("#page_view_results tr").first.text).to include "recent"
-      replace_content(f("[data-testid='inputQueryDate']"), old_date.year.to_s + "-" + old_date.month.to_s + "-" + old_date.day.to_s)
+      replace_content(f("#page_view_date"), old_date.strftime("%Y-%m-%d"))
       driver.action.send_keys(:tab).perform
       wait_for_ajaximations
       expect(ff("#page_view_results tr").first.text).to include "older"
       match = f("#page_views_csv_link")["href"].match(/start_time=([^&]+)/)
-      expect(match[1]).to include old_date.year.to_s + "-0" + old_date.month.to_s
+      expect(DateTime.parse(match[1]).to_i).to eq old_date.to_i
     end
   end
 
