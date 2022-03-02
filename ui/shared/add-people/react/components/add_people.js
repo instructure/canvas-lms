@@ -334,16 +334,14 @@ export default class AddPeople extends React.Component {
       >
         <Modal.Header>
           <CloseButton
-            buttonRef={c => {
+            elementRef={c => {
               this.modalCloseBtn = c
             }}
             placement="end"
             offset="medium"
-            variant="icon"
             onClick={this.close}
-          >
-            {cancelLabel}
-          </CloseButton>
+            screenReaderLabel={cancelLabel}
+          />
           <Heading tabIndex="-1">{modalTitle}</Heading>
         </Modal.Header>
         <Modal.Body>
@@ -374,7 +372,7 @@ export default class AddPeople extends React.Component {
           )}
           &nbsp;
           {onNext && (
-            <Button id="addpeople_next" onClick={onNext} variant="primary" disabled={!readyForNext}>
+            <Button id="addpeople_next" onClick={onNext} color="primary" disabled={!readyForNext}>
               {nextLabel}
             </Button>
           )}

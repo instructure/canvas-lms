@@ -64,9 +64,12 @@ export default class GeneratePairingCode extends Component {
   }
 
   renderCloseButton = () => (
-    <CloseButton placement="end" offset="medium" variant="icon" onClick={this.closeModal}>
-      Close
-    </CloseButton>
+    <CloseButton
+      placement="end"
+      offset="medium"
+      onClick={this.closeModal}
+      screenReaderLabel="\n      Close\n    "
+    />
   )
 
   renderPairingCode = () => {
@@ -89,7 +92,7 @@ export default class GeneratePairingCode extends Component {
     or after one use.`)
     return (
       <div>
-        <Button fluidWidth onClick={this.openModal}>
+        <Button onClick={this.openModal} display="block" textAlign="start">
           <IconGroupLine />
           {I18n.t('Pair with Observer')}
         </Button>
@@ -122,7 +125,7 @@ export default class GeneratePairingCode extends Component {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.closeModal} variant="primary" className="pairing-code-ok">
+            <Button onClick={this.closeModal} color="primary" className="pairing-code-ok">
               {I18n.t('OK')}
             </Button>
           </Modal.Footer>

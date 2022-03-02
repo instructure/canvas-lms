@@ -20,8 +20,7 @@ import $ from 'jquery'
 
 export default class ToolLaunchResizer {
   constructor(minToolHeight) {
-    this.minToolHeight =
-      minToolHeight || document.querySelector('#tool_content')?.style.height || 450
+    this.minToolHeight = minToolHeight || 450
   }
 
   sanitizedWrapperId(wrapperId) {

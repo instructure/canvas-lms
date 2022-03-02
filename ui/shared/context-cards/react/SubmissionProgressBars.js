@@ -116,7 +116,7 @@ class SubmissionProgressBars extends React.Component {
           {submissions.map(submission => {
             return (
               <div key={submission.id} className="StudentContextTray-Progress__Bar">
-                <Tooltip tip={submission.assignment.name} placement="top">
+                <Tooltip renderTip={submission.assignment.name} placement="top">
                   <Link
                     href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
                     theme={{textDecoration: 'none'}}

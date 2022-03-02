@@ -268,9 +268,9 @@ class ProficiencyRating extends React.Component {
         {canManage ? (
           <Popover
             on="click"
-            show={this.state.showColorPopover}
+            isShowingContent={this.state.showColorPopover}
             onToggle={this.handleMenuToggle}
-            onShow={this.focusColorPicker}
+            onPositioned={this.focusColorPicker}
             shouldContainFocus
             // Note: without this prop, there's a focus issue where the window will scroll up
             // on Chrome which seems to be caused by an issue within Popover (possibly INSTUI-1799)
@@ -278,8 +278,7 @@ class ProficiencyRating extends React.Component {
             // when it mounts (and resolves the scroll behavior), so we manually focus on
             // mount with focusColorPicker
             shouldFocusContentOnTriggerBlur
-          >
-            <Popover.Trigger>
+            renderTrigger={
               <Button ref={this.setColorRef} variant="link">
                 <div>
                   <span className="colorPickerIcon" style={{background: formatColor(color)}} />
@@ -289,25 +288,24 @@ class ProficiencyRating extends React.Component {
                   <span aria-hidden="true">{I18n.t('Change')}</span>
                 </div>
               </Button>
-            </Popover.Trigger>
-            <Popover.Content>
-              <ColorPicker
-                ref={this.setColorPickerRef}
-                parentComponent="ProficiencyRating"
-                colors={PREDEFINED_COLORS}
-                currentColor={formatColor(color)}
-                hidePrompt
-                nonModal
-                hideOnScroll={false}
-                withAnimation={false}
-                withBorder={false}
-                withBoxShadow={false}
-                withArrow={false}
-                focusOnMount={false}
-                afterClose={this.handleMenuClose}
-                setStatusColor={this.setColor}
-              />
-            </Popover.Content>
+            }
+          >
+            <ColorPicker
+              ref={this.setColorPickerRef}
+              parentComponent="ProficiencyRating"
+              colors={PREDEFINED_COLORS}
+              currentColor={formatColor(color)}
+              hidePrompt
+              nonModal
+              hideOnScroll={false}
+              withAnimation={false}
+              withBorder={false}
+              withBoxShadow={false}
+              withArrow={false}
+              focusOnMount={false}
+              afterClose={this.handleMenuClose}
+              setStatusColor={this.setColor}
+            />
           </Popover>
         ) : (
           <>

@@ -23,6 +23,7 @@ import * as Actions from '../index'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
 
 jest.mock('../../utilities/apiUtils', () => ({
+  ...jest.requireActual('../../utilities/apiUtils'),
   transformApiToInternalItem: jest.fn(response => ({...response, transformedToInternal: true})),
   transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
   transformInternalToApiOverride: jest.fn(internal => ({
@@ -598,54 +599,62 @@ describe('api actions', () => {
   describe('clearItems', () => {
     it('dispatches clearWeeklyItems and clearOpportunities actions', () => {
       const mockDispatch = jest.fn()
-      Actions.clearItems()(mockDispatch, getBasicState)
-      expect(mockDispatch).toHaveBeenCalledTimes(3)
+      Actions.clearItems()(mockDispatch, () => ({
+        weeklyDashboard: {}
+      }))
+      expect(mockDispatch).toHaveBeenCalledTimes(5)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_WEEKLY_ITEMS'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_OPPORTUNITIES'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_DAYS'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_COURSES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_SIDEBAR'})
+    })
+
+    it('does not dispatch clearWeeklyItems if not a weekly dashboard', () => {
+      const mockDispatch = jest.fn()
+      Actions.clearItems()(mockDispatch, () => ({}))
+      expect(mockDispatch).toHaveBeenCalledTimes(4)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_OPPORTUNITIES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_DAYS'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_COURSES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_SIDEBAR'})
     })
   })
 
   describe('reloadWithObservee', () => {
-    it('dispatches actions to reload planner if observeeId/contextCodes are present and have changed', () => {
-      const mockDispatch = jest.fn()
-      const getState = () => ({
-        ...getBasicState(),
-        selectedObservee: {id: '5', contextCodes: undefined}
-      })
-      Actions.reloadWithObservee('5', ['course_1'])(mockDispatch, getState)
-      expect(mockDispatch).toHaveBeenCalledTimes(5)
-      expect(mockDispatch).toHaveBeenCalledWith({
-        payload: {id: '5', contextCodes: ['course_1']},
-        type: 'SELECTED_OBSERVEE'
-      })
+    let mockDispatch, store, getState
+    beforeEach(() => {
+      mockDispatch = jest.fn(() => Promise.resolve({data: []}))
+      store = {...getBasicState()}
+      getState = () => store
     })
 
-    it('dispatches startLoadingItems if contextCodes are not present but observee id changed', () => {
-      const mockDispatch = jest.fn()
-      const getState = () => ({
-        ...getBasicState(),
-        selectedObservee: {id: '5', contextCodes: undefined}
-      })
-      Actions.reloadWithObservee('6', undefined)(mockDispatch, getState)
-      expect(mockDispatch).toHaveBeenCalledTimes(3)
-      expect(mockDispatch).toHaveBeenCalledWith({
-        payload: {id: '6', contextCodes: undefined},
-        type: 'SELECTED_OBSERVEE'
-      })
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'START_LOADING_ITEMS'
-      })
+    afterEach(() => {
+      jest.resetAllMocks()
     })
 
-    it('does not dispatch anything if contextCodes and id have not changed', () => {
-      const mockDispatch = jest.fn()
-      const getState = () => ({
-        ...getBasicState(),
-        selectedObservee: {id: '5', contextCodes: ['course_5']}
+    it('does nothing if no observee id', () => {
+      Actions.reloadWithObservee(undefined)(mockDispatch, getState)
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    it('does nothing if the observee id did not change', () => {
+      store.selectedObservee = '5'
+
+      Actions.reloadWithObservee('5')(mockDispatch, getState)
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    it('dispatches startLoadingItems if contextCodes are not present but observee id changed', async () => {
+      store.selectedObservee = '5'
+
+      await Actions.reloadWithObservee('6')(mockDispatch, getState)
+      expect(mockDispatch).toHaveBeenCalledTimes(4)
+      expect(mockDispatch).toHaveBeenCalledWith({
+        payload: '6',
+        type: 'SELECTED_OBSERVEE'
       })
-      Actions.reloadWithObservee('5', ['course_5'])(mockDispatch, getState)
-      expect(mockDispatch).toHaveBeenCalledTimes(0)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_ALL_OPPORTUNITIES'})
     })
   })
 })

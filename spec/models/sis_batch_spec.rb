@@ -998,6 +998,7 @@ test_4,TC 104,Test Course 104,,term1,active
         test_4,TC 104,Test Course 104b,,term1,active
       )
                             ], diffing_data_set_identifier: "default", change_threshold: 1)
+      expect(b2.diffing_threshold_exceeded).to eq false
 
       # whoops left out the whole file, don't delete everything.
       b3 = process_csv_data([
@@ -1006,6 +1007,7 @@ test_4,TC 104,Test Course 104,,term1,active
                             ], diffing_data_set_identifier: "default", change_threshold: 1)
       expect(b3).to be_imported_with_messages
       expect(b3.processing_warnings.first.last).to include("Diffing not performed")
+      expect(b3.diffing_threshold_exceeded).to eq true
 
       # no change threshold, _should_ delete everything maybe?
       b4 = process_csv_data([

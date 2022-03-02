@@ -21,7 +21,7 @@ import 'jquery.cookie'
 
 import submitHtmlForm from '@canvas/theme-editor/submitHtmlForm'
 
-let action, method, md5, csrfToken, form
+let action, method, md5, csrfToken
 
 QUnit.module('submitHtmlForm', {
   setup() {

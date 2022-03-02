@@ -98,7 +98,7 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
           <TextInput
             data-testid="pairing-code-input"
             messages={inputMessage}
-            label={<ScreenReaderContent>{I18n.t('Pairing code')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Pairing code')}</ScreenReaderContent>}
             inputRef={el => {
               pairingCodeInputRef.current = el
             }}

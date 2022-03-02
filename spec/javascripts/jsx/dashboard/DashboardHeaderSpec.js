@@ -240,9 +240,9 @@ QUnit.module('Dashboard Header', hooks => {
     dashboardHeader.changeDashboard('cards')
 
     moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      equal(request.url, '/dashboard/view')
-      equal(request.config.data, '{"dashboard_view":"cards"}')
+      const requests = moxios.requests
+      equal(requests.at(1).url, '/dashboard/view')
+      equal(requests.at(1).config.data, '{"dashboard_view":"cards"}')
       done()
     })
     ok(plannerStub.notCalled)
@@ -337,8 +337,13 @@ QUnit.module('Dashboard Header', hooks => {
       ]
     })
 
-    test('it should show the observer options Select', () => {
+    test('it should show the observer options Select on planner dashboard', () => {
       ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="planner" />, container)
+      ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
+    })
+
+    test('it should show the observer options Select on recent activity dashboard', () => {
+      ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="activity" />, container)
       ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
     })
   })

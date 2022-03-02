@@ -76,7 +76,7 @@ describe('<CreateButtonForm />', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-37.5,"translateY":-37.5,"width":75,"height":75,"transform":"translate(-37.5,-37.5)"}
+                {"type":"image/svg+xml-buttons-and-icons","name":"","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-37.5,"translateY":-37.5,"width":75,"height":75,"transform":"translate(-37.5,-37.5)"}
               </metadata>
               <svg
                 fill="none"
@@ -153,15 +153,16 @@ describe('<CreateButtonForm />', () => {
     beforeEach(() => {
       ed = new FakeEditor()
 
+      ENV.COURSE_ID = 23
+
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" alt="a red circle" />'
+        '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/download" alt="a red circle" />'
       )
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
     })
 
-    const subject = () =>
-      render(<CreateButtonForm onClose={jest.fn()} editing editor={new FakeEditor()} />)
+    const subject = () => render(<CreateButtonForm onClose={jest.fn()} editing editor={ed} />)
 
     beforeEach(() => {
       global.fetch = jest.fn().mockResolvedValue({

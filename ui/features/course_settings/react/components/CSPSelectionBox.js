@@ -111,8 +111,8 @@ export default class CSPSelectionBox extends Component {
           checkbox
         ) : (
           <Tooltip
-            variant="inverse"
-            tip={I18n.t('Only account administrators can change this setting.')}
+            color="primary"
+            renderTip={I18n.t('Only account administrators can change this setting.')}
             placement="start"
           >
             {checkbox}

@@ -34,7 +34,7 @@ import {
  * @returns The navigation message object
  */
 export function navigationMessage(event) {
-  return {messageType: NAVIGATION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
+  return {subject: NAVIGATION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
 }
 
 /**
@@ -47,11 +47,11 @@ export function navigationMessage(event) {
  * @returns The input change message object
  */
 export function inputChangeMessage(value) {
-  return {messageType: INPUT_CHANGE_MESSAGE, value}
+  return {subject: INPUT_CHANGE_MESSAGE, value}
 }
 
 export function selectionMessage(event) {
-  return {messageType: SELECTION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
+  return {subject: SELECTION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
 }
 
 /**

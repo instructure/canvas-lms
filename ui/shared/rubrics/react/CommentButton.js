@@ -17,16 +17,20 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconFeedbackLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!edit_rubricCommentButton'
 
 const CommentButton = ({onClick}) => (
   <div>
-    <Button variant="icon" icon={<IconFeedbackLine />} margin="0 x-small 0 0" onClick={onClick}>
-      <ScreenReaderContent>{I18n.t('Add Additional Comments')}</ScreenReaderContent>
-    </Button>
+    <IconButton
+      renderIcon={<IconFeedbackLine />}
+      withBackground={false}
+      withBorder={false}
+      margin="0 x-small 0 0"
+      onClick={onClick}
+      screenReaderLabel={I18n.t('Add Additional Comments')}
+    />
   </div>
 )
 CommentButton.propTypes = {

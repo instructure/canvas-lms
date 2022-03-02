@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
@@ -30,6 +30,8 @@ import I18n from 'i18n!gradebook'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
+
+import {Link} from '@instructure/ui-link'
 
 function SecondaryDetailLine(props) {
   const anonymous = props.assignment.anonymizeStudents
@@ -329,15 +331,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     const assignment = this.props.assignment
 
     return (
-      <Button
+      <Link
         size="small"
-        variant="link"
         theme={{smallPaddingHorizontal: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
         ref={this.bindAssignmentLink}
         href={assignment.htmlUrl}
+        isWithinText={false}
       >
         <span className="assignment-name">{assignment.name}</span>
-      </Button>
+      </Link>
     )
   }
 
@@ -345,14 +347,14 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     const optionsTitle = I18n.t('%{name} Options', {name: this.props.assignment.name})
 
     return (
-      <Button
-        buttonRef={ref => (this.optionsMenuTrigger = ref)}
+      <IconButton
+        elementRef={ref => (this.optionsMenuTrigger = ref)}
         size="small"
-        variant="icon"
-        icon={IconMoreSolid}
-      >
-        <ScreenReaderContent>{optionsTitle}</ScreenReaderContent>
-      </Button>
+        renderIcon={IconMoreSolid}
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel={optionsTitle}
+      />
     )
   }
 

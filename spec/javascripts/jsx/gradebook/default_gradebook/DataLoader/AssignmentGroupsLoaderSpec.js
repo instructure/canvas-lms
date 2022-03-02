@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import AssignmentGroupsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/AssignmentGroupsLoader.js'
-import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls.js'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import AssignmentGroupsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/AssignmentGroupsLoader'
+import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls'
 import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
 import {RequestDispatch} from '@canvas/network'
 

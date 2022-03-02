@@ -241,3 +241,16 @@ it('does not save an item if the sidebar is not loaded yet', () => {
   expect(initialState).toEqual(getInitialState({loaded: false}))
   expect(nextState).toBe(initialState)
 })
+
+describe('CLEAR_SIDEBAR', () => {
+  const initialState = getInitialState({
+    items: [
+      {uniqueId: '41', title: 'aaa', completed: false, date: moment.tz('2018-01-01', 'UTC')},
+      {uniqueId: '42', title: 'bbb', completed: false, date: moment.tz('2018-01-01', 'UTC')}
+    ]
+  })
+  const newState = reducer(initialState, {type: 'CLEAR_SIDEBAR'})
+  expect(newState.items).toEqual([])
+  expect(newState.range).toEqual({})
+  expect(newState.loaded).toEqual(false)
+})

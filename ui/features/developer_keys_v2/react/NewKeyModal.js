@@ -262,9 +262,11 @@ export default class DeveloperKeyModal extends React.Component {
           shouldCloseOnDocumentClick={false}
         >
           <Modal.Header>
-            <CloseButton placement="end" onClick={this.closeModal}>
-              {I18n.t('Cancel')}
-            </CloseButton>
+            <CloseButton
+              placement="end"
+              onClick={this.closeModal}
+              screenReaderLabel={I18n.t('Cancel')}
+            />
             <Heading>{I18n.t('Key Settings')}</Heading>
           </Modal.Header>
           <Modal.Body>
@@ -303,7 +305,7 @@ export default class DeveloperKeyModal extends React.Component {
             </Button>
             <Button
               onClick={isLtiKey ? this.saveLtiToolConfiguration : this.submitForm}
-              variant="primary"
+              color="primary"
               disabled={this.isSaving}
             >
               {I18n.t('Save')}

@@ -78,9 +78,8 @@ export default function CanvasInstUIModal({
           placement="end"
           offset="medium"
           onClick={onDismiss}
-        >
-          {closeButtonLabel || I18n.t('Close')}
-        </CloseButton>
+          screenReaderLabel={closeButtonLabel || I18n.t('Close')}
+        />
         <Heading>{label}</Heading>
       </Modal.Header>
       {children}

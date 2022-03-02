@@ -229,10 +229,7 @@ describe('ImportantDates', () => {
   describe('Parent Support', () => {
     beforeEach(() => {
       global.ENV = {
-        current_user_id: currentUserId,
-        FEATURES: {
-          k5_parent_support: true
-        }
+        current_user_id: currentUserId
       }
       fetchMock.get(OBSERVER_ASSIGNMENTS_URL, JSON.stringify(MOCK_OBSERVEE_ASSIGNMENTS))
       fetchMock.get(OBSERVER_EVENTS_URL, JSON.stringify(MOCK_OBSERVEE_EVENTS))

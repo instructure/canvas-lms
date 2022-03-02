@@ -49,7 +49,7 @@ describe "speed grader" do
       expect(f("#rubric_full")).to be_displayed
       expand_right_pane
       wait_for_ajaximations
-      f('svg[name="IconFeedback"]').find_element(:xpath, "../../parent::button").click
+      driver.execute_script(%(document.querySelector('svg[name="IconFeedback"]').parentElement.click()))
       f("textarea[data-selenium='criterion_comments_text']").send_keys(comment)
       wait_for_ajaximations
       f('td[data-testid="criterion-points"] input').send_keys(score.to_s)

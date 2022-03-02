@@ -37,7 +37,7 @@ const ConfirmationForm = props => {
         <Button onClick={onCancel} margin="0 x-small 0 0">
           {cancelLabel}
         </Button>
-        <Button onClick={onConfirm} variant="primary">
+        <Button onClick={onConfirm} color="primary">
           {confirmLabel}
         </Button>
       </View>

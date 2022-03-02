@@ -58,12 +58,9 @@ export default class SubmissionStatus extends React.Component {
 
     if (!assignment.published) {
       statusPillComponents.push(
-        <Pill
-          key="unpublished-assignment"
-          variant="danger"
-          text={I18n.t('Unpublished')}
-          margin="0 0 x-small"
-        />
+        <Pill key="unpublished-assignment" color="danger" margin="0 0 x-small">
+          {I18n.t('Unpublished')}
+        </Pill>
       )
     }
 
@@ -74,34 +71,25 @@ export default class SubmissionStatus extends React.Component {
 
     if (isPostable(submission)) {
       statusPillComponents.push(
-        <Pill
-          key="hidden-submission"
-          variant="warning"
-          text={I18n.t('Hidden')}
-          margin="0 0 x-small"
-        />
+        <Pill key="hidden-submission" color="warning" margin="0 0 x-small">
+          {I18n.t('Hidden')}
+        </Pill>
       )
     }
 
     if (submission.drop) {
       statusPillComponents.push(
-        <Pill
-          key="dropped-submission"
-          variant="default"
-          text={I18n.t('Dropped')}
-          margin="0 0 x-small"
-        />
+        <Pill key="dropped-submission" color="primary" margin="0 0 x-small">
+          {I18n.t('Dropped')}
+        </Pill>
       )
     }
 
     if (submission.excused) {
       statusPillComponents.push(
-        <Pill
-          key="excused-assignment"
-          variant="default"
-          text={I18n.t('Excused')}
-          margin="0 0 x-small"
-        />
+        <Pill key="excused-assignment" color="primary" margin="0 0 x-small">
+          {I18n.t('Excused')}
+        </Pill>
       )
     }
 

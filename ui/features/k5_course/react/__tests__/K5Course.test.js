@@ -105,8 +105,7 @@ const defaultProps = {
   pagesPath: '/courses/30/pages',
   hasWikiPages: true,
   hasSyllabusBody: true,
-  parentSupportEnabled: false,
-  observedUsersList: MOCK_OBSERVED_USERS_LIST,
+  observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
   selfEnrollment: {
     option: null,
     url: null
@@ -789,7 +788,9 @@ describe('K-5 Subject Course', () => {
     })
 
     it('shows picker when user is an observer', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} parentSupportEnabled />)
+      const {getByRole} = render(
+        <K5Course {...defaultProps} observedUsersList={MOCK_OBSERVED_USERS_LIST} />
+      )
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
       expect(select.value).toBe('Zelda')
@@ -797,7 +798,11 @@ describe('K-5 Subject Course', () => {
 
     it('shows the observee grades on the Grades Tab', async () => {
       const {getByRole, getByText} = render(
-        <K5Course {...defaultProps} parentSupportEnabled defaultTab={TAB_IDS.GRADES} />
+        <K5Course
+          {...defaultProps}
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
+          defaultTab={TAB_IDS.GRADES}
+        />
       )
       const select = getByRole('combobox', {name: 'Select a student to view'})
       act(() => select.click())

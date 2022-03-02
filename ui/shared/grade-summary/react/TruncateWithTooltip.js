@@ -48,7 +48,7 @@ export default class TruncateWithTooltip extends React.Component {
     )
     if (this.state.isTruncated) {
       return (
-        <Tooltip {...tooltipProps} tip={text}>
+        <Tooltip {...tooltipProps} renderTip={text}>
           <span>{truncatedText}</span>
         </Tooltip>
       )

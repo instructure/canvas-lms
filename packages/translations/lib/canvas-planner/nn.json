@@ -70,7 +70,7 @@
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte element}\n}"
   },
   "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-    "message": "{ count, plural,\n    one {Vis # manglande element}\n  other {Vis  manglande element}\n}"
+    "message": "{ count, plural,\n    one {Vis # manglande element}\n  other {Vis # manglande element}\n}"
   },
   "course_8a63b4a3": { "message": "Emne" },
   "course_to_do_bcbbab54": { "message": "{ course } Gjeremål" },
@@ -140,7 +140,7 @@
   },
   "join_6cafecca": { "message": "Ta del" },
   "join_active_online_meeting_d9d892b2": {
-    "message": "bli med på aktivt møte"
+    "message": "bli med på aktivt online møte"
   },
   "join_online_meeting_b1725843": { "message": "bli med på møtet" },
   "jump_to_navigation_toolbar_2952cd8b": {
@@ -273,7 +273,7 @@
   "view_next_week_7f61f755": { "message": "Vis neste veke" },
   "view_previous_week_6f83849f": { "message": "Vis førre veke" },
   "weekly_schedule_navigation_6b042645": {
-    "message": "Navigasjon for ukestimeplan"
+    "message": "Navigasjon for vekestimeplan"
   },
   "yesterday_at_date_1aa6d18e": { "message": "I går på { date }" },
   "yesterday_c6bd6abf": { "message": "I går" },

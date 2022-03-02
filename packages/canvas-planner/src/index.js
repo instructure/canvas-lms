@@ -249,22 +249,23 @@ function loading() {
 export function createPlannerApp() {
   if (!store.getState().weeklyDashboard) {
     // disable load on scroll for weekly dashboard
-    registerScrollEvents({
-      scrollIntoPast: handleScrollIntoPastAttempt,
-      scrollIntoFuture: handleScrollIntoFutureAttempt,
-      scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
-    })
+    if (!createPlannerApp.scrollEventsRegistered) {
+      // register events only once
+      registerScrollEvents({
+        scrollIntoPast: handleScrollIntoPastAttempt,
+        scrollIntoFuture: handleScrollIntoFutureAttempt,
+        scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
+      })
+      createPlannerApp.scrollEventsRegistered = true
+    }
 
     store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
   } else {
-    const waitingOnObserveeContextCodes =
-      store.getState().selectedObservee?.id && !store.getState().selectedObservee?.contextCodes
-    if (!waitingOnObserveeContextCodes) {
-      store.dispatch(
-        getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day'))
-      )
-      store.dispatch(startLoadingAllOpportunities())
-    }
+    store
+      .dispatch(getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+      .then(() => {
+        store.dispatch(startLoadingAllOpportunities())
+      })
   }
 
   return (
@@ -285,6 +286,7 @@ export function createPlannerApp() {
     </DynamicUiProvider>
   )
 }
+createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
   ReactDOM.render(createPlannerApp(), element)
@@ -325,7 +327,7 @@ export function renderToDoSidebar(element) {
     <Provider store={store}>
       <Suspense fallback={loading()}>
         <ToDoSidebar
-          courses={env.STUDENT_PLANNER_COURSES}
+          courses={store.getState().courses}
           timeZone={env.TIMEZONE}
           locale={env.MOMENT_LOCALE}
           changeDashboardView={initializedOptions.changeDashboardView}
@@ -377,13 +379,20 @@ export function preloadInitialItems() {
   }
 }
 
-// Call with student id and student's context codes to load planner scoped to
+// Call with student id to load planner scoped to
 // one of an observer's students
-export function reloadPlannerForObserver(observeeId, contextCodes) {
+export function reloadPlannerForObserver(newObserveeId) {
   if (!initializedOptions)
     throw new Error('initializePlanner must be called before reloadPlannerForObserver')
-  if (!store.getState().weeklyDashboard)
-    throw new Error('reloadPlannerForObserver is only supported in weekly dashboard mode')
 
-  store.dispatch(reloadWithObservee(observeeId, contextCodes))
+  // if observer is observing themselves, then we're not really observing
+  const observeeId =
+    !newObserveeId || newObserveeId === store.getState().currentUser.id ? null : newObserveeId
+
+  if (
+    observeeId !== store.getState().selectedObservee &&
+    (store.getState().weeklyDashboard || ENV.FEATURES.observer_picker)
+  ) {
+    store.dispatch(reloadWithObservee(observeeId))
+  }
 }

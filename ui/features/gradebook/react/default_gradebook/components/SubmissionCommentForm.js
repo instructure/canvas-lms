@@ -122,7 +122,7 @@ export default class SubmissionCommentForm extends React.Component {
               label={submitButtonLabel}
               margin="small 0"
               onClick={this.handlePublishComment}
-              variant="primary"
+              color="primary"
             >
               {I18n.t('Submit')}
             </Button>

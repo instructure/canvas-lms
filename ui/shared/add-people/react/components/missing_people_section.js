@@ -179,11 +179,11 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                required
+                isRequired
                 name="name"
                 type="text"
                 placeholder={nameLabel}
-                label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
                 data-address={missing.address}
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.name || ''}
@@ -191,11 +191,11 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                required
+                isRequired
                 name="email"
                 type="email"
                 placeholder={emailLabel}
-                label={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
                 data-address={missing.address}
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.email || ''}
@@ -270,11 +270,11 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                required
+                isRequired
                 name="name"
                 type="text"
                 placeholder={nameLabel}
-                label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
                 data-address={missing.address}
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.name || ''}

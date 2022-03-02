@@ -31,6 +31,7 @@ import Course from './Course'
 import {ImageOptions} from './ImageOptions'
 import {ColorInput} from '../../../../shared/ColorInput'
 import {convertFileToBase64} from '../../../svg/utils'
+import {transformForShape} from '../../../svg/image'
 
 const getColorSection = () => document.querySelector('#buttons-tray-color-section')
 
@@ -54,38 +55,40 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
   }
 
   useEffect(() => {
+    const transform = transformForShape(settings.shape, settings.size)
+
     // Set Q1 crop defaults
     // TODO: Set these properties based on cropper
     onChange({
       type: svgActions.SET_X,
-      payload: '50%'
+      payload: transform.x
     })
 
     onChange({
       type: svgActions.SET_Y,
-      payload: '50%'
+      payload: transform.y
     })
 
     onChange({
       type: svgActions.SET_WIDTH,
-      payload: 75
+      payload: transform.width
     })
 
     onChange({
       type: svgActions.SET_HEIGHT,
-      payload: 75
+      payload: transform.height
     })
 
     onChange({
       type: svgActions.SET_TRANSLATE_X,
-      payload: -37.5 // Width / 2
+      payload: transform.translateX
     })
 
     onChange({
       type: svgActions.SET_TRANSLATE_Y,
-      payload: -37.5 // Height / 2
+      payload: transform.translateY
     })
-  }, [])
+  }, [onChange, settings.shape, settings.size])
 
   useEffect(() => {
     if (editing) {

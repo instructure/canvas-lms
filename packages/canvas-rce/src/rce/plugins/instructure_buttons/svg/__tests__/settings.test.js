@@ -44,7 +44,7 @@ describe('useSvgSettings()', () => {
         encodedImageType: '',
         encodedImageName: '',
         outlineColor: null,
-        outlineSize: 'none',
+        outlineSize: 'small',
         text: '',
         textSize: 'small',
         textColor: '#000000',
@@ -91,7 +91,7 @@ describe('useSvgSettings()', () => {
           encodedImageType: '',
           encodedImageName: '',
           outlineColor: null,
-          outlineSize: 'none',
+          outlineSize: 'small',
           text: '',
           textSize: 'small',
           textColor: '#000000',
@@ -113,10 +113,13 @@ describe('useSvgSettings()', () => {
     beforeEach(() => {
       editing = true
 
+      ENV.COURSE_ID = 23
+
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" data-download=url="https://canvas.instructure.com/download" alt="a red circle" />'
+        '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/download" alt="a red circle" />'
       )
+
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
 
       // Stub fetch to return an SVG file
@@ -148,11 +151,53 @@ describe('useSvgSettings()', () => {
 
     afterEach(() => jest.resetAllMocks())
 
-    it('fetches the SVG file', () => {
+    it('fetches the SVG file, specifying the course ID and timestamp', () => {
       subject()
       expect(global.fetch).toHaveBeenCalledWith(
-        ed.selection.getNode().getAttribute('data-download-url')
+        expect.stringMatching(/https:\/\/canvas.instructure.com\/download\?course_id=23&ts=\d+/)
       )
+    })
+
+    describe('with a relative download URL', () => {
+      beforeEach(() => {
+        ENV = {
+          COURSE_ID: 23,
+          DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
+        }
+
+        ed.setContent(
+          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/download" alt="a red circle" />'
+        )
+        ed.setSelectedNode(ed.dom.select('#test-image')[0])
+      })
+
+      it('fetches the SVG file, specifying the course ID and timestamp', () => {
+        subject()
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringMatching(/https:\/\/domain.from.env\/download\?course_id=23&ts=\d+/)
+        )
+      })
+    })
+
+    describe('with a containing element selected', () => {
+      beforeEach(() => {
+        ENV = {
+          COURSE_ID: 23,
+          DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
+        }
+
+        ed.setContent(
+          '<p id="containing"><img data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/download" alt="a red circle" /></p>'
+        )
+        ed.setSelectedNode(ed.dom.select('#containing')[0])
+      })
+
+      it('fetches the SVG file, specifying the course ID and timestamp', () => {
+        subject()
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringMatching(/https:\/\/domain.from.env\/download\?course_id=23&ts=\d+/)
+        )
+      })
     })
 
     it('parses the SVG settings from the SVG metadata', async () => {
@@ -227,7 +272,7 @@ describe('useSvgSettings()', () => {
           encodedImageType: '',
           encodedImageName: '',
           outlineColor: null,
-          outlineSize: 'none',
+          outlineSize: 'small',
           text: '',
           textSize: 'small',
           textColor: '#000000',
@@ -260,7 +305,7 @@ describe('useSvgSettings()', () => {
           encodedImageType: '',
           encodedImageName: '',
           outlineColor: null,
-          outlineSize: 'none',
+          outlineSize: 'small',
           text: '',
           textSize: 'small',
           textColor: '#000000',

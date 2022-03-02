@@ -29,48 +29,56 @@ import drawSidebar from './jquery/sidebar'
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import UndatedEventsList from './jquery/UndatedEventsList'
 import configureSchedulerStore from './react/scheduler/store/configureStore'
+import loadFullCalendarLocaleData from './ext/loadFullCalendarLocaleData'
 import 'jquery-kyle-menu'
 
 const eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
-
 const schedulerStore = ENV.CALENDAR.SHOW_SCHEDULER ? configureSchedulerStore() : null
+const start = () => {
+  const header = new CalendarHeader({
+    el: '#calendar_header',
+    calendar2Only: ENV.CALENDAR.CAL2_ONLY
+  })
 
-const header = new CalendarHeader({
-  el: '#calendar_header',
-  calendar2Only: ENV.CALENDAR.CAL2_ONLY
-})
-
-const calendar = new Calendar(
-  '#calendar-app',
-  ENV.CALENDAR.CONTEXTS,
-  ENV.CALENDAR.MANAGE_CONTEXTS,
-  eventDataSource,
-  {
-    activateEvent: ENV.CALENDAR.ACTIVE_EVENT,
-    viewStart: ENV.CALENDAR.VIEW_START,
-    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER,
-    header,
-    userId: ENV.current_user_id,
-    schedulerStore,
-    onLoadAppointmentGroups: agMap => {
-      if (ENV.CALENDAR.SHOW_SCHEDULER) {
-        const courses = eventDataSource.contexts.filter(context =>
-          agMap.hasOwnProperty(context.asset_string)
-        )
-        if (courses.length > 0) {
-          ReactDOM.render(
-            <FindAppointment courses={courses} store={schedulerStore} />,
-            $('#select-course-component')[0]
+  const calendar = new Calendar(
+    '#calendar-app',
+    ENV.CALENDAR.CONTEXTS,
+    ENV.CALENDAR.MANAGE_CONTEXTS,
+    eventDataSource,
+    {
+      activateEvent: ENV.CALENDAR.ACTIVE_EVENT,
+      viewStart: ENV.CALENDAR.VIEW_START,
+      showScheduler: ENV.CALENDAR.SHOW_SCHEDULER,
+      header,
+      userId: ENV.current_user_id,
+      schedulerStore,
+      onLoadAppointmentGroups: agMap => {
+        if (ENV.CALENDAR.SHOW_SCHEDULER) {
+          const courses = eventDataSource.contexts.filter(context =>
+            agMap.hasOwnProperty(context.asset_string)
           )
+          if (courses.length > 0) {
+            ReactDOM.render(
+              <FindAppointment courses={courses} store={schedulerStore} />,
+              $('#select-course-component')[0]
+            )
+          }
         }
       }
     }
-  }
-)
+  )
 
-new MiniCalendar('#minical', calendar)
-new UndatedEventsList('#undated-events', eventDataSource, calendar)
-drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSource)
+  new MiniCalendar('#minical', calendar)
+  new UndatedEventsList('#undated-events', eventDataSource, calendar)
+  drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSource)
+}
+
+const startAnyway = error => {
+  console.error('Unable to load FullCalendar locale data for "%s" -- %s', ENV.MOMENT_LOCALE, error)
+  start()
+}
+
+loadFullCalendarLocaleData(ENV.MOMENT_LOCALE).then(start, startAnyway)
 
 let keyboardUser = true
 

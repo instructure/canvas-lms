@@ -23,6 +23,8 @@
 # http://stackoverflow.com/questions/937429/activerecordbase-without-table-rails
 class Tableless < ActiveRecord::Base
   class << self
+    def load_schema; end
+
     def columns(&block)
       if block
         @columns_block = block
@@ -39,9 +41,16 @@ class Tableless < ActiveRecord::Base
       @columns_hash ||= columns.index_by(&:name)
     end
 
-    def column(name, sql_type = nil, default = nil, null = true)
-      args = [name.to_s, default, connection.send(:lookup_cast_type, sql_type.to_s),
-              sql_type.to_s, null]
+    def column(name, sql_type = nil, default = nil)
+      cast_type = connection.send(:lookup_cast_type, sql_type.to_s)
+      type_metadata = ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(
+        sql_type: sql_type.to_s,
+        type: cast_type.type,
+        limit: cast_type.limit,
+        precision: cast_type.precision,
+        scale: cast_type.scale
+      )
+      args = [name.to_s, default, type_metadata, sql_type.to_s]
       columns << ActiveRecord::ConnectionAdapters::Column.new(*args)
     end
 

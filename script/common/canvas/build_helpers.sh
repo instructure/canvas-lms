@@ -111,7 +111,7 @@ If you want to migrate the existing database, cancel now
   start_spinner "Migrating (Test env)...."
   _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
   stop_spinner
-  [[ ${dropped:-DROP} == 'migrate' ]] || _canvas_lms_track run_command bundle exec rake db:initial_setup
+  [[ ${dropped:-DROP} == 'migrate' ]] || _canvas_lms_track run_command_tty bundle exec rake db:initial_setup
 }
 
 function bundle_install {
