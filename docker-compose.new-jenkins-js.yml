@@ -3,6 +3,5 @@ services:
   canvas:
     environment:
       JSPEC_GROUP: $JSPEC_GROUP
-      RAILS_LOAD_ALL_LOCALES: $RAILS_LOAD_ALL_LOCALES
     image: $KARMA_RUNNER_IMAGE
     init: true

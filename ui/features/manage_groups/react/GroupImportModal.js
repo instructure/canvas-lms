@@ -74,7 +74,7 @@ export default function ImportGroupsModal(props) {
         accept=".csv"
         onDrop={(acceptedFile, rejectedFile) => onSelection(acceptedFile, rejectedFile)}
         messages={messages}
-        label={
+        renderLabel={
           <div>
             <Billboard
               size="medium"

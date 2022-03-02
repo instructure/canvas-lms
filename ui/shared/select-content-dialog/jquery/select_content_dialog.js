@@ -57,7 +57,7 @@ SelectContentDialog.deepLinkingListener = event => {
   if (
     event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
     event.data &&
-    event.data.messageType === 'LtiDeepLinkingResponse'
+    event.data.subject === 'LtiDeepLinkingResponse'
   ) {
     if (event.data.content_items.length > 1) {
       return processMultipleContentItems(event)

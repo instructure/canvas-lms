@@ -27,8 +27,8 @@ import I18n from 'i18n!gradebook'
 export default function InvalidGradeIndicator(props) {
   return (
     <div className="Grid__GradeCell__InvalidGrade">
-      <Tooltip placement="bottom" tip={I18n.t('This is not a valid grade')} variant="inverse">
-        <Button buttonRef={props.elementRef} size="small" variant="icon">
+      <Tooltip placement="bottom" renderTip={I18n.t('This is not a valid grade')} color="primary">
+        <Button elementRef={props.elementRef} size="small" variant="icon">
           <Text color="danger">
             <IconWarningLine />
           </Text>

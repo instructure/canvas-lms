@@ -82,7 +82,7 @@ export default function FormContent({
           </Flex.Item>
 
           <Flex.Item>
-            <Button onClick={onHideClick} disabled={!gradesPublished} variant="primary">
+            <Button onClick={onHideClick} disabled={!gradesPublished} color="primary">
               {I18n.t('Hide')}
             </Button>
           </Flex.Item>

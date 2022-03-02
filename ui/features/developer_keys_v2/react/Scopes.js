@@ -120,10 +120,10 @@ export default class Scopes extends React.Component {
           {this.props.requireScopes ? (
             <Grid.Col width="auto">
               <TextInput
-                label={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
                 placeholder={searchEndpoints}
                 type="search"
-                icon={() => <IconSearchLine />}
+                renderAfterInput={() => <IconSearchLine />}
                 onChange={this.handleFilterChange}
               />
             </Grid.Col>
@@ -142,7 +142,7 @@ export default class Scopes extends React.Component {
                 data-automation="includes-checkbox"
               />
               &nbsp;
-              <Tooltip renderTip={includeTooltip} on={['hover', 'focus']} variant="inverse">
+              <Tooltip renderTip={includeTooltip} on={['hover', 'focus']} color="primary">
                 <span tabIndex="0">
                   <IconInfoLine />
                   <ScreenReaderContent>{includeTooltip}</ScreenReaderContent>

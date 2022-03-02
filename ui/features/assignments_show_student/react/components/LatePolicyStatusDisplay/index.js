@@ -25,6 +25,8 @@ import {Text} from '@instructure/ui-text'
 import LatePolicyToolTipContent from './LatePolicyToolTipContent'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
+import {Link} from '@instructure/ui-link'
+
 export default function LatePolicyStatusDisplay(props) {
   // TODO: actually pass the assignment and submission in here instead of all these
   //       separate props
@@ -37,7 +39,7 @@ export default function LatePolicyStatusDisplay(props) {
         </Flex.Item>
         <Flex.Item>
           <Tooltip
-            tip={
+            renderTip={
               <LatePolicyToolTipContent
                 attempt={attempt}
                 grade={grade}
@@ -50,9 +52,9 @@ export default function LatePolicyStatusDisplay(props) {
             on={['hover', 'focus']}
             placement="start"
           >
-            <Button
+            <Link
               href="#"
-              variant="link"
+              isWithinText={false}
               theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
             >
               <ScreenReaderContent>
@@ -67,7 +69,7 @@ export default function LatePolicyStatusDisplay(props) {
                   {count: props.pointsDeducted}
                 )}
               </Text>
-            </Button>
+            </Link>
           </Tooltip>
         </Flex.Item>
       </Flex>

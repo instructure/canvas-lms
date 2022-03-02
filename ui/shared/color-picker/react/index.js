@@ -493,7 +493,7 @@ const ColorPicker = createReactClass({
         tabIndex="-1"
       >
         {!this.isValidHex(this.state.currentColor) && (
-          <Tooltip tip={I18n.t('Invalid hexcode')}>
+          <Tooltip renderTip={I18n.t('Invalid hexcode')}>
             <IconWarningSolid color="warning" id="ColorPicker__InvalidHex" />
           </Tooltip>
         )}
@@ -527,7 +527,7 @@ const ColorPicker = createReactClass({
         <div className="ColorPicker__CustomInputContainer">
           {this.colorPreview()}
           <TextInput
-            label={
+            renderLabel={
               <ScreenReaderContent>
                 {this.isValidHex(this.state.currentColor)
                   ? I18n.t('Enter a hexcode here to use a custom color.')
@@ -551,7 +551,7 @@ const ColorPicker = createReactClass({
             {I18n.t('Cancel')}
           </Button>
           <Button
-            variant="primary"
+            color="primary"
             id="ColorPicker__Apply"
             size="small"
             onClick={this.onApply.bind(null, this.state.currentColor)}

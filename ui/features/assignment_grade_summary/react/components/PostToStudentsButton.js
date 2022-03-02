@@ -34,7 +34,7 @@ function startedButton(props) {
   const title = I18n.t('Posting to Students')
 
   return (
-    <Button {...props} variant="light">
+    <Button {...props} color="primary-inverse">
       <Spinner size="x-small" renderTitle={title} />
       <PresentationContent>{title}</PresentationContent>
     </Button>
@@ -43,7 +43,7 @@ function startedButton(props) {
 
 function successButton(props) {
   return (
-    <Button {...props} icon={IconCheckMarkSolid} variant="light">
+    <Button {...props} renderIcon={IconCheckMarkSolid} color="primary-inverse">
       {I18n.t('Grades Posted to Students')}
     </Button>
   )

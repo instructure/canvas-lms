@@ -108,7 +108,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 medium 0">
             <Flex.Item>
-              <CloseButton onClick={this.handleDismiss}>{I18n.t('Close')}</CloseButton>
+              <CloseButton onClick={this.handleDismiss} screenReaderLabel={I18n.t('Close')} />
             </Flex.Item>
 
             <Flex.Item margin="0 0 0 small" shrink>

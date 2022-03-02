@@ -111,9 +111,10 @@ export default function AssessmentSummary(props) {
           as="div"
           id="audit-tray-overall-anonymity-label"
           margin="x-small"
-          text={overallAnonymityLabel}
-          variant={overallAnonymityLabelColor}
-        />
+          color={overallAnonymityLabelColor}
+        >
+          {overallAnonymityLabel}
+        </Pill>
 
         <Text
           as="div"

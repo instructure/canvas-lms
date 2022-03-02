@@ -51,9 +51,9 @@ export default class ConfigurationFormLti2 extends React.Component {
           id="registrationUrl"
           name="tool_consumer_url"
           defaultValue={this.props.registrationUrl}
-          label={I18n.t('Registration URL')}
+          renderLabel={I18n.t('Registration URL')}
           hintText={I18n.t('Example: https://lti-tool-provider-example.herokuapp.com/register')}
-          required
+          isRequired
           errors={this.state.errors}
         />
       </div>

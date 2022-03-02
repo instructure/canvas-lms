@@ -18,6 +18,8 @@
 
 import {createSvgElement} from './utils'
 import {CLIP_PATH_ID} from './clipPath'
+import {Shape} from './shape'
+import {Size} from './constants'
 
 export function buildImage(settings) {
   // Don't attempt to embed an image if none exist
@@ -36,4 +38,58 @@ export function buildImage(settings) {
   group.appendChild(image)
 
   return group
+}
+
+/**
+ * Calculates the transformation props for a given
+ * shape and size.
+ *
+ * A Transform takes the following shape:
+ * {
+ *   x: string,
+ *   y: string,
+ *   width: number,
+ *   height: number,
+ *   translateX: number,
+ *   translateY: number
+ * }
+ *
+ * @param {Shape} shape
+ * @param {Size} size
+ *
+ * @returns Transform
+ */
+export function transformForShape(shape, size) {
+  switch (shape) {
+    case Shape.Pentagon:
+      return transformForPentagon(size)
+    default:
+      return transformForDefault(size)
+  }
+}
+
+function transformForPentagon(size) {
+  const defaults = transformForDefault(size)
+  return {
+    ...defaults,
+    y: '55%'
+  }
+}
+
+function transformForDefault(size) {
+  const dimensions = {
+    [Size.ExtraSmall]: 60,
+    [Size.Small]: 75,
+    [Size.Medium]: 80,
+    [Size.Large]: 110
+  }
+
+  return {
+    x: '50%',
+    y: '50%',
+    width: dimensions[size],
+    height: dimensions[size],
+    translateX: (dimensions[size] / 2) * -1,
+    translateY: (dimensions[size] / 2) * -1
+  }
 }

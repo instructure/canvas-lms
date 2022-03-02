@@ -34,11 +34,7 @@
         <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
         <div
           id="conversation_filter"
-          <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
-            class="conversations__filter"
-          <% else %>
-            style="display:inline-block; vertical-align: middle;"
-          <% end %>
+          class="conversations__filter"
         >
         </div>
       </div>
@@ -172,29 +168,11 @@
     </div>
   </header>
 
-  <div
-    <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
-      class="messaging-wrapper"
-    <% else %>
-      class="row-fluid messaging-wrapper"
-    <% end %>
-  >
-    <div
-      <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
-        class="message-list-scroller"
-      <% else %>
-        class="span4 message-list-scroller"
-      <% end %>
-    >
+  <div class="messaging-wrapper">
+    <div class="message-list-scroller">
       <div class="message-list"></div>
     </div>
-    <div
-      <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
-        class="message-detail conversations__message-detail"
-      <% else %>
-        class="span8 message-detail"
-      <% end %>
-    >
+    <div class="message-detail conversations__message-detail">
     </div>
   </div>
 </div>

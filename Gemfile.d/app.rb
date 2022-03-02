@@ -28,7 +28,7 @@ if CANVAS_RAILS6_0
 else
   gem "rails", "6.1.4.6"
     gem "tzinfo", "2.0.4"
-  gem "switchman", "3.0.7"
+  gem "switchman", "3.0.8"
     gem "guardrail", "3.0.0"
   gem "switchman-inst-jobs", "4.0.6"
 end
@@ -77,7 +77,7 @@ gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
 gem "i18n", "1.8.5"
-gem "i18nliner", "0.1.2"
+gem "i18nliner", "0.1.2", github: "instructure/i18nliner", ref: "rails-61"
   gem "ruby2ruby", "2.4.4", require: false
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false

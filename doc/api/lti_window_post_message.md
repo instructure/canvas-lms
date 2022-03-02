@@ -8,7 +8,7 @@ can send various types of events to resize windows, launch in new windows, or ot
 functionality. Note that this is not part of the LTI specification, and is Canvas-specific.
 
 The data sent to `window.postMessage` can be of any type, and each message type looks for different
-data. Most data is sent as an object, with either a `messageType` or `subject` property.
+data. Most data is sent as an object with a `subject` property.
 
 Some of these message handlers require the presence of a `token`, which identifies the tool launch.
 This token is present in the launch as a custom variable, `$com.instructure.PostMessageToken`, and
@@ -26,7 +26,7 @@ Launches the tool that sent the event in a full-window context (ie not inside a 
 Mainly used for Safari launches, since Safari disables setting cookies inside iframes.
 
 **Required properties:**
-- messageType: "requestFullWindowLaunch"
+- subject: "requestFullWindowLaunch"
 - data: either a string or an object
   - if a string, a url for relaunching the tool
   - if an object, has required sub-properties
@@ -45,7 +45,7 @@ Mainly used for Safari launches, since Safari disables setting cookies inside if
 ```js
 window.parent.postMessage(
   {
-    messageType: "requestFullWindowLaunch",
+    subject: "requestFullWindowLaunch",
     data: {
       url: "https://example-tool.com/launch",
       placement: "course_navigation",
@@ -65,10 +65,10 @@ window.parent.postMessage(
 Opens and closes the course navigation sidebar, giving more space for the tool to display.
 
 **Required properties:**
-- messageType: "toggleCourseNavigationMenu"
+- subject: "toggleCourseNavigationMenu"
 
 ```js
-window.parent.postMessage({ messageType: "toggleCourseNavigationMenu" }, "*")
+window.parent.postMessage({ subject: "toggleCourseNavigationMenu" }, "*")
 ```
 
 ## lti.resourceImported
@@ -78,10 +78,10 @@ Canvas will respond by reloading the page, if the tool was present in the extern
 apps tray. Used on wiki pages.
 
 **Required properties:**
-- messageType: "lti.resourceImported"
+- subject: "lti.resourceImported"
 
 ```js
-window.parent.postMessage({ messageType: "lti.resourceImported" }, "*")
+window.parent.postMessage({ subject: "lti.resourceImported" }, "*")
 ```
 
 ## lti.frameResize

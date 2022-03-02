@@ -43,7 +43,7 @@ export default function DuplicateConfirmationForm(props) {
         <div className="ReactModal__Footer-Actions">
           <Button
             id="cancel-install"
-            variant="primary"
+            color="primary"
             margin="0 x-small 0 0"
             onClick={props.onCancel}
           >

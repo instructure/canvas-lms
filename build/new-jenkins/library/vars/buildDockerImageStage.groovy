@@ -28,7 +28,7 @@ def handleDockerBuildFailure(imagePrefix, e) {
 
     sh(script: """
       docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $imagePrefix-failed
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $imagePrefix-failed
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $imagePrefix-failed
     """, label: 'upload failed image')
   }
 
@@ -102,7 +102,7 @@ def jsImage() {
 
       sh """
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_BUILDER_PREFIX
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $KARMA_BUILDER_PREFIX
       """
     } catch (e) {
       handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
@@ -113,7 +113,7 @@ def jsImage() {
 def lintersImage() {
   credentials.withStarlordCredentials {
     sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
-    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $LINTERS_RUNNER_PREFIX'
+    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push -a $LINTERS_RUNNER_PREFIX'
   }
 }
 
@@ -144,11 +144,11 @@ def premergeCacheImage() {
       // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
       // has changed between the post-merge build and this pre-merge build.
       sh(script: """
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $BASE_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX
       """, label: 'upload cache images')
     }
   }
@@ -192,11 +192,11 @@ def patchsetImage() {
     }
 
     sh(script: """
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $BASE_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX
     """, label: 'upload cache images')
   }
 }

@@ -82,10 +82,10 @@ export default class PronounsInput extends React.Component {
             document.querySelector(`#${this.state.input_id}`).value = ''
           }
         }}
-        label={
+        renderLabel={
           <>
             <Text>{I18n.t('Available Pronouns')}</Text>
-            <Tooltip tip={infoToolTip} on={['hover', 'focus']} variant="inverse">
+            <Tooltip renderTip={infoToolTip} on={['hover', 'focus']} color="primary">
               <span
                 style={{margin: '0 10px 0 10px'}}
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex

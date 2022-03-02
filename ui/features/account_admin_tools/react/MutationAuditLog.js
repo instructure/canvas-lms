@@ -48,16 +48,16 @@ const AuditLogForm = ({onSubmit}) => {
   }
 
   return (
-    <View background="light" as="div" padding="medium" borderWidth="small">
+    <View background="secondary" as="div" padding="medium" borderWidth="small">
       <form onSubmit={submit} style={{margin: 0}}>
         <TextInput
-          label={I18n.t('Asset String')}
+          renderLabel={I18n.t('Asset String')}
           placeholder="course_123"
           value={assetString}
           onChange={e => {
             setAssetString(e.target.value)
           }}
-          required
+          isRequired
         />
 
         <div style={{marginTop: '1.5em'}} />
@@ -85,7 +85,7 @@ const AuditLogForm = ({onSubmit}) => {
               />
             </Grid.Col>
             <Grid.Col vAlign="middle">
-              <Button variant="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
+              <Button color="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
                 {I18n.t('Find')}
               </Button>
             </Grid.Col>

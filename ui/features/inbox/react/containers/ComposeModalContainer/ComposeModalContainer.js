@@ -243,8 +243,11 @@ const ComposeModalContainer = props => {
               replaceAttachment={replaceAttachment}
             >
               <HeaderInputs
+                activeCourseFilter={selectedContext}
+                setUserNote={setUserNote}
                 contextName={props.pastConversation?.contextName}
                 courses={props.courses}
+                selectedRecipients={selectedIds}
                 isReply={props.isReply}
                 isForward={props.isForward}
                 onContextSelect={onContextSelect}

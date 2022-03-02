@@ -9177,7 +9177,7 @@ is:
       delete: Eyða
       edit: Breyta
       edited_comment: " *%{editor.display_name}* breytti þessu %{edited_at}"
-      go_to_parent: "Fara í móður"
+      go_to_parent: "Fara í yfir"
       go_to_topic: "Fara í umræðuefni"
       like_entry: "Líka við færslu"
       manage_discussion_entry: "Stjórna umræðufærslu"
@@ -10942,7 +10942,7 @@ is:
   go_30af2a7b: Áfram
   go_back_ed239e69: "Til baka"
   go_to_name_s_profile_eaa1826b: "Fara á notandaupplýsingar %{name}"
-  go_to_parent_7fb312b4: "Fara í móður"
+  go_to_parent_7fb312b4: "Fara í yfir"
   go_to_prerequisite_175c1f3f: "Fara í forsendur"
   go_to_quoted_reply_6f4661e: "Farðu í tilvitnað svar"
   go_to_reply_36fe5f51: "Fara í svara"

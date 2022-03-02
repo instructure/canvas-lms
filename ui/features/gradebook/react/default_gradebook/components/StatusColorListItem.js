@@ -19,11 +19,10 @@
 import React from 'react'
 import {func, string, bool} from 'prop-types'
 import I18n from 'i18n!gradebook'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {Text} from '@instructure/ui-text'
 import {IconEditSolid} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Grid} from '@instructure/ui-grid'
 import ColorPicker from '@canvas/color-picker'
 import {statusesTitleMap} from '../constants/statuses'
@@ -90,41 +89,39 @@ class StatusColorListItem extends React.Component {
             <Grid.Col width="auto">
               <Popover
                 on="click"
-                show={isColorPickerShown}
+                isShowingContent={isColorPickerShown}
                 onToggle={colorPickerOnToggle}
                 contentRef={colorPickerContentRef}
                 shouldReturnFocus
-              >
-                <Popover.Trigger>
-                  <Button buttonRef={colorPickerButtonRef} variant="icon" size="small">
-                    <Text size="medium">
-                      <ScreenReaderContent>
-                        {I18n.t('%{status} Color Picker', {status})}
-                      </ScreenReaderContent>
-                      <IconEditSolid />
-                    </Text>
-                  </Button>
-                </Popover.Trigger>
-
-                <Popover.Content>
-                  <ColorPicker
-                    parentComponent="StatusColorListItem"
-                    colors={colorPickerColors}
-                    currentColor={this.state.color}
-                    afterClose={colorPickerAfterClose}
-                    hideOnScroll={false}
-                    allowWhite
-                    nonModal
-                    hidePrompt
-                    withDarkCheck
-                    animate={false}
-                    withAnimation={false}
-                    withArrow={false}
+                renderTrigger={
+                  <IconButton
+                    size="small"
+                    withBackground={false}
                     withBorder={false}
-                    withBoxShadow={false}
-                    setStatusColor={this.setColor}
-                  />
-                </Popover.Content>
+                    elementRef={colorPickerButtonRef}
+                    screenReaderLabel={I18n.t('%{status} Color Picker', {status})}
+                  >
+                    <IconEditSolid />
+                  </IconButton>
+                }
+              >
+                <ColorPicker
+                  parentComponent="StatusColorListItem"
+                  colors={colorPickerColors}
+                  currentColor={this.state.color}
+                  afterClose={colorPickerAfterClose}
+                  hideOnScroll={false}
+                  allowWhite
+                  nonModal
+                  hidePrompt
+                  withDarkCheck
+                  animate={false}
+                  withAnimation={false}
+                  withArrow={false}
+                  withBorder={false}
+                  withBoxShadow={false}
+                  setStatusColor={this.setColor}
+                />
               </Popover>
             </Grid.Col>
           </Grid.Row>

@@ -31,6 +31,7 @@ module LtiAdvantage::Messages
       lti_message_hint
       canvas_region
       client_id
+      lti_storage_target
     ].freeze
 
     attr_accessor(*(REQUIRED_PARAMETERS + OPTIONAL_PARAMETERS))

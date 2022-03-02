@@ -49,5 +49,8 @@
     <resource identifier="1234facc599d2202cf67dce042ee34321" type="imsbasiclti_xmlv1p3">
       <file href="lti_resource_links/1234facc599d2202cf67dce042ee34321.xml"/>
     </resource>
+    <resource identifier="5678facc599d2202cf67dce042ee34321" type="imsbasiclti_xmlv1p3">
+      <file href="lti_resource_links/5678facc599d2202cf67dce042ee34321.xml"/>
+    </resource>
   </resources>
 </manifest>

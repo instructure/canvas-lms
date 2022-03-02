@@ -50,18 +50,10 @@ describe "profile communication settings" do
       course_with_teacher_logged_in
     end
 
-    context "with notification_settings_course_selector feature flag enabled" do
-      it "renders the generalized notification settings page" do
-        Account.site_admin.enable_feature! :notification_settings_course_selector
-        get "/profile/communication"
-        expect(f("h1").text).to eq "Notification Settings"
-      end
-    end
-
     it "renders" do
       get "/profile/communication"
       expect(f("#breadcrumbs")).to include_text("Notification Settings")
-      expect(f("h1").text).to eq "Account Notification Settings"
+      expect(f("h1").text).to eq "Notification Settings"
       expect(fj("div:contains('Account-level notifications apply to all courses.')")).to be_present
       expect(fj("thead span:contains('Course Activities')")).to be_present
       expect(fj("thead span:contains('Discussions')")).to be_present

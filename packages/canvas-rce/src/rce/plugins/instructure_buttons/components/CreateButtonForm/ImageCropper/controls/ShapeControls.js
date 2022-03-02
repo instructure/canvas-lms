@@ -22,16 +22,17 @@ import formatMessage from '../../../../../../../format-message'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import PropTypes from 'prop-types'
 import {ZoomControls} from './ZoomControls'
+import {Shape} from '../../../../svg/shape'
 
 const SHAPE_OPTIONS = [
-  {id: 'square', label: formatMessage('Square')},
-  {id: 'circle', label: formatMessage('Circle')},
-  {id: 'triangle', label: formatMessage('Triangle')},
-  {id: 'diamond', label: formatMessage('Diamond')},
-  {id: 'pentagon', label: formatMessage('Pentagon')},
-  {id: 'hexagon', label: formatMessage('Hexagon')},
-  {id: 'octagon', label: formatMessage('Octagon')},
-  {id: 'star', label: formatMessage('Star')}
+  {id: Shape.Square, label: formatMessage('Square')},
+  {id: Shape.Circle, label: formatMessage('Circle')},
+  {id: Shape.Triangle, label: formatMessage('Triangle')},
+  {id: Shape.Diamond, label: formatMessage('Diamond')},
+  {id: Shape.Pentagon, label: formatMessage('Pentagon')},
+  {id: Shape.Hexagon, label: formatMessage('Hexagon')},
+  {id: Shape.Octagon, label: formatMessage('Octagon')},
+  {id: Shape.Star, label: formatMessage('Star')}
 ]
 
 export const ShapeControls = ({shape, onChange}) => {
