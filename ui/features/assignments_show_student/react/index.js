@@ -19,13 +19,21 @@
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider, createClient} from '@canvas/apollo'
 import ErrorBoundary from '@canvas/error-boundary'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import ObserverOptions from '@canvas/observer-picker'
+import {
+  getHandleChangeObservedUser,
+  autoFocusObserverPicker
+} from '@canvas/observer-picker/util/pageReloadHelper'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import StudentViewQuery from './components/StudentViewQuery'
+import {View} from '@instructure/ui-view'
 
 const client = createClient()
+const I18n = useI18nScope('assignments_2')
 
 export default function renderAssignmentsApp(env, elt) {
   ReactDOM.render(
@@ -48,4 +56,22 @@ export default function renderAssignmentsApp(env, elt) {
     </ApolloProvider>,
     elt
   )
+
+  const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
+  if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
+    ReactDOM.render(
+      <View as="div" maxWidth="12em">
+        <ObserverOptions
+          autoFocus={autoFocusObserverPicker()}
+          canAddObservee={!!ENV.OBSERVER_OPTIONS?.CAN_ADD_OBSERVEE}
+          currentUserRoles={ENV.current_user_roles}
+          currentUser={ENV.current_user}
+          handleChangeObservedUser={getHandleChangeObservedUser()}
+          observedUsersList={ENV.OBSERVER_OPTIONS.OBSERVED_USERS_LIST}
+          renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
+        />
+      </View>,
+      observerPickerContainer
+    )
+  }
 }

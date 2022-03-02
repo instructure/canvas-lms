@@ -232,17 +232,20 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
+          if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+            js_env({ OBSERVER_OPTIONS: {
+                     OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                     CAN_ADD_OBSERVEE: @current_user
+                                       .profile
+                                       .tabs_available(@current_user, root_account: @domain_root_account)
+                                       .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                   } })
+          end
+
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?
             js_env({ enrollment_state: active_enrollment&.state_based_on_date })
             rce_js_env
-
-            # Initially we will not have any visual indicator of which
-            # student is observed so we will announce it in a flash notice.
-            unless student_to_view == @current_user
-              flash[:notice] = t "Observing %{student_name}. To select a different student, return to the dashboard.",
-                                 student_name: student_to_view.name
-            end
 
             render_a2_student_view(student: student_to_view)
             return

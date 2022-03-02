@@ -1909,6 +1909,49 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:latest_announcement][:title]).to eq "Hello students"
       end
     end
+
+    context "when logged in as an observer with multiple student associations" do
+      before do
+        @student2 = User.create!
+        @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+
+        @observer = User.create!
+        @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+        @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student2.id)
+        user_session(@observer)
+      end
+
+      it "sets context_enrollment using first enrollment" do
+        get :show, params: { id: @course.id }
+        enrollment = assigns[:context_enrollment]
+        expect(enrollment.is_a?(ObserverEnrollment)).to be true
+        expect(enrollment.user_id).to eq @observer.id
+        expect(enrollment.associated_user_id).to eq @student.id
+      end
+
+      context "when observer_picker and a2 observer view is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:observer_picker)
+          Setting.set("assignments_2_observer_view", "true")
+        end
+
+        it "sets context_enrollment using selected observed user" do
+          cookies["#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"] = @student2.id
+          get :show, params: { id: @course.id }
+          enrollment = assigns[:context_enrollment]
+          expect(enrollment.is_a?(ObserverEnrollment)).to be true
+          expect(enrollment.user_id).to eq @observer.id
+          expect(enrollment.associated_user_id).to eq @student2.id
+        end
+
+        it "sets js_env variables" do
+          get :show, params: { id: @course.id }
+          expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+          expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+          expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
+        end
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do

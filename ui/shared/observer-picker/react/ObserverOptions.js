@@ -42,7 +42,9 @@ const ObserverOptions = ({
   handleChangeObservedUser,
   margin,
   canAddObservee,
-  currentUserRoles
+  currentUserRoles,
+  autoFocus,
+  renderLabel
 }) => {
   const [observedUsers, setObservedUsers] = useState(() =>
     parseObservedUsersList(observedUsersList)
@@ -170,10 +172,13 @@ const ObserverOptions = ({
     return (
       <View as="div" margin={margin}>
         <CanvasAsyncSelect
+          autoFocus={!!autoFocus}
           data-testid="observed-student-dropdown"
           inputValue={selectSearchValue}
           renderLabel={
-            <ScreenReaderContent>{I18n.t('Select a student to view')}</ScreenReaderContent>
+            <ScreenReaderContent>
+              {renderLabel || I18n.t('Select a student to view')}
+            </ScreenReaderContent>
           }
           noOptionsLabel={I18n.t('No Results')}
           onInputChange={e => setSelectSearchValue(e.target.value)}
@@ -234,7 +239,9 @@ ObserverOptions.propTypes = {
   handleChangeObservedUser: PropTypes.func.isRequired,
   margin: PropTypes.string,
   canAddObservee: PropTypes.bool.isRequired,
-  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  autoFocus: PropTypes.bool,
+  renderLabel: PropTypes.string
 }
 
 export default ObserverOptions
