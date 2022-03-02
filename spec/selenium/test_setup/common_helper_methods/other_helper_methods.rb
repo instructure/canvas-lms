@@ -42,7 +42,7 @@ module OtherHelperMethods
     controller = opts[:controller] || "assignments"
     summarized = opts[:summarized] || nil
     url = opts[:url]
-    user_agent = opts[:user_agent] || "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+    user_agent = opts[:user_agent] || "firefox"
 
     page_view = course.page_views.build(
       user: user,
@@ -54,7 +54,6 @@ module OtherHelperMethods
     page_view.summarized = summarized
     page_view.request_id = SecureRandom.hex(10)
     page_view.created_at = opts[:created_at] || Time.now
-    page_view.http_method = opts[:http_method] || "get"
 
     if opts[:participated]
       page_view.participated = true
