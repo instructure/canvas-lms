@@ -2893,8 +2893,12 @@ class Submission < ActiveRecord::Base
 
     pg.scorer = pg.current_user = scorer
     pg.final = !!attrs[:final]
-    pg.grade = attrs[:grade] if attrs.key?(:grade)
-    pg.score = attrs[:score] if attrs.key?(:score)
+    if attrs.key?(:score)
+      pg.score = attrs[:score]
+      pg.grade = attrs[:grade].presence
+    elsif attrs.key?(:grade)
+      pg.grade = attrs[:grade]
+    end
     pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]
