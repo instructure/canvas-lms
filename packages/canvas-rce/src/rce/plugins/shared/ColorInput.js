@@ -127,7 +127,10 @@ export const ColorInput = ({
               color={c?.color}
               name={c?.name}
               disabled={!isOpen}
-              onSelect={() => handleColorChange(c?.color)}
+              onSelect={() => {
+                handleColorChange(c?.color)
+                setIsOpen(false)
+              }}
             />
           ))}
         </Flex>
