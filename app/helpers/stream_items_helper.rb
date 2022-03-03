@@ -186,7 +186,7 @@ module StreamItemsHelper
   end
 
   def assessment_author_name(asset, user = @current_user)
-    if can_do(asset, user, :read_assessment_user)
+    if asset&.grants_any_right?(user, session, :read_assessment_user)
       asset.asset.user.name
     else
       I18n.t(:anonymous_user, "Anonymous User")

@@ -1219,7 +1219,7 @@ class FilesController < ApplicationController
         return render_unauthorized_action
       end
     end
-    if can_do(@attachment, @current_user, :delete)
+    if @attachment&.grants_any_right?(@current_user, session, :delete)
       return render_unauthorized_action if editing_restricted?(@attachment)
 
       @attachment.destroy

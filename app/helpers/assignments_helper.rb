@@ -68,7 +68,7 @@ module AssignmentsHelper
   end
 
   def assignment_submission_button(assignment, user, user_submission, hidden)
-    if assignment.expects_submission? && can_do(assignment, user, :submit)
+    if assignment.expects_submission? && assignment&.grants_any_right?(user, session, :submit)
       submit_text = user_submission.try(:has_submission?) ? I18n.t("New Attempt") : I18n.t("Start Assignment")
       late = user_submission.try(:late?) ? "late" : ""
       options = {

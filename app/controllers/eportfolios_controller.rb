@@ -102,7 +102,7 @@ class EportfoliosController < ApplicationController
         @owner_url ||= user_url(@portfolio.user) if @portfolio.user.grants_right?(@current_user, :view_statistics)
       end
 
-      if can_do(@portfolio, @current_user, :update)
+      if @portfolio&.grants_any_right?(@current_user, session, :update)
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, verifier: @portfolio.uuid), { title: t("titles.feed", "Eportfolio Atom Feed") })
       elsif @portfolio.public
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { title: t("titles.feed", "Eportfolio Atom Feed") })

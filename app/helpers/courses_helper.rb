@@ -45,7 +45,7 @@ module CoursesHelper
 
     icon_data = [nil] + event_type
 
-    if can_do(context, current_user, :participate_as_student)
+    if context&.grants_any_right?(current_user, session, :participate_as_student)
       if submission && submission.workflow_state != "unsubmitted"
         event_type = ["", "icon-check"] unless show_assignment_type_icon
         icon_data = [submission.readable_state] + event_type
@@ -53,7 +53,7 @@ module CoursesHelper
         icon_data = [t("#courses.recent_event.not_submitted", "not submitted")] + event_type
       end
       icon_data[0] = nil unless recent_event.expects_submission?
-    elsif !student_only && can_do(context, current_user, :manage_grades)
+    elsif !student_only && context&.grants_any_right?(current_user, session, :manage_grades)
       # no submissions
       icon_data = if !recent_event.has_submitted_submissions?
                     [t("#courses.recent_event.no_submissions", "no submissions")] + event_type

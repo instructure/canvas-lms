@@ -30,11 +30,11 @@ module QuizzesHelper
   end
 
   def can_read(quiz, user = @current_user)
-    can_do(quiz, user, :read)
+    quiz&.grants_any_right?(user, session, :read)
   end
 
   def can_publish(quiz, user = @current_user)
-    can_do(quiz, user, :update) || can_do(quiz, user, :manage)
+    quiz&.grants_any_right?(user, session, :update) || quiz&.grants_any_right?(user, session, :manage)
   end
 
   def unpublished_quiz_warning

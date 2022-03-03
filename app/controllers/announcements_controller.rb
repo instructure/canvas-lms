@@ -71,7 +71,7 @@ class AnnouncementsController < ApplicationController
         feed_key = nil
         if @context_enrollment
           feed_key = @context_enrollment.feed_code
-        elsif can_do(@context, @current_user, :manage)
+        elsif @context&.grants_any_right?(@current_user, session, :manage)
           feed_key = @context.feed_code
         elsif @context.available? && @context.respond_to?(:is_public) && @context.is_public
           feed_key = @context.asset_string

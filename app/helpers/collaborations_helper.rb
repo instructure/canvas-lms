@@ -41,19 +41,19 @@ module CollaborationsHelper
   end
 
   def collaboration_links(collab, user)
-    if can_do(collab, user, :update, :delete)
+    if collab&.grants_any_right?(user, session, :update, :delete)
       render "collaborations/collaboration_links", collaboration: collab, user: user
     end
   end
 
   def edit_button(collab, user)
     if (!collab.is_a?(ExternalToolCollaboration) || collab.update_url) &&
-       can_do(collab, user, :update)
+       collab&.grants_any_right?(user, session, :update)
       render "collaborations/edit_button", collaboration: collab
     end
   end
 
   def delete_button(collab, user)
-    render "collaborations/delete_button", collaboration: collab if can_do(collab, user, :delete)
+    render "collaborations/delete_button", collaboration: collab if collab&.grants_any_right?(user, session, :delete)
   end
 end

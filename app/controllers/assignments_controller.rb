@@ -309,7 +309,7 @@ class AssignmentsController < ApplicationController
 
         if @context.feature_enabled?(:assignments_2_teacher) &&
            (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-           can_do(@context, @current_user, :read_as_admin)
+           @context&.grants_any_right?(@current_user, session, :read_as_admin)
           css_bundle :assignments_2_teacher
           js_bundle :assignments_show_teacher
           render html: "", layout: true
@@ -337,7 +337,7 @@ class AssignmentsController < ApplicationController
         permissions = {
           context: context_rights,
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
-          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
+          can_manage_groups: @context.groups.temp_record&.grants_any_right?(@current_user, session, :create)
         }
 
         @similarity_pledge = pledge_text
@@ -709,7 +709,7 @@ class AssignmentsController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PERMISSIONS: {
-          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
+          can_manage_groups: @context.groups.temp_record&.grants_any_right?(@current_user, session, :create)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,

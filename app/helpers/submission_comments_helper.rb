@@ -19,7 +19,7 @@
 
 module SubmissionCommentsHelper
   def comment_author_name_for(comment)
-    if can_do(comment, @current_user, :read_author)
+    if comment&.grants_any_right?(@current_user, session, :read_author)
       comment.author_name
     else
       t("Anonymous User")

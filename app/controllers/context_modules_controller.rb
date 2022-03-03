@@ -66,8 +66,8 @@ class ContextModulesController < ApplicationController
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
-      @can_edit = can_do(@context, @current_user, :manage_content)
-      @can_view_grades = can_do(@context, @current_user, :view_all_grades)
+      @can_edit = @context&.grants_any_right?(@current_user, session, :manage_content)
+      @can_view_grades = @context&.grants_any_right?(@current_user, session, :view_all_grades)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
 

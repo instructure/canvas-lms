@@ -1453,9 +1453,9 @@ class CoursesController < ApplicationController
       @invited_count = @context.invited_count_visible_to(@current_user)
 
       @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
-                            can_do(@context, @current_user, :manage_grades)
+                            @context&.grants_any_right?(@current_user, session, :manage_grades)
 
-      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
+      @homeroom_courses = if @context.account&.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
                             @context.account.courses.active.homeroom.to_a
                           else
                             @current_user.courses_for_enrollments(@current_user.teacher_enrollments).homeroom.to_a

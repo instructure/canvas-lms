@@ -120,9 +120,9 @@ class Quizzes::QuizzesController < ApplicationController
           new_quizzes_assignment_overrides: api_v1_course_new_quizzes_assignment_overrides_url(@context)
         },
         PERMISSIONS: {
-          create: can_do(@context.quizzes.temp_record, @current_user, :create),
+          create: @context.quizzes.temp_record&.grants_any_right?(@current_user, session, :create),
           manage: can_manage,
-          read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks)
+          read_question_banks: can_manage || @context&.grants_any_right?(@current_user, session, :read_question_banks)
         },
         FLAGS: {
           question_banks: feature_enabled?(:question_banks),

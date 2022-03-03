@@ -623,7 +623,7 @@ class GradebooksController < ApplicationController
   def post_grades_feature?
     @context.feature_enabled?(:post_grades) &&
       @context.allows_grade_publishing_by(@current_user) &&
-      can_do(@context, @current_user, :manage_grades)
+      @context&.grants_any_right?(@current_user, session, :manage_grades)
   end
 
   def history
