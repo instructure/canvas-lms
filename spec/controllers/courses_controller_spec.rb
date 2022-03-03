@@ -2738,6 +2738,43 @@ describe CoursesController do
       end
     end
 
+    describe "default due time" do
+      before do
+        user_session @teacher
+      end
+
+      it "sets the normalized due time if valid" do
+        put "update", params: { id: @course.id, course: { default_due_time: "4:00 PM" } }
+        expect(@course.reload.settings[:default_due_time]).to eq "16:00:00"
+      end
+
+      it "ignores invalid settings" do
+        put "update", params: { id: @course.id, course: { default_due_time: "lolcats" } }
+        expect(@course.reload.settings[:default_due_time]).to be_nil
+      end
+
+      it "inherits the account setting if `inherit` is given" do
+        @course.account.update settings: { default_due_time: { value: "21:00:00" } }
+        expect(@course.default_due_time).to eq "21:00:00"
+
+        @course.default_due_time = "22:00:00"
+        @course.save!
+        expect(@course.default_due_time).to eq "22:00:00"
+
+        put "update", params: { id: @course.id, course: { default_due_time: "inherit" } }
+        @course.reload
+        expect(@course.default_due_time).to eq "21:00:00"
+        expect(@course.settings[:default_due_time]).to be_nil
+      end
+
+      it "leaves the setting alone if the parameter isn't given" do
+        @course.default_due_time = "22:00:00"
+        @course.save!
+        put "update", params: { id: @course.id, course: { course_color: "#000000" } }
+        expect(@course.reload.settings[:default_due_time]).to eq "22:00:00"
+      end
+    end
+
     describe "master courses" do
       before :once do
         account_admin_user
