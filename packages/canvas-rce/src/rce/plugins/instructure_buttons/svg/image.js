@@ -63,6 +63,8 @@ export function transformForShape(shape, size) {
   switch (shape) {
     case Shape.Pentagon:
       return transformForPentagon(size)
+    case Shape.Triangle:
+      return transformForTriangle(size)
     default:
       return transformForDefault(size)
   }
@@ -73,6 +75,35 @@ function transformForPentagon(size) {
   return {
     ...defaults,
     y: '55%'
+  }
+}
+
+function transformForTriangle(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(24),
+        y: '65%'
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(50),
+        y: '65%'
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(80),
+        y: '65%'
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(112),
+        y: '65%'
+      }
   }
 }
 
@@ -87,9 +118,19 @@ function transformForDefault(size) {
   return {
     x: '50%',
     y: '50%',
-    width: dimensions[size],
-    height: dimensions[size],
-    translateX: (dimensions[size] / 2) * -1,
-    translateY: (dimensions[size] / 2) * -1
+    ...dimensionAttrsFor(dimensions[size])
+  }
+}
+
+function translationFor(width) {
+  return (width / 2) * -1
+}
+
+function dimensionAttrsFor(width) {
+  return {
+    width,
+    height: width,
+    translateX: translationFor(width),
+    translateY: translationFor(width)
   }
 }
