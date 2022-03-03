@@ -18,7 +18,6 @@
 
 import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState, useCallback} from 'react'
-import tz from '@canvas/timezone'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -27,16 +26,15 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = useI18nScope('assignments_bulk_edit');
-
-function formatDate(date) {
-  return tz.format(date, 'date.formats.medium_with_weekday')
-}
 
 function BulkEditDateSelect({selectDateRange}) {
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
+
+  const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
 
   const handleApply = useCallback(() => {
     const start = startDate || new Date(-100000, 1)
@@ -75,7 +73,7 @@ function BulkEditDateSelect({selectDateRange}) {
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Selection start date')}</ScreenReaderContent>
               }
-              formatDate={formatDate}
+              formatDate={dateFormatter}
               onSelectedDateChange={setStartDate}
             />
             <View as="span" margin="0 small">
@@ -86,7 +84,7 @@ function BulkEditDateSelect({selectDateRange}) {
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Selection end date')}</ScreenReaderContent>
               }
-              formatDate={formatDate}
+              formatDate={dateFormatter}
               onSelectedDateChange={setEndDate}
             />
             <Button
