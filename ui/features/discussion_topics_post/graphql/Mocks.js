@@ -275,6 +275,7 @@ export const deleteDiscussionEntryMock = ({id = '1'} = {}) => [
             _id: id,
             deleted: true
           }),
+          errors: null,
           __typename: 'DeleteDiscussionEntryPayload'
         }
       }
@@ -347,6 +348,7 @@ export const updateDiscussionEntryMock = ({
             message,
             attachment: removeAttachment ? null : Attachment.mock()
           }),
+          errors: null,
           __typename: 'UpdateDiscussionEntryPayload'
         }
       }
@@ -409,6 +411,7 @@ export const createDiscussionEntryMock = ({
             _id: '1',
             message
           }),
+          errors: null,
           __typename: 'CreateDiscussionEntryPayload'
         }
       }
@@ -426,6 +429,7 @@ export const deleteDiscussionTopicMock = ({id = '1'} = {}) => [
       data: {
         deleteDiscussionTopic: {
           discussionTopicId: id,
+          errors: null,
           __typename: 'DeleteDiscussionTopicPayload'
         }
       }
