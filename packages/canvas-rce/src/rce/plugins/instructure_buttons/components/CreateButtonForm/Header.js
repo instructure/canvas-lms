@@ -27,7 +27,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {decode} from '../../svg/utils'
 
 export const Header = ({settings, onChange}) => {
@@ -46,9 +45,7 @@ export const Header = ({settings, onChange}) => {
             </View>
           }
         >
-          <Button icon={IconQuestionLine} size="small" variant="icon">
-            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
-          </Button>
+          <Button icon={IconQuestionLine} size="small" variant="icon" />
         </Tooltip>
       </Flex.Item>
     </Flex>
@@ -71,7 +68,6 @@ export const Header = ({settings, onChange}) => {
       <Flex.Item padding="small">
         <TextArea
           id="button-alt-text"
-          aria-describedby="alt-text-label-tooltip"
           height="4rem"
           label={textAreaLabel}
           onChange={e => {
