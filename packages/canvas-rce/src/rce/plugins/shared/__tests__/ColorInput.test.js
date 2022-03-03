@@ -59,6 +59,7 @@ describe('<ColorInput />', () => {
     fireEvent.click(screen.getByText(/view predefined colors/i))
     fireEvent.click(screen.getByTestId('colorPreview-#06A3B7'))
     expect(defaults.onChange).toHaveBeenCalledWith('#06A3B7')
+    fireEvent.click(screen.getByText(/view predefined colors/i))
     fireEvent.click(screen.getByTestId('colorPreview-none'))
     expect(defaults.onChange).toHaveBeenCalledWith(null)
   })
