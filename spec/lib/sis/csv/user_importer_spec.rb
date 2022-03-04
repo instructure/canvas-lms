@@ -1771,18 +1771,6 @@ describe SIS::CSV::UserImporter do
     expect(importer.errors.map(&:last).first).to eql("Some of the fields contain NULL character")
   end
 
-  it "parses iso-8859-1 encoding" do
-    expect do
-      process_csv_data(
-        "user_id,login_id,password,first_name,last_name,short_name,email,status,building",
-        +"P88430,SarimarCruz\xDD.21@icloud.com,,EMILIE,CRU PE\xD1A,,SarimarCruz\xDD.21@icloud.com,active,5015"
-      )
-    end.not_to raise_error
-
-    user = CommunicationChannel.by_path("SarimarCruzÝ.21@icloud.com").first.user
-    expect(user.name).to eql("EMILIE CRU PEÑA")
-  end
-
   it "validates ccs on create" do
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",

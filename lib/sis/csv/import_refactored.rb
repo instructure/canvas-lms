@@ -20,7 +20,6 @@
 
 require "csv"
 require "zip"
-require "open3"
 
 module SIS
   module CSV
@@ -125,12 +124,6 @@ module SIS
         @csvs
       end
 
-      def get_csv_encoding(full_path)
-        out, _err, _st = Open3.capture3("file", "--mime", full_path)
-        encoding = out.strip.split("charset=").last
-        /utf.?8/i.match?(encoding) ? CSVBaseImporter::PARSE_ARGS[:encoding] : encoding
-      end
-
       def number_of_rows(create_importers:)
         IMPORTERS.each do |importer|
           @csvs[importer].reject! do |csv|
@@ -149,7 +142,7 @@ module SIS
 
       def count_rows(csv, importer, create_importers:)
         rows = 0
-        ::CSV.open(csv[:fullpath], "rb", **CSVBaseImporter::PARSE_ARGS.merge(encoding: get_csv_encoding(csv[:fullpath]))) do |faster_csv|
+        ::CSV.open(csv[:fullpath], "rb", **CSVBaseImporter::PARSE_ARGS) do |faster_csv|
           while faster_csv.shift
             if !@read_only && create_importers && rows % @rows_for_parallel == 0
               @parallel_importers[importer] ||= []
@@ -397,13 +390,12 @@ module SIS
       def process_file(base, file, att)
         csv = { base: base, file: file, fullpath: File.join(base, file), attachment: att }
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).casecmp?(".csv")
-          encoding = get_csv_encoding(csv[:fullpath])
-          unless Attachment.valid_utf8?(File.open(csv[:fullpath]), encoding)
+          unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return
           end
           begin
-            ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(headers: false, encoding: encoding)) do |row|
+            ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(headers: false)) do |row|
               row.each { |header| header&.downcase! }
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + "Importer").send(type.to_s + "_csv?", row)
@@ -438,7 +430,7 @@ module SIS
         Dir.mktmpdir do |tmp_dir|
           path = File.join(tmp_dir, File.basename(csv[:fullpath]).sub(/\.csv$/i, "_filtered.csv"))
           new_csv = ::CSV.open(path, "wb", headers: headers - HEADERS_TO_EXCLUDE_FOR_DOWNLOAD, write_headers: true)
-          ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(encoding: get_csv_encoding(csv[:fullpath]))) do |row|
+          ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS) do |row|
             HEADERS_TO_EXCLUDE_FOR_DOWNLOAD.each do |header|
               row.delete(header)
             end

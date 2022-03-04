@@ -32,7 +32,7 @@ describe SIS::CSV::ImportRefactored do
   it "errors files with invalid UTF-8" do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
-      (+"ABC2119_cc\u0000utrer_2012201_xlist,26076.20122\xA0,active").force_encoding("UTF-8")
+      (+"ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active").force_encoding("UTF-8")
     )
     expect(importer.errors.first.last).to eq "Invalid UTF-8"
   end
