@@ -31,6 +31,7 @@ import {BTN_AND_ICON_ATTRIBUTE, BTN_AND_ICON_DOWNLOAD_URL_ATTR} from '../registe
 import {FixedContentTray} from '../../shared/FixedContentTray'
 import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
+import buildDownloadUrl from '../../shared/buildDownloadUrl'
 
 function renderHeader(title, settings, setIsOpen) {
   return (
@@ -122,7 +123,7 @@ export function ButtonsTray({editor, onUnmount, editing}) {
     // URL to fetch the SVG from when loading the Edit tray.
     // We can't use the 'src' because Canvas will re-write the
     // source attribute to a URL that is not cross-origin friendly.
-    img.setAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR, url)
+    img.setAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR, buildDownloadUrl(url))
 
     editor.insertContent(img.outerHTML)
   }
