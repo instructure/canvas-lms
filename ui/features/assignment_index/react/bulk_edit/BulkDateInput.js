@@ -33,6 +33,7 @@ BulkDateInput.propTypes = {
   updateAssignmentDate: func.isRequired,
   timezone: string,
   fancyMidnight: bool,
+  defaultTime: string,
   interaction: string,
   messages: arrayOf(shape({type: string, text: string})),
   width: string
@@ -41,6 +42,7 @@ BulkDateInput.propTypes = {
 BulkDateInput.defaultProps = {
   timezone: null,
   fancyMidnight: false,
+  defaultTime: null,
   interaction: 'enabled',
   width: '100%'
 }
@@ -55,6 +57,7 @@ function BulkDateInput({
   updateAssignmentDate,
   timezone,
   fancyMidnight,
+  defaultTime,
   interaction,
   width
 }) {
@@ -92,12 +95,20 @@ function BulkDateInput({
       } else {
         // assign a default time to the new date
         const newMoment = moment.tz(newDate, timezone)
-        if (fancyMidnight) newMoment.endOf('day')
-        else newMoment.startOf('day')
+        if (defaultTime) {
+          const [h, m, s] = defaultTime.split(':').map(n => parseInt(n, 10))
+          newMoment.hour(h)
+          newMoment.minute(m)
+          newMoment.second(s)
+        } else if (fancyMidnight) {
+          newMoment.endOf('day')
+        } else {
+          newMoment.startOf('day')
+        }
         setDate(newMoment.toDate())
       }
     },
-    [fancyMidnight, selectedDateString, setDate, timezone]
+    [fancyMidnight, defaultTime, selectedDateString, setDate, timezone]
   )
 
   const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])

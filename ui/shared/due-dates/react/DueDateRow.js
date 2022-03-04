@@ -41,7 +41,8 @@ class DueDateRow extends React.Component {
     canDelete: PropTypes.bool.isRequired,
     currentlySearching: PropTypes.bool.isRequired,
     allStudentsFetched: PropTypes.bool.isRequired,
-    inputsDisabled: PropTypes.bool.isRequired
+    inputsDisabled: PropTypes.bool.isRequired,
+    defaultDueTime: PropTypes.string
   }
 
   // --------------------
@@ -192,6 +193,7 @@ class DueDateRow extends React.Component {
           sections={this.props.sections}
           dueDatesReadonly={this.props.dueDatesReadonly}
           availabilityDatesReadonly={this.props.availabilityDatesReadonly}
+          defaultDueTime={this.props.defaultDueTime}
         />
         {this.renderClosedGradingPeriodNotification()}
       </div>
