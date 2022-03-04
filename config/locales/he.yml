@@ -13551,7 +13551,7 @@ he:
       headers: 
         date: תאריך
         participated: השתתף/ה
-        time: זמן
+        time: "זמן "
         url: "כתובת דף"
         user_agent: "מאפייני סביבת המיחשוב של המשתמש"
   page_views_eb64cf53: "צפיות דף"
