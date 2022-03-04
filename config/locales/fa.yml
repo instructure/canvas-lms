@@ -15405,7 +15405,7 @@ fa:
     download_filename: "نماهای صفحه برای %{user}"
     table: 
       headers: 
-        date: تاریخ
+        date: Date
         participated: "شرکت شده"
         time: زمان
         url: "نشانی اینترنتی"
