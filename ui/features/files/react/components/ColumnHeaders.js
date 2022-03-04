@@ -33,9 +33,14 @@ ColumnHeaders.renderColumns = function(sort, order) {
     const isSortedCol = sort === column.property
     if (this.props.query.sort && isSortedCol && order) {
       const direction = order === 'asc' ? 'ascending' : 'descending'
-      $.screenReaderFlashMessage(
-        I18n.t('Sorted %{direction} by %{columnName}', {direction, columnName: column.displayName})
-      )
+      const message = I18n.t('Sorted %{direction} by %{columnName}', {
+        direction,
+        columnName: column.displayName
+      })
+      if (message !== this.lastScreenreaderMessage.current) {
+        $.screenReaderFlashMessage(message)
+        this.lastScreenreaderMessage.current = message
+      }
     }
     const columnClassNameObj = {
       'current-filter': isSortedCol
