@@ -11429,7 +11429,7 @@ hy:
       headers: 
         date: Ամսաթիվ
         participated: "Մասնակցել է"
-        time: Ժամը
+        time: Ժամ
         url: "URL հասցե"
         user_agent: "Օգտատիրոջ ներկայացուցիչ"
   page_views_eb64cf53: "Էջերի դիտումներ"
