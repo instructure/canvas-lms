@@ -74,7 +74,8 @@ export function useSvgSettings(editor, editing) {
 
         // Adding the Course ID to the request causes Canvas to follow the chain
         // of files that were uploaded and "replaced" previous versions of the file.
-        downloadURL.searchParams.append('course_id', ENV.COURSE_ID)
+        downloadURL.searchParams.append('replacement_chain_context_type', 'course')
+        downloadURL.searchParams.append('replacement_chain_context_id', ENV.COURSE_ID)
 
         // Prevent the browser from using an old cached SVGs
         downloadURL.searchParams.append('ts', Date.now())

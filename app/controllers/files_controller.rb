@@ -520,11 +520,19 @@ class FilesController < ApplicationController
       # this implicit context magic happens in ApplicationController#get_context
       if @context.nil? || @current_user.nil? || @context == @current_user
         @attachment = Attachment.find(params[:id])
+
+        # Check if a specific context for the relation replacement chain
+        # was set. If so, use it to look up the attachment. This is needed
+        # for some services (like Buttons & Icons) to avoid setting @context
+        # and being redirected
+        if replacement_chain_context && @attachment.deleted?
+          @attachment = attachment_or_replacement(replacement_chain_context, params[:id])
+        end
+
         @context = nil unless @context == @current_user || @context == @attachment.context
         @skip_crumb = true unless @context
       else
-        # NOTE: Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-        @attachment ||= @context.attachments.find(params[:id])
+        @attachment ||= attachment_or_replacement(@context, params[:id])
       end
 
       params[:download] ||= params[:preview]
@@ -1328,6 +1336,18 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def attachment_or_replacement(context, id)
+    # NOTE: Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+    context.attachments.find(id)
+  end
+
+  def replacement_chain_context
+    return unless params[:replacement_chain_context_type] == "course"
+    return unless params[:replacement_chain_context_id].present?
+
+    api_find(Course.active, params[:replacement_chain_context_id])
+  end
 
   def log_attachment_access(attachment)
     log_asset_access(attachment, "files", "files")

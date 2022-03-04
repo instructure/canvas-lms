@@ -154,7 +154,9 @@ describe('useSvgSettings()', () => {
     it('fetches the SVG file, specifying the course ID and timestamp', () => {
       subject()
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(/https:\/\/canvas.instructure.com\/download\?course_id=23&ts=\d+/)
+        expect.stringMatching(
+          /https:\/\/canvas.instructure.com\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+/
+        )
       )
     })
 
@@ -174,7 +176,9 @@ describe('useSvgSettings()', () => {
       it('fetches the SVG file, specifying the course ID and timestamp', () => {
         subject()
         expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringMatching(/https:\/\/domain.from.env\/download\?course_id=23&ts=\d+/)
+          expect.stringMatching(
+            /https:\/\/domain.from.env\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+/
+          )
         )
       })
     })
@@ -195,7 +199,9 @@ describe('useSvgSettings()', () => {
       it('fetches the SVG file, specifying the course ID and timestamp', () => {
         subject()
         expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringMatching(/https:\/\/domain.from.env\/download\?course_id=23&ts=\d+/)
+          expect.stringMatching(
+            /https:\/\/domain.from.env\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+/
+          )
         )
       })
     })
