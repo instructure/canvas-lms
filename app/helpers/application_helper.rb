@@ -1465,4 +1465,8 @@ module ApplicationHelper
       )
     end
   end
+
+  def append_default_due_time_js_env(context, hash)
+    hash[:DEFAULT_DUE_TIME] = context.default_due_time if context&.default_due_time.present? && context.root_account.feature_enabled?(:default_due_time)
+  end
 end
