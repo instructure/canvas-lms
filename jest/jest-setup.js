@@ -53,7 +53,6 @@ const ignoredErrors = [
   /A theme registry has already been initialized/,
   /An update to (%s|DefaultToolForm) inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /CancelAttemptButton: prop type `submission` is invalid/,
   /Cannot read property '(activeElement|useRealTimers)' of undefined/,
   /Cannot read property 'name' of null/,
   /Cannot update during an existing state transition/,
@@ -109,15 +108,7 @@ const ignoredWarnings = [
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /value provided is not in a recognized RFC2822 or ISO format/,
-  // the following warnings were not appropriately failing tests upon console.warn
-  // filtered from output, will need to be investigated within /ui/features/k5_*
-  /Unmatched GET to \/api\/v1\/announcements/,
-  /Unmatched GET to \/api\/v1\/users\/\d+\/calendar_events/,
-  /Unmatched GET to \/api\/v1\/courses\/\d+\/assignment_groups/,
-  /Unmatched GET to \/api\/v1\/courses\/\d+\/enrollments/,
-  /Unmatched GET to \/api\/v1\/courses\/\d+\/assignment_groups/
-  // end k5 console.warn investigation
+  /value provided is not in a recognized RFC2822 or ISO format/
 ]
 global.console = {
   log: console.log,
