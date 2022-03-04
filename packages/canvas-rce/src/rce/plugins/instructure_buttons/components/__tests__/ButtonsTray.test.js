@@ -147,7 +147,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
+        "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url/?buttons_and_icons=1\\">",
       ]
     `)
 
@@ -161,7 +161,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "<img src=\\"https://uploaded.url\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url\\">",
+        "<img src=\\"https://uploaded.url\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url/?buttons_and_icons=1\\">",
       ]
     `)
 
