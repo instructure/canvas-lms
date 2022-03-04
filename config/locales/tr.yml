@@ -13544,7 +13544,7 @@ tr:
       headers: 
         date: Tarih
         participated: Katılınan
-        time: Zaman
+        time: Süre
         url: URL
         user_agent: "Kullanıcı Temsilcisi"
   page_views_eb64cf53: "Sayfa Görüntülemeleri"
