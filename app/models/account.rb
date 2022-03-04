@@ -384,7 +384,7 @@ class Account < ActiveRecord::Base
                 new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
                                         Canvas::Plugin.value_to_boolean(inner_val)
                                       else
-                                        inner_val.to_s
+                                        inner_val.to_s.presence
                                       end
               end
             end
@@ -392,13 +392,13 @@ class Account < ActiveRecord::Base
           elsif opts[:boolean]
             settings[key] = Canvas::Plugin.value_to_boolean(val)
           else
-            settings[key] = val.to_s
+            settings[key] = val.to_s.presence
           end
         end
       end
     end
     # prune nil or "" hash values to save space in the DB.
-    settings.reject! { |_, value| value.nil? || value == "" }
+    settings.reject! { |_, value| value.nil? || value == { value: nil } || value == { value: nil, locked: false } }
     settings
   end
 
