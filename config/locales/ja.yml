@@ -4205,7 +4205,7 @@ ja:
       no_submission: なし
       points: 点数
       submission_types: "ファイル タイプ"
-      submitting: 提出しています
+      submitting: 提出方法
       turnitin: Turnitin
       turnitin_enabled: "この課題では Turnitin が有効になっています。"
       turnitin_enabled_short: "(Turnitin を有効にしました)"
@@ -4228,7 +4228,7 @@ ja:
       no_points: なし
       points: ポイント
       submission_types: "ファイル タイプ"
-      submitting: 提出しています
+      submitting: 提出方法
       turnitin_enabled_short: "(Turnitin を有効にしました)"
       vericite_enabled_short: "(VeriCite を有効にしました)"
     submission_sidebar: 
@@ -4738,7 +4738,7 @@ ja:
   available_from_date_43b5e11d: 利用可能期間の開始日付
   available_from_date_afc594fa: "日付から利用可能:"
   available_from_date_must_precede_available_until_c9f9e533: 「この日から利用可能」日は、「この日まで利用可能」日の前でなければなりません
-  available_from_f84e4611: 次から使用可能
+  available_from_f84e4611: 公開開始日時
   available_from_field_for_styleguide_7ced3861: スタイルガイドの欄から使用できます
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "次の日付けから- このような形式で YYYY-MM-DD hh:mm"
   available_pronouns_b45330b1: 利用できる代名詞
@@ -5100,7 +5100,7 @@ ja:
     sending: 送信しています...
     sent: 送信されました!
     show_all_artifacts: すべての成果物を表示
-    submit: 提出
+    submit: 保存
     unmasquerade: マスカレードを停止
     unpublish: 未公開
     unpublished: 未公開
@@ -5323,7 +5323,7 @@ ja:
     edit_calendar_event: 
       calendar: "カレンダー:"
       date: "日付:"
-      from: "自:"
+      from: "時刻:"
       links: 
         more_options: その他のオプション
       location: "場所:"
@@ -5341,7 +5341,7 @@ ja:
       end_time: 終了時刻
       event_description: イベントの説明
       event_title: "イベント タイトル"
-      location_address: "住所:"
+      location_address: "アドレス:"
       location_name: "場所:"
       new_calendar_event_header: "カレンダー イベントの新規作成"
       repeat: 重複
@@ -5379,7 +5379,7 @@ ja:
         reserve: 予約
         unreserve: 予約取り消し
       location: 場所
-      location_address: 住所
+      location_address: アドレス
       message_students: 受講者にメッセージを送る
       slots_available: 使用できるスロット
     event_event_title: "イベント タイトル:"
@@ -5556,7 +5556,7 @@ ja:
   can_create_subscription_to_data_service_data_bb2874f2: データサービスデータへのサブスクリプションを作成できます。
   can_destroy_external_tools_cdb0e734: 外部ツールを破棄できます。
   can_destroy_subscription_to_data_service_data_b8dfca27: データサービスデータへのサブスクリプションを廃棄ことができます。
-  can_edit_this_page_role_selection_6ccec3c7: このページの役割の選択を編集できます
+  can_edit_this_page_role_selection_6ccec3c7: このページを編集できる役割を選択できます
   can_interact_with_users_in_their_section_only_48cb8c43: セクション内のユーザーのみと対話することができます
   can_list_categorized_event_types_52596f7: イベントタイプを分類して記載できます。
   can_list_external_tools_9132ad0f: 外部ツールを記載できます。
@@ -5588,8 +5588,8 @@ ja:
   cancel_attempt_attempt_aab8c2a9: "試行をキャンセルする%{attempt}"
   cancel_caeb1e68: キャンセル
   cancel_custom_link_creation_39ec70bd: カスタムリンクの作成をキャンセルする
-  cancel_duplicating_original_assignment_name_e974c534: "\"%{original_assignment_name}\"の重複をキャンセルする"
-  cancel_duplicating_originalassignmentname_fd7ee1d8: "\"%{originalAssignmentName}\"の重複をキャンセルする"
+  cancel_duplicating_original_assignment_name_e974c534: "\"%{original_assignment_name}\"の複製をキャンセルする"
+  cancel_duplicating_originalassignmentname_fd7ee1d8: "\"%{originalAssignmentName}\"の複製をキャンセルする"
   cancel_importing_name_a0b6f3e1: "\"%{name}\"のインポートをキャンセルする"
   cancel_migrating_name_cfc745c2: "\"%{name}\"の移行をキャンセルする"
   cancel_rename_aa60a881: 名前変更のキャンセル
@@ -7720,7 +7720,7 @@ ja:
       other: "%{count} 個のコースが処理されました"
     course: コース
     course_format: 
-      blended: ブレンドされた
+      blended: ハイブリッド
       not_set: 設定されていません
       on_campus: キャンパス内
       online: オンライン
@@ -7766,7 +7766,7 @@ ja:
     public: 公開
     student_summary: 
       not_sorted: 受講者要約表
-    student_view_student_name: 受講者をテスト
+    student_view_student_name: テスト受講者
     syllabus: シラバス
     wiki_permissions: 
       all: 全員
@@ -8786,14 +8786,14 @@ ja:
   create_module_item_quiz: 
     discussion_name: ディスカッション名
     file_to_upload: アップロードするファイル
-    graded_quiz: 採点済みのクイズ
-    graded_survey: 採点済みのサーベイ
+    graded_quiz: クイズ（採点あり）
+    graded_survey: サーベイ（採点あり）
     header_name: ヘッダ名
     link_title: "リンク タイトル"
     page_name: ページ名
     practice_quiz: 練習クイズ
     quiz_name: クイズ名
-    ungrded_survey: 未採点のサーベイ
+    ungrded_survey: サーベイ（採点無し）
     url: URL
   create_new_attempt_19c96c03: 新しい試行を作成する
   create_new_course_e3ef9cd0: 新しいコースを作成する
@@ -8881,7 +8881,7 @@ ja:
     registered_services: 登録済みサービス
     revisions: リビジョン
     rubrics: ルーブリック
-    settings: ~
+    settings: 設定
     site_admin: サイト管理者
     stats: 統計
     syllabus: シラバス
@@ -10226,17 +10226,17 @@ ja:
       \x20               コースのサイズにより、\n\
       \x20               SpeedGrader\n\
       \x20             の開始前に、受講者グループを選択しなければなりません。"
-  duplicate_31cec192: 重複
-  duplicate_assignment_name_3ca7d753: "重複する課題%{name}"
+  duplicate_31cec192: 複製
+  duplicate_assignment_name_3ca7d753: "課題%{name}を複製する"
   duplicate_discussion_title_43b39959: "ディスカッションを複製する%{title}"
   duplicate_discussion_title_6537ef4d: "ディスカッションを複製する%{title}"
-  duplicate_item_339f54bb: 項目重複
+  duplicate_item_339f54bb: 項目複製
   duplicate_module_module_name_be40ad50: "モジュールを複製%{module_name}"
-  duplicate_module_name_ab26e5c3: "重複%{module_name}"
+  duplicate_module_name_ab26e5c3: "複製%{module_name}"
   duplicate_modules_8ea35557: モジュールを複製
   duplicate_objects_120eda73: オブジェクトを複製する
   duplicate_provider_provider_d9842134: "プロバイダー%{provider}を複製する"
-  duplicate_quiz_name_79fdcb3e: "小テスト%{name}を重複する"
+  duplicate_quiz_name_79fdcb3e: "小テスト%{name}を複製する"
   duplicate_this_module_79ca8243: このモジュールを複製する
   duplicating_calendar_events_9932cd37: カレンダーイベントを複製
   duplicating_module_9727f5e4: モジュールを複製...
@@ -11036,7 +11036,7 @@ ja:
   error_deleting_file_551dc16e: "%{file}の削除中にエラー"
   error_deleting_name_reason_11f9d399: "%{name} の削除時にエラーが発生しました: %{reason}"
   error_details_31e81e4d: エラー詳細
-  error_duplicating_module_4b023042: モジュール重複時にエラー
+  error_duplicating_module_4b023042: モジュール複製時にエラー
   error_during_group_creation_f232994b: グループ作成中にエラーが発生しました
   error_embedding_content_from_tool_49bb698e: ツールからのコンテンツの埋め込みエラー
   error_exporting_gradebook_msg_6ea31e2f: "グレードブックエクスポート中にエラーが発生しました：%{msg}"
@@ -12455,7 +12455,7 @@ ja:
         other: "%{count} 件のコメント"
       comment_count_screenreader: コメントを読む
       comments: コメント
-      disabled_for_student_view: 「受講者をテスト」のスコアは評定統計に含まれません。
+      disabled_for_student_view: 「テスト受講者」のスコアは成績統計に含まれません。
       expand: すべての学習達成アウトカムグループを展開します。
       expand_title: 展開
       for_course: "対象コース "
@@ -12694,8 +12694,8 @@ ja:
   graded_date_by_grader_e8e1ff75: "%{graded_date} 〜によって%{grader}"
   graded_discussion_a873bb3e: "課題用ディスカッション:"
   graded_on_submission_60ac3010: 提出時に採点済み
-  graded_quiz_7fabdf1f: 採点済みの小テスト
-  graded_survey_c0f0c395: 採点済みのサーベイ
+  graded_quiz_7fabdf1f: 小テスト（採点あり）
+  graded_survey_c0f0c395: サーベイ（採点あり）
   grader_comments_visible_to_graders_turned_off_d2af5e9d: 採点者に見える採点者コメントはオフになっています
   grader_comments_visible_to_graders_turned_on_dca303c7: 採点者に見える採点者コメントはオンになっています
   grader_count_cannot_be_0_9228afe4: グレーダーカウントは0にはできません
@@ -21548,7 +21548,7 @@ ja:
           matching: 整合
           missing_word: 適語補充
           multiple_answers: 複数解答
-          multiple_choice: 複数選択
+          multiple_choice: 選択
           multiple_dropdowns: 複数ドロップダウン
           numerical: 数値による解答
           short_answer: 穴埋め
@@ -22239,7 +22239,7 @@ ja:
       quiz_score_too_short: "スコアは 0 より大きい数字で指定してください。"
       retrieving_filters_failed: フィルタの取得に失敗しました
     ? "false"
-    : 不正解
+    : 偽
     final_answer: 最終的な答え
     label: 
       answer: 
@@ -22287,7 +22287,7 @@ ja:
       set_as_correct: この解答は正解として設定されます
     top_level: "-- トップ レベル --"
     ? "true"
-    : 正解
+    : 真
   quizzes_tutorial_tray_6f87cdd3: 小テストのチュートリアルトレイ
   quizzes_view_submission_log_ec105e3e: "小テスト - 提出ログを見る"
   quotas_account_settings_22c12b8d: 割り当て分担（アカウント設定）
@@ -22823,8 +22823,8 @@ ja:
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
   retrieving_content_ed0b9b33: コンテンツを取得
   retrieving_tool_51709735: ツールを取得する
-  retry_duplicating_original_assignment_name_90b83bb8: "\"%{original_assignment_name}\"の重複を再試行"
-  retry_duplicating_originalassignmentname_884aee1: "\"%{originalAssignmentName}\"の重複を再試行"
+  retry_duplicating_original_assignment_name_90b83bb8: "\"%{original_assignment_name}\"の複製を再試行"
+  retry_duplicating_originalassignmentname_884aee1: "\"%{originalAssignmentName}\"の複製を再試行"
   retry_ebd5f8ba: 再試行
   retry_migrating_name_bdc802ef: "\"%{name}\"の移行を再試行する"
   return_to_parent_folder_4ece2184: 親フォルダーに戻る
@@ -26503,7 +26503,7 @@ ja:
     other: "これは採点対象となるディスカッションです：%{count} の可能なポイント"
   this_is_a_graded_discussion_pointspossible_points__9782a08e: "これは採点対象となるディスカッションです：%{pointsPossible} の可能なポイント"
   this_is_a_media_comment_click_here_to_view_c297bf62: これはメディアのコメントです。*ここをクリックしてご覧ください*。
-  this_is_a_message_for_name_7abf1e39: "これは*%{name}* へのするメッセージです"
+  this_is_a_message_for_name_7abf1e39: "これは*%{name}* 宛のメッセージです"
   this_is_a_message_from_canvas_administration_dbd63778: "これは *Canvas 管理者*からのメッセージです"
   this_is_a_message_from_name_ec0cdfac: "これは *%{name}* からのメッセージです"
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: これは、小テストのドラフト版のプレビューです
@@ -27081,7 +27081,7 @@ ja:
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: 受講者をグループに割り当てるには、「group_name」欄にグループ名を入力します。
   to_be_added_2959cc72: 追加される
   to_be_removed_d4b48586: 削除するもの
-  to_c4c44f4b: 移動先
+  to_c4c44f4b: 〜
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: sis_account_id変更するにはユーザーにはmanage_sis許可が必要です。
   to_change_user_passwords_users_view_must_also_be_e_6aeea86c: "ユーザーのパスワードを変更するには、[ユーザー - 表示]も有効でなければなりません。"
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: 他のリンク切れをチェックするには、コースリンクバリデーターにアクセスしてください
@@ -27822,7 +27822,7 @@ ja:
   ungraded_out_of_pointspossible_2d6d81da: "%{pointsPossible}から未採点"
   ungraded_pointspossible_e2f86bd9: "未採点/%{pointsPossible}"
   ungraded_submissions_44efb0ec: 未採点の提出物
-  ungraded_survey_ad7de790: 未採点のサーベイ
+  ungraded_survey_ad7de790: サーベイ（採点無し）
   unique_user_id_dfca1a7f: ユーザーID
   united_arab_emirates_971_649b3750: "アラブ首長国連邦 (+971)"
   united_arab_emirates_a71e57c6: アラブ首長国連邦
@@ -27936,7 +27936,7 @@ ja:
   unsyncable_message_95faa75d: "同期できない：%{message}"
   unsynced_changes_4ddaec76: 同期されていない変更内容
   unsynched_changes_867a1790: 同期されていない変更
-  until_4a1f8cda: 次の日時から
+  until_4a1f8cda: 公開終了日時
   until_6437a827: まで
   until_8bdea3de: まで
   until_date_949017c4: "%{date} まで"
