@@ -280,6 +280,7 @@ const locale = {
   "image_options_tray_90a46006": {
     "message": "Te pereki mo ngā Kōwhiringa Āhua"
   },
+  "image_to_crop_3a34487d": { "message": "Āhua he tapahi" },
   "images_7ce26570": { "message": "Ngā Āhua" },
   "increase_indent_6d550a4a": { "message": "Whakapiki nuku" },
   "insert_593145ef": { "message": "Whakauru" },
