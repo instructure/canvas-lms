@@ -1436,7 +1436,8 @@ class CoursesController < ApplicationController
   #     "hide_sections_on_course_users_page": false,
   #     "lock_all_announcements": true,
   #     "usage_rights_required": false,
-  #     "homeroom_course": false
+  #     "homeroom_course": false,
+  #     "default_due_time": "23:59:59"
   #   }
   def api_settings
     get_context
@@ -1636,6 +1637,11 @@ class CoursesController < ApplicationController
   # @argument syllabus_course_summary [Boolean]
   #   Show the course summary (list of assignments and calendar events) on the syllabus page. Default is true.
   #
+  # @argument default_due_time [String]
+  #   Set the default due time for assignments. This is the time that will be pre-selected in the Canvas user interface
+  #   when setting a due date for an assignment. It does not change when any existing assignment is due. It should be
+  #   given in 24-hour HH:MM:SS format. The default is "23:59:59". Use "inherit" to inherit the account setting.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1648,6 +1654,11 @@ class CoursesController < ApplicationController
     return unless authorized_action(@course, @current_user, :update)
 
     old_settings = @course.settings
+
+    if (default_due_time = params.delete(:default_due_time))
+      @course.default_due_time = normalize_due_time(default_due_time)
+    end
+
     @course.attributes = params.permit(
       :allow_final_grade_override,
       :allow_student_discussion_topics,
