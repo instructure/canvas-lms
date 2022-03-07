@@ -604,6 +604,7 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                      string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL}"),
                       string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
                       string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
                     ])
