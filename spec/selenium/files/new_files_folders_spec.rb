@@ -50,7 +50,7 @@ describe "better_file_browsing, folders" do
       wait_for_animations
       expect(fln("Download")).to be_displayed
       expect(fln("Rename")).to be_displayed
-      expect(fln("Move")).to be_displayed
+      expect(fln("Move To...")).to be_displayed
       expect(fln("Delete")).to be_displayed
     end
 
