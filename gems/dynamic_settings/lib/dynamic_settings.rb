@@ -24,6 +24,7 @@ require "config_file"
 require "diplomat"
 require "dynamic_settings/circuit_breaker"
 require "dynamic_settings/memory_cache"
+require "dynamic_settings/null_request_cache"
 require "dynamic_settings/fallback_proxy"
 require "dynamic_settings/prefix_proxy"
 
@@ -35,7 +36,7 @@ module DynamicSettings
   class << self
     attr_accessor :environment
     attr_reader :fallback_data, :use_consul, :config
-    attr_writer :fallback_recovery_lambda, :retry_lambda, :cache, :logger
+    attr_writer :fallback_recovery_lambda, :retry_lambda, :cache, :request_cache, :logger
 
     def config=(conf_hash)
       @config = conf_hash
@@ -57,6 +58,7 @@ module DynamicSettings
         @data_center = conf_hash.fetch("global_dc", nil)
         @default_service = conf_hash.fetch("service", :canvas)
         @cache = conf_hash.fetch("cache", ::DynamicSettings::MemoryCache.new)
+        @request_cache = conf_hash.fetch("request_cache", ::DynamicSettings::NullRequestCache.new)
         @fallback_recovery_lambda = conf_hash.fetch("fallback_recovery_lambda", nil)
         @retry_lambda = conf_hash.fetch("retry_lambda", nil)
         @logger = conf_hash.fetch("logger", nil)
@@ -64,7 +66,8 @@ module DynamicSettings
         @environment = nil
         @use_consul = false
         @default_service = :canvas
-        @cache = ::DynamicSettings::MemoryCache.new
+        @cache = nil
+        @request_cache = nil
       end
     end
 
@@ -74,6 +77,10 @@ module DynamicSettings
 
     def cache
       @cache ||= ::DynamicSettings::MemoryCache.new
+    end
+
+    def request_cache
+      @request_cache ||= ::DynamicSettings::NullRequestCache.new
     end
 
     def on_fallback_recovery(exception)
