@@ -337,6 +337,16 @@ pipeline {
           lock(label: 'canvas_build_global_mutex', quantity: 1) {
             timeout(60) {
               node('master') {
+                // For builds like Rails 6.1 prototype, we want to be able to see the build link, but
+                // not have Gerrit vote on it. This isn't currently supported through the Gerrit Trigger
+                // plugin, because the Build Started message always votes and will clear the original
+                // vote. Work around this by disabling the build start message and setting EMULATE_BUILD_START=1
+                // in the Build Parameters section.
+                // https://issues.jenkins.io/browse/JENKINS-28339
+                if (configuration.getBoolean('emulate-build-start', 'false')) {
+                  gerrit.submitReview("", "Build Started ${RUN_DISPLAY_URL}")
+                }
+
                 if (configuration.skipCi()) {
                   currentBuild.result = 'NOT_BUILT'
                   gerrit.submitLintReview('-2', 'Build not executed due to [skip-ci] flag')

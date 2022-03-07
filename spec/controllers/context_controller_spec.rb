@@ -116,6 +116,60 @@ describe ContextController do
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
     end
+
+    context "when enable_user_notes is true" do
+      before :once do
+        a = Account.default
+        a.enable_user_notes = true
+        a.save!
+      end
+
+      it "sets manage_user_notes permission ENV var to true for teachers" do
+        user_session(@teacher)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be true
+      end
+
+      it "sets manage_user_notes permission ENV var to true for account admins" do
+        account_admin_user
+        user_session(@admin)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be true
+      end
+
+      it "sets manage_user_notes permission ENV var to false for students" do
+        user_session(@student)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+      end
+    end
+
+    context "when enable_user_notes is false" do
+      before :once do
+        a = Account.default
+        a.enable_user_notes = false
+        a.save!
+      end
+
+      it "sets manage_user_notes permission ENV var to false for teachers" do
+        user_session(@teacher)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+      end
+
+      it "sets manage_user_notes permission ENV var to false for account admins" do
+        account_admin_user
+        user_session(@admin)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+      end
+
+      it "sets manage_user_notes permission ENV var to false for students" do
+        user_session(@student)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+      end
+    end
   end
 
   describe "GET 'roster_user'" do
