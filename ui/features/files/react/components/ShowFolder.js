@@ -160,17 +160,15 @@ ShowFolder.render = function () {
         {I18n.t('select_all', 'Select All')}
       </label>
       <div role="grid" style={{flex: '1 1 auto'}}>
-        {this.props.userCanEditFilesForContext && (
-          <div
-            ref="accessibilityMessage"
-            className="ShowFolder__accessbilityMessage col-xs"
-            tabIndex={0}
-          >
-            {I18n.t(
-              'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
-            )}
-          </div>
-        )}
+        <div
+          ref="accessibilityMessage"
+          className="ShowFolder__accessbilityMessage col-xs"
+          tabIndex={0}
+        >
+          {I18n.t(
+            'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
+          )}
+        </div>
         {!showNewFileUpload && (
           <>
             <UploadDropZone currentFolder={this.props.currentFolder} />
