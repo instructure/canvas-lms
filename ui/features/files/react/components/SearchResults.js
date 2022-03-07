@@ -90,17 +90,19 @@ SearchResults.render = function () {
     return (
       <>
         <div role="grid">
-          <div
-            // eslint-disable-next-line react/no-string-refs
-            ref="accessibilityMessage"
-            className="SearchResults__accessbilityMessage col-xs"
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-            tabIndex="0"
-          >
-            {I18n.t(
-              'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
-            )}
-          </div>
+          {this.props.userCanEditFilesForContext && (
+            <div
+              // eslint-disable-next-line react/no-string-refs
+              ref="accessibilityMessage"
+              className="SearchResults__accessbilityMessage col-xs"
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex="0"
+            >
+              {I18n.t(
+                'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
+              )}
+            </div>
+          )}
           <ColumnHeaders
             to="search"
             query={this.props.query}
