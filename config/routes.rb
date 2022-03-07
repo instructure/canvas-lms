@@ -1770,6 +1770,7 @@ CanvasRails::Application.routes.draw do
 
       get "files/:id/:uuid/status", action: :api_file_status, as: "file_status"
       get "files/:id/public_url", action: :public_url
+      get "courses/:course_id/files/file_ref/:migration_id", action: :file_ref
       %w[course group user].each do |context|
         get "#{context}s/:#{context}_id/files/quota", action: :api_quota
         get "#{context}s/:#{context}_id/files/:id", action: :api_show, as: "#{context}_attachment"
