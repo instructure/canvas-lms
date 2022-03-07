@@ -167,8 +167,26 @@ describe ContentMigration do
       expect(@copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights).to eq(usage_rights)
     end
 
+    it "preservs 'category' on export/import" do
+      att = Attachment.create!(
+        filename: "1.txt",
+        uploaded_data: StringIO.new("1"),
+        folder: Folder.root_folders(@copy_from).first,
+        context: @copy_from,
+        category: Attachment::BUTTONS_AND_ICONS
+      )
+
+      run_export_and_import
+
+      copy = @copy_to.attachments.find_by(migration_id: mig_id(att))
+      expect(copy.category).to eq Attachment::BUTTONS_AND_ICONS
+    end
+
     it "preserves locked date restrictions on export/import" do
-      att = Attachment.create!(filename: "1.txt", uploaded_data: StringIO.new("1"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att = Attachment.create!(filename: "1.txt",
+                               uploaded_data: StringIO.new("1"),
+                               folder: Folder.root_folders(@copy_from).first,
+                               context: @copy_from)
       att.unlock_at = 2.days.from_now
       att.lock_at = 3.days.from_now
       att.save!
