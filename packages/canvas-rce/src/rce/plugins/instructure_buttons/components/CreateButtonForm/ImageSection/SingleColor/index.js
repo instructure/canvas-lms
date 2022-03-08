@@ -44,7 +44,7 @@ SingleColor.propTypes = {
   dispatch: () => {},
   data: {
     // Black color in color selector component
-    fillColor: '#111111'
+    fillColor: '#000000'
   }
 }
 
