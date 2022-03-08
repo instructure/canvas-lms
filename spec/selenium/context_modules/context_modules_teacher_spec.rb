@@ -110,9 +110,8 @@ describe "context modules" do
     end
 
     it "deletes a module item", priority: "1" do
+      add_existing_module_item("AssignmentModule", @assignment)
       get "/courses/#{@course.id}/modules"
-
-      add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
       f(".context_module_item .al-trigger").click
       f(".delete_item_link").click
       expect(driver.switch_to.alert).not_to be_nil
@@ -121,11 +120,12 @@ describe "context modules" do
     end
 
     it "edits a module item and validate the changes stick", priority: "1" do
+      add_existing_module_item("AssignmentModule", @assignment)
       get "/courses/#{@course.id}/modules"
 
-      item_edit_text = "Assignment Edit 1"
-      module_item = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
       tag = ContentTag.last
+      module_item = fj("#context_module_item_#{tag.id}:contains(#{@assignment.title})")
+      item_edit_text = "Assignment Edit 1"
       edit_module_item(module_item) do |edit_form|
         replace_content(edit_form.find_element(:id, "content_tag_title"), item_edit_text)
       end
@@ -140,10 +140,15 @@ describe "context modules" do
     end
 
     it "renames all instances of an item" do
+      2.times do
+        add_existing_module_item("AssignmentModule", @assignment)
+      end
+
       get "/courses/#{@course.id}/modules"
 
-      add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
-      item2 = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
+      tag = ContentTag.last
+      item2 = fj("#context_module_item_#{tag.id}:contains(#{@assignment.title})")
+
       edit_module_item(item2) do |edit_form|
         replace_content(edit_form.find_element(:id, "content_tag_title"), "renamed assignment")
       end
@@ -152,11 +157,15 @@ describe "context modules" do
       all_items.each { |i| expect(i.find_element(:css, ".title").text).to eq "renamed assignment" }
       expect(@assignment.reload.title).to eq "renamed assignment"
       run_jobs
-      @assignment.context_module_tags.each { |tag| expect(tag.title).to eq "renamed assignment" }
+      @assignment.context_module_tags.each { |cmtag| expect(cmtag.title).to eq "renamed assignment" }
 
       # reload the page and renaming should still work on existing items
+      add_existing_module_item("AssignmentModule", @assignment)
+
       get "/courses/#{@course.id}/modules"
-      item3 = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
+      tag = ContentTag.last
+      item3 = fj("#context_module_item_#{tag.id}:contains(#{@assignment.title})")
+
       edit_module_item(item3) do |edit_form|
         replace_content(edit_form.find_element(:id, "content_tag_title"), "again")
       end
@@ -165,13 +174,14 @@ describe "context modules" do
       all_items.each { |i| expect(i.find_element(:css, ".title").text).to eq "again" }
       expect(@assignment.reload.title).to eq "again"
       run_jobs
-      @assignment.context_module_tags.each { |tag| expect(tag.title).to eq "again" }
+      @assignment.context_module_tags.each { |cmtag| expect(cmtag.title).to eq "again" }
     end
 
     it "publishes a newly created item", :xbrowser do
-      @course.context_modules.create!(name: "Content Page")
+      new_module = @course.context_modules.create!(name: "Content Page")
+      wiki_page = @course.wiki_pages.create!(title: "New Page Title", body: "Here is the body", workflow_state: "unpublished")
+      new_module.add_item({ id: wiki_page.id, type: "wiki_page" })
       get "/courses/#{@course.id}/modules"
-      add_new_module_item("#wiki_pages_select", "Page", "[ New Page ]", "New Page Title")
 
       tag = ContentTag.last
       item = f("#context_module_item_#{tag.id}")
@@ -206,9 +216,9 @@ describe "context modules" do
     end
 
     it "adds a text header to a module", priority: "1" do
+      @course.context_modules.create!(name: "Text Header Module")
       get "/courses/#{@course.id}/modules"
       header_text = "new header text"
-      add_module("Text Header Module")
       f(".ig-header-admin .al-trigger").click
       f(".add_module_item_link").click
       select_module_item("#add_module_item_select", "Text Header")
@@ -220,28 +230,37 @@ describe "context modules" do
     end
 
     it "always shows module contents on empty module", priority: "1" do
+      @course.context_modules.create!(name: "Test Module")
       get "/courses/#{@course.id}/modules"
-      add_module "Test module"
       ff(".icon-mini-arrow-down")[0].click
       expect(f(".context_module .content")).to be_displayed
       expect(ff(".icon-mini-arrow-down")[0]).to be_displayed
     end
 
     it "allows adding an item twice" do
+      item1 = add_existing_module_item("AssignmentModule", @assignment)
+      item2 = add_existing_module_item("AssignmentModule", @assignment)
+
+      get "/courses/#{@course.id}/modules"
+
+      all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
+      expect(item1).not_to eq item2
+      expect(@assignment.reload.context_module_tags.size).to eq 2
+      expect(all_items.size).to eq 2
+    end
+
+    it "allows adding an external tool item" do
       @course.context_modules.create!(name: "External Tool")
       get "/courses/#{@course.id}/modules"
       tag = add_new_external_item("External Tool", "www.instructure.com", "Instructure")
       expect(f("#context_module_item_#{tag.id}")).to have_attribute(:class, "context_external_tool")
-      item1 = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
-      item2 = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
-      expect(item1).not_to eq item2
-      expect(@assignment.reload.context_module_tags.size).to eq 2
     end
 
     it "does not save an invalid external tool", priority: "1" do
+      @course.context_modules.create!(name: "Test Module")
+
       get "/courses/#{@course.id}/modules"
 
-      add_module "Test module"
       f(".ig-header-admin .al-trigger").click
       f(".add_module_item_link").click
       select_module_item("#add_module_item_select", "External Tool")
@@ -301,10 +320,10 @@ describe "context modules" do
     end
 
     it "properly changes indent of an item with arrows" do
-      get "/courses/#{@course.id}/modules"
-
-      add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
+      add_existing_module_item("AssignmentModule", @assignment)
       tag = ContentTag.last
+
+      get "/courses/#{@course.id}/modules"
 
       f("#context_module_item_#{tag.id} .al-trigger").click
       f(".indent_item_link").click
@@ -314,10 +333,9 @@ describe "context modules" do
     end
 
     it "properly changes indent of an item from edit dialog" do
-      get "/courses/#{@course.id}/modules"
-
-      add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
+      add_existing_module_item("AssignmentModule", @assignment)
       tag = ContentTag.last
+      get "/courses/#{@course.id}/modules"
 
       f("#context_module_item_#{tag.id} .al-trigger").click
       f(".edit_item_link").click
@@ -416,8 +434,9 @@ describe "context modules" do
 
     it "shows a vdd tooltip summary for assignments with multiple due dates" do
       selector = "li.Assignment_#{@assignment2.id} .due_date_display"
+      add_existing_module_item("AssignmentModule", @assignment2)
       get "/courses/#{@course.id}/modules"
-      add_existing_module_item("#assignments_select", "Assignment", @assignment2.title)
+
       expect(f(selector)).not_to include_text "Multiple Due Dates"
 
       # add a second due date

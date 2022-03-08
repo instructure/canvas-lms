@@ -120,7 +120,6 @@ const locale = {
   },
   "collaborations_5c56c15f": { "message": "Samarbejde" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Skjul { types }" },
-  "color_color_eb64b08": { "message": "Farve { color }" },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Indhold" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {

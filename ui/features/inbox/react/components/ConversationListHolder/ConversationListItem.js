@@ -219,9 +219,6 @@ export const ConversationListItem = ({...props}) => {
                       checked={props.isSelected}
                       onChange={e => {
                         e.stopPropagation()
-                        if (props.isSelected) {
-                          props.onRemoveFromSelectedConversations(props.id)
-                        }
                       }}
                     />
                   </View>
@@ -406,7 +403,6 @@ ConversationListItem.propTypes = {
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
-  onRemoveFromSelectedConversations: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
   readStateChangeConversationParticipants: PropTypes.func
