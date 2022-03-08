@@ -231,6 +231,7 @@ type GradebookState = {
   isGridLoaded: boolean
   modules: Module[]
   sections: Section[]
+  isStatusesModalOpen: boolean
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
@@ -300,8 +301,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   sections_enabled: boolean = false
 
   show_attendance?: boolean
-
-  statusesModal?: HTMLElement & {open?: () => void}
 
   studentGroups: StudentGroupMap = {}
 
@@ -387,7 +386,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       isEssentialDataLoaded: false,
       isGridLoaded: false,
       modules: [],
-      sections: this.options.sections.length > 1 ? this.options.sections : []
+      sections: this.options.sections.length > 1 ? this.options.sections : [],
+      isStatusesModalOpen: false
     }
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
@@ -1763,7 +1763,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.renderFilters()
     this.arrangeColumnsBy(this.getColumnOrder(), true)
     this.renderGradebookSettingsModal()
-    this.renderStatusesModal()
     return $('#keyboard-shortcuts').click(function () {
       const questionMarkKeyDown = $.Event('keydown', {
         keyCode: 191,
@@ -1920,9 +1919,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
       showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames,
       onSelectShowSeparateFirstLastNames: this.toggleShowSeparateFirstLastNames,
-      onSelectShowStatusesModal: () => {
-        this.statusesModal?.open?.()
-      },
+      onSelectShowStatusesModal: () => this.setState({isStatusesModalOpen: true}),
       onSelectViewUngradedAsZero: () => {
         confirmViewUngradedAsZero({
           currentValue: this.gridDisplaySettings.viewUngradedAsZero,
@@ -2244,19 +2241,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.hideNotesColumn()
       }
     })
-  }
-
-  renderStatusesModal = () => {
-    const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
-    const statusesModalProps = {
-      onClose: () => {
-        return this.viewOptionsMenu?.focus()
-      },
-      colors: this.state.gridColors,
-      afterUpdateStatusColors: this.updateGridColors
-    }
-    this.statusesModal = renderComponent(StatusesModal, statusesModalMountPoint, statusesModalProps)
-    return this.statusesModal
   }
 
   checkForUploadComplete = () => {
@@ -4784,6 +4768,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             </div>
           ))}
         </Portal>
+        {this.state.isStatusesModalOpen && (
+          <StatusesModal
+            onClose={() => {
+              this.viewOptionsMenu?.focus()
+              this.setState({isStatusesModalOpen: false})
+            }}
+            colors={this.state.gridColors}
+            afterUpdateStatusColors={this.updateGridColors}
+          />
+        )}
+
         <Portal node={this.props.settingsModalButtonContainer}>
           <Button
             renderIcon={IconSettingsSolid}
