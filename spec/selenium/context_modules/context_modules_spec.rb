@@ -539,7 +539,7 @@ describe "context modules" do
 
     it "adds a file item to a module", priority: "1" do
       get "/courses/#{@course.id}/modules"
-      manually_add_module_item("#attachments_select", "File", file_name)
+      add_existing_module_item("#attachments_select", "File", file_name)
     end
 
     it "does not remove the file link in a module when file is overwritten" do
@@ -557,11 +557,9 @@ describe "context modules" do
     end
 
     it "sets usage rights on a file in a module", priority: "1" do
-      course_module
-      @module.add_item({ id: @file.id, type: "attachment" })
       get "/courses/#{@course.id}/modules"
-
-      ff(".icon-publish")[1].click
+      add_existing_module_item("#attachments_select", "File", file_name)
+      ff(".icon-publish")[0].click
       wait_for_ajaximations
       set_value f(".UsageRightsSelectBox__select"), "own_copyright"
       set_value f("#copyrightHolder"), "Test User"
@@ -573,11 +571,8 @@ describe "context modules" do
     end
 
     it "edit file module item inline", priority: "2" do
-      course_module
-      @module.add_item({ id: @file.id, type: "attachment" })
-
       get "/courses/#{@course.id}/modules"
-
+      add_existing_module_item("#attachments_select", "File", file_name)
       verify_edit_item_form
     end
   end

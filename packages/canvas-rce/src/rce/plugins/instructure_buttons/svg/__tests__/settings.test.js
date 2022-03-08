@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
 import {useSvgSettings, svgFromUrl, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
@@ -327,85 +326,6 @@ describe('useSvgSettings()', () => {
           transform: ''
         })
       })
-    })
-  })
-
-  describe('when an existing button is edited while the tray is already open', () => {
-    beforeEach(() => {
-      editing = true
-
-      // Add an image to the editor and select it
-      ed.setContent(`
-        <img id="test-image-1" src="https://canvas.instructure.com/svg1"
-          data-inst-buttons-and-icons="true"
-          data-download-url="https://canvas.instructure.com/svg1/download" />
-        <img id="test-image-2" src="https://canvas.instructure.com/svg2"
-          data-inst-buttons-and-icons="true"
-          data-download-url="https://canvas.instructure.com/svg2/download" />
-      `)
-
-      fetchMock.mock('begin:https://canvas.instructure.com/svg1/download', {
-        body: `
-          <svg height="100" width="100">
-            <metadata>
-              {
-                "name":"Test Image 1",
-                "alt":"the first test image",
-                "shape":"triangle",
-                "size":"large",
-                "color":"#FF2717",
-                "outlineColor":"#06A3B7",
-                "outlineSize":"small",
-                "text":"Some Text",
-                "textSize":"medium",
-                "textColor":"#009606",
-                "textBackgroundColor":"#06A3B7",
-                "textPosition":"middle"
-              }
-            </metadata>
-            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-          </svg>`
-      })
-
-      fetchMock.mock('begin:https://canvas.instructure.com/svg2/download', {
-        body: `
-          <svg height="100" width="100">
-            <metadata>
-              {
-                "name":"Test Image 2",
-                "alt":"the second test image",
-                "shape":"square",
-                "size":"medium",
-                "color":"#FF2717",
-                "outlineColor":"#06A3B7",
-                "outlineSize":"small",
-                "text":"Some Text",
-                "textSize":"medium",
-                "textColor":"#009606",
-                "textBackgroundColor":"#06A3B7",
-                "textPosition":"middle"
-              }
-            </metadata>
-            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-          </svg>`
-      })
-    })
-
-    afterEach(() => fetchMock.reset())
-
-    it('loads the correct metadata', async () => {
-      const {result, rerender, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing))
-
-      ed.setSelectedNode(ed.dom.select('#test-image-1')[0])
-      rerender()
-      await waitForValueToChange(() => result.current)
-
-      ed.setSelectedNode(ed.dom.select('#test-image-2')[0])
-      rerender()
-      await waitForValueToChange(() => result.current)
-
-      expect(result.current[0].name).toEqual('Test Image 2')
-      expect(result.current[0].shape).toEqual('square')
     })
   })
 })

@@ -269,6 +269,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Hinga ki te hunga { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Tae { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Rorohiko"
     },
@@ -718,9 +721,6 @@
     },
     "image_options_tray_90a46006": {
         "message": "Te pereki mo ngā Kōwhiringa Āhua"
-    },
-    "image_to_crop_3a34487d": {
-        "message": "Āhua he tapahi"
     },
     "images_7ce26570": {
         "message": "Ngā Āhua"

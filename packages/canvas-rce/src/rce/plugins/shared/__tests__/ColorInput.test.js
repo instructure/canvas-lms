@@ -38,7 +38,7 @@ describe('<ColorInput />', () => {
 
   it('renders no background when no color is selected', () => {
     render(<ColorInput {...defaults} color={null} />)
-    const preview = screen.getByTestId('colorPreview-none')
+    const preview = screen.getByTestId('colorPreview-null')
     // js dom does not support linear gradient yet
     expect(preview.style.background).toBe('')
   })
@@ -59,8 +59,7 @@ describe('<ColorInput />', () => {
     fireEvent.click(screen.getByText(/view predefined colors/i))
     fireEvent.click(screen.getByTestId('colorPreview-#06A3B7'))
     expect(defaults.onChange).toHaveBeenCalledWith('#06A3B7')
-    fireEvent.click(screen.getByText(/view predefined colors/i))
-    fireEvent.click(screen.getByTestId('colorPreview-none'))
+    fireEvent.click(screen.getByTestId('colorPreview-null'))
     expect(defaults.onChange).toHaveBeenCalledWith(null)
   })
 })

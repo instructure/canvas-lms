@@ -640,28 +640,6 @@ describe GradebooksController do
         get "grade_summary", params: { course_id: @course.id, id: "lqw" }
       end
     end
-
-    context "js_env" do
-      before do
-        user_session(@student)
-      end
-
-      describe "outcome_service_results_to_canvas" do
-        it "is set to true if outcome_service_results_to_canvas feature flag is enabled" do
-          @course.enable_feature!(:outcome_service_results_to_canvas)
-          get "grade_summary", params: { course_id: @course.id, id: @student.id }
-          js_env = assigns[:js_env]
-          expect(js_env[:outcome_service_results_to_canvas]).to eq true
-        end
-
-        it "is set to false if outcome_service_results_to_canvas feature flag is disabled" do
-          @course.disable_feature!(:outcome_service_results_to_canvas)
-          get "grade_summary", params: { course_id: @course.id, id: @student.id }
-          js_env = assigns[:js_env]
-          expect(js_env[:outcome_service_results_to_canvas]).to eq false
-        end
-      end
-    end
   end
 
   describe "GET 'show'" do
@@ -1666,22 +1644,6 @@ describe GradebooksController do
             get :show, params: { course_id: @course.id }
             gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
             expect(gradebook_env[:IMPROVED_LMGB]).to eq true
-          end
-        end
-
-        describe "outcome_service_results_to_canvas" do
-          it "is set to true if outcome_service_results_to_canvas feature flag is enabled" do
-            @course.enable_feature!(:outcome_service_results_to_canvas)
-            get :show, params: { course_id: @course.id }
-            js_env = assigns[:js_env]
-            expect(js_env[:outcome_service_results_to_canvas]).to eq true
-          end
-
-          it "is set to false if outcome_service_results_to_canvas feature flag is disabled" do
-            @course.disable_feature!(:outcome_service_results_to_canvas)
-            get :show, params: { course_id: @course.id }
-            js_env = assigns[:js_env]
-            expect(js_env[:outcome_service_results_to_canvas]).to eq false
           end
         end
       end
