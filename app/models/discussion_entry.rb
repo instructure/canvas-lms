@@ -92,7 +92,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def mentioned_users
-    User.where("EXISTS (?)", mentions.distinct.select("user_id")).to_a
+    User.where(id: mentions.distinct.select("user_id")).to_a
   end
 
   def course_broadcast_data
