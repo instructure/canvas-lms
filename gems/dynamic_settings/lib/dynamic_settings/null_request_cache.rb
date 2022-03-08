@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2022 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,13 +16,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-module SubmissionCommentsHelper
-  def comment_author_name_for(comment)
-    if can_do(comment, @current_user, :read_author)
-      comment.author_name
-    else
-      I18n.t("Anonymous User")
+module DynamicSettings
+  class NullRequestCache
+    def cache(*_args)
+      yield
     end
   end
 end

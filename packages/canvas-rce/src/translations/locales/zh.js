@@ -108,7 +108,6 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "关闭了字幕/说明" },
   "collaborations_5c56c15f": { "message": "协作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "折叠以隐藏 { types }" },
-  "color_color_eb64b08": { "message": "颜色{ color }" },
   "computer_1d7dfa6f": { "message": "计算机" },
   "content_1440204b": { "message": "内容" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {

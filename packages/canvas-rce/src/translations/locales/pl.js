@@ -124,7 +124,6 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kliknij, aby ukryć { types }"
   },
-  "color_color_eb64b08": { "message": "Kolor { color }" },
   "computer_1d7dfa6f": { "message": "Komputer" },
   "content_1440204b": { "message": "Zawartość" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
