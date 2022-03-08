@@ -33,7 +33,7 @@ describe('transformShape()', () => {
     })
   })
 
-  describe('when the shape is a pentagon', () => {
+  describe('when the shape is a triangle', () => {
     beforeEach(() => (shape = Shape.Triangle))
 
     function sharedExamplesForTriangles() {
@@ -100,6 +100,76 @@ describe('transformShape()', () => {
       })
 
       sharedExamplesForTriangles()
+    })
+  })
+
+  describe('when the shape is a star', () => {
+    beforeEach(() => (shape = Shape.Star))
+
+    function sharedExamplesForStars() {
+      it('uses "55%" for the Y position', () => {
+        expect(subject().y).toEqual('55%')
+      })
+    }
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 8,
+          height: 8,
+          translateX: -4,
+          translateY: -4
+        })
+      })
+
+      sharedExamplesForStars()
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 24,
+          height: 24,
+          translateX: -12,
+          translateY: -12
+        })
+      })
+
+      sharedExamplesForStars()
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 44,
+          height: 44,
+          translateX: -22,
+          translateY: -22
+        })
+      })
+
+      sharedExamplesForStars()
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 72,
+          height: 72,
+          translateX: -36,
+          translateY: -36
+        })
+      })
+
+      sharedExamplesForStars()
     })
   })
 
