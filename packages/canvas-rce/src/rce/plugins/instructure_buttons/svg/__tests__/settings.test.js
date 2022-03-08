@@ -114,11 +114,14 @@ describe('useSvgSettings()', () => {
     beforeEach(() => {
       editing = true
 
-      ENV.COURSE_ID = 23
+      ENV = {
+        COURSE_ID: 23,
+        DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
+      }
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/download" alt="a red circle" />'
+        '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
       )
 
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
@@ -156,20 +159,33 @@ describe('useSvgSettings()', () => {
       subject()
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringMatching(
-          /https:\/\/canvas.instructure.com\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+/
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
         )
       )
     })
 
+    describe('when the download URL contains a course ID', () => {
+      beforeEach(() => {
+        ed.setContent(
+          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="courses/2/files/1/download" alt="a red circle" />'
+        )
+        ed.setSelectedNode(ed.dom.select('#test-image')[0])
+      })
+
+      it('fetches the SVG file using the /files/:file_id/download endpoint', () => {
+        subject()
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          )
+        )
+      })
+    })
+
     describe('with a relative download URL', () => {
       beforeEach(() => {
-        ENV = {
-          COURSE_ID: 23,
-          DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
-        }
-
         ed.setContent(
-          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/download" alt="a red circle" />'
+          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" />'
         )
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
@@ -178,7 +194,7 @@ describe('useSvgSettings()', () => {
         subject()
         expect(global.fetch).toHaveBeenCalledWith(
           expect.stringMatching(
-            /https:\/\/domain.from.env\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+/
+            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
           )
         )
       })
@@ -192,7 +208,7 @@ describe('useSvgSettings()', () => {
         }
 
         ed.setContent(
-          '<p id="containing"><img data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/download" alt="a red circle" /></p>'
+          '<p id="containing"><img data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>'
         )
         ed.setSelectedNode(ed.dom.select('#containing')[0])
       })
@@ -201,7 +217,7 @@ describe('useSvgSettings()', () => {
         subject()
         expect(global.fetch).toHaveBeenCalledWith(
           expect.stringMatching(
-            /https:\/\/domain.from.env\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+/
+            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
           )
         )
       })
@@ -338,13 +354,13 @@ describe('useSvgSettings()', () => {
       ed.setContent(`
         <img id="test-image-1" src="https://canvas.instructure.com/svg1"
           data-inst-buttons-and-icons="true"
-          data-download-url="https://canvas.instructure.com/svg1/download" />
+          data-download-url="https://canvas.instructure.com/files/1/download" />
         <img id="test-image-2" src="https://canvas.instructure.com/svg2"
           data-inst-buttons-and-icons="true"
-          data-download-url="https://canvas.instructure.com/svg2/download" />
+          data-download-url="https://canvas.instructure.com/files/2/download" />
       `)
 
-      fetchMock.mock('begin:https://canvas.instructure.com/svg1/download', {
+      fetchMock.mock('begin:https://domain.from.env/files/1/download', {
         body: `
           <svg height="100" width="100">
             <metadata>
@@ -367,7 +383,7 @@ describe('useSvgSettings()', () => {
           </svg>`
       })
 
-      fetchMock.mock('begin:https://canvas.instructure.com/svg2/download', {
+      fetchMock.mock('begin:https://domain.from.env/files/2/download', {
         body: `
           <svg height="100" width="100">
             <metadata>

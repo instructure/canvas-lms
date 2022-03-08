@@ -54,6 +54,8 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   }
 
   beforeAll(() => {
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://domain.from.env'
+
     global.fetch = jest.fn().mockResolvedValue({
       blob: () => Promise.resolve(new Blob())
     })
@@ -188,7 +190,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-buttons-and-icons="true" data-download-url="https://canvas.instructure.com/svg" alt="a red circle" />'
+        '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-buttons-and-icons="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
       )
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
     })
