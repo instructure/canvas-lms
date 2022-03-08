@@ -341,6 +341,62 @@ describe('transformShape()', () => {
     })
   })
 
+  describe('when the shape is a octagon', () => {
+    beforeEach(() => (shape = Shape.Octagon))
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 36,
+          height: 36,
+          translateX: -18,
+          translateY: -18
+        })
+      })
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 80,
+          height: 80,
+          translateX: -40,
+          translateY: -40
+        })
+      })
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 110,
+          height: 110,
+          translateX: -55,
+          translateY: -55
+        })
+      })
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 180,
+          height: 180,
+          translateX: -90,
+          translateY: -90
+        })
+      })
+    })
+  })
+
   describe('when no transform overrides are set (default case)', () => {
     beforeEach(() => {
       shape = 'default'
