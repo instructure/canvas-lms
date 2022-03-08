@@ -2226,6 +2226,13 @@ describe DiscussionTopic do
       expect { announcement.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
+    it "does not allow replies to locked announcements" do
+      announcement = @course.announcements.create!(message: "Lock this")
+      announcement.locked = true
+      announcement.save!
+      expect { announcement.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+    end
+
     it "does not allow replies from students to discussion topic before unlock date" do
       @topic = @course.discussion_topics.create!(user: @teacher)
       @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
