@@ -16,6 +16,7 @@ DOCKER_COMMAND=${DOCKER_COMMAND:-"docker-compose"}
 function trap_result {
   exit_code=$?
   last_command=$BASH_COMMAND
+  exec &>/dev/tty
   set +e
   stop_spinner $exit_code
   if [ "${exit_code}" == "0" ]; then
