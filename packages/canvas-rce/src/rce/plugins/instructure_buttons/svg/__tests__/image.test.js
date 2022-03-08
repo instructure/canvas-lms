@@ -285,6 +285,62 @@ describe('transformShape()', () => {
     })
   })
 
+  describe('when the shape is a hexagon', () => {
+    beforeEach(() => (shape = Shape.Hexagon))
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 28,
+          height: 28,
+          translateX: -14,
+          translateY: -14
+        })
+      })
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 68,
+          height: 68,
+          translateX: -34,
+          translateY: -34
+        })
+      })
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 100,
+          height: 100,
+          translateX: -50,
+          translateY: -50
+        })
+      })
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 160,
+          height: 160,
+          translateX: -80,
+          translateY: -80
+        })
+      })
+    })
+  })
+
   describe('when no transform overrides are set (default case)', () => {
     beforeEach(() => {
       shape = 'default'
