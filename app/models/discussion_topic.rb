@@ -1042,6 +1042,10 @@ class DiscussionTopic < ActiveRecord::Base
       (([user.id] + associated_user_ids) & user_ids_who_have_posted_and_admins).any?
   end
 
+  def locked_announcement?
+    is_a?(Announcement) && locked?
+  end
+
   def reply_from(opts)
     raise IncomingMail::Errors::ReplyToDeletedDiscussion if deleted?
     raise IncomingMail::Errors::UnknownAddress if context.root_account.deleted?
@@ -1061,7 +1065,7 @@ class DiscussionTopic < ActiveRecord::Base
     else
       shard.activate do
         entry = discussion_entries.new(message: message, user: user)
-        if entry.grants_right?(user, :create) && !comments_disabled?
+        if entry.grants_right?(user, :create) && !comments_disabled? && !locked_announcement?
           entry.save!
           entry
         else
