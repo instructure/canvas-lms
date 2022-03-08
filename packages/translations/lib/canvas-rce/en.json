@@ -51,7 +51,10 @@
   "available_folders_694d0436": { "message": "Available folders" },
   "basic_554cdc0a": { "message": "Basic" },
   "below_81d4dceb": { "message": "Below" },
+  "black_4cb01371": { "message": "Black" },
+  "blue_daf8fea9": { "message": "Blue" },
   "bottom_third_5f5fec1d": { "message": "Bottom Third" },
+  "brick_f2656265": { "message": "Brick" },
   "button_color_608a0242": { "message": "Button Color" },
   "button_outline_cf14f071": { "message": "Button Outline" },
   "button_outline_size_cc1d1df7": { "message": "Button Outline Size" },
@@ -95,7 +98,6 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Collapse to hide { types }"
   },
-  "color_color_eb64b08": { "message": "Color { color }" },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Content" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -125,9 +127,11 @@
   "crop_image_807ebb08": { "message": "Crop Image" },
   "current_image_f16c249c": { "message": "Current Image" },
   "custom_6979cd81": { "message": "Custom" },
+  "cyan_c1d5f68a": { "message": "Cyan" },
   "date_added_ed5ad465": { "message": "Date Added" },
   "decorative_image_3c28aa7d": { "message": "Decorative Image" },
   "decrease_indent_de6343ab": { "message": "Decrease indent" },
+  "deep_purple_bb3e2907": { "message": "Deep Purple" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "default bulleted unordered list"
   },
@@ -221,6 +225,8 @@
   },
   "grades_a61eba0a": { "message": "Grades" },
   "greek_65c5b3f7": { "message": "Greek" },
+  "green_15af4778": { "message": "Green" },
+  "grey_a55dceff": { "message": "Grey" },
   "group_documents_8bfd6ae6": { "message": "Group Documents" },
   "group_files_4324f3df": { "message": "Group Files" },
   "group_files_82e5dcdb": { "message": "Group files" },
@@ -255,6 +261,7 @@
   "image_to_crop_3a34487d": { "message": "Image to crop" },
   "images_7ce26570": { "message": "Images" },
   "increase_indent_6d550a4a": { "message": "Increase indent" },
+  "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Insert" },
   "insert_equella_links_49a8dacd": {
     "description": "Title for RCE button to insert links to Equella content",
@@ -274,6 +281,7 @@
   "large_9c5e80e7": { "message": "Large" },
   "left_to_right_e9b4fd06": { "message": "Left-to-Right" },
   "library_icon_ae1e54cf": { "message": "Library Icon" },
+  "light_blue_5374f600": { "message": "Light Blue" },
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link Options" },
   "links_14b70841": { "message": "Links" },
@@ -287,6 +295,7 @@
   "loading_please_wait_d276220a": { "message": "Loading, please wait" },
   "loading_preview_9f077aa1": { "message": "Loading preview" },
   "locked_762f138b": { "message": "Locked" },
+  "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Math Icon" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
@@ -304,6 +313,7 @@
   },
   "my_files_2f621040": { "message": "My files" },
   "name_1aed4a1b": { "message": "Name" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -323,6 +333,7 @@
   "none_3b5e34d2": { "message": "None" },
   "none_selected_b93d56d2": { "message": "None Selected" },
   "octagon_e48be9f": { "message": "Octagon" },
+  "olive_6a3e4d6b": { "message": "Olive" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open this keyboard shortcuts dialog"
   },
@@ -331,6 +342,7 @@
   },
   "operators_a2ef9a93": { "message": "Operators" },
   "options_3ab0ea65": { "message": "Options" },
+  "orange_81386a62": { "message": "Orange" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordered and Unordered Lists"
   },
@@ -350,6 +362,7 @@
   },
   "performing_arts_icon_f3497486": { "message": "Performing Arts Icon" },
   "physical_education_icon_d7dffd3e": { "message": "Physical Education Icon" },
+  "pink_68ad45cb": { "message": "Pink" },
   "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Posted: { when }" },
   "preformatted_d0670862": { "message": "Preformatted" },
@@ -363,10 +376,13 @@
   },
   "published_c944a23d": { "message": "published" },
   "published_when_302d8e23": { "message": "Published: { when }" },
+  "pumpkin_904428d5": { "message": "Pumpkin" },
+  "purple_7678a9fc": { "message": "Purple" },
   "quizzes_7e598f57": { "message": "Quizzes" },
   "raw_html_editor_e3993e41": { "message": "Raw HTML Editor" },
   "record_7c9448b": { "message": "Record" },
   "record_upload_media_5fdce166": { "message": "Record/Upload Media" },
+  "red_8258edf3": { "message": "Red" },
   "relationships_6602af70": { "message": "Relationships" },
   "religion_icon_246e0be1": { "message": "Religion Icon" },
   "remove_link_d1f2f4d0": { "message": "Remove Link" },
@@ -416,6 +432,7 @@
   "square_511eb3b3": { "message": "Square" },
   "square_unordered_list_b15ce93b": { "message": "square unordered list" },
   "star_8d156e09": { "message": "Star" },
+  "steel_blue_14296f08": { "message": "Steel Blue" },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Submit" },
   "subscript_59744f96": { "message": "Subscript" },
@@ -431,6 +448,7 @@
   },
   "syllabus_f191f65b": { "message": "Syllabus" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Arrows" },
+  "teal_f729a294": { "message": "Teal" },
   "text_7f4593da": { "message": "Text" },
   "text_background_color_16e61c3f": { "message": "Text Background Color" },
   "text_color_acf75eb6": { "message": "Text Color" },
@@ -531,6 +549,7 @@
   "view_title_description_67940918": {
     "message": "View { title } description"
   },
+  "white_87fa64fd": { "message": "White" },
   "width_492fec76": { "message": "Width" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Width and height must be numbers"
