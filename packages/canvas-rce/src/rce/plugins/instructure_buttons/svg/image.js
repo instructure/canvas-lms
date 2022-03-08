@@ -65,6 +65,8 @@ export function transformForShape(shape, size) {
       return transformForPentagon(size)
     case Shape.Triangle:
       return transformForTriangle(size)
+    case Shape.Star:
+      return transformForStar(size)
     default:
       return transformForDefault(size)
   }
@@ -103,6 +105,35 @@ function transformForTriangle(size) {
         ...transformForDefault(size),
         ...dimensionAttrsFor(112),
         y: '65%'
+      }
+  }
+}
+
+function transformForStar(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(8),
+        y: '55%'
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(24),
+        y: '55%'
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(44),
+        y: '55%'
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(72),
+        y: '55%'
       }
   }
 }
