@@ -79,7 +79,7 @@ def createLegacyDistribution(nestedStages) {
   def legacyEnvVars = baseEnvVars + [
     "CI_NODE_TOTAL=$legacyNodeTotal",
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-    'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium)',
+    'EXCLUDE_TESTS=.*/performance',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
     "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",

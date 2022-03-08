@@ -267,20 +267,17 @@ class Role < ActiveRecord::Base
   end
 
   def self.manageable_roles_by_user(user, context)
-    is_blueprint = context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context)
     manageable = []
-    if context.grants_right?(user, :manage_students) && !is_blueprint
-      manageable += %w[StudentEnrollment ObserverEnrollment]
+    if context.grants_right?(user, :manage_students) && !(context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context))
+      manageable += ["StudentEnrollment", "ObserverEnrollment"]
     end
     if context.grants_right?(user, :manage_admin_users)
-      manageable += %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
-      manageable << "ObserverEnrollment" unless is_blueprint
+      manageable += %w[ObserverEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
     end
     manageable.uniq.sort
   end
 
   def self.add_delete_roles_by_user(user, context)
-    is_blueprint = context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context)
     addable = []
     deleteable = []
     addable += ["TeacherEnrollment"] if context.grants_right?(user, :add_teacher_to_course)
@@ -289,9 +286,9 @@ class Role < ActiveRecord::Base
     deleteable += ["TaEnrollment"] if context.grants_right?(user, :remove_ta_from_course)
     addable += ["DesignerEnrollment"] if context.grants_right?(user, :add_designer_to_course)
     deleteable += ["DesignerEnrollment"] if context.grants_right?(user, :remove_designer_from_course)
-    addable += ["StudentEnrollment"] if context.grants_right?(user, :add_student_to_course) && !is_blueprint
+    addable += ["StudentEnrollment"] if context.grants_right?(user, :add_student_to_course)
     deleteable += ["StudentEnrollment"] if context.grants_right?(user, :remove_student_from_course)
-    addable += ["ObserverEnrollment"] if context.grants_right?(user, :add_observer_to_course) && !is_blueprint
+    addable += ["ObserverEnrollment"] if context.grants_right?(user, :add_observer_to_course)
     deleteable += ["ObserverEnrollment"] if context.grants_right?(user, :remove_observer_from_course)
 
     [addable, deleteable]

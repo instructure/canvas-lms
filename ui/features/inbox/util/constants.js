@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import I18n from 'i18n!conversations_2'
-import React from 'react'
 
 export const PARTICIPANT_EXPANSION_THRESHOLD = 2
 
@@ -80,9 +79,3 @@ export const SelectStrings = () => ({
   LIST_EXPANDED: I18n.t('List Expanded'),
   OPTION_SELECTED: I18n.t('{option} Selected')
 })
-
-const conversationContextDefaultValues = {
-  multiselect: false,
-  setMultiselect: () => {}
-}
-export const ConversationContext = React.createContext(conversationContextDefaultValues)

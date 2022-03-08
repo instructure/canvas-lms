@@ -19,21 +19,9 @@
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
-import rceFormatMessage from '@instructure/canvas-rce/lib/format-message'
-import plannerFormatMessage from '@instructure/canvas-planner/lib/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
-
-rceFormatMessage.setup({
-  locale: 'en',
-  missingTranslation: 'ignore'
-})
-
-plannerFormatMessage.setup({
-  locale: 'en',
-  missingTranslation: 'ignore'
-})
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
@@ -53,6 +41,7 @@ const ignoredErrors = [
   /A theme registry has already been initialized/,
   /An update to (%s|DefaultToolForm) inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
+  /CancelAttemptButton: prop type `submission` is invalid/,
   /Cannot read property '(activeElement|useRealTimers)' of undefined/,
   /Cannot read property 'name' of null/,
   /Cannot update during an existing state transition/,
@@ -108,6 +97,7 @@ const ignoredWarnings = [
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
+  /Translation for .* is missing/,
   /value provided is not in a recognized RFC2822 or ISO format/
 ]
 global.console = {
