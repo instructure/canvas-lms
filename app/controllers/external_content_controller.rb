@@ -26,8 +26,8 @@ class ExternalContentController < ApplicationController
 
   protect_from_forgery except: [:selection_test, :success], with: :exception
 
-  before_action :require_user, only: :oembed_retrieve, if: -> { require_oembed_token? }
-  before_action :validate_oembed_token!, only: :oembed_retrieve, if: -> { require_oembed_token? }
+  before_action :require_user, only: :oembed_retrieve
+  before_action :validate_oembed_token!, only: :oembed_retrieve
 
   rescue_from Lti::Concerns::Oembed::OembedAuthorizationError do |error|
     render json: { message: error.message }, status: :unauthorized
