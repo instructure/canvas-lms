@@ -30,7 +30,7 @@ end
 if CANVAS_RAILS6_0
   gem "rails", "6.0.4.2"
     gem "tzinfo", "1.2.7"
-  gem_override "switchman", "2.2.2"
+  gem_override "switchman", "2.2.3"
     gem "guardrail", "2.0.1"
   gem_override "switchman-inst-jobs", "3.2.10"
 else
