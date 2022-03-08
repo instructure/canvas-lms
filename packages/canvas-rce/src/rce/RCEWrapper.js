@@ -881,12 +881,10 @@ class RCEWrapper extends React.Component {
           return
         }
 
-        const popups = document.querySelectorAll('[data-mce-component]')
-        for(const popup of popups) {
-          if (popup.contains(document.activeElement)) {
-            // one of our popups has focus
-            return
-          }
+        const popup = document.querySelector('[data-mce-component]')
+        if (popup && popup.contains(document.activeElement)) {
+          // one of our popups has focus
+          return
         }
 
         bridge.blurEditor(this)

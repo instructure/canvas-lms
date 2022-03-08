@@ -29,14 +29,14 @@ export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
   const [replaceAll, setReplaceAll] = useState(false)
 
   return (
-    <>
+    <View as="footer">
       {editing && (
         <View as="div" padding="medium">
           <Checkbox
             label={formatMessage(
               'Apply changes to all instances of this Button and Icon in the Course'
             )}
-            data-testid="cb-replace-all"
+            data-testid='cb-replace-all'
             checked={replaceAll}
             onChange={() => {
               setReplaceAll(prev => !prev)
@@ -47,11 +47,11 @@ export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
       <View
         as="div"
         background="secondary"
-        borderWidth={editing ? 'small none none none' : 'none'}
+        borderWidth="small none none none"
         padding="small small x-small none"
       >
         <Flex>
-          <Flex.Item shouldGrow shouldShrink />
+          <Flex.Item shouldGrow shouldShrink></Flex.Item>
           <Flex.Item>
             <Button disabled={disabled} onClick={onCancel}>
               {formatMessage('Cancel')}
@@ -73,6 +73,6 @@ export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
           </Flex.Item>
         </Flex>
       </View>
-    </>
+    </View>
   )
 }

@@ -28,41 +28,39 @@ export const statuses = {
   IDLE: 'idle'
 }
 
-const getImageNode = editor => {
-  const selectedNode = editor?.selection?.getNode()
-
-  // No selection made, return
-  if (!selectedNode) return
-
-  // The button and icon image is selected. return it
-  if (selectedNode.getAttribute(BTN_AND_ICON_ATTRIBUTE)) return selectedNode
-
-  // The button and icon image element is not selected, but it's possible
-  // an element wrapping it is. Look for a button and icon image in the
-  // selection's children
-  const buttonAndIcon = selectedNode.querySelector(`img[${BTN_AND_ICON_ATTRIBUTE}="true"]`)
-
-  // Still not button and icon found in the selection's children. Return
-  if (!buttonAndIcon) return
-
-  // Button and icon found in the selections children. Return it and set the
-  // editor's selection to it as well
-  editor.selection.select(buttonAndIcon)
-  return buttonAndIcon
-}
-
 export function useSvgSettings(editor, editing) {
   const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
   const [status, setStatus] = useState(statuses.IDLE)
 
-  const urlFromNode = getImageNode(editor)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
-
   useEffect(() => {
-    const fetchSvgSettings = async () => {
-      if (!urlFromNode) return
+    const getImageNode = editor => {
+      const selectedNode = editor.selection.getNode()
 
+      // No selection made, return
+      if (!selectedNode) return
+
+      // The button and icon image is selected. return it
+      if (selectedNode.getAttribute(BTN_AND_ICON_ATTRIBUTE)) return selectedNode
+
+      // The button and icon image element is not selected, but it's possible
+      // an element wrapping it is. Look for a button and icon image in the
+      // selection's children
+      const buttonAndIcon = selectedNode.querySelector(`img[${BTN_AND_ICON_ATTRIBUTE}="true"]`)
+
+      // Still not button and icon found in the selection's children. Return
+      if (!buttonAndIcon) return
+
+      // Button and icon found in the selections children. Return it and set the
+      // editor's selection to it as well
+      editor.selection.select(buttonAndIcon)
+      return buttonAndIcon
+    }
+
+    const fetchSvgSettings = async () => {
       try {
         setStatus(statuses.LOADING)
+
+        const urlFromNode = getImageNode(editor)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
 
         let downloadURL
         try {
@@ -100,9 +98,7 @@ export function useSvgSettings(editor, editing) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-    // Otherwise, fetch default settings to set us back to creating
-    else dispatch(defaultState)
-  }, [editor, editing, urlFromNode])
+  }, [editor, editing])
 
   return [settings, status, dispatch]
 }

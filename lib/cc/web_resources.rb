@@ -50,7 +50,7 @@ module CC
         path = File.join(folder_names, file.display_name)
         @added_attachments[file.id] = path
         migration_id = create_key(file)
-        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename || file.category == Attachment::BUTTONS_AND_ICONS
+        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename
           files_with_metadata[:files] << [file, migration_id]
         end
         @resources.resource(
@@ -132,7 +132,6 @@ module CC
                 file_node.lock_at CCHelper.ims_datetime(file.lock_at) if file.lock_at
                 file_node.unlock_at CCHelper.ims_datetime(file.unlock_at) if file.unlock_at
                 file_node.display_name file.display_name if file.display_name != file.unencoded_filename
-                file_node.category file.category
                 if file.usage_rights
                   file_node.usage_rights(use_justification: file.usage_rights.use_justification) do |node|
                     node.legal_copyright file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?

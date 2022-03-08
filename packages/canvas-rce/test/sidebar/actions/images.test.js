@@ -91,9 +91,9 @@ describe('Image dispatch shapes', () => {
         assert.deepEqual(
           subject().payload.files.map(f => f['data-download-url']),
           [
-            'https://canvas.instructure.com/files/1/download?buttons_and_icons=1',
-            'https://canvas.instructure.com/files/2/download?buttons_and_icons=1',
-            'https://canvas.instructure.com/files/3/download?buttons_and_icons=1'
+            'https://canvas.instructure.com/files/1/download',
+            'https://canvas.instructure.com/files/2/download',
+            'https://canvas.instructure.com/files/3/download'
           ]
         )
       })
