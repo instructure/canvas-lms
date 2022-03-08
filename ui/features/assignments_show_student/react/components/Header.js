@@ -157,17 +157,12 @@ class Header extends React.Component {
     const popoverMessage = I18n.t(
       'After the first attempt, you cannot leave comments until you submit the assignment.'
     )
-
     return (
       <>
-        <div data-testid="unread_comments_badge">
+        <div>
           <StudentViewContext.Consumer>
-            {context => (
-              <Badge
-                margin="x-small"
-                count={this.props.submission ? this.props.submission.unreadCommentCount : null}
-                countUntil={100}
-              >
+            {context => {
+              const button = (
                 <Button
                   renderIcon={IconChatLine}
                   onClick={this.openCommentsTray}
@@ -178,8 +173,19 @@ class Header extends React.Component {
                     ? I18n.t('View Feedback')
                     : I18n.t('Add Comment')}
                 </Button>
-              </Badge>
-            )}
+              )
+
+              const unreadCount = this.props.submission?.unreadCommentCount
+              if (!unreadCount) return button
+
+              return (
+                <div data-testid="unread_comments_badge">
+                  <Badge pulse margin="x-small" count={unreadCount} countUntil={100}>
+                    {button}
+                  </Badge>
+                </div>
+              )
+            }}
           </StudentViewContext.Consumer>
           {addCommentsDisabled && (
             <Popover
