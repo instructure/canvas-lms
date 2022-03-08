@@ -27,7 +27,7 @@ module CC
     include LearningOutcomes
     include Rubrics
     include Events
-    include PacePlans
+    include CoursePaces
     include WebResources
 
     def add_canvas_non_cc_data
@@ -40,7 +40,7 @@ module CC
       resources = []
       resources << run_and_set_progress(:create_course_settings, nil, I18n.t("course_exports.errors.course_settings", "Failed to export course settings"), migration_id) if export_symbol?(:all_course_settings)
       resources << run_and_set_progress(:create_module_meta, nil, I18n.t("course_exports.errors.module_meta", "Failed to export module meta data"))
-      resources << run_and_set_progress(:create_pace_plans, nil, I18n.t("Failed to export pace plans"))
+      resources << run_and_set_progress(:create_course_paces, nil, I18n.t("Failed to export course paces"))
       resources << run_and_set_progress(:create_external_feeds, nil, I18n.t("course_exports.errors.external_feeds", "Failed to export external feeds"))
       resources << run_and_set_progress(:create_assignment_groups, nil, I18n.t("course_exports.errors.assignment_groups", "Failed to export assignment groups"))
       resources << run_and_set_progress(:create_grading_standards, 20, I18n.t("course_exports.errors.grading_standards", "Failed to export grading standards"))

@@ -911,30 +911,30 @@ describe ContentTag do
     end
   end
 
-  describe "#update_pace_plan_module_items" do
+  describe "#update_course_pace_module_items" do
     before do
       course_factory
       @context_module = @course.context_modules.create!
       @assignment = @course.assignments.create!
-      @pace_plan = @course.pace_plans.create!
+      @course_pace = @course.course_paces.create!
       @context_module.add_item(id: @assignment.id, type: "assignment")
       @tag = @context_module.content_tags.first
     end
 
-    it "creates a pace plan module item if a new content tag is created" do
+    it "creates a course pace module item if a new content tag is created" do
       assignment = @course.assignments.create!
       @context_module.add_item(id: assignment.id, type: "assignment")
       tag = @context_module.content_tags.find_by(content_id: assignment.id)
-      tag.update_pace_plan_module_items
-      expect(@pace_plan.pace_plan_module_items.where(module_item_id: tag.id).exists?).to eq(true)
+      tag.update_course_pace_module_items
+      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
     end
 
-    it "deletes a PacePlanModuleItem if a content tag is deleted" do
-      @tag.update_pace_plan_module_items
-      expect(@pace_plan.pace_plan_module_items.where(module_item_id: @tag.id).exists?).to eq(true)
+    it "deletes a CoursePaceModuleItem if a content tag is deleted" do
+      @tag.update_course_pace_module_items
+      expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to eq(true)
       @tag.destroy
-      @tag.update_pace_plan_module_items
-      expect(@pace_plan.pace_plan_module_items.where(module_item_id: @tag.id).exists?).to eq(false)
+      @tag.update_course_pace_module_items
+      expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to eq(false)
     end
   end
 end

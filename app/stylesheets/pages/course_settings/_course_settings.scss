@@ -408,7 +408,7 @@ ul.user_list div.enrollment_type.pending {
   .course-conclude-at-row,
   .course-participation-row,
   .language-row,
-  .pace-plans-row,
+  .course-paces-row,
   .friendly-name-row {
     align-items: flex-start;
     padding-top: 0.5rem;
@@ -472,7 +472,7 @@ td.center-text {
   margin-#{direction(left)}: 18px;
 }
 
-.pace-plans-caution-text {
+.course-paces-caution-text {
   display: flex;
   & i {
     color: $ic-color-danger;
