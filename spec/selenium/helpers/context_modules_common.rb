@@ -174,7 +174,7 @@ module ContextModulesCommon
     expect(f(".name").text).to eq "some module"
   end
 
-  def add_existing_module_item(item_select_selector, module_name, item_name)
+  def manually_add_module_item(item_select_selector, module_name, item_name)
     add_module(module_name + "Module")
     f(".ig-header-admin .al-trigger").click
     wait_for_ajaximations
@@ -187,6 +187,11 @@ module ContextModulesCommon
     wait_for_ajaximations
     tag = ContentTag.last
     fj("#context_module_item_#{tag.id}:contains(#{item_name.inspect})")
+  end
+
+  def add_existing_module_item(module_name, module_assignment)
+    new_module = @course.context_modules.create!(name: module_name, workflow_state: "active")
+    new_module.add_item(id: module_assignment.id, type: "assignment")
   end
 
   def add_existing_module_file_items(item_select_selector, file_names)
