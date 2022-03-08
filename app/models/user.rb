@@ -2761,7 +2761,7 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
-    return false if type == "StudentEnrollment" && MasterCourses::MasterTemplate.is_master_course?(course)
+    return false if %w[StudentEnrollment ObserverEnrollment].include?(type) && MasterCourses::MasterTemplate.is_master_course?(course)
     return false if course.template?
 
     if course.root_account.feature_enabled?(:granular_permissions_manage_users)

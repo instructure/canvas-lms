@@ -65,6 +65,16 @@ export function transformForShape(shape, size) {
       return transformForPentagon(size)
     case Shape.Triangle:
       return transformForTriangle(size)
+    case Shape.Star:
+      return transformForStar(size)
+    case Shape.Square:
+      return transformForSquare(size)
+    case Shape.Circle:
+      return transformForCircle(size)
+    case Shape.Hexagon:
+      return transformForHexagon(size)
+    case Shape.Octagon:
+      return transformForOctagon(size)
     default:
       return transformForDefault(size)
   }
@@ -103,6 +113,135 @@ function transformForTriangle(size) {
         ...transformForDefault(size),
         ...dimensionAttrsFor(112),
         y: '65%'
+      }
+  }
+}
+
+function transformForStar(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(8),
+        y: '55%'
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(24),
+        y: '55%'
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(44),
+        y: '55%'
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(72),
+        y: '55%'
+      }
+  }
+}
+
+function transformForSquare(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(60)
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(108)
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(142)
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(200)
+      }
+  }
+}
+
+function transformForCircle(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(54)
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(100)
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(132)
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(180)
+      }
+  }
+}
+
+function transformForHexagon(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(28)
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(68)
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(100)
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(160)
+      }
+  }
+}
+
+function transformForOctagon(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(36)
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(80)
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(110)
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(180)
       }
   }
 }
