@@ -16,9 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {render} from '@testing-library/react'
 import ColumnHeaders from '../ColumnHeaders'
 
+const defaultProps = newProps => {
+  const originalProps = {
+    areAllItemsSelected: () => {},
+    params: {},
+    pathname: '/',
+    query: {},
+    toggleAllSelected: () => {},
+    usageRightsRequiredForContext: false
+  }
+  return {...originalProps, ...newProps}
+}
+
+const renderComponent = (updatedProps = {}) =>
+  render(<ColumnHeaders {...defaultProps(updatedProps)} />)
+
 describe('ColumnHeaders', () => {
+  it('correctly assigns the appropriate hrefs', () => {
+    const props = {
+      query: {sort: 'something', order: 'asc'},
+      pathname: '/some/path/to/files'
+    }
+    const {getByRole} = renderComponent(props)
+    const nameLink = getByRole('link', {name: /Name/})
+    const url = new URL(nameLink.href)
+    expect(url.pathname).toEqual(props.pathname)
+    expect(url.search).toEqual('?sort=name&order=desc')
+  })
+
   describe('queryParamsFor method', () => {
     const {queryParamsFor} = ColumnHeaders.prototype
 
