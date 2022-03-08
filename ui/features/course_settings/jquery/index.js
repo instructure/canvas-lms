@@ -617,9 +617,9 @@ $(document).ready(function () {
     $('#course_home_page_announcement_limit').prop('disabled', !$(this).prop('checked'))
   })
 
-  $('#course_enable_pace_plans')
+  $('#course_enable_course_paces')
     .change(function () {
-      $('#pace_plans_caution_text').toggleClass('shown', this.checked)
+      $('#course_paces_caution_text').toggleClass('shown', this.checked)
     })
     .trigger('change')
 

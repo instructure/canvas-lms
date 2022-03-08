@@ -155,7 +155,7 @@ class BlackoutDatesController < ApplicationController
 
   def require_feature_flag
     account = @context.is_a?(Account) ? @context : @context.account
-    not_found unless account.feature_enabled?(:pace_plans)
+    not_found unless account.feature_enabled?(:course_paces)
   end
 
   def load_blackout_date

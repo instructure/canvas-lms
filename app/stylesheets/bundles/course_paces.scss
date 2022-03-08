@@ -1,0 +1,90 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base/environment';
+
+// This is a workaround for an InstUI v7 issue with the Menu component not being
+// properly themeable. This should be removed once we're on InstUI v8
+[data-position-content='course-pace-menu'] [role='menu'] {
+  max-width: 20rem;
+}
+
+// This allows us to animate on height and width, which InstUI Transitions don't
+// handle very well.
+.course-paces-collapse {
+  transition: max-height 500ms ease, width 500ms ease;
+  white-space: nowrap;
+}
+
+.course-paces-module-table {
+  // This prevents the focus outline on the ToggleDetails button from being
+  // overlapped by the modules Table underneath it
+  & button {
+    z-index: 1;
+  }
+
+  // This supports table-based transitions
+  & th,
+  td,
+  [role='cell'] {
+    overflow: hidden;
+    transition: height 500ms ease, width 500ms ease, opacity 500ms ease;
+    white-space: nowrap;
+
+    &:nth-child(3):not(:last-child) {
+      opacity: 0;
+    }
+  }
+
+  & [role='cell'] {
+    // This allows the auto-generated stacked labels to play nice with the
+    // assignment title cell, since that contains an icon + truncated text
+    display: flex;
+    align-items: center;
+
+    // This supports table-based transitions
+    transition: height 500ms ease, width 500ms ease, padding 500ms ease, opacity 500ms ease;
+    &:nth-child(3):not(:last-child) {
+      height: 0;
+      padding: 0 0.75rem;
+    }
+  }
+
+  // This supports table-based transitions
+  &.actually-expanded {
+    & th,
+    td,
+    [role='cell'] {
+      &:nth-child(3):not(:last-child) {
+        opacity: 1;
+      }
+    }
+    & [role='cell']:nth-child(3):not(:last-child) {
+      height: 3.75rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
+}
+
+#course-paces-required-end-date-input > span {
+  width: 100%;
+}
+
+.course-paces-assignment-row-points-possible {
+  color: $ic-color-medium-darker;
+}

@@ -20,29 +20,29 @@
 require_relative "course_copy_helper"
 
 describe ContentMigration do
-  context "pace plans" do
+  context "course paces" do
     include_context "course copy"
 
-    it "copies pace plan attributes" do
-      pace_plan = @copy_from.pace_plans.new
-      pace_plan.workflow_state = "active"
-      pace_plan.end_date = 1.day.from_now.beginning_of_day
-      pace_plan.published_at = Time.now.utc
-      pace_plan.exclude_weekends = false
-      pace_plan.hard_end_dates = true
-      pace_plan.save!
+    it "copies course pace attributes" do
+      course_pace = @copy_from.course_paces.new
+      course_pace.workflow_state = "active"
+      course_pace.end_date = 1.day.from_now.beginning_of_day
+      course_pace.published_at = Time.now.utc
+      course_pace.exclude_weekends = false
+      course_pace.hard_end_dates = true
+      course_pace.save!
 
       run_course_copy
-      expect(@copy_to.pace_plans.count).to eq 1
+      expect(@copy_to.course_paces.count).to eq 1
 
-      pace_plan_to = @copy_to.pace_plans.take
+      course_pace_to = @copy_to.course_paces.take
 
-      expect(pace_plan_to.workflow_state).to eq "active"
-      expect(pace_plan_to.start_date).to eq pace_plan.start_date
-      expect(pace_plan_to.end_date).to eq pace_plan.end_date
-      expect(pace_plan_to.published_at.to_i).to eq pace_plan.published_at.to_i
-      expect(pace_plan_to.exclude_weekends).to eq false
-      expect(pace_plan_to.hard_end_dates).to eq true
+      expect(course_pace_to.workflow_state).to eq "active"
+      expect(course_pace_to.start_date).to eq course_pace.start_date
+      expect(course_pace_to.end_date).to eq course_pace.end_date
+      expect(course_pace_to.published_at.to_i).to eq course_pace.published_at.to_i
+      expect(course_pace_to.exclude_weekends).to eq false
+      expect(course_pace_to.hard_end_dates).to eq true
     end
 
     context "module items" do
@@ -54,31 +54,31 @@ describe ContentMigration do
         @mod2 = @copy_from.context_modules.create! name: "module2"
         @tag2 = @mod2.add_item(type: "assignment", id: @a2.id)
 
-        @pace_plan = @copy_from.pace_plans.create!
-        @pace_plan.pace_plan_module_items.create! duration: 1, module_item_id: @tag1.id
-        @pace_plan.pace_plan_module_items.create! duration: 2, module_item_id: @tag2.id
+        @course_pace = @copy_from.course_paces.create!
+        @course_pace.course_pace_module_items.create! duration: 1, module_item_id: @tag1.id
+        @course_pace.course_pace_module_items.create! duration: 2, module_item_id: @tag2.id
       end
 
-      it "copies pace plan module item durations" do
+      it "copies course pace module item durations" do
         run_course_copy
 
         tag1_to = @copy_to.context_module_tags.where(migration_id: mig_id(@tag1)).take
         tag2_to = @copy_to.context_module_tags.where(migration_id: mig_id(@tag2)).take
-        pace_plan_to = @copy_to.pace_plans.where(workflow_state: "unpublished").take
+        course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
 
-        expect(pace_plan_to.pace_plan_module_items.find_by(module_item_id: tag1_to.id).duration).to eq 1
-        expect(pace_plan_to.pace_plan_module_items.find_by(module_item_id: tag2_to.id).duration).to eq 2
+        expect(course_pace_to.course_pace_module_items.find_by(module_item_id: tag1_to.id).duration).to eq 1
+        expect(course_pace_to.course_pace_module_items.find_by(module_item_id: tag2_to.id).duration).to eq 2
       end
 
       it "copies a subset of module items in selective migrations" do
         @cm.copy_options = {
-          all_pace_plans: true,
+          all_course_paces: true,
           context_modules: { mig_id(@mod1) => true }
         }
         run_course_copy
 
-        pace_plan_to = @copy_to.pace_plans.where(workflow_state: "unpublished").take
-        expect(pace_plan_to.pace_plan_module_items.count).to eq 1
+        course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
+        expect(course_pace_to.course_pace_module_items.count).to eq 1
       end
     end
   end
