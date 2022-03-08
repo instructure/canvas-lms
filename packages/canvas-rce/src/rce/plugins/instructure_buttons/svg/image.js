@@ -67,6 +67,8 @@ export function transformForShape(shape, size) {
       return transformForTriangle(size)
     case Shape.Star:
       return transformForStar(size)
+    case Shape.Square:
+      return transformForSquare(size)
     default:
       return transformForDefault(size)
   }
@@ -134,6 +136,31 @@ function transformForStar(size) {
         ...transformForDefault(size),
         ...dimensionAttrsFor(72),
         y: '55%'
+      }
+  }
+}
+
+function transformForSquare(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(60)
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(108)
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(142)
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(200)
       }
   }
 }

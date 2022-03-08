@@ -173,6 +173,62 @@ describe('transformShape()', () => {
     })
   })
 
+  describe('when the shape is a square', () => {
+    beforeEach(() => (shape = Shape.Square))
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 60,
+          height: 60,
+          translateX: -30,
+          translateY: -30
+        })
+      })
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 108,
+          height: 108,
+          translateX: -54,
+          translateY: -54
+        })
+      })
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 142,
+          height: 142,
+          translateX: -71,
+          translateY: -71
+        })
+      })
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 200,
+          height: 200,
+          translateX: -100,
+          translateY: -100
+        })
+      })
+    })
+  })
+
   describe('when no transform overrides are set (default case)', () => {
     beforeEach(() => {
       shape = 'default'
