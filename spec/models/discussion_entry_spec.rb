@@ -112,6 +112,7 @@ describe DiscussionEntry do
       allow(entry).to receive(:message).and_return("<p>hello <span class='mceNonEditable mention' data-mention=#{mentioned_student.id}>@#{mentioned_student.short_name}</span> what's up dude</p>")
       expect { entry.save! }.to change { entry.mentions.count }.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq mentioned_student.id
+      expect(entry.mentioned_users.count).to eq 1
     end
 
     describe "edits to an entry" do
