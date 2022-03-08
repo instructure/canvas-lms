@@ -229,6 +229,62 @@ describe('transformShape()', () => {
     })
   })
 
+  describe('when the shape is a circle', () => {
+    beforeEach(() => (shape = Shape.Circle))
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 54,
+          height: 54,
+          translateX: -27,
+          translateY: -27
+        })
+      })
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 100,
+          height: 100,
+          translateX: -50,
+          translateY: -50
+        })
+      })
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 132,
+          height: 132,
+          translateX: -66,
+          translateY: -66
+        })
+      })
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 180,
+          height: 180,
+          translateX: -90,
+          translateY: -90
+        })
+      })
+    })
+  })
+
   describe('when no transform overrides are set (default case)', () => {
     beforeEach(() => {
       shape = 'default'
