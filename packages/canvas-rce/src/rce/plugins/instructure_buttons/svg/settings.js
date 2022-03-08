@@ -55,6 +55,28 @@ export function useSvgSettings(editor, editing) {
   const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
   const [status, setStatus] = useState(statuses.IDLE)
 
+  const buildFilesUrl = (urlFromNode, host) => {
+    // http://canvas.docker/files/2169/download?download_frd=1&amp;buttons_and_icons=1
+
+    // Parse out the file ID from something like
+    // /courses/1/files/3/preview?...
+    const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
+    const downloadURL = new URL(`${host}/files/${fileId}/download`)
+
+    // Adding the Course ID to the request causes Canvas to follow the chain
+    // of files that were uploaded and "replaced" previous versions of the file.
+    downloadURL.searchParams.append('replacement_chain_context_type', 'course')
+    downloadURL.searchParams.append('replacement_chain_context_id', ENV.COURSE_ID)
+
+    // Prevent the browser from using an old cached SVGs
+    downloadURL.searchParams.append('ts', Date.now())
+
+    // Yes, we want do download for real dude
+    downloadURL.searchParams.append('download_frd', 1)
+
+    return downloadURL.toString()
+  }
+
   const urlFromNode = getImageNode(editor)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
 
   useEffect(() => {
@@ -64,26 +86,10 @@ export function useSvgSettings(editor, editing) {
       try {
         setStatus(statuses.LOADING)
 
-        let downloadURL
-        try {
-          downloadURL = new URL(urlFromNode)
-        } catch (error) {
-          // The URL was likely relative. This happens after course
-          // content goes through a course copy or other content migration.
-          // Add the domain to the URL from the JS ENV.
-          downloadURL = new URL(`${ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}${urlFromNode}`)
-        }
-
-        // Adding the Course ID to the request causes Canvas to follow the chain
-        // of files that were uploaded and "replaced" previous versions of the file.
-        downloadURL.searchParams.append('replacement_chain_context_type', 'course')
-        downloadURL.searchParams.append('replacement_chain_context_id', ENV.COURSE_ID)
-
-        // Prevent the browser from using an old cached SVGs
-        downloadURL.searchParams.append('ts', Date.now())
+        const downloadUrl = buildFilesUrl(urlFromNode, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
 
         // Parse SVG. If no SVG found, return defaults
-        const svg = await svgFromUrl(downloadURL.toString())
+        const svg = await svgFromUrl(downloadUrl)
         if (!svg) return
 
         // Parse metadata. If no metadata found, return defaults
