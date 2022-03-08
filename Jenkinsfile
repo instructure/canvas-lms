@@ -354,6 +354,8 @@ pipeline {
                   return
                 } else if (extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
                   gerrit.submitLintReview('-2', 'One or more build flags causes a subset of the build to be run')
+                } else if (setupStage.hasGemOverrides()) {
+                  gerrit.submitLintReview('-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
                 } else {
                   gerrit.submitLintReview('0')
                 }
@@ -604,7 +606,7 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL}"),
+                      string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL || setupStage.hasGemOverrides()}"),
                       string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
                       string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
                     ])
