@@ -105,8 +105,17 @@ module Importers
         file_id = context.attachments.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
         if file_id
           rest = link[:rest].presence || "/preview"
-          link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"
-          link[:new_value] = "/media_objects_iframe?mediahref=#{link[:new_value]}" if link[:in_media_iframe]
+
+          # Button and Icon files should not have the course
+          # context prepended to the URL. This prevents
+          # redirects to non cross-origin friendly urls
+          # during a file fetch
+          if rest.include?("buttons_and_icons=1")
+            link[:new_value] = "/files/#{file_id}#{rest}"
+          else
+            link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"
+            link[:new_value] = "/media_objects_iframe?mediahref=#{link[:new_value]}" if link[:in_media_iframe]
+          end
         end
       else
         raise "unrecognized link_type in unresolved link"

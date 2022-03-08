@@ -128,7 +128,6 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Réduire pour masquer { types }"
   },
-  "color_color_eb64b08": { "message": "Couleur { color }" },
   "computer_1d7dfa6f": { "message": "Ordinateur" },
   "content_1440204b": { "message": "Contenu" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {

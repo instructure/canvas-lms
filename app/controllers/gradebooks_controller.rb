@@ -149,7 +149,8 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency
+      outcome_proficiency: outcome_proficiency,
+      outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
     }
 
     # This really means "if the final grade override feature flag is enabled AND
@@ -590,7 +591,10 @@ class GradebooksController < ApplicationController
       version: params.fetch(:version, nil)
     }
 
-    js_env({ GRADEBOOK_OPTIONS: gradebook_options })
+    js_env({
+             GRADEBOOK_OPTIONS: gradebook_options,
+             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
+           })
   end
 
   def set_learning_mastery_env
@@ -612,7 +616,8 @@ class GradebooksController < ApplicationController
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
                IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb)
-             }
+             },
+             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
            })
   end
 
@@ -1541,5 +1546,9 @@ class GradebooksController < ApplicationController
 
   def allow_apply_score_to_ungraded?
     @context.account.feature_enabled?(:apply_score_to_ungraded)
+  end
+
+  def outcome_service_results_to_canvas_enabled?
+    @context.feature_enabled?(:outcome_service_results_to_canvas)
   end
 end

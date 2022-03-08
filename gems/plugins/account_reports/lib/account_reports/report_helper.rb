@@ -302,12 +302,12 @@ module AccountReports::ReportHelper
     )
   end
 
-  def write_report(headers, enable_i18n_features = false, &block)
-    file = generate_and_run_report(headers, "csv", enable_i18n_features, &block)
+  def write_report(headers, enable_i18n_features = false, replica = :report, &block)
+    file = generate_and_run_report(headers, "csv", enable_i18n_features, replica, &block)
     GuardRail.activate(:primary) { send_report(file) }
   end
 
-  def generate_and_run_report(headers = nil, extension = "csv", enable_i18n_features = false)
+  def generate_and_run_report(headers = nil, extension = "csv", enable_i18n_features = false, replica = :report)
     file = AccountReports.generate_file(@account_report, extension)
     options = {}
     if enable_i18n_features
@@ -316,7 +316,7 @@ module AccountReports::ReportHelper
     ExtendedCSV.open(file, "w", **options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
-      activate_report_db { yield csv } if block_given?
+      activate_report_db(replica: replica) { yield csv } if block_given?
       GuardRail.activate(:primary) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
@@ -449,7 +449,7 @@ module AccountReports::ReportHelper
 
   def write_report_from_rows(headers, replica: :report)
     activate_report_db(replica: replica) do
-      write_report(headers) do |csv|
+      write_report(headers, false, replica) do |csv|
         @account_report.account_report_rows.order(:account_report_runner_id, :row_number)
                        .find_in_batches(strategy: :cursor) do |batch|
           batch.each { |record| csv << record.row }
@@ -463,7 +463,7 @@ module AccountReports::ReportHelper
     activate_report_db(replica: replica) do
       files.each do |file, headers_for_file|
         csvs[file] = if @account_report.account_report_rows.where(file: file).exists?
-                       generate_and_run_report(headers_for_file) do |csv|
+                       generate_and_run_report(headers_for_file, "csv", false, replica) do |csv|
                          @account_report.account_report_rows.where(file: file)
                                         .order(:account_report_runner_id, :row_number)
                                         .find_in_batches(strategy: :cursor) do |batch|
@@ -471,7 +471,7 @@ module AccountReports::ReportHelper
                          end
                        end
                      else
-                       generate_and_run_report(headers_for_file)
+                       generate_and_run_report(headers_for_file, "csv", false, replica)
                      end
       end
     end
