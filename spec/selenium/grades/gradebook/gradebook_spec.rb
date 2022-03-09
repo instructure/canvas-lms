@@ -417,4 +417,14 @@ describe "Gradebook" do
       expect(grading_cell).not_to contain_css(".icon-not-graded")
     end
   end
+
+  context "export" do
+    it "exports the gradebook and displays a flash message when successfully started" do
+      Gradebook.visit(@course)
+      Gradebook.action_menu.click
+      Gradebook.action_menu_item_selector("export").click
+
+      expect_flash_message :success, "Gradebook export started"
+    end
+  end
 end
