@@ -110,8 +110,6 @@ export function useSvgSettings(editor, editing) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-    // Otherwise, fetch default settings to set us back to creating
-    else dispatch(defaultState)
   }, [editor, editing, urlFromNode])
 
   return [settings, status, dispatch]
