@@ -511,12 +511,12 @@ describe Folder do
         }.from(0).to(1)
       end
 
-      it "creates a folder with a default name of 'Buttons and Icons'" do
-        expect(subject.name).to eq "Buttons and Icons"
+      it "creates a folder with a default name of 'Icon Maker Icons'" do
+        expect(subject.name).to eq "Icon Maker Icons"
       end
     end
 
-    context "when a 'Buttons and Icons' folder already exists" do
+    context "when an 'Icon Maker Icons' folder already exists" do
       before do
         @existing_folder = Folder.buttons_and_icons_folder(course)
       end

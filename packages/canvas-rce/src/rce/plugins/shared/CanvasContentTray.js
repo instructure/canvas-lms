@@ -48,7 +48,7 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
 
   switch (contentSubtype) {
     case BUTTONS_AND_ICONS:
-      return formatMessage('Buttons and Icons')
+      return formatMessage('Icon Maker Icons')
     case 'images':
       if (contentType === 'course_files') return formatMessage('Course Images')
       if (contentType === 'group_files') return formatMessage('Group Images')
