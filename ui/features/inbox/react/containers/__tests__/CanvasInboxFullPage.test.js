@@ -168,7 +168,7 @@ describe('CanvasInbox Full Page', () => {
       )
     })
 
-    it.skip('Successfully star selected conversations', async () => {
+    it('Successfully star selected conversations', async () => {
       server.use(
         graphql.query('GetConversationsQuery', (req, res, ctx) => {
           const data = {

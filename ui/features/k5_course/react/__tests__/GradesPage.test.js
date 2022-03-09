@@ -231,6 +231,8 @@ describe('GradesPage', () => {
         JSON.stringify(MOCK_ASSIGNMENT_GROUPS)
       )
       fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=2`, JSON.stringify(MOCK_ENROLLMENTS))
+      fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
     })
 
     it('shows a grading period select when grading periods are returned', async () => {

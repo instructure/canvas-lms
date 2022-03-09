@@ -140,6 +140,12 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "A Tennivaló Listád Elkezdése"
     },
+    "blue_daf8fea9": {
+        "message": "Kék"
+    },
+    "brick_f2656265": {
+        "message": "Tégla"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -272,6 +278,9 @@
     "custom_6979cd81": {
         "message": "Egyéni"
     },
+    "cyan_c1d5f68a": {
+        "message": "Cián"
+    },
     "date_added_ed5ad465": {
         "message": "Dátum hozzáadva"
     },
@@ -295,6 +304,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Behúzás csökkentése"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Sötétlila"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "alapértelmezett nem rendezett lista"
@@ -533,6 +545,9 @@
     "greek_65c5b3f7": {
         "message": "Görög"
     },
+    "green_15af4778": {
+        "message": "Zöld"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Csoport dokumentumok"
     },
@@ -596,6 +611,9 @@
     "increase_indent_6d550a4a": {
         "message": "Behúzás növelése"
     },
+    "indigo_2035fc55": {
+        "message": "Indigókék"
+    },
     "insert_593145ef": {
         "message": "Beszúrás"
     },
@@ -637,6 +655,9 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Balról jobbra"
+    },
+    "light_blue_5374f600": {
+        "message": "Világoskék"
     },
     "link_7262adec": {
         "message": "Hivatkozás"
@@ -700,6 +721,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Úgy tűnik, itt nincsen semmi."
+    },
+    "magenta_4a65993c": {
+        "message": "Magenta"
     },
     "media_af190855": {
         "message": "Média"
@@ -824,6 +848,9 @@
     "options_3ab0ea65": {
         "message": "Beállítások"
     },
+    "orange_81386a62": {
+        "message": "Narancs"
+    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Rendezett és Rendezetlen Listák"
     },
@@ -853,6 +880,9 @@
     },
     "percentage_34ab7c2c": {
         "message": "Százalék"
+    },
+    "pink_68ad45cb": {
+        "message": "Rózsaszín"
     },
     "points_bceb5005": {
         "message": "pontszám"
@@ -887,6 +917,12 @@
     "published_when_302d8e23": {
         "message": "Publikálva: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Sütőtök"
+    },
+    "purple_7678a9fc": {
+        "message": "Lila"
+    },
     "quiz_e0dcce8f": {
         "message": "Kvíz"
     },
@@ -901,6 +937,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Médiafájl rögzítése/feltöltése"
+    },
+    "red_8258edf3": {
+        "message": "Vörös"
     },
     "relationships_6602af70": {
         "message": "Kapcsolatok"
@@ -1036,6 +1075,9 @@
     },
     "task_16b0ef38": {
         "message": "Feladat"
+    },
+    "teal_f729a294": {
+        "message": "Kékeszöld"
     },
     "text_7f4593da": {
         "message": "Szöveg"

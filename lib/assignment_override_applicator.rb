@@ -161,9 +161,11 @@ module AssignmentOverrideApplicator
       scope = if visible_user_ids.is_a?(ActiveRecord::Relation)
                 return adhoc_overrides if visible_user_ids.is_a?(ActiveRecord::NullRelation)
 
-                scope
-                  .joins("INNER JOIN #{Enrollment.quoted_table_name} ON assignment_override_students.user_id=enrollments.user_id")
-                  .merge(visible_user_ids.except(:select))
+                visible_user_ids.primary_shard.activate do
+                  scope
+                    .joins("INNER JOIN #{Enrollment.quoted_table_name} ON assignment_override_students.user_id=enrollments.user_id")
+                    .merge(visible_user_ids.except(:select))
+                end
               else
                 scope.where(user_id: visible_user_ids)
               end

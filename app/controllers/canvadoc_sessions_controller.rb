@@ -20,6 +20,7 @@
 
 class CanvadocSessionsController < ApplicationController
   include CanvadocsHelper
+  include CoursesHelper
   include HmacHelper
 
   def create
@@ -100,13 +101,15 @@ class CanvadocSessionsController < ApplicationController
       end
 
       if opts[:enable_annotations]
+        assignment = submission.assignment
         # Docviewer only cares about the enrollment type when we're doing annotations
-        opts[:enrollment_type] = blob["enrollment_type"]
         opts[:disable_annotation_notifications] = blob["disable_annotation_notifications"] || false
+        # We need to have another mechanism in which we can set enrollment type in the case
+        # that it's not provided in the params from a valid context i.e. ePortfolios
+        opts[:enrollment_type] = blob["enrollment_type"] || user_type(assignment.context, @current_user)
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: "unauthorized", status: :unauthorized) if opts[:enrollment_type].blank?
 
-        assignment = submission.assignment
         # If we're doing annotations, DocViewer needs additional information to send notifications
         opts[:canvas_base_url] = assignment.course.root_account.domain
         opts[:user_id] = @current_user.id

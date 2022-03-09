@@ -131,7 +131,7 @@ describe "blueprint courses - file locking" do
       options_text = options_panel
       expect(options_text).to include_text("Download")
       expect(options_text).to include_text("Rename")
-      expect(options_text).to include_text("Move")
+      expect(options_text).to include_text("Move To...")
       expect(options_text).to include_text("Delete")
     end
 
@@ -153,7 +153,7 @@ describe "blueprint courses - file locking" do
       options_text = options_panel
       expect(options_text).to include_text("Download")
       expect(options_text).to include_text("Rename")
-      expect(options_text).to include_text("Move")
+      expect(options_text).to include_text("Move To...")
       expect(options_text).to include_text("Delete")
     end
 
@@ -169,7 +169,7 @@ describe "blueprint courses - file locking" do
       options_text = options_panel
       expect(options_text).to include_text("Download")
       expect(options_text).to include_text("Rename")
-      expect(options_text).to include_text("Move")
+      expect(options_text).to include_text("Move To...")
       expect(options_text).to include_text("Delete")
     end
 
@@ -183,7 +183,7 @@ describe "blueprint courses - file locking" do
       options_text = options_panel
       expect(options_text).to include_text("Download")
       expect(options_text).to include_text("Rename")
-      expect(options_text).to include_text("Move")
+      expect(options_text).to include_text("Move To...")
       expect(options_text).to include_text("Delete")
     end
   end

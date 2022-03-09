@@ -31,8 +31,8 @@ module Gradebook
       f("#SubmissionTray__Content")
     end
 
-    def self.close_tray_button
-      fj("button:contains('Close submission tray')")
+    def self.click_close_tray_button
+      force_click("button:contains('Close submission tray')")
     end
 
     def self.avatar

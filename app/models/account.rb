@@ -384,7 +384,7 @@ class Account < ActiveRecord::Base
                 new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
                                         Canvas::Plugin.value_to_boolean(inner_val)
                                       else
-                                        inner_val.to_s
+                                        inner_val.to_s.presence
                                       end
               end
             end
@@ -392,13 +392,13 @@ class Account < ActiveRecord::Base
           elsif opts[:boolean]
             settings[key] = Canvas::Plugin.value_to_boolean(val)
           else
-            settings[key] = val.to_s
+            settings[key] = val.to_s.presence
           end
         end
       end
     end
     # prune nil or "" hash values to save space in the DB.
-    settings.reject! { |_, value| value.nil? || value == "" }
+    settings.reject! { |_, value| value.nil? || value == { value: nil } || value == { value: nil, locked: false } }
     settings
   end
 
@@ -2037,8 +2037,8 @@ class Account < ActiveRecord::Base
     :closed
   end
 
-  scope :root_accounts, -> { where(root_account_id: [0, nil]).where.not(id: 0) }
-  scope :non_root_accounts, -> { where.not(root_account_id: [0, nil]) }
+  scope :root_accounts, -> { where("(accounts.root_account_id = 0 OR accounts.root_account_id IS NULL) AND accounts.id != 0") }
+  scope :non_root_accounts, -> { where("(accounts.root_account_id != 0 AND accounts.root_account_id IS NOT NULL)") }
   scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
   scope :name_like, ->(name) { where(wildcard("accounts.name", name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
