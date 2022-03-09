@@ -701,6 +701,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def update_course_pace_module_items
+    return if tag_type == "learning_outcome_association"
+
     course = context.is_a?(Course) ? context : context.try(:course)
     return unless course
 

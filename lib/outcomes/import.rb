@@ -160,7 +160,8 @@ module Outcomes
         )
       end
 
-      parents = find_parents(outcome, context, allow_indirect: outcome.key?(:course_id))
+      allow_indirect = outcome.key?(:course_id)
+      parents = find_parents(outcome, context, allow_indirect: allow_indirect)
 
       if model.outcome_import_id == outcome_import_id
         raise InvalidDataError, I18n.t(
@@ -199,7 +200,7 @@ module Outcomes
       end
 
       parents = [] if outcome[:workflow_state] == "deleted"
-      update_outcome_parents(model, parents)
+      update_outcome_parents(model, parents, allow_indirect: allow_indirect)
 
       if outcome[:friendly_description].present?
         fd = OutcomeFriendlyDescription.find_or_create_by(context: model.context, learning_outcome: model)
@@ -298,16 +299,14 @@ module Outcomes
         return group
       end
 
-      guids = object[:parent_guids].strip.split
+      guids = object[:parent_guids].strip.split.uniq
       possible_parents = LearningOutcomeGroup.where(outcome_import_id: outcome_import_id, vendor_guid: guids)
 
-      possible_parents = if allow_indirect
-                           possible_parents.filter { |g| child_context?(g.context) }
-                         else
-                           possible_parents.where(context: given_context)
-                         end
+      # If allow_indirect is true, we could `filter{|g| child_context?(g.context) }`, but it is costly and
+      # redundant (since outcome_import_id matching is already enforced)
+      possible_parents = possible_parents.where(context: given_context) unless allow_indirect
 
-      found_guids = possible_parents.map(&:vendor_guid).uniq
+      found_guids = possible_parents.distinct.pluck(:vendor_guid)
       if found_guids.length < guids.length
         missing = guids - found_guids
         raise InvalidDataError, I18n.t(
@@ -325,10 +324,11 @@ module Outcomes
       of == child || child.account_chain.include?(of)
     end
 
-    def update_outcome_parents(outcome, parents)
-      existing_links = ContentTag.learning_outcome_links.where(context: outcome.context, content: outcome)
+    def update_outcome_parents(outcome, parents, allow_indirect: false)
+      next_parent_ids = parents.pluck(:id)
+      existing_links = ContentTag.learning_outcome_links.where(content: outcome)
+      existing_parent_ids = existing_links.pluck(:associated_asset_id)
 
-      next_parent_ids = parents.map(&:id)
       resurrect = existing_links
                   .where(associated_asset_id: next_parent_ids)
                   .where(associated_asset_type: "LearningOutcomeGroup")
@@ -337,19 +337,53 @@ module Outcomes
 
       # add new parents before removing old to avoid deleting last link
       # to an aligned outcome
-      existing_parent_ids = existing_links.pluck(:associated_asset_id)
-      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
-      new_parents.each { |p| p.add_outcome(outcome) }
+      new_parent_ids = Set.new(next_parent_ids) - existing_parent_ids
+      new_parent_ids.each_slice(1000) do |batch|
+        LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: batch), root_account_id: root_account_id)
+      end
 
       kill = existing_links
              .where.not(associated_asset_id: next_parent_ids)
              .where(associated_asset_type: "LearningOutcomeGroup")
              .where(workflow_state: "active")
-      kill.destroy_all
+
+      # The kill list needs additional scoping logic because (unlike the above cases) it can't leverage the scoping of next_parent_ids
+      if allow_indirect && context.is_a?(Account)
+        subaccount_ids = Account.sub_account_ids_recursive(context.id)
+        kill = kill.where(context: [Account.where(id: [context.id, subaccount_ids]), Course.where(account_id: subaccount_ids)])
+      else
+        kill = kill.where(context: outcome.context)
+      end
+
+      found_keeper = false
+      kill.in_batches(of: 1000) do |kill_batch|
+        undeletable_ids = kill_batch.joins(<<~SQL.squish).pluck(:id)
+          INNER JOIN #{ContentTag.quoted_table_name} associations
+            ON associations.tag_type = 'learning_outcome'
+            AND associations.learning_outcome_id = content_tags.content_id
+            AND associations.context_id = content_tags.context_id
+            AND associations.context_type = content_tags.context_type
+        SQL
+        found_keeper ||= undeletable_ids.present?
+        kill_batch.where.not(id: undeletable_ids).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+      end
+
+      unless found_keeper || new_parent_ids.present? || ContentTag.learning_outcome_links.active.where(content: outcome).present?
+        outcome.destroy
+      end
     end
 
     def outcome_import_id
       @outcome_import_id ||= @import&.id || SecureRandom.random_number(2**32)
+    end
+
+    def root_account_id
+      case context
+      when Account
+        context.resolved_root_account_id
+      else
+        context&.root_account_id
+      end
     end
   end
 end

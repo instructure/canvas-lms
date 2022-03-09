@@ -468,6 +468,16 @@ RSpec.describe Outcomes::Import do
         end.to raise_error(klass::InvalidDataError, /Parent references not found/)
       end
 
+      # NB: We _could_ add a "does not find parents from another context if allow_indirect" spec here, but
+      # the importer simplifies that by just checking that "outcome_import_id is same" (which is already specced)
+
+      it "finds parents from child context if allow_indirect" do
+        parent1.update! context: other_context
+        importer.import_outcome(**outcome_attributes, course_id: nil, parent_guids: "parent1")
+        expect(parent1.child_outcome_links.active.map(&:content)).to include existing_outcome
+        expect(parent2.child_outcome_links.active.map(&:content)).to be_empty
+      end
+
       it "reassigns parents of existing outcome" do
         parent1.add_outcome(existing_outcome)
         importer.import_outcome(**outcome_attributes, parent_guids: "parent2")
