@@ -85,7 +85,10 @@ describe("I18nliner", function() {
         absolute_key: "Absolute key",
         inferred_key_c49e3743: "Inferred key",
         esm: {
-          my_key: 'Hello world'
+          my_key: 'Hello world',
+          nested: {
+            relative_key: "Relative key in nested scope"
+          },
         },
         foo: {
           relative_key: "Relative key"
@@ -93,11 +96,7 @@ describe("I18nliner", function() {
         bar: {
           relative_key: "Another relative key"
         },
-        nested: {
-          relative_key: "Relative key in nested scope"
-        },
         yay_coffee_d4d65736: 'yay coffee',
-        yay_jsx_49700f4a: 'yay jsx',
         yay_typescript_2a26bb91: 'yay typescript'
       });
     });
