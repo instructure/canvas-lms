@@ -727,9 +727,10 @@ describe ContextExternalTool do
     let(:tool) { external_tool_model }
     let(:content_tag_opts) { { url: tool.url, content_type: "ContextExternalTool", context: assignment } }
     let(:content_tag) { ContentTag.new(content_tag_opts) }
-
+    let(:developer_key) { DeveloperKey.create! }
     let(:lti_1_3_tool) do
       t = tool.dup
+      t.developer_key_id = developer_key.id
       t.use_1_3 = true
       t.save!
       t
@@ -1031,9 +1032,11 @@ describe ContextExternalTool do
       end
 
       it "does not return preferred tool if it is 1.1 and there is a matching 1.3 tool" do
+        developer_key = DeveloperKey.create!
         @tool1_1 = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @tool1_3 = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @tool1_3.settings[:use_1_3] = true
+        @tool1_3.developer_key = developer_key
         @tool1_3.save!
 
         @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
@@ -1046,6 +1049,7 @@ describe ContextExternalTool do
         @tool1_1 = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @tool1_3 = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @tool1_3.settings[:use_1_3] = true
+        @tool1_3.developer_key = developer_key
         @tool1_3.save!
         @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
         expect(@found_tool).to eql(@tool1_3)
@@ -1099,8 +1103,9 @@ describe ContextExternalTool do
         let(:requested_url) { "" }
         let(:url) { "https://www.test.com/foo?bar=1" }
         let(:lti_1_1_tool) { external_tool_model(context: context, opts: opts) }
+        let(:developer_key) { DeveloperKey.create! }
         let(:lti_1_3_tool) do
-          t = external_tool_model(context: context, opts: opts)
+          t = external_tool_model(context: context, opts: opts.merge({ developer_key_id: developer_key.id }))
           t.use_1_3 = true
           t.save!
           t
@@ -1155,6 +1160,201 @@ describe ContextExternalTool do
           url, @course, nil, nil, tool2.developer_key.id
         )
         expect(external_tool).to eq tool2
+      end
+    end
+  end
+
+  describe "find_and_order_tools" do
+    subject do
+      ContextExternalTool.find_and_order_tools(@course, preferred_tool_id, exclude_tool_id, preferred_client_id).to_a
+    end
+
+    let(:tool1) { external_tool_model(context: @course, opts: { name: "tool1" }) }
+    let(:tool2) { external_tool_model(context: @course, opts: { name: "tool2" }) }
+    let(:tool3) { external_tool_model(context: @course, opts: { name: "tool3" }) }
+    let(:tools) { [tool1, tool2, tool3] }
+    let(:preferred_tool_id) { nil }
+    let(:exclude_tool_id) { nil }
+    let(:preferred_client_id) { nil }
+    let(:key) { DeveloperKey.create! }
+
+    before do
+      # initialize tools
+      tools
+    end
+
+    context "when tool is deleted" do
+      before do
+        tool1.destroy
+      end
+
+      it "is not included" do
+        expect(subject).not_to include(tool1)
+      end
+    end
+
+    context "when tool is from separate context" do
+      let(:other_tool) { external_tool_model(context: Course.create!) }
+
+      it "does not include tools from separate contexts" do
+        expect(subject).not_to include(other_tool)
+      end
+    end
+
+    context "when exclude_tool_is is provided" do
+      let(:exclude_tool_id) { tool2.id }
+
+      it "does not include tool with that id" do
+        expect(subject).not_to include(tool2)
+      end
+    end
+
+    context "when preferred_client_id is provided" do
+      let(:key) { DeveloperKey.create! }
+      let(:other_key) { DeveloperKey.create! }
+      let(:preferred_client_id) { key.id }
+
+      before do
+        tool3.update!(developer_key: key)
+        tool1.update!(developer_key: other_key)
+      end
+
+      it "includes tool from that developer key" do
+        expect(subject).to include(tool3)
+      end
+
+      it "does not include a tool from other developer key" do
+        expect(subject).not_to include(tool1)
+      end
+
+      it "does not include tool without developer key" do
+        expect(subject).not_to include(tool2)
+      end
+    end
+
+    context "with tools in the context chain" do
+      let(:account_tool) { external_tool_model(context: @course.account, opts: { name: "Account Tool" }) }
+
+      before do
+        tool2.destroy
+        tool3.destroy
+        account_tool
+      end
+
+      it "sorts tool from immediate context to the front" do
+        expect(subject.first).to eq tool1
+      end
+
+      it "sorts tool from farthest context to the back" do
+        expect(subject.last).to eq account_tool
+      end
+    end
+
+    context "with tools that have subdomains and urls" do
+      before do
+        tool2.update!(domain: "c.b.a.com")
+        tool3.update!(domain: "a.com")
+        tool1.update!(url: "https://a.com/launch")
+      end
+
+      it "sorts tools with more subdomains to the front" do
+        expect(subject.first).to eq tool2
+      end
+
+      it "sorts tools with fewer subdomains to the back" do
+        expect(subject.second).to eq tool3
+      end
+
+      it "sorts tools with url and no domain to the back" do
+        expect(subject.last).to eq tool1
+      end
+    end
+
+    context "with different LTI versions" do
+      before do
+        tool3.developer_key_id = key.id
+        tool3.use_1_3 = true
+        tool3.save!
+      end
+
+      it "sorts 1.3 tools to the front" do
+        expect(subject.first).to eq tool3
+      end
+
+      it "sorts 1.1 tools to the back" do
+        expect(subject.last).to eq tool2
+      end
+    end
+
+    context "with duplicate tools" do
+      before do
+        tool2.update!(name: "tool1")
+      end
+
+      it "sorts non-duplicate tools to the front" do
+        expect(subject.first).to eq tool1
+      end
+
+      it "sorts duplicate tools to the back" do
+        expect(subject.last).to eq tool2
+      end
+    end
+
+    context "when preferred_tool_id is provided" do
+      let(:preferred_tool_id) { tool2.id }
+
+      it "sorts tool with that id to the front" do
+        expect(subject.first).to eq tool2
+      end
+    end
+
+    context "with many tools that mix all ordering conditions" do
+      before do
+        tool3.developer_key_id = key.id
+        tool3.use_1_3 = true
+        tool3.domain = "c.com"
+        tool3.save!
+
+        tool1.developer_key_id = key.id
+        tool1.use_1_3 = true
+        tool1.domain = "a.b.c.com"
+        tool1.save
+
+        account_tool.developer_key_id = key.id
+        account_tool.use_1_3 = true
+        account_tool.domain = "b.c.com"
+        account_tool.save!
+
+        lti1tool
+        preferred_tool
+      end
+
+      let(:account_tool) { external_tool_model(context: @course.account, opts: { name: "Account Tool" }) }
+      let(:lti1tool) do
+        t = tool1.dup
+        t.developer_key_id = nil
+        t.use_1_3 = false
+        t.domain = "b.c.com"
+        t.save!
+        t
+      end
+      let(:preferred_tool) do
+        t = tool1.dup
+        t.name = "preferred"
+        t.save!
+        t
+      end
+      let(:preferred_tool_id) { preferred_tool.id }
+
+      it "sorts tools in order of order clauses" do
+        expect(subject.map(&:id)).to eq [
+          preferred_tool,
+          tool1,
+          tool3,
+          account_tool,
+          lti1tool,
+          tool2,
+        ].map(&:id)
       end
     end
   end
