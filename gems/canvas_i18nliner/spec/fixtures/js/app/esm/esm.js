@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,10 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var HtmlReporter = require('jasmine-pretty-html-reporter').Reporter;
-var path = require('path');
+import I18n from 'i18n!esm'
 
-// options object
-jasmine.getEnv().addReporter(new HtmlReporter({
-  path: path.join(__dirname,'../../../../tmp/spec_results')
-}));
+I18n.t('my_key', 'Hello world')
