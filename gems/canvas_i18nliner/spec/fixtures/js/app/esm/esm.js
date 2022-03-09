@@ -16,6 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!esm'
+import { useScope } from '@canvas/i18n'
+
+const I18n = useScope('esm')
 
 I18n.t('my_key', 'Hello world')
+I18n.t("#absolute_key", "Absolute key");
+I18n.t("Inferred key");
+I18n.t("nested.relative_key", "Relative key in nested scope");
+
+function a() {
+  const I18n = useScope('foo')
+  I18n.t("relative_key", "Relative key");
+}
+
+function b() {
+  const I18n = useScope('bar')
+  I18n.t("relative_key", "Another relative key");
+}
