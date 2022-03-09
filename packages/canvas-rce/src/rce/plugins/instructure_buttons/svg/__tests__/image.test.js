@@ -28,8 +28,70 @@ describe('transformShape()', () => {
   describe('when the shape is a pentagon', () => {
     beforeEach(() => (shape = Shape.Pentagon))
 
-    it('uses "55%" for the Y position', () => {
-      expect(subject().y).toEqual('55%')
+    function sharedExamplesForPentagon() {
+      it('uses "55%" for the Y position', () => {
+        expect(subject().y).toEqual('55%')
+      })
+    }
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 40,
+          height: 40,
+          translateX: -20,
+          translateY: -20
+        })
+      })
+
+      sharedExamplesForPentagon()
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 80,
+          height: 80,
+          translateX: -40,
+          translateY: -40
+        })
+      })
+
+      sharedExamplesForPentagon()
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 110,
+          height: 110,
+          translateX: -55,
+          translateY: -55
+        })
+      })
+
+      sharedExamplesForPentagon()
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 140,
+          height: 140,
+          translateX: -70,
+          translateY: -70
+        })
+      })
+
+      sharedExamplesForPentagon()
     })
   })
 
