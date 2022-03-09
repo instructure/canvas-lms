@@ -28,7 +28,11 @@ export const statuses = {
   IDLE: 'idle'
 }
 
-const getImageNode = editor => {
+const getImageNode = (editor, editing) => {
+  // If the user is creating a button rather then editing, no sense trying
+  // to get an existing SVG URL
+  if (!editing) return
+
   const selectedNode = editor?.selection?.getNode()
 
   // No selection made, return
@@ -77,7 +81,7 @@ export function useSvgSettings(editor, editing) {
     return downloadURL.toString()
   }
 
-  const urlFromNode = getImageNode(editor)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
+  const urlFromNode = getImageNode(editor, editing)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
 
   useEffect(() => {
     const fetchSvgSettings = async () => {
@@ -106,8 +110,6 @@ export function useSvgSettings(editor, editing) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-    // Otherwise, fetch default settings to set us back to creating
-    else dispatch(defaultState)
   }, [editor, editing, urlFromNode])
 
   return [settings, status, dispatch]
