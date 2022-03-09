@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2022 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,24 +16,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-require "selenium-webdriver"
-
-module Selenium
-  module WebDriver
-    module Remote
-      class Bridge
-        def log(type)
-          command(:get_log, "session/:session_id/log", :post)
-          data = execute :get_log, {}, { type: type.to_s }
-
-          Array(data).map do |l|
-            LogEntry.new l.fetch("level", "UNKNOWN"), l.fetch("timestamp"), l.fetch("message")
-          rescue KeyError
-            next
-          end
-        end
-      end
+module DynamicSettings
+  class NullRequestCache
+    def cache(*_args)
+      yield
     end
   end
 end

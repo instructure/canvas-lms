@@ -259,6 +259,30 @@ describe Api::V1::AssignmentOverride do
       expect(AssignmentOverride).to receive(:visible_enrollments_for).once.and_return(Enrollment.none)
       assignment_overrides_json
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "does not break when running for a teacher on a different shard while preloading adhoc overrides" do
+        @shard1.activate do
+          account = Account.create!
+
+          @student = User.create!
+          @teacher = User.create!
+
+          @cs_course = Course.create!(account: account)
+          @cs_course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
+          @cs_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+
+          @cs_assignment = @cs_course.assignments.create name: "assignment1"
+
+          @adhoc_override = assignment_override_model(assignment: @cs_assignment)
+          @adhoc_override.assignment_override_students.create!(user: @student)
+        end
+
+        expect(test_class.new.assignment_overrides_json([@override], @teacher).first[:student_ids]).to eq [@student.id]
+      end
+    end
   end
 
   describe "perform_batch_update_assignment_overrides" do

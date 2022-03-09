@@ -1,4 +1,4 @@
-FROM selenium/standalone-edge:96.0
+FROM selenium/node-edge:98.0
 
 COPY entry_point.sh /opt/bin/custom_entry_point.sh
 USER root

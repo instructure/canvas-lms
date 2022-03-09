@@ -16,6 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import groovy.transform.Field
+
+@Field final static OVERRIDABLE_GEMS = ['inst-jobs', 'switchman', 'switchman-inst-jobs']
+
+def hasGemOverrides() {
+  return OVERRIDABLE_GEMS.any { gem ->
+    return configuration.getString("pin-commit-$gem", "skip") != "skip"
+  }
+}
+
 def call() {
   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
   checkoutRepo('canvas-lms', refspecToCheckout, 100)
@@ -36,6 +46,12 @@ def call() {
   gems.each { gem ->
     if (env.GERRIT_PROJECT != gem) {
       pluginsToPull.add([name: gem, version: _getPluginVersion(gem), target: "gems/plugins/$gem"])
+    }
+  }
+
+  OVERRIDABLE_GEMS.each { gem ->
+    if (configuration.getString("pin-commit-$gem", "skip") != "skip") {
+      pluginsToPull.add([name: gem, version: _getPluginVersion(gem), target: "vendor/$gem"])
     }
   }
 
