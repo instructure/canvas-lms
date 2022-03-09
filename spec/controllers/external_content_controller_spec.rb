@@ -299,7 +299,12 @@ describe ExternalContentController do
 
     before { allow(CanvasHttp).to receive(:get).and_return(success_double) }
 
-    describe "oembed tokens" do
+    it "embeds oembed objects" do
+      expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
+      expect(subject).to be_successful
+    end
+
+    context 'With "use_oembed_token" enabed' do
       let(:oembed_token) do
         unsigned_token = JSON::JWT.new(
           {
@@ -323,6 +328,8 @@ describe ExternalContentController do
       let(:jti) { SecureRandom.uuid }
       let(:params) { { oembed_token: oembed_token } }
       let(:sub) { Lti::Asset.opaque_identifier_for(user) }
+
+      before { Account.site_admin.enable_feature!(:use_oembed_token) }
 
       context "and an active user session" do
         before { user_session(user) }

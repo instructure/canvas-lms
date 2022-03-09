@@ -34,11 +34,7 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
     spec = group.shift
     changed_files = group
 
-    if spec.empty? || changed_files.count.zero?
-      next
-    else
-      "'#{spec}' empty or Has 0 changed files!"
-    end
+    next if spec.empty? || changed_files.count.zero?
 
     # JS files will be added to the map based on the parent directory of the file only
     # TODO: we should have a flag to filter JS at this level
@@ -50,8 +46,6 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
         file
       end
     end
-
-    puts "Adding onto duplicate key! #{spec}" if map_body[spec]
 
     map_body[spec] ||= Set.new
     map_body[spec] << changed_files.uniq

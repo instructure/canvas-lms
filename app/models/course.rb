@@ -1226,9 +1226,7 @@ class Course < ActiveRecord::Base
       self.class.connection.after_transaction_commit do
         Enrollment.where(course_id: self).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
-        # We might get lots of database locks when lots of courses with the same users are being updated,
-        # so we can skip touching those users' updated_at stamp since another process will do it
-        User.touch_and_clear_cache_keys(user_ids, :enrollments, skip_locked: true)
+        User.touch_and_clear_cache_keys(user_ids, :enrollments)
       end
 
       data
@@ -3338,7 +3336,7 @@ class Course < ActiveRecord::Base
     invalid_keys = opts.except(*valid_keys).keys
     raise "invalid options - #{invalid_keys.inspect} (must be in #{valid_keys.inspect})" if invalid_keys.any?
 
-    cast_expression = "val.to_s.presence"
+    cast_expression = "val.to_s"
     cast_expression = "val" if opts[:arbitrary]
     if opts[:boolean]
       opts[:default] ||= false
@@ -3367,12 +3365,7 @@ class Course < ActiveRecord::Base
         if settings_frd[#{setting.inspect}] != new_val
           @changed_settings ||= []
           @changed_settings << #{setting.inspect}
-          if new_val.nil?
-            settings_frd.delete(#{setting.inspect})
-            nil
-          else
-            settings_frd[#{setting.inspect}] = new_val
-          end
+          settings_frd[#{setting.inspect}] = new_val
         end
       end
     RUBY
