@@ -153,6 +153,38 @@ describe LearningOutcomeGroup do
     end
   end
 
+  describe ".bulk_link_outcome" do
+    it "creates a link between the group and an outcome" do
+      group = @course.learning_outcome_groups.create!(title: "groupage")
+      outcome = @course.created_learning_outcomes.create!(title: "o1")
+
+      expect(group.child_outcome_links.map(&:content_id)).not_to include(outcome.id)
+      LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: group.id), root_account_id: Account.default.id)
+      expect(group.reload.child_outcome_links.map(&:content_id)).to include(outcome.id)
+    end
+
+    it "touches context when adding outcome to group" do
+      group = @course.learning_outcome_groups.create!(title: "groupage")
+      outcome = @course.created_learning_outcomes.create!(title: "o1")
+      expect do
+        LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: group.id), root_account_id: Account.default.id)
+      end.to change { group.context.reload.updated_at }
+    end
+
+    it "creates the ContentTag the same as #add_outcome" do
+      group = @course.learning_outcome_groups.create!(title: "groupage")
+      outcome = @course.created_learning_outcomes.create!(title: "o1")
+
+      group.add_outcome(outcome)
+      ct1 = ContentTag.last.as_json["content_tag"].except(:id, :created_at, :updated_at)
+      ContentTag.last.delete
+
+      LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: group.id), root_account_id: Account.default.id)
+      ct2 = ContentTag.last.as_json["content_tag"].except(:id, :created_at, :updated_at)
+      expect(ct2).to eq ct1
+    end
+  end
+
   describe "#add_outcome_group" do
     before do
       @group1 = @course.learning_outcome_groups.create!(title: "group1")
