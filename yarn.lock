@@ -1622,10 +1622,24 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
 
-"@instructure/i18nliner-handlebars@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-1.0.0.tgz#a823bb28b76967540d5e4a3b5d2ca8d60690e821"
-  integrity sha512-ZAAKm/I3Q9qH6l4Hb7dCoKUyEWCi7Z2kkzhdG79pjNPYRYyKxNZN9K+GpkOMceEtOgwTnfdWlkzuOlG6liF7Ug==
+"@instructure/i18nliner-handlebars@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-1.0.3.tgz#0b9f231386bbe013b855a959b35a4e2fe1542095"
+  integrity sha512-4JiqZ+kQUOG6D3Df4/UQOtpG/ZDMYW4vmtkaX4Jlkef/1suvPV3JBEyL2Y9rqY/Xvx6K5wp4i6k3FPs7HeCUUw==
+
+"@instructure/i18nliner@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@instructure/i18nliner/-/i18nliner-2.1.0.tgz#c225797d49882b4a9b10bffc795a664d284b9e3a"
+  integrity sha512-itJCIILSn68y0SjuYNnMfQvG4SvCMVxs6B25ag78lWUV3jaoWMPJ+Lc6ehjDYxI4Uyxac6IYLuyicGRxSZpJKg==
+  dependencies:
+    "@babel/parser" "^7"
+    "@babel/traverse" "^7"
+    cli-color "^1"
+    crc32 "~0.2.2"
+    gglobby "0.0.3"
+    minimist "~1.2.0"
+    mkdirp "~0.5.1"
+    speakingurl "13.0.0"
 
 "@instructure/instructure-theme@^7.14.0":
   version "7.14.0"
@@ -14088,7 +14102,7 @@ i18n-js@^3:
   resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.8.0.tgz#b8fd6b12e1d88cb71f9806c29bca7c31c012e504"
   integrity sha512-hDsGgPuvw/2P+lXSbOafAwspK8Ste8YrwuuUg17W3wEcO1JkQxBlPgsN1t2+852nTnz4YSYTjZc/1nAA2PC/nw==
 
-i18nliner@instructure/i18nliner-js#babel7, i18nliner@~0.2.0:
+i18nliner@~0.2.0:
   version "0.2.6"
   resolved "https://codeload.github.com/instructure/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
   dependencies:
