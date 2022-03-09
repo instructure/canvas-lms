@@ -25,6 +25,7 @@ describe('Overview Content', () => {
     content: '<h1>About this course <p>this is the course overview</p></h1>',
     url: '/courses/12/pages/thehomepage/edit',
     canEdit: true,
+    showImmersiveReader: true,
     ...overrides
   })
 
@@ -33,15 +34,29 @@ describe('Overview Content', () => {
     expect(queryByText('About this course')).toBeInTheDocument()
   })
 
-  it('renders an edit button if canEdit is true', () => {
-    const {getByRole} = render(<OverviewPage {...getProps()} />)
-    const button = getByRole('link', {name: 'Edit home page'})
-    expect(button).toBeInTheDocument()
-    expect(button.href).toContain('/courses/12/pages/thehomepage/edit')
+  describe('edit button', () => {
+    it('renders with correct link if canEdit is true', () => {
+      const {getByRole} = render(<OverviewPage {...getProps()} />)
+      const button = getByRole('link', {name: 'Edit home page'})
+      expect(button).toBeInTheDocument()
+      expect(button.href).toContain('/courses/12/pages/thehomepage/edit')
+    })
+
+    it('does not render when canEdit is false', () => {
+      const {queryByRole} = render(<OverviewPage {...getProps({canEdit: false})} />)
+      expect(queryByRole('link', {name: 'Edit home page'})).not.toBeInTheDocument()
+    })
   })
 
-  it('does not render edit button when canEdit is false', () => {
-    const {queryByRole} = render(<OverviewPage {...getProps({canEdit: false})} />)
-    expect(queryByRole('link', {name: 'Edit home page'})).not.toBeInTheDocument()
+  describe('immersive reader button', () => {
+    it('renders when showImmersiveReader is true', () => {
+      const {getByRole} = render(<OverviewPage {...getProps()} />)
+      expect(getByRole('button', {name: 'Immersive Reader'})).toBeInTheDocument()
+    })
+
+    it('does not render when showImmersiveReader is false', () => {
+      const {queryByText} = render(<OverviewPage {...getProps({showImmersiveReader: false})} />)
+      expect(queryByText('Immersive Reader')).not.toBeInTheDocument()
+    })
   })
 })

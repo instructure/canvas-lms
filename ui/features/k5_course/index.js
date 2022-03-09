@@ -60,6 +60,7 @@ ready(() => {
         selfEnrollment={ENV.COURSE.self_enrollment}
         tabContentOnly={ENV.TAB_CONTENT_ONLY}
         isMasterCourse={ENV.BLUEPRINT_COURSES_DATA?.isMasterCourse}
+        showImmersiveReader={ENV.SHOW_IMMERSIVE_READER}
       />,
       courseContainer
     )
