@@ -136,6 +136,7 @@ const HeaderInputs = props => {
                 onSelectedIdsChange={ids => {
                   props.onSelectedIdsChange(ids)
                 }}
+                activeCourseFilter={props.activeCourseFilter}
               />
             }
             shouldGrow
