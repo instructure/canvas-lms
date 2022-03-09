@@ -25,12 +25,13 @@ describe Canvas::RequestForgeryProtection do
     raw_headers = { "X-CSRF-Token" => "bogus" }
     raw_headers = ActionDispatch::Request.new(raw_headers)
     headers = ActionDispatch::Http::Headers.new(raw_headers)
-    cookies = ActionDispatch::Cookies::CookieJar.new(nil)
     request = double("request",
+                     cookies_same_site_protection: proc { false },
                      host_with_port: "example.com:80",
                      headers: headers,
                      get?: false,
                      head?: false)
+    cookies = ActionDispatch::Cookies::CookieJar.new(request)
     @controller = double("controller",
                          request: request,
                          cookies: cookies,
