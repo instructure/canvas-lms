@@ -943,51 +943,34 @@ class ContextExternalTool < ActiveRecord::Base
   # Tools with exclude_tool_id as their ID will never be returned.
   def self.find_external_tool(url, context, preferred_tool_id = nil, exclude_tool_id = nil, preferred_client_id = nil)
     GuardRail.activate(:secondary) do
-      contexts = contexts_to_search(context)
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
-      can_use_preferred_tool = preferred_tool && contexts.member?(preferred_tool.context)
+      can_use_preferred_tool = preferred_tool && contexts_to_search(context).member?(preferred_tool.context)
 
       # always use the preferred_tool_id if url isn't provided
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
-      all_external_tools = context.shard.activate do
-        query = ContextExternalTool.where(context: contexts).active
-        query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
-        query.to_a
-      end
-
-      sorted_external_tools = all_external_tools.sort_by do |t|
-        [contexts.index { |c| c.id == t.context_id && c.class.polymorphic_name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last]
-      end
-
-      search_options = { exclude_tool_id: exclude_tool_id }
+      sorted_external_tools = find_and_order_tools(context, preferred_tool_id, exclude_tool_id, preferred_client_id)
 
       # Check for a tool that exactly matches the given URL
       match = find_tool_match(
-        url,
         sorted_external_tools,
-        ->(t, u) { t.matches_url?(u) },
-        ->(t) { t.url.present? },
-        search_options
+        ->(t) { t.matches_url?(url) },
+        ->(t) { t.url.present? }
       )
 
       # If exactly match doesn't work, try to match by ignoring extra query parameters
       match ||= find_tool_match(
-        url,
         sorted_external_tools,
-        ->(t, u) { t.matches_url?(u, false) },
-        ->(t) { t.url.present? },
-        search_options
+        ->(t) { t.matches_url?(url, false) },
+        ->(t) { t.url.present? }
       )
 
       # If still no matches, use domain matching to try to find a tool
       match ||= find_tool_match(
-        url,
         sorted_external_tools,
-        ->(t, _u) { t.matches_tool_domain?(url) },
-        ->(t) { t.domain.present? },
-        search_options
+        ->(t) { t.matches_tool_domain?(url) },
+        ->(t) { t.domain.present? }
       )
 
       # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
@@ -1004,36 +987,71 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  # Given a collection of tools, finds the first tool that exactly
-  # matches the given URL.
+  # Sorts all tools in the context chain by a variety of criteria in SQL
+  # as opposed to in memory, in order to make it easier to find a tool that matches
+  # the given URL.
   #
-  # If a preferred LTI version is specified, this method will use
-  # LTI version as a tie-breaker.
-  def self.find_tool_match(url, sorted_tool_collection, matcher, matcher_condition, opts)
-    exclude_tool_id = opts[:exclude_tool_id]
+  # Criteria:
+  # * closer contexts preferred (Course over Account over Root Account etc)
+  # * more specific subdomains preferred (sub.domain.instructure.com over instructure.com)
+  # * LTI 1.3 tools preferred over 1.1 tools
+  # * if preferred_tool_id is provided, moves that tool to the front
+  # * if preferred_client_id is provided, only retrieves tools that came from that developer key
+  # * if exclude_tool_id is provided, does not retrieve that tool
+  #
+  # Theoretically once this method is done, the very first tool to match the URL will be
+  # the right tool, making it possible to eventually perform the rest of the URL matching
+  # in SQL as well.
+  def self.find_and_order_tools(context, preferred_tool_id, exclude_tool_id, preferred_client_id)
+    context.shard.activate do
+      contexts = contexts_to_search(context)
+      context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
 
-    # Find tools that match the given matcher
-    exact_matches = sorted_tool_collection.select do |tool|
-      matcher_condition.call(tool) && matcher.call(tool, url) && tool.id != exclude_tool_id
+      order_clauses = [
+        # prefer 1.3 tools
+        sort_by_sql_string("developer_key_id IS NOT NULL"),
+        # prefer tools from closer contexts
+        "context_order.ordering",
+        # prefer tools with more subdomains
+        precedence_sql_string
+      ]
+      # move preferred tool to the front when requested
+      order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}") if preferred_tool_id
+
+      query = ContextExternalTool.where(context: contexts).active
+      query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
+      query = query.where.not(id: exclude_tool_id) if exclude_tool_id
+
+      query.joins(sanitize_sql("INNER JOIN (values #{context_order}) as context_order (context_id, class, ordering)
+        ON #{quoted_table_name}.context_id = context_order.context_id AND #{quoted_table_name}.context_type = context_order.class"))
+           .order(Arel.sql(sanitize_sql(order_clauses.join(","))))
     end
-
-    # There was only a single match, so return it
-    return exact_matches.first if exact_matches.count == 1
-
-    version_match = find_exact_version_match(exact_matches)
-
-    # There is no LTI version preference or no matching
-    # version was found. Return the first matched tool
-    return exact_matches.first if version_match.blank?
-
-    # An LTI version is preferred and found, return it
-    version_match
   end
 
-  # Given a collection of tools, finds the first with the given LTI version
-  # If no matches were detected, returns nil
-  def self.find_exact_version_match(sorted_tool_collection)
-    sorted_tool_collection.find(&:uses_preferred_lti_version?)
+  # replicates the ContextExternalTool.precedence method, in SQL for an order clause.
+  # prefer tools that have more specific subdomains
+  def self.precedence_sql_string
+    <<~SQL.squish
+      CASE WHEN domain IS NOT NULL
+        THEN 25 - ARRAY_LENGTH(STRING_TO_ARRAY(domain, '.'), 1)
+        ELSE CASE WHEN url IS NOT NULL
+          THEN 25
+          ELSE 26
+        END
+      END
+    SQL
+  end
+
+  # Used in an SQL order clause to push tools that match the condition to the front of the relation.
+  def self.sort_by_sql_string(condition)
+    "CASE WHEN #{condition} THEN 1 ELSE 2 END"
+  end
+
+  # Given a collection of tools, finds the first tool that matches the given conditions
+  def self.find_tool_match(tool_collection, matcher, matcher_condition)
+    tool_collection.to_a.find do |tool|
+      matcher_condition.call(tool) && matcher.call(tool)
+    end
   end
 
   scope :having_setting, lambda { |setting|
@@ -1113,6 +1131,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     tool
   end
+
   scope :active, lambda {
     where.not(workflow_state: ["deleted", "disabled"])
   }
