@@ -83,7 +83,7 @@ const mimeClasses = {
     get displayName() {
       return I18n.t('Image')
     },
-    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg', 'image/webp']
+    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg']
   },
   ppt: {
     get displayName() {
@@ -152,7 +152,7 @@ export default function mimeClass(contentType) {
   return mimeClass.mimeClasses[contentType] || 'file'
 }
 
-mimeClass.displayName = function (contentType) {
+mimeClass.displayName = function(contentType) {
   const found = mimeClasses[mimeClass(contentType)]
   return (found && found.displayName) || I18n.t('Unknown')
 }

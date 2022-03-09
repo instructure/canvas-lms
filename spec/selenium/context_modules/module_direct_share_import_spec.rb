@@ -40,28 +40,27 @@ describe "modules" do
 
   before do
     user_session(@teacher)
+    visit_modules_index_page(@course.id)
   end
 
   it "shares a module" do
-    visit_modules_index_page(@course.id)
     manage_module_button(@module1).click
     module_index_menu_tool_link("Send To...").click
     replace_content(user_search, "Sharee")
-    wait_for_sharee_dropdown
-    click_option(user_search_selector, "Sharee")
+    wait_for_ajax_requests
+    user_dropdown("Sharee").click
     send_button.click
     wait_for_ajax_requests
     expect(@other_teacher.received_content_shares.last.name).to eq @module1.name
   end
 
   it "copies a module" do
-    visit_modules_index_page(@course.id)
     manage_module_button(@module1).click
     module_index_menu_tool_link("Copy To...").click
     course_search_dropdown.click
     course_search_dropdown.send_keys("course")
     wait_for_search_dropdown
-    click_option(course_dropdown_item_selector, @other_course.name)
+    course_dropdown_item(@other_course.name).click
     course_search_dropdown.send_keys(:tab)
     copy_button.click
     wait_for_ajax_requests
@@ -69,25 +68,23 @@ describe "modules" do
   end
 
   it "shares a module item" do
-    visit_modules_index_page(@course.id)
     manage_module_item_button(@item1).click
     module_index_menu_tool_link("Send To...").click
     replace_content(user_search, "Sharee")
-    wait_for_sharee_dropdown
-    click_option(user_search_selector, "Sharee")
+    wait_for_ajax_requests
+    user_dropdown("Sharee").click
     send_button.click
     wait_for_ajax_requests
     expect(@other_teacher.received_content_shares.last.name).to eq @assignment1.name
   end
 
   it "copies a module item" do
-    visit_modules_index_page(@course.id)
     manage_module_item_button(@item1).click
     module_index_menu_tool_link("Copy To...").click
     course_search_dropdown.click
     course_search_dropdown.send_keys("course")
     wait_for_search_dropdown
-    click_option(course_dropdown_item_selector, @other_course.name)
+    course_dropdown_item(@other_course.name).click
     course_search_dropdown.send_keys(:tab)
     copy_button.click
     wait_for_ajax_requests
@@ -95,31 +92,25 @@ describe "modules" do
   end
 
   it "shares a newly created module item" do
-    wiki_page = @course.wiki_pages.create!(title: "New Page Title", body: "Here is the body")
-    @module1.add_item({ id: wiki_page.id, type: "wiki_page" })
-    visit_modules_index_page(@course.id)
-
+    add_new_module_item(@module1, "wiki_page", "New Page Title")
     manage_module_item_button(ContentTag.last).click
     module_index_menu_tool_link("Send To...").click
     replace_content(user_search, "Sharee")
-    wait_for_sharee_dropdown
-    click_option(user_search_selector, "Sharee")
+    wait_for_ajax_requests
+    user_dropdown("Sharee").click
     send_button.click
     wait_for_ajax_requests
     expect(@other_teacher.received_content_shares.last.name).to eq "New Page Title"
   end
 
   it "copies a newly created module item" do
-    quiz = @course.quizzes.create!(title: "New Quiz")
-    @module1.add_item({ id: quiz.id, type: "quiz" })
-    visit_modules_index_page(@course.id)
-
+    add_new_module_item(@module1, "quiz", "New Quiz")
     manage_module_item_button(ContentTag.last).click
     module_index_menu_tool_link("Copy To...").click
     course_search_dropdown.click
     course_search_dropdown.send_keys("course")
     wait_for_search_dropdown
-    click_option(course_dropdown_item_selector, @other_course.name)
+    course_dropdown_item(@other_course.name).click
     course_search_dropdown.send_keys(:tab)
     copy_button.click
     wait_for_ajax_requests

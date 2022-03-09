@@ -76,7 +76,7 @@ export default function BulkEditTable({
   clearOverrideEdits
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
-  const DATE_COLUMN_WIDTH_REMS = 17
+  const DATE_COLUMN_WIDTH_REMS = 14
   const ACTION_COLUMN_WIDTH_REMS = 4
   const NOTE_COLUMN_WIDTH_REMS = 3
 
@@ -93,7 +93,6 @@ export default function BulkEditTable({
 
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
     const label = DATE_INPUT_META[dateKey].label
-    const calculatedWidth = `${DATE_COLUMN_WIDTH_REMS - 1}rem`
     return (
       <BulkDateInput
         label={label}
@@ -105,7 +104,6 @@ export default function BulkEditTable({
         updateAssignmentDate={updateAssignmentDate}
         fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
         interaction={dates.can_edit ? 'enabled' : 'disabled'}
-        width={calculatedWidth}
       />
     )
   }

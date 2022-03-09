@@ -54,22 +54,6 @@ describe "Gradebook - post grades to SIS" do
     plugin_setting || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
   end
 
-  def create_post_grades_tool(opts = {})
-    course = opts[:course] || @course
-    course.context_external_tools.create!(
-      name: opts[:name] || "test tool",
-      domain: "example.com",
-      url: "http://example.com/lti",
-      consumer_key: SecureRandom.hex,
-      shared_secret: "secret",
-      settings: {
-        post_grades: {
-          url: "http://example.com/lti/post_grades"
-        }
-      }
-    )
-  end
-
   describe "Plugin" do
     before(:once) { export_plugin_setting.update(disabled: false) }
 
@@ -158,6 +142,22 @@ describe "Gradebook - post grades to SIS" do
   end
 
   describe "LTI" do
+    def create_post_grades_tool(opts = {})
+      course = opts[:course] || @course
+      course.context_external_tools.create!(
+        name: opts[:name] || "test tool",
+        domain: "example.com",
+        url: "http://example.com/lti",
+        consumer_key: "key",
+        shared_secret: "secret",
+        settings: {
+          post_grades: {
+            url: "http://example.com/lti/post_grades"
+          }
+        }
+      )
+    end
+
     let!(:tool) { create_post_grades_tool }
     let(:tool_name) { "post_grades_lti_#{tool.id}" }
 
@@ -205,6 +205,22 @@ describe "Gradebook - post grades to SIS" do
   end
 
   describe "LTI with enhanced filters enabled" do
+    def create_post_grades_tool(opts = {})
+      course = opts[:course] || @course
+      course.context_external_tools.create!(
+        name: opts[:name] || "test tool",
+        domain: "example.com",
+        url: "http://example.com/lti",
+        consumer_key: "key",
+        shared_secret: "secret",
+        settings: {
+          post_grades: {
+            url: "http://example.com/lti/post_grades"
+          }
+        }
+      )
+    end
+
     before(:once) do
       @course.enable_feature!(:enhanced_gradebook_filters)
     end

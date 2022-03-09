@@ -93,9 +93,8 @@ describe "context modules" do
     end
 
     it "saves the requirement count chosen in the Edit Module form" do
-      add_existing_module_item("AssignmentModule", @assignment)
-
       get "/courses/#{@course.id}/modules"
+      add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
 
       @course.reload
 
@@ -191,11 +190,12 @@ describe "context modules" do
     end
 
     it "adds and remove completion criteria" do
-      add_existing_module_item("AssignmentModule", @assignment)
       get "/courses/#{@course.id}/modules"
+      add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
 
       @course.reload
       smodule = @course.context_modules.first
+      smodule.publish!
       # add completion criterion
       f(".ig-header-admin .al-trigger").click
       f(".edit_module_link").click
@@ -291,31 +291,49 @@ describe "context modules" do
     end
 
     it "still displays due date and points possible after indent change" do
-      add_existing_module_item("AssignmentModule", @assignment2)
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item("#assignments_select", "Assignment", @assignment2.title)
       tag = ContentTag.last
 
-      get "/courses/#{@course.id}/modules"
-
-      def due_date_assertion(tag)
-        wait_for_dom_ready
-        module_item = f("#context_module_item_#{tag.id}")
-        expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
+      def due_date_assertion
+        stale_element = true
+        attempt = 5
+        until (stale_element == true) && (attempt > 0)
+          begin
+            wait_for_dom_ready
+            expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
+            stale_element = false
+          rescue Selenium::WebDriver::Error::StaleElementReferenceError
+            stale_element = true
+            attempt -= 1
+          end
+        end
       end
 
       def points_possible_assertion(tag)
-        wait_for_dom_ready
+        stale_element = true
+        attempt = 5
         module_item = f("#context_module_item_#{tag.id}")
-        expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+        until (stale_element == true) && (attempt > 0)
+          begin
+            wait_for_dom_ready
+            expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+            stale_element = false
+          rescue Selenium::WebDriver::Error::StaleElementReferenceError
+            stale_element = true
+            attempt -= 1
+          end
+        end
       end
 
-      due_date_assertion(tag)
+      due_date_assertion
       points_possible_assertion(tag)
 
       # change indent with arrows
       f("#context_module_item_#{tag.id} .al-trigger").click
       f(".indent_item_link").click
 
-      due_date_assertion(tag)
+      due_date_assertion
       points_possible_assertion(tag)
 
       # change indent from edit form
@@ -326,7 +344,7 @@ describe "context modules" do
       form = f("#edit_item_form")
       form.submit
 
-      due_date_assertion(tag)
+      due_date_assertion
       points_possible_assertion(tag)
     end
 

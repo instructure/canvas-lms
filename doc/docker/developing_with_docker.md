@@ -245,11 +245,9 @@ To enable Selenium: Add `docker-compose/selenium.override.yml` to your `COMPOSE_
 The container used to run the selenium browser is only started when spinning up
 all docker-compose containers, or when specified explicitly. The selenium
 container needs to be started before running any specs that require selenium.
-Select a browser to run in selenium through config/selenium.yml and then ensure
-that only the corresponding browser is configured in selenium.override.yml.
 
 ```sh
-docker-compose up -d selenium-hub
+docker-compose up selenium-firefox # or selenium-chrome or selenium-edge
 ```
 
 With the container running, you should be able to open a VNC session:

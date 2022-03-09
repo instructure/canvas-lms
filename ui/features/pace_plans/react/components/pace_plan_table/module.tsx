@@ -79,7 +79,7 @@ export const Module: React.FC<PassedProps> = props => {
       <ColHeader width={actuallyExpanded ? '9.5em' : '0'} id={`module-${props.module.id}-duration`}>
         <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
           {I18n.t('Due Date')}
-          {props.isCompressing && (
+          {!isStudentPlan && props.isCompressing && (
             <View data-testid="duedate-tooltip" as="span" margin="0 0 0 x-small">
               <Tooltip
                 renderTip={I18n.t(
