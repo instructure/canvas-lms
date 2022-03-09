@@ -75,6 +75,8 @@ export function transformForShape(shape, size) {
       return transformForHexagon(size)
     case Shape.Octagon:
       return transformForOctagon(size)
+    case Shape.Diamond:
+      return transformForDiamond(size)
     default:
       return transformForDefault(size)
   }
@@ -242,6 +244,31 @@ function transformForOctagon(size) {
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(180)
+      }
+  }
+}
+
+function transformForDiamond(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(30)
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(60)
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(80)
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(120)
       }
   }
 }

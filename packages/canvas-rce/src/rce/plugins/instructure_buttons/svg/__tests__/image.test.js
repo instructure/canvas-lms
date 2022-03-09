@@ -397,6 +397,62 @@ describe('transformShape()', () => {
     })
   })
 
+  describe('when the shape is a diamond', () => {
+    beforeEach(() => (shape = Shape.Diamond))
+
+    describe('with x-small shape', () => {
+      beforeEach(() => (size = Size.ExtraSmall))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 30,
+          height: 30,
+          translateX: -15,
+          translateY: -15
+        })
+      })
+    })
+
+    describe('with small shape', () => {
+      beforeEach(() => (size = Size.Small))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 60,
+          height: 60,
+          translateX: -30,
+          translateY: -30
+        })
+      })
+    })
+
+    describe('with medium shape', () => {
+      beforeEach(() => (size = Size.Medium))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 80,
+          height: 80,
+          translateX: -40,
+          translateY: -40
+        })
+      })
+    })
+
+    describe('with large shape', () => {
+      beforeEach(() => (size = Size.Large))
+
+      it('sets the correct dimension attributes', () => {
+        expect(subject()).toMatchObject({
+          width: 120,
+          height: 120,
+          translateX: -60,
+          translateY: -60
+        })
+      })
+    })
+  })
+
   describe('when no transform overrides are set (default case)', () => {
     beforeEach(() => {
       shape = 'default'
