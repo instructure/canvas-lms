@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var I18nliner = require("i18nliner").default;
-var TranslateCall = require("i18nliner/dist/lib/extractors/translate_call").default;
+var I18nliner = require("@instructure/i18nliner/dist/lib/main").default;
+var TranslateCall = require("@instructure/i18nliner/dist/lib/extractors/translate_call").default;
 var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 var mkdirp = require("mkdirp");
@@ -55,10 +55,10 @@ GenerateJs.prototype.run = function() {
   TranslateCall.prototype.translations = function() {
     var key = this.key;
     var defaultValue = this.defaultValue;
-  
+
     if (typeof defaultValue === 'string' || !defaultValue)
       return [[key, defaultValue]];
-  
+
     var translations = [];
     for (var k in defaultValue) {
       if (defaultValue.hasOwnProperty(k)) {
