@@ -262,7 +262,7 @@ export default function Filter(props) {
                   value="buttons_and_icons"
                   renderBeforeLabel={IconImageLine}
                 >
-                  {formatMessage('Buttons and Icons')}
+                  {formatMessage('Icon Maker Icons')}
                 </SimpleSelect.Option>
               )}
 

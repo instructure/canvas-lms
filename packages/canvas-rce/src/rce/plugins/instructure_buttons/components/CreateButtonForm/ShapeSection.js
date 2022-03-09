@@ -34,7 +34,7 @@ export const ShapeSection = ({settings, onChange}) => (
         assistiveText={formatMessage('Use arrow keys to select a shape.')}
         id="button-shape"
         onChange={(e, option) => onChange({shape: option.value})}
-        renderLabel={formatMessage('Button Shape')}
+        renderLabel={formatMessage('Icon Shape')}
         value={settings.shape}
       >
         {Object.values(Shape).map(shape => (
@@ -50,7 +50,7 @@ export const ShapeSection = ({settings, onChange}) => (
         assistiveText={formatMessage('Use arrow keys to select a size.')}
         id="button-size"
         onChange={(e, option) => onChange({size: option.value})}
-        renderLabel={formatMessage('Button Size')}
+        renderLabel={formatMessage('Icon Size')}
         value={settings.size}
       >
         {SIZES.map(size => (
