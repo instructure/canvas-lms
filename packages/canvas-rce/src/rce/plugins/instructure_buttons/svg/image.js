@@ -83,10 +83,31 @@ export function transformForShape(shape, size) {
 }
 
 function transformForPentagon(size) {
-  const defaults = transformForDefault(size)
-  return {
-    ...defaults,
-    y: '55%'
+  switch (size) {
+    case Size.ExtraSmall:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(40),
+        y: '55%'
+      }
+    case Size.Small:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(80),
+        y: '55%'
+      }
+    case Size.Medium:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(110),
+        y: '55%'
+      }
+    case Size.Large:
+      return {
+        ...transformForDefault(size),
+        ...dimensionAttrsFor(140),
+        y: '55%'
+      }
   }
 }
 
