@@ -31,15 +31,20 @@ export default function (ed, document, type) {
     let container = document.querySelector('#instructure-rce-buttons-tray-container')
     const trayProps = bridge.trayProps.get(ed)
 
+    const handleUnmount = () => {
+      ReactDOM.unmountComponentAtNode(container)
+      ed.focus(false)
+    }
+
     if (!container) {
       container = document.createElement('div')
       container.id = 'instructure-rce-buttons-tray-container'
       document.body.appendChild(container)
-    }
-
-    const handleUnmount = () => {
-      ReactDOM.unmountComponentAtNode(container)
-      ed.focus(false)
+    } else if (type == CREATE_BUTTON) {
+      // This case indicates we are switching modes (i.e. Editing -> Creating)
+      // We unmount the component to clear all state. This also triggers an animation
+      // that closes and opens the tray to indicate a mode change to the user
+      handleUnmount()
     }
 
     ReactDOM.render(
