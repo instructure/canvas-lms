@@ -1745,6 +1745,15 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
       end
 
+      it "sets ENV.SHOW_IMMERSIVE_READER when user flag is enabled" do
+        Account.site_admin.enable_feature!(:more_immersive_reader)
+        @student.enable_feature!(:user_immersive_reader_wiki_pages)
+        user_session(@student)
+
+        get "show", params: { id: @course.id }
+        expect(assigns[:js_env][:SHOW_IMMERSIVE_READER]).to be_truthy
+      end
+
       context "ENV.COURSE.self_enrollment" do
         before :once do
           @course.root_account.allow_self_enrollment!
