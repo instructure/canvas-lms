@@ -2,7 +2,7 @@ const path = require('path')
 const glob = require('glob')
 const fs = require('fs')
 
-const filesByProcessor = { js: [], hbs: [] }
+const filesByProcessor = { js: [], hbs: [], ts: [] }
 
 const loadIgnoreFile = file => (
   fs.readFileSync(file, 'utf8')

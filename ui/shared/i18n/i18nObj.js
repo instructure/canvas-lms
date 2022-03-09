@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import i18nLolcalize from './i18nLolcalize'
 import I18n from 'i18n-js'
-import extend from 'i18nliner/dist/lib/extensions/i18n_js'
+import extend from '@instructure/i18nliner/dist/lib/extensions/i18n_js'
 
 import htmlEscape from 'html-escape'
 import 'date'
