@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import I18n from 'i18n!groups'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GroupCategoryEditView from './GroupCategoryEditView.coffee'
 import template from '../../jst/groupCategoryCreate.handlebars'
+
+I18n = useI18nScope('groups')
 
 export default class GroupCategoryCreateView extends GroupCategoryEditView
 

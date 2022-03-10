@@ -18,7 +18,9 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../../jst/subviews/SelectContentCheckbox.handlebars'
-import I18n from 'i18n!select_content_checkbox'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+I18n = useI18nScope('select_content_checkbox')
 
 export default class SelectContentCheckbox extends Backbone.View
   template: template

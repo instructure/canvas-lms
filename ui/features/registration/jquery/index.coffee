@@ -21,7 +21,9 @@ import signupDialog from '@canvas/signup-dialog'
 import loginForm from '../jst/login.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from 'html-escape'
-import I18n from 'i18n!registration'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+I18n = useI18nScope('registration')
 
 $loginForm = null
 

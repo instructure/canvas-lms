@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!assignment_group_category'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import $ from 'jquery'
@@ -24,6 +24,8 @@ import '@canvas/assignments/jquery/toggleAccessibly'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import GroupCategoryCreateView from './GroupCategoryCreateView.coffee'
 import GroupCategory from '../models/GroupCategory.coffee'
+
+I18n = useI18nScope('assignment_group_category')
 
 export default class GroupCategorySelector extends Backbone.View
 

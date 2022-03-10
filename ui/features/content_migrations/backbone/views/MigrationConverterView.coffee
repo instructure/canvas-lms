@@ -19,12 +19,14 @@ import $ from 'jquery'
 import _ from 'underscore'
 import template from '../../jst/MigrationConverter.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
-import I18n from 'i18n!content_migrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
 import ReactDOM from 'react-dom'
+
+I18n = useI18nScope('content_migrations')
 
 # This is an abstract class that is inherited
 # from by other MigrationConverter views

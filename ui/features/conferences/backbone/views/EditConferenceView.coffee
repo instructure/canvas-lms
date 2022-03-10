@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!conferences'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -26,6 +26,8 @@ import userSettingOptionsTemplate from '../../jst/userSettingOptions.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/forms/jquery/jquery.instructure_forms' # formSubmit
+
+I18n = useI18nScope('conferences')
 
 export default class EditConferenceView extends DialogBaseView
 

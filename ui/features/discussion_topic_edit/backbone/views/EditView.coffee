@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!discussion_topics'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector.coffee'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector.coffee'
@@ -43,6 +43,8 @@ import UsageRightsIndicator from '@canvas/files/react/components/UsageRightsIndi
 import setUsageRights from '@canvas/files/util/setUsageRights'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import 'jqueryui/tabs'
+
+I18n = useI18nScope('discussion_topics')
 
 RichContentEditor.preloadRemoteModule()
 
