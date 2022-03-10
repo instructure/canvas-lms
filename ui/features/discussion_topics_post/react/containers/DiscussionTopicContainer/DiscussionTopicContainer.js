@@ -216,7 +216,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     return rootEntryDraftMessage
   }
 
-  const podcast_url = document.querySelector("link[title='Discussion Podcast Feed']")
+  const podcast_url = document.querySelector("link[id='Discussion Podcast Feed']")
 
   return (
     <Responsive
