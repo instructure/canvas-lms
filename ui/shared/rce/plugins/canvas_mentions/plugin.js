@@ -36,7 +36,7 @@ function onInputChange(_e, ed = false) {
     editor.execCommand(
       'mceInsertContent',
       false,
-      `<span role="textbox" id="${MARKER_ID}" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="${ARIA_ID_TEMPLATES.ariaControlTemplate(
+      `<span role="textbox" id="${MARKER_ID}" aria-label="Mentions Textbox" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="${ARIA_ID_TEMPLATES.ariaControlTemplate(
         editor.id
       )}" aria-activedescendant=""></span>`
     )
