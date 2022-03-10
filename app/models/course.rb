@@ -3430,6 +3430,8 @@ class Course < ActiveRecord::Base
   add_setting :course_color
   add_setting :alt_name
 
+  add_setting :default_due_time, inherited: true
+
   def elementary_enabled?
     account.enable_as_k5_account?
   end
