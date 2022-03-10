@@ -18,8 +18,10 @@
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import Section from '@canvas/sections/backbone/models/Section.coffee'
-import I18n from 'i18n!assignmentOverride'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
+
+I18n = useI18nScope('assignmentOverride')
 
 export default class AssignmentOverride extends Backbone.Model
 

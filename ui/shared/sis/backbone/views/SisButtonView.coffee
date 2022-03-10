@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!SisButtonView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/_sisButton.handlebars'
 import SisValidationHelper from '../../SisValidationHelper'
+
+I18n = useI18nScope('SisButtonView')
 
 export default class SisButtonView extends Backbone.View
   template: template

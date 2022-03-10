@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!CollectionView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
+
+I18n = useI18nScope('CollectionView')
 
 ##
 # Renders a collection of items with an item view. Binds to a handful of

@@ -24,12 +24,14 @@ import VeriCiteSettings from '../../VeriCiteSettings.coffee'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection.coffee'
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection.coffee'
-import I18n from 'i18n!models_Assignment'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import tz from '@canvas/timezone'
 import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import { matchingToolUrls } from './LtiAssignmentHelpers'
+
+I18n = useI18nScope('models_Assignment')
 
 canManage = () ->
   ENV.PERMISSIONS?.manage

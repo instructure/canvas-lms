@@ -17,12 +17,14 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!observees'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import pairingCodeTemplate from '../../jst/PairingCodeUserObservees.handlebars'
 import itemView from './UserObserveeView.coffee'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {clearObservedId, savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+
+I18n = useI18nScope('observees')
 
 export default class UserObserveesView extends PaginatedCollectionView
   autoFetch: true

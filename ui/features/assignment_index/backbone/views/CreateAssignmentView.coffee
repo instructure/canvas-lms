@@ -22,13 +22,15 @@ import DateValidator from '@canvas/datetime/DateValidator'
 import template from '../../jst/CreateAssignment.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'
-import I18n from 'i18n!CreateAssignmentView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import round from 'round'
 import $ from 'jquery'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import '@canvas/datetime'
 import tz from '@canvas/timezone'
+
+I18n = useI18nScope('CreateAssignmentView')
 
 export default class CreateAssignmentView extends DialogFormView
   defaults:

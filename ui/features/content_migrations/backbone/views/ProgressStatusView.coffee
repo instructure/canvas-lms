@@ -17,7 +17,9 @@
 
 import Backbone from '@canvas/backbone'
 import template from '../../jst/ProgressStatus.handlebars'
-import I18n from 'i18n!content_migrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+I18n = useI18nScope('content_migrations')
 
 export default class ProgressingStatusView extends Backbone.View
   template: template
