@@ -21,7 +21,9 @@ import '@canvas/rails-flash-notifications'
 
 import fakeENV from 'helpers/fakeENV'
 import rubric_assessment from '@canvas/rubrics/jquery/rubric_assessment'
-import I18n from 'i18n!rubric_assessment'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('rubric_assessment');
 
 QUnit.module('RubricAssessment#roundAndFormat')
 
@@ -31,7 +33,7 @@ test('rounds given number to two decimal places', () => {
 })
 
 test('formats given number with I18n.n', () => {
-  sandbox.stub(I18n, 'n').returns('formatted_number')
+  sandbox.stub(I18n.constructor.prototype, 'n').returns('formatted_number')
   strictEqual(rubric_assessment.roundAndFormat(42), 'formatted_number')
   strictEqual(I18n.n.callCount, 1)
   ok(I18n.n.calledWith(42))
