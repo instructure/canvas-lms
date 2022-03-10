@@ -203,7 +203,7 @@ const getMenuConfigs = props => {
 }
 
 const renderMenuItem = (
-  {selectionCallback, icon, label, key, separator = false, disabled = false, color = 'primary'},
+  {selectionCallback, icon, label, key, separator = false, disabled = false, color},
   id
 ) => {
   return separator ? (
