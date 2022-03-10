@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var Errors = require("@instructure/i18nliner/dist/lib/errors").default;
-Errors.register("UnscopedTranslateCall");
-
+var Errors = require("./errors");
 var TranslateCall = require("@instructure/i18nliner/dist/lib/extractors/translate_call").default;
 var ScopedTranslateCall = require("./scoped_translate_call")(TranslateCall);
 
