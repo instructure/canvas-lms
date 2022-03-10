@@ -59,7 +59,7 @@ module FilesCommon
     case move_using
     when :cog_icon
       ff(".al-trigger")[row_selected].click
-      fln("Move To...").click
+      fln("Move").click
     when :toolbar_menu
       ff(".ef-item-row")[row_selected].click
       f(".btn-move").click

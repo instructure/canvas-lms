@@ -1745,15 +1745,6 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
       end
 
-      it "sets ENV.SHOW_IMMERSIVE_READER when user flag is enabled" do
-        Account.site_admin.enable_feature!(:more_immersive_reader)
-        @student.enable_feature!(:user_immersive_reader_wiki_pages)
-        user_session(@student)
-
-        get "show", params: { id: @course.id }
-        expect(assigns[:js_env][:SHOW_IMMERSIVE_READER]).to be_truthy
-      end
-
       context "ENV.COURSE.self_enrollment" do
         before :once do
           @course.root_account.allow_self_enrollment!
@@ -2672,14 +2663,14 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { image_id: @attachment.id } }
         @course.reload
         expect(@course.settings[:image_id]).to eq @attachment.id.to_s
-        expect(@course.settings[:image_url]).to be_nil
+        expect(@course.settings[:image_url]).to eq ""
       end
 
       it "clears the image_id when setting an image_url" do
         put "update", params: { id: @course.id, course: { image_id: "12345678" } }
         put "update", params: { id: @course.id, course: { image_url: "http://farm3.static.flickr.com/image.jpg" } }
         @course.reload
-        expect(@course.settings[:image_id]).to be_nil
+        expect(@course.settings[:image_id]).to eq ""
         expect(@course.settings[:image_url]).to eq "http://farm3.static.flickr.com/image.jpg"
       end
 
@@ -2687,16 +2678,16 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { image_id: "12345678" } }
         put "update", params: { id: @course.id, course: { remove_image: true } }
         @course.reload
-        expect(@course.settings[:image_id]).to be_nil
-        expect(@course.settings[:image_url]).to be_nil
+        expect(@course.settings[:image_id]).to eq ""
+        expect(@course.settings[:image_url]).to eq ""
       end
 
       it "clears image url after setting remove_image" do
         put "update", params: { id: @course.id, course: { image_url: "http://farm3.static.flickr.com/image.jpg" } }
         put "update", params: { id: @course.id, course: { remove_image: true } }
         @course.reload
-        expect(@course.settings[:image_id]).to be_nil
-        expect(@course.settings[:image_url]).to be_nil
+        expect(@course.settings[:image_id]).to eq ""
+        expect(@course.settings[:image_url]).to eq ""
       end
     end
 
@@ -2716,7 +2707,7 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { course_color: "1" } }
         put "update", params: { id: @course.id, course: { course_color: "#1a2b3c4e5f6" } }
         @course.reload
-        expect(@course.settings[:course_color]).to be_nil
+        expect(@course.settings[:course_color]).to eq ""
       end
 
       it "normalizes hexcodes without a leading #" do
@@ -2728,13 +2719,13 @@ describe CoursesController do
       it "sets blank inputs to nil" do
         put "update", params: { id: @course.id, course: { course_color: "   " } }
         @course.reload
-        expect(@course.settings[:course_color]).to be_nil
+        expect(@course.settings[:course_color]).to eq ""
       end
 
       it "sets single character (e.g. just a pound sign) inputs to nil" do
         put "update", params: { id: @course.id, course: { course_color: "#" } }
         @course.reload
-        expect(@course.settings[:course_color]).to be_nil
+        expect(@course.settings[:course_color]).to eq ""
       end
     end
 

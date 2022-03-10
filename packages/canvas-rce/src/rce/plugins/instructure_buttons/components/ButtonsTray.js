@@ -57,47 +57,34 @@ function renderHeader(title, settings, setIsOpen) {
   )
 }
 
-function renderBody(settings, dispatch, editor, editing, allowNameChange) {
+function renderBody(settings, dispatch, editor, editing) {
   return (
-    <CreateButtonForm
-      settings={settings}
-      dispatch={dispatch}
-      editor={editor}
-      editing={editing}
-      allowNameChange={allowNameChange}
-    />
+    <CreateButtonForm settings={settings} dispatch={dispatch} editor={editor} editing={editing} />
   )
 }
 
-function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll) {
+function renderFooter(status, onClose, handleSubmit, editing) {
   return (
     <View as="div" background="primary">
       <Footer
         disabled={status === statuses.LOADING}
         onCancel={onClose}
-        onSubmit={() => handleSubmit({replaceFile: replaceAll})}
-        replaceAll={replaceAll}
-        onReplaceAllChanged={setReplaceAll}
+        onSubmit={handleSubmit}
+        onReplace={() => handleSubmit({replaceFile: true})}
         editing={editing}
       />
     </View>
   )
 }
 
-export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
+export function ButtonsTray({editor, onUnmount, editing}) {
   const [isOpen, setIsOpen] = useState(true)
-  const [replaceAll, setReplaceAll] = useState(false)
-
   const title = formatMessage('Buttons and Icons')
 
-  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
+  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing)
   const [status, setStatus] = useState(statuses.IDLE)
   const storeProps = useStoreProps()
   const onClose = () => setIsOpen(false)
-
-  useEffect(() => {
-    setReplaceAll(false)
-  }, [settings.name])
 
   const handleSubmit = ({replaceFile = false}) => {
     setStatus(statuses.LOADING)
@@ -152,10 +139,8 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
       onDismiss={onClose}
       onUnmount={onUnmount}
       renderHeader={() => renderHeader(title, settings, setIsOpen)}
-      renderBody={() => renderBody(settings, dispatch, editor, editing, !replaceAll)}
-      renderFooter={() =>
-        renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll)
-      }
+      renderBody={() => renderBody(settings, dispatch, editor, editing)}
+      renderFooter={() => renderFooter(status, onClose, handleSubmit, editing)}
       bodyAs="form"
       shouldJoinBodyAndFooter
     />
@@ -165,8 +150,7 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
 ButtonsTray.propTypes = {
   editor: PropTypes.object.isRequired,
   onUnmount: PropTypes.func,
-  editing: PropTypes.bool,
-  rcsConfig: PropTypes.object.isRequired
+  editing: PropTypes.bool
 }
 
 ButtonsTray.defaultProps = {

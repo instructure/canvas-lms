@@ -465,8 +465,7 @@ export function K5Course({
   observedUsersList,
   selfEnrollment,
   tabContentOnly,
-  isMasterCourse,
-  showImmersiveReader
+  isMasterCourse
 }) {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -650,7 +649,6 @@ export function K5Course({
               content={courseOverview.body}
               url={`/courses/${id}/pages/${courseOverview.url}/edit`}
               canEdit={courseOverview.canEdit}
-              showImmersiveReader={showImmersiveReader}
             />
           ) : (
             <EmptyHome
@@ -742,8 +740,7 @@ K5Course.propTypes = {
   observedUsersList: ObservedUsersListShape.isRequired,
   selfEnrollment: PropTypes.object,
   tabContentOnly: PropTypes.bool,
-  isMasterCourse: PropTypes.bool.isRequired,
-  showImmersiveReader: PropTypes.bool.isRequired
+  isMasterCourse: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)

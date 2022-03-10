@@ -30,6 +30,7 @@ export const Size = {
 export const DEFAULT_SETTINGS = {
   // Basic button & icon settings
   type: TYPE,
+  name: '',
   alt: '',
   shape: 'square',
   size: Size.Small,

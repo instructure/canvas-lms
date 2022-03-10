@@ -91,7 +91,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
   }, [onChange, settings.shape, settings.size])
 
   useEffect(() => {
-    if (editing && !!settings.encodedImage) {
+    if (editing) {
       dispatch({
         type: actions.SET_IMAGE.type,
         payload: settings.encodedImage
@@ -100,7 +100,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
   }, [editing, settings.encodedImage])
 
   useEffect(() => {
-    if (editing && !!settings.encodedImageName) {
+    if (editing) {
       dispatch({
         type: actions.SET_IMAGE_NAME.type,
         payload: settings.encodedImageName

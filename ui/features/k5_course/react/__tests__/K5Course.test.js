@@ -114,8 +114,7 @@ const defaultProps = {
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
   currentUserRoles: ['user', 'student', 'teacher'],
-  isMasterCourse: false,
-  showImmersiveReader: false
+  isMasterCourse: false
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -135,7 +134,6 @@ const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
 const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1&include=observed_users'
-const ANNOUNEMENTS_URL_REGEX = /\/api\/v1\/announcements\.*/
 
 const GROUPS_URL = encodeURI(
   '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true'
@@ -186,7 +184,6 @@ beforeEach(() => {
   fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-  fetchMock.get(ANNOUNEMENTS_URL_REGEX, JSON.stringify([]))
   fakeXhrServer.respondWith('GET', GROUPS_URL, [
     200,
     {'Content-Type': 'application/json'},

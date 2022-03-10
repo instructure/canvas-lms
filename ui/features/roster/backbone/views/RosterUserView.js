@@ -82,7 +82,6 @@ export default class RosterUserView extends Backbone.View {
 
   permissionsJSON(json) {
     json.url = `${ENV.COURSE_ROOT_URL}/users/${this.model.get('id')}`
-    json.faculyJournalUrl = `/users/${this.model.get('id')}/user_notes`
     json.isObserver = this.model.hasEnrollmentType('ObserverEnrollment')
     json.isPending = this.model.pending(this.model.currentRole)
     json.isInactive = this.model.inactive()
@@ -104,7 +103,6 @@ export default class RosterUserView extends Backbone.View {
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
-    json.canManageUserNotes = ENV.permissions.manage_user_notes
 
     const candoAdminActions =
       ENV.permissions.can_allow_course_admin_actions || ENV.permissions.manage_admin_users

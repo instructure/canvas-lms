@@ -143,9 +143,9 @@ module CoursesHelper
     return nil if MasterCourses::MasterTemplate.is_master_course?(course)
 
     if MasterCourses::ChildSubscription.is_child_course?(course)
-      I18n.t("Course is already associated with a blueprint")
+      t("Course is already associated with a blueprint")
     elsif course.student_enrollments.not_fake.exists?
-      I18n.t("Cannot have a blueprint course with students")
+      t("Cannot have a blueprint course with students")
     else
       nil
     end

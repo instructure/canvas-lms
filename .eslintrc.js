@@ -255,7 +255,7 @@ module.exports = {
       }
     },
     {
-      files: ['ui/**/*', 'spec/**/*', 'public/**/*', 'jest/**/*'],
+      files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing

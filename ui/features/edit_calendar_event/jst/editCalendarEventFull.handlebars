@@ -3,16 +3,13 @@
   {{else}}{{#t "edit_calendar_event_header"}}Edit Calendar Event{{/t}}{{/if}}
 </h1>
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
-    <fieldset>
-      <label for="calendar_event_title"><strong>{{#t}}Event Title{{/t}}</strong></label>
-      <input type="text"
-             name="title"
-             id="calendar_event_title"
-             class="title input-block-level"
-             placeholder="{{#t}}Input Event Title{{/t}}"
-             value="{{title}}"
-             maxlength="255" />
-    </fieldset>
+  <input type="text"
+         name="title"
+         class="title input-block-level"
+         aria-label="{{#t "event_title"}}Event Title{{/t}}"
+         placeholder="{{#t "event_title"}}Event Title{{/t}}"
+         value="{{title}}"
+         maxlength="255" />
 
   <textarea class="input-block-level"
             id="calendar-description"

@@ -1,4 +1,5 @@
-FROM selenium/node-chrome:98.0
+ARG SELENIUM_VERSION=3.141.59-20210929
+FROM selenium/standalone-chrome-debug:$SELENIUM_VERSION
 
 COPY entry_point.sh /opt/bin/custom_entry_point.sh
 USER root
