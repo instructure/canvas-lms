@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if [[ "$SKIP_CANVAS_PRECOMMIT_HOOK" == "1" ]]; then
   exit 0
