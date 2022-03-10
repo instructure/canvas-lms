@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import '../public/javascripts/translations/_core_en'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
 import rceFormatMessage from '@instructure/canvas-rce/lib/format-message'
 import plannerFormatMessage from '@instructure/canvas-planner/lib/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
-
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
 
 rceFormatMessage.setup({
