@@ -255,7 +255,7 @@ module.exports = {
       }
     },
     {
-      files: ['ui/**/*', 'spec/**/*', 'public/**/*', 'jest/**/*'],
+      files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing
@@ -268,6 +268,15 @@ module.exports = {
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off'
+      }
+    },
+    {
+      files: ['jest/**/*'],
+      rules: {
+        'import/extensions': 'off',
+        'import/no-commonjs': 'off',
+        'import/no-extraneous-dependencies': 'off',
+        'import/order': 'off',
       }
     },
     {

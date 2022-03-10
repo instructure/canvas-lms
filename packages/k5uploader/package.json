@@ -6,7 +6,7 @@
   "module": "es/k5uploader.js",
   "scripts": {
     "test": "echo \"if we want tests, we should go to https://github.com/knomedia/k5uploader/blob/master/package.json#L7 and copy/paste back in the testem stuff\"",
-    "build:canvas": "babel --root-mode upward src -d es & JEST_WORKER_ID=true babel --root-mode upward src -d lib"
+    "build:canvas": "babel -d es src & babel --config-file=./babel.config.cjs.js -d lib src"
   },
   "repository": {
     "type": "git",
