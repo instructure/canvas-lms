@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!homeroom_page'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import useImmediate from '@canvas/use-immediate-hook'
 import {Heading} from '@instructure/ui-heading'
@@ -35,6 +35,8 @@ import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
+
+const I18n = useI18nScope('homeroom_page');
 
 const HomeroomPage = ({
   cards,

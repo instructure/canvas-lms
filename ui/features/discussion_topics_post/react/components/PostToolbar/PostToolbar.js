@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
@@ -46,6 +46,8 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
+
+const I18n = useI18nScope('discussion_posts');
 
 export function PostToolbar({repliesCount, unreadCount, ...props}) {
   return (

@@ -18,7 +18,7 @@
 
 import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
 import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
 import PropTypes from 'prop-types'
@@ -31,6 +31,8 @@ import {MediaAttachment} from '../../components/MediaAttachment/MediaAttachment'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer'
+
+const I18n = useI18nScope('conversations_2');
 
 const HeaderInputs = props => {
   let moreCourses

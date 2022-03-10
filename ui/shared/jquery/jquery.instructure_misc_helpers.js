@@ -17,9 +17,11 @@
  */
 
 import INST from 'browser-sniffer'
-import I18n from 'i18n!instructure'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
+
+const I18n = useI18nScope('instructure');
 
 // Return the first value which passes a truth test
 $.detect = function(collection, callback) {
@@ -100,7 +102,7 @@ $.underscore = function(string) {
   return (string || '')
     .replace(/([A-Z])/g, '_$1')
     .replace(/^_/, '')
-    .toLowerCase()
+    .toLowerCase();
 }
 
 $.titleize = function(string) {
@@ -109,7 +111,7 @@ $.titleize = function(string) {
     .replace(/_/g, ' ')
     .replace(/\s+/, ' ')
     .replace(/^\s/, '')
-  return $.map(res.split(/\s/), word => (word[0] || '').toUpperCase() + word.substring(1)).join(' ')
+  return $.map(res.split(/\s/), word => (word[0] || '').toUpperCase() + word.substring(1)).join(' ');
 }
 
 $.fileSize = function(bytes) {
@@ -165,7 +167,7 @@ $.queryParam = function(name) {
   const regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
   const results = regex.exec(window.location.search)
   if (results == null) return results
-  else return decodeURIComponent(results[1].replace(/\+/g, ' '))
+  else return decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
 $.capitalize = function(string) {

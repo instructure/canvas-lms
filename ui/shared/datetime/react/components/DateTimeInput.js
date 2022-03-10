@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!date_time_input'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState, useCallback, useRef} from 'react'
 import {func, node, string} from 'prop-types'
 import {TimeSelect} from '@instructure/ui-time-select'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import DateInput from './DateInput'
 import {utcTimeOffset, utcDateOffset} from '@canvas/datetime/changeTimezone'
+
+const I18n = useI18nScope('date_time_input');
 
 /*
  *  This is a helper component that implements a single date and time picker,

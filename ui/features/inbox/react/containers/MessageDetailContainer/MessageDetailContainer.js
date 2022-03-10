@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Conversation} from '../../../graphql/Conversation'
 import {CONVERSATION_MESSAGES_QUERY} from '../../../graphql/Queries'
 import {DELETE_CONVERSATION_MESSAGES} from '../../../graphql/Mutations'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
@@ -28,6 +28,8 @@ import React, {useContext} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('conversations_2');
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

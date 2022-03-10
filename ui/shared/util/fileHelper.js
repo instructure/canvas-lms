@@ -17,8 +17,10 @@
  */
 
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import I18n from 'i18n!shared_components'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
+
+const I18n = useI18nScope('shared_components');
 
 export const formatFileSize = (bytes, decimals = 2) => {
   if (bytes === 0) return '0 B'

@@ -23,9 +23,11 @@ import _ from 'underscore'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
-import I18n from 'i18n!GradingPeriodSetForm'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import EnrollmentTermInput from './EnrollmentTermInput'
 import '@canvas/rails-flash-notifications'
+
+const I18n = useI18nScope('GradingPeriodSetForm');
 
 const {array, bool, func, shape, string} = PropTypes
 

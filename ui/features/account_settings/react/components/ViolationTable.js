@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import I18n from 'i18n!csp_violation_table'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Table} from '@instructure/ui-table'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -25,6 +25,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+
+const I18n = useI18nScope('csp_violation_table');
 
 const HEADERS = [
   {

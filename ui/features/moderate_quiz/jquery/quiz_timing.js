@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!quizzes.timing'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
-import 'date' /* Date.parse */
+import 'date'
+const I18n = useI18nScope('quizzes.timing');
+/* Date.parse */
 
 var timing = {
   initialTime: new Date(),

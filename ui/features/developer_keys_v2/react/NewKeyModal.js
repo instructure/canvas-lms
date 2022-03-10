@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!react_developer_keys'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 
 import {CloseButton, Button} from '@instructure/ui-buttons'
@@ -27,6 +27,8 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import PropTypes from 'prop-types'
 import NewKeyForm from './NewKeyForm'
+
+const I18n = useI18nScope('react_developer_keys');
 
 export default class DeveloperKeyModal extends React.Component {
   state = {

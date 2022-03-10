@@ -32,8 +32,10 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('conversations_2');
 
 const Settings = props => (
   <Menu

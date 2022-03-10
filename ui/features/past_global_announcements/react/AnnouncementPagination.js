@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {Pagination} from '@instructure/ui-pagination'
-import I18n from 'i18n!past_global_announcements'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('past_global_announcements');
 
 /*
  * The account_notifications_controller#render_past_global_announcements

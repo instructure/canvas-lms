@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
@@ -44,6 +44,8 @@ import useRatings from '@canvas/outcomes/react/hooks/useRatings'
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)

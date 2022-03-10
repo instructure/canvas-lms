@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!discussions_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Avatar} from '@instructure/ui-avatar'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {Text} from '@instructure/ui-text'
 import {Select} from '@instructure/ui-select'
+
+const I18n = useI18nScope('discussions_posts');
 
 const CURRENT_USER = 'current_user'
 

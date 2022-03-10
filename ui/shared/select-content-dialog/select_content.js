@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!select_content_dialog'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('select_content_dialog');
 
 export default class {
   static contentPlacements = ['resource_selection']

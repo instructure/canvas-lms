@@ -19,7 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import I18n from 'i18n!choose_mastery_path'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('choose_mastery_path');
 
 const {func, bool} = PropTypes
 

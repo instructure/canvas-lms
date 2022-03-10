@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/datetime' /* datetimeString */
+import '@canvas/datetime'/* datetimeString */
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import INST from 'browser-sniffer'
-import I18n from 'i18n!content_locks'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('content_locks');
 
 INST.lockExplanation = function(data, type) {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb

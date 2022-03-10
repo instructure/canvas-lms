@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_coursesExpandableLockOptions'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
@@ -33,6 +33,8 @@ import LockCheckList from './LockCheckList'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import {formatLockObject} from '@canvas/blueprint-courses/react/LockItemFormat'
 import {itemTypeLabelPlurals} from '@canvas/blueprint-courses/react/labels'
+
+const I18n = useI18nScope('blueprint_coursesExpandableLockOptions');
 
 // ExpandableLockOptions is a single expandable tab that has a list of checkboxes as children
 // The tab has the toggle icon, the title of the tab, the lock icon that indicates whether the

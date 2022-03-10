@@ -18,7 +18,7 @@
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -32,6 +32,8 @@ import openMoveDialog from '../../openMoveDialog'
 import downloadStuffAsAZip from '../legacy/util/downloadStuffAsAZip'
 import deleteStuff from '../legacy/util/deleteStuff'
 import $ from 'jquery'
+
+const I18n = useI18nScope('react_files');
 
 class ItemCog extends React.Component {
   static displayName = 'ItemCog'

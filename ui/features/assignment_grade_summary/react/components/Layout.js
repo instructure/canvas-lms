@@ -21,7 +21,7 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!assignment_grade_summary'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 import {selectFinalGrade} from '../grades/GradeActions'
@@ -29,6 +29,8 @@ import {loadStudents} from '../students/StudentActions'
 import FlashMessageHolder from './FlashMessageHolder'
 import GradesGrid from './GradesGrid/index'
 import Header from './Header'
+
+const I18n = useI18nScope('assignment_grade_summary');
 
 class Layout extends Component {
   static propTypes = {

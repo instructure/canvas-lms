@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
-import I18n from 'i18n!react_developer_keys'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 
@@ -36,6 +36,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
+
+const I18n = useI18nScope('react_developer_keys');
 
 class DeveloperKey extends React.Component {
   static displayName = 'Row'

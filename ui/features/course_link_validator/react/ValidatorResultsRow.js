@@ -38,7 +38,9 @@ import {
 } from '@instructure/ui-icons'
 import sanitizeUrl from 'sanitize-url'
 
-import I18n from 'i18n!link_validator'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('link_validator');
 
 const TYPE_INFO = {
   course_card_image: {icon: IconSettingsLine, label: I18n.t('Course Settings')},

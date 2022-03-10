@@ -21,7 +21,7 @@ import CalculatedRenderer from './questions/calculated'
 import EssayRenderer from './questions/essay'
 import FileUploadRenderer from './questions/file_upload'
 import FillInMultipleBlanksRenderer from './questions/fill_in_multiple_blanks'
-import I18n from 'i18n!quiz_statistics'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import MultipleChoiceRenderer from './questions/multiple_choice'
 import QuestionRenderer from './question'
 import React from 'react'
@@ -29,6 +29,8 @@ import Report from './summary/report'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 import ShortAnswerRenderer from './questions/short_answer'
 import Summary from './summary/index'
+
+const I18n = useI18nScope('quiz_statistics');
 
 const extend = _.extend
 const Renderers = {

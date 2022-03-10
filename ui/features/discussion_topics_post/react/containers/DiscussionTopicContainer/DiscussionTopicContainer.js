@@ -24,7 +24,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
@@ -53,6 +53,8 @@ import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 import assignmentRubricDialog from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+
+const I18n = useI18nScope('discussion_posts');
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 

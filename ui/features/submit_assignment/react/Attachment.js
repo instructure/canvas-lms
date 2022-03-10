@@ -21,9 +21,11 @@ import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
 import WebcamModal from './WebcamModal'
 import {hasMediaFeature} from '../util/mediaUtils'
-import I18n from 'i18n!attachment'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {direction} from '@canvas/i18n/rtlHelper'
 import Focus from '@canvas/outcomes/react/Focus'
+
+const I18n = useI18nScope('attachment');
 
 const LegacyFileUpload = ({index}) => {
   return (

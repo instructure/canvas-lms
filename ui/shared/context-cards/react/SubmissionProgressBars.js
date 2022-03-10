@@ -18,13 +18,15 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!student_context_traySubmissionProgressBars'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import classnames from 'classnames'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Progress} from '@instructure/ui-progress'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
+
+const I18n = useI18nScope('student_context_traySubmissionProgressBars');
 
 function scoreInPoints(score, pointsPossible) {
   const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})

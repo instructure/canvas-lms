@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import I18n from 'i18n!grade_details'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -38,6 +38,8 @@ import {
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {GradeRow} from './GradeRow'
 import GradesEmptyPage from './GradesEmptyPage'
+
+const I18n = useI18nScope('grade_details');
 
 const NUM_GRADE_SKELETONS = 10
 

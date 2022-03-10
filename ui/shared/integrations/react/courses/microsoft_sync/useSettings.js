@@ -18,8 +18,10 @@
 
 import axios from 'axios'
 import React, {useState, useCallback} from 'react'
-import I18n from 'i18n!course_settings'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import useFetchApi from '@canvas/use-fetch-api-hook'
+
+const I18n = useI18nScope('course_settings');
 
 function useSettings(courseId) {
   const [group, setGroup] = useState({})

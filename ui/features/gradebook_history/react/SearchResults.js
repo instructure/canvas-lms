@@ -21,7 +21,7 @@ import {connect} from 'react-redux'
 import {arrayOf, bool, func, node, shape, string} from 'prop-types'
 import $ from 'jquery'
 import '@canvas/datetime'
-import I18n from 'i18n!gradebook_history'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -29,6 +29,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {getHistoryNextPage} from './actions/SearchResultsActions'
 import SearchResultsRow from './SearchResultsRow'
+
+const I18n = useI18nScope('gradebook_history');
 
 const colHeaders = [
   I18n.t('Date'),

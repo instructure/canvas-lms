@@ -18,8 +18,10 @@
 
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import I18n from 'i18n!terms_of_use'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+const I18n = useI18nScope('terms_of_use');
 
 ready(() => {
   $('form.reaccept_terms').submit(function() {

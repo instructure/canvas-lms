@@ -21,13 +21,15 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {createRating} from '@canvas/outcomes/react/hooks/useRatings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyRating from '../MasteryScale/ProficiencyRating'
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const ratingsShape = PropTypes.shape({
   key: PropTypes.string,

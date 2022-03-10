@@ -19,7 +19,9 @@
 import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {Select} from '@instructure/ui-select'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('gradebook');
 
 function optionIdForGradeInfo(gradeInfo) {
   if (gradeInfo.excused) {

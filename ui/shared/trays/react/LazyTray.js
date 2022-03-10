@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!canvas_lazy_tray'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {Suspense} from 'react'
 import CanvasTray from './Tray'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('canvas_lazy_tray');
 
 // children should be a react `lazy`. This won't work properly otherwise.
 export default function CanvasLazyTray({children, ...trayProps}) {

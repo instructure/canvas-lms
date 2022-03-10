@@ -18,7 +18,7 @@
 
 import FileUploadQuestionView from '../backbone/views/FileUploadQuestionView'
 import File from '@canvas/files/backbone/models/File.coffee'
-import I18n from 'i18n!quizzes.take_quiz'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import autoBlurActiveInput from './behaviors/autoBlurActiveInput'
@@ -30,12 +30,14 @@ import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_ev
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/util/toJSON'
-import '@canvas/datetime' /* friendlyDatetime, friendlyDate */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
+import '@canvas/datetime'/* friendlyDatetime, friendlyDate */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/quizzes/jquery/behaviors/quiz_selectmenu'
+
+const I18n = useI18nScope('quizzes.take_quiz');
 
 RichContentEditor.preloadRemoteModule()
 
@@ -527,7 +529,7 @@ const quizSubmission = (function () {
       const action = button.data('action')
       $('#submit_quiz_form').attr('action', action).submit()
     }
-  }
+  };
 })()
 
 $(window).focus(evt => {

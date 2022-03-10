@@ -21,7 +21,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import elideString from '../../helpers/elideString'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {getFileThumbnail} from '@canvas/util/fileHelper'
-import I18n from 'i18n!assignments_2_file_upload'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import MoreOptions from './MoreOptions/index'
 import React, {Component} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -40,6 +40,8 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
+
+const I18n = useI18nScope('assignments_2_file_upload');
 
 class FileUpload extends Component {
   static propTypes = {

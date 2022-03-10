@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebookHeaderMenu'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import messageStudents from '@canvas/message-students-dialog/jquery/message_students'
 import AssignmentDetailsDialog from './AssignmentDetailsDialog'
@@ -36,6 +36,8 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-kyle-menu'
+
+const I18n = useI18nScope('gradebookHeaderMenu');
 
 const isAdmin = function () {
   return ENV.current_user_roles.includes('admin')

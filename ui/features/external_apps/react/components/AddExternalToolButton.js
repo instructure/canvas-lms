@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import store from '../lib/ExternalAppsStore'
@@ -31,6 +31,8 @@ import '@canvas/rails-flash-notifications'
 import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
 import install13Tool from '../lib/install13Tool'
+
+const I18n = useI18nScope('external_tools');
 
 export default class AddExternalToolButton extends React.Component {
   static propTypes = {

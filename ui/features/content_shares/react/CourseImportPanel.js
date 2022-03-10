@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!direct_share_course_import_panel'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState} from 'react'
 import {func} from 'prop-types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -24,6 +24,8 @@ import contentShareShape from '@canvas/content-sharing/react/proptypes/contentSh
 import DirectShareOperationStatus from '@canvas/direct-sharing/react/components/DirectShareOperationStatus'
 import ConfirmActionButtonBar from '@canvas/direct-sharing/react/components/ConfirmActionButtonBar'
 import CourseAndModulePicker from '@canvas/direct-sharing/react/components/CourseAndModulePicker'
+
+const I18n = useI18nScope('direct_share_course_import_panel');
 
 CourseImportPanel.propTypes = {
   contentShare: contentShareShape.isRequired,
