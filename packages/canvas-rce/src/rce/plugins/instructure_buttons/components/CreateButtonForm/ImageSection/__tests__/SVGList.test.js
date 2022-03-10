@@ -23,11 +23,11 @@ import SVGList, {TYPE} from '../SVGList'
 import MultiColorSVG from '../MultiColor/svg'
 
 describe('SVGList', () => {
-  let type, onSelect
+  let type, onSelect, onMount
 
   beforeEach(() => (onSelect = () => {}))
 
-  const subject = () => render(<SVGList type={type} onSelect={onSelect} />)
+  const subject = () => render(<SVGList type={type} onSelect={onSelect} onMount={onMount} />)
 
   describe('when "type" is "multicolor"', () => {
     beforeEach(() => (type = TYPE.Multicolor))
@@ -62,6 +62,15 @@ describe('SVGList', () => {
           label: 'Art Icon'
         })
       )
+    })
+  })
+
+  describe('when an "onMount" function is given', () => {
+    beforeEach(() => (onMount = jest.fn()))
+
+    it('calls "onMount"', () => {
+      subject()
+      expect(onMount).toHaveBeenCalledTimes(1)
     })
   })
 })
