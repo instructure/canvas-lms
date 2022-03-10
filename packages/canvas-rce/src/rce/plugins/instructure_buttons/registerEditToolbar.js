@@ -21,9 +21,9 @@ import formatMessage from '../../../format-message'
 const BUTTON_ID = 'inst-button-and-icons-edit'
 const TOOLBAR_ID = 'inst-button-and-icons-edit-toolbar'
 
-export const BTN_AND_ICON_ATTRIBUTE = 'data-inst-buttons-and-icons'
+export const BTN_AND_ICON_ATTRIBUTE = 'data-inst-icon-maker-icon'
 export const BTN_AND_ICON_DOWNLOAD_URL_ATTR = 'data-download-url'
-export const BUTTONS_AND_ICONS = 'buttons_and_icons'
+export const BUTTONS_AND_ICONS = 'icon_maker_icons'
 
 export const shouldShowEditButton = node => !!node?.getAttribute(BTN_AND_ICON_ATTRIBUTE)
 

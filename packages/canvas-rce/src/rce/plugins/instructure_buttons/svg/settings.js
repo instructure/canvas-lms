@@ -120,8 +120,6 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-    // Otherwise, fetch default settings to set us back to creating
-    else dispatch({...defaultState, name: ''})
   }, [editor, editing, urlFromNode, rcsConfig])
 
   return [settings, status, dispatch]

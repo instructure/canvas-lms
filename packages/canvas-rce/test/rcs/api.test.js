@@ -462,10 +462,10 @@ describe('sources/api', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource
-        .preflightUpload(fileProps, {category: 'buttons_and_icons'}, apiProps)
+        .preflightUpload(fileProps, {category: 'icon_maker_icons'}, apiProps)
         .then(() => {
           const body = JSON.parse(fetchMock.lastOptions(uri).body)
-          assert.equal(body.category, 'buttons_and_icons')
+          assert.equal(body.category, 'icon_maker_icons')
         })
     })
 

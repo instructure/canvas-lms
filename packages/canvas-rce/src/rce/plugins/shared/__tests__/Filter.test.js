@@ -248,8 +248,8 @@ describe('RCE Plugins > Filter', () => {
         selectContentSubtype('Icon Maker Icons')
       })
 
-      it('sets the content subtype to "buttons_and_icons"', () => {
-        expect(currentFilterSettings.contentSubtype).toEqual('buttons_and_icons')
+      it('sets the content subtype to "icon_maker_icons"', () => {
+        expect(currentFilterSettings.contentSubtype).toEqual('icon_maker_icons')
       })
 
       it('sets the content type to "course_files"', () => {

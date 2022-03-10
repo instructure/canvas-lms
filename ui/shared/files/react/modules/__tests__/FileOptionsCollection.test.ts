@@ -21,7 +21,7 @@ import FileOptionsCollection from '../FileOptionsCollection'
 describe('applyCategory()', () => {
   let fileText, fileType
 
-  let file = () => ({
+  const file = () => ({
     slice: () => ({
       text: async () => fileText
     }),
@@ -43,12 +43,12 @@ describe('applyCategory()', () => {
 
     describe('when the file is a button & icon', () => {
       beforeEach(() => {
-        fileText = 'something something image/svg+xml-buttons-and-icons'
+        fileText = 'something something image/svg+xml-icon-maker-icons'
       })
 
-      it('adds the button and icon category', async () => {
+      it('adds the icon  maker icons category', async () => {
         const options = await subject()
-        expect(options[0].category).toEqual('buttons_and_icons')
+        expect(options[0].category).toEqual('icon_maker_icons')
       })
     })
 
@@ -79,7 +79,7 @@ describe('applyCategory()', () => {
 describe('queueUploads()', () => {
   let fileText, fileType
 
-  let file = () => ({
+  const file = () => ({
     slice: () => ({
       text: async () => fileText
     }),
