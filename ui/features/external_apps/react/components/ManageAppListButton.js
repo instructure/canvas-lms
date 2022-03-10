@@ -53,13 +53,13 @@ export default class ManageAppListButton extends React.Component {
   }
 
   openModal = () => {
-    this.setState({modalIsOpen: true, accessToken: this.state.originalAccessToken})
+    this.setState(state => ({modalIsOpen: true, accessToken: state.originalAccessToken}))
   }
 
   successHandler = () => {
-    this.setState({
-      originalAccessToken: this.maskedAccessToken(this.state.accessToken.substring(0, 5))
-    })
+    this.setState(state => ({
+      originalAccessToken: this.maskedAccessToken(state.accessToken.substring(0, 5))
+    }))
     if (typeof this.props.onUpdateAccessToken === 'function') {
       this.props.onUpdateAccessToken()
     }
@@ -75,7 +75,7 @@ export default class ManageAppListButton extends React.Component {
 
   handleSubmit = () => {
     this.closeModal(() => {
-      if (this.state.accessToken != this.state.originalAccessToken) {
+      if (this.state.accessToken !== this.state.originalAccessToken) {
         this.props.extAppStore.updateAccessToken(
           ENV.CONTEXT_BASE_URL,
           this.state.accessToken,
@@ -97,7 +97,9 @@ export default class ManageAppListButton extends React.Component {
     const allowListLink = I18n.t('#community.admin_app_center_allowlist')
     return (
       <View>
-        <Button onClick={this.openModal}>{I18n.t('Manage App List')}</Button>
+        <Button margin="none x-small" onClick={this.openModal}>
+          {I18n.t('Manage App List')}
+        </Button>
         <Modal
           open={this.state.modalIsOpen}
           onDismiss={this.closeModal}
@@ -107,10 +109,10 @@ export default class ManageAppListButton extends React.Component {
             <p
               dangerouslySetInnerHTML={{
                 __html: I18n.t(
-                  'Enter the access token for your organization from \
+                  `Enter the access token for your organization from \
                     *eduappcenter.com*. Once applied, only apps your organization has approved in the \
                     EduAppCenter will be listed on the External Apps page. \
-                    Learn how to **generate an access token**.',
+                    Learn how to **generate an access token**.`,
                   {
                     wrappers: [
                       '<a href="https://www.eduappcenter.com">$1</a>',
