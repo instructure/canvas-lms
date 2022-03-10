@@ -75,7 +75,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
   it('renders the create view', () => {
     renderComponent(defaults)
-    screen.getByRole('heading', {name: /buttons and icons/i})
+    screen.getByRole('heading', {name: /create icon/i})
   })
 
   it('closes the tray', async () => {
@@ -248,10 +248,10 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
       await waitFor(() => {
         expect(getByLabelText('Name').value).toEqual('')
-        expect(getByLabelText('Button Shape').value).toEqual('Square')
-        expect(getByLabelText('Button Size').value).toEqual('Small')
+        expect(getByLabelText('Icon Shape').value).toEqual('Square')
+        expect(getByLabelText('Icon Size').value).toEqual('Small')
         expect(getAllByTestId('colorPreview-none').length).toBeGreaterThan(0)
-        expect(getByLabelText('Button Outline Size').value).toEqual('Small')
+        expect(getByLabelText('Icon Outline Size').value).toEqual('Small')
       })
     })
   })
@@ -305,11 +305,11 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
       await waitFor(() => {
         expect(getByLabelText('Name').value).toEqual('Test Button')
-        expect(getByLabelText('Button Shape').value).toEqual('Triangle')
-        expect(getByLabelText('Button Size').value).toEqual('Large')
+        expect(getByLabelText('Icon Shape').value).toEqual('Triangle')
+        expect(getByLabelText('Icon Size').value).toEqual('Large')
         expect(getByTestId('colorPreview-#FF2717')).toBeInTheDocument() // button color
         expect(getByTestId('colorPreview-#06A3B7')).toBeInTheDocument() // button outline
-        expect(getByLabelText('Button Outline Size').value).toEqual('Small')
+        expect(getByLabelText('Icon Outline Size').value).toEqual('Small')
       })
     })
 

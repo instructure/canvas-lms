@@ -17,7 +17,7 @@
  */
 
 import 'jqueryui/dialog'
-import I18n from 'i18n!account_settings'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -33,6 +33,8 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' // confirmDelete, showIf
 import '@canvas/loading-image'
 import 'date' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
+
+const I18n = useI18nScope('account_settings');
 
 let reportsTabHasLoaded = false
 

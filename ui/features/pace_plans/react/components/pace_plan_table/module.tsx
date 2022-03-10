@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import I18n from 'i18n!pace_plans_module'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
@@ -32,6 +32,8 @@ import {View} from '@instructure/ui-view'
 
 import AssignmentRow from './assignment_row'
 import {Module as IModule, PacePlan, ResponsiveSizes} from '../../types'
+
+const I18n = useI18nScope('pace_plans_module');
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Body, ColHeader, Head, Row} = Table as any

@@ -17,12 +17,14 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import I18n from 'i18n!content_migrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/ContentCheckbox.handlebars'
 import checkboxCollectionTemplate from '../../jst/ContentCheckboxCollection.handlebars'
 import CheckboxCollection from '../collections/ContentCheckboxCollection.coffee'
 import CollectionView from '@canvas/backbone-collection-view'
 import TextHelper from '@canvas/util/TextHelper.coffee'
+
+I18n = useI18nScope('content_migrations')
 
 export default class ContentCheckboxView extends Backbone.View
   template: template

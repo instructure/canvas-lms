@@ -18,12 +18,14 @@
 
 import React from 'react'
 import {func, instanceOf, shape} from 'prop-types'
-import I18n from 'i18n!files_upload_progress'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import classnames from 'classnames'
 import ProgressBar from '@canvas/progress/react/components/ProgressBar'
 import mimeClass from '@canvas/mime/mimeClass'
 import UploadQueue from '../modules/UploadQueue'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('files_upload_progress');
 
 class UploadProgress extends React.Component {
   static propTypes = {

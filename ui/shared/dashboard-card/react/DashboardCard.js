@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!dashcards'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import axios from '@canvas/axios'
 
 import DashboardCardAction from './DashboardCardAction'
@@ -28,6 +28,8 @@ import PublishButton from './PublishButton'
 import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'
+
+const I18n = useI18nScope('dashcards');
 
 export function DashboardCardHeaderHero({image, backgroundColor, hideColorOverlays, onClick}) {
   if (image) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {func, string} from 'prop-types'
 import moment from 'moment-timezone'
@@ -34,6 +34,8 @@ import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
 import DateValidator from '@canvas/datetime/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import {originalDateField, canEditAll} from './utils'
+
+const I18n = useI18nScope('assignments_bulk_edit');
 
 BulkEdit.propTypes = {
   courseId: string.isRequired,

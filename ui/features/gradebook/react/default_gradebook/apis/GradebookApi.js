@@ -17,8 +17,10 @@
  */
 
 import axios from '@canvas/axios'
-import I18n from 'i18n!gradebookGradebookApi'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {underscore} from 'convert-case'
+
+const I18n = useI18nScope('gradebookGradebookApi');
 
 function applyScoreToUngradedSubmissions(courseId, params) {
   const url = `/api/v1/courses/${courseId}/apply_score_to_ungraded_submissions`

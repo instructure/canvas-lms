@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!dashboard_grades_page'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -31,6 +31,8 @@ import GradesSummary from './GradesSummary'
 import GradingPeriodSelect, {ALL_PERIODS_OPTION} from './GradingPeriodSelect'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+
+const I18n = useI18nScope('dashboard_grades_page');
 
 export const getGradingPeriodsFromCourses = courses =>
   courses

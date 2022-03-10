@@ -17,9 +17,11 @@
 
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import I18n from 'i18n!ExternalContentFileSubmissionView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/ExternalContentHomeworkFileSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView.coffee'
+
+I18n = useI18nScope('ExternalContentFileSubmissionView')
 
 export default class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissionView
   template: template

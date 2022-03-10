@@ -115,7 +115,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
     it('is labeled with "Buttons and Icons" when using the "list_buttons_and_icons" content type', async () => {
       await showTrayForPlugin('list_buttons_and_icons')
-      expect(getTrayLabel()).toEqual('Buttons and Icons')
+      expect(getTrayLabel()).toEqual('Icon Maker Icons')
     })
   })
 

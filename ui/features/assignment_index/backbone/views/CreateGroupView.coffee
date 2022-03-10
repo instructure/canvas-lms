@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import round from 'round'
-import I18n from 'i18n!CreateGroupView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -28,6 +28,8 @@ import template from '../../jst/CreateGroup.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import '@canvas/rails-flash-notifications'
+
+I18n = useI18nScope('CreateGroupView')
 
 SHORT_HEIGHT = 250
 

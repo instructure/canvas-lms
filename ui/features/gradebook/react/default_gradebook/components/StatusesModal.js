@@ -20,12 +20,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {func, shape, string} from 'prop-types'
 import update from 'immutability-helper'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Text} from '@instructure/ui-text'
 import {statuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
+
+const I18n = useI18nScope('gradebook');
 
 class StatusesModal extends React.Component {
   static propTypes = {

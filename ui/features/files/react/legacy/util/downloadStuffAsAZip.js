@@ -17,10 +17,12 @@
  */
 
 import _ from 'underscore'
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import Progress from '@canvas/progress/backbone/models/Progress.coffee'
 import Folder from '@canvas/files/backbone/models/Folder'
+
+const I18n = useI18nScope('react_files');
 
 export default function downloadStuffAsAZip(filesAndFolders, {contextType, contextId}) {
   let promptBeforeLeaving

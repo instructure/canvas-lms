@@ -20,7 +20,6 @@ const {defaults} = require('jest-config')
 
 module.exports = {
   moduleNameMapper: {
-    '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
     '\\.svg$': '<rootDir>/jest/imageMock.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
     'node_modules-version-of-react-modal': require.resolve('react-modal'),
@@ -65,7 +64,6 @@ module.exports = {
   testEnvironment: 'jest-environment-jsdom-fourteen',
 
   transform: {
-    '^i18n!': '<rootDir>/jest/i18nTransformer.js',
     '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
     '\\.graphql$': 'jest-raw-loader',

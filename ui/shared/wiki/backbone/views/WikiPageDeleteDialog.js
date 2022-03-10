@@ -16,8 +16,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!pages'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView.coffee'
+
+const I18n = useI18nScope('pages');
 
 const dialogDefaults = {
   fixDialogButtons: false,

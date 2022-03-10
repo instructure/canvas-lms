@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!external_tools'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 import Lti2ReregistrationUpdateModal from './Lti2ReregistrationUpdateModal'
+
+const I18n = useI18nScope('external_tools');
 
 export default class ManageUpdateExternalToolButton extends React.Component {
   static propTypes = {

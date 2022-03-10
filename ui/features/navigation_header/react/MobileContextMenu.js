@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback} from 'react'
-import I18n from 'i18n!MobileNavigation'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {string, node} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
@@ -60,6 +60,8 @@ import {
 } from '@instructure/ui-icons'
 
 import {Link} from '@instructure/ui-link'
+
+const I18n = useI18nScope('MobileNavigation');
 
 const icons = {
   home: IconHomeLine,

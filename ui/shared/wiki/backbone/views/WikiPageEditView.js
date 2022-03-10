@@ -23,9 +23,11 @@ import template from '../../jst/WikiPageEdit.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
-import I18n from 'i18n!pages'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import '@canvas/datetime'
+
+const I18n = useI18nScope('pages');
 
 RichContentEditor.preloadRemoteModule()
 

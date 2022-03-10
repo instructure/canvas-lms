@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
+
+const I18n = useI18nScope('react_files');
 
 export default function deleteStuff(filesAndFolders, args) {
   const isDeletingAnUnemptyFolder = filesAndFolders.some(

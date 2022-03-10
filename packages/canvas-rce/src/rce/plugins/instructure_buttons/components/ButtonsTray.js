@@ -88,7 +88,7 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
   const [isOpen, setIsOpen] = useState(true)
   const [replaceAll, setReplaceAll] = useState(false)
 
-  const title = formatMessage('Buttons and Icons')
+  const title = formatMessage('Create Icon')
 
   const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
   const [status, setStatus] = useState(statuses.IDLE)

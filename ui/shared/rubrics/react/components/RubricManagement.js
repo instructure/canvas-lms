@@ -20,10 +20,12 @@
 
 import React, {useState, useRef} from 'react'
 import {string} from 'prop-types'
-import I18n from 'i18n!RubricManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Tabs} from '@instructure/ui-tabs'
 import ProficiencyTable from './ProficiencyTable'
 import RubricPanel from './RubricPanel'
+
+const I18n = useI18nScope('RubricManagement');
 
 function RubricManagement(props) {
   const [tab, setTab] = useState('tab-panel-rubrics')

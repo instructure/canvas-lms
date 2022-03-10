@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import I18n from 'i18n!blueprint_settingsUnsyncedChanges'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import select from 'obj-select'
@@ -32,6 +32,8 @@ import {ConnectedMigrationOptions as MigrationOptions} from './MigrationOptions'
 
 import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
+
+const I18n = useI18nScope('blueprint_settingsUnsyncedChanges');
 
 export default class UnsyncedChanges extends Component {
   static propTypes = {

@@ -17,7 +17,9 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!webzip_exports'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('webzip_exports');
 
 const Errors = props => {
   return (

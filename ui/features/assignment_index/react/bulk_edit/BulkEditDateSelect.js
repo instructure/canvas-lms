@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState, useCallback} from 'react'
 import tz from '@canvas/timezone'
 
@@ -27,6 +27,8 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+
+const I18n = useI18nScope('assignments_bulk_edit');
 
 function formatDate(date) {
   return tz.format(date, 'date.formats.medium_with_weekday')

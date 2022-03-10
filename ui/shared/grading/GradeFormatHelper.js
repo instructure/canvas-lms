@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!sharedGradeFormatHelper'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from './GradingSchemeHelper'
+
+const I18n = useI18nScope('sharedGradeFormatHelper');
 
 const POINTS = 'points'
 const PERCENT = 'percent'
@@ -45,7 +47,7 @@ function isPercent(grade, gradeType) {
     return gradeType === PERCENT
   }
 
-  return /%/g.test(grade)
+  return /%/g.test(grade);
 }
 
 function isExcused(grade) {
@@ -212,7 +214,7 @@ const GradeFormatHelper = {
       return localizedGrade
     }
 
-    return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '')
+    return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '');
   },
 
   parseGrade(grade, options = {}) {

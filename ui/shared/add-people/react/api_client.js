@@ -22,7 +22,9 @@
 // on the api input.
 //
 import axios from '@canvas/axios'
-import I18n from 'i18n!add_people_api_client'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('add_people_api_client');
 
 export default {
   // @param courseId: id of current course

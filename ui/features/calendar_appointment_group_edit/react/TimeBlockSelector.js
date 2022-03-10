@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!appointment_groups'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
 import '@canvas/datetime'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -29,6 +29,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import TimeBlockSelectRow from './TimeBlockSelectRow'
 import NumberHelper from '@canvas/i18n/numberHelper'
+
+const I18n = useI18nScope('appointment_groups');
 
 const uniqueId = (() => {
   let count = 0

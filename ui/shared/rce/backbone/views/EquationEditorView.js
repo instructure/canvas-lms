@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!EquationEditorView'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
@@ -26,6 +26,8 @@ import preventDefault from 'prevent-default'
 import * as RceCommandShim from '../../RceCommandShim'
 import 'jqueryui/dialog'
 import '@canvas/mathquill'
+
+const I18n = useI18nScope('EquationEditorView');
 
 export default class EquationEditorView extends Backbone.View {
   static initClass() {
@@ -64,7 +66,7 @@ export default class EquationEditorView extends Backbone.View {
         } else {
           // if we're editing inline LaTex, strip the delimiters
           // if the selection included them
-          return elem.nodeValue.trim().replace(/^(?:\\\(|\$\$)(.*)*(?:\\\)|\$\$)$/g, '$1')
+          return elem.nodeValue.trim().replace(/^(?:\\\(|\$\$)(.*)*(?:\\\)|\$\$)$/g, '$1');
         }
 
         // Get alt attributes from IMG nodes
@@ -81,7 +83,7 @@ export default class EquationEditorView extends Backbone.View {
       }
     })
       .join('')
-      .trim()
+      .trim();
   }
 
   getEquationText(elems) {

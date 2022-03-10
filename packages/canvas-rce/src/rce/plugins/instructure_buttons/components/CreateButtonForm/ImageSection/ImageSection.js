@@ -184,7 +184,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
           <Flex.Item padding="small">
             <ColorInput
               color={state.iconFillColor}
-              label={formatMessage('Icon Color')}
+              label={formatMessage('Single Color Image Color')}
               name="single-color-image-fill"
               onChange={color => dispatch({type: actions.SET_ICON_FILL_COLOR.type, payload: color})}
               popoverMountNode={getColorSection}

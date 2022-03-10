@@ -17,7 +17,7 @@
  */
 
 import React, {useState, lazy, useCallback} from 'react'
-import I18n from 'i18n!content_share'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
@@ -28,6 +28,8 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('content_share');
 
 const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
 const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>

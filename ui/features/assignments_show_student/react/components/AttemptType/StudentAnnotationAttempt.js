@@ -17,9 +17,11 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import I18n from 'i18n!assignments_2_student_annotation'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import LoadingIndicator from '@canvas/loading-indicator'
 import axios from '@canvas/axios'
+
+const I18n = useI18nScope('assignments_2_student_annotation');
 
 export default function StudentAnnotationAttempt(props) {
   const [iframeURL, setIframeURL] = useState(null)

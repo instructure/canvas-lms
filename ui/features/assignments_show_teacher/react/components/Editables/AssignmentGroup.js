@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {arrayOf, bool, func, oneOf, string} from 'prop-types'
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
@@ -29,6 +29,8 @@ import {
   COURSE_ASSIGNMENT_GROUPS_QUERY,
   COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL
 } from '../../assignmentData'
+
+const I18n = useI18nScope('assignments_2');
 
 const AssignmentGroupPropTypes = {
   mode: oneOf(['edit', 'view']).isRequired,

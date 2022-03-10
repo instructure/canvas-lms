@@ -19,11 +19,13 @@ import _ from 'underscore'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {completeUpload} from '@canvas/upload-file'
-import I18n from 'i18n!content_migrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {ProgressBar} from '@instructure/ui-progress'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+I18n = useI18nScope('content_migrations')
 
 export default class ContentMigration extends Backbone.Model
   urlRoot: => "/api/v1/courses/#{@get('course_id')}/content_migrations"

@@ -17,9 +17,11 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import I18n from 'i18n!groups'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {func, string} from 'prop-types'
 import {NumberInput} from '@instructure/ui-number-input'
+
+const I18n = useI18nScope('groups');
 
 const MIN = 1
 const MAX = 100000

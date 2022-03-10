@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_LockItemFormat'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {lockLabels} from './labels'
+
+const I18n = useI18nScope('blueprint_LockItemFormat');
 
 export function formatLockArray(lockableAttributes) {
   const items = lockableAttributes.map(item => lockLabels[item])

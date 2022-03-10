@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_coursesLockManageer'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -27,6 +27,8 @@ import buildProps from './buildLockProps'
 import ApiClient from '../../apiClient'
 import LockBanner from './LockBanner'
 import LockToggle from './LockToggle'
+
+const I18n = useI18nScope('blueprint_coursesLockManageer');
 
 export default class LockManager {
   constructor() {

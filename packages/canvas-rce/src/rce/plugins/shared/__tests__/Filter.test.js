@@ -73,16 +73,16 @@ describe('RCE Plugins > Filter', () => {
     fireEvent.click(component.getByText(sortByLabel))
   }
 
-  it('does not render "Buttons and Icons" option when the feature is disabled', () => {
+  it('does not render "Icon Maker Icons" option when the feature is disabled', () => {
     renderComponent({use_rce_buttons_and_icons: false})
     fireEvent.click(getContentSubtypeField())
-    expect(component.queryByText('Buttons and Icons')).toBeNull()
+    expect(component.queryByText('Icon Maker Icons')).toBeNull()
   })
 
-  it('renders "Buttons and Icons" option when the feature is enabled', () => {
+  it('renders "Icon Maker Icons" option when the feature is enabled', () => {
     renderComponent({use_rce_buttons_and_icons: true})
     fireEvent.click(getContentSubtypeField())
-    expect(component.queryByText('Buttons and Icons')).toBeInTheDocument()
+    expect(component.queryByText('Icon Maker Icons')).toBeInTheDocument()
   })
 
   describe('initially', () => {
@@ -243,9 +243,9 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.sortValue).toEqual('date_added')
     })
 
-    describe('when "Buttons and Icons" is selected', () => {
+    describe('when "Icon Maker Icons" is selected', () => {
       beforeEach(() => {
-        selectContentSubtype('Buttons and Icons')
+        selectContentSubtype('Icon Maker Icons')
       })
 
       it('sets the content subtype to "buttons_and_icons"', () => {

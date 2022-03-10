@@ -17,8 +17,10 @@
  */
 
 import Backbone from '@canvas/backbone'
-import I18n from 'i18n!modelsPageView'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import TextHelper from '@canvas/util/TextHelper.coffee'
+
+const I18n = useI18nScope('modelsPageView');
 
 function parseUserAgentString(userAgent) {
   userAgent = (userAgent || '').toLowerCase()

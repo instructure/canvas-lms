@@ -15,13 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!assignment_grading_type'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import $ from 'jquery'
 import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
 import '@canvas/util/jquery/fixDialogButtons'
+
+I18n = useI18nScope('assignment_grading_type')
 
 export default class GradingTypeSelector extends Backbone.View
 

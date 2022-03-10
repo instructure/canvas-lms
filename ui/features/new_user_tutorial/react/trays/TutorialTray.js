@@ -18,13 +18,15 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!new_user_tutorial'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import plainStoreShape from '@canvas/util/react/proptypes/plainStoreShape'
 import {Tray} from '@instructure/ui-tray'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
+
+const I18n = useI18nScope('new_user_tutorial');
 
 class TutorialTray extends React.Component {
   static propTypes = {

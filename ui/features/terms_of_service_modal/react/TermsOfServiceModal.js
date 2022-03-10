@@ -17,12 +17,14 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!terms_of_service_modal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {Link} from '@instructure/ui-link'
 import {bool} from 'prop-types'
 import {defaultFetchOptions} from '@instructure/js-utils'
+
+const I18n = useI18nScope('terms_of_service_modal');
 
 const termsOfServiceText = I18n.t('Acceptable Use Policy')
 

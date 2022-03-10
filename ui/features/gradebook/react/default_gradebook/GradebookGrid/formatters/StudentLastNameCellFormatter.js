@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
 import {
   getSecondaryDisplayInfo,
@@ -24,6 +24,8 @@ import {
   getOptions,
   renderCell
 } from './StudentCellFormatter.utils'
+
+const I18n = useI18nScope('gradebook');
 
 export default class StudentLastNameCellFormatter {
   constructor(gradebook) {

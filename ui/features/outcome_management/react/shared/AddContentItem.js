@@ -18,13 +18,15 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!AddGroup'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {TextInput} from '@instructure/ui-text-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid, IconCheckSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import Focus from '@canvas/outcomes/react/Focus'
+
+const I18n = useI18nScope('AddGroup');
 
 const AddContentItem = ({
   labelInstructions,

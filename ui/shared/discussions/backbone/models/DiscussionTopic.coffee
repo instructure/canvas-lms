@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!discussion_topics'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -26,6 +26,8 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import stripTags from 'strip-tags'
 import axios from '@canvas/axios'
+
+I18n = useI18nScope('discussion_topics')
 
 export default class DiscussionTopic extends Backbone.Model
   resourceName: 'discussion_topics'

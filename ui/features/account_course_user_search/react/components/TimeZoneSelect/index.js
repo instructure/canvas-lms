@@ -19,7 +19,9 @@
 import React from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import I18n from 'i18n!edit_timezone'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('edit_timezone');
 
 export default function TimeZoneSelect({
   label,

@@ -23,11 +23,13 @@ import {Button} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import AssignmentGradeInput from '../AssignmentGradeInput/index'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
 import SimilarityIndicator from '../SimilarityIndicator'
+
+const I18n = useI18nScope('gradebook');
 
 const themeOverrides = {
   [Button.theme]: {

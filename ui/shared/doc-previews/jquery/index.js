@@ -17,15 +17,17 @@
  */
 
 import INST from 'browser-sniffer'
-import I18n from 'i18n!jquery_doc_previews'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {trackEvent} from '@canvas/google-analytics'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
+import '@canvas/jquery/jquery.instructure_misc_helpers'/*  /\$\.uniq/, capitalize */
 import '@canvas/loading-image'
 import sanitizeUrl from 'sanitize-url'
+
+const I18n = useI18nScope('jquery_doc_previews');
 
 // first element in array is if scribd can handle it, second is if google can.
 const previewableMimeTypes = {
@@ -220,5 +222,5 @@ $.fn.loadDocPreview = function(options) {
         )
       }
     }
-  })
+  });
 }

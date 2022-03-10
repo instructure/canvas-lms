@@ -22,7 +22,9 @@ import PropTypes from 'prop-types'
 import DueDateTokenWrapper from './DueDateTokenWrapper'
 import DueDateCalendars from './DueDateCalendars'
 import DueDateRemoveRowLink from './DueDateRemoveRowLink'
-import I18n from 'i18n!DueDateRow'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('DueDateRow');
 
 class DueDateRow extends React.Component {
   static propTypes = {

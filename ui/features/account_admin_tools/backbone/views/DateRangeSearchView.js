@@ -16,9 +16,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import I18n from 'i18n!user_date_range_search'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import template from '../../jst/dateRangeSearch.handlebars'
 import '@canvas/datetime'
+
+const I18n = useI18nScope('user_date_range_search');
 
 export default class DateRangeSearchView extends Backbone.View {
   static initClass() {

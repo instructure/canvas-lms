@@ -20,10 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
-import I18n from 'i18n!NewGradingPeriodSetForm'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import setsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('NewGradingPeriodSetForm');
 
 export default class NewGradingPeriodSetForm extends React.Component {
   static propTypes = {

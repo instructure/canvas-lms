@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import RubricAddCriterionPopover from '../react/components/RubricAddCriterionPopover'
 import RubricManagement from '../react/components/RubricManagement'
-import I18n from 'i18n!edit_rubric'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import changePointsPossibleToMatchRubricDialog from '../jst/changePointsPossibleToMatchRubricDialog.handlebars'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -28,17 +28,19 @@ import htmlEscape from 'html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/outcomes/find_outcome'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
 import '@canvas/loading-image'
-import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
 import '@canvas/rails-flash-notifications'
 import 'jquery-tinypubsub'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('edit_rubric');
 
 const rubricEditing = {
   htmlBody: null,

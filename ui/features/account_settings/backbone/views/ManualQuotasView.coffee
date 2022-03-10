@@ -16,13 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!accounts'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Course from '@canvas/courses/backbone/models/Course.coffee'
 import Group from '@canvas/groups/backbone/models/Group.coffee'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import htmlEscape from 'html-escape'
 import template from '../../jst/ManualQuotas.handlebars'
 import '@canvas/rails-flash-notifications'
+
+I18n = useI18nScope('accounts')
 
 export default class ManualQuotasView extends ValidatedFormView
   template: template

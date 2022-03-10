@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!PeopleValidationIssues'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 import shapes from './shapes'
 import DuplicateSection from './duplicate_section'
 import MissingPeopleSection from './missing_people_section'
 import {Alert} from '@instructure/ui-alerts'
+
+const I18n = useI18nScope('PeopleValidationIssues');
 
 class PeopleValidationIssues extends React.Component {
   static propTypes = {

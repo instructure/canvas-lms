@@ -72,7 +72,7 @@ import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 // @ts-ignore
 import InputFilterView from 'backbone-input-filter-view'
 // @ts-ignore
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
@@ -181,6 +181,8 @@ import {
   getInitialActionStates,
   columnWidths
 } from './initialState'
+
+const I18n = useI18nScope('gradebook');
 
 const GradebookGrid = React.lazy(() => import('./components/GradebookGrid'))
 
@@ -1956,7 +1958,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         acc.push(assignmentId)
       }
       return acc
-    }, [])
+    }, []);
   }
 
   getActionMenuProps = () => {
@@ -2384,7 +2386,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   setVisibleGridColumns = () => {
     let assignmentGroupId, ref1
     let parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
+      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId);
     })
     if (this.gridDisplaySettings.showSeparateFirstLastNames) {
       parentColumnIds = ['student_lastname', 'student_firstname'].concat(parentColumnIds)
@@ -3100,7 +3102,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   toggleNotesColumn = () => {
     const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId)
+      return !/^custom_col_/.test(columnId);
     })
     const customColumnIds = this.listVisibleCustomColumns().map(column => {
       return getCustomColumnId(column.id)

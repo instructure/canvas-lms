@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!AssignmentGroupListItemView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as MoveItem from '@canvas/move-item-tray'
 import Cache from '../../cache'
@@ -32,6 +32,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+
+I18n = useI18nScope('AssignmentGroupListItemView')
 
 
 export default class AssignmentGroupListItemView extends DraggableCollectionView
