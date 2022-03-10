@@ -167,7 +167,8 @@ module Api::V1::CalendarEvent
 
     if include.include?("web_conference") &&
        event.web_conference_id.present? &&
-       event.web_conference.grants_right?(user, session, :read)
+       event.web_conference.grants_right?(user, session, :read) &&
+       web_conference_plugin_enabled?(event.web_conference)
       hash["web_conference"] = api_conference_json(event.web_conference, user, session)
     end
 
@@ -293,5 +294,9 @@ module Api::V1::CalendarEvent
     return child_events.first.user if unique_user_ids.length == 1
 
     nil
+  end
+
+  def web_conference_plugin_enabled?(web_conference)
+    !PluginSetting.find_by_name(web_conference.conference_type.underscore)&.disabled
   end
 end
