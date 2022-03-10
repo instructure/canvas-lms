@@ -443,6 +443,17 @@ describe('OutcomeEditModal', () => {
           type: 'success'
         })
       })
+
+      it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
+        const {getByTestId} = renderWithProvider({
+          env: {
+            contextType: 'Account',
+            contextId: '1',
+            individualOutcomeRatingAndCalculationFF: true
+          }
+        })
+        expect(getByTestId('outcome-edit-modal-horizontal-divider')).toBeInTheDocument()
+      })
     })
 
     describe('when feature flag disabled', () => {
