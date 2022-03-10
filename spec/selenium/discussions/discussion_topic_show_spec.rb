@@ -167,6 +167,7 @@ describe "Discussion Topic Show" do
         wait_for_ajaximations
         type_in_tiny "textarea", "@"
         wait_for_ajaximations
+        driver.action.send_keys(:arrow_down).perform # Jeff
         driver.action.send_keys(:arrow_down).perform # Jefferson
         driver.action.send_keys(:arrow_down).perform # Jeffrey
         driver.action.send_keys(:enter).perform
