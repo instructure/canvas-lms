@@ -59,7 +59,6 @@ module StudentContextTray
   end
 
   def todo_tray_select_course_from_dropdown(course_name = "Optional: Add Course")
-    todo_tray_course_selector.click
     click_option("#to-do-item-course-select", course_name)
   end
 end
