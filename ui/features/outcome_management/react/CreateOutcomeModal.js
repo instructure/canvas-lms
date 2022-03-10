@@ -277,7 +277,11 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 canManage
               />
               <View as="div" minHeight="14rem">
-                <hr style={{margin: '1rem 0 0'}} />
+                <hr
+                  style={{margin: '1rem 0 0'}}
+                  aria-hidden="true"
+                  data-testid="outcome-create-modal-horizontal-divider"
+                />
                 <ProficiencyCalculation
                   update={updateProficiencyCalculation}
                   setError={setProficiencyCalculationError}

@@ -520,6 +520,14 @@ describe('CreateOutcomeModal', () => {
               })
             })
           })
+
+          it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
+            const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
+              individualOutcomeRatingAndCalculationFF: true
+            })
+            await act(async () => jest.runOnlyPendingTimers())
+            expect(getByTestId('outcome-create-modal-horizontal-divider')).toBeInTheDocument()
+          })
         })
 
         describe('when feature flag disabled', () => {
