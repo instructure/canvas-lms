@@ -131,9 +131,6 @@
     "basic_554cdc0a": {
         "message": "Temel"
     },
-    "blue_daf8fea9": {
-        "message": "Mavi"
-    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -239,9 +236,6 @@
     "custom_6979cd81": {
         "message": "Özelleştir"
     },
-    "cyan_c1d5f68a": {
-        "message": "Cam göbeği"
-    },
     "date_added_ed5ad465": {
         "message": "Eklendiği Tarih"
     },
@@ -253,9 +247,6 @@
     },
     "decrease_indent_de6343ab": {
         "message": "İçerden başlatma sınırını azalt"
-    },
-    "deep_purple_bb3e2907": {
-        "message": "Koyu Mor"
     },
     "delete_a6efa79d": {
         "message": "Sil"
@@ -374,9 +365,6 @@
     "greek_65c5b3f7": {
         "message": "Yunan"
     },
-    "green_15af4778": {
-        "message": "Yeşil"
-    },
     "group_files_82e5dcdb": {
         "message": "Grup dosyaları"
     },
@@ -422,9 +410,6 @@
     "increase_indent_6d550a4a": {
         "message": "İçerden başlat"
     },
-    "indigo_2035fc55": {
-        "message": "Indigo"
-    },
     "insert_593145ef": {
         "message": "Ekle"
     },
@@ -460,9 +445,6 @@
     },
     "late_2be42b88": {
         "message": "Geç"
-    },
-    "light_blue_5374f600": {
-        "message": "Açık Mavi"
     },
     "link_7262adec": {
         "message": "Bağlantı"
@@ -557,9 +539,6 @@
     "options_3ab0ea65": {
         "message": "Seçenekler"
     },
-    "orange_81386a62": {
-        "message": "Turuncu"
-    },
     "page_50c4823d": {
         "message": "Sayfa"
     },
@@ -574,9 +553,6 @@
     },
     "percentage_34ab7c2c": {
         "message": "Yüzde"
-    },
-    "pink_68ad45cb": {
-        "message": "Pembe"
     },
     "points_bceb5005": {
         "message": "puanlar"
@@ -599,9 +575,6 @@
     "published_c944a23d": {
         "message": "yayınlandı"
     },
-    "purple_7678a9fc": {
-        "message": "Mor"
-    },
     "quiz_e0dcce8f": {
         "message": "Kısa Sınav"
     },
@@ -610,9 +583,6 @@
     },
     "record_7c9448b": {
         "message": "Kayıt"
-    },
-    "red_8258edf3": {
-        "message": "Kırmızı"
     },
     "relationships_6602af70": {
         "message": "İlişkiler"

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef} from 'react'
+import React, {useState} from 'react'
 import formatMessage from '../../../../../../format-message'
 import {modes, actions} from '../../../reducers/imageSection'
 
@@ -25,7 +25,7 @@ import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 
-const ModeSelect = forwardRef(({dispatch, onFocus, onBlur}, ref) => {
+const ModeSelect = ({dispatch}) => {
   const menuFor = mode => (
     <Menu.Item
       key={mode.type}
@@ -44,11 +44,8 @@ const ModeSelect = forwardRef(({dispatch, onFocus, onBlur}, ref) => {
   return (
     <Menu
       placement="bottom"
-      ref={ref}
-      onFocus={onFocus}
-      onBlur={onBlur}
       trigger={
-        <Button color="secondary" data-testid="add-image">
+        <Button color="secondary">
           {formatMessage('Add Image')}
           <View margin="none none none x-small">
             <IconArrowOpenDownLine />
@@ -62,6 +59,6 @@ const ModeSelect = forwardRef(({dispatch, onFocus, onBlur}, ref) => {
       {showNonIconImages && menuFor(modes.courseImages)}
     </Menu>
   )
-})
+}
 
 export default ModeSelect

@@ -103,7 +103,7 @@ jest.mock('../../../../../../../bridge', () => {
   }
 })
 
-describe('ImageSection', () => {
+describe('ImageSectionc', () => {
   const defaultProps = {
     settings: {size: Size.Small},
     editing: false,

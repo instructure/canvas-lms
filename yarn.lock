@@ -1622,24 +1622,10 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
 
-"@instructure/i18nliner-handlebars@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-1.0.3.tgz#0b9f231386bbe013b855a959b35a4e2fe1542095"
-  integrity sha512-4JiqZ+kQUOG6D3Df4/UQOtpG/ZDMYW4vmtkaX4Jlkef/1suvPV3JBEyL2Y9rqY/Xvx6K5wp4i6k3FPs7HeCUUw==
-
-"@instructure/i18nliner@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@instructure/i18nliner/-/i18nliner-2.1.0.tgz#c225797d49882b4a9b10bffc795a664d284b9e3a"
-  integrity sha512-itJCIILSn68y0SjuYNnMfQvG4SvCMVxs6B25ag78lWUV3jaoWMPJ+Lc6ehjDYxI4Uyxac6IYLuyicGRxSZpJKg==
-  dependencies:
-    "@babel/parser" "^7"
-    "@babel/traverse" "^7"
-    cli-color "^1"
-    crc32 "~0.2.2"
-    gglobby "0.0.3"
-    minimist "~1.2.0"
-    mkdirp "~0.5.1"
-    speakingurl "13.0.0"
+"@instructure/i18nliner-handlebars@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-1.0.0.tgz#a823bb28b76967540d5e4a3b5d2ca8d60690e821"
+  integrity sha512-ZAAKm/I3Q9qH6l4Hb7dCoKUyEWCi7Z2kkzhdG79pjNPYRYyKxNZN9K+GpkOMceEtOgwTnfdWlkzuOlG6liF7Ug==
 
 "@instructure/instructure-theme@^7.14.0":
   version "7.14.0"
@@ -13069,7 +13055,7 @@ glob@^5.0.15:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7, glob@^7.0.0, glob@^7.0.3, glob@^7.0.5, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
+glob@^7, glob@^7.0.0, glob@^7.0.3, glob@^7.0.5, glob@^7.0.6, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
   version "7.1.7"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.7.tgz#3b193e9233f01d42d0b3f78294bbeeb418f94a90"
   integrity sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==
@@ -14102,7 +14088,7 @@ i18n-js@^3:
   resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.8.0.tgz#b8fd6b12e1d88cb71f9806c29bca7c31c012e504"
   integrity sha512-hDsGgPuvw/2P+lXSbOafAwspK8Ste8YrwuuUg17W3wEcO1JkQxBlPgsN1t2+852nTnz4YSYTjZc/1nAA2PC/nw==
 
-i18nliner@~0.2.0:
+i18nliner@instructure/i18nliner-js#babel7, i18nliner@~0.2.0:
   version "0.2.6"
   resolved "https://codeload.github.com/instructure/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
   dependencies:
@@ -15392,6 +15378,25 @@ iterate-value@^1.0.2:
   dependencies:
     es-get-iterator "^1.0.2"
     iterate-iterator "^1.0.1"
+
+jasmine-core@~2.99.0:
+  version "2.99.1"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.99.1.tgz#e6400df1e6b56e130b61c4bcd093daa7f6e8ca15"
+  integrity sha1-5kAN8ea1bhMLYcS80JPap/boyhU=
+
+jasmine-pretty-html-reporter@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/jasmine-pretty-html-reporter/-/jasmine-pretty-html-reporter-0.2.5.tgz#c61b7528bf06df386d5ef4360d7d029149692bc1"
+  integrity sha1-xht1KL8G3zhtXvQ2DX0CkUlpK8E=
+
+jasmine@^2.5.3:
+  version "2.99.0"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-2.99.0.tgz#8ca72d102e639b867c6489856e0e18a9c7aa42b7"
+  integrity sha1-jKctEC5jm4Z8ZImFbg4YqceqQrc=
+  dependencies:
+    exit "^0.1.2"
+    glob "^7.0.6"
+    jasmine-core "~2.99.0"
 
 jest-canvas-mock@^2:
   version "2.3.1"
@@ -24457,11 +24462,6 @@ timers-ext@^0.1.5, timers-ext@^0.1.7:
     es5-ext "~0.10.46"
     next-tick "1"
 
-timezone-mock@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/timezone-mock/-/timezone-mock-1.3.1.tgz#750ca001831007be5af7456c78f350812398d947"
-  integrity sha512-kWK2liWUaYSLW/B2yJ6/oUbLc26cEbtIjM7BPrRxaX/3TSeqOOQfXQ6N4pNhy05ZBnUs9vywWAthiE9QYGZFwA==
-
 timezone@^1.0.18:
   version "1.0.23"
   resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.23.tgz#87865e2c9d6aff6a52a598247e8f5102a92c881b"
@@ -24840,10 +24840,10 @@ ts-pnp@^1.1.6:
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.2.0.tgz#a500ad084b0798f1c3071af391e65912c86bca92"
   integrity sha512-csd+vJOb/gkzvcCHgTGSChYpy5f1/XKNsmvBGO4JXS+z1v2HobugDz4s1IeFXM3wZB44uczs+eazB5Q/ccdhQw==
 
-tsc-files@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/tsc-files/-/tsc-files-1.1.3.tgz#ef4cfcb7affc9b90577d707a879dc53bb105be83"
-  integrity sha512-G6uXkTNofGU9EE1fYBaCpR72x/aqXW4PDAuznWj4JYlDwhcaKnUn4CiCHBMc89lDxLmikK+hhaEWLoTPEKKvXg==
+tsc-files@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/tsc-files/-/tsc-files-1.1.2.tgz#acd181949ef53811fc6df455baef41adaf616442"
+  integrity sha512-biLtl4npoohZ9MBnTFw4NttqYM60RscjzjWxT538UCS8iXaGRZMi+AXj+vEEpDdcjIS2Kx0Acj++1gor5dbbBw==
 
 tsconfig-paths@^3.9.0:
   version "3.9.0"

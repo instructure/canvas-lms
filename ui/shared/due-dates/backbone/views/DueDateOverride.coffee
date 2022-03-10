@@ -53,9 +53,9 @@ export default class DueDateOverrideView extends Backbone.View
       dueAt: tz.parse(@model.assignment.get("due_at")),
       dueDatesReadonly: @options.dueDatesReadonly,
       availabilityDatesReadonly: @options.availabilityDatesReadonly,
-      importantDates: @model.assignment.get("important_dates"),
-      defaultDueTime: ENV.DEFAULT_DUE_TIME
+      importantDates: @model.assignment.get("important_dates")
     })
+
     ReactDOM.render(DueDatesElement, div)
 
   gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)

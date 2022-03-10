@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2015 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -20,23 +20,8 @@ const mkdirp = require("mkdirp");
 const { I18nliner } = require("../js/main");
 const scanner = require("../js/scanner");
 
-class PanickyCheck extends I18nliner.Commands.Check {
-  // don't print to TTY
-  print() {};
-
-  // and do throw errors
-  checkWrapper(file, checker) {
-    try {
-      checker(file)
-    }
-    catch (e) {
-      throw new Error(e.message)
-    }
-  };
-};
-
 var subject = function(dir) {
-  var command = new PanickyCheck({});
+  var command = new I18nliner.Commands.Check({});
   scanner.scanFilesFromI18nrc(scanner.loadConfigFromDirectory(dir))
   command.run();
   return command.translations.masterHash.translations;
@@ -67,15 +52,15 @@ describe("I18nliner", function() {
     });
 
     it('throws if no scope was specified', () => {
-      const command = new PanickyCheck({});
+      const command = new I18nliner.Commands.Check({});
+      const origDir = process.cwd();
 
-      scanner.scanFilesFromI18nrc(
-        scanner.loadConfigFromDirectory('spec/fixtures/hbs-missing-i18n-scope')
-      )
+      scanner.scanFilesFromI18nrc(scanner.loadConfigFromDirectory('spec/fixtures/hbs-missing-i18n-scope'))
+      command.checkFiles();
 
-      expect(() => {
-        command.checkFiles()
-      }).toThrowError(/expected i18nScope for Handlebars template to be specified/)
+      expect(command.isSuccess()).toBeFalsy()
+      expect(command.errors.length).toEqual(1)
+      expect(command.errors[0]).toMatch(/expected i18nScope for Handlebars template to be specified/)
     })
   });
 
@@ -84,9 +69,6 @@ describe("I18nliner", function() {
       expect(subject("spec/fixtures/js")).toEqual({
         absolute_key: "Absolute key",
         inferred_key_c49e3743: "Inferred key",
-        esm: {
-          my_key: 'Hello world'
-        },
         foo: {
           relative_key: "Relative key"
         },

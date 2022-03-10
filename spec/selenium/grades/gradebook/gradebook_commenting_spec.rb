@@ -68,7 +68,7 @@ describe "Gradebook" do
     Gradebook::Cells.open_tray(@student_1, group_assignment)
     Gradebook::GradeDetailTray.add_new_comment(@comment_text)
 
-    Gradebook::GradeDetailTray.click_close_tray_button
+    Gradebook::GradeDetailTray.close_tray_button.click
 
     # make sure it's on the other student's submission
     Gradebook::Cells.open_tray(@student_2, group_assignment)

@@ -50,8 +50,7 @@ export default class DueDates extends React.Component {
     dueDatesReadonly: PropTypes.bool,
     availabilityDatesReadonly: PropTypes.bool,
     importantDates: PropTypes.bool,
-    selectedGroupSetId: PropTypes.string,
-    defaultDueTime: PropTypes.string
+    selectedGroupSetId: PropTypes.string
   }
 
   static defaultProps = {
@@ -495,7 +494,6 @@ export default class DueDates extends React.Component {
           allStudentsFetched={this.state.allStudentsFetched}
           dueDatesReadonly={this.props.dueDatesReadonly}
           availabilityDatesReadonly={this.props.availabilityDatesReadonly}
-          defaultDueTime={this.props.defaultDueTime}
         />
       )
     })

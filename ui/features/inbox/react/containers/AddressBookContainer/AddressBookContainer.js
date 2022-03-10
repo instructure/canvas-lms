@@ -99,12 +99,6 @@ export const AddressBookContainer = props => {
     )
   }
 
-  if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1].context) {
-    addFilterHistory({
-      context: props.activeCourseFilter
-    })
-  }
-
   const menuData = useMemo(() => {
     if (loading && !data) {
       return []
@@ -191,11 +185,7 @@ AddressBookContainer.propTypes = {
   /**
    * use State function to set user filter for conversations
    */
-  onUserFilterSelect: PropTypes.func,
-  /**
-   * use State function to set current context for addressbook
-   */
-  activeCourseFilter: PropTypes.string
+  onUserFilterSelect: PropTypes.func
 }
 
 AddressBookContainer.defaultProps = {

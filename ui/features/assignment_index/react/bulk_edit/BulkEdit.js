@@ -38,15 +38,14 @@ import {originalDateField, canEditAll} from './utils'
 BulkEdit.propTypes = {
   courseId: string.isRequired,
   onCancel: func.isRequired,
-  onSave: func, // for now, this is just informational that save has been clicked
-  defaultDueTime: string
+  onSave: func // for now, this is just informational that save has been clicked
 }
 
 BulkEdit.defaultProps = {
   onSave: () => {}
 }
 
-export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
+export default function BulkEdit({courseId, onCancel, onSave}) {
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -64,8 +63,13 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   const [loadingError, setLoadingError] = useState(null)
   const [loading, setLoading] = useState(true)
   const [moveDatesModalOpen, setMoveDatesModalOpen] = useState(false)
-  const {saveAssignments, startingSave, startingSaveError, progressUrl, setProgressUrl} =
-    useSaveAssignments(courseId)
+  const {
+    saveAssignments,
+    startingSave,
+    startingSaveError,
+    progressUrl,
+    setProgressUrl
+  } = useSaveAssignments(courseId)
   const {jobCompletion, jobRunning, jobSuccess, jobErrors, setJobSuccess} = useMonitorJobCompletion(
     {
       progressUrl
@@ -164,7 +168,9 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     (override, dateFieldName, nDays) => {
       const currentDate = override[dateFieldName]
       if (currentDate) {
-        const newDate = moment(currentDate).add(nDays, 'days').toDate()
+        const newDate = moment(currentDate)
+          .add(nDays, 'days')
+          .toDate()
         setDateOnOverride(override, dateFieldName, newDate)
       }
     },
@@ -396,7 +402,6 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
           setAssignmentSelected={setAssignmentSelected}
           selectAllAssignments={selectAllAssignments}
           clearOverrideEdits={clearOverrideEdits}
-          defaultDueTime={defaultDueTime}
         />
       </>
     )

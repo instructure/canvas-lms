@@ -29,8 +29,7 @@ class DueDateCalendars extends React.Component {
     replaceDate: func.isRequired,
     disabled: bool.isRequired,
     dueDatesReadonly: bool.isRequired,
-    availabilityDatesReadonly: bool.isRequired,
-    defaultDueTime: string
+    availabilityDatesReadonly: bool.isRequired
   }
 
   // -------------------
@@ -54,7 +53,6 @@ class DueDateCalendars extends React.Component {
         labelText={labelText}
         isFancyMidnight={isNotUnlockAt}
         readonly={readonly}
-        defaultTime={dateType === 'due_at' ? this.props.defaultDueTime : null}
       />
     )
   }

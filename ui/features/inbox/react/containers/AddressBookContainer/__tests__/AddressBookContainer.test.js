@@ -62,14 +62,6 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(container).toBeTruthy()
     })
 
-    it('should filter menu by initial context', async () => {
-      setup({
-        activeCourseFilter: 'course_123'
-      })
-      const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
-    })
-
     it('Should load data on initial request', async () => {
       setup()
       const items = await screen.findAllByTestId('address-book-item')

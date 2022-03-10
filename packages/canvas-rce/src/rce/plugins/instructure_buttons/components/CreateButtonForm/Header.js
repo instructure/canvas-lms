@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
@@ -27,15 +27,10 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {decode} from '../../svg/utils'
 
-export const Header = ({settings, onChange, allowNameChange}) => {
-  const originalName = settings.originalName
-
-  useEffect(() => {
-    if (!allowNameChange) onChange({name: originalName})
-  }, [allowNameChange, onChange, originalName])
-
+export const Header = ({settings, onChange}) => {
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
     <Flex alignItems="center">
@@ -51,7 +46,9 @@ export const Header = ({settings, onChange, allowNameChange}) => {
             </View>
           }
         >
-          <Button icon={IconQuestionLine} size="small" variant="icon" />
+          <Button icon={IconQuestionLine} size="small" variant="icon">
+            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
+          </Button>
         </Tooltip>
       </Flex.Item>
     </Flex>
@@ -64,7 +61,6 @@ export const Header = ({settings, onChange, allowNameChange}) => {
           data-testid="button-name"
           renderLabel={formatMessage('Name')}
           placeholder={formatMessage('untitled')}
-          interaction={allowNameChange ? 'enabled' : 'disabled'}
           onChange={e => {
             const name = e.target.value
             onChange({name})
@@ -75,6 +71,7 @@ export const Header = ({settings, onChange, allowNameChange}) => {
       <Flex.Item padding="small">
         <TextArea
           id="button-alt-text"
+          aria-describedby="alt-text-label-tooltip"
           height="4rem"
           label={textAreaLabel}
           onChange={e => {

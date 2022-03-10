@@ -51,7 +51,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
-import assignmentRubricDialog from '../../../../discussion_topic/jquery/assignmentRubricDialog'
+import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
@@ -68,7 +68,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const isSearch = searchTerm || filter === 'unread'
 
   if (ENV.DISCUSSION?.GRADED_RUBRICS_URL) {
-    assignmentRubricDialog.initTriggers()
+    rubricTriggers.initDialog()
   }
 
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
@@ -216,7 +216,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     return rootEntryDraftMessage
   }
 
-  const podcast_url = document.querySelector("link[id='Discussion Podcast Feed']")
+  const podcast_url = document.querySelector("link[title='Discussion Podcast Feed']")
 
   return (
     <Responsive
@@ -379,9 +379,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   props.discussionTopic.permissions?.showRubric ||
                                   props.discussionTopic.permissions?.addRubric
                                     ? () => {
-                                        assignmentRubricDialog.initDialog()
-                                        assignmentRubricDialog.openDialog()
+                                        rubricTriggers.openDialog()
                                         rubricEditing.init()
+
+                                        const event = document.createEvent('Event')
+                                        event.initEvent('rubricEditDataReady', true, true)
+                                        document.dispatchEvent(event)
                                       }
                                     : null
                                 }

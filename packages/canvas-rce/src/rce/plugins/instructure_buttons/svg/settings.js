@@ -19,7 +19,6 @@
 import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
 import {BTN_AND_ICON_ATTRIBUTE, BTN_AND_ICON_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
-import RceApiSource from '../../../../rcs/api'
 
 const TYPE = 'image/svg+xml'
 
@@ -29,11 +28,7 @@ export const statuses = {
   IDLE: 'idle'
 }
 
-const getImageNode = (editor, editing) => {
-  // If the user is creating a button rather then editing, no sense trying
-  // to get an existing SVG URL
-  if (!editing) return
-
+const getImageNode = editor => {
   const selectedNode = editor?.selection?.getNode()
 
   // No selection made, return
@@ -56,13 +51,16 @@ const getImageNode = (editor, editing) => {
   return buttonAndIcon
 }
 
-export function useSvgSettings(editor, editing, rcsConfig) {
+export function useSvgSettings(editor, editing) {
   const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
   const [status, setStatus] = useState(statuses.IDLE)
 
-  const buildFilesUrl = (fileId, host) => {
+  const buildFilesUrl = (urlFromNode, host) => {
     // http://canvas.docker/files/2169/download?download_frd=1&amp;buttons_and_icons=1
 
+    // Parse out the file ID from something like
+    // /courses/1/files/3/preview?...
+    const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
     const downloadURL = new URL(`${host}/files/${fileId}/download`)
 
     // Adding the Course ID to the request causes Canvas to follow the chain
@@ -79,7 +77,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
     return downloadURL.toString()
   }
 
-  const urlFromNode = getImageNode(editor, editing)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
+  const urlFromNode = getImageNode(editor)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
 
   useEffect(() => {
     const fetchSvgSettings = async () => {
@@ -88,10 +86,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
       try {
         setStatus(statuses.LOADING)
 
-        // Parse out the file ID from something like
-        // /courses/1/files/3/preview?...
-        const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
-        const downloadUrl = buildFilesUrl(fileId, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+        const downloadUrl = buildFilesUrl(urlFromNode, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
 
         // Parse SVG. If no SVG found, return defaults
         const svg = await svgFromUrl(downloadUrl)
@@ -101,17 +96,8 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         const metadata = svg.querySelector('metadata')?.innerHTML
         if (!metadata) return
 
-        const rcs = new RceApiSource(rcsConfig)
-
-        const fileData = await rcs.getFile(fileId)
-        const fileName = fileData.name.replace(/\.[^\.]+$/, '')
-
-        const metadataJson = JSON.parse(metadata)
-        metadataJson.name = fileName
-        metadataJson.originalName = fileName
-
         // settings found, return parsed results
-        dispatch(metadataJson)
+        dispatch(JSON.parse(metadata))
         setStatus(statuses.IDLE)
       } catch (e) {
         setStatus(statuses.ERROR)
@@ -121,15 +107,14 @@ export function useSvgSettings(editor, editing, rcsConfig) {
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
     // Otherwise, fetch default settings to set us back to creating
-    else dispatch({...defaultState, name: ''})
-  }, [editor, editing, urlFromNode, rcsConfig])
+    else dispatch(defaultState)
+  }, [editor, editing, urlFromNode])
 
   return [settings, status, dispatch]
 }
 
 export async function svgFromUrl(url) {
   const response = await fetch(url)
-
   const data = await response.text()
   return new DOMParser().parseFromString(data, TYPE)
 }
