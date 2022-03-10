@@ -69,7 +69,7 @@ export const Header = ({settings, onChange, allowNameChange}) => {
             const name = e.target.value
             onChange({name})
           }}
-          value={decode(settings.name)}
+          value={settings.name ? decode(settings.name) : ''}
         />
       </Flex.Item>
       <Flex.Item padding="small">

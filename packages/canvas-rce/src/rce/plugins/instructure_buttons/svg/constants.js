@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const TYPE = 'image/svg+xml-buttons-and-icons'
+export const TYPE = 'image/svg+xml-icon-maker-icons'
 
 export const Size = {
   None: 'none',

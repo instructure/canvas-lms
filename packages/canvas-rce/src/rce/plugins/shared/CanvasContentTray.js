@@ -67,7 +67,7 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
 }
 
 const thePanels = {
-  buttons_and_icons: React.lazy(() => import('../instructure_buttons/components/SavedButtonList')),
+  icon_maker_icons: React.lazy(() => import('../instructure_buttons/components/SavedButtonList')),
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),

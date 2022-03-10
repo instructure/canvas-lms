@@ -49,9 +49,8 @@ describe('useSvgSettings()', () => {
       const [settings, ,] = subject().current
 
       expect(settings).toEqual({
-        type: 'image/svg+xml-buttons-and-icons',
+        type: 'image/svg+xml-icon-maker-icons',
         alt: '',
-        name: '',
         shape: 'square',
         size: 'small',
         color: null,
@@ -100,7 +99,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-buttons-and-icons',
+          type: 'image/svg+xml-icon-maker-icons',
           name: 'Banana',
           alt: '',
           shape: 'square',
@@ -142,7 +141,7 @@ describe('useSvgSettings()', () => {
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
+        '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
       )
 
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
@@ -198,7 +197,7 @@ describe('useSvgSettings()', () => {
     describe('when the download URL contains a course ID', () => {
       beforeEach(() => {
         ed.setContent(
-          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="courses/2/files/1/download" alt="a red circle" />'
+          '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="courses/2/files/1/download" alt="a red circle" />'
         )
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
@@ -216,7 +215,7 @@ describe('useSvgSettings()', () => {
     describe('with a relative download URL', () => {
       beforeEach(() => {
         ed.setContent(
-          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" />'
+          '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" />'
         )
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
@@ -238,7 +237,7 @@ describe('useSvgSettings()', () => {
         }
 
         ed.setContent(
-          '<p id="containing"><img data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>'
+          '<p id="containing"><img data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>'
         )
         ed.setSelectedNode(ed.dom.select('#containing')[0])
       })
@@ -260,9 +259,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toEqual({
-        type: 'image/svg+xml-buttons-and-icons',
-        name: 'Test Button',
-        originalName: 'Test Button',
+        type: 'image/svg+xml-icon-maker-icons',
         alt: 'a test image',
         shape: 'triangle',
         size: 'large',
@@ -283,6 +280,8 @@ describe('useSvgSettings()', () => {
         translateY: 0,
         width: 0,
         height: 0,
+        name: 'Test Button',
+        originalName: 'Test Button',
         transform: ''
       })
     })
@@ -312,7 +311,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-buttons-and-icons',
+          type: 'image/svg+xml-icon-maker-icons',
           alt: '',
           shape: 'square',
           size: 'small',
@@ -344,7 +343,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-buttons-and-icons',
+          type: 'image/svg+xml-icon-maker-icons',
           alt: '',
           shape: 'square',
           size: 'small',
@@ -378,10 +377,10 @@ describe('useSvgSettings()', () => {
       // Add an image to the editor and select it
       ed.setContent(`
         <img id="test-image-1" src="https://canvas.instructure.com/svg1"
-          data-inst-buttons-and-icons="true"
+          data-inst-icon-maker-icon="true"
           data-download-url="https://canvas.instructure.com/files/1/download" />
         <img id="test-image-2" src="https://canvas.instructure.com/svg2"
-          data-inst-buttons-and-icons="true"
+          data-inst-icon-maker-icon="true"
           data-download-url="https://canvas.instructure.com/files/2/download" />
       `)
 

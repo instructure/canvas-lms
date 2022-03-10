@@ -39,7 +39,7 @@ export const Footer = ({
         <View as="div" padding="medium">
           <Checkbox
             label={formatMessage(
-              'Apply changes to all instances of this Button and Icon in the Course'
+              'Apply changes to all instances of this Icon Maker Icon in the Course'
             )}
             data-testid="cb-replace-all"
             checked={replaceAll}

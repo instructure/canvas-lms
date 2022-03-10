@@ -45,7 +45,7 @@ class Attachment < ActiveRecord::Base
 
   CLONING_ERROR_TYPE = "attachment_clone_url"
 
-  BUTTONS_AND_ICONS = "buttons_and_icons"
+  BUTTONS_AND_ICONS = "icon_maker_icons"
   UNCATEGORIZED = "uncategorized"
   VALID_CATEGORIES = [BUTTONS_AND_ICONS, UNCATEGORIZED].freeze
 
