@@ -31,7 +31,7 @@ describe "browser" do
 
     get("/login")
     driver.execute_script("window.console.log('#{sample_msg}')")
-    browser_logs = driver.manage.logs.get(:browser)
+    browser_logs = driver.logs.get(:browser)
 
     expect(browser_logs.map(&:message)).to include(a_string_matching(sample_msg))
   end

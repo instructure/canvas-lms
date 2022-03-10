@@ -17,27 +17,41 @@
  */
 
 import fetchMock from 'fetch-mock'
+import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {useSvgSettings, svgFromUrl, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
-import {renderHook, act} from '@testing-library/react-hooks/dom'
+import RceApiSource from '../../../../../rcs/api'
+
+jest.mock('../../../../../rcs/api')
 
 describe('useSvgSettings()', () => {
-  let editing, ed
+  let editing, ed, rcs
 
-  beforeEach(() => (ed = new Editor()))
+  beforeEach(() => {
+    ed = new Editor()
+    rcs = {getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'}))}
+    RceApiSource.mockImplementation(() => rcs)
+  })
 
-  const subject = () => renderHook(() => useSvgSettings(ed, editing)).result
+  afterEach(() => RceApiSource.mockClear())
+
+  const subject = () => renderHook(() => useSvgSettings(ed, editing, rcs)).result
 
   describe('when a new button is being created (not editing)', () => {
-    beforeEach(() => (editing = false))
+    beforeEach(() => {
+      editing = false
+      global.fetch = jest.fn()
+    })
+
+    afterEach(() => jest.restoreAllMocks())
 
     it('initializes settings to the default', () => {
-      const [settings, _status, _dispatch] = subject().current
+      const [settings, ,] = subject().current
 
       expect(settings).toEqual({
         type: 'image/svg+xml-buttons-and-icons',
-        name: '',
         alt: '',
+        name: '',
         shape: 'square',
         size: 'small',
         color: null,
@@ -62,13 +76,17 @@ describe('useSvgSettings()', () => {
     })
 
     it('sets status to "IDLE"', () => {
-      const [_settings, status, _dispatch] = subject().current
+      const [, status] = subject().current
 
       expect(status).toEqual(statuses.IDLE)
     })
 
+    it('does not attempt to fetch an existing SVG', () => {
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
     it('returns dispatch', () => {
-      const [_settings, _status, dispatch] = subject().current
+      const [, , dispatch] = subject().current
 
       expect(typeof dispatch).toEqual('function')
     })
@@ -111,6 +129,9 @@ describe('useSvgSettings()', () => {
   })
 
   describe('when an existing button is being edited', () => {
+    let mock
+    let body
+
     beforeEach(() => {
       editing = true
 
@@ -126,41 +147,51 @@ describe('useSvgSettings()', () => {
 
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
 
+      //
+      // NOTE: 'name' is no longer a valid property in embedded metadata
+      // But we're leaving it here to test what happens with pre-existing
+      // B&I that have it
+      //
+      body = `
+        <svg height="100" width="100">
+        <metadata>
+          {
+            "name":"Test Image",
+            "alt":"a test image",
+            "shape":"triangle",
+            "size":"large",
+            "color":"#FF2717",
+            "outlineColor":"#06A3B7",
+            "outlineSize":"small",
+            "text":"Some Text",
+            "textSize":"medium",
+            "textColor":"#009606",
+            "textBackgroundColor":"#06A3B7",
+            "textPosition":"middle"
+          }
+        </metadata>
+        <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+      </svg>`
+
       // Stub fetch to return an SVG file
-      global.fetch = jest.fn().mockResolvedValue({
-        text: () =>
-          Promise.resolve(`
-            <svg height="100" width="100">
-              <metadata>
-                {
-                  "name":"Test Image",
-                  "alt":"a test image",
-                  "shape":"triangle",
-                  "size":"large",
-                  "color":"#FF2717",
-                  "outlineColor":"#06A3B7",
-                  "outlineSize":"small",
-                  "text":"Some Text",
-                  "textSize":"medium",
-                  "textColor":"#009606",
-                  "textBackgroundColor":"#06A3B7",
-                  "textPosition":"middle"
-                }
-              </metadata>
-              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-            </svg>
-          `)
+      mock = fetchMock.mock({
+        name: 'download-url',
+        matcher: '*',
+        response: () => ({body})
       })
     })
 
-    afterEach(() => jest.resetAllMocks())
+    afterEach(() => {
+      jest.resetAllMocks()
+      fetchMock.restore()
+    })
 
     it('fetches the SVG file, specifying the course ID and timestamp', () => {
       subject()
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
-        )
+
+      expect(mock.called('download-url')).toBe(true)
+      expect(mock.calls('download-url')[0][0]).toMatch(
+        /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
       )
     })
 
@@ -174,10 +205,10 @@ describe('useSvgSettings()', () => {
 
       it('fetches the SVG file using the /files/:file_id/download endpoint', () => {
         subject()
-        expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringMatching(
-            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
-          )
+
+        expect(mock.called('download-url')).toBe(true)
+        expect(mock.calls('download-url')[0][0]).toMatch(
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
         )
       })
     })
@@ -192,10 +223,9 @@ describe('useSvgSettings()', () => {
 
       it('fetches the SVG file, specifying the course ID and timestamp', () => {
         subject()
-        expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringMatching(
-            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
-          )
+        const calledUrl = mock.calls('download-url')[0][0]
+        expect(calledUrl).toMatch(
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
         )
       })
     })
@@ -215,16 +245,15 @@ describe('useSvgSettings()', () => {
 
       it('fetches the SVG file, specifying the course ID and timestamp', () => {
         subject()
-        expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringMatching(
-            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
-          )
+        const calledUrl = mock.calls('download-url')[0][0]
+        expect(calledUrl).toMatch(
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
         )
       })
     })
 
     it('parses the SVG settings from the SVG metadata', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing))
+      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
 
       await waitForValueToChange(() => {
         return result.current[0]
@@ -232,7 +261,8 @@ describe('useSvgSettings()', () => {
 
       expect(result.current[0]).toEqual({
         type: 'image/svg+xml-buttons-and-icons',
-        name: 'Test Image',
+        name: 'Test Button',
+        originalName: 'Test Button',
         alt: 'a test image',
         shape: 'triangle',
         size: 'large',
@@ -263,7 +293,7 @@ describe('useSvgSettings()', () => {
     })
 
     it('returns the status to "idle"', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing))
+      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
 
       await waitForValueToChange(() => {
         return result.current[1]
@@ -273,20 +303,16 @@ describe('useSvgSettings()', () => {
     })
 
     describe('and the metadata is non-parsable', () => {
-      global.fetch = jest.fn().mockResolvedValue({
-        text: () =>
-          Promise.resolve(`
-            <svg height="100" width="100">
-              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-            </svg>
-          `)
-      })
+      body = `
+        <svg height="100" width="100">
+          <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+        </svg>
+      `
 
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
           type: 'image/svg+xml-buttons-and-icons',
-          name: '',
           alt: '',
           shape: 'square',
           size: 'small',
@@ -319,7 +345,6 @@ describe('useSvgSettings()', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
           type: 'image/svg+xml-buttons-and-icons',
-          name: '',
           alt: '',
           shape: 'square',
           size: 'small',
@@ -365,7 +390,6 @@ describe('useSvgSettings()', () => {
           <svg height="100" width="100">
             <metadata>
               {
-                "name":"Test Image 1",
                 "alt":"the first test image",
                 "shape":"triangle",
                 "size":"large",
@@ -388,7 +412,6 @@ describe('useSvgSettings()', () => {
           <svg height="100" width="100">
             <metadata>
               {
-                "name":"Test Image 2",
                 "alt":"the second test image",
                 "shape":"square",
                 "size":"medium",
@@ -410,7 +433,9 @@ describe('useSvgSettings()', () => {
     afterEach(() => fetchMock.reset())
 
     it('loads the correct metadata', async () => {
-      const {result, rerender, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing))
+      const {result, rerender, waitForValueToChange} = renderHook(() =>
+        useSvgSettings(ed, editing, rcs)
+      )
 
       ed.setSelectedNode(ed.dom.select('#test-image-1')[0])
       rerender()
@@ -420,7 +445,7 @@ describe('useSvgSettings()', () => {
       rerender()
       await waitForValueToChange(() => result.current)
 
-      expect(result.current[0].name).toEqual('Test Image 2')
+      expect(result.current[0].name).toEqual('Test Button')
       expect(result.current[0].shape).toEqual('square')
     })
   })
@@ -432,12 +457,16 @@ describe('svgFromUrl()', () => {
   const subject = () => svgFromUrl('https://www.instructure.com/svg')
 
   beforeEach(() => {
-    global.fetch = jest.fn().mockResolvedValue({
-      text: () => Promise.resolve(svgResponse)
-    })
+    fetchMock.mock('https://www.instructure.com/svg', () => ({
+      body: svgResponse,
+      sendAsJson: false
+    }))
   })
 
-  afterEach(() => jest.resetAllMocks())
+  afterEach(() => {
+    fetchMock.restore()
+    jest.resetAllMocks()
+  })
 
   describe('when the url points to an SVG file', () => {
     beforeEach(() => {

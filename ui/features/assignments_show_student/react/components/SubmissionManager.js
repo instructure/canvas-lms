@@ -149,7 +149,7 @@ CancelAttemptButton.propTypes = {
   handleCacheUpdate: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  submission: PropTypes.shape.isRequired
+  submission: PropTypes.object.isRequired
 }
 
 export default class SubmissionManager extends Component {

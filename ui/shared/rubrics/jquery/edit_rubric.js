@@ -467,7 +467,8 @@ const rubricEditing = {
     })
     data.title = data['rubric[title]']
     data.points_possible = numberHelper.parse(data['rubric[points_possible]'])
-    data.rubric_id = $rubric.attr('id').substring(7)
+
+    data.rubric_id = $rubric.attr('id') ? $rubric.attr('id').substring(7) : undefined
     data = $.extend(data, $('#rubrics #rubric_parameters').getFormData())
     return data
   },

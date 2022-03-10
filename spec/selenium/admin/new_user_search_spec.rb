@@ -43,10 +43,6 @@ describe "new account user search" do
     user_session(@user)
   end
 
-  def wait_for_loading_to_disappear
-    expect(f('[data-automation="users list"]')).not_to contain_css("tr:nth-child(2)")
-  end
-
   describe "with default page visit" do
     before do
       @user.update_attribute(:name, "Test User")
@@ -95,7 +91,9 @@ describe "new account user search" do
       user_with_pseudonym(account: @account, name: "diffrient user")
       refresh_page
       user_search_box.send_keys("Test")
-      wait_for_loading_to_disappear
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 0.5) { fj("title:contains('Loading')").displayed? }
+      wait_for_no_such_element { fj("title:contains('Loading')") }
       expect(results_rows.count).to eq 1
       expect(results_rows.first).to include_text("Test")
     end

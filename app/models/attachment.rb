@@ -1223,7 +1223,7 @@ class Attachment < ActiveRecord::Base
       "image/gif" => "image",
       "image/bmp" => "image",
       "image/svg+xml" => "image",
-      # "image/webp" => "image", not supported by safari as of Version 13.1.1
+      "image/webp" => "image",
       "image/vnd.microsoft.icon" => "image",
       "application/x-rar" => "zip",
       "application/x-rar-compressed" => "zip",

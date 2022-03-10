@@ -26,6 +26,11 @@ class ConditionalReleaseObjects
       element_exists?("#conditional_content")
     end
 
+    def replace_mastery_path_scores(element, current_value, new_value)
+      current_value.length.times { element.send_keys(:backspace) }
+      element.send_keys(new_value)
+    end
+
     # Assignment Index Page
 
     def assignment_kebob(page_title)

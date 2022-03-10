@@ -71,6 +71,16 @@ describe('ShowFolder', () => {
     window.ENV = oldEnv
   })
 
+  it('renders the accessibility message if userCanEditFilesForContext is true', () => {
+    const {getByText} = render(<ShowFolder {...defaultProps()} />)
+    expect(getByText(/Warning/)).toBeInTheDocument()
+  })
+  it('does not render the accessibility message if userCanEditFilesForContext is false', () => {
+    const props = defaultProps({userCanEditFilesForContext: false})
+    const {queryByText} = render(<ShowFolder {...props} />)
+    expect(queryByText(/Warning/)).not.toBeInTheDocument()
+  })
+
   it('renders the FileUpload component if userCanAddFilesForContext is true', () => {
     const {getByText} = render(<ShowFolder {...defaultProps()} />)
     expect(getByText('Drop files here to upload')).toBeInTheDocument()

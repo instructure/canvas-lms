@@ -339,8 +339,7 @@ module CustomSeleniumActions
         tinymce_element = f("body")
         until tinymce_element.text.empty?
           tinymce_element.click
-          tinymce_element.send_keys(Array.new(100, :backspace))
-          tinymce_element = f("body")
+          tinymce_element.send_keys([:control, "a"], :backspace)
         end
       end
     else
@@ -515,14 +514,6 @@ module CustomSeleniumActions
       keys = value.to_s.empty? ? [:backspace] : []
       keys << value
       el.send_keys(*keys)
-      count = 0
-      until el["value"] == value.to_s
-        break if count > 1
-
-        count += 1
-        driver.execute_script("arguments[0].select();", el)
-        el.send_keys(*keys)
-      end
     end
 
     el.send_keys(:tab) if options[:tab_out]

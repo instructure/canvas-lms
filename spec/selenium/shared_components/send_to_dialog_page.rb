@@ -26,6 +26,10 @@ module SendToDialogPage
     "[role='dialog'][aria-label='Send To...']"
   end
 
+  def user_search_selector
+    "input[placeholder='Begin typing to search']"
+  end
+
   # ------------------------------ Elements ------------------------------
 
   def send_to_dialog
@@ -33,7 +37,7 @@ module SendToDialogPage
   end
 
   def user_search
-    f("input[placeholder='Begin typing to search']")
+    f(user_search_selector)
   end
 
   def user_dropdown(user_name)

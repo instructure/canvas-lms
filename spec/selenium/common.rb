@@ -192,7 +192,7 @@ shared_context "in-process server selenium tests" do
       example.metadata[:page_html] = document.to_html
     end
 
-    browser_logs = driver.manage.logs.get(:browser) rescue nil
+    browser_logs = driver.logs.get(:browser) rescue nil
 
     # log INSTUI deprecation warnings
     if browser_logs.present?
