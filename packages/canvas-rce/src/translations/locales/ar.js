@@ -116,7 +116,6 @@ const locale = {
   },
   "collaborations_5c56c15f": { "message": "الأعمال الجماعية" },
   "collapse_to_hide_types_1ab46d2e": { "message": "الطي لإخفاء { types }" },
-  "color_color_eb64b08": { "message": "اللون { color }" },
   "computer_1d7dfa6f": { "message": "الكمبيوتر" },
   "content_1440204b": { "message": "المحتوى" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {

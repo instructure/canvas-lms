@@ -41,6 +41,9 @@
     "basic_554cdc0a": {
         "message": "Βασική"
     },
+    "blue_daf8fea9": {
+        "message": "Μπλε"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -107,11 +110,17 @@
     "creative_commons_license_725584ae": {
         "message": "Άδεια Creative Commons:"
     },
+    "cyan_c1d5f68a": {
+        "message": "Κυανό"
+    },
     "date_ee500367": {
         "message": "Ημερομηνία"
     },
     "decrease_indent_de6343ab": {
         "message": "Μείωση Εσοχής Κειμένου"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Βαθύ μοβ"
     },
     "delete_a6efa79d": {
         "message": "Διαγραφή"
@@ -179,6 +188,9 @@
     "greek_65c5b3f7": {
         "message": "Ελληνικά"
     },
+    "green_15af4778": {
+        "message": "Πράσινο"
+    },
     "group_files_82e5dcdb": {
         "message": "Αρχεία ομάδας"
     },
@@ -205,6 +217,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Αύξηση Εσοχής Κειμένου"
+    },
+    "indigo_2035fc55": {
+        "message": "Λουλακί"
     },
     "insert_593145ef": {
         "message": "Εισαγωγή"
@@ -235,6 +250,9 @@
     },
     "late_2be42b88": {
         "message": "Πρόσφατο/α"
+    },
+    "light_blue_5374f600": {
+        "message": "Μπλε Ανοιχτό"
     },
     "link_7262adec": {
         "message": "Σύνδεσμος"
@@ -308,6 +326,9 @@
     "options_3ab0ea65": {
         "message": "Επιλογές"
     },
+    "orange_81386a62": {
+        "message": "Πορτοκαλί"
+    },
     "page_50c4823d": {
         "message": "Σελίδα"
     },
@@ -323,6 +344,9 @@
     "percentage_34ab7c2c": {
         "message": "Εκατοστιαία αναλογία"
     },
+    "pink_68ad45cb": {
+        "message": "Ροζ"
+    },
     "points_bceb5005": {
         "message": "Μόρια"
     },
@@ -335,6 +359,9 @@
     "published_c944a23d": {
         "message": "δημοσιευμένο/α"
     },
+    "purple_7678a9fc": {
+        "message": "Μοβ"
+    },
     "quiz_e0dcce8f": {
         "message": "Κουίζ"
     },
@@ -343,6 +370,9 @@
     },
     "record_7c9448b": {
         "message": "Ηχογράφηση"
+    },
+    "red_8258edf3": {
+        "message": "Κόκκινο"
     },
     "relationships_6602af70": {
         "message": "Σχέσεις"
@@ -373,6 +403,9 @@
     },
     "syllabus_f191f65b": {
         "message": "Αναλυτικό Πρόγραμμα"
+    },
+    "teal_f729a294": {
+        "message": "Γαλαζοπράσινο"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Το υλικό βρίσκεται στο δημόσιο domain"
@@ -415,6 +448,9 @@
     },
     "view_ba339f93": {
         "message": "Προβολή"
+    },
+    "white_87fa64fd": {
+        "message": "Λευκό"
     },
     "wiki_home_9cd54d0": {
         "message": "Αρχική Σελίδα Wiki"

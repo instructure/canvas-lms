@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var Errors = require("i18nliner/dist/lib/errors").default;
+var Errors = require("@instructure/i18nliner/dist/lib/errors").default;
 Errors.register("UnscopedTranslateCall");
 
-var TranslateCall = require("i18nliner/dist/lib/extractors/translate_call").default;
+var TranslateCall = require("@instructure/i18nliner/dist/lib/extractors/translate_call").default;
 var ScopedTranslateCall = require("./scoped_translate_call")(TranslateCall);
 
-var I18nJsExtractor = require("i18nliner/dist/lib/extractors/i18n_js_extractor").default;
+var I18nJsExtractor = require("@instructure/i18nliner/dist/lib/extractors/i18n_js_extractor").default;
 
 function ScopedI18nJsExtractor() {
   I18nJsExtractor.apply(this, arguments);

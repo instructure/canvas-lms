@@ -720,6 +720,7 @@ wb3: application/x-quattropro
 wbmp: image/vnd.wap.wbmp
 wbs: application/vnd.criticaltools.wbs+xml
 wbxml: application/vnd.wap.wbxml
+webp: image/webp
 wif: application/watcherinfo+xml
 wk1: application/vnd.lotus-1-2-3
 wk3: application/vnd.lotus-1-2-3

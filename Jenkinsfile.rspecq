@@ -168,7 +168,6 @@ pipeline {
     RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = '3.141.59-20210929'
     RSPECQ_REDIS_URL = redisUrl()
     CANVAS_ZEITWERK = '1'
   }

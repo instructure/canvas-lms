@@ -129,6 +129,7 @@ module AssignmentOverridesSeleniumHelper
     last_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days: 5)))
     last_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days: -1)))
     last_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days: 5)))
+    last_lock_at_element.send_keys(:tab)
   end
 
   def find_vdd_time(override_context)

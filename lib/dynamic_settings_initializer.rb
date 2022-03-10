@@ -48,6 +48,7 @@ module DynamicSettingsInitializer
     # dependency injection stuff from when
     # this got pulled out into a local gem
     ::DynamicSettings.cache = LocalCache
+    ::DynamicSettings.request_cache = RequestCache
     ::DynamicSettings.fallback_recovery_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) }
     ::DynamicSettings.retry_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) }
     ::DynamicSettings.logger = Rails.logger
