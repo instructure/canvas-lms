@@ -152,8 +152,6 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     pacePlan.end_date,
     pacePlan.hard_end_dates,
     pacePlan.start_date,
-    pacePlan.context_id,
-    pacePlan.context_type,
     projectedEndDate,
     uncompressDates
   ])

@@ -1801,11 +1801,11 @@ describe Account do
   end
 
   context "inheritable settings" do
-    before :once do
+    before do
       @settings = [:restrict_student_future_view, :lock_all_announcements]
     end
 
-    before :once do
+    before do
       account_model
       @sub1 = @account.sub_accounts.create!
       @sub2 = @sub1.sub_accounts.create!
@@ -1832,7 +1832,13 @@ describe Account do
 
       @settings.each do |key|
         expect(@account.send(key)).to eq({ locked: false, value: false })
+      end
+
+      @settings.each do |key|
         expect(@sub1.send(key)).to eq({ locked: true, value: true })
+      end
+
+      @settings.each do |key|
         expect(@sub2.send(key)).to eq({ locked: true, value: true, inherited: true })
       end
     end
@@ -1850,7 +1856,13 @@ describe Account do
 
       @settings.each do |key|
         expect(@account.send(key)).to eq({ locked: false, value: true })
+      end
+
+      @settings.each do |key|
         expect(@sub1.send(key)).to eq({ locked: false, value: true, inherited: true })
+      end
+
+      @settings.each do |key|
         expect(@sub2.send(key)).to eq({ locked: false, value: false })
       end
     end
@@ -1864,34 +1876,6 @@ describe Account do
 
       expect(@account.restrict_student_future_view).to eq({ locked: false, value: true })
       expect(@account.lock_all_announcements).to eq({ locked: false, value: true })
-    end
-
-    context "empty setting elision" do
-      before :once do
-        @account.update settings: { sis_assignment_name_length_input: { value: "100" } }
-        @sub1.update settings: { sis_assignment_name_length_input: { value: "150" } }
-        @sub2.update settings: { sis_assignment_name_length_input: { value: "200" } }
-      end
-
-      it "elides an empty setting" do
-        @sub1.update settings: { sis_assignment_name_length_input: { value: "" } }
-        expect(@sub1.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
-      end
-
-      it "elides a nil setting" do
-        @sub1.update settings: { sis_assignment_name_length_input: { value: nil } }
-        expect(@sub1.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
-      end
-
-      it "elides an explicitly-unlocked setting" do
-        @sub1.update settings: { sis_assignment_name_length_input: { value: nil, locked: false } }
-        expect(@sub1.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
-      end
-
-      it "doesn't elide a locked setting" do
-        @sub1.update settings: { sis_assignment_name_length_input: { value: nil, locked: true } }
-        expect(@sub2.sis_assignment_name_length_input).to eq({ value: nil, inherited: true, locked: true })
-      end
     end
 
     context "caching" do

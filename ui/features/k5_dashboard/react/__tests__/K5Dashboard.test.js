@@ -280,7 +280,6 @@ beforeEach(() => {
     JSON.stringify({status: 'ok'})
   )
   fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
-  fetchMock.get(/\/api\/v1\/users\/\d+\/calendar_events\.*/, JSON.stringify([]))
   global.ENV = defaultEnv
 })
 afterEach(() => {

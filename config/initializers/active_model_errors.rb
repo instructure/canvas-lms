@@ -141,7 +141,7 @@ module ActiveModel
   end
 end
 
-module RailsErrorsExtensions
+module Rails5Errors
   def details
     error_collection
   end
@@ -150,19 +150,9 @@ module RailsErrorsExtensions
     @error_collection = ActiveModel::BetterErrors::ErrorCollection.new(base)
     @error_collection.instance_variable_set(:@collection, other.error_collection.instance_variable_get(:@collection).dup)
   end
-
-  def group_by_attribute
-    error_collection.instance_variable_get(:@collection)
-  end
-
-  def import(error, override_options = {})
-    attribute = override_options.key?(:attribute) ? override_options[:attribute].to_sym : error.attribute
-
-    error_collection[attribute] << error
-  end
 end
 
-module RailsErrorCollectionExtensions
+module Rails5ErrorCollection
   def each_key(&block)
     @collection.each_key(&block)
   end
@@ -179,7 +169,7 @@ ActiveModel::BetterErrors.formatter = ActiveModel::BetterErrors::InstructureForm
 # old format. The ApiReporter is specifically activated by the API error
 # response code.
 
-# make better errors compatible with newer versions of Rails
+# make better errors compatible with Rails 5
 ActiveRecord::Base.include(ActiveModel::BetterErrors::AutosaveAssociation)
-ActiveModel::BetterErrors::Errors.include(RailsErrorsExtensions)
-ActiveModel::BetterErrors::ErrorCollection.include(RailsErrorCollectionExtensions)
+ActiveModel::BetterErrors::Errors.include(Rails5Errors)
+ActiveModel::BetterErrors::ErrorCollection.include(Rails5ErrorCollection)

@@ -456,7 +456,6 @@ CanvasRails::Application.routes.draw do
     end
 
     get "pace_plans" => "pace_plans#index"
-    get "blackout_dates" => "blackout_dates#index"
 
     post "collapse_all_modules" => "context_modules#toggle_collapse_all"
     resources :content_exports, only: %i[create index destroy show]
@@ -739,8 +738,6 @@ CanvasRails::Application.routes.draw do
     resources :developer_keys, only: :index
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
-
-    get "blackout_dates" => "blackout_dates#index"
   end
 
   get "images/users/:user_id" => "users#avatar_image", :as => :avatar_image
@@ -2390,21 +2387,6 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/pace_plans/:id", action: :update
       post "courses/:course_id/pace_plans/:id/publish", action: :publish
       post "courses/:course_id/pace_plans/compress_dates", action: :compress_dates
-    end
-
-    scope(controller: :blackout_dates) do
-      get "courses/:course_id/blackout_dates", action: :index
-      get "accounts/:account_id/blackout_dates", action: :index
-      post "courses/:course_id/blackout_dates", action: :create
-      post "accounts/:account_id/blackout_dates", action: :create
-      get "courses/:course_id/blackout_dates/new", action: :new
-      get "accounts/:account_id/blackout_dates/new", action: :new
-      get "courses/:course_id/blackout_dates/:id", action: :show
-      get "accounts/:account_id/blackout_dates/:id", action: :show
-      put "courses/:course_id/blackout_dates/:id", action: :update
-      put "accounts/:account_id/blackout_dates/:id", action: :update
-      delete "courses/:course_id/blackout_dates/:id", action: :destroy
-      delete "accounts/:account_id/blackout_dates/:id", action: :destroy
     end
 
     scope(controller: :eportfolios_api) do

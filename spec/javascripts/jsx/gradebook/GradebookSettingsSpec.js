@@ -551,8 +551,7 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 
 QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
   let gradebook
-  let container1
-  let container2
+  let container
 
   hooks.beforeEach(() => {
     const performanceControls = new PerformanceControls(performance_controls)
@@ -562,8 +561,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
 
     // We need to actually mount and render the Gradebook component here to
     // ensure that grid colors (which use setState) are properly updated
-    container1 = document.body.appendChild(document.createElement('div'))
-    container2 = document.body.appendChild(document.createElement('div'))
+    container = document.body.appendChild(document.createElement('div'))
     const component = React.createElement(Gradebook, {
       ...defaultGradebookProps,
       allow_view_ungraded_as_zero: true,
@@ -579,7 +577,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       performanceControls,
       dispatch
     })
-    ReactDOM.render(component, container2)
+    ReactDOM.render(component, container)
 
     gradebook.gotAllAssignmentGroups([
       {
@@ -616,7 +614,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     sinon.stub(GradebookApi, 'updateTeacherNotesColumn').resolves()
 
     sinon.stub(FlashAlert, 'showFlashError')
-    setFixtureHtml(container1)
+    setFixtureHtml(container)
   })
 
   hooks.afterEach(() => {
@@ -627,8 +625,8 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     GradebookApi.saveUserSettings.restore()
     GradebookApi.createTeacherNotesColumn.restore()
 
-    ReactDOM.unmountComponentAtNode(container2)
-    container1.remove()
+    ReactDOM.unmountComponentAtNode(container)
+    container.remove()
   })
 
   const teacherNotesColumn = () =>

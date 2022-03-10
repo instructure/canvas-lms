@@ -2289,8 +2289,7 @@ class CoursesController < ApplicationController
             STUDENT_PLANNER_ENABLED: planner_enabled?,
             TABS: @context.tabs_available(@current_user, course_subject_tabs: true, session: session),
             OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
-            TAB_CONTENT_ONLY: embed_mode,
-            SHOW_IMMERSIVE_READER: show_immersive_reader?
+            TAB_CONTENT_ONLY: embed_mode
           )
 
           self_enrollment_option = visible_self_enrollment_option

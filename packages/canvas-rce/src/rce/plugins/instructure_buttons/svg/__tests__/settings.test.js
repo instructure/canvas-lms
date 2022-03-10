@@ -29,12 +29,7 @@ describe('useSvgSettings()', () => {
   const subject = () => renderHook(() => useSvgSettings(ed, editing)).result
 
   describe('when a new button is being created (not editing)', () => {
-    beforeEach(() => {
-      editing = false
-      global.fetch = jest.fn()
-    })
-
-    afterEach(() => jest.restoreAllMocks())
+    beforeEach(() => (editing = false))
 
     it('initializes settings to the default', () => {
       const [settings, _status, _dispatch] = subject().current
@@ -70,10 +65,6 @@ describe('useSvgSettings()', () => {
       const [_settings, status, _dispatch] = subject().current
 
       expect(status).toEqual(statuses.IDLE)
-    })
-
-    it('does not attempt to fetch an existing SVG', () => {
-      expect(global.fetch).not.toHaveBeenCalled()
     })
 
     it('returns dispatch', () => {

@@ -228,23 +228,11 @@ describe('Assignment Bulk Edit Dates', () => {
   it('shows the specified dates', async () => {
     const {getAllByLabelText} = await renderBulkEditAndWait()
     const dueDateInputs = getAllByLabelText('Due At')
-    expect(dueDateInputs.map(i => i.value)).toEqual([
-      'Fri, Mar 20, 2020, 12:00 PM',
-      'Mon, Mar 30, 2020, 9:00 AM',
-      ''
-    ])
+    expect(dueDateInputs.map(i => i.value)).toEqual(['Fri, Mar 20, 2020', 'Mon, Mar 30, 2020', ''])
     const unlockAtInputs = getAllByLabelText('Available From')
-    expect(unlockAtInputs.map(i => i.value)).toEqual([
-      'Thu, Mar 19, 2020, 9:00 AM',
-      'Sun, Mar 29, 2020, 9:00 AM',
-      ''
-    ])
+    expect(unlockAtInputs.map(i => i.value)).toEqual(['Thu, Mar 19, 2020', 'Sun, Mar 29, 2020', ''])
     const lockAtInputs = getAllByLabelText('Available Until')
-    expect(lockAtInputs.map(i => i.value)).toEqual([
-      'Sat, Apr 11, 2020, 9:00 AM',
-      'Tue, Apr 21, 2020, 9:00 AM',
-      ''
-    ])
+    expect(lockAtInputs.map(i => i.value)).toEqual(['Sat, Apr 11, 2020', 'Tue, Apr 21, 2020', ''])
   })
 
   it('shows a message and no date default date fields if an assignment does not have default dates', async () => {
@@ -257,17 +245,17 @@ describe('Assignment Bulk Edit Dates', () => {
 
   it('modifies unlock date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
-    const assignmentUnlockInput = getByDisplayValue('Thu, Mar 19, 2020, 9:00 AM')
+    const assignmentUnlockInput = getByDisplayValue('Thu, Mar 19, 2020')
     changeAndBlurInput(assignmentUnlockInput, '2020-01-01')
-    expect(assignmentUnlockInput.value).toBe('Wed, Jan 1, 2020, 9:00 AM')
+    expect(assignmentUnlockInput.value).toBe('Wed, Jan 1, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
   it('modifies lock at date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
-    const overrideLockInput = getByDisplayValue('Tue, Apr 21, 2020, 9:00 AM')
+    const overrideLockInput = getByDisplayValue('Tue, Apr 21, 2020')
     changeAndBlurInput(overrideLockInput, '2020-12-31')
-    expect(overrideLockInput.value).toBe('Thu, Dec 31, 2020, 9:00 AM')
+    expect(overrideLockInput.value).toBe('Thu, Dec 31, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
@@ -275,13 +263,13 @@ describe('Assignment Bulk Edit Dates', () => {
     const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
     const nullDueDate = getAllByLabelText('Due At')[2]
     changeAndBlurInput(nullDueDate, '2020-06-15')
-    expect(nullDueDate.value).toBe('Mon, Jun 15, 2020, 11:59 PM')
+    expect(nullDueDate.value).toBe('Mon, Jun 15, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
   it('can blur a field without changes without revert button showing up', async () => {
     const {queryAllByText, getByDisplayValue, getAllByDisplayValue} = await renderBulkEditAndWait()
-    const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020, 9:00 AM')
+    const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020')
     fireEvent.blur(assignmentUnlockAt)
     let revertButtons = queryAllByText('Revert date changes').filter(elt => elt.closest('button'))
     expect(revertButtons).toHaveLength(0)
@@ -295,10 +283,10 @@ describe('Assignment Bulk Edit Dates', () => {
   it('can revert edited dates on a row', async () => {
     const {getAllByText, getAllByLabelText, getByDisplayValue} = await renderBulkEditAndWait()
 
-    const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020, 9:00 AM')
+    const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020')
     changeAndBlurInput(assignmentUnlockAt, '2020-06-15')
 
-    const overrideLockInput = getByDisplayValue('Tue, Apr 21, 2020, 9:00 AM')
+    const overrideLockInput = getByDisplayValue('Tue, Apr 21, 2020')
     changeAndBlurInput(overrideLockInput, '')
 
     const nullDueDate = getAllByLabelText('Due At')[2]
@@ -308,25 +296,25 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(revertButtons).toHaveLength(3)
 
     fireEvent.click(revertButtons[1])
-    expect(overrideLockInput.value).toBe('Tue, Apr 21, 2020, 9:00 AM') // original value
-    expect(assignmentUnlockAt.value).toBe('Mon, Jun 15, 2020, 9:00 AM') // not changed yet
-    expect(nullDueDate.value).toBe('Tue, Jun 16, 2020, 11:59 PM') // not changed yet
+    expect(overrideLockInput.value).toBe('Tue, Apr 21, 2020') // original value
+    expect(assignmentUnlockAt.value).toBe('Mon, Jun 15, 2020') // not changed yet
+    expect(nullDueDate.value).toBe('Tue, Jun 16, 2020') // not changed yet
     // focus should be explicitly set to the lock at input
     expect(document.activeElement).toBe(overrideLockInput)
 
     fireEvent.click(revertButtons[0])
     fireEvent.click(revertButtons[2])
-    expect(assignmentUnlockAt.value).toBe('Thu, Mar 19, 2020, 9:00 AM') // original value
+    expect(assignmentUnlockAt.value).toBe('Thu, Mar 19, 2020') // original value
     expect(nullDueDate.value).toBe('') // original value
   })
 
   it('can revert nonsense input on a row', async () => {
     const {getAllByText, getByDisplayValue} = await renderBulkEditAndWait()
-    const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020, 9:00 AM')
+    const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020')
     changeAndBlurInput(assignmentUnlockAt, 'asdf')
     const revertButton = getAllByText('Revert date changes').filter(elt => elt.closest('button'))[0]
     fireEvent.click(revertButton)
-    expect(assignmentUnlockAt.value).toBe('Thu, Mar 19, 2020, 9:00 AM') // original value
+    expect(assignmentUnlockAt.value).toBe('Thu, Mar 19, 2020') // original value
   })
 
   it('disables non-editable dates', async () => {

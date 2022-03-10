@@ -1188,7 +1188,6 @@ end
 module LockForNoKeyUpdate
   def lock(lock_type = true)
     lock_type = "FOR NO KEY UPDATE" if lock_type == :no_key_update
-    lock_type = "FOR NO KEY UPDATE SKIP LOCKED" if lock_type == :no_key_update_skip_locked
     super(lock_type)
   end
 end
@@ -1218,8 +1217,8 @@ ActiveRecord::Relation.class_eval do
     scope
   end
 
-  def update_all_locked_in_order(lock_type: :no_key_update, **updates)
-    locked_scope = lock(lock_type).order(primary_key.to_sym)
+  def update_all_locked_in_order(updates)
+    locked_scope = lock(:no_key_update).order(primary_key.to_sym)
     if Setting.get("update_all_locked_in_order_subquery", "true") == "true"
       unscoped.where(primary_key => locked_scope).update_all(updates)
     else
@@ -1233,16 +1232,6 @@ ActiveRecord::Relation.class_eval do
   def touch_all
     activate do |relation|
       relation.update_all_locked_in_order(updated_at: Time.now.utc)
-    end
-  end
-
-  def touch_all_skip_locked
-    if Setting.get("touch_all_skip_locked_enabled", "true") == "true"
-      activate do |relation|
-        relation.update_all_locked_in_order(updated_at: Time.now.utc, lock_type: :no_key_update_skip_locked)
-      end
-    else
-      touch_all
     end
   end
 

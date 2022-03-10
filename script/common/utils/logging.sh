@@ -120,7 +120,7 @@ function display_next_steps {
       echo ':docker-compose/selenium.override.yml' >> .env
 
     build the selenium container
-      ${DOCKER_COMMAND} build selenium-hub
+      ${DOCKER_COMMAND} build selenium-chrome
 
     run selenium
       ${DOCKER_COMMAND} run --rm web bundle exec rspec spec/selenium

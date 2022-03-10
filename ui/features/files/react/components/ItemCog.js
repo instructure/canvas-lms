@@ -237,7 +237,7 @@ class ItemCog extends React.Component {
         )
         // Move Link
         menuItems.push(
-          <li key="move-to" role="presentation">
+          <li key="move" role="presentation">
             <a
               href="#"
               onClick={wrap(openMoveDialog, {
@@ -248,7 +248,7 @@ class ItemCog extends React.Component {
               role="menuitem"
               tabIndex="-1"
             >
-              {I18n.t('Move To...')}
+              {I18n.t('Move')}
             </a>
           </li>
         )
