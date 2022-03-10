@@ -79,6 +79,34 @@ describe('SearchResults', () => {
     window.ENV = oldEnv
   })
 
+  describe('accessibility message', () => {
+    let wrapper
+
+    beforeEach(() => {
+      // eslint-disable-next-line no-global-assign
+      document = new JSDOM('')
+      document.body.appendChild(document.createElement('div'))
+    })
+
+    afterEach(() => {
+      wrapper.detach()
+    })
+
+    it('renders if userCanEditFilesForContext is true', () => {
+      wrapper = mount(<SearchResults {...defaultProps()} />, {attachTo: document.body.firstChild})
+      const message = document.querySelector('.SearchResults__accessbilityMessage')
+      expect(message).toBeInTheDocument()
+    })
+
+    it('does not render if userCanEditFilesForContext is false', () => {
+      wrapper = mount(<SearchResults {...defaultProps({userCanEditFilesForContext: false})} />, {
+        attachTo: document.body.firstChild
+      })
+      const message = document.querySelector('.SearchResults__accessbilityMessage')
+      expect(message).toBeNull()
+    })
+  })
+
   describe('File Menu', () => {
     let wrapper, menuItems
 
@@ -132,7 +160,7 @@ describe('SearchResults', () => {
     })
 
     it('Move item renders', () => {
-      expect(menuItems.some(i => i.textContent === 'Move')).toEqual(true)
+      expect(menuItems.some(i => i.textContent === 'Move To...')).toEqual(true)
     })
 
     it('Delete item renders', () => {

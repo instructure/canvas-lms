@@ -1522,19 +1522,21 @@ describe Submission do
       submission.grade_change_audit(force_audit: true)
     end
 
-    it "does not insert a grade change audit record if skip_insert is true" do
+    it "does not insert a grade change audit record if grade not changed" do
       expect(Auditors::GradeChange::Stream).not_to receive(:insert)
-      submission.grade_change_audit(force_audit: true, skip_insert: true)
+      submission.grade_change_audit(force_audit: true)
     end
 
-    it "emits a grade change live event when skip_insert is false" do
-      expect(Canvas::LiveEvents).to receive(:grade_changed).once
-      submission.grade_change_audit(force_audit: true, skip_insert: false)
+    it "inserts a grade change audit record if grade changed" do
+      # once for Cassandra, once for Postgres
+      expect(Auditors::GradeChange::Stream).to receive(:insert).twice
+      submission.score = 11
+      submission.save!
     end
 
-    it "emits a grade change live event when skip_insert is true" do
+    it "emits a grade change live event when force_audit" do
       expect(Canvas::LiveEvents).to receive(:grade_changed).once
-      submission.grade_change_audit(force_audit: true, skip_insert: true)
+      submission.grade_change_audit(force_audit: true)
     end
   end
 

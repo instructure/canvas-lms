@@ -163,10 +163,14 @@ export default class CreateAssignmentView extends DialogFormView
           trimmedInput = $.trim(e.target.value)
           newDate = timeField.data('unfudged-date')
           newDate = if trimmedInput == '' then null else newDate
-          newDate = tz.changeToTheSecondBeforeMidnight(newDate) if tz.isMidnight(newDate)
+          if tz.isMidnight(newDate)
+            if ENV.DEFAULT_DUE_TIME
+              newDate = tz.parse(tz.format(newDate, "%F #{ENV.DEFAULT_DUE_TIME}"))
+            else
+              newDate = tz.changeToTheSecondBeforeMidnight(newDate)
           dateStr = $.dateString(newDate)
           timeStr = $.timeString(newDate)
-          e.target.value = "#{dateStr} #{timeStr}"
+          timeField.data('inputdate', newDate).val("#{dateStr} #{timeStr}")
 
   newAssignmentUrl: ->
     ENV.URLS.new_assignment_url

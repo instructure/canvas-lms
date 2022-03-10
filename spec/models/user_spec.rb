@@ -3885,6 +3885,23 @@ describe User do
       )
       expect(@ta.can_create_enrollment_for?(@course, nil, "StudentEnrollment")).to be_truthy
     end
+
+    context "blueprint courses" do
+      before :once do
+        @teacher = user_factory(active_all: true)
+        @course.enroll_teacher(@teacher, enrollment_state: :active)
+        MasterCourses::MasterTemplate.set_as_master_course(@course)
+      end
+
+      it "returns false for StudentEnrollment and ObserverEnrollment types" do
+        expect(@teacher.can_create_enrollment_for?(@course, nil, "StudentEnrollment")).to be_falsey
+        expect(@teacher.can_create_enrollment_for?(@course, nil, "ObserverEnrollment")).to be_falsey
+      end
+
+      it "returns true for TeacherEnrollment types" do
+        expect(@teacher.can_create_enrollment_for?(@course, nil, "TeacherEnrollment")).to be_truthy
+      end
+    end
   end
 
   describe "comment_bank_items" do

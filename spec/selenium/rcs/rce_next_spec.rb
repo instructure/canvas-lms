@@ -221,21 +221,8 @@ describe "RCE next tests", ignore_js_errors: true do
           body: "<p id='para'><a id='lnk' href='http://example.com'>delete me</a></p>"
         )
         visit_existing_wiki_edit(@course, "title")
-
         f("##{rce_page_body_ifr_id}").click
-        f("##{rce_page_body_ifr_id}").send_keys(
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left],
-          %i[shift arrow_left]
-        )
-        f("##{rce_page_body_ifr_id}").send_keys(:enter)
+        f("##{rce_page_body_ifr_id}").send_keys([:control, "a"], :backspace)
 
         in_frame rce_page_body_ifr_id do
           expect(f("#para").text).to eql ""
@@ -1175,7 +1162,7 @@ describe "RCE next tests", ignore_js_errors: true do
       it "opens keyboard shortcut modal with alt-f8" do
         visit_front_page_edit(@course)
         rce = f(".tox-edit-area__iframe")
-        rce.send_keys %i[alt f8]
+        rce.send_keys(:alt, :f8)
 
         expect(keyboard_shortcut_modal).to be_displayed
       end
@@ -1184,7 +1171,7 @@ describe "RCE next tests", ignore_js_errors: true do
         visit_front_page_edit(@course)
         rce = f(".tox-edit-area__iframe")
         expect(f(".tox-menubar")).to be_displayed # always show menubar now
-        rce.send_keys %i[alt f9]
+        rce.send_keys(:alt, :f9)
 
         expect(f(".tox-menubar")).to be_displayed
         expect(fj('.tox-menubar button:contains("Edit")')).to eq(driver.switch_to.active_element)
@@ -1193,7 +1180,7 @@ describe "RCE next tests", ignore_js_errors: true do
       it "focuses the toolbar with alt-f10" do
         visit_front_page_edit(@course)
         rce = f(".tox-edit-area__iframe")
-        rce.send_keys %i[alt f10]
+        rce.send_keys(:alt, :f10)
 
         expect(fj('.tox-toolbar__primary button:contains("12pt")')).to eq(
           driver.switch_to.active_element

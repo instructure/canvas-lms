@@ -49,7 +49,7 @@ describe "cross-listing" do
     # crosslist a valid course
     course_id.click
     course_id.clear
-    course_id.send_keys([:control, "a"], @course2.id.to_s, "\n")
+    course_id.send_keys(@course2.id.to_s, "\n")
     expect(course_name).to include_text(@course2.name)
     expect(form.find_element(:id, "course_autocomplete_id")).to have_attribute(:value, @course.id.to_s)
     expect(submit_btn).not_to have_class("disabled")
@@ -107,7 +107,7 @@ describe "cross-listing" do
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
-    form.find_element(:css, "#course_id").send_keys([:control, "a"], other_course.id.to_s, "\n")
+    form.find_element(:css, "#course_id").send_keys(other_course.id.to_s, "\n")
     expect(f("#course_autocomplete_name")).to include_text other_course.name
     expect(form.find_element(:css, "#course_autocomplete_id")).to have_attribute(:value, other_course.id.to_s)
 

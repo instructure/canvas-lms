@@ -23,7 +23,6 @@ require "action_controller"
 require "active_record"
 
 Rails.env = "test"
-Time.zone = "UTC" # This is simplest, fight me.
 
 # Right now Canvas injects the Setting class as the store.
 # It would be great to pull that one out to something we can

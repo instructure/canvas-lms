@@ -122,7 +122,6 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "Phụ Đề" },
   "collaborations_5c56c15f": { "message": "Cộng Tác" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Thu gọn để ẩn { types }" },
-  "color_color_eb64b08": { "message": "Màu { color }" },
   "computer_1d7dfa6f": { "message": "Máy Tính" },
   "content_1440204b": { "message": "Nội Dung" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {

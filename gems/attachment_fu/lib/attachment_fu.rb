@@ -36,6 +36,7 @@ module AttachmentFu # :nodoc:
     "image/x-ms-bmp",
     "image/bmp",
     "image/x-bmp",
+    "image/webp",
     "image/x-bitmap",
     "image/x-xbitmap",
     "image/x-win-bitmap",

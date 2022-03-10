@@ -79,7 +79,7 @@ describe "better_file_browsing" do
         f(".al-trigger-gray").click
         expect(fln("Download")).to be_displayed
         expect(content).not_to contain_link("Rename")
-        expect(content).not_to contain_link("Move")
+        expect(content).not_to contain_link("Move To...")
         expect(content).not_to contain_link("Delete")
       end
 

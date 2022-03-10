@@ -389,8 +389,7 @@ describe FilesController do
       @file.content_type = "text/html"
       @file.save
       get "show", params: { course_id: @course.id, id: @file.id, download: 1, verifier: @file.uuid, download_frd: 1 }
-      expect(response.header["Cache-Control"]).not_to include "private"
-      expect(response.header["Cache-Control"]).to include "no-cache"
+      # rails will include private directive by default unless no-cache is provided
       expect(response.header["Cache-Control"]).to include "no-store"
       expect(response.header).not_to include("Expires")
       expect(response.header).to include("Pragma")

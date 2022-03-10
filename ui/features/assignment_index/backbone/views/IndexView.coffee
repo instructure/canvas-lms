@@ -122,6 +122,7 @@ export default class IndexView extends Backbone.View
           courseId: ENV.COURSE_ID
           onCancel: @cancelBulkEdit
           onSave: @handleBulkEditSaved
+          defaultDueTime: ENV.DEFAULT_DUE_TIME
         }),
         @$bulkEditRoot[0]
       )

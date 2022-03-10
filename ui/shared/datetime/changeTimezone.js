@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import moment from 'moment-timezone'
 
 const MINS = 60 * 1000
 
@@ -58,6 +59,14 @@ function parseableDateString(date, tz) {
 // timezone is used
 //
 function changeTimezone(date, {originTZ = null, desiredTZ = null}) {
+  const localTz = originTZ || Intl.DateTimeFormat().resolvedOptions().timeZone
+  const originTZOffset = moment.tz(localTz).utcOffset()
+  const desiredTZOffset = moment.tz(desiredTZ).utcOffset()
+  // let's bypass getTimezoneOffset if the desired timezone is equal or behind
+  // the user TZ, this fixes some bugs when shifting in or out of DST
+  if (originTZOffset >= desiredTZOffset) {
+    originTZ = localTz
+  }
   const originOffset = utcTimeOffset(date, originTZ)
   const desiredOffset = utcTimeOffset(date, desiredTZ)
   return new Date(date.getTime() + originOffset - desiredOffset)

@@ -328,6 +328,15 @@ describe Role do
           end
         end
       end
+
+      it "sets addable_by_user correctly in a blueprint course" do
+        @admin = account_admin_user(account: @course.account)
+        MasterCourses::MasterTemplate.set_as_master_course(@course)
+        roles = Role.role_data(@course, @admin)
+        expect(roles.find { |r| r[:name] == "TeacherEnrollment" }[:addable_by_user]).to be_truthy
+        expect(roles.find { |r| r[:name] == "StudentEnrollment" }[:addable_by_user]).to be_falsey
+        expect(roles.find { |r| r[:name] == "ObserverEnrollment" }[:addable_by_user]).to be_falsey
+      end
     end
   end
 
