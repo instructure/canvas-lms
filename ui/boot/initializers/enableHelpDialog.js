@@ -20,7 +20,7 @@
 // jqueryui dialog
 // jquery disableWhileLoading
 
-import I18n from 'i18n!helpDialog'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import helpDialogTemplate from './jst/helpDialog.handlebars'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -30,6 +30,8 @@ import preventDefault from 'prevent-default'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.disableWhileLoading'
+
+const I18n = useI18nScope('helpDialog');
 
 const helpDialog = {
   defaultTitle: I18n.t('Help', 'Help'),

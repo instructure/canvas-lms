@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!announcements_v2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, number, node} from 'prop-types'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
+
+const I18n = useI18nScope('announcements_v2');
 
 export function showConfirmDelete(props) {
   const parent = document.createElement('div')

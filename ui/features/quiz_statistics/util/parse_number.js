@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!quiz_statistics'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import parseDecimalNumber from 'parse-decimal-number'
+
+const I18n = useI18nScope('quiz_statistics');
 
 export default function parseNumber(s) {
   if (s == null) {

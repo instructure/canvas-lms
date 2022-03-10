@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!GroupUsersView'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import {backbone, renderTray} from '@canvas/move-item-tray'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
@@ -25,6 +25,8 @@ import template from '../../jst/groupUsers.handlebars'
 import groupHasSubmissions from '../../groupHasSubmissions'
 import 'jqueryui/draggable'
 import 'jqueryui/droppable'
+
+const I18n = useI18nScope('GroupUsersView');
 
 export default class GroupUsersView extends PaginatedCollectionView {
   static initClass() {

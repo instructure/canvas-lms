@@ -25,7 +25,9 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import StatusColorPanel from './StatusColorPanel'
 
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('gradebook');
 
 function buildAssignmentSortOptions(includeModules) {
   const options = [

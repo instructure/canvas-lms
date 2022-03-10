@@ -17,8 +17,10 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!assignment!reupload_submissions_helper'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/forms/jquery/jquery.instructure_forms' // brings in $.fn.formSubmit
+
+const I18n = useI18nScope('assignment!reupload_submissions_helper');
 
 const formId = 're_upload_submissions_form'
 

@@ -18,11 +18,13 @@
 
 import {Flex} from '@instructure/ui-flex'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import I18n from 'i18n!assignments_2_student_header'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {ProgressCircle} from '@instructure/ui-progress'
 import React from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
+
+const I18n = useI18nScope('assignments_2_student_header');
 
 const possibleStates = {
   inProgress: {

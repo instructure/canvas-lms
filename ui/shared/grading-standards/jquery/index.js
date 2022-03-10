@@ -17,16 +17,18 @@
  */
 
 import round from 'round'
-import I18n from 'i18n!grading_standards'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* ifExists, .dim, undim, confirmDelete */
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
+
+const I18n = useI18nScope('grading_standards');
 
 function roundedNumber(val) {
   return I18n.n(round(val, round.DEFAULT))

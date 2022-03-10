@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useContext} from 'react'
 import {Img} from '@instructure/ui-img'
 import {Billboard} from '@instructure/ui-billboard'
@@ -24,6 +24,8 @@ import {Billboard} from '@instructure/ui-billboard'
 import {SearchContext} from '../../utils/constants'
 
 import pageNotFound from '@canvas/images/PageNotFoundPanda.svg'
+
+const I18n = useI18nScope('discussion_posts');
 
 export const NoResultsFound = () => {
   const {searchTerm} = useContext(SearchContext)

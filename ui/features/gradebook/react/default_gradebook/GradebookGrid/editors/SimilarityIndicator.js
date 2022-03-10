@@ -20,9 +20,11 @@ import React from 'react'
 import {func, number, oneOf, shape} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import SimilarityIcon from '../../components/SimilarityIcon'
+
+const I18n = useI18nScope('gradebook');
 
 function tooltipText({similarityScore, status}) {
   if (status === 'error') {

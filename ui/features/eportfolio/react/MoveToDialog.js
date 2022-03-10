@@ -18,10 +18,12 @@
 
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
-import I18n from 'i18n!eportfolio'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import PropTypes from 'prop-types'
 import React from 'react'
+
+const I18n = useI18nScope('eportfolio');
 
 class MoveToDialog extends React.Component {
   static propTypes = {

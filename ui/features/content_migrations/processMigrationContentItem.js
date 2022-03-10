@@ -17,9 +17,11 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!content_migrations'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 import '@canvas/rails-flash-notifications'
+
+const I18n = useI18nScope('content_migrations');
 
 export default function processMigrationContentItem(event) {
   if (

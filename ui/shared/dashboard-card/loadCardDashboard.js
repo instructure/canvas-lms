@@ -24,7 +24,9 @@ import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@instructure/js-utils'
 import buildURL from 'axios/lib/helpers/buildURL'
-import I18n from 'i18n!load_card_dashboard'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('load_card_dashboard');
 
 export function createDashboardCards(dashboardCards, cardComponent = DashboardCard, extraProps) {
   const Box = getDroppableDashboardCardBox()

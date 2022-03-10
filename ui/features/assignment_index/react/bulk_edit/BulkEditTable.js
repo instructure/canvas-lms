@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useCallback} from 'react'
 import {arrayOf, func, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -32,6 +32,8 @@ import BulkDateInput from './BulkDateInput'
 import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
 import {canEditAll, originalDateField} from './utils'
+
+const I18n = useI18nScope('assignments_bulk_edit');
 
 const DATE_INPUT_META = {
   due_at: {

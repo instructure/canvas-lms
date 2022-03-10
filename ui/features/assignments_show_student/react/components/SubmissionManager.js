@@ -33,7 +33,7 @@ import {
   multipleTypesDrafted,
   totalAllowedAttempts
 } from '../helpers/SubmissionHelpers'
-import I18n from 'i18n!assignments_2_file_upload'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
@@ -51,6 +51,8 @@ import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('assignments_2_file_upload');
 
 function DraftStatus({status}) {
   const statusConfigs = {

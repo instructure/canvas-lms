@@ -18,7 +18,7 @@
 
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {CURRENT_USER, DEFAULT_AVATAR_URL} from '../../utils/constants'
-import I18n from 'i18n!discussions_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState} from 'react'
 
 import {Avatar} from '@instructure/ui-avatar'
@@ -27,6 +27,8 @@ import {Select} from '@instructure/ui-select'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import propTypes from 'prop-types'
+
+const I18n = useI18nScope('discussions_posts');
 
 export const AnonymousResponseSelector = props => {
   const [selectedOption, setSelectedOption] = useState(

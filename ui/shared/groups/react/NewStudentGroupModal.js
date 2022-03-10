@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import I18n from 'i18n!student_groups'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {array, bool, func, number, shape} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -34,6 +34,8 @@ import {throttle} from 'underscore'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import CanvasMultiSelect from '@canvas/multi-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+
+const I18n = useI18nScope('student_groups');
 
 export default function NewStudentGroupModal({userCollection, loadMore, onSave, ...modalProps}) {
   const [name, setName] = useState('')

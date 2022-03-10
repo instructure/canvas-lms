@@ -19,7 +19,9 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton, Button} from '@instructure/ui-buttons'
-import I18n from 'i18n!TourPoints'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('TourPoints');
 
 const TourContainer = ({
   current,

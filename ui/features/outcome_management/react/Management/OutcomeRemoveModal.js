@@ -20,7 +20,7 @@
 import React from 'react'
 import {useMutation} from 'react-apollo'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
@@ -34,6 +34,8 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {DELETE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {outcomeShape} from './shapes'
 import {IconCheckMarkIndeterminateLine} from '@instructure/ui-icons'
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const OutcomeRemoveModal = ({
   outcomes,

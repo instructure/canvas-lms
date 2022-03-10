@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!external_tools'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import ConfigOptionField from './ConfigOptionField'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('external_tools');
 
 export default class ManageAppListButton extends React.Component {
   static propTypes = {

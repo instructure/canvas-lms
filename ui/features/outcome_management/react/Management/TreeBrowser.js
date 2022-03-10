@@ -21,7 +21,9 @@ import {IconArrowOpenDownLine, IconArrowOpenEndLine, IconPlusLine} from '@instru
 import {TreeBrowser as InstuiTreeBrowser} from '@instructure/ui-tree-browser'
 import AddContentItem from '../shared/AddContentItem'
 import {isRTL} from '@canvas/i18n/rtlHelper'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const KEYCODES = {
   ENTER: 13,

@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import I18n from 'i18n!k5_tabs'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {Tabs} from '@instructure/ui-tabs'
@@ -25,6 +25,8 @@ import {View} from '@instructure/ui-view'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import k5Theme from './k5-theme'
+
+const I18n = useI18nScope('k5_tabs');
 
 export const scrollElementIntoViewIfCoveredByHeader = tabsRef => e => {
   const elementY = e.target.getBoundingClientRect().y

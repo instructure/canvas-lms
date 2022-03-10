@@ -20,7 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ChecklistItem from './ChecklistItem'
 import ListItems from './ListItems'
-import I18n from 'i18n!course_wizard'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('course_wizard');
 
 class Checklist extends React.Component {
   static displayName = 'Checklist'

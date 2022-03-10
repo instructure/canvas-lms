@@ -19,8 +19,10 @@
 import React from 'react'
 import {bool, func, object, string} from 'prop-types'
 import DueDateCalendarPicker from './DueDateCalendarPicker'
-import I18n from 'i18n!DueDateCalendars'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import cx from 'classnames'
+
+const I18n = useI18nScope('DueDateCalendars');
 
 class DueDateCalendars extends React.Component {
   static propTypes = {

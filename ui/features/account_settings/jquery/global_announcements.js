@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!account_settings'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
+
+const I18n = useI18nScope('account_settings');
 
 // optimization so user isn't waiting on RCS to
 // respond when they hit announcements

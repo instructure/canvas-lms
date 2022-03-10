@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!accounts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import h from 'html-escape'
 import authenticity_token from '@canvas/authenticity-token'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
+
+const I18n = useI18nScope('accounts');
 
 function testLDAP() {
   clearTestLDAP()

@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!messages'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import sendForm from './jst/sendForm.handlebars'
 import '@canvas/util/jquery/fixDialogButtons'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
+
+const I18n = useI18nScope('messages');
 
 $('.tabs').tabs()
 

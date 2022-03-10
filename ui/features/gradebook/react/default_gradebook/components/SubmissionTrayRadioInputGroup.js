@@ -21,7 +21,9 @@ import {bool, func, number, shape, string} from 'prop-types'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('gradebook');
 
 function checkedValue(submission, assignment) {
   // If students are anonymized we don't want to leak any information about the submission

@@ -22,13 +22,15 @@ import BreadcrumbLinkWithTip from './BreadcrumbLinkWithTip'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '@canvas/generic-error-page'
-import I18n from 'i18n!assignments_2_MoreOptions_CanvasFiles'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import LoadingIndicator from '@canvas/loading-indicator'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import React from 'react'
 
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Flex} from '@instructure/ui-flex'
+
+const I18n = useI18nScope('assignments_2_MoreOptions_CanvasFiles');
 
 class CanvasFiles extends React.Component {
   state = {

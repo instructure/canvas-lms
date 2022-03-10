@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!course_settings'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -28,6 +28,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('course_settings');
 
 const IntegrationRow = ({
   available,

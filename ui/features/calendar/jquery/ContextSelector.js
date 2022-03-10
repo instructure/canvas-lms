@@ -18,11 +18,13 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!context_sector'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import contextSelectorTemplate from '../jst/contextSelector.handlebars'
 import contextSelectorItemTemplate from '../jst/contextSelectorItem.handlebars'
 import preventDefault from 'prevent-default'
 import {publish, subscribe} from 'jquery-tinypubsub'
+
+const I18n = useI18nScope('context_sector');
 
 class ContextSelectorItem {
   constructor(context) {

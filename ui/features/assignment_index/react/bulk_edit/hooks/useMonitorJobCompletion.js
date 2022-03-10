@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit_use_save_assignment'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {useEffect, useRef, useState} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {extractFetchErrorMessage} from '../utils'
+
+const I18n = useI18nScope('assignments_bulk_edit_use_save_assignment');
 
 export default function useMonitorJobCompletion({progressUrl, pollingInterval = 2000}) {
   const [jobCompletion, setJobCompletion] = useState(0)

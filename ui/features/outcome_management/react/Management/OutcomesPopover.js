@@ -18,7 +18,7 @@
 
 import React, {useState, forwardRef} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
@@ -27,6 +27,8 @@ import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {outcomeShape} from './shapes'
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, ref) => {
   const [showOutcomesList, setShowOutcomesList] = useState(false)

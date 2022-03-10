@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Provider} from 'react-redux'
-import I18n from 'i18n!gradebook_history'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import GradebookMenu from '@canvas/gradebook-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchForm from './SearchForm'
@@ -26,6 +26,8 @@ import SearchResults from './SearchResults'
 
 import GradebookHistoryStore from './store/GradebookHistoryStore'
 import {bool, string} from 'prop-types'
+
+const I18n = useI18nScope('gradebook_history');
 
 const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}) => (
   <Provider store={GradebookHistoryStore}>

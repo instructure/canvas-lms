@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!jobs_v2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useCallback, useReducer, useMemo} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
+
+const I18n = useI18nScope('jobs_v2');
 
 function jobsReducer(prevState, action) {
   if (action.type === 'FETCH_SUCCESS') {

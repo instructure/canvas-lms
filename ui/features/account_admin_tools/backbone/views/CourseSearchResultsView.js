@@ -17,8 +17,10 @@
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/CourseSearchResults.handlebars'
-import I18n from 'i18n!course_search_results'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/rails-flash-notifications'
+
+const I18n = useI18nScope('course_search_results');
 
 export default class CourseSearchResultsView extends Backbone.View {
   static initClass() {

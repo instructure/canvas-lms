@@ -18,8 +18,10 @@
 
 import {number, string} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!GraderCountNumberInput'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {NumberInput} from '@instructure/ui-number-input'
+
+const I18n = useI18nScope('GraderCountNumberInput');
 
 const DEFAULT_GRADER_COUNT = 2
 

@@ -26,9 +26,11 @@ import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import I18n from 'i18n!account_course_user_search'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import preventDefault from 'prevent-default'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
+
+const I18n = useI18nScope('account_course_user_search');
 
 export default function UsersToolbar(props) {
   function handleRoleSelect(event, value) {

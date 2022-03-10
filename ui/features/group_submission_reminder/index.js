@@ -17,12 +17,14 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!GroupSubmissionAlert'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {string} from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import ready from '@instructure/ready'
+
+const I18n = useI18nScope('GroupSubmissionAlert');
 
 export default function GroupSubmissionAlert({groupType}) {
   return (
