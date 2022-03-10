@@ -43,9 +43,7 @@ class Notification < Switchman::UnshardedRecord
   ].freeze
 
   ALLOWED_PUSH_NOTIFICATION_CATEGORIES = %w[
-    all_submissions
     announcement
-    announcement_created_by_you
     appointment_availability
     appointment_cancelations
     calendar
