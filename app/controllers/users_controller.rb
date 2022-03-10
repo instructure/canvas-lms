@@ -569,7 +569,7 @@ class UsersController < ApplicationController
   def dashboard_stream_items
     cancel_cache_buster
 
-    @user = params[:observed_user].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user]) : @current_user
+    @user = params[:observed_user_id].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user_id]) : @current_user
     @is_observing_student = @current_user != @user
     course_ids = nil
     if @is_observing_student
@@ -632,7 +632,7 @@ class UsersController < ApplicationController
 
   def dashboard_sidebar
     GuardRail.activate(:secondary) do
-      @user = params[:observed_user].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user]) : @current_user
+      @user = params[:observed_user_id].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user_id]) : @current_user
       @is_observing_student = @current_user != @user
       course_ids = nil
 
