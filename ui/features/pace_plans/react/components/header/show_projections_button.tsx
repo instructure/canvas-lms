@@ -18,7 +18,7 @@
 
 import React from 'react'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import I18n from 'i18n!pace_plans_show_projections_button'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {connect} from 'react-redux'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -28,6 +28,8 @@ import {isStudentPlan} from '../../reducers/pace_plans'
 import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
 import {ResponsiveSizes, StoreState} from '../../types'
 import {actions as uiActions} from '../../actions/ui'
+
+const I18n = useI18nScope('pace_plans_show_projections_button');
 
 interface StoreProps {
   readonly responsiveSize: ResponsiveSizes

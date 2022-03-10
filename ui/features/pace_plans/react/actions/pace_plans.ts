@@ -20,12 +20,14 @@ import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import I18n from 'i18n!pace_plans_actions'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {PacePlanItemDueDates, PacePlan, PlanContextTypes, Progress, StoreState} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import * as Api from '../api/pace_plan_api'
+
+const I18n = useI18nScope('pace_plans_actions');
 
 export const PUBLISH_STATUS_POLLING_MS = 3000
 const TERMINAL_PROGRESS_STATUSES = ['completed', 'failed']
