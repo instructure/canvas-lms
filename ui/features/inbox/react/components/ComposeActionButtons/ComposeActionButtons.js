@@ -57,7 +57,10 @@ const renderUploadButtons = props => {
         type="file"
         style={{display: 'none'}}
         aria-hidden
-        onChange={props.onAttachmentUpload}
+        onChange={e => {
+          props.onAttachmentUpload(e)
+          attachmentInput.value = ''
+        }}
         multiple
       />
       {props.onMediaUpload && (
