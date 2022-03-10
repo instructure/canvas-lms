@@ -276,6 +276,7 @@ module PlannerPageObject
 
   def open_opportunities_dropdown
     fj("button:contains('opportunit')").click
+    wait_for(method: nil, timeout: 1) { f("#Opportunities-styles__tabs_container").displayed? }
   end
 
   def close_opportunities_dropdown
@@ -391,6 +392,7 @@ module PlannerPageObject
     go_to_list_view
     click_item_button(@student_to_do.title)
     @modal = todo_sidebar_modal(@student_to_do.title)
+    wait_for(method: nil, timeout: 1) { todo_tray_course_selector.displayed? }
   end
 
   def graded_discussion_in_the_past(due = Time.zone.now - 2.days, title = "Graded discussion past")
