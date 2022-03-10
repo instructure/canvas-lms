@@ -140,7 +140,7 @@ module Api
                                                   mobile_css_overrides: "https://example.com/child/account.css",
                                                   mobile_js_overrides: "https://example.com/child/account.js"
                                                 })
-          bc.parent = root_bc
+          bc.parent_md5 = root_bc.md5
           bc.save!
           child_account.save!
 
