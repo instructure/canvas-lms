@@ -20,7 +20,7 @@
 
 require_relative "messages_helper"
 
-describe "new_discussion_mention" do
+describe "discussion_mention" do
   before :once do
     discussion_topic_model
     entry = @topic.discussion_entries.create!(user: user_model)
@@ -28,7 +28,7 @@ describe "new_discussion_mention" do
   end
 
   let(:asset) { @object }
-  let(:notification_name) { :new_discussion_mention }
+  let(:notification_name) { :discussion_mention }
 
   include_examples "a message"
 
