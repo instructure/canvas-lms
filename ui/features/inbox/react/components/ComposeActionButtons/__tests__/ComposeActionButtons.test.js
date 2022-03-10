@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {ComposeActionButtons} from '../ComposeActionButtons'
 
 const createProps = overrides => {
@@ -39,6 +40,23 @@ describe('ComposeActionButtons', () => {
       fireEvent.click(getByTestId('attachment-upload'))
       fireEvent.change(getByTestId('attachment-input'))
       expect(props.onAttachmentUpload).toHaveBeenCalled()
+    })
+
+    it('triggers onAttachmentUpload again when file was previously uploaded', async () => {
+      const props = createProps()
+      const {getByTestId} = render(<ComposeActionButtons {...props} />)
+
+      const file = new File(['my-image'], 'my-image.png', {type: 'image/png'})
+      const input = getByTestId('attachment-input')
+
+      userEvent.upload(input, file)
+
+      input.value = ''
+      input.files = []
+
+      userEvent.upload(input, file)
+
+      expect(props.onAttachmentUpload).toHaveBeenCalledTimes(2)
     })
   })
 
