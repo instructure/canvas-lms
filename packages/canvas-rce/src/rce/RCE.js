@@ -96,7 +96,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       textareaClassName,
       trayProps: rcsProps,
       use_rce_buttons_and_icons,
-      editorOptions: Object.assign(editorOptions, editorOptions, {
+      editorOptions: Object.assign(editorOptions, {
         selector: `#${textareaId}`,
         height,
         language: editorLanguage(props.language)

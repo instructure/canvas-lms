@@ -941,10 +941,12 @@ class RCEWrapper extends React.Component {
     if (event.code === 'F9' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
+      this.setFocusAbilityForHeader(true);
       focusFirstMenuButton(this._elementRef.current)
     } else if (event.code === 'F10' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
+      this.setFocusAbilityForHeader(true);
       focusToolbar(this._elementRef.current)
     } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
       event.preventDefault()
@@ -1008,6 +1010,19 @@ class RCEWrapper extends React.Component {
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
     }
+
+    // Adds a focusout event listener for handling screen reader navigation focus
+    const header = this._elementRef.current.querySelector('.tox-editor-header')
+    if (header) {
+      header.addEventListener('focusout', e => {
+        const leavingHeader = !header.contains(e.relatedTarget)
+        if (leavingHeader) {
+          this.setFocusAbilityForHeader(false)
+        }
+      });
+    }
+    this.setFocusAbilityForHeader(false)
+
     // Probably should do this in tinymce.scss, but we only want it in new rce
     textarea.style.resize = 'none'
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
@@ -1030,6 +1045,13 @@ class RCEWrapper extends React.Component {
     // readonly should have been handled via the init property passed
     // to <Editor>, but it's not.
     editor.mode.set(this.props.readOnly ? 'readonly' : 'design')
+
+    // Not using iframe_aria_text because compatibility issues.
+    // Not using iframe_attrs because library overwriting.
+    if (this.iframe) {
+      this.iframe.setAttribute('title', formatMessage(
+        'Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.'))
+    }
 
     this.props.onInitted?.(editor)
   }
@@ -1372,6 +1394,14 @@ class RCEWrapper extends React.Component {
       this._showOnFocusButton.focus()
     } else {
       this._showOnFocusButton?.focus()
+    }
+  }
+
+  setFocusAbilityForHeader = (focusable) => {
+    // Sets aria-hidden to prevent screen readers focus in RCE menus and toolbar
+    const header = this._elementRef.current.querySelector('.tox-editor-header')
+    if (header) {
+      header.setAttribute('aria-hidden', focusable ? 'false' : 'true')
     }
   }
 
