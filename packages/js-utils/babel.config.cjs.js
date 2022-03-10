@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,18 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-const {compile} = require('../ui-build/webpack/i18nLinerHandlebars')
-const {transform} = require('@babel/core')
-
-exports.process = (source, path) => {
-  const amd = compile(source, path, {
-    // brandable_css assets are not available in test
-    injectBrandableStylesheet: false
-  })
-  const cjs = transform(amd, {
-    filename: path,
-    plugins: ['@babel/plugin-transform-modules-commonjs']
-  }).code
-  return cjs
+module.exports = {
+  presets: [
+    ['@babel/preset-env', { modules: 'commonjs' }],
+  ]
 }

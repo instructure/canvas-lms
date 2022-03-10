@@ -58,7 +58,6 @@ WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   cp --parents -rf \
-    babel.config.js \
     packages \
     \
     /tmp/dst
