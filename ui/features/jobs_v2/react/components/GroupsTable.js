@@ -25,7 +25,7 @@ import {InfoColumn, GroupedInfoColumnHeader} from './InfoColumn'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function TagsTable({tags, bucket, caption, onClickTag}) {
+export default function GroupsTable({groups, type, bucket, caption, onClickGroup}) {
   return (
     <div>
       <Responsive
@@ -42,7 +42,9 @@ export default function TagsTable({tags, bucket, caption, onClickTag}) {
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                <Table.ColHeader id="tag">{I18n.t('Tag')}</Table.ColHeader>
+                <Table.ColHeader id="group">
+                  {type === 'tag' ? I18n.t('Tag') : I18n.t('Strand')}
+                </Table.ColHeader>
                 <Table.ColHeader id="count">{I18n.t('Count')}</Table.ColHeader>
                 <Table.ColHeader id="info">
                   <GroupedInfoColumnHeader bucket={bucket} />
@@ -50,15 +52,16 @@ export default function TagsTable({tags, bucket, caption, onClickTag}) {
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {tags.map(tag_info => {
+              {groups.map(group => {
+                const tag_or_strand = group[type]
                 return (
-                  <Table.Row key={tag_info.tag}>
+                  <Table.Row key={tag_or_strand}>
                     <Table.Cell>
-                      <Link onClick={() => onClickTag(tag_info.tag)}>{tag_info.tag}</Link>
+                      <Link onClick={() => onClickGroup(tag_or_strand)}>{tag_or_strand}</Link>
                     </Table.Cell>
-                    <Table.Cell>{tag_info.count}</Table.Cell>
+                    <Table.Cell>{group.count}</Table.Cell>
                     <Table.Cell>
-                      <InfoColumn bucket={bucket} info={tag_info.info} />
+                      <InfoColumn bucket={bucket} info={group.info} />
                     </Table.Cell>
                   </Table.Row>
                 )

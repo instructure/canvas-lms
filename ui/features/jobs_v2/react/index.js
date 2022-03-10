@@ -21,7 +21,7 @@ import React, {useCallback, useReducer, useMemo} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
-import TagsTable from './components/TagsTable'
+import GroupsTable from './components/GroupsTable'
 import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('jobs_v2')
@@ -29,20 +29,23 @@ const I18n = useI18nScope('jobs_v2')
 function jobsReducer(prevState, action) {
   if (action.type === 'FETCHED_JOBS') {
     return {...prevState, jobs: action.payload}
-  } else if (action.type === 'FETCHED_TAGS') {
-    return {...prevState, tags: action.payload, jobs: []}
+  } else if (action.type === 'FETCHED_GROUPS') {
+    return {...prevState, groups: action.payload, jobs: []}
   } else if (action.type === 'CHANGE_BUCKET') {
-    return {...prevState, bucket: action.payload, tag: ''}
-  } else if (action.type === 'CHANGE_TAG') {
-    return {...prevState, tag: action.payload}
+    return {...prevState, bucket: action.payload, group_text: ''}
+  } else if (action.type === 'CHANGE_GROUP_TEXT') {
+    return {...prevState, group_text: action.payload}
+  } else if (action.type === 'CHANGE_GROUP_TYPE') {
+    return {...prevState, group_type: action.payload}
   }
 }
 
 export default function JobsIndex() {
   const [state, dispatch] = useReducer(jobsReducer, {
     bucket: 'running',
-    tag: '',
-    tags: [],
+    group_text: '',
+    group_type: 'tag',
+    groups: [],
     jobs: []
   })
 
@@ -56,16 +59,16 @@ export default function JobsIndex() {
   }, [])
 
   useFetchApi({
-    path: `/api/v1/jobs2/${state.bucket}/by_tag`,
+    path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
     success: useCallback(response => {
-      dispatch({type: 'FETCHED_TAGS', payload: response})
+      dispatch({type: 'FETCHED_GROUPS', payload: response})
     }, [])
   })
 
   useFetchApi({
     path: `/api/v1/jobs2/${state.bucket}`,
     params: {
-      tag: state.tag
+      [state.group_type]: state.group_text
     },
     success: useCallback(response => {
       dispatch({type: 'FETCHED_JOBS', payload: response})
@@ -79,16 +82,19 @@ export default function JobsIndex() {
       </Heading>
       <JobsHeader
         jobBucket={state.bucket}
-        onChange={event => dispatch({type: 'CHANGE_BUCKET', payload: event.target.value})}
+        onChangeBucket={event => dispatch({type: 'CHANGE_BUCKET', payload: event.target.value})}
+        jobGroup={state.group_type}
+        onChangeGroup={event => dispatch({type: 'CHANGE_GROUP_TYPE', payload: event.target.value})}
       />
       <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Tags')}
+        {state.group_type === 'tag' ? I18n.t('Tags') : I18n.t('Strands')}
       </Heading>
-      <TagsTable
-        tags={state.tags}
+      <GroupsTable
+        type={state.group_type}
+        groups={state.groups}
         bucket={state.bucket}
         caption={captions[state.bucket]}
-        onClickTag={tag => dispatch({type: 'CHANGE_TAG', payload: tag})}
+        onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
       />
       <Heading level="h2" margin="large 0 small 0">
         {I18n.t('Jobs')}
