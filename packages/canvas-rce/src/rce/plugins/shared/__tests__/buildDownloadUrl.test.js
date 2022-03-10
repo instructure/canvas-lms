@@ -46,7 +46,7 @@ describe('buildDownloadUrl()', () => {
 
       it('adds the new param and leaves the existing params', () => {
         expect(subject(url())).toMatchInlineSnapshot(
-          `"http://canvas.instructure.com/files/1/download?foo=bar&buttons_and_icons=1"`
+          `"http://canvas.instructure.com/files/1/download?foo=bar&icon_maker_icon=1"`
         )
       })
     })
@@ -56,7 +56,7 @@ describe('buildDownloadUrl()', () => {
 
       it('creates a new query string and adds the new param', () => {
         expect(subject(url())).toMatchInlineSnapshot(
-          `"http://canvas.instructure.com/files/1/download?buttons_and_icons=1"`
+          `"http://canvas.instructure.com/files/1/download?icon_maker_icon=1"`
         )
       })
     })

@@ -33,12 +33,12 @@ describe('createPreFlightParams()', () => {
   const subject = () => uploader().createPreFlightParams()
 
   beforeEach(() => {
-    fileOptions = {...fileOptions, category: 'buttons_and_icons'}
+    fileOptions = {...fileOptions, category: 'icon_maker_icons'}
   })
 
   describe('when a "category" option is given', () => {
     it('sets the category', () => {
-      expect(subject().category).toEqual('buttons_and_icons')
+      expect(subject().category).toEqual('icon_maker_icons')
     })
   })
 })

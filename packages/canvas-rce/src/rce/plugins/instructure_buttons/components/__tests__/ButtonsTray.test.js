@@ -37,7 +37,7 @@ const editor = {
       const element = document.createElement(tagName)
       element.setAttribute('src', src)
       element.setAttribute('alt', alt)
-      element.setAttribute('data-inst-buttons-and-icons', rest['data-inst-buttons-and-icons'])
+      element.setAttribute('data-inst-icon-maker-icon', rest['data-inst-icon-maker-icon'])
       return element
     }),
     create: name => document.createElement(name)
@@ -90,65 +90,69 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       render(<ButtonsTray {...defaults} />)
 
       userEvent.click(screen.getByRole('button', {name: /apply/i}))
+      let firstCall
       await waitFor(() => {
-        if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
         const result = startButtonsAndIconsUpload.mock.calls[0]
-        expect(result).toMatchInlineSnapshot(`
-          Array [
-            Object {
-              "domElement": <svg
+        if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
+        firstCall = startButtonsAndIconsUpload.mock.calls[0]
+        expect(result[1].onDuplicate).toBe(false)
+      })
+
+      expect(firstCall).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "domElement": <svg
+              fill="none"
+              height="122px"
+              viewBox="0 0 122 122"
+              width="122px"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <metadata>
+                {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)"}
+              </metadata>
+              <svg
                 fill="none"
                 height="122px"
                 viewBox="0 0 122 122"
                 width="122px"
-                xmlns="http://www.w3.org/2000/svg"
+                x="0"
               >
-                <metadata>
-                  {"type":"image/svg+xml-buttons-and-icons","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":""}
-                </metadata>
-                <svg
+                <g
                   fill="none"
-                  height="122px"
-                  viewBox="0 0 122 122"
-                  width="122px"
-                  x="0"
                 >
-                  <g
-                    fill="none"
+                  <clippath
+                    id="clip-path-for-embed"
                   >
-                    <clippath
-                      id="clip-path-for-embed"
-                    >
-                      <rect
-                        height="114"
-                        width="114"
-                        x="4"
-                        y="4"
-                      />
-                    </clippath>
                     <rect
                       height="114"
                       width="114"
                       x="4"
                       y="4"
                     />
-                  </g>
-                </svg>
-                <style
-                  type="text/css"
-                >
-                  @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
-                </style>
-              </svg>,
-              "name": "untitled.svg",
-            },
-            Object {
-              "onDuplicate": false,
-            },
-          ]
-        `)
-        expect(result[1].onDuplicate).toBe(false)
-      })
+                  </clippath>
+                  <rect
+                    height="114"
+                    width="114"
+                    x="4"
+                    y="4"
+                  />
+                </g>
+              </svg>
+              <style
+                type="text/css"
+              >
+                @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+              </style>
+            </svg>,
+            "name": "untitled.svg",
+          },
+          Object {
+            "onDuplicate": false,
+          },
+        ]
+      `)
+
       await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
     })
 
@@ -179,7 +183,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url/?buttons_and_icons=1\\">",
+        "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
       ]
     `)
 
@@ -193,7 +197,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "<img src=\\"https://uploaded.url\\" data-inst-buttons-and-icons=\\"true\\" data-download-url=\\"https://uploaded.url/?buttons_and_icons=1\\">",
+        "<img src=\\"https://uploaded.url\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
       ]
     `)
 
@@ -264,7 +268,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-buttons-and-icons="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
+        '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
       )
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
     })
