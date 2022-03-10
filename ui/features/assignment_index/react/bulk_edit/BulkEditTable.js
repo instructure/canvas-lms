@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!assignments_bulk_edit'
 import React, {useCallback} from 'react'
-import {arrayOf, func} from 'prop-types'
+import {arrayOf, func, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -65,7 +65,9 @@ BulkEditTable.propTypes = {
   // {assignmentId, overrideId or base: true}
   clearOverrideEdits: func.isRequired,
 
-  setAssignmentSelected: func.isRequired // (assignmentId, selected) => {}
+  setAssignmentSelected: func.isRequired, // (assignmentId, selected) => {}
+
+  defaultDueTime: string // e.g. "16:00:00"
 }
 
 export default function BulkEditTable({
@@ -73,7 +75,8 @@ export default function BulkEditTable({
   updateAssignmentDate,
   setAssignmentSelected,
   selectAllAssignments,
-  clearOverrideEdits
+  clearOverrideEdits,
+  defaultDueTime
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
   const DATE_COLUMN_WIDTH_REMS = 17
@@ -104,6 +107,7 @@ export default function BulkEditTable({
         overrideId={overrideId}
         updateAssignmentDate={updateAssignmentDate}
         fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
+        defaultTime={dateKey === 'due_at' ? defaultDueTime : null}
         interaction={dates.can_edit ? 'enabled' : 'disabled'}
         width={calculatedWidth}
       />

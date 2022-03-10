@@ -641,6 +641,7 @@ class DiscussionTopicsController < ApplicationController
     if context.is_a?(Course)
       js_hash[:allow_self_signup] = true # for group creation
       js_hash[:group_user_type] = "student"
+      append_default_due_time_js_env(@context, js_hash)
     end
     js_env(js_hash)
 

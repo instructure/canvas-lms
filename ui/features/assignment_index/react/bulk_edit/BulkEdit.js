@@ -38,14 +38,15 @@ import {originalDateField, canEditAll} from './utils'
 BulkEdit.propTypes = {
   courseId: string.isRequired,
   onCancel: func.isRequired,
-  onSave: func // for now, this is just informational that save has been clicked
+  onSave: func, // for now, this is just informational that save has been clicked
+  defaultDueTime: string
 }
 
 BulkEdit.defaultProps = {
   onSave: () => {}
 }
 
-export default function BulkEdit({courseId, onCancel, onSave}) {
+export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -63,13 +64,8 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
   const [loadingError, setLoadingError] = useState(null)
   const [loading, setLoading] = useState(true)
   const [moveDatesModalOpen, setMoveDatesModalOpen] = useState(false)
-  const {
-    saveAssignments,
-    startingSave,
-    startingSaveError,
-    progressUrl,
-    setProgressUrl
-  } = useSaveAssignments(courseId)
+  const {saveAssignments, startingSave, startingSaveError, progressUrl, setProgressUrl} =
+    useSaveAssignments(courseId)
   const {jobCompletion, jobRunning, jobSuccess, jobErrors, setJobSuccess} = useMonitorJobCompletion(
     {
       progressUrl
@@ -168,9 +164,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     (override, dateFieldName, nDays) => {
       const currentDate = override[dateFieldName]
       if (currentDate) {
-        const newDate = moment(currentDate)
-          .add(nDays, 'days')
-          .toDate()
+        const newDate = moment(currentDate).add(nDays, 'days').toDate()
         setDateOnOverride(override, dateFieldName, newDate)
       }
     },
@@ -402,6 +396,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
           setAssignmentSelected={setAssignmentSelected}
           selectAllAssignments={selectAllAssignments}
           clearOverrideEdits={clearOverrideEdits}
+          defaultDueTime={defaultDueTime}
         />
       </>
     )
