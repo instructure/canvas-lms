@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Apply" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Apply changes to all instances of this Button and Icon in the Course"
-  },
   "apps_54d24a47": { "message": "Apps" },
   "arrows_464a3e54": { "message": "Arrows" },
   "art_icon_8e1daad": { "message": "Art Icon" },
@@ -73,12 +70,6 @@ const locale = {
   "basic_554cdc0a": { "message": "Basic" },
   "below_81d4dceb": { "message": "Below" },
   "bottom_third_5f5fec1d": { "message": "Bottom Third" },
-  "button_color_608a0242": { "message": "Button Colour" },
-  "button_outline_cf14f071": { "message": "Button Outline" },
-  "button_outline_size_cc1d1df7": { "message": "Button Outline Size" },
-  "button_shape_dbecb573": { "message": "Button Shape" },
-  "button_size_20f5fce1": { "message": "Button Size" },
-  "buttons_and_icons_e66ee12c": { "message": "Buttons and Icons" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel" },
   "choose_caption_file_9c45bc4e": { "message": "Choose caption file" },
@@ -137,7 +128,6 @@ const locale = {
   "course_links_b56959b9": { "message": "Course Links" },
   "course_media_ec759ad": { "message": "Course Media" },
   "course_navigation_dd035109": { "message": "Course Navigation" },
-  "create_button_and_icon_5c089934": { "message": "Create Button and Icon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Licence:"
   },
@@ -191,8 +181,6 @@ const locale = {
   "embed_828fac4a": { "message": "Embed" },
   "embed_code_314f1bd5": { "message": "Embed Code" },
   "embed_image_1080badc": { "message": "Embed Image" },
-  "embed_options_tray_901cfd19": { "message": "Embed Options Tray" },
-  "embed_preview_2d741e1f": { "message": "Embed Preview" },
   "embed_video_a97a64af": { "message": "Embed Video" },
   "embedded_content_aaeb4d3d": { "message": "embedded content" },
   "engineering_icon_f8f3cf43": { "message": "Engineering Icon" },
@@ -344,7 +332,6 @@ const locale = {
     "message": "Open { title } application"
   },
   "operators_a2ef9a93": { "message": "Operators" },
-  "options_3ab0ea65": { "message": "Options" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordered and Unordered Lists"
   },
@@ -392,7 +379,6 @@ const locale = {
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
   },
   "save_11a80ec3": { "message": "Save" },
-  "saved_buttons_and_icons_8278eed2": { "message": "Saved Buttons and Icons" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },
   "select_crop_shape_d441feeb": { "message": "Select crop shape" },
@@ -402,7 +388,6 @@ const locale = {
     "message": "Shift-O to open the pretty html editor."
   },
   "show_audio_options_b489926b": { "message": "Show audio options" },
-  "show_embed_options_ef8d7ef": { "message": "Show embed options" },
   "show_image_options_1e2ecc6b": { "message": "Show image options" },
   "show_link_options_545338fd": { "message": "Show link options" },
   "show_video_options_6ed3721a": { "message": "Show video options" },

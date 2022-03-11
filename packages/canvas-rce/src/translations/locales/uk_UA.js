@@ -155,7 +155,6 @@ const locale = {
     "message": "Вікрити діалогове вікно гарячих клавіш"
   },
   "operators_a2ef9a93": { "message": "Оператори" },
-  "options_3ab0ea65": { "message": "Параметри" },
   "orange_81386a62": { "message": "Помаранчевий" },
   "pages_e5414c2c": { "message": "Сторінки" },
   "people_b4ebb13c": { "message": "Люди" },

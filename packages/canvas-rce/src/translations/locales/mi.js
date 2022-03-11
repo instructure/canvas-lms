@@ -50,9 +50,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Rārangi Pānuitanga" },
   "announcements_a4b8ed4a": { "message": "Pānuitanga" },
   "apply_781a2546": { "message": "Tono" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Tono huringa ki ngā wāhanga katoa o tēnei Pātene me te Ata i roto i te Akoranga"
-  },
   "apps_54d24a47": { "message": "Tono" },
   "arrows_464a3e54": { "message": "Pere" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
@@ -75,12 +72,6 @@ const locale = {
   "basic_554cdc0a": { "message": "Taketake" },
   "below_81d4dceb": { "message": "Raro" },
   "bottom_third_5f5fec1d": { "message": "Raro Tuatoru" },
-  "button_color_608a0242": { "message": "Pātene Tae" },
-  "button_outline_cf14f071": { "message": "Pātene Whakahuahua" },
-  "button_outline_size_cc1d1df7": { "message": "Pātene Whakahuahua Rahi" },
-  "button_shape_dbecb573": { "message": "Pātene Āhua" },
-  "button_size_20f5fce1": { "message": "Pātene Rahi" },
-  "buttons_and_icons_e66ee12c": { "message": "Pātene me ngā Ata" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Whakakore" },
   "choose_caption_file_9c45bc4e": { "message": "Kōwhiria kōnae tapanga" },
@@ -148,7 +139,6 @@ const locale = {
   "course_links_b56959b9": { "message": "Ngā Akoranga Hononga" },
   "course_media_ec759ad": { "message": "Akoranga Pāpāho" },
   "course_navigation_dd035109": { "message": "Whakaterenga Akoranga" },
-  "create_button_and_icon_5c089934": { "message": "Hanga Pātene me te Ata" },
   "creative_commons_license_725584ae": { "message": "Auaha ngā Raihana Noa:" },
   "crop_image_807ebb08": { "message": "Tapahi Whakaahua" },
   "current_image_f16c249c": { "message": "Whakapakoko o Nāianei" },
@@ -199,8 +189,6 @@ const locale = {
   "embed_828fac4a": { "message": "Whakauru" },
   "embed_code_314f1bd5": { "message": "Waehere tāmau" },
   "embed_image_1080badc": { "message": "Tāmau Āhua" },
-  "embed_options_tray_901cfd19": { "message": "Whakauru Kōwhiri Pereki" },
-  "embed_preview_2d741e1f": { "message": "Whakauru Arokite" },
   "embed_video_a97a64af": { "message": "Whakauru Ataata" },
   "embedded_content_aaeb4d3d": { "message": "ihirangi tāmau" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
@@ -346,7 +334,6 @@ const locale = {
   },
   "open_title_application_fd624fc5": { "message": "Huaki { title } tono" },
   "operators_a2ef9a93": { "message": "Ngā Kaiwhakamahi" },
-  "options_3ab0ea65": { "message": "Ngā kōwhiringa" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Rārangi kua rārangitia me te kore rārangi"
   },
@@ -391,9 +378,6 @@ const locale = {
     "message": "E pouri ana te ataahua HTML kaore i te papa patopato whakauru. Whakauru te mata HTML editor ataahua i konei."
   },
   "save_11a80ec3": { "message": "Tiaki" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "Pātene me ngā Ata kua Tiakina"
-  },
   "search_280d00bd": { "message": "Rapu" },
   "search_term_b2d2235": { "message": "Rapu tau" },
   "select_crop_shape_d441feeb": { "message": "Tīpako tapahi āhua" },
@@ -405,7 +389,6 @@ const locale = {
   "show_audio_options_b489926b": {
     "message": "Whakaatutia ororongo kōwhiringa"
   },
-  "show_embed_options_ef8d7ef": { "message": "Whakātu whakauru kōwhiri" },
   "show_image_options_1e2ecc6b": { "message": "Whakātu wāhanga āhua" },
   "show_link_options_545338fd": { "message": "Whakātu Hono Kōwhiringa" },
   "show_video_options_6ed3721a": { "message": "Whakātu ataata kōwhiringa" },

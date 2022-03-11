@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "アナウンス リスト" },
   "announcements_a4b8ed4a": { "message": "発表" },
   "apply_781a2546": { "message": "適用" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "コース内のこのボタンとアイコンのすべてのインスタンスに変更を適用する"
-  },
   "apps_54d24a47": { "message": "アプリ" },
   "arrows_464a3e54": { "message": "矢印" },
   "art_icon_8e1daad": { "message": "アートのアイコン" },
@@ -75,12 +72,6 @@ const locale = {
   "basic_554cdc0a": { "message": "ベーシック" },
   "below_81d4dceb": { "message": "下の" },
   "bottom_third_5f5fec1d": { "message": "下から3番目" },
-  "button_color_608a0242": { "message": "ボタンの色" },
-  "button_outline_cf14f071": { "message": "ボタンの輪郭" },
-  "button_outline_size_cc1d1df7": { "message": "ボタンの輪郭サイズ" },
-  "button_shape_dbecb573": { "message": "ボタンの形状" },
-  "button_size_20f5fce1": { "message": "ボタンのサイズ" },
-  "buttons_and_icons_e66ee12c": { "message": "ボタンとアイコン" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "キャンセル" },
   "choose_caption_file_9c45bc4e": {
@@ -145,7 +136,6 @@ const locale = {
   "course_links_b56959b9": { "message": "コースリンク" },
   "course_media_ec759ad": { "message": "コースメディア" },
   "course_navigation_dd035109": { "message": "コース ナビゲーション" },
-  "create_button_and_icon_5c089934": { "message": "ボタンとアイコンを作成" },
   "creative_commons_license_725584ae": {
     "message": "クリエイティブ コモンズ ライセンス:"
   },
@@ -199,8 +189,6 @@ const locale = {
   "embed_828fac4a": { "message": "埋め込み" },
   "embed_code_314f1bd5": { "message": "埋め込みコード" },
   "embed_image_1080badc": { "message": "画像の埋め込み" },
-  "embed_options_tray_901cfd19": { "message": "オプショントレイの埋め込み" },
-  "embed_preview_2d741e1f": { "message": "プレビューの埋め込み" },
   "embed_video_a97a64af": { "message": "ビデオを埋め込む" },
   "embedded_content_aaeb4d3d": { "message": "埋め込まれたコンテンツ" },
   "engineering_icon_f8f3cf43": { "message": "エンジニアリングのアイコン" },
@@ -358,7 +346,6 @@ const locale = {
     "message": "{ title }アプリケーションを開く"
   },
   "operators_a2ef9a93": { "message": "演算子" },
-  "options_3ab0ea65": { "message": "オプション" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "番号付きリストと番号無しリスト"
   },
@@ -410,9 +397,6 @@ const locale = {
     "message": "残念ながら、pretty HTMLエディタはキーボードからはアクセスできません。生のHTMLエディタにはこちらからアクセスできます。"
   },
   "save_11a80ec3": { "message": "保存" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "保存されたボタンとアイコン"
-  },
   "search_280d00bd": { "message": "検索" },
   "search_term_b2d2235": { "message": "検索用語" },
   "select_crop_shape_d441feeb": { "message": "クロップ形状の選択" },
@@ -424,7 +408,6 @@ const locale = {
   "show_audio_options_b489926b": {
     "message": "オーディオオプションを表示する"
   },
-  "show_embed_options_ef8d7ef": { "message": "埋め込みオプションを表示する" },
   "show_image_options_1e2ecc6b": { "message": "画像オプションを表示" },
   "show_link_options_545338fd": { "message": "リンクオプションを表示する" },
   "show_video_options_6ed3721a": { "message": "ビデオオプションを表示する" },
