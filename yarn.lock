@@ -24501,10 +24501,10 @@ tinycolor2@^1.4.1:
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.2.tgz#3f6a4d1071ad07676d7fa472e1fac40a719d8803"
   integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
 
-tinymce-a11y-checker@^3.3.4:
-  version "3.3.4"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-3.3.4.tgz#1419ebd911e08ee5851ef470b2d12ffa87d23c7e"
-  integrity sha512-NMfvdPASHumy9G35d4nGLDYuKMBjQ7U2ezXJzAJC4lnkvVW9ktA/Lj2NgVSuu6ipKoEXCqRFFDKRNZNvvsGheg==
+tinymce-a11y-checker@^3.3.5:
+  version "3.3.5"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-3.3.5.tgz#ef4d35283f7782f18dab65d452f9f09a07149152"
+  integrity sha512-3pN8nXHH1KLxr+FB3OyGPfzkufBjvTE5lSZbQ3Ha0ks+GeKHpXIFGqc2ADV1qRPbnPXxGkiIWqQZbZGAMWvUFA==
   dependencies:
     "@instructure/canvas-theme" "^7.6.0"
     "@instructure/ui-a11y-content" "^7.6.0"
