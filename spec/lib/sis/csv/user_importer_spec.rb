@@ -868,6 +868,31 @@ describe SIS::CSV::UserImporter do
     expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).not_to be_nil
   end
 
+  it "sends a registration notification email when canvas_password_notification is provided" do
+    expect_any_instance_of(Pseudonym).to receive(:send_registration_notification!).once
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status,canvas_password_notification,authentication_provider_id",
+      "user_1,user1,User,Uno,user1@example.com,active,true,canvas"
+    )
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status,canvas_password_notification,authentication_provider_id",
+      "user_1,user1,User,Uno,user1@example.com,active,true,canvas"
+    )
+
+    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.workflow_state).to eq "pre_registered"
+  end
+
+  it "does not send a registration notification email when canvas_password_notification is not provided" do
+    expect_any_instance_of(Pseudonym).not_to receive(:send_registration_notification!)
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user1,user1,User,Uno,user@example.com,active"
+    )
+  end
+
   it "does not send a merge notification email when self service merge is disabled" do
     @account.disable_feature!(:self_service_user_merge)
     user1 = User.create!(name: "User Uno")
