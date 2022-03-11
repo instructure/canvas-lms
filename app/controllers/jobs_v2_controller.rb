@@ -135,7 +135,9 @@ class JobsV2Controller < ApplicationController
   end
 
   def job_json(job, base_time:)
-    json = api_json(job, @current_user, nil, only: %w[id priority attempts run_at locked_at expires_at tag strand next_in_strand singleton max_concurrent])
+    job_fields = %w[id tag strand singleton shard_id max_concurrent priority attempts max_attempts locked_by run_at locked_at handler]
+    job_fields += %w[failed_at original_job_id last_error] if @bucket == "failed"
+    json = api_json(job, @current_user, nil, only: job_fields)
     json.merge("info" => list_info_data(job, base_time: base_time))
   end
 

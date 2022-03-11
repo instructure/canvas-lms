@@ -22,21 +22,24 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
 import GroupsTable from './components/GroupsTable'
+import JobDetails from './components/JobDetails'
 import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('jobs_v2')
 
 function jobsReducer(prevState, action) {
-  if (action.type === 'FETCHED_JOBS') {
-    return {...prevState, jobs: action.payload}
-  } else if (action.type === 'FETCHED_GROUPS') {
-    return {...prevState, groups: action.payload, jobs: []}
-  } else if (action.type === 'CHANGE_BUCKET') {
-    return {...prevState, bucket: action.payload, group_text: ''}
-  } else if (action.type === 'CHANGE_GROUP_TEXT') {
-    return {...prevState, group_text: action.payload}
+  if (action.type === 'CHANGE_BUCKET') {
+    return {...prevState, bucket: action.payload, groups: [], jobs: [], job: null, group_text: ''}
   } else if (action.type === 'CHANGE_GROUP_TYPE') {
-    return {...prevState, group_type: action.payload}
+    return {...prevState, group_type: action.payload, groups: [], jobs: [], job: null}
+  } else if (action.type === 'FETCHED_GROUPS') {
+    return {...prevState, groups: action.payload, jobs: [], job: null}
+  } else if (action.type === 'CHANGE_GROUP_TEXT') {
+    return {...prevState, group_text: action.payload, jobs: [], job: null}
+  } else if (action.type === 'FETCHED_JOBS') {
+    return {...prevState, jobs: action.payload, job: null}
+  } else if (action.type === 'SELECT_JOB') {
+    return {...prevState, job: action.payload}
   }
 }
 
@@ -46,7 +49,8 @@ export default function JobsIndex() {
     group_text: '',
     group_type: 'tag',
     groups: [],
-    jobs: []
+    jobs: [],
+    job: null
   })
 
   const captions = useMemo(() => {
@@ -99,7 +103,16 @@ export default function JobsIndex() {
       <Heading level="h2" margin="large 0 small 0">
         {I18n.t('Jobs')}
       </Heading>
-      <JobsTable bucket={state.bucket} jobs={state.jobs} caption={captions[state.bucket]} />
+      <JobsTable
+        bucket={state.bucket}
+        jobs={state.jobs}
+        caption={captions[state.bucket]}
+        onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
+      />
+      <Heading level="h2" margin="large 0 small 0">
+        {I18n.t('Details')}
+      </Heading>
+      <JobDetails job={state.job} />
     </>
   )
 }
