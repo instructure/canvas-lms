@@ -20,18 +20,21 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import React, {useCallback} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
+import {Link} from '@instructure/ui-link'
 import {InfoColumn, InfoColumnHeader} from './InfoColumn'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function JobsTable({bucket, jobs, caption}) {
+export default function JobsTable({bucket, jobs, caption, onClickJob}) {
   const renderJobRow = useCallback(
     job => {
       const cellTheme = {fontSize: '0.75rem'}
 
       return (
         <Table.Row key={job.id}>
-          <Table.RowHeader>{job.id}</Table.RowHeader>
+          <Table.RowHeader>
+            <Link onClick={() => onClickJob(job)}>{job.id}</Link>
+          </Table.RowHeader>
           <Table.Cell theme={cellTheme}>{job.tag}</Table.Cell>
           <Table.Cell theme={cellTheme}>{job.strand}</Table.Cell>
           <Table.Cell theme={cellTheme}>{job.singleton}</Table.Cell>
@@ -41,7 +44,7 @@ export default function JobsTable({bucket, jobs, caption}) {
         </Table.Row>
       )
     },
-    [bucket]
+    [bucket, onClickJob]
   )
 
   return (
