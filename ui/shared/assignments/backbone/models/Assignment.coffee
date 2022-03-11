@@ -463,7 +463,7 @@ export default class Assignment extends Model
 
   htmlUrl: =>
     if @isQuizLTIAssignment() && canManage() && ENV.FLAGS && ENV.FLAGS.new_quizzes_modules_support
-      return @htmlEditUrl()
+      return "#{@htmlEditUrl()}?quiz_lti"
     else
       return @get 'html_url'
 
