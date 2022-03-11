@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
 import SearchBreadcrumb from './shared/SearchBreadcrumb'
@@ -39,7 +39,7 @@ import {
   IMPORT_PENDING
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const FindOutcomesView = ({
   outcomesGroup,
@@ -67,9 +67,11 @@ const FindOutcomesView = ({
     ([outId, importStatus]) =>
       outcomesIds.includes(outId) && [IMPORT_COMPLETED, IMPORT_PENDING].includes(importStatus)
   ).length
-  const enabled =
-    !!outcomesCount &&
-    outcomesCount > 0 &&
+  const hasOutcomes = !!outcomesCount && outcomesCount > 0
+  const searchEnabled =
+    hasOutcomes && [IMPORT_NOT_STARTED, IMPORT_COMPLETED, IMPORT_FAILED].includes(importGroupStatus)
+  const addAllEnabled =
+    hasOutcomes &&
     notImportedOutcomesCount - importedOutcomesCount > 0 &&
     [IMPORT_NOT_STARTED, IMPORT_FAILED].includes(importGroupStatus)
   const [scrollContainer, setScrollContainer] = useState(null)
@@ -117,7 +119,7 @@ const FindOutcomesView = ({
           <Flex.Item size="10rem" alignSelf="end">
             <Button
               interaction={
-                enabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
+                addAllEnabled && !searchString && !disableAddAllButton ? 'enabled' : 'disabled'
               }
               onClick={onAddAllHandler}
               ref={addAllBtnRef}
@@ -143,7 +145,7 @@ const FindOutcomesView = ({
       )}
       <View as="div" padding={isMobileView ? 'x-small 0' : 'large 0 medium'}>
         <OutcomeSearchBar
-          enabled={enabled || searchString.length > 0}
+          enabled={searchEnabled || searchString.length > 0}
           placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
           searchString={searchString}
           onChangeHandler={onChangeHandler}
