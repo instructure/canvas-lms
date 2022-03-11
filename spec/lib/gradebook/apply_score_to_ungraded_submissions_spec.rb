@@ -39,15 +39,12 @@ describe Gradebook::ApplyScoreToUngradedSubmissions do
 
   def build_options(**overrides)
     default_options = {
-      assignment_group: nil,
-      context_module: nil,
-      course_section: nil,
       excused: false,
-      grading_period: nil,
       mark_as_missing: false,
       only_apply_to_past_due: false,
       percent: "60",
-      student_group: nil
+      assignment_ids: [assignment1.id.to_s],
+      student_ids: [student1.id.to_s]
     }
 
     Gradebook::ApplyScoreToUngradedSubmissions::Options.new(
@@ -240,154 +237,6 @@ describe Gradebook::ApplyScoreToUngradedSubmissions do
       end.not_to change {
         test_submission.updated_at
       }
-    end
-
-    describe "filtering options" do
-      describe "assignment group" do
-        let(:other_assignment_group) { course.assignment_groups.create!(name: "other") }
-        let!(:other_assignment) do
-          course.assignments.create!(
-            assignment_group: other_assignment_group,
-            grading_type: "letter_grade",
-            points_possible: 1000.0
-          )
-        end
-
-        it "grades submissions for assignments in the supplied assignment group" do
-          run(assignment_group: other_assignment_group)
-          aggregate_failures do
-            expect(test_submission(assignment: other_assignment).grade).to eq "F"
-            expect(test_submission(assignment: other_assignment).score).to eq 600
-
-            expect(test_submission.grade).to eq nil
-          end
-        end
-
-        it "ignores submissions for assignments not in the supplied assignment group" do
-          expect do
-            run(assignment_group: other_assignment_group)
-          end.not_to change {
-            test_submission.grade
-          }
-        end
-      end
-
-      describe "course section" do
-        let(:other_section) { course.course_sections.create!(name: "other") }
-        let!(:other_student) { course.enroll_student(User.create!, section: other_section, enrollment_state: "active").user }
-
-        it "grades submissions for students in the supplied course section" do
-          run(course_section: other_section)
-          expect(test_submission(student: other_student).grade).to eq "60%"
-        end
-
-        it "ignores submissions for students not in the supplied course section" do
-          expect do
-            run(course_section: other_section)
-          end.not_to change {
-            test_submission.grade
-          }
-        end
-      end
-
-      describe "context module" do
-        let(:context_module) { course.context_modules.create!(name: "module") }
-        let!(:module_assignment) do
-          course.assignments.create!(title: "module", points_possible: 10.0).tap do |assignment|
-            context_module.add_item(id: assignment.id, type: "assignment")
-          end
-        end
-
-        it "grades submissions for assignments in the supplied module" do
-          run(context_module: context_module)
-          expect(test_submission(assignment: module_assignment).grade).to eq "6"
-        end
-
-        it "ignores submissions for assignments not in the supplied module" do
-          expect do
-            run(context_module: context_module)
-          end.not_to change {
-            test_submission.grade
-          }
-        end
-      end
-
-      describe "grading period" do
-        let!(:grading_period) do
-          grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(course.root_account)
-          course.enrollment_term.grading_period_group = grading_period_group
-          course.enrollment_term.save!
-
-          grading_period_group.grading_periods.create!(
-            start_date: 2.months.ago,
-            end_date: 1.month.ago,
-            close_date: 1.month.ago,
-            title: "some boring GP"
-          )
-          grading_period_group.grading_periods.create!(
-            start_date: 1.month.ago,
-            end_date: 1.month.from_now,
-            title: "a more interesting GP"
-          )
-        end
-
-        let!(:assignment_in_gp) do
-          course.assignments.create!(
-            due_at: 1.day.from_now(grading_period.start_date),
-            points_possible: "500"
-          )
-        end
-
-        it "grades submissions that fall in the specified grading period" do
-          run(grading_period: grading_period)
-          expect(test_submission(assignment: assignment_in_gp).grade).to eq "300"
-        end
-
-        it "ignores submissions that fall outside the specified grading period" do
-          assignment1.update(due_at: 2.months.ago)
-          expect do
-            run(grading_period: grading_period)
-          end.not_to change {
-            test_submission.grade
-          }
-        end
-
-        it "ignores submissions in closed grading periods even if not filtering" do
-          assignment1.update!(due_at: 1.day.from_now(2.months.ago))
-          expect do
-            run
-          end.not_to change {
-            test_submission.grade
-          }
-        end
-      end
-
-      describe "student group" do
-        let(:group) do
-          group_set = course.group_categories.create!(name: "groupset")
-          group_set.create_groups(1)
-          group_set.groups.first
-        end
-
-        let!(:student_in_group) do
-          student = course.enroll_student(User.create!, enrollment_state: "active").user
-          group.add_user(student, "accepted")
-          student
-        end
-
-        it "grades submissions for students in the supplied student group" do
-          run(student_group: group)
-          expect(test_submission(student: student_in_group).grade).to eq "60%"
-        end
-
-        it "ignores submissions for students not in the supplied student group" do
-          expect do
-            run(student_group: group)
-          end.not_to change {
-            test_submission.grade
-          }
-        end
-      end
     end
 
     describe "grading types" do

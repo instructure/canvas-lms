@@ -100,12 +100,12 @@ class ScoreToUngradedManager {
     }, this.pollingInterval)
   }
 
-  startProcess(courseId, optionsWithFilters) {
+  startProcess(courseId, options) {
     if (this.process) {
       return Promise.reject(I18n.t('A process is already in progress.'))
     }
 
-    return GradebookApi.applyScoreToUngradedSubmissions(courseId, optionsWithFilters)
+    return GradebookApi.applyScoreToUngradedSubmissions(courseId, options)
       .then(response => {
         this.process = {
           progressId: response.data.id,
