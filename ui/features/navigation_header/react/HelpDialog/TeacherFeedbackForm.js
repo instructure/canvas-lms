@@ -101,7 +101,7 @@ class TeacherFeedbackForm extends React.Component {
     const selectedCourse = this.state.courses
       .filter(c => !c.access_restricted_by_date)
       .find(c => c.id === window.ENV.context_id)
-    const currentSelectValue = selectedCourse ? `course_${selectedCourse.id}_admins` : null
+    const currentSelectValue = selectedCourse ? `course_${selectedCourse.id}_admins` : undefined
     return (
       <form ref={c => (this.form = c)} action="/api/v1/conversations" method="POST">
         <fieldset className="ic-Form-group ic-HelpDialog__form-fieldset">
