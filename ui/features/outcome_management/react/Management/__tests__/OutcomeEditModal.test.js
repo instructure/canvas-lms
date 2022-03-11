@@ -436,6 +436,7 @@ describe('OutcomeEditModal', () => {
           target: {value: 'Updated description'}
         })
         fireEvent.click(getByText('Delete mastery level 5'))
+        fireEvent.click(getByText('Confirm'))
         fireEvent.click(getByText('Save'))
         await act(async () => jest.runOnlyPendingTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
