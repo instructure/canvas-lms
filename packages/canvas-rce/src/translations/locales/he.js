@@ -125,7 +125,6 @@ const locale = {
     "message": "פתיחת חלון דיאלוג של מקשי קיצור"
   },
   "operators_a2ef9a93": { "message": "מפעילים" },
-  "options_3ab0ea65": { "message": "אפשרויות" },
   "orange_81386a62": { "message": "כתום" },
   "pages_e5414c2c": { "message": "דפים" },
   "people_b4ebb13c": { "message": "אנשים " },

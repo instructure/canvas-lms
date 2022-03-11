@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Lijst met aankondiging" },
   "announcements_a4b8ed4a": { "message": "Aankondigingen" },
   "apply_781a2546": { "message": "Toepassen" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Wijzigingen toepassen bij alle gevallen van deze knop en pictogram in de cursus"
-  },
   "apps_54d24a47": { "message": "Apps" },
   "arrows_464a3e54": { "message": "Pijlen" },
   "art_icon_8e1daad": { "message": "Kunstpictogram" },
@@ -75,12 +72,6 @@ const locale = {
   "basic_554cdc0a": { "message": "Basis" },
   "below_81d4dceb": { "message": "Hieronder" },
   "bottom_third_5f5fec1d": { "message": "Derde van beneden" },
-  "button_color_608a0242": { "message": "Knopkleur" },
-  "button_outline_cf14f071": { "message": "Knopomtrek" },
-  "button_outline_size_cc1d1df7": { "message": "Knopomtrekgrootte" },
-  "button_shape_dbecb573": { "message": "Knopvorm" },
-  "button_size_20f5fce1": { "message": "Knopgrootte" },
-  "buttons_and_icons_e66ee12c": { "message": "Knoppen en pictogrammen" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Annuleren" },
   "choose_caption_file_9c45bc4e": { "message": "Ondertitelingsbestand kiezen" },
@@ -145,7 +136,6 @@ const locale = {
   "course_links_b56959b9": { "message": "Cursuslinks" },
   "course_media_ec759ad": { "message": "Cursusmedia" },
   "course_navigation_dd035109": { "message": "Cursusnavigatie" },
-  "create_button_and_icon_5c089934": { "message": "Knop en pictogram maken" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
   },
@@ -199,8 +189,6 @@ const locale = {
   "embed_828fac4a": { "message": "Insluiten" },
   "embed_code_314f1bd5": { "message": "Code insluiten" },
   "embed_image_1080badc": { "message": "Afbeelding insluiten" },
-  "embed_options_tray_901cfd19": { "message": "Optiegebied insluiten" },
-  "embed_preview_2d741e1f": { "message": "Voorbeeld insluiten" },
   "embed_video_a97a64af": { "message": "Video insluiten" },
   "embedded_content_aaeb4d3d": { "message": "ingesloten inhoud" },
   "engineering_icon_f8f3cf43": { "message": "Engineering-pictogram" },
@@ -366,7 +354,6 @@ const locale = {
     "message": "{ title } applicatie openen"
   },
   "operators_a2ef9a93": { "message": "Operators" },
-  "options_3ab0ea65": { "message": "Opties" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Geordende en ongeordende lijsten"
   },
@@ -420,9 +407,6 @@ const locale = {
     "message": "Jammer genoeg is de pretty HTML-editor niet toetsenbordtoegankelijk. Open de raw HTML-editor hier."
   },
   "save_11a80ec3": { "message": "Opslaan" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "Opgeslagen knoppen en pictogrammen"
-  },
   "search_280d00bd": { "message": "Zoeken" },
   "search_term_b2d2235": { "message": "Zoekterm" },
   "select_crop_shape_d441feeb": { "message": "Bijsnijvorm selecteren" },
@@ -432,7 +416,6 @@ const locale = {
     "message": "Shift-O om de pretty HTML-editor te openen."
   },
   "show_audio_options_b489926b": { "message": "Audio-opties weergeven" },
-  "show_embed_options_ef8d7ef": { "message": "Ingesloten opties weergeven" },
   "show_image_options_1e2ecc6b": { "message": "Afbeeldingsopties weergeven" },
   "show_link_options_545338fd": { "message": "Linkopties weergeven" },
   "show_video_options_6ed3721a": { "message": "Video-opties weergeven" },

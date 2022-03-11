@@ -125,7 +125,6 @@ const locale = {
   "no_results_940393cf": { "message": "No results." },
   "none_3b5e34d2": { "message": "Ոչինչ չկա" },
   "operators_a2ef9a93": { "message": "Օպերատորներ" },
-  "options_3ab0ea65": { "message": "Պարամետրեր" },
   "orange_81386a62": { "message": "Նարնջագույն" },
   "pages_e5414c2c": { "message": "Էջեր" },
   "people_b4ebb13c": { "message": "Մարդիկ" },

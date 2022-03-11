@@ -51,9 +51,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Lista de anuncios" },
   "announcements_a4b8ed4a": { "message": "Anuncios" },
   "apply_781a2546": { "message": "Aplicar" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Aplica cambios a todas las instancias de este Botón e icono en el Curso"
-  },
   "apps_54d24a47": { "message": "Aplicaciones" },
   "arrows_464a3e54": { "message": "Flechas" },
   "art_icon_8e1daad": { "message": "Icono plástica" },
@@ -77,14 +74,6 @@ const locale = {
   "basic_554cdc0a": { "message": "Básico" },
   "below_81d4dceb": { "message": "Debajo" },
   "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
-  "button_color_608a0242": { "message": "Color del botón" },
-  "button_outline_cf14f071": { "message": "Contorno del botón" },
-  "button_outline_size_cc1d1df7": {
-    "message": "Tamaño del contorno del botón"
-  },
-  "button_shape_dbecb573": { "message": "Forma del botón" },
-  "button_size_20f5fce1": { "message": "Tamaño del botón" },
-  "buttons_and_icons_e66ee12c": { "message": "Botones e iconos" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancelar" },
   "choose_caption_file_9c45bc4e": {
@@ -155,7 +144,6 @@ const locale = {
   "course_links_b56959b9": { "message": "Enlaces de la asignatura" },
   "course_media_ec759ad": { "message": "Multimedia de la asignatura" },
   "course_navigation_dd035109": { "message": "Navegación de la asignatura" },
-  "create_button_and_icon_5c089934": { "message": "Crear botón e ícono" },
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
   },
@@ -211,8 +199,6 @@ const locale = {
   "embed_828fac4a": { "message": "Insertar" },
   "embed_code_314f1bd5": { "message": "Código de inserción" },
   "embed_image_1080badc": { "message": "Insertar imagen" },
-  "embed_options_tray_901cfd19": { "message": "Insertar bandeja de opciones" },
-  "embed_preview_2d741e1f": { "message": "Insertar vista previa" },
   "embed_video_a97a64af": { "message": "Insertar video" },
   "embedded_content_aaeb4d3d": { "message": "contenido insertado" },
   "engineering_icon_f8f3cf43": { "message": "Icono tecnología" },
@@ -372,7 +358,6 @@ const locale = {
     "message": "Abrir aplicación { title }"
   },
   "operators_a2ef9a93": { "message": "Operadores" },
-  "options_3ab0ea65": { "message": "Opciones" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listas ordenadas y no ordenadas"
   },
@@ -424,9 +409,6 @@ const locale = {
     "message": "Lamentablemente, no se puede acceder al Editor HTML agradable desde el teclado. Acceda al Editor de HTML sin formato aquí."
   },
   "save_11a80ec3": { "message": "Guardar" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "Botones e íconos guardados"
-  },
   "search_280d00bd": { "message": "Buscar" },
   "search_term_b2d2235": { "message": "Término de búsqueda" },
   "select_crop_shape_d441feeb": { "message": "Seleccione la forma de recorte" },
@@ -436,9 +418,6 @@ const locale = {
     "message": "Mayúsc-O para abrir el editor html agradable."
   },
   "show_audio_options_b489926b": { "message": "Mostrar opciones de audio" },
-  "show_embed_options_ef8d7ef": {
-    "message": "Mostrar opciones de incrustación"
-  },
   "show_image_options_1e2ecc6b": { "message": "Mostrar opciones de imágenes" },
   "show_link_options_545338fd": { "message": "Mostrar opciones de enlace" },
   "show_video_options_6ed3721a": { "message": "Mostrar opciones de video" },
