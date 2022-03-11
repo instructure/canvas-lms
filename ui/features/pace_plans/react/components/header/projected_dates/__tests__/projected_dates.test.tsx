@@ -219,6 +219,25 @@ describe('ProjectedDates', () => {
       expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
       expect(defaultProps.compressDates).toHaveBeenCalled()
     })
+
+    it('calls compressDates when switching from course to student plan and squshing is necessary', () => {
+      // the course ends on 2021-12-31
+      const pp = {...defaultProps.pacePlan}
+      pp.hard_end_dates = false
+      pp.end_date = undefined
+      const ped = '2022-01-01'
+      const {rerender} = renderConnected(
+        <ProjectedDates {...defaultProps} pacePlan={pp} projectedEndDate={ped} />
+      )
+
+      expect(defaultProps.compressDates).toHaveBeenCalledTimes(1)
+
+      pp.context_id = '1'
+      pp.context_type = 'Enrollment'
+      rerender(<ProjectedDates {...defaultProps} pacePlan={pp} projectedEndDate={ped} />)
+
+      expect(defaultProps.compressDates).toHaveBeenCalledTimes(2)
+    })
   })
 
   describe('specified end date checkbox', () => {

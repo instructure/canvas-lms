@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!mimeClass'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('mimeClass');
 
 // this module works together with app/stylesheets/components/_MimeClassIcons.scss
 // so, given the mime-type of a file you can give it a css class name that corresponds to it.
@@ -83,7 +85,7 @@ const mimeClasses = {
     get displayName() {
       return I18n.t('Image')
     },
-    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg']
+    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg', 'image/webp']
   },
   ppt: {
     get displayName() {
@@ -152,7 +154,7 @@ export default function mimeClass(contentType) {
   return mimeClass.mimeClasses[contentType] || 'file'
 }
 
-mimeClass.displayName = function(contentType) {
+mimeClass.displayName = function (contentType) {
   const found = mimeClasses[mimeClass(contentType)]
   return (found && found.displayName) || I18n.t('Unknown')
 }

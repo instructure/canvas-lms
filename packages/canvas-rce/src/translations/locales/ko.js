@@ -92,7 +92,6 @@ const locale = {
   "no_results_940393cf": { "message": "No results." },
   "none_3b5e34d2": { "message": "없음" },
   "operators_a2ef9a93": { "message": "연산자" },
-  "options_3ab0ea65": { "message": "옵션" },
   "pages_e5414c2c": { "message": "페이지" },
   "people_b4ebb13c": { "message": "사용자" },
   "percentage_34ab7c2c": { "message": "퍼센트" },

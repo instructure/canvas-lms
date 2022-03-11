@@ -25,13 +25,15 @@ import {Text} from '@instructure/ui-text'
 import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
 
 import {Link} from '@instructure/ui-link'
+
+const I18n = useI18nScope('gradebook');
 
 function SecondaryDetailLine(props) {
   const anonymous = props.assignment.anonymizeStudents

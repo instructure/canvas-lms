@@ -31,8 +31,10 @@ import {
   IconImportLine
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const OutcomeKebabMenu = ({
   menuTitle,

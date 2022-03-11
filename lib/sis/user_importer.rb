@@ -213,10 +213,17 @@ module SIS
             end
           end
 
-          # we just leave all users registered now
-          # since we've deleted users though, we need to do this to be
-          # backwards compatible with the data
-          user.workflow_state = "registered"
+          is_new_user_with_password_notification = user.new_record? && user_row.email.present? && user_row.canvas_password_notification.present? && user_row.authentication_provider_id == "canvas"
+          # if the workflow_state is already 'pre_registered'
+          # or 'canvas_password_notification' is provided
+          # the user will have 'pre_registered' state
+          # otherwise it will have 'registered' state
+          # because of backwards compatible with the data
+          user.workflow_state = if user.workflow_state == "pre_registered" || is_new_user_with_password_notification
+                                  "pre_registered"
+                                else
+                                  "registered"
+                                end
 
           should_add_account_associations = false
           should_update_account_associations = false
@@ -420,6 +427,13 @@ module SIS
             @pseudos_to_set_sis_batch_ids << pseudo.id
           end
           maybe_write_roll_back_data
+          if is_new_user_with_password_notification
+            pseudo.unique_id = user_row.email
+            cc.workflow_state = "unconfirmed"
+            if pseudo.save_without_broadcasting && cc.save_without_broadcasting
+              pseudo.send_registration_notification!
+            end
+          end
 
           @success_count += 1
         end

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,10 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Webpack wants to be able to resolve every module before
-// building.  Because we use a pitching loader for i18n tags,
-// we never make it to the resource itself (or shouldn't). However,
-// We need to give webpack a resource that exists on the Filesystem
-// before the pitching i18n loader catches it, so we replace
-// i18n!some-scope requires with i18n?some-scope!dummyI18nResource
-throw 'Should never actually call this module'
+import { useScope } from '@canvas/i18n'
+
+const I18n = useScope('esm')
+
+I18n.t('my_key', 'Hello world')
+I18n.t("#absolute_key", "Absolute key");
+I18n.t("Inferred key");
+I18n.t("nested.relative_key", "Relative key in nested scope");
+
+function a() {
+  const I18n = useScope('foo')
+  I18n.t("relative_key", "Relative key");
+}
+
+function b() {
+  const I18n = useScope('bar')
+  I18n.t("relative_key", "Another relative key");
+}

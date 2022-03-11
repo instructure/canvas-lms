@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!modules'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
+
+const I18n = useI18nScope('modules');
 
 export default function PostGradesDialogSummaryPage(props) {
   return (

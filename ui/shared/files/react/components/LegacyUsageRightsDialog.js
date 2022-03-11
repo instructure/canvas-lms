@@ -18,13 +18,15 @@
 
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!usage_rights_modal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import customPropTypes from '../modules/customPropTypes'
 import filesEnv from '../modules/filesEnv'
 import setUsageRights from '../../util/setUsageRights'
 import updateModelsUsageRights from '../../util/updateModelsUsageRights'
 import '@canvas/rails-flash-notifications'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+const I18n = useI18nScope('usage_rights_modal');
 
 export default {
   displayName: 'ManageUsageRightsModal',

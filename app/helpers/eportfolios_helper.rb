@@ -29,7 +29,7 @@ module EportfoliosHelper
 
   def delete_icon(png = false)
     if png
-      image_tag("delete.png", alt: t("Delete"))
+      image_tag("delete.png", alt: I18n.t("Delete"))
     else
       raw("&#215;")
     end

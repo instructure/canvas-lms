@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
 import React from 'react'
 import createReactClass from 'create-react-class'
@@ -32,6 +32,8 @@ import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+
+const I18n = useI18nScope('react_files');
 
 SearchResults.displayErrors = function (errors) {
   let error_message = null
@@ -90,17 +92,19 @@ SearchResults.render = function () {
     return (
       <>
         <div role="grid">
-          <div
-            // eslint-disable-next-line react/no-string-refs
-            ref="accessibilityMessage"
-            className="SearchResults__accessbilityMessage col-xs"
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-            tabIndex="0"
-          >
-            {I18n.t(
-              'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
-            )}
-          </div>
+          {this.props.userCanEditFilesForContext && (
+            <div
+              // eslint-disable-next-line react/no-string-refs
+              ref="accessibilityMessage"
+              className="SearchResults__accessbilityMessage col-xs"
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex="0"
+            >
+              {I18n.t(
+                'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
+              )}
+            </div>
+          )}
           <ColumnHeaders
             to="search"
             query={this.props.query}

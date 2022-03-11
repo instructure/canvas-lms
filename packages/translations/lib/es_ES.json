@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Aplicar"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Aplica cambios a todas las instancias de este Botón e icono en el Curso"
-    },
     "apps_54d24a47": {
         "message": "Aplicaciones"
     },
@@ -182,24 +179,6 @@
     "bottom_third_5f5fec1d": {
         "message": "Tercero desde abajo"
     },
-    "button_color_608a0242": {
-        "message": "Color del botón"
-    },
-    "button_outline_cf14f071": {
-        "message": "Contorno del botón"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Tamaño del contorno del botón"
-    },
-    "button_shape_dbecb573": {
-        "message": "Forma del botón"
-    },
-    "button_size_20f5fce1": {
-        "message": "Tamaño del botón"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Botones e iconos"
-    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -275,9 +254,6 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Colapsar para ocultar { types }"
     },
-    "color_color_eb64b08": {
-        "message": "Color { color }"
-    },
     "computer_1d7dfa6f": {
         "message": "Ordenador"
     },
@@ -340,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } TAREAS PENDIENTES"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Crear botón e ícono"
     },
     "creative_commons_license_725584ae": {
         "message": "Licencia Creative Commons:"
@@ -505,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Insertar imagen"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Insertar bandeja de opciones"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Insertar vista previa"
     },
     "embed_video_a97a64af": {
         "message": "Insertar video"
@@ -1034,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Opcional: Añadir curso"
     },
-    "options_3ab0ea65": {
-        "message": "Opciones"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Listas ordenadas y no ordenadas"
     },
@@ -1175,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Guardar"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Botones e íconos guardados"
-    },
     "schedule_preview_3bcda153": {
         "message": "Vista previa del horario"
     },
@@ -1213,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Mostrar opciones de audio"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Mostrar opciones de incrustación"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Mostrar opciones de imágenes"

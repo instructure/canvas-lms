@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {arrayOf, func, number} from 'prop-types'
 import {Select} from '@instructure/ui-select'
 
 import {OverrideShape} from '../../assignmentData'
 
 import {Flex} from '@instructure/ui-flex'
+
+const I18n = useI18nScope('assignments_2');
 
 /*
  *  CAUTION: The InstUI Select component is greatly changed in v7.

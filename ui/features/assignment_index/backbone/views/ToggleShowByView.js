@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!assignmentsToggleShowByView'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
@@ -25,6 +25,8 @@ import Cache from '../../cache'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const I18n = useI18nScope('assignmentsToggleShowByView');
 
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {

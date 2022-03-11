@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Bruk"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Bruk endringer på alle forekomster av denne Knappen og Ikonet i emnet"
-    },
     "apps_54d24a47": {
         "message": "Apper"
     },
@@ -182,24 +179,6 @@
     "bottom_third_5f5fec1d": {
         "message": "Nedre tredjedel"
     },
-    "button_color_608a0242": {
-        "message": "Knappefarge"
-    },
-    "button_outline_cf14f071": {
-        "message": "Knappeomriss"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Knappeomriss størrelse"
-    },
-    "button_shape_dbecb573": {
-        "message": "Knappeform"
-    },
-    "button_size_20f5fce1": {
-        "message": "Knappestørrelse"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Knapper og ikoner"
-    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -275,9 +254,6 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Kollaps for å skjule { types }"
     },
-    "color_color_eb64b08": {
-        "message": "Farge { color }"
-    },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
     },
@@ -340,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } GJØREMÅL"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Opprett knapp og ikon"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-lisens:"
@@ -505,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Bygg inn bilde"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Legg ved valgbrett"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Legg ved forhåndsvisning"
     },
     "embed_video_a97a64af": {
         "message": "Legg ved video"
@@ -1034,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Valgfri: Legg til emne"
     },
-    "options_3ab0ea65": {
-        "message": "Valg"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Ordnede og uordnede lister"
     },
@@ -1175,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Lagre"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Lagrede knapper og ikoner"
-    },
     "schedule_preview_3bcda153": {
         "message": "Planlegg forhåndsvisning"
     },
@@ -1213,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Vis lydalternativer"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Vis valg for å legge til"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Vis bildemuligheter"

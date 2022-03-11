@@ -46,9 +46,10 @@ describe "context modules" do
     end
 
     it "publishes a newly created item using keyboard" do
-      @course.context_modules.create!(name: "Content Page")
+      mod = @course.context_modules.create!(name: "Content Page")
+      page = @course.wiki_pages.create(title: "New Page Title", workflow_state: "unpublished")
+      mod.add_item({ id: page.id, type: "wiki_page" })
       get "/courses/#{@course.id}/modules"
-      add_new_module_item("#wiki_pages_select", "Page", "[ New Page ]", "New Page Title")
 
       tag = ContentTag.last
       item = f("#context_module_item_#{tag.id}")
@@ -71,9 +72,11 @@ describe "context modules" do
     end
 
     it "focuses close button on open edit modal" do
+      add_existing_module_item("AssignmentModule", @assignment)
       get "/courses/#{@course.id}/modules"
 
-      module_item = add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
+      tag = ContentTag.last
+      module_item = fj("#context_module_item_#{tag.id}:contains(#{@assignment.title})")
       edit_module_item(module_item) do
         divs = ff(".ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix")
         close_button = nil
@@ -161,7 +164,7 @@ describe "context modules" do
       end
 
       it "returns focus to the previous module item link when deleting a module item." do
-        add_existing_module_item("#assignments_select", "Assignment", @assignment.title)
+        manually_add_module_item("#assignments_select", "Assignment", @assignment.title)
         @tag2 = ContentTag.last
         hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil

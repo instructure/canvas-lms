@@ -19,7 +19,7 @@
 # TODO: consolidate this into DiscussionTopic
 #
 
-import I18n from 'i18n!discussions'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, extend, values} from 'underscore'
 import Backbone from '@canvas/backbone'
@@ -28,6 +28,8 @@ import BackoffPoller from '@canvas/backoff-poller'
 import walk from '../../array-walk'
 import erase from 'array-erase'
 import '@canvas/jquery/jquery.ajaxJSON'
+
+I18n = useI18nScope('discussions')
 
 UNKNOWN_AUTHOR =
   avatar_image_url: null

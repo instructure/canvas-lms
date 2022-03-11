@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {arrayOf, bool, func, number} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
@@ -28,6 +28,8 @@ import {View} from '@instructure/ui-view'
 import CanvasInlineAlert from '@canvas/alerts/react/InlineAlert'
 import {originalDateField} from './utils'
 import {AssignmentShape} from './BulkAssignmentShape'
+
+const I18n = useI18nScope('assignments_bulk_edit');
 
 BulkEditHeader.propTypes = {
   assignments: arrayOf(AssignmentShape).isRequired,

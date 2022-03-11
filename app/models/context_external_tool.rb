@@ -1069,7 +1069,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :selectable, -> { where("context_external_tools.not_selectable IS NOT TRUE") }
 
-  scope :visible, lambda { |user, context, session, placements, current_scope = ContextExternalTool.all|
+  scope :visible, lambda { |user, context, session, placements, current_scope = ContextExternalTool.default_scoped.all|
     if context.grants_right?(user, session, :read_as_admin)
       all
     elsif !placements

@@ -50,6 +50,12 @@
     "basic_554cdc0a": {
         "message": "اصلی"
     },
+    "blue_daf8fea9": {
+        "message": "آبی"
+    },
+    "brick_f2656265": {
+        "message": "آجر"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -125,6 +131,9 @@
     "custom_6979cd81": {
         "message": "سفارشی"
     },
+    "cyan_c1d5f68a": {
+        "message": "آبی تیره"
+    },
     "date_ee500367": {
         "message": "تاریخ"
     },
@@ -133,6 +142,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "کاهش تورفتگی"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "ارغوانی پر رنگ"
     },
     "delete_a6efa79d": {
         "message": "حذف"
@@ -212,6 +224,9 @@
     "greek_65c5b3f7": {
         "message": "یونانی"
     },
+    "green_15af4778": {
+        "message": "سبز"
+    },
     "group_files_82e5dcdb": {
         "message": "فایل های گروه"
     },
@@ -238,6 +253,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "افزایش تورفتگی"
+    },
+    "indigo_2035fc55": {
+        "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "درج"
@@ -268,6 +286,9 @@
     },
     "late_2be42b88": {
         "message": "با تأخیر"
+    },
+    "light_blue_5374f600": {
+        "message": "آبی روشن"
     },
     "link_7262adec": {
         "message": "پیوند"
@@ -301,6 +322,9 @@
     },
     "locked_762f138b": {
         "message": "قفل شده"
+    },
+    "magenta_4a65993c": {
+        "message": "ارغوانی"
     },
     "media_af190855": {
         "message": "رسانه"
@@ -344,14 +368,17 @@
     "nothing_for_now_e3e3ce2a": {
         "message": "چیزی در حال حاضر موجود نیست"
     },
+    "olive_6a3e4d6b": {
+        "message": "زیتون"
+    },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
     },
     "operators_a2ef9a93": {
         "message": "عملگرها"
     },
-    "options_3ab0ea65": {
-        "message": "گزینه ها"
+    "orange_81386a62": {
+        "message": "نارنجی"
     },
     "page_50c4823d": {
         "message": "صفحه"
@@ -367,6 +394,9 @@
     },
     "percentage_34ab7c2c": {
         "message": "درصد"
+    },
+    "pink_68ad45cb": {
+        "message": "صورتی"
     },
     "points_bceb5005": {
         "message": "امتیازها"
@@ -386,6 +416,12 @@
     "published_c944a23d": {
         "message": "منتشر شده"
     },
+    "pumpkin_904428d5": {
+        "message": "کدوتنبل"
+    },
+    "purple_7678a9fc": {
+        "message": "ارغوانی"
+    },
     "quiz_e0dcce8f": {
         "message": "آزمون"
     },
@@ -394,6 +430,9 @@
     },
     "record_7c9448b": {
         "message": "ضبط کردن"
+    },
+    "red_8258edf3": {
+        "message": "قرمز"
     },
     "relationships_6602af70": {
         "message": "روابط"
@@ -436,6 +475,9 @@
     },
     "syllabus_f191f65b": {
         "message": "سرفصل"
+    },
+    "teal_f729a294": {
+        "message": "سبز مایل به آبی"
     },
     "text_7f4593da": {
         "message": "متن"

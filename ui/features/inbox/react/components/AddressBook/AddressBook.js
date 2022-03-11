@@ -39,8 +39,10 @@ import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
 import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useEffect, useMemo, useState, useRef, useCallback} from 'react'
+
+const I18n = useI18nScope('conversations_2');
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'

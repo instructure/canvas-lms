@@ -30,9 +30,6 @@
   "announcement_list_da155734": { "message": "Liste des annonces" },
   "announcements_a4b8ed4a": { "message": "Annonces" },
   "apply_781a2546": { "message": "Appliquer" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Appliquer les changements à toutes les instances de ce Bouton et des Icônes dans le cours."
-  },
   "apps_54d24a47": { "message": "Applications" },
   "arrows_464a3e54": { "message": "Flèches" },
   "art_icon_8e1daad": { "message": "Icône art" },
@@ -56,12 +53,6 @@
   "basic_554cdc0a": { "message": "Basique" },
   "below_81d4dceb": { "message": "En-dessous" },
   "bottom_third_5f5fec1d": { "message": "Tiers inférieur" },
-  "button_color_608a0242": { "message": "Couleur du bouton" },
-  "button_outline_cf14f071": { "message": "Pourtour du bouton" },
-  "button_outline_size_cc1d1df7": { "message": "Épaisseur du pourtour" },
-  "button_shape_dbecb573": { "message": "Forme du bouton" },
-  "button_size_20f5fce1": { "message": "Taille du bouton" },
-  "buttons_and_icons_e66ee12c": { "message": "Boutons et icônes" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Annuler" },
   "choose_caption_file_9c45bc4e": {
@@ -109,7 +100,6 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Réduisez pour masquer { types }"
   },
-  "color_color_eb64b08": { "message": "Couleur { color }" },
   "computer_1d7dfa6f": { "message": "Ordinateur" },
   "content_1440204b": { "message": "Contenu" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -131,7 +121,6 @@
   "course_links_b56959b9": { "message": "Liens du cours" },
   "course_media_ec759ad": { "message": "Médias du cours" },
   "course_navigation_dd035109": { "message": "Barre de navigation des cours" },
-  "create_button_and_icon_5c089934": { "message": "Créer Bouton et Icône" },
   "creative_commons_license_725584ae": {
     "message": "Licence Creative Commons :"
   },
@@ -187,8 +176,6 @@
   "embed_828fac4a": { "message": "Intégrer" },
   "embed_code_314f1bd5": { "message": "Embarquer du code" },
   "embed_image_1080badc": { "message": "Incorporer l’image" },
-  "embed_options_tray_901cfd19": { "message": "Menu Options d''intégration" },
-  "embed_preview_2d741e1f": { "message": "Intégrer l''aperçu" },
   "embed_video_a97a64af": { "message": "Intégrer la vidéo" },
   "embedded_content_aaeb4d3d": { "message": "contenu intégré" },
   "engineering_icon_f8f3cf43": { "message": "Icône ingénierie" },
@@ -352,7 +339,6 @@
     "message": "Ouvrir l’application { title }"
   },
   "operators_a2ef9a93": { "message": "Opérateurs" },
-  "options_3ab0ea65": { "message": "Options" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listes ordonnées et non ordonnées"
   },
@@ -404,9 +390,6 @@
     "message": "L’éditeur HTML embelli n’est malheureusement pas accessible au clavier. Accédez à l’éditeur HTML brut ici."
   },
   "save_11a80ec3": { "message": "Enregistrer" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "Boutons et icônes enregistrés."
-  },
   "search_280d00bd": { "message": "Rechercher" },
   "search_term_b2d2235": { "message": "Terme de recherche" },
   "select_crop_shape_d441feeb": {
@@ -418,9 +401,6 @@
     "message": "Maj+O pour ouvrir l''éditeur HTML embelli"
   },
   "show_audio_options_b489926b": { "message": "Afficher les options audio" },
-  "show_embed_options_ef8d7ef": {
-    "message": "Afficher les options d''intégration"
-  },
   "show_image_options_1e2ecc6b": {
     "message": "Afficher les options d''images"
   },

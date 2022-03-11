@@ -37,6 +37,8 @@ describe "A file with a know extension" do
 
     expect(File.mime_types["application/x-kontour"]).to eq "kon"
     expect(File.mime_types["application/vnd.kde.kontour"]).to eq "kon"
+
+    expect(File.mime_types["image/webp"]).to eq "webp"
   end
 end
 

@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!user_logins'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
 import '@canvas/util/templateData'
+
+const I18n = useI18nScope('user_logins');
 
 const savedSSOIcons = {}
 

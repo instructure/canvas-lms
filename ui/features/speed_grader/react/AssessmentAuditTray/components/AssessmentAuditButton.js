@@ -21,7 +21,9 @@ import {func} from 'prop-types'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {IconClockLine} from '@instructure/ui-icons'
-import I18n from 'i18n!speed_grader'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('speed_grader');
 
 const theme = {
   [Button.theme]: {

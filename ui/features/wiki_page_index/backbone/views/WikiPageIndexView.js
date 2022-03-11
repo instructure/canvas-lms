@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!pages'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
 import WikiPageEditView from '@canvas/wiki/backbone/views/WikiPageEditView'
@@ -33,6 +33,8 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {ltiState} from '@canvas/lti/jquery/messages'
+
+const I18n = useI18nScope('pages');
 
 export default class WikiPageIndexView extends PaginatedCollectionView {
   static initClass() {

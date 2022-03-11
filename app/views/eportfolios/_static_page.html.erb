@@ -29,7 +29,7 @@
 <div id="container">
   <div id="header">
     <a href="#skip_navigation" id="skip_navigation_link"><%= t('links.skip_navigation', "Skip Navigation") %></a>
-    <a href="http://www.instructure.com" title="<%= t('created_with_canvas', "Created with Canvas") %>"><img class="logo" src="logo.png" alt="<%= t('logo', "logo") %>"/></a>
+    <a href="http://www.instructure.com" title="<%= t('created_with_canvas', "Created with Canvas") %>"><img class="logo" src="logo.svg" alt="<%= t('logo', "logo") %>"/></a>
     <h1><%= @page.name %></h1>
     <h2><a href="<%= @page.eportfolio.eportfolio_categories.first.eportfolio_entries.first.full_slug %>.html"><%= @page.eportfolio.name %></a> &#187; <a href="<%= @page.eportfolio_category.eportfolio_entries.first.full_slug %>.html"><%= @page.eportfolio_category.name %></a></h2>
     <div class="clear"></div>

@@ -19,7 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {IconModuleSolid, IconUploadLine} from '@instructure/ui-icons'
-import I18n from 'i18n!modules_home_page'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('modules_home_page');
 
 export default class ModulesHomePage extends React.Component {
   static propTypes = {

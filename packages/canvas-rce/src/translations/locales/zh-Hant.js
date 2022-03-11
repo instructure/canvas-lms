@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "通告清單" },
   "announcements_a4b8ed4a": { "message": "通告" },
   "apply_781a2546": { "message": "應用" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "在課程中套用變更到此按鈕和圖示的所有執行個體"
-  },
   "apps_54d24a47": { "message": "應用程式" },
   "arrows_464a3e54": { "message": "箭號" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "外觀比例將被保留" },
@@ -70,12 +67,6 @@ const locale = {
   "basic_554cdc0a": { "message": "基本" },
   "below_81d4dceb": { "message": "以下" },
   "bottom_third_5f5fec1d": { "message": "底部第三個" },
-  "button_color_608a0242": { "message": "按鈕顏色" },
-  "button_outline_cf14f071": { "message": "按鈕提綱" },
-  "button_outline_size_cc1d1df7": { "message": "按鈕提綱大小" },
-  "button_shape_dbecb573": { "message": "按鈕形狀" },
-  "button_size_20f5fce1": { "message": "按鈕大小" },
-  "buttons_and_icons_e66ee12c": { "message": "按鈕和圖示" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "取消" },
   "choose_caption_file_9c45bc4e": { "message": "選擇字幕檔案" },
@@ -108,7 +99,6 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "隱藏圖片說明/字幕" },
   "collaborations_5c56c15f": { "message": "協作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "收起以隱藏 { types }" },
-  "color_color_eb64b08": { "message": "顏色 { color }" },
   "computer_1d7dfa6f": { "message": "電腦" },
   "content_1440204b": { "message": "內容" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -130,7 +120,6 @@ const locale = {
   "course_links_b56959b9": { "message": "課程連結" },
   "course_media_ec759ad": { "message": "課程媒體" },
   "course_navigation_dd035109": { "message": "課程導航" },
-  "create_button_and_icon_5c089934": { "message": "建立按鈕和圖示" },
   "creative_commons_license_725584ae": { "message": "創意共享授權：" },
   "crop_image_807ebb08": { "message": "裁剪影像" },
   "current_image_f16c249c": { "message": "目前的圖像" },
@@ -175,8 +164,6 @@ const locale = {
   "embed_828fac4a": { "message": "嵌入" },
   "embed_code_314f1bd5": { "message": "嵌入代碼" },
   "embed_image_1080badc": { "message": "嵌入影像" },
-  "embed_options_tray_901cfd19": { "message": "嵌入選項收集箱" },
-  "embed_preview_2d741e1f": { "message": "嵌入預覽" },
   "embed_video_a97a64af": { "message": "嵌入影片" },
   "embedded_content_aaeb4d3d": { "message": "嵌入內容" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
@@ -302,7 +289,6 @@ const locale = {
   },
   "open_title_application_fd624fc5": { "message": "開啟 { title } 應用程式" },
   "operators_a2ef9a93": { "message": "操作員" },
-  "options_3ab0ea65": { "message": "選項" },
   "ordered_and_unordered_lists_cfadfc38": { "message": "有序和無序的清單" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "其他編輯器快速鍵位於"
@@ -343,7 +329,6 @@ const locale = {
     "message": "很遺憾，美觀 HTML 編輯器無法用鍵盤存取。在這裡存取原始 HTML 編輯器。"
   },
   "save_11a80ec3": { "message": "儲存" },
-  "saved_buttons_and_icons_8278eed2": { "message": "儲存的按鈕和圖示" },
   "search_280d00bd": { "message": "搜尋" },
   "search_term_b2d2235": { "message": "搜尋學期" },
   "select_crop_shape_d441feeb": { "message": "選擇裁剪形狀" },
@@ -353,7 +338,6 @@ const locale = {
     "message": "按 Shift-O 開啟美觀 HTML 編輯器。"
   },
   "show_audio_options_b489926b": { "message": "顯示音訊選項" },
-  "show_embed_options_ef8d7ef": { "message": "顯示嵌入選項" },
   "show_image_options_1e2ecc6b": { "message": "顯示影像選項" },
   "show_link_options_545338fd": { "message": "顯示連結選項" },
   "show_video_options_6ed3721a": { "message": "顯示影片選項" },

@@ -231,7 +231,7 @@ describe "better_file_browsing" do
     it "sets focus to the folder tree when opening the dialog", priority: "1" do
       get "/courses/#{@course.id}/files"
       ff(".al-trigger")[0].click
-      fln("Move").click
+      fln("Move To...").click
       wait_for_ajaximations
       check_element_has_focus(ff(".tree")[1])
     end

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!filter_calendars_modal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -33,6 +33,8 @@ import {View} from '@instructure/ui-view'
 import {Modal} from '@instructure/ui-modal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {saveSelectedContexts} from '@canvas/k5/react/utils'
+
+const I18n = useI18nScope('filter_calendars_modal');
 
 export const ContextCheckbox = ({
   assetString,

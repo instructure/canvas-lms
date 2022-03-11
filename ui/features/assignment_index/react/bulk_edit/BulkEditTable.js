@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useCallback} from 'react'
-import {arrayOf, func} from 'prop-types'
+import {arrayOf, func, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -32,6 +32,8 @@ import BulkDateInput from './BulkDateInput'
 import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
 import {canEditAll, originalDateField} from './utils'
+
+const I18n = useI18nScope('assignments_bulk_edit');
 
 const DATE_INPUT_META = {
   due_at: {
@@ -65,7 +67,9 @@ BulkEditTable.propTypes = {
   // {assignmentId, overrideId or base: true}
   clearOverrideEdits: func.isRequired,
 
-  setAssignmentSelected: func.isRequired // (assignmentId, selected) => {}
+  setAssignmentSelected: func.isRequired, // (assignmentId, selected) => {}
+
+  defaultDueTime: string // e.g. "16:00:00"
 }
 
 export default function BulkEditTable({
@@ -73,10 +77,11 @@ export default function BulkEditTable({
   updateAssignmentDate,
   setAssignmentSelected,
   selectAllAssignments,
-  clearOverrideEdits
+  clearOverrideEdits,
+  defaultDueTime
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
-  const DATE_COLUMN_WIDTH_REMS = 14
+  const DATE_COLUMN_WIDTH_REMS = 17
   const ACTION_COLUMN_WIDTH_REMS = 4
   const NOTE_COLUMN_WIDTH_REMS = 3
 
@@ -93,6 +98,7 @@ export default function BulkEditTable({
 
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
     const label = DATE_INPUT_META[dateKey].label
+    const calculatedWidth = `${DATE_COLUMN_WIDTH_REMS - 1}rem`
     return (
       <BulkDateInput
         label={label}
@@ -103,7 +109,9 @@ export default function BulkEditTable({
         overrideId={overrideId}
         updateAssignmentDate={updateAssignmentDate}
         fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
+        defaultTime={dateKey === 'due_at' ? defaultDueTime : null}
         interaction={dates.can_edit ? 'enabled' : 'disabled'}
+        width={calculatedWidth}
       />
     )
   }

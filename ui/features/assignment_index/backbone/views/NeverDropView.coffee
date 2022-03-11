@@ -17,8 +17,10 @@
 
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
-import I18n from 'i18n!assignmentsNeverDrop'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import neverDropTemplate from '../../jst/NeverDrop.handlebars'
+
+I18n = useI18nScope('assignmentsNeverDrop')
 
 export default class NeverDrop extends Backbone.View
   className: 'never_drop_rule'

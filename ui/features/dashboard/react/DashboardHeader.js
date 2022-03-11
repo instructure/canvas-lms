@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!dashboard'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import axios from '@canvas/axios'
 import classnames from 'classnames'
 import {bool, func, string, object, oneOf} from 'prop-types'
@@ -40,6 +40,8 @@ import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseM
 import ObserverOptions from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('dashboard');
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)

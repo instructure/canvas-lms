@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!courses'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useContext, useEffect} from 'react'
 import {func, string} from 'prop-types'
 import {useQuery} from 'react-apollo'
 import NotificationPreferencesContextSelect from './NotificationPreferencesContextSelect'
 import {NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY} from '../graphql/Queries'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+
+const I18n = useI18nScope('courses');
 
 export default function NotificationPreferencesContextSelectQuery(props) {
   const {setOnFailure} = useContext(AlertManagerContext)

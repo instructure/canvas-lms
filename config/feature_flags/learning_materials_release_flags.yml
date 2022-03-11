@@ -18,11 +18,14 @@ new_equation_editor:
   description: Includes the equation editor in the @instructure/canvas-rce package
   applies_to: SiteAdmin
 buttons_and_icons_root_account:
-  state: hidden
+  state: allowed
   applies_to: RootAccount
-  display_name: RCE Buttons & Icons
+  display_name: RCE Icon Maker
   description: |-
-    Manage a library of custom buttons and icons from the RCE.
+    Manage a library of custom icons from the RCE.
+  environments:
+    production:
+      state: hidden
 buttons_and_icons_cropper:
   state: hidden
   display_name: Cropper & Associated Features in Buttons & Icons

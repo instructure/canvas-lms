@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,15 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(["i18n!foo"], function(I18n) {
-  I18n.t("#absolute_key", "Absolute key");
-  I18n.t("Inferred key");
-  define(["i18n!nested"], function(I18n) {
-    I18n.t("relative_key", "Relative key in nested scope");
-  });
-  I18n.t("relative_key", "Relative key");
-});
+const { default: Errors } = require("@instructure/i18nliner/dist/lib/errors");
 
-define(["i18n!bar"], function(I18n) {
-  I18n.t("relative_key", "Another relative key");
-});
+Errors.register("UnscopedTranslateCall");
+
+module.exports = Errors

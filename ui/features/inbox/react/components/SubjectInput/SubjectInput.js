@@ -17,13 +17,15 @@
  */
 
 import {ComposeInputWrapper} from '../ComposeInputWrapper/ComposeInputWrapper'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React from 'react'
 
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
+
+const I18n = useI18nScope('conversations_2');
 
 export const SubjectInput = ({value, onChange, onBlur, onFocus}) => {
   return (

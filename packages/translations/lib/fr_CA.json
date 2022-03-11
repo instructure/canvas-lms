@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Appliquer"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Appliquer des modifications à toutes les instances de ce bouton et icône dans le cours"
-    },
     "apps_54d24a47": {
         "message": "Applications"
     },
@@ -182,24 +179,6 @@
     "bottom_third_5f5fec1d": {
         "message": "Troisième inférieure"
     },
-    "button_color_608a0242": {
-        "message": "Couleur du bouton"
-    },
-    "button_outline_cf14f071": {
-        "message": "Contour du bouton"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Taille du contour du bouton"
-    },
-    "button_shape_dbecb573": {
-        "message": "Forme du bouton"
-    },
-    "button_size_20f5fce1": {
-        "message": "Taille du bouton"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Boutons et icônes"
-    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -275,9 +254,6 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Réduire pour masquer { types }"
     },
-    "color_color_eb64b08": {
-        "message": "Couleur { color }"
-    },
     "computer_1d7dfa6f": {
         "message": "Ordinateur"
     },
@@ -340,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } À FAIRE"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Bouton et icône de création"
     },
     "creative_commons_license_725584ae": {
         "message": "Licence Creative Commons :"
@@ -505,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Incorporer l’image"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Intégrer le plateau des options"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Intégrer un aperçu"
     },
     "embed_video_a97a64af": {
         "message": "Intégrer la vidéo"
@@ -1034,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Facultatif : Ajouter un cours"
     },
-    "options_3ab0ea65": {
-        "message": "Options"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Listes triées et non triées"
     },
@@ -1175,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Enregistrer"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Boutons et icônes enregistrés"
-    },
     "schedule_preview_3bcda153": {
         "message": "Aperçu de l’horaire"
     },
@@ -1213,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Afficher les options audio"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Afficher les options intégrées"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Afficher les options d’image"

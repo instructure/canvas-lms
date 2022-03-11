@@ -18,13 +18,15 @@
 
 import React from 'react'
 import {func, string} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 
 import {Text} from '@instructure/ui-text'
+
+const I18n = useI18nScope('gradebook');
 
 class AnonymousSpeedGraderAlert extends React.Component {
   static propTypes = {

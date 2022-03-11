@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-import I18n from 'i18n!instructure_js'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -26,13 +26,13 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/doc-previews' /* loadDocPreview */
+import '@canvas/doc-previews'/* loadDocPreview */
 import {trackEvent} from '@canvas/google-analytics'
-import '@canvas/datetime' /* datetimeString, dateString, fudgeDateForProfileTimezone */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import '@canvas/datetime'/* datetimeString, dateString, fudgeDateForProfileTimezone */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
+import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags, youTubeID */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
@@ -40,11 +40,13 @@ import '@canvas/util/templateData'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'date'
-import 'jquery-tinypubsub' /* /\.publish\(/ */
+import 'jquery-tinypubsub'/* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import '../../../boot/initializers/trackGoogleAnalyticsEventsOnClick'
+
+const I18n = useI18nScope('instructure_js');
 
 let preview_counter = 0
 function previewId() {

@@ -45,7 +45,7 @@ class Attachment < ActiveRecord::Base
 
   CLONING_ERROR_TYPE = "attachment_clone_url"
 
-  BUTTONS_AND_ICONS = "buttons_and_icons"
+  BUTTONS_AND_ICONS = "icon_maker_icons"
   UNCATEGORIZED = "uncategorized"
   VALID_CATEGORIES = [BUTTONS_AND_ICONS, UNCATEGORIZED].freeze
 
@@ -1223,7 +1223,7 @@ class Attachment < ActiveRecord::Base
       "image/gif" => "image",
       "image/bmp" => "image",
       "image/svg+xml" => "image",
-      # "image/webp" => "image", not supported by safari as of Version 13.1.1
+      "image/webp" => "image",
       "image/vnd.microsoft.icon" => "image",
       "application/x-rar" => "zip",
       "application/x-rar-compressed" => "zip",

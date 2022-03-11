@@ -37,7 +37,6 @@ pipeline {
     RUBY = configuration.ruby()
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = '3.141.59-20210929'
 
     CASSANDRA_IMAGE_TAG = imageTag.cassandra()
     DYNAMODB_IMAGE_TAG = imageTag.dynamodb()

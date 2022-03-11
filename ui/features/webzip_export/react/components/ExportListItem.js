@@ -18,9 +18,11 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!webzip_exports'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import '@canvas/datetime'
+
+const I18n = useI18nScope('webzip_exports');
 
 class ExportListItem extends React.Component {
   static propTypes = {

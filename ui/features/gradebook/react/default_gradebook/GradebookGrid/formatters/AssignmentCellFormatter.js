@@ -18,7 +18,7 @@
 
 // xsslint safeString.method I18n.t
 
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import htmlEscape from 'html-escape'
 import {extractDataTurnitin} from '@canvas/grading/Turnitin'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
@@ -28,6 +28,8 @@ import {
   similarityIcon
 } from '@canvas/grading/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
+
+const I18n = useI18nScope('gradebook');
 
 function getTurnitinState(submission) {
   const turnitin = extractDataTurnitin(submission)

@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!important_dates_empty'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 
 import ImportantDatesPandaUrl from '../images/important-dates.svg'
+
+const I18n = useI18nScope('important_dates_empty');
 
 const ImportantDatesEmpty = () => (
   <Flex as="div" direction="column" alignItems="center" textAlign="center" margin="large 0">

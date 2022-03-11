@@ -21,7 +21,9 @@ import {bool, func, shape} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('gradebook');
 
 export default function AdvancedTabPanel(props) {
   const {courseSettings, onCourseSettingsChange} = props

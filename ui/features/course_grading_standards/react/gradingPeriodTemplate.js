@@ -20,10 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import I18n from 'i18n!gradingPeriodTemplate'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/datetime'
+
+const I18n = useI18nScope('gradingPeriodTemplate');
 
 const postfixId = (text, {props}) => text + props.id
 

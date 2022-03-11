@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!discussions'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import walk from '../../array-walk'
 import {View} from '@canvas/backbone'
@@ -24,6 +24,8 @@ import template from '../../jst/EntryCollectionView.handlebars'
 import entryStatsTemplate from '../../jst/entryStats.handlebars'
 import EntryView from './EntryView.coffee'
 import 'jquery-scroll-into-view'
+
+I18n = useI18nScope('discussions')
 
 export default class EntryCollectionView extends View
 

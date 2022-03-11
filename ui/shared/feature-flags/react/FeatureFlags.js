@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!feature_flags'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState} from 'react'
 import {groupBy, debounce} from 'lodash'
 
@@ -29,6 +29,8 @@ import {Flex} from '@instructure/ui-flex'
 
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import FeatureFlagTable from './FeatureFlagTable'
+
+const I18n = useI18nScope('feature_flags');
 
 const SEARCH_DELAY = 350
 

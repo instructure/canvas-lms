@@ -15,10 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!course_statistics'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import RecentStudentTemplate from '../../jst/recentStudent.handlebars'
+
+I18n = useI18nScope('course_statistics')
 
 export default class RecentStudentView extends Backbone.View
 

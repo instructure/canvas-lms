@@ -35,8 +35,10 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {colors} from '@instructure/canvas-theme'
+
+const I18n = useI18nScope('conversations_2');
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
@@ -219,9 +221,6 @@ export const ConversationListItem = ({...props}) => {
                       checked={props.isSelected}
                       onChange={e => {
                         e.stopPropagation()
-                        if (props.isSelected) {
-                          props.onRemoveFromSelectedConversations(props.id)
-                        }
                       }}
                     />
                   </View>
@@ -406,7 +405,6 @@ ConversationListItem.propTypes = {
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
-  onRemoveFromSelectedConversations: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
   readStateChangeConversationParticipants: PropTypes.func

@@ -199,7 +199,7 @@ describe StudentEnrollment do
 
       it "queues only one update when multiple enrollments are created" do
         3.times { student_in_course(active_all: true, user: user_with_pseudonym) }
-        expect(Delayed::Job.where("strand LIKE 'pace_plan_republish:%'").count).to eq 1
+        expect(Delayed::Job.where("singleton LIKE 'pace_plan_republish:%'").count).to eq 1
       end
 
       it "doesn't queue an update for non-student-enrollment creation" do

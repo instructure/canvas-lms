@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!media_recorder'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {func} from 'prop-types'
+
+const I18n = useI18nScope('media_recorder');
 
 const translations = {
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),
