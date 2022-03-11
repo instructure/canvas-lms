@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
 import {bool, func, string, object, oneOf} from 'prop-types'
@@ -41,7 +41,7 @@ import ObserverOptions from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('dashboard');
+const I18n = useI18nScope('dashboard')
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)
@@ -153,7 +153,7 @@ class DashboardHeader extends React.Component {
     // populates the stream items via ajax when the toggle is switched
     const streamItemsUrl =
       observedUserId && observerMode()
-        ? `/dashboard/stream_items?observed_user=${observedUserId}`
+        ? `/dashboard/stream_items?observed_user_id=${observedUserId}`
         : '/dashboard/stream_items'
 
     const $dashboardActivity = $('#dashboard-activity')
@@ -339,7 +339,7 @@ export default responsiviser()(DashboardHeader)
 function loadDashboardSidebar(observedUserId) {
   const dashboardSidebarUrl =
     observedUserId && observerMode()
-      ? `/dashboard-sidebar?observed_user=${observedUserId}`
+      ? `/dashboard-sidebar?observed_user_id=${observedUserId}`
       : '/dashboard-sidebar'
 
   const rightSide = $('#right-side')

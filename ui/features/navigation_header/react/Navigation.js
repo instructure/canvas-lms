@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {func} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
@@ -30,7 +30,7 @@ import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import tourPubSub from '@canvas/tour-pubsub'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
-const I18n = useI18nScope('Navigation');
+const I18n = useI18nScope('Navigation')
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
@@ -189,7 +189,7 @@ export default class Navigation extends React.Component {
       let forceLoad = false
       const k5_observed_user_id = savedObservedId(ENV.current_user_id)
       if (k5_observed_user_id) {
-        url = `${url}&observed_user=${k5_observed_user_id}`
+        url = `${url}&observed_user_id=${k5_observed_user_id}`
         if (k5_observed_user_id !== this.state.observedUserId) {
           this.setState({
             observedUserId: k5_observed_user_id,
