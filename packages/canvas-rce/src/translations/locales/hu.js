@@ -161,8 +161,6 @@ const locale = {
   "embed_828fac4a": { "message": "Beágyaz" },
   "embed_code_314f1bd5": { "message": "Kód beágyazása" },
   "embed_image_1080badc": { "message": "Beágyazott kép" },
-  "embed_options_tray_901cfd19": { "message": "Beállítások tálca beágyazása" },
-  "embed_preview_2d741e1f": { "message": "Előnézet beágyazása" },
   "embed_video_a97a64af": { "message": "Videó beágyazása" },
   "embedded_content_aaeb4d3d": { "message": "beágyazott tartalom" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
@@ -289,7 +287,6 @@ const locale = {
     "message": "Nyissa meg a billentyűkombinációk párbeszédablakot"
   },
   "operators_a2ef9a93": { "message": "Műveletek" },
-  "options_3ab0ea65": { "message": "Beállítások" },
   "orange_81386a62": { "message": "Narancs" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Rendezett és Rendezetlen Listák"
@@ -335,9 +332,6 @@ const locale = {
   "search_term_b2d2235": { "message": "Kifejezés keresése" },
   "select_language_7c93a900": { "message": "Válasszon nyelvet" },
   "selected_274ce24f": { "message": "Kiválasztva" },
-  "show_embed_options_ef8d7ef": {
-    "message": "Beágyazási lehetőségek mutatása"
-  },
   "show_image_options_1e2ecc6b": { "message": "Képbeállítások mutatása" },
   "show_link_options_545338fd": { "message": "Linkbeállítások mutatása" },
   "show_video_options_6ed3721a": { "message": "Videóbeállítások mutatása" },

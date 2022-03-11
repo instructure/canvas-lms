@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Kunngjeringsliste" },
   "announcements_a4b8ed4a": { "message": "Kunngjeringar" },
   "apply_781a2546": { "message": "Bruk" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Bruk endringane på alle forekomster av denne knappen og ikonet i emnet."
-  },
   "apps_54d24a47": { "message": "Appar" },
   "arrows_464a3e54": { "message": "Piler" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
@@ -74,12 +71,6 @@ const locale = {
   "blue_daf8fea9": { "message": "Blå" },
   "bottom_third_5f5fec1d": { "message": "Nedre tredel" },
   "brick_f2656265": { "message": "Murstein" },
-  "button_color_608a0242": { "message": "Knappefarge" },
-  "button_outline_cf14f071": { "message": "Knappeomriss" },
-  "button_outline_size_cc1d1df7": { "message": "Storleik på knappeomriss" },
-  "button_shape_dbecb573": { "message": "Knappeform" },
-  "button_size_20f5fce1": { "message": "Knappestorleik" },
-  "buttons_and_icons_e66ee12c": { "message": "Knappar og ikon" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
@@ -137,7 +128,6 @@ const locale = {
   "course_links_b56959b9": { "message": "Emnelenker" },
   "course_media_ec759ad": { "message": "Emnemedier" },
   "course_navigation_dd035109": { "message": "Emnenavigering" },
-  "create_button_and_icon_5c089934": { "message": "Lag knapp og ikon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-lisens:"
   },
@@ -192,8 +182,6 @@ const locale = {
   "embed_828fac4a": { "message": "Sett inn" },
   "embed_code_314f1bd5": { "message": "Integrer kode" },
   "embed_image_1080badc": { "message": "Sett inn bilde" },
-  "embed_options_tray_901cfd19": { "message": "Sett inn-meny" },
-  "embed_preview_2d741e1f": { "message": "Sett inn-førehandsvising" },
   "embed_video_a97a64af": { "message": "Integrer video" },
   "embedded_content_aaeb4d3d": { "message": "innebygd innhald" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
@@ -329,7 +317,6 @@ const locale = {
     "message": "Opne { title } applikasjon"
   },
   "operators_a2ef9a93": { "message": "Operatør" },
-  "options_3ab0ea65": { "message": "Alternativ" },
   "orange_81386a62": { "message": "Oransje" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordna og uordna lister"
@@ -381,7 +368,6 @@ const locale = {
     "message": "I den pene HTML-editoren kan du ikkje redigere med tastatur. Gå til ein rein HTML-editor her."
   },
   "save_11a80ec3": { "message": "Lagre" },
-  "saved_buttons_and_icons_8278eed2": { "message": "Knappar og ikon er lagra" },
   "search_280d00bd": { "message": "Søk" },
   "search_term_b2d2235": { "message": "Søkeord" },
   "select_crop_shape_d441feeb": { "message": "Vel skjæringsform" },
@@ -391,7 +377,6 @@ const locale = {
     "message": "Bruk Shift-O for å opne den pene HTML-editoren."
   },
   "show_audio_options_b489926b": { "message": "Vis lydalternativ" },
-  "show_embed_options_ef8d7ef": { "message": "Vis sett inn-alternativ" },
   "show_image_options_1e2ecc6b": { "message": "Vis alternativ for bilde" },
   "show_link_options_545338fd": { "message": "Vis lenkealternativ" },
   "show_video_options_6ed3721a": { "message": "Vis videoalternativ" },

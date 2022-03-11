@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Ankündigungsliste" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Anwenden" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Änderungen für alle Schaltflächen und Icons im Kurs übernehmen"
-  },
   "apps_54d24a47": { "message": "Apps" },
   "arrows_464a3e54": { "message": "Pfeile" },
   "art_icon_8e1daad": { "message": "Kunstsymbol" },
@@ -73,14 +70,6 @@ const locale = {
   "basic_554cdc0a": { "message": "Grundlegend" },
   "below_81d4dceb": { "message": "Unten" },
   "bottom_third_5f5fec1d": { "message": "Unteres Drittel" },
-  "button_color_608a0242": { "message": "Farbe der Schaltfläche" },
-  "button_outline_cf14f071": { "message": "Kontur der Schaltfläche" },
-  "button_outline_size_cc1d1df7": {
-    "message": "Größe der Schaltflächenkontur"
-  },
-  "button_shape_dbecb573": { "message": "Form der Schaltfläche" },
-  "button_size_20f5fce1": { "message": "Größe der Schaltfläche" },
-  "buttons_and_icons_e66ee12c": { "message": "Schaltflächen und Icons" },
   "c_2001_acme_inc_283f7f80": { "message": "© 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Abbrechen" },
   "choose_caption_file_9c45bc4e": { "message": "Caption-Datei auswählen" },
@@ -139,9 +128,6 @@ const locale = {
   "course_links_b56959b9": { "message": "Kurs-Links" },
   "course_media_ec759ad": { "message": "Kursmedien" },
   "course_navigation_dd035109": { "message": "Kursnavigation" },
-  "create_button_and_icon_5c089934": {
-    "message": "Schaltfläche und Icon erstellen"
-  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-Lizenz:"
   },
@@ -195,8 +181,6 @@ const locale = {
   "embed_828fac4a": { "message": "Einbetten" },
   "embed_code_314f1bd5": { "message": "Code einbetten" },
   "embed_image_1080badc": { "message": "Bild einbetten" },
-  "embed_options_tray_901cfd19": { "message": "Optionsfach einbetten" },
-  "embed_preview_2d741e1f": { "message": "Vorschau einbetten" },
   "embed_video_a97a64af": { "message": "Video einbetten" },
   "embedded_content_aaeb4d3d": { "message": "Eingebettete Inhalte" },
   "engineering_icon_f8f3cf43": { "message": "Engineering-Symbol" },
@@ -352,7 +336,6 @@ const locale = {
     "message": "Anwendung { title } öffnen"
   },
   "operators_a2ef9a93": { "message": "Operatoren" },
-  "options_3ab0ea65": { "message": "Optionen" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Geordnete und ungeordnete Listen"
   },
@@ -406,9 +389,6 @@ const locale = {
     "message": "Leider ist der Pretty HTML-Editor nicht über die Tastatur zugänglich. Den Editor für reines HTML finden Sie hier."
   },
   "save_11a80ec3": { "message": "Speichern" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "Gespeicherte Schaltflächen und Icons"
-  },
   "search_280d00bd": { "message": "Suchen" },
   "search_term_b2d2235": { "message": "Suchbegriff" },
   "select_crop_shape_d441feeb": { "message": "Zuschnittsform auswählen" },
@@ -418,7 +398,6 @@ const locale = {
     "message": "Shift-O, um den Pretty HTML-Editor zu öffnen."
   },
   "show_audio_options_b489926b": { "message": "Audiooptionen anzeigen" },
-  "show_embed_options_ef8d7ef": { "message": "Einbettungsoptionen anzeigen" },
   "show_image_options_1e2ecc6b": { "message": "Bildoptionen anzeigen" },
   "show_link_options_545338fd": { "message": "Link-Optionen anzeigen" },
   "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },

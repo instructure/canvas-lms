@@ -419,12 +419,6 @@
     "embed_image_1080badc": {
         "message": "Beágyazott kép"
     },
-    "embed_options_tray_901cfd19": {
-        "message": "Beállítások tálca beágyazása"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Előnézet beágyazása"
-    },
     "embed_video_a97a64af": {
         "message": "Videó beágyazása"
     },
@@ -845,9 +839,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Opcionális: kurzus hozzáadása"
     },
-    "options_3ab0ea65": {
-        "message": "Beállítások"
-    },
     "orange_81386a62": {
         "message": "Narancs"
     },
@@ -985,9 +976,6 @@
     },
     "show_all_ae37d610": {
         "message": "Összes megjelenítése"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Beágyazási lehetőségek mutatása"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Képbeállítások mutatása"

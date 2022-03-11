@@ -28,9 +28,6 @@
   "announcement_list_da155734": { "message": "รายการประกาศ" },
   "announcements_a4b8ed4a": { "message": "ประกาศ" },
   "apply_781a2546": { "message": "ปรับใช้" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "ปรับใช้การเปลี่ยนแปลงกับส่วนรายการทั้งหมดปุ่มและไอคอนนี้ในบทเรียนนี้"
-  },
   "apps_54d24a47": { "message": "แอพ" },
   "arrows_464a3e54": { "message": "ลูกศร" },
   "art_icon_8e1daad": { "message": "ไอคอนอาร์ตเวิร์ค" },
@@ -54,12 +51,6 @@
   "basic_554cdc0a": { "message": "พื้นฐาน" },
   "below_81d4dceb": { "message": "ด้านล่าง" },
   "bottom_third_5f5fec1d": { "message": "อันดับที่สามจากด้านล่าง" },
-  "button_color_608a0242": { "message": "สีปุ่ม" },
-  "button_outline_cf14f071": { "message": "กรอบปุ่ม" },
-  "button_outline_size_cc1d1df7": { "message": "ขนาดกรอบปุ่ม" },
-  "button_shape_dbecb573": { "message": "รูปทรงปุ่ม" },
-  "button_size_20f5fce1": { "message": "ขนาดปุ่ม" },
-  "buttons_and_icons_e66ee12c": { "message": "ปุ่มและไอคอน" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "ยกเลิก" },
   "choose_caption_file_9c45bc4e": { "message": "เลือกไฟล์คำบรรยาย" },
@@ -118,7 +109,6 @@
   "course_links_b56959b9": { "message": "ลิงค์บทเรียน" },
   "course_media_ec759ad": { "message": "สื่อสำหรับบทเรียน" },
   "course_navigation_dd035109": { "message": "การสืบค้นเนื้อหาบทเรียน" },
-  "create_button_and_icon_5c089934": { "message": "จัดทำปุ่มและไอคอน" },
   "creative_commons_license_725584ae": {
     "message": "สิทธิ์ใช้งาน Creative Commons:"
   },
@@ -172,8 +162,6 @@
   "embed_828fac4a": { "message": "ผนวก" },
   "embed_code_314f1bd5": { "message": "ผนวกรหัส" },
   "embed_image_1080badc": { "message": "ผนวกภาพ" },
-  "embed_options_tray_901cfd19": { "message": "ผนวกถาดเผื่อเลือก" },
-  "embed_preview_2d741e1f": { "message": "ผนวกการแสดงตัวอย่าง" },
   "embed_video_a97a64af": { "message": "ผนวกวิดีโอ" },
   "embedded_content_aaeb4d3d": { "message": "เนื้อหาที่ผนวก" },
   "engineering_icon_f8f3cf43": { "message": "ไอคอนวิศวกรรม" },
@@ -325,7 +313,6 @@
     "message": "เปิดแอพพลิเคชั่น { title }"
   },
   "operators_a2ef9a93": { "message": "ผู้ดำเนินการ" },
-  "options_3ab0ea65": { "message": "ตัวเลือก" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "รายการที่จัดลำดับและไม่ได้จัดลำดับ"
   },
@@ -375,7 +362,6 @@
     "message": "น่าเสียดาย HTML Editor ที่สวยงามไม่สามารถใช้งานผ่านแป้นพิมพ์ ใช้งาน HTML Editor แบบไม่ปรุงแต่งที่นี่"
   },
   "save_11a80ec3": { "message": "บันทึก" },
-  "saved_buttons_and_icons_8278eed2": { "message": "ปุ่มและไอคอนที่บันทึกไว้" },
   "search_280d00bd": { "message": "ค้นหา" },
   "search_term_b2d2235": { "message": "คำค้นหา" },
   "select_crop_shape_d441feeb": { "message": "เลือกรูปทรงการครอป" },
@@ -385,7 +371,6 @@
     "message": "Shift-O เพื่อเปิด HTML Editor ที่สวยงาม"
   },
   "show_audio_options_b489926b": { "message": "แสดงตัวเลือกเสียง" },
-  "show_embed_options_ef8d7ef": { "message": "แสดงตัวเลือกในการผนวก" },
   "show_image_options_1e2ecc6b": { "message": "แสดงตัวเลือกสำหรับภาพ" },
   "show_link_options_545338fd": { "message": "แสดงตัวเลือกสำหรับลิงค์" },
   "show_video_options_6ed3721a": { "message": "แสดงตัวเลือกสำหรับวิดีโอ" },

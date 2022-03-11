@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Virkja"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Notaðu breytingar á öll tilvik þessa hnapps og tákns í námskeiðinu"
-    },
     "apps_54d24a47": {
         "message": "Smáforrit"
     },
@@ -181,24 +178,6 @@
     },
     "bottom_third_5f5fec1d": {
         "message": "Neðsti þriðjungur"
-    },
-    "button_color_608a0242": {
-        "message": "Litur hnapps"
-    },
-    "button_outline_cf14f071": {
-        "message": "Útlínur hnapps"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Stærð útlínu hnapps"
-    },
-    "button_shape_dbecb573": {
-        "message": "Form hnapps"
-    },
-    "button_size_20f5fce1": {
-        "message": "Stærð hnapps"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Hnappar og tákn"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -337,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } VERKEFNI"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Búa til hnapp og tákn"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons leyfi:"
@@ -502,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Fella inn mynd"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Fella inn valkostabakka"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Fella inn forskoðun"
     },
     "embed_video_a97a64af": {
         "message": "Fella inn myndband"
@@ -1031,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Valkvætt: Bæta við námskeiði"
     },
-    "options_3ab0ea65": {
-        "message": "Valkostir"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Raðaðir og óraðaðir listar"
     },
@@ -1172,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Vista"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Vistaðir hnappar og tákn"
-    },
     "schedule_preview_3bcda153": {
         "message": "Forskoðun stundaskrár"
     },
@@ -1210,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Sýna hljóðvalkosti"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Sýna innfelli valkosti"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Sýna valkosti myndar"

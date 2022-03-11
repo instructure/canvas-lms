@@ -136,7 +136,6 @@ const locale = {
     "message": "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
   },
   "operators_a2ef9a93": { "message": "عملگرها" },
-  "options_3ab0ea65": { "message": "گزینه ها" },
   "orange_81386a62": { "message": "نارنجی" },
   "pages_e5414c2c": { "message": "صفحه ها" },
   "people_b4ebb13c": { "message": "افراد" },
