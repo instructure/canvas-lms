@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
 import {RadioInput} from '@instructure/ui-radio-input'
@@ -32,7 +32,7 @@ import ColorPicker, {PREDEFINED_COLORS} from '@canvas/color-picker'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import requiredIf from '../shared/requiredIf'
 
-const I18n = useI18nScope('ProficiencyRating');
+const I18n = useI18nScope('ProficiencyRating')
 
 function formatColor(color) {
   if (color[0] !== '#') {
@@ -49,6 +49,7 @@ class ProficiencyRating extends React.Component {
     focusField: PropTypes.oneOf(['description', 'points', 'mastery', 'trash']),
     mastery: requiredIf(({individualOutcome}) => !individualOutcome, PropTypes.bool),
     onColorChange: requiredIf(({individualOutcome}) => !individualOutcome, PropTypes.func),
+    onFocusChange: PropTypes.func,
     onDelete: PropTypes.func.isRequired,
     onDescriptionChange: PropTypes.func.isRequired,
     onMasteryChange: PropTypes.func.isRequired,
@@ -64,6 +65,7 @@ class ProficiencyRating extends React.Component {
   static defaultProps = {
     descriptionError: null,
     focusField: null,
+    onFocusChange: () => {},
     pointsError: null,
     canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
     isMobileView: false,
@@ -82,7 +84,19 @@ class ProficiencyRating extends React.Component {
     this.colorButton = null
   }
 
+  componentDidMount() {
+    this.handleFocus()
+  }
+
   componentDidUpdate() {
+    this.handleFocus()
+  }
+
+  handleBlur = () => {
+    this.props.onFocusChange()
+  }
+
+  handleFocus = () => {
     if (this.props.canManage) {
       if (this.props.focusField === 'trash') {
         setTimeout(
@@ -165,6 +179,7 @@ class ProficiencyRating extends React.Component {
                 {I18n.t(`Change description for mastery level %{position}`, {position})}
               </ScreenReaderContent>
             }
+            onBlur={this.handleBlur}
             onChange={this.handleDescriptionChange}
             inputRef={element => this.setDescriptionRef(element)}
             defaultValue={description}
