@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!student_groups'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import InfiniteScroll from './mixins/InfiniteScroll'
 import Group from './Group'
-
-const I18n = useI18nScope('student_groups');
 
 const PaginatedGroupList = createReactClass({
   displayName: 'PaginatedGroupList',

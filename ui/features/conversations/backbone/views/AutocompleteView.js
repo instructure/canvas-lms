@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -25,8 +25,6 @@ import PaginatedCollectionView from '@canvas/pagination/backbone/views/Paginated
 import tokenTemplate from '../../jst/autocompleteToken.handlebars'
 import resultTemplate from '../../jst/autocompleteResult.handlebars'
 import 'jquery-scroll-into-view'
-
-const I18n = useI18nScope('conversations');
 
 // Public: Helper method for capitalizing a string
 //
@@ -424,7 +422,7 @@ export default class AutocompleteView extends Backbone.View {
         return map
       },
       {}
-    );
+    )
   }
 
   // Internal: Add, if appropriate, an "All in %{context}" result to the

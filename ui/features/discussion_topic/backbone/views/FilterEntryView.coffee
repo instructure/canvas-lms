@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {View} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!discussions'
 import EntryView from './EntryView.coffee'
 import template from '../../jst/results_entry.handlebars'
-
-I18n = useI18nScope('discussions')
 
 export default class FilterEntryView extends View
 

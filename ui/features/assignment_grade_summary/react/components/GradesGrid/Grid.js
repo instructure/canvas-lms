@@ -20,11 +20,9 @@ import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment_grade_summary'
 
 import GridRow from './GridRow'
-
-const I18n = useI18nScope('assignment_grade_summary');
 
 export default class Grid extends Component {
   static propTypes = {

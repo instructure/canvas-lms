@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {object} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!IndividualStudentMasteryUnassessedAssignment'
 import _ from 'lodash'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
@@ -26,8 +26,6 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
 
 import {Link} from '@instructure/ui-link'
-
-const I18n = useI18nScope('IndividualStudentMasteryUnassessedAssignment');
 
 const UnassessedAssignment = ({assignment}) => {
   const {id, url, submission_types, title} = assignment

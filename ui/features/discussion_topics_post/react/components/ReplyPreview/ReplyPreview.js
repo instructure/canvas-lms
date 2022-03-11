@@ -17,7 +17,7 @@
  */
 
 import DateHelper from '../../../../../shared/datetime/dateHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_topics_post'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {getDisplayName, responsiveQuerySizes} from '../../utils'
@@ -27,8 +27,6 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {CondensedButton} from '@instructure/ui-buttons'
-
-const I18n = useI18nScope('discussion_topics_post');
 
 export const ReplyPreview = ({...props}) => {
   const [shouldShowTruncatedText, setShouldShowTruncatedText] = useState(true)

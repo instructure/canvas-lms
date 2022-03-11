@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import store from '../lib/ExternalAppsStore'
@@ -27,8 +27,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckMarkSolid, IconEndSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-
-const I18n = useI18nScope('external_tools');
 
 const ALL_PLACEMENTS = {
   account_navigation: I18n.t('Account Navigation'),

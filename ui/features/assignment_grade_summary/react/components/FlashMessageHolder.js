@@ -19,14 +19,12 @@
 import {Component} from 'react'
 import {arrayOf, bool, oneOf, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment_grade_summary'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import * as AssignmentActions from '../assignment/AssignmentActions'
 import * as GradeActions from '../grades/GradeActions'
 import * as StudentActions from '../students/StudentActions'
-
-const I18n = useI18nScope('assignment_grade_summary');
 
 function enumeratedStatuses(actions) {
   return [actions.FAILURE, actions.STARTED, actions.SUCCESS]

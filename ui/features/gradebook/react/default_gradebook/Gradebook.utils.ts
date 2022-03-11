@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
 import type {
@@ -42,8 +42,6 @@ import type {
   StudentGroupCategoryMap,
   Submission
 } from './gradebook.d'
-
-const I18n = useI18nScope('gradebook');
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)

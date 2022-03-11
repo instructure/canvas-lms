@@ -324,9 +324,7 @@ module K5DashboardPageObject
   end
 
   def announcement_title(announcement_title)
-    wait_for(method: nil, timeout: 1) do
-      fxpath(announcement_title_xpath_selector(announcement_title))
-    end
+    fxpath(announcement_title_xpath_selector(announcement_title))
   end
 
   def assignment_edit_button

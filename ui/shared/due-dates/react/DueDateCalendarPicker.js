@@ -25,7 +25,6 @@ import tz from '@canvas/timezone'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import cx from 'classnames'
-import {format, parse} from 'datetime'
 
 function DueDateCalendarPicker(props) {
   const dateInput = useRef(null)
@@ -43,7 +42,6 @@ function DueDateCalendarPicker(props) {
 
         let newDate = field.data('unfudged-date')
         newDate = trimmedInput === '' ? null : newDate
-        newDate = applyDefaultTimeIfNeeded(newDate)
         newDate = changeToFancyMidnightIfNeeded(newDate)
         newDate = setToEndOfMinuteIfNeeded(newDate)
 
@@ -58,13 +56,6 @@ function DueDateCalendarPicker(props) {
     oldDate.current = props.dateValue
     $(dateInput.current).data('inputdate', props.dateValue).val(formatDate(props.dateValue))
   }, [formatDate, props.dateValue])
-
-  function applyDefaultTimeIfNeeded(date) {
-    if (props.defaultTime && tz.isMidnight(date)) {
-      return tz.parse(tz.format(date, `%F ${props.defaultTime}`))
-    }
-    return date
-  }
 
   function changeToFancyMidnightIfNeeded(date) {
     if (props.isFancyMidnight && tz.isMidnight(date)) {
@@ -157,7 +148,6 @@ DueDateCalendarPicker.propTypes = {
   disabled: bool.isRequired,
   isFancyMidnight: bool.isRequired,
   defaultToEndOfMinute: bool,
-  defaultTime: string,
   dateValue: oneOfType([instanceOf(Date), string]),
   contextLabel: string,
   labelText: string,

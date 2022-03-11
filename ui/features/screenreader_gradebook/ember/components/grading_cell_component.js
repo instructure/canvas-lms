@@ -15,15 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!grading_cell'
 import GRADEBOOK_TRANSLATIONS from '@canvas/grading/GradebookTranslations'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import Ember from 'ember'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-
-const I18n = useI18nScope('grading_cell');
 
 const GradingCellComponent = Ember.Component.extend({
   value: null,

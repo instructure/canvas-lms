@@ -15,15 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!course_settings'
 
 import $ from 'jquery'
 import _ from 'underscore'
 import DialogBaseView from '@canvas/dialog-base-view'
 import invitationsViewTemplate from '../../jst/InvitationsView.handlebars'
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('course_settings');
 
 export default class InvitationsView extends DialogBaseView {
   dialogOptions() {

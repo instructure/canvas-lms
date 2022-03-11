@@ -148,7 +148,7 @@ describe DiscussionEntry do
       @non_posting_student = @student
       student_in_course(active_all: true)
 
-      @notification_mention = "Discussion Mention"
+      @notification_mention = "New Discussion Mention"
       n = Notification.create(name: @notification_mention, category: "TestImmediately")
       NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
 

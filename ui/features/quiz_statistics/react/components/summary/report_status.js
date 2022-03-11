@@ -18,12 +18,10 @@
 
 import Actions from '../../../actions'
 import Descriptor from '../../../backbone/models/quiz_report_descriptor'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_reports'
 import K from '../../../constants'
 import React from 'react'
 import PropTypes from 'prop-types'
-
-const I18n = useI18nScope('quiz_reports');
 
 class ReportStatus extends React.Component {
   static propTypes = {

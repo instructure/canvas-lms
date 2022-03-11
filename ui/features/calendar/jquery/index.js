@@ -20,7 +20,7 @@
 //  * Make assignments (due date) events non-resizable. Having an end date on them doesn't
 //    make sense.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -48,8 +48,6 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
 import 'jqueryui/button'
-
-const I18n = useI18nScope('calendar');
 
 // we use a <div> (with a <style> inside it) because you cant set .innerHTML directly on a
 // <style> node in ie8

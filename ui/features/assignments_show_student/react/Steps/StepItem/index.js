@@ -18,15 +18,13 @@
 
 import classNames from 'classnames'
 import {element, oneOf, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2_shared_Steps'
 import React, {Component} from 'react'
 
 import {IconCheckMarkSolid, IconLockSolid} from '@instructure/ui-icons'
 import {omitProps} from '@instructure/ui-react-utils'
 import {px} from '@instructure/ui-utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('assignments_2_shared_Steps');
 
 export const stepLabels = {
   get available() {

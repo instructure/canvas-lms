@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2_file_upload'
 import {Button} from '@instructure/ui-buttons'
 import {bool, func, string} from 'prop-types'
 import {IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 import React, {useState} from 'react'
 import {SET_MODULE_ITEM_COMPLETION} from '@canvas/assignments/graphql/student/Mutations'
 import {useMutation} from 'react-apollo'
-
-const I18n = useI18nScope('assignments_2_file_upload');
 
 function MarkAsDoneButton({done: initialDone, itemId, moduleId, onError, onToggle}) {
   const [done, setDone] = useState(initialDone)

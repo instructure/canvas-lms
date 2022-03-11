@@ -19,7 +19,7 @@
 import actions from '../actions'
 import {connect} from 'react-redux'
 import {COURSE} from '@canvas/permissions/react/propTypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!permissions_v2_add_tray'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {roleIsCourseBaseRole} from '@canvas/permissions/util'
@@ -33,8 +33,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {IconXSolid} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
-
-const I18n = useI18nScope('permissions_v2_add_tray');
 
 export default class AddTray extends Component {
   static propTypes = {

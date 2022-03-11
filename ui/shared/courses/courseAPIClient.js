@@ -17,10 +17,8 @@
  */
 
 import axios from '@canvas/axios'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!modules_home_page'
 import $ from 'jquery'
-
-const I18n = useI18nScope('modules_home_page');
 
 export const publishCourse = ({courseId}) => {
   axios

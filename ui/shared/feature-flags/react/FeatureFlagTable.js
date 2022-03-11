@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!feature_flags'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
@@ -25,8 +25,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Pill} from '@instructure/ui-pill'
 import FeatureFlagButton from './FeatureFlagButton'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('feature_flags');
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 

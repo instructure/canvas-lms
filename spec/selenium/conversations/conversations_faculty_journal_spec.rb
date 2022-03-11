@@ -232,7 +232,6 @@ describe "conversations new" do
         f("li[role='none']").click
         ff("input[aria-label='Address Book']")[1].send_keys "first student"
         wait_for_ajaximations
-        driver.action.send_keys(:arrow_down).perform
         driver.action.send_keys(:enter).perform
         wait_for_ajaximations
         fj("label:contains('Add as a Faculty Journal entry')").click

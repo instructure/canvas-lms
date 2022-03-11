@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!groups'
 
 import {View} from '@canvas/backbone'
 import _ from 'underscore'
@@ -29,8 +29,6 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GroupCategoryProgress from '../../react/GroupCategoryProgress'
-
-const I18n = useI18nScope('groups');
 
 let _previousSearchTerm = ''
 export default class GroupCategoryView extends View {

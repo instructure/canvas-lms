@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_posts'
 
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -25,8 +25,6 @@ import {responsiveQuerySizes} from '../../utils/index'
 import {Text} from '@instructure/ui-text'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
-
-const I18n = useI18nScope('discussion_posts');
 
 export function AssignmentMultipleAvailabilityWindows({...props}) {
   return (

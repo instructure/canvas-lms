@@ -28,13 +28,11 @@ import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!speed_grader'
 
 import DateEventGroup from './DateEventGroup'
 import * as propTypes from './propTypes'
 import {roleLabelFor, creatorNameFor} from '../../AuditTrailHelpers'
-
-const I18n = useI18nScope('speed_grader');
 
 const themeOverride = {
   [View.theme]: {

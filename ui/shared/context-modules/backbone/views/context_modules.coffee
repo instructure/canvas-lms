@@ -17,10 +17,8 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!viewsContextModules'
 import '@canvas/loading-image'
-
-I18n = useI18nScope('viewsContextModules')
 
 ###
 xsslint jqueryObject.identifier dragItem dragModule

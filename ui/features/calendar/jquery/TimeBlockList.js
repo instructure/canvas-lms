@@ -17,14 +17,12 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
 import TimeBlockRow from './TimeBlockRow'
 import '@canvas/datetime'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'date'
-
-const I18n = useI18nScope('calendar');
 
 export default class TimeBlockList {
   constructor(element, splitterSelector, blocks, blankRow) {

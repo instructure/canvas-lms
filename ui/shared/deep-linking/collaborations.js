@@ -19,9 +19,7 @@
 import $ from 'jquery'
 import {addDeepLinkingListener as addOriginalListener} from './DeepLinking'
 import processSingleContentItem from './processors/processSingleContentItem'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('collaborations');
+import I18n from 'i18n!collaborations'
 
 export const addDeepLinkingListener = () => {
   window.removeEventListener('message', handleDeepLinking)

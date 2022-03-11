@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations'
 import {View} from '@canvas/backbone'
 import _ from 'underscore'
 import template from '../../jst/message.handlebars'
@@ -23,8 +23,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('conversations');
 
 export default class MessageView extends View {
   initialize(...args) {

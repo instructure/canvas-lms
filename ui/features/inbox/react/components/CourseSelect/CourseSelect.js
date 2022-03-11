@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations_2'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import PropTypes from 'prop-types'
 import React from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
-
-const I18n = useI18nScope('conversations_2');
 
 export const ALL_COURSES_ID = 'all_courses'
 

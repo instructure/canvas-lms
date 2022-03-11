@@ -20,12 +20,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!LearningMasteryGradebook'
 import ProficiencyFilter from './ProficiencyFilter'
 import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
-
-const I18n = useI18nScope('LearningMasteryGradebook');
 
 const getRatings = () => {
   const ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings

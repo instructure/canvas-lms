@@ -1,5 +1,5 @@
 # Keep this image version tag synced with Gemfile.d/test.rb
-FROM selenium/node-firefox:96.0
+FROM selenium/standalone-firefox-debug:3.12.0-americium
 
 COPY entry_point.sh /opt/bin/custom_entry_point.sh
 USER root

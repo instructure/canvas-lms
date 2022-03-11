@@ -56,12 +56,12 @@ describe ImportedHtmlConverter do
 
       context "and a data-download-url attribute references a button and icon" do
         let(:test_string) do
-          %(<img src="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1" alt="" data-inst-icon-maker-icon="true" data-download-url="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1&icon_maker_icon=1">)
+          %(<img src="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1" alt="" data-inst-buttons-and-icons="true" data-download-url="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1&buttons_and_icons=1">)
         end
 
         it "converst data-download-url for files without appending a context" do
           expect(subject).to eq(
-            "<img src=\"/courses/#{course.id}/files/#{attachment.id}/download?download_frd=1\" alt=\"\" data-inst-icon-maker-icon=\"true\" data-download-url=\"/files/#{attachment.id}/download?download_frd=1&icon_maker_icon=1\">"
+            "<img src=\"/courses/#{course.id}/files/#{attachment.id}/download?download_frd=1\" alt=\"\" data-inst-buttons-and-icons=\"true\" data-download-url=\"/files/#{attachment.id}/download?download_frd=1&buttons_and_icons=1\">"
           )
         end
       end

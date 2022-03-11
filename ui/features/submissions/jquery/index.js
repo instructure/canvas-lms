@@ -17,21 +17,19 @@
  */
 
 import round from 'round'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!submissions'
 import $ from 'jquery'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONFiles */
-import '@canvas/datetime'/* datetimeString */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* fragmentChange, showIf */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/datetime' /* datetimeString */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf */
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import '@canvas/rubrics/jquery/rubric_assessment'
-const I18n = useI18nScope('submissions');
-/* global rubricAssessment */
+import '@canvas/rubrics/jquery/rubric_assessment' /* global rubricAssessment */
 
 const rubricAssessments = ENV.rubricAssessments
 

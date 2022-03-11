@@ -17,22 +17,20 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!profile'
 import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* datetimeString, time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, formErrors, errorBox */
+import '@canvas/datetime' /* datetimeString, time_field, datetime_field */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, fragmentChange, showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('profile');
 
 const $edit_settings_link = $('.edit_settings_link')
 

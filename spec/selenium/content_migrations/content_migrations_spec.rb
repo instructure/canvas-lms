@@ -611,8 +611,7 @@ describe "content migrations", :non_parallel do
       ff("[name=selective_import]")[0].click
       submit
       run_jobs
-      # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
-      keep_trying_until { ContentMigration.last.workflow_state == "imported" }
+      expect(f(".migrationProgressItem .progressStatus")).to include_text("Completed")
       @course.reload
       expect(@course.announcements.last.locked).to be_truthy
       expect(@course.lock_all_announcements).to be_truthy
@@ -632,8 +631,7 @@ describe "content migrations", :non_parallel do
       ff("[name=selective_import]")[0].click
       submit
       run_jobs
-      # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
-      keep_trying_until { ContentMigration.last.workflow_state == "imported" }
+      expect(f(".migrationProgressItem .progressStatus")).to include_text("Completed")
       @course.reload
       expect(@course.discussion_topics.last.allow_rating).to be_truthy
     end

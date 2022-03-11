@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -32,8 +32,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import ScopesList from './ScopesList'
-
-const I18n = useI18nScope('react_developer_keys');
 
 export default class Scopes extends React.Component {
   state = {filter: ''}

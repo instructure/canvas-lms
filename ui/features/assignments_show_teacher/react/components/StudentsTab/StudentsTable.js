@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, func, string, number} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {TeacherAssignmentShape, SubmissionShape} from '../../assignmentData'
 
@@ -33,8 +33,6 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import StudentTray from './StudentTray'
 
 import {Link} from '@instructure/ui-link'
-
-const I18n = useI18nScope('assignments_2');
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 

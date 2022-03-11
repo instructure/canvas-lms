@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!course_settings'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -27,8 +27,6 @@ import IntegrationRow from './IntegrationRow'
 import MicrosoftSync from './microsoft_sync/MicrosoftSync'
 import useMicrosoftSettings from './microsoft_sync/useSettings'
 import MicrosoftSyncButton from './microsoft_sync/MicrosoftSyncButton'
-
-const I18n = useI18nScope('course_settings');
 
 const Integrations = () => {
   const [msGroup, msEnabled, msLoading, msError, msToggleEnabled, setMSError, setMSGroup] =

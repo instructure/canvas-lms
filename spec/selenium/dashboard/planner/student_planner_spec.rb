@@ -266,7 +266,7 @@ describe "student planner" do
     end
 
     it "edits a To Do", priority: "1" do
-      @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Title Text")
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
       todo_item = todo_info_holder
@@ -275,7 +275,8 @@ describe "student planner" do
       click_item_button("Title Text")
 
       # gives the To Do a new name and saves it
-      title_input("Title Text").send_keys([:control, "a"], :backspace, "New Text")
+      element = title_input("Title Text")
+      replace_content(element, "New Text")
       todo_save_button.click
 
       # verifies that the edited To Do is showing up
@@ -448,12 +449,7 @@ describe "student planner" do
     end
 
     it "closes the opportunities dropdown.", priority: "1" do
-      # Adding this today assignment only so that an alert doesn't come up saying Nothing is Due Today
-      # It interferes with the dropdown in Jenkins
-      @course.assignments.create!(name: "assignment due today",
-                                  description: "we need this so we dont get the popup",
-                                  submission_types: "online_text_entry",
-                                  due_at: Time.zone.now)
+      skip("Flaky: skip for now LS-2135 to fix")
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown

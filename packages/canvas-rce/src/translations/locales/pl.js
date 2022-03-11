@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
   "apply_781a2546": { "message": "Zastosuj" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Zastosuj zmiany do wszystkich instancji tego przycisku oraz ikony w kursie"
+  },
   "apps_54d24a47": { "message": "Aplikacje" },
   "arrows_464a3e54": { "message": "Strzałki" },
   "art_icon_8e1daad": { "message": "Ikona sztuki" },
@@ -72,6 +75,14 @@ const locale = {
   "basic_554cdc0a": { "message": "Podstawowy" },
   "below_81d4dceb": { "message": "Poniżej" },
   "bottom_third_5f5fec1d": { "message": "Trzeci od dołu" },
+  "button_color_608a0242": { "message": "Kolor przycisku" },
+  "button_outline_cf14f071": { "message": "Obramowanie przycisku" },
+  "button_outline_size_cc1d1df7": {
+    "message": "Rozmiar obramowania przycisku"
+  },
+  "button_shape_dbecb573": { "message": "Kształt przycisku" },
+  "button_size_20f5fce1": { "message": "Rozmiar przycisku" },
+  "buttons_and_icons_e66ee12c": { "message": "Przycisk i ikony" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Anuluj" },
   "choose_caption_file_9c45bc4e": { "message": "Wybierz plik z napisami" },
@@ -113,6 +124,7 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kliknij, aby ukryć { types }"
   },
+  "color_color_eb64b08": { "message": "Kolor { color }" },
   "computer_1d7dfa6f": { "message": "Komputer" },
   "content_1440204b": { "message": "Zawartość" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -134,6 +146,7 @@ const locale = {
   "course_links_b56959b9": { "message": "Łącza kursu" },
   "course_media_ec759ad": { "message": "Multimedia kursu" },
   "course_navigation_dd035109": { "message": "Nawigowanie po kursie" },
+  "create_button_and_icon_5c089934": { "message": "Utwórz przycisk i ikonę" },
   "creative_commons_license_725584ae": {
     "message": "Licencja Creative Commons:"
   },
@@ -187,6 +200,8 @@ const locale = {
   "embed_828fac4a": { "message": "Osadź" },
   "embed_code_314f1bd5": { "message": "Osadź kod" },
   "embed_image_1080badc": { "message": "Osadź obraz" },
+  "embed_options_tray_901cfd19": { "message": "Osadź panel opcji" },
+  "embed_preview_2d741e1f": { "message": "Osadź podgląd" },
   "embed_video_a97a64af": { "message": "Osadź wideo" },
   "embedded_content_aaeb4d3d": { "message": "osadzona zawartość" },
   "engineering_icon_f8f3cf43": { "message": "Ikona inżynierii" },
@@ -340,6 +355,7 @@ const locale = {
     "message": "Otwórz aplikację { title }"
   },
   "operators_a2ef9a93": { "message": "Operatory" },
+  "options_3ab0ea65": { "message": "Opcje" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listy uporządkowane i nieuporządkowane"
   },
@@ -395,6 +411,9 @@ const locale = {
     "message": "Niestety ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Tutaj możesz uzyskać dostęp do edytor HTML bez formatowania."
   },
   "save_11a80ec3": { "message": "Zapisz" },
+  "saved_buttons_and_icons_8278eed2": {
+    "message": "Zapisane Przycisk i ikony"
+  },
   "search_280d00bd": { "message": "Wyszukaj" },
   "search_term_b2d2235": { "message": "Wyszukiwany termin" },
   "select_crop_shape_d441feeb": { "message": "Wybierz przycięty fragment" },
@@ -404,6 +423,7 @@ const locale = {
     "message": "Naciśnij Shift-O, aby otworzyć ulepszony edytor HTML."
   },
   "show_audio_options_b489926b": { "message": "Pokaż opcje audio" },
+  "show_embed_options_ef8d7ef": { "message": "Pokaż opcje osadzania" },
   "show_image_options_1e2ecc6b": { "message": "Pokaż opcje obrazów" },
   "show_link_options_545338fd": { "message": "Pokaż opcje łącza" },
   "show_video_options_6ed3721a": { "message": "Pokaż opcje wideo" },

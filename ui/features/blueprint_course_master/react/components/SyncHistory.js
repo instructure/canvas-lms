@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!blueprint_settingsSyncHistory'
 import select from 'obj-select'
 
 import {Text} from '@instructure/ui-text'
@@ -30,8 +30,6 @@ import SyncHistoryItem from '@canvas/blueprint-courses/react/components/SyncHist
 import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import LoadStates from '@canvas/blueprint-courses/react/loadStates'
-
-const I18n = useI18nScope('blueprint_settingsSyncHistory');
 
 const {func, bool} = PropTypes
 

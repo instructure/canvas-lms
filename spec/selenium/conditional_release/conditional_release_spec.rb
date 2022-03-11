@@ -126,8 +126,8 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "72")
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff2, "40", "47")
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "72")
+      replace_content(ConditionalReleaseObjects.division_cutoff2, "47")
       ConditionalReleaseObjects.division_cutoff2.send_keys :tab
 
       expect(ConditionalReleaseObjects.division_cutoff1.attribute("value")).to eq("72 pts")
@@ -188,10 +188,10 @@ describe "native canvas conditional release" do
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
 
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "")
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "")
       expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to eq(true)
 
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "", "35")
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "35")
       expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to eq(true)
     end
 

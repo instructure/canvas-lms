@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!dashcards'
 import $ from 'jquery'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,8 +26,6 @@ import {Button} from '@instructure/ui-buttons'
 import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import createStore from '@canvas/util/createStore'
 import * as apiClient from '@canvas/courses/courseAPIClient'
-
-const I18n = useI18nScope('dashcards');
 
 export default class PublishButton extends React.Component {
   static propTypes = {

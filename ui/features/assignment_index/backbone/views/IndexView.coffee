@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!assignmentsIndexView'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import $ from 'jquery'
@@ -33,8 +33,6 @@ import configureIndexMenuStore from '../../react/stores/indexMenuStore'
 import BulkEditIndex from '../../react/bulk_edit/BulkEditIndex'
 import '@canvas/rails-flash-notifications'
 import easy_student_view from '@canvas/easy-student-view'
-
-I18n = useI18nScope('assignmentsIndexView')
 
 export default class IndexView extends Backbone.View
   @mixin AssignmentKeyBindingsMixin
@@ -124,7 +122,6 @@ export default class IndexView extends Backbone.View
           courseId: ENV.COURSE_ID
           onCancel: @cancelBulkEdit
           onSave: @handleBulkEditSaved
-          defaultDueTime: ENV.DEFAULT_DUE_TIME
         }),
         @$bulkEditRoot[0]
       )

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!question_bank'
 import $ from 'jquery'
 import find_outcome from '@canvas/outcomes/find_outcome'
 import moveQuestionTemplate from '../jst/move_question.handlebars'
@@ -25,15 +25,13 @@ import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
 import loadBanks from './loadBanks'
 import addBank from './addBank'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, .dim */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
-
-const I18n = useI18nScope('question_bank');
 
 export function updateAlignments(alignments) {
   $('.add_outcome_text')

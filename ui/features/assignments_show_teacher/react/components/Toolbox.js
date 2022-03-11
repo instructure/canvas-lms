@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -28,8 +28,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentPoints from './Editables/AssignmentPoints'
-
-const I18n = useI18nScope('assignments_2');
 
 export default class Toolbox extends React.Component {
   static propTypes = {

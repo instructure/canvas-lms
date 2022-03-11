@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!account_settings_jsx_bundle'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('account_settings_jsx_bundle');
 
 export default function LoginAttributeSelector(props) {
   return (

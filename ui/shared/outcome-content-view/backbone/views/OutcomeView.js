@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeView'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -30,8 +30,6 @@ import {showConfirmOutcomeEdit} from '../../react/ConfirmOutcomeEditModal'
 import {addCriterionInfoButton} from '../../react/CriterionInfo'
 import 'jqueryui/dialog'
 import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
-
-const I18n = useI18nScope('OutcomeView');
 
 // For outcomes in the main content view.
 

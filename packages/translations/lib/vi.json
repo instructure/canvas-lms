@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Áp Dụng"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Áp dụng thay đổi cho tất cả phiên bản của Nút này và Biểu Tượng trong Khóa Học"
+    },
     "apps_54d24a47": {
         "message": "Ứng Dụng"
     },
@@ -179,6 +182,24 @@
     "bottom_third_5f5fec1d": {
         "message": "Một Phần Ba Dưới"
     },
+    "button_color_608a0242": {
+        "message": "Màu Nút"
+    },
+    "button_outline_cf14f071": {
+        "message": "Viền Nút"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Cỡ Viền Nút"
+    },
+    "button_shape_dbecb573": {
+        "message": "Hình Dạng Nút"
+    },
+    "button_size_20f5fce1": {
+        "message": "Cỡ Nút"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Nút Và Biểu Tượng"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -254,6 +275,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Thu gọn để ẩn { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Màu { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Máy Tính"
     },
@@ -316,6 +340,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } VIỆC CẦN LÀM"
+    },
+    "create_button_and_icon_5c089934": {
+        "message": "Tạo Nút Và Biểu Tượng"
     },
     "creative_commons_license_725584ae": {
         "message": "Giấy Phép Creative Commons:"
@@ -478,6 +505,12 @@
     },
     "embed_image_1080badc": {
         "message": "Nhúng Hình Ảnh"
+    },
+    "embed_options_tray_901cfd19": {
+        "message": "Nhúng Khay Tùy Chọn"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "Nhúng Nội Dung Xem Trước"
     },
     "embed_video_a97a64af": {
         "message": "Nhúng Video"
@@ -1001,6 +1034,9 @@
     "optional_add_course_ef0d70fc": {
         "message": "Không bắt buộc: Thêm Khóa Học"
     },
+    "options_3ab0ea65": {
+        "message": "Tùy Chọn"
+    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Danh Sách Theo Thứ Tự Và Không Theo Thứ Tự"
     },
@@ -1139,6 +1175,9 @@
     "save_11a80ec3": {
         "message": "Lưu"
     },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "Nút Và Biểu Tượng Đã Lưu"
+    },
     "schedule_preview_3bcda153": {
         "message": "Xem Trước Lịch Trình"
     },
@@ -1174,6 +1213,9 @@
     },
     "show_audio_options_b489926b": {
         "message": "Hiển thị tùy chọn âm thanh"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "Hiển thị tùy chọn nhúng"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Hiển thị tùy chọn hình ảnh"

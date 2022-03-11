@@ -18,11 +18,9 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!ConfirmationDialog'
 import {Button} from '@instructure/ui-buttons'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-
-const I18n = useI18nScope('ConfirmationDialog');
 
 const dialogHolderId = 'confirmation_dialog_holder'
 

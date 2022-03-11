@@ -18,7 +18,7 @@
 
 import React from 'react'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_settings'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
@@ -40,8 +40,6 @@ import {getExcludeWeekends, getPacePlan, getPlanPublishing} from '../../../reduc
 import {pacePlanActions} from '../../../actions/pace_plans'
 import {actions as uiActions} from '../../../actions/ui'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
-
-const I18n = useI18nScope('pace_plans_settings');
 
 interface StoreProps {
   readonly course: Course

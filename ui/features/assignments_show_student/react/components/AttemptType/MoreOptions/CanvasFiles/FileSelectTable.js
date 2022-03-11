@@ -17,15 +17,13 @@
  */
 
 import {func, object, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import React from 'react'
 import TableFiles from './TableFiles'
 import TableFolders from './TableFolders'
 import TableHeader from './TableHeader'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('assignments_2');
 
 const foldersPresent = folder => {
   return folder && folder.subFolderIDs

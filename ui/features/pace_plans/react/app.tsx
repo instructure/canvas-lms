@@ -33,14 +33,12 @@ import {ResponsiveSizes, StoreState} from './types'
 import {getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_app'
 import {getSummarizedChanges} from './reducers/pace_plans'
 import {pacePlanActions} from './actions/pace_plans'
 import {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
 import Errors from './components/errors'
-
-const I18n = useI18nScope('pace_plans_app');
 
 interface StoreProps {
   readonly loadingMessage: string

@@ -18,14 +18,12 @@
 
 import React from 'react'
 import {bool, func, number} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {OverrideShape} from '../../assignmentData'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 import OverrideSummary from './OverrideSummary'
 import OverrideDetail from './OverrideDetail'
-
-const I18n = useI18nScope('assignments_2');
 
 export default class Override extends React.Component {
   static propTypes = {

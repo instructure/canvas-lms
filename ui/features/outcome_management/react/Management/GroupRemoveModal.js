@@ -19,7 +19,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -27,8 +27,6 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSuccess}) => {
   const {contextType, contextId} = useCanvasContext()

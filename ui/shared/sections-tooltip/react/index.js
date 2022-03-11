@@ -21,10 +21,8 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!sections_tooltip'
 import {string} from 'prop-types'
-
-const I18n = useI18nScope('sections_tooltip');
 
 function sectionsOrTotalCount(props, propName, componentName) {
   if (!props.totalUserCount && !props.sections) {

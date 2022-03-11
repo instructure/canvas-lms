@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!asignments_2'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentDescription from './AssignmentDescription'
@@ -26,8 +26,6 @@ import Overrides from './Overrides/Overrides'
 import AddHorizontalRuleButton from './AddHorizontalRuleButton'
 
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('asignments_2');
 
 Details.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,

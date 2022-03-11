@@ -20,14 +20,12 @@ import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import StudentViewContext from './Context'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2_attempt_tab'
 import React from 'react'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {bool, func, oneOfType, string} from 'prop-types'
-
-const I18n = useI18nScope('assignments_2_attempt_tab');
 
 const foregroundColor = selected => (selected ? 'primary-inverse' : 'brand')
 

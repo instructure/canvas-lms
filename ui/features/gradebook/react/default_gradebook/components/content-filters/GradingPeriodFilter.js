@@ -19,12 +19,8 @@
 import React from 'react'
 import {arrayOf, shape, string, bool, func} from 'prop-types'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook_default_gradebook_components_content_filters_grading_period_filter'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
-
-const I18n = useI18nScope(
-  'gradebook_default_gradebook_components_content_filters_grading_period_filter'
-);
 
 function normalizeGradingPeriods(gradingPeriods) {
   return gradingPeriods.map(gradingPeriod => ({

@@ -17,14 +17,12 @@
  */
 
 import axios from '@canvas/axios'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!module_sequence_footer'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 
 import SpeedGraderLink from '@canvas/speed-grader-link'
 import StudentGroupFilter from '@canvas/student-group-filter'
-
-const I18n = useI18nScope('module_sequence_footer');
 
 class ModuleSequenceFooter extends Component {
   constructor(props) {

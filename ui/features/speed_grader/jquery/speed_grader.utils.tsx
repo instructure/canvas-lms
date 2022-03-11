@@ -20,10 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!speed_grader_helpers'
 import htmlEscape from 'html-escape'
-
-const I18n = useI18nScope('speed_grader_helpers');
 
 export const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 export const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
@@ -134,7 +132,7 @@ export const configureRecognition = (recognition, messages) => {
 
   // xsslint safeString.function linebreak
   function linebreak(transcript) {
-    return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>');
+    return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')
   }
 }
 

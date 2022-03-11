@@ -32,10 +32,8 @@ import CanvasDateInput, {
 import {BlackoutDate, InputInteraction} from '../types'
 import {pacePlanTimezone, weekendIntegers} from '../api/backend_serializer'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plan_date_input'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-
-const I18n = useI18nScope('pace_plan_date_input');
 
 export type PacePlansDateInputProps = {
   id?: string

@@ -19,7 +19,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
@@ -50,8 +50,6 @@ import useRatings, {
 } from '@canvas/outcomes/react/hooks/useRatings'
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Management/Ratings'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
   const {

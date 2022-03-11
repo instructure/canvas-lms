@@ -138,13 +138,6 @@ export const ColorInput = ({
     )
   }
 
-  const renderLabel = () => (
-    <>
-      {label}
-      <ScreenReaderContent>{colorName || ''}</ScreenReaderContent>
-    </>
-  )
-
   return (
     <View as="div">
       <TextInput
@@ -153,9 +146,9 @@ export const ColorInput = ({
         onBlur={handleInputBlur}
         onChange={(e, value) => handleColorChange(value)}
         placeholder={formatMessage('None')}
-        renderBeforeInput={<ColorPreview color={color} disabled margin="0" />}
+        renderBeforeInput={<ColorPreview color={color} name={colorName} disabled margin="0" />}
         renderAfterInput={renderPopover()}
-        renderLabel={renderLabel()}
+        renderLabel={label}
         shouldNotWrap
         value={inputValue || ''}
         width={width}
@@ -175,10 +168,9 @@ function ColorPreview({color, name, disabled, margin = 'xxx-small', onSelect}) {
       size="small"
       withBackground={false}
       withBorder={false}
-      aria-hidden={disabled}
     >
       <ScreenReaderContent>
-        {color ? formatMessage('{name} ({color})', {name, color}) : formatMessage('None')}
+        {color ? formatMessage('{name} ({color})', {color, name}) : formatMessage('None')}
       </ScreenReaderContent>
       <PreviewIcon color={color} testId={`colorPreview-${color || 'none'}`} />
     </BaseButton>

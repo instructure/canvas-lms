@@ -18,10 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_collaborations'
 import NewCollaborationsDropDown from './NewCollaborationsDropDown'
-
-const I18n = useI18nScope('react_collaborations');
 
 class CollaborationsNavigation extends React.Component {
   renderNewCollaborationsDropDown() {

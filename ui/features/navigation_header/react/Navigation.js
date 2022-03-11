@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!Navigation'
 import React from 'react'
 import {func} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
@@ -29,8 +29,6 @@ import preventDefault from 'prevent-default'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import tourPubSub from '@canvas/tour-pubsub'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
-
-const I18n = useI18nScope('Navigation');
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))

@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!release_notes'
 import {Table} from '@instructure/ui-table'
 
 import NotesTableRow from './NotesTableRow'
-
-const I18n = useI18nScope('release_notes');
 
 export default function NotesTable({notes, setPublished, editNote, deleteNote}) {
   return (

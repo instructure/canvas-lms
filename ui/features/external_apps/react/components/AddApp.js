@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
@@ -28,8 +28,6 @@ import ExternalTool from '@canvas/external-tools/backbone/models/ExternalTool.co
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
 import {Button} from '@instructure/ui-buttons'
-
-const I18n = useI18nScope('external_tools');
 
 export default createReactClass({
   displayName: 'AddApp',

@@ -18,13 +18,11 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!pages'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
-
-I18n = useI18nScope('pages')
 
 pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']
 

@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!section'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, formErrors */
+import '@canvas/datetime' /* time_field, datetime_field */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -32,8 +32,6 @@ import PaginatedList from './PaginatedList'
 import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
-
-const I18n = useI18nScope('section');
 
 $(document).ready(function() {
   const section_id = window.location.pathname.split('/')[4],

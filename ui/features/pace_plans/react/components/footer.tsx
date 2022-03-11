@@ -19,7 +19,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_footer'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,8 +30,6 @@ import {StoreState} from '../types'
 import {getAutoSaving, getShowLoadingOverlay} from '../reducers/ui'
 import {pacePlanActions} from '../actions/pace_plans'
 import {getPlanPublishing, getUnpublishedChangeCount, isStudentPlan} from '../reducers/pace_plans'
-
-const I18n = useI18nScope('pace_plans_footer');
 
 interface StoreProps {
   readonly autoSaving: boolean

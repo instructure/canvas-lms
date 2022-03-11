@@ -19,18 +19,18 @@
 import _ from 'underscore'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/util/templateData'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
-import '@canvas/media-comments'/* mediaComment */
+import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
 import {camelize} from 'convert-case'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import htmlEscape from 'html-escape'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradingGradeSummary'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
@@ -40,8 +40,6 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import StatusPill from '@canvas/grading-status-pill'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
-
-const I18n = useI18nScope('gradingGradeSummary');
 
 const GradeSummary = {
   getSelectedGradingPeriodId() {
@@ -592,7 +590,7 @@ function getSelectMenuGroupProps() {
     selectedGradingPeriodID: ENV.current_grading_period_id,
     selectedStudentID: ENV.student_id,
     students: ENV.students
-  };
+  }
 }
 
 function renderSelectMenuGroup() {

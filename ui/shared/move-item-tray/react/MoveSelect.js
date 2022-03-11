@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!move_select'
 import {itemShape, moveOptionsType} from './propTypes'
 import {positions} from '../positions'
 import SelectPosition, {RenderSelect} from '@canvas/select-position'
@@ -26,8 +26,6 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('move_select');
 
 export default class MoveSelect extends React.Component {
   static propTypes = {

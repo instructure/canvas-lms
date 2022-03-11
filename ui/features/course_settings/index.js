@@ -30,10 +30,8 @@ import initialState from './react/store/initialState'
 import './jquery/index'
 import '@canvas/grading-standards'
 import FeatureFlags from '@canvas/feature-flags'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!course_settings'
 import ready from '@instructure/ready'
-
-const I18n = useI18nScope('course_settings');
 
 const BlueprintLockOptions = React.lazy(() => import('./react/components/BlueprintLockOptions'))
 const CourseTemplateDetails = React.lazy(() => import('./react/components/CourseTemplateDetails'))

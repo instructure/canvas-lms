@@ -20,7 +20,7 @@ import {BUTTONS_AND_ICONS} from '../../instructure_buttons/registerEditToolbar'
 
 export const typeTest = 'image/svg'
 const sliceSize = 400 // bytes
-const buttonIconType = 'image/svg+xml-icon-maker-icons'
+const buttonIconType = 'image/svg+xml-buttons-and-icons'
 
 export async function process(file) {
   try {
@@ -33,5 +33,7 @@ export async function process(file) {
         category: BUTTONS_AND_ICONS
       }
     }
-  } catch {}
+  } catch {
+    return
+  }
 }

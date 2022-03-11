@@ -24,9 +24,7 @@ import {nanoid} from 'nanoid'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('PronounsInput');
+import I18n from 'i18n!PronounsInput'
 
 export default class PronounsInput extends React.Component {
   constructor(props) {

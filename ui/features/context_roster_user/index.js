@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!context.roster_user'
 import initLastAttended from './react/index'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -27,8 +27,6 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/link-enrollment'
-
-const I18n = useI18nScope('context.roster_user');
 
 $(document).ready(() => {
   $('.show_user_services_checkbox').change(function() {

@@ -17,11 +17,10 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import React from 'react'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import store from '../lib/ExternalAppsStore'
-import {bool, string} from 'prop-types'
 import ConfigurationForm from './ConfigurationForm'
 import ConfirmationForm from './ConfirmationForm'
 import Lti2Iframe from './Lti2Iframe'
@@ -32,22 +31,8 @@ import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
 import install13Tool from '../lib/install13Tool'
 
-const I18n = useI18nScope('external_tools');
-
 export default class AddExternalToolButton extends React.Component {
-  static propTypes = {
-    modalIsOpen: bool,
-    isLti2: bool,
-    configurationType: string,
-    duplicateTool: bool
-  }
-
-  static defaultProps = {
-    modalIsOpen: false,
-    isLti2: false,
-    configurationType: '',
-    duplicateTool: false
-  }
+  static propTypes = {}
 
   constructor(props) {
     super(props)
@@ -59,7 +44,7 @@ export default class AddExternalToolButton extends React.Component {
       toolConfiguration: null,
       clientId: null,
       lti2RegistrationUrl: 'about:blank',
-      configurationType: props.configurationType,
+      configurationType: props.configurationType || '',
       duplicateTool: props.duplicateTool,
       attemptedToolSaveData: {},
       attemptedToolConfigurationType: ''
@@ -240,6 +225,7 @@ export default class AddExternalToolButton extends React.Component {
     } else if (this.state.isLti2 && this.state.tool.app_id) {
       return (
         <Lti2Permissions
+          ref="lti2Permissions"
           tool={this.state.tool}
           handleCancelLti2={this.handleCancelLti2}
           handleActivateLti2={this.handleActivateLti2}
@@ -266,6 +252,7 @@ export default class AddExternalToolButton extends React.Component {
       return (
         <div>
           <ConfigurationForm
+            ref="configurationForm"
             tool={this.state.tool}
             configurationType="manual"
             handleSubmit={this.createTool}
@@ -277,6 +264,7 @@ export default class AddExternalToolButton extends React.Component {
             </button>
           </ConfigurationForm>
           <Lti2Iframe
+            ref="lti2Iframe"
             handleInstall={this.handleLti2ToolInstalled}
             registrationUrl={this.state.lti2RegistrationUrl}
             hideComponent={!this.state.isLti2}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!blueprint_coursesLockBanner'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -25,8 +25,6 @@ import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import {formatLockObject} from '../../LockItemFormat'
 import propTypes from '../../propTypes'
-
-const I18n = useI18nScope('blueprint_coursesLockBanner');
 
 export default class LockBanner extends Component {
   static propTypes = {

@@ -27,11 +27,6 @@ RUN --mount=target=/tmp/src \
     -name "*.gemspec" -o \
     -name "gem_version.rb" -o \
     -name "version.rb" \
-  \) -exec cp --parents -rf {} /tmp/dst \; && \
-  find vendor -type d \( \
-    -not -name "qti_migration_tool" \
-    -maxdepth 1 \
-    -mindepth 1 \
   \) -exec cp --parents -rf {} /tmp/dst \;
 
 FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-yarn

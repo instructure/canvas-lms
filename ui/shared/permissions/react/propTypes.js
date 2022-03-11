@@ -17,9 +17,7 @@
  */
 
 import {shape, string, bool, oneOf, object} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('permissions_v2_propTypes');
+import I18n from 'i18n!permissions_v2_propTypes'
 
 const propTypes = {}
 

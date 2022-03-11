@@ -32,10 +32,8 @@ import {
 } from './graphql/Mutations'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {COMMENTS_QUERY} from './graphql/Queries'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
-
-const I18n = useI18nScope('CommentLibrary');
 
 function persistCheckbox(state) {
   doFetchApi({

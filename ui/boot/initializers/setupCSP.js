@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!common_bundle'
 import _ from 'underscore'
-
-const I18n = useI18nScope('common_bundle');
 
 /**
  * Sets up CSP enforcement for iframes and alerts end users to csp failures

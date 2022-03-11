@@ -18,7 +18,7 @@
 
 // xsslint safeString.method I18n.t
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!submit_assignment'
 import $ from 'jquery'
 import axios from '@canvas/axios'
 import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView.coffee'
@@ -28,9 +28,9 @@ import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tree'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONPreparedFiles, getFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* fragmentChange, showIf, /\.log\(/ */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -41,8 +41,6 @@ import FileBrowser from '@canvas/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
-
-const I18n = useI18nScope('submit_assignment');
 
 let submissionAttachmentIndex = -1
 
@@ -522,7 +520,7 @@ $(document).ready(function () {
     )
   }
   function getFilename(fileInput) {
-    return fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1');
+    return fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1')
   }
   function updateRemoveLinkAltText(fileInput) {
     let altText = I18n.t('remove empty attachment')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!permissions_role_tray_table_row'
 import {bool, func, node, oneOfType, string} from 'prop-types'
 import React from 'react'
 import {Button} from '@instructure/ui-buttons'
@@ -27,8 +27,6 @@ import {Text} from '@instructure/ui-text'
 import {ConnectedGranularCheckbox} from './GranularCheckbox'
 import {ConnectedPermissionButton} from './PermissionButton'
 import permissionPropTypes from '@canvas/permissions/react/propTypes'
-
-const I18n = useI18nScope('permissions_role_tray_table_row');
 
 // TODO Pass in props needed to actually generate the button sara is working on
 // TODO add expandable-ness to this. Will probably need to make this not a

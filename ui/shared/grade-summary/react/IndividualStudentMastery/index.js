@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!IndividualStudentMasteryIndex'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
@@ -28,8 +28,6 @@ import OutcomeGroup from './OutcomeGroup'
 import fetchOutcomes from './fetchOutcomes'
 import {Set} from 'immutable'
 import * as shapes from './shapes'
-
-const I18n = useI18nScope('IndividualStudentMasteryIndex');
 
 class IndividualStudentMastery extends React.Component {
   static propTypes = {

@@ -85,7 +85,6 @@ class AssignmentsController < ApplicationController
         }
 
         set_default_tool_env!(@context, hash)
-        append_default_due_time_js_env(@context, hash)
 
         js_env(hash)
 
@@ -746,7 +745,6 @@ class AssignmentsController < ApplicationController
       end
 
       set_default_tool_env!(@context, hash)
-      append_default_due_time_js_env(@context, hash)
 
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)

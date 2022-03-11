@@ -412,19 +412,7 @@ describe "Gradebook" do
       grading_cell.click
 
       Gradebook::Cells.edit_grade(student, essay_quiz.assignment, 10)
-      # Re-select element in case it's gone stale
-      grading_cell = Gradebook::Cells.grading_cell(student, essay_quiz.assignment)
       expect(grading_cell).not_to contain_css(".icon-not-graded")
-    end
-  end
-
-  context "export" do
-    it "exports the gradebook and displays a flash message when successfully started" do
-      Gradebook.visit(@course)
-      Gradebook.action_menu.click
-      Gradebook.action_menu_item_selector("export").click
-
-      expect_flash_message :success, "Gradebook export started"
     end
   end
 end

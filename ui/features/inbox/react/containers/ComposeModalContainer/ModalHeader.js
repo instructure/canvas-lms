@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-
-const I18n = useI18nScope('conversations_2');
 
 const ModalHeader = props => (
   <Modal.Header>

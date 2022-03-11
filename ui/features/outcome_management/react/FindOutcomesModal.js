@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -38,8 +38,6 @@ import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
-
-const I18n = useI18nScope('FindOutcomesModal');
 
 const getSelectegGroupAncestorsWithSelf = (collections, selectedGroupId) => {
   const resp = []

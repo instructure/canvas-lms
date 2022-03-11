@@ -18,14 +18,12 @@
 
 import React from 'react'
 import createReactClass from 'create-react-class'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!restrict_student_access'
 import classNames from 'classnames'
 import UsageRightsSelectBox from './UsageRightsSelectBox'
 import RestrictedRadioButtons from './RestrictedRadioButtons'
 import DialogPreview from './DialogPreview'
 import RestrictedDialogForm from './LegacyRestrictedDialogForm'
-
-const I18n = useI18nScope('restrict_student_access');
 
 RestrictedDialogForm.renderUsageRightsWarning = function() {
   return (

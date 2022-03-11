@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {string, func, bool, arrayOf, node, shape} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!selectPosition'
 import ConnectorIcon from './ConnectorIcon'
 import {Text} from '@instructure/ui-text'
 import {FormField} from '@instructure/ui-form-field'
@@ -26,8 +26,6 @@ import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {positions} from '@canvas/move-item-tray/positions'
 import {itemShape} from '@canvas/move-item-tray/react/propTypes'
-
-const I18n = useI18nScope('selectPosition');
 
 RenderSelect.propTypes = {
   label: string.isRequired,

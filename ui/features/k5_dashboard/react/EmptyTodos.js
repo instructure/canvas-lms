@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!empty_home'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -25,8 +25,6 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import emptyTodosUrl from '../images/empty-todos.svg'
-
-const I18n = useI18nScope('empty_home');
 
 const EmptyTodos = () => (
   <Flex

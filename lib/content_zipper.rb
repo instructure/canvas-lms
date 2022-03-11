@@ -173,8 +173,8 @@ class ContentZipper
           add_attachment_to_zip(a.attachment, zipfile, a.unencoded_filename)
           update_progress(zip_attachment, index, count)
         end
-        zipfile.add("eportfolio.css", Rails.root.join("app/stylesheets/eportfolio_static.css"))
-        zipfile.add("logo.svg", Rails.root.join("public/images/canvas-logo.svg"))
+        content = Rails.root.join("public/images/logo.png").read rescue nil
+        zipfile.get_output_stream("logo.png") { |f| f.write content } if content
       end
       mark_successful!
       complete_attachment!(zip_attachment, zip_name)
@@ -185,11 +185,9 @@ class ContentZipper
     @page = page
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
-
-    ApplicationController.render(
-      partial: "eportfolios/static_page",
-      locals: { page: page, portfolio: portfolio, static_attachments: static_attachments, submissions_hash: submissions_hash }
-    )
+    av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
+    av.extend TextHelper
+    av.render(partial: "eportfolios/static_page", locals: { page: page, portfolio: portfolio, static_attachments: static_attachments, submissions_hash: submissions_hash })
   end
 
   def self.zip_base_folder(*args)

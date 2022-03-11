@@ -25,14 +25,12 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import OutcomeKebabMenu from './OutcomeKebabMenu'
 import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {ratingsShape} from './shapes'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const ManageOutcomeItem = ({
   linkId,

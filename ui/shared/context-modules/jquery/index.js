@@ -29,11 +29,11 @@ import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!context_modulespublic'
 import $ from 'jquery'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import ContextModulesView from '../backbone/views/context_modules.coffee'/* handles the publish/unpublish state */
+import ContextModulesView from '../backbone/views/context_modules.coffee' /* handles the publish/unpublish state */
 import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
@@ -47,16 +47,16 @@ import get from 'lodash/get'
 import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* dateString, datetimeString, time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors, errorBox */
+import '@canvas/datetime' /* dateString, datetimeString, time_field, datetime_field */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.underscore/ */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, confirmDelete, fragmentChange, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
-import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
-import 'date'/* Date.parse */
+import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import 'date' /* Date.parse */
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
@@ -64,8 +64,6 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import mathml from 'mathml'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
-
-const I18n = useI18nScope('context_modulespublic');
 
 function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return
@@ -347,7 +345,9 @@ window.modules = (function () {
     },
 
     itemClass(content_tag) {
-      return (content_tag.content_type || '').replace(/^[A-Za-z]+::/, '') + '_' + content_tag.content_id;
+      return (
+        (content_tag.content_type || '').replace(/^[A-Za-z]+::/, '') + '_' + content_tag.content_id
+      )
     },
 
     updateAllItemInstances(content_tag) {
@@ -861,7 +861,7 @@ window.modules = (function () {
       const view = new LockIconView(viewOptions)
       view.render()
     }
-  };
+  }
 })()
 
 var addIcon = function ($icon_container, css_class, message) {

@@ -18,11 +18,9 @@
 
 import React from 'react'
 import {func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {Button} from '@instructure/ui-buttons'
 import theme from '@instructure/canvas-theme'
-
-const I18n = useI18nScope('assignments_2');
 
 TeacherFooter.propTypes = {
   onCancel: func.isRequired,

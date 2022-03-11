@@ -18,11 +18,9 @@
 
 import _ from 'underscore'
 import tz from '@canvas/timezone'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!DateValidator'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import DateHelper from './dateHelper'
-
-const I18n = useI18nScope('DateValidator');
 
 const DATE_RANGE_ERRORS = {
   due_at: {

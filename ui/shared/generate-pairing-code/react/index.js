@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!generate_pairing_code'
 import React, {Component} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -27,8 +27,6 @@ import {IconGroupLine} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import axios from '@canvas/axios'
 import {string} from 'prop-types'
-
-const I18n = useI18nScope('generate_pairing_code');
 
 export default class GeneratePairingCode extends Component {
   state = {

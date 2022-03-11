@@ -16,19 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!profile'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, getFormData, formErrors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
+import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jqueryui/tabs'
-
-const I18n = useI18nScope('profile');
 
 $(document).ready(function() {
   $('#communication_channels').tabs()

@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/Mutations'
 import noComments from '../../../images/NoComments.svg'
 import React, {useContext, useEffect} from 'react'
@@ -33,8 +33,6 @@ import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionC
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('assignments_2');
 
 export default function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

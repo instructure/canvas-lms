@@ -19,9 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('conditional_release');
+import I18n from 'i18n!conditional_release'
 
 const {bool, func, object} = PropTypes
 
