@@ -75,6 +75,7 @@ describe('Ratings', () => {
     it('calls onChangeRatings when delete rating without the deleted rating', () => {
       const {getByText} = render(<Ratings {...defaultProps()} />)
       fireEvent.click(getByText('Delete mastery level 1'))
+      fireEvent.click(getByText('Confirm'))
       expect(onChangeRatingsMock).toHaveBeenCalled()
       const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
       expect(newRatings.length).toEqual(1)
@@ -112,6 +113,7 @@ describe('Ratings', () => {
     it('When deleting the rating 1 out of 2, focusField is set to points', () => {
       const {getByText} = render(<Ratings {...defaultProps()} />)
       fireEvent.click(getByText('Delete mastery level 1'))
+      fireEvent.click(getByText('Confirm'))
       const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
       expect(newRatings[0].focusField).toEqual('points')
     })
@@ -120,6 +122,7 @@ describe('Ratings', () => {
       const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2)]
       const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
       fireEvent.click(getByText('Delete mastery level 3'))
+      fireEvent.click(getByText('Confirm'))
       const newRatings = onChangeRatingsMock.mock.calls[0][0](threeRatings)
       expect(newRatings[0].focusField).toBeNull()
       expect(newRatings[1].focusField).toEqual('trash')
@@ -129,6 +132,7 @@ describe('Ratings', () => {
       const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2)]
       const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
       fireEvent.click(getByText('Delete mastery level 2'))
+      fireEvent.click(getByText('Confirm'))
       const newRatings = onChangeRatingsMock.mock.calls[0][0](threeRatings)
       expect(newRatings[0].focusField).toEqual('trash')
       expect(newRatings[1].focusField).toBeNull()

@@ -347,7 +347,7 @@ class ProficiencyRating extends React.Component {
   }
 
   renderDeleteButton = () => {
-    const {disableDelete, position, individualOutcome} = this.props
+    const {disableDelete, position} = this.props
     const {showDeleteModal} = this.state
 
     return (
@@ -357,21 +357,19 @@ class ProficiencyRating extends React.Component {
           withBorder={false}
           disabled={disableDelete}
           elementRef={this.setTrashRef}
-          onClick={individualOutcome ? this.handleRealDelete : this.handleDelete}
+          onClick={this.handleDelete}
           renderIcon={<IconTrashLine />}
           screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
           data-testid="rating-delete-btn"
         />
-        {!individualOutcome && (
-          <ConfirmMasteryModal
-            onConfirm={this.handleRealDelete}
-            modalText={I18n.t('This will remove the mastery level from your mastery scale.')}
-            isOpen={showDeleteModal}
-            onClose={this.handleCloseDeleteModal}
-            title={I18n.t('Remove Mastery Level')}
-            confirmButtonText={I18n.t('Confirm')}
-          />
-        )}
+        <ConfirmMasteryModal
+          onConfirm={this.handleRealDelete}
+          modalText={I18n.t('This will remove the mastery level from your mastery scale.')}
+          isOpen={showDeleteModal}
+          onClose={this.handleCloseDeleteModal}
+          title={I18n.t('Remove Mastery Level')}
+          confirmButtonText={I18n.t('Confirm')}
+        />
       </div>
     )
   }
