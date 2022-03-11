@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Zastosuj"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Zastosuj zmiany do wszystkich instancji tego przycisku oraz ikony w kursie"
-    },
     "apps_54d24a47": {
         "message": "Aplikacje"
     },
@@ -181,24 +178,6 @@
     },
     "bottom_third_5f5fec1d": {
         "message": "Trzeci od dołu"
-    },
-    "button_color_608a0242": {
-        "message": "Kolor przycisku"
-    },
-    "button_outline_cf14f071": {
-        "message": "Obramowanie przycisku"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Rozmiar obramowania przycisku"
-    },
-    "button_shape_dbecb573": {
-        "message": "Kształt przycisku"
-    },
-    "button_size_20f5fce1": {
-        "message": "Rozmiar przycisku"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Przycisk i ikony"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -337,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } LISTA ZADAŃ"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Utwórz przycisk i ikonę"
     },
     "creative_commons_license_725584ae": {
         "message": "Licencja Creative Commons:"
@@ -502,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Osadź obraz"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Osadź panel opcji"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Osadź podgląd"
     },
     "embed_video_a97a64af": {
         "message": "Osadź wideo"
@@ -1031,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Opcjonalnie: Dodaj kurs"
     },
-    "options_3ab0ea65": {
-        "message": "Opcje"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Listy uporządkowane i nieuporządkowane"
     },
@@ -1172,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Zapisz"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Zapisane Przycisk i ikony"
-    },
     "schedule_preview_3bcda153": {
         "message": "Zaplanuj podgląd"
     },
@@ -1210,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Pokaż opcje audio"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Pokaż opcje osadzania"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Pokaż opcje obrazów"

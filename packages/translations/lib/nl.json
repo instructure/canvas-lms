@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Toepassen"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Wijzigingen toepassen bij alle gevallen van deze knop en pictogram in de cursus"
-    },
     "apps_54d24a47": {
         "message": "Apps"
     },
@@ -181,24 +178,6 @@
     },
     "bottom_third_5f5fec1d": {
         "message": "Derde van beneden"
-    },
-    "button_color_608a0242": {
-        "message": "Knopkleur"
-    },
-    "button_outline_cf14f071": {
-        "message": "Knopomtrek"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Knopomtrekgrootte"
-    },
-    "button_shape_dbecb573": {
-        "message": "Knopvorm"
-    },
-    "button_size_20f5fce1": {
-        "message": "Knopgrootte"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Knoppen en pictogrammen"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -337,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } TO-DO"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Knop en pictogram maken"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-licentie:"
@@ -502,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Afbeelding insluiten"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Optiegebied insluiten"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Voorbeeld insluiten"
     },
     "embed_video_a97a64af": {
         "message": "Video insluiten"
@@ -1031,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Optioneel: Cursus toevoegen"
     },
-    "options_3ab0ea65": {
-        "message": "Opties"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Geordende en ongeordende lijsten"
     },
@@ -1172,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Opslaan"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Opgeslagen knoppen en pictogrammen"
-    },
     "schedule_preview_3bcda153": {
         "message": "Planningsvoorbeeld"
     },
@@ -1210,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Audio-opties weergeven"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Ingesloten opties weergeven"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Afbeeldingsopties weergeven"

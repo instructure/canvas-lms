@@ -30,9 +30,6 @@
   "announcement_list_da155734": { "message": "Ilmoitusluettelo" },
   "announcements_a4b8ed4a": { "message": "Ilmoitukset" },
   "apply_781a2546": { "message": "Käytä" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Käytä muutoksia kaikkiin tämän kurssipainikkeen esiintymiin ja kuvakkeeseen kurssilla"
-  },
   "apps_54d24a47": { "message": "Sovellukset" },
   "arrows_464a3e54": { "message": "Nuolet" },
   "art_icon_8e1daad": { "message": "Taide-kuvake" },
@@ -56,12 +53,6 @@
   "basic_554cdc0a": { "message": "Perus" },
   "below_81d4dceb": { "message": "Alle" },
   "bottom_third_5f5fec1d": { "message": "Alakolmannes" },
-  "button_color_608a0242": { "message": "Painikkeen väri" },
-  "button_outline_cf14f071": { "message": "Painikkeen ääriviiva" },
-  "button_outline_size_cc1d1df7": { "message": "Painikkeen ääriviivan koko" },
-  "button_shape_dbecb573": { "message": "Painikkeen muoto" },
-  "button_size_20f5fce1": { "message": "Painikkeen koko" },
-  "buttons_and_icons_e66ee12c": { "message": "Painikkeet ja kuvakkeet" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Peruuta" },
   "choose_caption_file_9c45bc4e": { "message": "Muokkaa tekstitystiedostoa" },
@@ -126,7 +117,6 @@
   "course_links_b56959b9": { "message": "Kurssin linkit" },
   "course_media_ec759ad": { "message": "Kurssimedia" },
   "course_navigation_dd035109": { "message": "Kurssin navigointi" },
-  "create_button_and_icon_5c089934": { "message": "Luo painike ja kuvake" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons -lisenssi:"
   },
@@ -182,8 +172,6 @@
   "embed_828fac4a": { "message": "Upota" },
   "embed_code_314f1bd5": { "message": "Upota koodi" },
   "embed_image_1080badc": { "message": "Upota kuva" },
-  "embed_options_tray_901cfd19": { "message": "Upota asetusten ilmoitusalue" },
-  "embed_preview_2d741e1f": { "message": "Upota esikatselu" },
   "embed_video_a97a64af": { "message": "Upota video" },
   "embedded_content_aaeb4d3d": { "message": "upotettu sisältö" },
   "engineering_icon_f8f3cf43": { "message": "Suunnittelu-kuvake" },
@@ -339,7 +327,6 @@
   },
   "open_title_application_fd624fc5": { "message": "Avoin { title }-sovellus" },
   "operators_a2ef9a93": { "message": "Operaattorit" },
-  "options_3ab0ea65": { "message": "Asetukset" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Järjestetyt ja järjestämättömät listat"
   },
@@ -391,9 +378,6 @@
     "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Käytä HTML-tekstieditoria täällä."
   },
   "save_11a80ec3": { "message": "Tallenna" },
-  "saved_buttons_and_icons_8278eed2": {
-    "message": "Tallennetut painikkeet ja kuvakkeet"
-  },
   "search_280d00bd": { "message": "Hae" },
   "search_term_b2d2235": { "message": "Hakutermi" },
   "select_crop_shape_d441feeb": { "message": "Valitse rajauksen muoto" },
@@ -403,7 +387,6 @@
     "message": "Shift-O avaa Pretty-tekstieditorin."
   },
   "show_audio_options_b489926b": { "message": "Näytä ääniasetukset" },
-  "show_embed_options_ef8d7ef": { "message": "Näytä upotusasetukset" },
   "show_image_options_1e2ecc6b": { "message": "Näytä kuva-asetukset" },
   "show_link_options_545338fd": { "message": "Näytä linkin asetukset" },
   "show_video_options_6ed3721a": { "message": "Näytä videoasetukset" },
