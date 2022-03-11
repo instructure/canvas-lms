@@ -13692,7 +13692,7 @@ tr:
         sis_source_identifier: "Banner örnek isminiz"
     big_blue_button: 
       description: "BigBlueButton web konferans desteği"
-      name: BigBlueButton
+      name: "Canlı Ders"
     big_blue_button_fallback_settings: 
       domain_description: "BigblueButton kurulumunuzun **hostname** veya **ip address** (örneğin bigbluebutton.mycompany.com)"
       labels: 
