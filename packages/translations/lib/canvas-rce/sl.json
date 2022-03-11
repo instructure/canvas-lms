@@ -30,9 +30,6 @@
   "announcement_list_da155734": { "message": "Seznam obvestil" },
   "announcements_a4b8ed4a": { "message": "Obvestila" },
   "apply_781a2546": { "message": "Uporabi" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Uveljavi spremembe za vse primerke tega gumba in ikone v predmetu"
-  },
   "apps_54d24a47": { "message": "Aplikacije" },
   "arrows_464a3e54": { "message": "Puščice" },
   "art_icon_8e1daad": { "message": "Ikona umetnosti" },
@@ -56,12 +53,6 @@
   "basic_554cdc0a": { "message": "Osnovno" },
   "below_81d4dceb": { "message": "Spodaj" },
   "bottom_third_5f5fec1d": { "message": "Tretja spodaj" },
-  "button_color_608a0242": { "message": "Barva gumba" },
-  "button_outline_cf14f071": { "message": "Oris gumba" },
-  "button_outline_size_cc1d1df7": { "message": "Velikost orisa gumba" },
-  "button_shape_dbecb573": { "message": "Oblika gumba" },
-  "button_size_20f5fce1": { "message": "Velikost gumba" },
-  "buttons_and_icons_e66ee12c": { "message": "Gumbi in ikone" },
   "c_2001_acme_inc_283f7f80": {
     "message": "Avtorske pravice (c) 2001 Acme Inc."
   },
@@ -130,7 +121,6 @@
   "course_links_b56959b9": { "message": "Povezave predmeta" },
   "course_media_ec759ad": { "message": "Mediji predmeta" },
   "course_navigation_dd035109": { "message": "Navigacija po predmetu" },
-  "create_button_and_icon_5c089934": { "message": "Ustvari gumb in ikono" },
   "creative_commons_license_725584ae": {
     "message": "Licenca Creative Commons:"
   },
@@ -184,8 +174,6 @@
   "embed_828fac4a": { "message": "Vdelaj" },
   "embed_code_314f1bd5": { "message": "Vdelaj kodo" },
   "embed_image_1080badc": { "message": "Vdelaj sliko" },
-  "embed_options_tray_901cfd19": { "message": "Vrstica z možnostmi vdelave" },
-  "embed_preview_2d741e1f": { "message": "Predogled vdelave" },
   "embed_video_a97a64af": { "message": "Vdelajte videoposnetek" },
   "embedded_content_aaeb4d3d": { "message": "vdelano vsebino" },
   "engineering_icon_f8f3cf43": { "message": "Ikona inženirstva" },
@@ -339,7 +327,6 @@
     "message": "Odpri aplikacijo { title }"
   },
   "operators_a2ef9a93": { "message": "Upravljavci" },
-  "options_3ab0ea65": { "message": "Možnosti" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Urejeni in neurejeni seznami"
   },
@@ -393,7 +380,6 @@
     "message": "Žal urejevalnik Pretty HTML Editor ni dostopen s tipkovnico. Tukaj lahko dostopate do surovega urejevalnika HTML."
   },
   "save_11a80ec3": { "message": "Shrani" },
-  "saved_buttons_and_icons_8278eed2": { "message": "Shranjeni gumbi in ikone" },
   "search_280d00bd": { "message": "Iskanje" },
   "search_term_b2d2235": { "message": "Iskalni izraz" },
   "select_crop_shape_d441feeb": { "message": "Izberite obliko izrezovanja" },
@@ -403,7 +389,6 @@
     "message": "Urejevalnik Pretty HTML Editor odprete s pritiskom na tipki Shift+O"
   },
   "show_audio_options_b489926b": { "message": "Prikaži možnosti zvoka" },
-  "show_embed_options_ef8d7ef": { "message": "Prikaži možnosti vdelave" },
   "show_image_options_1e2ecc6b": { "message": "Prikaži možnosti slike" },
   "show_link_options_545338fd": { "message": "Prikaži povezave na slike" },
   "show_video_options_6ed3721a": {

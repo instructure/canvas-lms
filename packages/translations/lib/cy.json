@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Rhoi ar waith"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Gosod newidiadau i bob achos o’r Botymau a’r Eiconau hyn yn y Cwrs."
-    },
     "apps_54d24a47": {
         "message": "Apiau"
     },
@@ -181,24 +178,6 @@
     },
     "bottom_third_5f5fec1d": {
         "message": "Traean Isaf"
-    },
-    "button_color_608a0242": {
-        "message": "Lliw’r Botwm"
-    },
-    "button_outline_cf14f071": {
-        "message": "Amlinell o’r Botwm"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Maint yr Amlinell o’r Botwm"
-    },
-    "button_shape_dbecb573": {
-        "message": "Siâp y Botwm"
-    },
-    "button_size_20f5fce1": {
-        "message": "Maint y Botwm"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Botymau ac Eiconau"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -337,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } – TASGAU I’W GWNEUD"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "Eicon a Botwm Creu"
     },
     "creative_commons_license_725584ae": {
         "message": "Trwydded Creative Commons:"
@@ -502,12 +478,6 @@
     },
     "embed_image_1080badc": {
         "message": "Plannu Delwedd"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Ardal Opsiynau Plannu"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Plannu Rhagolwg"
     },
     "embed_video_a97a64af": {
         "message": "Plannu Fideo"
@@ -1031,9 +1001,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "Dewisol: Ychwanegu Cwrs"
     },
-    "options_3ab0ea65": {
-        "message": "Opsiynau"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Rhestrau Mewn Trefn a Rhestrau Ddim Mewn Trefn"
     },
@@ -1172,9 +1139,6 @@
     "save_11a80ec3": {
         "message": "Cadw"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Botymau ac Eiconau Wedi’u Cadw"
-    },
     "schedule_preview_3bcda153": {
         "message": "Trefnu Rhagolwg"
     },
@@ -1210,9 +1174,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Dangos opsiynau sain"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Dangos opsiynau plannu"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Dangos opsiynau delwedd"
