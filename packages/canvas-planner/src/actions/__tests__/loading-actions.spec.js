@@ -581,7 +581,7 @@ describe('api actions', () => {
 
       expect(moxios.requests.count()).toBe(4)
       expect(moxios.requests.at(0).url).toMatch(/dashboard_cards/)
-      expect(moxios.requests.at(0).url).not.toContain('observed_user')
+      expect(moxios.requests.at(0).url).not.toContain('observed_user_id')
       expect(moxios.requests.at(1).url).not.toContain('observed_user_id')
       expect(moxios.requests.at(2).url).not.toContain('observed_user_id')
       expect(moxios.requests.at(3).url).not.toContain('observed_user_id')
