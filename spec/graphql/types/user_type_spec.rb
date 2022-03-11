@@ -728,19 +728,19 @@ describe Types::UserType do
 
     it "correctly returns default teacher role" do
       expect(
-        user_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        user_teacher_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to eq ["TeacherEnrollment"]
     end
 
     it "correctly returns default TA role" do
       expect(
-        user_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        user_ta_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to eq ["TaEnrollment"]
     end
 
     it "does not return student role" do
       expect(
-        user_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        user_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to be_nil
     end
 
@@ -758,37 +758,37 @@ describe Types::UserType do
 
     it "does not return custom roles based on teacher" do
       expect(
-        custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        custom_teacher_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to be_nil
     end
 
     it "Returns multiple roles when mutiple enrollments exist" do
       expect(
-        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        teacher_ta_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to include("TaEnrollment", "TeacherEnrollment")
     end
 
     it "does not return duplicate roles when mutiple enrollments exist" do
       expect(
-        teacher_with_duplicate_role_types.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        teacher_with_duplicate_role_types.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to eq ["TeacherEnrollment"]
     end
 
     it "returns all roles if no role types are specified" do
       expect(
-        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id})|)
+        teacher_ta_type.resolve(%|courseRoles(courseId: "#{@course.id}")|)
       ).to include("TaEnrollment", "TeacherEnrollment")
     end
 
     it "returns only the role specified" do
       expect(
-        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment"])|)
+        teacher_ta_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TaEnrollment"])|)
       ).to eq ["TaEnrollment"]
     end
 
     it "returns custom role's base_type if built_in_only is set to false" do
       expect(
-        custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TeacherEnrollment"], builtInOnly: false)|)
+        custom_teacher_type.resolve(%|courseRoles(courseId: "#{@course.id}", roleTypes: ["TeacherEnrollment"], builtInOnly: false)|)
       ).to eq ["TeacherEnrollment"]
     end
   end
