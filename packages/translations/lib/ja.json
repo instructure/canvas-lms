@@ -539,6 +539,9 @@
     "extracurricular_icon_67c8ca42": {
         "message": "課外活動のアイコン"
     },
+    "failed_getting_course_list_49846a93": {
+        "message": "コースリストの取得に失敗"
+    },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "あなたの未来を覗くことに失敗しました"
     },

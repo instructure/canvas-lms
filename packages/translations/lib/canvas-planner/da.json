@@ -109,6 +109,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Spændende diskussion" },
   "excused_cf8792eb": { "message": "Undskyldt" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Kunne ikke hente fagliste"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Mislykkedes at kigge ind i din fremtid"
   },

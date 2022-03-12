@@ -107,6 +107,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Spannende discussie" },
   "excused_cf8792eb": { "message": "Vrijgesteld" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Cursuslijst kan niet worden opgehaald"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Gluren in de toekomst is mislukt"
   },
