@@ -107,6 +107,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Trafodaeth gyffrous" },
   "excused_cf8792eb": { "message": "Wedi esgusodi" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Wedi methu cael y rhestr cyrsiau"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Wedi methu cael cipolwg i’ch dyfodol"
   },
