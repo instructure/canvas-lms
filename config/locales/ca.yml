@@ -1958,6 +1958,7 @@ ca:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet que els instructors apliquin massivament puntuacions a les entregues sense nota des dels menús Grup d'activitats i Total de columnes del Llibre de notes."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permet que es puguin seleccionar els resultats d'aprenentatge en migrar el contingut de l'assignatura"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permet modificar la configuració de les notificacions de qualsevol assignatura des de la pàgina de configuració de les notificacions de nivell de l'usuari."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permet que les dades de resultats emmagatzemades al servei Resultats es mostrin als informes del Canvas (LMGB, sLMGB i informes administratius relacionats amb els resultats)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permet establir mètodes de càlcul i escales de domini a nivell d'usuari i d'assignatura, substituint els mètodes de càlcul i les classificacions de criteri per resultats"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Permet establir opcions de classificació del criteri i de mètodes de càlcul per obtenir resultats individuals."
   allows_students_to_access_other_student_groups_wit_43918810: "Permet als estudiants accedir a altres grups d’estudiants dins d’un conjunt de grups amb un enllaç directe."
@@ -2768,6 +2769,7 @@ ca:
   applied_cc7be774: Aplicat
   applied_filters_63a90ccd: "Filtres aplicats:"
   apply_781a2546: Aplica
+  apply_conditions_9e941010: "Aplica les condicions"
   apply_date_range_selection_cc4351ed: "Aplica la selecció d'interval de dates"
   apply_filter_7e4f6113: "Aplica el filtre"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Aplica els filtres. Nota: en fer clic en aquest botó, la pàgina es tornarà a carregar."
@@ -8368,6 +8370,7 @@ ca:
   end_date_e0093ed7: "Data de finalització"
   end_date_from_cdd9d90: "Data de finalització des del:"
   end_date_to_8b17929d: "Data de finalització fins al:"
+  end_date_value_3d3e8906: "Data de finalització %{value}"
   end_dates_249d8dbb: "Dates de finalització:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Les dates de fi no poden ser anteriors a les dates d'inici"
   end_time_250391e8: "Hora de finalització"
@@ -9044,6 +9047,7 @@ ca:
   failed_getting_next_batch_of_announcements_1f1165a5: "No s’ha pogut obtenir el lot següent d’anuncis."
   failed_initializing_dashboard_3d967143: "No s’ha pogut inicialitzar el panell de control"
   failed_jobs_b632bbf0: "Tasques amb errors"
+  failed_loading_course_cards_8fcdb36d: "No s'han pogut carregar les targetes de l'assignatura"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "No s'han pogut carregar les seccions de l'assignatura. Actualitzeu la pàgina per tornar-ho a provar."
   failed_pairing_student_c9f0863b: "No s’ha pogut dur a terme l’emparellament de l’estudiant."
   failed_please_report_the_following_error_code_to_y_42248d60: "S'ha produït un error, proporcioneu el codi d'error següent a l'administrador del sistema: ErrorReport:%{error};"
@@ -14924,6 +14928,7 @@ ca:
   outcome_results_23a0a117: Resultats
   outcome_results_title: Resultats
   outcome_score_141cf00a: "puntuació de resultats"
+  outcome_service_results_to_canvas_reporting_749667bc: "Resultats del servei Resultats per als informes del Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultat: %{title} té l'estat %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "S'ha creat correctament el resultat \"%{title}\"."
   outcome_title_was_successfully_created_be3a408: "S'ha creat correctament el resultat “%{title}”"
@@ -15154,6 +15159,7 @@ ca:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Els codis d'emparellament només s’admeten quan s’habilita l’autorregistre a l'usuari."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panamà (+507)"
+  panda_taking_photograph_8db13e0f: "un panda fa una fotografia"
   paper_view_7405eeab: "Visualització en paper"
   paraguay_595_ca58b83a: "Paraguai (+595)"
   parameter_91ed199: Paràmetre
@@ -17675,6 +17681,7 @@ ca:
   remove_attribute_59a4aa64: "Suprimeix l'atribut"
   remove_avatar_picture_aba765eb: "Suprimeix la imatge de l’avatar"
   remove_collaborationtitle_c3e81adb: "Voleu suprimir \"%{collaborationTitle}\"?"
+  remove_condition_9cf94f7f: "Suprimeix la condició"
   remove_conference_title_207d32c0: "Suprimeix la conferència: %{title}"
   remove_contact_method_ca890ba3: "Suprimeix el mètode de contacte"
   remove_course_association_name_b760c502: "Suprimeix l'associació de l'assignatura %{name}"
@@ -17908,6 +17915,7 @@ ca:
   review_now_318a6a3e: "Revisa-ho ara"
   rich_content_editor_2708ef21: "Editor de contingut enriquit"
   right_sidebar_logo_5483dc0a: "Logotip de la barra lateral dreta"
+  rocketship_on_launchpad_4011ea8c: "coet espacial a la plataforma de llançament"
   role: 
     duplicate_role: "Ja existeix un rol amb aquest nom"
   role_13a7be77: Rol
@@ -19551,6 +19559,7 @@ ca:
   start_date_from_20503757: "Data d’inici des del:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} a %{end_time}"
   start_date_to_1e6e6bbe: "Data d’inici fins al:"
+  start_date_value_817cab96: "Data d'inici %{value}"
   start_dates_8f1c22a8: "Dates d’inici:"
   start_entry_4b491f60: "Comença una entrada"
   start_link_validation_dc0ac99c: "Inicia la validació d'enllaços"
@@ -19695,6 +19704,7 @@ ca:
   student_sis_6721040e: "SIS de l’estudiant"
   student_sis_d9f0cd39: "sis d'estudiant"
   student_sis_id_abe6b292: "id del sis d'estudiant"
+  student_student_number_5c98bd2d: "Estudiant %{student_number}"
   student_studentnumber_f398d9c2: "Estudiant %{studentNumber}"
   student_submissions_910da1b3: "Entregues de l’estudiant"
   student_submissions_report_prospect_education_108daf59: "Informe d’entregues de l’estudiant (educació de futur)"
@@ -20287,6 +20297,7 @@ ca:
   the_app_was_added_successfully_3f785a23: "S'ha afegit l'aplicació correctament"
   the_app_was_deactivated_573520ab: "S'ha desactivat l'aplicació"
   the_app_was_updated_successfully_3d71cd1b: "S'ha actualitzat l'aplicació correctament"
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "S'espera que l’argument proporcionat sigui de tipus booleà."
   the_assignment_group_id_to_report_on_83880208: "L’ID del grup d'activitats sobre el qual s’ha d’informar"
   the_assignment_group_named_major_9d349037: "L’especialitat del grup d'activitats designat"
   the_assignment_group_named_papers_e1cb6a34: "Les activitats del grup d'activitats designat"
@@ -22732,6 +22743,7 @@ ca:
   web_page_146f9102: "Pàgina web"
   web_url_d84feaf5: "URL web"
   webcam_fe91b20f: "Càmera web"
+  webcam_photo_ee55462c: "Fotografia feta amb càmera web"
   webct_credentials: 
     credential_not_found: "No s’han trobat les credencials."
   webct_display: "Blackboard Vista/CE (WebCT)"
