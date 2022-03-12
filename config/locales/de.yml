@@ -2325,6 +2325,7 @@ de:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Ermöglicht es Dozenten, unbenotete Abgaben in den Spaltenmenüs „Aufgabengruppe“ und „Gesamt“ im Notenbuch gemeinsam zu bewerten."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Ermöglicht die Auswahl von Lernzielen bei der Migration von Kursinhalten"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Ermöglicht die Änderung der Einstellungen für Benachrichtigungen für jeden Kurs auf der Seite der Benachrichtigungseinstellungen auf Kontoebene."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Ermöglicht die Anzeige von im Lernziele-Service gespeicherten Ergebnisdaten in Canvas-Berichten (LMGB-, sLMGB- und ergebnisbezogene Administratorberichte)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Ermöglicht, Leistungszielmaßstäbe und Berechnungsmethoden auf Konto- und Kursebene festzulegen, die die lernzielbezogenen Einstufungen und Berechnungsmethoden nach Lernzielkriterium ersetzen"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Erlaubt die Einstellung von Kriterieneinstufungen und Optionen der Berechnungsmethoden für einzelne Lernziele."
   allows_students_to_access_other_student_groups_wit_43918810: "Erlaubt Teilnehmern, innerhalb eines Gruppensets mit einem direkten Link auf andere studentische Gruppen zuzugreifen."
@@ -3370,6 +3371,7 @@ de:
   applied_filters_63a90ccd: "Angewendete Filter:"
   apply_781a2546: Anwenden
   apply_changes_b1dffc70: "Änderungen anwenden"
+  apply_conditions_9e941010: "Bedingungen anwenden"
   apply_date_range_selection_cc4351ed: "Auswahl des Datumsbereichs anwenden"
   apply_filter_7e4f6113: "Filter anwenden"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Filter anwenden.. Hinweis: Mit dieser Schaltfläche wird die Seite erneut geladen."
@@ -9133,7 +9135,7 @@ de:
   deactivate_user_86c09036: "Benutzer deaktivieren"
   debugging_f98fcd74: Debugging
   decaying_average_8bf6a0dd: "Abfallender Durchschnitt"
-  decaying_average_recentint_remainderint_ab0636cc: "Durchschnittlicher Verfall – %{recentInt}%/%{remainderInt}%"
+  decaying_average_recentint_remainderint_ab0636cc: "Durchschnittlicher Verfall – %{recentInt}%/%{remainderInt}%"
   decorative_image_3c28aa7d: "Dekoratives Bild"
   decrease_indent_d9cf469d: "Einzug verkleinern"
   decrease_indent_de6343ab: "Einzug verkleinern"
@@ -10453,6 +10455,7 @@ de:
   end_date_e0093ed7: Enddatum
   end_date_from_cdd9d90: "Enddatum von:"
   end_date_to_8b17929d: "Enddatum bis:"
+  end_date_value_3d3e8906: "Enddatum %{value}"
   end_dates_249d8dbb: "Enddaten:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Enddaten dürfen nicht vor den Startdaten liegen."
   end_time_250391e8: Endzeit
@@ -11281,6 +11284,7 @@ de:
   failed_initializing_dashboard_3d967143: "Dashboard konnte nicht initialisiert werden"
   failed_jobs_b632bbf0: "Fehlgeschlagene Jobs"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Fehler beim Laden der Komponente Verknüpfungen Ist Ihre Netzwerkverbindung in Ordnung?"
+  failed_loading_course_cards_8fcdb36d: "Kurskarten konnten nicht geladen werden"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Kursabschnitte konnten nicht geladen werden. Aktualisieren Sie die Seite, um es erneut zu versuchen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Fehler beim Laden der Komponente Synchronisationsverlauf Ist Ihre Netzwerkverbindung in Ordnung?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Fehler beim Laden der Komponente Nichtsynchronisierte Änderungen Ist Ihre Netzwerkverbindung in Ordnung?"
@@ -17805,8 +17809,8 @@ de:
   must_be_a_number_f6e09df7: "muss eine Zahl sein"
   must_be_a_valid_number_59f0069: "Muss eine gültige Zahl sein"
   must_be_after_start_date_95e251a3: "muss nach dem Beginndatum liegen"
-  must_be_between_1_and_5_3b42aca1: "muss zwischen 1 und 5 liegen"
-  must_be_between_1_and_99_589b827d: "muss zwischen 1 und 99 liegen"
+  must_be_between_1_and_5_3b42aca1: "muss zwischen 1 und 5 liegen"
+  must_be_between_1_and_99_589b827d: "muss zwischen 1 und 99 liegen"
   must_be_between_availability_dates_ceaca984: "muss innerhalb der Verfügbarkeitsdaten liegen"
   must_be_between_lower_and_upper_1f501b2a: "Muss zwischen %{lower} und %{upper} liegen."
   must_be_length_characters_or_less_8c24db67: "Darf maximal %{length} Zeichen lang sein"
@@ -18923,6 +18927,7 @@ de:
   outcome_results_23a0a117: Lernzielergebnisse
   outcome_results_title: Lernzielergebnisse
   outcome_score_141cf00a: "Punktzahl für Ergebnis"
+  outcome_service_results_to_canvas_reporting_749667bc: "Lernziele-Service-Ergebnisse in Canvas-Berichte"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Lernziel: %{title} hat den Status %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Lernziel „%{title}“ wurde erfolgreich erstellt."
   outcome_title_was_successfully_created_be3a408: "Lernziel „%{title}“ wurde erfolgreich erstellt."
@@ -19143,7 +19148,7 @@ de:
       headers: 
         date: Datum
         participated: Teilgenommen
-        time: Uhrzeit
+        time: Zeit
         url: URL
         user_agent: "User Agent"
   page_views_csv_9835a9f9: Seitenanzeigen-CSV-Datei
@@ -19213,6 +19218,7 @@ de:
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   panama_fa454c86: Panama
+  panda_taking_photograph_8db13e0f: "Panda fotografiert"
   paper_view_7405eeab: "Aufsatz anzeigen"
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
@@ -22331,6 +22337,7 @@ de:
   remove_avatar_picture_aba765eb: "Avatarbild entfernen"
   remove_c_name_section_d8eabd3a: "%{c.name} Abschnitt entfernen"
   remove_collaborationtitle_c3e81adb: "„%{collaborationTitle}“ entfernen?"
+  remove_condition_9cf94f7f: "Bedingung entfernen"
   remove_conference_69b9e0d0: "Konferenz entfernen"
   remove_conference_title_207d32c0: "Konferenz entfernen %{title}"
   remove_contact_method_ca890ba3: "Kontaktmöglichkeit entfernen"
@@ -22595,6 +22602,7 @@ de:
   rich_content_editor_2708ef21: Rich-Content-Editor
   rich_content_editor_sidebar_enhancements_8bd945d3: "Seitenleistenerweiterungen für Rich Content Editor"
   right_sidebar_logo_5483dc0a: "Logo der rechten Seitenleiste"
+  rocketship_on_launchpad_4011ea8c: "Rakete auf der Startrampe"
   role: 
     duplicate_role: "Eine Rolle mit diesem Namen ist bereits vorhanden"
   role_13a7be77: Rolle
@@ -24777,6 +24785,7 @@ de:
   start_date_from_20503757: "Startdatum von:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, von %{start_time} bis %{end_time}"
   start_date_to_1e6e6bbe: "Startdatum bis:"
+  start_date_value_817cab96: "Startdatum %{value}"
   start_dates_8f1c22a8: "Startdaten:"
   start_entry_4b491f60: Beginneintrag
   start_from_a_template_380d4e8: "Von einer Vorlage aus beginnen..."
@@ -24940,6 +24949,7 @@ de:
   student_sis_6721040e: "Student SIS"
   student_sis_d9f0cd39: "SIS für Student"
   student_sis_id_abe6b292: "SIS-ID für Student"
+  student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
   student_submissions_910da1b3: "Student Abgaben"
   student_submissions_report_prospect_education_108daf59: "Student Abgabenbericht (Prospect Education)"
@@ -25604,6 +25614,7 @@ de:
   the_app_was_added_successfully_3f785a23: "Die App wurde hinzugefügt."
   the_app_was_deactivated_573520ab: "Die Anwendung wurde deaktiviert."
   the_app_was_updated_successfully_3d71cd1b: "Die App wurde aktualisiert."
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Das erwartete Argument muss vom booleschen Typ sein."
   the_assignment_group_id_to_report_on_83880208: "Die Aufgabengruppen-ID, über die berichtet wird"
   the_assignment_group_named_major_9d349037: "Die Aufgabengruppe namens Wichtig"
   the_assignment_group_named_papers_e1cb6a34: "Die Aufgabengruppe namens Papiere"
@@ -28536,6 +28547,7 @@ de:
   web_page_146f9102: Webseite
   web_url_d84feaf5: Web-URL
   webcam_fe91b20f: Webcam
+  webcam_photo_ee55462c: Webcam-Foto
   webct_credentials: 
     credential_not_found: "Zugangsdaten nicht gefunden."
   webct_display: "Blackboard Vista/CE (WebCT)"
