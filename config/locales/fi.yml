@@ -2003,6 +2003,7 @@ fi:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Mahdollista ohjaajien soveltavan arvosanoja arvostelemattomiin massapalautuksiin tehtäväryhmästä ja Yhteensä-sarakevalikoista arvosanakirjassa."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Sallii oppimistulosten olevan valittavissa, kun kurssin sisältöä siirretään"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Sallii kurssien ilmoitusasetukset tilitason ilmoitusten asetussivulta."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Mahdollistaa tulosten palvelussa säilytettyjen tietojen esittämisen Canvas-raportoinnissa (LMGB, sLMGB ja järjestelmäkäyttäjän raportointiin liittyvät tulokset)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Mahdollistaa tili- ja kurssitason hallinnan asteikkojen määrittämisen ja laskentamenetelmät, ja korvaa tulokohtaisen ehdon luokitukset ja laskentamenetelmät"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Sallii asetusehdon arvostelut ja laskentamenetelmien asetukset yksittäisille tuloksille."
   allows_students_to_access_other_student_groups_wit_43918810: "Sallii opiskelijoiden käyttää muita opiskelijaryhmiä ryhmäjoukossa suoralla linkillä."
@@ -2985,6 +2986,7 @@ fi:
   applied_cc7be774: Käytössä
   applied_filters_63a90ccd: "Käytetyt suodattimet:"
   apply_781a2546: Käytä
+  apply_conditions_9e941010: "Sovella ehtoja"
   apply_date_range_selection_cc4351ed: "Käytä pvm-alueen valintaa"
   apply_filter_7e4f6113: "Käytä suodatinta"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Käytä suodattimia. Huomautus: tämän painikkeen painaminen lataa sivun uudelleen."
@@ -8932,6 +8934,7 @@ fi:
   end_date_e0093ed7: Päättymispäivä
   end_date_from_cdd9d90: "Päättymispäivä lähtien:"
   end_date_to_8b17929d: "Päättymispäivä asti:"
+  end_date_value_3d3e8906: "Päättymispäivämäärä %{value}"
   end_dates_249d8dbb: "Päättymispäivät:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Päättymispäivät eivät voi olla ennen alkamispäiviä"
   end_time_250391e8: Päättymisaika
@@ -9616,6 +9619,7 @@ fi:
   failed_initializing_dashboard_3d967143: "Koontinäytön alustus epäonnistui"
   failed_jobs_b632bbf0: "Epäonnistuneet työtehtävät"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Liitosten komponentin lataaminen epäonnistui. Onko verkkoyhteytesi OK?"
+  failed_loading_course_cards_8fcdb36d: "Kurssikorttien lataus epäonnistui"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Kurssin osioiden lataus epäonnistui. Päivitä sivu ja yritä uudelleen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Synkronointihistoriakomponentin lataaminen epäonnistui. Onko verkkoyhteytesi OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Synkronoimattomien muutosten komponentin lataus epäonnistui. Onko verkkoyhteytesi OK?"
@@ -15946,6 +15950,7 @@ fi:
   outcome_results_23a0a117: Osaamistulokset
   outcome_results_title: Osaamistulokset
   outcome_score_141cf00a: "tuloksen pistemäärä"
+  outcome_service_results_to_canvas_reporting_749667bc: "Tulosten palveln tulokset Canvas-raportointiin"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Osaamistulos: %{title} on tilassa %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Tuloksen \"%{title}\" luonti onnistui"
   outcome_title_was_successfully_created_be3a408: "Tuloksen \"%{title}\" luonti onnistui"
@@ -16214,6 +16219,7 @@ fi:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Parinmuodostuskoodeja tuetaan vain kun itserekisteröityminen on käytössä tilille."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
+  panda_taking_photograph_8db13e0f: "panda ottamassa valokuvaa"
   paper_view_7405eeab: Paperinäkymä
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameter_91ed199: Muuttuja
@@ -18913,6 +18919,7 @@ fi:
   remove_attribute_59a4aa64: "Poista määrite"
   remove_avatar_picture_aba765eb: "Poista avatar-kuva"
   remove_collaborationtitle_c3e81adb: "Poista ”%{collaborationTitle}”?"
+  remove_condition_9cf94f7f: "Poista ehto"
   remove_conference_69b9e0d0: "Poista konferenssi"
   remove_conference_title_207d32c0: "Poista konferenssi: %{title}"
   remove_contact_method_ca890ba3: "Poista yhteydenottotapa"
@@ -19153,6 +19160,7 @@ fi:
   rich_content_editor_2708ef21: "Monipuolinen sisältöeditori"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Rich Content Editor -sivupalkin tehosteet"
   right_sidebar_logo_5483dc0a: "Oikean sivupalkin logo"
+  rocketship_on_launchpad_4011ea8c: "raketti laukaisualustalla"
   role: 
     duplicate_role: "Tämän niminen rooli on jo olemassa"
   role_13a7be77: Rooli
@@ -20963,6 +20971,7 @@ fi:
   start_date_from_20503757: "Aloituspäivämäärä alk.:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} kohteeseen %{end_time}"
   start_date_to_1e6e6bbe: "Aloituspäivämäärä asti:"
+  start_date_value_817cab96: "Alkamispäivä %{value}"
   start_dates_8f1c22a8: "Aloituspäivämäärät:"
   start_entry_4b491f60: "Aloita kirjoittaminen"
   start_link_validation_dc0ac99c: "Käynnistä linkkien tarkistus"
@@ -21113,6 +21122,7 @@ fi:
   student_sis_6721040e: "Opiskelijan sis"
   student_sis_d9f0cd39: "opiskelijan sis"
   student_sis_id_abe6b292: "opiskelijan sis-tunnus"
+  student_student_number_5c98bd2d: "Opiskelija %{student_number}"
   student_studentnumber_f398d9c2: "Opiskelija %{studentNumber}"
   student_submissions_910da1b3: "Opiskelijan palautukset"
   student_submissions_report_prospect_education_108daf59: "Opiskelijan palautusraportti (ehdokkaan koulutus)"
@@ -21722,6 +21732,7 @@ fi:
   the_app_was_added_successfully_3f785a23: "Sovelluksen lisäys onnistui"
   the_app_was_deactivated_573520ab: "Sovelluksen aktivointi poistettiin"
   the_app_was_updated_successfully_3d71cd1b: "Sovelluksen päivitys onnistui."
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Annetun argumentin odotetaan olevan tyyppiä Totuusarvo."
   the_assignment_group_id_to_report_on_83880208: "Sen tehtäväryhmän tunnus, johon raportoidaan"
   the_assignment_group_named_major_9d349037: "Tehtäväryhmä nimesi pääaineen"
   the_assignment_group_named_papers_e1cb6a34: "Tehtäväryhmä nimesi tutkielmat"
@@ -24425,6 +24436,7 @@ fi:
   web_page_146f9102: Verkkosivusto
   web_url_d84feaf5: "Kotisivun URL"
   webcam_fe91b20f: Nettikamera
+  webcam_photo_ee55462c: "Verkkokameran valokuva"
   webct_credentials: 
     credential_not_found: "Valtuututunnuksia ei löytynyt"
   webct_display: "Blackboard Vista/CE (WebCT)"
