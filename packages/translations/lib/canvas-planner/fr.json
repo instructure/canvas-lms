@@ -111,6 +111,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Discussion passionnante" },
   "excused_cf8792eb": { "message": "Excusé" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Échec de la récupération de la liste de cours"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Impossible de jeter un œil à votre avenir"
   },
