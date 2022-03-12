@@ -2175,6 +2175,7 @@ da-x-k12:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Giver instruktører mulighed for at give resultater for adskillige ikke-bedømte afleveringer fra Opgavegruppe- og I alt-kolonnemenuerne i vurderingsoversigten."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gør, at læringsudbytter kan vælges, når man overfører fagindhold"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillader ændring af meddelelses-indstillinger for ethvert fag fra siden Meddelelses-indstillinger på kontoniveau."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Tillader, at læringsudbyttedata, som gemmes i Outcomes Service, vises i Canvas-rapportering (LMGB, sLMGB og læringsudbytterelateret admin-rapportering)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillader indstilling af skalaer og beregningsmetoder for opfyldelse af læringsmål på konto- og fagniveau, hvilket erstatter kriteriebedømmelser og beregningsmetoder for læringsudbytter"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Tillader indstilling af kriteriebedømmelser og beregningsmetodemuligheder for individuelle læringsudbytter."
   allows_students_to_access_other_student_groups_wit_43918810: "Gør det muligt for elever at få adgang til andre elevgrupper i et gruppesæt med et direkte link."
@@ -3180,6 +3181,7 @@ da-x-k12:
   applied_cc7be774: Anvendt
   applied_filters_63a90ccd: "Anvend filtre:"
   apply_781a2546: Tildel
+  apply_conditions_9e941010: "Anvend betingelser"
   apply_date_range_selection_cc4351ed: "Anvend valg af datointerval"
   apply_filter_7e4f6113: "Anvend filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Anvend filtre. Bemærk: Ved at klikke på denne knap bliver siden genindlæst."
@@ -9462,6 +9464,7 @@ da-x-k12:
   end_date_e0093ed7: Slutdato
   end_date_from_cdd9d90: "Slutdato fra:"
   end_date_to_8b17929d: "Slutdato til:"
+  end_date_value_3d3e8906: "Slutdato %{value}"
   end_dates_249d8dbb: "Slutdatoer:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Slutdatoer kan ikke ligge før startdatoer"
   end_time_250391e8: Sluttidspunkt
@@ -10175,6 +10178,7 @@ da-x-k12:
   failed_initializing_dashboard_3d967143: "Kunne ikke initialisere oversigten"
   failed_jobs_b632bbf0: "Mislykkedes jobs"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Kunne ikke læse Associationer-komponent. Er din netværksforbindelse OK?"
+  failed_loading_course_cards_8fcdb36d: "Indlæsning af fagkort mislykkedes."
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Lastning af fag-sektioner mislykkedes. Opdater side for at prøve igen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Fejl ved læsning af Synkroniseringshistorik-komponent. Er din netværksforbindelse OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Fejl ved læsning af ikke-synkroniserede ændringer-komponent. Er din netværksforbindelse OK?"
@@ -16677,6 +16681,7 @@ da-x-k12:
   outcome_results_23a0a117: Læringsudbytteresultater
   outcome_results_title: Læringsudbytteresultater
   outcome_score_141cf00a: læringsudbytte
+  outcome_service_results_to_canvas_reporting_749667bc: "Outcome Service-resultater til Canvas-rapportering"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Læringsudbytte: %{title} har en status for %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Læringsudbytte \"%{title}\" blev oprettet."
   outcome_title_was_successfully_created_be3a408: "Læringsudbytte \"%{title}\" blev oprettet"
@@ -16956,6 +16961,7 @@ da-x-k12:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Parringskoder understøttes kun, når selvregistrering er aktiveret for kontoen."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
+  panda_taking_photograph_8db13e0f: "panda tager billede"
   paper_view_7405eeab: Papirvisning
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameter_91ed199: Parameter
@@ -19689,6 +19695,7 @@ da-x-k12:
   remove_attribute_59a4aa64: "Fjern egenskab"
   remove_avatar_picture_aba765eb: "Slet billede"
   remove_collaborationtitle_c3e81adb: "Fjern \"%{collaborationTitle}\"?"
+  remove_condition_9cf94f7f: "Fjern betingelse"
   remove_conference_69b9e0d0: "Fjern konference"
   remove_conference_title_207d32c0: "Fjern konference: %{title}"
   remove_contact_method_ca890ba3: "Fjern kontaktmetode"
@@ -19933,6 +19940,7 @@ da-x-k12:
   rich_content_editor_2708ef21: "Rich Content Editor"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Forbedringer til Rich Content Editor-sidepanel"
   right_sidebar_logo_5483dc0a: "Højre sidepanel logo"
+  rocketship_on_launchpad_4011ea8c: "raket på affyringsrampen"
   role: 
     duplicate_role: "En rolle med dette navn eksisterer allerede"
   role_13a7be77: Rolle
@@ -21834,6 +21842,7 @@ da-x-k12:
   start_date_from_20503757: "Start dato fra:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} til %{end_time}"
   start_date_to_1e6e6bbe: "Startdato til:"
+  start_date_value_817cab96: "Startdato %{value}"
   start_dates_8f1c22a8: "Startdatoer:"
   start_entry_4b491f60: "Start indtastning"
   start_link_validation_dc0ac99c: "Start godkendelse af link"
@@ -21979,6 +21988,7 @@ da-x-k12:
   student_sis_6721040e: "Elevens SIS"
   student_sis_d9f0cd39: "elevens SIS"
   student_sis_id_abe6b292: "elevens SIS-ID"
+  student_student_number_5c98bd2d: "Elev %{student_number}"
   student_studentnumber_f398d9c2: "Elev %{studentNumber}"
   student_submissions_910da1b3: Elevafleveringer
   student_submissions_report_prospect_education_108daf59: "Rapport over elevers afleveringer (Prospect Education)"
@@ -22598,6 +22608,7 @@ da-x-k12:
   the_app_was_added_successfully_3f785a23: "App'en blev tilføjet"
   the_app_was_deactivated_573520ab: "App'en blev deaktiveret"
   the_app_was_updated_successfully_3d71cd1b: "App'en blev opdateret"
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Det angivne argument forventes at være af typen boolesk."
   the_assignment_group_id_to_report_on_83880208: "Opgavegruppe-id at oprette rapport over"
   the_assignment_group_named_major_9d349037: "Opgavegruppen kaldet major"
   the_assignment_group_named_papers_e1cb6a34: "Opgavegruppen kaldet opgaver"
@@ -25341,6 +25352,7 @@ da-x-k12:
   web_page_146f9102: Webside
   web_url_d84feaf5: Web-URL
   webcam_fe91b20f: Webcam
+  webcam_photo_ee55462c: Webcam-billede
   webct_credentials: 
     credential_not_found: "Legitimationsoplysninger ikke fundet."
   webct_display: "Blackboard Vista/CE (WebCT)"

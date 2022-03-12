@@ -2279,6 +2279,7 @@ fr-CA:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet aux instructeurs d’appliquer des scores à des envois non notés en masse à partir du groupe de tâches et des menus de colonne Total dans le carnet de notes."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permet de sélectionner les acquis lors de la migration du contenu du cours"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permet de modifier les paramètres de notification pour n’importe quel cours depuis la page des paramètres de notification au niveau du compte."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permet aux données de résultats stockées dans le Service des acquis de s'afficher dans les rapports Canvas (LMGB, sLMGB et rapports administratifs liés aux résultats)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permet de définir des échelles de maîtrise au niveau du compte et du cours, remplaçant les évaluations par critère par acquis et les méthodes de calcul"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Permet de définir les notes des critères et les options de méthode de calcul pour les résultats individuels."
   allows_students_to_access_other_student_groups_wit_43918810: "Permet aux étudiants d’accéder à d’autres groupes d’étudiants au sein d’un ensemble de groupes avec un lien direct."
@@ -3311,6 +3312,7 @@ fr-CA:
   applied_cc7be774: Appliqué
   applied_filters_63a90ccd: "Filtres appliqués :"
   apply_781a2546: Appliquer
+  apply_conditions_9e941010: "Appliquer les conditions"
   apply_date_range_selection_cc4351ed: "Appliquer la sélection de plage de date"
   apply_filter_7e4f6113: "Appliquer filtres."
   apply_filters_note_clicking_this_button_will_cause_753f04: "Appliquer filtres. Remarque : cliquer sur ce bouton déclenche le rechargement de la page."
@@ -9971,6 +9973,7 @@ fr-CA:
   end_date_e0093ed7: "Date de fin"
   end_date_from_cdd9d90: "Date de fin à partir de :"
   end_date_to_8b17929d: "Date de fin (échéance) :"
+  end_date_value_3d3e8906: "Date de fin %{value}"
   end_dates_249d8dbb: "Dates de fin :"
   end_dates_cannot_be_before_start_dates_d6018daf: "Les dates de fin ne peuvent pas être antérieures aux dates de début"
   end_time_250391e8: "Heure de fin"
@@ -10701,6 +10704,7 @@ fr-CA:
   failed_initializing_dashboard_3d967143: "Échec de l’initialisation du tableau de bord"
   failed_jobs_b632bbf0: "Tâches échouées"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Échec lors du chargement du composant des associations. Est-ce que votre connexion réseau est OK?"
+  failed_loading_course_cards_8fcdb36d: "Échec du chargement des cartes des cours"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Échec du chargement des sections des cours. Rafraîchissez la page pour réessayer."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Échec lors du chargement du composant de l'historique de synchronisation. Est-ce que votre connexion réseau est OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Échec lors du chargement de composant des modifications non synchronisées. Est-ce que votre connexion réseau est OK?"
@@ -13506,7 +13510,7 @@ fr-CA:
   invalid_fields_after_ratings_fields_815ff223: "Champs non valides après les notations : %{fields}"
   invalid_fields_fields_8698284: "Champs non valides : %{fields}"
   invalid_fields_for_a_group_invalid_f440b733: "Champs non valides pour un groupe : %{invalid}"
-  invalid_fields_for_an_outcome_invalid_fafdf0df: "Champs non valides pour un acquis : %{invalid}"
+  invalid_fields_for_an_outcome_invalid_fafdf0df: "Champs non valides pour un acquis : %{invalid}"
   invalid_file_type_881cc9b2: "Type de fichier non valide"
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting non valide"
   invalid_hexcode_9124519f: "Code hexadécimal non valide"
@@ -17731,6 +17735,7 @@ fr-CA:
   outcome_results_23a0a117: "Résultats d’acquis"
   outcome_results_title: Résultats
   outcome_score_141cf00a: "Résultats des acquis"
+  outcome_service_results_to_canvas_reporting_749667bc: "Résultats du service des acquis vers le rapport Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Résultat : %{title} a le statut %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Acquis « %{title} » a été créé avec succès."
   outcome_title_was_successfully_created_be3a408: "Acquis « %{title} » a été créé avec succès"
@@ -18019,6 +18024,7 @@ fr-CA:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Les codes de jumelage ne sont pris en charge que lorsque l’auto-inscription est activée pour le compte."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
+  panda_taking_photograph_8db13e0f: "panda prenant une photo"
   paper_view_7405eeab: "Format copie"
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameter_91ed199: Paramètres
@@ -20850,6 +20856,7 @@ fr-CA:
   remove_avatar_picture_aba765eb: "Retirer l’image de l’avatar"
   remove_c_name_section_d8eabd3a: "Retirer la section %{c.name}"
   remove_collaborationtitle_c3e81adb: "Retirer « %{collaborationTitle} »?"
+  remove_condition_9cf94f7f: "Retirer la condition"
   remove_conference_69b9e0d0: "Retirer la conférence"
   remove_conference_title_207d32c0: "Retirer la conférence : %{title}"
   remove_contact_method_ca890ba3: "Retirer le mode de contact"
@@ -21097,6 +21104,7 @@ fr-CA:
   rich_content_editor_2708ef21: "Éditeur de texte enrichi"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Améliorations de barre latérale de l’Éditeur de texte enrichi"
   right_sidebar_logo_5483dc0a: "Logo de la barre latérale droite"
+  rocketship_on_launchpad_4011ea8c: "fusée sur la rampe de lancement"
   role: 
     duplicate_role: "Il existe déjà un rôle avec ce nom"
   role_13a7be77: Rôle
@@ -23139,6 +23147,7 @@ fr-CA:
   start_date_from_20503757: "Date de début à partir de :"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} à %{end_time}"
   start_date_to_1e6e6bbe: "Date de début (échéance) :"
+  start_date_value_817cab96: "Date de début %{value}"
   start_dates_8f1c22a8: "Dates de début :"
   start_entry_4b491f60: "Lancement de saisie"
   start_link_validation_dc0ac99c: "Commencer la validation de lien"
@@ -23293,6 +23302,7 @@ fr-CA:
   student_sis_6721040e: "Sis de l'étudiant"
   student_sis_d9f0cd39: "SIS d’étudiant"
   student_sis_id_abe6b292: "ID SIS d’étudiant"
+  student_student_number_5c98bd2d: "Étudiant %{student_number}"
   student_studentnumber_f398d9c2: "Étudiant %{studentNumber}"
   student_submissions_910da1b3: "Envois des étudiants"
   student_submissions_report_prospect_education_108daf59: "Rapport sur les envois des étudiants (Prospect Education)"
@@ -23936,6 +23946,7 @@ fr-CA:
   the_app_was_added_successfully_3f785a23: "L’application a bien été ajoutée"
   the_app_was_deactivated_573520ab: "L’application était désactivée"
   the_app_was_updated_successfully_3d71cd1b: "L’application a bien été mise à jour"
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "L'argument fourni est censé être de type booléen."
   the_assignment_group_id_to_report_on_83880208: "L'identifiant du groupe de tâches pour le rapport"
   the_assignment_group_named_major_9d349037: "Le groupe de tâches appelé principaux"
   the_assignment_group_named_papers_e1cb6a34: "Le groupe de tâches appelé papier"
@@ -26795,6 +26806,7 @@ fr-CA:
   web_page_146f9102: "Page Web"
   web_url_d84feaf5: "URL de site Web"
   webcam_fe91b20f: Webcam
+  webcam_photo_ee55462c: "Photo de la Webcam"
   webct_credentials: 
     credential_not_found: "Les informations d’identification sont introuvables."
   webct_display: "Blackboard Vista/CE (WebCT)"
