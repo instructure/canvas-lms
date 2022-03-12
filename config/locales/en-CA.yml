@@ -2206,6 +2206,7 @@ en-CA:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Allows instructors to apply scores to ungraded submissions en masse from assignment group and Total column menus in the Gradebook."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Allows learning outcomes to be selectable when migrating course content"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Allows modifying notification settings for any course from within the account-level notification settings page."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Allows setting Account & Course Level mastery scales and calculation methods, replacing per-outcome criterion ratings & calculation methods"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Allows setting criterion ratings and calculation method options for individual outcomes."
   allows_students_to_access_other_student_groups_wit_43918810: "Allows students to access other student groups within a group set with a direct link."
@@ -3241,6 +3242,7 @@ en-CA:
   applied_cc7be774: Applied
   applied_filters_63a90ccd: "Applied Filters:"
   apply_781a2546: Apply
+  apply_conditions_9e941010: "Apply conditions"
   apply_date_range_selection_cc4351ed: "Apply date range selection"
   apply_filter_7e4f6113: "Apply filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Apply filters. Note: clicking this button will cause the page to reload."
@@ -9663,6 +9665,7 @@ en-CA:
   end_date_e0093ed7: "End Date"
   end_date_from_cdd9d90: "End Date From:"
   end_date_to_8b17929d: "End Date To:"
+  end_date_value_3d3e8906: "End Date %{value}"
   end_dates_249d8dbb: "End Dates:"
   end_dates_cannot_be_before_start_dates_d6018daf: "End dates cannot be before start dates"
   end_time_250391e8: "End Time"
@@ -10379,6 +10382,7 @@ en-CA:
   failed_initializing_dashboard_3d967143: "Failed initializing dashboard"
   failed_jobs_b632bbf0: "Failed jobs"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Failed loading Associations component. Is your network connection OK?"
+  failed_loading_course_cards_8fcdb36d: "Failed loading course cards"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Failed loading course sections. Refresh page to try again."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Failed loading Sync History component. Is your network connection OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Failed loading Unsynced Changes component. Is your network connection OK?"
@@ -17019,6 +17023,7 @@ en-CA:
   outcome_results_23a0a117: "Outcome Results"
   outcome_results_title: "Outcome Results"
   outcome_score_141cf00a: "outcome score"
+  outcome_service_results_to_canvas_reporting_749667bc: "Outcome Service Results to Canvas Reporting"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Outcome: %{title} has a status of %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Outcome \"%{title}\" was successfully created."
   outcome_title_was_successfully_created_be3a408: "Outcome \"%{title}\" was successfully created"
@@ -17302,6 +17307,7 @@ en-CA:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Pairing codes are only supported when self registration is enabled for the account."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
+  panda_taking_photograph_8db13e0f: "panda taking photograph"
   paper_view_7405eeab: "Paper View"
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameter_91ed199: Parameter
@@ -20081,6 +20087,7 @@ en-CA:
   remove_attribute_59a4aa64: "Remove Attribute"
   remove_avatar_picture_aba765eb: "Remove avatar picture"
   remove_collaborationtitle_c3e81adb: "Remove \"%{collaborationTitle}\"?"
+  remove_condition_9cf94f7f: "Remove condition"
   remove_conference_69b9e0d0: "Remove conference"
   remove_conference_title_207d32c0: "Remove conference: %{title}"
   remove_contact_method_ca890ba3: "Remove contact method"
@@ -20326,6 +20333,7 @@ en-CA:
   rich_content_editor_2708ef21: "Rich Content Editor"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Rich Content Editor Sidebar Enhancements"
   right_sidebar_logo_5483dc0a: "Right Sidebar Logo"
+  rocketship_on_launchpad_4011ea8c: "rocketship on launchpad"
   role: 
     duplicate_role: "A role with this name already exists"
   role_13a7be77: Role
@@ -22289,6 +22297,7 @@ en-CA:
   start_date_from_20503757: "Start Date From:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} to %{end_time}"
   start_date_to_1e6e6bbe: "Start Date To:"
+  start_date_value_817cab96: "Start Date %{value}"
   start_dates_8f1c22a8: "Start Dates:"
   start_entry_4b491f60: "Start Entry"
   start_link_validation_dc0ac99c: "Start Link Validation"
@@ -22441,6 +22450,7 @@ en-CA:
   student_sis_6721040e: "Student Sis"
   student_sis_d9f0cd39: "student sis"
   student_sis_id_abe6b292: "student sis id"
+  student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
   student_submissions_910da1b3: "Student Submissions"
   student_submissions_report_prospect_education_108daf59: "Student Submissions Report (Prospect Education)"
@@ -23070,6 +23080,7 @@ en-CA:
   the_app_was_added_successfully_3f785a23: "The app was added successfully"
   the_app_was_deactivated_573520ab: "The app was deactivated"
   the_app_was_updated_successfully_3d71cd1b: "The app was updated successfully"
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "The argument provided is expected to be of type boolean."
   the_assignment_group_id_to_report_on_83880208: "The assignment group id to report on"
   the_assignment_group_named_major_9d349037: "The Assignment Group named major"
   the_assignment_group_named_papers_e1cb6a34: "The Assignment Group named papers"
@@ -25879,6 +25890,7 @@ en-CA:
   web_page_146f9102: "Web page"
   web_url_d84feaf5: "Web URL"
   webcam_fe91b20f: Webcam
+  webcam_photo_ee55462c: "Webcam Photo"
   webct_credentials: 
     credential_not_found: "Credential not found."
   webct_display: "Blackboard Vista/CE (WebCT)"
