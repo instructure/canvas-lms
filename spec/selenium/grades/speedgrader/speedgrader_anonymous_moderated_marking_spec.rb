@@ -71,7 +71,7 @@ describe "SpeedGrader" do
     it "student names are anonymous", priority: "1" do
       Speedgrader.students_dropdown_button.click
       student_names = Speedgrader.students_select_menu_list.map(&:text)
-      expect(student_names).to eql ["Student 1", "Student 2"]
+      expect(student_names).to match_array ["Student 1", "Student 2"]
     end
 
     context "given a specific student" do
