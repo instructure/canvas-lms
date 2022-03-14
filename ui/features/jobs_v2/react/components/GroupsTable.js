@@ -18,35 +18,14 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import React, {useCallback} from 'react'
+import React from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {Link} from '@instructure/ui-link'
-import {InfoColumn, InfoColumnHeader} from './InfoColumn'
+import {InfoColumn, GroupedInfoColumnHeader} from './InfoColumn'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function JobsTable({bucket, jobs, caption, onClickJob}) {
-  const renderJobRow = useCallback(
-    job => {
-      const cellTheme = {fontSize: '0.75rem'}
-
-      return (
-        <Table.Row key={job.id}>
-          <Table.RowHeader>
-            <Link onClick={() => onClickJob(job)}>{job.id}</Link>
-          </Table.RowHeader>
-          <Table.Cell theme={cellTheme}>{job.tag}</Table.Cell>
-          <Table.Cell theme={cellTheme}>{job.strand}</Table.Cell>
-          <Table.Cell theme={cellTheme}>{job.singleton}</Table.Cell>
-          <Table.Cell>
-            <InfoColumn bucket={bucket} info={job.info} />
-          </Table.Cell>
-        </Table.Row>
-      )
-    },
-    [bucket, onClickJob]
-  )
-
+export default function GroupsTable({groups, type, bucket, caption, onClickGroup}) {
   return (
     <div>
       <Responsive
@@ -63,18 +42,29 @@ export default function JobsTable({bucket, jobs, caption, onClickJob}) {
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                <Table.ColHeader id="id">{I18n.t('ID')}</Table.ColHeader>
-                <Table.ColHeader id="tag">{I18n.t('Tag')}</Table.ColHeader>
-                <Table.ColHeader id="strand">{I18n.t('Strand')}</Table.ColHeader>
-                <Table.ColHeader id="singleton">{I18n.t('Singleton')}</Table.ColHeader>
+                <Table.ColHeader id="group">
+                  {type === 'tag' ? I18n.t('Tag') : I18n.t('Strand')}
+                </Table.ColHeader>
+                <Table.ColHeader id="count">{I18n.t('Count')}</Table.ColHeader>
                 <Table.ColHeader id="info">
-                  <InfoColumnHeader bucket={bucket} />
+                  <GroupedInfoColumnHeader bucket={bucket} />
                 </Table.ColHeader>
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {jobs.map(job => {
-                return renderJobRow(job)
+              {groups.map(group => {
+                const tag_or_strand = group[type]
+                return (
+                  <Table.Row key={tag_or_strand}>
+                    <Table.Cell>
+                      <Link onClick={() => onClickGroup(tag_or_strand)}>{tag_or_strand}</Link>
+                    </Table.Cell>
+                    <Table.Cell>{group.count}</Table.Cell>
+                    <Table.Cell>
+                      <InfoColumn bucket={bucket} info={group.info} />
+                    </Table.Cell>
+                  </Table.Row>
+                )
               })}
             </Table.Body>
           </Table>

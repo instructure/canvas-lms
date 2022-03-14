@@ -18,7 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class JobsV2Controller < ApplicationController
+  BUCKETS = %w[queued running future failed].freeze
+
   before_action :require_view_jobs
+  before_action :require_bucket, only: [:grouped_info, :list]
   before_action :set_site_admin_context, :set_navigation, only: [:index]
 
   def require_view_jobs
@@ -37,68 +40,162 @@ class JobsV2Controller < ApplicationController
     end
   end
 
-  # @{not an}API List queued jobs grouped by tag
+  # @{not an}API List jobs grouped by tag or strand
   #
-  # @argument order [String,"count"|"tag"|"min_run_at"]
-  #   Sort column. Default is "min_run_at"
-  def queued_tags
-    scope = Delayed::Job.where("run_at <= now() AND (locked_by IS NULL OR locked_by = ?)", ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY)
-                        .select("count(*) AS count, tag, MIN(run_at) AS min_run_at")
-                        .group(:tag)
-                        .order(tags_order_clause("min_run_at ASC"))
-    tag_info = Api.paginate(scope, self, api_v1_jobs_tags_queued_url)
-    render json: tag_info.map { |info| { count: info.count, tag: info.tag, min_run_at: info.min_run_at } }
+  # @argument group [String,"tag"|"strand"]
+  #   How to group jobs. Default is "tag".
+  #
+  # @argument bucket [Required,String,"queued"|"running"|"future"|"failed"]
+  #   Which jobs to consider. the +info+ column returned will vary depending on which bucket
+  #   you're looking at:
+  #   - queued: maximum time a job with this tag/strand has been queued, in seconds
+  #   - running: maximum time a job with this tag/strand has been running, in seconds
+  #   - future: timestamp for the next scheduled run of a job with this tag/strand
+  #   - failed: timestamp when the last failure of a job with this tag/strand occurred
+  #
+  # @argument order [String,"count"|"tag"|"strand"|"info"]
+  #   Sort column. Default is "info". See the +bucket+ argument for a description of this field.
+  def grouped_info
+    group = params[:group] == "strand" ? :strand : :tag
+
+    scope = jobs_scope
+            .select("count(*) AS count, #{group}, #{grouped_info_select}")
+            .where.not(group => nil)
+            .group(group)
+            .order(grouped_order_clause)
+
+    tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
+    now = Delayed::Job.db_time_now
+    render json: tag_info.map { |row| grouped_info_json(row, group, base_time: now) }
   end
 
-  # @{not an}API List running jobs grouped by tag
+  # @{not an}API List jobs
   #
-  # @argument order [String,"count"|"tag"|"first_locked_at"]
-  #   Sort column. Default is "first_locked_at"
-  def running_tags
-    scope = Delayed::Job.running
-                        .select("count(*) AS count, tag, MIN(locked_at) AS first_locked_at")
-                        .group(:tag)
-                        .order(tags_order_clause("first_locked_at ASC"))
-    tag_info = Api.paginate(scope, self, api_v1_jobs_tags_running_url)
-    render json: tag_info.map { |info| { count: info.count, tag: info.tag, first_locked_at: info.first_locked_at } }
-  end
+  # @argument bucket [Required,String,"queued"|"running"|"future"|"failed"]
+  #   Which jobs to consider. The +info+ column will vary depending on which
+  #   bucket is chosen:
+  #   - queued: length of time the job has been waiting to run, in seconds
+  #   - running: length of time the job has been running, in seconds
+  #   - future: scheduled run time for the job
+  #   - failed: the timestamp when the job failed
+  #
+  # @argument tag [Optional,String]
+  #   Include only jobs with the given tag
+  #
+  # @argument strand [Optional,String]
+  #   Include only jobs with the given strand
+  #
+  # @argument singleton [Optional,String]
+  #   Include only job with the given singleton
+  #
+  # @argument account_id [Optional,Integer]
+  #   Include only jobs with the given account id
+  #
+  # @argument shard_id [Optional,Integer]
+  #   Include only jobs with the given shard id
+  #
+  # @argument order [String,"tag"|"strand"|"singleton"|"info"]
+  #   Sort column. Default is "info". See the +bucket+ argument for a description of this field.
+  def list
+    scope = jobs_scope
 
-  # @{not an}API List future jobs grouped by tag
-  #
-  # @argument order [String,"count"|"tag"|"next_run_at"]
-  #   Sort column. Default is "next_run_at"
-  def future_tags
-    scope = Delayed::Job.future
-                        .select("count(*) AS count, tag, MIN(run_at) AS next_run_at")
-                        .group(:tag)
-                        .order(tags_order_clause("next_run_at ASC"))
-    tag_info = Api.paginate(scope, self, api_v1_jobs_tags_future_url)
-    render json: tag_info.map { |info| { count: info.count, tag: info.tag, next_run_at: info.next_run_at } }
-  end
+    %i[tag strand singleton account_id shard_id].each do |filter_param|
+      scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
+    end
+    scope = scope.order(list_order_clause)
 
-  # @{not an}API List failed jobs grouped by tag
-  #
-  # @argument order [String,"count"|"tag"|"last_failed_at"]
-  #   Sort column. Default is "last_failed_at"
-  def failed_tags
-    scope = Delayed::Job::Failed
-            .select("count(*) AS count, tag, MAX(failed_at) AS last_failed_at")
-            .group(:tag)
-            .order(tags_order_clause("last_failed_at DESC"))
-    tag_info = Api.paginate(scope, self, api_v1_jobs_tags_failed_url)
-    render json: tag_info.map { |info| { count: info.count, tag: info.tag, last_failed_at: info.last_failed_at } }
+    jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
+
+    now = Delayed::Job.db_time_now
+    render json: jobs.map { |job| job_json(job, base_time: now) }
   end
 
   protected
 
-  def tags_order_clause(default_order)
+  def require_bucket
+    @bucket = params[:bucket]
+    throw :abort unless BUCKETS.include?(@bucket)
+  end
+
+  def queued_scope
+    Delayed::Job.where("run_at <= now() AND (locked_by IS NULL OR locked_by = ?)", ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY)
+  end
+
+  def jobs_scope
+    case @bucket
+    when "queued" then queued_scope
+    when "running" then Delayed::Job.running
+    when "future" then Delayed::Job.future
+    when "failed" then Delayed::Job::Failed
+    end
+  end
+
+  def grouped_info_json(row, group, base_time:)
+    { :count => row.count, group => row[group], :info => grouped_info_data(row, base_time: base_time) }
+  end
+
+  def job_json(job, base_time:)
+    job_fields = %w[id tag strand singleton shard_id max_concurrent priority attempts max_attempts locked_by run_at locked_at handler]
+    job_fields += %w[failed_at original_job_id last_error] if @bucket == "failed"
+    json = api_json(job, @current_user, nil, only: job_fields)
+    json.merge("info" => list_info_data(job, base_time: base_time))
+  end
+
+  def grouped_order_clause
     case params[:order]
     when "tag"
-      "tag ASC"
+      :tag
+    when "strand"
+      :strand
     when "count"
-      "count DESC"
+      { count: :DESC }
     else
-      default_order
+      case @bucket
+      when "queued" then :min_run_at
+      when "running" then :first_locked_at
+      when "future" then :next_run_at
+      when "failed" then { last_failed_at: :DESC }
+      end
+    end
+  end
+
+  def grouped_info_select
+    case @bucket
+    when "queued" then "MIN(run_at) AS min_run_at"
+    when "running" then "MIN(locked_at) AS first_locked_at"
+    when "future" then "MIN(run_at) AS next_run_at"
+    when "failed" then "MAX(failed_at) AS last_failed_at"
+    end
+  end
+
+  def grouped_info_data(row, base_time:)
+    case @bucket
+    when "queued" then base_time - row.min_run_at
+    when "running" then base_time - row.first_locked_at
+    when "future" then row.next_run_at
+    when "failed" then row.last_failed_at
+    end
+  end
+
+  def list_info_data(row, base_time:)
+    case @bucket
+    when "queued" then base_time - row.run_at
+    when "running" then base_time - row.locked_at
+    when "future" then row.run_at
+    when "failed" then row.failed_at
+    end
+  end
+
+  def list_order_clause
+    case params[:order]
+    when "tag", "strand", "singleton"
+      params[:order]
+    else
+      case @bucket
+      when "queued", "future" then :run_at
+      when "running" then :locked_at
+      when "failed" then { failed_at: :DESC }
+      end
     end
   end
 
