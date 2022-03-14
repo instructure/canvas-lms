@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import SubmissionProgressBars from '@canvas/context-cards/react/SubmissionProgressBars'
-import {Progress as InstUIProgress} from '@instructure/ui-progress'
+import {ProgressBar as InstUIProgress} from '@instructure/ui-progress'
 import {shallow} from 'enzyme'
 
 const user = {_id: 1}
@@ -298,7 +298,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       ]
 
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      equal(tray.find('Progress').length, 1)
+      equal(tray.find('ProgressBar').length, 1)
     })
 
     test('links to submission urls', () => {

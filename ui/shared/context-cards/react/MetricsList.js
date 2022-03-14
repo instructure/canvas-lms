@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useScope as useI18nScope } from '@canvas/i18n';
-import {MetricsList as InstUIMetricsList} from '@instructure/ui-metric'
+import { Metric, MetricGroup } from '@instructure/ui-metric'
 
 const I18n = useI18nScope('student_context_trayMetricsList');
 
@@ -76,11 +76,11 @@ class MetricsList extends React.Component {
     if (typeof this.props.user.enrollments !== 'undefined' && this.props.analytics) {
       return (
         <section className="StudentContextTray__Section StudentContextTray-MetricsList">
-          <InstUIMetricsList>
-            <InstUIMetricsList.Item label={I18n.t('Grade')} value={this.grade} />
-            <InstUIMetricsList.Item label={I18n.t('Missing')} value={this.missingCount} />
-            <InstUIMetricsList.Item label={I18n.t('Late')} value={this.lateCount} />
-          </InstUIMetricsList>
+          <MetricGroup>
+            <Metric label={I18n.t('Grade')} value={this.grade} />
+            <Metric label={I18n.t('Missing')} value={this.missingCount} />
+            <Metric label={I18n.t('Late')} value={this.lateCount} />
+          </MetricGroup>
         </section>
       )
     } else {
