@@ -2350,7 +2350,6 @@ sv:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Gör att lärare kan sätta masspoängsätta ej bedömda inlämningar från menyerna Uppgiftsgrupp och Totalt antal kolumner i omdömesboken."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gör lärandemål valbara under migrering av kursinnehåll"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillåter modifiering av aviseringsinställningar i kurser på sidan för aviseringsinställningar på kontonivå."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Tillåter att resultatdata lagrad i lärandemålstjänsten visas i Canvas-rapporteringen (LMGB, sLMGB och lärandemålrelaterad administratörsrapportering)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillåter inställning av skalor och beräkningsmetoder för måluppfyllelse på konto- och kursnivå för att ersätta bedömningar efter kriterier per lärandemål och beräkningsmetoder"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Tillåter inställning av värderingskriterium och alternativ för beräkningsmetoder för enskilda lärandemål."
   allows_students_to_access_other_student_groups_wit_43918810: "Tillåter användare att öppna andra studentgrupper inom en gruppuppsättning med en direktlänk."
@@ -3397,7 +3396,6 @@ sv:
   applied_filters_63a90ccd: "Tillämpade filter:"
   apply_781a2546: Tillämpa
   apply_changes_b1dffc70: "Tillämpa ändringar"
-  apply_conditions_9e941010: "Tillämpa villkoren"
   apply_date_range_selection_cc4351ed: "Tillämpa urval med datumintervall"
   apply_filter_7e4f6113: "Tillämpa filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Använd filter. Obs! Om du klickar på den här knappen kommer sidan att laddas om."
@@ -10507,7 +10505,6 @@ sv:
   end_date_e0093ed7: Slutdatum
   end_date_from_cdd9d90: "Slutdatum från:"
   end_date_to_8b17929d: "Slutdatum till:"
-  end_date_value_3d3e8906: "Slutdatum %{value}"
   end_dates_249d8dbb: "Slutdatum:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Slutdatum får inte vara före startdatum"
   end_time_250391e8: Sluttid
@@ -11337,7 +11334,6 @@ sv:
   failed_initializing_dashboard_3d967143: "Det gick inte att initiera översikten"
   failed_jobs_b632bbf0: "Misslyckade jobb"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Misslyckades att ladda föreningskomponenten. Är din nätverksanslutning OK?"
-  failed_loading_course_cards_8fcdb36d: "Det gick inte att läsa in kurskort"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Det gick inte att ladda kursval. Uppdatera sidan och försök igen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Misslyckades med att ladda synkronisering-historik (Sync History) komponenten. Är din nätverksanslutning OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Misslyckades med att ladda ej synkroniserade ändringar (Unsynced Changes) komponenten. Är din nätverksanslutning OK?"
@@ -19005,7 +19001,6 @@ sv:
   outcome_results_23a0a117: "Lärandemål resultat"
   outcome_results_title: "Resultat för lärandemål"
   outcome_score_141cf00a: resultat
-  outcome_service_results_to_canvas_reporting_749667bc: "Resultat för lärandemålstjänsten till Canvas-rapportering"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Lärandemål: %{title} har statusen %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Lärandemålet %{title} skapades."
   outcome_title_was_successfully_created_be3a408: "Lärandemålet %{title} skapades"
@@ -19296,7 +19291,6 @@ sv:
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   panama_fa454c86: Panama
-  panda_taking_photograph_8db13e0f: "en panda som fotograferar"
   paper_view_7405eeab: Pappersvy
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
@@ -22425,7 +22419,6 @@ sv:
   remove_avatar_picture_aba765eb: "Ta bort avatarbild"
   remove_c_name_section_d8eabd3a: "Ta bort %{c.name} sektionen"
   remove_collaborationtitle_c3e81adb: "Ta bort \"%{collaborationTitle}\"?"
-  remove_condition_9cf94f7f: "Ta bort villkor"
   remove_conference_69b9e0d0: "Tar bort konferensen"
   remove_conference_title_207d32c0: "Ta bort konferensen: %{title}"
   remove_contact_method_ca890ba3: "Ta bort kontaktmetod"
@@ -22690,7 +22683,6 @@ sv:
   rich_content_editor_2708ef21: Innehållsredigeraren
   rich_content_editor_sidebar_enhancements_8bd945d3: "Förbättringar för Rich Content Editor sidofält"
   right_sidebar_logo_5483dc0a: "Logotyp i höger sidofält"
-  rocketship_on_launchpad_4011ea8c: "rymdraket på avskjutningsramp"
   role: 
     duplicate_role: "En roll med det här namnet finns redan"
   role_13a7be77: Roll
@@ -24872,7 +24864,6 @@ sv:
   start_date_from_20503757: "Startdatum från:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} till %{end_time}"
   start_date_to_1e6e6bbe: "Startdatum till:"
-  start_date_value_817cab96: "Startdatum %{value}"
   start_dates_8f1c22a8: "Startdatum:"
   start_entry_4b491f60: "Påbörja inlägg"
   start_from_a_template_380d4e8: "Starta från en mall..."
@@ -25038,7 +25029,6 @@ sv:
   student_sis_6721040e: Student-SIS
   student_sis_d9f0cd39: "studentens sis"
   student_sis_id_abe6b292: "studentens sis id"
-  student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
   student_submissions_910da1b3: Studentinlämning
   student_submissions_report_prospect_education_108daf59: "Inlämningsrapport för student (Prospect Education)"
@@ -25706,7 +25696,6 @@ sv:
   the_app_was_added_successfully_3f785a23: "Appen lades till"
   the_app_was_deactivated_573520ab: "Appen har inaktiverats"
   the_app_was_updated_successfully_3d71cd1b: "Appen uppdaterades"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Argumentet som tillhandahölls förväntades vara av typen boolesk."
   the_assignment_group_id_to_report_on_83880208: "ID för uppgiftsgruppen som ska rapporteras"
   the_assignment_group_named_major_9d349037: "Uppgiftsgruppen med namnet ”huvudämne”"
   the_assignment_group_named_papers_e1cb6a34: "Uppgiftsgruppen med namnet ”uppsatser”"
@@ -28645,7 +28634,6 @@ sv:
   web_page_146f9102: Webbsida
   web_url_d84feaf5: Webb-URL
   webcam_fe91b20f: Webbkamera
-  webcam_photo_ee55462c: Webbkamerafoto
   webct_credentials: 
     credential_not_found: "Inloggningsuppgifterna hittades inte."
   webct_display: "Blackboard Vista/CE (WebCT)"

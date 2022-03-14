@@ -30,11 +30,6 @@ describe "course copy" do
     expect(header.text).to eq @course.course_code
   end
 
-  def wait_for_migration_to_complete
-    completed_status = fj("div.progressStatus:contains('Completed')")
-    keep_trying_until(5) { completed_status.displayed? == true }
-  end
-
   it "copies the course" do
     course_with_admin_logged_in
     @course.syllabus_body = "<p>haha</p>"
@@ -42,12 +37,11 @@ describe "course copy" do
     @course.default_view = "modules"
     @course.wiki_pages.create!(title: "hi", body: "Whatever")
     @course.save!
+
     get "/courses/#{@course.id}/copy"
     expect_new_page_load { f('button[type="submit"]').click }
-    expect(f("div.progressStatus").text.include?("Queued")).to eq(true)
     run_jobs
-    wait_for_ajaximations
-    wait_for_migration_to_complete
+    expect(f("div.progressStatus span")).to include_text "Completed"
 
     @new_course = Course.last
     expect(@new_course.syllabus_body).to eq @course.syllabus_body
@@ -129,11 +123,12 @@ describe "course copy" do
     get "/courses/#{@course.id}/settings"
     link = f(".copy_course_link")
     expect(link).to be_displayed
+
     expect_new_page_load { link.click }
+
     expect_new_page_load { f('button[type="submit"]').click }
     run_jobs
-    wait_for_ajaximations
-    wait_for_migration_to_complete
+    expect(f("div.progressStatus span")).to include_text "Completed"
 
     @new_course = subaccount.courses.where("id <>?", @course.id).last
     expect(@new_course.syllabus_body).to eq @course.syllabus_body

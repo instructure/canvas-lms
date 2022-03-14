@@ -21,9 +21,7 @@ import {bool, func, oneOf} from 'prop-types'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('hide_assignment_grades_tray');
+import I18n from 'i18n!hide_assignment_grades_tray'
 
 export const EVERYONE = 'everyone'
 export const GRADED = 'graded'

@@ -17,9 +17,7 @@
  */
 
 import $ from '@canvas/rails-flash-notifications'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('ltiMessages');
+import I18n from 'i18n!ltiMessages'
 
 export default function showAlert({message, responseMessages}) {
   if (!message.body) {

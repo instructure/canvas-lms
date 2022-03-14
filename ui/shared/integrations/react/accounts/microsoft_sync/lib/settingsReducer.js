@@ -22,9 +22,7 @@ import {
   setTenantInfoMessages,
   getSuffixErrorMessages
 } from './settingsHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('account_settings_jsx_bundle');
+import I18n from 'i18n!account_settings_jsx_bundle'
 
 /**
  * @typedef {Object} ReducerAction

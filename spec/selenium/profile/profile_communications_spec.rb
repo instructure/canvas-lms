@@ -50,22 +50,6 @@ describe "profile communication settings" do
       course_with_teacher_logged_in
     end
 
-    it "shows unsupported push categories as disabled" do
-      Notification.create(category: "Announcement Created By You", name: "Announcement Created By You")
-      Notification.create(category: "All Submissions", name: "All Submissions")
-
-      communication_channel(@user, { username: "8011235555@vtext.com", path_type: "push", active_cc: true })
-      get "/profile/communication"
-
-      expect(
-        fj("tr[data-testid='announcement_created_by_you'] button:contains('Notifications unsupported')")
-      ).to be_present
-
-      expect(
-        fj("tr[data-testid='all_submissions'] button:contains('Notifications unsupported')")
-      ).to be_present
-    end
-
     it "renders" do
       get "/profile/communication"
       expect(f("#breadcrumbs")).to include_text("Notification Settings")

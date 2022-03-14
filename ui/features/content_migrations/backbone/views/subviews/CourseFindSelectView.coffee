@@ -18,15 +18,13 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!content_migrations'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
 import autocompleteItemTemplate from '../../../jst/autocomplete_item.handlebars'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/autocomplete'
-
-I18n = useI18nScope('content_migrations')
 
 export default class CourseFindSelectView extends Backbone.View
   @optionProperty 'current_user_id', 'show_select'

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!HelpLinks'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
@@ -29,8 +29,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import tourPubSub from '@canvas/tour-pubsub'
-
-const I18n = useI18nScope('HelpLinks');
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
   const featuredLink = links.find(link => link.is_featured)

@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!submissions'
 import Ember from 'ember'
 import register from '../helpers/register'
 import '../../jst/components/ic-submission-download-dialog.hbs'
 import 'jqueryui/progressbar'
 import 'jqueryui/dialog'
-
-const I18n = useI18nScope('submissions');
 
 //  example usage:
 //    {{

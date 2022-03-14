@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const TYPE = 'image/svg+xml-icon-maker-icons'
+export const TYPE = 'image/svg+xml-buttons-and-icons'
 
 export const Size = {
   None: 'none',
@@ -30,6 +30,7 @@ export const Size = {
 export const DEFAULT_SETTINGS = {
   // Basic button & icon settings
   type: TYPE,
+  name: '',
   alt: '',
   shape: 'square',
   size: Size.Small,

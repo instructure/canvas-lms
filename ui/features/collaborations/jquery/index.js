@@ -15,18 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!collaborations'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData, errorBox */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, confirmDelete, fragmentChange, showIf */
-import '@canvas/util/templateData'/* getTemplateData */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import '@canvas/util/templateData' /* getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
 import {addDeepLinkingListener, onExternalContentReady} from '@canvas/deep-linking/collaborations'
-
-const I18n = useI18nScope('collaborations');
 
 const CollaborationsPage = {}
 

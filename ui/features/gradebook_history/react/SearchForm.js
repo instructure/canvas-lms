@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, func, shape, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook_history'
 import tz from '@canvas/timezone'
 import moment from 'moment'
 import {debounce} from 'lodash'
@@ -34,8 +34,6 @@ import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import environment from './environment'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-
-const I18n = useI18nScope('gradebook_history');
 
 const DEBOUNCE_DELAY = 500 // milliseconds
 

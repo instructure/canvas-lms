@@ -20,7 +20,7 @@ import React, {useCallback, useEffect} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_projected_dates'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -45,8 +45,6 @@ import PacePlanDateInput, {
   PacePlansDateInputProps
 } from '../../../shared/components/pace_plan_date_input'
 import SlideTransition from '../../../utils/slide_transition'
-
-const I18n = useI18nScope('pace_plans_projected_dates');
 
 interface StoreProps {
   readonly pacePlan: PacePlan
@@ -154,8 +152,6 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     pacePlan.end_date,
     pacePlan.hard_end_dates,
     pacePlan.start_date,
-    pacePlan.context_id,
-    pacePlan.context_type,
     projectedEndDate,
     uncompressDates
   ])

@@ -18,13 +18,11 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import {View} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!calendar.edit'
 import template from '../../jst/missingDueDateDialog.handlebars'
 import htmlEscape from 'html-escape'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-
-I18n = useI18nScope('calendar.edit')
 
 export default class MissingDateDialogView extends View
   dialogTitle: """

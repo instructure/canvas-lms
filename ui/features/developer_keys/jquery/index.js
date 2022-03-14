@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!developer_keys'
 import $ from 'jquery'
 import developer_key from '../jst/developer_key.handlebars'
 import developerKeyFormTemplate from '../jst/developer_key_form.handlebars'
@@ -24,8 +24,6 @@ import ready from '@instructure/ready'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
-
-const I18n = useI18nScope('developer_keys');
 
 let page = 0
 
@@ -84,7 +82,7 @@ function nextPage() {
   let req
   $('#loading').attr('class', 'loading')
   page++
-  return req = $.ajaxJSON(`${accountEndpoint()}?page=${page}`, 'GET', {}, data => {
+  return (req = $.ajaxJSON(`${accountEndpoint()}?page=${page}`, 'GET', {}, data => {
     data.forEach(key => {
       const $key = buildKey(key)
       $('#keys tbody').append($key)
@@ -99,7 +97,7 @@ function nextPage() {
     } else {
       return $('#loading').attr('class', '')
     }
-  });
+  }))
 }
 
 ready(() => {

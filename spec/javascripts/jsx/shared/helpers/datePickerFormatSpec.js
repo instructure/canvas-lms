@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
-
-const I18n = useI18nScope('calendar');
 
 QUnit.module('Date Picker Format Spec')
 

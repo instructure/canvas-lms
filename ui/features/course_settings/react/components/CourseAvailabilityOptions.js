@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!CourseAvailabilityOptions'
 import tz from '@canvas/timezone'
 import moment from 'moment'
 import React, {useState} from 'react'
@@ -29,8 +29,6 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
-
-const I18n = useI18nScope('CourseAvailabilityOptions');
 
 export default function CourseAvailabilityOptions({canManage, viewPastLocked, viewFutureLocked}) {
   const FORM_IDS = {

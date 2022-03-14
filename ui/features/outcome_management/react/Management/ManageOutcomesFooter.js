@@ -22,12 +22,10 @@ import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconOutcomesLine, IconTrashLine, IconMoveEndLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import OutcomesPopover from './OutcomesPopover'
 import {outcomeShape} from './shapes'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const ManageOutcomesFooter = ({
   selected,

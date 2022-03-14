@@ -22,9 +22,7 @@ import PropTypes from 'prop-types'
 import DueDateTokenWrapper from './DueDateTokenWrapper'
 import DueDateCalendars from './DueDateCalendars'
 import DueDateRemoveRowLink from './DueDateRemoveRowLink'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('DueDateRow');
+import I18n from 'i18n!DueDateRow'
 
 class DueDateRow extends React.Component {
   static propTypes = {
@@ -43,8 +41,7 @@ class DueDateRow extends React.Component {
     canDelete: PropTypes.bool.isRequired,
     currentlySearching: PropTypes.bool.isRequired,
     allStudentsFetched: PropTypes.bool.isRequired,
-    inputsDisabled: PropTypes.bool.isRequired,
-    defaultDueTime: PropTypes.string
+    inputsDisabled: PropTypes.bool.isRequired
   }
 
   // --------------------
@@ -195,7 +192,6 @@ class DueDateRow extends React.Component {
           sections={this.props.sections}
           dueDatesReadonly={this.props.dueDatesReadonly}
           availabilityDatesReadonly={this.props.availabilityDatesReadonly}
-          defaultDueTime={this.props.defaultDueTime}
         />
         {this.renderClosedGradingPeriodNotification()}
       </div>

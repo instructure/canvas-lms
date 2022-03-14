@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import CustomColumnHeader from './CustomColumnHeader'
-
-const I18n = useI18nScope('gradebook');
 
 function getProps(column, gradebook, options) {
   const customColumn = gradebook.getCustomColumn(column.customColumnId)

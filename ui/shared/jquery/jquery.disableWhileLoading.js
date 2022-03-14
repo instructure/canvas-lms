@@ -32,12 +32,10 @@ $('#form').disableWhileLoading(promise, {
 });
 
 */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!disableWhileLoading'
 import $ from 'jquery'
 import './jquery.ajaxJSON'
 import 'spin.js/jquery.spin'
-
-const I18n = useI18nScope('disableWhileLoading');
 
 function eraseFromArray(array, victim) {
   array.forEach((prospect, index) => {

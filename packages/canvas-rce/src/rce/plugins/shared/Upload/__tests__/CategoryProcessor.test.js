@@ -37,13 +37,13 @@ describe('process()', () => {
   describe('when the file type matches the SVG processor', () => {
     beforeEach(() => {
       fileType = 'image/svg'
-      fileText = 'something something image/svg+xml-icon-maker-icons'
+      fileText = 'something something image/svg+xml-buttons-and-icons'
     })
 
     it('processes the file with the SVG processor', async () => {
       const category = await subject()
       expect(category).toMatchObject({
-        category: 'icon_maker_icons'
+        category: 'buttons_and_icons'
       })
     })
   })

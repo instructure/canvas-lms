@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import INST from 'browser-sniffer'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!user_lists'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
@@ -27,8 +27,6 @@ import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible'
 import '@canvas/util/templateData'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-
-I18n = useI18nScope('user_lists')
 
 $user_lists_processed_person_template = $("#user_lists_processed_person_template").removeAttr("id").detach()
 $user_list_no_valid_users = $("#user_list_no_valid_users")

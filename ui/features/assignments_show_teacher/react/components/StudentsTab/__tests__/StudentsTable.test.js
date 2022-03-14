@@ -22,10 +22,8 @@ import {closest, mockAssignment, mockUser, mockSubmission} from '../../../test-u
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import StudentsTable from '../StudentsTable'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import tz from '@canvas/timezone'
-
-const I18n = useI18nScope('assignments_2');
 
 jest.mock('@canvas/util/jquery/apiUserContent')
 apiUserContent.convert = jest.fn(arg => `converted ${arg}`)

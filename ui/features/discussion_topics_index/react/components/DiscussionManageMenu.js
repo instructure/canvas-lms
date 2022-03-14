@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!shared_components'
 import React, {Component} from 'react'
 import {func, string} from 'prop-types'
 
@@ -23,8 +23,6 @@ import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('shared_components');
 
 export default class DiscussionManageMenu extends Component {
   static propTypes = {

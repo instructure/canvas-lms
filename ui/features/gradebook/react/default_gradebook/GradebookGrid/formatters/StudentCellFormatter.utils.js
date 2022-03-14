@@ -18,9 +18,7 @@
 
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('gradebook');
+import I18n from 'i18n!gradebook'
 
 export function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!rubric_assessment'
 import $ from 'jquery'
 import _ from 'lodash'
 import React from 'react'
@@ -24,16 +24,14 @@ import htmlEscape from 'html-escape'
 import TextHelper from '@canvas/util/TextHelper.coffee'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/util/templateData'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
 import Rubric from '../react/Rubric'
 import {fillAssessment, updateAssociationData} from '../react/helpers'
-
-const I18n = useI18nScope('rubric_assessment');
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /* global rubricAssessment */

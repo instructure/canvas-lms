@@ -26,6 +26,7 @@ const glob = require('glob')
 const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
+const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const EncapsulationPlugin = require('webpack-encapsulation-plugin')
@@ -314,6 +315,9 @@ module.exports = {
       endYear: new Date().getFullYear() + 15
     }),
 
+    // handles our custom i18n stuff
+    I18nPlugin,
+
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({
       context: canvasDir,
@@ -338,7 +342,7 @@ module.exports = {
         path.resolve(canvasDir, 'public/javascripts'),
         path.resolve(canvasDir, 'gems/plugins')
       ],
-      exclude: [/\/node_modules\//],
+      exclude: [/\/node_modules\//, path.resolve(canvasDir, 'ui/shims/dummyI18nResource.js')],
       formatter: require('./encapsulation/ErrorFormatter'),
       rules: require('./encapsulation/moduleAccessRules')
     }),

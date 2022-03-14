@@ -18,12 +18,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!custom_help_link'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 import {Text} from '@instructure/ui-text'
-
-const I18n = useI18nScope('custom_help_link');
 
 export default class CustomHelpLinkForm extends React.Component {
   static propTypes = {

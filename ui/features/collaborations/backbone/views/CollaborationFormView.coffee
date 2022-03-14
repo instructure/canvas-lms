@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!collaborations'
 import {View} from '@canvas/backbone'
 import CollaboratorPickerView from './CollaboratorPickerView.coffee'
-
-I18n = useI18nScope('collaborations')
 
 export default class CollaborationFormView extends View
   translations:

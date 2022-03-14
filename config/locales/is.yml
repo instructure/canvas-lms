@@ -2257,7 +2257,6 @@ is:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Leyfir kennurum að setja einkunnir á skil án einkunnar í massavís úr verkefnahópi og heildardálkavalmyndum í einkunnabókinni."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Hægt að velja lærdómsniðurstöður á meðan á flutningi efnis námskeiðs stendur"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Leyfir að breyta tilkynningastillingum fyrir hvaða námskeið sem er innan tilkynningastillingarsíðu reikningsstigs."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Leyfir niðurstöðugögnum sem geymd eru í niðurstöðuþjónustunni að birtast í Canvas skýrslugerð (LMGB, sLMGB og niðurstöðutengd stjórnendaskýrsla)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Leyfir stillingu á leiknikvörðum reiknings- og námskeiðsstigs og útreikningsaðferðum, sem kemur í stað viðmiðunarmats og útreikningsaðferða fyrir hverja niðurstöðu"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Leyfir að stilla viðmiðunarmat og valkosti fyrir útreikningsaðferðir fyrir einstakar niðurstöður."
   allows_students_to_access_other_student_groups_wit_43918810: "Gefur notanda aðgang að öðrum nemendahópum innan hópasetts með beinum hlekk."
@@ -3293,7 +3292,6 @@ is:
   applied_cc7be774: Virkjað
   applied_filters_63a90ccd: "Notaðar síur:"
   apply_781a2546: Virkja
-  apply_conditions_9e941010: "Virkja skilyrði"
   apply_date_range_selection_cc4351ed: "Nota dagsetningasvið vals"
   apply_filter_7e4f6113: "Virkja síu"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Setja upp síur. Ath: síðan endurhleðst ef smellt er á þennan hnapp."
@@ -9745,7 +9743,6 @@ is:
   end_date_e0093ed7: Lokadagur
   end_date_from_cdd9d90: "Lokadagsetning frá:"
   end_date_to_8b17929d: "Lokadagsetning til:"
-  end_date_value_3d3e8906: "Lokadagsetning %{value}"
   end_dates_249d8dbb: "Lokadagsetningar:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Lokadagar geta ekki verið á undan upphafsdögum"
   end_time_250391e8: Lokatími
@@ -10466,7 +10463,6 @@ is:
   failed_initializing_dashboard_3d967143: "Mistókst að frumstilla mælaborð"
   failed_jobs_b632bbf0: "Mislukkuð störf"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Ekki tókst að hlaða inn tenginga einingu. Er nettenging þín í lagi?"
-  failed_loading_course_cards_8fcdb36d: "Tókst ekki að hlaða námskeiðsspjaldi"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Ekki tókst að sækja námskeiðshluta. Glæðið til að reyna aftur."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Ekki tókst að hlaða inn samstillingarsögu einingu. Er nettenging þín í lagi?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Ekki tókst að hlaða inn ósamstilltar breytingar einingu. Er nettenging þín í lagi?"
@@ -17143,7 +17139,6 @@ is:
   outcome_results_23a0a117: "Árangur niðurstöðu"
   outcome_results_title: "Árangur niðurstöðu"
   outcome_score_141cf00a: niðurstöðueinkunn
-  outcome_service_results_to_canvas_reporting_749667bc: "Niðurstöður niðurstöðuþjónustu í Canvas skýrslugerð"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Niðurstaða: %{title} hefur stöðu %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Niðurstaða “%{title}” var búin til."
   outcome_title_was_successfully_created_be3a408: "Niðurstaðan „%{title}“ var búin til"
@@ -17429,7 +17424,6 @@ is:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Pörunarkóðar eru eingöngu studdir þegar sjálfsskráning er virkjuð fyrir reikninginn."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
-  panda_taking_photograph_8db13e0f: "Pandabjörn að taka mynd"
   paper_view_7405eeab: Pappírssýn
   paraguay_595_ca58b83a: "Paragvæ (+595)"
   parameter_91ed199: Færibreyta
@@ -20220,7 +20214,6 @@ is:
   remove_attribute_59a4aa64: "Fjarlægja eiginleika"
   remove_avatar_picture_aba765eb: "Fjarlægja myndgengil"
   remove_collaborationtitle_c3e81adb: "Fjarlægja \"%{collaborationTitle}\"?"
-  remove_condition_9cf94f7f: "Fjarlægja skilyrði"
   remove_conference_69b9e0d0: "Fjarlægja ráðstefnu"
   remove_conference_title_207d32c0: "Fjarlægja ráðstefnu %{title}"
   remove_contact_method_ca890ba3: "Fjarlægja tengiaðferð"
@@ -20466,7 +20459,6 @@ is:
   rich_content_editor_2708ef21: "Rich Content ritill"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Endurbætur á hliðarstiku Rich Content-ritils"
   right_sidebar_logo_5483dc0a: "Merki í hægri hliðarslá"
-  rocketship_on_launchpad_4011ea8c: "geimflaug á skotpalli"
   role: 
     duplicate_role: "Hlutverk með þessu heiti er til"
   role_13a7be77: Hlutverk
@@ -22442,7 +22434,6 @@ is:
   start_date_from_20503757: "Upphafsdagsetning frá:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} til %{end_time}"
   start_date_to_1e6e6bbe: "Upphafsdagsetning til:"
-  start_date_value_817cab96: "Upphafsdagur %{value}"
   start_dates_8f1c22a8: "Upphafsdagsetningar:"
   start_entry_4b491f60: "Hefja færslu"
   start_link_validation_dc0ac99c: "Staðfesting upphafstengils"
@@ -22595,7 +22586,6 @@ is:
   student_sis_6721040e: "SIS nemanda"
   student_sis_d9f0cd39: "sis nemanda"
   student_sis_id_abe6b292: "sis-auðkenni nemanda"
-  student_student_number_5c98bd2d: "Nemandi %{student_number}"
   student_studentnumber_f398d9c2: "Nemandi %{studentNumber}"
   student_submissions_910da1b3: "Skil nemanda"
   student_submissions_report_prospect_education_108daf59: "Skilaskýrsla nemanda (Prospect Education)"
@@ -23232,7 +23222,6 @@ is:
   the_app_was_added_successfully_3f785a23: "Smáforritinu var bætt við"
   the_app_was_deactivated_573520ab: "Smáforritið var aftengt"
   the_app_was_updated_successfully_3d71cd1b: "Smáforritið var uppfært"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Búist er við að rökin sem gefin eru upp séu af gerðinni Boolean."
   the_assignment_group_id_to_report_on_83880208: "Verkefnahópsauðkennið til að greina frá"
   the_assignment_group_named_major_9d349037: "Útnefnd aðalgrein verkefnahópsins"
   the_assignment_group_named_papers_e1cb6a34: "Útnefndar ritgerðir verkefnahópsins"
@@ -26061,7 +26050,6 @@ is:
   web_page_146f9102: Vefsíða
   web_url_d84feaf5: "URL vefs"
   webcam_fe91b20f: Vefmyndavél
-  webcam_photo_ee55462c: Vefmyndavélarljósmynd
   webct_credentials: 
     credential_not_found: "Aðgangsskilríki fundust ekki."
   webct_display: "Blackboard Vista/CE (WebCT)"

@@ -2353,7 +2353,6 @@ ja:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: 講師が成績表の課題グループや［合計欄］のメニューから、未採点の提出物に一括してスコアを適用できるようになります。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: コースコンテンツの移行時に学習結果を選択できるようにします
   allows_modifying_notification_settings_for_any_cou_5004ac71: アカウントレベルの通知設定ページ内で、任意のコースの通知設定を変更することができます。
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: 成果サービスに保存された結果データをCanvasレポート（LMGB、sLMGB、成果関連の管理者レポート）に表示できるようにします。
   allows_setting_account_course_level_mastery_scales_1939e0fd: アカウントおよびコースレベルの達成度スケールと計算方法を設定し、結果ごとの基準の評価と計算方法を置き換えできるようにします
   allows_setting_criterion_ratings_and_calculation_m_24542321: 個々の結果に対する基準評価と計算方法のオプションを設定することができるようにします。
   allows_students_to_access_other_student_groups_wit_43918810: ユーザーが、受講生が直接リンクしているグループ内の他の受講生グループにアクセスできるようにします。
@@ -3400,7 +3399,6 @@ ja:
   applied_filters_63a90ccd: 適用されるフィルター：
   apply_781a2546: 適用
   apply_changes_b1dffc70: 変更を適用
-  apply_conditions_9e941010: 適用条件
   apply_date_range_selection_cc4351ed: 日付範囲選択を適用する
   apply_filter_7e4f6113: フィルターを適用する
   apply_filters_note_clicking_this_button_will_cause_753f04: フィルターを適用する。注：このボタンをクリックすると、ページが再読み込みされます。
@@ -10499,7 +10497,6 @@ ja:
   end_date_e0093ed7: 終了日
   end_date_from_cdd9d90: （）から終了日：
   end_date_to_8b17929d: （）まで終了日：
-  end_date_value_3d3e8906: "終了日%{value}"
   end_dates_249d8dbb: 終了日：
   end_dates_cannot_be_before_start_dates_d6018daf: 終了日は開始日より前にすることはできません
   end_time_250391e8: 終了時間
@@ -11331,7 +11328,6 @@ ja:
   failed_initializing_dashboard_3d967143: ダッシュボードの初期化に失敗しました
   failed_jobs_b632bbf0: ジョブに失敗しました
   failed_loading_associations_component_is_your_netw_fa49fb32: 関連コンポーネントの読み込みに失敗しました。ネットワーク接続は正常ですか？
-  failed_loading_course_cards_8fcdb36d: コースカードの読み込みに失敗
   failed_loading_course_sections_refresh_page_to_try_f97160bf: コースセクションのロードに失敗ページを再読み込みして再試行する。
   failed_loading_sync_history_component_is_your_netw_2d04fc10: 同期履歴コンポーネントの読み込みに失敗しました。ネットワーク接続は正常ですか？
   failed_loading_unsynced_changes_component_is_your__89f863d6: 非同期変更コンポーネントの読み込みに失敗しました。ネットワーク接続は正常ですか？
@@ -18992,7 +18988,6 @@ ja:
   outcome_results_23a0a117: 成果の結果
   outcome_results_title: 成果の結果
   outcome_score_141cf00a: 成果のスコア
-  outcome_service_results_to_canvas_reporting_749667bc: 成果サービスの結果をCanvasのレポーティングに
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "成果: %{title} の状況は %{statusTooltip} です"
   outcome_title_was_successfully_created_a4094d6c: "成果「%{title}」は正常に作成されました。。"
   outcome_title_was_successfully_created_be3a408: "成果 「%{title}」 は正常に作成されました。"
@@ -19213,9 +19208,9 @@ ja:
       headers: 
         date: 日付
         participated: 参加した
-        time: 時間
+        time: 時刻
         url: URL
-        user_agent: ユーザーエージェント
+        user_agent: "ユーザ エージェント"
   page_views_csv_9835a9f9: ページビューcsv
   page_views_eb64cf53: "ページ ビュー"
   page_views_only_312b7577: "ページ ビューのみ"
@@ -19283,7 +19278,6 @@ ja:
   pakistan_92_da28c36: パキスタン（+92）
   panama_507_831fbc99: "パナマ (+507)"
   panama_fa454c86: パナマ
-  panda_taking_photograph_8db13e0f: パンダが写真撮影
   paper_view_7405eeab: 印刷表示
   paraguay_181a5029: パラグアイ
   paraguay_595_ca58b83a: "パラグアイ (+595)"
@@ -22413,7 +22407,6 @@ ja:
   remove_avatar_picture_aba765eb: アバター画像を削除
   remove_c_name_section_d8eabd3a: " %{c.name} セクションを削除"
   remove_collaborationtitle_c3e81adb: "\"%{collaborationTitle}\"を削除しますか？"
-  remove_condition_9cf94f7f: 条件を削除
   remove_conference_69b9e0d0: 会議を削除する
   remove_conference_title_207d32c0: "会議を削除する：%{title}"
   remove_contact_method_ca890ba3: 連絡方法を削除する
@@ -22678,7 +22671,6 @@ ja:
   rich_content_editor_2708ef21: "リッチ コンテンツ エディタ"
   rich_content_editor_sidebar_enhancements_8bd945d3: リッチコンテンツエディタのサイドバーの機能拡張
   right_sidebar_logo_5483dc0a: 右のサイドバーロゴ
-  rocketship_on_launchpad_4011ea8c: 発射台上の宇宙船
   role: 
     duplicate_role: 同じ名前の役割が既に存在しています
   role_13a7be77: "役割:"
@@ -24863,7 +24855,6 @@ ja:
   start_date_from_20503757: "（）からの開始日:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}、%{start_time} まで%{end_time}"
   start_date_to_1e6e6bbe: "（）までの開始日:"
-  start_date_value_817cab96: "開始日%{value}"
   start_dates_8f1c22a8: 開始日：
   start_entry_4b491f60: エントリを開始する
   start_from_a_template_380d4e8: テンプレートから開始
@@ -25029,7 +25020,6 @@ ja:
   student_sis_6721040e: "受講生 Sis"
   student_sis_d9f0cd39: "受講生 sis"
   student_sis_id_abe6b292: "受講生 SIS ID"
-  student_student_number_5c98bd2d: "受講生%{student_number}"
   student_studentnumber_f398d9c2: "受講者%{studentNumber}"
   student_submissions_910da1b3: 受講生提出
   student_submissions_report_prospect_education_108daf59: "受講生提出レポート (Prospect Education)"
@@ -25698,7 +25688,6 @@ ja:
   the_app_was_added_successfully_3f785a23: アプリが正常に追加されました
   the_app_was_deactivated_573520ab: アプリが非アクティブ化されました
   the_app_was_updated_successfully_3d71cd1b: アプリが正常に更新されました
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: 引数はブール型であることが期待されます。
   the_assignment_group_id_to_report_on_83880208: "レポートする課題グループの ID"
   the_assignment_group_named_major_9d349037: 主要（major）と名付けられた課題グループ
   the_assignment_group_named_papers_e1cb6a34: 小論文（papers）と名付けられた課題グループ
@@ -28635,7 +28624,6 @@ ja:
   web_page_146f9102: "Web ページ"
   web_url_d84feaf5: "Web URL"
   webcam_fe91b20f: ウェブカム
-  webcam_photo_ee55462c: ウェブカメラ写真
   webct_credentials: 
     credential_not_found: 資格情報が見つかりません。
   webct_display: "Blackboard Vista/CE (WebCT)"

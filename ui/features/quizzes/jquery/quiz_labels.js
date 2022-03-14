@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quizzes.timing'
 import $ from 'jquery'
-
-const I18n = useI18nScope('quizzes.timing');
 
 export default function addAriaDescription($answer, id) {
   const text = I18n.t('Answer %{answerId}', {answerId: id})

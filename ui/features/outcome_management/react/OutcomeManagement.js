@@ -17,7 +17,7 @@
  */
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
@@ -30,8 +30,6 @@ import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress
 } from '@canvas/outcomes/react/OutcomesImporter'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const unmount = mount => ReactDOM.unmountComponentAtNode(mount)
 

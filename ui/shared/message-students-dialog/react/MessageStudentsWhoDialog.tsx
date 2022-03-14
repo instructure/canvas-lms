@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useContext} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!public_message_students_who'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -43,8 +43,6 @@ import {
   addAttachmentsFn,
   removeAttachmentFn
 } from '@canvas/message-attachments'
-
-const I18n = useI18nScope('public_message_students_who');
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item} = Flex as any

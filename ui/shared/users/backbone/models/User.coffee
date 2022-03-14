@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!user'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-
-I18n = useI18nScope('user')
 
 export default class User extends Backbone.Model
   modelType: 'user'

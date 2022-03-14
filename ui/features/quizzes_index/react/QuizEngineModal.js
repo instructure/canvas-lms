@@ -19,15 +19,13 @@
 import React, {useState} from 'react'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_engine_modal'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Link} from '@instructure/ui-link'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import getCookie from '@instructure/get-cookie'
-
-const I18n = useI18nScope('quiz_engine_modal');
 
 const CLASSIC = 'classic'
 const NEW = 'new'

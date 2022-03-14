@@ -22,12 +22,10 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 
 import {gradeEntry, gradeInfo} from './PropTypes'
 import TextGradeInput from './TextGradeInput'
-
-const I18n = useI18nScope('gradebook');
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__GradeCell__GradingSchemeInput',

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,26 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this target is intended for use in browsers
-//
-// refer to ui-build/babel-recommendations.md for guidance
-module.exports = {
-  presets: [
-    ['@babel/preset-env', {
-      useBuiltIns: 'entry',
-      corejs: '3.20',
-      modules: false,
-    }]
-  ],
-  plugins: [
-    ['@babel/plugin-transform-runtime', {
-      corejs: 3,
-      helpers: true,
-      useESModules: true
-    }]
-  ],
-  targets: {
-    browsers: 'last 2 versions',
-    esmodules: true
-  }
-}
+define(['i18n!jsx'], (I18n) => {
+  return I18n.t("yay jsx");
+});

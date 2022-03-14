@@ -23,11 +23,9 @@ import {connect} from 'react-redux'
 import React, {createRef, ReactNode, RefObject} from 'react'
 import {ExpandableErrorAlert} from '@canvas/alerts/react/ExpandableErrorAlert'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_errors'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-
-const I18n = useI18nScope('pace_plans_errors');
 
 type StoreProps = {
   errors: CategoryErrors

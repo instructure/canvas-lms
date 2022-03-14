@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {Tray} from '@instructure/ui-tray'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 
 import AdvancedTabPanel from './AdvancedTabPanel'
 import {
@@ -39,8 +39,6 @@ import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
 import ViewOptionsTabPanel from './ViewOptionsTabPanel'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {confirmViewUngradedAsZero} from '../Gradebook.utils'
-
-const I18n = useI18nScope('gradebook');
 
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}) {
   return !_.isEmpty(changes) && _.isEmpty(validationErrors)

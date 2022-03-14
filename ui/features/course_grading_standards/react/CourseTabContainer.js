@@ -21,11 +21,9 @@ import PropTypes from 'prop-types'
 import GradingStandardCollection from '@canvas/grading-standard-collection'
 import GradingPeriodCollection from './gradingPeriodCollection'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradingCourseTabContainer'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jqueryui/tabs'
-
-const I18n = useI18nScope('gradingCourseTabContainer');
 
 class CourseTabContainer extends React.Component {
   static propTypes = {

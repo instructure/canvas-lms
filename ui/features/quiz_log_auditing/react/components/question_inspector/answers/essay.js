@@ -17,11 +17,9 @@
  */
 
 import Button from '../../button'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_log_auditing.question_answers.essay'
 import K from '../../../../constants'
 import React from 'react'
-
-const I18n = useI18nScope('quiz_log_auditing.question_answers.essay');
 
 class Essay extends React.Component {
   static defaultProps = {

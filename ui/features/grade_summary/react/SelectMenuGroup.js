@@ -26,10 +26,8 @@ import {Text} from '@instructure/ui-text'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!grade_summary'
 import SelectMenu from './SelectMenu'
-
-const I18n = useI18nScope('grade_summary');
 
 class SelectMenuGroup extends React.Component {
   static propTypes = {

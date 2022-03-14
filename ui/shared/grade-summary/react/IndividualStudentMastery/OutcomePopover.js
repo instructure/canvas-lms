@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'lodash'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!IndividualStudentMasteryOutcomePopover'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -30,8 +30,6 @@ import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import * as shapes from './shapes'
-
-const I18n = useI18nScope('IndividualStudentMasteryOutcomePopover');
 
 class OutcomePopover extends React.Component {
   static propTypes = {

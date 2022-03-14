@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!k5_utils'
 import moment from 'moment-timezone'
 import PropTypes from 'prop-types'
 
@@ -24,8 +24,6 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
-
-const I18n = useI18nScope('k5_utils');
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {

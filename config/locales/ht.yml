@@ -2268,7 +2268,6 @@ ht:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Pèmèt pwofesè yo aplike nòt nan soumisyon ki pa klase yo an mas a pati de meni gwoup devwa yo ak kolonn Total la nan Bilten an."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Otorize seleksyon rezilta aprantisaj yo pandan deplasman kontni kou yo"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Pèmèt chanje paramèt notifikasyon yo pou tout kou yo apati de paj paramèt notifikasyon yo onivo kont lan."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Pèmèt done rezilta yo estoke nan Sèvis Rezilta yo afiche nan rapò Canvas yo (LMGB, sLMGB ak rapò administratif ki lye a rezilta yo)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Pèmèt defini echèl metriz kont ak nivo kou yo ansanm ak metòd kalkil yo nan plas kritè notasyon yo ak metòd kalkil yo pa rezilta."
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Pèmèt defini nòt kritè ak opsyon metòd kalkil pou rezilta pèsonèl yo."
   allows_students_to_access_other_student_groups_wit_43918810: "Pèmèt elèv yo gen aksè a lòt gwoup elèv nan yon gwoup ak lyen dirèk."
@@ -3301,7 +3300,6 @@ ht:
   applied_cc7be774: Aplike
   applied_filters_63a90ccd: "Filtè Aplike:"
   apply_781a2546: Aplike
-  apply_conditions_9e941010: "Aplike kondisyon yo"
   apply_date_range_selection_cc4351ed: "Aplike seleksyon ranje dat"
   apply_filter_7e4f6113: "Aplike filtè"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Aplike filtè. Nòt: klike sou bouton sa a ap rechaje paj la."
@@ -9955,7 +9953,6 @@ ht:
   end_date_e0093ed7: "Dat Finisman"
   end_date_from_cdd9d90: "Dat Finisman De:"
   end_date_to_8b17929d: "Dat Finisman Jiska:"
-  end_date_value_3d3e8906: "Dat Finisman %{value}"
   end_dates_249d8dbb: "Dat Finisman yo:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Dat finisman a gendwa anvan dat kòmansman yo"
   end_time_250391e8: "Lè pou Fini"
@@ -10680,7 +10677,6 @@ ht:
   failed_initializing_dashboard_3d967143: "Echèk inisyalizasyon tablo"
   failed_jobs_b632bbf0: "Djòb echwe"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Echèk chajman Asosyasyon yo Èske koneksyon entènèt ou a bon?"
-  failed_loading_course_cards_8fcdb36d: "Echèk chajman kat kou yo"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Echèk chajman seksyon kou. Aktyalize paj lapou eseye ankò."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Echèk chajman konpozan Istorik Senkwonizasyon an. Èske koneksyon entènèt ou a bon?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Echèk chajman konpozan modifikasyon ki pa Senkwonize yo. Èske koneksyon entènèt ou a bon?"
@@ -17512,7 +17508,6 @@ ht:
   outcome_results_23a0a117: Rezilta
   outcome_results_title: Rezilta
   outcome_score_141cf00a: rezilta
-  outcome_service_results_to_canvas_reporting_749667bc: "Sèvis Rezilta pou Rapò Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Rezilta: %{title} gen estati %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Rezilta \"%{title}\" te kreye avèk siksè."
   outcome_title_was_successfully_created_be3a408: "Rezilta \"%{title}\" te kreye ak siksè"
@@ -17732,7 +17727,7 @@ ht:
       headers: 
         date: Dat
         participated: Patisipe
-        time: Tan
+        time: Lè
         url: URL
         user_agent: "Ajan Itilizatè"
   page_views_csv_9835a9f9: "afichaj paj csv"
@@ -17801,7 +17796,6 @@ ht:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Kòd kouplaj yo akseptab sèlman lè oto enskripsyon aktive pou kont lan."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
-  panda_taking_photograph_8db13e0f: "panda ap fè foto"
   paper_view_7405eeab: "Afichaj Papye"
   paraguay_595_ca58b83a: "Paragwe (+595)"
   parameter_91ed199: Paramèt
@@ -20616,7 +20610,6 @@ ht:
   remove_attribute_59a4aa64: "Elimine Atribi"
   remove_avatar_picture_aba765eb: "Elimine foto avata"
   remove_collaborationtitle_c3e81adb: "Elimine \"%{collaborationTitle}\"?"
-  remove_condition_9cf94f7f: "Elimine kondisyon"
   remove_conference_69b9e0d0: "Elimine konferans"
   remove_conference_title_207d32c0: "Elimine Konferans: %{title}"
   remove_contact_method_ca890ba3: "Elimine metòd kontak"
@@ -20861,7 +20854,6 @@ ht:
   rich_content_editor_2708ef21: "Editè Kontni Rich"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Amelyorasyon Ba Lateral Editè Kontni Anrichi"
   right_sidebar_logo_5483dc0a: "Logo ba Lateral Dwat"
-  rocketship_on_launchpad_4011ea8c: "fize sou ranp lansman"
   role: 
     duplicate_role: "Gen yon wòl ki egziste a non sa a deja"
   role_13a7be77: Wòl
@@ -22874,7 +22866,6 @@ ht:
   start_date_from_20503757: "Dat Kòmansman De:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} a %{end_time}"
   start_date_to_1e6e6bbe: "Dat Kòmansman Jiska:"
-  start_date_value_817cab96: "Dat Kòmansman %{value}"
   start_dates_8f1c22a8: "Dat Kòmansman:"
   start_entry_4b491f60: "Kòmanse Antre"
   start_link_validation_dc0ac99c: "Validasyon Lyen Demaraj"
@@ -23029,7 +23020,6 @@ ht:
   student_sis_6721040e: "Sis Elèv"
   student_sis_d9f0cd39: "sis elèv"
   student_sis_id_abe6b292: "id sis elèv"
-  student_student_number_5c98bd2d: "Elèv %{student_number}"
   student_studentnumber_f398d9c2: "Elèv %{studentNumber}"
   student_submissions_910da1b3: "Soumisyon Elèv"
   student_submissions_report_prospect_education_108daf59: "Rapò Soumisyon Elèv (Edikasyon Pwospektif)"
@@ -23671,7 +23661,6 @@ ht:
   the_app_was_added_successfully_3f785a23: "App la ajoute kòrèkteman"
   the_app_was_deactivated_573520ab: "App la dezaktive"
   the_app_was_updated_successfully_3d71cd1b: "App la aktyalize  kòrèkteman"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Yo espere agiman yo bay la sipoze tip bouleyen."
   the_assignment_group_id_to_report_on_83880208: "Id gwoup travay pou fè rapò sou li a"
   the_assignment_group_named_major_9d349037: "Gwoup Travay pou nonmen prensipal"
   the_assignment_group_named_papers_e1cb6a34: "Gwoup Travay pou nonmen papye"
@@ -26531,7 +26520,6 @@ ht:
   web_page_146f9102: "Paj web"
   web_url_d84feaf5: "URL Web"
   webcam_fe91b20f: Webcam
-  webcam_photo_ee55462c: "Foto Wèbcam"
   webct_credentials: 
     credential_not_found: "Idantifyan entwouvab."
   webct_display: "Blackboard Vista/CE (WebCT)"

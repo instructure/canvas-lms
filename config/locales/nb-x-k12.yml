@@ -2191,7 +2191,6 @@ nb-x-k12:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Lar faglærere bruke resultater på innleveringer uten vurdering gruppevis fra oppgavegruppe- og total kolonne-menyer i Vurderingsoversikten."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Lar læringsutbytteet være valgbart under migrering av faginnhold"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillater endring av varslingsinnstillinger for ethvert fag fra siden for varslingsinnstillinger på kontonivå."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Lar resultatdata som er lagret i Mål-tjenesten vises i Canvas-rapportering (LMGB, sLMGB og målrelatert admin-rapportering)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillater å sette mestringsskalaer og beregningsmetoder for konto- og fagnivå, som erstatter kriterievurderinger og beregningsmetoder per mål."
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Tillat alternativer for kriterievurderinger og beregningsmetoder for individuelle mål."
   allows_students_to_access_other_student_groups_wit_43918810: "Lar elever bruke elevgrupper innenfor et gruppesett med en direkte lenke."
@@ -3199,7 +3198,6 @@ nb-x-k12:
   applied_cc7be774: Brukt
   applied_filters_63a90ccd: "Brukte filtre:"
   apply_781a2546: Bruk
-  apply_conditions_9e941010: "Bruk vilkår"
   apply_date_range_selection_cc4351ed: "Bruk valg av datointervall"
   apply_filter_7e4f6113: "Bruk filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Bruk filtre. Merk: Ved å klikke på denne tasten vil siden bli lastet inn på nytt."
@@ -9493,7 +9491,6 @@ nb-x-k12:
   end_date_e0093ed7: Sluttdato
   end_date_from_cdd9d90: "Sluttdato fra:"
   end_date_to_8b17929d: "Sluttdato til:"
-  end_date_value_3d3e8906: "Sluttdato %{value}"
   end_dates_249d8dbb: "Sluttdatoer:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Sluttdato kan ikke finne sted før startdato"
   end_time_250391e8: Sluttidspunkt
@@ -10207,7 +10204,6 @@ nb-x-k12:
   failed_initializing_dashboard_3d967143: "Kunne ikke initialisere oversikt"
   failed_jobs_b632bbf0: "Mislykkede jobber"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Feil ved lasting av selskapskomponent. Er nettverksforbindelsen din OK?"
-  failed_loading_course_cards_8fcdb36d: "Kunne ikke laste inn fagkort"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Kunne ikke hente fagdeler. Oppdater siden for å prøve på nytt."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Kunne ikke laste inn Synkroniseringshistorikk-komponenten. Er nettverksforbindelsen din OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Feil ved lasting av Usynkroniserte Endringer-komponent. Er nettverksforbindelsen din OK?"
@@ -16724,7 +16720,6 @@ nb-x-k12:
   outcome_results_23a0a117: "Resultater for mål"
   outcome_results_title: "Resultater for mål"
   outcome_score_141cf00a: "resultat for mål"
-  outcome_service_results_to_canvas_reporting_749667bc: "Mål-tjenesteresultater til Canvas-rapportering"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Mål: %{title} har status som %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Målet «%{title}» ble opprettet"
   outcome_title_was_successfully_created_be3a408: "Målet «%{title}» ble opprettet"
@@ -17007,7 +17002,6 @@ nb-x-k12:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Paringskoder støttes bare når egenregistrering er aktivert for kontoen."
   pakistan_92_da28c36: "Pakistan (+ 92)"
   panama_507_831fbc99: "Panama (+507)"
-  panda_taking_photograph_8db13e0f: "panda som tar bilde"
   paper_view_7405eeab: Papirvisning
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameter_91ed199: Parameter
@@ -19748,7 +19742,6 @@ nb-x-k12:
   remove_attribute_59a4aa64: "Fjern attributt"
   remove_avatar_picture_aba765eb: "Fjern avatarbilde"
   remove_collaborationtitle_c3e81adb: "Fjern «%{collaborationTitle}»?"
-  remove_condition_9cf94f7f: "Fjern betingelse"
   remove_conference_69b9e0d0: "Fjerner konferanse"
   remove_conference_title_207d32c0: "Fjern videomøte: %{title}"
   remove_contact_method_ca890ba3: "Fjerne kontaktmetode"
@@ -19993,7 +19986,6 @@ nb-x-k12:
   rich_content_editor_2708ef21: "Rich innholdsredigering"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Sidefeltforbedringer av redigeringsverktøyet for rikt innhold"
   right_sidebar_logo_5483dc0a: "Logo høyre sidestolpe"
-  rocketship_on_launchpad_4011ea8c: "romrakett på utskytingsrampe"
   role: 
     duplicate_role: "En rolle med dette navnet finnes allerede"
   role_13a7be77: "Rolle: "
@@ -21899,7 +21891,6 @@ nb-x-k12:
   start_date_from_20503757: "Startdato fra:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} til %{end_time}"
   start_date_to_1e6e6bbe: "Startdato til:"
-  start_date_value_817cab96: "Startdato %{value}"
   start_dates_8f1c22a8: "Startdatoer:"
   start_entry_4b491f60: "Start innlevering"
   start_link_validation_dc0ac99c: "Start lenke-validering"
@@ -22046,7 +22037,6 @@ nb-x-k12:
   student_sis_6721040e: Elev-SIS
   student_sis_d9f0cd39: "elev sis"
   student_sis_id_abe6b292: "elev sis id"
-  student_student_number_5c98bd2d: "Elev %{student_number}"
   student_studentnumber_f398d9c2: "Elev %{studentNumber}"
   student_submissions_910da1b3: Elevinnleveringer
   student_submissions_report_prospect_education_108daf59: "Innleveringsrapporter elev (prospektutdanning)"
@@ -22667,7 +22657,6 @@ nb-x-k12:
   the_app_was_added_successfully_3f785a23: "App ble lagt til"
   the_app_was_deactivated_573520ab: "Appen ble deaktivert"
   the_app_was_updated_successfully_3d71cd1b: "App ble oppdatert"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Argumentet som oppgis forventes å være av typen boolsk."
   the_assignment_group_id_to_report_on_83880208: "Oppgavegruppe-id for å rapportere på"
   the_assignment_group_named_major_9d349037: "Oppgavegruppen med navn viktig"
   the_assignment_group_named_papers_e1cb6a34: "Oppgavegruppen med navn papirer"
@@ -25418,7 +25407,6 @@ nb-x-k12:
   web_page_146f9102: Nettside
   web_url_d84feaf5: Web-lenke
   webcam_fe91b20f: Webkamera
-  webcam_photo_ee55462c: Webkamera-bilde
   webct_credentials: 
     credential_not_found: "Finner ikke disse opplysningene."
   webct_display: "Blackboard Vista/CE (WebCT)"

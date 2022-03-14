@@ -30,6 +30,9 @@
   "announcement_list_da155734": { "message": "Danh Sách Thông Báo" },
   "announcements_a4b8ed4a": { "message": "Thông Báo Chung" },
   "apply_781a2546": { "message": "Áp Dụng" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Áp dụng thay đổi cho tất cả phiên bản của Nút này và Biểu Tượng trong Khóa Học"
+  },
   "apps_54d24a47": { "message": "Ứng Dụng" },
   "arrows_464a3e54": { "message": "Các phím mũi tên" },
   "art_icon_8e1daad": { "message": "Biểu Tượng Nghệ Thuật" },
@@ -53,6 +56,12 @@
   "basic_554cdc0a": { "message": "Cơ Bản" },
   "below_81d4dceb": { "message": "Bên Dưới" },
   "bottom_third_5f5fec1d": { "message": "Một Phần Ba Dưới" },
+  "button_color_608a0242": { "message": "Màu Nút" },
+  "button_outline_cf14f071": { "message": "Viền Nút" },
+  "button_outline_size_cc1d1df7": { "message": "Cỡ Viền Nút" },
+  "button_shape_dbecb573": { "message": "Hình Dạng Nút" },
+  "button_size_20f5fce1": { "message": "Cỡ Nút" },
+  "buttons_and_icons_e66ee12c": { "message": "Nút Và Biểu Tượng" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Hủy" },
   "choose_caption_file_9c45bc4e": { "message": "Chọn tập tin phụ đề" },
@@ -92,6 +101,7 @@
   "closed_captions_subtitles_e6aaa016": { "message": "Phụ Đề" },
   "collaborations_5c56c15f": { "message": "Cộng Tác" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Thu gọn để ẩn { types }" },
+  "color_color_eb64b08": { "message": "Màu { color }" },
   "computer_1d7dfa6f": { "message": "Máy Tính" },
   "content_1440204b": { "message": "Nội Dung" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -113,6 +123,7 @@
   "course_links_b56959b9": { "message": "Liên Kết Khóa Học" },
   "course_media_ec759ad": { "message": "Nội Dung Phương Tiện Khóa Học" },
   "course_navigation_dd035109": { "message": "Điều Hướng Khóa Học" },
+  "create_button_and_icon_5c089934": { "message": "Tạo Nút Và Biểu Tượng" },
   "creative_commons_license_725584ae": {
     "message": "Giấy Phép Creative Commons:"
   },
@@ -168,6 +179,8 @@
   "embed_828fac4a": { "message": "Nhúng" },
   "embed_code_314f1bd5": { "message": "Mã Nhúng" },
   "embed_image_1080badc": { "message": "Nhúng Hình Ảnh" },
+  "embed_options_tray_901cfd19": { "message": "Nhúng Khay Tùy Chọn" },
+  "embed_preview_2d741e1f": { "message": "Nhúng Nội Dung Xem Trước" },
   "embed_video_a97a64af": { "message": "Nhúng Video" },
   "embedded_content_aaeb4d3d": { "message": "nội dung nhúng" },
   "engineering_icon_f8f3cf43": { "message": "Biểu Tượng Kỹ Thuật" },
@@ -323,6 +336,7 @@
   },
   "open_title_application_fd624fc5": { "message": "Mở ứng dụng { title }" },
   "operators_a2ef9a93": { "message": "Toán Tử" },
+  "options_3ab0ea65": { "message": "Tùy Chọn" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Danh Sách Theo Thứ Tự Và Không Theo Thứ Tự"
   },
@@ -376,6 +390,7 @@
     "message": "Rất tiếc, không thể sử dụng bàn phím trong trình chỉnh sửa HTML đẹp. Truy cập trình chỉnh sửa HTML thô ở đây."
   },
   "save_11a80ec3": { "message": "Lưu" },
+  "saved_buttons_and_icons_8278eed2": { "message": "Nút Và Biểu Tượng Đã Lưu" },
   "search_280d00bd": { "message": "Tìm Kiếm" },
   "search_term_b2d2235": { "message": "Từ Khóa Tìm Kiếm" },
   "select_crop_shape_d441feeb": { "message": "Chọn hình dạng cắt gọt" },
@@ -385,6 +400,7 @@
     "message": "Nhấn Shift-O để mở trình chỉnh sửa html đẹp."
   },
   "show_audio_options_b489926b": { "message": "Hiển thị tùy chọn âm thanh" },
+  "show_embed_options_ef8d7ef": { "message": "Hiển thị tùy chọn nhúng" },
   "show_image_options_1e2ecc6b": { "message": "Hiển thị tùy chọn hình ảnh" },
   "show_link_options_545338fd": { "message": "Hiển thị tùy chọn liên kết" },
   "show_video_options_6ed3721a": { "message": "Hiển thị tùy chọn video" },

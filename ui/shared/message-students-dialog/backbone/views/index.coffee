@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!viewsMessageStudentsDialog'
 import $ from 'jquery'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import template from '../../jst/messageStudentsDialog.handlebars'
@@ -24,8 +24,6 @@ import ConversationCreator from '../models/ConversationCreator.coffee'
 import recipientListTemplate from '../../jst/_messageStudentsWhoRecipientList.handlebars'
 import _ from 'underscore'
 import '@canvas/forms/jquery/serializeForm'
-
-I18n = useI18nScope('viewsMessageStudentsDialog')
 
 export default class MessageStudentsDialog extends DialogFormView
 

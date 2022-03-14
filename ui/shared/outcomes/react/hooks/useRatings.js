@@ -17,11 +17,9 @@
  */
 
 import {useMemo, useState, useCallback} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!ProficiencyTable'
 import uuid from 'uuid/v1'
 import useBoolean from './useBoolean'
-
-const I18n = useI18nScope('ProficiencyTable');
 
 const floatRegex = /^[+-]?\d+(\.\d+)?$/
 

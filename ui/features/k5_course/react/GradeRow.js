@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!grade_row'
 import tz from '@canvas/timezone'
 
 import {Table} from '@instructure/ui-table'
@@ -28,8 +28,6 @@ import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-conte
 import {Badge} from '@instructure/ui-badge'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
-
-const I18n = useI18nScope('grade_row');
 
 // For the instui Table to render correctly with layout="stacked", (see GradeDetails)
 // its body's children must be Table.Rows. It doesn't work to trick it by setting

@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!MoveOutcomesModal'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -27,8 +27,6 @@ import TargetGroupSelector from '../shared/TargetGroupSelector'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
-
-const I18n = useI18nScope('MoveOutcomesModal');
 
 const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandler, onSuccess}) => {
   const [targetGroup, setTargetGroup] = useState(parentGroup)

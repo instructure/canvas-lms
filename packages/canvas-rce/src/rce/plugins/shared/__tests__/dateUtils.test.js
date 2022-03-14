@@ -20,8 +20,7 @@ import {applyTimezoneOffsetToDate} from '../dateUtils'
 
 describe('dateUtils', () => {
   describe('applyTimezoneOffsetToDate', () => {
-    // Temporarily skipping to get builds passing again. App code should take DST into account.
-    it.skip('with a (-) current timezone > (-) target timezone', () => {
+    it('with a (-) current timezone > (-) target timezone', () => {
       moment.tz.setDefault('America/Caracas') // -04:00
       const date = '2022-04-15T02:00:00Z'
       const targetTimezone = 'America/Denver' // -07:00

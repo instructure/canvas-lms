@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { default: Errors } = require("@instructure/i18nliner/dist/lib/errors");
+var HtmlReporter = require('jasmine-pretty-html-reporter').Reporter;
+var path = require('path');
 
-Errors.register("UnscopedTranslateCall");
-
-module.exports = Errors
+// options object
+jasmine.getEnv().addReporter(new HtmlReporter({
+  path: path.join(__dirname,'../../../../tmp/spec_results')
+}));

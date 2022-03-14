@@ -381,7 +381,7 @@ it('clears state on modal close', () => {
 })
 
 it('hasRedirectUris', () => {
-  developerKey.redirect_uris = ''
+  developerKey.redirect_uris = null
 
   const wrapper = mount(
     modal({
@@ -395,7 +395,7 @@ it('hasRedirectUris', () => {
     })
   )
 
-  expect(wrapper.instance().hasRedirectUris).toEqual('')
+  expect(wrapper.instance().hasRedirectUris).toEqual(null)
 
   wrapper.instance().updateToolConfiguration(validToolConfig)
 

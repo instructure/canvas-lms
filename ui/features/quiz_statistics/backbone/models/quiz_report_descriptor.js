@@ -17,9 +17,7 @@
  */
 
 import DateTimeHelpers from '@canvas/quiz-legacy-client-apps/util/date_time_helpers'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('quiz_reports');
+import I18n from 'i18n!quiz_reports'
 
 const STUDENT_ANALYSIS = 'student_analysis'
 const ITEM_ANALYSIS = 'item_analysis'

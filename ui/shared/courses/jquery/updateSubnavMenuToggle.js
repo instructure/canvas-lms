@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('subnav_menu_toggle');
+import I18n from 'i18n!subnav_menu_toggle'
 
 const subnavMenuTranslations = {
   hide: {

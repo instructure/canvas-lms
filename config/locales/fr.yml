@@ -2353,7 +2353,6 @@ fr:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet aux instructeurs d'appliquer des notes en masse aux soumissions dénuées de notes provenant de groupes de travail et des menus de colonne Total dans le carnet de note."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permet aux résultats d'apprentissage d’être sélectionnables lors des migrations de contenus de cours"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permet de modifier les paramètres de notification pour n’importe quel cours depuis la page de paramètres de notifications au niveau du cours."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permet aux données de résultats stockées dans le service Résultats d'apparaître dans les rapports Canvas (rapports administrateurs liés aux résultats, sLMGB et LMGB)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permet de définir des échelles de réussite et des méthodes de calcul au niveau des comptes et des cours, et de remplacer les notes du critère en fonction des résultats et les méthodes de calcul."
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Permettre le paramétrage des critères de notation et des options de méthode de calcul pour les résultats individuels"
   allows_students_to_access_other_student_groups_wit_43918810: "Permet aux élèves d'accéder à d'autres groupes d'élèves au sein d'un groupe par un lien direct."
@@ -3398,7 +3397,6 @@ fr:
   applied_filters_63a90ccd: "Filtres appliqués :"
   apply_781a2546: Appliquer
   apply_changes_b1dffc70: "Appliquer les changements"
-  apply_conditions_9e941010: "Appliquer les conditions"
   apply_date_range_selection_cc4351ed: "Appliquer la sélection d'une plage de dates"
   apply_filter_7e4f6113: "Appliquer les filtres."
   apply_filters_note_clicking_this_button_will_cause_753f04: "Appliquer les filtres. Note : cliquer sur ce bouton entraînera le rafraichissement de la page."
@@ -9514,7 +9512,7 @@ fr:
     cancel: Annuler
     save_settings: "Enregistrer les paramètres"
     saving: Enregistrement...
-  did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: "Le saviez-vous ? Vous pouvez désormais créer des filtres détaillés et les enregistrer pour les utiliser plus tard."
+  did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: "Le saviez-vous ? Vous pouvez désormais créer des filtres détaillés et les enregistrer pour les utiliser plus tard."
   did_you_mean_id_241c900c: "Vouliez-vous dire ? *%{id}*"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Vous n’avez pas trouvé ce que vous cherchiez ? Essayez encore !"
   different_course_b875770e: "cours différent"
@@ -10508,7 +10506,6 @@ fr:
   end_date_e0093ed7: "Date de fin"
   end_date_from_cdd9d90: "Date de fin à partir du :"
   end_date_to_8b17929d: "Date de fin jusqu’au :"
-  end_date_value_3d3e8906: "Date de fin %{value}"
   end_dates_249d8dbb: "Dates de fin :"
   end_dates_cannot_be_before_start_dates_d6018daf: "Les dates de fins ne peuvent être situées avant les dates de début."
   end_time_250391e8: "Heure de fin"
@@ -11338,7 +11335,6 @@ fr:
   failed_initializing_dashboard_3d967143: "Échec de l’initialisation du tableau de bord"
   failed_jobs_b632bbf0: "Tâches échouées"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Échec du chargement du composant Associations. Votre connexion réseau fonctionne-t-elle correctement ?"
-  failed_loading_course_cards_8fcdb36d: "Échec du chargement des cartes de cours"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Échec du chargement des sections des cours. Rafraîchissez la page pour réessayer."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Échec du chargement du composant Historique de synchronisation. Votre connexion réseau fonctionne-t-elle correctement ?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Échec du chargement du composant Changements non synchronisés Votre connexion réseau fonctionne-t-elle correctement ?"
@@ -14389,7 +14385,7 @@ fr:
   invalid_fields_after_ratings_fields_815ff223: "Champs non valides après les notations : %{fields}"
   invalid_fields_fields_8698284: "Champs non valides : %{fields}"
   invalid_fields_for_a_group_invalid_f440b733: "Zones non valides pour un groupe : %{invalid}"
-  invalid_fields_for_an_outcome_invalid_fafdf0df: "Champs invalides pour un résultat : %{invalid}"
+  invalid_fields_for_an_outcome_invalid_fafdf0df: "Champs invalides pour un résultat : %{invalid}"
   invalid_file_type_881cc9b2: "Type de fichier non valide"
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting non valide"
   invalid_hexcode_9124519f: "Hexcode non valide"
@@ -18996,7 +18992,6 @@ fr:
   outcome_results_23a0a117: Résultats
   outcome_results_title: Acquis
   outcome_score_141cf00a: "Résultats des acquis"
-  outcome_service_results_to_canvas_reporting_749667bc: "Données du service Résultats dans les rapports Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Acquis : %{title} a le statut %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Le résultat « %{title} » a été créé avec succès."
   outcome_title_was_successfully_created_be3a408: "Le résultat « %{title} »  a été créé avec succès"
@@ -19217,7 +19212,7 @@ fr:
       headers: 
         date: Date
         participated: "A participé"
-        time: Temps
+        time: Heure
         url: URL
         user_agent: "Agent utilisateur"
   page_views_csv_9835a9f9: "Vues de la page CSV"
@@ -19287,7 +19282,6 @@ fr:
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   panama_fa454c86: Panama
-  panda_taking_photograph_8db13e0f: "un panda prenant une photo"
   paper_view_7405eeab: "Format copie"
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
@@ -22420,7 +22414,6 @@ fr:
   remove_avatar_picture_aba765eb: "Supprimer l’image de l’avatar"
   remove_c_name_section_d8eabd3a: "Retirer la section %{c.name}"
   remove_collaborationtitle_c3e81adb: "Supprimer \"%{collaborationTitle}\"?"
-  remove_condition_9cf94f7f: "Supprimer la condition"
   remove_conference_69b9e0d0: "Supprimer la conférence"
   remove_conference_title_207d32c0: "Supprimer la conférence : %{title}"
   remove_contact_method_ca890ba3: "Supprimer le mode de contact"
@@ -22685,7 +22678,6 @@ fr:
   rich_content_editor_2708ef21: "Éditeur de texte enrichi"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Améliorations de la barre latérale de l’éditeur de contenu enrichi"
   right_sidebar_logo_5483dc0a: "Logo de la barre latérale droite"
-  rocketship_on_launchpad_4011ea8c: "une fusée sur une rampe de lancement"
   role: 
     duplicate_role: "Il existe déjà un rôle avec ce nom"
   role_13a7be77: Rôle
@@ -24871,7 +24863,6 @@ fr:
   start_date_from_20503757: "Date de démarrage à partir du :"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} à %{end_time}"
   start_date_to_1e6e6bbe: "Date de démarrage jusqu’au :"
-  start_date_value_817cab96: "Date de début %{value}"
   start_dates_8f1c22a8: "Dates de démarrage :"
   start_entry_4b491f60: "Démarrer une entrée"
   start_from_a_template_380d4e8: "Commencer depuis un modèle..."
@@ -25037,7 +25028,6 @@ fr:
   student_sis_6721040e: "Sis de l'élève"
   student_sis_d9f0cd39: "sis de l'étudiant"
   student_sis_id_abe6b292: "ID SIS d’étudiant"
-  student_student_number_5c98bd2d: "Élève %{student_number}"
   student_studentnumber_f398d9c2: "Élève %{studentNumber}"
   student_submissions_910da1b3: "Soumissions de l’élève"
   student_submissions_report_prospect_education_108daf59: "Rapport des soumissions de l’élève (Prospect Education)"
@@ -25705,7 +25695,6 @@ fr:
   the_app_was_added_successfully_3f785a23: "L’application a bien été ajoutée"
   the_app_was_deactivated_573520ab: "L’application était désactivée"
   the_app_was_updated_successfully_3d71cd1b: "L’application a bien été mise à jour"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "L'argument fourni est attendu comme étant de type booléen."
   the_assignment_group_id_to_report_on_83880208: "L’identifiant du groupe de travail sur lequel doit porter le rapport"
   the_assignment_group_named_major_9d349037: "La matière principale nommée du groupe de travail"
   the_assignment_group_named_papers_e1cb6a34: "Les articles nommés du groupe de travail"
@@ -28643,7 +28632,6 @@ fr:
   web_page_146f9102: "Page Web"
   web_url_d84feaf5: URL
   webcam_fe91b20f: Webcam
-  webcam_photo_ee55462c: "Photo par webcam"
   webct_credentials: 
     credential_not_found: "Les informations d’identification sont introuvables."
   webct_display: "Blackboard Vista/CE (WebCT)"

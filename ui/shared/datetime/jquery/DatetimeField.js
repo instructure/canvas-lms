@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!datepicker'
 import $ from 'jquery'
 import {debounce} from 'underscore'
 import tz from '@canvas/timezone'
@@ -24,8 +24,6 @@ import {isRTL} from '@canvas/i18n/rtlHelper'
 
 import moment from 'moment'
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('datepicker');
 
 const TIME_FORMAT_OPTIONS = {
   hour: 'numeric',

@@ -1831,7 +1831,6 @@ th:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "อนุญาตให้ผู้สอนปรับใช้คะแนนกับผลงานจัดส่งที่ไม่ได้ให้เกรดในภาพรวมจากกลุ่มภารกิจและเมนูคอลัมน์รวมในสมุดบันทึกเกรด (Gradebook)"
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: อนุญาตผลการเรียนรู้ให้เป็นแบบเลือกได้ขณะโอนย้ายเนื้อหาบทเรียน
   allows_modifying_notification_settings_for_any_cou_5004ac71: สามารถแก้ไขค่าการแจ้งข้อมูลสำหรับบทเรียนจากภายในเพจค่าปรับตั้งการแจ้งข้อมูลระดับบัญชีผู้ใช้
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "อนุญาตข้อมูลผลลัพธ์ที่จัดเก็บใน บริการสำหรับผลลัพธ์ (Outcomes Service) เพื่อจัดแสดงในรายงานของ Canvas (LMGB, sLMGB และรายงานโดยผู้ดูแลที่เกี่ยวกับผลลัพธ์)"
   allows_setting_account_course_level_mastery_scales_1939e0fd: "อนุญาตให้กำหนดคะแนนความเชี่ยวชาญระดับบัญชีและบทเรียนและวิธีการคำนวณ โดยแทนที่คะแนนตามเกณฑ์และวิธีการคำนวณตามผลลัพธ์"
   allows_setting_criterion_ratings_and_calculation_m_24542321: อนุญาตให้กำหนดคะแนนตามเกณฑ์และตัวเลือกวิธีการคำนวณสำหรับผลลัพธ์เฉพาะรายการ
   allows_students_to_access_other_student_groups_wit_43918810: "อนุญาตให้ผู้เรียนสืบค้นกลุ่มผู้เรียนอื่น ๆ ภายในชุดกลุ่มที่มีลิงค์ตรง"
@@ -2443,7 +2442,6 @@ th:
   applied_cc7be774: ที่ปรับใช้
   applied_filters_63a90ccd: "ตัวกรองที่ใช้:"
   apply_781a2546: ปรับใช้
-  apply_conditions_9e941010: ปรับใช้เงื่อนไข
   apply_date_range_selection_cc4351ed: ปรับใช้การเลือกช่วงวันที่
   apply_filter_7e4f6113: ปรับใช้ตัวกรอง
   apply_filters_note_clicking_this_button_will_cause_753f04: "ปรับใช้ตัวกรอง หมายเหตุ: การคลิกที่ปุ่มนี้จะทำให้เพจโหลดใหม่"
@@ -7725,7 +7723,6 @@ th:
   end_date_e0093ed7: วันที่สิ้นสุด
   end_date_from_cdd9d90: "วันที่สิ้นสุด จาก:"
   end_date_to_8b17929d: "วันที่สิ้นสุด ถึง:"
-  end_date_value_3d3e8906: "วันที่สิ้นสุด %{value}"
   end_dates_249d8dbb: "วันที่สิ้นสุด:"
   end_dates_cannot_be_before_start_dates_d6018daf: วันที่สิ้นสุดจะอยู่ก่อนวันที่เริ่มต้นไม่ได้
   end_time_250391e8: เวลาสิ้นสุด
@@ -8325,7 +8322,6 @@ th:
   failed_getting_next_batch_of_announcements_1f1165a5: ไม่สามารถสืบค้นประกาศชุดถัดไป
   failed_initializing_dashboard_3d967143: ไม่สามารถเริ่มการทำงานของแผงข้อมูล
   failed_jobs_b632bbf0: งานล้มเหลว
-  failed_loading_course_cards_8fcdb36d: ไม่สามารถโหลดบัตรข้อมูลบทเรียน
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "ไม่สามารถโหลดกลุ่มย่อยของบทเรียน รีเฟรชเพจเพื่อลองใหม่อีกครั้ง"
   failed_pairing_student_c9f0863b: ไม่สามารถเข้าคู่ผู้เรียนได้
   failed_please_report_the_following_error_code_to_y_42248d60: "ล้มเหลว กรุณาแจ้งรหัสข้อผิดพลาดต่อไปนี้ไปยังผู้ดูแลระบบของคุณ รายงานข้อผิดพลาด:%{error};"
@@ -13937,7 +13933,6 @@ th:
   outcome_results_23a0a117: ผลลัพธ์
   outcome_results_title: ผลลัพธ์
   outcome_score_141cf00a: คะแนนผลลัพธ์
-  outcome_service_results_to_canvas_reporting_749667bc: "บริการสำหรับผลลัพธ์เป็นชุดรายงาน Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "ผลลัพธ์: %{title} มีสถานะ %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "ไม่พบผลลัพธ์ที่ใช้ canvas id \"%{id}\""
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "ผลลัพธ์พร้อม ID %{guid} มีอยู่แล้วในบทเรียนหรือบัญชีอื่นที่ไม่เกี่ยวข้อง (%{name})"
@@ -14156,7 +14151,6 @@ th:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: รองรับรหัสเข้าคู่ก็ต่อเมื่อเปิดใช้การลงทะเบียนด้วยตัวเองไว้สำหรับบัญชี
   pakistan_92_da28c36: "ปากีสถาน (+92)"
   panama_507_831fbc99: "ปานามา (+507)"
-  panda_taking_photograph_8db13e0f: แพนด้ากำลังถ่ายภาพ
   paper_view_7405eeab: มุมมองเอกสาร
   paraguay_595_ca58b83a: "ปารากวัย (+595)"
   parameter_91ed199: พารามิเตอร์
@@ -16618,7 +16612,6 @@ th:
   remove_attribute_59a4aa64: ลบคุณลักษณะ
   remove_avatar_picture_aba765eb: ลบภาพประจำตัว
   remove_collaborationtitle_c3e81adb: "ลบ \"%{collaborationTitle}\" หรือไม่"
-  remove_condition_9cf94f7f: ลบเงื่อนไข
   remove_conference_title_207d32c0: "ลบการประชุม: %{title}"
   remove_contact_method_ca890ba3: ลบวิธีการติดต่อ
   remove_course_association_name_b760c502: "ลบการเชื่อมโยงบทเรียน %{name}"
@@ -16831,7 +16824,6 @@ th:
   review_now_318a6a3e: พิจารณาตอนนี้
   rich_content_editor_2708ef21: "Rich Content Editor"
   right_sidebar_logo_5483dc0a: โลโก้แถบข้อมูลด้านข้างทางขวา
-  rocketship_on_launchpad_4011ea8c: จรวดบนฐานปล่อย
   role: 
     duplicate_role: บทบาทชื่อนี้มีอยู่แล้ว
   role_13a7be77: บทบาท
@@ -18425,7 +18417,6 @@ th:
   start_date_from_20503757: "วันที่เริ่มต้น จาก:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} ถึง %{end_time}"
   start_date_to_1e6e6bbe: "วันที่เริ่มต้น ถึง:"
-  start_date_value_817cab96: "วันที่เริ่มต้น %{value}"
   start_dates_8f1c22a8: "วันที่เริ่มต้น:"
   start_link_validation_dc0ac99c: เริ่มการตรวจสอบลิงค์
   start_over_f7552aa9: เริ่มใหม่
@@ -18564,7 +18555,6 @@ th:
   student_sis_6721040e: "SIS ผู้เรียน"
   student_sis_d9f0cd39: "SIS ผู้เรียน"
   student_sis_id_abe6b292: "SIS ID ผู้เรียน"
-  student_student_number_5c98bd2d: "ผู้เรียน %{student_number}"
   student_studentnumber_f398d9c2: "ผู้เรียน %{studentNumber}"
   student_submissions_910da1b3: ผลงานจัดส่งของผู้เรียน
   student_submissions_report_prospect_education_108daf59: "รายงานผลงานจัดส่งของผู้เรียน (Prospect Education)"
@@ -19120,7 +19110,6 @@ th:
   the_app_was_added_successfully_3f785a23: เพิ่มแอพเสร็จสิ้น
   the_app_was_deactivated_573520ab: ปิดใช้งานแอพแล้ว
   the_app_was_updated_successfully_3d71cd1b: อัพเดตแอพเสร็จสิ้น
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: อาร์กิวเมนท์ที่แจ้งคาดว่าจะเป็นแบบบูลีน
   the_assignment_group_id_to_report_on_83880208: "Id กลุ่มภารกิจที่จะแจ้ง"
   the_assignment_group_named_major_9d349037: "กลุ่มภารกิจ วิชาหลักที่ระบุ"
   the_assignment_group_named_papers_e1cb6a34: "กลุ่มภารกิจ เอกสารที่ระบุ"
@@ -21228,7 +21217,6 @@ th:
   web_page_146f9102: เว็บเพจ
   web_url_d84feaf5: "URL เว็บ"
   webcam_fe91b20f: เว็บแคม
-  webcam_photo_ee55462c: ภาพเว็บแคม
   webct_credentials: 
     credential_not_found: ไม่พบข้อมูลล็อกอิน
   webct_display: "Blackboard Vista/CE (WebCT)"

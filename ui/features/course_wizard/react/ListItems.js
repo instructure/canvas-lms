@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
-const I18n = useI18nScope('course_wizard');
+import I18n from 'i18n!course_wizard'
 /**
  * Returns an array containing all the possible items for the checklist
  * For many ListItems, the ! is added for the complete property

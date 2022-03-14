@@ -19,9 +19,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('theme_editor');
+import I18n from 'i18n!theme_editor'
 
 // consider anything other than null or undefined (including '') as "set"
 function isSet(val) {

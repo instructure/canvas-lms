@@ -17,10 +17,8 @@
  */
 
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_change_tracking'
 import {PacePlanItem} from '../types'
-
-const I18n = useI18nScope('pace_plans_change_tracking');
 
 export type Change<T = unknown> = {
   id: string

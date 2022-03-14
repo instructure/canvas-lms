@@ -20,11 +20,9 @@ import React from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!modules'
 import PostGradesDialog from './PostGradesDialog'
 import classnames from 'classnames'
-
-const I18n = useI18nScope('modules');
 
 // The PostGradesApp mounts a single "Sync Grades" button, which pops up
 // the PostGradesDialog when clicked.

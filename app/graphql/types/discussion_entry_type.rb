@@ -66,7 +66,7 @@ module Types
       argument :role_types, [String], "Return only requested base role types", required: false
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
-    def author(course_id: nil, role_types: nil, built_in_only: false)
+    def author(course_id: nil, role_types: nil, built_in_only: true)
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous? && object.is_anonymous_author
           nil
@@ -112,7 +112,7 @@ module Types
       argument :role_types, [String], "Return only requested base role types", required: false
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
-    def editor(course_id: nil, role_types: nil, built_in_only: false)
+    def editor(course_id: nil, role_types: nil, built_in_only: true)
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous? && !course_id
           nil

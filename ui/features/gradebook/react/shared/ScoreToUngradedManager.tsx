@@ -17,11 +17,9 @@
  */
 
 import axios from '@canvas/axios'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebookSharedScoreToUngradedManager'
 
 import GradebookApi from '../default_gradebook/apis/GradebookApi'
-
-const I18n = useI18nScope('gradebookSharedScoreToUngradedManager');
 
 type Progress = {
   progressId: number
@@ -100,12 +98,12 @@ class ScoreToUngradedManager {
     }, this.pollingInterval)
   }
 
-  startProcess(courseId, options) {
+  startProcess(courseId, optionsWithFilters) {
     if (this.process) {
       return Promise.reject(I18n.t('A process is already in progress.'))
     }
 
-    return GradebookApi.applyScoreToUngradedSubmissions(courseId, options)
+    return GradebookApi.applyScoreToUngradedSubmissions(courseId, optionsWithFilters)
       .then(response => {
         this.process = {
           progressId: response.data.id,

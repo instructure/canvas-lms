@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Llista d''anuncis" },
   "announcements_a4b8ed4a": { "message": "Anuncis" },
   "apply_781a2546": { "message": "Aplica" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Aplica els canvis a totes les instàncies d’aquest botó i d’aquesta icona a l''assignatura"
+  },
   "apps_54d24a47": { "message": "Aplicacions" },
   "arrows_464a3e54": { "message": "Fletxes" },
   "art_icon_8e1daad": { "message": "Icona d''art" },
@@ -74,6 +77,12 @@ const locale = {
   "basic_554cdc0a": { "message": "Bàsic" },
   "below_81d4dceb": { "message": "A sota de" },
   "bottom_third_5f5fec1d": { "message": "Terç inferior" },
+  "button_color_608a0242": { "message": "Color del botó" },
+  "button_outline_cf14f071": { "message": "Contorn del botó" },
+  "button_outline_size_cc1d1df7": { "message": "Mida del contorn del botó" },
+  "button_shape_dbecb573": { "message": "Forma del botó" },
+  "button_size_20f5fce1": { "message": "Mida del botó" },
+  "buttons_and_icons_e66ee12c": { "message": "Botons i icones" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel·la" },
   "choose_caption_file_9c45bc4e": { "message": "Tria un fitxer de subtítols" },
@@ -119,6 +128,7 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Contrau per amagar { types }"
   },
+  "color_color_eb64b08": { "message": "Color { color }" },
   "computer_1d7dfa6f": { "message": "Ordinador" },
   "content_1440204b": { "message": "Contingut" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -142,6 +152,7 @@ const locale = {
     "message": "Elements multimèdia de l''assignatura"
   },
   "course_navigation_dd035109": { "message": "Navegació de l''assignatura" },
+  "create_button_and_icon_5c089934": { "message": "Botó i icona Crea" },
   "creative_commons_license_725584ae": {
     "message": "Llicència de Creative Commons:"
   },
@@ -197,6 +208,10 @@ const locale = {
   "embed_828fac4a": { "message": "Integra" },
   "embed_code_314f1bd5": { "message": "Integra el codi" },
   "embed_image_1080badc": { "message": "Integra la imatge" },
+  "embed_options_tray_901cfd19": {
+    "message": "Safata d''opcions d''integració"
+  },
+  "embed_preview_2d741e1f": { "message": "Integra la visualització prèvia" },
   "embed_video_a97a64af": { "message": "Integra el vídeo" },
   "embedded_content_aaeb4d3d": { "message": "contingut incrustat" },
   "engineering_icon_f8f3cf43": { "message": "Icona d’enginyeria" },
@@ -358,6 +373,7 @@ const locale = {
     "message": "Obre l’aplicació { title }"
   },
   "operators_a2ef9a93": { "message": "Operadors" },
+  "options_3ab0ea65": { "message": "Opcions" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Llistes ordenades i desordenades"
   },
@@ -417,6 +433,7 @@ const locale = {
     "message": "Malauradament, no es pot accedir a l’editor de dades HTML processades amb el teclat. Accediu a l’editor de dades HTML sense processar aquí."
   },
   "save_11a80ec3": { "message": "Desa" },
+  "saved_buttons_and_icons_8278eed2": { "message": "Botons i icones desats" },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Terme de cerca" },
   "select_crop_shape_d441feeb": {
@@ -428,6 +445,7 @@ const locale = {
     "message": "Premeu Maj+O per obrir l''editor de dades HTML processades."
   },
   "show_audio_options_b489926b": { "message": "Mostra les opcions de so" },
+  "show_embed_options_ef8d7ef": { "message": "Mostra les opcions integrades" },
   "show_image_options_1e2ecc6b": { "message": "Mostra les opcions d''imatge" },
   "show_link_options_545338fd": { "message": "Mostra les opcions d''enllaç" },
   "show_video_options_6ed3721a": { "message": "Mostra les opcions de vídeo" },

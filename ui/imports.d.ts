@@ -22,6 +22,7 @@ import {HTMLElement, KeyboardEventHandler, MouseEventHandler} from 'react'
 // by default. Declaring them as wildcard modules allows TS to recognize them as
 // bare-bones interfaces with the `any` type.
 // See https://www.typescriptlang.org/docs/handbook/modules.html#wildcard-module-declarations
+declare module 'i18n!*'
 declare module '*.coffee'
 declare module '*.graphql'
 declare module '*.handlebars'

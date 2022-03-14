@@ -231,7 +231,7 @@ describe('Upload data actions', () => {
         contextId: 101,
         contextType: 'course',
         onDuplicate: undefined,
-        category: 'icon_maker_icons'
+        category: 'buttons_and_icons'
       }
 
       return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
@@ -274,7 +274,7 @@ describe('Upload data actions', () => {
             parentFolderId: 2
           },
           {
-            category: 'icon_maker_icons',
+            category: 'buttons_and_icons',
             contextId: 101,
             contextType: 'course',
             host: 'http://host:port',
@@ -464,24 +464,24 @@ describe('Upload data actions', () => {
 
       describe('when the file is a button & icon svg', () => {
         beforeEach(() => {
-          fileText = 'something something image/svg+xml-icon-maker-icons'
+          fileText = 'something something image/svg+xml-buttons-and-icons'
         })
 
-        it('sets the category to "icon_maker_icons"', () => {
+        it('sets the category to "buttons_and_icons"', () => {
           subject().then(() => {
             sinon.assert.calledWith(successStore.preflightUpload, {
-              category: 'icon_maker_icons'
+              category: 'buttons_and_icons'
             })
           })
         })
       })
 
-      describe('when the file is not a button & icon svg', () => {
+      describe('when the file is a button & icon svg', () => {
         beforeEach(() => {
           fileText = 'something something not buttons & icons'
         })
 
-        it('sets the category to undefined', () => {
+        it('sets the category to "buttons_and_icons"', () => {
           subject().then(() => {
             sinon.assert.calledWith(successStore.preflightUpload, {
               category: undefined
@@ -507,7 +507,7 @@ describe('Upload data actions', () => {
 
       const subject = () => store.dispatch(actions.uploadPreflight('files', fileProps()))
 
-      it('sets the category to undefined', () => {
+      it('sets the category to "buttons_and_icons"', () => {
         subject().then(() => {
           sinon.assert.calledWith(successStore.preflightUpload, {
             category: undefined

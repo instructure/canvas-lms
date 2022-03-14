@@ -19,7 +19,7 @@
 import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!unpublished_changes_button_props'
 import {getPacePlan, getPlanPublishing, getUnpublishedChangeCount} from '../reducers/pace_plans'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
@@ -28,8 +28,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('unpublished_changes_button_props');
 
 type StateProps = {
   changeCount: number

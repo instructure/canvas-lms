@@ -1942,7 +1942,6 @@ sl:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Izvajalcem omogoča, da v redovalnici množično ocenijo neocenjene oddaje v menijih skupin nalog in stolpcev Skupno."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Omogoča izbiro učnih ciljev med migracijo vsebine predmeta"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Dovoljuje spreminjanje nastavitev obvestil za kateri koli predmet s strani nastavitev obvestil na ravni računa."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Omogoča prikaz podatkov o rezultatih, shranjenih v storitvi Učni izidi, v poročilih Canvas (LMGB, sLMGB in poročila skrbnika, povezana z učnimi izidi)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Omogoča nastavitev lestvic in računske metode doseganja ciljev na ravni računa in predmeta ter nadomešča ocene in izračune na podlagi meril za posamezni izid"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Omogoča nastavitev ocen meril in možnosti metode izračuna za posamezne učne izide."
   allows_students_to_access_other_student_groups_wit_43918810: "Dovoljuje študentom, da v naboru skupin dostopajo do drugih skupin študentov prek neposredne povezave."
@@ -2739,7 +2738,6 @@ sl:
   applied_cc7be774: Uporabljeno
   applied_filters_63a90ccd: "Uporabljeni filtri:"
   apply_781a2546: Uporabi
-  apply_conditions_9e941010: "Uveljavi pogoje"
   apply_date_range_selection_cc4351ed: "Uveljavi izbiro razpona datumov"
   apply_filter_7e4f6113: "Uporabljeni filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Uporabi filtre Opomba: s klikom tega gumba se bo stran ponovno naložila."
@@ -8494,7 +8492,6 @@ sl:
   end_date_e0093ed7: "Do datuma"
   end_date_from_cdd9d90: "Datum konca od:"
   end_date_to_8b17929d: "Datum konca do:"
-  end_date_value_3d3e8906: "Datum konca %{value}"
   end_dates_249d8dbb: "Datumi konca:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Datumi konca ne morejo biti pred datumi začetka."
   end_time_250391e8: "Čas konca"
@@ -9109,7 +9106,6 @@ sl:
   failed_initializing_dashboard_3d967143: "Inicializacija nadzorne plošče ni uspela"
   failed_jobs_b632bbf0: "Neuspela opravila"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Neuspelo nalaganje komponente povezav. Ali povezava z omrežjem deluje?"
-  failed_loading_course_cards_8fcdb36d: "Nalaganje kartic predmetov ni uspelo"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Neuspelo nalaganje sekcij predmeta. Osvežite stran in poskusite znova."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Neuspelo nalaganje komponente sinhronizacije zgodovine. Ali povezava z omrežjem deluje?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Neuspelo nalaganje komponente nesinhroniziranih sprememb. Ali povezava z omrežjem deluje?"
@@ -15235,7 +15231,6 @@ sl:
   outcome_results_23a0a117: "Rezultati učnih izidov"
   outcome_results_title: "Rezultati učnih izidov"
   outcome_score_141cf00a: "izid (točk)"
-  outcome_service_results_to_canvas_reporting_749667bc: "Rezultati storitve Učni izidi za poročila Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Izid: %{title} ima status %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Izida z ID sistema Canvas »%{id}« ni mogoče najti."
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Izid z ID %{guid} že obstaja v drugem nepovezanem predmetu ali računu (%{name})"
@@ -15491,7 +15486,6 @@ sl:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Kode za povezovanje so podprte samo, če je za račun omogočena samoregistracija."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
-  panda_taking_photograph_8db13e0f: "panda fotografira"
   paper_view_7405eeab: "Pogled postavitve na papirju"
   paraguay_595_ca58b83a: "Paragvaj (+595)"
   parameter_91ed199: Parameter
@@ -18163,7 +18157,6 @@ sl:
   remove_attribute_59a4aa64: "Odstrani lastnost"
   remove_avatar_picture_aba765eb: "Odstrani sliko avatarja"
   remove_collaborationtitle_c3e81adb: "Odstrani »%{collaborationTitle}«"
-  remove_condition_9cf94f7f: "Odstrani pogoj"
   remove_conference_title_207d32c0: "Odstrani konferenco: %{title}"
   remove_contact_method_ca890ba3: "Odstrani način stika"
   remove_course_association_name_b760c502: "Odstrani povezavo predmeta %{name}"
@@ -18380,7 +18373,6 @@ sl:
   rich_content_editor_2708ef21: Urejevalnik
   rich_content_editor_sidebar_enhancements_8bd945d3: "Izboljšave stranske vrstice urejevalnika"
   right_sidebar_logo_5483dc0a: "Logotip v desni stranski vrstici"
-  rocketship_on_launchpad_4011ea8c: "raketa na podlagi za izstrelitev"
   role: 
     duplicate_role: "Vloga s tem imenom že obstaja."
   role_13a7be77: Vloga
@@ -20162,7 +20154,6 @@ sl:
   start_date_from_20503757: "Datum začetka od:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} za %{end_time}"
   start_date_to_1e6e6bbe: "Datum začetka do:"
-  start_date_value_817cab96: "Datum začetka %{value}"
   start_dates_8f1c22a8: "Datumi začetka:"
   start_link_validation_dc0ac99c: "Zaženi preverjanje povezave"
   start_over_f7552aa9: "Začnite znova"
@@ -20303,7 +20294,6 @@ sl:
   student_sis_6721040e: "SIS študenta"
   student_sis_d9f0cd39: "sis študenta"
   student_sis_id_abe6b292: "sis id študenta"
-  student_student_number_5c98bd2d: "Študent %{student_number}"
   student_studentnumber_f398d9c2: "Študent %{studentNumber}"
   student_submissions_910da1b3: "Oddaje študenta"
   student_submissions_report_prospect_education_108daf59: "Poročilo o oddajah študentov (Prospect Education)"
@@ -20883,7 +20873,6 @@ sl:
   the_app_was_added_successfully_3f785a23: "Aplikacija je bila uspešno dodana."
   the_app_was_deactivated_573520ab: "Aplikacija je bila deaktivirana."
   the_app_was_updated_successfully_3d71cd1b: "Aplikacija je bila uspešno posodobljena."
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Pričakovano je, da bo podani argument logično število."
   the_assignment_group_id_to_report_on_83880208: "ID skupine nalog za poročanje"
   the_assignment_group_named_major_9d349037: "Glavni predmet z imenom skupine nalog"
   the_assignment_group_named_papers_e1cb6a34: "Pisni izdelki z imenom skupine nalog"
@@ -23236,7 +23225,6 @@ sl:
   web_page_146f9102: "Spletna stran"
   web_url_d84feaf5: "Spletni naslov (URL)"
   webcam_fe91b20f: "Spletna kamera"
-  webcam_photo_ee55462c: "Fotografija spletne kamere"
   webct_credentials: 
     credential_not_found: "Podatkov za prijavo v sistem ni mogoče najti."
   webct_display: "Blackboard Vista/CE (WebCT)"

@@ -17,12 +17,10 @@
  */
 
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!modules'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'
 import AssignmentCorrectionRow from './AssignmentCorrectionRow'
-
-const I18n = useI18nScope('modules');
 
 class PostGradesDialogCorrectionsPage extends React.Component {
   componentDidMount() {

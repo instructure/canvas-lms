@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!grades_empty_page'
 import PropTypes from 'prop-types'
 
 import {Img} from '@instructure/ui-img'
@@ -27,8 +27,6 @@ import {Flex} from '@instructure/ui-flex'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import EmptyGradesUrl from '../images/empty-grades.svg'
-
-const I18n = useI18nScope('grades_empty_page');
 
 const GradesEmptyPage = ({userIsCourseAdmin, courseId, courseName}) => (
   <Flex

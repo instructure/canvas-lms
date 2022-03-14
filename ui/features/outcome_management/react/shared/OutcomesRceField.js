@@ -19,11 +19,9 @@
 
 import React, {useState, useRef, Suspense} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const CanvasRce = React.lazy(() => import('@canvas/rce/react/CanvasRce'))
 

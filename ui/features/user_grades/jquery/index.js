@@ -17,10 +17,8 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!user_grades'
 import '@canvas/jquery/jquery.ajaxJSON'
-
-const I18n = useI18nScope('user_grades');
 
 $(document).ready(function() {
   $('.grading_periods_selector').each(function() {

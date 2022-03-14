@@ -80,7 +80,7 @@ describe "dashboard" do
     @course2.enroll_teacher(@observer, enrollment_state: :active)
     user_session(@observer)
 
-    get "/dashboard-sidebar?observed_user_id=#{@student2.id}"
+    get "/dashboard-sidebar?observed_user=#{@student2.id}"
     expect(f("#unauthorized_message")).to be_displayed
   end
 
@@ -91,7 +91,7 @@ describe "dashboard" do
     submission.submission_comments.create!(comment: "Comment 3", author: @teacher)
     user_session(@observer)
 
-    get "/dashboard-sidebar?observed_user_id=#{@student1.id}"
+    get "/dashboard-sidebar?observed_user=#{@student1.id}"
     expect(recent_feedback).to include_text "Comment 1"
     expect(recent_feedback).not_to include_text "Comment 2"
     expect(recent_feedback).not_to include_text "Comment 3"

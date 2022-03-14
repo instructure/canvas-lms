@@ -149,8 +149,7 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency,
-      outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
+      outcome_proficiency: outcome_proficiency
     }
 
     # This really means "if the final grade override feature flag is enabled AND
@@ -591,10 +590,7 @@ class GradebooksController < ApplicationController
       version: params.fetch(:version, nil)
     }
 
-    js_env({
-             GRADEBOOK_OPTIONS: gradebook_options,
-             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
-           })
+    js_env({ GRADEBOOK_OPTIONS: gradebook_options })
   end
 
   def set_learning_mastery_env
@@ -616,8 +612,7 @@ class GradebooksController < ApplicationController
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
                IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb)
-             },
-             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
+             }
            })
   end
 
@@ -1127,11 +1122,25 @@ class GradebooksController < ApplicationController
   # @argument only_past_due [Boolean]
   #   If true, only operate on submissions whose due date has passed.
   #
-  # @argument assignment_ids [Required, Array]
-  #   An array of assignment ids to apply score to ungraded submissions.
+  # @argument assignment_group_id [Integer]
+  #   If supplied, only operate on submissions belonging to assignments within
+  #   the specified assignment group.
   #
-  # @argument student_ids [Required, Array]
-  #   An array of student ids to apply score to ungraded submissions.
+  # @argument grading_period_id [Integer]
+  #   If supplied, only operate on submissions belonging to the specified
+  #   grading period.
+  #
+  # @argument course_section_id [Integer]
+  #   If supplied, only operate on submissions belonging to students within the
+  #   specified course section.
+  #
+  # @argument student_group_id [Integer]
+  #   If supplied, only operate on submissions belonging to students within the
+  #   specified student group.
+  #
+  # @argument module_id [Integer]
+  #   If supplied, only operate on submissions belonging to assignments within
+  #   the specified module.
   #
   # @example_request
   #
@@ -1139,8 +1148,7 @@ class GradebooksController < ApplicationController
   #   "percent": "50.0",
   #   "mark_as_missing": true,
   #   "only_past_due": true,
-  #   "assignment_ids": ["1", "2", "3"],
-  #   "student_ids": ["11", "22"]
+  #   "assignment_group_id": "10"
   # }
   #
   # @returns Progress
@@ -1169,12 +1177,17 @@ class GradebooksController < ApplicationController
       mark_as_missing: Canvas::Plugin.value_to_boolean(params[:mark_as_missing]),
       only_apply_to_past_due: Canvas::Plugin.value_to_boolean(params[:only_past_due])
     )
+    options.assignment_group = @context.assignment_groups.active.find(params[:assignment_group_id]) if params[:assignment_group_id].present?
+    options.context_module = @context.context_modules.not_deleted.find(params[:module_id]) if params[:module_id].present?
+    options.course_section = @context.course_sections.active.find(params[:course_section_id]) if params[:course_section_id].present?
+    options.student_group = @context.active_groups.find(params[:student_group_id]) if params[:student_group_id].present?
 
-    return render json: { error: :no_student_ids_provided }, status: :bad_request if params[:student_ids].blank?
-    return render json: { error: :no_assignment_ids_provided }, status: :bad_request if params[:assignment_ids].blank?
+    if params[:grading_period_id].present?
+      grading_period = GradingPeriod.for(@context).find(params[:grading_period_id])
+      return render json: { error: :cannot_apply_to_closed_grading_period }, status: :bad_request if grading_period.closed?
 
-    options.assignment_ids = params[:assignment_ids]
-    options.student_ids = params[:student_ids]
+      options.grading_period = grading_period
+    end
 
     progress = ::Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(
       course: @context,
@@ -1528,9 +1541,5 @@ class GradebooksController < ApplicationController
 
   def allow_apply_score_to_ungraded?
     @context.account.feature_enabled?(:apply_score_to_ungraded)
-  end
-
-  def outcome_service_results_to_canvas_enabled?
-    @context.feature_enabled?(:outcome_service_results_to_canvas)
   end
 end

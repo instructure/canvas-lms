@@ -641,7 +641,6 @@ class DiscussionTopicsController < ApplicationController
     if context.is_a?(Course)
       js_hash[:allow_self_signup] = true # for group creation
       js_hash[:group_user_type] = "student"
-      append_default_due_time_js_env(@context, js_hash)
     end
     js_env(js_hash)
 
@@ -1656,8 +1655,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.podcast_enabled
         content_for_head helpers.auto_discovery_link_tag(:rss,
                                                          feeds_topic_format_path(@topic.id, rss_context.feed_code, :rss),
-                                                         { title: t(:discussion_podcast_feed_title, "Discussion Podcast Feed"),
-                                                           id: "Discussion Podcast Feed" })
+                                                         { title: t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
       end
     end
   end

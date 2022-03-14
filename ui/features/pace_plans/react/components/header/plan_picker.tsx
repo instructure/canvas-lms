@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import keycode from 'keycode'
 import {connect} from 'react-redux'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_plan_picker'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
@@ -39,8 +39,6 @@ import {getSortedSections} from '../../reducers/sections'
 import {getCourse} from '../../reducers/course'
 import {actions} from '../../actions/ui'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
-
-const I18n = useI18nScope('pace_plans_plan_picker');
 
 const PICKER_WIDTH = '20rem'
 

@@ -1983,21 +1983,17 @@ class Submission < ActiveRecord::Base
   end
   private :validate_single_submission
 
-  def grade_change_audit(force_audit: false)
-    # grade or graded status changed
-    grade_changed = (saved_changes.keys & %w[grade score excused]).present? || (saved_change_to_workflow_state? && workflow_state == "graded")
+  def grade_change_audit(force_audit: assignment_changed_not_sub, skip_insert: false)
+    newly_graded = saved_change_to_workflow_state? && workflow_state == "graded"
+    grade_changed = (saved_changes.keys & %w[grade score excused]).present?
+    return true unless newly_graded || grade_changed || force_audit
 
-    # any auditable conditions
-    perform_audit = force_audit || grade_changed || assignment_changed_not_sub || saved_change_to_posted_at?
-
-    if perform_audit
-      if grade_change_event_author_id.present?
-        self.grader_id = grade_change_event_author_id
-      end
-      self.class.connection.after_transaction_commit do
-        Auditors::GradeChange.record(submission: self, skip_insert: !grade_changed)
-        queue_conditional_release_grade_change_handler if grade_changed
-      end
+    if grade_change_event_author_id.present?
+      self.grader_id = grade_change_event_author_id
+    end
+    self.class.connection.after_transaction_commit do
+      Auditors::GradeChange.record(skip_insert: skip_insert, submission: self)
+      queue_conditional_release_grade_change_handler if newly_graded || grade_changed
     end
   end
 
@@ -2659,7 +2655,7 @@ class Submission < ActiveRecord::Base
   end
 
   def assignment_muted_changed
-    grade_change_audit(force_audit: true)
+    grade_change_audit(force_audit: true, skip_insert: true)
   end
 
   def without_graded_submission?
@@ -2945,10 +2941,10 @@ class Submission < ActiveRecord::Base
     # posting/hiding on a separate copy of the assignment, then reload our copy
     # of the assignment to make sure we pick up any changes to the muted status.
     if posted? && !previously_posted
-      Assignment.find(assignment_id).post_submissions(submission_ids: [id], skip_updating_timestamp: true, skip_muted_changed: true)
+      Assignment.find(assignment_id).post_submissions(submission_ids: [id], skip_updating_timestamp: true)
       assignment.reload
     elsif !posted? && previously_posted
-      Assignment.find(assignment_id).hide_submissions(submission_ids: [id], skip_updating_timestamp: true, skip_muted_changed: true)
+      Assignment.find(assignment_id).hide_submissions(submission_ids: [id], skip_updating_timestamp: true)
       assignment.reload
     end
   end

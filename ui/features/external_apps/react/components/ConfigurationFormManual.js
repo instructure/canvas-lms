@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
@@ -26,8 +26,6 @@ import TextAreaInput from './TextAreaInput'
 import SelectInput from './SelectInput'
 import CheckboxInput from './CheckboxInput'
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('external_tools');
 
 const PRIVACY_OPTIONS = {
   anonymous: I18n.t('Anonymous'),

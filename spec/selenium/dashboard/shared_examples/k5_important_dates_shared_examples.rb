@@ -44,7 +44,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "shows an important date for an assignment" do
-    assignment_title = "Elec HW"
+    assignment_title = "Electricity Homework"
     due_at = 2.days.from_now(Time.zone.now)
 
     assignment = create_important_date_assignment(@subject_course, assignment_title, due_at)
@@ -58,7 +58,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "only shows no dates panda when important dates is not set for assignment" do
-    assignment_title = "Elec HW"
+    assignment_title = "Electricity Homework"
     due_at = 2.days.from_now(Time.zone.now)
     create_dated_assignment(@subject_course, assignment_title, due_at)
 
@@ -68,7 +68,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "shows an important date for a quiz" do
-    quiz_title = "Elec Quiz"
+    quiz_title = "Electricity Quiz"
     due_at = 2.days.from_now(Time.zone.now)
     quiz = quiz_model(course: @subject_course, title: quiz_title)
     quiz.generate_quiz_data
@@ -101,7 +101,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "does not show an important date assignment in the past" do
-    assignment_title = "Elec HW"
+    assignment_title = "Electricity Homework"
     due_at = 2.days.ago(Time.zone.now)
     create_important_date_assignment(@subject_course, assignment_title, due_at)
 
@@ -111,7 +111,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "shows an important date for a calendar event" do
-    calendar_event_title = "Elec Event"
+    calendar_event_title = "Electricity Event"
     start_at = 2.days.from_now(Time.zone.now)
     calendar_event = create_calendar_event(@subject_course, calendar_event_title, start_at)
     calendar_event.update!(important_dates: true)
@@ -124,7 +124,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "does not show an important date for a calendar event" do
-    calendar_event_title = "Elec Event"
+    calendar_event_title = "Electricity Event"
     start_at = 2.days.ago(Time.zone.now)
     calendar_event = create_calendar_event(@subject_course, calendar_event_title, start_at)
     calendar_event.update!(important_dates: true)
@@ -134,7 +134,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "shows a specific color icon when color is set for subject" do
-    assignment_title = "Elec HW"
+    assignment_title = "Electricity Homework"
     due_at = 2.days.from_now(Time.zone.now)
     create_important_date_assignment(@subject_course, assignment_title, due_at)
 

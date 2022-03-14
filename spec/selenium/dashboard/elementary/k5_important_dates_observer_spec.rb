@@ -42,7 +42,7 @@ describe "observer k5 dashboard important dates" do
 
   context "important dates panel" do
     it "shows the important date for observed student with override", custom_timeout: 20 do
-      assignment_title = "Elec HW"
+      assignment_title = "Electricity Homework"
       due_at = 2.days.ago(Time.zone.now)
       assignment = create_dated_assignment(@subject_course, assignment_title, due_at)
       assignment.update!(important_dates: true)

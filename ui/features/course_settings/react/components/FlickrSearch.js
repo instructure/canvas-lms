@@ -17,15 +17,13 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!flickr_search'
 import FlickrActions from '../actions/FlickrActions'
 import FlickrStore from '../stores/FlickrStore'
 import FlickrImage from './FlickrImage'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-
-const I18n = useI18nScope('flickr_search');
 
 export default class FlickrSearch extends React.Component {
   state = FlickrStore.getState()

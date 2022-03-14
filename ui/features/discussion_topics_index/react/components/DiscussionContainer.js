@@ -21,7 +21,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DropTarget} from 'react-dnd'
 import {string, func, bool} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussions_v2'
 import moment from 'moment'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -36,8 +36,6 @@ import actions from '../actions'
 import {ConnectedDiscussionRow, ConnectedDraggableDiscussionRow} from './DiscussionRow'
 import {discussionList} from '../proptypes/discussion'
 import propTypes from '../propTypes'
-
-const I18n = useI18nScope('discussions_v2');
 
 // Handle drag and drop on a discussion. The props passed in tell us how we
 // should update the discussion if something is dragged into this container

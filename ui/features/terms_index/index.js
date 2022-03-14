@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!terms.index'
 
 import $ from 'jquery'
 import '@canvas/datetime'
@@ -23,8 +23,6 @@ import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/templateData'
-
-const I18n = useI18nScope('terms.index');
 
 const dateOpts = {format: 'full'}
 

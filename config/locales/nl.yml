@@ -2353,7 +2353,6 @@ nl:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Maakt het voor cursusleiders mogelijk om massaal scores toe te passen op niet-beoordeelde inleveringen vanaf de opdrachtgroep en menu's met een Totaal-kolom in de Cijferlijst."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Maakt leerdoelen selecteerbaar wanneer cursusinhoud wordt gemigreerd"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Hiermee kunnen meldingsinstellingen voor elke cursus vanuit de pagina meldingsinstellingen op accountniveau worden gewijzigd."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Hiermee kunnen resultaatgegevens opgeslagen in de Leerdoelenservice worden weergegeven in Canvas-rapportage (LMGB, sLMGB en leerdoelgerelateerde beheerdersrapportage)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Maakt instelling van vakbeheersingsschalen en berekeningsmethoden op account- en cursusniveau mogelijk, als vervanging voor criteriabeoordelingen en berekeningsmethoden per leerdoel"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Hiermee kunnen criteriabeoordelingen en opties voor berekeningsmethoden voor afzonderlijke leerdoelen worden ingesteld."
   allows_students_to_access_other_student_groups_wit_43918810: "Hiermee krijgen cursisten toegang tot andere groepen cursisten binnen een groepsreeks met een rechtstreekse link."
@@ -3400,7 +3399,6 @@ nl:
   applied_filters_63a90ccd: "Toegepaste filters:"
   apply_781a2546: Toepassen
   apply_changes_b1dffc70: "Wijzigingen toepassen"
-  apply_conditions_9e941010: "Condities toepassen"
   apply_date_range_selection_cc4351ed: "Datumbereikselectie toepassen"
   apply_filter_7e4f6113: "Filter toepassen"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Pas filters toe. Opmerking: als je op deze knop klikt, wordt de pagina opnieuw geladen."
@@ -10495,7 +10493,6 @@ nl:
   end_date_e0093ed7: Einddatum
   end_date_from_cdd9d90: "Einddatum van:"
   end_date_to_8b17929d: "Einddatum tot:"
-  end_date_value_3d3e8906: "Einddatum %{value}"
   end_dates_249d8dbb: "Einddatums:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Einddatums mogen niet voor begindatums liggen"
   end_time_250391e8: Eindtijd
@@ -11325,7 +11322,6 @@ nl:
   failed_initializing_dashboard_3d967143: "Initialiseren van dashboard mislukt"
   failed_jobs_b632bbf0: "Mislukte taken"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Laden van  component Koppelingen is mislukt. Is je netwerkverbinding in orde?"
-  failed_loading_course_cards_8fcdb36d: "Laden van cursuskaarten mislukt"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Laden van cursussecties mislukt. Vernieuw de pagina om het opnieuw te proberen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Laden van component Synchronisatiegeschiedenis is mislukt. Is je netwerkverbinding in orde?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Laden van component Niet-gesynchroniseerde wijzigingen is mislukt. Is je netwerkverbinding in orde?"
@@ -18983,7 +18979,6 @@ nl:
   outcome_results_23a0a117: "Resultaten van leerdoelen"
   outcome_results_title: "Resultaten van leerdoelen"
   outcome_score_141cf00a: resultaat
-  outcome_service_results_to_canvas_reporting_749667bc: "Resultaten van leerdoelenservice naar Canvas-rapportage"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultaat: %{title}heeft een status van %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Aanmaken van leerdoel \"%{title}\" is gelukt."
   outcome_title_was_successfully_created_be3a408: "Leerdoel \"%{title}\" succesvol aangemaakt"
@@ -19207,7 +19202,7 @@ nl:
         time: Tijd
         url: URL
         user_agent: Gebruikersagent
-  page_views_csv_9835a9f9: "paginaweergaven CSV"
+  page_views_csv_9835a9f9: "Paginaweergaven CSV"
   page_views_eb64cf53: "Bezoekers van pagina"
   page_views_only_312b7577: "Alleen paginaweergaven"
   page_views_service_is_temporarily_unavailable_2eb4818: "Paginaweergavefunctie is tijdelijk niet beschikbaar"
@@ -19274,7 +19269,6 @@ nl:
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   panama_fa454c86: Panama
-  panda_taking_photograph_8db13e0f: "panda die foto maakt"
   paper_view_7405eeab: "Paper weergave"
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
@@ -22409,7 +22403,6 @@ nl:
   remove_avatar_picture_aba765eb: "Avatarfoto verwijderen"
   remove_c_name_section_d8eabd3a: "%{c.name} Sectie verwijderen"
   remove_collaborationtitle_c3e81adb: "\"%{collaborationTitle}\" verwijderen?"
-  remove_condition_9cf94f7f: "Conditie verwijderen"
   remove_conference_69b9e0d0: "Vergadering verwijderen"
   remove_conference_title_207d32c0: "Vergadering verwijderen: %{title}"
   remove_contact_method_ca890ba3: "Contactmethode bevestigen"
@@ -22674,7 +22667,6 @@ nl:
   rich_content_editor_2708ef21: "Rich Content Editor"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Uitbreidingen van zijbalk Rich Content Editor"
   right_sidebar_logo_5483dc0a: "Rechter zijbalk logo"
-  rocketship_on_launchpad_4011ea8c: "raket op lanceerplatform"
   role: 
     duplicate_role: "Een functie/rol met deze naam bestaat al"
   role_13a7be77: Functie
@@ -24863,7 +24855,6 @@ nl:
   start_date_from_20503757: "Begindatum van:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} tot %{end_time}"
   start_date_to_1e6e6bbe: "Begindatum tot:"
-  start_date_value_817cab96: "Begindatum %{value}"
   start_dates_8f1c22a8: "Begindatums:"
   start_entry_4b491f60: "Invoer starten"
   start_from_a_template_380d4e8: "Beginnen vanaf een sjabloon..."
@@ -25027,7 +25018,6 @@ nl:
   student_sis_6721040e: Cursist-SIS
   student_sis_d9f0cd39: "cursist SIS"
   student_sis_id_abe6b292: cursist-SIS-ID
-  student_student_number_5c98bd2d: "Cursist %{student_number}"
   student_studentnumber_f398d9c2: "Cursist %{studentNumber}"
   student_submissions_910da1b3: "Inleveringen van cursist"
   student_submissions_report_prospect_education_108daf59: "Rapport voor inleveringen van cursist (Prospect Education)"
@@ -25695,7 +25685,6 @@ nl:
   the_app_was_added_successfully_3f785a23: "De app werd succesvol toegevoegd"
   the_app_was_deactivated_573520ab: "De app is gedeactiveerd"
   the_app_was_updated_successfully_3d71cd1b: "De app werd succesvol bijgewerkt"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Het opgegeven argument wordt verondersteld van het type booleaans te zijn."
   the_assignment_group_id_to_report_on_83880208: "De opdrachtgroep-ID voor rapportage"
   the_assignment_group_named_major_9d349037: "De opdrachtgroep genaamd primair"
   the_assignment_group_named_papers_e1cb6a34: "De opdrachtgroep genaamd werkstukken"
@@ -28634,7 +28623,6 @@ nl:
   web_page_146f9102: webpagina
   web_url_d84feaf5: Web-URL
   webcam_fe91b20f: Webcam
-  webcam_photo_ee55462c: Webcamfoto
   webct_credentials: 
     credential_not_found: "Referentie niet gevonden."
   webct_display: "Blackboard Vista/CE (WebCT)"

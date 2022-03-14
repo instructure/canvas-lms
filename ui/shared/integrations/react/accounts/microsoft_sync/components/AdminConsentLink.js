@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!account_settings_jsx_bundle'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('account_settings_jsx_bundle');
 
 function consentUrl({baseUrl, clientId, redirectUri, tenant}) {
   const url = new URL(`${baseUrl}/${tenant}/adminconsent`)

@@ -33,7 +33,7 @@ import {
   IconUploadLine,
   IconTextLine
 } from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component} from 'react'
@@ -45,8 +45,6 @@ import {uploadFile} from '@canvas/upload-file'
 import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
-
-const I18n = useI18nScope('assignments_2_attempt_tab');
 
 const ExternalToolSubmission = React.lazy(() => import('./AttemptType/ExternalToolSubmission'))
 const FilePreview = React.lazy(() => import('./AttemptType/FilePreview'))

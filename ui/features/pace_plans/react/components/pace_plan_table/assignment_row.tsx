@@ -19,7 +19,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!pace_plans_assignment_row'
 import {debounce, pick} from 'lodash'
 import moment from 'moment-timezone'
 
@@ -54,8 +54,6 @@ import {actions} from '../../actions/pace_plan_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {getShowProjections} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
-
-const I18n = useI18nScope('pace_plans_assignment_row');
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Cell, Row} = Table as any

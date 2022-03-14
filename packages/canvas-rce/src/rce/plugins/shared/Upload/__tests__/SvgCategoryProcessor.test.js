@@ -35,13 +35,13 @@ describe('process()', () => {
 
   describe('when the file includes button and icon type', () => {
     beforeEach(() => {
-      fileText = 'something something image/svg+xml-icon-maker-icons'
+      fileText = 'something something image/svg+xml-buttons-and-icons'
     })
 
     it('returns the button and icons category', async () => {
       const category = await subject()
       expect(category).toMatchObject({
-        category: 'icon_maker_icons'
+        category: 'buttons_and_icons'
       })
     })
   })

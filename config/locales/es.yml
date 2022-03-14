@@ -2353,7 +2353,6 @@ es:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permite a los profesores puntuar las entregas o calificadas de forma masiva desde los menús de grupo de tareas y columna Total en el Libro de calificaciones."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permite que las competencias de aprendizaje puedan seleccionarse durante la migración del contenido del curso"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permite modificar las configuraciones de las notificaciones para cualquier curso desde dentro de la página de configuración de las notificaciones a nivel de la cuenta."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permite que los datos de competencias almacenados en el Servicio de competencias se muestren en los reportes de Canvas (LMGB, sLMGB y reportes administrativos relacionados con las competencias)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permite configurar escalas de dominio y métodos de cálculo a nivel de la cuenta y del curso, reemplazando las valoraciones de criterio y los métodos de cálculo en función de la competencia"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Permite configurar clasificaciones de criterio y opciones de método de cálculo para resultados individuales."
   allows_students_to_access_other_student_groups_wit_43918810: "Permite a los estudiantes acceder a otros grupos de estudiantes dentro de un conjunto de grupos con un enlace directo."
@@ -3400,7 +3399,6 @@ es:
   applied_filters_63a90ccd: "Filtros aplicados:"
   apply_781a2546: Aplicar
   apply_changes_b1dffc70: "Aplicar los Cambios"
-  apply_conditions_9e941010: "Aplicar condiciones"
   apply_date_range_selection_cc4351ed: "Aplicar selección del rango de fechas"
   apply_filter_7e4f6113: "Aplicar filtro"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Aplicar filtros. Nota: al hacer clic en este botón, se recargará la página."
@@ -10503,7 +10501,6 @@ es:
   end_date_e0093ed7: "Fecha de finalización"
   end_date_from_cdd9d90: "Fecha de finalización desde:"
   end_date_to_8b17929d: "Fecha de finalización hasta:"
-  end_date_value_3d3e8906: "Fecha de finalización %{value}"
   end_dates_249d8dbb: "Fechas de finalización:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Las fechas de término deben ser posteriores a la fecha de comienzo"
   end_time_250391e8: "Hora de finalización"
@@ -11333,7 +11330,6 @@ es:
   failed_initializing_dashboard_3d967143: "Error al inicializar el tablero"
   failed_jobs_b632bbf0: "Error en los trabajos"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Error al cargar el componente de Asociaciones. ¿La conexión de su red funciona bien?"
-  failed_loading_course_cards_8fcdb36d: "Falló la carga de las tarjetas del curso"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Falló la carga de las secciones del curso. Actualizar la página para intentarlo de nuevo."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Error al cargar el componente Historial de sincronización. ¿La conexión de su red funciona bien?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Error al cargar el componente Cambios no sincronizados. ¿La conexión de su red funciona bien?"
@@ -18995,7 +18991,6 @@ es:
   outcome_results_23a0a117: "Resultados de competencias"
   outcome_results_title: "Resultado de competencias"
   outcome_score_141cf00a: "puntaje de la competencia"
-  outcome_service_results_to_canvas_reporting_749667bc: "Resultados del Servicio de competencias a Reportes de Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Competencia: el estado de %{title} es %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "El resultado “%{title}” se creó con éxito."
   outcome_title_was_successfully_created_be3a408: "Competencia \"%{title}\" fue creada con éxito"
@@ -19218,7 +19213,7 @@ es:
         participated: Participó
         time: Hora
         url: URL
-        user_agent: "Agente del usuario"
+        user_agent: "Agente de usuario"
   page_views_csv_9835a9f9: "cvs de visualizaciones de la página"
   page_views_eb64cf53: "Vistas de página"
   page_views_only_312b7577: "Vistas de la página solamente"
@@ -19286,7 +19281,6 @@ es:
   pakistan_92_da28c36: "Paquistán (+92)"
   panama_507_831fbc99: "Panamá (+507)"
   panama_fa454c86: Panamá
-  panda_taking_photograph_8db13e0f: "panda tomando una fotografía"
   paper_view_7405eeab: "Vista del ensayo"
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
@@ -22417,7 +22411,6 @@ es:
   remove_avatar_picture_aba765eb: "Eliminar el avatar"
   remove_c_name_section_d8eabd3a: "Remover sección de %{c.name} "
   remove_collaborationtitle_c3e81adb: "¿Eliminar \"%{collaborationTitle}\"?"
-  remove_condition_9cf94f7f: "Eliminar condición"
   remove_conference_69b9e0d0: "Eliminar conferencia"
   remove_conference_title_207d32c0: "Eliminar conferencia: %{title}"
   remove_contact_method_ca890ba3: "Eliminar el método de contacto"
@@ -22682,7 +22675,6 @@ es:
   rich_content_editor_2708ef21: "Editor de contenido enriquecido"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Mejoras en la barra lateral del editor de contenido enriquecido"
   right_sidebar_logo_5483dc0a: "Logotipo de la barra lateral derecha"
-  rocketship_on_launchpad_4011ea8c: "cohete en la plataforma de lanzamiento"
   role: 
     duplicate_role: "Ya existe un rol con este nombre"
   role_13a7be77: Rol
@@ -24864,7 +24856,6 @@ es:
   start_date_from_20503757: "Fecha de inicio desde:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} a %{end_time}"
   start_date_to_1e6e6bbe: "Fecha de comienzo hasta:"
-  start_date_value_817cab96: "Fecha de inicio %{value}"
   start_dates_8f1c22a8: "Fechas de inicio:"
   start_entry_4b491f60: "Iniciar entrada"
   start_from_a_template_380d4e8: "Comience a partir de una plantilla..."
@@ -25028,7 +25019,6 @@ es:
   student_sis_6721040e: "Sis del estudiante"
   student_sis_d9f0cd39: "SIS del estudiante"
   student_sis_id_abe6b292: "Identificación del SIS del estudiante"
-  student_student_number_5c98bd2d: "Estudiante %{student_number}"
   student_studentnumber_f398d9c2: "Estudiante %{studentNumber}"
   student_submissions_910da1b3: "Entregas del estudiante"
   student_submissions_report_prospect_education_108daf59: "Reporte de entregas del estudiante (educación prospectiva)"
@@ -25696,7 +25686,6 @@ es:
   the_app_was_added_successfully_3f785a23: "Se agregó la aplicación correctamente"
   the_app_was_deactivated_573520ab: "Se desactivó la aplicación"
   the_app_was_updated_successfully_3d71cd1b: "Se actualizó la aplicación correctamente"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Se espera que el argumento proporcionado sea de tipo booleano."
   the_assignment_group_id_to_report_on_83880208: "La identificación del grupo de tareas a reportar"
   the_assignment_group_named_major_9d349037: "El grupo de tareas nombrado principal"
   the_assignment_group_named_papers_e1cb6a34: "El grupo de tareas nombrado trabajos"
@@ -28629,7 +28618,6 @@ es:
   web_page_146f9102: "Página web"
   web_url_d84feaf5: "URL web"
   webcam_fe91b20f: "Cámara web"
-  webcam_photo_ee55462c: "Foto de la cámara web"
   webct_credentials: 
     credential_not_found: "Credencial no encontrada."
   webct_display: "Blackboard Vista/CE (WebCT)"

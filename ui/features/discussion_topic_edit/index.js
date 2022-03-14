@@ -31,10 +31,8 @@ import LockManager from '@canvas/blueprint-courses/react/components/LockManager/
 import SectionsAutocomplete from './react/SectionsAutocomplete'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussions'
 import {AnonymousPostSelector} from './react/AnonymousPostSelector/AnonymousPostSelector'
-
-const I18n = useI18nScope('discussions');
 
 const isAnnouncement =
   ENV.DISCUSSION_TOPIC.ATTRIBUTES != null

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import React from 'react'
 import {bool, func, number, object} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -33,8 +33,6 @@ import store from '../lib/ExternalAppsStore'
 import classMunger from '../lib/classMunger'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-
-const I18n = useI18nScope('external_tools');
 
 const MAX_FAVS = 2
 export default class ExternalToolsTableRow extends React.Component {

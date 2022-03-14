@@ -116,9 +116,6 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Початок вашої історії завдань"
     },
-    "blue_daf8fea9": {
-        "message": "Синій"
-    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -212,9 +209,6 @@
     "custom_6979cd81": {
         "message": "Звичай"
     },
-    "cyan_c1d5f68a": {
-        "message": "Зелено-синій колір"
-    },
     "date_at_time_dbdb1b99": {
         "message": "{ date } в { time }"
     },
@@ -235,9 +229,6 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Зменшити відступ"
-    },
-    "deep_purple_bb3e2907": {
-        "message": "Темно-фіолетовий"
     },
     "delete_a6efa79d": {
         "message": "Видалити"
@@ -365,9 +356,6 @@
     "greek_65c5b3f7": {
         "message": "Грецький"
     },
-    "green_15af4778": {
-        "message": "Зелений"
-    },
     "group_files_82e5dcdb": {
         "message": "Файли групи"
     },
@@ -397,9 +385,6 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Збільшити відступ"
-    },
-    "indigo_2035fc55": {
-        "message": "Індиго"
     },
     "insert_593145ef": {
         "message": "Вставка"
@@ -433,9 +418,6 @@
     },
     "late_2be42b88": {
         "message": "Пізніше"
-    },
-    "light_blue_5374f600": {
-        "message": "Світло-блакитний"
     },
     "link_7262adec": {
         "message": "Посилання"
@@ -581,8 +563,8 @@
     "optional_add_course_ef0d70fc": {
         "message": "Опціонально: Додати курс"
     },
-    "orange_81386a62": {
-        "message": "Помаранчевий"
+    "options_3ab0ea65": {
+        "message": "Параметри"
     },
     "page_50c4823d": {
         "message": "Сторінка"
@@ -601,9 +583,6 @@
     },
     "percentage_34ab7c2c": {
         "message": "Відсоток"
-    },
-    "pink_68ad45cb": {
-        "message": "Рожевий"
     },
     "points_bceb5005": {
         "message": "бали"
@@ -626,9 +605,6 @@
     "published_c944a23d": {
         "message": "опубліковано"
     },
-    "purple_7678a9fc": {
-        "message": "Фіолетовий"
-    },
     "quiz_e0dcce8f": {
         "message": "Контрольна робота"
     },
@@ -640,9 +616,6 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Запис/завантаження медіа"
-    },
-    "red_8258edf3": {
-        "message": "Червоний"
     },
     "relationships_6602af70": {
         "message": "Зв''язки"
@@ -709,9 +682,6 @@
     },
     "task_16b0ef38": {
         "message": "Завдання"
-    },
-    "teal_f729a294": {
-        "message": "Бірюзовий"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Дата та час, до якого це потрібно виконати"

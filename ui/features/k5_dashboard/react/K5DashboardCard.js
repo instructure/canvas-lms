@@ -18,7 +18,7 @@
 
 import React, {useContext} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!k5_dashboard_card'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
@@ -36,8 +36,6 @@ import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import {DEFAULT_COURSE_COLOR, FOCUS_TARGETS} from '@canvas/k5/react/utils'
 
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
-
-const I18n = useI18nScope('k5_dashboard_card');
 
 export const CARD_SIZE_PX = 300
 

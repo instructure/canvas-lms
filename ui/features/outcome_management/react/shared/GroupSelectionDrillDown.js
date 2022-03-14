@@ -18,14 +18,12 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import PropTypes from 'prop-types'
 import {IconCheckSolid, IconArrowOpenStartSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {Options} from '@instructure/ui-options'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const BACK_INDEX = -2
 const SELECTED_GROUP_INDEX = -1

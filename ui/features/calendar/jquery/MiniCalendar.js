@@ -17,12 +17,10 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import _ from 'underscore'
 import calendarDefaults from '../CalendarDefaults'
 import 'jquery-tinypubsub'
-
-const I18n = useI18nScope('calendar');
 
 export default class MiniCalendar {
   constructor(selector, mainCalendar) {

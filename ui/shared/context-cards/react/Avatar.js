@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!student_context_trayAvatar'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
-
-const I18n = useI18nScope('student_context_trayAvatar');
 
 class Avatar extends React.Component {
   static propTypes = {

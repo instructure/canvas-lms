@@ -17,10 +17,8 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebookHelpers'
 import GradebookConstants from './constants'
-
-const I18n = useI18nScope('gradebookHelpers');
 
 export default {
   FLASH_ERROR_CLASS: '.ic-flash-error',

@@ -99,8 +99,10 @@ module Lti
       user_visible_to_proxy = user.enrollments
                                   .joins(course: :assignments)
                                   .where(assignments: { id: tool_proxy_assignments })
-                                  .where.not(courses: { workflow_state: "deleted" })
-                                  .where.not(assignments: { workflow_state: "deleted" })
+                                  .where.not(
+                                    courses: { workflow_state: "deleted" },
+                                    assignments: { workflow_state: "deleted" }
+                                  )
                                   .exists?
       render_unauthorized_action unless user_visible_to_proxy
     end

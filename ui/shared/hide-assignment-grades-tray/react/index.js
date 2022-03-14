@@ -24,7 +24,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!hide_assignment_grades_tray'
 
 import Layout from './Layout'
 import {
@@ -34,8 +34,6 @@ import {
 } from './Api'
 import {isHideable} from '@canvas/grading/SubmissionHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-
-const I18n = useI18nScope('hide_assignment_grades_tray');
 
 function initialShowState() {
   return {

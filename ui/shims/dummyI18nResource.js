@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2015 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-module.exports = {
-  presets: [
-    ['@babel/preset-env', { modules: 'commonjs' }],
-  ]
-}
+
+// Webpack wants to be able to resolve every module before
+// building.  Because we use a pitching loader for i18n tags,
+// we never make it to the resource itself (or shouldn't). However,
+// We need to give webpack a resource that exists on the Filesystem
+// before the pitching i18n loader catches it, so we replace
+// i18n!some-scope requires with i18n?some-scope!dummyI18nResource
+throw 'Should never actually call this module'

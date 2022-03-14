@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!content_migrations'
 import template from '../../jst/SelectContent.handlebars'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import checkboxCollectionTemplate from '../../jst/ContentCheckboxCollection.handlebars'
@@ -29,8 +29,6 @@ import NavigationForTree from './NavigationForTree.coffee'
 import ExpandCollapseContentSelectTreeItems from './ExpandCollapseContentSelectTreeItems.coffee'
 import CheckingCheckboxesForTree from './CheckingCheckboxesForTree.coffee'
 import ScrollPositionForTree from './ScrollPositionForTree.coffee'
-
-I18n = useI18nScope('content_migrations')
 
 export default class SelectContentView extends DialogFormView
 

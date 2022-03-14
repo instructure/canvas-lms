@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!user_name'
 import React, {useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Link} from '@instructure/ui-link'
@@ -26,8 +26,6 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-
-const I18n = useI18nScope('user_name');
 
 const SUSPEND = 'suspend'
 const REACTIVATE = 'unsuspend'

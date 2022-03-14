@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_row'
 
 import React, {Component} from 'react'
 import {bindActionCreators} from 'redux'
@@ -73,8 +73,6 @@ import select from 'obj-select'
 import ToggleIcon from './ToggleIcon'
 import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
-
-const I18n = useI18nScope('discussion_row');
 
 const dragTarget = {
   beginDrag(props) {

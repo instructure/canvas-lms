@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {bool, oneOf, string, func, number, arrayOf, element} from 'prop-types'
 import {Text} from '@instructure/ui-text'
@@ -34,8 +34,6 @@ import {
   setCspInherited
 } from '../actions'
 import {ConnectedWhitelist} from './Whitelist'
-
-const I18n = useI18nScope('security_panel');
 
 export class SecurityPanel extends Component {
   static propTypes = {

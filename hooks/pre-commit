@@ -1,8 +1,4 @@
-#!/usr/bin/env bash
-
-if [[ "$SKIP_CANVAS_PRECOMMIT_HOOK" == "1" ]]; then
-  exit 0
-fi
+#!/bin/sh
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 CANVAS=$(dirname $SCRIPTPATH)

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!teacher_groups_page'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -27,8 +27,6 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 
 import EmptyGroups from '../images/empty-groups.svg'
-
-const I18n = useI18nScope('teacher_groups_page');
 
 const TeacherGroupsPage = props => (
   <Flex

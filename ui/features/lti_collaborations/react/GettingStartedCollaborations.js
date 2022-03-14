@@ -17,10 +17,8 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_collaborations'
 import splitAssetString from '@canvas/util/splitAssetString'
-
-const I18n = useI18nScope('react_collaborations');
 
 class GettingStartedCollaborations extends React.Component {
   renderContent() {

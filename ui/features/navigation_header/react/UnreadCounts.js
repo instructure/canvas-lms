@@ -47,9 +47,7 @@ import {createPortal} from 'react-dom'
 import {any, bool, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {defaultFetchOptions} from '@instructure/js-utils'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('UnreadCounts');
+import I18n from 'i18n!UnreadCounts'
 
 const DEFAULT_POLL_INTERVAL = 120000
 

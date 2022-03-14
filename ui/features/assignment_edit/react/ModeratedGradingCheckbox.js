@@ -19,9 +19,7 @@
 import {bool, func} from 'prop-types'
 import React from 'react'
 import {Tooltip} from '@instructure/ui-tooltip'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('ModeratedGradingCheckbox');
+import I18n from 'i18n!ModeratedGradingCheckbox'
 
 export default function ModeratedGradingCheckbox(props) {
   function handleChange() {

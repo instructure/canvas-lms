@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook_uploads'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
@@ -23,13 +23,11 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import {waitForProcessing} from './wait_for_processing'
 import ProcessGradebookUpload from './process_gradebook_upload'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import 'slickgrid'/* global Slick */
-import 'slickgrid/slick.editors'/* global.Slick.Editors */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* errorBox */
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\.detect/ */
-import '@canvas/util/templateData'
-const I18n = useI18nScope('gradebook_uploads');
-/* fillTemplateData */
+import 'slickgrid' /* global Slick */
+import 'slickgrid/slick.editors' /* global.Slick.Editors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* errorBox */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\.detect/ */
+import '@canvas/util/templateData' /* fillTemplateData */
 
 function shouldHighlightScoreChange(oldValue, newValue) {
   // Even if canvas is operating in a locale that does commas as

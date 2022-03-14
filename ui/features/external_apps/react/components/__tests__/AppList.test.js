@@ -16,12 +16,9 @@
 
 import $ from 'jquery'
 import React from 'react'
-import page from 'page'
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import store from '../../lib/AppCenterStore'
 import AppList from '../AppList'
-
-jest.mock('page')
 
 describe('AppList', () => {
   const originalGetJSON = $.getJSON
@@ -162,10 +159,11 @@ describe('AppList', () => {
     expect(getByText('View App Configurations')).toBeVisible()
   })
 
-  it('follows the app configurations button to the right place', () => {
+  it('uses baseUrl for the app configurations link', () => {
     const {getByText} = renderAppList()
-    fireEvent.click(getByText('View App Configurations'))
-    expect(page.redirect).toHaveBeenCalledWith('/configurations')
+    expect(getByText('View App Configurations').closest('a').getAttribute('href')).toEqual(
+      '/the/base/url/configurations'
+    )
   })
 
   it('renders app filters', () => {

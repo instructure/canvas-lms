@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment_muter'
 import $ from 'jquery'
 import mute_dialog_template from '../jst/mute_dialog.handlebars'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/dialog'
 import 'jquery-tinypubsub'
-
-const I18n = useI18nScope('assignment_muter');
 
 export default class AssignmentMuter {
   constructor($link, assignment, url, setter, options) {

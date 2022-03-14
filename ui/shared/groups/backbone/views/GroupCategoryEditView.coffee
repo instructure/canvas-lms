@@ -16,13 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!groups'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
 import h from 'html-escape'
-
-I18n = useI18nScope('groups')
 
 export default class GroupCategoryEditView extends DialogFormView
 

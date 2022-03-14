@@ -2353,7 +2353,6 @@ pt-BR:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permite que os instrutores apliquem pontuações às submissões não avaliadas em massa do grupo de tarefas e dos menus da coluna Total no Boletim."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permite que resultados de aprendizado sejam selecionáveis ao migrar conteúdo do curso"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permite modificar as configurações de notificação para qualquer curso a partir da página de configurações de notificação no nível da conta."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permite que os dados de resultados armazenados no Outcomes Service sejam exibidos em relatórios do Canvas (LMGB, sLMGB e relatórios administrativos relacionados a resultados)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permite escalas e métodos de cálculos de domínio de nível de curso e conta, substituindo classificações por critério de resultado e métodos de cálculo"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Permitir definir classificações de critério e opções de método de cálculo para resultados individuais."
   allows_students_to_access_other_student_groups_wit_43918810: "Permite que os alunos acessem outros grupos de alunos dentro de um conjunto de grupos com um link direto."
@@ -3400,7 +3399,6 @@ pt-BR:
   applied_filters_63a90ccd: "Filtros aplicados:"
   apply_781a2546: Aplicar
   apply_changes_b1dffc70: "Aplicar Alterações"
-  apply_conditions_9e941010: "Aplicar condições"
   apply_date_range_selection_cc4351ed: "Aplicar seleção de período"
   apply_filter_7e4f6113: "Aplicar filtro"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Aplicar filtros. Nota: Clicar nesse botão causará o recarregamento da página."
@@ -10491,7 +10489,6 @@ pt-BR:
   end_date_e0093ed7: "Data final"
   end_date_from_cdd9d90: "Data de término a partir de:"
   end_date_to_8b17929d: "Data de término até:"
-  end_date_value_3d3e8906: "Data de término %{value}"
   end_dates_249d8dbb: "Datas de término:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Datas finais não podem ser antes das datas iniciais"
   end_time_250391e8: "Hora final"
@@ -11321,7 +11318,6 @@ pt-BR:
   failed_initializing_dashboard_3d967143: "Falha ao inicializar painel"
   failed_jobs_b632bbf0: "Trabalhos com falha"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Falha ao carregar componente das Associações. A sua conexão à rede está OK?"
-  failed_loading_course_cards_8fcdb36d: "Falha ao carregar cartões de curso"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Falhou ao carregar seções do curso. Atualize a página para tentar novamente."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Falha ao carregar componente do Sincronizar Histórico. A sua conexão à rede está OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Falha ao carregar componente do Histórico Não Sincronizado. A sua conexão à rede está OK?"
@@ -18986,7 +18982,6 @@ pt-BR:
   outcome_results_23a0a117: "Resultados de saída"
   outcome_results_title: "Resultados dos objetivos"
   outcome_score_141cf00a: "pontuação do objetivo"
-  outcome_service_results_to_canvas_reporting_749667bc: "Resultados do serviço de resultados para relatórios do Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Objetivo: %{title} tem um status de %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Resultado \"%{title}\" criado com sucesso."
   outcome_title_was_successfully_created_be3a408: "Resultado “%{title}” foi criado com sucesso"
@@ -19277,7 +19272,6 @@ pt-BR:
   pakistan_92_da28c36: "Paquistão (+92)"
   panama_507_831fbc99: "Panamá (+507)"
   panama_fa454c86: Panamá
-  panda_taking_photograph_8db13e0f: "panda tirando foto"
   paper_view_7405eeab: "Visualização em papel"
   paraguay_181a5029: Paraguai
   paraguay_595_ca58b83a: "Paraguai (+595)"
@@ -22408,7 +22402,6 @@ pt-BR:
   remove_avatar_picture_aba765eb: "Remover imagem do avatar"
   remove_c_name_section_d8eabd3a: "Remover a Seção %{c.name}"
   remove_collaborationtitle_c3e81adb: "Remover \"%{collaborationTitle}\"?"
-  remove_condition_9cf94f7f: "Remover condição"
   remove_conference_69b9e0d0: "Remover conferência"
   remove_conference_title_207d32c0: "Remover conferência: %{title}"
   remove_contact_method_ca890ba3: "Remover método de contato"
@@ -22673,7 +22666,6 @@ pt-BR:
   rich_content_editor_2708ef21: "Editor de conteúdo avançado"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Melhorias da barra lateral do Editor de conteúdo avançado"
   right_sidebar_logo_5483dc0a: "Logotipo da Barra Lateral Direita"
-  rocketship_on_launchpad_4011ea8c: "foguete na plataforma de lançamento"
   role: 
     duplicate_role: "Já existe um papel com este nome"
   role_13a7be77: Papel
@@ -24865,7 +24857,6 @@ pt-BR:
   start_date_from_20503757: "Data de início a partir de:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} para %{end_time}"
   start_date_to_1e6e6bbe: "Data de início até:"
-  start_date_value_817cab96: "Data de início %{value}"
   start_dates_8f1c22a8: "Datas de início:"
   start_entry_4b491f60: "Iniciar entrada"
   start_from_a_template_380d4e8: "Começar a partir de um modelo ..."
@@ -25029,7 +25020,6 @@ pt-BR:
   student_sis_6721040e: "Sis do aluno"
   student_sis_d9f0cd39: "sis do aluno"
   student_sis_id_abe6b292: "id do sis do aluno"
-  student_student_number_5c98bd2d: "Aluno %{student_number}"
   student_studentnumber_f398d9c2: "Aluno %{studentNumber}"
   student_submissions_910da1b3: "Envios de alunos"
   student_submissions_report_prospect_education_108daf59: "Relatório de envios de alunos (educação prospectiva)"
@@ -25697,7 +25687,6 @@ pt-BR:
   the_app_was_added_successfully_3f785a23: "O aplicativo foi adicionado com sucesso"
   the_app_was_deactivated_573520ab: "O aplicativo foi desativado"
   the_app_was_updated_successfully_3d71cd1b: "O aplicativo foi atualizado com sucesso"
-  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Espera-se que o argumento fornecido seja do tipo boolean."
   the_assignment_group_id_to_report_on_83880208: "O ID do grupo de tarefa sobre o qual relatar"
   the_assignment_group_named_major_9d349037: "As graduações nomeadas do Grupo de Tarefa"
   the_assignment_group_named_papers_e1cb6a34: "Os artigos nomeados do Grupo de Tarefa"
@@ -28633,7 +28622,6 @@ pt-BR:
   web_page_146f9102: "Página Web"
   web_url_d84feaf5: "URL da web"
   webcam_fe91b20f: Webcam
-  webcam_photo_ee55462c: "Foto da webcam"
   webct_credentials: 
     credential_not_found: "Credencial não encontrada."
   webct_display: "Blackboard Vista/CE (WebCT)"

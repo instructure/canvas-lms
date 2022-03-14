@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!permissions_role_tray'
 import $ from 'jquery'
 
 import {connect} from 'react-redux'
@@ -42,8 +42,6 @@ import RoleTrayTableRow from './RoleTrayTableRow'
 import permissionPropTypes from '@canvas/permissions/react/propTypes'
 
 import {getPermissionsWithLabels, roleIsBaseRole} from '@canvas/permissions/util'
-
-const I18n = useI18nScope('permissions_role_tray');
 
 export default class RoleTray extends Component {
   static propTypes = {

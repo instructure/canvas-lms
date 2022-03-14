@@ -27,12 +27,10 @@
 //   ui/shared/mediaelement/mep-feature-tracks-instructure.js
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!mepfeaturetracksinstructure'
 import htmlEscape from 'html-escape'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 ;
-
-const I18n = useI18nScope('mepfeaturetracksinstructure');
 
 (function($) {
   // add extra default options
