@@ -18,7 +18,7 @@
 
 import {formatFileSize, getFileThumbnail} from '@canvas/util/fileHelper'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import {func, object, shape, string} from 'prop-types'
+import {arrayOf, func, object, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import tz from '@canvas/timezone'
@@ -64,6 +64,22 @@ class TableFiles extends React.Component {
 
   formattedDateTime = dateTime => {
     return tz.format(tz.parse(dateTime), I18n.t('#date.formats.medium'))
+  }
+
+  allowedExtension = filename => {
+    if (!this.props.allowedExtensions.length) return true
+
+    const delimiterPosition = (filename || '').lastIndexOf('.')
+    // Position will be < 1 if there's no delimiter (-1) or no filename before
+    // the delimiter (0)
+    if (delimiterPosition < 1) {
+      return false
+    }
+
+    const extension = filename.slice(delimiterPosition + 1).toLowerCase()
+    if (!extension) return false
+
+    return this.props.allowedExtensions.some(ext => ext.toLowerCase() === extension)
   }
 
   renderSRContents = file => {
@@ -130,51 +146,58 @@ class TableFiles extends React.Component {
   render() {
     return (
       <>
-        {this.props.folders[this.props.selectedFolderID].subFileIDs.map(id => {
+        {this.props.folders[this.props.selectedFolderID].subFileIDs.reduce((buttons, id) => {
           const file = this.props.files[id]
-          return (
-            <FileButton
-              key={id}
-              selected={this.state.selectedFileID === id}
-              onClick={() => {
-                this.setState({selectedFileID: id})
-                this.props.handleCanvasFileSelect(id)
-              }}
-              tip={file.display_name}
-            >
-              {this.renderSRContents(file)}
-              <Flex aria-hidden>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.thumbnailWidth}>
-                  {getFileThumbnail(file, 'small')}
-                </Flex.Item>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.nameWidth} grow>
-                  {this.renderFileName(file.display_name)}
-                </Flex.Item>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.dateCreatedWidth}>
-                  {this.renderDateCreated(file.created_at)}
-                </Flex.Item>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.dateModifiedWidth}>
-                  {this.renderDateModified(file.updated_at)}
-                </Flex.Item>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.modifiedByWidth}>
-                  {this.renderModifiedBy(file.user)}
-                </Flex.Item>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.fileSizeWidth}>
-                  {this.renderFileSize(file.size)}
-                </Flex.Item>
-                <Flex.Item padding="xx-small" size={this.props.columnWidths.publishedWidth}>
-                  {this.renderPublishedState(file.locked)}
-                </Flex.Item>
-              </Flex>
-            </FileButton>
-          )
-        })}
+          if (this.allowedExtension(file.filename)) {
+            const button = (
+              <FileButton
+                key={id}
+                selected={this.state.selectedFileID === id}
+                onClick={() => {
+                  this.setState({selectedFileID: id})
+                  this.props.handleCanvasFileSelect(id)
+                }}
+                tip={file.display_name}
+              >
+                {this.renderSRContents(file)}
+                <Flex aria-hidden>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.thumbnailWidth}>
+                    {getFileThumbnail(file, 'small')}
+                  </Flex.Item>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.nameWidth} grow>
+                    {this.renderFileName(file.display_name)}
+                  </Flex.Item>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.dateCreatedWidth}>
+                    {this.renderDateCreated(file.created_at)}
+                  </Flex.Item>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.dateModifiedWidth}>
+                    {this.renderDateModified(file.updated_at)}
+                  </Flex.Item>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.modifiedByWidth}>
+                    {this.renderModifiedBy(file.user)}
+                  </Flex.Item>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.fileSizeWidth}>
+                    {this.renderFileSize(file.size)}
+                  </Flex.Item>
+                  <Flex.Item padding="xx-small" size={this.props.columnWidths.publishedWidth}>
+                    {this.renderPublishedState(file.locked)}
+                  </Flex.Item>
+                </Flex>
+              </FileButton>
+            )
+
+            buttons.push(button)
+          }
+
+          return buttons
+        }, [])}
       </>
     )
   }
 }
 
 TableFiles.propTypes = {
+  allowedExtensions: arrayOf(string),
   columnWidths: shape({
     thumbnailWidth: string,
     nameWidth: string,
@@ -189,6 +212,10 @@ TableFiles.propTypes = {
   folders: object,
   handleCanvasFileSelect: func,
   selectedFolderID: string
+}
+
+TableFiles.defaultProps = {
+  allowedExtensions: []
 }
 
 export default TableFiles

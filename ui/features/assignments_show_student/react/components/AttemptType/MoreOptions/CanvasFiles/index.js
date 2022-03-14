@@ -263,6 +263,7 @@ class CanvasFiles extends React.Component {
         {this.renderFolderPathBreadcrumb()}
         <Flex.Item>
           <FileSelectTable
+            allowedExtensions={this.props.allowedExtensions}
             folders={this.state.loadedFolders}
             files={this.state.loadedFiles}
             selectedFolderID={this.state.selectedFolderID}
@@ -281,6 +282,7 @@ class CanvasFiles extends React.Component {
 }
 
 CanvasFiles.propTypes = {
+  allowedExtensions: arrayOf(string),
   courseID: string.isRequired,
   handleCanvasFileSelect: func.isRequired,
   userGroups: arrayOf(

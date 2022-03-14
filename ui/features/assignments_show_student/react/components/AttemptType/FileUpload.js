@@ -280,6 +280,7 @@ class FileUpload extends Component {
                   width={mobileOnly ? '100%' : desktop ? '330px' : '400px'}
                 >
                   <MoreOptions
+                    allowedExtensions={this.props.assignment.allowedExtensions}
                     assignmentID={this.props.assignment._id}
                     courseID={this.props.assignment.env.courseId}
                     handleCanvasFiles={this.handleCanvasFiles}
