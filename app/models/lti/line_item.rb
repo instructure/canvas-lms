@@ -47,10 +47,16 @@ class Lti::LineItem < ApplicationRecord
   before_destroy :destroy_resource_link, if: :assignment_line_item? # assignment will destroy all the other line_items of a resourceLink
   before_destroy :destroy_assignment
 
-  AGS_EXT_SUBMISSION_TYPE = "https://canvas.instructure.com/lti/submission_type"
+  AGS_EXT_PREFIX = "https://canvas.instructure.com/lti/"
+  AGS_EXT_SUBMISSION_TYPE = "#{AGS_EXT_PREFIX}submission_type"
+  AGS_EXT_LAUNCH_URL = "#{AGS_EXT_PREFIX}launch_url"
 
   def assignment_line_item?
     assignment.line_items.order(:created_at).first.id == id
+  end
+
+  def launch_url_extension
+    { AGS_EXT_LAUNCH_URL => assignment.external_tool_tag&.url }
   end
 
   def self.create_line_item!(assignment, context, tool, params)

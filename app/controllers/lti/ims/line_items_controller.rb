@@ -62,6 +62,11 @@ module Lti
     #            "description": "The extension that defines the submission_type of the line_item. Only returns if set through the line_item create endpoint.",
     #            "example": "{\n\t\"type\":\"external_tool\",\n\t\"external_tool_url\":\"https://my.launch.url\",\n}",
     #            "type": "string"
+    #          },
+    #          "https://canvas.instructure.com/lti/launch_url": {
+    #            "description": "The launch url of the Line Item. Only returned if `include=launch_url` query parameter is passed, and only for Show and List actions.",
+    #            "example": "https://my.tool.url/launch",
+    #            "type": "string"
     #          }
     #       }
     #     }
@@ -175,16 +180,22 @@ module Lti
       # @API Show a Line Item
       # Show existing Line Item
       #
+      # @argument include[] [String, "launch_url"]
+      #   Array of additional information to include.
+      #
+      #   "launch_url":: includes the launch URL for this line item using the "https\://canvas.instructure.com/lti/launch_url" extension
+      #
       # @returns LineItem
       def show
         # the LineItem workflow_state still "active" even if the assignment is deleted
         head :not_found and return if line_item.assignment.deleted?
 
-        render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
+        render json: LineItemsSerializer.new(line_item, line_item_id(line_item), include_launch_url?),
                content_type: MIME_TYPE
       end
 
       # @API List line Items
+      # List all Line Items for a course
       #
       # @argument tag [String]
       #   If specified only Line Items with this tag will be included.
@@ -197,6 +208,11 @@ module Lti
       #
       # @argument limit [String]
       #   May be used to limit the number of Line Items returned in a page
+      #
+      # @argument include[] [String, "launch_url"]
+      #   Array of additional information to include.
+      #
+      #   "launch_url":: includes the launch URL for each line item using the "https\://canvas.instructure.com/lti/launch_url" extension
       #
       # @returns LineItem
       def index
@@ -222,6 +238,10 @@ module Lti
       end
 
       private
+
+      def include_launch_url?
+        params[:include]&.include? "launch_url"
+      end
 
       def line_item_params
         @_line_item_params ||= params.permit(%i[resourceId resourceLinkId scoreMaximum label tag],
@@ -278,7 +298,7 @@ module Lti
       end
 
       def line_item_collection(line_items)
-        line_items.map { |li| LineItemsSerializer.new(li, line_item_id(li)) }
+        line_items.map { |li| LineItemsSerializer.new(li, line_item_id(li), include_launch_url?) }
       end
 
       def verify_valid_resource_link
