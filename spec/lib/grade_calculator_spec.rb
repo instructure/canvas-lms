@@ -1096,14 +1096,14 @@ describe GradeCalculator do
 
         it "schedules assignment score statistic updates as a singleton" do
           calculator = GradeCalculator.new(@student.id, @course)
-          expect(ScoreStatisticsGenerator).to receive(:update_score_statistics_in_singleton).with(@course.id)
+          expect(ScoreStatisticsGenerator).to receive(:update_score_statistics_in_singleton).with(@course)
 
           calculator.compute_and_save_scores
         end
 
         it "does not update score statistics when calculating scores for hidden assignments" do
           calculator = GradeCalculator.new(@student.id, @course, ignore_muted: false)
-          expect(ScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course.id)
+          expect(ScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course)
           calculator.compute_and_save_scores
         end
       end
@@ -1255,7 +1255,7 @@ describe GradeCalculator do
 
       it "schedules assignment score statistic updates as a singleton" do
         calculator = GradeCalculator.new(@student.id, @course)
-        expect(ScoreStatisticsGenerator).to receive(:update_score_statistics_in_singleton).with(@course.id)
+        expect(ScoreStatisticsGenerator).to receive(:update_score_statistics_in_singleton).with(@course)
 
         calculator.compute_and_save_scores
       end
@@ -1274,7 +1274,7 @@ describe GradeCalculator do
         it "does not update score statistics when calculating non-course scores" do
           calculator_options = { grading_period: @first_period, update_course_score: false }
           calculator = GradeCalculator.new(@student.id, @course, calculator_options)
-          expect(ScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course.id)
+          expect(ScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course)
           calculator.compute_and_save_scores
         end
 
