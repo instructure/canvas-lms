@@ -31,7 +31,8 @@ export const Footer = ({
   onSubmit,
   replaceAll,
   onReplaceAllChanged,
-  editing
+  editing,
+  applyRef
 }) => {
   return (
     <>
@@ -66,7 +67,16 @@ export const Footer = ({
                 {formatMessage('Save')}
               </Button>
             ) : (
-              <Button disabled={disabled} margin="0 0 0 x-small" color="primary" onClick={onSubmit}>
+              <Button
+                disabled={disabled}
+                margin="0 0 0 x-small"
+                color="primary"
+                onClick={onSubmit}
+                data-testid="create-icon-button"
+                elementRef={ref => {
+                  if (applyRef) applyRef.current = ref
+                }}
+              >
                 {formatMessage('Apply')}
               </Button>
             )}
