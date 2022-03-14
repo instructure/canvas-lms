@@ -305,9 +305,13 @@ describe('sources/api', () => {
 
       it('makes a request to the files api with given host and folder ID', () => {
         subject()
-        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2?', {
-          Authorization: 'Bearer theJWT'
-        })
+        sinon.assert.calledWith(
+          apiSource.apiFetch,
+          'https://canvas.rce/api/files/2?&category=uncategorized',
+          {
+            Authorization: 'Bearer theJWT'
+          }
+        )
       })
 
       describe('with perPage set', () => {
@@ -319,7 +323,7 @@ describe('sources/api', () => {
           subject()
           sinon.assert.calledWith(
             apiSource.apiFetch,
-            'https://canvas.rce/api/files/2?per_page=50',
+            'https://canvas.rce/api/files/2?per_page=50&category=uncategorized',
             {
               Authorization: 'Bearer theJWT'
             }
