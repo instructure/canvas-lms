@@ -19,7 +19,10 @@
 #
 
 class ScoreStatisticsGenerator
-  def self.update_score_statistics_in_singleton(course_id)
+  def self.update_score_statistics_in_singleton(course)
+    course_global_id = course.global_id
+    global_root_account_id = course.global_root_account_id
+
     # The delay below is in case lots of little grade calculator
     # updates come close together. Since we're a singleton, they won't
     # queue up additional jobs if one exists. Our goal is to try to
@@ -28,10 +31,11 @@ class ScoreStatisticsGenerator
     # term or all courses in a grading period at the same time.
     min = Setting.get("minimum_seconds_wait_for_grade_statistics", 10).to_i
     max = Setting.get("maximum_seconds_wait_for_grade_statistics", 130).to_i
-    delay_if_production(singleton: "ScoreStatisticsGenerator:#{course_id}",
+    delay_if_production(singleton: "ScoreStatisticsGenerator:#{course_global_id}",
+                        n_strand: ["ScoreStatisticsGenerator", global_root_account_id],
                         run_at: rand(min..max).seconds.from_now,
                         on_conflict: :loose)
-      .update_score_statistics(course_id)
+      .update_score_statistics(course.id)
   end
 
   def self.update_score_statistics(course_id)
