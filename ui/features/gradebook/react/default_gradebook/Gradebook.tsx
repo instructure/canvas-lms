@@ -710,7 +710,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   gotSections = sections => {
-    this.setSections(sections.map(htmlEscape))
+    this.setSections(sections)
     this.hasSections.resolve()
     return this.postGradesStore.setSections(this.sections)
   }
