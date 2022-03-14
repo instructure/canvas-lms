@@ -355,7 +355,9 @@ export default class SubmissionManager extends Component {
     }
     this.updateUploadingFiles(false)
     const element = document.createElement('div')
-    element.insertAdjacentHTML('beforeend', body)
+    if (body) {
+      element.insertAdjacentHTML('beforeend', body)
+    }
 
     if (success) {
       if (!element.querySelector(`[data-placeholder-for]`)) {
@@ -410,7 +412,7 @@ export default class SubmissionManager extends Component {
         onCompleted={data =>
           this.handleDraftComplete(
             !data.createSubmissionDraft.errors,
-            data.createSubmissionDraft.submissionDraft.body,
+            data.createSubmissionDraft.submissionDraft?.body,
             context
           )
         }
