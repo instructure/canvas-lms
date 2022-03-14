@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -29,7 +29,7 @@ import {createRating} from '@canvas/outcomes/react/hooks/useRatings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyRating from '../MasteryScale/ProficiencyRating'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const ratingsShape = PropTypes.shape({
   key: PropTypes.string,
@@ -58,10 +58,12 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
     if (points < 0.0 || Number.isNaN(points)) {
       points = 0.0
     }
-    // when a rating is added, reset the focusField value to maintain focus on the add button
-    ratings = ratings.map(r => ({...r, focusField: null}))
-    onChangeRatings([...ratings, createRating('', points, null, false)])
+    // when a rating is added, set the focusField value to the new rating's description field
+    ratings = clearFocusFields(ratings)
+    onChangeRatings([...ratings, createRating('', points, 'description', false)])
   }
+
+  const clearFocusFields = () => ratings.map(r => ({...r, focusField: null}))
 
   const onRatingFieldChange = (field, value, index) => {
     onChangeRatings(currentRatings => {
@@ -240,6 +242,7 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
             disableDelete={ratings.length === 1}
             onDelete={() => handleDelete(index)}
             onDescriptionChange={value => onRatingFieldChange('description', value, index)}
+            onFocusChange={() => onChangeRatings(clearFocusFields())}
             onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
             onPointsChange={value => onRatingFieldChange('points', value, index)}
             focusField={focusField}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {render, fireEvent, screen, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
@@ -24,9 +24,13 @@ import {ButtonsTray} from '../ButtonsTray'
 import {useStoreProps} from '../../../shared/StoreContext'
 import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
+import useDebouncedValue from '../../utils/useDebouncedValue'
 
 jest.mock('../../../../../rcs/api')
 jest.mock('../../../shared/StoreContext')
+jest.mock('../../utils/useDebouncedValue', () =>
+  jest.requireActual('../../utils/__tests__/useMockedDebouncedValue')
+)
 
 const startButtonsAndIconsUpload = jest.fn().mockResolvedValue({url: 'https://uploaded.url'})
 useStoreProps.mockReturnValue({startButtonsAndIconsUpload})

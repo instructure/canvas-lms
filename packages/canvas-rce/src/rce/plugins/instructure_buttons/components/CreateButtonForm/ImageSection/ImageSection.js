@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useEffect, Suspense} from 'react'
+import React, {useReducer, useEffect, Suspense, useRef, useCallback} from 'react'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
@@ -37,6 +37,15 @@ const getColorSection = () => document.querySelector('#buttons-tray-color-sectio
 
 export const ImageSection = ({settings, onChange, editing, editor}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const bottomRef = useRef()
+
+  const scrollToBottom = useCallback(() => {
+    if (!bottomRef.current?.scrollIntoView) return
+    if (state.scrolled) return
+
+    bottomRef.current.scrollIntoView({behavior: 'smooth'})
+    dispatch({...actions.SET_SCROLLED, payload: true})
+  })
 
   const Upload = React.lazy(() => import('./Upload'))
   const SingleColor = React.lazy(() => import('./SingleColor'))
@@ -176,7 +185,12 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
         >
           {modeIsAllowed && state.collectionOpen && (
             <Flex.Item padding="small">
-              <ImageSelector dispatch={dispatch} editor={editor} data={state} />
+              <ImageSelector
+                dispatch={dispatch}
+                editor={editor}
+                data={state}
+                onMount={scrollToBottom}
+              />
             </Flex.Item>
           )}
         </Suspense>
@@ -192,6 +206,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
           </Flex.Item>
         )}
       </Flex>
+      <span ref={bottomRef}></span>
     </Group>
   )
 }

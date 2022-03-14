@@ -318,10 +318,12 @@ describe('ImageSection', () => {
   })
 
   describe('when the "Single Color Image" mode is selected', () => {
-    let spyFn, getByTestId, getByText, container
+    let spyFn, getByTestId, getByText, container, scrollIntoView
 
     beforeAll(() => {
       spyFn = jest.spyOn(svg.art, 'source')
+      scrollIntoView = jest.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoView
     })
 
     beforeEach(() => {
@@ -335,8 +337,14 @@ describe('ImageSection', () => {
       fireEvent.click(getByText('Single Color Image'))
     })
 
-    it('renders the course images component', async () => {
+    afterEach(() => jest.clearAllMocks())
+
+    it('renders the single color images component', async () => {
       await waitFor(() => expect(getByTestId('singlecolor-svg-list')).toBeInTheDocument())
+    })
+
+    it('scrolls the component into view smoothly 😎', async () => {
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({behavior: 'smooth'}))
     })
 
     describe('user selects an image', () => {

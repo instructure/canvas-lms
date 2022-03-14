@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {TextSection} from '../TextSection'
@@ -36,12 +36,13 @@ function selectOption(button, option) {
 }
 
 describe('<TextSection />', () => {
-  it('changes the button text', () => {
+  it('changes the button text', async () => {
     const onChange = jest.fn()
     render(<TextSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = document.querySelector('#button-text')
     fireEvent.change(input, {target: {value: 'Hello World!'}})
-    expect(onChange).toHaveBeenCalledWith({text: 'Hello World!'})
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith({text: 'Hello World!'}))
   })
 
   it('changes the button text size', () => {

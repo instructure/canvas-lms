@@ -20,7 +20,6 @@ import React, {useEffect} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-
 import formatMessage from '../../../../../format-message'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -28,13 +27,31 @@ import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {decode} from '../../svg/utils'
+import useDebouncedValue from '../../utils/useDebouncedValue'
 
 export const Header = ({settings, onChange, allowNameChange}) => {
   const originalName = settings.originalName
 
+  const [name, setName, setImmediateName] = useDebouncedValue(settings.name, n =>
+    onChange({name: n})
+  )
+  const [alt, setAlt] = useDebouncedValue(settings.alt, a => onChange({alt: a}))
+
   useEffect(() => {
     if (!allowNameChange) onChange({name: originalName})
   }, [allowNameChange, onChange, originalName])
+
+  useEffect(() => {
+    // The "immediate" bit of name state may have been initialized to an
+    // empty value if the app has not yet fetched the file's name from the
+    // API (on icon edit).
+    //
+    // If that's the case, we need to update the "immediate" piece of name
+    // state to present the file name.
+    if (!name && !!settings.name) {
+      setImmediateName(settings.name)
+    }
+  }, [name, setImmediateName, settings.name])
 
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
@@ -65,11 +82,8 @@ export const Header = ({settings, onChange, allowNameChange}) => {
           renderLabel={formatMessage('Name')}
           placeholder={formatMessage('untitled')}
           interaction={allowNameChange ? 'enabled' : 'disabled'}
-          onChange={e => {
-            const name = e.target.value
-            onChange({name})
-          }}
-          value={settings.name ? decode(settings.name) : ''}
+          onChange={setName}
+          value={name ? decode(name) : ''}
         />
       </Flex.Item>
       <Flex.Item padding="small">
@@ -77,13 +91,10 @@ export const Header = ({settings, onChange, allowNameChange}) => {
           id="button-alt-text"
           height="4rem"
           label={textAreaLabel}
-          onChange={e => {
-            const alt = e.target.value
-            onChange({alt})
-          }}
+          onChange={setAlt}
           placeholder={formatMessage('(Describe the image)')}
           resize="vertical"
-          value={settings.alt}
+          value={alt}
         />
       </Flex.Item>
     </Flex>

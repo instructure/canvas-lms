@@ -279,7 +279,13 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                 canManage={!!attributesEditable.individualRatings}
               />
               <View as="div" minHeight={attributesEditable.calculationMethod ? '14rem' : '5rem'}>
-                {attributesEditable.calculationMethod && <hr style={{margin: '1rem 0 0'}} />}
+                {attributesEditable.calculationMethod && (
+                  <hr
+                    style={{margin: '1rem 0 0'}}
+                    aria-hidden="true"
+                    data-testid="outcome-edit-modal-horizontal-divider"
+                  />
+                )}
                 <ProficiencyCalculation
                   method={{
                     calculationMethod: proficiencyCalculationMethod,
