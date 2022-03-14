@@ -47,6 +47,17 @@ describe ScoreStatisticsGenerator do
     end
   end
 
+  it "queues an update using the appropriate strand / singleton" do
+    delayed_job_args = {
+      n_strand: ["ScoreStatisticsGenerator", @course.global_root_account_id],
+      singleton: "ScoreStatisticsGenerator:#{@course.global_id}",
+    }
+
+    expect(ScoreStatisticsGenerator).to receive(:delay_if_production).with(hash_including(**delayed_job_args)).and_return(ScoreStatisticsGenerator)
+
+    ScoreStatisticsGenerator.update_score_statistics_in_singleton(@course)
+  end
+
   it "updates score statistics for all assignments with graded submissions" do
     ScoreStatistic.where(assignment: @assignments).destroy_all
 

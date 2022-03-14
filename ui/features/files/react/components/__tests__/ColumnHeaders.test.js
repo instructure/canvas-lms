@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
 import {render} from '@testing-library/react'
 import ColumnHeaders from '../ColumnHeaders'
 
@@ -46,6 +47,34 @@ describe('ColumnHeaders', () => {
     const url = new URL(nameLink.href)
     expect(url.pathname).toEqual(props.pathname)
     expect(url.search).toEqual('?sort=name&order=desc')
+  })
+
+  describe('sort order message', () => {
+    beforeEach(() => {
+      $.screenReaderFlashMessage = jest.fn()
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    describe('when no query is provided', () => {
+      it('is not added to the flash_screenreader_holder', () => {
+        renderComponent()
+        expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(0)
+      })
+    })
+
+    describe('when a query is provided', () => {
+      it('is added to the flash_screenreader_holder each time the query changes', () => {
+        renderComponent()
+        renderComponent({query: {sort: 'name', order: 'desc'}})
+        renderComponent({query: {sort: 'name', order: 'asc'}})
+        renderComponent({query: {sort: 'name', order: 'asc'}})
+        renderComponent({query: {sort: 'created_at', order: 'asc'}})
+        expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(3)
+      })
+    })
   })
 
   describe('queryParamsFor method', () => {
