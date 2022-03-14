@@ -22,10 +22,11 @@ import React, {useCallback} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {Link} from '@instructure/ui-link'
 import {InfoColumn, InfoColumnHeader} from './InfoColumn'
+import SortColumnHeader from './SortColumnHeader'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function JobsTable({bucket, jobs, caption, onClickJob}) {
+export default function JobsTable({bucket, jobs, caption, sortColumn, onClickJob, onClickHeader}) {
   const renderJobRow = useCallback(
     job => {
       const cellTheme = {fontSize: '0.75rem'}
@@ -47,6 +48,23 @@ export default function JobsTable({bucket, jobs, caption, onClickJob}) {
     [bucket, onClickJob]
   )
 
+  const renderColHeader = useCallback(
+    (attr, content) => {
+      return (
+        <Table.ColHeader id={attr}>
+          <SortColumnHeader
+            bucket={bucket}
+            attr={attr}
+            content={content}
+            sortColumn={sortColumn}
+            onClickHeader={onClickHeader}
+          />
+        </Table.ColHeader>
+      )
+    },
+    [bucket, sortColumn, onClickHeader]
+  )
+
   return (
     <div>
       <Responsive
@@ -63,13 +81,11 @@ export default function JobsTable({bucket, jobs, caption, onClickJob}) {
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                <Table.ColHeader id="id">{I18n.t('ID')}</Table.ColHeader>
-                <Table.ColHeader id="tag">{I18n.t('Tag')}</Table.ColHeader>
-                <Table.ColHeader id="strand">{I18n.t('Strand')}</Table.ColHeader>
-                <Table.ColHeader id="singleton">{I18n.t('Singleton')}</Table.ColHeader>
-                <Table.ColHeader id="info">
-                  <InfoColumnHeader bucket={bucket} />
-                </Table.ColHeader>
+                {renderColHeader('id', I18n.t('ID'))}
+                {renderColHeader('tag', I18n.t('Tag'))}
+                {renderColHeader('strand', I18n.t('Strand'))}
+                {renderColHeader('singleton', I18n.t('Singleton'))}
+                {renderColHeader('info', <InfoColumnHeader bucket={bucket} />)}
               </Table.Row>
             </Table.Head>
             <Table.Body>

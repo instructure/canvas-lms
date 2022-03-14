@@ -53,8 +53,9 @@ class JobsV2Controller < ApplicationController
   #   - future: timestamp for the next scheduled run of a job with this tag/strand
   #   - failed: timestamp when the last failure of a job with this tag/strand occurred
   #
-  # @argument order [String,"count"|"tag"|"strand"|"info"]
+  # @argument order [String,"count"|"tag"|"strand"|"group"|"info"]
   #   Sort column. Default is "info". See the +bucket+ argument for a description of this field.
+  #   If set to "group", order by the +group+ argument ("tag" or "strand").
   def grouped_info
     group = params[:group] == "strand" ? :strand : :tag
 
@@ -62,7 +63,7 @@ class JobsV2Controller < ApplicationController
             .select("count(*) AS count, #{group}, #{grouped_info_select}")
             .where.not(group => nil)
             .group(group)
-            .order(grouped_order_clause)
+            .order(grouped_order_clause(group))
 
     tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
     now = Delayed::Job.db_time_now
@@ -141,7 +142,7 @@ class JobsV2Controller < ApplicationController
     json.merge("info" => list_info_data(job, base_time: base_time))
   end
 
-  def grouped_order_clause
+  def grouped_order_clause(group_type)
     case params[:order]
     when "tag"
       :tag
@@ -149,6 +150,8 @@ class JobsV2Controller < ApplicationController
       :strand
     when "count"
       { count: :DESC }
+    when "group"
+      group_type
     else
       case @bucket
       when "queued" then :min_run_at
@@ -190,6 +193,8 @@ class JobsV2Controller < ApplicationController
     case params[:order]
     when "tag", "strand", "singleton"
       params[:order]
+    when "id"
+      { id: :DESC }
     else
       case @bucket
       when "queued", "future" then :run_at

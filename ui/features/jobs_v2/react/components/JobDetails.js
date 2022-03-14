@@ -37,7 +37,7 @@ export default function JobDetails({job}) {
           <Table.Row>
             <Table.RowHeader>{title}</Table.RowHeader>
             <Table.Cell>
-              {timestamp ? I18n.l('date.formats.date_at_time', job[attr]) : job[attr]}
+              {job[attr] && timestamp ? I18n.l('date.formats.date_at_time', job[attr]) : job[attr]}
             </Table.Cell>
           </Table.Row>
         )
