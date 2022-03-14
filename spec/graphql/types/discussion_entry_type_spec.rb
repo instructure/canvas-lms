@@ -191,27 +191,27 @@ describe Types::DiscussionEntryType do
     end
 
     it "returns the teacher author if a course id is provided" do
-      expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+      expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @teacher.short_name
     end
 
     it "returns the teacher editor if a course id is provided" do
-      expect(@anon_teacher_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+      expect(@anon_teacher_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq @teacher.short_name
     end
 
     it "returns the designer author if a course id is provided" do
-      expect(@anon_designer_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
+      expect(@anon_designer_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @designer.short_name
     end
 
     it "returns the designer editor if a course id is provided" do
-      expect(@anon_designer_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
+      expect(@anon_designer_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq @designer.short_name
     end
 
     it "does not return the student author if a course id is provided" do
-      expect(@anon_student_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
     end
 
     it "does not return the student editor if a course id is provided" do
-      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
     end
 
     describe "quoted reply" do
@@ -251,11 +251,11 @@ describe Types::DiscussionEntryType do
     context "partial anonymity" do
       context "when is_anonymous_author is set to true" do
         it "does not return author" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
         end
 
         it "does not return editor" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
         end
 
         it "returns anonymous_author" do
@@ -264,12 +264,16 @@ describe Types::DiscussionEntryType do
       end
 
       context "when is_anonymous_author is set to false" do
+        it "returns author when shard id is present" do
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: \"#{Shard.current.id}~#{@course.id}\") { shortName }")).to eq @student.short_name
+        end
+
         it "returns author" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @student.short_name
         end
 
         it "returns editor" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq @student.short_name
         end
 
         it "does not return anonymous_author" do
