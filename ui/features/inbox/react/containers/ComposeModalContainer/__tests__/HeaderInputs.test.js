@@ -244,7 +244,7 @@ describe('HeaderInputs', () => {
     fireEvent.change(input, {target: {value: 'Fred'}})
 
     const items = await screen.findAllByTestId('address-book-item')
-    fireEvent.mouseDown(items[0])
+    fireEvent.mouseDown(items[1])
 
     expect(container.findAllByTestId('address-book-tag')).toBeTruthy()
 
