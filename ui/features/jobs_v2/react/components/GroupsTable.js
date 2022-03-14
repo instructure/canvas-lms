@@ -18,14 +18,40 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {Link} from '@instructure/ui-link'
 import {InfoColumn, GroupedInfoColumnHeader} from './InfoColumn'
+import SortColumnHeader from './SortColumnHeader'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function GroupsTable({groups, type, bucket, caption, onClickGroup}) {
+export default function GroupsTable({
+  groups,
+  type,
+  bucket,
+  caption,
+  sortColumn,
+  onClickGroup,
+  onClickHeader
+}) {
+  const renderColHeader = useCallback(
+    (attr, width, content) => {
+      return (
+        <Table.ColHeader id={attr} width={width}>
+          <SortColumnHeader
+            bucket={bucket}
+            attr={attr}
+            content={content}
+            sortColumn={sortColumn}
+            onClickHeader={onClickHeader}
+          />
+        </Table.ColHeader>
+      )
+    },
+    [bucket, sortColumn, onClickHeader]
+  )
+
   return (
     <div>
       <Responsive
@@ -42,13 +68,9 @@ export default function GroupsTable({groups, type, bucket, caption, onClickGroup
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                <Table.ColHeader id="group">
-                  {type === 'tag' ? I18n.t('Tag') : I18n.t('Strand')}
-                </Table.ColHeader>
-                <Table.ColHeader id="count">{I18n.t('Count')}</Table.ColHeader>
-                <Table.ColHeader id="info">
-                  <GroupedInfoColumnHeader bucket={bucket} />
-                </Table.ColHeader>
+                {renderColHeader('group', '', type === 'tag' ? I18n.t('Tag') : I18n.t('Strand'))}
+                {renderColHeader('count', '6em', I18n.t('Count'))}
+                {renderColHeader('info', '10em', <GroupedInfoColumnHeader bucket={bucket} />)}
               </Table.Row>
             </Table.Head>
             <Table.Body>

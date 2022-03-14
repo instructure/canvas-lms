@@ -104,8 +104,8 @@ describe "Jobs V2 API", type: :request do
         ::Kernel.delay(strand: "foo", run_at: 1.hour.ago).puts
         ::Kernel.delay(strand: "bar", run_at: 2.hours.ago).puts
         ::Kernel.delay(strand: "bar", run_at: 30.minutes.ago).p
-        json = api_call(:get, "/api/v1/jobs2/queued/by_strand?order=strand",
-                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "strand" },
+        json = api_call(:get, "/api/v1/jobs2/queued/by_strand?order=group",
+                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "group" },
                         {}, {}, expected_status: 200)
         expect(json.size).to eq 2
         expect(json[0]["strand"]).to eq "bar"
