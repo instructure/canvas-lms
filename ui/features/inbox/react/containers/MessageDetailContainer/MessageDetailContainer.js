@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Conversation} from '../../../graphql/Conversation'
 import {CONVERSATION_MESSAGES_QUERY} from '../../../graphql/Queries'
 import {DELETE_CONVERSATION_MESSAGES} from '../../../graphql/Mutations'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
@@ -29,7 +29,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -53,10 +53,21 @@ export const MessageDetailContainer = props => {
     cache.writeQuery({...options, data})
   }
 
+  const handleDeleteConversationMessage = conversationMessageId => {
+    const delMsg = I18n.t(
+      'Are you sure you want to delete your copy of this message? This action cannot be undone.'
+    )
+
+    const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
+    if (confirmResult) {
+      deleteConversationMessages({variables: {ids: [conversationMessageId]}})
+    }
+  }
+
   const [deleteConversationMessages] = useMutation(DELETE_CONVERSATION_MESSAGES, {
     update: removeConversationMessagesFromCache,
     onCompleted() {
-      setOnSuccess(I18n.t('Successfully deleted the conversation message'))
+      setOnSuccess(I18n.t('Successfully deleted the conversation message'), false)
     },
     onError() {
       setOnFailure(I18n.t('There was an unexpected error deleting the conversation message'))
@@ -95,7 +106,7 @@ export const MessageDetailContainer = props => {
             contextName={data?.legacyNode?.contextName}
             onReply={() => props.onReply(message)}
             onReplyAll={() => props.onReplyAll(message)}
-            onDelete={() => deleteConversationMessages({variables: {ids: [message._id]}})}
+            onDelete={() => handleDeleteConversationMessage(message._id)}
           />
         </View>
       ))}

@@ -17,14 +17,14 @@
  */
 
 import {IconButton} from '@instructure/ui-buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailActions = ({...props}) => {
   return (
@@ -63,7 +63,7 @@ export const MessageDetailActions = ({...props}) => {
           {I18n.t('Reply All')}
         </Menu.Item>
         <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
-        <Menu.Item value="delete" onSelect={props.onDelete}>
+        <Menu.Item value="delete" onSelect={props.onDelete} data-testid="message-delete">
           {I18n.t('Delete')}
         </Menu.Item>
       </Menu>
