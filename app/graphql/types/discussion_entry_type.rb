@@ -43,7 +43,7 @@ module Types
       if object.deleted?
         nil
       else
-        object.message
+        object.parse_message(current_user)
       end
     end
 
