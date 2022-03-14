@@ -20,7 +20,7 @@ import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
-import {Progress} from '@instructure/ui-progress'
+import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('groups');
@@ -31,7 +31,7 @@ const GroupCategoryProgress = props => {
       <Flex.Item>
         <Flex height="400px" width="400px" as="div" direction="column" textAlign="center">
           <Flex.Item margin="medium 0">
-            <Progress
+            <ProgressBar
               label={I18n.t('Percent complete')}
               size="large"
               formatValueText={() =>
