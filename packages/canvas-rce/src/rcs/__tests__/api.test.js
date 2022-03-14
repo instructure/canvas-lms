@@ -29,14 +29,19 @@ beforeEach(() => {
     },
     alertFunc: jest.fn()
   })
+
+  apiSource.fetchPage = jest.fn()
   fetchMock.mock('/api/session', '{}')
 })
 
-afterEach(() => fetchMock.restore())
+afterEach(() => {
+  fetchMock.restore()
+  jest.resetAllMocks()
+})
 
 describe('fetchImages()', () => {
   let props
-  let standardProps = {
+  const standardProps = {
     contextType: 'course',
     images: {
       course: {}
@@ -65,6 +70,22 @@ describe('fetchImages()', () => {
         '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized'
       )
     ).toEqual(true)
+  })
+})
+
+describe('fetchFilesForFolder()', () => {
+  let apiProps
+
+  const subject = () => apiSource.fetchFilesForFolder(apiProps)
+
+  beforeEach(() => {
+    apiProps = {host: 'test.com', jwt: 'asd.asdf.asdf', filesUrl: '/api/files'}
+    fetchMock.mock('/api/files', '[]')
+  })
+
+  it.only('includes the "uncategorized" category in the request', () => {
+    subject()
+    expect(apiSource.fetchPage).toHaveBeenCalledWith('/api/files?&category=uncategorized', 'theJWT')
   })
 })
 
