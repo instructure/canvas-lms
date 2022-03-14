@@ -39,14 +39,15 @@ import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
 import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useMemo, useState, useRef, useCallback} from 'react'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'
 export const COURSE_TYPE = 'course'
+export const SUBMENU_TYPE = 'subMenu'
 export const BACK_BUTTON_TYPE = 'backButton'
 export const HEADER_TEXT_TYPE = 'headerText'
 
@@ -64,7 +65,8 @@ export const AddressBook = ({
   onUserFilterSelect,
   fetchMoreMenuData,
   hasMoreMenuData,
-  isLoadingMoreMenuData
+  isLoadingMoreMenuData,
+  inputValue
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -74,12 +76,20 @@ export const AddressBook = ({
   const [selectedUsers, setSelectedUsers] = useState([])
   const [isLimitReached, setLimitReached] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState('200px')
-  const [inputValue, setInputValue] = useState('')
   const menuRef = useRef(null)
   const [focusType, setFocusType] = useState(KEYBOARD_FOCUS_TYPE) // Options are 'keyboard' and 'mouse'
   const backButtonArray = isSubMenu ? [{id: 'backButton', name: I18n.t('Back')}] : []
   const headerArray = headerText ? [{id: 'headerText', name: headerText, focusSkip: true}] : []
-  const [data, setData] = useState([...backButtonArray, ...headerArray, ...menuData])
+  const homeMenu = [
+    {id: 'subMenuCourse', name: I18n.t('Courses')},
+    {id: 'subMenuStudents', name: I18n.t('Students')}
+  ]
+  const [data, setData] = useState([
+    ...backButtonArray,
+    ...headerArray,
+    ...menuData.contextData,
+    ...menuData.userData
+  ])
   const ariaAddressBookLabel = I18n.t('Address Book')
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
@@ -95,9 +105,13 @@ export const AddressBook = ({
 
   // Keep Menu Data Up to Date when props change
   useEffect(() => {
-    setData([...backButtonArray, ...headerArray, ...menuData])
+    if (!isSubMenu) {
+      setData([...homeMenu])
+    } else {
+      setData([...backButtonArray, ...headerArray, ...menuData.contextData, ...menuData.userData])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuData])
+  }, [menuData, isSubMenu])
 
   // Reset selected item when data changes
   useEffect(() => {
@@ -149,13 +163,14 @@ export const AddressBook = ({
   }, [fetchMoreMenuData, hasMoreMenuData, menuItemCurrent])
 
   // Render individual menu items
-  const renderMenuItem = (user, isCourse, isBackButton, isHeader, isLast) => {
+  const renderMenuItem = (user, isCourse, isBackButton, isHeader, isLast, isSubmenu) => {
     if (isHeader) {
       return renderHeaderItem(user.name)
     }
 
     return (
       <View
+        key={`address-book-item-${user.id}`}
         elementRef={el => {
           if (isLast) {
             onItemRefSet(el)
@@ -163,15 +178,14 @@ export const AddressBook = ({
         }}
       >
         <AddressBookItem
-          iconAfter={isCourse ? <IconArrowOpenEndLine /> : null}
+          iconAfter={isCourse || isSubmenu ? <IconArrowOpenEndLine /> : null}
           iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
-          key={`address-book-item-${user.id}`}
           as="div"
           isSelected={selectedItem?.id === user.id}
-          hasPopup={!!isCourse}
+          hasPopup={!!(isCourse || isSubmenu)}
           id={`address-book-menu-item-${user.id}`}
           onSelect={() => {
-            selectHandler(user, isCourse, isBackButton)
+            selectHandler(user, isCourse, isBackButton, isSubmenu)
           }}
           onHover={() => {
             if (focusType !== MOUSE_FOCUS_TYPE) {
@@ -241,7 +255,8 @@ export const AddressBook = ({
         user.id.includes(COURSE_TYPE),
         user.id.includes(BACK_BUTTON_TYPE),
         user.id.includes(HEADER_TEXT_TYPE),
-        user?.isLast
+        user?.isLast,
+        user.id.includes(SUBMENU_TYPE)
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -345,16 +360,17 @@ export const AddressBook = ({
 
   // Handler for selecting an item
   // Controls callback + tag addition
-  const selectHandler = (user, isCourse, isBackButton) => {
+  const selectHandler = (user, isCourse, isBackButton, isSubmenu) => {
     // If information is not available, quickly find it from data state
-    if (isCourse === undefined && isBackButton === undefined) {
+    if (isCourse === undefined && isBackButton === undefined && isSubmenu === undefined) {
       const selectedUser = data.find(u => u.id === selectedItem?.id)
       isCourse = selectedUser.id.includes(COURSE_TYPE)
+      isSubmenu = user.id.includes(SUBMENU_TYPE)
       isBackButton = selectedUser.id.includes(BACK_BUTTON_TYPE)
     }
 
     // Only add tags for users
-    if (!isBackButton && !isCourse) {
+    if (!isBackButton && !isCourse && !isSubmenu) {
       addTag(user)
       onSelect(user.id)
       if (onUserFilterSelect) {
@@ -362,7 +378,7 @@ export const AddressBook = ({
       }
     } else {
       setIsSubMenuSelection(true)
-      onSelect(user.id, isCourse, isBackButton)
+      onSelect(user.id, isCourse, isBackButton, isSubmenu)
     }
   }
 
@@ -375,7 +391,6 @@ export const AddressBook = ({
     // Prevent duplicate IDs from being added
     if (matchedUsers.length === 0) {
       newSelectedUsers.push(user)
-      setInputValue('')
       onTextChange('')
     }
 
@@ -440,7 +455,6 @@ export const AddressBook = ({
                   }}
                   value={inputValue}
                   onChange={e => {
-                    setInputValue(e.target.value)
                     onTextChange(e.target.value)
                     setIsMenuOpen(true)
                   }}
@@ -502,7 +516,7 @@ export const AddressBook = ({
 
 AddressBook.defaultProps = {
   width: '340px',
-  menuData: [],
+  menuData: {},
   onTextChange: () => {},
   onSelect: () => {},
   onSelectedIdsChange: () => {}
@@ -512,7 +526,7 @@ AddressBook.propTypes = {
   /**
    * Array of Menu Data to be displayed
    */
-  menuData: PropTypes.array,
+  menuData: PropTypes.object,
   /**
    * Callback for an item being selected
    */
@@ -564,7 +578,8 @@ AddressBook.propTypes = {
   /**
    * Bool which determines if menu is fetching more data
    */
-  isLoadingMoreMenuData: PropTypes.bool
+  isLoadingMoreMenuData: PropTypes.bool,
+  inputValue: PropTypes.string
 }
 
 export default AddressBook
