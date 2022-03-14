@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!calendar.edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import tz from '@canvas/timezone'
 import Backbone from '@canvas/backbone'
@@ -34,6 +34,8 @@ import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
+
+const I18n = useI18nScope('calendar.edit');
 
 RichContentEditor.preloadRemoteModule()
 

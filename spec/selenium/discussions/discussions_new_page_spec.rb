@@ -104,8 +104,8 @@ describe "discussions" do
           wait_for_ajaximations
           fj(".ic-tokeninput-option:visible:first").click
           wait_for_ajaximations
-          fj(".datePickerDateField[data-date-type='due_at']:first").send_keys(format_date_for_view(due_at1))
-
+          fj(".datePickerDateField[data-date-type='due_at']:first").send_keys(format_date_for_view(due_at1), :tab)
+          wait_for_ajaximations
           f("#add_due_date").click
           wait_for_ajaximations
 

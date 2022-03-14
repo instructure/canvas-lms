@@ -109,6 +109,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Spännande diskussion" },
   "excused_cf8792eb": { "message": "Ursäktad" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Det gick inte att ladda ned kurslistan"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Det gick inte att titta in i din framtid"
   },

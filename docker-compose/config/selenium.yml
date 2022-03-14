@@ -1,6 +1,6 @@
 test:
-  remote_url_firefox: http://selenium-firefox:4444/wd/hub
-  remote_url_chrome: http://selenium-chrome:4444/wd/hub
-  remote_url_edge: http://selenium-edge:4444/wd/hub
+  remote_url_firefox: http://selenium-hub:4444/wd/hub
+  remote_url_chrome: http://selenium-hub:4444/wd/hub
+  remote_url_edge: http://selenium-hub:4444/wd/hub
   browser: chrome
   # auto_open_devtools: true

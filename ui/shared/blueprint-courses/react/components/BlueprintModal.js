@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!BlueprintModal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
@@ -25,6 +25,8 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
+
+const I18n = useI18nScope('BlueprintModal');
 
 export default class BlueprintModal extends Component {
   static propTypes = {

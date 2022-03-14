@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
@@ -36,6 +36,8 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../helpers/UploadMediaTranslations'
+
+const I18n = useI18nScope('assignments_2');
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}

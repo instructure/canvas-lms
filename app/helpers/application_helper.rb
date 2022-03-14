@@ -980,7 +980,7 @@ module ApplicationHelper
   def agree_to_terms
     # may be overridden by a plugin
     @agree_to_terms ||
-      t(
+      I18n.t(
         "I agree to the *terms of use*.",
         wrapper: {
           "*" => link_to('\1', "#", class: "terms_of_service_link")
@@ -1174,12 +1174,12 @@ module ApplicationHelper
   def link_to_parent_signup(auth_type)
     data = reg_link_data(auth_type)
     link_to(
-      t("Parents sign up here"),
+      I18n.t("Parents sign up here"),
       "#",
       id: "signup_parent",
       class: "signup_link",
       data: data,
-      title: t("Parent Signup")
+      title: I18n.t("Parent Signup")
     )
   end
 
@@ -1464,5 +1464,9 @@ module ApplicationHelper
           @domain_root_account.feature_enabled?(:improved_outcomes_management)
       )
     end
+  end
+
+  def append_default_due_time_js_env(context, hash)
+    hash[:DEFAULT_DUE_TIME] = context.default_due_time if context&.default_due_time.present? && context.root_account.feature_enabled?(:default_due_time)
   end
 end

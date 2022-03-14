@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!GroupUserCollection'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 import GroupUser from '../models/GroupUser.coffee'
 import h from 'html-escape'
+
+I18n = useI18nScope('GroupUserCollection')
 
 export default class GroupUserCollection extends PaginatedCollection
 

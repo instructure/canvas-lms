@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+
+const I18n = useI18nScope('assignments_2');
 
 export default function AvailabilityDates({assignment, formatStyle}) {
   const longFmt = formatStyle === 'long'

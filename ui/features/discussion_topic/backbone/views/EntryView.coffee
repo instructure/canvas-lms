@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!discussions'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import MarkAsReadWatcher from '../MarkAsReadWatcher'
 import walk from '../../array-walk'
 import Backbone from '@canvas/backbone'
@@ -35,6 +35,8 @@ import {isRTL} from '@canvas/i18n/rtlHelper'
 import mathml from 'mathml'
 import '@canvas/avatar/jst/_avatar.handlebars'
 import '../../jst/_reply_form.handlebars'
+
+I18n = useI18nScope('discussions')
 
 class EntryView extends Backbone.View
 

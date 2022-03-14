@@ -23,20 +23,6 @@ require_relative "common_helper_methods/custom_alert_actions"
 require_relative "common_helper_methods/custom_screen_actions"
 require_relative "patches/selenium/webdriver/remote/w3c/bridge"
 
-# WebDriver uses port 7054 (the "locking port") as a mutex to ensure
-# that we don't launch two Firefox instances at the same time. Each
-# new instance you create will wait for the mutex before starting
-# the browser, then release it as soon as the browser is open.
-#
-# The default port mutex wait timeout is 45 seconds.
-# Bump it to 90 seconds as a stopgap for the recent flood of:
-# `unable to bind to locking port 7054 within 45 seconds`
-#
-# TODO: Investigate why it's taking so long to launch Firefox, or
-#       what process is hogging port 7054.
-Selenium::WebDriver::Firefox::Launcher.send :remove_const, :SOCKET_LOCK_TIMEOUT
-Selenium::WebDriver::Firefox::Launcher::SOCKET_LOCK_TIMEOUT = 90
-
 module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
   SECONDS_UNTIL_GIVING_UP = 10
@@ -275,9 +261,8 @@ module SeleniumDriverSetup
       # by modifying 'chromedriver_version: <version>' for the version you want.
       # otherwise this will use the default version matching what is used in docker.
       Webdrivers::Chromedriver.required_version = CONFIG[:chromedriver_version]
-      chrome_options = Selenium::WebDriver::Chrome::Options.new
 
-      Selenium::WebDriver.for :chrome, desired_capabilities: desired_capabilities, options: chrome_options
+      Selenium::WebDriver.for :chrome, capabilities: desired_capabilities
     end
 
     def ruby_safari_driver
@@ -287,16 +272,16 @@ module SeleniumDriverSetup
 
     def ruby_edge_driver
       puts "Thread: provisioning local edge driver"
-      edge_options = Selenium::WebDriver::Edge::Options.new
-      Selenium::WebDriver.for :edge, desired_capabilities: desired_capabilities, options: edge_options
+      Selenium::WebDriver.for :edge, capabilities: desired_capabilities
     end
 
     def selenium_remote_driver
       puts "Thread: provisioning remote #{browser} driver"
+      puts "Selenium_Url: #{selenium_url}"
       driver = Selenium::WebDriver.for(
         :remote,
         url: selenium_url,
-        desired_capabilities: desired_capabilities
+        capabilities: desired_capabilities
       )
 
       driver.file_detector = lambda do |args|
@@ -311,37 +296,36 @@ module SeleniumDriverSetup
     def desired_capabilities
       case browser
       when :firefox
-        caps = Selenium::WebDriver::Remote::Capabilities.firefox
+        options = Selenium::WebDriver::Options.firefox
+        options.log_level = :debug
       when :chrome
-        caps = Selenium::WebDriver::Remote::Capabilities.chrome
-        caps["goog:chromeOptions"] = {
-          args: %w[disable-dev-shm-usage no-sandbox start-maximized]
-        }
-        caps["goog:loggingPrefs"] = {
+        options = Selenium::WebDriver::Options.chrome
+        options.add_argument("no-sandbox")
+        options.add_argument("start-maximized")
+        options.add_argument("disable-dev-shm-usage")
+        options.logging_prefs = {
           browser: "ALL"
         }
         # put `auto_open_devtools: true` in your selenium.yml if you want to have
         # the chrome dev tools open by default by selenium
         if CONFIG[:auto_open_devtools]
-          caps["goog:chromeOptions"][:args].append("auto-open-devtools-for-tabs")
+          options.add_argument("auto-open-devtools-for-tabs")
         end
         # put `headless: true` and `window_size: "<x>,<y>"` in your selenium.yml
         # if you want to run against headless chrome
         if CONFIG[:headless]
-          caps["goog:chromeOptions"][:args].append("headless")
+          options.add_argument("headless")
         end
-        if CONFIG[:window_size].present?
-          caps["goog:chromeOptions"][:args].append("window-size=#{CONFIG[:window_size]}")
-        end
-        caps["unexpectedAlertBehaviour"] = "ignore"
       when :edge
-        caps = Selenium::WebDriver::Remote::Capabilities.edge
+        options = Selenium::WebDriver::Options.edge
+        options.add_argument("disable-dev-shm-usage")
       when :safari
         # TODO: options for safari driver
       else
         raise "unsupported browser #{browser}"
       end
-      caps
+      options.unhandled_prompt_behavior = "ignore"
+      options
     end
 
     def selenium_url
@@ -362,24 +346,7 @@ module SeleniumDriverSetup
     def ruby_firefox_driver
       puts "Thread: provisioning local firefox driver"
       Selenium::WebDriver.for(:firefox,
-                              profile: firefox_profile,
-                              desired_capabilities: desired_capabilities)
-    end
-
-    def firefox_profile
-      if CONFIG[:firefox_path].present?
-        Selenium::WebDriver::Firefox::Binary.path = (CONFIG[:firefox_path]).to_s
-      end
-      profile = Selenium::WebDriver::Firefox::Profile.new
-      profile.add_extension Rails.root.join("spec/selenium/test_setup/JSErrorCollector.xpi")
-      profile.log_file = "/dev/stdout"
-      # firefox randomly reloads if/when it decides to download the OpenH264 codec, so don't let it
-      profile["media.gmp-manager.url"] = ""
-
-      if CONFIG[:firefox_profile].present?
-        profile = Selenium::WebDriver::Firefox::Profile.from_name(CONFIG[:firefox_profile])
-      end
-      profile
+                              capabilities: desired_capabilities)
     end
 
     def_delegator :driver_capabilities, :browser_name
@@ -514,18 +481,6 @@ module SeleniumDriverSetup
       self.server = SpecFriendlyWebServer
       server.run(rack_app, port: server_port)
     end
-  end
-end
-
-# get some extra verbose logging from firefox for when things go wrong
-Selenium::WebDriver::Firefox::Binary.class_eval do
-  def execute(*extra_args)
-    args = [self.class.path, "-no-remote"] + extra_args
-    SeleniumDriverSetup.browser_process = @process = ChildProcess.build(*args)
-    SeleniumDriverSetup.browser_log = @process.io.stdout = @process.io.stderr = Tempfile.new("firefox")
-    $DEBUG = true
-    @process.start
-    $DEBUG = nil
   end
 end
 

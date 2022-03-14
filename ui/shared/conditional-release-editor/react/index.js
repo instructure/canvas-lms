@@ -20,8 +20,10 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!conditional_release'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+const I18n = useI18nScope('conditional_release');
 
 const SAVE_TIMEOUT = 15000
 

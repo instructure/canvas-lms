@@ -17,7 +17,7 @@
  */
 
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import I18n from 'i18n!app_shared_components_canvas_date_time'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {ReactNode, useRef, useState} from 'react'
 import moment, {Moment} from 'moment-timezone'
 import tz from '@canvas/timezone'
@@ -29,6 +29,8 @@ import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-ic
 import {nanoid} from 'nanoid'
 import {log} from '@canvas/datetime-natural-parsing-instrument'
 import {DateInputInteraction, DateInputLayout} from '@instructure/ui-date-input/types'
+
+const I18n = useI18nScope('app_shared_components_canvas_date_time');
 
 // can use INSTUI definition of the message type once
 // https://github.com/instructure/instructure-ui/issues/815 is closed

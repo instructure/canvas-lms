@@ -371,6 +371,18 @@ describe('Add Comment/View Feedback button', () => {
     expect(getByText('Add Comment')).toBeInTheDocument()
   })
 
+  it('shows the unread comments badge if there are unread comments', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+    const {getByTestId} = render(<Header {...props} />)
+    expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
+  })
+
+  it('does not show the unread comments badge if there are no unread comments', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 0}})
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
+  })
+
   it('renders as "Add Comment" by default for nonDigitalSubmission', async () => {
     const props = await mockAssignmentAndSubmission({
       Assignment: {nonDigitalSubmission: true},

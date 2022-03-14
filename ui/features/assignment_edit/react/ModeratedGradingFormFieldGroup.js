@@ -18,13 +18,15 @@
 
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!ModeratedGradingFormFieldGroup'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import FinalGraderSelectMenu from './FinalGraderSelectMenu'
 import GraderCommentVisibilityCheckbox from './GraderCommentVisibilityCheckbox'
 import GraderCountNumberInput from './GraderCountNumberInput'
 import GraderNamesVisibleToFinalGraderCheckbox from './GraderNamesVisibleToFinalGraderCheckbox'
 import ModeratedGradingCheckbox from './ModeratedGradingCheckbox'
 import {direction} from '@canvas/i18n/rtlHelper'
+
+const I18n = useI18nScope('ModeratedGradingFormFieldGroup');
 
 export default class ModeratedGradingFormFieldGroup extends React.Component {
   static propTypes = {

@@ -39,14 +39,14 @@ describe('<ShapeSection />', () => {
   it('changes the button shape', () => {
     const onChange = jest.fn()
     render(<ShapeSection settings={{...DEFAULT_SETTINGS, shape: 'circle'}} onChange={onChange} />)
-    selectOption(/button shape/i, /triangle/i)
+    selectOption(/icon shape/i, /triangle/i)
     expect(onChange).toHaveBeenCalledWith({shape: 'triangle'})
   })
 
   it('changes the button size', () => {
     const onChange = jest.fn()
     render(<ShapeSection settings={{...DEFAULT_SETTINGS, size: 'small'}} onChange={onChange} />)
-    selectOption(/button size/i, /extra small/i)
+    selectOption(/icon size/i, /extra small/i)
     expect(onChange).toHaveBeenCalledWith({size: 'x-small'})
   })
 })

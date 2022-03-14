@@ -189,7 +189,6 @@ pipeline {
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/'
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = '3.141.59-20210929'
 
     // Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and
     // repeats each test FSC_REPEAT_FACTOR times.

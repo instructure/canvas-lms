@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!calendar'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
 import EditCalendarEventDetails from './EditCalendarEventDetails'
 import EditAssignmentDetails from '../backbone/views/EditAssignmentDetails'
@@ -28,6 +28,8 @@ import EditToDoItemDetails from '../backbone/views/EditToDoItemDetails'
 import editEventTemplate from '../jst/editEvent.handlebars'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
+
+const I18n = useI18nScope('calendar');
 
 const dialog = $('<div id="edit_event"><div /></div>')
   .appendTo('body')

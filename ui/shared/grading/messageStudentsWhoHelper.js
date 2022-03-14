@@ -17,7 +17,9 @@
  */
 
 import _ from 'underscore'
-import I18n from 'i18n!gradebooksharedMessageStudentsWhoHelper'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('gradebooksharedMessageStudentsWhoHelper');
 
 export function hasSubmitted(submission) {
   if (submission.excused) {

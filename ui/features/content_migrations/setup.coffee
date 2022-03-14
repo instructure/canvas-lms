@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!content_migrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import progressingMigrationCollectionTemplate from './jst/ProgressingContentMigrationCollection.handlebars'
 import pubsub from 'jquery-tinypubsub'
@@ -49,6 +49,8 @@ import OverwriteAssessmentContentView from '@canvas/content-migrations/backbone/
 import ImportQuizzesNextView from '@canvas/content-migrations/backbone/views/ImportQuizzesNextView.coffee'
 import processMigrationContentItem from './processMigrationContentItem'
 import {subscribe} from 'jquery-tinypubsub'
+
+I18n = useI18nScope('content_migrations')
 
 ConverterViewControl.setModel new ContentMigrationModel
                                 course_id: ENV.COURSE_ID

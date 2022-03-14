@@ -19,12 +19,14 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!OutcomesImporter'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import * as apiClient from './apiClient'
+
+const I18n = useI18nScope('OutcomesImporter');
 
 const unmount = mount => () => ReactDOM.unmountComponentAtNode(mount)
 export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {

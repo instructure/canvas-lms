@@ -1226,7 +1226,9 @@ class Course < ActiveRecord::Base
       self.class.connection.after_transaction_commit do
         Enrollment.where(course_id: self).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
-        User.touch_and_clear_cache_keys(user_ids, :enrollments)
+        # We might get lots of database locks when lots of courses with the same users are being updated,
+        # so we can skip touching those users' updated_at stamp since another process will do it
+        User.touch_and_clear_cache_keys(user_ids, :enrollments, skip_locked: true)
       end
 
       data
@@ -3336,7 +3338,7 @@ class Course < ActiveRecord::Base
     invalid_keys = opts.except(*valid_keys).keys
     raise "invalid options - #{invalid_keys.inspect} (must be in #{valid_keys.inspect})" if invalid_keys.any?
 
-    cast_expression = "val.to_s"
+    cast_expression = "val.to_s.presence"
     cast_expression = "val" if opts[:arbitrary]
     if opts[:boolean]
       opts[:default] ||= false
@@ -3365,7 +3367,12 @@ class Course < ActiveRecord::Base
         if settings_frd[#{setting.inspect}] != new_val
           @changed_settings ||= []
           @changed_settings << #{setting.inspect}
-          settings_frd[#{setting.inspect}] = new_val
+          if new_val.nil?
+            settings_frd.delete(#{setting.inspect})
+            nil
+          else
+            settings_frd[#{setting.inspect}] = new_val
+          end
         end
       end
     RUBY
@@ -3422,6 +3429,8 @@ class Course < ActiveRecord::Base
 
   add_setting :course_color
   add_setting :alt_name
+
+  add_setting :default_due_time, inherited: true
 
   def elementary_enabled?
     account.enable_as_k5_account?

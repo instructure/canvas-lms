@@ -89,7 +89,7 @@ module.exports = function(source) {
   }
 
   if (result.translationCount > 0) {
-    dependencies.push(`i18n!${result.scope}`)
+    dependencies.push('@canvas/i18n')
   }
   const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies)
   return compiledTemplate

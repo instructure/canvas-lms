@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 
-import I18n from 'i18n!assignment_grade_summary'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import * as AssignmentActions from '../assignment/AssignmentActions'
 import GradersTable from './GradersTable/index'
@@ -34,6 +34,8 @@ import {
   SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   setReleaseGradesStatus
 } from '../assignment/AssignmentActions'
+
+const I18n = useI18nScope('assignment_grade_summary');
 
 /* eslint-disable no-alert */
 

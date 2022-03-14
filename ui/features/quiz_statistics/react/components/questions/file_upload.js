@@ -17,8 +17,10 @@
  */
 
 import AbstractTextQuestion from './abstract_text_question'
-import I18n from 'i18n!quiz_statistics'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
+
+const I18n = useI18nScope('quiz_statistics');
 
 const FileUpload = props => (
   <AbstractTextQuestion

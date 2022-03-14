@@ -25,11 +25,11 @@
 <%
   if k5_user?
     dashboard_title = t('Home')
-    dashboard_icon_path = "shared/svg/svg_icon_home.svg"
+    dashboard_icon_path = "shared/svg/svg_icon_home"
     courses_title = t('Subjects')
   else
     dashboard_title = t('Dashboard')
-    dashboard_icon_path = "shared/svg/#{'k12/' if k12?}svg_icon_dashboard.svg"
+    dashboard_icon_path = "shared/svg/#{'k12/' if k12?}svg_icon_dashboard"
     courses_title = t('Courses')
   end
 %>
@@ -102,7 +102,7 @@
         <li class="menu-item ic-app-header__menu-list-item">
           <a id="global_nav_login_link" href="/login" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
-              <%= render(:partial => "shared/svg/svg_login_new_styles.svg") %>
+              <%= render(partial: "shared/svg/svg_login_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('Login') %>
@@ -114,7 +114,7 @@
         <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
           <button id="global_nav_accounts_link" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
-              <%= render(:partial => "shared/svg/svg_icon_accounts_new_styles.svg") %>
+              <%= render(partial: "shared/svg/svg_icon_accounts_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('Admin') %>
@@ -125,7 +125,7 @@
       <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
         <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
           <div class="menu-item-icon-container" aria-hidden="true">
-            <%= render(partial: dashboard_icon_path) %>
+            <%= render(partial: dashboard_icon_path, formats: [:svg]) %>
           </div>
           <div class="menu-item__text"><%= dashboard_title %></div>
         </a>
@@ -134,7 +134,7 @@
         <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
           <button id="global_nav_courses_link" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
-              <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_courses_new_styles.svg") %>
+              <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_courses_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= courses_title %>
@@ -146,7 +146,7 @@
         <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/groups') %>">
           <button id="global_nav_groups_link" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
-              <%= render(partial: "shared/svg/svg_icon_groups_new_styles.svg") %>
+              <%= render(partial: "shared/svg/svg_icon_groups_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('Groups') %>
@@ -157,7 +157,7 @@
       <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/calendar') %>">
         <a id="global_nav_calendar_link" href="/calendar" class="ic-app-header__menu-list-link">
           <div class="menu-item-icon-container" aria-hidden="true">
-            <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_calendar_new_styles.svg") %>
+            <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_calendar_new_styles", formats: [:svg]) %>
           </div>
           <div class="menu-item__text">
             <%= t('Calendar') %>
@@ -167,7 +167,7 @@
       <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
         <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
           <div class="menu-item-icon-container">
-            <span aria-hidden="true"><%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_inbox.svg") %></span>
+            <span aria-hidden="true"><%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_inbox", formats: [:svg]) %></span>
             <span class="menu-item__badge"></span>
           </div>
           <div class="menu-item__text">
@@ -179,7 +179,7 @@
         <li class="menu-item ic-app-header__menu-list-item" <%= ' ic-app-header__menu-list-item--active' if active_path?('/history') %>>
           <button id="global_nav_history_link" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
-              <%= render(partial: "shared/svg/svg_icon_history.svg") %>
+              <%= render(partial: "shared/svg/svg_icon_history", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('History') %>
@@ -188,7 +188,7 @@
         </li>
       <% end %>
       <% unless @current_user.nil? %>
-        <%= render(:partial => 'external_tools/global_nav_menu_items') %>
+        <%= render(partial: 'external_tools/global_nav_menu_items') %>
       <% end %>
       <li class="ic-app-header__menu-list-item">
         <%= link_to help_link_url,
@@ -198,7 +198,7 @@
                     :data => help_link_data do %>
           <div class="menu-item-icon-container" role="presentation">
             <% if %w{help information folder cog lifepreserver}.include? help_link_icon %>
-              <%= render(partial: "shared/svg/svg_icon_#{help_link_icon}.svg") %>
+              <%= render(partial: "shared/svg/svg_icon_#{help_link_icon}", formats: [:svg]) %>
             <% else # fallback for if it is not one of the expected icons we know we have %>
               <%= svg_icon help_link_icon %>
             <% end%>
@@ -223,7 +223,7 @@
                 <% else %><%= t('Minimize global navigation') %><% end %>"
         >
           <div class="menu-item-icon-container" aria-hidden="true">
-            <%= render(partial: "shared/svg/svg_icon_navtoggle.svg") %>
+            <%= render(partial: "shared/svg/svg_icon_navtoggle", formats: [:svg]) %>
           </div>
         </button>
       </li>

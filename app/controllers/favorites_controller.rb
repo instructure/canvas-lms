@@ -70,7 +70,7 @@ class FavoritesController < ApplicationController
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
     opts = {}
-    opts[:observee_user] = User.find_by(id: params[:observed_user].to_i) || @current_user if params.key?(:observed_user)
+    opts[:observee_user] = User.find_by(id: params[:observed_user_id].to_i) || @current_user if params.key?(:observed_user_id)
 
     courses = @current_user.menu_courses(nil, opts)
     if courses.any? && value_to_boolean(params[:exclude_blueprint_courses])

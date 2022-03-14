@@ -22,5 +22,6 @@
 class UnshardedRecord < ::ActiveRecord::Base
   self.abstract_class = true
 
-  self.shard_category = :unsharded
+  # This line is conditional just so if it is eager-loaded nothing breaks
+  self.shard_category = :unsharded if CANVAS_RAILS6_0
 end

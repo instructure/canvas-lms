@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var TranslationHash = require("i18nliner/dist/lib/extractors/translation_hash").default;
+var TranslationHash = require("@instructure/i18nliner/dist/lib/extractors/translation_hash").default;
 
 function keys(obj) {
   var result = [];

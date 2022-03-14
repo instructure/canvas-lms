@@ -29,8 +29,7 @@ def createDistribution(nestedStages) {
 
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-    'POSTGRES_PASSWORD=sekret',
-    'SELENIUM_VERSION=3.141.59-20210929'
+    'POSTGRES_PASSWORD=sekret'
   ]
 
   def rspecqEnvVars = baseEnvVars + [
@@ -70,8 +69,7 @@ def createDistribution(nestedStages) {
 def createLegacyDistribution(nestedStages) {
   def setupNodeHook = this.&setupNode
   def baseEnvVars = [
-    'POSTGRES_PASSWORD=sekret',
-    'SELENIUM_VERSION=3.141.59-20210929'
+    'POSTGRES_PASSWORD=sekret'
   ]
 
   // Used only for crystalball map generation
@@ -79,7 +77,7 @@ def createLegacyDistribution(nestedStages) {
   def legacyEnvVars = baseEnvVars + [
     "CI_NODE_TOTAL=$legacyNodeTotal",
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-    'EXCLUDE_TESTS=.*/performance',
+    'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium)',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
     "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",

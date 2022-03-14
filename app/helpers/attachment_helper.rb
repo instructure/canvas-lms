@@ -99,7 +99,7 @@ module AttachmentHelper
       send_file_headers!(length: body.length, filename: attachment.filename, disposition: "inline", type: attachment.content_type_with_encoding)
       render body: body
     elsif must_proxy
-      render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
+      render 400, text: I18n.t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
       redirect_to authenticated_inline_url(attachment)
     else

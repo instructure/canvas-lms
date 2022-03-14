@@ -62,7 +62,7 @@ export function mimeClass(file) {
         'image/gif': 'image',
         'image/bmp': 'image',
         'image/svg+xml': 'image',
-        // 'image/webp': 'image', not supported by safari as of Version 13.1.1
+        'image/webp': 'image',
         'application/x-rar': 'zip',
         'application/x-rar-compressed': 'zip',
         'application/x-zip': 'zip',

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!BlueprintCourseSidebar'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
@@ -24,6 +24,8 @@ import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {IconBlueprintSolid, IconXSolid} from '@instructure/ui-icons'
+
+const I18n = useI18nScope('BlueprintCourseSidebar');
 
 export default class BlueprintCourseSidebar extends Component {
   static propTypes = {

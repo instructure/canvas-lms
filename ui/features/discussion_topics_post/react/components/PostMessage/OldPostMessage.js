@@ -17,7 +17,7 @@
  */
 
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
@@ -34,6 +34,8 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {InlineList} from '@instructure/ui-list'
+
+const I18n = useI18nScope('discussion_posts');
 
 export function OldPostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)

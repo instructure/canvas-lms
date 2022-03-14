@@ -18,8 +18,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!student_context_trayMetricsList'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {MetricsList as InstUIMetricsList} from '@instructure/ui-metric'
+
+const I18n = useI18nScope('student_context_trayMetricsList');
 
 class MetricsList extends React.Component {
   static propTypes = {

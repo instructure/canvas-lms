@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import I18n from 'i18n!k5_app_link'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -30,6 +30,8 @@ import {IconLtiSolid} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import k5Theme from './k5-theme'
 import {Flex} from '@instructure/ui-flex'
+
+const I18n = useI18nScope('k5_app_link');
 
 export default function K5AppLink({app}) {
   const [isModalOpen, setModalOpen] = useState(false)

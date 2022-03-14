@@ -22,12 +22,14 @@ import ReactDOM from 'react-dom'
 import DueDateOverride from '@canvas/assignments/jst/DueDateOverride.handlebars'
 import DateValidator from '@canvas/datetime/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
-import I18n from 'i18n!DueDateOverrideView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import tz from '@canvas/timezone'
 import '@canvas/forms/jquery/jquery.instructure_forms' # errorBox
+
+I18n = useI18nScope('DueDateOverrideView')
 
 export default class DueDateOverrideView extends Backbone.View
   @mixin ValidatedMixin
@@ -53,9 +55,9 @@ export default class DueDateOverrideView extends Backbone.View
       dueAt: tz.parse(@model.assignment.get("due_at")),
       dueDatesReadonly: @options.dueDatesReadonly,
       availabilityDatesReadonly: @options.availabilityDatesReadonly,
-      importantDates: @model.assignment.get("important_dates")
+      importantDates: @model.assignment.get("important_dates"),
+      defaultDueTime: ENV.DEFAULT_DUE_TIME
     })
-
     ReactDOM.render(DueDatesElement, div)
 
   gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)

@@ -109,7 +109,7 @@ shared_examples_for "k5 homeroom announcements" do
     end
   end
 
-  describe "announcement attachments" do
+  context "announcement attachments" do
     before :once do
       attachment_model(uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
       @homeroom_course.announcements.create!(

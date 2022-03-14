@@ -183,8 +183,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           enable_cache do
             subject
             link_header = response.headers["Link"]
-            cache_key = Rails.cache.instance_variable_get(:@data).keys.grep(/quizzes\.next/).first.dup
-            cache_key.sub!(/^rails60:/, "")
+            cache_key = Rails.cache.instance_variable_get(:@data).keys.grep(/quizzes\.next/).first.dup.split(":", 2).last
             cached_content = Rails.cache.read(cache_key)
             expect(cached_content[:link]).to eq(link_header)
           end

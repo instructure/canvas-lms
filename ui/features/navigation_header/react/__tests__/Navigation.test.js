@@ -130,7 +130,7 @@ describe('GlobalNavigation', () => {
         render(<Navigation ref={navRef} unreadComponent={unreadComponent} />)
         navRef.current.ensureLoaded('courses')
         expect($.getJSON).toHaveBeenCalledWith(
-          '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname&observed_user=17',
+          '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname&observed_user_id=17',
           expect.anything()
         )
       })

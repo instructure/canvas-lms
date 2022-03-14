@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
 import {ImageOptions} from '../ImageOptions'
 import {actions} from '../../../../reducers/imageSection'
 
@@ -52,6 +52,42 @@ describe('ImageOptions', () => {
     it('renders a "None Selected" message', () => {
       const {getByText} = subject()
       expect(getByText('None Selected')).toBeInTheDocument()
+    })
+  })
+
+  describe('focus management', () => {
+    const state = {
+      image: null,
+      imageName: 'banana.jpg',
+      mode: 'Course',
+      collectionOpen: false,
+      loading: false
+    }
+
+    it('focuses Clear button when an image is selected', async () => {
+      const {getByTestId, rerender} = render(<ImageOptions state={state} />)
+
+      const addImage = await getByTestId('add-image')
+      act(() => addImage.focus())
+
+      state.image = 'data:image/png;base64,asdfasdfjksdf=='
+
+      rerender(<ImageOptions state={state} />)
+
+      await waitFor(() => expect(getByTestId('clear-image')).toHaveFocus())
+    })
+
+    it('focuses Add Image button when an image is cleared', async () => {
+      state.image = 'data:image/png;base64,asdfasdfjksdf=='
+      const {getByTestId, rerender} = render(<ImageOptions state={state} />)
+
+      const clearImage = getByTestId('clear-image')
+      act(() => clearImage.focus())
+
+      state.image = null
+      rerender(<ImageOptions state={state} />)
+
+      await waitFor(() => expect(getByTestId('add-image')).toHaveFocus())
     })
   })
 

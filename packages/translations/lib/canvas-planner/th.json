@@ -105,6 +105,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "การพูดคุยที่น่าตื่นเต้น" },
   "excused_cf8792eb": { "message": "ได้รับการยกเว้น" },
+  "failed_getting_course_list_49846a93": {
+    "message": "ไม่สามารถสืบค้นรายชื่อบทเรียน"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "ไม่สามารถดูตัวอย่างอนาคตของคุณ"
   },

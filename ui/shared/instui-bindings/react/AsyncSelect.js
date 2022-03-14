@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!canvas_async_search_select'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {useState, useRef} from 'react'
 import {bool, func, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
+
+const I18n = useI18nScope('canvas_async_search_select');
 
 const noOptionsId = '~~empty-option~~'
 

@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import I18n from 'i18n!groups'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -26,6 +26,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+
+const I18n = useI18nScope('groups');
 
 GroupCategoryCloneModal.propTypes = {
   groupCategory: shape({

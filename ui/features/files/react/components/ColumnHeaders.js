@@ -17,11 +17,13 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import createReactClass from 'create-react-class'
 import classnames from 'classnames'
 import ColumnHeaders from '../legacy/components/ColumnHeaders'
+
+const I18n = useI18nScope('react_files');
 
 ColumnHeaders.renderColumns = function(sort, order) {
   return this.columns.map(column => {

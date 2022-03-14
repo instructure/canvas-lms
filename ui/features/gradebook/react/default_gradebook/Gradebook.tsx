@@ -72,14 +72,15 @@ import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 // @ts-ignore
 import InputFilterView from 'backbone-input-filter-view'
 // @ts-ignore
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 // @ts-ignore
 import UserSettings from '@canvas/user-settings'
-import Spinner from 'spin.js'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 // @ts-ignore
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
@@ -180,6 +181,8 @@ import {
   getInitialActionStates,
   columnWidths
 } from './initialState'
+
+const I18n = useI18nScope('gradebook');
 
 const GradebookGrid = React.lazy(() => import('./components/GradebookGrid'))
 
@@ -353,8 +356,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   defaultSortType: string = 'assignment_group'
-
-  spinner?: Spinner
 
   gridDisplaySettings: GridDisplaySettings
 
@@ -562,17 +563,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     this.startedInitializing = true
     if (this.gridReady.state() !== 'resolved') {
-      if (!this.spinner) {
-        this.spinner = new Spinner()
-      }
-      $(this.spinner.spin().el)
-        .css({
-          opacity: 0.5,
-          top: '55px',
-          left: '50%'
-        })
-        .addClass('use-css-transitions-for-show-hide')
-        .appendTo('#main')
       return $('#gradebook-grid-wrapper').hide()
     } else {
       return $('#gradebook_grid').trigger('resize.fillWindowWithMe')
@@ -675,7 +665,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.setAssignmentGroupsLoaded(true)
     assignmentGroups.forEach(assignmentGroup => {
       let group = this.assignmentGroups[assignmentGroup.id]
-
       if (!group) {
         group = assignmentGroup
         this.assignmentGroups[group.id] = group
@@ -1960,15 +1949,24 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  getAssignmentOrder = () => {
+  getAssignmentOrder = (assignmentGroupId?: string) => {
     return this.gridData.columns.scrollable.reduce((acc: string[], column) => {
       const matches = column.match(/assignment_(\d+)/)
       if (matches) {
-        const assignmentId = matches[1]
-        acc.push(assignmentId)
+        if (
+          assignmentGroupId === undefined ||
+          this.assignments[parseInt(matches[1])]?.assignment_group_id === assignmentGroupId
+        ) {
+          const assignmentId = matches[1]
+          acc.push(assignmentId)
+        }
       }
       return acc
-    }, [])
+    }, []);
+  }
+
+  getStudentOrder = () => {
+    return this.gridData.rows.map(row => row.id)
   }
 
   getActionMenuProps = () => {
@@ -2396,7 +2394,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   setVisibleGridColumns = () => {
     let assignmentGroupId, ref1
     let parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
+      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId);
     })
     if (this.gridDisplaySettings.showSeparateFirstLastNames) {
       parentColumnIds = ['student_lastname', 'student_firstname'].concat(parentColumnIds)
@@ -2741,13 +2739,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   onGridInit = () => {
-    if (this.spinner) {
-      // TODO: this "if @spinner" crap is necessary because the outcome
-      // gradebook kicks off the gradebook (unnecessarily).  back when the
-      // gradebook was slow, this code worked, but now the spinner may never
-      // initialize.  fix the way outcome gradebook loads
-      $(this.spinner.el).remove()
-    }
     $('#gradebook-grid-wrapper').show()
     this.uid = this.gradebookGrid?.grid.getUID()
     $('#accessibility_warning').focus(function () {
@@ -3119,7 +3110,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   toggleNotesColumn = () => {
     const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId)
+      return !/^custom_col_/.test(columnId);
     })
     const customColumnIds = this.listVisibleCustomColumns().map(column => {
       return getCustomColumnId(column.id)
@@ -4600,28 +4591,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   executeApplyScoreToUngraded = args => {
     const {value, ...options} = args
 
-    // TODO: if updated Gradebook filters are enabled, we should use those
-    // instead, either by replacing the lines below with checks against the
-    // current filters or by passing the ID of the active filter (and looking up
-    // the contents of the filter on the back-end)
-
-    let moduleId = this.getFilterColumnsBySetting('contextModuleId')
-    if (moduleId === '0') {
-      moduleId = null
-    }
-
-    const optionsWithFilters = {
+    const optionsWithAssignmentsAndStudentIds = {
       ...options,
-      courseSectionId: this.getFilterRowsBySetting('sectionId'),
-      gradingPeriodId: this.getFilterColumnsBySetting('gradingPeriodId'),
-      moduleId,
-      studentGroupId: this.getFilterRowsBySetting('studentGroupId')
+      assignment_ids: this.getAssignmentOrder(args.assignmentGroupId),
+      student_ids: this.getStudentOrder()
     }
 
     if (value === 'excused') {
-      optionsWithFilters.excused = true
+      optionsWithAssignmentsAndStudentIds.excused = true
     } else {
-      optionsWithFilters.percent = value
+      optionsWithAssignmentsAndStudentIds.percent = value
     }
 
     this.isRunningScoreToUngraded = true
@@ -4636,7 +4615,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         )
       )
       .then(() => {
-        this.scoreToUngradedManager!.startProcess(this.options.context_id, optionsWithFilters)
+        this.scoreToUngradedManager!.startProcess(
+          this.options.context_id,
+          optionsWithAssignmentsAndStudentIds
+        )
           .then(
             FlashAlert.showFlashSuccess(I18n.t('Score to ungraded process finished successfully'))
           )
@@ -4816,6 +4798,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             variant="DefaultGradebook"
           />
         </Portal>
+        {(!this.state.isGridLoaded || !this.state.isEssentialDataLoaded) && (
+          <View as="div" width="100%" textAlign="center">
+            <Spinner renderTitle={I18n.t('Loading Gradebook')} margin="large auto 0 auto" />
+          </View>
+        )}
         {!this.props.hideGrid && (
           <ErrorBoundary
             errorComponent={

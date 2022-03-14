@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!HelpTray'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {bool, array, func, string} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import HelpDialog from '../HelpDialog/index'
 import ReleaseNotesList from '../ReleaseNotesList'
+
+const I18n = useI18nScope('HelpTray');
 
 export default function HelpTray({
   trayTitle,

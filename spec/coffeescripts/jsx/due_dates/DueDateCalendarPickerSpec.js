@@ -84,6 +84,15 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
     equal(getEnteredDate().toUTCString(), 'Tue, 01 Sep 2015 04:59:59 GMT')
   })
 
+  test('sets the default time (if provided) in the timezone of the user', () => {
+    props.defaultTime = '16:22:22'
+    props.isFancyMidnight = true
+    mountComponent()
+    tzInTest.changeZone(chicago, 'America/Chicago')
+    simulateChange('2022-02-22')
+    equal(getEnteredDate().toUTCString(), 'Tue, 22 Feb 2022 22:22:22 GMT')
+  })
+
   test('does not convert to fancy midnight when isFancyMidnight is false', () => {
     mountComponent()
     simulateChange('2015-08-31T00:00:00')

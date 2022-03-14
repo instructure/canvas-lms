@@ -59,6 +59,8 @@ const locale = {
   },
   "available_folders_694d0436": { "message": "Elérhető mappák" },
   "basic_554cdc0a": { "message": "Alap" },
+  "blue_daf8fea9": { "message": "Kék" },
+  "brick_f2656265": { "message": "Tégla" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Mégse" },
   "choose_caption_file_9c45bc4e": { "message": "Feliratfájl választása" },
@@ -115,9 +117,11 @@ const locale = {
     "message": "Creative Commons licenc:"
   },
   "custom_6979cd81": { "message": "Egyéni" },
+  "cyan_c1d5f68a": { "message": "Cián" },
   "date_added_ed5ad465": { "message": "Dátum hozzáadva" },
   "decorative_image_3c28aa7d": { "message": "Dekoratív kép" },
   "decrease_indent_de6343ab": { "message": "Behúzás csökkentése" },
+  "deep_purple_bb3e2907": { "message": "Sötétlila" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "alapértelmezett nem rendezett lista"
   },
@@ -157,8 +161,6 @@ const locale = {
   "embed_828fac4a": { "message": "Beágyaz" },
   "embed_code_314f1bd5": { "message": "Kód beágyazása" },
   "embed_image_1080badc": { "message": "Beágyazott kép" },
-  "embed_options_tray_901cfd19": { "message": "Beállítások tálca beágyazása" },
-  "embed_preview_2d741e1f": { "message": "Előnézet beágyazása" },
   "embed_video_a97a64af": { "message": "Videó beágyazása" },
   "embedded_content_aaeb4d3d": { "message": "beágyazott tartalom" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
@@ -201,6 +203,7 @@ const locale = {
   },
   "grades_a61eba0a": { "message": "Értékelések" },
   "greek_65c5b3f7": { "message": "Görög" },
+  "green_15af4778": { "message": "Zöld" },
   "group_documents_8bfd6ae6": { "message": "Csoport dokumentumok" },
   "group_files_4324f3df": { "message": "Csoportfájlok" },
   "group_files_82e5dcdb": { "message": "Csoportfájlok" },
@@ -226,6 +229,7 @@ const locale = {
   "image_options_tray_90a46006": { "message": "Képbeállítások tálca" },
   "images_7ce26570": { "message": "Képek" },
   "increase_indent_6d550a4a": { "message": "Behúzás növelése" },
+  "indigo_2035fc55": { "message": "Indigókék" },
   "insert_593145ef": { "message": "Beszúrás" },
   "insert_equella_links_49a8dacd": { "message": "Equella linkek beszúrása" },
   "insert_link_6dc23cae": { "message": "Link beszúrása" },
@@ -238,6 +242,7 @@ const locale = {
   "keyboard_shortcuts_ed1844bd": { "message": "Billentyűparancsok" },
   "large_9c5e80e7": { "message": "Nagy" },
   "left_to_right_e9b4fd06": { "message": "Balról jobbra" },
+  "light_blue_5374f600": { "message": "Világoskék" },
   "link_7262adec": { "message": "Hivatkozás" },
   "link_options_a16b758b": { "message": "Link beállításai" },
   "links_14b70841": { "message": "Linkek" },
@@ -250,6 +255,7 @@ const locale = {
   "loading_folders_d8b5869e": { "message": "Mappák betöltése" },
   "loading_please_wait_d276220a": { "message": "Betöltés, kérjük, várjon" },
   "locked_762f138b": { "message": "Zárolva" },
+  "magenta_4a65993c": { "message": "Magenta" },
   "media_af190855": { "message": "Média" },
   "medium_5a8e9ead": { "message": "Közepes" },
   "misc_3b692ea7": { "message": "Egyéb" },
@@ -281,7 +287,7 @@ const locale = {
     "message": "Nyissa meg a billentyűkombinációk párbeszédablakot"
   },
   "operators_a2ef9a93": { "message": "Műveletek" },
-  "options_3ab0ea65": { "message": "Beállítások" },
+  "orange_81386a62": { "message": "Narancs" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Rendezett és Rendezetlen Listák"
   },
@@ -295,6 +301,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Bekezdés" },
   "people_b4ebb13c": { "message": "Résztvevők" },
   "percentage_34ab7c2c": { "message": "Százalék" },
+  "pink_68ad45cb": { "message": "Rózsaszín" },
   "posted_when_a578f5ab": { "message": "Közzétéve: { when }" },
   "preformatted_d0670862": { "message": "Előre formázott" },
   "preview_53003fd2": { "message": "Előnézet" },
@@ -304,12 +311,15 @@ const locale = {
   },
   "published_c944a23d": { "message": "publikált" },
   "published_when_302d8e23": { "message": "Publikálva: { when }" },
+  "pumpkin_904428d5": { "message": "Sütőtök" },
+  "purple_7678a9fc": { "message": "Lila" },
   "quizzes_7e598f57": { "message": "Kvízek" },
   "raw_html_editor_e3993e41": { "message": "Egyszerű HTML szerkesztő" },
   "record_7c9448b": { "message": "Felvétel" },
   "record_upload_media_5fdce166": {
     "message": "Médiafájl rögzítése/feltöltése"
   },
+  "red_8258edf3": { "message": "Vörös" },
   "relationships_6602af70": { "message": "Kapcsolatok" },
   "remove_link_d1f2f4d0": { "message": "Link eltávolítása" },
   "restore_auto_save_deccd84b": {
@@ -322,9 +332,6 @@ const locale = {
   "search_term_b2d2235": { "message": "Kifejezés keresése" },
   "select_language_7c93a900": { "message": "Válasszon nyelvet" },
   "selected_274ce24f": { "message": "Kiválasztva" },
-  "show_embed_options_ef8d7ef": {
-    "message": "Beágyazási lehetőségek mutatása"
-  },
   "show_image_options_1e2ecc6b": { "message": "Képbeállítások mutatása" },
   "show_link_options_545338fd": { "message": "Linkbeállítások mutatása" },
   "show_video_options_6ed3721a": { "message": "Videóbeállítások mutatása" },
@@ -358,6 +365,7 @@ const locale = {
   },
   "syllabus_f191f65b": { "message": "Tematika" },
   "tab_arrows_4cf5abfc": { "message": "Tab/Nyilak" },
+  "teal_f729a294": { "message": "Kékeszöld" },
   "text_7f4593da": { "message": "Szöveg" },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Az anyag a közkincs kategóriába tartozik"

@@ -21,7 +21,9 @@ import React, {useState} from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('conversations_2');
 
 export const MessageBody = props => {
   const [body, setBody] = useState('')

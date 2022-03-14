@@ -18,10 +18,12 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import I18n from 'i18n!content_share_preview_overlay'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Button} from '@instructure/ui-buttons'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import contentShareShape from '@canvas/content-sharing/react/proptypes/contentShare'
+
+const I18n = useI18nScope('content_share_preview_overlay');
 
 PreviewModal.propTypes = {
   open: bool,

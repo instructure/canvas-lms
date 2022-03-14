@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!catalog'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import 'jqueryui/dialog'
+
+const I18n = useI18nScope('catalog');
 
 const startupHost = window.location.host
 

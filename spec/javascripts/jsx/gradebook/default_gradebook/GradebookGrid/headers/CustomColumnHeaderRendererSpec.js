@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
@@ -24,6 +24,8 @@ import {
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import CustomColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
 import {getCustomColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
+
+const I18n = useI18nScope('gradebook');
 
 QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
   let $container
@@ -75,7 +77,7 @@ QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
     })
 
     test('uses translated label for teacher notes', () => {
-      sinon.stub(I18n, 't').withArgs('Notes').returns('Translated Notes')
+      sinon.stub(I18n.constructor.prototype, 't').withArgs('Notes').returns('Translated Notes')
       render()
       equal(component.props.title, 'Translated Notes')
       I18n.t.restore()

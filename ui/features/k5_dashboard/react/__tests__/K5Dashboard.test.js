@@ -280,6 +280,7 @@ beforeEach(() => {
     JSON.stringify({status: 'ok'})
   )
   fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
+  fetchMock.get(/\/api\/v1\/users\/\d+\/calendar_events\.*/, JSON.stringify([]))
   global.ENV = defaultEnv
 })
 afterEach(() => {
@@ -580,7 +581,7 @@ describe('K-5 Dashboard', () => {
     })
 
     it('reloads the planner with correct data when the selected observee is updated', async done => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=1', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=1', {
         status: 200,
         response: MOCK_CARDS
       })
@@ -614,7 +615,7 @@ describe('K-5 Dashboard', () => {
         })
       ).toBeInTheDocument()
       moxios.stubs.reset()
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
         status: 200,
         response: MOCK_CARDS_2
       })
@@ -791,7 +792,7 @@ describe('K-5 Dashboard', () => {
     })
 
     it('prefetches dashboard cards with the correct url param', async done => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=4', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
         status: 200,
         response: MOCK_CARDS
       })
@@ -812,17 +813,17 @@ describe('K-5 Dashboard', () => {
         {timeout: 5000}
       )
       const preFetchedRequest = moxios.requests.mostRecent()
-      expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+      expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user_id=4')
       expect(moxios.requests.count()).toBe(1)
       done()
     })
 
     it('does not make a request if the user has been already requested', async () => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=4', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
         status: 200,
         response: MOCK_CARDS
       })
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
         status: 200,
         response: MOCK_CARDS_2
       })
@@ -839,14 +840,14 @@ describe('K-5 Dashboard', () => {
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select.value).toBe('Student 4')
       expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user=4'
+        '/api/v1/dashboard/dashboard_cards?observed_user_id=4'
       )
       act(() => select.click())
       act(() => getByText('Student 2').click())
       expect(await findByText('Economics 203')).toBeInTheDocument()
       expect(queryByText('Economics 101')).not.toBeInTheDocument()
       expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user=2'
+        '/api/v1/dashboard/dashboard_cards?observed_user_id=2'
       )
       act(() => select.click())
       act(() => getByText('Student 4').click())
@@ -854,7 +855,7 @@ describe('K-5 Dashboard', () => {
       expect(queryByText('Economics 203')).not.toBeInTheDocument()
       // Should not fetch student 4's cards again; they've been cached
       expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user=2'
+        '/api/v1/dashboard/dashboard_cards?observed_user_id=2'
       )
       // 2 total requests - one for student 4, one for student 2
       expect(moxios.requests.count()).toBe(2)
@@ -863,11 +864,11 @@ describe('K-5 Dashboard', () => {
     it('shows the observee missing items on dashboard cards', async () => {
       moxios.stubs.reset()
       moxios.requests.reset()
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=4', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
         status: 200,
         response: MOCK_CARDS
       })
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
         status: 200,
         response: MOCK_CARDS_2
       })

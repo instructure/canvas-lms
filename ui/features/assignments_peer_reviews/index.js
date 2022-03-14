@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!assignments.peer_reviews'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -25,6 +25,8 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
+
+const I18n = useI18nScope('assignments.peer_reviews');
 
 $(document).ready(() => {
   $('.peer_review').hover(

@@ -18,7 +18,9 @@
 import Backbone from '@canvas/backbone'
 
 import template from '../../jst/authLoggingItem.handlebars'
-import I18n from 'i18n!auth_logging'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('auth_logging');
 
 export default class AuthLoggingItemView extends Backbone.View {
   static initClass() {

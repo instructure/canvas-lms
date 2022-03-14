@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!conversations'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import _ from 'underscore'
 import {View} from '@canvas/backbone'
@@ -24,6 +24,8 @@ import template from '../../jst/courseOptions.handlebars'
 import '@canvas/datetime'
 import 'bootstrap-dropdown'
 import 'bootstrap-select'
+
+const I18n = useI18nScope('conversations');
 
 export default class CourseSelectionView extends View {
   static initClass() {

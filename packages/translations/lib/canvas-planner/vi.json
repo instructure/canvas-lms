@@ -99,6 +99,9 @@
   "error_loading_past_items_2881dbb1": { "message": "Lỗi tải mục quá khứ" },
   "exciting_discussion_9f67bd0a": { "message": "Cuộc thảo luận thú vị" },
   "excused_cf8792eb": { "message": "Đã Xin Phép" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Lỗi không nhận được danh sách khóa học"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Hé nhìn vào tương lai của bạn thất bại"
   },

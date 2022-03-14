@@ -18,10 +18,12 @@
 
 import React from 'react'
 import {bool, func, string} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const I18n = useI18nScope('gradebook');
 
 export default class SubmissionCommentForm extends React.Component {
   static propTypes = {

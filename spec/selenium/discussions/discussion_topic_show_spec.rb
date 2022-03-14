@@ -38,6 +38,33 @@ describe "Discussion Topic Show" do
       user_session(@teacher)
     end
 
+    it "shows the correct number of rubrics in the find rubric option" do
+      assignment = @course.assignments.create!(
+        name: "Assignment",
+        submission_types: ["online_text_entry"],
+        points_possible: 20
+      )
+      dt = @course.discussion_topics.create!(
+        title: "Graded Discussion",
+        discussion_type: "threaded",
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher,
+        assignment: assignment
+      )
+
+      rubric = rubric_model({ context: @course })
+      rubric.associate_with(assignment, @course, purpose: "grading")
+
+      get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+
+      f("button[data-testid='discussion-post-menu-trigger']").click
+      fj("span[role='menuitem']:contains('Show Rubric')").click
+      fj(".find_rubric_link").click
+
+      expect(fj(".select_rubric_link:contains(#{rubric.title})")).to be_present
+      expect(ffj(".rubrics_dialog_rubric:visible").count).to eq 1
+    end
+
     it "displays properly for a teacher" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       expect(f("input[placeholder='Search entries or author...']")).to be_present

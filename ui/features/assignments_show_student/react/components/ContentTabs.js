@@ -17,7 +17,7 @@
  */
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import LoadingIndicator from '@canvas/loading-indicator'
 import React, {lazy, Suspense} from 'react'
@@ -25,6 +25,8 @@ import SubmissionManager from './SubmissionManager'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('assignments_2');
 
 const RubricTab = lazy(() => import('./RubricTab'))
 

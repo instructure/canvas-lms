@@ -17,10 +17,12 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/rails-flash-notifications'
 
 import AsyncComponents from './AsyncComponents'
+
+const I18n = useI18nScope('gradebook');
 
 const CurveGradesDialogManager = {
   createCurveGradesAction(assignment, students, {isAdmin, contextUrl, submissionsLoaded} = {}) {

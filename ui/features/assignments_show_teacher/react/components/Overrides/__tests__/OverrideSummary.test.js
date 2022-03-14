@@ -18,11 +18,13 @@
 
 import React from 'react'
 // I18n and tz needed to replicate what FriendlyDatetime does in formatting
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import tz from '@canvas/timezone'
 import {render} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import OverrideSummary from '../OverrideSummary'
+
+const I18n = useI18nScope('assignments_2');
 
 describe('OverrideSummary', () => {
   it('renders with unlock and lock dates', () => {
