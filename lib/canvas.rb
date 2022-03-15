@@ -80,7 +80,7 @@ module Canvas
         ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end
     when "memory_store"
-      ActiveSupport::Cache.lookup_store(:memory_store)
+      ActiveSupport::Cache.lookup_store(:memory_store, { coder: Marshal })
     when "nil_store", "null_store"
       ActiveSupport::Cache.lookup_store(:null_store)
     end
