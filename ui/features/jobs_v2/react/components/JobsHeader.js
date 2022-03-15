@@ -27,7 +27,7 @@ const I18n = useI18nScope('jobs_v2')
 
 export default function JobsHeader({jobBucket, onChangeBucket, jobGroup, onChangeGroup}) {
   return (
-    <Flex>
+    <Flex wrap="wrap">
       <Flex.Item>
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Job category')}</ScreenReaderContent>}
@@ -60,6 +60,7 @@ export default function JobsHeader({jobBucket, onChangeBucket, jobGroup, onChang
           >
             <RadioInput label={I18n.t('Tag')} value="tag" />
             <RadioInput label={I18n.t('Strand')} value="strand" />
+            <RadioInput label={I18n.t('Singleton')} value="singleton" />
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>

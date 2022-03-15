@@ -29,6 +29,7 @@ const I18n = useI18nScope('jobs_v2')
 export default function GroupsTable({
   groups,
   type,
+  typeCaption,
   bucket,
   caption,
   sortColumn,
@@ -68,7 +69,7 @@ export default function GroupsTable({
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                {renderColHeader('group', '', type === 'tag' ? I18n.t('Tag') : I18n.t('Strand'))}
+                {renderColHeader('group', '', typeCaption)}
                 {renderColHeader('count', '6em', I18n.t('Count'))}
                 {renderColHeader('info', '10em', <GroupedInfoColumnHeader bucket={bucket} />)}
               </Table.Row>

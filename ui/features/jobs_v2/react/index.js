@@ -37,7 +37,12 @@ function jobsReducer(prevState, action) {
   } else if (action.type === 'FETCHED_GROUPS') {
     return {...prevState, groups: action.payload}
   } else if (action.type === 'CHANGE_GROUP_TEXT') {
-    return {...prevState, group_text: action.payload, jobs: [], job: null}
+    if (prevState.group_text !== action.payload) {
+      return {...prevState, group_text: action.payload, jobs: [], job: null}
+    } else {
+      // clicking the same tag again will toggle the filter off
+      return {...prevState, group_text: '', jobs: [], job: null}
+    }
   } else if (action.type === 'CHANGE_JOBS_ORDER') {
     return {...prevState, jobs_order: action.payload, jobs: [], job: null}
   } else if (action.type === 'FETCHED_JOBS') {
@@ -59,12 +64,28 @@ export default function JobsIndex() {
     job: null
   })
 
-  const captions = useMemo(() => {
+  const bucketCaptions = useMemo(() => {
     return {
       queued: I18n.t('Queued jobs'),
       running: I18n.t('Running jobs'),
       future: I18n.t('Future jobs'),
       failed: I18n.t('Failed jobs')
+    }
+  }, [])
+
+  const groupCaptions = useMemo(() => {
+    return {
+      tag: I18n.t('Tag'),
+      strand: I18n.t('Strand'),
+      singleton: I18n.t('Singleton')
+    }
+  }, [])
+
+  const groupTitles = useMemo(() => {
+    return {
+      tag: I18n.t('Tags'),
+      strand: I18n.t('Strands'),
+      singleton: I18n.t('Singletons')
     }
   }, [])
 
@@ -101,13 +122,14 @@ export default function JobsIndex() {
         onChangeGroup={event => dispatch({type: 'CHANGE_GROUP_TYPE', payload: event.target.value})}
       />
       <Heading level="h2" margin="large 0 small 0">
-        {state.group_type === 'tag' ? I18n.t('Tags') : I18n.t('Strands')}
+        {groupTitles[state.group_type]}
       </Heading>
       <GroupsTable
         type={state.group_type}
+        typeCaption={groupCaptions[state.group_type]}
         groups={state.groups}
         bucket={state.bucket}
-        caption={captions[state.bucket]}
+        caption={bucketCaptions[state.bucket]}
         sortColumn={state.group_order}
         onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
@@ -118,7 +140,7 @@ export default function JobsIndex() {
       <JobsTable
         bucket={state.bucket}
         jobs={state.jobs}
-        caption={captions[state.bucket]}
+        caption={bucketCaptions[state.bucket]}
         sortColumn={state.jobs_order}
         onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
