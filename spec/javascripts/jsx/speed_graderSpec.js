@@ -1576,6 +1576,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         <div id="multiple_submissions"></div>
         <div id="speed_grader_edit_status_mount_point"></div>
         <div id="speed_grader_edit_status_secondary_mount_point"></div>
+        <div id="submission_word_count"></div>
       </div>`)
       sinon.stub($, 'ajaxJSON')
 
@@ -1618,7 +1619,8 @@ QUnit.module('SpeedGrader', rootHooks => {
                     {
                       attachment: {viewed_at: new Date('Jan 1, 2011').toISOString()}
                     }
-                  ]
+                  ],
+                  word_count: 24
                 }
               }
             ]
@@ -1723,6 +1725,44 @@ QUnit.module('SpeedGrader', rootHooks => {
       const menuOption = $menuContent.querySelectorAll('[role="none"]')[index]
       menuOption.children[0].click()
     }
+
+    QUnit.module('SpeedGrader#shouldParseGrade', hooks => {
+      hooks.afterEach(() => {
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'basic_lti_launch'
+      })
+
+      test('does not show the word count for online text entry submission with feature disabled', () => {
+        ENV.FEATURES.word_count_in_speed_grader = false
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 0)
+      })
+
+      test('does not show the word count for basic lti submission', () => {
+        ENV.FEATURES.word_count_in_speed_grader = true
+        finishSetup()
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 0)
+      })
+
+      test('does not show the word count for external tool submission', () => {
+        ENV.FEATURES.word_count_in_speed_grader = true
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'external_tool'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 0)
+      })
+
+      test('shows the word count for online text entry submission', () => {
+        ENV.FEATURES.word_count_in_speed_grader = true
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 1)
+        strictEqual($('#submission_word_count').text(), 'Word Count: 24 words')
+      })
+    })
 
     test('should use submission history lti launch url', () => {
       finishSetup()

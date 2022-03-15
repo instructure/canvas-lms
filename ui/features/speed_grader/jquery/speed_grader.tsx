@@ -2141,7 +2141,12 @@ EG = {
   },
 
   updateWordCount(wordCount) {
-    if (ENV.FEATURES?.word_count_in_speed_grader) {
+    if (
+      ENV.FEATURES?.word_count_in_speed_grader &&
+      !['basic_lti_launch', 'external_tool'].includes(
+        this.currentStudent.submission.submission_type
+      )
+    ) {
       // xsslint safeString.method toLocaleString
       // xsslint safeString.method t
       const wordCountHTML = wordCount
