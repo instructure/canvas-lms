@@ -403,6 +403,8 @@ Style/AccessModifierDeclarations:
 Style/AccessorGrouping:
   Severity: convention
   AutoCorrect: false
+Style/CaseLikeIf:
+  Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
   AutoCorrect: false

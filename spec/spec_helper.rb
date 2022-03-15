@@ -654,6 +654,8 @@ RSpec.configure do |config|
       else
         skip "redis required"
       end
+    elsif new_cache == :memory_store
+      cache_opts[:coder] = Marshal
     end
     new_cache ||= :null_store
     new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)
