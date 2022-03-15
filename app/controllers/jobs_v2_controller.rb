@@ -19,9 +19,11 @@
 
 class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
+  SEARCH_LIMIT = 50
 
   before_action :require_view_jobs
-  before_action :require_bucket, only: [:grouped_info, :list]
+  before_action :require_bucket, only: %i[grouped_info list search]
+  before_action :require_group, only: %i[grouped_info search]
   before_action :set_site_admin_context, :set_navigation, only: [:index]
 
   def require_view_jobs
@@ -40,9 +42,9 @@ class JobsV2Controller < ApplicationController
     end
   end
 
-  # @{not an}API List jobs grouped by tag or strand
+  # @{not an}API List jobs grouped by tag, strand, or singleton
   #
-  # @argument group [String,"tag"|"strand"]
+  # @argument group [String,"tag"|"strand"|"singleton"]
   #   How to group jobs. Default is "tag".
   #
   # @argument bucket [Required,String,"queued"|"running"|"future"|"failed"]
@@ -55,19 +57,17 @@ class JobsV2Controller < ApplicationController
   #
   # @argument order [String,"count"|"tag"|"strand"|"group"|"info"]
   #   Sort column. Default is "info". See the +bucket+ argument for a description of this field.
-  #   If set to "group", order by the +group+ argument ("tag" or "strand").
+  #   If set to "group", order by the +group+ argument (e.g. "tag" or "strand").
   def grouped_info
-    group = params[:group] == "strand" ? :strand : :tag
-
     scope = jobs_scope
-            .select("count(*) AS count, #{group}, #{grouped_info_select}")
-            .where.not(group => nil)
-            .group(group)
-            .order(grouped_order_clause(group))
+            .select("count(*) AS count, #{@group}, #{grouped_info_select}")
+            .where.not(@group => nil)
+            .group(@group)
+            .order(grouped_order_clause(@group))
 
     tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
     now = Delayed::Job.db_time_now
-    render json: tag_info.map { |row| grouped_info_json(row, group, base_time: now) }
+    render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
   end
 
   # @{not an}API List jobs
@@ -111,11 +111,47 @@ class JobsV2Controller < ApplicationController
     render json: jobs.map { |job| job_json(job, base_time: now) }
   end
 
+  # @{not an}API Find tags or strands via text search
+  #
+  # @argument bucket [Required,String,"queued"|"running"|"future"|"failed"]
+  #   Which jobs to consider.
+  #
+  # @argument group [String,"tag"|"strand"|"singleton"]
+  #   How to group jobs. Default is "tag".
+  #
+  # @argument term [Required,String]
+  #   Search term
+  #
+  # @example_request
+  #     curl https://<canvas>/jobs2/running/by_tag/search?term=foo \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   { "foobar": 3, "foobaz": 1 }
+  def search
+    term = params[:term]
+    raise ActionController::BadRequest unless term.present?
+
+    result = jobs_scope
+             .where(ActiveRecord::Base.wildcard(@group, term))
+             .group(@group)
+             .order(count_id: :DESC)
+             .limit(SEARCH_LIMIT)
+             .count(:id)
+
+    render json: result
+  end
+
   protected
 
   def require_bucket
     @bucket = params[:bucket]
     throw :abort unless BUCKETS.include?(@bucket)
+  end
+
+  def require_group
+    @group = params[:group].to_sym if %w[tag strand singleton].include?(params[:group])
+    throw :abort unless @group
   end
 
   def queued_scope
@@ -144,14 +180,12 @@ class JobsV2Controller < ApplicationController
 
   def grouped_order_clause(group_type)
     case params[:order]
-    when "tag"
-      :tag
-    when "strand"
-      :strand
+    when "tag", "strand", "singleton"
+      "LOWER(#{params[:order]})"
     when "count"
       { count: :DESC }
     when "group"
-      group_type
+      "LOWER(#{group_type})"
     else
       case @bucket
       when "queued" then :min_run_at
@@ -192,7 +226,7 @@ class JobsV2Controller < ApplicationController
   def list_order_clause
     case params[:order]
     when "tag", "strand", "singleton"
-      params[:order]
+      "LOWER(#{params[:order]})"
     when "id"
       { id: :DESC }
     else

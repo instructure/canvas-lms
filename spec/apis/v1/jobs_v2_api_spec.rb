@@ -100,20 +100,57 @@ describe "Jobs V2 API", type: :request do
         end
       end
 
-      it "groups by strand" do
-        ::Kernel.delay(strand: "foo", run_at: 1.hour.ago).puts
-        ::Kernel.delay(strand: "bar", run_at: 2.hours.ago).puts
-        ::Kernel.delay(strand: "bar", run_at: 30.minutes.ago).p
-        json = api_call(:get, "/api/v1/jobs2/queued/by_strand?order=group",
-                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "group" },
-                        {}, {}, expected_status: 200)
-        expect(json.size).to eq 2
-        expect(json[0]["strand"]).to eq "bar"
-        expect(json[0]["count"]).to eq 2
-        expect(json[0]["info"].seconds).to be_within(1.minute).of(2.hours)
-        expect(json[1]["strand"]).to eq "foo"
-        expect(json[1]["count"]).to eq 1
-        expect(json[1]["info"].seconds).to be_within(1.minute).of(1.hour)
+      describe "by_strand" do
+        before :once do
+          ::Kernel.delay(strand: "foo", run_at: 1.hour.ago).puts
+          ::Kernel.delay(strand: "bar", run_at: 2.hours.ago).puts
+          ::Kernel.delay(strand: "bar", run_at: 30.minutes.ago).p
+        end
+
+        it "groups by strand" do
+          json = api_call(:get, "/api/v1/jobs2/queued/by_strand?order=group",
+                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "group" },
+                          {}, {}, expected_status: 200)
+          expect(json.size).to eq 2
+          expect(json[0]["strand"]).to eq "bar"
+          expect(json[0]["count"]).to eq 2
+          expect(json[0]["info"].seconds).to be_within(1.minute).of(2.hours)
+          expect(json[1]["strand"]).to eq "foo"
+          expect(json[1]["count"]).to eq 1
+          expect(json[1]["info"].seconds).to be_within(1.minute).of(1.hour)
+        end
+
+        it "searches by strand" do
+          json = api_call(:get, "/api/v1/jobs2/queued/by_strand/search?term=bar",
+                          { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "strand", term: "bar" })
+          expect(json).to eq({ "bar" => 2 })
+        end
+      end
+
+      describe "by_singleton" do
+        before :once do
+          ::Kernel.delay(singleton: "foobar2000", run_at: 1.hour.ago).puts
+          ::Kernel.delay(singleton: "zombo20001", run_at: 22.hours.ago).puts
+        end
+
+        it "groups by singleton" do
+          json = api_call(:get, "/api/v1/jobs2/queued/by_singleton?order=info",
+                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "singleton", order: "info" },
+                          {}, {}, expected_status: 200)
+          expect(json.size).to eq 2
+          expect(json[0]["singleton"]).to eq "zombo20001"
+          expect(json[0]["count"]).to eq 1
+          expect(json[0]["info"].seconds).to be_within(1.minute).of(22.hours)
+          expect(json[1]["singleton"]).to eq "foobar2000"
+          expect(json[1]["count"]).to eq 1
+          expect(json[1]["info"].seconds).to be_within(1.minute).of(1.hour)
+        end
+
+        it "searches by singleton" do
+          json = api_call(:get, "/api/v1/jobs2/queued/by_singleton/search?term=2000",
+                          { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "singleton", term: "2000" })
+          expect(json).to eq({ "foobar2000" => 1, "zombo20001" => 1 })
+        end
       end
 
       describe "ungrouped" do
@@ -133,6 +170,12 @@ describe "Jobs V2 API", type: :request do
           expect(json.size).to eq 2
           expect(json[0]["info"].seconds).to be_within(1.minute).of(1.day)
         end
+      end
+
+      it "searches queued tags" do
+        json = api_call(:get, "/api/v1/jobs2/queued/by_tag/search?term=p",
+                        { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "tag", term: "p" })
+        expect(json).to eq({ "Kernel.pp" => 2, "Kernel.p" => 1 })
       end
     end
 
@@ -165,19 +208,30 @@ describe "Jobs V2 API", type: :request do
         expect(json[1]["info"].seconds).to be_within(1.minute).of(30.minutes)
       end
 
-      it "groups by strand" do
-        Delayed::Job.where(tag: "Kernel.pp").update_all(strand: "foo")
-        Delayed::Job.where(tag: "Kernel.p").update_all(strand: "bar")
-        json = api_call(:get, "/api/v1/jobs2/running/by_strand?order=strand",
-                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "running", group: "strand", order: "strand" },
-                        {}, {}, expected_status: 200)
-        expect(json.size).to eq 2
-        expect(json[0]["strand"]).to eq "bar"
-        expect(json[0]["count"]).to eq 1
-        expect(json[0]["info"].seconds).to be_within(1.minute).of(30.minutes)
-        expect(json[1]["strand"]).to eq "foo"
-        expect(json[1]["count"]).to eq 2
-        expect(json[1]["info"].seconds).to be_within(1.minute).of(2.hours)
+      describe "by_strand" do
+        before :once do
+          Delayed::Job.where(tag: "Kernel.pp").update_all(strand: "foo")
+          Delayed::Job.where(tag: "Kernel.p").update_all(strand: "barfood")
+        end
+
+        it "groups by strand" do
+          json = api_call(:get, "/api/v1/jobs2/running/by_strand?order=strand",
+                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "running", group: "strand", order: "strand" },
+                          {}, {}, expected_status: 200)
+          expect(json.size).to eq 2
+          expect(json[0]["strand"]).to eq "barfood"
+          expect(json[0]["count"]).to eq 1
+          expect(json[0]["info"].seconds).to be_within(1.minute).of(30.minutes)
+          expect(json[1]["strand"]).to eq "foo"
+          expect(json[1]["count"]).to eq 2
+          expect(json[1]["info"].seconds).to be_within(1.minute).of(2.hours)
+        end
+
+        it "searches by strand" do
+          json = api_call(:get, "/api/v1/jobs2/running/by_strand/search?term=foo",
+                          { controller: "jobs_v2", action: "search", format: "json", bucket: "running", group: "strand", term: "foo" })
+          expect(json).to eq({ "foo" => 2, "barfood" => 1 })
+        end
       end
 
       it "lists running jobs" do
@@ -190,6 +244,12 @@ describe "Jobs V2 API", type: :request do
         expect(json[1]["info"].seconds).to be_within(1.minute).of(1.hour)
         expect(json[2]["tag"]).to eq "Kernel.p"
         expect(json[2]["info"].seconds).to be_within(1.minute).of(30.minutes)
+      end
+
+      it "searches running tags" do
+        json = api_call(:get, "/api/v1/jobs2/running/by_tag/search?term=p",
+                        { controller: "jobs_v2", action: "search", format: "json", bucket: "running", group: "tag", term: "p" })
+        expect(json).to eq({ "Kernel.pp" => 2, "Kernel.p" => 1 })
       end
     end
 
@@ -212,20 +272,31 @@ describe "Jobs V2 API", type: :request do
         expect(json[1]["count"]).to eq 1
       end
 
-      it "groups by strand" do
-        ::Kernel.delay(run_at: 1.hour.from_now, strand: "foo").puts
-        ::Kernel.delay(run_at: 2.hours.from_now, strand: "foo").puts
-        ::Kernel.delay(run_at: 1.day.from_now, strand: "bar").puts
-        json = api_call(:get, "/api/v1/jobs2/future/by_strand?order=strand",
-                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "future", group: "strand", order: "strand" },
-                        {}, {}, expected_status: 200)
-        expect(json.size).to eq 2
-        expect(json[0]["strand"]).to eq "bar"
-        expect(json[0]["count"]).to eq 1
-        expect(Time.zone.parse(json[0]["info"])).to be_within(1.minute).of(1.day.from_now)
-        expect(json[1]["strand"]).to eq "foo"
-        expect(json[1]["count"]).to eq 2
-        expect(Time.zone.parse(json[1]["info"])).to be_within(1.minute).of(1.hour.from_now)
+      describe "by_strand" do
+        before :once do
+          ::Kernel.delay(run_at: 1.hour.from_now, strand: "foo").puts
+          ::Kernel.delay(run_at: 2.hours.from_now, strand: "foo").puts
+          ::Kernel.delay(run_at: 1.day.from_now, strand: "bar").puts
+        end
+
+        it "groups by strand" do
+          json = api_call(:get, "/api/v1/jobs2/future/by_strand?order=strand",
+                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "future", group: "strand", order: "strand" },
+                          {}, {}, expected_status: 200)
+          expect(json.size).to eq 2
+          expect(json[0]["strand"]).to eq "bar"
+          expect(json[0]["count"]).to eq 1
+          expect(Time.zone.parse(json[0]["info"])).to be_within(1.minute).of(1.day.from_now)
+          expect(json[1]["strand"]).to eq "foo"
+          expect(json[1]["count"]).to eq 2
+          expect(Time.zone.parse(json[1]["info"])).to be_within(1.minute).of(1.hour.from_now)
+        end
+
+        it "searches by strand" do
+          json = api_call(:get, "/api/v1/jobs2/future/by_strand/search?term=foo",
+                          { controller: "jobs_v2", action: "search", format: "json", bucket: "future", group: "strand", term: "foo" })
+          expect(json).to eq({ "foo" => 2 })
+        end
       end
 
       it "lists future jobs" do
@@ -236,6 +307,12 @@ describe "Jobs V2 API", type: :request do
         expect(Time.zone.parse(json[0]["info"])).to be_within(1.minute).of(1.hour.from_now)
         expect(json[1]["tag"]).to eq "Kernel.p"
         expect(Time.zone.parse(json[1]["info"])).to be_within(1.minute).of(1.day.from_now)
+      end
+
+      it "searches future tags" do
+        json = api_call(:get, "/api/v1/jobs2/future/by_tag/search?term=p",
+                        { controller: "jobs_v2", action: "search", format: "json", bucket: "future", group: "tag", term: "p" })
+        expect(json).to eq({ "Kernel.pp" => 1, "Kernel.p" => 1 })
       end
     end
 
@@ -270,6 +347,12 @@ describe "Jobs V2 API", type: :request do
         expect(Time.zone.parse(json[0]["info"])).to be_within(1.minute).of(1.hour.ago)
         expect(json[1]["tag"]).to eq "Kernel.raise"
         expect(Time.zone.parse(json[1]["info"])).to be_within(1.minute).of(1.day.ago)
+      end
+
+      it "searches failed tags" do
+        json = api_call(:get, "/api/v1/jobs2/failed/by_tag/search?term=ais",
+                        { controller: "jobs_v2", action: "search", format: "json", bucket: "failed", group: "tag", term: "ais" })
+        expect(json).to eq({ "Kernel.raise" => 2 })
       end
     end
   end
