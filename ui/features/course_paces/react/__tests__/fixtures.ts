@@ -149,11 +149,17 @@ export const PRIMARY_PACE: CoursePace = {
   context_type: 'Course',
   context_id: COURSE.id,
   start_date: '2021-09-01',
+  start_date_context: 'course',
   end_date: '2021-12-15',
+  end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: true,
   hard_end_dates: true,
-  modules: [PACE_MODULE_1, PACE_MODULE_2]
+  modules: [PACE_MODULE_1, PACE_MODULE_2],
+  // @ts-ignore
+  course: undefined,
+  compressed_due_dates: undefined,
+  updated_at: ''
 }
 
 export const SECTION_PACE: CoursePace = {
@@ -164,11 +170,17 @@ export const SECTION_PACE: CoursePace = {
   context_type: 'Section',
   context_id: SECTION_1.id,
   start_date: '2021-09-15',
+  start_date_context: 'course',
   end_date: '2021-12-15',
+  end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: false,
   hard_end_dates: true,
-  modules: [PACE_MODULE_1, PACE_MODULE_2]
+  modules: [PACE_MODULE_1, PACE_MODULE_2],
+  // @ts-ignore
+  course: undefined,
+  compressed_due_dates: undefined,
+  updated_at: ''
 }
 
 export const STUDENT_PACE: CoursePace = {
@@ -179,11 +191,17 @@ export const STUDENT_PACE: CoursePace = {
   context_type: 'Enrollment',
   context_id: ENROLLMENT_1.user_id,
   start_date: '2021-10-01',
+  start_date_context: 'user',
   end_date: '2021-12-15',
+  end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: true,
   hard_end_dates: true,
-  modules: [PACE_MODULE_1, PACE_MODULE_2]
+  modules: [PACE_MODULE_1, PACE_MODULE_2],
+  // @ts-ignore
+  course: undefined,
+  compressed_due_dates: undefined,
+  updated_at: ''
 }
 
 export const PROGRESS_RUNNING = {
