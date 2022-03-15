@@ -1234,11 +1234,11 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_existing_wiki_edit(@course, page_title)
 
-        expect(lti_tools_button).to be_displayed
+        expect(lti_tools_button_with_mru).to be_displayed
       end
 
-      # if there's mru data in local_storage we get the menu button
-      # if not we get a button that opens the modal directly
+      # we are now only using the menu button regardless of presence/absence
+      # of mru data in local storage
       it "displays the lti tool modal", ignore_js_errors: true do
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
@@ -1249,7 +1249,10 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_existing_wiki_edit(@course, page_title)
         driver.local_storage.delete("ltimru")
-        lti_tools_button.click
+
+        wait_for_tiny(edit_wiki_css)
+        lti_tools_button_with_mru.click
+        menu_item_by_name("View All").click
 
         expect(lti_tools_modal).to be_displayed
       end

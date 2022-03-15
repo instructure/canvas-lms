@@ -17,7 +17,6 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
 
 const I18n = useI18nScope('ExternalToolsPlugin')
 
@@ -76,17 +75,8 @@ export default {
       ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)
     )
     const button = ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`))
-    if (window.localStorage?.getItem('ltimru')) {
-      menubutton.attr('aria-hidden', 'false')
-      button.attr('aria-hidden', 'true')
-      menubutton.show()
-      button.hide()
-    } else {
-      menubutton.attr('aria-hidden', 'true')
-      button.attr('aria-hidden', 'false')
-      menubutton.hide()
-      button.show()
-    }
+    menubutton.attr('aria-hidden', 'false')
+    button.attr('aria-hidden', 'true')
   },
 
   updateMRUList(toolId) {

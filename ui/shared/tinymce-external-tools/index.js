@@ -70,7 +70,6 @@ const ExternalToolsPlugin = {
       ed.addCommand(`instructureExternalButton${current_button.id}`, openDialog)
     }
     if (ltiButtons.length) {
-      buildToolsButton(ed, ltiButtons)
       buildFavoriteToolsButtons(ed, ltiButtons)
       buildMRUMenuButton(ed, ltiButtons)
       buildMenubarItem(ed, ltiButtons)
@@ -115,23 +114,6 @@ function buildMenubarItem(ed, ltiButtons) {
       getSubmenuItems: () => getLtiMRUItems(ed, ltiButtons)
     })
   }
-}
-
-// register the Apps toolbar button for when there are no MRU apps
-function buildToolsButton(ed, ltiButtons) {
-  const tooltip = I18n.t('Apps')
-  ed.ui.registry.addButton('lti_tool_dropdown', {
-    onAction: () => {
-      const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
-      document.dispatchEvent(ev)
-    },
-    icon: 'lti',
-    tooltip,
-    onSetup(_api) {
-      // start off with the right button visible
-      ExternalToolsHelper.showHideButtons(ed)
-    }
-  })
 }
 
 // register the favorite lti tools toolbar buttons
