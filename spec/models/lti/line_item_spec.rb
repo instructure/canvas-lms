@@ -74,6 +74,25 @@ RSpec.describe Lti::LineItem, type: :model do
     end
   end
 
+  describe "#launch_url_extension" do
+    let(:url) { "https://example.com/launch" }
+    let(:assignment) do
+      a = assignment_model
+      a.external_tool_tag = ContentTag.create!(context: a, url: url)
+      a.save!
+      a
+    end
+    let(:line_item) { line_item_model(assignment: assignment) }
+
+    it "returns hash with extension key" do
+      expect(line_item.launch_url_extension).to have_key(Lti::LineItem::AGS_EXT_LAUNCH_URL)
+    end
+
+    it "returns launch url in hash" do
+      expect(line_item.launch_url_extension[Lti::LineItem::AGS_EXT_LAUNCH_URL]).to eq url
+    end
+  end
+
   context "with lti_link not matching assignment" do
     let(:resource_link) { resource_link_model }
     let(:line_item) { line_item_model resource_link: resource_link }

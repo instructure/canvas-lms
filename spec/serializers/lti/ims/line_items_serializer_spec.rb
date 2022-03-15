@@ -75,16 +75,37 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
       )
     end
 
-    it "does not incude values that are nil" do
-      line_item.update!(resource_link: nil, tag: nil)
-      expect(described_class.new(line_item, line_item_id).as_json).to eq(
-        {
-          id: line_item_id,
-          scoreMaximum: line_item.score_maximum,
-          label: line_item.label,
-          resourceId: line_item.resource_id
-        }
-      )
+    context "with nil values" do
+      before do
+        line_item.update!(resource_link: nil, tag: nil)
+      end
+
+      it "does not incude values that are nil" do
+        expect(described_class.new(line_item, line_item_id).as_json).to eq(
+          {
+            id: line_item_id,
+            scoreMaximum: line_item.score_maximum,
+            label: line_item.label,
+            resourceId: line_item.resource_id
+          }
+        )
+      end
+    end
+
+    context "with submission_type extensions" do
+      before do
+        line_item.update!(extensions: { Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => "extension" })
+      end
+
+      it "includes extension" do
+        expect(described_class.new(line_item, line_item_id).as_json).to include(Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => "extension")
+      end
+    end
+
+    context "with launch_url extensions" do
+      it "includes extension" do
+        expect(described_class.new(line_item, line_item_id, true).as_json).to include(Lti::LineItem::AGS_EXT_LAUNCH_URL => tool.url)
+      end
     end
   end
 end
