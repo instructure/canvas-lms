@@ -513,23 +513,23 @@
           </div>
         </div>
       <% end %>
-      <% if @context.account.feature_enabled?(:pace_plans) %>
-        <div class="form-row pace-plans-row">
-          <div class="form-label nobr"><%= f.blabel :pace_plans, :en => "Pace Plans" %></div>
+      <% if @context.account.feature_enabled?(:course_paces) %>
+        <div class="form-row course-paces-row">
+          <div class="form-label nobr"><%= f.blabel :course_paces, :en => "Course Pacing" %></div>
           <div class="tall-row">
             <div class="nobr">
-              <%= f.check_box :enable_pace_plans, :disabled => !can_manage %>
-              <%= f.label :enable_pace_plans, :en => "Enable Pace Plans" %><br/>
+              <%= f.check_box :enable_course_paces, :disabled => !can_manage %>
+              <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %><br/>
             </div>
-            <div id="pace_plans_caution_text" class="aside palign pace-plans-caution-text">
+            <div id="course_paces_caution_text" class="aside palign course-paces-caution-text">
               <i class='icon-warning-borderless'></i>
               <div>
                 <p>
-                  <%= t ("Pace Plans is in active development.")%>
+                  <%= t ("Course Pacing is in active development.")%>
                 </p>
                 <p>
                   <%= t do %>
-                    Learn more about this feature in the <a href="<%= t(:'#community.pace_plans') %>" target="_blank">Pace Plans User Group</a>.
+                    Learn more about this feature in the <a href="<%= t(:'#community.pace_plans') %>" target="_blank">Course Pacing User Group</a>.
                   <% end %>
                 </p>
               </div>

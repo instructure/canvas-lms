@@ -23,7 +23,7 @@ module CC::Importer::Canvas
     include LearningOutcomesConverter
     include RubricsConverter
     include ModuleConverter
-    include PacePlansConverter
+    include CoursePacesConverter
 
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
@@ -48,7 +48,7 @@ module CC::Importer::Canvas
       @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
       @course[:modules] = convert_modules(settings_doc(MODULE_META))
-      @course[:pace_plans] = convert_pace_plans(settings_doc(PACE_PLANS))
+      @course[:course_paces] = convert_course_paces(settings_doc(COURSE_PACES))
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
       @course[:late_policy] = convert_late_policy(settings_doc(LATE_POLICY))
