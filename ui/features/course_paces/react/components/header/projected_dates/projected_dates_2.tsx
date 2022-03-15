@@ -26,11 +26,11 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {StoreState, CoursePace} from '../../../types'
+import {StoreState, CoursePace, PaceDuration} from '../../../types'
 import {
   getCoursePace,
   getCoursePaceItems,
-  getPaceWeeks,
+  getPaceDuration,
   getProjectedEndDate
 } from '../../../reducers/course_paces'
 import {coursePaceTimezone} from '../../../shared/api/backend_serializer'
@@ -38,6 +38,8 @@ import {coursePaceTimezone} from '../../../shared/api/backend_serializer'
 const I18n = useI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
+const NBSP = String.fromCharCode(0x00a0)
+
 const START_DATE_CAPTIONS = {
   user: I18n.t('Student enrollment date'),
   course: I18n.t('Determined by course start date'),
@@ -61,14 +63,14 @@ const END_DATE_CAPTIONS = {
 type ComponentProps = {
   readonly coursePace: CoursePace
   readonly assignments: number
-  readonly paceWeeks: number
+  readonly paceDuration: PaceDuration
   readonly projectedEndDate: string
 }
 
 export const ProjectedDates: React.FC<ComponentProps> = ({
   coursePace,
   assignments,
-  paceWeeks,
+  paceDuration,
   projectedEndDate
 }) => {
   const formatDate = useDateTimeFormat('date.formats.long', coursePaceTimezone, ENV.LOCALE)
@@ -136,8 +138,16 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
                   one: '1 week',
                   other: '%{count} weeks'
                 },
-                {count: paceWeeks}
+                {count: paceDuration.weeks}
               )}
+              {NBSP}
+              {I18n.t(
+                {
+                  one: '1 day',
+                  other: '%{count} days'
+                },
+                {count: paceDuration.days}
+              )}{' '}
             </Text>
           </View>
         </Flex.Item>
@@ -180,7 +190,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     coursePace: getCoursePace(state),
     assignments: getCoursePaceItems(state).length,
-    paceWeeks: getPaceWeeks(state),
+    paceDuration: getPaceDuration(state),
     projectedEndDate: getProjectedEndDate(state)
   }
 }
