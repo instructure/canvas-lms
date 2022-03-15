@@ -457,7 +457,7 @@ class MessageableUser
       # Discussion Topics could be assigned to multiple sections so this allows
       # supporting multiple sections through this method.
       sections = nil
-      if section_or_id.is_a?(Array)
+      if section_or_id.respond_to?("count") && section_or_id.count > 0
         sections = section_or_id
         section_or_id = sections.first
       end
