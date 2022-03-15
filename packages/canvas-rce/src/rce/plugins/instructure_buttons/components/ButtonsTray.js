@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -33,7 +33,7 @@ import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
 
-function renderHeader(title, settings, setIsOpen) {
+function renderHeader(title, settings, setIsOpen, onKeyDown) {
   return (
     <View as="div" background="primary">
       <Flex direction="column">
@@ -43,7 +43,13 @@ function renderHeader(title, settings, setIsOpen) {
               <Heading as="h2">{title}</Heading>
             </Flex.Item>
             <Flex.Item>
-              <CloseButton placement="static" variant="icon" onClick={() => setIsOpen(false)}>
+              <CloseButton
+                placement="static"
+                variant="icon"
+                onClick={() => setIsOpen(false)}
+                onKeyDown={onKeyDown}
+                data-testid="icon-maker-close-button"
+              >
                 {formatMessage('Close')}
               </CloseButton>
             </Flex.Item>
@@ -57,7 +63,7 @@ function renderHeader(title, settings, setIsOpen) {
   )
 }
 
-function renderBody(settings, dispatch, editor, editing, allowNameChange) {
+function renderBody(settings, dispatch, editor, editing, allowNameChange, nameRef) {
   return (
     <CreateButtonForm
       settings={settings}
@@ -65,11 +71,12 @@ function renderBody(settings, dispatch, editor, editing, allowNameChange) {
       editor={editor}
       editing={editing}
       allowNameChange={allowNameChange}
+      nameRef={nameRef}
     />
   )
 }
 
-function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll) {
+function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef) {
   return (
     <View as="div" background="primary">
       <Footer
@@ -79,12 +86,15 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
         replaceAll={replaceAll}
         onReplaceAllChanged={setReplaceAll}
         editing={editing}
+        applyRef={applyRef}
       />
     </View>
   )
 }
-
 export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
+  const nameRef = useRef()
+  const applyRef = useRef()
+
   const [isOpen, setIsOpen] = useState(true)
   const [replaceAll, setReplaceAll] = useState(false)
 
@@ -94,6 +104,13 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
   const [status, setStatus] = useState(statuses.IDLE)
   const storeProps = useStoreProps()
   const onClose = () => setIsOpen(false)
+
+  const onKeyDown = event => {
+    if (event.keyCode !== 9) return
+
+    event.preventDefault()
+    event.shiftKey ? applyRef.current?.focus() : nameRef.current?.focus()
+  }
 
   useEffect(() => {
     setReplaceAll(false)
@@ -151,10 +168,10 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
       isOpen={isOpen}
       onDismiss={onClose}
       onUnmount={onUnmount}
-      renderHeader={() => renderHeader(title, settings, setIsOpen)}
-      renderBody={() => renderBody(settings, dispatch, editor, editing, !replaceAll)}
+      renderHeader={() => renderHeader(title, settings, setIsOpen, onKeyDown)}
+      renderBody={() => renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef)}
       renderFooter={() =>
-        renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll)
+        renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef)
       }
       bodyAs="form"
       shouldJoinBodyAndFooter

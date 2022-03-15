@@ -89,6 +89,52 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })
 
+  describe('when the close button is focused', () => {
+    let focusedElement, originalFocus
+
+    beforeAll(() => {
+      originalFocus = window.HTMLElement.prototype.focus
+    })
+
+    beforeEach(() => {
+      window.HTMLElement.prototype.focus = jest.fn().mockImplementation(function (args) {
+        focusedElement = this
+      })
+    })
+
+    afterEach(() => (window.HTMLElement.prototype.focus = originalFocus))
+
+    describe('and the user does a forward tab', () => {
+      const event = {key: 'Tab', keyCode: 9}
+
+      it('moves focus to the "name" input', async () => {
+        const {findByTestId} = render(<ButtonsTray {...defaults} />)
+
+        const closeButton = await findByTestId('icon-maker-close-button')
+        const expectedElement = await findByTestId('button-name')
+
+        fireEvent.keyDown(closeButton, event)
+
+        expect(focusedElement).toEqual(expectedElement)
+      })
+    })
+
+    describe('and the user does a reverse tab', () => {
+      const event = {key: 'Tab', keyCode: 9, shiftKey: true}
+
+      it('moves focus to the apply button', async () => {
+        const {findByTestId} = render(<ButtonsTray {...defaults} />)
+
+        const closeButton = await findByTestId('icon-maker-close-button')
+        const expectedElement = await findByTestId('create-icon-button')
+
+        fireEvent.keyDown(closeButton, event)
+
+        expect(focusedElement).toEqual(expectedElement)
+      })
+    })
+  })
+
   describe('uploads the svg', () => {
     it('with correct content', async () => {
       render(<ButtonsTray {...defaults} />)
