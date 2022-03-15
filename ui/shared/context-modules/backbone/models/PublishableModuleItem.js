@@ -97,7 +97,8 @@ export default class PublishableModuleItem extends Model {
   }
 
   branch(key) {
-    return (this[key][this.get('module_type')] || this[key].generic).call(this)
+    const moduleType = this.get('module_type') === 'lti-quiz' ? 'quiz' : this.get('module_type')
+    return (this[key][moduleType] || this[key].generic).call(this)
   }
 
   url() {
