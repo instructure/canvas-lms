@@ -126,18 +126,6 @@ shared_context "in-process server selenium tests" do
     ActiveRecord::Base.connection.class.prepend(SynchronizeConnection)
   end
 
-  # tricksy tricksy. grab the current connection, and then always return the same one
-  # (even if on a different thread - i.e. the server's thread), so that it will be in
-  # the same transaction and see the same data
-  before do
-    @db_connection = ActiveRecord::Base.connection
-    @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
-
-    allow(ActiveRecord::Base).to receive(:connection).and_return(@db_connection)
-    allow(Delayed::Backend::ActiveRecord::Job).to receive(:connection).and_return(@dj_connection)
-    allow(Delayed::Backend::ActiveRecord::Job::Failed).to receive(:connection).and_return(@dj_connection)
-  end
-
   after do |example|
     begin
       clear_timers!
