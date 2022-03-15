@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 describe CoursePace do
   before :once do
     course_with_student active_all: true
-    @course.update start_at: "2021-09-01"
+    @course.update start_at: "2021-09-01", restrict_enrollments_to_course_dates: true
     @module = @course.context_modules.create!
     @assignment = @course.assignments.create!
     @course_section = @course.course_sections.first
@@ -313,26 +313,86 @@ describe CoursePace do
       enrollment.update start_at: "2022-01-29"
       @course_pace.user_id = student3.id
       expect(@course_pace.start_date.to_date).to eq(Date.parse("2022-01-29"))
+
+      result = @course_pace.start_date(with_context: true)
+      expect(result[:start_date].to_date).to eq(Date.parse("2022-01-29"))
+      expect(result[:start_date_context]).to eq("user")
     end
 
     it "returns section start if available" do
       other_section = @course.course_sections.create! name: "other_section", start_at: "2022-01-30"
       section_plan = @course.course_paces.create! course_section: other_section
       expect(section_plan.start_date.to_date).to eq(Date.parse("2022-01-30"))
+
+      result = section_plan.start_date(with_context: true)
+      expect(result[:start_date].to_date).to eq(Date.parse("2022-01-30"))
+      expect(result[:start_date_context]).to eq("section")
     end
 
     it "returns course start if available" do
       @course.update start_at: "2022-01-28"
       expect(@course_pace.start_date.to_date).to eq(Date.parse("2022-01-28"))
+
+      result = @course_pace.start_date(with_context: true)
+      expect(result[:start_date].to_date).to eq(Date.parse("2022-01-28"))
+      expect(result[:start_date_context]).to eq("course")
     end
 
     it "returns course's term start if available" do
       @course.enrollment_term.update start_at: "2022-01-27"
       expect(@course_pace.start_date.to_date).to eq(Date.parse("2022-01-27"))
+
+      result = @course_pace.start_date(with_context: true)
+      expect(result[:start_date].to_date).to eq(Date.parse("2022-01-27"))
+      expect(result[:start_date_context]).to eq("term")
     end
 
-    it "returns course created_at date as a last resort" do
-      expect(@course_pace.start_date.to_date).to eq(@course.created_at.to_date)
+    it "returns today date as a last resort" do
+      # there's an extremely tiny window where the date may have changed between
+      # when start_date called Time.now and now causing this to fail
+      # I don't think it's worth worrying about.
+      expect(@course_pace.start_date.to_date).to eq(Time.now.to_date)
+
+      result = @course_pace.start_date(with_context: true)
+      expect(result[:start_date].to_date).to eq(Time.now.to_date)
+      expect(result[:start_date_context]).to eq("hypothetical")
+    end
+  end
+
+  describe "default plan end_at" do
+    before do
+      @course.update start_at: nil
+      @course_pace.user_id = nil
+    end
+
+    it "returns hard end date if set" do
+      @course_pace.hard_end_dates = true
+      @course_pace[:end_date] = "2022-03-17"
+      result = @course_pace.end_date(with_context: true)
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-03-17"))
+      expect(result[:end_date_context]).to eq("hard")
+    end
+
+    it "returns course end if available" do
+      @course.update conclude_at: "2022-01-28"
+      result = @course_pace.end_date(with_context: true)
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-01-28"))
+      expect(result[:end_date_context]).to eq("course")
+    end
+
+    it "returns course's term end if available" do
+      @course.enrollment_term.update end_at: "2022-01-27"
+      result = @course_pace.end_date(with_context: true)
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-01-27"))
+      expect(result[:end_date_context]).to eq("term")
+    end
+
+    it "returns nil if no fixed date is available" do
+      @course.restrict_enrollments_to_course_dates = false
+      @course.enrollment_term.update start_at: nil, end_at: nil
+      result = @course_pace.end_date(with_context: true)
+      expect(result[:end_date]).to be_nil
+      expect(result[:end_date_context]).to eq("hypothetical")
     end
   end
 end
