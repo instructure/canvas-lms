@@ -124,6 +124,14 @@ function getMenuItems(ed) {
   return items
 }
 
+function removeAnchorFromSelectedElement(ed) {
+  const selectedElem = ed.selection.getNode()
+  const anchorElem = getAnchorElement(ed, selectedElem)
+  ed.selection.select(anchorElem)
+  ed.undoManager.add()
+  ed.execCommand('Unlink')
+}
+
 function doMenuItem(ed, value) {
   switch (value) {
     case 'instructureTrayToEditLink':
@@ -131,13 +139,7 @@ function doMenuItem(ed, value) {
       ed.execCommand(value)
       break
     case 'instructureUnlink':
-      {
-        const selectedElm = ed.selection.getNode()
-        const anchorElm = getAnchorElement(ed, selectedElm)
-        ed.selection.select(anchorElm)
-        ed.undoManager.add()
-        ed.execCommand('unlink')
-      }
+      removeAnchorFromSelectedElement(ed)
       break
     case 'instructureUnlinkAll':
       ed.undoManager.add()
@@ -271,10 +273,8 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     })
     const remButtonLabel = formatMessage('Remove Link')
     ed.ui.registry.addButton('instructureUnlink', {
-      onAction(/* buttonApi */) {
-        // show the tray
-        ed.undoManager.add()
-        ed.execCommand('Unlink')
+      onAction() {
+        removeAnchorFromSelectedElement(ed)
       },
 
       text: remButtonLabel
