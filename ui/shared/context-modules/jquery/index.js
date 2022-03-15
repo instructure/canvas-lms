@@ -33,7 +33,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import ContextModulesView from '../backbone/views/context_modules.coffee'/* handles the publish/unpublish state */
+import ContextModulesView from '../backbone/views/context_modules.coffee' /* handles the publish/unpublish state */
 import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
@@ -47,16 +47,16 @@ import get from 'lodash/get'
 import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* dateString, datetimeString, time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors, errorBox */
+import '@canvas/datetime' /* dateString, datetimeString, time_field, datetime_field */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.underscore/ */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, confirmDelete, fragmentChange, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
-import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
-import 'date'/* Date.parse */
+import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import 'date' /* Date.parse */
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
@@ -347,7 +347,9 @@ window.modules = (function () {
     },
 
     itemClass(content_tag) {
-      return (content_tag.content_type || '').replace(/^[A-Za-z]+::/, '') + '_' + content_tag.content_id;
+      return (
+        (content_tag.content_type || '').replace(/^[A-Za-z]+::/, '') + '_' + content_tag.content_id
+      )
     },
 
     updateAllItemInstances(content_tag) {
@@ -861,7 +863,7 @@ window.modules = (function () {
       const view = new LockIconView(viewOptions)
       view.render()
     }
-  };
+  }
 })()
 
 var addIcon = function ($icon_container, css_class, message) {
@@ -1228,12 +1230,12 @@ modules.initModuleManagement = function (duplicate) {
         let displayType
         const data = $(this).getTemplateData({textValues: ['id', 'type']})
         data.title = $(this).find('.title').attr('title')
-        if (data.type === 'assignment') {
+        if (data.type === 'quiz' || data.type === 'lti-quiz' || $(this).hasClass('lti-quiz')) {
+          displayType = I18n.t('optgroup.quizzes', 'Quizzes')
+        } else if (data.type === 'assignment') {
           displayType = I18n.t('optgroup.assignments', 'Assignments')
         } else if (data.type === 'attachment') {
           displayType = I18n.t('optgroup.files', 'Files')
-        } else if (data.type === 'quiz' || data.type === 'lti-quiz') {
-          displayType = I18n.t('optgroup.quizzes', 'Quizzes')
         } else if (data.type === 'external_url') {
           displayType = I18n.t('optgroup.external_urls', 'External URLs')
         } else if (data.type === 'context_external_tool') {
