@@ -28,6 +28,7 @@ RSpec.describe ApplicationController do
   context "group 1" do
     before do
       request_double = double(
+        cookies_same_site_protection: proc { false },
         host_with_port: "www.example.com",
         host: "www.example.com",
         url: "http://www.example.com",
@@ -734,9 +735,6 @@ RSpec.describe ApplicationController do
         end
 
         it "logs error reports to the domain_root_accounts shard" do
-          report = ErrorReport.new
-          allow(ErrorReport).to receive(:log_exception).and_return(report)
-          allow(ErrorReport).to receive(:find).and_return(report)
           allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).and_return({})
 
           req = double
@@ -752,9 +750,12 @@ RSpec.describe ApplicationController do
 
           controller.instance_variable_set(:@domain_root_account, @account)
 
-          expect(@shard2).to receive(:activate)
-
           controller.send(:rescue_action_in_public, Exception.new)
+
+          expect(ErrorReport.count).to eq 0
+          @shard2.activate do
+            expect(ErrorReport.count).to eq 1
+          end
         end
       end
     end
@@ -1504,7 +1505,7 @@ RSpec.describe ApplicationController do
     describe "verify_authenticity_token" do
       before do
         # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
-        cookies = ActionDispatch::Cookies::CookieJar.new(nil)
+        cookies = ActionDispatch::Cookies::CookieJar.new(controller.request)
         controller.allow_forgery_protection = true
         allow(controller.request).to receive(:cookie_jar).and_return(cookies)
         allow(controller.request).to receive(:get?).and_return(false)
