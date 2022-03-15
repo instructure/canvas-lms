@@ -21,6 +21,9 @@ import PropTypes from 'prop-types'
 import React, {useEffect, useState, useRef} from 'react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {useScope} from '@canvas/i18n'
+
+const I18n = useScope('mentions')
 
 const MentionDropdownOption = props => {
   const [isHover, setHover] = useState(false)
@@ -68,6 +71,7 @@ const MentionDropdownOption = props => {
       <li
         aria-selected={props.isSelected}
         id={props.id}
+        aria-label={I18n.t('Select %{name} to mention', {name: props.name})}
         role="option"
         style={{listStyle: 'none'}}
         onClick={props.onSelect}
