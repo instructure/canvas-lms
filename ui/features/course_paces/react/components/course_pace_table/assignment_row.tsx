@@ -321,7 +321,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           <Cell data-testid="pp-title-cell">
             <View margin={labelMargin}>{this.renderTitle()}</View>
           </Cell>
-          <Cell textAlign="center">
+          <Cell data-testid="pp-duration-cell" textAlign="center">
             <View data-testid="duration-input" margin={labelMargin}>
               {this.renderDurationInput()}
             </View>
