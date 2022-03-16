@@ -23,9 +23,11 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import I18n from 'i18n!edit_rubricRatings'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {ratingShape, tierShape} from './types'
+
+const I18n = useI18nScope('edit_rubricRatings');
 
 const pointString = (points, endOfRangePoints) => {
   if (endOfRangePoints !== null) {

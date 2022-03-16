@@ -21,9 +21,11 @@ import PropTypes from 'prop-types'
 import Modal from '@canvas/react-modal'
 
 import ConnectedAssignmentPicker from './assignment-picker'
-import I18n from 'i18n!conditional_release'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {transformScore} from '../score-helpers'
+
+const I18n = useI18nScope('conditional_release');
 
 const {object, bool, func} = PropTypes
 

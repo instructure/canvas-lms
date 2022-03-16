@@ -4114,7 +4114,8 @@ describe CoursesController, type: :request do
                                "homeroom_course" => false,
                                "image_url" => nil,
                                "image_id" => nil,
-                               "image" => nil
+                               "image" => nil,
+                               "default_due_time" => "23:59:59"
                              })
         end
 
@@ -4151,7 +4152,8 @@ describe CoursesController, type: :request do
                             show_announcements_on_home_page: false,
                             syllabus_course_summary: false,
                             home_page_announcement_limit: nil,
-                            homeroom_course: true
+                            homeroom_course: true,
+                            default_due_time: "9:00:00"
                           })
           expect(json).to eq({
                                "allow_final_grade_override" => true,
@@ -4183,7 +4185,8 @@ describe CoursesController, type: :request do
                                "homeroom_course" => true,
                                "image_url" => nil,
                                "image_id" => nil,
-                               "image" => nil
+                               "image" => nil,
+                               "default_due_time" => "09:00:00"
                              })
           @course.reload
           expect(@course.allow_final_grade_override?).to eq true
@@ -4204,6 +4207,7 @@ describe CoursesController, type: :request do
           expect(@course.syllabus_course_summary?).to eq false
           expect(@course.home_page_announcement_limit).to be nil
           expect(@course.homeroom_course?).to eq true
+          expect(@course.default_due_time).to eq "09:00:00"
         end
       end
 
@@ -4249,7 +4253,8 @@ describe CoursesController, type: :request do
                                "homeroom_course" => false,
                                "image_url" => nil,
                                "image_id" => nil,
-                               "image" => nil
+                               "image" => nil,
+                               "default_due_time" => "23:59:59"
                              })
         end
 

@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_bulk_edit'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('assignments_bulk_edit');
 
 function BulkEditOverrideTitle({assignmentName, overrideTitle, overrideBase}) {
   const [visibleTitle, srSubTitle, size, indent] = overrideBase

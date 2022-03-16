@@ -18,7 +18,21 @@
 const path = require('path')
 
 require('@babel/register')({
-  ...require('./babel.config.js'),
+  configFile: false,
+  presets: [
+    ['@babel/preset-env'],
+    ['@babel/preset-react', {}],
+  ],
+  plugins: [
+    ['@babel/plugin-proposal-decorators', {legacy: true}],
+    ['@instructure/babel-plugin-themeable-styles', {
+      postcssrc: require('@instructure/ui-postcss-config')()(),
+      themeablerc: {},
+    }]
+  ],
+  targets: {
+    node: 'current'
+  },
   only: [
     path.resolve(__dirname, 'src'),
     path.resolve(__dirname, 'test'),

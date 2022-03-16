@@ -129,13 +129,6 @@ a {
   float: direction(right);
 }
 
-#terms_link {
-  @include ic-focus-base;
-  &:focus {
-    @include ic-focus-variant;
-  }
-}
-
 #signup_teacher, #signup_student {
   @include ic-focus-base;
   &:focus {

@@ -251,6 +251,14 @@ describe "Importing assignments" do
     expect(assignment.lock_at).not_to be_nil
   end
 
+  it "results in the creation of an audit event, with the migration user, when configured with anonymous grading" do
+    course_model
+    @course.enable_feature!(:anonymous_marking)
+    migration = @course.content_migrations.create! user: User.create!
+    Importers::AssignmentImporter.import_from_migration({ "title" => "Imported", "anonymous_grading" => true }, @course, migration)
+    expect(AnonymousOrModerationEvent.last.user).to eq migration.user
+  end
+
   context "when assignments use an LTI tool" do
     subject do
       assignment # trigger create

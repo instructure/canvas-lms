@@ -333,9 +333,9 @@ class ContextModulesController < ApplicationController
         m.save_without_touching_context
         Canvas::LiveEvents.module_updated(m) if m.position != order_before[m.id]
       end
-      # Update pace plans if enabled
-      if @context.account.feature_enabled?(:pace_plans) && @context.enable_pace_plans
-        @context.pace_plans.primary.find_each(&:create_publish_progress)
+      # Update course paces if enabled
+      if @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces
+        @context.course_paces.primary.find_each(&:create_publish_progress)
       end
       @context.touch
 

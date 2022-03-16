@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['i18n!ts'], function (I18n) {
-    let test: string = 'test'
-    I18n.t('yay typescript')
-})
+import { useScope } from '@canvas/i18n'
+
+let test: string = 'test'
+
+const I18n = useScope('ts')
+I18n.t('yay typescript')

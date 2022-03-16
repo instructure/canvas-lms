@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!grade_summaryOutcome'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import {Model, Collection} from '@canvas/backbone'
 import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
 import tz from '@canvas/timezone'
+
+I18n = useI18nScope('grade_summaryOutcome')
 
 
 GradeSummary = {}

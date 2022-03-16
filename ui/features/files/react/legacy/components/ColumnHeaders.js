@@ -16,9 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
+import React from 'react'
 import PropTypes from 'prop-types'
+
+const I18n = useI18nScope('react_files');
 
 const columns = [
   {
@@ -69,6 +72,11 @@ export default {
       hideToggleAll: true
     }
   },
+
+  // Using a ref here instead of state because
+  // we need to update this value in render()
+  // and don't want to cause a re-render loop
+  lastScreenreaderMessage: React.createRef(),
 
   queryParamsFor(query, property) {
     const order = (query.sort || 'name') === property && query.order === 'desc' ? 'asc' : 'desc'

@@ -436,12 +436,24 @@ describe('OutcomeEditModal', () => {
           target: {value: 'Updated description'}
         })
         fireEvent.click(getByText('Delete mastery level 5'))
+        fireEvent.click(getByText('Confirm'))
         fireEvent.click(getByText('Save'))
         await act(async () => jest.runOnlyPendingTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: '"Updated name" was successfully updated.',
           type: 'success'
         })
+      })
+
+      it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
+        const {getByTestId} = renderWithProvider({
+          env: {
+            contextType: 'Account',
+            contextId: '1',
+            individualOutcomeRatingAndCalculationFF: true
+          }
+        })
+        expect(getByTestId('outcome-edit-modal-horizontal-divider')).toBeInTheDocument()
       })
     })
 

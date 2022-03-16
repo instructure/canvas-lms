@@ -133,8 +133,8 @@ describe "Common Cartridge exporting" do
       @event1 = @course.calendar_events.create!(title: "event2", start_at: 2.weeks.from_now)
       @bank = @course.assessment_question_banks.create!(title: "bank")
       @bank2 = @course.assessment_question_banks.create!(title: "bank2")
-      @pp1 = @course.pace_plans.create! workflow_state: "unpublished"
-      @pp2 = @course.pace_plans.create! workflow_state: "active"
+      @pp1 = @course.course_paces.create! workflow_state: "unpublished"
+      @pp2 = @course.course_paces.create! workflow_state: "active"
 
       # only select one of each type
       @ce.selected_content = {
@@ -152,7 +152,7 @@ describe "Common Cartridge exporting" do
         wiki_pages: { mig_id(@wiki) => "1", mig_id(@wiki2) => "0" },
         calendar_events: { mig_id(@event) => "1", mig_id(@event2) => "0" },
         assessment_question_banks: { mig_id(@bank) => "1", mig_id(@bank2) => "0" },
-        pace_plans: { mig_id(@pp1) => "1", mig_id(@pp2) => "0" }
+        course_paces: { mig_id(@pp1) => "1", mig_id(@pp2) => "0" }
       }
       @ce.save!
 
@@ -205,9 +205,9 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("event[identifier=#{mig_id(@event2)}]")).to be_nil
       expect(ccc_schema.validate(doc)).to be_empty
 
-      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/pace_plans.xml"))
-      expect(doc.at_css("pace_plan[identifier=#{mig_id(@pp1)}]")).not_to be_nil
-      expect(doc.at_css("pace_plan[identifier=#{mig_id(@pp2)}]")).to be_nil
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/course_paces.xml"))
+      expect(doc.at_css("course_pace[identifier=#{mig_id(@pp1)}]")).not_to be_nil
+      expect(doc.at_css("course_pace[identifier=#{mig_id(@pp2)}]")).to be_nil
       expect(ccc_schema.validate(doc)).to be_empty
     end
 

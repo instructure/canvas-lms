@@ -67,6 +67,11 @@ conditional_release:
   root_opt_in: true
   custom_transition_proc: conditional_release_transition_hook
   after_state_change_proc: conditional_release_after_change_hook
+default_due_time:
+  state: hidden
+  display_name: Default Due Time
+  description: Adds an account/course setting for a default due time for new assignments
+  applies_to: RootAccount
 disable_alert_timeouts:
   type: setting
   state: allowed

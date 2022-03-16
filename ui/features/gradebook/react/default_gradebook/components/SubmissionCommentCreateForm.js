@@ -17,8 +17,10 @@
  */
 
 import {func} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import SubmissionCommentForm from './SubmissionCommentForm'
+
+const I18n = useI18nScope('gradebook');
 
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   static propTypes = {

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!calendar'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import moment from 'moment'
 import tz from '@canvas/timezone'
@@ -27,6 +27,8 @@ import ShowEventDetailsDialog from '../../jquery/ShowEventDetailsDialog'
 import template from '../../jst/agendaView.handlebars'
 import '../../fcMomentHandlebarsHelpers' # make sure fcMomentToString is available to agendaView.handlebars
 import 'jquery-tinypubsub'
+
+I18n = useI18nScope('calendar')
 
 
 export default class AgendaView extends Backbone.View

@@ -259,10 +259,10 @@ export default function Filter(props) {
               {props.use_rce_buttons_and_icons && (
                 <SimpleSelect.Option
                   id="buttons_and_icons"
-                  value="buttons_and_icons"
+                  value="icon_maker_icons"
                   renderBeforeLabel={IconImageLine}
                 >
-                  {formatMessage('Buttons and Icons')}
+                  {formatMessage('Icon Maker Icons')}
                 </SimpleSelect.Option>
               )}
 

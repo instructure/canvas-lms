@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!react_files'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
@@ -36,6 +36,8 @@ import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialo
 import '@canvas/rails-flash-notifications'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+
+const I18n = useI18nScope('react_files');
 
 export default class Toolbar extends React.Component {
   static propTypes = {

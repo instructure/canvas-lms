@@ -291,7 +291,7 @@ Here is an example of using mockGraphqlQuery in conjunction with Apollo's
 `MockedProvider`. This can be tweaked to the needs of your specific test:
 
 ```javascript
-import {createCache} from 'canvas-apollo'
+import {createCache} from '@canvas/apollo'
 import mockGraphqlQuery from 'graphql-query-mock'
 
 const ASSIGNMENT_QUERY = gql`

@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!courses'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('courses');
 
 export default function LoadingIndicator() {
   return (

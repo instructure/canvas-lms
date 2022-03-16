@@ -17,9 +17,10 @@
  */
 
 import {handleActions} from 'redux-actions'
-import I18n from 'i18n!add_peopleapiState_reducer'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {actionTypes} from '../actions'
 import {defaultState} from '../store'
+const I18n = useI18nScope('add_peopleapiState_reducer');
 // helpers -----------------------
 //
 // There are 2 paths to *_ERROR actions.

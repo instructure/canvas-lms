@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!OutcomeMoveModal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -28,6 +28,8 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {MOVE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 import {outcomeShape} from './shapes'
+
+const I18n = useI18nScope('OutcomeMoveModal');
 
 const OutcomeMoveModal = ({
   outcomes,

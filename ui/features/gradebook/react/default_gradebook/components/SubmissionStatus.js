@@ -18,11 +18,13 @@
 
 import React from 'react'
 import {bool, instanceOf, number, shape, string} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
 import Message from './SubmissionStatus/Message'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
+
+const I18n = useI18nScope('gradebook');
 
 export default class SubmissionStatus extends React.Component {
   static defaultProps = {

@@ -193,13 +193,6 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
     }
   }, [editor, inputText, onExited])
 
-  // Make us maintain a focused user when open
-  useEffect(() => {
-    if (!filteredOptions.includes(focusedUser)) {
-      setFocusedUser(filteredOptions[0])
-    }
-  }, [filteredOptions, focusedUser])
-
   // Keep Focus User and active decendant always up to date
   useEffect(() => {
     if (focusedUser) {

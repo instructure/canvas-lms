@@ -107,6 +107,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Olemassa oleva keskustelu" },
   "excused_cf8792eb": { "message": "Annettu anteeksi" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Kurssiluettelon haku epäonnistui"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Tulevaisuuteesi katsominen epäonnistui"
   },

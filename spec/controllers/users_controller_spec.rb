@@ -2797,7 +2797,7 @@ describe UsersController do
       it "passes context to cached_recent_stream_items for observers when observer_picker flag is on" do
         expect_any_instance_of(User).to receive(:cached_recent_stream_items).with({ contexts: [@course1] })
 
-        get "dashboard_stream_items", params: { observed_user: @student.id }
+        get "dashboard_stream_items", params: { observed_user_id: @student.id }
         expect(assigns[:user].id).to be(@student.id)
         expect(assigns[:is_observing_student]).to be(true)
       end
@@ -2805,16 +2805,16 @@ describe UsersController do
       it "does not set @user to observer parameter if observer_picker flag is off" do
         Account.site_admin.disable_feature!(:observer_picker)
 
-        get "dashboard_stream_items", params: { observed_user: @student.id }
+        get "dashboard_stream_items", params: { observed_user_id: @student.id }
         expect(assigns[:user].id).to be(@user1.id)
         expect(assigns[:is_observing_student]).to be(false)
       end
 
-      it "returns unauthorized if user passes observed_user whom they are not observing" do
+      it "returns unauthorized if user passes observed_user_id of user whom they are not observing" do
         @another_student = user_factory(active_all: true)
         @course1.enroll_student(@another_student)
 
-        get "dashboard_stream_items", params: { observed_user: @another_student.id }
+        get "dashboard_stream_items", params: { observed_user_id: @another_student.id }
         expect(response).to be_unauthorized
       end
     end
@@ -2881,7 +2881,7 @@ describe UsersController do
       end
 
       it "sets variables for observer observing themself" do
-        get "dashboard_sidebar", params: { observed_user: @user1.id }
+        get "dashboard_sidebar", params: { observed_user_id: @user1.id }
         expect(assigns[:user].id).to be(@user1.id)
         expect(assigns[:is_observing_student]).to be(false)
         expect(assigns[:show_recent_feedback]).to be(false)
@@ -2889,18 +2889,18 @@ describe UsersController do
       end
 
       it "sets variables for observer observing a student" do
-        get "dashboard_sidebar", params: { observed_user: @student.id }
+        get "dashboard_sidebar", params: { observed_user_id: @student.id }
         expect(assigns[:user].id).to be(@student.id)
         expect(assigns[:is_observing_student]).to be(true)
         expect(assigns[:show_recent_feedback]).to be(true)
         expect(controller).not_to have_received(:prepare_current_user_dashboard_items)
       end
 
-      it "returns unauthorized if user passes observed_user who they are not observing" do
+      it "returns unauthorized if user passes observed_user_id of user who they are not observing" do
         @another_student = user_factory(active_all: true)
         @course1.enroll_student(@another_student)
 
-        get "dashboard_sidebar", params: { observed_user: @another_student.id }
+        get "dashboard_sidebar", params: { observed_user_id: @another_student.id }
         expect(response).to be_unauthorized
       end
     end

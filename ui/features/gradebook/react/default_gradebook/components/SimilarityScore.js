@@ -24,9 +24,11 @@ import {Text} from '@instructure/ui-text'
 
 import SimilarityIcon from './SimilarityIcon'
 
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {Link} from '@instructure/ui-link'
+
+const I18n = useI18nScope('gradebook');
 
 export default class SimilarityScore extends PureComponent {
   static propTypes = {

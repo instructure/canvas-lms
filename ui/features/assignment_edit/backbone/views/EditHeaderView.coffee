@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!assignmentsEditHeaderView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/EditHeaderView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/tabs'
+
+I18n = useI18nScope('assignmentsEditHeaderView')
 
 export default class EditHeaderView extends Backbone.View
   @optionProperty 'userIsAdmin'

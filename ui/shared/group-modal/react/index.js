@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import I18n from 'i18n!groups'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {func, number, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -30,6 +30,8 @@ import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import GroupMembershipInput from './GroupMembershipInput'
+
+const I18n = useI18nScope('groups');
 
 GroupModal.propTypes = {
   groupCategory: shape({id: string}),

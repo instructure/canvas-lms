@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import I18n from 'i18n!sharedCurveGradesDialog'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import curveGradesDialogTemplate from '../jst/CurveGradesDialog.handlebars'
@@ -27,6 +27,8 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/jquery/fixDialogButtons'
 import 'jquery-tinypubsub'
+
+I18n = useI18nScope('sharedCurveGradesDialog')
 
 export default class CurveGradesDialog
   constructor: ({@assignment, @students, @context_url}) ->

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!a2LatePolicyStatusDisplay'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -26,6 +26,8 @@ import LatePolicyToolTipContent from './LatePolicyToolTipContent'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {Link} from '@instructure/ui-link'
+
+const I18n = useI18nScope('a2LatePolicyStatusDisplay');
 
 export default function LatePolicyStatusDisplay(props) {
   // TODO: actually pass the assignment and submission in here instead of all these

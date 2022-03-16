@@ -266,5 +266,61 @@ describe Quizzes::QuizQuestionsController do
       linked_question.reload
       expect(linked_question.question_data["question_text"]).to eq translated_text # leave alone
     end
+
+    context "when the quiz_question doesn't have an assessment_question and its workflow_state is not 'generated'" do
+      before do
+        @question.update!(question_data: { question_type: "multiple_choice_question" })
+        @question.update_column(:assessment_question_id, nil)
+      end
+
+      it "generates an assessment_question for the quiz_question" do
+        user_session(@teacher)
+        expect do
+          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+                                  question: {
+                                    neutral_comments_html: ""
+                                  } }
+          @question.reload
+        end.to change { @question.assessment_question.present? }.from(false).to(true)
+      end
+
+      it "does not reset the question's data" do
+        user_session(@teacher)
+        expect do
+          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+                                  question: {
+                                    neutral_comments_html: ""
+                                  } }
+          @question.reload
+        end.not_to change { @question.question_data["question_type"] }
+      end
+    end
+
+    context "when the quiz_question doesn't have an assessment_question and its workflow_state is 'generated'" do
+      before do
+        @question.update_column(:assessment_question_id, nil)
+        allow_any_instance_of(Quizzes::QuizQuestion).to receive(:generated?).and_return(true)
+      end
+
+      it "does not generate an assessment_question for the quiz_question" do
+        user_session(@teacher)
+        expect do
+          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+                                  question: { neutral_comments_html: "" } }
+          @question.reload
+        end.not_to change { @question.assessment_question.present? }
+      end
+    end
+
+    context "when the quiz_question has an assessment_question" do
+      it "does not generates an assessment_question for the quiz_question" do
+        user_session(@teacher)
+        expect do
+          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+                                  question: { neutral_comments_html: "" } }
+          @question.reload
+        end.not_to change { @question.assessment_question }
+      end
+    end
   end
 end

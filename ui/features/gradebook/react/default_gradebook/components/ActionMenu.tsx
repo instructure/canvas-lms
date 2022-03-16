@@ -27,8 +27,10 @@ import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import tz from '@canvas/timezone'
 import DateHelper from '@canvas/datetime/dateHelper'
 // @ts-ignore
-import I18n from 'i18n!gradebookActionMenu'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/rails-flash-notifications'
+
+const I18n = useI18nScope('gradebookActionMenu');
 
 const {Item: MenuItem, Menu: MenuSeparator} = Menu as any
 

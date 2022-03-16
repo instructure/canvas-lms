@@ -18,8 +18,10 @@
 
 import _ from 'underscore'
 import $ from 'jquery'
-import I18n from 'i18n!gradebook_upload'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/jquery/jquery.ajaxJSON'
+
+const I18n = useI18nScope('gradebook_upload');
 
 const successMessage = I18n.t(
   'You will be redirected to Gradebook while your file is being uploaded. ' +

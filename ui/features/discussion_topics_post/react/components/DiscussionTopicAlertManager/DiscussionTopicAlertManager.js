@@ -19,13 +19,15 @@
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {responsiveQuerySizes} from '../../utils'
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import React from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
+
+const I18n = useI18nScope('discussion_posts');
 
 export const DiscussionTopicAlertManager = props => {
   const getAnonymousAlertText = () => {

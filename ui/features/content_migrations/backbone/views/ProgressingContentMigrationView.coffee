@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import I18n from 'i18n!content_migrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/ProgressingContentMigration.handlebars'
 import progressingIssuesTemplate from '../../jst/ProgressingIssues.handlebars'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
@@ -26,6 +26,8 @@ import ProgressBarView from './ProgressBarView.coffee'
 import ProgressStatusView from './ProgressStatusView.coffee'
 import SelectContentView from './SelectContentView.coffee'
 import SourceLinkView from './SourceLinkView.coffee'
+
+I18n = useI18nScope('content_migrations')
 
 export default class ProgressingContentMigrationView extends Backbone.View
   template: template

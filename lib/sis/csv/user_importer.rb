@@ -60,6 +60,7 @@ module SIS
           pronouns: row["pronouns"],
           declared_user_type: row["declared_user_type"],
           password: row["password"],
+          canvas_password_notification: row["canvas_password_notification"],
           ssha_password: row["ssha_password"],
           integration_id: row["integration_id"],
           short_name: row["short_name"],

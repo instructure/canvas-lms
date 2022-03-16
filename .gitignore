@@ -26,7 +26,6 @@
 /coverage/
 /coverage-js/
 /db/schema.rb
-/db/*.sqlite*
 /db/*sql
 docker-compose.override.yml
 /exports/
@@ -45,9 +44,9 @@ npm-debug.log
 /storybook-static/
 /tmp/*
 !/tmp/.keep
-/vendor/bundle/
-/vendor/cache/
+/vendor
 yarn-error.log
+dump.rdb
 
 # canvas-gems
 /gems/*/coverage

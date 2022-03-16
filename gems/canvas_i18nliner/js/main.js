@@ -65,7 +65,7 @@ JsProcessor.prototype.preProcess = function(data) {
 };
 
 require("./scoped_hbs_pre_processor");
-var ScopedI18nJsExtractor = require("./scoped_i18n_js_extractor");
+var ScopedESMExtractor = require("./scoped_esm_extractor");
 var ScopedHbsExtractor = require("./scoped_hbs_extractor");
 var ScopedTranslationHash = require("./scoped_translation_hash");
 
@@ -88,7 +88,7 @@ Commands.Generate_js = GenerateJs;
 
 // swap out the defaults for our scope-aware varieties
 Check.prototype.TranslationHash = ScopedTranslationHash;
-JsProcessor.prototype.I18nJsExtractor = ScopedI18nJsExtractor;
+JsProcessor.prototype.I18nJsExtractor = ScopedESMExtractor;
 HbsProcessor.prototype.Extractor = ScopedHbsExtractor;
 CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
 

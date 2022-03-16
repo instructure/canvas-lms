@@ -17,9 +17,11 @@
 
 import $ from 'jquery'
 
-import I18n from 'i18n!media_comments_upload_view_manager'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import 'jqueryui/progressbar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+
+const I18n = useI18nScope('media_comments_upload_view_manager');
 
 /*
  * Watches uploader and updates UI with file upload details, errors

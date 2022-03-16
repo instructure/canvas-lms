@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!user_name'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
 
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+
+const I18n = useI18nScope('user_name');
 
 $(document).ready(function() {
   $('#name_and_email').delegate('.edit_user_link', 'click', event => {

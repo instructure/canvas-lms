@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!accounts.statistics'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
+
+const I18n = useI18nScope('accounts.statistics');
 
 function populateDialog(data_points, axis, $link) {
   $('#over_time_dialog').dialog({

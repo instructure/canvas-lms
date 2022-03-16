@@ -21,7 +21,7 @@ import {COURSES_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {CourseSelect, ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {MailboxSelectionDropdown} from '../components/MailboxSelectionDropdown/MailboxSelectionDropdown'
 import {MessageActionButtons} from '../components/MessageActionButtons/MessageActionButtons'
 import PropTypes from 'prop-types'
@@ -32,6 +32,8 @@ import {View} from '@instructure/ui-view'
 import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../util/utils'
+
+const I18n = useI18nScope('conversations_2');
 
 const MessageListActionContainer = props => {
   const LIMIT_TAG_COUNT = 1

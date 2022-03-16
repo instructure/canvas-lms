@@ -48,9 +48,39 @@ module Crystalball
 
         def dry_run(prediction)
           prediction_file_path = config["dry_run_output_file_path"]
-          File.write(prediction_file_path, prediction.to_a.join(","))
+          # remove leading ./ and trailing brackets [], then uniq
+          prediction = prediction.map do |s|
+            s.gsub(/\[.*?\]/, "").sub("./", "")
+          end.uniq
+
+          if prediction.size > 10
+            prediction = compress_prediction(prediction)
+          end
+
+          Crystalball.log :info, "Prediction: #{prediction.first(5).join(" ")}#{"..." if prediction.size > 5}"
+
+          File.write(prediction_file_path, prediction.flatten.join(","))
           Crystalball.log :info, "Saved RSpec prediction to #{prediction_file_path}"
           exit # rubocop:disable Rails/Exit
+        end
+
+        def compress_prediction(prediction)
+          Crystalball.log :info, "Compressing Tests..........."
+          # create array of parents
+          parents = []
+          prediction.flat_map do |name|
+            parents << File.dirname(name.to_s)
+          end
+          # each parent, if all children present, remove children from prediction
+          # and add parent to prediction.
+          parents.each do |parent|
+            actual_files = Dir["#{parent}/*spec.rb"]
+            next unless (actual_files - prediction).none?
+
+            prediction -= actual_files
+            prediction << "#{parent}/*spec.rb"
+          end
+          prediction
         end
 
         def reset!
@@ -193,6 +223,7 @@ module Crystalball
       root_suite_path = ENV["CRYSTALBALL_TEST_SUITE_ROOT"] || "."
       raw_prediction = raw_prediction(diff)
       prediction_list = includes_root?(raw_prediction) ? [root_suite_path] : raw_prediction
+      prediction_list = filter_out_specs(prediction_list)
       Prediction.new(filter(prediction_list))
     end
 
@@ -202,6 +233,17 @@ module Crystalball
       prediction_list.include?(".") ||
         prediction_list.include?("./.") ||
         prediction_list.include?(ENV["CRYSTALBALL_TEST_SUITE_ROOT"])
+    end
+
+    def filter_out_specs(prediction_list)
+      prediction_list.reject do |spec|
+        if spec =~ %r{gems/.*spec\.rb} && spec !~ %r{gems/plugins/.*/spec_canvas/.*spec\.rb}
+          puts "Filtering out #{spec}"
+          true
+        else
+          false
+        end
+      end
     end
   end
 

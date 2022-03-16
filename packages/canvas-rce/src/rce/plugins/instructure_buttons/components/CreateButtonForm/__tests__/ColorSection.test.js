@@ -39,7 +39,7 @@ describe('<ColorSection />', () => {
   it('changes the button color', () => {
     const onChange = jest.fn()
     render(<ColorSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
-    const input = screen.getByRole('textbox', {name: /button color/i})
+    const input = screen.getByRole('textbox', {name: /icon color/i})
     fireEvent.change(input, {target: {value: '#fff'}})
     expect(onChange).toHaveBeenCalledWith({color: '#fff'})
   })
@@ -47,7 +47,7 @@ describe('<ColorSection />', () => {
   it('changes the outline color', () => {
     const onChange = jest.fn()
     render(<ColorSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
-    const input = screen.getByRole('textbox', {name: /button outline/i})
+    const input = screen.getByRole('textbox', {name: /icon outline/i})
     fireEvent.change(input, {target: {value: '#000'}})
     expect(onChange).toHaveBeenCalledWith({outlineColor: '#000'})
   })
@@ -57,9 +57,9 @@ describe('<ColorSection />', () => {
     render(
       <ColorSection settings={{...DEFAULT_SETTINGS, outlineSize: 'medium'}} onChange={onChange} />
     )
-    selectOption(/button outline size/i, /small/i)
+    selectOption(/icon outline size/i, /small/i)
     expect(onChange).toHaveBeenCalledWith({outlineSize: 'small'})
-    selectOption(/button outline size/i, /none/i)
+    selectOption(/icon outline size/i, /none/i)
     expect(onChange).toHaveBeenCalledWith({outlineSize: 'none'})
   })
 })

@@ -20,9 +20,11 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import I18n from 'i18n!account_settings_jsx_bundle'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React from 'react'
+
+const I18n = useI18nScope('account_settings_jsx_bundle');
 
 export default function MicrosoftSyncTitle(props) {
   return (

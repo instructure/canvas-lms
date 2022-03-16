@@ -43,7 +43,7 @@ module Types
       if object.deleted?
         nil
       else
-        object.message
+        object.parse_message(current_user)
       end
     end
 
@@ -62,11 +62,11 @@ module Types
     end
 
     field :author, Types::UserType, null: true do
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
-    def author(course_id: nil, role_types: nil, built_in_only: true)
+    def author(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous? && object.is_anonymous_author
           nil
@@ -108,11 +108,11 @@ module Types
     end
 
     field :editor, Types::UserType, null: true do
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
-    def editor(course_id: nil, role_types: nil, built_in_only: true)
+    def editor(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous? && !course_id
           nil

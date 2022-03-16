@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!quiz_log_auditing.event_stream'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import K from '../../../constants'
 import React from 'react'
 import secondsToTime from '@canvas/quiz-legacy-client-apps/util/seconds_to_time'
 import SightedUserContent from '@canvas/quiz-legacy-client-apps/react/components/sighted_user_content'
 import {Link} from 'react-router-dom'
 import {IconTroubleLine, IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
+
+const I18n = useI18nScope('quiz_log_auditing.event_stream');
 
 class Event extends React.Component {
   static defaultProps = {

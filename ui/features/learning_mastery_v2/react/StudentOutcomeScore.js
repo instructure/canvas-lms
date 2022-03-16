@@ -22,7 +22,9 @@ import {Flex} from '@instructure/ui-flex'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {svgUrl} from './icons'
 import {outcomeShape, outcomeRollupShape} from './shapes'
-import I18n from 'i18n!learning_mastery_gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('learning_mastery_gradebook');
 
 const StudentOutcomeScore = ({outcome, rollup}) => (
   <Flex width="100%" height="100%" alignItems="center" justifyItems="center">

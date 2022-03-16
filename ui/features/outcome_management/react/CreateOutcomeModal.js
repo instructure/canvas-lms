@@ -19,7 +19,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!OutcomeManagement'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
@@ -50,6 +50,8 @@ import useRatings, {
 } from '@canvas/outcomes/react/hooks/useRatings'
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Management/Ratings'
+
+const I18n = useI18nScope('OutcomeManagement');
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
   const {
@@ -275,7 +277,11 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 canManage
               />
               <View as="div" minHeight="14rem">
-                <hr style={{margin: '1rem 0 0'}} />
+                <hr
+                  style={{margin: '1rem 0 0'}}
+                  aria-hidden="true"
+                  data-testid="outcome-create-modal-horizontal-divider"
+                />
                 <ProficiencyCalculation
                   update={updateProficiencyCalculation}
                   setError={setProficiencyCalculationError}

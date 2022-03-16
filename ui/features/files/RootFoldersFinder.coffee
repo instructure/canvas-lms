@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!rootFoldersFinder'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Folder from '@canvas/files/backbone/models/Folder'
 import splitAssetString from '@canvas/util/splitAssetString'
+
+I18n = useI18nScope('rootFoldersFinder')
 
 export default class RootFoldersFinder
   constructor: (opts) ->

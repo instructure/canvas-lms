@@ -20,7 +20,7 @@
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
 import regradeTemplate from '../jst/regrade.handlebars'
-import I18n from 'i18n!quizzes_public'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
@@ -46,11 +46,11 @@ import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime' /* time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
+import '@canvas/datetime'/* time_field, datetime_field */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags, /\$\.underscore/ */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, confirmDelete, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
@@ -60,6 +60,8 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
+
+const I18n = useI18nScope('quizzes_public');
 
 let dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation
 
@@ -4162,7 +4164,7 @@ $(document).ready(function () {
         type: group.length > 0 ? 'group' : 'question',
         name: parent.find('.name').text(),
         sortable: group.length > 0 ? group : holder.parent()
-      }
+      };
     },
 
     sortableItems() {
@@ -4191,8 +4193,8 @@ $(document).ready(function () {
           group: groupId,
           top: !item.parent().hasClass('group'),
           sortable
-        }
-      })
+        };
+      });
     },
 
     // we can move item to a group if

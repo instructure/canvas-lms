@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,43 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 module.exports = {
+  assumptions: {
+    setPublicClassFields: true
+  },
+
+  env: {
+    production: {
+      plugins: [
+        '@babel/plugin-transform-react-constant-elements',
+        '@babel/plugin-transform-react-inline-elements',
+        'minify-constant-folding',
+        'minify-dead-code-elimination',
+        'minify-guarded-expressions',
+        'transform-react-remove-prop-types',
+      ]
+    }
+  },
+
   presets: [
-    [
-      '@instructure/ui-babel-preset',
-      {
-        coverage: process.env.BABEL_ENV === 'test-node',
-        transformImports: false,
-        node: ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID,
-        esModules: !(
-          ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID
-        )
-      }
-    ],
-    [
-      '@instructure/babel-preset-pretranslated-translations-package-format-message',
-      {
-        translationsDir: 'lib/canvas-rce',
-        extractDefaultTranslations: false
-      }
-    ]
+    ['@babel/preset-env', {
+      useBuiltIns: 'entry',
+      corejs: '3.20',
+      modules: false,
+    }],
+    ['@babel/preset-react', { useBuiltIns: true }],
+    ['@instructure/babel-preset-pretranslated-translations-package-format-message', {
+      translationsDir: 'lib/canvas-rce',
+      extractDefaultTranslations: false
+    }]
   ],
+
   plugins: [
-    [
-      'transform-inline-environment-variables',
-      {
-        include: ['BUILD_LOCALE']
-      }
-    ],
-    'minify-constant-folding',
-    'minify-guarded-expressions',
-    'minify-dead-code-elimination',
-    // something changed in @instructure/ui-babel-preset that necessitated
-    // @babel/plugin-proposal-private-methods, {loose: true}
-    // to stop the build from flooding the console output with warnings.
-    // then that broke decorators, which RCEWrapper uses. The other
-    // 2 plugin-proposal-* plugins fix that and get rid of the wornings
+    ['transform-inline-environment-variables', {
+      include: ['BUILD_LOCALE']
+    }],
+
+    ['@babel/plugin-transform-runtime', {
+      corejs: 3,
+      helpers: true,
+      useESModules: true,
+      regenerator: true
+    }],
+
     ['@babel/plugin-proposal-decorators', {legacy: true}],
-    ['@babel/plugin-proposal-class-properties', {loose: true}],
-    ['@babel/plugin-proposal-private-methods', {loose: true}]
-  ]
+
+    ['@instructure/babel-plugin-themeable-styles', {
+      ignore: () => false,
+      postcssrc: require('@instructure/ui-postcss-config')()(),
+      themeablerc: {},
+    }]
+  ],
+
+  targets: {
+    browsers: 'last 2 versions',
+    esmodules: true
+  }
 }

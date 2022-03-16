@@ -22,7 +22,6 @@ const { DefinePlugin, EnvironmentPlugin } = require('webpack')
 const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
 const { canvasDir } = require('#params')
-const I18nPlugin = require('#webpack-i18n-plugin')
 
 const {
   CONTEXT_COFFEESCRIPT_SPEC,
@@ -206,8 +205,6 @@ module.exports = {
       pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
       outfile: WEBPACK_PLUGIN_SPECS
     }),
-
-    I18nPlugin
   ].concat(
     process.env.JSPEC_GROUP ? [
       partitioning.createPlugin({
