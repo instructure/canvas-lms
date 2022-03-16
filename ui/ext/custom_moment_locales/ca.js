@@ -121,6 +121,17 @@ const apply = () => {
   moment.locale(origLocale)
 }
 
-apply();
+const applyWhenTranslationsAreAvailable = () => {
+  const trigger = ({ detail }) => {
+    if (detail === 'localeFiles') {
+      apply()
+      window.removeEventListener('canvasReadyStateChange', trigger)
+    }
+  }
 
-export default apply;
+  window.addEventListener('canvasReadyStateChange', trigger)
+}
+
+applyWhenTranslationsAreAvailable();
+
+export default applyWhenTranslationsAreAvailable;
