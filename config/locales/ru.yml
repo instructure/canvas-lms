@@ -2380,6 +2380,7 @@ ru:
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Позволяет преподавателям выставлять баллы отправкам без оценок в массовом порядке из меню групп заданий и столбцов Total (Всего) в журнале успеваемости."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Позволяет выбирать результаты обучения во время миграции содержимого курса"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Позволяет изменять настройки уведомлений для любого курса со страницы настроек уведомлений на уровне учетной записи."
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Позволяет отображать в отчетах Canvas данные о результатах, сохраненные в службе Outcomes Service (отчеты LMGB, sLMGB и отчеты администратора, связанные с результатами)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Позволяет настраивать шкалы усвоения и методы расчетов на уровне учетных записей и курсов для замены методов оценивания и расчета критериев по результату"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Позволяет установить рейтинги критериев и параметры метода расчета для отдельных результатов."
   allows_students_to_access_other_student_groups_wit_43918810: "Позволяет студентам получать доступ к другим студенческим группам в наборе групп по прямой ссылке."
@@ -3445,6 +3446,7 @@ ru:
   applied_filters_63a90ccd: "Примененные фильтры:"
   apply_781a2546: Применить
   apply_changes_b1dffc70: "Применить изменения"
+  apply_conditions_9e941010: "Применить условия"
   apply_date_range_selection_cc4351ed: "Применить выбор диапазона дат"
   apply_filter_7e4f6113: "Применить фильтр"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Примените фильтры. Примечание: нажатие этой кнопки приведет к перезагрузке страницы."
@@ -10776,6 +10778,7 @@ ru:
   end_date_e0093ed7: "Дата окончания"
   end_date_from_cdd9d90: "Дата окончания от:"
   end_date_to_8b17929d: "Дата окончания до:"
+  end_date_value_3d3e8906: "Дата окончания %{value}"
   end_dates_249d8dbb: "Даты окончания:"
   end_dates_cannot_be_before_start_dates_d6018daf: "Даты окончания не могут предшествовать датам начала"
   end_time_250391e8: "Время окончания"
@@ -11617,6 +11620,7 @@ ru:
   failed_initializing_dashboard_3d967143: "Не удалось инициализировать панель управления"
   failed_jobs_b632bbf0: "Неудачные задания"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Не удалось загрузить компонент ассоциаций. Подключение в вашей сети в порядке?"
+  failed_loading_course_cards_8fcdb36d: "Не удалось загрузить карточки курса"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Не удалось загрузить разделы курса. Перезагрузите страницу, чтобы попытаться еще раз."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Не удалось загрузить компонент истории синхронизации. Подключение в вашей сети в порядке?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Не удалось загрузить компонент несинхронизированных изменений. Подключение в вашей сети в порядке?"
@@ -19400,6 +19404,7 @@ ru:
   outcome_results_23a0a117: "Результаты успеваемости"
   outcome_results_title: "Результаты успеваемости"
   outcome_score_141cf00a: "оценка результата"
+  outcome_service_results_to_canvas_reporting_749667bc: "Вывод сервисных результатов в отчетность Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Результат: %{title} имеет статус %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Результат «%{title}» был успешно создан."
   outcome_title_was_successfully_created_be3a408: "Результат «%{title}» успешно создан"
@@ -19694,6 +19699,7 @@ ru:
   pakistan_92_da28c36: "Пакистан (+92)"
   panama_507_831fbc99: "Панама (+507)"
   panama_fa454c86: Панама
+  panda_taking_photograph_8db13e0f: "панда делает фотоснимок"
   paper_view_7405eeab: "Представление документации"
   paraguay_181a5029: Парагвай
   paraguay_595_ca58b83a: "Парагвай (+595)"
@@ -22926,6 +22932,7 @@ ru:
   remove_avatar_picture_aba765eb: "Удалить изображение аватара"
   remove_c_name_section_d8eabd3a: "Удалить раздел %{c.name}"
   remove_collaborationtitle_c3e81adb: "Удалить «%{collaborationTitle}»?"
+  remove_condition_9cf94f7f: "Удалить условие"
   remove_conference_69b9e0d0: "Удалить конференцию"
   remove_conference_title_207d32c0: "Удалить конференцию: %{title}"
   remove_contact_method_ca890ba3: "Удалить способ связи"
@@ -23203,6 +23210,7 @@ ru:
   rich_content_editor_2708ef21: "Редактор форматированного текста"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Улучшения боковой панели редактора форматированного текста"
   right_sidebar_logo_5483dc0a: "Логотип правой панели"
+  rocketship_on_launchpad_4011ea8c: "ракета на стартовой площадке"
   role: 
     duplicate_role: "Роль с таким именем уже существует"
   role_13a7be77: Роль
@@ -25426,6 +25434,7 @@ ru:
   start_date_from_20503757: "Дата начала от:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} в %{end_time}"
   start_date_to_1e6e6bbe: "Дата начала до:"
+  start_date_value_817cab96: "Дата начала %{value}"
   start_dates_8f1c22a8: "Даты начала:"
   start_entry_4b491f60: "Начать ввод"
   start_from_a_template_380d4e8: "Начать с шаблона..."
@@ -25591,6 +25600,7 @@ ru:
   student_sis_6721040e: "Sis учащегося"
   student_sis_d9f0cd39: "sis студента"
   student_sis_id_abe6b292: "идентификатор sis студента"
+  student_student_number_5c98bd2d: "Студент %{student_number}"
   student_studentnumber_f398d9c2: "Студент %{studentNumber}"
   student_submissions_910da1b3: "Сданные работы студентов"
   student_submissions_report_prospect_education_108daf59: "Отчет о сданных работах студентов (Prospect Education)"
@@ -26278,6 +26288,7 @@ ru:
   the_app_was_added_successfully_3f785a23: "Приложение успешно добавлено"
   the_app_was_deactivated_573520ab: "Приложение деактивировано"
   the_app_was_updated_successfully_3d71cd1b: "Приложение успешно обновлено"
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Предполагается, что предоставленный аргумент является логическим."
   the_assignment_group_id_to_report_on_83880208: "Идентификатор группы заданий для отчета"
   the_assignment_group_named_major_9d349037: "Группа заданий, названные основные"
   the_assignment_group_named_papers_e1cb6a34: "Группа заданий, названные документы"
@@ -29268,6 +29279,7 @@ ru:
   web_page_146f9102: Веб-страница
   web_url_d84feaf5: "URL-адрес веб-узла"
   webcam_fe91b20f: Веб-камера
+  webcam_photo_ee55462c: "Фото с веб-камеры"
   webct_credentials: 
     credential_not_found: "Учетные данные не найдены."
   webct_display: "Blackboard Vista/CE (WebCT)"

@@ -237,7 +237,7 @@ export default createReactClass({
           <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
             &nbsp;
-            <Button onClick={this.submit} variant="primary">
+            <Button onClick={this.submit} color="primary">
               {I18n.t('Add App')}
             </Button>
           </Modal.Footer>

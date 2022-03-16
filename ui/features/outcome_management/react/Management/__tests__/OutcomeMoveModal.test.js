@@ -93,11 +93,14 @@ describe('OutcomeMoveModal', () => {
       contextType = 'Account',
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
-      mocks = defaultMocks
+      mocks = defaultMocks,
+      treeBrowserRootGroupId = '1'
     } = {}
   ) => {
     return realRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
+      <OutcomesContext.Provider
+        value={{env: {contextType, contextId, rootOutcomeGroup, treeBrowserRootGroupId}}}
+      >
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>

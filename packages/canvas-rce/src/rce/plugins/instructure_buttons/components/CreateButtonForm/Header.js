@@ -22,13 +22,13 @@ import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 
 import formatMessage from '../../../../../format-message'
-import {Preview} from './Preview'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {decode} from '../../svg/utils'
 
 export const Header = ({settings, onChange}) => {
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
@@ -54,20 +54,18 @@ export const Header = ({settings, onChange}) => {
     </Flex>
   )
   return (
-    <Flex as="header" direction="column" padding="0 small 0">
-      <Flex.Item padding="small">
-        <Preview settings={settings} />
-      </Flex.Item>
+    <Flex direction="column" padding="small small 0">
       <Flex.Item padding="small">
         <TextInput
           id="button-name"
+          data-testid="button-name"
           renderLabel={formatMessage('Name')}
           placeholder={formatMessage('untitled')}
           onChange={e => {
             const name = e.target.value
             onChange({name})
           }}
-          value={settings.name}
+          value={decode(settings.name)}
         />
       </Flex.Item>
       <Flex.Item padding="small">

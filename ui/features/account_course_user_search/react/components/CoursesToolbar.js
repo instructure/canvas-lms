@@ -133,7 +133,7 @@ export default function CoursesToolbar({
                   <Grid.Col width={6}>
                     <TextInput
                       type="search"
-                      label={<ScreenReaderContent>{searchLabel}</ScreenReaderContent>}
+                      renderLabel={<ScreenReaderContent>{searchLabel}</ScreenReaderContent>}
                       value={draftFilters.search_term}
                       placeholder={searchLabel}
                       onChange={e => onUpdateFilters({search_term: e.target.value})}

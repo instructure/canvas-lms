@@ -23,7 +23,8 @@ import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
 import {
   getContextCodesFromState,
   transformApiToInternalGrade,
-  observedUserId
+  observedUserId,
+  getResponseHeader
 } from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
@@ -142,7 +143,7 @@ export function* loadGradesSaga() {
         gradesData[internalGrade.courseId] = internalGrade
       })
 
-      const links = parseLinkHeader(response.headers.link)
+      const links = parseLinkHeader(getResponseHeader(response, 'link'))
       loadingUrl = links && links.next ? links.next.url : null
     }
     yield put(gotGradesSuccess(gradesData))
@@ -160,9 +161,9 @@ export function* loadAllOpportunitiesSaga() {
     const observed_user_id = observedUserId({selectedObservee, currentUser})
     let course_ids
     if (observed_user_id) {
-      course_ids = selectedObservee.contextCodes?.map(c => c.split('_')[1])
+      course_ids = courses.map(c => c.id)
     } else {
-      course_ids = singleCourse ? courses.map(({id}) => id) : undefined
+      course_ids = singleCourse ? courses.map(c => c.id) : undefined
     }
     while (loadingUrl != null) {
       const filter = ['submittable']
@@ -178,7 +179,7 @@ export function* loadAllOpportunitiesSaga() {
       })
       items.push(...response.data)
 
-      const links = parseLinkHeader(response.headers.link)
+      const links = parseLinkHeader(getResponseHeader(response, 'link'))
       loadingUrl = links?.next ? links.next.url : null
     }
     yield put(addOpportunities({items, nextUrl: null}))

@@ -16,26 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu'
 
 const $fixtures = document.getElementById('fixtures')
 
 QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
-  test('includes exactly the required ViewOptionsMenu overrides props require', () => {
-    const props = createGradebook().getViewOptionsMenuProps()
-    const consoleSpy = sinon.spy(console, 'error')
-    PropTypes.checkPropTypes(ViewOptionsMenu.propTypes, props, 'prop', 'ViewOptionsMenu')
-    strictEqual(consoleSpy.called, false)
-    consoleSpy.restore()
-  })
-
   test('showSeparateFirstLastNames is false', () => {
     const {showSeparateFirstLastNames} = createGradebook().getViewOptionsMenuProps()
     strictEqual(showSeparateFirstLastNames, false)
@@ -184,20 +174,6 @@ test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters
     .querySelectorAll('[data-component="ActionMenu"] Button')[0]
     .innerText.trim()
   equal(buttonText, 'Actions')
-})
-
-test('StatusesModal is mounted on renderStatusesModal', function () {
-  const clock = sinon.useFakeTimers()
-  const statusModal = this.gradebook.renderStatusesModal()
-  statusModal.open()
-  clock.tick(500) // wait for Modal to transition open
-
-  const header = document.querySelector('[aria-label="Statuses"][role="dialog"] h2')
-  equal(header.innerText, 'Statuses')
-
-  const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
-  ReactDOM.unmountComponentAtNode(statusesModalMountPoint)
-  clock.restore()
 })
 
 QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', hooks => {

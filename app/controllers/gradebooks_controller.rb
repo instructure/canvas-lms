@@ -110,8 +110,7 @@ class GradebooksController < ApplicationController
       json = {
         assignment_id: submission.assignment_id
       }
-
-      if submission.user_can_read_grade?(@current_user)
+      if submission.user_can_read_grade?(@presenter.student)
         json.merge!({
                       excused: submission.excused?,
                       score: submission.score,
@@ -1176,12 +1175,12 @@ class GradebooksController < ApplicationController
       percent: percent_value,
       excused: excused,
       mark_as_missing: Canvas::Plugin.value_to_boolean(params[:mark_as_missing]),
-      only_apply_to_past_due: Canvas::Plugin.value_to_boolean(params[:only_apply_to_past_due])
+      only_apply_to_past_due: Canvas::Plugin.value_to_boolean(params[:only_past_due])
     )
     options.assignment_group = @context.assignment_groups.active.find(params[:assignment_group_id]) if params[:assignment_group_id].present?
     options.context_module = @context.context_modules.not_deleted.find(params[:module_id]) if params[:module_id].present?
     options.course_section = @context.course_sections.active.find(params[:course_section_id]) if params[:course_section_id].present?
-    options.student_group = @context.active_groups.find(params[:group_id]) if params[:group_id].present?
+    options.student_group = @context.active_groups.find(params[:student_group_id]) if params[:student_group_id].present?
 
     if params[:grading_period_id].present?
       grading_period = GradingPeriod.for(@context).find(params[:grading_period_id])

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$use_high_contrast: false;
-$use_responsive_layout: true;
+const BUTTON_AND_ICON_PARAM = 'buttons_and_icons'
+
+export default function buildDownloadUrl(url) {
+  let downloadUrl
+
+  try {
+    downloadUrl = new URL(url)
+  } catch (e) {
+    throw `Error parsing ${url}. 'buildButtonAndIconURL' only supports absolute URLs.`
+  }
+
+  downloadUrl.searchParams.append(BUTTON_AND_ICON_PARAM, 1)
+
+  return downloadUrl.toString()
+}

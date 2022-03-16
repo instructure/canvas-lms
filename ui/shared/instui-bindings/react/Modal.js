@@ -77,9 +77,11 @@ export default function CanvasModal({
             <Heading>{title}</Heading>
           </Flex.Item>
           <Flex.Item>
-            <CloseButton onClick={onDismiss} size={closeButtonSize}>
-              {I18n.t('Close')}
-            </CloseButton>
+            <CloseButton
+              onClick={onDismiss}
+              size={closeButtonSize}
+              screenReaderLabel={I18n.t('Close')}
+            />
           </Flex.Item>
         </Flex>
       </Modal.Header>

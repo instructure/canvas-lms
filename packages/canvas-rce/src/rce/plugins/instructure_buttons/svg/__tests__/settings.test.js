@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fetchMock from 'fetch-mock'
 import {useSvgSettings, svgFromUrl, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
@@ -44,7 +45,7 @@ describe('useSvgSettings()', () => {
         encodedImageType: '',
         encodedImageName: '',
         outlineColor: null,
-        outlineSize: 'none',
+        outlineSize: 'small',
         text: '',
         textSize: 'small',
         textColor: '#000000',
@@ -91,7 +92,7 @@ describe('useSvgSettings()', () => {
           encodedImageType: '',
           encodedImageName: '',
           outlineColor: null,
-          outlineSize: 'none',
+          outlineSize: 'small',
           text: '',
           textSize: 'small',
           textColor: '#000000',
@@ -113,10 +114,16 @@ describe('useSvgSettings()', () => {
     beforeEach(() => {
       editing = true
 
+      ENV = {
+        COURSE_ID: 23,
+        DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
+      }
+
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" data-download=url="https://canvas.instructure.com/download" alt="a red circle" />'
+        '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
       )
+
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
 
       // Stub fetch to return an SVG file
@@ -148,11 +155,72 @@ describe('useSvgSettings()', () => {
 
     afterEach(() => jest.resetAllMocks())
 
-    it('fetches the SVG file', () => {
+    it('fetches the SVG file, specifying the course ID and timestamp', () => {
       subject()
       expect(global.fetch).toHaveBeenCalledWith(
-        ed.selection.getNode().getAttribute('data-download-url')
+        expect.stringMatching(
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+        )
       )
+    })
+
+    describe('when the download URL contains a course ID', () => {
+      beforeEach(() => {
+        ed.setContent(
+          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="courses/2/files/1/download" alt="a red circle" />'
+        )
+        ed.setSelectedNode(ed.dom.select('#test-image')[0])
+      })
+
+      it('fetches the SVG file using the /files/:file_id/download endpoint', () => {
+        subject()
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          )
+        )
+      })
+    })
+
+    describe('with a relative download URL', () => {
+      beforeEach(() => {
+        ed.setContent(
+          '<img id="test-image" data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" />'
+        )
+        ed.setSelectedNode(ed.dom.select('#test-image')[0])
+      })
+
+      it('fetches the SVG file, specifying the course ID and timestamp', () => {
+        subject()
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          )
+        )
+      })
+    })
+
+    describe('with a containing element selected', () => {
+      beforeEach(() => {
+        ENV = {
+          COURSE_ID: 23,
+          DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
+        }
+
+        ed.setContent(
+          '<p id="containing"><img data-inst-buttons-and-icons="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>'
+        )
+        ed.setSelectedNode(ed.dom.select('#containing')[0])
+      })
+
+      it('fetches the SVG file, specifying the course ID and timestamp', () => {
+        subject()
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          )
+        )
+      })
     })
 
     it('parses the SVG settings from the SVG metadata', async () => {
@@ -227,7 +295,7 @@ describe('useSvgSettings()', () => {
           encodedImageType: '',
           encodedImageName: '',
           outlineColor: null,
-          outlineSize: 'none',
+          outlineSize: 'small',
           text: '',
           textSize: 'small',
           textColor: '#000000',
@@ -260,7 +328,7 @@ describe('useSvgSettings()', () => {
           encodedImageType: '',
           encodedImageName: '',
           outlineColor: null,
-          outlineSize: 'none',
+          outlineSize: 'small',
           text: '',
           textSize: 'small',
           textColor: '#000000',
@@ -275,6 +343,85 @@ describe('useSvgSettings()', () => {
           transform: ''
         })
       })
+    })
+  })
+
+  describe('when an existing button is edited while the tray is already open', () => {
+    beforeEach(() => {
+      editing = true
+
+      // Add an image to the editor and select it
+      ed.setContent(`
+        <img id="test-image-1" src="https://canvas.instructure.com/svg1"
+          data-inst-buttons-and-icons="true"
+          data-download-url="https://canvas.instructure.com/files/1/download" />
+        <img id="test-image-2" src="https://canvas.instructure.com/svg2"
+          data-inst-buttons-and-icons="true"
+          data-download-url="https://canvas.instructure.com/files/2/download" />
+      `)
+
+      fetchMock.mock('begin:https://domain.from.env/files/1/download', {
+        body: `
+          <svg height="100" width="100">
+            <metadata>
+              {
+                "name":"Test Image 1",
+                "alt":"the first test image",
+                "shape":"triangle",
+                "size":"large",
+                "color":"#FF2717",
+                "outlineColor":"#06A3B7",
+                "outlineSize":"small",
+                "text":"Some Text",
+                "textSize":"medium",
+                "textColor":"#009606",
+                "textBackgroundColor":"#06A3B7",
+                "textPosition":"middle"
+              }
+            </metadata>
+            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+          </svg>`
+      })
+
+      fetchMock.mock('begin:https://domain.from.env/files/2/download', {
+        body: `
+          <svg height="100" width="100">
+            <metadata>
+              {
+                "name":"Test Image 2",
+                "alt":"the second test image",
+                "shape":"square",
+                "size":"medium",
+                "color":"#FF2717",
+                "outlineColor":"#06A3B7",
+                "outlineSize":"small",
+                "text":"Some Text",
+                "textSize":"medium",
+                "textColor":"#009606",
+                "textBackgroundColor":"#06A3B7",
+                "textPosition":"middle"
+              }
+            </metadata>
+            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+          </svg>`
+      })
+    })
+
+    afterEach(() => fetchMock.reset())
+
+    it('loads the correct metadata', async () => {
+      const {result, rerender, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing))
+
+      ed.setSelectedNode(ed.dom.select('#test-image-1')[0])
+      rerender()
+      await waitForValueToChange(() => result.current)
+
+      ed.setSelectedNode(ed.dom.select('#test-image-2')[0])
+      rerender()
+      await waitForValueToChange(() => result.current)
+
+      expect(result.current[0].name).toEqual('Test Image 2')
+      expect(result.current[0].shape).toEqual('square')
     })
   })
 })

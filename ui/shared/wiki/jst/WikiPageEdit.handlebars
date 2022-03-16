@@ -5,7 +5,7 @@
         <h1>{{title}}</h1>
         <input name="title" type="hidden" value="{{title}}">
       {{else}}
-        <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
+        <label for="title">{{#t "title_label"}}Page Title{{/t}}</label>
         <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
       {{/if}}
     {{else}}

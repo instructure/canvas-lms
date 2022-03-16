@@ -17,7 +17,7 @@
  */
 import {arrayOf, func, string} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -81,12 +81,20 @@ const renderPreferenceMenuItem = preferenceConfig => (
   </Flex>
 )
 
-const NotificationPreferencesSetting = props => {
-  const [selection, setSelection] = useState(props.selectedPreference)
+const NotificationPreferencesSetting = ({
+  selectedPreference,
+  preferenceOptions,
+  updatePreference
+}) => {
+  const [selection, setSelection] = useState(selectedPreference)
+
+  useEffect(() => {
+    setSelection(selectedPreference)
+  }, [selectedPreference])
 
   const handleUpdate = value => {
     setSelection(value)
-    props.updatePreference(value)
+    updatePreference(value)
   }
 
   const preferenceConfig = preferenceConfigs[selection]
@@ -96,7 +104,7 @@ const NotificationPreferencesSetting = props => {
       disabled={selection === 'disabled'}
       onSelect={(e, value) => handleUpdate(value)}
     >
-      {props.preferenceOptions.map(option => (
+      {preferenceOptions.map(option => (
         <Menu.Item key={option} value={option} selected={option === selection}>
           {renderPreferenceMenuItem(preferenceConfigs[option])}
         </Menu.Item>

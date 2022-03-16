@@ -52,28 +52,27 @@ const makeProps = async overrides => {
 }
 
 // LS-1339  created to figure out why these are failing
-
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('MediaAttempt', () => {
+describe('MediaAttempt', () => {
   describe('unsubmitted', () => {
-    it('renders the upload tab by default', async () => {
+    it('renders record and upload buttons', async () => {
       const props = await makeProps()
-      const {getByText} = render(<MediaAttempt {...props} />)
-      expect(getByText('Record/Upload')).toBeInTheDocument()
-      expect(getByText('Add Media')).toBeInTheDocument()
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('open-record-media-modal-button')).toBeInTheDocument()
+      expect(getByTestId('open-upload-media-modal-button')).toBeInTheDocument()
     })
 
-    it('moves focus to the media modal button after render if focusOnInit is true', async () => {
+    it('moves focus to the record media modal button after render if focusOnInit is true', async () => {
       const props = await makeProps()
       props.focusOnInit = true
       const {getByTestId} = render(<MediaAttempt {...props} />)
-      expect(getByTestId('media-modal-launch-button')).toHaveFocus()
+      expect(getByTestId('open-record-media-modal-button')).toHaveFocus()
     })
 
-    it('enables media modal button for students', async () => {
+    it('enables media modal buttons for students', async () => {
       const props = await makeProps()
       const {getByTestId} = render(<MediaAttempt {...props} />)
-      expect(getByTestId('media-modal-launch-button')).not.toBeDisabled()
+      expect(getByTestId('open-record-media-modal-button')).not.toBeDisabled()
+      expect(getByTestId('open-upload-media-modal-button')).not.toBeDisabled()
     })
 
     it('disables media modal button for observers', async () => {
@@ -83,22 +82,24 @@ describe.skip('MediaAttempt', () => {
           <MediaAttempt {...props} />
         </StudentViewContext.Provider>
       )
-      expect(getByTestId('media-modal-launch-button')).toBeDisabled()
+      expect(getByTestId('open-record-media-modal-button')).toBeDisabled()
+      expect(getByTestId('open-upload-media-modal-button')).toBeDisabled()
     })
 
     it('does not move focus to the media modal button after render if focusOnInit is false', async () => {
       const props = await makeProps()
       const {getByTestId} = render(<MediaAttempt {...props} />)
-      expect(getByTestId('media-modal-launch-button')).not.toHaveFocus()
+      expect(getByTestId('open-record-media-modal-button')).not.toHaveFocus()
+      expect(getByTestId('open-upload-media-modal-button')).not.toHaveFocus()
     })
 
-    it('renders the current submission draft', async () => {
+    it.skip('renders the current submission draft', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('media-recording')).toBeInTheDocument()
     })
 
-    it('removes the current submission draft when the media is removed', async () => {
+    it.skip('removes the current submission draft when the media is removed', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       const trashButton = getByTestId('remove-media-recording')
@@ -114,7 +115,7 @@ describe.skip('MediaAttempt', () => {
     })
   })
 
-  describe('submitted', () => {
+  describe.skip('submitted', () => {
     it('renders the current submission', async () => {
       const props = await makeProps({
         Submission: {

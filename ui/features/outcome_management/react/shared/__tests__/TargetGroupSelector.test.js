@@ -57,10 +57,15 @@ describe('TargetGroupSelector', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      mocks = accountMocks({childGroupsCount: 0}),
+      treeBrowserRootGroupId = '1'
+    } = {}
   ) => {
     return realRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, treeBrowserRootGroupId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>

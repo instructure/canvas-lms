@@ -25,7 +25,7 @@ export default function setDefaultToolValues(result, tool) {
 
   window.postMessage(
     {
-      messageType: 'defaultToolContentReady',
+      subject: 'defaultToolContentReady',
       content: result
     },
     ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN

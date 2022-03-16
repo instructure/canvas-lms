@@ -121,15 +121,39 @@ describe Lti::LtiAdvantageAdapter do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end
 
-    it "creates a login message" do
-      expect(login_message.keys).to match_array %w[
-        iss
-        login_hint
-        target_link_uri
-        lti_message_hint
-        canvas_region
-        client_id
-      ]
+    context "when lti_platform_storage flag is disabled" do
+      before do
+        Account.site_admin.disable_feature! :lti_platform_storage
+      end
+
+      it "creates a login message" do
+        expect(login_message.keys).to match_array %w[
+          iss
+          login_hint
+          target_link_uri
+          lti_message_hint
+          canvas_region
+          client_id
+        ]
+      end
+    end
+
+    context "when lti_platform_storage flag is enabled" do
+      before do
+        Account.site_admin.enable_feature! :lti_platform_storage
+      end
+
+      it "creates a login message" do
+        expect(login_message.keys).to match_array %w[
+          iss
+          login_hint
+          target_link_uri
+          lti_message_hint
+          canvas_region
+          client_id
+          lti_storage_target
+        ]
+      end
     end
 
     it 'sets the "login_hint" to the current user LTI ID' do

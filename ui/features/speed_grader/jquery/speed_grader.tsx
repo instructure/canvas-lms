@@ -254,6 +254,12 @@ function unexcuseSubmission(grade, submission, assignment) {
   return grade === '' && submission.excused && assignment.grading_type === 'pass_fail'
 }
 
+// anonymous_name is preferred and will be available for all anonymous
+// assignments. Fall back to naming based on index for assignments that are not
+// anonymous, but the teacher has selected to 'Hide Student Names' in SpeedGrader.
+const anonymousName = student =>
+  student.anonymous_name || I18n.t('Student %{number}', {number: student.index + 1})
+
 const utils = {
   getParam(name) {
     const pathRegex = new RegExp(`${name}/([^/]+)`)
@@ -457,7 +463,7 @@ function initDropdown() {
     let {name} = student
     const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
     if (hideStudentNames || isAnonymous) {
-      name = I18n.t('Student %{number}', {number: student.index + 1})
+      name = anonymousName(student)
     }
 
     return {[anonymizableId]: student[anonymizableId], anonymizableId, name, className}
@@ -1493,7 +1499,7 @@ EG = {
   getStudentNameAndGrade: (student = EG.currentStudent) => {
     let studentName
     if (utils.shouldHideStudentNames()) {
-      studentName = I18n.t('student_index', 'Student %{index}', {index: student.index + 1})
+      studentName = anonymousName(student)
     } else {
       studentName = student.name
     }
@@ -3018,8 +3024,7 @@ EG = {
     hideStudentName =
       opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]]
     if (hideStudentName) {
-      const {index} = window.jsonData.studentMap[comment[anonymizableAuthorId]]
-      comment.author_name = I18n.t('Student %{position}', {position: index + 1})
+      comment.author_name = anonymousName(window.jsonData.studentMap[comment[anonymizableAuthorId]])
     }
     // anonymous commentors
     if (comment.author_name == null) {
@@ -3299,6 +3304,7 @@ EG = {
         }
         return historySubmission.attempt === submission.attempt
       }) || 0
+    const foundMatchingSubmission = historyIndex !== -1
     historyIndex = historyIndex === -1 ? 0 : historyIndex
 
     if (typeof submission.submission_history === 'undefined') {
@@ -3306,8 +3312,14 @@ EG = {
       submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
     }
 
-    // update the nested submission in submission_history if needed
-    if (student.submission?.submission_history?.[historyIndex]?.submission) {
+    // update the nested submission in submission_history if needed, assuming we
+    // could map the submission we got to a specific attempt (notably, with
+    // Quizzes.Next submissions and possibly other LTIs we don't get an
+    // "attempt" field)
+    if (
+      foundMatchingSubmission &&
+      student.submission?.submission_history?.[historyIndex]?.submission
+    ) {
       const versionedAttachments =
         submission.submission_history[historyIndex].submission?.versioned_attachments || []
       submission.submission_history[historyIndex].submission = $.extend(

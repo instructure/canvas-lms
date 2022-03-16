@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {
   IconMoreLine,
   IconEditLine,
@@ -48,9 +48,12 @@ const OutcomeKebabMenu = ({
   return (
     <Menu
       trigger={
-        <Button variant="icon" icon={IconMoreLine}>
-          <ScreenReaderContent>{menuTitle || I18n.t('Menu')}</ScreenReaderContent>
-        </Button>
+        <IconButton
+          renderIcon={IconMoreLine}
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={menuTitle || I18n.t('Menu')}
+        />
       }
       onSelect={onMenuHandler}
     >

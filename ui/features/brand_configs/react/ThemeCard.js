@@ -152,7 +152,7 @@ export default function ThemeCard(props) {
           <Modal.Footer>
             <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>
             &nbsp;
-            <Button variant="primary" type="submit">
+            <Button color="primary" type="submit">
               {I18n.t('Delete')}
             </Button>
           </Modal.Footer>

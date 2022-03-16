@@ -57,7 +57,7 @@ describe "speed grader - rubrics" do
     f('td[data-testid="criterion-points"] input').send_keys("3")
     expand_right_pane
     ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Amazing" }.click
-    f('svg[name="IconFeedback"]').find_element(:xpath, "../../parent::button").click
+    driver.execute_script(%(document.querySelector('svg[name="IconFeedback"]').parentElement.click()))
     f("textarea[data-selenium='criterion_comments_text']").send_keys("special rubric comment")
     wait_for_ajaximations
     expect(f("span[data-selenium='rubric_total']")).to include_text("8")

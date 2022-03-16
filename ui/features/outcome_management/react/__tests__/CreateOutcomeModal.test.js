@@ -53,7 +53,8 @@ describe('CreateOutcomeModal', () => {
       individualOutcomeRatingAndCalculationFF = false,
       mocks = accountMocks({childGroupsCount: 0}),
       isMobileView = false,
-      renderer = rtlRender
+      renderer = rtlRender,
+      treeBrowserRootGroupId = '1'
     } = {}
   ) => {
     return renderer(
@@ -64,7 +65,8 @@ describe('CreateOutcomeModal', () => {
             contextId,
             friendlyDescriptionFF,
             individualOutcomeRatingAndCalculationFF,
-            isMobileView
+            isMobileView,
+            treeBrowserRootGroupId
           }
         }}
       >

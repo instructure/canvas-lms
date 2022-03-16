@@ -134,9 +134,12 @@ export default function UserSuspendLink() {
     return (
       <Modal size="small" open={modalIsOpen} onDismiss={onModalCancel} label={modalLabel}>
         <Modal.Header>
-          <CloseButton placement="end" offset="medium" onClick={onModalCancel}>
-            {I18n.t('Cancel')}
-          </CloseButton>
+          <CloseButton
+            placement="end"
+            offset="medium"
+            onClick={onModalCancel}
+            screenReaderLabel={I18n.t('Cancel')}
+          />
           <Heading>{modalLabel}</Heading>
         </Modal.Header>
 

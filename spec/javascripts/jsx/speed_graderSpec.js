@@ -1467,12 +1467,14 @@ QUnit.module('SpeedGrader', rootHooks => {
           index: 0,
           id: 4,
           name: 'Guy B. Studying',
+          anonymous_name: 'Student 1',
           submission_state: 'not_graded'
         },
         {
           index: 1,
           id: 12,
           name: 'Sil E. Bus',
+          anonymous_name: 'Student 2',
           submission_state: 'graded'
         }
       ]
@@ -3911,8 +3913,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       anonymousHooks.beforeEach(() => {
         assignment = {anonymize_students: true}
         originalJsonData = window.jsonData
-        alpha = {anonymous_id: '00000'}
-        omega = {anonymous_id: 'zzzzz'}
+        alpha = {anonymous_id: '00000', anonymous_name: 'Student 1'}
+        omega = {anonymous_id: 'zzzzz', anonymous_name: 'Student 2'}
         alphaStudent = {
           ...alpha,
           submission_history: [],
@@ -5003,6 +5005,18 @@ QUnit.module('SpeedGrader', rootHooks => {
           delete alphaSubmission.versioned_attachments
           const {submission} = SpeedGrader.EG.setOrUpdateSubmission(alphaSubmission)
           deepEqual(submission.submission_history[0].versioned_attachments, versionedAttachments)
+        })
+
+        test('does not thoughtlessly alter the submission field of the first attempt of the existing submission object if the passed-in submission has no attempt field', () => {
+          alphaSubmission.submission_history[0].submission = {grade: 'please spare me'}
+
+          const fakeSubmission = {
+            ...alphaSubmission,
+            score: '10'
+          }
+          SpeedGrader.EG.setOrUpdateSubmission(fakeSubmission)
+
+          strictEqual(alphaSubmission.submission_history[0].submission.grade, 'please spare me')
         })
       })
 

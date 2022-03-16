@@ -207,6 +207,7 @@ describe "calendar2" do
     describe "main calendar" do
       it "displays in Spanish" do
         skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]
+        skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
         date = Date.new(2012, 7, 12)
         # Use event to  open to a specific and testable month
         event = calendar_event_model(title: "Test Event", start_at: date, end_at: (date + 1.hour))

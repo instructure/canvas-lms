@@ -25,12 +25,14 @@ import {TeacherAssignmentShape, SubmissionShape} from '../../assignmentData'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Table} from '@instructure/ui-table'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import SubmissionStatusPill from '@canvas/assignments/react/SubmissionStatusPill'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import StudentTray from './StudentTray'
+
+import {Link} from '@instructure/ui-link'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
@@ -124,14 +126,14 @@ export default class StudentsTable extends React.Component {
       const viewLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}&student_id=${student.lid}&attempt=${attempt.attempt}`
       return (
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
-          <Button
+          <Link
             href={viewLink}
+            isWithinText={false}
             target="_blank"
-            variant="link"
             theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {I18n.t('Attempt %{number}', {number: attempt.attempt})}
-          </Button>
+          </Link>
         </View>
       )
     })
@@ -181,15 +183,15 @@ export default class StudentsTable extends React.Component {
 
   renderTrayButton(student) {
     return (
-      <Button
-        variant="icon"
-        icon={<IconExpandStartLine rotate="180" />}
+      <IconButton
+        renderIcon={<IconExpandStartLine rotate="180" />}
+        withBackground={false}
+        withBorder={false}
         data-student-id={student.lid}
         ref={b => (this.trayButton = b)}
         onClick={this.handleTrayOpen}
-      >
-        <ScreenReaderContent>{I18n.t('Open student context tray')}</ScreenReaderContent>
-      </Button>
+        screenReaderLabel={I18n.t('Open student context tray')}
+      />
     )
   }
 

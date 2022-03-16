@@ -405,16 +405,59 @@ describe FilesController do
       expect(response).to be_redirect
     end
 
-    it "finds overwritten files" do
-      @old_file = @course.attachments.build(display_name: "old file")
-      @old_file.file_state = "deleted"
-      @old_file.replacement_attachment = @file
-      @old_file.save!
+    context "when the attachment has been overwritten" do
+      subject do
+        get "show", params: params
+        response
+      end
 
-      user_session(@teacher)
-      get "show", params: { course_id: @course.id, id: @old_file.id, preview: 1 }
-      expect(response).to be_redirect
-      expect(response.location).to match(%r{/courses/#{@course.id}/files/#{@file.id}})
+      let(:old_file) do
+        old = @course.attachments.build(display_name: "old file")
+        old.file_state = "deleted"
+        old.replacement_attachment = file
+        old.save!
+        old
+      end
+
+      let(:file) { @file }
+      let(:params) { { course_id: @course.id, id: old_file.id, preview: 1 } }
+
+      before { user_session(@teacher) }
+
+      it "finds overwritten files" do
+        expect(subject).to be_redirect
+        expect(subject.location).to match(%r{/courses/#{@course.id}/files/#{file.id}})
+      end
+
+      context "and no context is given" do
+        let(:params) { { id: old_file.id, preview: 1 } }
+
+        it "does not find the file" do
+          expect(subject).to be_not_found
+        end
+
+        context "but a replacement_chain_context is given" do
+          let(:params) do
+            {
+              id: old_file.id,
+              preview: 1,
+              replacement_chain_context_type: "course",
+              replacement_chain_context_id: @course.id
+            }
+          end
+
+          it "find the new file" do
+            expect(subject).to be_redirect
+
+            location = URI.parse(subject.location)
+            query = CGI.parse(location.query)
+
+            expect(location.path).to eq "/files/#{file.id}/download"
+            expect(query["download_frd"]).to eq ["1"]
+            expect(query["sf_verifier"]).to be_present
+          end
+        end
+      end
     end
 
     describe "as a student" do

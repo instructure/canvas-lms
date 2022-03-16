@@ -125,6 +125,8 @@ module CC::Exporter::WebZip
     end
 
     def string_to_symbol_type(type)
+      return if type.nil?
+
       case type
       when "pages"
         :wiki_pages

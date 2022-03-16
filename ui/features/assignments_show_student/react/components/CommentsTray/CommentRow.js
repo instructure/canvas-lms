@@ -28,6 +28,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
 
+import {Link} from '@instructure/ui-link'
+
 export default function CommentRow(props) {
   const {author, mediaObject, read} = props.comment
   let mediaTracks = null
@@ -77,15 +79,15 @@ export default function CommentRow(props) {
           {props.comment.comment}
         </Text>
         {props.comment.attachments.map(attachment => (
-          <Button
-            variant="link"
+          <Link
             key={attachment._id}
             href={attachment.url}
-            icon={getIconByType(attachment.mimeClass)}
+            isWithinText={false}
+            renderIcon={getIconByType(attachment.mimeClass)}
             theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {attachment.displayName}
-          </Button>
+          </Link>
         ))}
         {mediaObject && <MediaPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />}
       </div>

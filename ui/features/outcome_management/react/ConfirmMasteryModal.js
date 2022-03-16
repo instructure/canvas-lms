@@ -59,7 +59,7 @@ export default class ConfirmMasteryModal extends Component {
         <Modal.Footer>
           <Button onClick={this.onClose}>{I18n.t('Cancel')}</Button>
           &nbsp;
-          <Button onClick={this.onConfirm} variant="primary">
+          <Button onClick={this.onConfirm} color="primary">
             {this.props.confirmButtonText}
           </Button>
         </Modal.Footer>

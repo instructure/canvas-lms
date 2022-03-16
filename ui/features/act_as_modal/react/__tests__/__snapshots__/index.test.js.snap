@@ -560,7 +560,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             >
               <Button
                 as="button"
-                buttonRef={[Function]}
+                color="primary"
                 cursor="pointer"
                 data-method="post"
                 display="inline-block"
@@ -571,7 +571,6 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                 size="medium"
                 textAlign="center"
                 type="button"
-                variant="primary"
                 withBackground={true}
               >
                 Proceed

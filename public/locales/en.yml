@@ -1,12 +1,10 @@
 ---
 en:
   1_item_scores_5512cd03: 1- Item scores
-  1_item_scores_example_item_scores_7345479: '1- Item Scores: Example item scores:'
   1_item_scores_examplescores_9736236: '1- Item Scores: %{exampleScores}'
   25th_75th_ile_406a67bf: 25th-75th %ile
   25th_75th_percentile_aa4c11f2: 25th-75th Percentile
   2_final_score_7b0fd15e: 2- Final score
-  2_final_score_example_final_score_80199132: '2- Final Score: Example final score:'
   2_final_score_exampleresult_922edf9c: '2- Final Score: %{exampleResult}'
   558x270_png_jpg_gif_c3faa839: 558x270 png, jpg, gif
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: 558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)
@@ -1540,7 +1538,6 @@ en:
   add_lti_ad9aaef2: Add LTI
   add_manage_conclude_delete_publish_reset_8a5aa902: add / manage / conclude / delete / publish / reset
   add_mastery_level_76469d98: Add Mastery Level
-  add_media_cfa37b54: Add Media
   add_more_e1ffaa65: Add More
   add_name_db699e72: Add %{name}
   add_new_announcement_ddacd624: Add New Announcement
@@ -1809,7 +1806,7 @@ en:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu.
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: Allows instructors to apply scores to ungraded submissions en masse from assignment group and Total column menus in the Gradebook.
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: Allows learning outcomes to be selectable when migrating course content
-  allows_modifying_notification_settings_for_any_cou_5004ac71: Allows modifying notification settings for any course from within the account-level notification settings page.
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting).
   allows_setting_account_course_level_mastery_scales_1939e0fd: Allows setting Account & Course Level mastery scales and calculation methods, replacing per-outcome criterion ratings & calculation methods
   allows_setting_criterion_ratings_and_calculation_m_24542321: Allows setting criterion ratings and calculation method options for individual outcomes.
   allows_students_to_access_other_student_groups_wit_43918810: Allows students to access other student groups within a group set with a direct link.
@@ -2416,6 +2413,7 @@ en:
   applied_cc7be774: Applied
   applied_filters_63a90ccd: 'Applied Filters:'
   apply_781a2546: Apply
+  apply_conditions_9e941010: Apply conditions
   apply_date_range_selection_cc4351ed: Apply date range selection
   apply_filter_7e4f6113: Apply filter
   apply_filters_note_clicking_this_button_will_cause_753f04: 'Apply filters. Note: clicking this button will cause the page to reload.'
@@ -4058,7 +4056,6 @@ en:
   canvas_files_889a274f: Canvas Files
   canvas_for_elementary_analytics_15dc1e07: Canvas for Elementary Analytics
   canvas_for_elementary_e6f5a06f: Canvas for Elementary
-  canvas_for_elementary_parent_support_74a2356e: 'Canvas for Elementary: Parent Support'
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   canvas_guides_d65431: Canvas Guides
@@ -4282,6 +4279,7 @@ en:
   close_student_details_2f6900: Close student details
   close_submission_tray_c4988fa8: Close submission tray
   close_suggestions_6fcb4985: Close suggestions
+  close_the_window_and_try_again_7353f8e: Close the window and try again.
   close_warning_d61daf2c: Close warning
   closed_for_comments_e395b42f: Closed for Comments
   closes_5c6b4367: 'Closes:'
@@ -4407,7 +4405,6 @@ en:
   collapse_subdiscussion_89af1f5c: Collapse Subdiscussion
   collapse_tutorial_tray_66ee7dc1: Collapse tutorial tray
   collapsed_510aa02a: Collapsed
-  collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
   colombia_57_c6c75620: Colombia (+57)
   color_a363e1b0: Color
   color_color_for_mastery_level_position_35079de: Color %{color} for mastery level %{position}
@@ -4619,7 +4616,6 @@ en:
     releases_beta_test_schedule: https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments
     resource_course_content_distribution_comparison: https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051
     resource_pairing_codes_faq: https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738
-  community_releases_beta_test_schedule_e080d4d4: "#community.releases_beta_test_schedule"
   complete_4f4efbc: complete
   complete_all_items_e1779257: Complete All Items
   complete_fd828dea: Complete
@@ -7606,7 +7602,6 @@ en:
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: Enables modal to warn user when a draft comment is left unposted in SpeedGrader.
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: Enables new API endpoints for the course and user data provided by New Analytics.
-  enables_support_for_observers_within_canvas_for_el_c5e31b5b: Enables support for observers within Canvas for Elementary.
   enables_the_course_templates_feature_globally_79d5302f: Enables the Course Templates feature globally
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: Enables the Microsoft Immersive Reader button in supported areas of Canvas. The button may still be enabled in a course regardless of this setting if the account administrator has turned it on for all users.
   enabling_the_elementary_theme_will_change_the_font_c944b619: Enabling the Elementary Theme will change the font in the Canvas interface and simplify the Course Navigation Menu for all users in your course.
@@ -7618,6 +7613,7 @@ en:
   end_date_e0093ed7: End Date
   end_date_from_cdd9d90: 'End Date From:'
   end_date_to_8b17929d: 'End Date To:'
+  end_date_value_3d3e8906: End Date %{value}
   end_dates_249d8dbb: 'End Dates:'
   end_dates_cannot_be_before_start_dates_d6018daf: End dates cannot be before start dates
   end_time_250391e8: End Time
@@ -8212,6 +8208,7 @@ en:
   failed_getting_next_batch_of_announcements_1f1165a5: Failed getting next batch of announcements.
   failed_initializing_dashboard_3d967143: Failed initializing dashboard
   failed_jobs_b632bbf0: Failed jobs
+  failed_loading_course_cards_8fcdb36d: Failed loading course cards
   failed_loading_course_sections_refresh_page_to_try_f97160bf: Failed loading course sections. Refresh page to try again.
   failed_pairing_student_c9f0863b: Failed pairing student.
   failed_please_report_the_following_error_code_to_y_42248d60: 'Failed, please report the following error code to your system administrator: ErrorReport:%{error};'
@@ -10201,11 +10198,6 @@ en:
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: Keep in mind, this submission will count for everyone in your %{groupType} group.
   keep_students_informed_3f41a7e6: Keep students informed
   keep_submissions_anonymous_5cbaf419: Keep Submissions Anonymous
-  keep_track_of_which_settings_page_tab_you_are_on_s_2424ab91: |-
-    Keep track of which Settings page tab you are on
-    so the browser's back button takes you to your previous
-    tab, and that refreshing the page will return you to
-    the current active tab.
   kenya_254_2945663a: Kenya (+254)
   key_api_key_68bf80ae: 'Key: *%{api_key}*'
   key_f2a919d5: Key
@@ -13463,7 +13455,6 @@ en:
   notification_policies_requires_the_communication_c_2e7ded08: Notification policies requires the communication channel id, the notification category, and the frequency to update
   notification_preferences_cf47083d: Notification Preferences
   notification_settings_652dc60b: Notification Settings
-  notification_settings_course_selector_ff07468b: 'Notification settings: Course selector'
   notifications_cbfa7704: Notifications
   notifications_off_80da021c: Notifications off
   notifications_search_results_80a0b06f: Notifications Search Results
@@ -13734,6 +13725,7 @@ en:
   outcome_results_23a0a117: Outcome Results
   outcome_results_title: Outcome Results
   outcome_score_141cf00a: outcome score
+  outcome_service_results_to_canvas_reporting_749667bc: Outcome Service Results to Canvas Reporting
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: 'Outcome: %{title} has a status of %{statusTooltip}'
   outcome_with_canvas_id_id_not_found_215c5227: Outcome with canvas id "%{id}" not found
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: Outcome with ID %{guid} already exists in another unrelated course or account (%{name})
@@ -13880,12 +13872,15 @@ en:
   page_title_ascending_b5df950c: 'Page title: Ascending'
   page_title_descending_70c1483d: 'Page title: Descending'
   page_views:
-    browsers:
-      unrecognized: Unrecognized Browser
     download_filename: Pageviews For %{user}
     table:
       headers:
+        date: Date
+        participated: Participated
+        time: Time
         url: URL
+        user_agent: User Agent
+  page_views_csv_9835a9f9: page views csv
   page_views_eb64cf53: Page Views
   page_views_only_312b7577: Page Views Only
   page_views_service_is_temporarily_unavailable_2eb4818: Page Views service is temporarily unavailable
@@ -13947,6 +13942,7 @@ en:
   pairing_codes_are_only_supported_when_self_registr_af82b9bc: Pairing codes are only supported when self registration is enabled for the account.
   pakistan_92_da28c36: Pakistan (+92)
   panama_507_831fbc99: Panama (+507)
+  panda_taking_photograph_8db13e0f: panda taking photograph
   paper_view_7405eeab: Paper View
   paraguay_595_ca58b83a: Paraguay (+595)
   parameter_91ed199: Parameter
@@ -16293,7 +16289,6 @@ en:
   record_audio_video_d9993f6c: Record Audio/Video
   record_media_6637ff19: Record Media
   record_not_found_da7857e9: Record not found
-  record_upload_35dfb2ab: Record/Upload
   record_upload_media_comment_4d01b943: Record/Upload Media Comment
   record_with_microphone_only_e4ee07aa: Record with Microphone Only
   record_with_webcam_af21e07c: Record with Webcam
@@ -16377,7 +16372,6 @@ en:
   remember_course_navigation_collapsed_state_60fe6c95: Remember Course Navigation Collapsed State
   remember_my_choice_for_this_course_5a3b7206: Remember my choice for this course
   remember_whether_module_links_load_in_new_tab_91fccb4f: Remember Whether Module Links Load in New Tab
-  remember_your_settings_page_tab_a081121d: Remember your settings page tab
   remove_account_from_this_profile_c3095eb2: Remove account from this profile
   remove_all_course_observer_members_4622c70d: Remove All Course Observer Members
   remove_as_frontpagetext_133cdaee: Remove as %{frontPageText}
@@ -16387,6 +16381,7 @@ en:
   remove_attribute_59a4aa64: Remove Attribute
   remove_avatar_picture_aba765eb: Remove avatar picture
   remove_collaborationtitle_c3e81adb: Remove "%{collaborationTitle}"?
+  remove_condition_9cf94f7f: Remove condition
   remove_conference_title_207d32c0: 'Remove conference: %{title}'
   remove_contact_method_ca890ba3: Remove contact method
   remove_course_association_name_b760c502: Remove course association %{name}
@@ -16555,10 +16550,7 @@ en:
       labels:
         enabled: Enabled (must enable QTI Converter as well)
   response_body_was_empty_c7034341: Response body was empty
-  responsive_awareness_226843a: Responsive Awareness
   responsive_global_nav_logo_99488e92: Responsive Global Nav Logo
-  responsive_layout_54e4ca06: Responsive Layout
-  responsive_misc_dc572cc0: Responsive Misc
   responsive_student_grades_page_324e9c8b: Responsive Student Grades Page
   restart_link_validation_b61286fc: Restart Link Validation
   restore_courses_182e162e: Restore Courses
@@ -16592,6 +16584,7 @@ en:
   review_feedback_4b4abb38: Review Feedback
   review_now_318a6a3e: Review Now
   right_sidebar_logo_5483dc0a: Right Sidebar Logo
+  rocketship_on_launchpad_4011ea8c: rocketship on launchpad
   role:
     duplicate_role: A role with this name already exists
   role_13a7be77: Role
@@ -18085,7 +18078,6 @@ en:
     recording_expired_message: Speech recognition has expired due to inactivity. Click the "Stop" button to use current text for comment or "Cancel" to discard.
     recording_message: Recording...
     student: Student
-    student_index: Student %{index}
     submissions_dropdown:
       grade: "(grade: %{grade})"
       see_all_quiz_attempts: See all quiz attempts
@@ -18177,6 +18169,7 @@ en:
   start_date_from_20503757: 'Start Date From:'
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} to %{end_time}"
   start_date_to_1e6e6bbe: 'Start Date To:'
+  start_date_value_817cab96: Start Date %{value}
   start_dates_8f1c22a8: 'Start Dates:'
   start_link_validation_dc0ac99c: Start Link Validation
   start_over_f7552aa9: Start Over
@@ -18224,7 +18217,6 @@ en:
   statuses_f41543d8: Statuses
   stemscopes_namespace_custom_data_87bcd65a: STEMScopes - Namespace Custom Data
   step: Step
-  sticky_left_navigation_3d438a81: Sticky Left Navigation
   still_having_difficulty_get_more_help_here_3cdc8de1: 'Still having difficulty? Get more help here:'
   stop_acting_as_user_8809a97f: Stop Acting as User
   storage_quotas_manage_6ca14bbb: Storage Quotas - manage
@@ -18304,7 +18296,6 @@ en:
   student_page_history_ce86b3c2: Student Page History
   student_paired_successfully_a88def61: Student paired successfully
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
-  student_position_6d3b7750: Student %{position}
   student_progress_custom_report_bc7593d4: Student Progress Custom Report
   student_progress_custom_report_proservices_119dffa6: Student Progress Custom Report (Proservices)
   student_progress_report_559c7963: Student Progress Report
@@ -18312,6 +18303,7 @@ en:
   student_sis_6721040e: Student Sis
   student_sis_d9f0cd39: student sis
   student_sis_id_abe6b292: student sis id
+  student_student_number_5c98bd2d: Student %{student_number}
   student_studentnumber_f398d9c2: Student %{studentNumber}
   student_submissions_910da1b3: Student Submissions
   student_submissions_report_prospect_education_108daf59: Student Submissions Report (Prospect Education)
@@ -18866,6 +18858,7 @@ en:
   the_app_was_added_successfully_3f785a23: The app was added successfully
   the_app_was_deactivated_573520ab: The app was deactivated
   the_app_was_updated_successfully_3d71cd1b: The app was updated successfully
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: The argument provided is expected to be of type boolean.
   the_assignment_group_id_to_report_on_83880208: The assignment group id to report on
   the_assignment_group_named_major_9d349037: The Assignment Group named major
   the_assignment_group_named_papers_e1cb6a34: The Assignment Group named papers
@@ -19283,6 +19276,11 @@ en:
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
     This feature flag enables Isolated View inside the new
     Discussions Redesign work.
+  this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
+    This feature option is only visible to users with Site Admin access.
+                                End users will not see it until enabled by a Site Admin user.
+                                Before enabling for an institution, please be sure you fully understand
+                                the functionality and possible impacts to users.
   this_field_is_required_fa58c4a: This field is required
   this_field_name_is_required_988caebc: This field "%{name}" is required.
   this_field_name_is_required_b9196401: This field "name" is required.
@@ -19309,7 +19307,6 @@ en:
   this_is_a_blueprint_course_5e7b47fe: This is a blueprint course
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: This is a comma separated list of URL's to trust. Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.
   this_is_a_course_template_99bbe698: This is a course template
-  this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: This is a feature to allow the development of a responsive layout
   this_is_a_media_comment_click_here_to_view_c297bf62: This is a media comment, *click here to view*.
   this_is_a_message_from_canvas_administration_dbd63778: This is a message from *Canvas Administration*
   this_is_a_message_from_name_ec0cdfac: This is a message from *%{name}*
@@ -19965,7 +19962,6 @@ en:
     originality_report_visible_after_due_date: After the Due Date
     originality_report_visible_after_grading: After the assignment is graded
     originality_report_visible_immediately: Immediately
-  turns_left_side_navigation_sidebar_sticky_333df56f: Turns left-side navigation sidebar sticky.
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: Type a date or use arrow keys to navigate date picker.
@@ -20881,6 +20877,7 @@ en:
   web_page_146f9102: Web page
   web_url_d84feaf5: Web URL
   webcam_fe91b20f: Webcam
+  webcam_photo_ee55462c: Webcam Photo
   webct_credentials:
     credential_not_found: Credential not found.
   webct_display: Blackboard Vista/CE (WebCT)

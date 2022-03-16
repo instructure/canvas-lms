@@ -64,7 +64,7 @@ describe('router', () => {
 
     describe('when LTI 1.3 message is received', () => {
       it('does nothing for non-deep-linking-messages', async () => {
-        window.postMessage({messageType: 'lol'}, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+        window.postMessage({subject: 'lol'}, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
         await sleep(100)
         expect(actions.externalContentReady).not.toHaveBeenCalled()
         expect(actions.externalContentRetrievalFailed).not.toHaveBeenCalled()
@@ -74,7 +74,7 @@ describe('router', () => {
         const item = {service_id: 1, hello: 'world'}
         window.postMessage(
           {
-            messageType: 'LtiDeepLinkingResponse',
+            subject: 'LtiDeepLinkingResponse',
             content_items: [item]
           },
           ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN

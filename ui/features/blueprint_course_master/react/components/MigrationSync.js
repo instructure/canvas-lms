@@ -110,7 +110,7 @@ export default class MigrationSync extends Component {
         )}
         <div className="bcs__migration-sync__button">
           <Button
-            variant="primary"
+            color="primary"
             onClick={this.handleSyncClick}
             ref={c => {
               this.syncBtn = c

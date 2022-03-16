@@ -23,14 +23,15 @@ require "account_reports/report_helper"
 module AccountReports
   class OutcomeExport
     include ReportHelper
+    include Outcomes::OutcomeFriendlyDescriptionResolver
 
     def initialize(account_report)
       @account_report = account_report
       include_deleted_objects
     end
 
-    NO_SCORE_HEADERS = %w[vendor_guid object_type title description display_name parent_guids workflow_state].freeze
-    OUTCOME_EXPORT_SCALAR_HEADERS = %w[vendor_guid object_type title description display_name calculation_method calculation_int parent_guids workflow_state mastery_points].freeze
+    NO_SCORE_HEADERS = %w[vendor_guid object_type title description friendly_description display_name parent_guids workflow_state].freeze
+    OUTCOME_EXPORT_SCALAR_HEADERS = %w[vendor_guid object_type title description friendly_description display_name calculation_method calculation_int parent_guids workflow_state mastery_points].freeze
     OUTCOME_EXPORT_HEADERS = (OUTCOME_EXPORT_SCALAR_HEADERS + ["ratings"]).freeze
 
     def outcome_export
@@ -137,12 +138,15 @@ module AccountReports
 
     def export_outcomes(csv, headers, include_ratings)
       I18n.locale = account.default_locale if account.default_locale.present?
-      outcome_scope.find_each do |row|
+      outcomes = outcome_scope
+      friendly_descriptions = resolve_friendly_descriptions(account, nil, outcomes.map(&:id)).map { |description| [description.learning_outcome_id, description.description] }.to_h
+      outcomes.find_each do |row|
         outcome_model = row.learning_outcome_content
         outcome = row.attributes.dup
         outcome["object_type"] = "outcome"
         criterion = outcome_model.rubric_criterion
         outcome["mastery_points"] = I18n.n(criterion[:mastery_points])
+        outcome["friendly_description"] = friendly_descriptions[row.id]
         csv_row = headers.map { |h| outcome[h] }
         ratings = criterion[:ratings]
         if ratings.present? && include_ratings

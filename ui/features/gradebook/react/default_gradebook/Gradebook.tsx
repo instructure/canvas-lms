@@ -230,6 +230,7 @@ type GradebookState = {
   isGridLoaded: boolean
   modules: Module[]
   sections: Section[]
+  isStatusesModalOpen: boolean
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
@@ -299,8 +300,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   sections_enabled: boolean = false
 
   show_attendance?: boolean
-
-  statusesModal?: HTMLElement & {open?: () => void}
 
   studentGroups: StudentGroupMap = {}
 
@@ -388,7 +387,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       isEssentialDataLoaded: false,
       isGridLoaded: false,
       modules: [],
-      sections: this.options.sections.length > 1 ? this.options.sections : []
+      sections: this.options.sections.length > 1 ? this.options.sections : [],
+      isStatusesModalOpen: false
     }
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
@@ -1775,7 +1775,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.renderFilters()
     this.arrangeColumnsBy(this.getColumnOrder(), true)
     this.renderGradebookSettingsModal()
-    this.renderStatusesModal()
     return $('#keyboard-shortcuts').click(function () {
       const questionMarkKeyDown = $.Event('keydown', {
         keyCode: 191,
@@ -1932,9 +1931,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
       showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames,
       onSelectShowSeparateFirstLastNames: this.toggleShowSeparateFirstLastNames,
-      onSelectShowStatusesModal: () => {
-        this.statusesModal?.open?.()
-      },
+      onSelectShowStatusesModal: () => this.setState({isStatusesModalOpen: true}),
       onSelectViewUngradedAsZero: () => {
         confirmViewUngradedAsZero({
           currentValue: this.gridDisplaySettings.viewUngradedAsZero,
@@ -2256,19 +2253,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.hideNotesColumn()
       }
     })
-  }
-
-  renderStatusesModal = () => {
-    const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
-    const statusesModalProps = {
-      onClose: () => {
-        return this.viewOptionsMenu?.focus()
-      },
-      colors: this.state.gridColors,
-      afterUpdateStatusColors: this.updateGridColors
-    }
-    this.statusesModal = renderComponent(StatusesModal, statusesModalMountPoint, statusesModalProps)
-    return this.statusesModal
   }
 
   checkForUploadComplete = () => {
@@ -4620,16 +4604,22 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     // instead, either by replacing the lines below with checks against the
     // current filters or by passing the ID of the active filter (and looking up
     // the contents of the filter on the back-end)
+
+    let moduleId = this.getFilterColumnsBySetting('contextModuleId')
+    if (moduleId === '0') {
+      moduleId = null
+    }
+
     const optionsWithFilters = {
       ...options,
       courseSectionId: this.getFilterRowsBySetting('sectionId'),
       gradingPeriodId: this.getFilterColumnsBySetting('gradingPeriodId'),
-      moduleId: this.getFilterColumnsBySetting('contextModuleId'),
+      moduleId,
       studentGroupId: this.getFilterRowsBySetting('studentGroupId')
     }
 
     if (value === 'excused') {
-      optionsWithFilters.excuse = true
+      optionsWithFilters.excused = true
     } else {
       optionsWithFilters.percent = value
     }
@@ -4797,6 +4787,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             </div>
           ))}
         </Portal>
+        {this.state.isStatusesModalOpen && (
+          <StatusesModal
+            onClose={() => {
+              this.viewOptionsMenu?.focus()
+              this.setState({isStatusesModalOpen: false})
+            }}
+            colors={this.state.gridColors}
+            afterUpdateStatusColors={this.updateGridColors}
+          />
+        )}
+
         <Portal node={this.props.settingsModalButtonContainer}>
           <Button
             renderIcon={IconSettingsSolid}

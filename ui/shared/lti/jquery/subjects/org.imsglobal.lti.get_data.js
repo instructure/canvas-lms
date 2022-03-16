@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,6 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$use_high_contrast: true;
-$use_responsive_layout: true;
-$direction: rtl;
+import {getData} from '../platform_storage'
+
+export default function handler({message, responseMessages, event}) {
+  const {key} = message
+
+  if (!key) {
+    responseMessages.sendBadRequestError("Missing required 'key' field")
+    return true
+  }
+
+  const value = getData(event.origin, key)
+  responseMessages.sendResponse({key, value})
+  return true
+}

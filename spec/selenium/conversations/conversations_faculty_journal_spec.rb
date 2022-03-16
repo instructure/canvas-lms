@@ -101,110 +101,145 @@ describe "conversations new" do
       expect(f(".user_content").text).to eq "FJ Body text 2"
       expect(f(".creator_name")).to include_text(time)
     end
-
-    it "should clear the subject and body when cancel is clicked", priority: "1"
   end
 
   context "Faculty Journal" do
     before do
-      @course.account.update_attribute(:enable_user_notes, true)
-      user_session(@teacher)
-      conversations
+      Account.default.update_attribute(:enable_user_notes, true)
     end
 
-    it "goes to the user_notes page", priority: "1" do
-      get user_notes_url
-      expect(f("#breadcrumbs")).to include_text("Faculty Journal")
+    context "when react_inbox feature flag is OFF" do
+      before do
+        Account.default.disable_feature! :react_inbox
+      end
+
+      it "is allowed on new private conversations with students", priority: "1" do
+        user_session(@teacher)
+        conversations
+        compose course: @course, to: [@s1, @s2], body: "hallo!", send: false
+        checkbox = f(".user_note")
+        expect(checkbox).to be_displayed
+        checkbox.click
+        count1 = @s1.user_notes.count
+        count2 = @s2.user_notes.count
+        click_send
+        expect(@s1.user_notes.reload.count).to eq count1 + 1
+        expect(@s2.user_notes.reload.count).to eq count2 + 1
+      end
+
+      it "is allowed with student groups", priority: "1" do
+        user_session(@teacher)
+        conversations
+        compose course: @course, to: [@group], body: "hallo!", send: false
+        checkbox = f(".user_note")
+        expect(checkbox).to be_displayed
+        checkbox.click
+        count1 = @s1.user_notes.count
+        click_send
+        expect(@s1.user_notes.reload.count).to eq count1 + 1
+      end
+
+      it "is not allowed if disabled", priority: "1" do
+        user_session(@teacher)
+        conversations
+        account.update_attribute(:enable_user_notes, false)
+        conversations
+        compose course: @course, to: [@s1], body: "hallo!", send: false
+        expect(f(".user_note")).not_to be_displayed
+      end
+
+      it "is not allowed for students", priority: "1" do
+        user_session(@s1)
+        conversations
+        compose course: @course, to: [@s2], body: "hallo!", send: false
+        expect(f(".user_note")).not_to be_displayed
+      end
+
+      it "is not allowed with non-student recipient", priority: "1" do
+        user_session(@teacher)
+        conversations
+        compose course: @course, to: [@teacher], body: "hallo!", send: false
+        expect(f(".user_note")).not_to be_displayed
+      end
+
+      it "has the Journal entry checkbox come back unchecked", priority: "1" do
+        user_session(@teacher)
+        conversations
+        f("#compose-btn").click
+        wait_for_ajaximations
+        expect(f(".user_note")).not_to be_displayed
+
+        select_message_course(@course)
+        add_message_recipient(@s1)
+        write_message_body("Give the Turkey his day")
+
+        expect(f(".user_note")).to be_displayed
+        add_message_recipient(@s2)
+        checkbox = f(".user_note")
+        expect(checkbox).to be_displayed
+        checkbox.click
+        expect(is_checked(".user_note")).to be_present
+        hover_and_click(".ac-token-remove-btn")
+        expect(f(".user_note")).not_to be_displayed
+        add_message_recipient(@s3)
+        expect(is_checked(".user_note")).not_to be_present
+      end
+
+      it "has the Journal entry checkbox visible", priority: "1" do
+        user_session(@teacher)
+        conversations
+        f("#compose-btn").click
+        wait_for_ajaximations
+        expect(f(".user_note")).not_to be_displayed
+
+        select_message_course(@course)
+        add_message_recipient(@s1)
+        write_message_body("Give the Turkey his day")
+        expect(f(".user_note")).to be_displayed
+        add_message_recipient(@s2)
+        expect(f(".user_note")).to be_displayed
+      end
+
+      it "sends a message with faculty journal checked", priority: "1" do
+        user_session(@teacher)
+        conversations
+        # First verify teacher can send a message with faculty journal entry checked to one student
+        compose course: @course, to: [@s1], body: "hallo!", journal: true, send: true
+        expect_flash_message :success, "Message sent!"
+        # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
+        #   still lets teacher know it was sent successfully.
+        fj(".ic-flash-success:last").click
+        compose course: @course, to: [@s1], body: "hallo!", journal: true, send: false
+        add_message_recipient(@s2)
+        expect(is_checked(".user_note")).to be_truthy
+        click_send
+        expect_flash_message :success, "Message sent!"
+      end
     end
 
-    it "is allowed on new private conversations with students", priority: "1" do
-      compose course: @course, to: [@s1, @s2], body: "hallo!", send: false
-      checkbox = f(".user_note")
-      expect(checkbox).to be_displayed
-      checkbox.click
-      count1 = @s1.user_notes.count
-      count2 = @s2.user_notes.count
-      click_send
-      expect(@s1.user_notes.reload.count).to eq count1 + 1
-      expect(@s2.user_notes.reload.count).to eq count2 + 1
-    end
+    context "when react_inbox feature flag is ON", ignore_js_errors: true do
+      before do
+        Account.default.enable_feature! :react_inbox
+      end
 
-    it "is allowed with student groups", priority: "1" do
-      compose course: @course, to: [@group], body: "hallo!", send: false
-      checkbox = f(".user_note")
-      expect(checkbox).to be_displayed
-      checkbox.click
-      count1 = @s1.user_notes.count
-      click_send
-      expect(@s1.user_notes.reload.count).to eq count1 + 1
-    end
+      it "successfully faculty journalizes a message", priority: "1" do
+        user_session(@teacher)
+        get conversations_path
 
-    it "is not allowed if disabled", priority: "1" do
-      @course.account.update_attribute(:enable_user_notes, false)
-      conversations
-      compose course: @course, to: [@s1], body: "hallo!", send: false
-      expect(f(".user_note")).not_to be_displayed
-    end
-
-    it "is not allowed for students", priority: "1" do
-      user_session(@s1)
-      conversations
-      compose course: @course, to: [@s2], body: "hallo!", send: false
-      expect(f(".user_note")).not_to be_displayed
-    end
-
-    it "is not allowed with non-student recipient", priority: "1" do
-      compose course: @course, to: [@teacher], body: "hallo!", send: false
-      expect(f(".user_note")).not_to be_displayed
-    end
-
-    it "has the Journal entry checkbox come back unchecked", priority: "1" do
-      f("#compose-btn").click
-      wait_for_ajaximations
-      expect(f(".user_note")).not_to be_displayed
-
-      select_message_course(@course)
-      add_message_recipient(@s1)
-      write_message_body("Give the Turkey his day")
-
-      expect(f(".user_note")).to be_displayed
-      add_message_recipient(@s2)
-      checkbox = f(".user_note")
-      expect(checkbox).to be_displayed
-      checkbox.click
-      expect(is_checked(".user_note")).to be_present
-      hover_and_click(".ac-token-remove-btn")
-      expect(f(".user_note")).not_to be_displayed
-      add_message_recipient(@s3)
-      expect(is_checked(".user_note")).not_to be_present
-    end
-
-    it "has the Journal entry checkbox visible", priority: "1" do
-      f("#compose-btn").click
-      wait_for_ajaximations
-      expect(f(".user_note")).not_to be_displayed
-
-      select_message_course(@course)
-      add_message_recipient(@s1)
-      write_message_body("Give the Turkey his day")
-      expect(f(".user_note")).to be_displayed
-      add_message_recipient(@s2)
-      expect(f(".user_note")).to be_displayed
-    end
-
-    it "sends a message with faculty journal checked", priority: "1" do
-      conversations
-      # First verify teacher can send a message with faculty journal entry checked to one student
-      compose course: @course, to: [@s1], body: "hallo!", journal: true, send: true
-      expect_flash_message :success, "Message sent!"
-      # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
-      #   still lets teacher know it was sent successfully.
-      fj(".ic-flash-success:last").click
-      compose course: @course, to: [@s1], body: "hallo!", journal: true, send: false
-      add_message_recipient(@s2)
-      expect(is_checked(".user_note")).to be_truthy
-      click_send
-      expect_flash_message :success, "Message sent!"
+        f("button[data-testid='compose']").click
+        # select the only course option
+        f("input[placeholder='Select Course']").click
+        f("li[role='none']").click
+        ff("input[aria-label='Address Book']")[1].send_keys "first student"
+        wait_for_ajaximations
+        driver.action.send_keys(:enter).perform
+        wait_for_ajaximations
+        fj("label:contains('Add as a Faculty Journal entry')").click
+        f("textarea[data-testid='message-body']").send_keys "hallo!"
+        fj("button:contains('Send')").click
+        wait_for_ajaximations
+        expect(@s1.user_notes.last.note).to eq "hallo!"
+      end
     end
   end
 end
