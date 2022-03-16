@@ -20,6 +20,7 @@ import $ from 'jquery'
 import i18nLolcalize from './i18nLolcalize'
 import I18n from 'i18n-js'
 import extend from '@instructure/i18nliner/dist/lib/extensions/i18n_js'
+import logEagerLookupViolations from './logEagerLookupViolations'
 
 import htmlEscape from 'html-escape'
 import 'date'
@@ -49,7 +50,7 @@ I18n.interpolate = function(message, origOptions) {
 
 I18n.locale = document.documentElement.getAttribute('lang')
 
-I18n.lookup = function(scope, options = {}) {
+I18n.lookup = logEagerLookupViolations(function(scope, options = {}) {
   const translations = I18n.translations
   const locales = I18n.getLocaleAndFallbacks(options.locale || I18n.currentLocale())
   if (typeof scope === 'object') {
@@ -76,7 +77,7 @@ I18n.lookup = function(scope, options = {}) {
   }
 
   return messages
-}
+})
 
 I18n.getLocaleAndFallbacks = function(locale) {
   if (!I18n.fallbacksMap) {
