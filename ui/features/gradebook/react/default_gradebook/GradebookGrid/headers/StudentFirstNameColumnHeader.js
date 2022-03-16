@@ -21,10 +21,10 @@ import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ColumnHeader from './ColumnHeader'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default class StudentFirstNameColumnHeader extends ColumnHeader {
   static propTypes = {
@@ -49,6 +49,7 @@ export default class StudentFirstNameColumnHeader extends ColumnHeader {
                 <View
                   className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
                   padding="0 0 0 small"
+                  data-testid="first-name-header"
                 >
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Student First Name')}

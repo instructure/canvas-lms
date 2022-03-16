@@ -49,6 +49,22 @@ describe "Gradebook" do
     expect(f(".slick-header-columns")).not_to include_text(@ungraded_assignment.title)
   end
 
+  it "splits student first and last name when view option is toggled on" do
+    Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
+    @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
+    @course.root_account.save!
+
+    Gradebook.visit(@course)
+    Gradebook.open_gradebook_menu("View")
+    Gradebook.split_student_names_option.click
+
+    expect(f("span[data-testid='first-name-header']").text).to eql("Student First Name")
+    expect(f("span[data-testid='student-column-header']").text).to eql("Student Last Name")
+
+    expect(Gradebook.student_column_cell_element(0, 0)).to include_text(@student_1.last_name)
+    expect(Gradebook.student_column_cell_element(1, 1)).to include_text(@student_1.first_name)
+  end
+
   context "search" do
     it "filters students without delay" do
       Account.site_admin.enable_feature!(:remove_gradebook_student_search_delay)

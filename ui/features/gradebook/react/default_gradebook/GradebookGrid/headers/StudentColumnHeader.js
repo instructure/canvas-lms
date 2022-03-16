@@ -19,18 +19,18 @@
 import React from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import studentRowHeaderConstants from '../../constants/studentRowHeaderConstants'
 import ColumnHeader from './ColumnHeader'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default class StudentColumnHeader extends ColumnHeader {
   static propTypes = {
@@ -240,6 +240,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                 <View
                   className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
                   padding="0 0 0 small"
+                  data-testid="student-column-header"
                 >
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {this.getColumnHeaderName()}
