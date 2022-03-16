@@ -223,6 +223,10 @@ module CC
 
       tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
+        unless obj.attachment
+          obj.attachment = Attachment.create!(context_id: obj.context_id, context_type: obj.context_type, filename: obj.title || "", content_type: "unknown/unknown")
+          obj.save!
+        end
         migration_id = create_key(obj.attachment)
         info = html_content_exporter.media_object_infos[obj.id]
         next unless info && info[:asset]
