@@ -406,6 +406,7 @@ describe "student planner" do
     end
 
     it "allows editing the course of a to-do item", priority: "1" do
+      skip("LS-3035 this flaky spec is only working 65% of the time -- it's the course picker")
       view_todo_item
       todo_tray_select_course_from_dropdown
       todo_save_button.click
