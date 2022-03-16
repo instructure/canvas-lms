@@ -86,7 +86,7 @@ shared_examples_for "k5 important dates" do
   end
 
   it "shows an important date for a graded discussion" do
-    discussion_title = "Electricity Discussion"
+    discussion_title = "Elec Disc"
     due_at = 2.days.from_now(Time.zone.now)
     discussion_assignment = create_dated_assignment(@subject_course, discussion_title, due_at, 10)
     @course.discussion_topics.create!(title: discussion_title, assignment: discussion_assignment)
