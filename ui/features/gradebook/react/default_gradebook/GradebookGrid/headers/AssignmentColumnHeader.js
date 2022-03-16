@@ -20,22 +20,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {ApolloProvider} from 'react-apollo'
-import {createClient} from '@canvas/apollo'
+import I18n from 'i18n!gradebook'
 
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
 
 import {Link} from '@instructure/ui-link'
-
-const I18n = useI18nScope('gradebook')
 
 function SecondaryDetailLine(props) {
   const anonymous = props.assignment.anonymizeStudents
@@ -133,7 +129,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       anonymizeStudents: bool.isRequired,
       courseId: string.isRequired,
       htmlUrl: string.isRequired,
-      gradingType: string.isRequired,
       id: string.isRequired,
       name: string.isRequired,
       pointsPossible: number,
@@ -304,12 +299,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           onSend: this.handleSendMessageStudentsWho,
           messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId
         }
-        ReactDOM.render(
-          <ApolloProvider client={createClient()}>
-            <MessageStudentsWhoDialog {...props} />
-          </ApolloProvider>,
-          mountPoint
-        )
+        ReactDOM.render(<MessageStudentsWhoDialog {...props} />, mountPoint)
       }
     } else {
       const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWhoDialog()

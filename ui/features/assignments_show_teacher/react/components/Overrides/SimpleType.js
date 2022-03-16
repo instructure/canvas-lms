@@ -18,15 +18,13 @@
 
 import React from 'react'
 import {bool, string, element, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
-
-const I18n = useI18nScope('assignments_2');
 
 export default class SimpleType extends React.Component {
   static propTypes = {

@@ -19,14 +19,12 @@
 # TODO: consolidate this into DiscussionEntry
 #
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!discussions'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import stripTags from 'strip-tags'
 import '@canvas/jquery/jquery.ajaxJSON'
-
-I18n = useI18nScope('discussions')
 
 ##
 # Model representing an entry in discussion topic

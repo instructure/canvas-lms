@@ -82,11 +82,11 @@ describe('<Preview />', () => {
               id="clip-path-for-embed"
             >
               <path
-                d="M109 8L210 214H8L109 8Z"
+                d="M109 8L210 210H8L109 8Z"
               />
             </clippath>
             <path
-              d="M109 8L210 214H8L109 8Z"
+              d="M109 8L210 210H8L109 8Z"
             />
           </g>
         </svg>

@@ -42,15 +42,13 @@ import {
   IconClockLine,
   IconHomeLine
 } from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!MobileGlobalMenu'
 import HelpDialog from './HelpDialog/index'
 import LogoutButton from './LogoutButton'
 import HighContrastModeToggle from './trays/HighContrastModeToggle'
 import HistoryList from './HistoryList'
 
 import {Link} from '@instructure/ui-link'
-
-const I18n = useI18nScope('MobileGlobalMenu');
 
 function ActiveText({children, url}) {
   return window.location.pathname.startsWith(url) ? <Text weight="bold">{children}</Text> : children

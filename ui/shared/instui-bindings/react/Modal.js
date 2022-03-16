@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!canvas_modal'
 import React from 'react'
 import {string, node, func, oneOfType} from 'prop-types'
 
@@ -29,8 +29,6 @@ import {Modal} from '@instructure/ui-modal'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-
-const I18n = useI18nScope('canvas_modal');
 
 CanvasModal.propTypes = {
   ...Modal.propTypes,

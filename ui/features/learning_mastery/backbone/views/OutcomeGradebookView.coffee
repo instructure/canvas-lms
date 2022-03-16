@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!gradebookOutcomeGradebookView'
 import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
@@ -34,8 +34,6 @@ import 'jquery-tinypubsub'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/jquery/jquery.disableWhileLoading'
-
-I18n = useI18nScope('gradebookOutcomeGradebookView')
 
 Dictionary =
   exceedsMastery:

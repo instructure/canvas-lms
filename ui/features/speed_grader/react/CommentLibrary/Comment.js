@@ -25,11 +25,9 @@ import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!CommentLibrary'
 import CommentEditView from './CommentEditView'
 import shave from '@canvas/shave'
-
-const I18n = useI18nScope('CommentLibrary');
 
 const Comment = ({
   comment,

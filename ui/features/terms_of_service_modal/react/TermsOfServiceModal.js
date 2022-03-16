@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {Link} from '@instructure/ui-link'
+import $ from 'jquery'
+import React from 'react'
 import {bool} from 'prop-types'
+import I18n from 'i18n!terms_of_service_modal'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {defaultFetchOptions} from '@instructure/js-utils'
-
-const I18n = useI18nScope('terms_of_service_modal');
 
 const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
@@ -69,11 +67,11 @@ export default class TermsOfServiceModal extends React.Component {
 
   handleLinkClick = () => {
     this.setState(state => {
-      const rceContainer = document.getElementById('custom_tos_rce_container')
+      const $rce_container = $('#custom_tos_rce_container')
       let TERMS_OF_SERVICE_CUSTOM_CONTENT
-      if (rceContainer) {
-        const textArea = rceContainer.querySelector('textarea')
-        TERMS_OF_SERVICE_CUSTOM_CONTENT = RichContentEditor.callOnRCE(textArea, 'get_code')
+      if ($rce_container.length > 0) {
+        const $textarea = $rce_container.find('textarea')
+        TERMS_OF_SERVICE_CUSTOM_CONTENT = RichContentEditor.callOnRCE($textarea, 'get_code')
       }
 
       return {
@@ -86,14 +84,16 @@ export default class TermsOfServiceModal extends React.Component {
   render() {
     return (
       <span id="terms_of_service_modal">
-        <Link
-          elementRef={c => {
+        <a
+          className="terms_link"
+          href="#"
+          ref={c => {
             this.link = c
           }}
           onClick={this.handleLinkClick}
         >
           {this.props.preview ? I18n.t('Preview') : termsOfServiceText}
-        </Link>
+        </a>
         {this.state.open && (
           <Modal
             open={this.state.open}

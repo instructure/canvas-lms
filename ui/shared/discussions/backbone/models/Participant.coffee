@@ -16,9 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-I18n = useI18nScope('discussions.participant')
+import I18n from 'i18n!discussions.participant'
 
 export default class Participant extends Backbone.Model
 

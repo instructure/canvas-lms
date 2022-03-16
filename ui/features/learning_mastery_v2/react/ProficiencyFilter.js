@@ -18,11 +18,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!LearningMasteryGradebook'
 import ProficiencyRating from './ProficiencyRating'
 import {proficiencyRatingShape} from './shapes'
-
-const I18n = useI18nScope('LearningMasteryGradebook');
 
 const ProficiencyFilter = ({ratings}) => {
   return (

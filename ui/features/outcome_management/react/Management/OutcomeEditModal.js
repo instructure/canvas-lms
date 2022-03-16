@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
@@ -44,8 +44,6 @@ import useRatings from '@canvas/outcomes/react/hooks/useRatings'
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
@@ -279,13 +277,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                 canManage={!!attributesEditable.individualRatings}
               />
               <View as="div" minHeight={attributesEditable.calculationMethod ? '14rem' : '5rem'}>
-                {attributesEditable.calculationMethod && (
-                  <hr
-                    style={{margin: '1rem 0 0'}}
-                    aria-hidden="true"
-                    data-testid="outcome-edit-modal-horizontal-divider"
-                  />
-                )}
+                {attributesEditable.calculationMethod && <hr style={{margin: '1rem 0 0'}} />}
                 <ProficiencyCalculation
                   method={{
                     calculationMethod: proficiencyCalculationMethod,

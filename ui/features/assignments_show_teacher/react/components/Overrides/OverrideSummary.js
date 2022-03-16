@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {OverrideShape} from '../../assignmentData'
 import OverrideAttempts from './OverrideAttempts'
 import OverrideAssignTo from './OverrideAssignTo'
@@ -30,8 +30,6 @@ import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-
-const I18n = useI18nScope('assignments_2');
 
 export default class OverrideSummary extends React.Component {
   static contextType = TeacherViewContext

@@ -17,9 +17,7 @@
 #
 
 import {Model} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-I18n = useI18nScope('modelsSection')
+import I18n from 'i18n!modelsSection'
 
 export default class Section extends Model
   @defaultDueDateSection: ->

@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!direct_share_user_panel'
 import React from 'react'
 import {arrayOf, func, string} from 'prop-types'
 import {Tag} from '@instructure/ui-tag'
 import ContentShareUserSearchSelector from './ContentShareUserSearchSelector'
 import {basicUser} from '@canvas/users/react/proptypes/user'
-
-const I18n = useI18nScope('direct_share_user_panel');
 
 DirectShareUserPanel.propTypes = {
   courseId: string,

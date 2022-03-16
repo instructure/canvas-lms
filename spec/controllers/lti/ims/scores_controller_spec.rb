@@ -75,7 +75,7 @@ module Lti::IMS
       it_behaves_like "advantage services"
       it_behaves_like "lti services"
 
-      shared_examples_for "a successful scores request" do
+      context "with valid params" do
         context "when the lti_id userId is used" do
           let(:userId) { user.lti_id }
 
@@ -853,18 +853,6 @@ module Lti::IMS
             expect(result.submission.reload.score).to be_nil
           end
         end
-      end
-
-      context "with valid params" do
-        it_behaves_like "a successful scores request"
-      end
-
-      context "when user_id is a fake student in course" do
-        let(:user) do
-          course_with_user("StudentViewEnrollment", course: course, active_all: true).user
-        end
-
-        it_behaves_like "a successful scores request"
       end
 
       context "with invalid params" do

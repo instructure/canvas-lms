@@ -17,11 +17,9 @@
  */
 
 import Cell from './cell'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_log_auditing.table_view'
 import React from 'react'
 import secondsToTime from '@canvas/quiz-legacy-client-apps/util/seconds_to_time'
-
-const I18n = useI18nScope('quiz_log_auditing.table_view');
 
 /**
  * @class Events.Views.AnswerMatrix.Table

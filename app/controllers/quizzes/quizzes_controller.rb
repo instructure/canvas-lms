@@ -372,7 +372,6 @@ class Quizzes::QuizzesController < ApplicationController
       end
 
       append_sis_data(hash)
-      append_default_due_time_js_env(@context, hash)
       js_env(hash)
 
       conditional_release_js_env(@quiz.assignment)

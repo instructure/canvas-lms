@@ -22,11 +22,9 @@ import {Button} from '@instructure/ui-buttons'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conferences'
 import ConferenceSelect from './ConferenceSelect'
 import webConferenceType from '../proptypes/webConferenceType'
-
-const I18n = useI18nScope('conferences');
 
 const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect, inputRef}) => {
   if (!conferenceTypes || conferenceTypes.length === 0) {

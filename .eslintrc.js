@@ -271,15 +271,6 @@ module.exports = {
       }
     },
     {
-      files: ['jest/**/*'],
-      rules: {
-        'import/extensions': 'off',
-        'import/no-commonjs': 'off',
-        'import/no-extraneous-dependencies': 'off',
-        'import/order': 'off',
-      }
-    },
-    {
       files: [
         'ui/features/quiz_log_auditing/**/*',
         'ui/features/quiz_statistics/**/*',

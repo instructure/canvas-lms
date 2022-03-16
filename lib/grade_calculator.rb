@@ -485,7 +485,7 @@ class GradeCalculator
     return if @grading_period   # only update score statistics when calculating course scores
     return unless @ignore_muted # only update when calculating final scores
 
-    ScoreStatisticsGenerator.update_score_statistics_in_singleton(@course)
+    ScoreStatisticsGenerator.update_score_statistics_in_singleton(@course.id)
   end
 
   def save_scores

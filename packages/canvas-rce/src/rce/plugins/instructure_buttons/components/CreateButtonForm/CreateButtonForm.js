@@ -24,22 +24,10 @@ import {ColorSection} from './ColorSection'
 import {TextSection} from './TextSection'
 import {ImageSection} from './ImageSection'
 
-export const CreateButtonForm = ({
-  settings,
-  dispatch,
-  editor,
-  editing,
-  allowNameChange,
-  nameRef
-}) => {
+export const CreateButtonForm = ({settings, dispatch, editor, editing}) => {
   return (
     <>
-      <Header
-        settings={settings}
-        onChange={dispatch}
-        allowNameChange={allowNameChange}
-        nameRef={nameRef}
-      />
+      <Header settings={settings} onChange={dispatch} />
       <ShapeSection settings={settings} onChange={dispatch} />
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />

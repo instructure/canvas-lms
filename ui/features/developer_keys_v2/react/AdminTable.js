@@ -21,13 +21,11 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_developer_keys'
 
 import DeveloperKey from './DeveloperKey'
 
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('react_developer_keys');
 
 class DeveloperKeysTable extends React.Component {
   createSetFocusCallback = developerKeyId => {

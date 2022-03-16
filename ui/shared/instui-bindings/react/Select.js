@@ -45,12 +45,10 @@
 import React from 'react'
 import {func, node, string, oneOfType} from 'prop-types'
 import {compact, castArray, isEqual} from 'lodash'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!app_shared_components'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
-
-const I18n = useI18nScope('app_shared_components');
 
 const noOptionsOptionId = '_noOptionsOption'
 

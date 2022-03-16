@@ -17,11 +17,9 @@
  */
 
 import Event from './event'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_log_auditing.event_stream'
 import K from '../../../constants'
 import React from 'react'
-
-const I18n = useI18nScope('quiz_log_auditing.event_stream');
 
 const visibleEventTypes = [
   K.EVT_PAGE_BLURRED,

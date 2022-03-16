@@ -20,7 +20,7 @@ import {SetState, GetState} from 'zustand'
 import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import type {PartialFilter, AppliedFilter, FilterCondition, Filter} from '../gradebook.d'
 import {
   deserializeFilter,
@@ -29,8 +29,6 @@ import {
   findAllAppliedFilterValuesOfType
 } from '../Gradebook.utils'
 import type {GradebookStore} from './index'
-
-const I18n = useI18nScope('gradebook');
 
 export type FiltersState = {
   filters: Filter[]

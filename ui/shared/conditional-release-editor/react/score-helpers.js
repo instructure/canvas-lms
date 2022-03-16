@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conditional_release'
 
 import GradingTypes from './grading-types'
 import numberHelper from '@canvas/i18n/numberHelper'
-
-const I18n = useI18nScope('conditional_release');
 
 const TEN_E_8 = 10e8
 

@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!instructure_inline_media_comment'
 import $ from 'jquery'
 import {trackEvent} from '@canvas/google-analytics'
 import preventDefault from 'prevent-default'
 import htmlEscape from 'html-escape'
 import '@canvas/media-comments/jquery/mediaComment'
-
-const I18n = useI18nScope('instructure_inline_media_comment');
 
 const inlineMediaComment = {
   buildMinimizerLink: () =>

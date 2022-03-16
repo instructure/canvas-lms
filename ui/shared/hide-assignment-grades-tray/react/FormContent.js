@@ -24,12 +24,10 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!hide_assignment_grades_tray'
 
 import Description from './Description'
 import SpecificSections from '@canvas/grading/react/SpecificSections'
-
-const I18n = useI18nScope('hide_assignment_grades_tray');
 
 export default function FormContent({
   assignment: {anonymousGrading, gradesPublished},

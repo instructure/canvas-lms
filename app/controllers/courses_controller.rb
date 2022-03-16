@@ -356,7 +356,6 @@ class CoursesController < ApplicationController
   include CoursesHelper
   include NewQuizzesFeaturesHelper
   include ObserverEnrollmentsHelper
-  include DefaultDueTimeHelper
 
   before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export]
   before_action :require_user_or_observer, only: [:user_index]
@@ -1436,8 +1435,7 @@ class CoursesController < ApplicationController
   #     "hide_sections_on_course_users_page": false,
   #     "lock_all_announcements": true,
   #     "usage_rights_required": false,
-  #     "homeroom_course": false,
-  #     "default_due_time": "23:59:59"
+  #     "homeroom_course": false
   #   }
   def api_settings
     get_context
@@ -1637,11 +1635,6 @@ class CoursesController < ApplicationController
   # @argument syllabus_course_summary [Boolean]
   #   Show the course summary (list of assignments and calendar events) on the syllabus page. Default is true.
   #
-  # @argument default_due_time [String]
-  #   Set the default due time for assignments. This is the time that will be pre-selected in the Canvas user interface
-  #   when setting a due date for an assignment. It does not change when any existing assignment is due. It should be
-  #   given in 24-hour HH:MM:SS format. The default is "23:59:59". Use "inherit" to inherit the account setting.
-  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1654,11 +1647,6 @@ class CoursesController < ApplicationController
     return unless authorized_action(@course, @current_user, :update)
 
     old_settings = @course.settings
-
-    if (default_due_time = params.delete(:default_due_time))
-      @course.default_due_time = normalize_due_time(default_due_time)
-    end
-
     @course.attributes = params.permit(
       :allow_final_grade_override,
       :allow_student_discussion_topics,
@@ -1684,7 +1672,7 @@ class CoursesController < ApplicationController
       :homeroom_course_id,
       :course_color,
       :friendly_name,
-      :enable_course_paces
+      :enable_pace_plans
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY)
@@ -2301,8 +2289,7 @@ class CoursesController < ApplicationController
             STUDENT_PLANNER_ENABLED: planner_enabled?,
             TABS: @context.tabs_available(@current_user, course_subject_tabs: true, session: session),
             OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
-            TAB_CONTENT_ONLY: embed_mode,
-            SHOW_IMMERSIVE_READER: show_immersive_reader?
+            TAB_CONTENT_ONLY: embed_mode
           )
 
           self_enrollment_option = visible_self_enrollment_option
@@ -2855,10 +2842,10 @@ class CoursesController < ApplicationController
   #   Elementary account, it will be shown instead of the course name. This setting takes priority over
   #   course nicknames defined by individual users.
   #
-  # @argument course[enable_course_paces] [Boolean]
-  #   Enable or disable Course Pacing for the course. This setting only has an effect when the Course Pacing feature flag is
-  #   enabled for the sub-account. Otherwise, Course Pacing are always disabled.
-  #     Note: Course Pacing is in active development.
+  # @argument course[enable_pace_plans] [Boolean]
+  #   Enable or disable Pace Plans for the course. This setting only has an effect when the Pace Plans feature flag is
+  #   enabled for the sub-account. Otherwise, Pace Plans are always disabled.
+  #     Note: Pace Plans is in active development.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -3039,10 +3026,6 @@ class CoursesController < ApplicationController
         else
           @course.errors.add(:course_color, t("Invalid hexcode provided"))
         end
-      end
-
-      if (default_due_time = params_for_update.delete(:default_due_time))
-        @course.default_due_time = normalize_due_time(default_due_time)
       end
 
       update_image(params, "image")
@@ -3927,7 +3910,7 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time
+      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_pace_plans
     )
   end
 end

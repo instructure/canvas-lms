@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -31,8 +31,6 @@ import {
 } from '@instructure/ui-icons'
 
 import SelectableText from './SelectableText'
-
-const I18n = useI18nScope('assignments_2');
 
 const assignment_type = {value: 'assignment', label: I18n.t('Assignment'), icon: IconAssignmentLine}
 const peer_review_type = {

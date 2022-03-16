@@ -17,10 +17,8 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!new_user_tutorial'
 import TutorialTrayContent from './TutorialTrayContent'
-
-const I18n = useI18nScope('new_user_tutorial');
 
 const GradesTray = () => (
   <TutorialTrayContent

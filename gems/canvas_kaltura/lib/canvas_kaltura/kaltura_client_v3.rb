@@ -369,9 +369,7 @@ module CanvasKaltura
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
       response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
-      result = Nokogiri::XML(response.body).css("result").first
-      Canvas::Errors.capture("Unexpected kaltura_client response", response, :info) if result.nil?
-      result
+      Nokogiri::XML(response.body).css("result").first
     end
 
     # FIXME: SSL verifification should not be turned off, but since we're just

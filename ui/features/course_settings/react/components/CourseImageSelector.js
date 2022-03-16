@@ -23,11 +23,9 @@ import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!course_images'
 import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
-
-const I18n = useI18nScope('course_images');
 
 let overflow = ''
 

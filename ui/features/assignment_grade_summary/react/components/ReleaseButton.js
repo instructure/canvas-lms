@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconCheckMarkSolid} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment_grade_summary'
 
 import {
   FAILURE,
@@ -32,8 +32,6 @@ import {
   STARTED,
   SUCCESS
 } from '../assignment/AssignmentActions'
-
-const I18n = useI18nScope('assignment_grade_summary');
 
 function readyButton(props) {
   return (

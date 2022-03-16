@@ -16,10 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!incompleteregistration'
 import template from './jst/incompleteRegistrationWarning.handlebars'
-
-const I18n = useI18nScope('incompleteregistration');
 
 if (ENV.INCOMPLETE_REGISTRATION) {
   $(template({email: ENV.USER_EMAIL}))

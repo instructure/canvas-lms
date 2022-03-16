@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -29,8 +29,6 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('discussion_posts');
 
 export function ThreadingToolbar({...props}) {
   return (

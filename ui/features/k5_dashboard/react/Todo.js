@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment-timezone'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!todo'
 
 import {AccessibleContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Badge} from '@instructure/ui-badge'
@@ -33,8 +33,6 @@ import {Flex} from '@instructure/ui-flex'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ignoreTodo} from '@canvas/k5/react/utils'
 import tz from '@canvas/timezone'
-
-const I18n = useI18nScope('todo');
 
 export const getBaseDueAt = ({all_dates}) =>
   (all_dates.filter(d => d.base)[0] || all_dates[0])?.due_at

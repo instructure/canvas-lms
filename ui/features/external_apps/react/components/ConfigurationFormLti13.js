@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconLtiLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('external_tools');
 
 class ConfigurationFormLti13 extends React.Component {
   constructor(props) {

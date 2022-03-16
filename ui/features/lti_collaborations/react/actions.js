@@ -17,13 +17,11 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!course_wizard'
 import axios from '@canvas/axios'
 import splitAssetString from '@canvas/util/splitAssetString'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import page from 'page'
-
-const I18n = useI18nScope('course_wizard');
 
 const actions = {}
 

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!dashcards'
 
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
@@ -29,8 +29,6 @@ import {
   IconMoveDownBottomLine,
   IconStarSolid
 } from '@instructure/ui-icons'
-
-const I18n = useI18nScope('dashcards');
 
 class DashboardCardMovementMenu extends React.Component {
   static propTypes = {

@@ -21,7 +21,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import shortid from 'shortid'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conditional_release'
 import GradingTypes from '../grading-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -33,8 +33,6 @@ import {
   getGradingType,
   isNumeric
 } from '../score-helpers'
-
-const I18n = useI18nScope('conditional_release');
 
 const {string, func, object, number} = PropTypes
 

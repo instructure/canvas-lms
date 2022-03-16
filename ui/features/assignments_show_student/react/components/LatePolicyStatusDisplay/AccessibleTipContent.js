@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!a2_AccessibleTipContent'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PropTypes from 'prop-types'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-
-const I18n = useI18nScope('a2_AccessibleTipContent');
 
 export default function AccessibleTipContent(props) {
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props

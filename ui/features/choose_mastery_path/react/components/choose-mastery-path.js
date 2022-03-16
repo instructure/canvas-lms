@@ -18,11 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!choose_mastery_path'
 import PathOption from './path-option'
 import optionShape from '../shapes/option-shape'
-
-const I18n = useI18nScope('choose_mastery_path');
 
 const {func, number, arrayOf} = PropTypes
 

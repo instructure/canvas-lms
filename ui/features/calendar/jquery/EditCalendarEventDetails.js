@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
 import React from 'react'
@@ -35,8 +35,6 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
-
-const I18n = useI18nScope('calendar');
 
 export default class EditCalendarEventDetails {
   constructor(selector, event, contextChangeCB, closeCB) {
@@ -145,13 +143,13 @@ export default class EditCalendarEventDetails {
     if (date) {
       const start_time = this.$form.find('input[name=start_time]').data('date')
       let start_at = date.toString('yyyy-MM-dd')
-      if (start_time) start_at += this.event.allDay ? ' 00:00' : start_time.toString(' HH:mm')
+      if (start_time) start_at += start_time.toString(' HH:mm')
 
       data.start_at = tz.parse(start_at)
 
       const end_time = this.$form.find('input[name=end_time]').data('date')
       let end_at = date.toString('yyyy-MM-dd')
-      if (end_time) end_at += this.event.allDay ? ' 00:00' : end_time.toString(' HH:mm')
+      if (end_time) end_at += end_time.toString(' HH:mm')
       data.end_at = tz.parse(end_at)
     }
 

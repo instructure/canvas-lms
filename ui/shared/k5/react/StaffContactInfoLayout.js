@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!staff_contact_info_layout'
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -25,8 +25,6 @@ import {Heading} from '@instructure/ui-heading'
 
 import StaffInfo, {StaffShape} from './StaffInfo'
 import LoadingWrapper from './LoadingWrapper'
-
-const I18n = useI18nScope('staff_contact_info_layout');
 
 const StaffContactInfoLayout = ({isLoading, staff}) => {
   return (

@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Aplicar"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Aplicar as alterações a todas as instâncias deste botão e ícone no curso"
+    },
     "apps_54d24a47": {
         "message": "Aplicativos"
     },
@@ -179,6 +182,24 @@
     "bottom_third_5f5fec1d": {
         "message": "Terço inferior"
     },
+    "button_color_608a0242": {
+        "message": "Cor do botão"
+    },
+    "button_outline_cf14f071": {
+        "message": "Contorno do botão"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Tamanho do contorno do botão"
+    },
+    "button_shape_dbecb573": {
+        "message": "Formato do botão"
+    },
+    "button_size_20f5fce1": {
+        "message": "Tamanho do botão"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Botões e ícones"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -254,6 +275,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Recolher para ocultar { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Cor { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Computador"
     },
@@ -316,6 +340,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "LISTA DE TAREFAS DE { course }"
+    },
+    "create_button_and_icon_5c089934": {
+        "message": "Criar botão e ícone"
     },
     "creative_commons_license_725584ae": {
         "message": "Licença do Creative Commons:"
@@ -479,6 +506,12 @@
     "embed_image_1080badc": {
         "message": "Imagem incorporada"
     },
+    "embed_options_tray_901cfd19": {
+        "message": "Incorporar bandeja de opções"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "Incorporar pré-visualização"
+    },
     "embed_video_a97a64af": {
         "message": "Incorporar vídeo"
     },
@@ -538,9 +571,6 @@
     },
     "extracurricular_icon_67c8ca42": {
         "message": "Ícone extracurricular"
-    },
-    "failed_getting_course_list_49846a93": {
-        "message": "Falha ao obter lista de cursos"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Falha ao olhar para o seu futuro"
@@ -1004,6 +1034,9 @@
     "optional_add_course_ef0d70fc": {
         "message": "Opcional: Adicionar Curso"
     },
+    "options_3ab0ea65": {
+        "message": "Opções"
+    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Listas ordenadas e não ordenadas"
     },
@@ -1142,6 +1175,9 @@
     "save_11a80ec3": {
         "message": "Salvar"
     },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "Botões e ícones salvos"
+    },
     "schedule_preview_3bcda153": {
         "message": "Pré-visualização da programação"
     },
@@ -1177,6 +1213,9 @@
     },
     "show_audio_options_b489926b": {
         "message": "Mostrar opções de áudio"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "Exibir opções de incorporação"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Exibir opções de imagem"

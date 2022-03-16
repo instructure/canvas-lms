@@ -543,28 +543,6 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
       context_id: '1234'
     })
 
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z'},
-      {id: '4', sortable_name: 'A'},
-      {id: '1', sortable_name: 'C'}
-    ]
-
-    gradebook.gridData.columns.scrollable = [
-      'assignment_3',
-      'custom_col_8',
-      'assignment_2',
-      'assignment_group_1',
-      'assignment_7',
-      'total_grade'
-    ]
-
-    const assignments = [
-      {id: '3', assignment_group_id: '10'},
-      {id: '2', assignment_group_id: '10'},
-      {id: '7'}
-    ]
-    gradebook.gotAllAssignmentGroups([{id: '10', position: 1, name: 'Assignments', assignments}])
-
     startProcessStub = sandbox.stub(gradebook.scoreToUngradedManager, 'startProcess')
     startProcessStub.resolves({})
 
@@ -608,23 +586,30 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
     strictEqual(passedArgs.assignmentGroupId, '10', 'assignmentGroupId not passed')
     strictEqual(passedArgs.onlyPastDue, true, 'onlyPastDue not passed')
     strictEqual(passedArgs.markAsMissing, true, 'markAsMissing not passed')
-    deepEqual(passedArgs.assignment_ids, ['3', '2'], 'assignment ids not passed')
-    deepEqual(passedArgs.student_ids, ['3', '4', '1'], 'student ids not passed')
   })
 
-  test('passes all assignments when assignmentGroupId is not specified', async () => {
-    await gradebook.executeApplyScoreToUngraded({
-      onlyPastDue: true,
-      markAsMissing: true,
-      value: 40.0
-    })
+  test('calls the startProcess method with the current course section ID when one is set', async () => {
+    gradebook.setFilterRowsBySetting('sectionId', '5')
+    await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    strictEqual(startProcessStub.firstCall.args[1].courseSectionId, '5')
+  })
 
-    const passedArgs = startProcessStub.firstCall.args[1]
-    strictEqual(passedArgs.assignmentGroupId, undefined, 'assignmentGroupId not passed')
-    strictEqual(passedArgs.onlyPastDue, true, 'onlyPastDue not passed')
-    strictEqual(passedArgs.markAsMissing, true, 'markAsMissing not passed')
-    deepEqual(passedArgs.assignment_ids, ['3', '2', '7'], 'assignment ids not passed')
-    deepEqual(passedArgs.student_ids, ['3', '4', '1'], 'student ids not passed')
+  test('calls the startProcess method with the current grading period ID when one is set', async () => {
+    gradebook.setFilterColumnsBySetting('gradingPeriodId', '7')
+    await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    strictEqual(startProcessStub.firstCall.args[1].gradingPeriodId, '7')
+  })
+
+  test('calls the startProcess method with the current module ID when one is set', async () => {
+    gradebook.setFilterColumnsBySetting('contextModuleId', '12')
+    await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    strictEqual(startProcessStub.firstCall.args[1].moduleId, '12')
+  })
+
+  test('calls the startProcess method with the current student group ID when one is set', async () => {
+    gradebook.setFilterRowsBySetting('studentGroupId', '15')
+    await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    strictEqual(startProcessStub.firstCall.args[1].studentGroupId, '15')
   })
 
   test('shows an initial flash alert when the process starts', async () => {

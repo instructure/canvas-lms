@@ -124,24 +124,9 @@
                              [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
                              {:selected => @context.default_locale}, {:class => 'locale'} %>
                 <%= render :partial => 'shared/locale_warning' %>
-                <p class="aside"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
+                <p style="font-size: 0.9em;"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
               </td>
             </tr>
-            <% end %>
-            <% if !@account.site_admin? && @account.root_account.feature_enabled?(:default_due_time) %>
-              <%= f.fields_for :settings do |settings| %>
-                <%= settings.fields_for :default_due_time do |ddt| %>
-                  <tr>
-                    <td><%= ddt.blabel :value, t("Default Due Time") %></td>
-                    <td>
-                        <%= ddt.select :value, options_for_select(default_due_time_options(@account), default_due_time_key(@account)) %>
-                        <p class="aside">
-                          <%= t("This influences the user interface for setting due dates. It does not change when any existing assignment is due.") %>
-                        </p>
-                    </td>
-                  </tr>
-                 <% end %>
-              <% end %>
             <% end %>
             <% if @account.primary_settings_root_account? %>
               <tr>
@@ -191,7 +176,7 @@
                                               :value => @account.settings[:trusted_referers],
                                               :class => 'same-width-as-select',
                                               :placeholder => "https://example.edu" %>
-                      <p class="aside"><%= t("This is a comma separated list of URL's to trust.  Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.") %></p>
+                      <p style="font-size: 0.9em;"><%= t("This is a comma separated list of URL's to trust.  Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.") %></p>
                     </td>
                   </tr>
 
@@ -200,7 +185,7 @@
                       <td><%= settings.blabel :default_dashboard_view, t("Default View for Dashboard") %></td>
                       <td>
                         <%= settings.select :default_dashboard_view, options_for_select(dashboard_view_options, @account.default_dashboard_view) %>
-                        <p class="aside"><%= settings.check_box :force_default_dashboard_view, :checked => false %>  <%= settings.label :force_default_dashboard_view, t("Overwrite all users' existing default dashboard preferences") %></p>
+                        <p style="font-size: 0.9em;"><%= settings.check_box :force_default_dashboard_view, :checked => false %>  <%= settings.label :force_default_dashboard_view, t("Overwrite all users' existing default dashboard preferences") %></p>
                       </td>
                     </tr>
                   <% end %>

@@ -26,9 +26,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('conversations_2')
+import I18n from 'i18n!conversations_2'
 
 export const MessageDetailHeader = ({...props}) => {
   return (
@@ -50,7 +48,6 @@ export const MessageDetailHeader = ({...props}) => {
       render={responsiveProps => (
         <Flex padding="small">
           <Flex.Item shouldGrow shouldShrink>
-            <span tabIndex="-1" ref={ref => props.focusRef(ref)} />
             <Heading
               level={responsiveProps.level}
               as={responsiveProps.as}
@@ -111,11 +108,9 @@ MessageDetailHeader.propTypes = {
   text: PropTypes.string,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
-  onDelete: PropTypes.func,
-  focusRef: PropTypes.any
+  onDelete: PropTypes.func
 }
 
 MessageDetailHeader.defaultProps = {
-  text: null,
-  focusRef: () => {}
+  text: null
 }

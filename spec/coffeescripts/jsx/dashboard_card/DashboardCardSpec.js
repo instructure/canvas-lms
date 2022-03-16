@@ -18,10 +18,12 @@
 
 import $ from 'jquery'
 import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-dom/test-utils'
 import moxios from 'moxios'
 import sinon from 'sinon'
 import {moxiosWait} from 'jest-moxios-utils'
-import {act, cleanup, render, waitFor} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
 import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
@@ -48,15 +50,6 @@ QUnit.module('DashboardCard', {
       href: '/courses/1',
       courseCode: '101',
       id: '1',
-      links: [
-        {
-          css_class: 'discussions',
-          hidden: false,
-          icon: 'icon-discussion',
-          label: 'Discussions',
-          path: '/courses/1/discussion_topics'
-        }
-      ],
       backgroundColor: '#EF4437',
       image: null,
       isFavorited: true,
@@ -64,14 +57,12 @@ QUnit.module('DashboardCard', {
       connectDropTarget: c => c
     }
     moxios.install()
-    return (this.getStateForCourseStub = sandbox
-      .stub(CourseActivitySummaryStore, 'getStateForCourse')
-      .returns({}))
+    return sandbox.stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
   },
   teardown() {
     moxios.uninstall()
     localStorage.clear()
-    cleanup()
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.component).parentNode)
     if (this.wrapper) {
       return this.wrapper.remove()
     }
@@ -84,41 +75,61 @@ function errorRendered() {
   }
 }
 
-test('obtains new course activity when course activity is updated', function (assert) {
-  const {getByText} = render(<DashboardCard {...this.props} />)
-
-  assert.notEqual(getByText(`${this.props.links[0].label} - ${this.props.shortName}`), undefined)
-  assert.ok(this.getStateForCourseStub.calledOnce)
-
-  act(() => CourseActivitySummaryStore.setState({streams: {1: {stream: this.stream}}}))
-
-  assert.ok(this.getStateForCourseStub.calledTwice)
+test('render', function () {
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  const $html = $(ReactDOM.findDOMNode(this.component))
+  ok($html.attr('class').match(/DashboardCard/))
+  const renderSpy = sandbox.spy(this.component, 'render')
+  ok(!renderSpy.called, 'precondition')
+  CourseActivitySummaryStore.setState({streams: {1: {stream: this.stream}}})
+  ok(renderSpy.called, 'should re-render on state update')
 })
 
 // eslint-disable-next-line qunit/resolve-async
-test('is accessible', function (assert) {
+test('it should be accessible', function (assert) {
+  const DashCard = <DashboardCard {...this.props} />
   this.wrapper = $('<div>').appendTo('body')[0]
-  const {container} = render(<DashboardCard {...this.props} />, this.wrapper)
-  const $html = $(container.firstChild)
+  this.component = ReactDOM.render(DashCard, this.wrapper)
+  const $html = $(ReactDOM.findDOMNode(this.component))
   const done = assert.async()
   assertions.isAccessible($html, done)
 })
 
-test('does not have an image when a url is not provided', function (assert) {
-  const {getByText, queryByText} = render(<DashboardCard {...this.props} />)
-
-  assert.equal(queryByText(`Course image for ${this.props.shortName}`), undefined)
-  assert.notEqual(getByText(`Course card color region for ${this.props.shortName}`), undefined)
+test('unreadCount', function () {
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  ok(!this.component.unreadCount('icon-discussion', []), 'should not blow up without a stream')
+  equal(
+    this.component.unreadCount('icon-discussion', this.stream),
+    2,
+    'should pass down unread count if stream item corresponding to icon has unread count'
+  )
 })
 
-test('has an image when a url is provided', function (assert) {
+test('does not have image attribute when a url is not provided', function () {
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  strictEqual(
+    TestUtils.scryRenderedDOMComponentsWithClass(this.component, 'ic-DashboardCard__header_image')
+      .length,
+    0,
+    'image attribute should not be present'
+  )
+})
+
+test('has image attribute when url is provided', function () {
   this.props.image = 'http://coolUrl'
-  const {getByText} = render(<DashboardCard {...this.props} />)
-
-  assert.notEqual(getByText(`Course image for ${this.props.shortName}`), undefined)
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  const $html = TestUtils.findRenderedDOMComponentWithClass(
+    this.component,
+    'ic-DashboardCard__header_image'
+  )
+  ok($html, 'image showing')
 })
 
-test('handles success removing course from favorites', async function (assert) {
+test('#removeCourseFromFavorites succeeds', function () {
   const handleRerenderSpy = sinon.spy()
   this.props.onConfirmUnfavorite = handleRerenderSpy
 
@@ -128,30 +139,25 @@ test('handles success removing course from favorites', async function (assert) {
     }
   }
 
-  const {getByText} = render(<DashboardCard {...this.props} />)
-  act(() =>
-    getByText(
-      `Choose a color or course nickname or move course card for ${this.props.shortName}`
-    ).click()
-  )
-  act(() => getByText('Move').click())
-  act(() => getByText('Unfavorite').click())
-  act(() => getByText('Submit').click())
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  this.component.removeCourseFromFavorites()
 
-  await moxiosWait(() => {
+  return moxiosWait(function () {
     const request = moxios.requests.mostRecent()
     request.respondWith({
       status: 200,
       response: []
     })
+  }).then(async function () {
+    await waitFor(() => waitForResponse())
+    ok(handleRerenderSpy.calledOnce)
   })
-
-  await waitFor(() => waitForResponse())
-  assert.ok(handleRerenderSpy.calledOnce)
 })
 
-test('handles failure removing course from favorites', async function (assert) {
-  this.props.onConfirmUnfavorite = sinon.spy()
+test('#removeCourseFromFavorites fails', function () {
+  const handleRerenderSpy = sinon.spy()
+  this.props.onConfirmUnfavorite = handleRerenderSpy
 
   function waitForAlert() {
     if (errorRendered) {
@@ -159,24 +165,18 @@ test('handles failure removing course from favorites', async function (assert) {
     }
   }
 
-  const {getByText} = render(<DashboardCard {...this.props} />)
-  act(() =>
-    getByText(
-      `Choose a color or course nickname or move course card for ${this.props.shortName}`
-    ).click()
-  )
-  act(() => getByText('Move').click())
-  act(() => getByText('Unfavorite').click())
-  act(() => getByText('Submit').click())
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  this.component.removeCourseFromFavorites()
 
-  await moxiosWait(() => {
+  return moxiosWait(function () {
     const request = moxios.requests.mostRecent()
     request.respondWith({
       status: 403,
       response: []
     })
+  }).then(async function () {
+    await waitFor(() => waitForAlert())
+    ok(errorRendered)
   })
-
-  await waitFor(() => waitForAlert())
-  assert.ok(errorRendered)
 })

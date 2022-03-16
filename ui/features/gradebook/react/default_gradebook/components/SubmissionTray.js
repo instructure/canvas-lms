@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -40,8 +40,6 @@ import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 
 import {Link} from '@instructure/ui-link'
-
-const I18n = useI18nScope('gradebook');
 
 function renderAvatar(name, avatarUrl) {
   return (

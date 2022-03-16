@@ -30,7 +30,6 @@ const defaultProps = (props = {}) => ({
   onColorChange: () => {},
   onDelete: () => {},
   onDescriptionChange: () => {},
-  onFocusChange: () => {},
   onMasteryChange: () => {},
   onPointsChange: () => {},
   points: '10.0',

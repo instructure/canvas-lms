@@ -48,14 +48,10 @@ module ActiveRecord
             Setting.get("revert_cache_register_migration_#{base_class.name.downcase}_#{key_type}", "false") != "true"
         end
 
-        def touch_and_clear_cache_keys(ids_or_records, *key_types, skip_locked: false)
+        def touch_and_clear_cache_keys(ids_or_records, *key_types)
           unless key_types.all? { |type| skip_touch_for_type?(type) }
             Array(ids_or_records).sort.each_slice(1000) do |slice|
-              if skip_locked
-                where(id: slice).touch_all_skip_locked
-              else
-                where(id: slice).touch_all
-              end
+              where(id: slice).touch_all
             end
           end
           clear_cache_keys(ids_or_records, *key_types)

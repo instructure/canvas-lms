@@ -43,7 +43,9 @@ class Notification < Switchman::UnshardedRecord
   ].freeze
 
   ALLOWED_PUSH_NOTIFICATION_CATEGORIES = %w[
+    all_submissions
     announcement
+    announcement_created_by_you
     appointment_availability
     appointment_cancelations
     calendar
@@ -571,18 +573,10 @@ class Notification < Switchman::UnshardedRecord
       t(:discussion_description, "New Discussion topic in your course")
     when "DiscussionEntry"
       t(:discussion_post_description, "New reply on a topic you're subscribed to")
-    # Remove the feature flag explanation when :react_discussions_post feature flag is removed
     when "DiscussionMention"
-      mt(:discussion_mention_description, <<~MD)
-        New Mention in a Discussion.
-
-        *Discussion Mentions are only available
-        for courses or accounts that have the
-        Discussions/Announcements Redesign
-        feature flag turned on.*
-      MD
+      t("New Mention in a Discussion")
     when "ReportedReply"
-      t(:reported_reply_description, "New reported reply in a Discussion")
+      t("New reported reply in a Discussion")
     when "Due Date"
       t(:due_date_description, "Assignment due date change")
     when "Grading"

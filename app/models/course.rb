@@ -254,7 +254,7 @@ class Course < ActiveRecord::Base
 
   has_many :comment_bank_items, inverse_of: :course
 
-  has_many :course_paces
+  has_many :pace_plans
   has_many :blackout_dates, as: :context, inverse_of: :context
 
   prepend Profile::Association
@@ -1226,9 +1226,7 @@ class Course < ActiveRecord::Base
       self.class.connection.after_transaction_commit do
         Enrollment.where(course_id: self).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
-        # We might get lots of database locks when lots of courses with the same users are being updated,
-        # so we can skip touching those users' updated_at stamp since another process will do it
-        User.touch_and_clear_cache_keys(user_ids, :enrollments, skip_locked: true)
+        User.touch_and_clear_cache_keys(user_ids, :enrollments)
       end
 
       data
@@ -2943,7 +2941,7 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
   TAB_SCHEDULE = 19
-  TAB_COURSE_PACES = 20
+  TAB_PACE_PLANS = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3103,27 +3101,27 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     course_subject_tabs = elementary_subject_course? && opts[:course_subject_tabs]
-    course_paces_allowed = false
+    pace_plans_allowed = false
     default_tabs = if elementary_homeroom_course?
                      Course.default_homeroom_tabs
                    elsif course_subject_tabs
                      Course.course_subject_tabs
                    elsif elementary_subject_course?
-                     course_paces_allowed = true
+                     pace_plans_allowed = true
                      Course.elementary_course_nav_tabs
                    else
-                     course_paces_allowed = true
+                     pace_plans_allowed = true
                      Course.default_tabs
                    end
     # can't manage people in template courses
     default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
-    # only show course paces if enabled
-    if course_paces_allowed && account.feature_enabled?(:course_paces) && enable_course_paces
+    # only show pace plans if enabled
+    if pace_plans_allowed && account.feature_enabled?(:pace_plans) && enable_pace_plans
       default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
-                            id: TAB_COURSE_PACES,
-                            label: t("#tabs.course_paces", "Course Pacing"),
-                            css_class: "course_paces",
-                            href: :course_course_paces_path,
+                            id: TAB_PACE_PLANS,
+                            label: t("#tabs.pace_plans", "Pace Plans"),
+                            css_class: "pace_plans",
+                            href: :course_pace_plans_path,
                             visibility: "admins"
                           })
     end
@@ -3241,7 +3239,7 @@ class Course < ActiveRecord::Base
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES, TAB_COURSE_PACES], :read, :manage_content)
+        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES, TAB_PACE_PLANS], :read, :manage_content)
 
         member_only_tabs = tabs.select { |t| t[:visibility] == "members" }
         tabs -= member_only_tabs if member_only_tabs.present? && !check_for_permission.call(:participate_as_student, :read_as_admin)
@@ -3338,7 +3336,7 @@ class Course < ActiveRecord::Base
     invalid_keys = opts.except(*valid_keys).keys
     raise "invalid options - #{invalid_keys.inspect} (must be in #{valid_keys.inspect})" if invalid_keys.any?
 
-    cast_expression = "val.to_s.presence"
+    cast_expression = "val.to_s"
     cast_expression = "val" if opts[:arbitrary]
     if opts[:boolean]
       opts[:default] ||= false
@@ -3367,12 +3365,7 @@ class Course < ActiveRecord::Base
         if settings_frd[#{setting.inspect}] != new_val
           @changed_settings ||= []
           @changed_settings << #{setting.inspect}
-          if new_val.nil?
-            settings_frd.delete(#{setting.inspect})
-            nil
-          else
-            settings_frd[#{setting.inspect}] = new_val
-          end
+          settings_frd[#{setting.inspect}] = new_val
         end
       end
     RUBY
@@ -3423,14 +3416,12 @@ class Course < ActiveRecord::Base
   add_setting :syllabus_course_summary, boolean: true, default: true
   add_setting :syllabus_updated_at
 
-  add_setting :enable_course_paces, boolean: true, default: false
+  add_setting :enable_pace_plans, boolean: true, default: false
 
   add_setting :usage_rights_required, boolean: true, default: false, inherited: true
 
   add_setting :course_color
   add_setting :alt_name
-
-  add_setting :default_due_time, inherited: true
 
   def elementary_enabled?
     account.enable_as_k5_account?

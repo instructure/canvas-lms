@@ -74,7 +74,7 @@ import round from 'round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!speed_grader'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
 import tz from '@canvas/timezone'
@@ -103,14 +103,14 @@ import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
 // @ts-ignore
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
-import '@canvas/jquery/jquery.ajaxJSON'/* getJSON, ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONFiles */
-import '@canvas/doc-previews'/* loadDocPreview */
-import '@canvas/datetime'/* datetimeString */
+import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/doc-previews' /* loadDocPreview */
+import '@canvas/datetime' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, hasScrollbar */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -122,8 +122,6 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
-
-const I18n = useI18nScope('speed_grader');
 
 const {Alert} = Alerts as any
 
@@ -797,7 +795,7 @@ function initCommentBox() {
     }
 
     const formatComment = function (current_comment) {
-      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
+      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
     }
 
     $('.speech_recognition_link').click(() => {

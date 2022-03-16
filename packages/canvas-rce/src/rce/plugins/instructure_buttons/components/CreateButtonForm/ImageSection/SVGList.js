@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 import {Link} from '@instructure/ui-link'
@@ -36,12 +36,8 @@ export function svgSourceFor(type) {
   return type === TYPE.Multicolor ? MultiColorSVG : SingleColorSVG
 }
 
-const SVGList = ({type, onSelect, fillColor, onMount}) => {
+const SVGList = ({type, onSelect, fillColor}) => {
   const svgSourceList = svgSourceFor(type)
-
-  useEffect(() => {
-    if (onMount) onMount()
-  }, [onMount])
 
   return (
     <Flex
@@ -79,13 +75,11 @@ const SVGList = ({type, onSelect, fillColor, onMount}) => {
 SVGList.propTypes = {
   fillColor: PropTypes.string,
   type: PropTypes.oneOf(Object.values(TYPE)).isRequired,
-  onSelect: PropTypes.func.isRequired,
-  onMount: PropTypes.func
+  onSelect: PropTypes.func.isRequired
 }
 
 SVGList.defaultProps = {
-  fillColor: '#000000',
-  onMount: () => {}
+  fillColor: '#000000'
 }
 
 export default SVGList

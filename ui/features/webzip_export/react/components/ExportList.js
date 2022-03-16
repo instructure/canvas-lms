@@ -18,10 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!webzip_exports'
 import ExportListItem from './ExportListItem'
-
-const I18n = useI18nScope('webzip_exports');
 
 class ExportList extends React.Component {
   static propTypes = {

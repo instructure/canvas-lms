@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations_2'
 import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {IconEmailLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-
-const I18n = useI18nScope('conversations_2');
 
 export const NoSelectedConversation = () => (
   <Flex textAlign="center" direction="column">

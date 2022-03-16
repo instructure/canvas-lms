@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Kunngjøringsliste" },
   "announcements_a4b8ed4a": { "message": "Kunngjøringer" },
   "apply_781a2546": { "message": "Bruk" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Bruk endringer på alle forekomster av denne Knappen og Ikonet i emnet"
+  },
   "apps_54d24a47": { "message": "Apper" },
   "arrows_464a3e54": { "message": "Piler" },
   "art_icon_8e1daad": { "message": "Kunstikon" },
@@ -70,6 +73,12 @@ const locale = {
   "basic_554cdc0a": { "message": "Grunnleggende" },
   "below_81d4dceb": { "message": "Under" },
   "bottom_third_5f5fec1d": { "message": "Nedre tredjedel" },
+  "button_color_608a0242": { "message": "Knappefarge" },
+  "button_outline_cf14f071": { "message": "Knappeomriss" },
+  "button_outline_size_cc1d1df7": { "message": "Knappeomriss størrelse" },
+  "button_shape_dbecb573": { "message": "Knappeform" },
+  "button_size_20f5fce1": { "message": "Knappestørrelse" },
+  "buttons_and_icons_e66ee12c": { "message": "Knapper og ikoner" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "choose_caption_file_9c45bc4e": { "message": "Velg undertekst-fil" },
@@ -109,6 +118,7 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kollaps for å skjule { types }"
   },
+  "color_color_eb64b08": { "message": "Farge { color }" },
   "computer_1d7dfa6f": { "message": "Datamaskin" },
   "content_1440204b": { "message": "Innhold" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -130,6 +140,7 @@ const locale = {
   "course_links_b56959b9": { "message": "Emnelenker" },
   "course_media_ec759ad": { "message": "Emnemedia" },
   "course_navigation_dd035109": { "message": "Emnenavigasjon" },
+  "create_button_and_icon_5c089934": { "message": "Opprett knapp og ikon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-lisens:"
   },
@@ -183,6 +194,8 @@ const locale = {
   "embed_828fac4a": { "message": "Innebygd" },
   "embed_code_314f1bd5": { "message": "Integrere kode" },
   "embed_image_1080badc": { "message": "Bygg inn bilde" },
+  "embed_options_tray_901cfd19": { "message": "Legg ved valgbrett" },
+  "embed_preview_2d741e1f": { "message": "Legg ved forhåndsvisning" },
   "embed_video_a97a64af": { "message": "Legg ved video" },
   "embedded_content_aaeb4d3d": { "message": "inkludert innhold" },
   "engineering_icon_f8f3cf43": { "message": "Ingeniør-ikon" },
@@ -336,6 +349,7 @@ const locale = {
     "message": "Åpne { title }-applikasjon"
   },
   "operators_a2ef9a93": { "message": "Operatører" },
+  "options_3ab0ea65": { "message": "Valg" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordnede og uordnede lister"
   },
@@ -385,6 +399,9 @@ const locale = {
     "message": "Dessverre er Elegante HTML-redigering ikke tilgjengelig med tastaturet. Få tilgang til rå HTML-redigering her."
   },
   "save_11a80ec3": { "message": "Lagre" },
+  "saved_buttons_and_icons_8278eed2": {
+    "message": "Lagrede knapper og ikoner"
+  },
   "search_280d00bd": { "message": "Søk" },
   "search_term_b2d2235": { "message": "Søkeord" },
   "select_crop_shape_d441feeb": { "message": "Velg beskjæringsform" },
@@ -394,6 +411,7 @@ const locale = {
     "message": "Skift-O for å åpne elegante html-redigering."
   },
   "show_audio_options_b489926b": { "message": "Vis lydalternativer" },
+  "show_embed_options_ef8d7ef": { "message": "Vis valg for å legge til" },
   "show_image_options_1e2ecc6b": { "message": "Vis bildemuligheter" },
   "show_link_options_545338fd": { "message": "Vis lenkevalg" },
   "show_video_options_6ed3721a": { "message": "Vis videovalg" },

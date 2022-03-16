@@ -20,14 +20,12 @@ import React, {Component} from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
 import CompleteIncompleteGradeInput from './GradeInput/CompleteIncompleteGradeInput'
-
-const I18n = useI18nScope('gradebook');
 
 function normalizeSubmissionGrade(props) {
   const {submission, assignment, enterGradesAs: formatType, gradingScheme} = props

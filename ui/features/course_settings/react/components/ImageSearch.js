@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import qs from 'qs'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!image_search'
 import ImageSearchActions from '../actions/ImageSearchActions'
 import ImageSearchStore from '../stores/ImageSearchStore'
 import ImageSearchItem from './ImageSearchItem'
@@ -33,8 +33,6 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('image_search');
 
 const unsplashParams = {
   w: 262,

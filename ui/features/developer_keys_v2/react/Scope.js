@@ -21,10 +21,8 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_developer_keys'
 import ScopesMethod from './ScopesMethod'
-
-const I18n = useI18nScope('react_developer_keys');
 
 const DeveloperKeyScope = props => {
   return (

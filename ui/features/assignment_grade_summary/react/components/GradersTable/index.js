@@ -25,13 +25,11 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment_grade_summary'
 
 import * as GradeActions from '../../grades/GradeActions'
 import * as StudentActions from '../../students/StudentActions'
 import AcceptGradesButton from './AcceptGradesButton'
-
-const I18n = useI18nScope('assignment_grade_summary');
 
 function GradersTable(props) {
   const rows = props.graders.map(grader => {

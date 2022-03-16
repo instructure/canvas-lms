@@ -18,10 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!epub_exports'
 import _ from 'underscore'
-
-const I18n = useI18nScope('epub_exports');
 
 class DownloadLink extends React.Component {
   static displayName = 'DownloadLink'

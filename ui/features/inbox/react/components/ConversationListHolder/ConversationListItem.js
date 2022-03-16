@@ -19,7 +19,6 @@
 import {Badge} from '@instructure/ui-badge'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {ConversationContext} from '../../../util/constants'
 import {Focusable} from '@instructure/ui-focusable'
 import {Grid} from '@instructure/ui-grid'
 import {
@@ -29,21 +28,18 @@ import {
   IconEmptySolid
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations_2'
 import {colors} from '@instructure/canvas-theme'
-
-const I18n = useI18nScope('conversations_2');
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
-  const {setMessageOpenEvent} = useContext(ConversationContext)
 
   const isSubmissionComments = props.submissionComments && !props.conversation
 
@@ -223,6 +219,9 @@ export const ConversationListItem = ({...props}) => {
                       checked={props.isSelected}
                       onChange={e => {
                         e.stopPropagation()
+                        if (props.isSelected) {
+                          props.onRemoveFromSelectedConversations(props.id)
+                        }
                       }}
                     />
                   </View>
@@ -359,10 +358,7 @@ export const ConversationListItem = ({...props}) => {
                           display="block"
                           textAlign="center"
                           size="small"
-                          onClick={e => {
-                            setMessageOpenEvent(true) // Required to redirect focus into message
-                            handleConversationClick(e)
-                          }}
+                          onClick={handleConversationClick}
                         >
                           {I18n.t('Open Conversation')}
                         </Button>
@@ -410,6 +406,7 @@ ConversationListItem.propTypes = {
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
+  onRemoveFromSelectedConversations: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
   readStateChangeConversationParticipants: PropTypes.func

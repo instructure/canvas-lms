@@ -221,33 +221,6 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(@course.calendar_events.last.important_dates).to be_truthy
       end
-
-      it "can edit an all_day event in calendar", priority: "1" do
-        @date = Time.zone.now.beginning_of_day
-        @event = make_event(start: @date, end: @date, title: "An all day event")
-
-        new_date = @date
-        new_date = if new_date.to_date.mday == "15"
-                     new_date.change({ day: 20 })
-                   else
-                     new_date.change({ day: 15 })
-                   end
-
-        get "/calendar2"
-        f(".fc-content .fc-title").click
-        f(".edit_event_link").click
-        replace_content(f("input#calendar_event_title"), "An all day event edited")
-        replace_content(f("input#calendar_event_date"), format_date_for_view(new_date, :short))
-        f("button[type=submit]").click
-        wait_for_ajaximations
-        refresh_page
-        f(".fc-content .fc-title").click
-        event_content = fj(".event-details-content:visible")
-        expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq format_date_for_view(new_date, "%b %d")
-        @event.reload
-        expect(@event.all_day).to eq true
-      end
     end
   end
 

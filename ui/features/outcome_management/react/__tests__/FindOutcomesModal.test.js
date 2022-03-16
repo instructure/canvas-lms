@@ -72,8 +72,7 @@ const defaultTreeGroupMocks = () =>
     groupOutcomesNotImportedCount: {
       200: 3,
       300: 3
-    },
-    withGroupDetailsRefetch: true
+    }
   })
 
 describe('FindOutcomesModal', () => {
@@ -81,7 +80,6 @@ describe('FindOutcomesModal', () => {
   let onCloseHandlerMock
   let showFlashAlertSpy
   let isMobileView
-  const withFindGroupRefetch = true
   const courseImportMocks = [
     ...findModalMocks(),
     ...groupMocks({groupId: '100'}),
@@ -89,8 +87,7 @@ describe('FindOutcomesModal', () => {
       groupId: '300',
       isImported: false,
       contextType: 'Course',
-      outcomesCount: 51,
-      withFindGroupRefetch
+      outcomesCount: 51
     })
   ]
   const defaultProps = (props = {}) => ({
@@ -395,7 +392,7 @@ describe('FindOutcomesModal', () => {
           mocks: [
             ...findModalMocks(),
             ...groupMocks({groupId: '100'}),
-            ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
+            ...findOutcomesMocks({groupId: '300'}),
             ...importGroupMocks({groupId: '300'})
           ]
         })
@@ -419,7 +416,7 @@ describe('FindOutcomesModal', () => {
           mocks: [
             ...findModalMocks(),
             ...groupMocks({groupId: '100'}),
-            ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
+            ...findOutcomesMocks({groupId: '300'}),
             ...importGroupMocks({groupId: '300'})
           ]
         })
@@ -445,8 +442,7 @@ describe('FindOutcomesModal', () => {
               groupId: '300',
               isImported: false,
               contextType: 'Course',
-              outcomesCount: 50,
-              withFindGroupRefetch
+              outcomesCount: 50
             }),
             ...importGroupMocks({
               groupId: '300',
@@ -635,77 +631,6 @@ describe('FindOutcomesModal', () => {
         expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
       })
 
-      it('refetches outcomes if parent/ancestor group is selected after group import', async () => {
-        const doResolveProgress = delayImportOutcomesProgress()
-
-        const {getByText, getAllByText, queryByText} = render(
-          <FindOutcomesModal {...defaultProps()} />,
-          {
-            contextType: 'Course',
-            mocks: [
-              ...findModalMocks({parentAccountChildren: 1}),
-              ...defaultTreeGroupMocks(),
-              ...importGroupMocks({
-                groupId: '300',
-                targetContextType: 'Course'
-              })
-            ]
-          }
-        )
-        await act(async () => jest.runAllTimers())
-        await clickEl(getByText('Account Standards'))
-        await clickEl(getByText('Root Account Outcome Group 0'))
-
-        // select group with outcomes 1, 2, 3 and add it to course
-        await clickEl(getByText('Group 200'))
-        await clickEl(getByText('Group 300'))
-        await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(getAllByText('Loading').length).toBe(3)
-
-        // finish import
-        await act(async () => doResolveProgress())
-        expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(3)
-
-        // select parent/ancestor group
-        await clickEl(getByText('Group 200'))
-        expect(getByText('All Refetched Group 200 Outcomes')).toBeInTheDocument()
-      })
-
-      it('does not refetch outcomes if no group is selected after group import', async () => {
-        const doResolveProgress = delayImportOutcomesProgress()
-
-        const {getByText, getAllByText, queryByText} = render(
-          <FindOutcomesModal {...defaultProps()} />,
-          {
-            contextType: 'Course',
-            mocks: [
-              ...findModalMocks({parentAccountChildren: 1}),
-              ...defaultTreeGroupMocks(),
-              ...importGroupMocks({
-                groupId: '300',
-                targetContextType: 'Course'
-              })
-            ]
-          }
-        )
-        await act(async () => jest.runAllTimers())
-        await clickEl(getByText('Account Standards'))
-        await clickEl(getByText('Root Account Outcome Group 0'))
-
-        // select group with outcomes 1, 2, 3 and add it to course
-        await clickEl(getByText('Group 200'))
-        await clickEl(getByText('Group 300'))
-        await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(getAllByText('Loading').length).toBe(3)
-
-        // finish import
-        await act(async () => doResolveProgress())
-        expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(3)
-        expect(queryByText('All Refetched Group 200 Outcomes')).not.toBeInTheDocument()
-      })
-
       it('loads localstorage.activeImports if present', async () => {
         const doResolveProgress = delayImportOutcomesProgress()
 
@@ -794,7 +719,7 @@ describe('FindOutcomesModal', () => {
           mocks: [
             ...findModalMocks(),
             ...groupMocks({groupId: '100'}),
-            ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
+            ...findOutcomesMocks({groupId: '300'}),
             ...importGroupMocks({groupId: '300'})
           ]
         })
@@ -825,7 +750,7 @@ describe('FindOutcomesModal', () => {
             mocks: [
               ...findModalMocks(),
               ...groupMocks({groupId: '100'}),
-              ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
+              ...findOutcomesMocks({groupId: '300'}),
               ...importGroupMocks({groupId: '300', targetGroupId: '1'})
             ]
           }
@@ -1035,8 +960,7 @@ describe('FindOutcomesModal', () => {
               isImported: false,
               contextType: 'Account',
               outcomesGroupContextId: '2',
-              outcomesCount: 51,
-              withFindGroupRefetch
+              outcomesCount: 51
             }),
             ...importOutcomeMocks({
               outcomeId: '5',
@@ -1068,8 +992,7 @@ describe('FindOutcomesModal', () => {
               contextType: 'Account',
               outcomesGroupContextId: null,
               outcomesGroupContextType: null,
-              outcomesCount: 51,
-              withFindGroupRefetch
+              outcomesCount: 51
             }),
             ...importOutcomeMocks({
               outcomeId: '5',

@@ -2595,7 +2595,9 @@ describe Assignment do
         end
 
         it "inserts a record" do
-          expect(Auditors::GradeChange).to receive(:record)
+          # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+          # second time is for the grade change on the record.
+          expect(Auditors::GradeChange).to receive(:record).twice
           assignment.grade_student(student, grade: 10, grader: teacher)
         end
       end
@@ -2621,8 +2623,8 @@ describe Assignment do
           assignment.ensure_post_policy(post_manually: false)
         end
 
-        it "emits one event when grading" do
-          expect(Canvas::LiveEvents).to receive(:grade_changed).once
+        it "emits two events when grading: one for grading and one for posting" do
+          expect(Canvas::LiveEvents).to receive(:grade_changed).twice
           assignment.grade_student(student, grade: 10, grader: teacher)
         end
       end
@@ -3747,7 +3749,9 @@ describe Assignment do
 
     describe "grade change audit records" do
       it "continues to insert grade change records when assignment is muted" do
-        expect(Auditors::GradeChange).to receive(:record).once
+        # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+        # second time is for the grade change on the record.
+        expect(Auditors::GradeChange).to receive(:record).twice
         @assignment.grade_student(@student, grade: 10, grader: @teacher)
       end
 
@@ -8794,7 +8798,9 @@ describe Assignment do
           end
 
           it "inserts a single grade change record" do
-            expect(Auditors::GradeChange).to receive(:record).once
+            # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+            # second time is for the grade change on the record.
+            expect(Auditors::GradeChange).to receive(:record).twice
             assignment.grade_student(student1, grade: 10, grader: teacher)
           end
 
@@ -8816,7 +8822,9 @@ describe Assignment do
           end
 
           it "inserts a single grade change record" do
-            expect(Auditors::GradeChange).to receive(:record).once
+            # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+            # second time is for the grade change on the record.
+            expect(Auditors::GradeChange).to receive(:record).twice
             assignment.grade_student(student1, grade: 10, grader: teacher)
           end
         end
@@ -8845,13 +8853,6 @@ describe Assignment do
             expect(Canvas::LiveEvents).to receive(:grade_changed).once
             assignment.hide_submissions
           end
-
-          it "does not emit a live event when skip_muted_changed" do
-            assignment.grade_student(student1, grade: 10, grader: teacher)
-            expect(Canvas::LiveEvents).not_to receive(:grade_changed)
-            assignment.hide_submissions(skip_muted_changed: true)
-            assignment.post_submissions(skip_muted_changed: true)
-          end
         end
 
         context "when assignment posts automatically" do
@@ -8859,16 +8860,9 @@ describe Assignment do
             assignment.ensure_post_policy(post_manually: false)
           end
 
-          it "emits one event when grading" do
-            expect(Canvas::LiveEvents).to receive(:grade_changed).once
+          it "emits two events when grading: one for grading and one for posting" do
+            expect(Canvas::LiveEvents).to receive(:grade_changed).twice
             assignment.grade_student(student1, grade: 10, grader: teacher)
-          end
-
-          it "does not emit a live event when skip_muted_changed" do
-            assignment.grade_student(student1, grade: 10, grader: teacher)
-            expect(Canvas::LiveEvents).not_to receive(:grade_changed)
-            assignment.hide_submissions(skip_muted_changed: true)
-            assignment.post_submissions(skip_muted_changed: true)
           end
         end
       end

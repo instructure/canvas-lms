@@ -253,64 +253,18 @@ test('invalidates rows after updating students', function () {
   this.gradebook.gotCustomColumnDataChunk('2401', data)
 })
 
-QUnit.module('Gradebook#getStudentOrder', () => {
-  test('returns the IDs of the ordered students in Gradebook', () => {
+QUnit.module('Gradebook#getAssignmentOrder', () => {
+  test('returns the IDs of the ordered assignments in Gradebook', () => {
     const gradebook = createGradebook()
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z'},
-      {id: '4', sortable_name: 'A'},
-      {id: '1', sortable_name: 'C'}
-    ]
-    propEqual(gradebook.getStudentOrder(), ['3', '4', '1'])
-  })
-})
-
-QUnit.module('Gradebook#getAssignmentOrder', hooks => {
-  let gradebook
-
-  hooks.beforeEach(() => {
-    gradebook = createGradebook()
     gradebook.gridData.columns.scrollable = [
-      'assignment_2301',
-      'assignment_2302',
-      'assignment_2303',
-      'assignment_2304',
-      'Assignments',
-      'Homework',
+      'assignment_3',
+      'custom_col_8',
+      'assignment_2',
+      'assignment_group_1',
+      'assignment_7',
       'total_grade'
     ]
-
-    const assignments = [
-      {
-        id: '2301',
-        assignment_group_id: '2201'
-      },
-      {
-        id: '2302',
-        assignment_group_id: '2201'
-      },
-      {
-        id: '2303',
-        assignment_group_id: '2202'
-      },
-      {
-        id: '2304',
-        assignment_group_id: '2202'
-      }
-    ]
-
-    gradebook.gotAllAssignmentGroups([
-      {id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 2)},
-      {id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(2, 4)}
-    ])
-  })
-
-  test('returns the IDs of the assignments in the assignment group', () => {
-    deepEqual(gradebook.getAssignmentOrder('2201'), ['2301', '2302'])
-  })
-
-  test('returns the IDs of the all assignments if no assignment group id is specified', () => {
-    deepEqual(gradebook.getAssignmentOrder(), ['2301', '2302', '2303', '2304'])
+    propEqual(gradebook.getAssignmentOrder(), ['3', '2', '7'])
   })
 })
 

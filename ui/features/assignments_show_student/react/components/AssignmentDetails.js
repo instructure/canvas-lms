@@ -19,12 +19,10 @@
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {Heading} from '@instructure/ui-heading'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
-
-const I18n = useI18nScope('assignments_2_student_header_date_title');
 
 export default function AssignmentDetails({assignment}) {
   return (

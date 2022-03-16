@@ -170,8 +170,8 @@ export function getCourseList() {
       return Promise.resolve({data: getState().courses}) // set via INITIAL_OPTIONS
     }
     const observeeId = observedUserId(getState())
-    const observeeParam = observeeId ? `?observed_user_id=${observeeId}` : ''
-    const url = `/api/v1/dashboard/dashboard_cards${observeeParam}`
+    const ovserveeParam = observeeId ? `?observed_user=${observeeId}` : ''
+    const url = `/api/v1/dashboard/dashboard_cards${ovserveeParam}`
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
     return request
   }

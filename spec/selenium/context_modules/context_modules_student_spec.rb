@@ -408,7 +408,7 @@ describe "context modules" do
         expect(prog).to be_completed
       end
 
-      it "doesn't show the mark done button on locked pages" do
+      it "doesn'ts show the mark done button on locked pages" do
         mod = create_context_module("Mark Done Module")
         assmt = @course.assignments.create!(title: "assmt")
         page = @course.wiki_pages.create!(title: "page", body: "hi")

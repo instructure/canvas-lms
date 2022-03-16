@@ -26,10 +26,6 @@ module CopyToTrayPage
     "[role='dialog'][aria-label='Copy To...']"
   end
 
-  def course_dropdown_item_selector
-    "input[value='course']"
-  end
-
   def import_dialog_css_selector
     "[role='dialog'][aria-label='Import...']"
   end
@@ -106,9 +102,5 @@ module CopyToTrayPage
 
   def wait_for_search_dropdown
     wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2 }
-  end
-
-  def wait_for_sharee_dropdown
-    wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 1 }
   end
 end

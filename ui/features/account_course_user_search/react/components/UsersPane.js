@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shape, func, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!account_course_user_search'
 import {debounce, isEmpty} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import UsersList from './UsersList'
@@ -26,8 +26,6 @@ import UsersToolbar from './UsersToolbar'
 import SearchMessage from './SearchMessage'
 import SRSearchMessage from './SRSearchMessage'
 import UserActions from '../actions/UserActions'
-
-const I18n = useI18nScope('account_course_user_search');
 
 const MIN_SEARCH_LENGTH = 2
 export const SEARCH_DEBOUNCE_TIME = 750

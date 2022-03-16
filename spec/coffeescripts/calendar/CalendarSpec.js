@@ -18,7 +18,7 @@
 
 import Calendar from 'ui/features/calendar/jquery/index.js'
 import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import moment from 'moment'
 import tz from '@canvas/timezone'
@@ -29,8 +29,6 @@ import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
 import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from 'helpers/fakeENV'
-
-const I18n = useI18nScope('calendar');
 
 QUnit.module('Calendar', {
   setup() {
@@ -87,14 +85,14 @@ test('creates a fullcalendar instance', () => {
 
 test('returns correct format for 24 hour times', () => {
   const cal = makeCal()
-  const stub = sinon.stub(I18n.constructor.prototype, 'lookup').returns('%k:%M')
+  const stub = sinon.stub(I18n, 'lookup').returns('%k:%M')
   strictEqual(cal.eventTimeFormat(), 'HH:mm')
   stub.restore()
 })
 
 test('return correct format for non 24 hour times', () => {
   const cal = makeCal()
-  const stub = sinon.stub(I18n.constructor.prototype, 'lookup').returns('whatever')
+  const stub = sinon.stub(I18n, 'lookup').returns('whatever')
   strictEqual(cal.eventTimeFormat(), null)
   stub.restore()
 })

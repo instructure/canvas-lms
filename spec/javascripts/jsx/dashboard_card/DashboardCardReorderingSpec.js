@@ -24,7 +24,6 @@ import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
 import DraggableDashboardCard from '@canvas/dashboard-card/react/DraggableDashboardCard'
 import getDroppableDashboardCardBox from '@canvas/dashboard-card/react/getDroppableDashboardCardBox'
 import fakeENV from 'helpers/fakeENV'
-import {render} from '@testing-library/react'
 
 let cards
 let fakeServer
@@ -85,8 +84,8 @@ test('it renders', () => {
   ok(root)
 })
 
-test('cards have opacity of 0 while moving', assert => {
-  const {container} = render(
+test('cards have opacity of 0 while moving', () => {
+  const card = TestUtils.renderIntoDocument(
     <DashboardCard
       cardComponent={DashboardCard}
       {...cards[0]}
@@ -95,8 +94,8 @@ test('cards have opacity of 0 while moving', assert => {
       isDragging
     />
   )
-
-  assert.equal(container.firstChild.style.opacity, 0)
+  const div = TestUtils.findRenderedDOMComponentWithClass(card, 'ic-DashboardCard')
+  equal(div.style.opacity, 0)
 })
 
 test('moving a card adjusts the position property', () => {

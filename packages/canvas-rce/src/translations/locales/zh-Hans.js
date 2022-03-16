@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "公告列表" },
   "announcements_a4b8ed4a": { "message": "公告" },
   "apply_781a2546": { "message": "申请" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "将更改应用于课程中的此按钮和图标的所有实例"
+  },
   "apps_54d24a47": { "message": "应用程序" },
   "arrows_464a3e54": { "message": "箭头" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "保留长宽比" },
@@ -67,6 +70,12 @@ const locale = {
   "basic_554cdc0a": { "message": "基本" },
   "below_81d4dceb": { "message": "下方" },
   "bottom_third_5f5fec1d": { "message": "倒数第三" },
+  "button_color_608a0242": { "message": "按钮颜色" },
+  "button_outline_cf14f071": { "message": "按钮轮廓" },
+  "button_outline_size_cc1d1df7": { "message": "按钮轮廓大小" },
+  "button_shape_dbecb573": { "message": "按钮形状" },
+  "button_size_20f5fce1": { "message": "按钮大小" },
+  "buttons_and_icons_e66ee12c": { "message": "按钮和图标" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "取消" },
   "choose_caption_file_9c45bc4e": { "message": "选择标题文件" },
@@ -97,6 +106,7 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "关闭了字幕/说明" },
   "collaborations_5c56c15f": { "message": "协作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "折叠以隐藏 { types }" },
+  "color_color_eb64b08": { "message": "颜色{ color }" },
   "computer_1d7dfa6f": { "message": "计算机" },
   "content_1440204b": { "message": "内容" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -118,6 +128,7 @@ const locale = {
   "course_links_b56959b9": { "message": "课程链接" },
   "course_media_ec759ad": { "message": "课程媒体" },
   "course_navigation_dd035109": { "message": "课程导航" },
+  "create_button_and_icon_5c089934": { "message": "创建按钮和图标" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons 许可证："
   },
@@ -166,6 +177,8 @@ const locale = {
   "embed_828fac4a": { "message": "嵌入" },
   "embed_code_314f1bd5": { "message": "嵌入代码" },
   "embed_image_1080badc": { "message": "嵌入图片" },
+  "embed_options_tray_901cfd19": { "message": "嵌入选项托盘" },
+  "embed_preview_2d741e1f": { "message": "嵌入预览" },
   "embed_video_a97a64af": { "message": "嵌入视频" },
   "embedded_content_aaeb4d3d": { "message": "嵌入内容" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
@@ -289,6 +302,7 @@ const locale = {
   },
   "open_title_application_fd624fc5": { "message": "打开{ title }应用程序" },
   "operators_a2ef9a93": { "message": "运算符" },
+  "options_3ab0ea65": { "message": "选项" },
   "ordered_and_unordered_lists_cfadfc38": { "message": "有序列表和无序列表" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "其他编辑器快捷方式可见于"
@@ -329,6 +343,7 @@ const locale = {
     "message": "很抱歉，无法通过键盘访问精美 HTML 编辑器。在此处访问原始 HTML 编辑器"
   },
   "save_11a80ec3": { "message": "保存" },
+  "saved_buttons_and_icons_8278eed2": { "message": "保存的按钮和图标" },
   "search_280d00bd": { "message": "搜索" },
   "search_term_b2d2235": { "message": "搜索学期" },
   "select_crop_shape_d441feeb": { "message": "选择裁剪形状" },
@@ -338,6 +353,7 @@ const locale = {
     "message": "按 Shift-O 打开精美 HTML 编辑器。"
   },
   "show_audio_options_b489926b": { "message": "显示音频选项" },
+  "show_embed_options_ef8d7ef": { "message": "显示嵌入选项" },
   "show_image_options_1e2ecc6b": { "message": "显示图像选项" },
   "show_link_options_545338fd": { "message": "显示链接选项" },
   "show_video_options_6ed3721a": { "message": "显示视频选项" },

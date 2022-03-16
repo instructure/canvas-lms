@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Meddelelsesliste" },
   "announcements_a4b8ed4a": { "message": "Beskeder" },
   "apply_781a2546": { "message": "Tildel" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Anvend ændringer på alle forekomster af denne knap og ikon i faget"
+  },
   "apps_54d24a47": { "message": "Apps" },
   "arrows_464a3e54": { "message": "Pile" },
   "art_icon_8e1daad": { "message": "Kunst-ikon" },
@@ -72,6 +75,12 @@ const locale = {
   "basic_554cdc0a": { "message": "Grundlæggende" },
   "below_81d4dceb": { "message": "Under" },
   "bottom_third_5f5fec1d": { "message": "Nederste tredjedel" },
+  "button_color_608a0242": { "message": "Knapfarve" },
+  "button_outline_cf14f071": { "message": "Knapkontur" },
+  "button_outline_size_cc1d1df7": { "message": "Knapkonturens størrelse" },
+  "button_shape_dbecb573": { "message": "Knapform" },
+  "button_size_20f5fce1": { "message": "Knapstørrelse" },
+  "buttons_and_icons_e66ee12c": { "message": "Knapper og ikoner" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Annullér" },
   "choose_caption_file_9c45bc4e": { "message": "Vælg billedtekstfil" },
@@ -111,6 +120,7 @@ const locale = {
   },
   "collaborations_5c56c15f": { "message": "Samarbejde" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Skjul { types }" },
+  "color_color_eb64b08": { "message": "Farve { color }" },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Indhold" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -132,6 +142,7 @@ const locale = {
   "course_links_b56959b9": { "message": "Faglinks" },
   "course_media_ec759ad": { "message": "Fagmedier" },
   "course_navigation_dd035109": { "message": "Fagnavigation" },
+  "create_button_and_icon_5c089934": { "message": "Opret knap og ikon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
   },
@@ -185,6 +196,10 @@ const locale = {
   "embed_828fac4a": { "message": "Indlejre" },
   "embed_code_314f1bd5": { "message": "Indlejr kode" },
   "embed_image_1080badc": { "message": "Integrer billede" },
+  "embed_options_tray_901cfd19": {
+    "message": "Bakke til indlejringsindstillinger"
+  },
+  "embed_preview_2d741e1f": { "message": "Indlejr forhåndsvisning" },
   "embed_video_a97a64af": { "message": "Indlejr video" },
   "embedded_content_aaeb4d3d": { "message": "indlejret indhold" },
   "engineering_icon_f8f3cf43": { "message": "Teknik-ikon" },
@@ -338,6 +353,7 @@ const locale = {
   },
   "open_title_application_fd624fc5": { "message": "Åbn { title } applikation" },
   "operators_a2ef9a93": { "message": "Operatører" },
+  "options_3ab0ea65": { "message": "Muligheder" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Sorterede og usorterede lister"
   },
@@ -387,6 +403,7 @@ const locale = {
     "message": "Desværre er det pæne HTML-redigeringsværktøj ikke tilgængeligt på tastaturet. Få adgang til det rå HTML-redigeringsværktøj her."
   },
   "save_11a80ec3": { "message": "Gem" },
+  "saved_buttons_and_icons_8278eed2": { "message": "Gemte knapper og ikoner" },
   "search_280d00bd": { "message": "Søg" },
   "search_term_b2d2235": { "message": "Søgeord" },
   "select_crop_shape_d441feeb": { "message": "Vælg beskæringsform" },
@@ -396,6 +413,7 @@ const locale = {
     "message": "Shift-O for at åbne det pæne html-redigeringsværktøj."
   },
   "show_audio_options_b489926b": { "message": "Vis lydindstillinger" },
+  "show_embed_options_ef8d7ef": { "message": "Vis indlejringsindstillinger" },
   "show_image_options_1e2ecc6b": { "message": "Vis billedindstillinger" },
   "show_link_options_545338fd": { "message": "Vis linkindstillinger" },
   "show_video_options_6ed3721a": { "message": "Vis videoindstillinger" },

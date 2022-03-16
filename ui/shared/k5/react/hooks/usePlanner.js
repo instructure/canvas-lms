@@ -17,14 +17,12 @@
  */
 
 import {useEffect, useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!k5_use_planner'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {initializePlanner} from '@instructure/canvas-planner'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
-
-const I18n = useI18nScope('k5_use_planner');
 
 /**
  * A hook for setting up the planner prior to first rendering it. This function is

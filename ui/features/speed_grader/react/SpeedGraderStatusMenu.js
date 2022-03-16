@@ -18,15 +18,13 @@
 
 import React from 'react'
 import {func, number, string, oneOf} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!speed_grader'
 import {Menu} from '@instructure/ui-menu'
 import {IconEditLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TimeLateInput from '@canvas/grading/TimeLateInput'
-
-const I18n = useI18nScope('speed_grader');
 
 const statusesMap = {
   excused: I18n.t('Excused'),

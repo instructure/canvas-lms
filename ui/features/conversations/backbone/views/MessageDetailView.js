@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations'
 import $ from 'jquery'
 import _ from 'underscore'
 import {View} from '@canvas/backbone'
@@ -27,8 +27,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Avatar} from '@instructure/ui-avatar'
 import {nanoid} from 'nanoid'
-
-const I18n = useI18nScope('conversations');
 
 export default class MessageDetailView extends View {
   static initClass() {

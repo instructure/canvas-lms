@@ -3687,7 +3687,7 @@ class Assignment < ActiveRecord::Base
     !!effective_post_policy&.post_manually?
   end
 
-  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false)
+  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil)
     submissions = if submission_ids.nil?
                     self.submissions.active
                   else
@@ -3715,7 +3715,7 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    submissions.in_workflow_state("graded").each(&:assignment_muted_changed) unless skip_muted_changed
+    submissions.in_workflow_state("graded").each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
@@ -3725,7 +3725,7 @@ class Assignment < ActiveRecord::Base
     broadcast_submissions_posted(posting_params) if posting_params.present?
   end
 
-  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, skip_muted_changed: false)
+  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false)
     submissions = if submission_ids.nil?
                     self.submissions.active
                   else
@@ -3737,7 +3737,7 @@ class Assignment < ActiveRecord::Base
 
     User.clear_cache_keys(user_ids, :submissions)
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
-    submissions.in_workflow_state("graded").each(&:assignment_muted_changed) unless skip_muted_changed
+    submissions.in_workflow_state("graded").each(&:assignment_muted_changed)
     hide_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!

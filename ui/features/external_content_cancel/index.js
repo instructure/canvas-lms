@@ -16,9 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('external_content.cancel');
+import I18n from 'i18n!external_content.cancel'
 
 let parentWindow
 window.parentWindow = window.parent

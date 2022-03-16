@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conferences'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
@@ -37,8 +37,6 @@ import '@canvas/util/templateData'
 import '@canvas/datetime'
 import renderConferenceAlternatives from './react/renderAlternatives'
 import ready from '@instructure/ready'
-
-const I18n = useI18nScope('conferences');
 
 if (ENV.can_create_conferences) {
   if (ENV.render_alternatives) {

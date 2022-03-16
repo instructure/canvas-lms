@@ -33,18 +33,14 @@ BulkDateInput.propTypes = {
   updateAssignmentDate: func.isRequired,
   timezone: string,
   fancyMidnight: bool,
-  defaultTime: string,
   interaction: string,
-  messages: arrayOf(shape({type: string, text: string})),
-  width: string
+  messages: arrayOf(shape({type: string, text: string}))
 }
 
 BulkDateInput.defaultProps = {
   timezone: null,
   fancyMidnight: false,
-  defaultTime: null,
-  interaction: 'enabled',
-  width: '100%'
+  interaction: 'enabled'
 }
 
 function BulkDateInput({
@@ -57,14 +53,12 @@ function BulkDateInput({
   updateAssignmentDate,
   timezone,
   fancyMidnight,
-  defaultTime,
-  interaction,
-  width
+  interaction
 }) {
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
 
-  const formatDate = useDateTimeFormat('date.formats.full_with_weekday', timezone)
+  const formatDate = useDateTimeFormat('date.formats.medium_with_weekday', timezone)
 
   const setDate = useCallback(
     newDate => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
@@ -78,37 +72,27 @@ function BulkDateInput({
       } else if (selectedDateString) {
         // preserve the existing selected time
         const selectedMoment = moment.tz(selectedDateString, timezone)
+        const [h, m, s, ms] = [
+          selectedMoment.hour(),
+          selectedMoment.minute(),
+          selectedMoment.second(),
+          selectedMoment.millisecond()
+        ]
         const newMoment = moment.tz(newDate, timezone)
-        if (!newMoment.isSame(selectedMoment, 'day')) {
-          const [h, m, s, ms] = [
-            selectedMoment.hour(),
-            selectedMoment.minute(),
-            selectedMoment.second(),
-            selectedMoment.millisecond()
-          ]
-          newMoment.hour(h)
-          newMoment.minute(m)
-          newMoment.second(s)
-          newMoment.millisecond(ms)
-        }
+        newMoment.hour(h)
+        newMoment.minute(m)
+        newMoment.second(s)
+        newMoment.millisecond(ms)
         setDate(newMoment.toDate())
       } else {
         // assign a default time to the new date
         const newMoment = moment.tz(newDate, timezone)
-        if (defaultTime) {
-          const [h, m, s] = defaultTime.split(':').map(n => parseInt(n, 10))
-          newMoment.hour(h)
-          newMoment.minute(m)
-          newMoment.second(s)
-        } else if (fancyMidnight) {
-          newMoment.endOf('day')
-        } else {
-          newMoment.startOf('day')
-        }
+        if (fancyMidnight) newMoment.endOf('day')
+        else newMoment.startOf('day')
         setDate(newMoment.toDate())
       }
     },
-    [fancyMidnight, defaultTime, selectedDateString, setDate, timezone]
+    [fancyMidnight, selectedDateString, setDate, timezone]
   )
 
   const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])
@@ -122,7 +106,6 @@ function BulkDateInput({
       timezone={timezone}
       interaction={interaction}
       messages={messages}
-      width={width}
       withRunningValue
     />
   )

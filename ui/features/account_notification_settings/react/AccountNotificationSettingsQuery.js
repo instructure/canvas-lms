@@ -20,13 +20,11 @@ import {ACCOUNT_NOTIFICATIONS_QUERY} from '../graphql/Queries'
 import AccountNotificationSettingsManager from './AccountNotificationSettingsManager'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!courses'
 import LoadingIndicator from '@canvas/loading-indicator'
 import React from 'react'
 import {string} from 'prop-types'
 import {useQuery} from 'react-apollo'
-
-const I18n = useI18nScope('courses');
 
 export default function AccountNotificationSettingsQuery(props) {
   const {loading, error, data} = useQuery(ACCOUNT_NOTIFICATIONS_QUERY, {

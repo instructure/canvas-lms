@@ -1098,7 +1098,7 @@ describe "Users API", type: :request do
         specs_require_sharding
 
         it "takes all relevant pseudonyms and return the maximum current_login_at" do
-          @shard1.activate do
+          @shard3.activate do
             p4 = @u.pseudonyms.create!(account: @account, unique_id: "p4")
             p4.current_login_at = 4.minutes.ago
             p4.save!
@@ -1116,27 +1116,28 @@ describe "Users API", type: :request do
             p3.current_login_at = 6.minutes.ago
             p3.save!
           end
+          @shard1.activate do
+            account = Account.create!
+            course = account.courses.create!
+            course.enroll_student(@u)
 
-          account = Account.create!
-          course = account.courses.create!
-          course.enroll_student(@u)
+            account_admin_user
+            user_session(@user)
 
-          account_admin_user
-          user_session(@user)
-
-          json =
-            api_call(
-              :get,
-              "/api/v1/users/#{@u.id}",
-              {
-                controller: "users",
-                action: "api_show",
-                id: @u.id.to_param,
-                format: "json"
-              },
-              { include: ["last_login"] }
-            )
-          expect(json.fetch("last_login")).to eq @p.current_login_at.iso8601
+            json =
+              api_call(
+                :get,
+                "/api/v1/users/#{@u.id}",
+                {
+                  controller: "users",
+                  action: "api_show",
+                  id: @u.id.to_param,
+                  format: "json"
+                },
+                { include: ["last_login"] }
+              )
+            expect(json.fetch("last_login")).to eq @p.current_login_at.iso8601
+          end
         end
       end
     end

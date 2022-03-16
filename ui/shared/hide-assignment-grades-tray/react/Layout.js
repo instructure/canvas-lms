@@ -28,11 +28,9 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 
 import {View} from '@instructure/ui-view'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!hide_assignment_grades_tray'
 
 import FormContent from './FormContent'
-
-const I18n = useI18nScope('hide_assignment_grades_tray');
 
 export default function Layout({
   assignment: {anonymousGrading, gradesPublished},

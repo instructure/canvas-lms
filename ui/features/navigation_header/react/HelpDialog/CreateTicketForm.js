@@ -18,12 +18,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!createTicketForm'
 import $ from 'jquery'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('createTicketForm');
 
 class CreateTicketForm extends React.Component {
   static propTypes = {

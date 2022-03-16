@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!shared.flash_notices'
 
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import NotificationsHelper from '@canvas/rails-flash-notifications/jquery/helper'
-
-const I18n = useI18nScope('shared.flash_notices');
 
 let helper
 let fixtures

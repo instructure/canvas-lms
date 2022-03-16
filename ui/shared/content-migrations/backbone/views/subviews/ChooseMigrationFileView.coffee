@@ -17,9 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import template from '../../../jst/subviews/ChooseMigrationFile.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-I18n = useI18nScope('content_migrations')
+import I18n from 'i18n!content_migrations'
 
 export default class ChooseMigrationFile extends Backbone.View
   template: template

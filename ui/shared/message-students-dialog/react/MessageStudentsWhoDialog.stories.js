@@ -18,9 +18,6 @@
 
 import React from 'react'
 import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
-import {ApolloProvider, useQuery} from 'react-apollo'
-import {createClient} from '@canvas/apollo'
-
 
 const students = [
   {
@@ -62,7 +59,7 @@ export default {
   }
 }
 
-const Template = args =>  <ApolloProvider client={createClient()}><MessageStudentsWhoDialog {...args} /></ApolloProvider>
+const Template = args => <MessageStudentsWhoDialog {...args} />
 export const ScoredAssignment = Template.bind({})
 ScoredAssignment.args = {
   assignment: {

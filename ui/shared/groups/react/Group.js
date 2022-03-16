@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!student_groups'
 import React from 'react'
 import natcompare from '@canvas/util/natcompare'
 import {Button} from '@instructure/ui-buttons'
-
-const I18n = useI18nScope('student_groups');
 
 class Group extends React.Component {
   state = {open: false}

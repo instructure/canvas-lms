@@ -26,8 +26,7 @@ export const initialState = {
   iconFillColor: '#000000',
   collectionOpen: false,
   loading: false,
-  error: undefined,
-  scrolled: false
+  error: undefined
 }
 
 export const actions = {
@@ -40,8 +39,7 @@ export const actions = {
   SET_IMAGE_COLLECTION_OPEN: {type: 'SetImageCollectionOpen'},
   START_LOADING: {type: 'StartLoading'},
   STOP_LOADING: {type: 'StopLoading'},
-  CLEAR_MODE: {type: 'ClearMode'},
-  SET_SCROLLED: {type: 'SetScrolled'}
+  CLEAR_MODE: {type: 'ClearMode'}
 }
 
 export const modes = {
@@ -73,8 +71,6 @@ const imageSection = (state, action) => {
       return {...state, collectionOpen: action.payload}
     case actions.RESET_ALL.type:
       return {...state, ...initialState}
-    case actions.SET_SCROLLED.type:
-      return {...state, scrolled: action.payload}
     case modes.uploadImages.type:
       return {...state, mode: modes.uploadImages.type}
     case modes.singleColorImages.type:

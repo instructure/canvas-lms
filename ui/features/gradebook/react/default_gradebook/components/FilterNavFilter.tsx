@@ -19,7 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import uuid from 'uuid'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import {View} from '@instructure/ui-view'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -44,8 +44,6 @@ import type {
   Section,
   StudentGroupCategoryMap
 } from '../gradebook.d'
-
-const I18n = useI18nScope('gradebook');
 
 const {Item} = Flex as any
 

@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!plugins'
 import $ from 'jquery'
-import '@canvas/jquery/jquery.instructure_misc_plugins'
-const I18n = useI18nScope('plugins');
-/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 
 $('form.edit_plugin_setting').live('submit', function() {
   $(this)

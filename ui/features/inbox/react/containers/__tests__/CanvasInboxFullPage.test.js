@@ -168,7 +168,7 @@ describe('CanvasInbox Full Page', () => {
       )
     })
 
-    it('Successfully star selected conversations', async () => {
+    it.skip('Successfully star selected conversations', async () => {
       server.use(
         graphql.query('GetConversationsQuery', (req, res, ctx) => {
           const data = {
@@ -231,7 +231,7 @@ describe('CanvasInbox Full Page', () => {
       expect(checkbox.checked).toBeFalsy()
     })
 
-    it('should trigger confirm when deleting from MessageListActions', async () => {
+    it('should trigger confirm when deleting', async () => {
       window.confirm = jest.fn(() => true)
       const container = setup()
 
@@ -240,20 +240,6 @@ describe('CanvasInbox Full Page', () => {
 
       const deleteBtn = await container.findByTestId('delete')
       fireEvent.click(deleteBtn)
-      expect(window.confirm).toHaveBeenCalled()
-    })
-
-    it('should trigger confirm when deleting from message kebab menu', async () => {
-      window.confirm = jest.fn(() => true)
-      const container = setup()
-
-      const conversation = await container.findByTestId('conversationListItem-Checkbox')
-      fireEvent.click(conversation)
-
-      const moreOptionsButtons = await container.findAllByTestId('message-more-options')
-      fireEvent.click(moreOptionsButtons[1])
-      const deleteOption = await container.findByTestId('message-delete')
-      fireEvent.click(deleteOption)
       expect(window.confirm).toHaveBeenCalled()
     })
 

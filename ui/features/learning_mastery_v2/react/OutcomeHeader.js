@@ -24,10 +24,8 @@ import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!learning_mastery_gradebook'
 import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
-
-const I18n = useI18nScope('learning_mastery_gradebook');
 
 const OutcomeHeader = ({title}) => (
   <View background="secondary" as="div" width={COLUMN_WIDTH} borderWidth="large 0 medium 0">

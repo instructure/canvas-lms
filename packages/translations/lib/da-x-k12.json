@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Tildel"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Anvend ændringer på alle forekomster af denne knap og ikon i faget"
+    },
     "apps_54d24a47": {
         "message": "Apps"
     },
@@ -179,6 +182,24 @@
     "bottom_third_5f5fec1d": {
         "message": "Nederste tredjedel"
     },
+    "button_color_608a0242": {
+        "message": "Knapfarve"
+    },
+    "button_outline_cf14f071": {
+        "message": "Knapkontur"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Knapkonturens størrelse"
+    },
+    "button_shape_dbecb573": {
+        "message": "Knapform"
+    },
+    "button_size_20f5fce1": {
+        "message": "Knapstørrelse"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Knapper og ikoner"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -254,6 +275,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Skjul { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Farve { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -316,6 +340,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } OPGAVELISTE"
+    },
+    "create_button_and_icon_5c089934": {
+        "message": "Opret knap og ikon"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons licens:"
@@ -479,6 +506,12 @@
     "embed_image_1080badc": {
         "message": "Integrer billede"
     },
+    "embed_options_tray_901cfd19": {
+        "message": "Bakke til indlejringsindstillinger"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "Indlejr forhåndsvisning"
+    },
     "embed_video_a97a64af": {
         "message": "Indlejr video"
     },
@@ -538,9 +571,6 @@
     },
     "extracurricular_icon_67c8ca42": {
         "message": "Fritids-ikon"
-    },
-    "failed_getting_course_list_49846a93": {
-        "message": "Kunne ikke hente fagliste"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Mislykkedes at kigge ind i din fremtid"
@@ -1004,6 +1034,9 @@
     "optional_add_course_ef0d70fc": {
         "message": "Valgfrit: Tilføj fag"
     },
+    "options_3ab0ea65": {
+        "message": "Muligheder"
+    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Sorterede og usorterede lister"
     },
@@ -1142,6 +1175,9 @@
     "save_11a80ec3": {
         "message": "Gem"
     },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "Gemte knapper og ikoner"
+    },
     "schedule_preview_3bcda153": {
         "message": "Forhåndsvisning af tidsplan"
     },
@@ -1177,6 +1213,9 @@
     },
     "show_audio_options_b489926b": {
         "message": "Vis lydindstillinger"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "Vis indlejringsindstillinger"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Vis billedindstillinger"

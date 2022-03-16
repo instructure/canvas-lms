@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import StudentColumnHeader from './StudentColumnHeader'
-
-const I18n = useI18nScope('gradebook');
 
 export default class StudentLastNameColumnHeader extends StudentColumnHeader {
   getColumnHeaderName() {

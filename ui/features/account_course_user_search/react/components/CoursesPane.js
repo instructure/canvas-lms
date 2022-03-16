@@ -19,7 +19,7 @@
 import React from 'react'
 import {shape, arrayOf, string, func} from 'prop-types'
 import {debounce} from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!account_course_user_search'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CoursesStore from '../store/CoursesStore'
 import TermsStore from '../store/TermsStore'
@@ -29,8 +29,6 @@ import CoursesToolbar from './CoursesToolbar'
 import SearchMessage from './SearchMessage'
 import SRSearchMessage from './SRSearchMessage'
 import {SEARCH_DEBOUNCE_TIME} from './UsersPane'
-
-const I18n = useI18nScope('account_course_user_search');
 
 const MIN_SEARCH_LENGTH = 2
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]

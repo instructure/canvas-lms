@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, number, oneOf, oneOfType, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
@@ -27,8 +27,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 
 import EditableNumber from './EditableNumber'
-
-const I18n = useI18nScope('assignments_2');
 
 const editLabel = I18n.t('Edit Points')
 const label = I18n.t('Points')

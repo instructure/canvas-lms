@@ -17,7 +17,7 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -38,8 +38,6 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
-
-const I18n = useI18nScope('assignment');
 
 ready(() => {
   const lockManager = new LockManager()
