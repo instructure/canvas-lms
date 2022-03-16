@@ -91,6 +91,7 @@ function getProps(column, gradebook, options) {
       anonymizeStudents: assignment.anonymize_students,
       courseId: assignment.course_id,
       htmlUrl: assignment.html_url,
+      gradingType: assignment.grading_type,
       id: assignment.id,
       muted: assignment.muted,
       name: assignment.name,

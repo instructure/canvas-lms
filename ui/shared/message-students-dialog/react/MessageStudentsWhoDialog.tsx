@@ -17,14 +17,20 @@
  */
 
 import React, {useState, useContext} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
+import {
+  IconAddSolid,
+  IconArrowOpenDownLine,
+  IconArrowOpenUpLine,
+  IconXSolid
+} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -34,6 +40,12 @@ import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
+
+import _ from 'lodash'
+import {OBSERVER_ENROLLMENTS_QUERY} from '../graphql/Queries'
+
+import {useQuery} from 'react-apollo'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
@@ -44,7 +56,7 @@ import {
   removeAttachmentFn
 } from '@canvas/message-attachments'
 
-const I18n = useI18nScope('public_message_students_who');
+const I18n = useI18nScope('public_message_students_who')
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item} = Flex as any
@@ -59,6 +71,7 @@ export type Student = {
 }
 
 export type Assignment = {
+  courseId: string
   gradingType: string
   id: string
   name: string
@@ -122,6 +135,29 @@ const filterCriteria: FilterCriterion[] = [
   }
 ]
 
+// Interim Tag-like component representing a selectable student or observer
+// until whatever we're using gets finalized
+// Still needed: some sort of onClick handler so we can select and deselect
+const FakeTag = ({text, selected = false}) => {
+  const contents = selected ? (
+    <>
+      <View margin="0 small 0 0">
+        <Text color="primary">{text}</Text>
+      </View>
+      <IconXSolid />
+    </>
+  ) : (
+    <>
+      <View margin="0 small 0 0">
+        <Text color="secondary">{text}</Text>
+      </View>
+      <IconAddSolid color="brand" />
+    </>
+  )
+
+  return <Tag text={contents} />
+}
+
 const MessageStudentsWhoDialog: React.FC<Props> = ({
   assignment,
   onClose,
@@ -130,16 +166,41 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   messageAttachmentUploadFolderId
 }) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-
   const [open, setOpen] = useState(true)
   const [sending, setSending] = useState(false)
 
   const close = () => setOpen(false)
 
+  const {loading, data} = useQuery(OBSERVER_ENROLLMENTS_QUERY, {
+    variables: {
+      courseId: assignment.courseId,
+      studentIds: students.map(student => student.id)
+    }
+  })
+
+  const observerEnrollments = data?.course?.enrollmentsConnection?.nodes || []
+  const observersByStudentID = observerEnrollments.reduce((results, enrollment) => {
+    const observeeId = enrollment.associatedUser._id
+    results[observeeId] = results[observeeId] || []
+    const existingObservers = results[observeeId]
+
+    if (!existingObservers.some(user => user._id === enrollment.user._id)) {
+      results[observeeId].push(enrollment.user)
+    }
+
+    return results
+  }, {})
+
   const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
   const [showTable, setShowTable] = useState(false)
   const [selectedCriterion, setSelectedCriterion] = useState(availableCriteria[0])
   const [cutoff, setCutoff] = useState(0.0)
+  const [attachments, setAttachments] = useState([])
+  const [pendingUploads, setPendingUploads] = useState([])
+
+  if (loading) {
+    return <LoadingIndicator />
+  }
 
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
 
@@ -149,12 +210,6 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
       setSelectedCriterion(newCriterion)
     }
   }
-
-  // TODO: get observers from GraphQL eventually
-  const observers = []
-
-  const [attachments, setAttachments] = useState([])
-  const [pendingUploads, setPendingUploads] = useState([])
 
   const handleSendButton = () => {
     if (pendingUploads.length) {
@@ -238,6 +293,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
             </Item>
             <Item margin="0 0 0 medium">
               <Checkbox
+                defaultChecked
                 label={
                   <Text weight="bold">
                     {I18n.t('%{studentCount} Students', {studentCount: students.length})}
@@ -249,7 +305,9 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
               <Checkbox
                 label={
                   <Text weight="bold">
-                    {I18n.t('%{observerCount} Observers', {observerCount: observers.length})}
+                    {I18n.t('%{observerCount} Observers', {
+                      observerCount: observerEnrollments.length
+                    })}
                   </Text>
                 }
               />
@@ -259,6 +317,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 onClick={() => setShowTable(!showTable)}
                 renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
                 iconPlacement="end"
+                data-testid="show_all_recipients"
               >
                 {showTable ? I18n.t('Hide all recipients') : I18n.t('Show all recipients')}
               </Link>
@@ -276,9 +335,20 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 {sortedStudents.map(student => (
                   <Row key={student.id}>
                     <Cell>
-                      <Tag text={student.name} />
+                      <FakeTag text={student.name} selected />
                     </Cell>
-                    <Cell>{/* observers will go here */}</Cell>
+                    <Cell>
+                      <Flex direction="row" margin="0 0 0 small" wrap="wrap">
+                        {_.sortBy(
+                          observersByStudentID[student.id] || [],
+                          observer => observer.sortableName
+                        ).map(observer => (
+                          <Item key={observer._id}>
+                            <FakeTag text={observer.name} />
+                          </Item>
+                        ))}
+                      </Flex>
+                    </Cell>
                   </Row>
                 ))}
               </TableBody>

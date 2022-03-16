@@ -31,6 +31,8 @@ import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import MessageStudentsWithObserversDialog from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
+import {ApolloProvider} from 'react-apollo'
+import {createClient} from '@canvas/apollo'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -213,15 +215,23 @@ export default class GradebookHeaderMenu {
       const mountPoint = document.querySelector(
         "[data-component='MessageStudentsWithObserversModal']"
       )
-      const dialog = React.createElement(MessageStudentsWithObserversDialog, {
-        assignment,
+      const props = {
+        assignment: {
+          id: assignment.id,
+          name: assignment.name
+        },
         onClose: () => {
           ReactDOM.unmountComponentAtNode(mountPoint)
         },
         onSend,
         students
-      })
-      ReactDOM.render(dialog, mountPoint)
+      }
+      ReactDOM.render(
+        <ApolloProvider client={createClient()}>
+          <MessageStudentsWithObserversDialog {...props} />
+        </ApolloProvider>,
+        mountPoint
+      )
     } else {
       const settings = MessageStudentsWhoHelper.settings(assignment, students)
       return messageStudents(settings)
