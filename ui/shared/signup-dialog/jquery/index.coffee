@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!registration'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import preventDefault from 'prevent-default'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import teacherDialog from '../jst/teacherDialog.handlebars'
@@ -30,6 +30,8 @@ import './validate'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/datetime'
 import '@canvas/util/jquery/fixDialogButtons'
+
+I18n = useI18nScope('registration')
 
 $nodes = {}
 templates = {teacherDialog, studentDialog, parentDialog, newParentDialog, samlDialog}

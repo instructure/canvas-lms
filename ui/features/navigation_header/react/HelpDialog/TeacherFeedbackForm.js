@@ -19,9 +19,11 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!TeacherFeedbackForm'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/rails-flash-notifications'
+
+const I18n = useI18nScope('TeacherFeedbackForm');
 
 class TeacherFeedbackForm extends React.Component {
   static propTypes = {
@@ -99,7 +101,7 @@ class TeacherFeedbackForm extends React.Component {
     const selectedCourse = this.state.courses
       .filter(c => !c.access_restricted_by_date)
       .find(c => c.id === window.ENV.context_id)
-    const currentSelectValue = selectedCourse ? `course_${selectedCourse.id}_admins` : null
+    const currentSelectValue = selectedCourse ? `course_${selectedCourse.id}_admins` : undefined
     return (
       <form ref={c => (this.form = c)} action="/api/v1/conversations" method="POST">
         <fieldset className="ic-Form-group ic-HelpDialog__form-fieldset">

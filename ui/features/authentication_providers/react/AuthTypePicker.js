@@ -18,8 +18,10 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!authentication_providers'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {FormField} from '@instructure/ui-form-field'
+
+const I18n = useI18nScope('authentication_providers');
 
 export default function AuthTypePicker({onChange, authTypes}) {
   const [selectedAuthType, setSelectedAuthType] = useState('default')

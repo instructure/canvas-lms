@@ -39,7 +39,7 @@ export const ColorSection = ({settings, onChange}) => (
     <Flex.Item padding="small">
       <ColorInput
         color={settings.color}
-        label={formatMessage('Button Color')}
+        label={formatMessage('Icon Color')}
         name="button-color"
         onChange={color => onChange({color})}
         popoverMountNode={getColorSection}
@@ -49,7 +49,7 @@ export const ColorSection = ({settings, onChange}) => (
     <Flex.Item padding="small">
       <ColorInput
         color={settings.outlineColor}
-        label={formatMessage('Button Outline')}
+        label={formatMessage('Icon Outline')}
         name="button-outline"
         onChange={outlineColor => onChange({outlineColor})}
         popoverMountNode={getColorSection}
@@ -61,7 +61,7 @@ export const ColorSection = ({settings, onChange}) => (
         assistiveText={formatMessage('Use arrow keys to select an outline size.')}
         id="button-outline-size"
         onChange={(e, option) => onChange({outlineSize: option.value})}
-        renderLabel={formatMessage('Button Outline Size')}
+        renderLabel={formatMessage('Icon Outline Size')}
         value={settings.outlineSize}
       >
         {OUTLINE_SIZES.map(size => (

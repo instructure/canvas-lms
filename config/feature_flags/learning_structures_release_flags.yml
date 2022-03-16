@@ -25,13 +25,13 @@ auto_show_cc:
     Automatically show closed captions in the user's current
     language (if available) when playing canvas media.
   applies_to: User
-pace_plans:
+course_paces:
   state: hidden
-  display_name: 'Pace Plans'
-  description: Pace Plans adds support for rolling enrollments to Canvas;
+  display_name: 'Course Pacing'
+  description: Course Pacing adds support for rolling enrollments to Canvas;
     allowing magical distribution of due dates for students with different
     start dates based on an instructor's defined pace. Learn more and give
-    feedback by joining the Pace Plans User Group.
+    feedback by joining the Course Pacing User Group.
   applies_to: Account
   beta: true
 create_course_subaccount_picker:

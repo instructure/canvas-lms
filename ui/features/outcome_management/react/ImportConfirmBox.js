@@ -19,12 +19,14 @@
 import React, {useState, useEffect, useRef} from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!ImportConfirmBox'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'
+
+const I18n = useI18nScope('ImportConfirmBox');
 
 const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
   const containerRef = useRef()

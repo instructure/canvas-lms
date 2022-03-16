@@ -21,7 +21,7 @@ import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Modal} from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
@@ -33,6 +33,8 @@ import {responsiveQuerySizes} from '../../../util/utils'
 import {uploadFiles} from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
 import {MediaCaptureStrings, SelectStrings, UploadMediaStrings} from '../../../util/constants'
+
+const I18n = useI18nScope('conversations_2');
 
 const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

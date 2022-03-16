@@ -17,8 +17,10 @@
 #
 
 import $ from 'jquery'
-import I18n from 'i18n!lib.text_helper'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
+
+I18n = useI18nScope('lib.text_helper')
 
 AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
 AUTO_LINKIFY_REGEX = ///

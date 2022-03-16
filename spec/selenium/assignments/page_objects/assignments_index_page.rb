@@ -92,7 +92,7 @@ module AssignmentsIndexPage
   end
 
   def bulk_edit_tr_rows
-    ff("#bulkEditRoot tbody tr")
+    ff("#bulkEditRoot [role='table'] [role='row']")
   end
 
   def bulk_edit_loading_spinner

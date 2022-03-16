@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!ProfileTray'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {arrayOf, bool, object, shape, string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
@@ -30,6 +30,8 @@ import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+
+const I18n = useI18nScope('ProfileTray');
 
 // Trying to keep this as generalized as possible, but it's still a bit
 // gross matching on the id of the tray tabs given to us by Rails

@@ -21,7 +21,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
 // @ts-ignore
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
@@ -43,6 +43,8 @@ import type {
 } from '../gradebook.d'
 import {getLabelForFilterCondition} from '../Gradebook.utils'
 import useStore from '../stores/index'
+
+const I18n = useI18nScope('gradebook');
 
 const {Item: FlexItem} = Flex as any
 

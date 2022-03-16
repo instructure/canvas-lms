@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!ProfileTray'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {bool} from 'prop-types'
 import React, {useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -30,6 +30,8 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Checkbox, ToggleFacade} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
+
+const I18n = useI18nScope('ProfileTray');
 
 const {porcelain, licorice, shamrock, brand} = hcmColors.values
 

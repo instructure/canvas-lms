@@ -123,19 +123,19 @@ function buildTriangle(size) {
   switch (size) {
     case Size.ExtraSmall:
       return createSvgElement('path', {
-        d: 'M37 8L66 66H8L37 8Z'
+        d: 'M37 8L66 70H8L37 8Z'
       })
     case Size.Small:
       return createSvgElement('path', {
-        d: 'M61 8L114 114H8L61 8Z'
+        d: 'M61 8L114 118H8L61 8Z'
       })
     case Size.Medium:
       return createSvgElement('path', {
-        d: 'M79 8L150 150H8L79 8Z'
+        d: 'M79 8L150 154H8L79 8Z'
       })
     case Size.Large:
       return createSvgElement('path', {
-        d: 'M109 8L210 210H8L109 8Z'
+        d: 'M109 8L210 214H8L109 8Z'
       })
     default:
       throw new Error(`Invalid size: ${size}`)

@@ -25,10 +25,12 @@ import {View} from '@instructure/ui-view'
 
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import studentRowHeaderConstants from '../../constants/studentRowHeaderConstants'
 import ColumnHeader from './ColumnHeader'
+
+const I18n = useI18nScope('gradebook');
 
 export default class StudentColumnHeader extends ColumnHeader {
   static propTypes = {

@@ -18,13 +18,15 @@ import React, {useState, useEffect, useRef} from 'react'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {func, number} from 'prop-types'
-import I18n from 'i18n!webcam_modal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {IconRecordSolid, IconVideoCameraOffSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('webcam_modal');
 
 // Somewhat arbitrary height to allow the video feed to fit comfortably within
 // the containing modal

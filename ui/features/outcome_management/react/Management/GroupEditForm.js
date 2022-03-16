@@ -18,7 +18,7 @@
 
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!FindOutcomesModal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Form} from 'react-final-form'
@@ -33,6 +33,8 @@ import {
 } from '@canvas/outcomes/react/validators/finalFormValidators'
 import LabeledTextField from '../shared/LabeledTextField'
 import LabeledRceField from '../shared/LabeledRceField'
+
+const I18n = useI18nScope('FindOutcomesModal');
 
 const titleValidator = composeValidators(requiredValidator, maxLengthValidator(255))
 

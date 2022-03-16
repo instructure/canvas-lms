@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!permission_button'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {func, bool, string} from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
@@ -39,6 +39,8 @@ import propTypes, {
   ENABLED_FOR_ALL,
   ENABLED_FOR_PARTIAL
 } from '@canvas/permissions/react/propTypes'
+
+const I18n = useI18nScope('permission_button');
 
 // let's cinch up that large margin around the IconButtons so that their
 // decorations snuggle up a little closer and are more obviously a part

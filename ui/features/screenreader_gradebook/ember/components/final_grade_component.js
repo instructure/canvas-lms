@@ -17,7 +17,9 @@
 
 import Ember from 'ember'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
-import I18n from 'i18n!sr_gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('sr_gradebook');
 
 const FinalGradeComponent = Ember.Component.extend({
   percent: function() {

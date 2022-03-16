@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,18 +15,40 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// this target is intended for use in browsers
+//
+// refer to ui-build/babel-recommendations.md for guidance
 module.exports = {
+  assumptions: {
+    setPublicClassFields: true
+  },
+  env: {
+    production: {
+      plugins: [
+        'transform-react-remove-prop-types',
+        '@babel/plugin-transform-react-inline-elements',
+        '@babel/plugin-transform-react-constant-elements'
+      ]
+    }
+  },
   presets: [
-    [
-      '@instructure/ui-babel-preset',
-      {
-        coverage: process.env.BABEL_ENV === 'test-node',
-        transformImports: false,
-        node: ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID,
-        esModules: !(
-          ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID
-        )
-      }
-    ]
-  ]
+    ['@babel/preset-env', {
+      useBuiltIns: 'entry',
+      corejs: '3.20',
+      modules: false,
+    }],
+    ['@babel/preset-react', { useBuiltIns: true }],
+  ],
+  plugins: [
+    ['@babel/plugin-transform-runtime', {
+      corejs: 3,
+      helpers: true,
+      useESModules: true
+    }],
+  ],
+  targets: {
+    browsers: 'last 2 versions',
+    esmodules: true
+  }
 }

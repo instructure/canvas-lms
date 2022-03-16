@@ -22,9 +22,11 @@ import {shape, string} from 'prop-types'
 import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
-import I18n from 'i18n!gradinggradingStandard'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
 import splitAssetString from '@canvas/util/splitAssetString'
+
+const I18n = useI18nScope('gradinggradingStandard');
 
 class GradingStandard extends React.Component {
   static propTypes = {

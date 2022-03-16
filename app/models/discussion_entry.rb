@@ -25,6 +25,7 @@ class DiscussionEntry < ActiveRecord::Base
   include SendToStream
   include TextHelper
   include HtmlTextHelper
+  include Api
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
@@ -89,6 +90,16 @@ class DiscussionEntry < ActiveRecord::Base
     User.where(id: user_ids).each do |u|
       mentions.find_or_create_by!(user: u, root_account_id: root_account_id)
     end
+  end
+
+  def parse_message(user)
+    if message.include?("instructure_inline_media_comment")
+      api_user_content(message, discussion_topic.context, user)
+    else
+      message
+    end
+  rescue NoMethodError
+    message
   end
 
   def mentioned_users

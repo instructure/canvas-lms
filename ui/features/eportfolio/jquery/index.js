@@ -25,7 +25,7 @@
 // settings on their own personal eportfolio, they can't
 // affect anyone else
 
-import I18n from 'i18n!eportfolio'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -35,18 +35,20 @@ import MoveToDialog from '../react/MoveToDialog'
 import {fetchContent} from './eportfolio_section'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import '@canvas/jquery/jquery.ajaxJSON'
-import 'jquery-tree' /* instTree */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import 'jquery-tree'/* instTree */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/rails-flash-notifications' /* $.screenReaderFlashMessageExclusive */
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import '@canvas/rails-flash-notifications'/* $.screenReaderFlashMessageExclusive */
+import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags, scrollSidebar */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
 import '@canvas/loading-image'
-import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
+
+const I18n = useI18nScope('eportfolio');
 
 // optimization so user isn't waiting on RCS to
 // respond when they hit edit

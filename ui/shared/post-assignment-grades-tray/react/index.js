@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
-import I18n from 'i18n!post_grades_tray'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import Layout from './Layout'
 import {EVERYONE, GRADED} from './PostTypes'
@@ -34,6 +34,8 @@ import {
 } from './Api'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('post_grades_tray');
 
 function initialShowState() {
   return {

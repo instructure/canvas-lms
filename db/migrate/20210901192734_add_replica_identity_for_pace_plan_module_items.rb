@@ -21,11 +21,15 @@ class AddReplicaIdentityForPacePlanModuleItems < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
+    return unless defined?(PacePlanModuleItem)
+
     add_replica_identity "PacePlanModuleItem", :root_account_id, 0
     remove_index :pace_plan_module_items, column: :root_account_id, if_exists: true
   end
 
   def down
+    return unless defined?(PacePlanModuleItem)
+
     add_index :pace_plan_module_items, :root_account_id, algorithm: :concurrently, if_not_exists: true
     remove_replica_identity "PacePlanModuleItem"
   end

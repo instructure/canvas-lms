@@ -20,8 +20,10 @@ import React from 'react'
 import {string} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import I18n from 'i18n!modal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Modal} from '@instructure/ui-modal'
+
+const I18n = useI18nScope('modal');
 
 /*
 ---
@@ -87,7 +89,7 @@ export default function CanvasInstUIModal({
   )
 }
 
-;['Header', 'Body', 'Footer'].forEach(prop => (CanvasInstUIModal[prop] = Modal[prop]))
+['Header', 'Body', 'Footer'].forEach(prop => (CanvasInstUIModal[prop] = Modal[prop]))
 
 CanvasInstUIModal.propTypes = {
   ...Modal.propTypes,

@@ -19,7 +19,9 @@
 import React from 'react'
 import {bool, string} from 'prop-types'
 import {Tooltip} from '@instructure/ui-tooltip'
-import I18n from 'i18n!assignment'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('assignment');
 
 function renderLink(anchorProps) {
   // This uses a plain <a /> rather than Instructure-UI's <Link /> because

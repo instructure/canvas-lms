@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BUTTON_AND_ICON_PARAM = 'buttons_and_icons'
+const BUTTON_AND_ICON_PARAM = 'icon_maker_icon'
 
 export default function buildDownloadUrl(url) {
   let downloadUrl

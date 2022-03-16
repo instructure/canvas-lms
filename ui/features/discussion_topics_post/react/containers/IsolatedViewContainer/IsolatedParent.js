@@ -23,7 +23,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {getDisplayName, isTopicAuthor, responsiveQuerySizes} from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
@@ -42,6 +42,8 @@ import {useMutation, useApolloClient} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+
+const I18n = useI18nScope('discussion_posts');
 
 export const IsolatedParent = props => {
   const [updateIsolatedViewDeeplyNestedAlert] = useMutation(

@@ -51,7 +51,7 @@ if ENV["CRYSTALBALL_MAP"] == "1"
   Coverage.start unless Coverage.running?
   Crystalball::MapGenerator.start! do |config|
     config.register Crystalball::MapGenerator::CoverageStrategy.new
-    config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
+    config.map_storage_path = "log/results/crystalball_results/#{SecureRandom.uuid}_#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
   end
 
   module Crystalball
@@ -431,7 +431,7 @@ RSpec.configure do |config|
 
   # The Pact build needs RspecJunitFormatter and does not run RSpecQ
   file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
-  config.add_formatter "RspecJunitFormatter", file if ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]
+  config.add_formatter "RspecJunitFormatter", file if (ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]) || ENV["CRYSTALBALL_MAP"] == "1"
 
   config.include Helpers
   config.include Factories
@@ -654,6 +654,8 @@ RSpec.configure do |config|
       else
         skip "redis required"
       end
+    elsif new_cache == :memory_store
+      cache_opts[:coder] = Marshal
     end
     new_cache ||= :null_store
     new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)

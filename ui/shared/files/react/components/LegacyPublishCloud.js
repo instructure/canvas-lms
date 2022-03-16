@@ -18,10 +18,12 @@
 
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!broccoli_cloud'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import customPropTypes from '../modules/customPropTypes'
 import '@canvas/rails-flash-notifications'
 import '@canvas/datetime' // $.datetimeString
+
+const I18n = useI18nScope('broccoli_cloud');
 
 export default {
   displayName: 'PublishCloud',

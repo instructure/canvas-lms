@@ -22,8 +22,8 @@ export const applyTimezoneOffsetToDate = (date, targetTimezone) => {
   if (!targetTimezone) {
     return moment(date).toDate()
   }
-  const currentTimezoneOffset = moment().utcOffset()
-  const expectedTimezoneOffset = moment.tz(targetTimezone).utcOffset()
+  const currentTimezoneOffset = moment(date).utcOffset()
+  const expectedTimezoneOffset = moment.tz(date, targetTimezone).utcOffset()
   const totalOffset = expectedTimezoneOffset - currentTimezoneOffset
   return moment(date).add(totalOffset, 'm').toDate()
 }

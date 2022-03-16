@@ -421,7 +421,7 @@ describe Attachment do
       let_once(:button_and_icon) { attachment_model(category: Attachment::BUTTONS_AND_ICONS) }
       let_once(:uncategorized) { attachment_model }
 
-      let(:category) { "buttons_and_icons" }
+      let(:category) { Attachment::BUTTONS_AND_ICONS }
 
       before do
         button_and_icon

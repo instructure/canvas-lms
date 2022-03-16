@@ -15,10 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!gradebookGradeDisplayWarningDialog'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import gradeDisplayWarningDialogTemplate from '../jst/GradeDisplayWarningDialog.handlebars'
 import 'jqueryui/dialog'
+
+I18n = useI18nScope('gradebookGradeDisplayWarningDialog')
 
 export default class GradeDisplayWarningDialog
   constructor: (options) ->

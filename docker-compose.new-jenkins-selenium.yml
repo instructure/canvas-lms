@@ -6,19 +6,12 @@ services:
       - selenium-chrome
       - canvasrceapi
     environment:
-      remote_url: http://selenium-chrome:4444/wd/hub
+      remote_url: http://selenium-hub:4444/wd/hub
       browser: chrome
       RCE_HOST: "http://canvasrceapi"
       # these are so we can use prod compiled assets in test environment
       USE_OPTIMIZED_JS: 'true'
       SASS_STYLE: 'compressed'
-
-  selenium-chrome:
-    image: starlord.inscloudgate.net/jenkins/selenium-chrome:$SELENIUM_VERSION
-    environment:
-      SCREEN_WIDTH: 1680
-      SCREEN_HEIGHT: 1050
-    init: true
 
   canvasrceapi:
     image: starlord.inscloudgate.net/jenkins/canvas-rce-api
@@ -33,3 +26,52 @@ services:
       STATSD_HOST: 127.0.0.1
       STATSD_PORT: 8125
     init: true
+
+  selenium-hub:
+    image: starlord.inscloudgate.net/jenkins/selenium-hub
+    environment:
+      GRID_BROWSER_TIMEOUT: 3000
+
+  selenium-chrome: &NODE_CHROME
+    image: starlord.inscloudgate.net/jenkins/selenium-node-chrome
+    environment: &NODE_CHROME_ENV
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      HUB_PORT_4444_TCP_ADDR: selenium-hub
+      HUB_PORT_4444_TCP_PORT: 4444
+      SE_NODE_HOST: selenium-chrome
+      JAVA_OPTS: '-Dwebdriver.chrome.whitelistedIps='
+    init: true
+    links:
+      - selenium-hub
+
+  selenium-chrome2:
+    <<: *NODE_CHROME
+    environment:
+      <<: *NODE_CHROME_ENV
+      SE_NODE_HOST: selenium-chrome2
+
+  selenium-chrome3:
+    <<: *NODE_CHROME
+    environment:
+      <<: *NODE_CHROME_ENV
+      SE_NODE_HOST: selenium-chrome3
+
+  selenium-chrome4:
+    <<: *NODE_CHROME
+    environment:
+      <<: *NODE_CHROME_ENV
+      SE_NODE_HOST: selenium-chrome4
+
+  selenium-chrome5:
+    <<: *NODE_CHROME
+    environment:
+      <<: *NODE_CHROME_ENV
+      SE_NODE_HOST: selenium-chrome5
+
+  selenium-chrome6:
+    <<: *NODE_CHROME
+    environment:
+      <<: *NODE_CHROME_ENV
+      SE_NODE_HOST: selenium-chrome6

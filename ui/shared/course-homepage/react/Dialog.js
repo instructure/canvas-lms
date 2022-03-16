@@ -25,8 +25,10 @@ import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
-import I18n from 'i18n!course_home_dialog'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import plainStoreShape from '@canvas/util/react/proptypes/plainStoreShape'
+
+const I18n = useI18nScope('course_home_dialog');
 
 class CourseHomeDialog extends React.Component {
   static propTypes = {

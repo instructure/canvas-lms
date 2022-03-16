@@ -575,6 +575,22 @@ module Lti
             expect(response).to be_not_found
           end
         end
+
+        context "without include=launch_url parameter" do
+          it "does not include launch url extension" do
+            send_request
+            expect(parsed_response_body).not_to have_key(Lti::LineItem::AGS_EXT_LAUNCH_URL)
+          end
+        end
+
+        context "with include[]=launch_url parameter" do
+          let(:params_overrides) { super().merge({ "include[]" => "launch_url" }) }
+
+          it "includes launch url extension in line item json" do
+            send_request
+            expect(parsed_response_body).to include(Lti::LineItem::AGS_EXT_LAUNCH_URL => tool.url)
+          end
+        end
       end
 
       describe "#index" do
@@ -706,6 +722,22 @@ module Lti
         it "includes pagination headers" do
           send_request
           expect(response.headers).to have_key("Link")
+        end
+
+        context "without include=launch_url parameter" do
+          it "does not include launch url extension" do
+            send_request
+            expect(parsed_response_body).not_to include(have_key(Lti::LineItem::AGS_EXT_LAUNCH_URL))
+          end
+        end
+
+        context "with include[]=launch_url parameter" do
+          let(:params_overrides) { super().merge({ "include[]" => "launch_url" }) }
+
+          it "includes launch url extension in line item json" do
+            send_request
+            expect(parsed_response_body).to all(include(Lti::LineItem::AGS_EXT_LAUNCH_URL => tool.url))
+          end
         end
       end
 

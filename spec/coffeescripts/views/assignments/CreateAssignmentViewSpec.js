@@ -567,6 +567,32 @@ test('renders due dates in appropriate time zone', function () {
   equal(view.$('#vdd_tooltip_assign_1 div dd').first().text().trim(), 'Aug 27')
 })
 
+QUnit.module('ENV.DEFAULT_DUE_TIME', {
+  setup() {
+    this.assignment2 = new Assignment(buildAssignment2())
+    this.group = assignmentGroup()
+    I18nStubber.pushFrame()
+    fakeENV.setup({DEFAULT_DUE_TIME: '16:00:00'})
+  },
+  teardown() {
+    fakeENV.teardown()
+    tzInTest.restore()
+    I18nStubber.clear()
+  }
+})
+
+test('sets the default due time', function () {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.useInitialTranslations()
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el.find('.datetime_field').val('Feb 2, 2021').trigger('change')
+  equal(view.$el.find('.datetime_field').val(), 'Feb 2, 2021 4pm')
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
 QUnit.module('due_at', hooks => {
   const date = '2000-08-28T11:00:23'
   const assignment = {

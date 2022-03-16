@@ -163,7 +163,7 @@ function i18nLinerHandlebarsLoader(source) {
   }
 
   if (result.translationCount > 0) {
-    dependencies.push(`i18n!${result.scope}`)
+    dependencies.push('@canvas/i18n')
   }
 
   // make sure the template has access to all our handlebars helpers

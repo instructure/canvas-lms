@@ -18,7 +18,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import INST from 'browser-sniffer'
-import I18n from 'i18n!assignment_editview'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import _ from 'underscore'
 import $, {param} from 'jquery'
@@ -54,6 +54,8 @@ import '@canvas/util/toJSON'
 import '@canvas/rails-flash-notifications'
 import '../../../../boot/initializers/activateTooltips.js'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
+
+I18n = useI18nScope('assignment_editview')
 
 ###
 xsslint safeString.identifier srOnly

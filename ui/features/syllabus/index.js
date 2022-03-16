@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
-import I18n from 'i18n!syllabus'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import SyllabusCollection from './backbone/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from './backbone/collections/SyllabusAppointmentGroupsCollection'
@@ -27,6 +27,8 @@ import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCol
 import SyllabusView from './backbone/views/SyllabusView'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
+
+const I18n = useI18nScope('syllabus');
 
 // Setup the collections
 const collections = [

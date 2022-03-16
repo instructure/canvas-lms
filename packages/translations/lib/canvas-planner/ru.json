@@ -105,6 +105,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Захватывающее обсуждение" },
   "excused_cf8792eb": { "message": "По уважительной причине" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Не удалось получить список курсов"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Не удалось «заглянуть в будущее»"
   },

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!GroupsTray'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-view'
@@ -24,6 +24,8 @@ import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
+
+const I18n = useI18nScope('GroupsTray');
 
 export default function GroupsTray({groups, hasLoaded}) {
   return (

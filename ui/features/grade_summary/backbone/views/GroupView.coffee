@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!grade_summaryGroupView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View, Collection} from '@canvas/backbone'
 import _ from 'underscore'
 import CollectionView from '@canvas/backbone-collection-view'
 import OutcomeView from './OutcomeView.coffee'
 import template from '../../jst/group.handlebars'
+
+I18n = useI18nScope('grade_summaryGroupView')
 
 export default class GroupView extends View
   tagName: 'li'

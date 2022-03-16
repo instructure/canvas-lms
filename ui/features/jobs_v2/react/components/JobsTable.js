@@ -16,26 +16,55 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!jobs_v2'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
+import {Link} from '@instructure/ui-link'
+import {InfoColumn, InfoColumnHeader} from './InfoColumn'
+import SortColumnHeader from './SortColumnHeader'
 
-function renderJobRow(job) {
-  const cellTheme = {fontSize: '0.75rem'}
+const I18n = useI18nScope('jobs_v2')
 
-  return (
-    <Table.Row key={job.id}>
-      <Table.RowHeader>{job.id}</Table.RowHeader>
-      <Table.Cell theme={cellTheme}>{job.tag}</Table.Cell>
-      <Table.Cell theme={cellTheme}>{job.strand}</Table.Cell>
-      <Table.Cell theme={cellTheme}>{job.singleton}</Table.Cell>
-      <Table.Cell theme={cellTheme}>{job.run_at}</Table.Cell>
-    </Table.Row>
+export default function JobsTable({bucket, jobs, caption, sortColumn, onClickJob, onClickHeader}) {
+  const renderJobRow = useCallback(
+    job => {
+      const cellTheme = {fontSize: '0.75rem'}
+
+      return (
+        <Table.Row key={job.id}>
+          <Table.RowHeader>
+            <Link onClick={() => onClickJob(job)}>{job.id}</Link>
+          </Table.RowHeader>
+          <Table.Cell theme={cellTheme}>{job.tag}</Table.Cell>
+          <Table.Cell theme={cellTheme}>{job.strand}</Table.Cell>
+          <Table.Cell theme={cellTheme}>{job.singleton}</Table.Cell>
+          <Table.Cell>
+            <InfoColumn bucket={bucket} info={job.info} />
+          </Table.Cell>
+        </Table.Row>
+      )
+    },
+    [bucket, onClickJob]
   )
-}
 
-export default function JobsTable({jobs, caption}) {
+  const renderColHeader = useCallback(
+    (attr, content) => {
+      return (
+        <Table.ColHeader id={attr}>
+          <SortColumnHeader
+            bucket={bucket}
+            attr={attr}
+            content={content}
+            sortColumn={sortColumn}
+            onClickHeader={onClickHeader}
+          />
+        </Table.ColHeader>
+      )
+    },
+    [bucket, sortColumn, onClickHeader]
+  )
+
   return (
     <div>
       <Responsive
@@ -52,11 +81,11 @@ export default function JobsTable({jobs, caption}) {
           <Table caption={caption} {...props}>
             <Table.Head>
               <Table.Row>
-                <Table.ColHeader>{I18n.t('ID')}</Table.ColHeader>
-                <Table.ColHeader>{I18n.t('Tag')}</Table.ColHeader>
-                <Table.ColHeader>{I18n.t('Strand')}</Table.ColHeader>
-                <Table.ColHeader>{I18n.t('Singleton')}</Table.ColHeader>
-                <Table.ColHeader>{I18n.t('Run At')}</Table.ColHeader>
+                {renderColHeader('id', I18n.t('ID'))}
+                {renderColHeader('tag', I18n.t('Tag'))}
+                {renderColHeader('strand', I18n.t('Strand'))}
+                {renderColHeader('singleton', I18n.t('Singleton'))}
+                {renderColHeader('info', <InfoColumnHeader bucket={bucket} />)}
               </Table.Row>
             </Table.Head>
             <Table.Body>

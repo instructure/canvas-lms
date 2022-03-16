@@ -455,7 +455,8 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get "pace_plans" => "pace_plans#index"
+    get "blackout_dates" => "blackout_dates#index"
+    get "course_paces" => "course_paces#index"
 
     post "collapse_all_modules" => "context_modules#toggle_collapse_all"
     resources :content_exports, only: %i[create index destroy show]
@@ -738,6 +739,8 @@ CanvasRails::Application.routes.draw do
     resources :developer_keys, only: :index
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
+
+    get "blackout_dates" => "blackout_dates#index"
   end
 
   get "images/users/:user_id" => "users#avatar_image", :as => :avatar_image
@@ -2380,13 +2383,28 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/apply_score_to_ungraded_submissions", action: "apply_score_to_ungraded_submissions"
     end
 
-    scope(controller: :pace_plans) do
-      post "courses/:course_id/pace_plans", action: :create
-      get "courses/:course_id/pace_plans/new", action: :new
-      get "courses/:course_id/pace_plans/:id", action: :api_show
-      put "courses/:course_id/pace_plans/:id", action: :update
-      post "courses/:course_id/pace_plans/:id/publish", action: :publish
-      post "courses/:course_id/pace_plans/compress_dates", action: :compress_dates
+    scope(controller: :course_paces) do
+      post "courses/:course_id/course_paces", action: :create
+      get "courses/:course_id/course_paces/new", action: :new
+      get "courses/:course_id/course_paces/:id", action: :api_show
+      put "courses/:course_id/course_paces/:id", action: :update
+      post "courses/:course_id/course_paces/:id/publish", action: :publish
+      post "courses/:course_id/course_paces/compress_dates", action: :compress_dates
+    end
+
+    scope(controller: :blackout_dates) do
+      get "courses/:course_id/blackout_dates", action: :index
+      get "accounts/:account_id/blackout_dates", action: :index
+      post "courses/:course_id/blackout_dates", action: :create
+      post "accounts/:account_id/blackout_dates", action: :create
+      get "courses/:course_id/blackout_dates/new", action: :new
+      get "accounts/:account_id/blackout_dates/new", action: :new
+      get "courses/:course_id/blackout_dates/:id", action: :show
+      get "accounts/:account_id/blackout_dates/:id", action: :show
+      put "courses/:course_id/blackout_dates/:id", action: :update
+      put "accounts/:account_id/blackout_dates/:id", action: :update
+      delete "courses/:course_id/blackout_dates/:id", action: :destroy
+      delete "accounts/:account_id/blackout_dates/:id", action: :destroy
     end
 
     scope(controller: :eportfolios_api) do
@@ -2414,10 +2432,9 @@ CanvasRails::Application.routes.draw do
     # jobs_v2 actually does do regular pagination, but the comments above
     # otherwise still apply
     scope(controller: :jobs_v2) do
-      get "jobs/tags/queued", action: :queued_tags, as: :jobs_tags_queued
-      get "jobs/tags/running", action: :running_tags, as: :jobs_tags_running
-      get "jobs/tags/future", action: :future_tags, as: :jobs_tags_future
-      get "jobs/tags/failed", action: :failed_tags, as: :jobs_tags_failed
+      get "jobs2/:bucket/by_:group/search", action: :search
+      get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
+      get "jobs2/:bucket", action: :list, as: :jobs_list
     end
   end
 

@@ -16,12 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import '../public/javascripts/translations/_core_en'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import rceFormatMessage from '@instructure/canvas-rce/lib/format-message'
+import plannerFormatMessage from '@instructure/canvas-planner/lib/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
-
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
+
+rceFormatMessage.setup({
+  locale: 'en',
+  missingTranslation: 'ignore'
+})
+
+plannerFormatMessage.setup({
+  locale: 'en',
+  missingTranslation: 'ignore'
+})
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
@@ -35,13 +47,11 @@ const ignoredErrors = [
   /\[object Object\]/,
   /%s has a method called shouldComponentUpdate/,
   /`NaN` is an invalid value for the `%s` css style property/,
-  /`value` prop on `%s` should not be null/,
   /<Provider> does not support changing `store` on the fly/,
   /A component is changing a controlled input of type %s to be uncontrolled/,
   /A theme registry has already been initialized/,
   /An update to (%s|DefaultToolForm) inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /CancelAttemptButton: prop type `submission` is invalid/,
   /Cannot read property '(activeElement|useRealTimers)' of undefined/,
   /Cannot read property 'name' of null/,
   /Cannot update during an existing state transition/,
@@ -97,7 +107,6 @@ const ignoredWarnings = [
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /Translation for .* is missing/,
   /value provided is not in a recognized RFC2822 or ISO format/
 ]
 global.console = {

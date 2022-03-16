@@ -65,11 +65,7 @@ module Lti::Concerns
     end
 
     def uri_source
-      require_oembed_token? ? verified_jwt : params
-    end
-
-    def require_oembed_token?
-      Account.site_admin.feature_enabled?(:use_oembed_token)
+      verified_jwt
     end
 
     def associated_tool

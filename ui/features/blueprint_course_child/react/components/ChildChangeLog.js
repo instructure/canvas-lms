@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_coursesChildChangeLog'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 
 import React, {Component} from 'react'
@@ -31,6 +31,8 @@ import SyncHistoryItem from '@canvas/blueprint-courses/react/components/SyncHist
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import LoadStates from '@canvas/blueprint-courses/react/loadStates'
+
+const I18n = useI18nScope('blueprint_coursesChildChangeLog');
 
 export default class ChildChangeLog extends Component {
   static propTypes = {

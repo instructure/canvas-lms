@@ -24,7 +24,9 @@ import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@instructure/js-utils'
 import buildURL from 'axios/lib/helpers/buildURL'
-import I18n from 'i18n!load_card_dashboard'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('load_card_dashboard')
 
 export function createDashboardCards(dashboardCards, cardComponent = DashboardCard, extraProps) {
   const Box = getDroppableDashboardCardBox()
@@ -71,7 +73,7 @@ export class CardDashboardLoader {
       let sessionStorageTimeout
       const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
       const urlPrefix = '/api/v1/dashboard/dashboard_cards'
-      const url = buildURL(urlPrefix, {observed_user: observedUserId})
+      const url = buildURL(urlPrefix, {observed_user_id: observedUserId})
       this.promiseToGetDashboardCards =
         asJson(getPrefetchedXHR(url)) ||
         axios

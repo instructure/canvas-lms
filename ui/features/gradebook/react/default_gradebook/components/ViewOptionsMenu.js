@@ -23,8 +23,10 @@ import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {filterLabels} from '../constants/ViewOptions'
+
+const I18n = useI18nScope('gradebook');
 
 function renderTriggerButton(bindButton) {
   return (

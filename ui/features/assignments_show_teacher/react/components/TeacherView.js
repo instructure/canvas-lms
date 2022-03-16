@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, string} from 'prop-types'
-import I18n from 'i18n!assignments_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Mutation} from 'react-apollo'
 import classnames from 'classnames'
 import produce from 'immer'
@@ -46,6 +46,8 @@ import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 import AssignmentFieldValidator from '../AssignentFieldValidator'
+
+const I18n = useI18nScope('assignments_2');
 
 const pathToOverrides = /assignmentOverrides\.nodes\.\d+/
 

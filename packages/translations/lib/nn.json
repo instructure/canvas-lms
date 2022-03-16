@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "Bruk"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "Bruk endringane på alle forekomster av denne knappen og ikonet i emnet."
-    },
     "apps_54d24a47": {
         "message": "Appar"
     },
@@ -176,26 +173,14 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Nedanfor er eit døme på korleis timeplanen ser ut for studentane"
     },
+    "blue_daf8fea9": {
+        "message": "Blå"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Nedre tredel"
     },
-    "button_color_608a0242": {
-        "message": "Knappefarge"
-    },
-    "button_outline_cf14f071": {
-        "message": "Knappeomriss"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "Storleik på knappeomriss"
-    },
-    "button_shape_dbecb573": {
-        "message": "Knappeform"
-    },
-    "button_size_20f5fce1": {
-        "message": "Knappestorleik"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "Knappar og ikon"
+    "brick_f2656265": {
+        "message": "Murstein"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -269,9 +254,6 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Skjul og lukk { types }"
     },
-    "color_color_eb64b08": {
-        "message": "Farge { color }"
-    },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
     },
@@ -335,9 +317,6 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } Gjeremål"
     },
-    "create_button_and_icon_5c089934": {
-        "message": "Lag knapp og ikon"
-    },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-lisens:"
     },
@@ -349,6 +328,9 @@
     },
     "custom_6979cd81": {
         "message": "Eigendefinert"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Cyan"
     },
     "date_added_ed5ad465": {
         "message": "Dato lagd til"
@@ -373,6 +355,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Reduser innrykk"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Mørk lilla"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "standard uordna liste med kulepunkt"
@@ -496,12 +481,6 @@
     },
     "embed_image_1080badc": {
         "message": "Sett inn bilde"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Sett inn-meny"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Sett inn-førehandsvising"
     },
     "embed_video_a97a64af": {
         "message": "Integrer video"
@@ -650,6 +629,9 @@
     "greek_65c5b3f7": {
         "message": "Gresk"
     },
+    "green_15af4778": {
+        "message": "Grønt"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Grupper dokument"
     },
@@ -728,6 +710,9 @@
     "increase_indent_6d550a4a": {
         "message": "Auk innrykk"
     },
+    "indigo_2035fc55": {
+        "message": "Indigo"
+    },
     "insert_593145ef": {
         "message": "Set inn"
     },
@@ -781,6 +766,9 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Venste mot høgre"
+    },
+    "light_blue_5374f600": {
+        "message": "Lyseblå"
     },
     "link_7262adec": {
         "message": "Lenke"
@@ -847,6 +835,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Ser ikkje ut som om det finns noko her"
+    },
+    "magenta_4a65993c": {
+        "message": "Magenta"
     },
     "math_ede93050": {
         "message": "Matematikk"
@@ -968,6 +959,9 @@
     "octagon_e48be9f": {
         "message": "Åttekant"
     },
+    "olive_6a3e4d6b": {
+        "message": "Oliven"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Kun nyaste karaktersetjingsperiode viser."
     },
@@ -986,8 +980,8 @@
     "optional_add_course_ef0d70fc": {
         "message": "Valfri: Legg til emne"
     },
-    "options_3ab0ea65": {
-        "message": "Alternativ"
+    "orange_81386a62": {
+        "message": "Oransje"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Ordna og uordna lister"
@@ -1024,6 +1018,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Prosent må være eit tal"
+    },
+    "pink_68ad45cb": {
+        "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Pixlar"
@@ -1070,6 +1067,12 @@
     "published_when_302d8e23": {
         "message": "Publisert: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Gresskar"
+    },
+    "purple_7678a9fc": {
+        "message": "Lilla"
+    },
     "quiz_e0dcce8f": {
         "message": "Quiz"
     },
@@ -1084,6 +1087,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Ta opp / last opp media"
+    },
+    "red_8258edf3": {
+        "message": "Raud"
     },
     "redo_363c58b7": {
         "message": "Gjer om att"
@@ -1117,9 +1123,6 @@
     },
     "save_11a80ec3": {
         "message": "Lagre"
-    },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "Knappar og ikon er lagra"
     },
     "schedule_preview_3bcda153": {
         "message": "Førehandsvising av timeplan"
@@ -1156,9 +1159,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "Vis lydalternativ"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "Vis sett inn-alternativ"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Vis alternativ for bilde"
@@ -1264,6 +1264,9 @@
     },
     "task_16b0ef38": {
         "message": "Oppgåve"
+    },
+    "teal_f729a294": {
+        "message": "Blågrøn"
     },
     "text_7f4593da": {
         "message": "Tekst"
@@ -1483,6 +1486,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigasjon for vekestimeplan"
+    },
+    "white_87fa64fd": {
+        "message": "Kvit"
     },
     "width_492fec76": {
         "message": "Vidde"

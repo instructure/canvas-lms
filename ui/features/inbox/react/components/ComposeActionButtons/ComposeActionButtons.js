@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -24,6 +24,8 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconAttachMediaLine, IconPaperclipLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
+
+const I18n = useI18nScope('conversations_2');
 
 export const ComposeActionButtons = ({...props}) => {
   return (

@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "應用"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "在課程中套用變更到此按鈕和圖示的所有執行個體"
-    },
     "apps_54d24a47": {
         "message": "應用程式"
     },
@@ -182,24 +179,6 @@
     "bottom_third_5f5fec1d": {
         "message": "底部第三個"
     },
-    "button_color_608a0242": {
-        "message": "按鈕顏色"
-    },
-    "button_outline_cf14f071": {
-        "message": "按鈕提綱"
-    },
-    "button_outline_size_cc1d1df7": {
-        "message": "按鈕提綱大小"
-    },
-    "button_shape_dbecb573": {
-        "message": "按鈕形狀"
-    },
-    "button_size_20f5fce1": {
-        "message": "按鈕大小"
-    },
-    "buttons_and_icons_e66ee12c": {
-        "message": "按鈕和圖示"
-    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -275,9 +254,6 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "收起以隱藏 { types }"
     },
-    "color_color_eb64b08": {
-        "message": "顏色 { color }"
-    },
     "computer_1d7dfa6f": {
         "message": "電腦"
     },
@@ -340,9 +316,6 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } 待辦事項"
-    },
-    "create_button_and_icon_5c089934": {
-        "message": "建立按鈕和圖示"
     },
     "creative_commons_license_725584ae": {
         "message": "創意共享授權："
@@ -506,12 +479,6 @@
     "embed_image_1080badc": {
         "message": "嵌入影像"
     },
-    "embed_options_tray_901cfd19": {
-        "message": "嵌入選項收集箱"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "嵌入預覽"
-    },
     "embed_video_a97a64af": {
         "message": "嵌入影片"
     },
@@ -571,6 +538,9 @@
     },
     "extracurricular_icon_67c8ca42": {
         "message": "課外活動圖示"
+    },
+    "failed_getting_course_list_49846a93": {
+        "message": "取得課程表失敗"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "無法窺視您的未來"
@@ -1034,9 +1004,6 @@
     "optional_add_course_ef0d70fc": {
         "message": "可選：添加課程"
     },
-    "options_3ab0ea65": {
-        "message": "選項"
-    },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "有序和無序的清單"
     },
@@ -1175,9 +1142,6 @@
     "save_11a80ec3": {
         "message": "儲存"
     },
-    "saved_buttons_and_icons_8278eed2": {
-        "message": "儲存的按鈕和圖示"
-    },
     "schedule_preview_3bcda153": {
         "message": "排程預覽"
     },
@@ -1213,9 +1177,6 @@
     },
     "show_audio_options_b489926b": {
         "message": "顯示音訊選項"
-    },
-    "show_embed_options_ef8d7ef": {
-        "message": "顯示嵌入選項"
     },
     "show_image_options_1e2ecc6b": {
         "message": "顯示影像選項"

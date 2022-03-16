@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!PeopleReadyList'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import PropTypes from 'prop-types'
 import {personReadyToEnrollShape} from './shapes'
 import {Alert} from '@instructure/ui-alerts'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const I18n = useI18nScope('PeopleReadyList');
 
 class PeopleReadyList extends React.Component {
   static propTypes = {

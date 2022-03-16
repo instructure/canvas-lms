@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!announcements_on_home_page'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from '@canvas/axios'
@@ -25,6 +25,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import AnnouncementRow from '@canvas/announcements/react/components/AnnouncementRow'
 import ready from '@instructure/ready'
+
+const I18n = useI18nScope('announcements_on_home_page');
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
   ready(() => {

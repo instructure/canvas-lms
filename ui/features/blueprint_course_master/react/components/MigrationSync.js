@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_settingsMigrationSync'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -26,13 +26,15 @@ import cx from 'classnames'
 import '@canvas/rails-flash-notifications'
 
 import {Text} from '@instructure/ui-text'
-import {Progress} from '@instructure/ui-progress'
+import {ProgressBar} from '@instructure/ui-progress'
 import {Button} from '@instructure/ui-buttons'
 import {IconRefreshLine} from '@instructure/ui-icons'
 
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import actions from '@canvas/blueprint-courses/react/actions'
+
+const I18n = useI18nScope('blueprint_settingsMigrationSync');
 
 export default class MigrationSync extends Component {
   static propTypes = {
@@ -93,7 +95,7 @@ export default class MigrationSync extends Component {
             <Text as="p" size="small">
               {I18n.t('This may take a bit...')}
             </Text>
-            <Progress
+            <ProgressBar
               label={I18n.t('Sync in progress')}
               size="x-small"
               valueNow={MigrationStates.getLoadingValue(migrationStatus)}

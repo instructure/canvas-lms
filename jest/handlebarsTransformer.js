@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {transformSync} = require('@babel/core')
 const {compile} = require('../ui-build/webpack/i18nLinerHandlebars')
+const {transform} = require('@babel/core')
 
 exports.process = (source, path) => {
   const amd = compile(source, path, {
     // brandable_css assets are not available in test
     injectBrandableStylesheet: false
   })
-  const cjs = transformSync(amd, {filename: path}).code
+  const cjs = transform(amd, {
+    filename: path,
+    plugins: ['@babel/plugin-transform-modules-commonjs']
+  }).code
   return cjs
 }

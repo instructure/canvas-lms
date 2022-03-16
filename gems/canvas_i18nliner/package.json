@@ -15,11 +15,10 @@
   },
   "devDependencies": {
     "coffee-script": "^1.12.4",
-    "jasmine": "^2.5.3",
-    "jasmine-pretty-html-reporter": "^0.2.5"
+    "jest": "^26"
   },
   "peerDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/jasmine"
+    "test": "jest"
   }
 }

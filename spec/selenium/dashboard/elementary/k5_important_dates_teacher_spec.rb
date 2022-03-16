@@ -98,7 +98,7 @@ describe "teacher k5 dashboard important dates" do
 
   context "mark important dates for classic quizzes" do
     it "sets the mark important dates checkbox for quiz", custom_timeout: 25 do
-      quiz_title = "Electricity Quiz"
+      quiz_title = "Elec Quiz"
       due_at = 2.days.from_now(Time.zone.now)
       quiz = quiz_model(course: @subject_course, title: quiz_title)
       quiz.generate_quiz_data
@@ -119,7 +119,7 @@ describe "teacher k5 dashboard important dates" do
 
   context "mark important dates for graded discussions" do
     it "sets the mark important dates checkbox for discussion", custom_timeout: 25 do
-      discussion_title = "Electricity Discussion"
+      discussion_title = "Elec Disc"
       due_at = 2.days.from_now(Time.zone.now)
       discussion_assignment = create_dated_assignment(@subject_course, discussion_title, due_at, 10)
       graded_discussion = @course.discussion_topics.create!(title: discussion_title, assignment: discussion_assignment)

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!AssignmentGroupCreateDialog'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/AssignmentGroupCreateDialog.handlebars'
@@ -24,6 +24,8 @@ import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/jquery/fixDialogButtons'
+
+I18n = useI18nScope('AssignmentGroupCreateDialog')
 
 export default class AssignmentGroupCreateDialog extends View
 

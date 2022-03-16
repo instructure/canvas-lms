@@ -16,13 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!AssignmentSettingsView'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import _ from 'underscore'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSettingsTemplate from '../../jst/AssignmentSettings.handlebars'
+
+I18n = useI18nScope('AssignmentSettingsView')
 
 export default class AssignmentSettingsView extends DialogFormView
   template: assignmentSettingsTemplate

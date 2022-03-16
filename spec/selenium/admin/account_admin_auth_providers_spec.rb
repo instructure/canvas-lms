@@ -29,26 +29,22 @@ describe "account authentication" do
   end
 
   describe "sso settings" do
-    let(:login_handle_name) { f("#sso_settings_login_handle_name") }
-    let(:change_password_url) { f("#sso_settings_change_password_url") }
-    let(:auth_discovery_url) { f("#sso_settings_auth_discovery_url") }
-
     it "saves", priority: "1" do
       add_sso_config
-      expect(login_handle_name).to have_value "login"
-      expect(change_password_url).to have_value "http://test.example.com"
-      expect(auth_discovery_url).to have_value "http://test.example.com"
+      expect(f("#sso_settings_login_handle_name")).to have_value "login"
+      expect(f("#sso_settings_change_password_url")).to have_value "http://test.example.com"
+      expect(f("#sso_settings_auth_discovery_url")).to have_value "http://test.example.com"
     end
 
     it "updates", priority: "1" do
       add_sso_config
-      login_handle_name.clear
-      change_password_url.clear
-      auth_discovery_url.clear
+      f("#sso_settings_login_handle_name").clear
+      f("#sso_settings_change_password_url").clear
+      f("#sso_settings_auth_discovery_url").clear
       f("#edit_sso_settings button[type='submit']").click
-      expect(login_handle_name).not_to have_value "login"
-      expect(change_password_url).not_to have_value "http://test.example.com"
-      expect(auth_discovery_url).not_to have_value "http://test.example.com"
+      expect(f("#sso_settings_login_handle_name")).not_to have_value "login"
+      expect(f("#sso_settings_change_password_url")).not_to have_value "http://test.example.com"
+      expect(f("#sso_settings_auth_discovery_url")).not_to have_value "http://test.example.com"
     end
   end
 

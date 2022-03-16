@@ -107,6 +107,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Vznemirljiva razprava" },
   "excused_cf8792eb": { "message": "Opravičeno" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Seznama predmetov ni bilo mogoče pridobiti"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Kukanje v vašo prihodnost ni uspelo"
   },
