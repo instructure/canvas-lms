@@ -70,25 +70,61 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(items.length).toBe(2)
     })
 
-    it('Should load data on initial request', async () => {
+    it('Should load the new courses and students submenu on initial load', async () => {
       setup()
       const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length > 0).toBe(true)
+      expect(items.length).toBe(2)
+      expect(screen.queryByText('Students')).toBeInTheDocument()
+      expect(screen.queryByText('Courses')).toBeInTheDocument()
+    })
+
+    it('Should load data on initial request', async () => {
+      setup()
+      let items = await screen.findAllByTestId('address-book-item')
+      expect(items.length).toBe(2)
+      // open student sub-menu
+      fireEvent.mouseDown(items[1])
+
+      items = await screen.findAllByTestId('address-book-item')
+      // VErify that all students and backbutton appear
+      expect(items.length).toBe(4)
     })
 
     it('Should load new data when variables changes', async () => {
       setup()
       let items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[0])
+      fireEvent.mouseDown(items[1])
       items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
+      // Expects there to be 3 users and 1 backbutton
+      expect(items.length).toBe(4)
     })
 
     it('should filter menu when typing', async () => {
       const {container} = setup()
       fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
       const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(1)
+      // Expects The user Fred and a back button
+      expect(items.length).toBe(2)
+    })
+
+    it('should return to last filter when backing out of search', async () => {
+      const {container} = setup()
+      let items = await screen.findAllByTestId('address-book-item')
+      // open students submenu
+      fireEvent.mouseDown(items[1])
+
+      items = await screen.findAllByTestId('address-book-item')
+      expect(items.length).toBe(4)
+      fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
+
+      items = await screen.findAllByTestId('address-book-item')
+      // search results
+      expect(items.length).toBe(2)
+      fireEvent.mouseDown(items[0])
+
+      items = await screen.findAllByTestId('address-book-item')
+      // the student sub-menu
+      expect(items.length).toBe(4)
     })
 
     it('Should clear text field when item is clicked', async () => {
@@ -98,7 +134,8 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(input.value).toBe('Fred')
 
       const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(1)
+      // Expects Fred and a back button
+      expect(items.length).toBe(2)
 
       fireEvent.mouseDown(items[0])
       input = container.querySelector('input')
@@ -107,11 +144,11 @@ describe('Should load <AddressBookContainer> normally', () => {
 
     it('should navigate through filters', async () => {
       setup()
-      // Find all current items
+      // Find initial courses and students sub-menu
       let items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(4)
+      expect(items.length).toBe(2)
 
-      // Click item that is a sub menu
+      // Click courses submenu
       fireEvent.mouseDown(items[0])
       items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)
@@ -119,7 +156,7 @@ describe('Should load <AddressBookContainer> normally', () => {
       // Click back button which is always first position in submenu
       fireEvent.mouseDown(items[0])
       items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(4)
+      expect(items.length).toBe(2)
     })
   })
 
@@ -129,9 +166,15 @@ describe('Should load <AddressBookContainer> normally', () => {
       setup({
         onSelectedIdsChange: onSelectedIdsChangeMock
       })
-      const items = await screen.findAllByTestId('address-book-item')
-      fireEvent.click(items[3])
-      expect(onSelectedIdsChangeMock.mock.calls.length).toBe(1)
+      let items = await screen.findAllByTestId('address-book-item')
+      fireEvent.mouseDown(items[1])
+
+      items = await screen.findAllByTestId('address-book-item')
+      fireEvent.mouseDown(items[1])
+
+      // Loads once when initially loading the page, and then a second time when a user is selected
+      expect(onSelectedIdsChangeMock.mock.calls.length).toBe(2)
+      expect(onSelectedIdsChangeMock.mock.calls[0][0][0].name).toEqual('Frederick Dukes')
     })
   })
 })
