@@ -149,6 +149,9 @@ export function getPlannerItems(fromMoment) {
     dispatch(startLoadingItems())
     return dispatch(getCourseList()) // classic planner never does singleCourse
       .then(res => {
+        res.data.forEach(c => {
+          c.color = ENV.PREFERENCES?.custom_colors[c.assetString] || '#666666'
+        })
         dispatch(gotCourseList(res.data))
         dispatch(continueLoadingInitialItems()) // a start counts as a continue for the ContinueInitialLoad animation
         dispatch(getFirstNewActivityDate(fromMoment))
