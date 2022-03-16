@@ -22,21 +22,13 @@ require_relative "../views_helper"
 
 describe "shared/_fullstory_snippet.html.erb" do
   before do
-    controller.singleton_class.class_eval do
-      protected
-
-      def fullstory_app_key
-        "fak"
-      end
-      helper_method :fullstory_app_key
-    end
-
     @context = {}
     @current_user = User.new
     @domain_root_account = Account.default
     assign(:context, @context)
     assign(:current_user, @current_user)
     assign(:domain_root_account, @domain_root_account)
+    allow(view).to receive(:fullstory_app_key).and_return("fak")
   end
 
   it "renders" do
