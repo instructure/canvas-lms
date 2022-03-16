@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -37,11 +37,11 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
-import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import useOutcomesImport, {IMPORT_COMPLETED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-const I18n = useI18nScope('FindOutcomesModal');
+const I18n = useI18nScope('FindOutcomesModal')
 
-const getSelectegGroupAncestorsWithSelf = (collections, selectedGroupId) => {
+const getSelectedGroupAncestorsWithSelf = (collections, selectedGroupId) => {
   const resp = []
   let currGroupId = selectedGroupId
   while (currGroupId) {
@@ -56,6 +56,9 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
   const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
+  const [importedGroupIds, setImportedGroupIds] = useState([])
+  const [importedGroupAncestors, setImportedGroupAncestors] = useState({})
+  const [rhsGroupIdsToRefetch, setRhsGroupIdsToRefetch] = useState([])
   const {
     rootId,
     isLoading,
@@ -75,7 +78,8 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
     query: FIND_GROUP_OUTCOMES,
     loadOutcomesIsImported: true,
     searchString: debouncedSearchString,
-    targetGroupId: rootOutcomeGroup?.id
+    targetGroupId: rootOutcomeGroup?.id,
+    rhsGroupIdsToRefetch
   })
 
   useEffect(() => {
@@ -114,6 +118,33 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
     }
   }, [open, setHasAddedOutcomes])
 
+  useEffect(() => {
+    // after group is imported add all of its ancestors to the refetch array
+    const newlyImportedGroupIds = new Set(
+      Object.entries(importGroupsStatus).reduce(
+        (acc, [gid, importStatus]) => (importStatus === IMPORT_COMPLETED ? [...acc, gid] : acc),
+        []
+      )
+    )
+    for (const importedGroupId of importedGroupIds) {
+      newlyImportedGroupIds.delete(importedGroupId)
+    }
+
+    if (newlyImportedGroupIds.size > 0) {
+      setImportedGroupIds(importedGids => [...new Set([...importedGids, ...newlyImportedGroupIds])])
+
+      const newRhsGroupIdsToRefetch = [...newlyImportedGroupIds].reduce(
+        (acc, groupId) =>
+          importedGroupAncestors[groupId] ? [...acc, ...importedGroupAncestors[groupId]] : acc,
+        []
+      )
+
+      setRhsGroupIdsToRefetch(gidsToRefetch => [
+        ...new Set([...gidsToRefetch, ...newRhsGroupIdsToRefetch])
+      ])
+    }
+  }, [importGroupsStatus]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const onAddAllHandler = () => {
     const callImportApiToGroup = () => {
       importOutcomes({
@@ -121,6 +152,10 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
         targetGroupTitle: targetGroup?.title,
         outcomeOrGroupId: selectedGroupId,
         groupTitle: group.title
+      })
+      setImportedGroupAncestors({
+        ...importedGroupAncestors,
+        [selectedGroupId]: getSelectedGroupAncestorsWithSelf(collections, selectedGroupId)
       })
     }
 
@@ -165,7 +200,7 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
     : I18n.t('Add Outcomes to Account')
 
   const selfOrParentBeingImported =
-    getSelectegGroupAncestorsWithSelf(collections, selectedGroupId).find(
+    getSelectedGroupAncestorsWithSelf(collections, selectedGroupId).find(
       gid => importGroupsStatus[gid]
     ) || selectedGroupId
 
