@@ -1465,7 +1465,7 @@
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
   integrity sha512-QPcGmICAPbGLGb6F/yNf/KzKqvFx8z5qx3D1yFqVAjoFmXK35EgyW+cJ57Te3CNsmzblwtzakLGFqHPqrfb4Tw==
 
-"@instructure/babel-plugin-themeable-styles@7", "@instructure/babel-plugin-themeable-styles@^7.7.1":
+"@instructure/babel-plugin-themeable-styles@7":
   version "7.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-themeable-styles/-/babel-plugin-themeable-styles-7.7.1.tgz#54b64939e0674f1d2306de213fa4e2205744435f"
   integrity sha512-G12DlgkZ3Up1HjeahxlNI+8B/SrZIZw+6/hwm+40pZmlc4jBaGWRiJVE4WGcy2Ed1g1WGNoqLxACLDC+JwUSnQ==
@@ -1501,13 +1501,6 @@
   version "6.27.1"
   resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-transform-imports/-/babel-plugin-transform-imports-6.27.1.tgz#ccc8a973e33fd8a847a8d7ec1f10deaf215a4866"
   integrity sha512-BQUF0KOYoICbXWMePkAk63rO8SWOK6sYOKmPA/HURMU3QrCXb0nS73QpkqMagfih6WPdqvF/tHCLz3Oy2mPZUA==
-  dependencies:
-    globby "^10.0.1"
-
-"@instructure/babel-plugin-transform-imports@^7.7.1":
-  version "7.7.1"
-  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-transform-imports/-/babel-plugin-transform-imports-7.7.1.tgz#3b85872e8d3f8f4abd92ba4f2cb5bd2c2fa69d97"
-  integrity sha512-UjQ4EixzkXOa/IlfKtHDpB4ugIw5qOMIi+KFNXRL3hrs3n5oQChrkZrryVS3C7w3D2qXwmfC8HYof/5VFMtn2g==
   dependencies:
     globby "^10.0.1"
 
@@ -1906,41 +1899,6 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
     axe-core "^3.3.2"
-
-"@instructure/ui-babel-preset@7":
-  version "7.7.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-babel-preset/-/ui-babel-preset-7.7.1.tgz#619ce4c8025d65d86a2bf53e9d0bbeaa8287c5bd"
-  integrity sha512-K5XQtTYwVEW1Ckmuli3gIATU6oKIiku37yo8Hbs2IPu6miHZ7ba48Nu84z/SW05C0W2hk9pzGdKQO5heqybYXg==
-  dependencies:
-    "@babel/core" "^7.12.10"
-    "@babel/plugin-proposal-class-properties" "^7.8.3"
-    "@babel/plugin-proposal-decorators" "^7.8.3"
-    "@babel/plugin-proposal-export-default-from" "^7.8.3"
-    "@babel/plugin-proposal-object-rest-spread" "^7.9.5"
-    "@babel/plugin-proposal-optional-chaining" "^7"
-    "@babel/plugin-syntax-dynamic-import" "^7.8.3"
-    "@babel/plugin-transform-classes" "^7.9.5"
-    "@babel/plugin-transform-destructuring" "^7.9.5"
-    "@babel/plugin-transform-react-constant-elements" "^7.9.0"
-    "@babel/plugin-transform-react-display-name" "^7.8.3"
-    "@babel/plugin-transform-runtime" "^7.9.0"
-    "@babel/preset-env" "^7.9.5"
-    "@babel/preset-react" "^7.9.4"
-    "@babel/runtime" "^7.12.5"
-    "@instructure/babel-plugin-themeable-styles" "^7.7.1"
-    "@instructure/babel-plugin-transform-imports" "^7.7.1"
-    "@instructure/browserslist-config-instui" "^7.7.1"
-    "@instructure/config-loader" "^7.7.1"
-    "@instructure/ui-postcss-config" "^7.7.1"
-    babel-loader "^8.1.0"
-    babel-plugin-add-import-extension "^1.4.3"
-    babel-plugin-dynamic-import-node "^2.3.0"
-    babel-plugin-istanbul "^6.0.0"
-    babel-plugin-macros "^2.8.0"
-    babel-plugin-transform-ensure-ignore "^0.1.0"
-    babel-plugin-transform-remove-console "^6.9.4"
-    babel-plugin-transform-undefined-to-void "^6.9.4"
-    core-js "^3.2.1"
 
 "@instructure/ui-babel-preset@^6":
   version "6.27.1"
@@ -7321,13 +7279,6 @@ babel-messages@^6.23.0:
   integrity sha1-8830cDhYA1sqKVHG7F7fbGLyYw4=
   dependencies:
     babel-runtime "^6.22.0"
-
-babel-plugin-add-import-extension@^1.4.3:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-add-import-extension/-/babel-plugin-add-import-extension-1.5.1.tgz#bd32f1107fa297386d7a34bffe84c97a6879166f"
-  integrity sha512-/aEHejW3v0HqUDasz5fCmCwU6P2r9fyzyZfXzvTbU0bLqtC7yVKMWpK4bNDW+OZ24XR6N/tap0pqfRB0PZ7xrA==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.13.0"
 
 babel-plugin-add-react-displayname@^0.0.5:
   version "0.0.5"

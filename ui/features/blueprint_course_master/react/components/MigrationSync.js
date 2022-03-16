@@ -26,7 +26,7 @@ import cx from 'classnames'
 import '@canvas/rails-flash-notifications'
 
 import {Text} from '@instructure/ui-text'
-import {Progress} from '@instructure/ui-progress'
+import {ProgressBar} from '@instructure/ui-progress'
 import {Button} from '@instructure/ui-buttons'
 import {IconRefreshLine} from '@instructure/ui-icons'
 
@@ -95,7 +95,7 @@ export default class MigrationSync extends Component {
             <Text as="p" size="small">
               {I18n.t('This may take a bit...')}
             </Text>
-            <Progress
+            <ProgressBar
               label={I18n.t('Sync in progress')}
               size="x-small"
               valueNow={MigrationStates.getLoadingValue(migrationStatus)}

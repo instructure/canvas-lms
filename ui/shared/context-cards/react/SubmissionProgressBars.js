@@ -22,7 +22,7 @@ import { useScope as useI18nScope } from '@canvas/i18n';
 import classnames from 'classnames'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {Progress} from '@instructure/ui-progress'
+import {ProgressBar} from '@instructure/ui-progress'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 
@@ -124,16 +124,14 @@ class SubmissionProgressBars extends React.Component {
                     theme={{textDecoration: 'none'}}
                     display="block"
                   >
-                    <Progress
+                    <ProgressBar
                       size="small"
                       successColor={false}
                       label={I18n.t('Grade')}
                       valueMax={submission.assignment.points_possible}
                       valueNow={submission.score || 0}
-                      formatValueText={() =>
-                        SubmissionProgressBars.displayScreenreaderGrade(submission)
-                      }
-                      formatDisplayedValue={() => (
+                      screenReaderLabel={SubmissionProgressBars.displayScreenreaderGrade(submission)}
+                      renderValue={() => (
                         <Text size="x-small" color="secondary">
                           {SubmissionProgressBars.displayGrade(submission)}
                         </Text>
