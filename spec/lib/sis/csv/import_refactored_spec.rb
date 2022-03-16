@@ -29,12 +29,13 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Couldn't find Canvas CSV import headers"
   end
 
-  it "errors files with invalid UTF-8" do
-    importer = process_csv_data(
-      "xlist_course_id,section_id,status",
-      (+"ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active").force_encoding("UTF-8")
-    )
-    expect(importer.errors.first.last).to eq "Invalid UTF-8"
+  it "does not raise error for UTF-8 encoded texts" do
+    expect do
+      process_csv_data(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        (+"C001,Hu\u0000m101,Humanities\xA0,A001,T001,active").force_encoding("UTF-8")
+      )
+    end.not_to raise_error
   end
 
   it "works with valid UTF-8 when split across bytes" do
