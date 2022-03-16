@@ -543,6 +543,10 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def remove_attachments_from_drafts
+    submission_draft_attachments.destroy_all
+  end
+
   def update_word_count
     update_column(:word_count, calculate_words)
   end
@@ -1501,6 +1505,7 @@ class Attachment < ActiveRecord::Base
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
     context.clear_avatar_image_url_with_uuid(self.uuid) if context_type == "User" && self.uuid.present?
+    remove_attachments_from_drafts
     true
   end
 

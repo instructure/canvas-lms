@@ -687,6 +687,37 @@ describe Attachment do
       expect(purgatory.take.attachment_id).to eq a.id
     end
 
+    it "destroys all associated submission_draft_attachments on destroy" do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      submission = submission_model
+      submission_draft = SubmissionDraft.create!(
+        submission: submission,
+        submission_attempt: submission.attempt
+      )
+      SubmissionDraftAttachment.create!(
+        submission_draft: submission_draft,
+        attachment: a
+      )
+      a.destroy
+      expect(a.submission_draft_attachments.count).to eq 0
+    end
+
+    it "does not destroy any submission_draft_attachments associated to other attachments on destroy" do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a2 = attachment_model(uploaded_data: default_uploaded_data)
+      submission = submission_model
+      submission_draft = SubmissionDraft.create!(
+        submission: submission,
+        submission_attempt: submission.attempt
+      )
+      SubmissionDraftAttachment.create!(
+        submission_draft: submission_draft,
+        attachment: a2
+      )
+      a.destroy
+      expect(a2.submission_draft_attachments.count).to eq 1
+    end
+
     context "inst-fs" do
       before do
         allow(InstFS).to receive(:enabled?).and_return(true)
@@ -1166,6 +1197,40 @@ describe Attachment do
       @a2.destroy
       tag2.reload
       expect(tag2).to be_deleted
+    end
+
+    it "destroys all associated submission_draft_attachments when overwriting" do
+      @a1.update_attribute(:display_name, "a2")
+      submission = submission_model
+      submission_draft = SubmissionDraft.create!(
+        submission: submission,
+        submission_attempt: submission.attempt
+      )
+      SubmissionDraftAttachment.create!(
+        submission_draft: submission_draft,
+        attachment: @a1
+      )
+
+      @a2.handle_duplicates(:overwrite)
+      @a1.reload
+      expect(@a1.submission_draft_attachments.count).to eq 0
+    end
+
+    it "does not destroy any submission_draft_attachments associated to other attachments when overwriting" do
+      @a1.update_attribute(:display_name, "a2")
+      submission = submission_model
+      submission_draft = SubmissionDraft.create!(
+        submission: submission,
+        submission_attempt: submission.attempt
+      )
+      SubmissionDraftAttachment.create!(
+        submission_draft: submission_draft,
+        attachment: @a2
+      )
+
+      @a2.handle_duplicates(:overwrite)
+      @a1.reload
+      expect(@a2.submission_draft_attachments.count).to eq 1
     end
 
     it "finds replacement file by id if name changes" do
