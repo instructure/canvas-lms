@@ -10,6 +10,7 @@ linter_options = {
   format: "eslint",
   command: "node_modules/.bin/eslint",
   campsite_mode: false,
+  boyscout_mode: false,
   append_files_to_command: true,
   comment_post_processing: proc do |comments|
     # This section should be removed when we start -2ing patchsets
