@@ -20,11 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_scheduler'
 import Actions from '../actions'
 import preventDefault from 'prevent-default'
-
-const I18n = useI18nScope('react_scheduler');
 
 export default class FindAppointment extends React.Component {
   static propTypes = {

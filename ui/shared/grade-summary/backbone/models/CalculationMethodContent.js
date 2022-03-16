@@ -15,10 +15,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!CalculationMethodContent'
 import numberFormat from '@canvas/i18n/numberFormat'
-
-const I18n = useI18nScope('CalculationMethodContent');
 
 _.mixin({
   sum(array, accessor = null, start = 0) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussions'
 import EntryView from './backbone/views/EntryView.coffee'
 import DiscussionFilterState from './backbone/models/DiscussionFilterState'
 import DiscussionToolbarView from './backbone/views/DiscussionToolbarView'
@@ -35,8 +35,6 @@ import EntriesView from './backbone/views/EntriesView'
 import SectionsTooltip from '@canvas/sections-tooltip'
 import DiscussionTopicKeyboardShortcutModal from './react/DiscussionTopicKeyboardShortcutModal'
 import ready from '@instructure/ready'
-
-const I18n = useI18nScope('discussions');
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 if (ENV.STUDENT_CONTEXT_CARDS_ENABLED)

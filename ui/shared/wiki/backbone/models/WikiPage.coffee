@@ -21,9 +21,7 @@ import WikiPageRevision from './WikiPageRevision.coffee'
 import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-I18n = useI18nScope('pages')
+import I18n from 'i18n!pages'
 
 pageOptions = ['contextAssetString', 'revision']
 

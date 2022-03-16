@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('assignments_2_elide_string');
+import I18n from 'i18n!assignments_2_elide_string'
 
 const elideString = title => {
   if (title.length > 21) {

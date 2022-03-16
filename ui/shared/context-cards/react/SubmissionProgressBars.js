@@ -18,15 +18,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!student_context_traySubmissionProgressBars'
 import classnames from 'classnames'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {ProgressBar} from '@instructure/ui-progress'
+import {Progress} from '@instructure/ui-progress'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
-
-const I18n = useI18nScope('student_context_traySubmissionProgressBars');
 
 function scoreInPoints(score, pointsPossible) {
   const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
@@ -124,14 +122,16 @@ class SubmissionProgressBars extends React.Component {
                     theme={{textDecoration: 'none'}}
                     display="block"
                   >
-                    <ProgressBar
+                    <Progress
                       size="small"
                       successColor={false}
                       label={I18n.t('Grade')}
                       valueMax={submission.assignment.points_possible}
                       valueNow={submission.score || 0}
-                      screenReaderLabel={SubmissionProgressBars.displayScreenreaderGrade(submission)}
-                      renderValue={() => (
+                      formatValueText={() =>
+                        SubmissionProgressBars.displayScreenreaderGrade(submission)
+                      }
+                      formatDisplayedValue={() => (
                         <Text size="x-small" color="secondary">
                           {SubmissionProgressBars.displayGrade(submission)}
                         </Text>

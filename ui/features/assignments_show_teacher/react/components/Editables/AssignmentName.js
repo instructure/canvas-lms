@@ -18,15 +18,13 @@
 
 import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {Text} from '@instructure/ui-text'
 
 import EditableHeading from './EditableHeading'
-
-const I18n = useI18nScope('assignments_2');
 
 const nameLabel = I18n.t('Edit assignment name')
 const namePlaceholder = I18n.t('Assignment name')

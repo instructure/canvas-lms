@@ -38,7 +38,7 @@ import {changeContext, changeSearchString, changeSortBy} from '../actions/filter
 import {allFilesLoading} from '../actions/all_files'
 import {get as getSession} from '../actions/session'
 
-export const DEFAULT_FILE_CATEGORY = 'uncategorized'
+const DEFAULT_FILE_CATEGORY = 'uncategorized'
 
 export default function propsFromDispatch(dispatch) {
   return {

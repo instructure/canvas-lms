@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!TourPoints'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -24,8 +24,6 @@ import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import handleOpenTray from '../handleOpenTray'
 import assetFactory from '@canvas/confetti/react/assetFactory'
-
-const I18n = useI18nScope('TourPoints');
 
 export default [
   {

@@ -19,10 +19,8 @@
 import React from 'react'
 import {arrayOf, number, oneOf, shape, string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-
-const I18n = useI18nScope('gradebook');
 
 export default function LatePolicyGrade(props) {
   const pointsDeducted = I18n.n(-props.submission.pointsDeducted)

@@ -17,7 +17,6 @@
  */
 
 import {changeTimezone, utcTimeOffset, utcDateOffset} from '../changeTimezone'
-import timezone_mock from 'timezone-mock'
 
 const HRS = 60 * 60 * 1000
 const MINS = 60 * 1000
@@ -48,24 +47,6 @@ const australiaTZName = 'GMT+9:30'
 const testTZOffset = (Date.UTC(2021, 5, 7, 15) - new Date(2021, 5, 7, 15)) / HRS
 
 describe('changeTimezone::', () => {
-  const originalIntl = Intl
-
-  afterEach(() => {
-    global.Intl = originalIntl
-    timezone_mock.unregister()
-  })
-
-  const mockUserTimeZone = function (timeZone) {
-    const DateTimeFormat = Intl.DateTimeFormat
-    // Replace the global Date object with a mocked one for the specified timezone
-    // this makes getTimezoneOffset to use the specified timezone to calculate the offset
-    timezone_mock.register(timeZone)
-    // Replace browser timezone with a mocked one for the specified timezone
-    jest
-      .spyOn(global.Intl, 'DateTimeFormat')
-      .mockImplementation((locale, options) => new DateTimeFormat(locale, {...options, timeZone}))
-  }
-
   it('does nothing if given no conversion timezones', () => {
     const sameDate = changeTimezone(date, {})
     expect(sameDate.getTime()).toBe(date.getTime())
@@ -111,48 +92,6 @@ describe('changeTimezone::', () => {
     // this is fun! we've moved the time through two time zone shifts and it should come out
     // the same time of day in the final time zone.
     expect(format(asiaToAustraliaDate, australiaTZ)).toBe(`${sampleTime} ${australiaTZName}`)
-  })
-
-  it('keeps consistent dates if the user timezone is shifting to DST', () => {
-    // supported by timezone_mock
-    const DSTTz = 'US/Eastern'
-    // simulate user timezone
-    mockUserTimeZone(DSTTz)
-
-    const beforeDST = new Date('2022-03-12 00:00')
-    const dstStartDate = new Date('2022-03-13 00:00')
-    const dstDate = new Date('2022-03-14 00:00')
-
-    // if user tz is the same as desiredTZ the changeTimezone should return the same date
-    // even for DST shifting dates
-    const parsedBeforeDSTDate = changeTimezone(beforeDST, {desiredTZ: DSTTz})
-    const parsedDSTStartDate = changeTimezone(dstStartDate, {desiredTZ: DSTTz})
-    const parsedDSTDate = changeTimezone(dstDate, {desiredTZ: DSTTz})
-
-    expect(parsedDSTStartDate.getTime()).toBe(dstStartDate.getTime())
-    expect(parsedBeforeDSTDate.getTime()).toBe(beforeDST.getTime())
-    expect(parsedDSTDate.getTime()).toBe(dstDate.getTime())
-  })
-
-  it('keeps consistent dates if the user timezone is shifting out from DST', () => {
-    // supported by timezone_mock
-    const DSTTz = 'US/Eastern'
-    // simulate user timezone
-    mockUserTimeZone(DSTTz)
-
-    const dstDate = new Date('2022-11-05 00:00')
-    const dstEndDate = new Date('2022-11-06 00:00')
-    const STDate = new Date('2022-11-07 00:00')
-
-    // if user tz is the same as desiredTZ the changeTimezone should return the same date
-    // even for DST shifting dates
-    const parsedDSTDate = changeTimezone(dstDate, {desiredTZ: DSTTz})
-    const parsedDSTEndDate = changeTimezone(dstEndDate, {desiredTZ: DSTTz})
-    const parsedSTDate = changeTimezone(STDate, {desiredTZ: DSTTz})
-
-    expect(parsedDSTDate.getTime()).toBe(dstDate.getTime())
-    expect(parsedDSTEndDate.getTime()).toBe(dstEndDate.getTime())
-    expect(parsedSTDate.getTime()).toBe(STDate.getTime())
   })
 })
 

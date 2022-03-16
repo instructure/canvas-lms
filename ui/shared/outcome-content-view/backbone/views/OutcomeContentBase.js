@@ -16,15 +16,13 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeContentBase'
 import $ from 'jquery'
 import _ from 'underscore'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
-
-const I18n = useI18nScope('OutcomeContentBase');
 
 RichContentEditor.preloadRemoteModule()
 
@@ -234,7 +232,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
           }
         }
       })
-    );
+    )
   }
 
   move(e) {

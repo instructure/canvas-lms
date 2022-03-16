@@ -23,7 +23,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_topics_post'
 import {
   isTopicAuthor,
   updateDiscussionTopicEntryCounts,
@@ -46,8 +46,6 @@ import {
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
-
-const I18n = useI18nScope('discussion_topics_post');
 
 export const IsolatedThreadsContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

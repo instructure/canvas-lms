@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!blueprint_settingsCoursePicker'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -27,8 +27,6 @@ import '@canvas/rails-flash-notifications'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import CourseFilter from './CourseFilter'
 import CoursePickerTable from './CoursePickerTable'
-
-const I18n = useI18nScope('blueprint_settingsCoursePicker');
 
 const {func, bool, arrayOf, string} = PropTypes
 

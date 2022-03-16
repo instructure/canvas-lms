@@ -20,10 +20,8 @@ import {View} from '@canvas/backbone'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!dashboard'
 import showMoreTemplate from '../../jst/show_more_link.handlebars'
-
-const I18n = useI18nScope('dashboard');
 
 export default class DashboardView extends View {
   static initClass() {

@@ -19,14 +19,12 @@
 import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignment_grade_summary'
 
 import {speedGraderUrl} from '../../assignment/AssignmentApi'
 import FocusableView from '../FocusableView'
 import Grid from './Grid'
 import PageNavigation from './PageNavigation'
-
-const I18n = useI18nScope('assignment_grade_summary');
 
 const ROWS_PER_PAGE = 20
 

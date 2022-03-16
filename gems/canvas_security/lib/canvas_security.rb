@@ -310,7 +310,7 @@ module CanvasSecurity
     if db_hash.nil? || overwrite
       begin
         settings_store.set("encryption_key_hash", Digest::SHA1.hexdigest(encryption_key))
-      rescue *[ActiveRecord::StatementInvalid, (CANVAS_RAILS6_0 ? nil : ActiveRecord::ConnectionNotEstablished)].compact
+      rescue ActiveRecord::StatementInvalid
         # the db may not exist yet
       end
     else

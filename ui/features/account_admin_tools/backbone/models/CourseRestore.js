@@ -17,10 +17,8 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!course_restore'
 import '@canvas/forms/jquery/jquery.instructure_forms'
-
-const I18n = useI18nScope('course_restore');
 
 export default class CourseRestore extends Backbone.Model {
   baseUrl() {

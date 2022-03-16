@@ -17,15 +17,13 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!empty_modules'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 
 import EmptyModulesUrl from '../images/empty-modules.svg'
-
-const I18n = useI18nScope('empty_modules');
 
 const EmptyModules = () => (
   <Flex

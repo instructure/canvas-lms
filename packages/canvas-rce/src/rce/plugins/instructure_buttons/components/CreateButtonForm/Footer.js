@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -25,27 +25,21 @@ import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'
 
-export const Footer = ({
-  disabled,
-  onCancel,
-  onSubmit,
-  replaceAll,
-  onReplaceAllChanged,
-  editing,
-  applyRef
-}) => {
+export const Footer = ({disabled, onCancel, onSubmit, onReplace, editing}) => {
+  const [replaceAll, setReplaceAll] = useState(false)
+
   return (
     <>
       {editing && (
         <View as="div" padding="medium">
           <Checkbox
             label={formatMessage(
-              'Apply changes to all instances of this Icon Maker Icon in the Course'
+              'Apply changes to all instances of this Button and Icon in the Course'
             )}
             data-testid="cb-replace-all"
             checked={replaceAll}
-            onChange={e => {
-              onReplaceAllChanged && onReplaceAllChanged(e.target.checked)
+            onChange={() => {
+              setReplaceAll(prev => !prev)
             }}
           />
         </View>
@@ -63,20 +57,16 @@ export const Footer = ({
               {formatMessage('Cancel')}
             </Button>
             {editing ? (
-              <Button disabled={disabled} color="primary" onClick={onSubmit} margin="0 0 0 x-small">
+              <Button
+                disabled={disabled}
+                color="primary"
+                onClick={replaceAll ? onReplace : onSubmit}
+                margin="0 0 0 x-small"
+              >
                 {formatMessage('Save')}
               </Button>
             ) : (
-              <Button
-                disabled={disabled}
-                margin="0 0 0 x-small"
-                color="primary"
-                onClick={onSubmit}
-                data-testid="create-icon-button"
-                elementRef={ref => {
-                  if (applyRef) applyRef.current = ref
-                }}
-              >
+              <Button disabled={disabled} margin="0 0 0 x-small" color="primary" onClick={onSubmit}>
                 {formatMessage('Apply')}
               </Button>
             )}

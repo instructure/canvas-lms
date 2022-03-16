@@ -26,14 +26,12 @@ import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!bounced_emails'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import tz from '@canvas/timezone'
 import $ from 'jquery'
-
-const I18n = useI18nScope('bounced_emails');
 
 BouncedEmailsView.propTypes = {
   accountId: string.isRequired

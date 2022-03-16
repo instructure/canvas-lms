@@ -23,11 +23,9 @@ import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!edit_rubricComments'
 
 import {assessmentShape} from './types'
-
-const I18n = useI18nScope('edit_rubricComments');
 
 const ellipsis = () => I18n.t('…')
 

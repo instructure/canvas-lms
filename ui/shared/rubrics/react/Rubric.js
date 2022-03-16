@@ -17,7 +17,7 @@
  */
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!edit_rubricRubric'
 import {get, isUndefined, keyBy, max, sum} from 'lodash'
 import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
@@ -25,8 +25,6 @@ import Criterion from './Criterion'
 import {getSavedComments} from './helpers'
 import {roundIfWhole} from './Points'
 import {rubricAssessmentShape, rubricAssociationShape, rubricShape} from './types'
-
-const I18n = useI18nScope('edit_rubricRubric');
 
 // be a little responsive about minimum widths of columns in the rubric table
 const MIN_WIDTH_PERCENT = 20

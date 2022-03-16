@@ -16,43 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
+
 import formatMessage from '../../../../../format-message'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {decode} from '../../svg/utils'
-import useDebouncedValue from '../../utils/useDebouncedValue'
 
-export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
-  const originalName = settings.originalName
-
-  const [name, setName, setImmediateName] = useDebouncedValue(settings.name, n =>
-    onChange({name: n})
-  )
-  const [alt, setAlt] = useDebouncedValue(settings.alt, a => onChange({alt: a}))
-
-  useEffect(() => {
-    if (!allowNameChange) onChange({name: originalName})
-  }, [allowNameChange, onChange, originalName])
-
-  useEffect(() => {
-    // The "immediate" bit of name state may have been initialized to an
-    // empty value if the app has not yet fetched the file's name from the
-    // API (on icon edit).
-    //
-    // If that's the case, we need to update the "immediate" piece of name
-    // state to present the file name.
-    if (!name && !!settings.name) {
-      setImmediateName(settings.name)
-    }
-  }, [name, setImmediateName, settings.name])
-
+export const Header = ({settings, onChange}) => {
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
     <Flex alignItems="center">
@@ -68,7 +46,9 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
             </View>
           }
         >
-          <Button icon={IconQuestionLine} size="small" variant="icon" />
+          <Button icon={IconQuestionLine} size="small" variant="icon">
+            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
+          </Button>
         </Tooltip>
       </Flex.Item>
     </Flex>
@@ -81,23 +61,26 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
           data-testid="button-name"
           renderLabel={formatMessage('Name')}
           placeholder={formatMessage('untitled')}
-          interaction={allowNameChange ? 'enabled' : 'disabled'}
-          onChange={setName}
-          value={name ? decode(name) : ''}
-          inputRef={ref => {
-            if (nameRef) nameRef.current = ref
+          onChange={e => {
+            const name = e.target.value
+            onChange({name})
           }}
+          value={decode(settings.name)}
         />
       </Flex.Item>
       <Flex.Item padding="small">
         <TextArea
           id="button-alt-text"
+          aria-describedby="alt-text-label-tooltip"
           height="4rem"
           label={textAreaLabel}
-          onChange={setAlt}
+          onChange={e => {
+            const alt = e.target.value
+            onChange({alt})
+          }}
           placeholder={formatMessage('(Describe the image)')}
           resize="vertical"
-          value={alt}
+          value={settings.alt}
         />
       </Flex.Item>
     </Flex>

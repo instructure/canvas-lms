@@ -19,13 +19,11 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import round from 'round'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
-
-const I18n = useI18nScope('gradebook');
 
 function getGradePercentage(score, pointsPossible) {
   const grade = scoreToPercentage(score, pointsPossible)

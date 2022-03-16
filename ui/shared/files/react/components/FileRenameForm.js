@@ -22,9 +22,7 @@ import FileRenameForm from './LegacyFileRenameForm'
 import Modal from '@canvas/modal'
 import ModalContent from '@canvas/modal/react/content'
 import ModalButtons from '@canvas/modal/react/buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('file_rename_form');
+import I18n from 'i18n!file_rename_form'
 
 FileRenameForm.buildContent = function() {
   const {onRenameFileMessage, onLockFileMessage} = this.props

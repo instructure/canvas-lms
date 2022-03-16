@@ -19,11 +19,9 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!theme_editor'
 import rgb2hex from '@canvas/util/rgb2hex'
 import classnames from 'classnames'
-
-const I18n = useI18nScope('theme_editor');
 
 export default class ThemeEditorColorRow extends Component {
   static propTypes = {
@@ -91,7 +89,7 @@ export default class ThemeEditorColorRow extends Component {
   }
 
   invalidHexString(colorString) {
-    return colorString.match(/#/) ? !colorString.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) : false;
+    return colorString.match(/#/) ? !colorString.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) : false
   }
 
   inputChange = value => {

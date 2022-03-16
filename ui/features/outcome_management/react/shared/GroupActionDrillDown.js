@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
@@ -26,8 +26,6 @@ import {Select} from '@instructure/ui-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-
-const I18n = useI18nScope('FindOutcomesModal');
 
 const BACK_OPTION = 'back'
 const VIEW_OPTION = 'view'

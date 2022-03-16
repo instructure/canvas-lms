@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, number, string, arrayOf} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -29,8 +29,6 @@ import {TextInput} from '@instructure/ui-text-input'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import {hasSubmission} from '@canvas/grading/messageStudentsWhoHelper'
-
-const I18n = useI18nScope('assignments_2');
 
 /*
  *  CAUTION: The InstUI Select component is greatly changed in v7.

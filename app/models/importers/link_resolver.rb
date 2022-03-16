@@ -110,7 +110,7 @@ module Importers
           # context prepended to the URL. This prevents
           # redirects to non cross-origin friendly urls
           # during a file fetch
-          if rest.include?("icon_maker_icon=1")
+          if rest.include?("buttons_and_icons=1")
             link[:new_value] = "/files/#{file_id}#{rest}"
           else
             link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"

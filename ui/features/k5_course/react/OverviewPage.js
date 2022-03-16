@@ -16,47 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!overview_page'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import {ImmersiveReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
-const I18n = useI18nScope('overview_page');
-
-export default function OverviewPage({content, url, canEdit, showImmersiveReader}) {
-  const html = useMemo(() => apiUserContent.convert(content), [content])
+export default function OverviewPage({content, url, canEdit}) {
   return (
     <>
-      <Flex justifyItems="end" alignItems="center" margin="small 0 0">
-        {canEdit && (
-          <Flex.Item>
-            <IconButton
-              screenReaderLabel={I18n.t('Edit home page')}
-              renderIcon={IconEditLine}
-              href={url}
-              withBackground={false}
-              withBorder={false}
-            />
-          </Flex.Item>
-        )}
-        {showImmersiveReader && (
-          <Flex.Item margin="0 0 0 small">
-            <ImmersiveReaderButton
-              content={{content: () => html, title: I18n.t('Subject Home Page')}}
-            />
-          </Flex.Item>
-        )}
-      </Flex>
+      {canEdit && (
+        <View as="div" textAlign="end" margin="small 0 0">
+          <IconButton
+            screenReaderLabel={I18n.t('Edit home page')}
+            renderIcon={IconEditLine}
+            href={url}
+            withBackground={false}
+            withBorder={false}
+          />
+        </View>
+      )}
       <div
         className="user_content"
         /* html sanitized by server */
-        dangerouslySetInnerHTML={{__html: html}}
+        dangerouslySetInnerHTML={{__html: apiUserContent.convert(content)}}
       />
     </>
   )
@@ -65,6 +52,5 @@ export default function OverviewPage({content, url, canEdit, showImmersiveReader
 OverviewPage.propTypes = {
   content: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  canEdit: PropTypes.bool.isRequired,
-  showImmersiveReader: PropTypes.bool.isRequired
+  canEdit: PropTypes.bool.isRequired
 }

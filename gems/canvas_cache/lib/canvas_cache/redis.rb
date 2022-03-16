@@ -124,10 +124,10 @@ module CanvasCache
       # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
       if redis_name.include?("localhost")
         # talking to local redis should not short ciruit as long
-        return (Time.now.utc - last_redis_failure[redis_name]) < (settings_store.get("redis_local_failure_time", "2").to_i rescue 2)
+        return (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get("redis_local_failure_time", "2").to_i rescue 2)
       end
 
-      (Time.now.utc - last_redis_failure[redis_name]) < (settings_store.get("redis_failure_time", "300").to_i rescue 300)
+      (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get("redis_failure_time", "300").to_i rescue 300)
     end
 
     def self.last_redis_failure
@@ -174,7 +174,7 @@ module CanvasCache
       settings_store.skip_cache do
         if ignore_redis_failures?
           CanvasCache.invoke_on_captured_error(e)
-          last_redis_failure[redis_name] = Time.now.utc
+          last_redis_failure[redis_name] = Time.zone.now
           failure_retval
         else
           raise
@@ -204,7 +204,7 @@ module CanvasCache
       def process(commands, *a, &b)
         # These instance vars are used by the added #log_request_response method.
         @processing_requests = commands.map(&:dup)
-        @process_start = Time.now.utc
+        @process_start = Time.zone.now
 
         # try to return the type of value the command would expect, for some
         # specific commands that we know can cause problems if we just return
@@ -244,7 +244,7 @@ module CanvasCache
         # client works this way because #process may be called with many commands
         # at once, if using #pipeline.
         @processing_requests ||= []
-        @process_start ||= Time.now.utc
+        @process_start ||= Time.zone.now
         log_request_response(@processing_requests.shift, response, @process_start)
         response
       end
@@ -261,7 +261,7 @@ module CanvasCache
           command: command,
           # request_size is the sum of all the string parameters send with the command.
           request_size: request.sum { |c| c.to_s.size },
-          request_time_ms: ((Time.now.utc - start_time) * 1000).round(3),
+          request_time_ms: ((Time.zone.now - start_time) * 1000).round(3),
           host: location,
         }
         unless NON_KEY_COMMANDS.include?(command)

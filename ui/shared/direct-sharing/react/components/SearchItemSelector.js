@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!managed_course_selector'
 import React, {useState, useEffect} from 'react'
 import {func, string, object, shape, instanceOf} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
 import {MINIMUM_SEARCH_LENGTH, isSearchableTerm} from '../effects/useManagedCourseSearchApi'
-
-const I18n = useI18nScope('managed_course_selector');
 
 SearchItemSelector.propTypes = {
   onItemSelected: func, // expects each item to have the 'name' property

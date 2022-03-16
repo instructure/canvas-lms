@@ -18,10 +18,8 @@
 
 import axios from '@canvas/axios'
 import qs from 'qs'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!upload_file'
 import resolveProgress from '@canvas/progress/resolve_progress'
-
-const I18n = useI18nScope('upload_file');
 
 // error interpretations. specifically avoid reporting an unhelpful "Network
 // Error". TODO: more introspection of the errors for more detailed/specific

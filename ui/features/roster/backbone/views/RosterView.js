@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!RosterView'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
 import AddPeopleApp from '@canvas/add-people'
-
-const I18n = useI18nScope('RosterView');
 
 export default class RosterView extends Backbone.View {
   static initClass() {

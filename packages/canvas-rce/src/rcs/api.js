@@ -23,7 +23,6 @@ import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
 import formatMessage from '../format-message'
 import alertHandler from '../rce/alertHandler'
 import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '../rce/plugins/shared/Upload/constants'
-import {DEFAULT_FILE_CATEGORY} from '../sidebar/containers/sidebarHandlers'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -278,10 +277,7 @@ class RceApiSource {
 
     if (!bookmark) {
       const perPageQuery = props.perPage ? `per_page=${props.perPage}` : ''
-      const categoryQuery = `category=${DEFAULT_FILE_CATEGORY}`
-      uri = `${props.filesUrl}?${perPageQuery}&${categoryQuery}${getSearchParam(
-        props.searchString
-      )}`
+      uri = `${props.filesUrl}?${perPageQuery}${getSearchParam(props.searchString)}`
 
       if (props.sortBy) {
         uri += `${getSortParams(props.sortBy.sort, props.sortBy.order)}`

@@ -20,11 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_files'
 import BBTreeBrowserView from '../legacy/modules/BBTreeBrowserView'
 import RootFoldersFinder from '../../RootFoldersFinder.coffee'
-
-const I18n = useI18nScope('react_files');
 
 class BBTreeBrowser extends React.Component {
   static displayName = 'BBTreeBrowser'

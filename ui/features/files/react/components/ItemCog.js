@@ -18,7 +18,7 @@
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_files'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -32,8 +32,6 @@ import openMoveDialog from '../../openMoveDialog'
 import downloadStuffAsAZip from '../legacy/util/downloadStuffAsAZip'
 import deleteStuff from '../legacy/util/deleteStuff'
 import $ from 'jquery'
-
-const I18n = useI18nScope('react_files');
 
 class ItemCog extends React.Component {
   static displayName = 'ItemCog'
@@ -239,7 +237,7 @@ class ItemCog extends React.Component {
         )
         // Move Link
         menuItems.push(
-          <li key="move-to" role="presentation">
+          <li key="move" role="presentation">
             <a
               href="#"
               onClick={wrap(openMoveDialog, {
@@ -250,7 +248,7 @@ class ItemCog extends React.Component {
               role="menuitem"
               tabIndex="-1"
             >
-              {I18n.t('Move To...')}
+              {I18n.t('Move')}
             </a>
           </li>
         )

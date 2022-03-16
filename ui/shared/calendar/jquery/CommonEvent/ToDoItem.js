@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import fcUtil from '../fcUtil.coffee'
 import CommonEvent from './CommonEvent'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-
-const I18n = useI18nScope('calendar');
 
 extend(ToDoItem, CommonEvent)
 

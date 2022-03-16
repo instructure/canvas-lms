@@ -17,10 +17,8 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!collaborations'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
-
-const I18n = useI18nScope('collaborations');
 
 let main
 

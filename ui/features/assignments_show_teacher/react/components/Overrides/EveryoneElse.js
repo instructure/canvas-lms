@@ -18,11 +18,9 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {TeacherAssignmentShape} from '../../assignmentData'
 import Override from './Override'
-
-const I18n = useI18nScope('assignments_2');
 
 // When all the students are not included in the assignment
 // overrides, those that are left out (e.g. everyone else,

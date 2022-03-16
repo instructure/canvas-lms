@@ -17,27 +17,25 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {Header} from '../Header'
 
 describe('<Header />', () => {
-  it('changes the button name', async () => {
+  it('changes the button name', () => {
     const onChange = jest.fn()
     render(<Header settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = document.querySelector('#button-name')
     fireEvent.change(input, {target: {value: 'A b&i name'}})
-
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith({name: 'A b&i name'}))
+    expect(onChange).toHaveBeenCalledWith({name: 'A b&i name'})
   })
 
-  it('changes the button alt text', async () => {
+  it('changes the button alt text', () => {
     const onChange = jest.fn()
     render(<Header settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = document.querySelector('#button-alt-text')
     fireEvent.change(input, {target: {value: 'A descriptive text'}})
-
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith({alt: 'A descriptive text'}))
+    expect(onChange).toHaveBeenCalledWith({alt: 'A descriptive text'})
   })
 
   describe('when the name contains html entities', () => {

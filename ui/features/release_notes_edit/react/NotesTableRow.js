@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!release_notes'
 import {
   IconPublishSolid,
   IconUnpublishedLine,
@@ -30,8 +30,6 @@ import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {rolesObject} from './util'
-
-const I18n = useI18nScope('release_notes');
 
 const formatLanguage = new Intl.DisplayNames(['en'], {type: 'language'})
 

@@ -19,9 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('gradingStatusPill');
+import I18n from 'i18n!gradingStatusPill'
 
 function forEachNode(nodeList, fn) {
   for (let i = 0; i < nodeList.length; i += 1) {

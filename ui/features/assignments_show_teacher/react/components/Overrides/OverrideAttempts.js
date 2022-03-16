@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {bool, oneOf, number} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {requiredIfDetail} from '../../assignmentData'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -27,8 +27,6 @@ import {Select} from '@instructure/ui-select'
 import {Text} from '@instructure/ui-text'
 
 import NumberHelper from '@canvas/i18n/numberHelper'
-
-const I18n = useI18nScope('assignments_2');
 
 /*
  *  CAUTION: The InstUI Select component is greatly changed in v7.

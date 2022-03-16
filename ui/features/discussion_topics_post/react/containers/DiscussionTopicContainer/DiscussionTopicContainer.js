@@ -24,7 +24,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
@@ -51,10 +51,8 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
-import assignmentRubricDialog from '../../../../discussion_topic/jquery/assignmentRubricDialog'
+import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
-
-const I18n = useI18nScope('discussion_posts');
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 
@@ -70,7 +68,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const isSearch = searchTerm || filter === 'unread'
 
   if (ENV.DISCUSSION?.GRADED_RUBRICS_URL) {
-    assignmentRubricDialog.initTriggers()
+    rubricTriggers.initDialog()
   }
 
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
@@ -218,7 +216,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     return rootEntryDraftMessage
   }
 
-  const podcast_url = document.querySelector("link[id='Discussion Podcast Feed']")
+  const podcast_url = document.querySelector("link[title='Discussion Podcast Feed']")
 
   return (
     <Responsive
@@ -381,9 +379,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   props.discussionTopic.permissions?.showRubric ||
                                   props.discussionTopic.permissions?.addRubric
                                     ? () => {
-                                        assignmentRubricDialog.initDialog()
-                                        assignmentRubricDialog.openDialog()
+                                        rubricTriggers.openDialog()
                                         rubricEditing.init()
+
+                                        const event = document.createEvent('Event')
+                                        event.initEvent('rubricEditDataReady', true, true)
+                                        document.dispatchEvent(event)
                                       }
                                     : null
                                 }

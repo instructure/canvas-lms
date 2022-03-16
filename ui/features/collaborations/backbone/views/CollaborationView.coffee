@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!collaborations'
 import $ from 'jquery'
 import {extend} from 'underscore'
 import {View} from '@canvas/backbone'
@@ -24,8 +24,6 @@ import CollaboratorPickerView from './CollaboratorPickerView.coffee'
 import editForm from '../../jst/edit.handlebars'
 import editIframe from '../../jst/EditIframe.handlebars'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
-
-I18n = useI18nScope('collaborations')
 
 export default class CollaborationView extends View
   events:

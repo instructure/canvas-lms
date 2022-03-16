@@ -17,7 +17,7 @@
  */
 
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {responsiveQuerySizes} from '../../utils'
@@ -30,8 +30,6 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('discussion_posts');
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)

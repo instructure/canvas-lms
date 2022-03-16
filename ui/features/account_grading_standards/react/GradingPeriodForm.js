@@ -22,12 +22,10 @@ import ReactDOM from 'react-dom'
 import update from 'immutability-helper'
 import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradingPeriodForm'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import numberHelper from '@canvas/i18n/numberHelper'
 import round from 'round'
-
-const I18n = useI18nScope('gradingPeriodForm');
 
 function roundWeight(val) {
   const value = numberHelper.parse(val)

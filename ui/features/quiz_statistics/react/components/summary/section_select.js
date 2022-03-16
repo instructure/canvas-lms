@@ -18,11 +18,9 @@
 
 import $ from 'jquery'
 import config from '../../../config'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_statistics'
 import quizStatistics from '../../../stores/statistics'
 import React from 'react'
-
-const I18n = useI18nScope('quiz_statistics');
 
 const SectionLink = props => (
   <li

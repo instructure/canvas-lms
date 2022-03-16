@@ -17,15 +17,13 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import TextInput from './TextInput'
 import TextAreaInput from './TextAreaInput'
 import CheckboxInput from './CheckboxInput'
 import '@canvas/rails-flash-notifications'
-
-const I18n = useI18nScope('external_tools');
 
 export default class ConfigurationFormXml extends React.Component {
   static propTypes = {

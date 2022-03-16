@@ -24,9 +24,7 @@ import GenericErrorPage from '@canvas/generic-error-page'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('mentions');
+import I18n from 'i18n!mentions'
 
 const client = createClient()
 

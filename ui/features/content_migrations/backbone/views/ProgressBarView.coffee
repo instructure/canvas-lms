@@ -17,9 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import template from '../../jst/ProgressBar.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-I18n = useI18nScope('progressbar_view')
+import I18n from 'i18n!progressbar_view'
 
 export default class ProgressBarView extends Backbone.View
   template: template

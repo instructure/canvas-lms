@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!sub_accounts'
 import jQuery from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData */
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
-
-const I18n = useI18nScope('sub_accounts');
 
 jQuery(function($) {
   $('.add_sub_account_link').click(function() {

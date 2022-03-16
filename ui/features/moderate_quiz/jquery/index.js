@@ -16,22 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quizzes.moderate'
 import $ from 'jquery'
 import timing from './quiz_timing'
 import openModerateStudentDialog from './openModerateStudentDialog'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* datetimeString */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData */
+import '@canvas/datetime' /* datetimeString */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/templateData'/* fillTemplateData */
-import 'date'
-const I18n = useI18nScope('quizzes.moderate');
-/* Date.parse */
+import '@canvas/util/templateData' /* fillTemplateData */
+import 'date' /* Date.parse */
 
 const DIALOG_WIDTH = 490
 /**

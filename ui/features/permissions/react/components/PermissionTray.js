@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!permissions_role_tray'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, string} from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
@@ -36,8 +36,6 @@ import permissionPropTypes, {COURSE} from '@canvas/permissions/react/propTypes'
 
 import DetailsToggle from './DetailsToggle'
 import {PERMISSION_DETAIL_SECTIONS} from '../generateActionTemplates'
-
-const I18n = useI18nScope('permissions_role_tray');
 
 function PermissionDetailToggles({tab, permissionName}) {
   const [permData, setPermData] = useState(null)

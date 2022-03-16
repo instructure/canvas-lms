@@ -3112,21 +3112,21 @@ describe Course do
         end
       end
 
-      context "course paces" do
+      context "pace plans" do
         before :once do
-          @course.account.enable_feature!(:course_paces)
-          @course.enable_course_paces = true
+          @course.account.enable_feature!(:pace_plans)
+          @course.enable_pace_plans = true
           @course.save!
         end
 
-        it "is included when course paces is enabled" do
+        it "is included when pace plans is enabled" do
           tabs = @course.tabs_available(@teacher).pluck(:id)
-          expect(tabs).to include(Course::TAB_COURSE_PACES)
+          expect(tabs).to include(Course::TAB_PACE_PLANS)
         end
 
         it "is not included for students" do
           tabs = @course.tabs_available(@student).pluck(:id)
-          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+          expect(tabs).not_to include(Course::TAB_PACE_PLANS)
         end
       end
     end

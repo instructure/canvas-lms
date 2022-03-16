@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!observer_options'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
@@ -33,8 +33,6 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
 import AddStudentModal from './AddStudentModal'
 import {parseObservedUsersList, parseObservedUsersResponse} from './utils'
-
-const I18n = useI18nScope('observer_options');
 
 const ObserverOptions = ({
   observedUsersList,

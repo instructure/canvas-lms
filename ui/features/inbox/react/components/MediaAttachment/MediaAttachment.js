@@ -17,15 +17,13 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!conversations_2'
 import {IconAttachMediaLine, IconXLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('conversations_2');
 
 export const MediaAttachment = props => {
   return (

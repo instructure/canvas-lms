@@ -23,10 +23,8 @@ import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconCheckMarkSolid, IconExpandStartLine, IconEndSolid} from '@instructure/ui-icons'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-
-const I18n = useI18nScope('gradebook');
 
 const themeOverrides = {
   [Button.theme]: {

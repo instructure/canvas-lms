@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!staff_info'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
@@ -36,8 +36,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {readableRoleName, sendMessage} from './utils'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-
-const I18n = useI18nScope('staff_info');
 
 export default function StaffInfo({
   id,

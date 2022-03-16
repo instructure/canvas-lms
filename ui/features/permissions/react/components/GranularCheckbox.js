@@ -18,15 +18,13 @@
 
 import React from 'react'
 import {func, bool, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!permission_button'
 import {connect} from 'react-redux'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Spinner} from '@instructure/ui-spinner'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import actions from '../actions'
 import propTypes, {ENABLED_FOR_NONE} from '@canvas/permissions/react/propTypes'
-
-const I18n = useI18nScope('permission_button');
 
 export default function GranularCheckbox({
   apiBusy,

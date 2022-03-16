@@ -16,21 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import store from '../lib/AppCenterStore'
-import page from 'page'
 import extStore from '../lib/ExternalAppsStore'
 import AppTile from './AppTile'
 import Header from './Header'
 import AppFilters from './AppFilters'
 import ManageAppListButton from './ManageAppListButton'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('external_tools');
 
 export default class AppList extends React.Component {
   static propTypes = {
@@ -71,19 +66,6 @@ export default class AppList extends React.Component {
     }
   }
 
-  viewConfigurationsButton = () => (
-    <View>
-      <Button
-        margin="none x-small"
-        onClick={() => {
-          page.redirect('/configurations')
-        }}
-      >
-        {I18n.t('View App Configurations')}
-      </Button>
-    </View>
-  )
-
   apps = () => {
     if (store.getState().isLoading) {
       return <div ref={this.loadingIndicator} className="loadingIndicator" data-testid="spinner" />
@@ -101,7 +83,12 @@ export default class AppList extends React.Component {
       <div className="AppList">
         <Header>
           {this.manageAppListButton()}
-          {this.viewConfigurationsButton()}
+          <a
+            href={`${this.props.baseUrl}/configurations`}
+            className="btn view_tools_link lm pull-right"
+          >
+            {I18n.t('View App Configurations')}
+          </a>
         </Header>
         <AppFilters ref={this.setAppFiltersRef} />
         <div className="app_center">

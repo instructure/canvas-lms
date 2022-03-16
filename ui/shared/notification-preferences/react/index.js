@@ -17,7 +17,7 @@
  */
 
 import {bool, func, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!notification_preferences'
 import {NotificationPreferencesShape} from './Shape'
 import NotificationPreferencesTable from './Table'
 import React, {useContext, useEffect, useState} from 'react'
@@ -29,8 +29,6 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {NotificationPreferencesContext} from './NotificationPreferencesContextProvider'
 import NotificationPreferencesContextSelectQuery from './NotificationPreferencesContextSelectQuery'
-
-const I18n = useI18nScope('notification_preferences');
 
 const NotificationPreferences = props => {
   const {enabled} = props

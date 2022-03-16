@@ -24,7 +24,7 @@ import round from 'round'
 import userSettings from '@canvas/user-settings'
 import fetchAllPages from '../helpers/xhr/fetch_all_pages'
 import parseLinkHeader from '../helpers/xhr/parse_link_header'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!sr_gradebook'
 import Ember from 'ember'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -43,8 +43,6 @@ import '@canvas/datetime'
 import 'jquery-tinypubsub'
 
 import '../components/ic_submission_download_dialog_component'
-
-const I18n = useI18nScope('sr_gradebook');
 
 const {get, set, setProperties} = Ember
 
@@ -802,7 +800,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       return window.ENV.GRADEBOOK_OPTIONS.custom_columns_url
     } else {
       const notesID = __guard__(this.get('teacherNotes'), x => x.id)
-      return window.ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID);
+      return window.ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
     }
   }.property('shouldCreateNotes', 'custom_columns.@each'),
 

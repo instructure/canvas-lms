@@ -305,13 +305,9 @@ describe('sources/api', () => {
 
       it('makes a request to the files api with given host and folder ID', () => {
         subject()
-        sinon.assert.calledWith(
-          apiSource.apiFetch,
-          'https://canvas.rce/api/files/2?&category=uncategorized',
-          {
-            Authorization: 'Bearer theJWT'
-          }
-        )
+        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2?', {
+          Authorization: 'Bearer theJWT'
+        })
       })
 
       describe('with perPage set', () => {
@@ -323,7 +319,7 @@ describe('sources/api', () => {
           subject()
           sinon.assert.calledWith(
             apiSource.apiFetch,
-            'https://canvas.rce/api/files/2?per_page=50&category=uncategorized',
+            'https://canvas.rce/api/files/2?per_page=50',
             {
               Authorization: 'Bearer theJWT'
             }
@@ -466,10 +462,10 @@ describe('sources/api', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource
-        .preflightUpload(fileProps, {category: 'icon_maker_icons'}, apiProps)
+        .preflightUpload(fileProps, {category: 'buttons_and_icons'}, apiProps)
         .then(() => {
           const body = JSON.parse(fetchMock.lastOptions(uri).body)
-          assert.equal(body.category, 'icon_maker_icons')
+          assert.equal(body.category, 'buttons_and_icons')
         })
     })
 

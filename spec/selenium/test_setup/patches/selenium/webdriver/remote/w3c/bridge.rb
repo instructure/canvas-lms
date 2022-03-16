@@ -22,15 +22,20 @@ require "selenium-webdriver"
 module Selenium
   module WebDriver
     module Remote
-      class Bridge
-        def log(type)
-          command(:get_log, "session/:session_id/log", :post)
-          data = execute :get_log, {}, { type: type.to_s }
+      module W3C
+        class Bridge
+          COMMANDS = remove_const(:COMMANDS).dup
+          COMMANDS[:get_log] = [:post, "session/:session_id/log"]
+          COMMANDS.freeze
 
-          Array(data).map do |l|
-            LogEntry.new l.fetch("level", "UNKNOWN"), l.fetch("timestamp"), l.fetch("message")
-          rescue KeyError
-            next
+          def log(type)
+            data = execute :get_log, {}, { type: type.to_s }
+
+            Array(data).map do |l|
+              LogEntry.new l.fetch("level", "UNKNOWN"), l.fetch("timestamp"), l.fetch("message")
+            rescue KeyError
+              next
+            end
           end
         end
       end

@@ -16,23 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!sharedGradeFormatHelper'
 import numberHelper from '@canvas/i18n/numberHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-
-const I18n = useI18nScope('sharedGradeFormatHelper');
 
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup() {
     this.translateString = I18n.t
     sandbox.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)))
-    sandbox.stub(I18n.constructor.prototype, 't').callsFake(this.translateString)
+    sandbox.stub(I18n, 't').callsFake(this.translateString)
   }
 })
 
 test('uses I18n#n to format numerical integer grades', () => {
   sandbox
-    .stub(I18n.constructor.prototype, 'n')
+    .stub(I18n, 'n')
     .withArgs(1000)
     .returns('* 1,000')
   equal(GradeFormatHelper.formatGrade(1000), '* 1,000')
@@ -52,7 +50,7 @@ test('uses formatPointsOutOf to format points grade type', () => {
 
 test('uses I18n#n to format numerical decimal grades', () => {
   sandbox
-    .stub(I18n.constructor.prototype, 'n')
+    .stub(I18n, 'n')
     .withArgs(123.45)
     .returns('* 123.45')
   equal(GradeFormatHelper.formatGrade(123.45), '* 123.45')
@@ -108,7 +106,7 @@ test('returns the given grade when it is numbers followed by letters', () => {
 })
 
 test('does not format letter grades', () => {
-  sandbox.spy(I18n.constructor.prototype, 'n')
+  sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade('A')
   equal(I18n.n.callCount, 0, 'I18n.n was not called')
 })
@@ -138,7 +136,7 @@ test('returns the grade when given an empty string and no defaultValue option', 
 })
 
 test('formats numerical integer grades as percent when given a gradingType of "percent"', () => {
-  sandbox.spy(I18n.constructor.prototype, 'n')
+  sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade(10, {gradingType: 'percent'})
   const [value, options] = I18n.n.getCall(0).args
   strictEqual(value, 10)
@@ -146,7 +144,7 @@ test('formats numerical integer grades as percent when given a gradingType of "p
 })
 
 test('formats numerical decimal grades as percent when given a gradingType of "percent"', () => {
-  sandbox.spy(I18n.constructor.prototype, 'n')
+  sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade(10.1, {gradingType: 'percent'})
   const [value, options] = I18n.n.getCall(0).args
   strictEqual(value, 10.1)
@@ -154,7 +152,7 @@ test('formats numerical decimal grades as percent when given a gradingType of "p
 })
 
 test('formats string percentage grades as points when given a gradingType of "points"', () => {
-  sandbox.spy(I18n.constructor.prototype, 'n')
+  sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade('10%', {gradingType: 'points'})
   const [value, options] = I18n.n.getCall(0).args
   strictEqual(value, 10)
@@ -314,7 +312,7 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     sinon.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)))
-    sinon.stub(I18n.constructor.prototype, 't').callsFake(translateString)
+    sinon.stub(I18n, 't').callsFake(translateString)
   })
 
   suiteHooks.afterEach(() => {

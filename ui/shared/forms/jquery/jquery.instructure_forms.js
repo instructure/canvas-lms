@@ -18,21 +18,19 @@
 
 import {send} from '@canvas/rce/RceCommandShim'
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import _ from 'underscore'
 import FakeXHR from './FakeXHR'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from 'html-escape'
-import '@canvas/jquery/jquery.ajaxJSON'/* ajaxJSON, defaultAjaxError */
+import '@canvas/jquery/jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {trackEvent} from '@canvas/google-analytics'
-import '@canvas/datetime'/* date_field, time_field, datetime_field */
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.uniq/ */
+import '@canvas/datetime' /* date_field, time_field, datetime_field */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-
-const I18n = useI18nScope('instructure');
 
 // Intercepts the default form submission process.  Uses the form tag's
 // current action and method attributes to know where to submit to.
@@ -580,7 +578,7 @@ $.toMultipartForm = function (params, callback) {
     return
   }
   function sanitizeQuotedString(text) {
-    return text.replace(/\"/g, '');
+    return text.replace(/\"/g, '')
   }
   function finished() {
     result.body = body.substring(0, body.length - 2) + '--'

@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Список объявлений" },
   "announcements_a4b8ed4a": { "message": "Объявления" },
   "apply_781a2546": { "message": "Применить" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Применить изменения ко всем экземплярам этой кнопки и пиктограммы в курсе"
+  },
   "apps_54d24a47": { "message": "Приложения" },
   "arrows_464a3e54": { "message": "Стрелки" },
   "art_icon_8e1daad": { "message": "Значок искусства" },
@@ -72,6 +75,12 @@ const locale = {
   "basic_554cdc0a": { "message": "Основной" },
   "below_81d4dceb": { "message": "Ниже" },
   "bottom_third_5f5fec1d": { "message": "Нижняя треть" },
+  "button_color_608a0242": { "message": "Кнопка «Цвет»" },
+  "button_outline_cf14f071": { "message": "Кнопка «Контур»" },
+  "button_outline_size_cc1d1df7": { "message": "Кнопка «Размер контура»" },
+  "button_shape_dbecb573": { "message": "Кнопка «Форма»" },
+  "button_size_20f5fce1": { "message": "Кнопка «Размер»" },
+  "buttons_and_icons_e66ee12c": { "message": "Кнопки и пиктограммы" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 г. Acme Inc." },
   "cancel_caeb1e68": { "message": "Отменить" },
   "choose_caption_file_9c45bc4e": {
@@ -119,6 +128,7 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Свернуть, чтобы скрыть { types }"
   },
+  "color_color_eb64b08": { "message": "Цвет { color }" },
   "computer_1d7dfa6f": { "message": "Компьютер" },
   "content_1440204b": { "message": "Содержимое" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -140,6 +150,9 @@ const locale = {
   "course_links_b56959b9": { "message": "Ссылки курса" },
   "course_media_ec759ad": { "message": "Мультимедиа курса" },
   "course_navigation_dd035109": { "message": "Навигация курса" },
+  "create_button_and_icon_5c089934": {
+    "message": "Создать кнопку и пиктограмму"
+  },
   "creative_commons_license_725584ae": {
     "message": "Лицензионное соглашение Creative Commons:"
   },
@@ -195,6 +208,8 @@ const locale = {
   "embed_828fac4a": { "message": "Вставить" },
   "embed_code_314f1bd5": { "message": "Внедрить код" },
   "embed_image_1080badc": { "message": "Вставить изображение" },
+  "embed_options_tray_901cfd19": { "message": "Вставить лоток опций" },
+  "embed_preview_2d741e1f": { "message": "Встроить предварительный просмотр" },
   "embed_video_a97a64af": { "message": "Вставить видео" },
   "embedded_content_aaeb4d3d": { "message": "интегрированный контент" },
   "engineering_icon_f8f3cf43": { "message": "Значок техники" },
@@ -358,6 +373,7 @@ const locale = {
     "message": "Открыть приложение { title }"
   },
   "operators_a2ef9a93": { "message": "Операторы" },
+  "options_3ab0ea65": { "message": "Опции" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Упорядоченные и неупорядоченные списки"
   },
@@ -415,6 +431,9 @@ const locale = {
     "message": "К сожалению, возможность доступа к редактору Pretty HTML с клавиатуры отсутствует. Обратитесь к редактору Raw HTML здесь."
   },
   "save_11a80ec3": { "message": "Сохранить" },
+  "saved_buttons_and_icons_8278eed2": {
+    "message": "Сохраненные кнопки и пиктограммы"
+  },
   "search_280d00bd": { "message": "Поиск" },
   "search_term_b2d2235": { "message": "критерий поиска" },
   "select_crop_shape_d441feeb": { "message": "Выберите обрезку формы" },
@@ -424,6 +443,7 @@ const locale = {
     "message": "Нажать Shift-O, чтобы открыть редактор Pretty HTML."
   },
   "show_audio_options_b489926b": { "message": "Показать параметры звука" },
+  "show_embed_options_ef8d7ef": { "message": "Показать параметры вставки" },
   "show_image_options_1e2ecc6b": { "message": "Показать варианты изображения" },
   "show_link_options_545338fd": { "message": "Показать параметры ссылки" },
   "show_video_options_6ed3721a": { "message": "Показать параметры видео" },

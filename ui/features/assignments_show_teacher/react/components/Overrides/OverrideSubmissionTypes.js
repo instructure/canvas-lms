@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, oneOf} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import {OverrideShape, requiredIfDetail} from '../../assignmentData'
 import TeacherViewContext from '../TeacherViewContext'
 import ExternalToolType from './ExternalToolType'
@@ -41,8 +41,6 @@ import {
   IconLinkLine,
   IconUnpublishedLine
 } from '@instructure/ui-icons'
-
-const I18n = useI18nScope('assignments_2');
 
 export default class OverrideSubmissionTypes extends React.Component {
   static contextType = TeacherViewContext

@@ -68,7 +68,7 @@ describe MasterCourses::ChildSubscription do
       sub.destroy!
       expect(page_copy.reload.migration_id).to eq(sub.deactivation_prefix + mc_tag.migration_id)
       expect(child_tag.reload.migration_id).to eq(sub.deactivation_prefix + mc_tag.migration_id)
-      expect(child_course.reload.syllabus_master_template_id).to be_nil
+      expect(child_course.reload.syllabus_master_template_id).to be_empty
 
       sub.undestroy
       expect(page_copy.reload.migration_id).to eq mc_tag.migration_id

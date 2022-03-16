@@ -17,13 +17,11 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_files'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import classnames from 'classnames'
 import ColumnHeaders from '../legacy/components/ColumnHeaders'
-
-const I18n = useI18nScope('react_files');
 
 ColumnHeaders.renderColumns = function(sort, order) {
   return this.columns.map(column => {
@@ -33,14 +31,9 @@ ColumnHeaders.renderColumns = function(sort, order) {
     const isSortedCol = sort === column.property
     if (this.props.query.sort && isSortedCol && order) {
       const direction = order === 'asc' ? 'ascending' : 'descending'
-      const message = I18n.t('Sorted %{direction} by %{columnName}', {
-        direction,
-        columnName: column.displayName
-      })
-      if (message !== this.lastScreenreaderMessage.current) {
-        $.screenReaderFlashMessage(message)
-        this.lastScreenreaderMessage.current = message
-      }
+      $.screenReaderFlashMessage(
+        I18n.t('Sorted %{direction} by %{columnName}', {direction, columnName: column.displayName})
+      )
     }
     const columnClassNameObj = {
       'current-filter': isSortedCol

@@ -17,7 +17,7 @@
  */
 
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import mimeClass from '@canvas/mime/mimeClass'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -29,8 +29,6 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
-const I18n = useI18nScope('assignments_2');
 
 const getIcon = file => {
   if (mimeClass(file.type) === 'image') {

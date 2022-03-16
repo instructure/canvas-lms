@@ -19,9 +19,7 @@
 import React from 'react'
 import {shape, string, arrayOf} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import { useScope as useI18nScope } from '@canvas/i18n';
-
-const I18n = useI18nScope('keyboardShortcutModal');
+import I18n from 'i18n!keyboardShortcutModal'
 
 export default class KeyboardShortcutModal extends React.Component {
   static propTypes = {

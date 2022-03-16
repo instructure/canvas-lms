@@ -17,11 +17,9 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!calendar'
 import messageParticipantsTemplate from '../jst/messageParticipants.handlebars'
 import recipientListTemplate from '../jst/recipientList.handlebars'
-
-const I18n = useI18nScope('calendar');
 
 export default class MessageParticipantsDialog {
   constructor(opts) {

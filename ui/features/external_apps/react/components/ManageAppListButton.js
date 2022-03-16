@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import ConfigOptionField from './ConfigOptionField'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('external_tools');
 
 export default class ManageAppListButton extends React.Component {
   static propTypes = {
@@ -53,13 +51,13 @@ export default class ManageAppListButton extends React.Component {
   }
 
   openModal = () => {
-    this.setState(state => ({modalIsOpen: true, accessToken: state.originalAccessToken}))
+    this.setState({modalIsOpen: true, accessToken: this.state.originalAccessToken})
   }
 
   successHandler = () => {
-    this.setState(state => ({
-      originalAccessToken: this.maskedAccessToken(state.accessToken.substring(0, 5))
-    }))
+    this.setState({
+      originalAccessToken: this.maskedAccessToken(this.state.accessToken.substring(0, 5))
+    })
     if (typeof this.props.onUpdateAccessToken === 'function') {
       this.props.onUpdateAccessToken()
     }
@@ -75,7 +73,7 @@ export default class ManageAppListButton extends React.Component {
 
   handleSubmit = () => {
     this.closeModal(() => {
-      if (this.state.accessToken !== this.state.originalAccessToken) {
+      if (this.state.accessToken != this.state.originalAccessToken) {
         this.props.extAppStore.updateAccessToken(
           ENV.CONTEXT_BASE_URL,
           this.state.accessToken,
@@ -97,9 +95,7 @@ export default class ManageAppListButton extends React.Component {
     const allowListLink = I18n.t('#community.admin_app_center_allowlist')
     return (
       <View>
-        <Button margin="none x-small" onClick={this.openModal}>
-          {I18n.t('Manage App List')}
-        </Button>
+        <Button onClick={this.openModal}>{I18n.t('Manage App List')}</Button>
         <Modal
           open={this.state.modalIsOpen}
           onDismiss={this.closeModal}
@@ -109,10 +105,10 @@ export default class ManageAppListButton extends React.Component {
             <p
               dangerouslySetInnerHTML={{
                 __html: I18n.t(
-                  `Enter the access token for your organization from \
+                  'Enter the access token for your organization from \
                     *eduappcenter.com*. Once applied, only apps your organization has approved in the \
                     EduAppCenter will be listed on the External Apps page. \
-                    Learn how to **generate an access token**.`,
+                    Learn how to **generate an access token**.',
                   {
                     wrappers: [
                       '<a href="https://www.eduappcenter.com">$1</a>',

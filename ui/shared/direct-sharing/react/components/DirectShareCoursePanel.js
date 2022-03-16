@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!direct_share_course_panel'
 
 import React, {useState} from 'react'
 import {func, string} from 'prop-types'
@@ -27,8 +27,6 @@ import contentSelectionShape from '../proptypes/contentSelection'
 import ConfirmActionButtonBar from './ConfirmActionButtonBar'
 import CourseAndModulePicker from './CourseAndModulePicker'
 import DirectShareOperationStatus from './DirectShareOperationStatus'
-
-const I18n = useI18nScope('direct_share_course_panel');
 
 // eventually this will have options for where to place the item in the new course.
 // for now, it just has the selector plus some buttons

@@ -21,11 +21,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!gradebook_individual_gradebook_gradebook_selector'
 
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
-
-const I18n = useI18nScope('gradebook_individual_gradebook_gradebook_selector');
 
 const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook'
 const LEARNING_MASTERY = 'LearningMastery'

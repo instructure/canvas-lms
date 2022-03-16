@@ -19,13 +19,11 @@
 import {useEffect, useRef} from 'react'
 import {useApolloClient, useQuery} from 'react-apollo'
 import useCanvasContext from './useCanvasContext'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import {uniqWith, uniqBy, uniq, isEqual} from 'lodash'
 import {gql} from '@canvas/apollo'
-
-const I18n = useI18nScope('OutcomeManagement');
 
 const useAbortController = dependencies => {
   const abortRef = useRef()

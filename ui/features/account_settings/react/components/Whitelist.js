@@ -17,7 +17,7 @@
  */
 
 import React, {Component, Suspense} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string, number, element} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -38,8 +38,6 @@ import isValidDomain from 'is-valid-domain'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
 
 import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
-
-const I18n = useI18nScope('security_panel');
 
 const ViolationTray = React.lazy(() => import('./ViolationTray'))
 

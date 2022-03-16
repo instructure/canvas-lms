@@ -25,7 +25,7 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Grid} from '@instructure/ui-grid'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!react_developer_keys'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import React from 'react'
@@ -33,8 +33,6 @@ import PropTypes from 'prop-types'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
-
-const I18n = useI18nScope('react_developer_keys');
 
 const validationMessage = [
   {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}

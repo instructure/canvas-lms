@@ -18,13 +18,11 @@
 
 import _ from 'lodash-underscore'
 import Backbone from '@canvas/backbone'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!quiz_statistics'
 import K from '../../constants'
 import pickAndNormalize from '@canvas/quiz-legacy-client-apps/util/pick_and_normalize'
 import round from '@canvas/quiz-legacy-client-apps/util/round'
 import wrap from '@canvas/quiz-legacy-client-apps/util/array_wrap'
-
-const I18n = useI18nScope('quiz_statistics');
 
 const findWhere = _.findWhere
 let parseQuestion

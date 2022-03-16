@@ -17,7 +17,7 @@
  */
 
 import {func, number, string, shape} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2_external_tool'
 import React, {useEffect, useState} from 'react'
 
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
@@ -27,8 +27,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-const I18n = useI18nScope('assignments_2_external_tool');
 
 // A generic component that shows an iframe for a given URL, used for both
 // launching the LTI to select content and showing selected content

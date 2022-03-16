@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!courses'
 import $ from 'jquery'
-
-const I18n = useI18nScope('courses');
 
 $(document).ready(() => {
   $('.reject_button').click(event => {

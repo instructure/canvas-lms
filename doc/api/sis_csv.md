@@ -282,14 +282,6 @@ recommended to omit this field over using fake email addresses for testing.</td>
 student, student_other, or teacher. Can pass "&lt;delete>" to remove the
 declared user type from the user.</td>
 </tr>
-<td>canvas_password_notification</td>
-<td>boolean</td>
-<td></td>
-<td></td>
-<td>Defaults to false. When true, user is notified for password setup if
-the authentication_provider_id is canvas</td>
-</tr>
-<tr>
 <tr>
 <td>status</td>
 <td>enum</td>

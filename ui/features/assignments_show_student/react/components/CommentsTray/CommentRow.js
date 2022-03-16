@@ -22,15 +22,13 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
 
 import {Link} from '@instructure/ui-link'
-
-const I18n = useI18nScope('assignments_2');
 
 export default function CommentRow(props) {
   const {author, mediaObject, read} = props.comment

@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
   "apply_781a2546": { "message": "تطبيق" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "تطبيق التغييرات على كافة مثيلات هذا الزر والأيقونة في المساق"
+  },
   "apps_54d24a47": { "message": "التطبيق" },
   "arrows_464a3e54": { "message": "الأسهم" },
   "art_icon_8e1daad": { "message": "أيقونة الفنون" },
@@ -72,6 +75,12 @@ const locale = {
   "basic_554cdc0a": { "message": "أساسي" },
   "below_81d4dceb": { "message": "الأسفل" },
   "bottom_third_5f5fec1d": { "message": "الثالث من الأسفل" },
+  "button_color_608a0242": { "message": "لون الزر" },
+  "button_outline_cf14f071": { "message": "إطار الزر" },
+  "button_outline_size_cc1d1df7": { "message": "حجم إطار الزر" },
+  "button_shape_dbecb573": { "message": "شكل الزر" },
+  "button_size_20f5fce1": { "message": "حجم الزر" },
+  "buttons_and_icons_e66ee12c": { "message": "الأزرار والأيقونات" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "إلغاء" },
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
@@ -107,6 +116,7 @@ const locale = {
   },
   "collaborations_5c56c15f": { "message": "الأعمال الجماعية" },
   "collapse_to_hide_types_1ab46d2e": { "message": "الطي لإخفاء { types }" },
+  "color_color_eb64b08": { "message": "اللون { color }" },
   "computer_1d7dfa6f": { "message": "الكمبيوتر" },
   "content_1440204b": { "message": "المحتوى" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -128,6 +138,7 @@ const locale = {
   "course_links_b56959b9": { "message": "روابط المساق" },
   "course_media_ec759ad": { "message": "وسائط المساق" },
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
+  "create_button_and_icon_5c089934": { "message": "إنشاء زر وأيقونة" },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
   "crop_image_41bf940c": { "message": "قص الصورة" },
   "crop_image_807ebb08": { "message": "قص صورة" },
@@ -181,6 +192,8 @@ const locale = {
   "embed_828fac4a": { "message": "تضمين" },
   "embed_code_314f1bd5": { "message": "تضمين تعليمات برمجية" },
   "embed_image_1080badc": { "message": "تضمين صورة" },
+  "embed_options_tray_901cfd19": { "message": "علبة خيارات التضمين" },
+  "embed_preview_2d741e1f": { "message": "معاينة التضمين" },
   "embed_video_a97a64af": { "message": "تضمين الفيديو" },
   "embedded_content_aaeb4d3d": { "message": "مضمّن آخر" },
   "engineering_icon_f8f3cf43": { "message": "أيقونة الهندسة" },
@@ -328,6 +341,7 @@ const locale = {
   },
   "open_title_application_fd624fc5": { "message": "فتح تطبيق { title }" },
   "operators_a2ef9a93": { "message": "المشغلون" },
+  "options_3ab0ea65": { "message": "خيارات" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "القوائم المرتبة وغير المرتبة"
   },
@@ -375,6 +389,9 @@ const locale = {
     "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
   },
   "save_11a80ec3": { "message": "حفظ" },
+  "saved_buttons_and_icons_8278eed2": {
+    "message": "الأزرار والأيقونات المحفوظة"
+  },
   "search_280d00bd": { "message": "بحث" },
   "search_term_b2d2235": { "message": "مصطلح البحث" },
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
@@ -384,6 +401,7 @@ const locale = {
     "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
   },
   "show_audio_options_b489926b": { "message": "إظهار خيارات الصوت" },
+  "show_embed_options_ef8d7ef": { "message": "إظهار خيارات التضمين" },
   "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
   "show_video_options_6ed3721a": { "message": "إظهار خيارات الفيديو" },

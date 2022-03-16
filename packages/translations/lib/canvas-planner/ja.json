@@ -111,9 +111,6 @@
     "message": "エキサイティングなディスカッション"
   },
   "excused_cf8792eb": { "message": "免除" },
-  "failed_getting_course_list_49846a93": {
-    "message": "コースリストの取得に失敗"
-  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "あなたの未来を覗くことに失敗しました"
   },

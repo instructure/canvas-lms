@@ -349,7 +349,7 @@ if (window.ENV && window.ENV.lolcalize) {
   I18n.CallHelpers.normalizeDefault = i18nLolcalize
 }
 
-I18n.scoped = I18n.useScope = (scope, callback) => {
+I18n.scoped = (scope, callback) => {
   const preloadLocale = window.ENV && window.ENV.LOCALE ? window.ENV.LOCALE : 'en'
   const i18n_scope = new I18n.scope(scope)
   if (callback) callback(i18n_scope)
@@ -428,4 +428,3 @@ if (I18n.translations) {
 }
 
 export default I18n
-export const useScope = I18n.useScope

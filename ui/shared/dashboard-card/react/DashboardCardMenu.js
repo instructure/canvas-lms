@@ -18,15 +18,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!dashcards'
 import {Popover} from '@instructure/ui-popover'
 import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 
 import ColorPicker from '@canvas/color-picker'
 import DashboardCardMovementMenu from './DashboardCardMovementMenu'
-
-const I18n = useI18nScope('dashcards');
 
 export default class DashboardCardMenu extends React.Component {
   static propTypes = {

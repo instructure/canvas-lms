@@ -19,15 +19,13 @@ import Backbone from '@canvas/backbone'
 import ValidatedMixin from './ValidatedMixin.coffee'
 import $ from 'jquery'
 import _ from 'underscore'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import I18n from 'i18n!errors'
 import '@canvas/util/toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
 import {send} from '@canvas/rce/RceCommandShim'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import sanitizeData from '../../sanitizeData'
-
-I18n = useI18nScope('errors')
 
 ##
 # Sets model data from a form, saves it, and displays errors returned in a

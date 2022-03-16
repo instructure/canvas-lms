@@ -21,7 +21,7 @@ import {bindActionCreators} from 'redux'
 import {bool, func, string, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!discussions_v2'
 import propTypes from '../propTypes'
 import React, {Component} from 'react'
 import select from 'obj-select'
@@ -37,8 +37,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
-
-const I18n = useI18nScope('discussions_v2');
 
 const filters = {
   all: I18n.t('All'),

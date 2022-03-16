@@ -18,10 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!OutcomeAlignmentDeleteLink'
 import $ from 'jquery'
-
-const I18n = useI18nScope('OutcomeAlignmentDeleteLink');
 
 class OutcomeAlignmentDeleteLink extends React.Component {
   static propTypes = {

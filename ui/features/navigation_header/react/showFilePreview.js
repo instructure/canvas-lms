@@ -19,13 +19,11 @@
 import React, {useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {instanceOf} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import I18n from 'i18n!standalone_file_preview'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import File from '@canvas/files/backbone/models/File.coffee'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
-
-const I18n = useI18nScope('standalone_file_preview');
 
 // showFilePreview repurposes the file preview overlay from the Files
 // pages to show a single file in an arbitrary context. First use
