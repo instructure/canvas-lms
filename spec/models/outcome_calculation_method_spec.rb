@@ -63,9 +63,7 @@ describe OutcomeCalculationMethod, type: :model do
           expect(subject).to allow_values(
             1,
             4,
-            5,
-            7,
-            10
+            5
           ).for(:calculation_int)
         end
 
@@ -73,8 +71,8 @@ describe OutcomeCalculationMethod, type: :model do
           expect(subject).not_to allow_values(
             -1,
             0,
-            11,
-            28,
+            6,
+            10,
             nil
           ).for(:calculation_int)
         end
