@@ -530,7 +530,7 @@ QUnit.module('SubmissionTray', hooks => {
     ok($el.textContent.includes('Jane Doe'))
   })
 
-  test('shows student carousel with no left arrow when isFirstStudent and isLastStudent are true', function() {
+  test('shows student carousel with no left arrow when isFirstStudent and isLastStudent are true', function () {
     mountComponent({
       isFirstStudent: true,
       isLastStudent: true
@@ -541,7 +541,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with no right arrow when isFirstStudent and isLastStudent are true', function() {
+  test('shows student carousel with no right arrow when isFirstStudent and isLastStudent are true', function () {
     mountComponent({
       isFirstStudent: true,
       isLastStudent: true
@@ -552,7 +552,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with left arrow when isFirstStudent and isLastStudent are false', function() {
+  test('shows student carousel with left arrow when isFirstStudent and isLastStudent are false', function () {
     mountComponent({
       isFirstStudent: false,
       isLastStudent: false
@@ -563,7 +563,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with right arrow when isFirstStudent and isLastStudent are false', function() {
+  test('shows student carousel with right arrow when isFirstStudent and isLastStudent are false', function () {
     mountComponent({
       isFirstStudent: false,
       isLastStudent: false
@@ -574,7 +574,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with left arrow when isFirstStudent is false', function() {
+  test('shows student carousel with left arrow when isFirstStudent is false', function () {
     mountComponent({
       isFirstStudent: false,
       isLastStudent: true
@@ -585,7 +585,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with no right arrow when isFirstStudent is false', function() {
+  test('shows student carousel with no right arrow when isFirstStudent is false', function () {
     mountComponent({
       isFirstStudent: false,
       isLastStudent: true
@@ -596,7 +596,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with right arrow when isLastStudent is false', function() {
+  test('shows student carousel with right arrow when isLastStudent is false', function () {
     mountComponent({
       isFirstStudent: true,
       isLastStudent: false
@@ -607,7 +607,7 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  test('shows student carousel with no left arrow when isLastStudent is false', function() {
+  test('shows student carousel with no left arrow when isLastStudent is false', function () {
     mountComponent({
       isFirstStudent: true,
       isLastStudent: false
@@ -618,12 +618,12 @@ QUnit.module('SubmissionTray', hooks => {
     )
   })
 
-  QUnit.module('Grade Input', function() {
+  QUnit.module('Grade Input', function () {
     function findGradeInput() {
       return GradeInputDriver.find(content)
     }
 
-    test('receives the "assignment" given to the Tray', function() {
+    test('receives the "assignment" given to the Tray', function () {
       const assignment = {
         anonymizeStudents: false,
         gradingType: 'points',
@@ -695,43 +695,43 @@ QUnit.module('SubmissionTray', hooks => {
     })
   })
 
-  QUnit.module('Similarity Score', function(similarityHooks) {
+  QUnit.module('Similarity Score', function (similarityHooks) {
     let submission
 
-    similarityHooks.beforeEach(function() {
+    similarityHooks.beforeEach(function () {
       submission = defaultProps.submission
       submission.turnitin_data = {submission_2501: {status: 'scored', similarity_score: 55}}
     })
 
-    test('does not render if students are anonymized', function() {
+    test('does not render if students are anonymized', function () {
       defaultProps.assignment.anonymizeStudents = true
       mountComponent()
       notOk(content.textContent.includes('55.0% similarity score'))
     })
 
-    test('does not render if the submission has no originality data', function() {
+    test('does not render if the submission has no originality data', function () {
       submission.turnitin_data = {}
       mountComponent()
       notOk(content.textContent.includes('55.0% similarity score'))
     })
 
-    test('does not render if the showSimilarityScore prop is false', function() {
+    test('does not render if the showSimilarityScore prop is false', function () {
       mountComponent({showSimilarityScore: false})
       notOk(content.textContent.includes('55.0% similarity score'))
     })
 
-    QUnit.module('when originality data exists and students are not anonymized', function() {
-      test('renders the similarity score with data from the submission', function() {
+    QUnit.module('when originality data exists and students are not anonymized', function () {
+      test('renders the similarity score with data from the submission', function () {
         mountComponent()
         ok(content.textContent.includes('55.0% similarity score'))
       })
 
-      test('includes a link to the originality report for the submission', function() {
+      test('includes a link to the originality report for the submission', function () {
         mountComponent()
         ok(content.querySelector('a[href$="/submissions/27/turnitin/submission_2501"]'))
       })
 
-      test('includes a message when the submission is a file upload submission with multiple reports', function() {
+      test('includes a message when the submission is a file upload submission with multiple reports', function () {
         submission.submissionType = 'online_upload'
         submission.attachments = [{id: '1001'}, {id: '1002'}]
         submission.turnitinData = {
@@ -746,7 +746,7 @@ QUnit.module('SubmissionTray', hooks => {
         )
       })
 
-      test('does not include a "multiple reports" when the submission only has one report', function() {
+      test('does not include a "multiple reports" when the submission only has one report', function () {
         mountComponent()
         notOk(
           content.textContent.includes(
@@ -757,7 +757,7 @@ QUnit.module('SubmissionTray', hooks => {
     })
   })
 
-  test('renders the new comment form if the editedCommentId is null', function() {
+  test('renders the new comment form if the editedCommentId is null', function () {
     mountComponent()
     ok(content.querySelector('textarea[placeholder="Leave a comment"]'))
   })

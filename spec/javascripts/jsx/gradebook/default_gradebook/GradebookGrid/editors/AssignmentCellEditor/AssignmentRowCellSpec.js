@@ -486,35 +486,20 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: false})
-      strictEqual(
-        document.activeElement,
-        wrapper
-          .find('input')
-          .at(0)
-          .getDOMNode()
-      )
+      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
     })
 
     test('does not set focus on the grade input when the submission has not finished updating', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: true})
-      notStrictEqual(
-        document.activeElement,
-        wrapper
-          .find('input')
-          .at(0)
-          .getDOMNode()
-      )
+      notStrictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
     })
 
     test('does not set focus on the grade input when the tray button has focus', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
-      const button = wrapper
-        .find('button')
-        .at(0)
-        .getDOMNode()
+      const button = wrapper.find('button').at(0).getDOMNode()
       button.focus()
       wrapper.setProps({submissionIsUpdating: false})
       strictEqual(document.activeElement, button)

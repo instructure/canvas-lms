@@ -46,60 +46,60 @@ QUnit.module('Carousel', {
   }
 })
 
-test('renders children', function() {
+test('renders children', function () {
   this.wrapper = mountComponent()
   strictEqual(this.wrapper.text(), 'Book Report')
 })
 
-test('does not render left arrow when displayLeftArrow is false', function() {
+test('does not render left arrow when displayLeftArrow is false', function () {
   this.wrapper = mountComponent()
   strictEqual(this.wrapper.find('.left-arrow-button-container button').length, 0)
 })
 
-test('renders left arrow when displayLeftArrow is true', function() {
+test('renders left arrow when displayLeftArrow is true', function () {
   this.wrapper = mountComponent({displayLeftArrow: true})
   strictEqual(this.wrapper.find('.left-arrow-button-container button').length, 1)
 })
 
-test('does not render right arrow when displayRightArrow is false', function() {
+test('does not render right arrow when displayRightArrow is false', function () {
   this.wrapper = mountComponent()
   strictEqual(this.wrapper.find('.right-arrow-button-container button').length, 0)
 })
 
-test('renders right arrow when displayRightArrow is true', function() {
+test('renders right arrow when displayRightArrow is true', function () {
   this.wrapper = mountComponent({displayRightArrow: true})
   strictEqual(this.wrapper.find('.right-arrow-button-container button').length, 1)
 })
 
-test('calls onLeftArrowClick when left arrow is clicked', function() {
+test('calls onLeftArrowClick when left arrow is clicked', function () {
   const onLeftArrowClick = sinon.stub()
   this.wrapper = mountComponent({displayLeftArrow: true, onLeftArrowClick})
   this.wrapper.find('.left-arrow-button-container button').simulate('click')
   strictEqual(onLeftArrowClick.callCount, 1)
 })
 
-test('calls onRightArrowClick when right arrow is clicked', function() {
+test('calls onRightArrowClick when right arrow is clicked', function () {
   const onRightArrowClick = sinon.stub()
   this.wrapper = mountComponent({displayRightArrow: true, onRightArrowClick})
   this.wrapper.find('.right-arrow-button-container button').simulate('click')
   strictEqual(onRightArrowClick.callCount, 1)
 })
 
-test('focuses right arrow on right arrow click when both arrows are displayed', function() {
+test('focuses right arrow on right arrow click when both arrows are displayed', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, displayRightArrow: true})
   const rightArrow = this.wrapper.instance().rightArrow
   this.wrapper.find('.right-arrow-button-container button').simulate('click')
   strictEqual(rightArrow.focused, true)
 })
 
-test('focuses left arrow on left arrow click when both arrows are displayed', function() {
+test('focuses left arrow on left arrow click when both arrows are displayed', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, displayRightArrow: true})
   const leftArrow = this.wrapper.instance().leftArrow
   this.wrapper.find('.left-arrow-button-container button').simulate('click')
   strictEqual(leftArrow.focused, true)
 })
 
-test('focuses left arrow when transitioning from displaying both arrows to only the left arrow', function() {
+test('focuses left arrow when transitioning from displaying both arrows to only the left arrow', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, displayRightArrow: true})
   const instance = this.wrapper.instance()
   const leftArrow = instance.leftArrow
@@ -107,7 +107,7 @@ test('focuses left arrow when transitioning from displaying both arrows to only 
   strictEqual(leftArrow.focused, true)
 })
 
-test('focuses right arrow when transitioning from displaying both arrows to only the right arrow', function() {
+test('focuses right arrow when transitioning from displaying both arrows to only the right arrow', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, displayRightArrow: true})
   const instance = this.wrapper.instance()
   const rightArrow = instance.rightArrow
@@ -115,32 +115,32 @@ test('focuses right arrow when transitioning from displaying both arrows to only
   strictEqual(rightArrow.focused, true)
 })
 
-test('left button is not disabled', function() {
+test('left button is not disabled', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, disabled: false})
   strictEqual(this.wrapper.find('Button').prop('disabled'), false)
 })
 
-test('right button is not disabled', function() {
+test('right button is not disabled', function () {
   this.wrapper = mountComponent({displayRightArrow: true, disabled: false})
   strictEqual(this.wrapper.find('Button').prop('disabled'), false)
 })
 
-test('left button can be disabled', function() {
+test('left button can be disabled', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, disabled: true})
   strictEqual(this.wrapper.find('Button').prop('disabled'), true)
 })
 
-test('right button is not disabled', function() {
+test('right button is not disabled', function () {
   this.wrapper = mountComponent({displayRightArrow: true, disabled: true})
   strictEqual(this.wrapper.find('Button').prop('disabled'), true)
 })
 
-test('adds a VO description for the left arrow button', function() {
+test('adds a VO description for the left arrow button', function () {
   this.wrapper = mountComponent({displayLeftArrow: true, leftArrowDescription: 'Previous record'})
   strictEqual(this.wrapper.find('IconArrowOpenStartLine').prop('title'), 'Previous record')
 })
 
-test('adds a VO description for the right arrow button', function() {
+test('adds a VO description for the right arrow button', function () {
   this.wrapper = mountComponent({displayRightArrow: true, rightArrowDescription: 'Next record'})
   strictEqual(this.wrapper.find('IconArrowOpenEndLine').prop('title'), 'Next record')
 })

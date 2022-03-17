@@ -118,10 +118,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
   test('optionally disables the menu button', () => {
     props.disabled = true
     mountComponent()
-    const button = wrapper
-      .find('button')
-      .at(0)
-      .getDOMNode()
+    const button = wrapper.find('button').at(0).getDOMNode()
     strictEqual(button.disabled, true)
   })
 
@@ -338,13 +335,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
     test('sets focus on the button', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(
-        document.activeElement,
-        wrapper
-          .find('button')
-          .at(0)
-          .getDOMNode()
-      )
+      strictEqual(document.activeElement, wrapper.find('button').at(0).getDOMNode())
     })
   })
 
@@ -355,11 +346,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
       mountComponent()
       const handleKeyDown = action => wrapper.instance().handleKeyDown({...action})
       // return false to allow the popover menu to open
-      wrapper
-        .find('button')
-        .at(0)
-        .getDOMNode()
-        .focus()
+      wrapper.find('button').at(0).getDOMNode().focus()
       strictEqual(handleKeyDown(ENTER), false)
     })
   })

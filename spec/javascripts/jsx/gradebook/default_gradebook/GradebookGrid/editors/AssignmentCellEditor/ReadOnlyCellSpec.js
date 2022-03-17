@@ -48,7 +48,13 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
       },
       enterGradesAs: 'points',
       gradeIsVisible: true,
-      gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],
+      gradingScheme: [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0.0]
+      ],
       isSubmissionTrayOpen: false,
       onToggleSubmissionTrayOpen() {},
       student: {
