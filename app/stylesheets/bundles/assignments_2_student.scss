@@ -24,6 +24,7 @@
 @import "pages/assignments2_student/students_comments.scss";
 @import "components/_rubric.scss";
 @import "components/_ic-code.scss";
+@import "components/emoji";
 
 $student-footer-height: 60px;
 $student-view-banner-height: 50px;
@@ -62,6 +63,10 @@ $student-view-banner-height: 50px;
   padding-bottom: $student-footer-height;
 }
 
+#textarea-emoji-container {
+  position: relative;
+}
+
 body.is-masquerading-or-student-view {
   // show the student footer above the masquerading banner
   #assignments-student-footer {
@@ -87,4 +92,10 @@ body.is-masquerading-or-student-view {
   color: $ic-color-light;
   line-height: 1;
   text-shadow: $ic-color-dark 3px 3px 10px;
+}
+
+.emoji-picker-container {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }

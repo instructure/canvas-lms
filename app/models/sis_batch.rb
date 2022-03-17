@@ -181,21 +181,23 @@ class SisBatch < ActiveRecord::Base
   # once no SisBatch#process_without_send_later jobs are being created anymore, we
   # can rename this to something more sensible.
   def process_without_send_later
+    return_after_transaction = false
     self.class.transaction do
-      if workflow_state == "aborted"
+      case workflow_state
+      when "aborted"
         self.progress = 100
         save
-        return
-      end
-      if workflow_state == "created"
+        return_after_transaction = true
+      when "created"
         self.workflow_state = :importing
         self.progress = 0
         self.started_at = Time.now.utc
         save
       else
-        return
+        return_after_transaction = true
       end
     end
+    return if return_after_transaction
 
     import_scheme = SisBatch.valid_import_types[data[:import_type]]
     if import_scheme.nil?

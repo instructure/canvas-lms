@@ -18,7 +18,7 @@
 
 // xsslint safeString.method I18n.t
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import axios from '@canvas/axios'
 import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView.coffee'
@@ -41,12 +41,19 @@ import FileBrowser from '@canvas/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
+import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
-const I18n = useI18nScope('submit_assignment');
+const I18n = useI18nScope('submit_assignment')
 
 let submissionAttachmentIndex = -1
 
 RichContentEditor.preloadRemoteModule()
+
+function insertEmoji(emoji) {
+  const $textarea = $(this).find('.submission_comment_textarea')
+  $textarea.val((_i, text) => text + emoji.native)
+  $textarea.focus()
+}
 
 $(document).ready(function () {
   let submitting = false
@@ -69,21 +76,32 @@ $(document).ready(function () {
     )
   }
 
-  // grow and shrink the comments box on focus/blur if the user
-  // hasn't entered any content.
-  submissionForm
-    .delegate('#submission_comment', 'focus', function (_e) {
-      const box = $(this)
-      if (box.val().trim() === '') {
-        box.addClass('focus_or_content')
+  submissionForm.delegate('.textarea-emoji-container', 'focus', function (_e) {
+    const $container = $(this)
+    const box = $container.find('.submission_comment_textarea')
+    if (box.length && !box.hasClass('focus_or_content')) {
+      box.addClass('focus_or_content')
+
+      if (!ENV.EMOJIS_ENABLED) {
+        return
       }
-    })
-    .delegate('#submission_comment', 'blur', function (_e) {
-      const box = $(this)
-      if (box.val().trim() === '') {
-        box.removeClass('focus_or_content')
+
+      const $emojiPicker = $container.find('.emoji-picker-container')
+      if ($emojiPicker.length) {
+        ReactDOM.render(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
+        $emojiPicker.show()
       }
-    })
+
+      const $emojiQuickPicker = $container.find('.emoji-quick-picker-container')
+      if ($emojiQuickPicker.length) {
+        ReactDOM.render(
+          <EmojiQuickPicker insertEmoji={insertEmoji.bind(this)} />,
+          $emojiQuickPicker[0]
+        )
+        $emojiQuickPicker.show()
+      }
+    }
+  })
 
   submissionForm.submit(function (event) {
     const self = this

@@ -21,16 +21,21 @@ import PropTypes from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CommentLibrary from './CommentLibrary'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
+
+function Portal({node, children}) {
+  return ReactDOM.createPortal(children, node)
+}
 
 const textAreaProps = {
   height: '4rem',
   id: 'speed_grader_comment_textarea',
   label: <ScreenReaderContent>{I18n.t('Add a Comment')}</ScreenReaderContent>,
-  placeholder: I18n.t('Add a Comment'),
-  resize: 'vertical'
+  placeholder: I18n.t('Add a Comment')
 }
 
 export default function CommentArea({getTextAreaRef, courseId, userId}) {
@@ -52,6 +57,13 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
     setSuggestionsRef(node)
   }, [])
 
+  const insertEmoji = emoji => {
+    setComment(comment + emoji.native)
+    if (textAreaRef.current) {
+      textAreaRef.current.focus()
+    }
+  }
+
   return (
     <>
       {showCommentLibrary && (
@@ -64,12 +76,24 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
           suggestionsRef={suggestionsRef}
         />
       )}
-      <TextArea
-        value={comment}
-        onChange={e => setComment(e.target.value)}
-        textareaRef={setTextAreaRef}
-        {...textAreaProps}
-      />
+      <div id="textarea-container">
+        <TextArea
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          textareaRef={setTextAreaRef}
+          {...textAreaProps}
+        />
+        {!!ENV.EMOJIS_ENABLED && (
+          <span className="emoji-picker-container">
+            <EmojiPicker insertEmoji={insertEmoji} />
+          </span>
+        )}
+      </div>
+      {!!ENV.EMOJIS_ENABLED && (
+        <Portal node={document.getElementById('emoji-quick-picker-container')}>
+          <EmojiQuickPicker insertEmoji={insertEmoji} />
+        </Portal>
+      )}
       {showCommentLibrary && <div ref={onSetSuggestionsRef} id="library-suggestions" />}
     </>
   )

@@ -29,6 +29,7 @@
   @show_embedded_chat = false
   add_body_class 'ic-no-flex-layout full-width'
   @can_edit_anything = !@context.completed?
+  @emojis_enabled = @context.feature_enabled?(:submission_comment_emojis)
 %>
 
 <% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
@@ -338,28 +339,31 @@
                   </a>
                 </div>
                 <div class="ic-Action-header">
-                  <div class="ic-Action-header__Primary attach_things" role="group">
-                    <button class="Button Button--small" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
-                      <i class="icon-paperclip" aria-hidden="true"></i>
-                      <span class="screenreader-only">
-                        <%= t("File Attachment") %>
-                      </span>
-                    </button>
-                    <% if feature_enabled?(:kaltura) %>
-                      <button id="media_comment_button" class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
-                        <i class="icon-media" aria-hidden="true"></i>
+                  <div id="emojis-attachments-container">
+                    <span id="emoji-quick-picker-container"></span>
+                    <div class="ic-Action-header__Primary attach_things<%= @emojis_enabled ? " emojis" : "" %>" role="group">
+                      <button class="Button Button--small" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
+                        <i class="icon-paperclip" aria-hidden="true"></i>
                         <span class="screenreader-only">
-                          <%= t("Media Comment") %>
+                          <%= t("File Attachment") %>
                         </span>
                       </button>
-                    <% end %>
-                    <div class="speech-recognition" style="display:none">
-                      <a id="speech_recognition_button" title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
-                        <i class="icon-audio"></i>
-                        <span class="screenreader-only">
-                          <%= t("Speech Recognition") %>
-                        </span>
-                      </a>
+                      <% if feature_enabled?(:kaltura) %>
+                        <button id="media_comment_button" class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
+                          <i class="icon-media" aria-hidden="true"></i>
+                          <span class="screenreader-only">
+                            <%= t("Media Comment") %>
+                          </span>
+                        </button>
+                      <% end %>
+                      <div class="speech-recognition" style="display:none">
+                        <a id="speech_recognition_button" title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
+                          <i class="icon-audio"></i>
+                          <span class="screenreader-only">
+                            <%= t("Speech Recognition") %>
+                          </span>
+                        </a>
+                      </div>
                     </div>
                   </div>
                   <div class="ic-Action-header__Secondary">

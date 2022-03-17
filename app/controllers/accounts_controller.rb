@@ -1042,6 +1042,13 @@ class AccountsController < ApplicationController
           params[:account][:settings][:outgoing_email_default_name] = ""
         end
 
+        emoji_deny_list = params[:account][:settings].try(:delete, :emoji_deny_list)
+        if @account.feature_allowed?(:submission_comment_emojis) &&
+           @account.root_account? &&
+           !@account.site_admin?
+          @account.settings[:emoji_deny_list] = emoji_deny_list
+        end
+
         if @account.grants_right?(@current_user, :manage_site_settings)
           google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
@@ -1234,7 +1241,8 @@ class AccountsController < ApplicationController
                  REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
                  BASE_URL: MicrosoftSync::LoginService::BASE_URL
                },
-               COURSE_CREATION_SETTINGS: course_creation_settings
+               COURSE_CREATION_SETTINGS: course_creation_settings,
+               EMOJI_DENY_LIST: @account.root_account.settings[:emoji_deny_list]
              })
       js_env(edit_help_links_env, true)
     end

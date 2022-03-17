@@ -46,7 +46,9 @@ class SubmissionsBaseController < ApplicationController
                  rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
                  rubricAssociation: rubric_association_json ? rubric_association_json["rubric_association"] : nil,
                  outcome_proficiency: outcome_proficiency,
-                 media_comment_asset_string: @current_user.asset_string
+                 media_comment_asset_string: @current_user.asset_string,
+                 EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+                 EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list]
                })
 
         js_bundle :submissions

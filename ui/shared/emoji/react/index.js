@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,34 +15,5 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-@import "base/environment";
-@import "pages/account_settings/account_settings.scss";
-@import "pages/shared/external_tools.scss";
-@import "pages/shared/feature_flags";
-@import "components/ic-sortable-list.scss";
-@import "components/emoji";
-
-@include mobile-only {
-  table.narrow td {
-    display: block;
-    max-width: 320px;
-  }
-
-  .long-word {
-    word-break: break-all;
-  }
-
-  .custom-text {
-    display: block;
-  }
-}
-
-.delete_filter_link {
-  margin: auto 5px;
-}
-
-.aside {
-  font-size: 0.9em;
-  margin-block-start: 0;
-}
+export {default as EmojiPicker} from './EmojiPicker'
+export {default as EmojiQuickPicker} from './EmojiQuickPicker'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
@@ -36,8 +36,9 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../helpers/UploadMediaTranslations'
+import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}
@@ -195,6 +196,19 @@ export default class CommentTextArea extends Component {
     this.setState({commentText: e.target.value})
   }
 
+  insertEmoji = emoji => {
+    this.setState(
+      state => {
+        return {commentText: state.commentText + emoji.native}
+      },
+      () => {
+        if (this._commentTextBox) {
+          this._commentTextBox.focus()
+        }
+      }
+    )
+  }
+
   handleRemoveFile = refsMap => e => {
     e.preventDefault()
 
@@ -250,7 +264,7 @@ export default class CommentTextArea extends Component {
       >
         {createSubmissionComment => (
           <div>
-            <div>
+            <div id="textarea-emoji-container">
               <TextArea
                 label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
                 onChange={this.onTextChange}
@@ -260,83 +274,93 @@ export default class CommentTextArea extends Component {
                 }}
                 value={this.state.commentText}
               />
-              {this.state.uploadingComments && <LoadingIndicator />}
-              {this.state.currentFiles.length !== 0 && !this.state.uploadingComments && (
-                <div data-testid="assignments_2_comment_attachment">
-                  <FileList
-                    files={this.state.currentFiles}
-                    removeFileHandler={this.handleRemoveFile}
-                    canRemove
-                  />
-                </div>
-              )}
+              <span className="emoji-picker-container">
+                {!this.state.uploadingComments && !!ENV.EMOJIS_ENABLED && (
+                  <EmojiPicker insertEmoji={this.insertEmoji} />
+                )}
+              </span>
             </div>
+            {this.state.uploadingComments && <LoadingIndicator />}
+            {this.state.currentFiles.length !== 0 && !this.state.uploadingComments && (
+              <div data-testid="assignments_2_comment_attachment">
+                <FileList
+                  files={this.state.currentFiles}
+                  removeFileHandler={this.handleRemoveFile}
+                  canRemove
+                />
+              </div>
+            )}
             {!this.state.uploadingComments && !this.state.hasError && (
               <div className="textarea-action-button-container">
-                <input
-                  id="attachmentFile"
-                  ref={element => {
-                    this.fileInput = element
-                  }}
-                  multiple
-                  onChange={this.onFileSelected}
-                  style={{
-                    display: 'none'
-                  }}
-                  type="file"
-                />
-                <IconButton
-                  id="attachmentFileButton"
-                  renderIcon={DEFAULT_ICON}
-                  margin="0 x-small 0 0"
-                  onClick={() => {
-                    this.fileInput.click()
-                  }}
-                  ref={element => {
-                    this.attachmentFileButton = element
-                  }}
-                  size="small"
-                  screenReaderLabel={I18n.t('Attach a File')}
-                  withBackground={false}
-                  withBorder={false}
-                />
-                <IconButton
-                  id="mediaCommentButton"
-                  onClick={() => this.setState({mediaModalOpen: true})}
-                  renderIcon={IconAttachMediaLine}
-                  margin="0 x-small 0 0"
-                  size="small"
-                  disabled={this.state.mediaObject}
-                  withBackground={false}
-                  withBorder={false}
-                  screenReaderLabel={I18n.t('Record Audio/Video')}
-                />
-                <UploadMedia
-                  contextId={this.props.assignment.env.courseId}
-                  contextType="course"
-                  languages={languages}
-                  liveRegion={() => document.getElementById('flash_screenreader_holder')}
-                  onDismiss={this.onMediaModalDismiss}
-                  onUploadComplete={(error, data) => {
-                    this.handleMediaUpload(error, data, createSubmissionComment)
-                  }}
-                  open={this.state.mediaModalOpen}
-                  rcsConfig={{
-                    contextId: this.props.assignment.env.courseId,
-                    contextType: 'course'
-                  }}
-                  tabs={{embed: false, record: true, upload: true}}
-                  uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
-                  disableSubmitWhileUploading
-                />
-                <Button
-                  disabled={
-                    this.state.commentText.length === 0 && this.state.currentFiles.length === 0
-                  }
-                  onClick={() => this.onSendComment(createSubmissionComment)}
-                >
-                  {I18n.t('Send Comment')}
-                </Button>
+                <span className="emoji-quick-picker-container">
+                  {!!ENV.EMOJIS_ENABLED && <EmojiQuickPicker insertEmoji={this.insertEmoji} />}
+                </span>
+                <span className="textarea-action-buttons">
+                  <input
+                    id="attachmentFile"
+                    ref={element => {
+                      this.fileInput = element
+                    }}
+                    multiple
+                    onChange={this.onFileSelected}
+                    style={{
+                      display: 'none'
+                    }}
+                    type="file"
+                  />
+                  <IconButton
+                    id="attachmentFileButton"
+                    renderIcon={DEFAULT_ICON}
+                    margin="0 x-small 0 0"
+                    onClick={() => {
+                      this.fileInput.click()
+                    }}
+                    ref={element => {
+                      this.attachmentFileButton = element
+                    }}
+                    size="small"
+                    screenReaderLabel={I18n.t('Attach a File')}
+                    withBackground={false}
+                    withBorder={false}
+                  />
+                  <IconButton
+                    id="mediaCommentButton"
+                    onClick={() => this.setState({mediaModalOpen: true})}
+                    renderIcon={IconAttachMediaLine}
+                    margin="0 x-small 0 0"
+                    size="small"
+                    disabled={this.state.mediaObject}
+                    withBackground={false}
+                    withBorder={false}
+                    screenReaderLabel={I18n.t('Record Audio/Video')}
+                  />
+                  <UploadMedia
+                    contextId={this.props.assignment.env.courseId}
+                    contextType="course"
+                    languages={languages}
+                    liveRegion={() => document.getElementById('flash_screenreader_holder')}
+                    onDismiss={this.onMediaModalDismiss}
+                    onUploadComplete={(error, data) => {
+                      this.handleMediaUpload(error, data, createSubmissionComment)
+                    }}
+                    open={this.state.mediaModalOpen}
+                    rcsConfig={{
+                      contextId: this.props.assignment.env.courseId,
+                      contextType: 'course'
+                    }}
+                    tabs={{embed: false, record: true, upload: true}}
+                    uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+                    disableSubmitWhileUploading
+                  />
+                  <Button
+                    disabled={
+                      this.state.commentText.length === 0 && this.state.currentFiles.length === 0
+                    }
+                    onClick={() => this.onSendComment(createSubmissionComment)}
+                  >
+                    {I18n.t('Send Comment')}
+                  </Button>
+                </span>
               </div>
             )}
           </div>
