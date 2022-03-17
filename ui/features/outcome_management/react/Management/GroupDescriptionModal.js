@@ -37,7 +37,7 @@ const GroupDescriptionModal = ({outcomeGroup, isOpen, onCloseHandler}) => (
     shouldReturnFocus
   >
     <Modal.Body>
-      <View as="div" padding="small 0" maxHeight="330px">
+      <View as="div" padding="small 0" maxHeight="330px" tabIndex="0">
         <Text size="medium" weight="bold">
           {I18n.t('Description')}
         </Text>
