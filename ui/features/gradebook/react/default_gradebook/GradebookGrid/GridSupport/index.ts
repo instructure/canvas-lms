@@ -24,6 +24,22 @@ import State from './State'
 import Style from './Style'
 
 export default class GridSupport {
+  grid: any
+
+  options: any
+
+  events: Events
+
+  helper: GridHelper
+
+  columns: Columns
+
+  state: State
+
+  navigation: Navigation
+
+  style: Style
+
   constructor(grid, options = {}) {
     this.grid = grid
     this.options = options
