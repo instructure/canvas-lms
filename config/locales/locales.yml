@@ -139,7 +139,7 @@ da:
       weekday: "%A"
   dow_offset: 1
   locales:
-    da: Dansk
+    da: Dansk (Danmark)
   time:
     event: "%{date} kl. %{time}"
     formats:
@@ -189,7 +189,7 @@ da-x-k12:
   dow_offset: 1
   fullcalendar_locale: da
   locales:
-    da-x-k12: Dansk GR/GY
+    da-x-k12: Dansk (GR/GY)
   moment_locale: da
   time:
     event: "%{date} kl. %{time}"
@@ -307,7 +307,7 @@ el:
 en:
   bigeasy_locale: en_US
   locales:
-    en: English (US)
+    en: English (United States)
 en-AU:
   date:
     abbr_month_names:
@@ -460,7 +460,7 @@ es:
       weekday: "%A"
   dow_offset: 1
   locales:
-    es: Español
+    es: Español (Latinoamérica)
   time:
     event: "%{date} en %{time}"
     formats:
@@ -640,7 +640,7 @@ fr:
       weekday: "%A"
   dow_offset: 1
   locales:
-    fr: Français
+    fr: Français (France)
   time:
     event: "%{date} à %{time}"
     formats:
@@ -1068,7 +1068,7 @@ ko:
       full: "%Y.%-m.%-d. %P %l:%M"
       full_with_weekday: "%Y.%-m.%-d. %a %P %l:%M"
   locales:
-    ko: 한국말
+    ko: 한국어
   time:
     event: "%{date} %{time}"
     formats:
@@ -1109,7 +1109,7 @@ mi:
       weekday: "%A"
   fullcalendar_locale: mi_NZ
   locales:
-    mi: Reo Māori (Aotearoa)
+    mi: Te reo Māori
   moment_locale: mi-nz
   time:
     event: "%{date} i %{time} "
@@ -1151,7 +1151,7 @@ nb:
       weekday: "%A"
   dow_offset: 1
   locales:
-    nb: Norsk (Bokmål)
+    nb: Norsk bokmål (Norge)
   time:
     event: "%{date} i %{time}"
     formats:
@@ -1201,7 +1201,7 @@ nb-x-k12:
   dow_offset: 1
   fullcalendar_locale: nb
   locales:
-    nb-x-k12: Norsk (Bokmål) GS/VGS
+    nb-x-k12: Norsk bokmål (GS/VGS)
   moment_locale: nb
   time:
     event: "%{date} i %{time}"
@@ -1303,7 +1303,7 @@ nn:
   dow_offset: 1
   fullcalendar_locale: nb
   locales:
-    nn: Norsk (Nynorsk)
+    nn: Norsk nynorsk
   time:
     event: "%{date} %{time}"
     formats:
@@ -1401,7 +1401,7 @@ pt:
       weekday: "%A"
   dow_offset: 1
   locales:
-    pt: Português
+    pt: Português (Portugal)
   time:
     event: "%{date} em %{time}"
     formats:
@@ -1448,7 +1448,7 @@ pt-BR:
       short_with_weekday: "%a, %-d %b"
       weekday: "%A"
   locales:
-    pt-BR: Português do Brasil
+    pt-BR: Português (Brasil)
   time:
     event: "%{date} em %{time}"
     formats:
@@ -1497,7 +1497,7 @@ ru:
       weekday: "%A"
   dow_offset: 1
   locales:
-    ru: pу́сский
+    ru: Русский
   time:
     event: "%{date} в %{time}"
     formats:
@@ -1586,7 +1586,7 @@ sv:
       weekday: "%A"
   dow_offset: 1
   locales:
-    sv: Svenska
+    sv: Svenska (Sverige)
   time:
     event: "%{date} kl %{time}"
     formats:
@@ -1636,7 +1636,7 @@ sv-x-k12:
   dow_offset: 1
   fullcalendar_locale: sv
   locales:
-    sv-x-k12: Svenska GR/GY
+    sv-x-k12: Svenska (GR/GY)
   moment_locale: sv
   time:
     event: "%{date} kl %{time}"
@@ -1783,7 +1783,7 @@ uk:
       weekday: "%A"
   dow_offset: 1
   locales:
-    uk: український
+    uk: Українська
   time:
     event: "%{date} о %{time}"
     formats:
