@@ -138,10 +138,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   test('optionally disables the menu button', () => {
     props.disabled = true
     mountComponent()
-    const button = wrapper
-      .find('button')
-      .at(0)
-      .getDOMNode()
+    const button = wrapper.find('button').at(0).getDOMNode()
     strictEqual(button.disabled, true)
   })
 
@@ -180,11 +177,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
 
     test('does not update the input value when the input has focus', () => {
       mountComponent()
-      wrapper
-        .find('input')
-        .at(0)
-        .getDOMNode()
-        .focus()
+      wrapper.find('input').at(0).getDOMNode().focus()
       wrapper.setProps({submission: {...props.submission, enteredScore: 8.0, enteredGrade: 'B-'}})
       strictEqual(getTextInputValue(), '')
     })
@@ -648,13 +641,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
     test('sets focus on the input', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(
-        document.activeElement,
-        wrapper
-          .find('input')
-          .at(0)
-          .getDOMNode()
-      )
+      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
     })
 
     test('selects the content of the input', () => {
@@ -666,19 +653,9 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
 
     test('does not take focus from the grading scheme menu button', () => {
       mountComponent()
-      wrapper
-        .find('button')
-        .at(0)
-        .getDOMNode()
-        .focus()
+      wrapper.find('button').at(0).getDOMNode().focus()
       wrapper.instance().focus()
-      strictEqual(
-        document.activeElement,
-        wrapper
-          .find('button')
-          .at(0)
-          .getDOMNode()
-      )
+      strictEqual(document.activeElement, wrapper.find('button').at(0).getDOMNode())
     })
 
     test('does not change focus when the grading scheme menu is open', () => {

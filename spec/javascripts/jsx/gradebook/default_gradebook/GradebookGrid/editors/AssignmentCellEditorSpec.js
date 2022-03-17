@@ -57,14 +57,8 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
       user_id: '1101'
     })
 
-    sinon
-      .stub(gradebook, 'isGradeEditable')
-      .withArgs('1101', '2301')
-      .returns(true)
-    sinon
-      .stub(gradebook, 'isGradeVisible')
-      .withArgs('1101', '2301')
-      .returns(true)
+    sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
+    sinon.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
 
     editorOptions = {
       column: {

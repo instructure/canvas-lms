@@ -36,7 +36,13 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
       excused: false,
       id: '2501'
     }
-    const gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0]]
+    const gradingScheme = [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.7],
+      ['D', 0.6],
+      ['F', 0]
+    ]
     props = {
       assignment,
       enterGradesAs: 'points',
@@ -88,10 +94,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
 
   QUnit.module('when the "enter grades as" setting is "passFail"', contextHooks => {
     const getInputValue = () =>
-      wrapper
-        .find('.Grid__GradeCell__CompleteIncompleteValue')
-        .at(0)
-        .getDOMNode().textContent
+      wrapper.find('.Grid__GradeCell__CompleteIncompleteValue').at(0).getDOMNode().textContent
 
     contextHooks.beforeEach(() => {
       props.enterGradesAs = 'passFail'
@@ -263,11 +266,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
 
     test('does not update the input value when the input has focus', () => {
       mountComponent()
-      wrapper
-        .find('input[type="text"]')
-        .at(0)
-        .getDOMNode()
-        .focus()
+      wrapper.find('input[type="text"]').at(0).getDOMNode().focus()
       wrapper.setProps({submission: {...props.submission, enteredScore: 8.0, enteredGrade: '8.00'}})
       strictEqual(getTextInputValue(), '')
     })
@@ -553,13 +552,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
     test('sets focus on the input', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(
-        document.activeElement,
-        wrapper
-          .find('input[type="text"]')
-          .at(0)
-          .getDOMNode()
-      )
+      strictEqual(document.activeElement, wrapper.find('input[type="text"]').at(0).getDOMNode())
     })
 
     test('selects the content of the input', () => {

@@ -90,34 +90,22 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
     })
 
     test('.gradeIsEditable is true when the grade for the submission is editable', () => {
-      sinon
-        .stub(gradebook, 'isGradeEditable')
-        .withArgs('1101', '2301')
-        .returns(true)
+      sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
       strictEqual(getProps().gradeIsEditable, true)
     })
 
     test('.gradeIsEditable is false when the grade for the submission is not editable', () => {
-      sinon
-        .stub(gradebook, 'isGradeEditable')
-        .withArgs('1101', '2301')
-        .returns(false)
+      sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(false)
       strictEqual(getProps().gradeIsEditable, false)
     })
 
     test('.gradeIsVisible is true when the grade for the submission is visible', () => {
-      sinon
-        .stub(gradebook, 'isGradeVisible')
-        .withArgs('1101', '2301')
-        .returns(true)
+      sinon.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
       strictEqual(getProps().gradeIsVisible, true)
     })
 
     test('.gradeIsVisible is false when the grade for the submission is not visible', () => {
-      sinon
-        .stub(gradebook, 'isGradeVisible')
-        .withArgs('1101', '2301')
-        .returns(false)
+      sinon.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(false)
       strictEqual(getProps().gradeIsVisible, false)
     })
 

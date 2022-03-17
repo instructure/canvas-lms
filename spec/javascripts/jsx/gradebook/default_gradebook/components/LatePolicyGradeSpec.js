@@ -38,7 +38,11 @@ QUnit.module('LatePolicyGrade', suiteHooks => {
         pointsDeducted: 3
       },
       enterGradesAs: 'percent',
-      gradingScheme: [['A', 90], ['B', 80], ['C', 70]]
+      gradingScheme: [
+        ['A', 90],
+        ['B', 80],
+        ['C', 70]
+      ]
     }
     wrapper = mount(<LatePolicyGrade {...defaultProps} {...props} />)
   }
