@@ -18,7 +18,7 @@
 
 import React, {forwardRef, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {connect, Provider} from 'react-redux'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {store} from '@instructure/canvas-planner'
@@ -74,7 +74,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
-const I18n = useI18nScope('k5_course');
+const I18n = useI18nScope('k5_course')
 
 const HERO_ASPECT_RATIO = 5
 const HERO_STICKY_HEIGHT_PX = 64

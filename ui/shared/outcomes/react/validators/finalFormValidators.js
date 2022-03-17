@@ -17,9 +17,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('Validators');
+const I18n = useI18nScope('Validators')
 
 export const requiredValidator = value => (!value ? I18n.t('This field is required') : null)
 

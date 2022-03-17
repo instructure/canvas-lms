@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
-const I18n = useI18nScope('EnrollmentTermInput');
+const I18n = useI18nScope('EnrollmentTermInput')
 
 const groupByTagType = function(options) {
   const now = new Date()

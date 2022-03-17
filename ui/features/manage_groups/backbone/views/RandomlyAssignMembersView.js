@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import GroupCategoryCloneView from './GroupCategoryCloneView.coffee'
@@ -23,7 +23,7 @@ import template from '../../jst/randomlyAssignMembers.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import groupHasSubmissions from '../../groupHasSubmissions'
 
-const I18n = useI18nScope('groups');
+const I18n = useI18nScope('groups')
 
 export default class RandomlyAssignMembersView extends DialogFormView {
   static initClass() {

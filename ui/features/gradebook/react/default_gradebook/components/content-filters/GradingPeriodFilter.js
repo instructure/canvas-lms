@@ -19,7 +19,7 @@
 import React from 'react'
 import {arrayOf, shape, string, bool, func} from 'prop-types'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
 const I18n = useI18nScope(

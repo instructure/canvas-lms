@@ -19,7 +19,7 @@
 import React from 'react'
 import createReactClass from 'create-react-class'
 import UsageRightsDialog from './LegacyUsageRightsDialog'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import UsageRightsSelectBox from './UsageRightsSelectBox'
 import RestrictedRadioButtons from './RestrictedRadioButtons'
 import DialogPreview from './DialogPreview'
@@ -29,7 +29,7 @@ import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import htmlEscape from 'html-escape'
 
-const I18n = useI18nScope('usage_rights_modal');
+const I18n = useI18nScope('usage_rights_modal')
 
 const MAX_FOLDERS_TO_SHOW = 2
 

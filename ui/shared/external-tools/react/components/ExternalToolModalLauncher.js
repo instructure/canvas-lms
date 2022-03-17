@@ -19,11 +19,11 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 
-const I18n = useI18nScope('external_toolsModalLauncher');
+const I18n = useI18nScope('external_toolsModalLauncher')
 
 export default class ExternalToolModalLauncher extends React.Component {
   static propTypes = {

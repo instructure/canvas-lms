@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {func, string} from 'prop-types'
 
-const I18n = useI18nScope('generic_error_page');
+const I18n = useI18nScope('generic_error_page')
 
 export default function ErrorTextInputForm(props) {
   const submitButtonState = props.email.length === 0 ? 'disabled' : 'enabled'

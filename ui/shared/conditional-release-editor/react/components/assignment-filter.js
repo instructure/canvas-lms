@@ -22,9 +22,9 @@ import _ from 'lodash'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import categories from '../categories'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release');
+const I18n = useI18nScope('conditional_release')
 
 const {func, string} = PropTypes
 

@@ -17,10 +17,10 @@
  */
 
 import Emblem from './emblem'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('quiz_log_auditing.table_view');
+const I18n = useI18nScope('quiz_log_auditing.table_view')
 
 /**
  * @class Events.Views.AnswerMatrix.Legend

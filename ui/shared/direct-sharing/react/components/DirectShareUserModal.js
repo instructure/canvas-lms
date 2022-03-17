@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Suspense, lazy, useState, useRef} from 'react'
 import {oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -28,7 +28,7 @@ import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/conte
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('direct_share_user_modal');
+const I18n = useI18nScope('direct_share_user_modal')
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 

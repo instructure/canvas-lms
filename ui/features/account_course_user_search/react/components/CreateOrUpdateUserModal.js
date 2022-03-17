@@ -28,7 +28,7 @@ import update from 'immutability-helper'
 import {get, isEmpty} from 'lodash'
 import axios from '@canvas/axios'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   firstNameFirst,
   lastNameFirst,
@@ -40,7 +40,7 @@ import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TimeZoneSelect from './TimeZoneSelect/index'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 const trim = (str = '') => str.trim()
 

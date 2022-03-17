@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import HeaderFilterView from './backbone/views/HeaderFilterView'
@@ -28,7 +28,7 @@ import studentCellTemplate from './jst/outcome_gradebook_student_cell.handlebars
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('gradebookOutcomeGradebookGrid');
+const I18n = useI18nScope('gradebookOutcomeGradebookGrid')
 
 /*
 xsslint safeString.method cellHtml

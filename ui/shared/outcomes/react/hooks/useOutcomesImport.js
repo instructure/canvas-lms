@@ -17,14 +17,14 @@
  */
 
 import {useState, useCallback, useEffect} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {IMPORT_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('FindOutcomesModal');
+const I18n = useI18nScope('FindOutcomesModal')
 
 export const IMPORT_NOT_STARTED = 'IMPORT_NOT_STARTED'
 export const IMPORT_PENDING = 'IMPORT_PENDING'

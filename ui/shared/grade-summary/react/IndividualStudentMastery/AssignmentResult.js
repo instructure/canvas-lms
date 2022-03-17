@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -29,7 +29,7 @@ import Ratings from '@canvas/rubrics/react/Ratings'
 
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('IndividiualStudentMasteryAssignmentResult');
+const I18n = useI18nScope('IndividiualStudentMasteryAssignmentResult')
 
 const scoreFromPercent = (percent, outcome) => {
   if (outcome.points_possible > 0) {

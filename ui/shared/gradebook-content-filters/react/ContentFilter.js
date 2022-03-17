@@ -22,9 +22,9 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 
 import natcompare from '@canvas/util/natcompare'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook_default_gradebook_components_content_filters_content_filter');
+const I18n = useI18nScope('gradebook_default_gradebook_components_content_filters_content_filter')
 
 function renderItem(option, {disabled, highlightedItemId, selectedItemId}) {
   return (

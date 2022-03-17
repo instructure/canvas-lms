@@ -17,11 +17,11 @@
  */
 
 import timezone from '@canvas/timezone'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {auditEventStudentAnonymityStates, overallAnonymityStates} from './AuditTrailHelpers'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 const {OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
 const {FULL, PARTIAL} = overallAnonymityStates

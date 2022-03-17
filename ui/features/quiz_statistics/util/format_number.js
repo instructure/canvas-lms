@@ -17,10 +17,10 @@
  */
 
 import config from '../config'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import parseNumber from './parse_number'
 
-const I18n = useI18nScope('quiz_statistics');
+const I18n = useI18nScope('quiz_statistics')
 
 export default function formatNumber(n, precision) {
   if (precision === undefined) {

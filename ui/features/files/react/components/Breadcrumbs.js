@@ -18,13 +18,13 @@
 
 import React from 'react'
 import createReactClass from 'create-react-class'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Breadcrumbs from '../legacy/components/Breadcrumbs'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import BreadcrumbCollapsedContainer from './BreadcrumbCollapsedContainer'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 const MAX_CRUMB_WIDTH = 500
 const MIN_CRUMB_WIDTH = 80

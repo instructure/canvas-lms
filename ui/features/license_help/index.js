@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 
-const I18n = useI18nScope('license_help');
+const I18n = useI18nScope('license_help')
 
 const licenceTypes = ['by', 'nc', 'nd', 'sa']
 const toggleButton = (el, check) =>

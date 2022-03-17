@@ -19,12 +19,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import GroupModal from '@canvas/group-modal'
 import Group from '@canvas/groups/backbone/models/Group.coffee'
 
-const I18n = useI18nScope('StudentGroupDialog');
+const I18n = useI18nScope('StudentGroupDialog')
 
 function reloadStudentGroup() {
   return window.location.reload()

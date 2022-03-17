@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -36,7 +36,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from '../Context'
 import {TextInput} from '@instructure/ui-text-input'
 
-const I18n = useI18nScope('assignments_2_url_entry');
+const I18n = useI18nScope('assignments_2_url_entry')
 
 const ERROR_MESSAGE = [
   {text: I18n.t('Please enter a valid url (e.g. http://example.com)'), type: 'error'}

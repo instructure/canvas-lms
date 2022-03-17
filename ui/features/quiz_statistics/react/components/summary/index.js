@@ -17,7 +17,7 @@
  */
 
 import formatNumber from '../../../util/format_number'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import parseNumber from '../../../util/parse_number'
 import React from 'react'
 import Report from './report'
@@ -36,7 +36,7 @@ import {
   IconQuizStatsTimeLine
 } from '@instructure/ui-icons'
 
-const I18n = useI18nScope('quiz_statistics.summary');
+const I18n = useI18nScope('quiz_statistics.summary')
 
 const NA_LABEL = I18n.t('not_available_abbrev', 'N/A')
 

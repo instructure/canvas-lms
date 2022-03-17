@@ -18,14 +18,14 @@
 
 import React, {useState} from 'react'
 import {bool, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Tabs} from '@instructure/ui-tabs'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 import StudentsSearcher from './StudentsTab/StudentsSearcher'
 import {Img} from '@instructure/ui-img'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,

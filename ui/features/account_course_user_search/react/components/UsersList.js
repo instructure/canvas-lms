@@ -20,11 +20,11 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, string, object, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import UsersListRow from './UsersListRow'
 import UsersListHeader from './UsersListHeader'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 export default class UsersList extends React.Component {
   shouldComponentUpdate(nextProps) {
