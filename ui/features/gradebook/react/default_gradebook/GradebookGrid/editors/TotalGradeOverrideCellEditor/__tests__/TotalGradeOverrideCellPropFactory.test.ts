@@ -32,7 +32,13 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
 
     beforeEach(() => {
       gradingScheme = {
-        data: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]],
+        data: [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['C', 0.7],
+          ['D', 0.6],
+          ['F', 0.5]
+        ],
         id: '2801',
         title: 'Default Grading Scheme'
       }
