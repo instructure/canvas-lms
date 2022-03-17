@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import StudentGroupFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/StudentGroupFilter.js'
+import StudentGroupFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/StudentGroupFilter'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {

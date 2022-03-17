@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import LatePolicyGrade from 'ui/features/gradebook/react/default_gradebook/components/LatePolicyGrade.js'
+import LatePolicyGrade from 'ui/features/gradebook/react/default_gradebook/components/LatePolicyGrade'
 
 QUnit.module('LatePolicyGrade', suiteHooks => {
   let wrapper

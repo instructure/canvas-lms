@@ -18,7 +18,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import SubmissionCommentCreateForm from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentCreateForm.js'
+import SubmissionCommentCreateForm from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentCreateForm'
 
 QUnit.module('SubmissionCommentCreateForm', hooks => {
   let props

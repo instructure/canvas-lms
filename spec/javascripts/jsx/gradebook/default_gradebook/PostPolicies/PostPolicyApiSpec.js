@@ -17,7 +17,7 @@
  */
 
 import MockCanvasClient from '../../../../support/MockCanvasClient'
-import * as PostPolicyApi from 'ui/features/gradebook/react/default_gradebook/PostPolicies/PostPolicyApi.js'
+import * as PostPolicyApi from 'ui/features/gradebook/react/default_gradebook/PostPolicies/PostPolicyApi'
 
 QUnit.module('PostPolicyApi', () => {
   QUnit.module('.setCoursePostPolicy()', hooks => {
