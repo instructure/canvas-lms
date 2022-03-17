@@ -18,14 +18,12 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
-import {convertLatexToMathMl} from '../mathlive'
-
 import {TextArea} from '@instructure/ui-text-area'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
+import {debounce} from '@instructure/debounce'
 
 import formatMessage from '../../../../format-message'
 
@@ -34,6 +32,10 @@ import EquationEditorToolbar from '../EquationEditorToolbar'
 import {css} from 'aphrodite'
 import mathml from './mathml'
 import styles from './styles'
+
+// Import the <math-field> container and all
+// the relevant math fonts from mathlive
+import '../mathlive'
 
 export default class EquationEditorModal extends Component {
   static propTypes = {
@@ -47,6 +49,7 @@ export default class EquationEditorModal extends Component {
   }
 
   static boundaryRegex = /\\\((.+?)\\\)/g
+  static debounceRate = 1000
 
   static defaultProps = {
     title: null,
@@ -185,14 +188,26 @@ export default class EquationEditorModal extends Component {
     onModalDismiss()
   }
 
+  renderMathInAdvancedPreview = debounce(
+    () => {
+      if (this.previewElement.current) {
+        this.previewElement.current.innerHTML = `\\\(${this.state.workingFormula}\\\)`
+        mathml.processNewMathInElem(this.previewElement.current)
+      }
+    },
+    EquationEditorModal.debounceRate,
+    {
+      leading: false,
+      trailing: true
+    }
+  )
+
   setPreviewElementContent() {
     if (!this.state.advanced) {
       return
     }
-    const mathMlContent = convertLatexToMathMl(this.state.workingFormula)
-    if (mathMlContent) {
-      this.previewElement.current.innerHTML = `<math>${mathMlContent}</math>`
-      mathml.processNewMathInElem(this.previewElement.current)
+    if (this.state.workingFormula) {
+      this.renderMathInAdvancedPreview()
     } else {
       this.previewElement.current.innerHTML = ''
     }
