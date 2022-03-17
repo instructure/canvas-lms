@@ -18,14 +18,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 
-const I18n = useI18nScope('assignment_index_menu');
+const I18n = useI18nScope('assignment_index_menu')
 
 export default class IndexMenu extends React.Component {
   static propTypes = {

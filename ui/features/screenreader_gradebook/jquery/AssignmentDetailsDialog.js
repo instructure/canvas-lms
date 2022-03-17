@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import assignmentDetailsDialogTemplate from '../jst/AssignmentDetailsDialog.handlebars'
 import round from 'round'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 
-const I18n = useI18nScope('assignment_details');
+const I18n = useI18nScope('assignment_details')
 
 export default class AssignmentDetailsDialog {
   static show(opts) {

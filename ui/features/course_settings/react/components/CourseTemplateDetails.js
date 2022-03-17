@@ -18,7 +18,7 @@
 
 import React, {useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Spinner} from '@instructure/ui-spinner'
@@ -31,7 +31,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {IconInfoLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('course_template_details');
+const I18n = useI18nScope('course_template_details')
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 

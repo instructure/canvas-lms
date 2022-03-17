@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import {Collection} from '@canvas/backbone'
@@ -33,7 +33,7 @@ import ContextMessagesView from './ContextMessagesView'
 import 'jquery.elastic'
 import '@canvas/forms/jquery/jquery.instructure_forms.js'
 
-const I18n = useI18nScope('conversation_dialog');
+const I18n = useI18nScope('conversation_dialog')
 
 // #
 // reusable message composition dialog

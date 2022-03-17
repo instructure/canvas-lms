@@ -19,11 +19,11 @@
 import React from 'react'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import ValidatorResultsRow from './ValidatorResultsRow'
 
-const I18n = useI18nScope('link_validator');
+const I18n = useI18nScope('link_validator')
 
 export default class ValidatorResults extends React.Component {
   state = {

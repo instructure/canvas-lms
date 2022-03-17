@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, getFormData, formErrors */
@@ -28,7 +28,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
 import 'jqueryui/tabs'
 
-const I18n = useI18nScope('profile');
+const I18n = useI18nScope('profile')
 
 $(document).ready(function() {
   $('#communication_channels').tabs()

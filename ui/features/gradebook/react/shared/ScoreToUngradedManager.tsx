@@ -17,11 +17,11 @@
  */
 
 import axios from '@canvas/axios'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import GradebookApi from '../default_gradebook/apis/GradebookApi'
 
-const I18n = useI18nScope('gradebookSharedScoreToUngradedManager');
+const I18n = useI18nScope('gradebookSharedScoreToUngradedManager')
 
 type Progress = {
   progressId: number

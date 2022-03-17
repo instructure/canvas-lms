@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -29,7 +29,7 @@ import PropTypes from 'prop-types'
 
 import emptyHomeUrl from '../images/empty-home.svg'
 
-const I18n = useI18nScope('empty_home');
+const I18n = useI18nScope('empty_home')
 
 const EmptyHome = ({pagesPath, hasWikiPages, courseName, canManage}) => (
   <Flex

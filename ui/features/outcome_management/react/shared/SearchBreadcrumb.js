@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -27,7 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
   <Heading level="h4">

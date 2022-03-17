@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('image_search');
+const I18n = useI18nScope('image_search')
 
 class ImageSearchItem extends React.Component {
   static propTypes = {

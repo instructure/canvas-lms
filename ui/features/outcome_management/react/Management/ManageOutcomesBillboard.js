@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -25,7 +25,7 @@ import {Billboard} from '@instructure/ui-billboard'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import SVGWrapper from '@canvas/svg-wrapper'
 
-const I18n = useI18nScope('FindOutcomesModal');
+const I18n = useI18nScope('FindOutcomesModal')
 
 const ManageOutcomesBillboard = () => (
   <Flex as="div" height="50vh">

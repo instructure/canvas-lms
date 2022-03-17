@@ -17,7 +17,7 @@
  */
 
 import {Alert} from '@instructure/ui-alerts'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 
@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import LoadingIndicator from '@canvas/loading-indicator'
 
-const I18n = useI18nScope('discussion_topics_post');
+const I18n = useI18nScope('discussion_topics_post')
 
 const REPORT_TYPES = [
   {value: 'inappropriate', getLabel: () => I18n.t('Inappropriate')},

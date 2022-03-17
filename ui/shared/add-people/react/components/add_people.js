@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
@@ -37,7 +37,7 @@ import PeopleReadyList from './people_ready_list'
 import PeopleValidationIssues from './people_validation_issues'
 import APIError from './api_error'
 
-const I18n = useI18nScope('add_people');
+const I18n = useI18nScope('add_people')
 
 const PEOPLESEARCH = 'peoplesearch'
 const PEOPLEREADYLIST = 'peoplereadylist'

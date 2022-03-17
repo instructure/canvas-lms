@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string} from 'prop-types'
 
@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 
 import locked1SVG from '../../images/Locked1.svg'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 function modulesPage(moduleUrl) {
   const encodedUrl = encodeURI(moduleUrl)

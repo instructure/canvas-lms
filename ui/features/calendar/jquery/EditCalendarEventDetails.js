@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
 import React from 'react'
@@ -36,7 +36,7 @@ import CalendarConferenceWidget from '@canvas/calendar-conferences/react/Calenda
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
 
-const I18n = useI18nScope('calendar');
+const I18n = useI18nScope('calendar')
 
 export default class EditCalendarEventDetails {
   constructor(selector, event, contextChangeCB, closeCB) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -27,7 +27,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 
-const I18n = useI18nScope('authentication_providers');
+const I18n = useI18nScope('authentication_providers')
 
 const selectorNode = document.getElementById('add-authentication-provider')
 const authTypeOptions = JSON.parse(selectorNode.getAttribute('data-options'))

@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('react_collaborations');
+const I18n = useI18nScope('react_collaborations')
 
 class NewCollaborationsDropDown extends React.Component {
   constructor(props) {

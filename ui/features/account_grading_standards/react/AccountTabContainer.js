@@ -21,10 +21,10 @@ import {bool, string, shape} from 'prop-types'
 import GradingStandardCollection from '@canvas/grading-standard-collection'
 import GradingPeriodSetCollection from './GradingPeriodSetCollection'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import 'jqueryui/tabs'
 
-const I18n = useI18nScope('AccountTabContainer');
+const I18n = useI18nScope('AccountTabContainer')
 
 class AccountTabContainer extends React.Component {
   static propTypes = {

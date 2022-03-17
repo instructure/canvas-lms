@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {func, bool} from 'prop-types'
 
@@ -29,7 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconSettingsLine} from '@instructure/ui-icons'
 import propTypes from '../propTypes'
 
-const I18n = useI18nScope('discussion_settings');
+const I18n = useI18nScope('discussion_settings')
 
 const STUDENT_SETTINGS = [
   'allow_student_forum_attachments',

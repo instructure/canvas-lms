@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, instanceOf, array} from 'prop-types'
@@ -26,7 +26,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
-const I18n = useI18nScope('wiki_pages');
+const I18n = useI18nScope('wiki_pages')
 
 export function showConfirmDelete(props) {
   const parent = document.createElement('div')

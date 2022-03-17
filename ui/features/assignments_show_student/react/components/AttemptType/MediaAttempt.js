@@ -23,7 +23,7 @@ import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import elideString from '../../helpers/elideString'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconTrashLine, IconUploadLine, IconAttachMediaSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -47,7 +47,7 @@ import {MediaPlayer} from '@instructure/ui-media-player'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('assignments_2_media_attempt');
+const I18n = useI18nScope('assignments_2_media_attempt')
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}

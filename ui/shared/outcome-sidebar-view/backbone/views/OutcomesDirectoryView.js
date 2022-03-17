@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
@@ -31,7 +31,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/droppable'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('OutcomesDirectoryView');
+const I18n = useI18nScope('OutcomesDirectoryView')
 
 // The outcome group "directory" browser.
 export default class OutcomesDirectoryView extends PaginatedView {

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import developer_key from '../jst/developer_key.handlebars'
 import developerKeyFormTemplate from '../jst/developer_key_form.handlebars'
@@ -25,7 +25,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('developer_keys');
+const I18n = useI18nScope('developer_keys')
 
 let page = 0
 

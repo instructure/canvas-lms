@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import cx from 'classnames'
 
@@ -32,7 +32,7 @@ import propTypes from '../propTypes'
 
 import {itemTypeLabels, changeTypeLabels, exceptionTypeLabels} from '../labels'
 
-const I18n = useI18nScope('blueprint_settingsSyncChange');
+const I18n = useI18nScope('blueprint_settingsSyncChange')
 
 class SyncChange extends Component {
   static propTypes = {

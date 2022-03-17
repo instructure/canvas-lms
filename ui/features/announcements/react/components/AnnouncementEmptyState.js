@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool} from 'prop-types'
 
@@ -27,7 +27,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 
 import AnnouncementHornSVGURL from '../../images/announcements-airhorn.svg'
 
-const I18n = useI18nScope('announcements_v2');
+const I18n = useI18nScope('announcements_v2')
 
 const AnnouncementEmptyState = props => (
   <View margin="large auto" textAlign="center" display="block">

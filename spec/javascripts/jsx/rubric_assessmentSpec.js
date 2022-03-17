@@ -21,9 +21,9 @@ import '@canvas/rails-flash-notifications'
 
 import fakeENV from 'helpers/fakeENV'
 import rubric_assessment from '@canvas/rubrics/jquery/rubric_assessment'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('rubric_assessment');
+const I18n = useI18nScope('rubric_assessment')
 
 QUnit.module('RubricAssessment#roundAndFormat')
 

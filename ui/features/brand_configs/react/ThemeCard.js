@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string, func, bool} from 'prop-types'
 import SVGWrapper from '@canvas/svg-wrapper'
@@ -24,7 +24,7 @@ import SVGWrapper from '@canvas/svg-wrapper'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('theme_editor');
+const I18n = useI18nScope('theme_editor')
 
 export default function ThemeCard(props) {
   const getVar = props.getVariable

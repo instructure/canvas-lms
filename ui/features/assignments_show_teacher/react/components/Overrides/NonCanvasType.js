@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, string, element, func, arrayOf} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -28,7 +28,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import SubmitOptionShape from './SubmitOptionShape'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 /*
  *  CAUTION: The InstUI Select component is greatly changed in v7.

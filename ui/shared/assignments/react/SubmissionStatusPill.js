@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {bool, string} from 'prop-types'
 import React from 'react'
 
 import {Pill} from '@instructure/ui-pill'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 export default function SubmissionStatusPill(props) {
   if (props.excused) {
