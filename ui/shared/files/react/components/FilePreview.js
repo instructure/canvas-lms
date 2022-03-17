@@ -28,13 +28,13 @@ import preventDefault from 'prevent-default'
 import _ from 'underscore'
 import PropTypes from 'prop-types'
 import customPropTypes from '../modules/customPropTypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import File from '../../backbone/models/File.coffee'
 import FilesystemObject from '../../backbone/models/FilesystemObject.coffee'
 import codeToRemoveLater from '../../jquery/codeToRemoveLater'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('file_preview');
+const I18n = useI18nScope('file_preview')
 
 export default class FilePreview extends React.PureComponent {
   static propTypes = {

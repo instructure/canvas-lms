@@ -19,11 +19,11 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('TeacherFeedbackForm');
+const I18n = useI18nScope('TeacherFeedbackForm')
 
 class TeacherFeedbackForm extends React.Component {
   static propTypes = {

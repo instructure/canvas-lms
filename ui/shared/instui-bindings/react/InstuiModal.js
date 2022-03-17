@@ -20,10 +20,10 @@ import React from 'react'
 import {string} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 
-const I18n = useI18nScope('modal');
+const I18n = useI18nScope('modal')
 
 /*
 ---

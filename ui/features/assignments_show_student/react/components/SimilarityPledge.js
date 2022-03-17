@@ -17,13 +17,13 @@
  */
 
 import {Checkbox} from '@instructure/ui-checkbox'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {direction} from '@canvas/i18n/rtlHelper'
 
-const I18n = useI18nScope('assignments_2_file_upload');
+const I18n = useI18nScope('assignments_2_file_upload')
 
 function eulaHTML(eulaUrl) {
   const encodedUrl = encodeURI(eulaUrl)

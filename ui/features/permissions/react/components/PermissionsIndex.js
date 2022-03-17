@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
 import {func, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
@@ -48,7 +48,7 @@ import {ConnectedPermissionTray} from './PermissionTray'
 import {ConnectedRoleTray} from './RoleTray'
 import {ConnectedAddTray} from './AddTray'
 
-const I18n = useI18nScope('permissions_v2');
+const I18n = useI18nScope('permissions_v2')
 
 function setDiff(minuend, subtrahend) {
   const difference = new Set(minuend)

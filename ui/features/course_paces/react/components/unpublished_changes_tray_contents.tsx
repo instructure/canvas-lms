@@ -22,10 +22,10 @@ import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import React from 'react'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {SummarizedChange} from '../utils/change_tracking'
 
-const I18n = useI18nScope('unpublished_changes_tray_contents');
+const I18n = useI18nScope('unpublished_changes_tray_contents')
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item} = List as any

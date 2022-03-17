@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {max, invert} from 'underscore'
 import originalityReportSubmissionKey from './originalityReportSubmissionKey'
 
-const I18n = useI18nScope('turnitin');
+const I18n = useI18nScope('turnitin')
 
 export const extractDataTurnitin = function(submission) {
   let attachment, i, item, len, plagData, ref, turnitin

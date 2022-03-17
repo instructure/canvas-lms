@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingTypes from './grading-types'
 import numberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('conditional_release');
+const I18n = useI18nScope('conditional_release')
 
 // stack overflow suggests this implementation
 const isNumeric = n => {

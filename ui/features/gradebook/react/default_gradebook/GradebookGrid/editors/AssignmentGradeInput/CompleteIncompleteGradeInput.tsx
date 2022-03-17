@@ -18,17 +18,16 @@
 
 import React, {Component} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {IconArrowOpenDownLine, IconCheckSolid, IconEndSolid} from '@instructure/ui-icons'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 function componentForGrade(grade, options = {}) {
   const textSize = options.forMenu ? null : 'small'

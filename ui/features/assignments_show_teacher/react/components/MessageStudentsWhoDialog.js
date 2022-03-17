@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {sendMesssageStudentsWho} from '../api'
 
@@ -32,7 +32,7 @@ import {TeacherAssignmentShape} from '../assignmentData'
 import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWhoForm from './MessageStudentsWhoForm'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 export default class MessageStudentsWhoDialog extends React.Component {
   static propTypes = {

@@ -20,13 +20,13 @@ import AnswerTable from './answer_table'
 import calculateResponseRatio from '../../../backbone/models/ratio_calculator'
 import classSet from '@canvas/quiz-legacy-client-apps/util/class_set'
 import CorrectAnswerDonut from '../correct_answer_donut'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Question from '../question'
 import QuestionHeader from './header'
 import React from 'react'
 import round from '@canvas/quiz-legacy-client-apps/util/round'
 
-const I18n = useI18nScope('quiz_statistics');
+const I18n = useI18nScope('quiz_statistics')
 
 class FillInMultipleBlanks extends React.Component {
   state = {

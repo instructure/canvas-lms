@@ -17,7 +17,7 @@
  */
 
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
 import PropTypes from 'prop-types'
@@ -32,7 +32,7 @@ import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 export default class FilePreview extends Component {
   static propTypes = {

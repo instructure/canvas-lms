@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
-const I18n = useI18nScope('ExternalToolsPlugin');
+const I18n = useI18nScope('ExternalToolsPlugin')
 
 // setting ENV.MAX_MRU_LTI_TOOLS can make it easier to test
 const MAX_MRU_LTI_TOOLS = ENV.MAX_MRU_LTI_TOOLS || 5

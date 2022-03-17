@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('EnrollmentTermsDropdown');
+const I18n = useI18nScope('EnrollmentTermsDropdown')
 
 class EnrollmentTermsDropdown extends React.Component {
   static propTypes = {

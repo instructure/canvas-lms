@@ -19,11 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import speedGrader from './jquery/speed_grader'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 const mountPoint = document.getElementById('speed_grader_loading')
 

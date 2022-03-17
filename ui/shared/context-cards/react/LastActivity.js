@@ -18,10 +18,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
-const I18n = useI18nScope('student_context_trayLastActivity');
+const I18n = useI18nScope('student_context_trayLastActivity')
 
 class LastActivity extends React.Component {
   static propTypes = {

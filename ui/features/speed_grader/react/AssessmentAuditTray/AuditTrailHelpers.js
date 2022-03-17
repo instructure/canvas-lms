@@ -26,9 +26,9 @@ import {
   IconTrashLine,
   IconUnmutedLine
 } from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 export const auditEventStudentAnonymityStates = Object.freeze({
   NA: 'N/A',

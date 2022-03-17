@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SubmissionTrayRadioInput from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTrayRadioInput.js'
+import SubmissionTrayRadioInput from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTrayRadioInput'
 import {NumberInput} from '@instructure/ui-number-input'
 
 let wrapper

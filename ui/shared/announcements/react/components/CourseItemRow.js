@@ -18,7 +18,7 @@
 
 // TODO: Get rid of this component.  AnnouncementRow should manage its own layout
 // with the shared utilities created in g/something.
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {bool, node, string, func, shape, arrayOf, oneOf} from 'prop-types'
 import cx from 'classnames'
@@ -37,7 +37,7 @@ import LockIconView from '@canvas/lock-icon'
 import {author as authorShape} from '@canvas/users/react/proptypes/user'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 
-const I18n = useI18nScope('shared_components');
+const I18n = useI18nScope('shared_components')
 
 export default class CourseItemRow extends Component {
   static propTypes = {

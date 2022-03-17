@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
@@ -25,7 +25,7 @@ import {
 import CustomColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
 import {getCustomColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
   let $container

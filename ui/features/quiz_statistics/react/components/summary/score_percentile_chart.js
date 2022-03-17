@@ -18,10 +18,10 @@
 
 import createChartComponent, {addTitle, addDescription} from '../../hocs/createChartComponent'
 import d3 from 'd3'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('quiz_statistics.summary');
+const I18n = useI18nScope('quiz_statistics.summary')
 
 const max = d3.max
 const sum = d3.sum

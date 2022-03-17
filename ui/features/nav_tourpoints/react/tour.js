@@ -18,7 +18,7 @@
 
 import React from 'react'
 import Reactour from '@instructure/reactour/dist/reactour.cjs'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import tourPubSub from '@canvas/tour-pubsub'
 import TourContainer from './TourContainer'
 import {Heading} from '@instructure/ui-heading'
@@ -28,7 +28,7 @@ import teacherTour from './tours/teacherTour'
 import studentTour from './tours/studentTour'
 import handleOpenTray from './handleOpenTray'
 
-const I18n = useI18nScope('TourPoints');
+const I18n = useI18nScope('TourPoints')
 
 const allSteps = {
   admin: adminTour,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -46,7 +46,7 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import '../../../boot/initializers/trackGoogleAnalyticsEventsOnClick'
 
-const I18n = useI18nScope('instructure_js');
+const I18n = useI18nScope('instructure_js')
 
 let preview_counter = 0
 function previewId() {

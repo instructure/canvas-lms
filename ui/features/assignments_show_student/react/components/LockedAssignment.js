@@ -19,12 +19,12 @@
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import {Flex} from '@instructure/ui-flex'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import lockedSVG from '../../images/Locked.svg'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 export default function LockedAssignment({assignment}) {
   return (

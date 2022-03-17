@@ -19,13 +19,13 @@
 import $ from 'jquery'
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import InfoFrame from './InfoFrame'
 import Checklist from './Checklist'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('course_wizard');
+const I18n = useI18nScope('course_wizard')
 
 export default function CourseWizard({onHideWizard}) {
   const [selectedItem, setSelectedItem] = useState('')

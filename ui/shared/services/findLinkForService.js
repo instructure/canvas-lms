@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import TextHelper from '@canvas/util/TextHelper.coffee'
@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('findLinkForService');
+const I18n = useI18nScope('findLinkForService')
 
 export function getUserServices(service_types, success, error) {
   if (!$.isArray(service_types)) {

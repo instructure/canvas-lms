@@ -18,12 +18,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoveStartLine, IconMoveEndLine} from '@instructure/ui-icons'
 import plainStoreShape from '@canvas/util/react/proptypes/plainStoreShape'
 
-const I18n = useI18nScope('new_user_tutorial');
+const I18n = useI18nScope('new_user_tutorial')
 
 class NewUserTutorialToggleButton extends React.Component {
   static propTypes = {

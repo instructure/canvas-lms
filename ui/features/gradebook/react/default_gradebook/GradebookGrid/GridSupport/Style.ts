@@ -19,6 +19,12 @@
 import {direction} from '@canvas/i18n/rtlHelper'
 
 export default class Style {
+  grid: any
+
+  gridSupport: any
+
+  $styles: any
+
   constructor(grid, gridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport

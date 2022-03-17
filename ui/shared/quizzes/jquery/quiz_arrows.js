@@ -18,11 +18,11 @@
 
 // xsslint jqueryObject.property /Tpl$/
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {direction} from '@canvas/i18n/rtlHelper'
 
-const I18n = useI18nScope('quizzes.show');
+const I18n = useI18nScope('quizzes.show')
 
 // Create and append right/wrong arrows to all appropriate
 // answers on a quiz results page.

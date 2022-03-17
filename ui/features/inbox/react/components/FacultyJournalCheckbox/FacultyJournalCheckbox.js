@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 export const FacultyJournalCheckBox = props => {
   return (

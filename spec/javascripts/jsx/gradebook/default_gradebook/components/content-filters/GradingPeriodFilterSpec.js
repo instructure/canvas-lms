@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import GradingPeriodFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/GradingPeriodFilter.js'
+import GradingPeriodFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/GradingPeriodFilter'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {
@@ -34,7 +34,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
       props = {
         disabled: false,
-        gradingPeriods: [{id: '1501', title: 'Q1'}, {id: '1502', title: 'Q2'}],
+        gradingPeriods: [
+          {id: '1501', title: 'Q1'},
+          {id: '1502', title: 'Q2'}
+        ],
         onSelect: sinon.stub(),
         selectedGradingPeriodId: '0'
       }

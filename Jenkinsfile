@@ -450,7 +450,7 @@ pipeline {
                   extendedStage('Generate Crystalball Prediction')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
-                    .required(!configuration.isChangeMerged())
+                    .required(!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master")
                     .timeout(2)
                     .execute {
                       try {

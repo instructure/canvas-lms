@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map} from 'underscore'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
@@ -24,7 +24,7 @@ import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {updateAlignments, attachPageEvents} from './jquery/index'
 import './jst/move_question.handlebars'
 
-const I18n = useI18nScope('bundles_quesiton_bank');
+const I18n = useI18nScope('bundles_quesiton_bank')
 
 class QuestionBankPage {
   static initClass() {

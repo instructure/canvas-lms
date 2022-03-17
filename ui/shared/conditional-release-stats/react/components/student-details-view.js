@@ -20,12 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {i18nGrade} from '@canvas/conditional-release-score'
 import StudentAssignmentItem from './student-assignment-item'
 import {assignmentShape, studentShape} from '../shapes/index'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_student_details_view');
+const I18n = useI18nScope('cyoe_assignment_sidebar_student_details_view')
 
 const {shape, string, number, arrayOf, func, bool} = PropTypes
 

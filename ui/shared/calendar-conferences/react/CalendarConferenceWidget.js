@@ -19,7 +19,7 @@
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import AddConference from './AddConference/index'
 import Conference from './Conference'
@@ -27,7 +27,7 @@ import getConferenceType from '../getConferenceType'
 import webConference from './proptypes/webConference'
 import webConferenceType from './proptypes/webConferenceType'
 
-const I18n = useI18nScope('conferences');
+const I18n = useI18nScope('conferences')
 
 const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConference}) => {
   const addConferenceRef = useRef(null)
