@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import CustomColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeader.js'
+import CustomColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeader'
 
 QUnit.module('GradebookGrid CustomColumnHeader', suiteHooks => {
   let $container

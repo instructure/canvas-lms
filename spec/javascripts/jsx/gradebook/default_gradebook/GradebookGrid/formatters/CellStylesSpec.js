@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {classNamesForAssignmentCell} from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/CellStyles.js'
+import {classNamesForAssignmentCell} from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/CellStyles'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid CellStyles', () => {

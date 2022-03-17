@@ -159,14 +159,14 @@ module Importers
       item.save!
 
       item_map = {}
-      item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
+      manually_created_items = item.content_tags.not_deleted.where(migration_id: nil).pluck(:position).compact
+      item.item_migration_position ||= (manually_created_items + [manually_created_items.count]).max
       items = hash[:items] || []
       items = items.map { |i| flatten_item(i, 0) }.flatten
 
       imported_migration_ids = []
-      frozen_positions = item.content_tags.where(migration_id: nil).pluck(:position)
       items.each do |tag_hash|
-        tags = add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration, frozen_positions)
+        tags = add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
         imported_migration_ids.concat tags.map(&:migration_id)
       rescue
         migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
@@ -198,15 +198,13 @@ module Importers
       item
     end
 
-    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration, frozen_positions = [])
+    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
       existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(context_module: context_module, context: context)
-
-      is_new_record = existing_item.new_record?
 
       existing_item.mark_as_importing!(migration)
       migration.add_imported_item(existing_item)
@@ -348,19 +346,10 @@ module Importers
         item_map[hash[:migration_id]] = item if hash[:migration_id]
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
-
-        if is_new_record && (!hash[:position] || context_module.item_migration_position) # we're adding new items to an existing module - append on the end
-          context_module.item_migration_position ||= 0
-          context_module.item_migration_position += 1
-          item.position = context_module.item_migration_position
-        elsif hash[:position]
-          new_position = hash[:position]
-          while frozen_positions.include?(new_position)
-            new_position += 1
-          end
-          item.position = new_position
-          frozen_positions.append(new_position)
-        end
+        # add imported items starting from the last manually created item
+        context_module.item_migration_position ||= 0
+        context_module.item_migration_position += 1
+        item.position = context_module.item_migration_position
 
         item.mark_as_importing!(migration)
         if hash[:workflow_state]

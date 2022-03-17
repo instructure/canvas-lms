@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import TotalGradeOverrideCellPropFactory from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory.js'
-import TotalGradeOverrideCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/index.js'
-import GridEvent from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/GridEvent.js'
+import TotalGradeOverrideCellPropFactory from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
+import TotalGradeOverrideCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/index'
+import GridEvent from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/GridEvent'
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {

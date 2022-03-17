@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import GradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/GradeInput/index.js'
+import GradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/GradeInput/index'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 
 /* eslint-disable qunit/no-identical-names */
@@ -34,7 +34,13 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: {
-        data: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0]]
+        data: [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['C', 0.7],
+          ['D', 0.6],
+          ['F', 0]
+        ]
       }
     })
 
