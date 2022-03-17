@@ -19,13 +19,13 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
-import {convertLatexToMathMl} from '../../mathlive'
 import mathml from '../mathml'
 
 function defaultProps() {
   return {
     editor: {},
     label: '',
+    onEquationSubmit: () => {},
     onModalDismiss: () => {},
     onModalClose: () => {},
     title: '',
@@ -38,16 +38,9 @@ function renderModal(overrideProps = {}) {
   return render(<EquationEditorModal {...props} {...overrideProps} />)
 }
 
-jest.mock('../../mathlive', () => ({
-  convertLatexToMarkup: jest.fn().mockReturnValue('<p>Markup content</p>'),
-  convertLatexToMathMl: jest.fn()
-}))
-
 jest.mock('../mathml', () => ({
   processNewMathInElem: jest.fn()
 }))
-
-convertLatexToMathMl.mockReturnValue('<p>MathML content</p>')
 
 describe('EquationEditorModal', () => {
   let editor, mockFn
@@ -240,6 +233,18 @@ describe('EquationEditorModal', () => {
   })
 
   describe('renders preview on advanced view when', () => {
+    let actualDebounceRate
+    const testDebounceRate = 100
+
+    beforeAll(() => {
+      actualDebounceRate = EquationEditorModal.debounceRate
+      EquationEditorModal.debounceRate = testDebounceRate
+    })
+
+    afterAll(() => {
+      EquationEditorModal.debounceRate = actualDebounceRate
+    })
+
     it('recovering last formula', async () => {
       renderModal({editor})
       const mathField = document.body.querySelector('math-field')
@@ -249,42 +254,33 @@ describe('EquationEditorModal', () => {
       })
       fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
       await waitFor(() => {
-        expect(convertLatexToMathMl).toHaveBeenCalledWith('latexcontent')
         expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
           <span
             data-testid="mathml-preview-element"
           >
-            <math>
-              <p>
-                MathML content
-              </p>
-            </math>
+            \\(latexcontent\\)
           </span>
         `)
       })
     })
 
-    it('updates formula', () => {
+    it('updates formula', async () => {
       renderModal({editor})
       fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
       const textarea = document.body.querySelector('textarea')
       fireEvent.change(textarea, {target: {value: 'hello'}})
-      expect(convertLatexToMathMl).toHaveBeenCalledWith('hello')
-      expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
-        <span
-          data-testid="mathml-preview-element"
-        >
-          <math>
-            <p>
-              MathML content
-            </p>
-          </math>
-        </span>
-      `)
+      await waitFor(() => {
+        expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
+          <span
+            data-testid="mathml-preview-element"
+          >
+            \\(hello\\)
+          </span>
+        `)
+      })
     })
 
     it('updates formula with empty string', async () => {
-      convertLatexToMathMl.mockReturnValue('')
       renderModal({editor})
       const mathField = document.body.querySelector('math-field')
       await waitFor(() => {
@@ -295,7 +291,6 @@ describe('EquationEditorModal', () => {
       const textarea = document.body.querySelector('textarea')
       fireEvent.change(textarea, {target: {value: ''}})
       await waitFor(() => {
-        expect(convertLatexToMathMl).toHaveBeenCalledWith('')
         const previewElement = screen.getByTestId('mathml-preview-element')
         expect(previewElement.innerHTML).toEqual('')
       })
