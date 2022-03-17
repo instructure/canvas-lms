@@ -22,9 +22,9 @@ import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default function InvalidGradeIndicator(props) {
   return (
