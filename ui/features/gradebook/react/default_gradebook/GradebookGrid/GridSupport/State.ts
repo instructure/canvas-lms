@@ -19,7 +19,7 @@
 import GridHelper from './GridHelper'
 
 function getItemMetadata(data, rowIndex) {
-  const classes = []
+  const classes: string[] = []
 
   if (rowIndex === 0) {
     classes.push('first-row')
@@ -39,9 +39,15 @@ function getItemMetadata(data, rowIndex) {
 }
 
 export default class State {
-  activeLocation = {region: 'unknown'}
+  grid: any
 
-  previousLocation = null
+  gridSupport: any
+
+  helper: GridHelper
+
+  activeLocation: any = {region: 'unknown'}
+
+  previousLocation: any = null
 
   constructor(grid, gridSupport) {
     this.grid = grid
@@ -65,7 +71,7 @@ export default class State {
     return this.activeLocation
   }
 
-  setActiveLocation(region, attr = {}) {
+  setActiveLocation(region, attr: {row?: any; cell?: any} = {}) {
     this.helper.commitCurrentEdit()
     this.setActiveLocationInternal(region, attr)
 
@@ -117,7 +123,7 @@ export default class State {
     this.previousLocation = null
   }
 
-  setActiveLocationInternal(region, attr = {}) {
+  setActiveLocationInternal(region, attr: {cell?: any; row?: any; columnId?: any} = {}) {
     this.activeLocation = {region, ...attr}
 
     if (attr.cell != null) {

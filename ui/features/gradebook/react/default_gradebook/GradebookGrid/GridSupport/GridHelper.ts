@@ -17,6 +17,8 @@
  */
 
 export default class GridHelper {
+  grid: any
+
   constructor(grid) {
     this.grid = grid
   }

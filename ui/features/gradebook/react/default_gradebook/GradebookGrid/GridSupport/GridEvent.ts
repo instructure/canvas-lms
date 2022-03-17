@@ -17,7 +17,7 @@
  */
 
 export default class GridEvent {
-  handlers = []
+  handlers: any[] = []
 
   subscribe(handler) {
     if (!this.handlers.includes(handler)) {
