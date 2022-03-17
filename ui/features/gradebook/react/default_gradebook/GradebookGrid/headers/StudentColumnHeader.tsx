@@ -32,7 +32,30 @@ import ColumnHeader from './ColumnHeader'
 
 const I18n = useI18nScope('gradebook')
 
-export default class StudentColumnHeader extends ColumnHeader {
+const {Item: MenuItem, Group: MenuGroup, Separator: MenuSeparator} = Menu as any
+
+type Props = {
+  disabled: boolean
+  loginHandleName?: string
+  onMenuDismiss: any
+  onSelectPrimaryInfo: any
+  onToggleEnrollmentFilter: any
+  sectionsEnabled: boolean
+  selectedEnrollmentFilters: any
+  selectedPrimaryInfo: any
+  selectedSecondaryInfo: any
+  sisName?: string
+  studentGroupsEnabled: boolean
+  sortBySetting: any
+  onSelectSecondaryInfo: any
+}
+
+type State = {
+  menuShown: boolean
+  hasFocus: boolean
+}
+
+export default class StudentColumnHeader extends ColumnHeader<Props, State> {
   static propTypes = {
     selectedPrimaryInfo: oneOf(studentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
@@ -171,59 +194,59 @@ export default class StudentColumnHeader extends ColumnHeader {
         contentRef={this.bindSortByMenuContent}
         disabled={this.props.disabled}
       >
-        <Menu.Group label={I18n.t('Type')}>
-          <Menu.Item
+        <MenuGroup label={I18n.t('Type')}>
+          <MenuItem
             selected={selectedSortSetting === 'sortable_name'}
             disabled={disabled}
             onSelect={onSortBySortableName}
           >
             <span>{I18n.t('Name')}</span>
-          </Menu.Item>
+          </MenuItem>
 
-          <Menu.Item
+          <MenuItem
             selected={selectedSortSetting === 'sis_user_id'}
             disabled={disabled}
             onSelect={onSortBySisId}
           >
             <span>{secondaryInfoLabels.sis_id}</span>
-          </Menu.Item>
+          </MenuItem>
 
-          <Menu.Item
+          <MenuItem
             selected={selectedSortSetting === 'integration_id'}
             disabled={disabled}
             onSelect={onSortByIntegrationId}
           >
             <span>{secondaryInfoLabels.integration_id}</span>
-          </Menu.Item>
+          </MenuItem>
 
-          <Menu.Item
+          <MenuItem
             selected={selectedSortSetting === 'login_id'}
             disabled={disabled}
             onSelect={onSortByLoginId}
           >
             <span>{secondaryInfoLabels.login_id}</span>
-          </Menu.Item>
-        </Menu.Group>
+          </MenuItem>
+        </MenuGroup>
 
-        <Menu.Group label={I18n.t('Order')}>
-          <Menu.Item
+        <MenuGroup label={I18n.t('Order')}>
+          <MenuItem
             disabled={disabled}
             key="ascending"
             onSelect={onSortInAscendingOrder}
             selected={selectedSortDirection === 'ascending'}
           >
             <span>{I18n.t('A–Z')}</span>
-          </Menu.Item>
+          </MenuItem>
 
-          <Menu.Item
+          <MenuItem
             disabled={disabled}
             key="descending"
             onSelect={onSortInDescendingOrder}
             selected={selectedSortDirection === 'descending'}
           >
             <span>{I18n.t('Z–A')}</span>
-          </Menu.Item>
-        </Menu.Group>
+          </MenuItem>
+        </MenuGroup>
       </Menu>
     )
 
@@ -275,24 +298,24 @@ export default class StudentColumnHeader extends ColumnHeader {
                         contentRef={this.bindDisplayAsMenuContent}
                         disabled={this.props.disabled}
                       >
-                        <Menu.Group
+                        <MenuGroup
                           label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}
                         >
-                          <Menu.Item
+                          <MenuItem
                             key="first_last"
                             selected={this.props.selectedPrimaryInfo === 'first_last'}
                             onSelect={this.onShowFirstLastNames}
                           >
                             {studentRowHeaderConstants.primaryInfoLabels.first_last}
-                          </Menu.Item>
-                          <Menu.Item
+                          </MenuItem>
+                          <MenuItem
                             key="last_first"
                             selected={this.props.selectedPrimaryInfo === 'last_first'}
                             onSelect={this.onShowLastFirstNames}
                           >
                             {studentRowHeaderConstants.primaryInfoLabels.last_first}
-                          </Menu.Item>
-                        </Menu.Group>
+                          </MenuItem>
+                        </MenuGroup>
                       </Menu>
                     )}
 
@@ -301,87 +324,87 @@ export default class StudentColumnHeader extends ColumnHeader {
                       disabled={this.props.disabled}
                       label={I18n.t('Secondary info')}
                     >
-                      <Menu.Group
+                      <MenuGroup
                         label={
                           <ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>
                         }
                       >
                         {this.props.sectionsEnabled && (
-                          <Menu.Item
+                          <MenuItem
                             key="section"
                             selected={this.props.selectedSecondaryInfo === 'section'}
                             onSelect={this.onShowSectionNames}
                           >
                             {studentRowHeaderConstants.secondaryInfoLabels.section}
-                          </Menu.Item>
+                          </MenuItem>
                         )}
-                        <Menu.Item
+                        <MenuItem
                           key="sis_id"
                           selected={this.props.selectedSecondaryInfo === 'sis_id'}
                           onSelect={this.onShowSisId}
                         >
                           {this.props.sisName ||
                             studentRowHeaderConstants.secondaryInfoLabels.sis_id}
-                        </Menu.Item>
+                        </MenuItem>
 
-                        <Menu.Item
+                        <MenuItem
                           key="integration_id"
                           selected={this.props.selectedSecondaryInfo === 'integration_id'}
                           onSelect={this.onShowIntegrationId}
                         >
                           {studentRowHeaderConstants.secondaryInfoLabels.integration_id}
-                        </Menu.Item>
+                        </MenuItem>
 
-                        <Menu.Item
+                        <MenuItem
                           key="login_id"
                           selected={this.props.selectedSecondaryInfo === 'login_id'}
                           onSelect={this.onShowLoginId}
                         >
                           {this.props.loginHandleName ||
                             studentRowHeaderConstants.secondaryInfoLabels.login_id}
-                        </Menu.Item>
+                        </MenuItem>
 
                         {this.props.studentGroupsEnabled && (
-                          <Menu.Item
+                          <MenuItem
                             key="group"
                             selected={this.props.selectedSecondaryInfo === 'group'}
                             onSelect={this.onShowGroup}
                           >
                             {studentRowHeaderConstants.secondaryInfoLabels.group}
-                          </Menu.Item>
+                          </MenuItem>
                         )}
 
-                        <Menu.Item
+                        <MenuItem
                           key="none"
                           selected={this.props.selectedSecondaryInfo === 'none'}
                           onSelect={this.onHideSecondaryInfo}
                         >
                           {studentRowHeaderConstants.secondaryInfoLabels.none}
-                        </Menu.Item>
-                      </Menu.Group>
+                        </MenuItem>
+                      </MenuGroup>
                     </Menu>
 
-                    <Menu.Separator />
+                    <MenuSeparator />
 
-                    <Menu.Group label={I18n.t('Show')} allowMultiple>
-                      <Menu.Item
+                    <MenuGroup label={I18n.t('Show')} allowMultiple>
+                      <MenuItem
                         key="inactive"
                         selected={this.props.selectedEnrollmentFilters.includes('inactive')}
                         onSelect={this.onToggleInactive}
                         disabled={this.props.disabled}
                       >
                         {studentRowHeaderConstants.enrollmentFilterLabels.inactive}
-                      </Menu.Item>
+                      </MenuItem>
 
-                      <Menu.Item
+                      <MenuItem
                         key="concluded"
                         selected={this.props.selectedEnrollmentFilters.includes('concluded')}
                         onSelect={this.onToggleConcluded}
                         disabled={this.props.disabled}
                       >
                         {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
-                      </Menu.Item>
-                    </Menu.Group>
+                      </MenuItem>
+                    </MenuGroup>
                   </Menu>
                 </div>
               </Grid.Col>

@@ -25,8 +25,22 @@ import StudentLastNameColumnHeader from './StudentLastNameColumnHeader'
 import StudentFirstNameColumnHeaderRenderer from './StudentFirstNameColumnHeaderRenderer'
 import TotalGradeColumnHeaderRenderer from './TotalGradeColumnHeaderRenderer'
 import TotalGradeOverrideColumnHeaderRenderer from './TotalGradeOverrideColumnHeaderRenderer'
+import type Gradebook from '../../Gradebook'
 
 export default class ColumnHeaderRenderer {
+  gradebook: Gradebook
+
+  factories: {
+    assignment: AssignmentColumnHeaderRenderer
+    assignment_group: AssignmentGroupColumnHeaderRenderer
+    custom_column: CustomColumnHeaderRenderer
+    student: StudentColumnHeaderRenderer
+    student_lastname: StudentColumnHeaderRenderer
+    student_firstname: StudentFirstNameColumnHeaderRenderer
+    total_grade: TotalGradeColumnHeaderRenderer
+    total_grade_override: TotalGradeOverrideColumnHeaderRenderer
+  }
+
   constructor(gradebook) {
     this.gradebook = gradebook
     this.factories = {

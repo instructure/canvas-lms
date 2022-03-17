@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
+import type Gradebook from '../../Gradebook'
 
 function getSubmission(student, assignmentId) {
   const submission = student[`assignment_${assignmentId}`]
@@ -188,6 +189,8 @@ function getProps(column, gradebook, options) {
 }
 
 export default class AssignmentColumnHeaderRenderer {
+  gradebook: Gradebook
+
   constructor(gradebook) {
     this.gradebook = gradebook
   }

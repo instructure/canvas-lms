@@ -31,6 +31,8 @@ import ColumnHeader from './ColumnHeader'
 
 const I18n = useI18nScope('gradebook')
 
+const {Item: MenuItem, Group: MenuGroup, Separator: MenuSeparator} = Menu as any
+
 function renderTrigger(ref) {
   return (
     <IconButton
@@ -77,7 +79,26 @@ TotalDetailContent.propTypes = {
   viewUngradedAsZero: bool.isRequired
 }
 
-export default class TotalGradeColumnHeader extends ColumnHeader {
+type Props = {
+  grabFocus?: boolean
+  gradeDisplay: any
+  isRunningScoreToUngraded?: boolean
+  onApplyScoreToUngraded?: any
+  onMenuDismiss: any
+  position: any
+  sortBySetting: any
+  viewUngradedAsZero: any
+}
+
+type State = {
+  menuShown: boolean
+  hasFocus: boolean
+  skipFocusOnClose: boolean
+}
+
+export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
+  bindOptionsMenu: any
+
   static propTypes = {
     sortBySetting: shape({
       direction: string.isRequired,
@@ -166,10 +187,10 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                     trigger={renderTrigger(ref => (this.optionsMenuTrigger = ref))}
                   >
                     <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
-                      <Menu.Group
+                      <MenuGroup
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
-                        <Menu.Item
+                        <MenuItem
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'ascending'
@@ -178,9 +199,9 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeAscending}
                         >
                           <span>{I18n.t('Grade - Low to High')}</span>
-                        </Menu.Item>
+                        </MenuItem>
 
-                        <Menu.Item
+                        <MenuItem
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'descending'
@@ -189,13 +210,13 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeDescending}
                         >
                           <span>{I18n.t('Grade - High to Low')}</span>
-                        </Menu.Item>
-                      </Menu.Group>
+                        </MenuItem>
+                      </MenuGroup>
                     </Menu>
 
-                    {showSeparator && <Menu.Separator />}
+                    {showSeparator && <MenuSeparator />}
                     {!gradeDisplay.hidden && (
-                      <Menu.Item
+                      <MenuItem
                         disabled={this.props.gradeDisplay.disabled}
                         onSelect={this.switchGradeDisplay}
                       >
@@ -204,36 +225,36 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                             ? I18n.t('Display as Percentage')
                             : I18n.t('Display as Points')}
                         </span>
-                      </Menu.Item>
+                      </MenuItem>
                     )}
 
                     {!position.isInFront && (
-                      <Menu.Item onSelect={position.onMoveToFront}>
+                      <MenuItem onSelect={position.onMoveToFront}>
                         <span data-menu-item-id="total-grade-move-to-front">
                           {I18n.t('Move to Front')}
                         </span>
-                      </Menu.Item>
+                      </MenuItem>
                     )}
 
                     {!position.isInBack && (
-                      <Menu.Item onSelect={position.onMoveToBack}>
+                      <MenuItem onSelect={position.onMoveToBack}>
                         <span data-menu-item-id="total-grade-move-to-back">
                           {I18n.t('Move to End')}
                         </span>
-                      </Menu.Item>
+                      </MenuItem>
                     )}
 
-                    {this.props.onApplyScoreToUngraded && <Menu.Separator />}
+                    {this.props.onApplyScoreToUngraded && <MenuSeparator />}
 
                     {this.props.onApplyScoreToUngraded && (
-                      <Menu.Item
+                      <MenuItem
                         disabled={this.props.isRunningScoreToUngraded}
                         onSelect={this.props.onApplyScoreToUngraded}
                       >
                         {this.props.isRunningScoreToUngraded
                           ? I18n.t('Applying Score to Ungraded')
                           : I18n.t('Apply Score to Ungraded')}
-                      </Menu.Item>
+                      </MenuItem>
                     )}
                   </Menu>
                 </div>
