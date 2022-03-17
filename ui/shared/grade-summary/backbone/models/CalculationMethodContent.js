@@ -15,10 +15,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
-const I18n = useI18nScope('CalculationMethodContent');
+const I18n = useI18nScope('CalculationMethodContent')
 
 _.mixin({
   sum(array, accessor = null, start = 0) {
@@ -84,7 +84,7 @@ export default class CalculationMethodContent {
   }
 
   exampleScoreIntegers() {
-    return [1, 4, 2, 3, 5, 3, 6]
+    return [1, 4, 2, 3, 5, 3, 6, 1, 4, 2, 3, 5, 3, 6]
   }
 
   nMastery() {
@@ -112,7 +112,7 @@ export default class CalculationMethodContent {
           },
           n_mastery: {
             calculationIntLabel: I18n.t('# of times'),
-            calculationIntDescription: I18n.t('must be between 1 and 5')
+            calculationIntDescription: I18n.t('must be between 1 and 10')
           },
           lastest: {
             method: I18n.t('Most Recent Score')
@@ -133,7 +133,7 @@ export default class CalculationMethodContent {
           },
           n_mastery: {
             calculationIntLabel: I18n.t('Items: '),
-            calculationIntDescription: I18n.t('Between 1 and 5')
+            calculationIntDescription: I18n.t('Between 1 and 10')
           },
           lastest: {
             method: I18n.t('Latest Score')
@@ -189,7 +189,7 @@ export default class CalculationMethodContent {
         exampleScores: this.exampleScoreIntegers().join(', '),
         exampleResult: numberFormat.outcomeScore(this.nMastery()),
         defaultInt: 5,
-        validRange: [1, 5]
+        validRange: [1, 10]
       },
       latest: {
         method: alternativeCalculationValues.lastest.method,

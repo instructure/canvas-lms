@@ -31,7 +31,7 @@ class OutcomeCalculationMethod < ApplicationRecord
 
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
-    "n_mastery" => (1..5),
+    "n_mastery" => (1..10),
     "highest" => [].freeze,
     "latest" => [].freeze,
   }.freeze

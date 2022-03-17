@@ -82,6 +82,43 @@ class LearningOutcomeGroup < ActiveRecord::Base
     )
   end
 
+  def self.bulk_link_outcome(outcome, groups, root_account_id:)
+    groups = groups.preload(:learning_outcome_group, :context)
+    timestamp = Time.now.utc
+    touch_set = Set.new
+
+    new_tags = groups.map do |group|
+      touch_set << group.context
+      tgroup = group
+      while tgroup && !touch_set.include?(tgroup)
+        touch_set << tgroup
+        tgroup = tgroup.learning_outcome_group
+      end
+
+      {
+        tag_type: "learning_outcome_association",
+        content_id: outcome.id,
+        content_type: outcome.class,
+        associated_asset_id: group.id,
+        associated_asset_type: group.class,
+        context_id: group.context_id || group.id,
+        context_type: group.context_id.present? ? group.context_type : LearningOutcomeGroup,
+        root_account_id: root_account_id,
+        title: outcome.title,
+        comments: "",
+        context_code: "#{group.context_type.to_s.underscore}_#{group.context_id}",
+        created_at: timestamp,
+        updated_at: timestamp,
+      }
+    end
+
+    ContentTag.insert_all(new_tags)
+
+    touch_set.group_by(&:class).each do |cls, idset|
+      cls.where(id: idset).update_all(updated_at: timestamp)
+    end
+  end
+
   def sync_source_group
     transaction do
       return unless source_outcome_group
