@@ -111,6 +111,22 @@ RSpec.describe Mutations::AddConversationMessage do
     expect(cm.conversation_id).to eq @conversation.conversation_id
   end
 
+  it "when context is nil, still able to add a message" do
+    nil_context_convo = conversation
+    nil_context_convo.conversation.update_attribute(:context, nil)
+
+    result = run_mutation(conversation_id: nil_context_convo.conversation_id, body: "This should still send", recipients: [@teacher.id.to_s])
+
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "addConversationMessage", "errors")).to be nil
+    expect(
+      result.dig("data", "addConversationMessage", "conversationMessage", "body")
+    ).to eq "This should still send"
+    cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
+    expect(cm).to_not be nil
+    expect(cm.conversation_id).to eq nil_context_convo.conversation_id
+  end
+
   it "requires permissions" do
     conversation
     @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
