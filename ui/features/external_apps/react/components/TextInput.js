@@ -28,9 +28,9 @@ export default createReactClass({
 
   propTypes: {
     defaultValue: PropTypes.string,
-    label: PropTypes.string,
+    renderLabel: PropTypes.string,
     id: PropTypes.string,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     hintText: PropTypes.string,
     placeholder: PropTypes.string,
     errors: PropTypes.object,
@@ -41,14 +41,14 @@ export default createReactClass({
     return (
       <div className={this.getClassNames()}>
         <label>
-          {this.props.label}
+          {this.props.renderLabel}
           <input
             ref="input"
             type="text"
             defaultValue={this.state.value}
             className="form-control input-block-level"
-            placeholder={this.props.placeholder || this.props.label}
-            required={this.props.required ? 'required' : null}
+            placeholder={this.props.placeholder || this.props.renderLabel}
+            required={this.props.isRequired ? 'required' : null}
             onChange={this.handleChange}
             aria-invalid={!!this.getErrorMessage()}
             name={this.props.name || null}
