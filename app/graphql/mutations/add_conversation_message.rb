@@ -44,7 +44,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       current_user: current_user,
       session: session,
       recipients: input[:recipients],
-      context_code: input[:context_code] || conversation.conversation.context.asset_string,
+      context_code: input[:context_code] || conversation.conversation.context&.asset_string || nil,
       message_ids: input[:included_messages],
       body: input[:body],
       attachment_ids: input[:attachment_ids],
