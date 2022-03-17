@@ -17,7 +17,7 @@
  */
 
 import slickgrid from 'slickgrid'
-import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index'
+import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index.js'
 
 const {Editors, Grid} = slickgrid
 
