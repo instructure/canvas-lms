@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {COURSE, ACCOUNT} from '@canvas/permissions/react/propTypes'
 
-const I18n = useI18nScope('permissions_detail_sections');
+const I18n = useI18nScope('permissions_detail_sections')
 
 export const PERMISSION_DETAIL_SECTIONS = [
   {title: () => I18n.t('What it does'), key: 'what_it_does'},

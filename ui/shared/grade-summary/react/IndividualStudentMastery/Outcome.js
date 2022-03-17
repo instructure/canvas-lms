@@ -19,7 +19,7 @@
 import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
@@ -35,7 +35,7 @@ import TruncateWithTooltip from '../TruncateWithTooltip'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import * as shapes from './shapes'
 
-const I18n = useI18nScope('IndividualStudentMasteryOutcome');
+const I18n = useI18nScope('IndividualStudentMasteryOutcome')
 
 class Outcome extends React.Component {
   static propTypes = {

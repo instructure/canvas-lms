@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Avatar from './Avatar'
 import LastActivity from './LastActivity'
 import MetricsList from './MetricsList'
@@ -35,7 +35,7 @@ import {Tray} from '@instructure/ui-tray'
 
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('student_context_trayStudentContextTray');
+const I18n = useI18nScope('student_context_trayStudentContextTray')
 
 const courseShape = PropTypes.shape({
   permissions: PropTypes.shape({}).isRequired,

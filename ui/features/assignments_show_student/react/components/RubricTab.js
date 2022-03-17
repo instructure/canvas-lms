@@ -18,7 +18,7 @@
 import {arrayOf} from 'prop-types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'
 import React, {useState} from 'react'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const ENROLLMENT_STRINGS = {
   StudentEnrollment: I18n.t('Student'),

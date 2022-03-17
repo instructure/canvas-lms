@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('shared.error_form');
+const I18n = useI18nScope('shared.error_form')
 
 $(document).ready(() => {
   $('#error_username').hide()

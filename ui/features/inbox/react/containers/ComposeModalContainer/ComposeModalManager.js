@@ -26,13 +26,13 @@ import {
   COURSES_QUERY,
   REPLY_CONVERSATION_QUERY
 } from '../../../graphql/Queries'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 const ComposeModalManager = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

@@ -23,11 +23,11 @@ import GenerateLink from './GenerateLink'
 import DownloadLink from './DownloadLink'
 import ApiProgressBar from '@canvas/progress/react/components/ApiProgressBar'
 import CourseEpubExportStore from './CourseStore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import classnames from 'classnames'
 
-const I18n = useI18nScope('epub_exports');
+const I18n = useI18nScope('epub_exports')
 
 class CourseListItem extends React.Component {
   static displayName = 'CourseListItem'

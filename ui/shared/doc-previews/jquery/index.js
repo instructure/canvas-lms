@@ -17,7 +17,7 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
@@ -27,7 +27,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'/*  /\$\.uniq/, capitaliz
 import '@canvas/loading-image'
 import sanitizeUrl from 'sanitize-url'
 
-const I18n = useI18nScope('jquery_doc_previews');
+const I18n = useI18nScope('jquery_doc_previews')
 
 // first element in array is if scribd can handle it, second is if google can.
 const previewableMimeTypes = {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import {func} from 'prop-types'
 
@@ -42,7 +42,7 @@ import StudentsTable from './StudentsTable'
 import Filters from './Filters'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const STUDENT_SEARCH_DELAY = 750
 const MIN_SEARCH_CHARS = 3

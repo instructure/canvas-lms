@@ -17,7 +17,7 @@
  */
 
 import round from 'round'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -28,7 +28,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
-const I18n = useI18nScope('grading_standards');
+const I18n = useI18nScope('grading_standards')
 
 function roundedNumber(val) {
   return I18n.n(round(val, round.DEFAULT))

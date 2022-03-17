@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 const columns = [
   {

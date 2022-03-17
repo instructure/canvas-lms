@@ -17,10 +17,10 @@
  */
 
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, { useState } from 'react'
 
-const I18n = useI18nScope('quiz_statistics');
+const I18n = useI18nScope('quiz_statistics')
 
 const UserListDialog = ({answer_id, user_names}) => {
   const [displayingDialog, displayDialog] = useState(false)

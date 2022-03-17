@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import RubricAddCriterionPopover from '../react/components/RubricAddCriterionPopover'
 import RubricManagement from '../react/components/RubricManagement'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import changePointsPossibleToMatchRubricDialog from '../jst/changePointsPossibleToMatchRubricDialog.handlebars'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -40,7 +40,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('edit_rubric');
+const I18n = useI18nScope('edit_rubric')
 
 const rubricEditing = {
   htmlBody: null,

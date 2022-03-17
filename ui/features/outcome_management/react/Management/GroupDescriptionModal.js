@@ -19,14 +19,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {outcomeGroupShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const GroupDescriptionModal = ({outcomeGroup, isOpen, onCloseHandler}) => (
   <Modal

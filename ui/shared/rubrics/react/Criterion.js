@@ -27,7 +27,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
 import {IconOutcomesLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import numberHelper from '@canvas/i18n/numberHelper'
 import {assessmentShape, criterionShape} from './types'
@@ -36,7 +36,7 @@ import Comments, {CommentText} from './Comments'
 import Points from './Points'
 import Ratings from './Ratings'
 
-const I18n = useI18nScope('edit_rubricCriterion');
+const I18n = useI18nScope('edit_rubricCriterion')
 
 const OutcomeIcon = () => (
   <span>

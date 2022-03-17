@@ -18,7 +18,7 @@
 
 import React, {useRef} from 'react'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -37,7 +37,7 @@ import type {
   StudentGroupCategoryMap
 } from '../gradebook.d'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 const {Item} = Flex as any
 const {Option, Group: OptionGroup} = SimpleSelect as any

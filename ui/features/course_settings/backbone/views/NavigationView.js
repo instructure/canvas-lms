@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
-const I18n = useI18nScope('course_navigation');
+const I18n = useI18nScope('course_navigation')
 /*
 xsslint jqueryObject.identifier dragObject current_item
 */

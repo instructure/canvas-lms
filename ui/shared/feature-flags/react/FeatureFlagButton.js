@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import {bool, object, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -36,7 +36,7 @@ import {showConfirmationDialog} from './ConfirmationDialog'
 
 import * as flagUtils from './util'
 
-const I18n = useI18nScope('feature_flags');
+const I18n = useI18nScope('feature_flags')
 
 function setFlag(flagName, state) {
   return doFetchApi({

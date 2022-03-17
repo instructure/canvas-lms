@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import '@canvas/forms/jquery/jquery.instructure_forms'
@@ -25,7 +25,7 @@ import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-pageless'
 
-const I18n = useI18nScope('user_notes');
+const I18n = useI18nScope('user_notes')
 
 ready(function() {
   if (ENV.user_note_list_pageless_options) {

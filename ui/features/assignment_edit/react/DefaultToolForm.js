@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState, useEffect} from 'react'
 
@@ -30,7 +30,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('DefaultToolForm');
+const I18n = useI18nScope('DefaultToolForm')
 
 const DefaultToolForm = props => {
   const [launchDefinitions, setLaunchDefinitions] = useState([])

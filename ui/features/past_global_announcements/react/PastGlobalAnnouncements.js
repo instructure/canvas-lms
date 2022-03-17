@@ -21,9 +21,9 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import AnnouncementFactory from './AnnouncementFactory'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('past_global_announcements');
+const I18n = useI18nScope('past_global_announcements')
 
 const PastGlobalAnnouncements = () => {
   const [selectedIndex, setSelectedIndex] = useState(0)

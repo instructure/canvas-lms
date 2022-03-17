@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import React, {useRef} from 'react'
 import {func, string, bool} from 'prop-types'
@@ -29,7 +29,7 @@ import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
 import SearchItemSelector from './SearchItemSelector'
 import ModulePositionPicker from './ModulePositionPicker'
 
-const I18n = useI18nScope('course_and_module_picker');
+const I18n = useI18nScope('course_and_module_picker')
 
 CourseAndModulePicker.propTypes = {
   selectedCourseId: string,

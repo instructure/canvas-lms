@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -26,7 +26,7 @@ import {IconGradebookLine, IconNotGradedLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export const InlineGrade = props => {
   const gradeStatusIcon = () => {

@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import CourseHomeDialog from './Dialog'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('home_page_prompt');
+const I18n = useI18nScope('home_page_prompt')
 
 class HomePagePromptContainer extends React.Component {
   static propTypes = {

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('sharedGradeFormatHelper');
+const I18n = useI18nScope('sharedGradeFormatHelper')
 
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup() {

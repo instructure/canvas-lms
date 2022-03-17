@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import '@canvas/quizzes/jquery/behaviors/quiz_selectmenu'
 
-const I18n = useI18nScope('quizzes.quiz_submission');
+const I18n = useI18nScope('quizzes.quiz_submission')
 
 $(document).ready(() => {
   $('#questions.assessment_results .question').hover(

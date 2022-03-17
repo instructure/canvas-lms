@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import submissionDetailsDialog from '../jst/SubmissionDetailsDialog.handlebars'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import originalityReportSubmissionKey from '@canvas/grading/originalityReportSubmissionKey'
 import {extractDataForTurnitin} from '@canvas/grading/Turnitin'
@@ -33,7 +33,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-tinypubsub'
 
-const I18n = useI18nScope('submission_details_dialog');
+const I18n = useI18nScope('submission_details_dialog')
 
 export default class SubmissionDetailsDialog {
   constructor(assignment, student, options) {
