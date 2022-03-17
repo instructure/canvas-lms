@@ -156,7 +156,7 @@ class ExternalToolsController < ApplicationController
     end
 
     placement = placement_from_params
-    add_crumb(@context.name, named_context_url(@context, :context_url))
+    add_crumb(@tool.name)
     @lti_launch = lti_launch(
       tool: @tool,
       selection_type: placement,
@@ -384,7 +384,7 @@ class ExternalToolsController < ApplicationController
       placement = placement_from_params
       return unless find_tool(params[:id], placement)
 
-      add_crumb(@context.name, named_context_url(@context, :context_url))
+      add_crumb(@tool.name)
 
       @return_url = named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", { include_host: true })
       @redirect_return = true
@@ -443,7 +443,6 @@ class ExternalToolsController < ApplicationController
   end
 
   def resource_selection
-    add_crumb(@context.name, named_context_url(@context, :context_url))
     placement = params[:placement] || params[:launch_type]
     selection_type = placement || "resource_selection"
     selection_type = "editor_button" if params[:editor]
