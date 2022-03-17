@@ -1097,6 +1097,7 @@ class DiscussionTopic < ActiveRecord::Base
         dtsv.save
       end
     end
+    discussion_topic_section_visibilities.reload
     self.workflow_state = can_unpublish? ? "unpublished" : "active"
     save
 
