@@ -379,6 +379,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.gradingPeriodSet = this.options.grading_period_set
       ? GradingPeriodSetsApi.deserializeSet(this.options.grading_period_set)
       : null
+    this.gridDisplaySettings = getInitialGridDisplaySettings(
+      this.options.settings,
+      this.props.colors
+    )
     this.gradingPeriodId = this.getCurrentGradingPeriod()
 
     this.state = {
@@ -428,10 +432,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     $.subscribe('currentSection/change', this.updateCurrentSection)
     this.courseContent = getInitialCourseContent(this.options)
     this.gradebookContent = getInitialGradebookContent(this.options)
-    this.gridDisplaySettings = getInitialGridDisplaySettings(
-      this.options.settings,
-      this.props.colors
-    )
     this.contentLoadStates = getInitialContentLoadStates(this.options)
     this.actionStates = getInitialActionStates()
     this.setAssignments({})
@@ -1962,7 +1962,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
       return acc
-    }, []);
+    }, [])
   }
 
   getStudentOrder = () => {
@@ -2394,7 +2394,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   setVisibleGridColumns = () => {
     let assignmentGroupId, ref1
     let parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId);
+      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
     })
     if (this.gridDisplaySettings.showSeparateFirstLastNames) {
       parentColumnIds = ['student_lastname', 'student_firstname'].concat(parentColumnIds)
@@ -3110,7 +3110,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   toggleNotesColumn = () => {
     const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId);
+      return !/^custom_col_/.test(columnId)
     })
     const customColumnIds = this.listVisibleCustomColumns().map(column => {
       return getCustomColumnId(column.id)
