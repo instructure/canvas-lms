@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import AssignmentRowCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell.js'
+import AssignmentRowCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell'
 
 QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
   let $container

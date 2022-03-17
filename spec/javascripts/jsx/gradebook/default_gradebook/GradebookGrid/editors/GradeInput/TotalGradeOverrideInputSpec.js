@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import GradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/GradeInput/index.js'
+import GradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/GradeInput/index'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 
 /* eslint-disable qunit/no-identical-names */

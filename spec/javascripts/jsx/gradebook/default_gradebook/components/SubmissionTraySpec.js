@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 
-import SubmissionTray from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTray.js'
+import SubmissionTray from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTray'
 import GradeInputDriver from './GradeInput/GradeInputDriver'
 
 /* eslint qunit/no-identical-names: 0 */
