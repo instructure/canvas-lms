@@ -313,7 +313,7 @@ module OutcomeCommon
     f(".add_outcome_link").click
     wait_for_tiny(f(".outcomes-content textarea[name=description]"))
     below_range = 0
-    above_range = 6
+    above_range = 11
     replace_content(f(".outcomes-content input[name=title]"), "n Number of Times")
     click_option("#calculation_method", "n Number of Times")
     # enter invalid number below range
