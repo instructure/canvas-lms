@@ -19,8 +19,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {getProps} from './StudentColumnHeaderRenderer.utils'
+import type Gradebook from '../../Gradebook'
 
 export default class StudentColumnHeaderRenderer {
+  gradebook: Gradebook
+
+  element: any
+
+  columnName: string
+
   constructor(gradebook, element, columnName) {
     this.gradebook = gradebook
     this.element = element

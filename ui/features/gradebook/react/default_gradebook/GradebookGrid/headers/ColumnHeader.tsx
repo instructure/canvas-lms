@@ -19,7 +19,9 @@
 import React from 'react'
 import {func} from 'prop-types'
 
-export default class ColumnHeader extends React.Component {
+export default class ColumnHeader<Props, State> extends React.Component<Props, State> {
+  optionsMenuTrigger: any
+
   static propTypes = {
     addGradebookElement: func,
     removeGradebookElement: func,

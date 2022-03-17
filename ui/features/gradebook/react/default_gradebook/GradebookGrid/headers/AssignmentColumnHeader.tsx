@@ -35,6 +35,8 @@ import ColumnHeader from './ColumnHeader'
 
 import {Link} from '@instructure/ui-link'
 
+const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
+
 const I18n = useI18nScope('gradebook')
 
 function SecondaryDetailLine(props) {
@@ -107,7 +109,39 @@ function speedGraderUrl(assignment) {
   )
 }
 
-export default class AssignmentColumnHeader extends ColumnHeader {
+type Props = {
+  allStudents: any
+  assignment: any
+  curveGradesAction: any
+  downloadSubmissionsAction: any
+  enterGradesAsSetting: any
+  getCurrentlyShownStudents: any
+  hideGradesAction: any
+  messageAttachmentUploadFolderId: string
+  onMenuDismiss: any
+  postGradesAction: any
+  reuploadSubmissionsAction: any
+  setDefaultGradeAction: any
+  showGradePostingPolicyAction: any
+  showMessageStudentsWithObserversDialog: any
+  showUnpostedMenuItem: any
+  sortBySetting: any
+  submissionsLoaded: boolean
+}
+
+type State = {
+  hasFocus: boolean
+  isMenuFocused: boolean
+  isMenuOpen: boolean
+  menuShown: boolean
+  skipFocusOnClose: boolean
+}
+
+export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
+  assignmentLink: any
+
+  enterGradesAsMenuContent: any
+
   static propTypes = {
     ...ColumnHeader.propTypes,
 
@@ -244,6 +278,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     // this is because the onToggle handler in ColumnHeader.js is going to get
     // called synchronously, before the SetState takes effect, and it needs to
     // know to skipFocusOnClose
+    // @ts-ignore
     this.state.skipFocusOnClose = true
 
     this.setState({skipFocusOnClose: true}, () => action.onSelect(this.focusAtEnd))
@@ -279,6 +314,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   handleSendMessageStudentsWho = () => {}
 
   showMessageStudentsWhoDialog = async () => {
+    // @ts-ignore
     this.state.skipFocusOnClose = true
     this.setState({skipFocusOnClose: true})
 
@@ -385,133 +421,133 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         onDismiss={this.props.onMenuDismiss}
       >
         <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
-          <Menu.Group label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
-            <Menu.Item
+          <MenuGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+            <MenuItem
               selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByGradeAscending}
             >
               {I18n.t('Grade - Low to High')}
-            </Menu.Item>
+            </MenuItem>
 
-            <Menu.Item
+            <MenuItem
               selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByGradeDescending}
             >
               {I18n.t('Grade - High to Low')}
-            </Menu.Item>
+            </MenuItem>
 
-            <Menu.Item
+            <MenuItem
               selected={selectedSortSetting === 'missing'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByMissing}
             >
               {I18n.t('Missing')}
-            </Menu.Item>
+            </MenuItem>
 
-            <Menu.Item
+            <MenuItem
               selected={selectedSortSetting === 'late'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByLate}
             >
               {I18n.t('Late')}
-            </Menu.Item>
+            </MenuItem>
 
             {this.props.showUnpostedMenuItem && (
-              <Menu.Item
+              <MenuItem
                 selected={selectedSortSetting === 'unposted'}
                 disabled={sortBySetting.disabled}
                 onSelect={sortBySetting.onSortByUnposted}
               >
                 {I18n.t('Unposted')}
-              </Menu.Item>
+              </MenuItem>
             )}
-          </Menu.Group>
+          </MenuGroup>
         </Menu>
 
-        <Menu.Item href={speedGraderUrl(this.props.assignment)} target="_blank">
+        <MenuItem href={speedGraderUrl(this.props.assignment)} target="_blank">
           {I18n.t('SpeedGrader')}
-        </Menu.Item>
+        </MenuItem>
 
-        <Menu.Item
+        <MenuItem
           disabled={!this.props.submissionsLoaded || this.props.assignment.anonymizeStudents}
           onSelect={this.showMessageStudentsWhoDialog}
         >
           <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>
-        </Menu.Item>
+        </MenuItem>
 
-        <Menu.Item disabled={this.props.curveGradesAction.isDisabled} onSelect={this.curveGrades}>
+        <MenuItem disabled={this.props.curveGradesAction.isDisabled} onSelect={this.curveGrades}>
           <span data-menu-item-id="curve-grades">{I18n.t('Curve Grades')}</span>
-        </Menu.Item>
+        </MenuItem>
 
-        <Menu.Item
+        <MenuItem
           disabled={this.props.setDefaultGradeAction.disabled}
           onSelect={this.setDefaultGrades}
         >
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
-        </Menu.Item>
+        </MenuItem>
 
         {this.props.postGradesAction.enabledForUser && (
-          <Menu.Item
+          <MenuItem
             disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
             onSelect={this.postGrades}
           >
             {labelForPostGradesAction(this.props.postGradesAction)}
-          </Menu.Item>
+          </MenuItem>
         )}
 
         {this.props.postGradesAction.enabledForUser && (
-          <Menu.Item
+          <MenuItem
             disabled={!this.props.hideGradesAction.hasGradesOrCommentsToHide}
             onSelect={this.hideGrades}
           >
             {labelForHideGradesAction(this.props.hideGradesAction)}
-          </Menu.Item>
+          </MenuItem>
         )}
 
-        {!this.props.enterGradesAsSetting.hidden && <Menu.Separator />}
+        {!this.props.enterGradesAsSetting.hidden && <MenuSeparator />}
 
         {!this.props.enterGradesAsSetting.hidden && (
           <Menu contentRef={this.bindEnterGradesAsMenuContent} label={I18n.t('Enter Grades as')}>
-            <Menu.Group
+            <MenuGroup
               label={<ScreenReaderContent>{I18n.t('Enter Grades as')}</ScreenReaderContent>}
               onSelect={this.onEnterGradesAsSettingSelect}
               selected={[this.props.enterGradesAsSetting.selected]}
             >
-              <Menu.Item value="points">{I18n.t('Points')}</Menu.Item>
+              <MenuItem value="points">{I18n.t('Points')}</MenuItem>
 
-              <Menu.Item value="percent">{I18n.t('Percentage')}</Menu.Item>
+              <MenuItem value="percent">{I18n.t('Percentage')}</MenuItem>
 
               {this.props.enterGradesAsSetting.showGradingSchemeOption && (
-                <Menu.Item value="gradingScheme">{I18n.t('Grading Scheme')}</Menu.Item>
+                <MenuItem value="gradingScheme">{I18n.t('Grading Scheme')}</MenuItem>
               )}
-            </Menu.Group>
+            </MenuGroup>
           </Menu>
         )}
 
         {!(
           this.props.downloadSubmissionsAction.hidden && this.props.reuploadSubmissionsAction.hidden
-        ) && <Menu.Separator />}
+        ) && <MenuSeparator />}
 
         {!this.props.downloadSubmissionsAction.hidden && (
-          <Menu.Item onSelect={this.downloadSubmissions}>
+          <MenuItem onSelect={this.downloadSubmissions}>
             <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
-          </Menu.Item>
+          </MenuItem>
         )}
 
         {!this.props.reuploadSubmissionsAction.hidden && (
-          <Menu.Item onSelect={this.reuploadSubmissions}>
+          <MenuItem onSelect={this.reuploadSubmissions}>
             <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
-          </Menu.Item>
+          </MenuItem>
         )}
 
-        {this.props.postGradesAction.enabledForUser && <Menu.Separator />}
+        {this.props.postGradesAction.enabledForUser && <MenuSeparator />}
 
         {this.props.postGradesAction.enabledForUser && (
-          <Menu.Item onSelect={this.showGradePostingPolicy}>
+          <MenuItem onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
-          </Menu.Item>
+          </MenuItem>
         )}
       </Menu>
     )

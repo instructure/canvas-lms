@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AssignmentGroupColumnHeader from './AssignmentGroupColumnHeader'
+import type Gradebook from '../../Gradebook'
 
 function getProps(column, gradebook, options) {
   const columnId = column.id
@@ -74,6 +75,8 @@ function getProps(column, gradebook, options) {
 }
 
 export default class AssignmentGroupColumnHeaderRenderer {
+  gradebook: Gradebook
+
   constructor(gradebook) {
     this.gradebook = gradebook
   }

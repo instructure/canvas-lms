@@ -19,8 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TotalGradeColumnHeader from './TotalGradeColumnHeader'
+import type Gradebook from '../../Gradebook'
 
-function getProps(column, gradebook, gridSupport, options) {
+function getProps(_column, gradebook, gridSupport, options) {
   const columnId = 'total_grade'
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
 
@@ -90,6 +91,8 @@ function getProps(column, gradebook, gridSupport, options) {
 }
 
 export default class TotalGradeColumnHeaderRenderer {
+  gradebook: Gradebook
+
   constructor(gradebook) {
     this.gradebook = gradebook
   }

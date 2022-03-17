@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import CustomColumnHeader from './CustomColumnHeader'
+import type Gradebook from '../../Gradebook'
 
 const I18n = useI18nScope('gradebook')
 
@@ -33,6 +34,8 @@ function getProps(column, gradebook, options) {
 }
 
 export default class CustomColumnHeaderRenderer {
+  gradebook: Gradebook
+
   constructor(gradebook) {
     this.gradebook = gradebook
   }

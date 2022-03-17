@@ -26,7 +26,17 @@ import ColumnHeader from './ColumnHeader'
 
 const I18n = useI18nScope('gradebook')
 
-export default class StudentFirstNameColumnHeader extends ColumnHeader {
+type Props = {
+  addGradebookElement?: any
+  removeGradebookElement?: any
+  onHeaderKeyDown?: any
+}
+
+type State = {
+  hasFocus: boolean
+}
+
+export default class StudentFirstNameColumnHeader extends ColumnHeader<Props, State> {
   static propTypes = {
     ...ColumnHeader.propTypes
   }

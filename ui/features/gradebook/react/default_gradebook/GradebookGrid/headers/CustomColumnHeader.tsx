@@ -17,15 +17,14 @@
  */
 
 import React from 'react'
-import {string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import ColumnHeader from './ColumnHeader'
 
-export default class CustomColumnHeader extends ColumnHeader {
-  static propTypes = {
-    title: string.isRequired
-  }
+type Props = {
+  title: string
+}
 
+export default class CustomColumnHeader extends ColumnHeader<Props, {}> {
   render() {
     return (
       <div className="Gradebook__ColumnHeaderContent">
