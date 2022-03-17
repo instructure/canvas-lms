@@ -26,15 +26,15 @@ const wrapper = document.getElementById('fixtures')
 const createElement = data => (
   <TextInput
     defaultValue={data.defaultValue}
-    label={data.label}
+    renderLabel={data.renderLabel}
     id={data.id}
-    required={data.required}
+    isRequired={data.isRequired}
     hintText={data.hintText}
     errors={data.errors}
   />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const inputNode = component.refs.input
   const hintNode = component.refs.hintText
@@ -50,9 +50,9 @@ QUnit.module('ExternalApps.TextInput', {
 test('renders', () => {
   const data = {
     defaultValue: 'Joe',
-    label: 'Name',
+    renderLabel: 'Name',
     id: 'name',
-    required: true,
+    isRequired: true,
     hintText: 'First Name',
     errors: {}
   }
@@ -63,12 +63,12 @@ test('renders', () => {
   equal(component.state.value, 'Joe')
 })
 
-test('renders without hint text and required', () => {
+test('renders without hint text and isRequired', () => {
   const data = {
     defaultValue: 'Joe',
-    label: 'Name',
+    renderLabel: 'Name',
     id: 'name',
-    required: false,
+    isRequired: false,
     hintText: null,
     errors: {}
   }
@@ -82,9 +82,9 @@ test('renders without hint text and required', () => {
 test('renders with error hint text', () => {
   const data = {
     defaultValue: '',
-    label: 'Name',
+    renderLabel: 'Name',
     id: 'name',
-    required: true,
+    isRequired: true,
     hintText: null,
     errors: {name: 'Must be present'}
   }
@@ -96,9 +96,9 @@ test('renders with error hint text', () => {
 test('modifies state when text is entered', () => {
   const data = {
     defaultValue: '',
-    label: 'Name',
+    renderLabel: 'Name',
     id: 'name',
-    required: true,
+    isRequired: true,
     hintText: 'First Name',
     errors: {}
   }
