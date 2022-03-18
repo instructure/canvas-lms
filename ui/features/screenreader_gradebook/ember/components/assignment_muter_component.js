@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
 import AssignmentMuter from '../../jquery/AssignmentMuter'
 
-const I18n = useI18nScope('sr_gradebook');
+const I18n = useI18nScope('sr_gradebook')
 
 // http://emberjs.com/guides/components/
 // http://emberjs.com/api/classes/Ember.Component.html

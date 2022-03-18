@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 
-const I18n = useI18nScope('blueprint_settingsCourseFilter');
+const I18n = useI18nScope('blueprint_settingsCourseFilter')
 
 const {func} = PropTypes
 const MIN_SEACH = 3 // min search term length for API

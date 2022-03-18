@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {func, bool, string, shape, arrayOf, oneOf} from 'prop-types'
 import {connect} from 'react-redux'
@@ -54,7 +54,7 @@ import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
 
-const I18n = useI18nScope('discussions_v2');
+const I18n = useI18nScope('discussions_v2')
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {

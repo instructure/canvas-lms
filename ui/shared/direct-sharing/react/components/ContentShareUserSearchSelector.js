@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {arrayOf, func, string} from 'prop-types'
 
@@ -26,7 +26,7 @@ import useContentShareUserSearchApi from '../effects/useContentShareUserSearchAp
 import UserSearchSelectorItem from './UserSearchSelectorItem'
 import {basicUser} from '@canvas/users/react/proptypes/user'
 
-const I18n = useI18nScope('user_search_selector');
+const I18n = useI18nScope('user_search_selector')
 
 ContentShareUserSearchSelector.propTypes = {
   courseId: string.isRequired,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import find_outcome from '@canvas/outcomes/find_outcome'
 import moveQuestionTemplate from '../jst/move_question.handlebars'
@@ -33,7 +33,7 @@ import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('question_bank');
+const I18n = useI18nScope('question_bank')
 
 export function updateAlignments(alignments) {
   $('.add_outcome_text')

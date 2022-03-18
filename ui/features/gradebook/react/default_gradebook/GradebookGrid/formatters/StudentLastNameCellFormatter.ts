@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
-import {getEnrollmentLabel, renderCell} from './StudentCellFormatter.utils'
+import {
+  getSecondaryDisplayInfo,
+  getEnrollmentLabel,
+  getOptions,
+  renderCell
+} from './StudentCellFormatter.utils'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
-export default class StudentFirstNameCellFormatter {
+export default class StudentLastNameCellFormatter {
   constructor(gradebook) {
-    this.options = {
-      courseId: gradebook.options.context_id
-    }
+    this.options = getOptions(gradebook)
   }
 
   render = (_row, _cell, _value, _columnDef, student /* dataContext */) => {
@@ -34,10 +37,13 @@ export default class StudentFirstNameCellFormatter {
       return ''
     }
 
+    const secondaryInfo = this.options.getSelectedSecondaryInfo()
+
     const options = {
       courseId: this.options.courseId,
-      displayName: student.first_name || I18n.t('<No first name>'),
+      displayName: student.last_name || I18n.t('<No last name>'),
       enrollmentLabel: getEnrollmentLabel(student),
+      secondaryInfo: getSecondaryDisplayInfo(student, secondaryInfo, this.options),
       studentId: student.id,
       url: `${student.enrollments[0].grades.html_url}#tab-assignments`
     }

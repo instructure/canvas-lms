@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {updateDiscussionTopicEntryCounts} from '../../utils/index'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
@@ -30,7 +30,7 @@ import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_topics_post');
+const I18n = useI18nScope('discussion_topics_post')
 
 export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

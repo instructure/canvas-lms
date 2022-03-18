@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {assessmentShape} from './types'
 
-const I18n = useI18nScope('edit_rubricPoints');
+const I18n = useI18nScope('edit_rubricPoints')
 
 export const roundIfWhole = n =>
   I18n.toNumber(n, {

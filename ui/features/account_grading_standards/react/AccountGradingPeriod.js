@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import axios from '@canvas/axios'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const I18n = useI18nScope('AccountGradingPeriod');
+const I18n = useI18nScope('AccountGradingPeriod')
 
 export default class AccountGradingPeriod extends React.Component {
   static propTypes = {

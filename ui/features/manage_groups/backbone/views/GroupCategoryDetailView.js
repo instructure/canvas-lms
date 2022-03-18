@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import RandomlyAssignMembersView from './RandomlyAssignMembersView'
@@ -28,7 +28,7 @@ import GroupCategoryCloneModal from '../../react/GroupCategoryCloneModal'
 import GroupCategoryMessageAllUnassignedModal from '../../react/GroupCategoryMessageAllUnassignedModal'
 import GroupImportModal from '../../react/GroupImportModal'
 
-const I18n = useI18nScope('groups');
+const I18n = useI18nScope('groups')
 
 export default class GroupCategoryDetailView extends View {
   static initClass() {

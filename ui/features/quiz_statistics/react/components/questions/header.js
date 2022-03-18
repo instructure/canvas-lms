@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 
-const I18n = useI18nScope('quiz_statistics');
+const I18n = useI18nScope('quiz_statistics')
 
 const QuestionHeader = ({position = 1, responseCount = 0, participantCount = 0, questionText}) => (
   <header>

@@ -20,9 +20,9 @@ import React from 'react'
 import ConfettiGenerator from 'confetti-js'
 import getRandomConfettiFlavor from './confettiFlavor'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('confetti');
+const I18n = useI18nScope('confetti')
 
 export default function Confetti() {
   const [visible, setVisible] = React.useState(true)

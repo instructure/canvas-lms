@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -28,7 +28,7 @@ import FlickrSearch from './FlickrSearch'
 import ImageSearch from './ImageSearch'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 
-const I18n = useI18nScope('course_images');
+const I18n = useI18nScope('course_images')
 
 const dropIcon = getIconByType('image')
 

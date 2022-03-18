@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -27,7 +27,7 @@ import LoadingSkeleton from './LoadingSkeleton'
 
 import ImportantInfo, {ImportantInfoShape, ImportantInfoEditHeader} from './ImportantInfo'
 
-const I18n = useI18nScope('important_info_announcement');
+const I18n = useI18nScope('important_info_announcement')
 
 const ImportantInfoLayout = ({isLoading, importantInfos, courseId}) => {
   const sectionHeading = <Heading level="h2">{I18n.t('Important Info')}</Heading>

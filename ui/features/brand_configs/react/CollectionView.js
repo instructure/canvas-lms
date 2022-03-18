@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {find, flatten, groupBy, map, sortBy} from 'lodash'
 import {arrayOf, func, shape, string} from 'prop-types'
@@ -33,7 +33,7 @@ import {Popover} from '@instructure/ui-popover'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('theme_collection_view');
+const I18n = useI18nScope('theme_collection_view')
 
 function NewTheme({onNewTheme, bases}) {
   return (

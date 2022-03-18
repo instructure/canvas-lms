@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import Popover from 'jquery-popover'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
@@ -39,7 +39,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import Conference from '@canvas/calendar-conferences/react/Conference'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
 
-const I18n = useI18nScope('calendar');
+const I18n = useI18nScope('calendar')
 
 const destroyArguments = fn =>
   (function() {

@@ -19,13 +19,13 @@
 import React, {Component} from 'react'
 import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import CompleteIncompleteGradeInput from './CompleteIncompleteGradeInput'
 import GradingSchemeGradeInput from './GradingSchemeGradeInput'
 import TextGradeInput from './TextGradeInput'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__GradeCell__GradingSchemeInput',

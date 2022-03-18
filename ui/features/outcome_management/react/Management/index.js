@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
 import TreeBrowser from './TreeBrowser'
@@ -45,7 +45,7 @@ import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/use
 import FindOutcomesModal from '../FindOutcomesModal'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const OutcomeManagementPanel = ({
   importNumber,

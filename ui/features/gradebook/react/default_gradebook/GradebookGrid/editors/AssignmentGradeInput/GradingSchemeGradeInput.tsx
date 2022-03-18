@@ -22,11 +22,11 @@ import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {hasGradeChanged, parseTextValue} from '@canvas/grading/GradeInputHelper'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 function formatGrade(submission, assignment, gradingScheme, pendingGradeInfo) {
   if (pendingGradeInfo) {

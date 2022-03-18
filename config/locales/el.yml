@@ -1440,6 +1440,7 @@ el:
         record_invalid: "Η επικύρωση απέτυχε: %{errors}"
         restrict_dependent_destroy: 
           has_one: "Δεν είναι δυνατή η διαγραφή της καταχώρισης επειδή υπάρχει εξαρτώμενη καταγραφή %{record}"
+  activity_13915493: "Δραστηριότητα λογαριασμού"
   activity_by_category_9c2033d1: "Δραστηριότητα ανά Κατηγορία"
   activity_by_date_878c5b49: "Δραστηριότητα ανά ημερομηνία"
   add_2nd_review_ea988088: "Προσθήκη 2ης Κριτικής"
@@ -1791,6 +1792,7 @@ el:
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε αυτή την καταχώριση;"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε αυτή την περίοδο βαθμολόγησης;"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Είσαστε σίγουρος/η πως θέλετε να διαγράψετε αυτόν το κανονισμό βαθμολόγισης;"
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε το αντίγραφο αυτού του μηνύματος; Αυτή η πράξη δεν μπορεί να αναιρεθεί."
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Είστε σίγουρος/η ότι θέλετε να το κάνετε; Δεν μπορεί να αναιρεθεί και θα παρακάμψει τους υπάρχοντες βαθμούς στο βιβλίο βαθμών."
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Είστε βέβαιος ότι επιθυμείτε να αφαιρέσετε αυτό το εργαλείο;"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Είστε βέβαιος ότι επιθυμείτε να αφαιρέσετε την εικόνα από το προφιλ αυτού του χρήστη;"
@@ -4566,6 +4568,8 @@ el:
         everyone_tab: Όλοι/ες
         groups: Ομάδες
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "Ο χρήστης δεν έχει ακόμη αποδεχθεί την πρόσκληση για το μάθημα"
         links: 
           edit_sections: "Επεξεργασία Τομέων"
           link_to_students: "Σύνδεσμος με Σπουδαστές"
@@ -5319,6 +5323,10 @@ el:
       student_settings: "Ρυθμίσεις Φοιτητή/ιας"
     edit_crumb: Διαμόρφωση
     edit_view: 
+      ? " saving"
+      : "Αποθήκευση σε εξέλιξη..."
+      ? " topic_title"
+      : "Τίτλος Θέματος"
       allow_liking: "Να επιτρέπεται η λειτουργία «Μου Αρέσει»"
       allow_threaded_replies: "Να επιτρέπονται οι απαντήσεις σε νήμα"
       attachment: "Επισυναπτόμενο αρχείο"
@@ -6051,6 +6059,7 @@ el:
   event_date_f05219e7: "Ημερομηνία Γεγονότος:"
   event_end_time_ef830e66: "Ώρα Τερματισμού του Γεγονότος"
   event_start_time_441b491f: "Ώρα Έναρξης του Γεγονότος"
+  event_title_7f1051a6: "Τίτλος Γεγονότος"
   every_665d821e: Κάθε
   everyone_854554dd: Όλοι/ες
   everyone_else_6c6dc7b6: "Όλοι οι Άλλοι"
@@ -6148,6 +6157,7 @@ el:
   external_tools_6e77821: "Εξωτερικά Εργαλεία"
   external_url_e9b87215: "Εξωτερικό Url"
   failed_307449e1: "Απέτυχε:"
+  failed_at_f471dfd3: "Απέτυχε σε"
   failed_please_report_the_following_error_code_to_y_42248d60: "Σφάλμα, παρακαλώ αναφέρετε τον ακόλουθο κωδικό σφάλματος στον διαχειριστή των υπολογιστικών συστημάτων σας: ErrorReport:%{error}"
   failed_to_create_webhook_b766cf5c: "Αποτυχία δημιουργίας webhook."
   failed_to_import_media_objects_4c1fcb4f: "Η εισαγωγή αντικειμένων πολυμέσων απέτυχε"
@@ -6988,6 +6998,7 @@ el:
       αρχείων.</mrk>  <mrk mid="7282" mtype="seg">Οι ομάδες μπορούν να συνεργάζονται σε έγγραφα ή και να προγραμματίζουν συνεδρίες μέσω διαδικτύου.</mrk>
       <mrk mid="7283" mtype="seg">Μοιάζει με μίνι μάθημα όπου μπορεί κανείς να δουλέψει μαζί με μικρότερο αριθμό σπουδαστών σε κάποιο
       πιο στοχευμένο πρότζεκτ.</mrk>
+  handler_7912052f: Χειριστής
   haven_t_been_graded_d7dee5bb: "Δεν έχει/έχουν βαθμολογηθεί"
   haven_t_submitted_yet_e63834db: "Δεν έχει γίνει ακόμη υποβολή"
   helpDialog: 
@@ -7384,6 +7395,7 @@ el:
     titles: 
       job_handler: "Διαχειριστής Εργασιών"
       last_error: "Τελευταίο Σφάλμα"
+  jobs_ec5d59d8: Εργασίες
   join_6cafecca: Συμμετοχή
   join_course_511e6cb3: "Συμμετοχή στο %{course}"
   join_group_group_name_871a5e3f: "Συμμετοχή στην ομάδα %{group_name}"
@@ -7420,6 +7432,7 @@ el:
     lock_module_until: "Κλειδωμένο έως"
   language_6b3e2c7c: Γλώσσα
   last_enrollment_activity_10fe15ba: "Δραστηριότητα Τελευταίας Εγγραφής"
+  last_error_a3832668: "Τελευταίο Σφάλμα"
   last_export_899a04c5: "Τελευταία Εξαγωγή"
   last_item_79583712: "<mrk mid=\"5897\" mtype=\"seg\">Τελευταίο Στοιχείο:</mrk> "
   last_login_54565109: "Τελευταία Σύνδεση"
@@ -7607,6 +7620,8 @@ el:
   lock_date_cannot_be_after_term_end_cf1a188f: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι μετά το τέλος του εξαμήνου"
   lock_date_cannot_be_before_due_date_ac30f54: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι πριν την καταληκτική ημερομηνία"
   locked_762f138b: Κλειδωμένο
+  locked_at_cda02889: "Κλειδώθηκε Στις"
+  locked_by_983c07f7: "Κλειδώθηκε Έως"
   locked_until_unlock_date_498ead5f: "Κλειδωμένο έως %{unlock_date}"
   log_in_5c66644d: Σύνδεση
   log_on_url_fc166e4c: "URL Σύνδεσης"
@@ -7767,6 +7782,7 @@ el:
       miscellaneous: Διάφορα
       operators: Χειριστές
       relationships: Σχέσεις
+  max_attempts_ae7b90bc: "Μέγιστος Αριθμός Προσπαθειών"
   max_dd02d615: μέγιστο
   max_users_groups_per_appointment_867c505b: "Μέγιστος αριθμός χρηστών/ομάδων ανά εργασία"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Μέγιστος αριθμός εργασιών στις οποίες μπορεί να παρευρεθεί κάποιος συμμετέχων"
@@ -8580,6 +8596,10 @@ el:
         course_starts_next_week: "Το μάθημά σου ξεκινάει την επόμενη εβδομάδα"
     dialog: 
       title: "Αποστολή απαντητικού μηνύματος"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "Κάντε κλικ εδώ για να συμμετάσχετε στη συνομιλία"
     email: 
       footer: |-
           <mrk mid="7197" mtype="seg">Λάβατε αυτό το email επειδή συμμετέχετε σε ένα ή περισσότερα μαθήματα μέσω του Canvas.</mrk>  <mrk mid="7198" mtype="seg">Για να αλλάξετε ή να απενεργοποιήσετε τις ειδοποιήσεις ηλεκτρονικού ταχυδρομείου, επισκεφθείτε το:</mrk>
@@ -9545,6 +9565,7 @@ el:
   move_module_item_77754119: "Μετακίνηση Ενότητας/Στοιχείου"
   move_outcome_ce497e6c: "Μετακίνηση Αποτελέσματος"
   move_outcome_group_cfa1a505: "Μετακίνηση Ομάδας Αποτελεσμάτων"
+  move_to_1c208ae5: "Μεταφορά Προς..."
   move_to_dde1a5e1: "Μεταφορά Προς..."
   moving_a4d552df: Μετακίνηση...
   multi_factor_authentication_configured_865b1bde: "Ρυθμίστηκε ο έλεγχος ταυτότητας πολλών παραγόντων "
@@ -10019,6 +10040,7 @@ el:
   order_301c3ac1: Σειρά
   ordered_by_recent_activity_112d33d5: "Κατάταξη με βάση Πρόσφατη Δραστηριότητα"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Οργάνωση epub βάσει τύπου περιεχομένου (ως προεπιλογή έχει οριστεί η οργάνωση βάσει ενότητας)."
+  original_job_id_d81afbb3: "ID Αρχικής Εργασίας"
   out_of_points_possible_8ab14f7: "απο %{points_possible}"
   outcome_groups: 
     invalid_file: "Μη έγκυρο αρχείο ομάδας αποτελεσμάτων"
@@ -10698,6 +10720,7 @@ el:
   primary_button_text_1f55d27b: "Κείμενο Πρωτεύοντος Κουμπιού"
   primary_color_button_b75db628: "Κουμπί βασικού χρώματος"
   primary_color_button_disabled_9081ddff: "Το κουμπί βασικού χρώματος έχει απενεργοποιηθεί"
+  priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
   processing_2fcc9739: "Γίνεται Επεξεργασία"
   product_name: Canvas
@@ -14015,6 +14038,7 @@ el:
     tab_location_error: "Αυτή η τοποθεσία καρτέλας δεν είναι έγκυρη"
     tab_unmanagable_error: "Το %{css_class} δεν είναι διαχειρίσιμο"
   tag_7bb005ff: Ετικέτα
+  tags_2b72a03b: Ετικέτες
   take_a_picture_d582acf1: "Λήψη Φωτογραφίας"
   take_the_quiz_87214d7e: "Κάντε το Κουίζ"
   take_the_quiz_again_8ea51a6c: "Κάντε ξανά το κουίζ"

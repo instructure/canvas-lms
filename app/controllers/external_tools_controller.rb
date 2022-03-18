@@ -111,7 +111,8 @@ class ExternalToolsController < ApplicationController
   #        "selection_width": 500,
   #        "selection_height": 500,
   #        "icon_url": "...",
-  #        "not_selectable": false
+  #        "not_selectable": false,
+  #        "deployment_id": null
   #      },
   #      { ...  }
   #     ]
@@ -310,6 +311,7 @@ class ExternalToolsController < ApplicationController
   # @response_field selection_height The pixel height of the iFrame that the tool will be rendered in
   # @response_field icon_url The url for the tool icon
   # @response_field not_selectable whether the tool is not selectable from assignment and modules
+  # @response_field deployment_id The unique identifier for the deployment of the tool
   #
   # @example_response
   #      {

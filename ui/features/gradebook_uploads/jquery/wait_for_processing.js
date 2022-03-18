@@ -18,10 +18,10 @@
 
 import $ from 'jquery'
 import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON' // eslint-disable-line no-unused-vars
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import 'spin.js/jquery.spin'
 
-const I18n = useI18nScope('gradebook_uploads');
+const I18n = useI18nScope('gradebook_uploads')
 
 async function sleep(milliseconds) {
   return new Promise(resolve => {

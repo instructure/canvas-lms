@@ -18,7 +18,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Header from './Header'
 import {Query} from 'react-apollo'
 import React, {Suspense, lazy} from 'react'
@@ -28,7 +28,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import ViewManager from './ViewManager'
 
-const I18n = useI18nScope('assignments_2_submission_histories_query');
+const I18n = useI18nScope('assignments_2_submission_histories_query')
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 

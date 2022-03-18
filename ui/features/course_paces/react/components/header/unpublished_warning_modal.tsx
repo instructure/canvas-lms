@@ -18,13 +18,13 @@
 
 import React from 'react'
 // @ts-ignore: TS doesn't understand i18n scoped imports
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
-const I18n = useI18nScope('unpublished_warning_modal');
+const I18n = useI18nScope('unpublished_warning_modal')
 
 export type UnpublishedWarningModalProps = {
   open: boolean

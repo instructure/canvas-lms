@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import fcUtil from '../fcUtil.coffee'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('calendar');
+const I18n = useI18nScope('calendar')
 
 const EVENT_TYPES = {
   todo_item: 'todo_item'

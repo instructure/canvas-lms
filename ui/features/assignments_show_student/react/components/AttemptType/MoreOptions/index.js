@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {IconFolderLine, IconLtiLine} from '@instructure/ui-icons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {useQuery} from 'react-apollo'
@@ -41,7 +41,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
-const I18n = useI18nScope('assignments_2_MoreOptions');
+const I18n = useI18nScope('assignments_2_MoreOptions')
 
 // An "abstract" component that renders a button allowing the user to upload a
 // file via an interface supplied by the caller.

@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {string, number, oneOfType, node} from 'prop-types'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('unread_badge');
+const I18n = useI18nScope('unread_badge')
 
 export default function UnreadBadge({unreadCount, totalCount, unreadLabel, totalLabel}) {
   return (

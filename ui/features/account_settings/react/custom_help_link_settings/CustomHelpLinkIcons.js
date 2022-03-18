@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   IconSettingsLine,
   IconFolderLine,
@@ -28,7 +28,7 @@ import {
 } from '@instructure/ui-icons'
 import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
 
-const I18n = useI18nScope('custom_help_link');
+const I18n = useI18nScope('custom_help_link')
 
 export default function CustomHelpLinkIcons(props) {
   const {defaultValue} = props

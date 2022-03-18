@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import React from 'react'
@@ -40,7 +40,7 @@ import 'jqueryui/tooltip'
 import '@canvas/rails-flash-notifications'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
-const I18n = useI18nScope('AssignmentListItemView');
+const I18n = useI18nScope('AssignmentListItemView')
 
 let AssignmentListItemView
 

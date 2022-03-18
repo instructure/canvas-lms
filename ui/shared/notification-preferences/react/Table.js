@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import NotificationPreferencesSetting from './Setting'
 import {NotificationPreferencesShape} from './Shape'
 import React, {useEffect, useState} from 'react'
@@ -30,7 +30,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('notification_preferences');
+const I18n = useI18nScope('notification_preferences')
 
 const formattedCategoryNames = {
   courseActivities: () => I18n.t('Course Activities'),

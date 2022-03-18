@@ -21,11 +21,11 @@ import $ from 'jquery'
 import {shape, func, object} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
 import preventDefault from 'prevent-default'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
-const I18n = useI18nScope('MobileNavigation');
+const I18n = useI18nScope('MobileNavigation')
 
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))

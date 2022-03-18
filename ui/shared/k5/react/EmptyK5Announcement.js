@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string, bool} from 'prop-types'
 import {View} from '@instructure/ui-view'
@@ -27,7 +27,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {AccessibleContent, PresentationContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('empty_homeroom_announcement');
+const I18n = useI18nScope('empty_homeroom_announcement')
 
 export const K5AddAnnouncementButton = ({courseUrl, courseName}) => {
   return (
