@@ -338,7 +338,7 @@
         <div class="tall-row">
           <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)) %>
           <div class="aside palign">
-            <%= t("This influences the user interface for setting due dates. It does not change when any existing assignment is due.") %>
+            <%= t("This influences the user interface for setting due dates. It does not change the time due for any existing assignments.") %>
           </div>
         </div>
       </div>
