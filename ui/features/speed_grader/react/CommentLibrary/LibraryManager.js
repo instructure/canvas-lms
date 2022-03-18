@@ -22,7 +22,7 @@ import {useQuery, useMutation, useLazyQuery} from 'react-apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import useDebouncedSearchTerm from '@canvas/direct-sharing/react/hooks/useDebouncedSearchTerm'
+import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import {
   DELETE_COMMENT_MUTATION,
   CREATE_COMMENT_MUTATION,
