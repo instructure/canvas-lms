@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import UploadMedia from '../index'
 
@@ -75,6 +75,54 @@ describe('Upload Media', () => {
       const {getByText} = renderComponent({tabs: {record: true, upload: true}})
       expect(getByText('Computer')).toBeInTheDocument()
       expect(getByText('Record')).toBeInTheDocument()
+    })
+  })
+
+  describe('when the tabs prop changes', () => {
+    it('recomputes the selected panel', () => {
+      const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
+
+      // Initial render with no tabs
+      const {rerender} = render(
+        <UploadMedia
+          rcsConfig={{
+            contextType: 'course',
+            contextId: '17',
+            origin: 'http://host:port',
+            jwt: 'whocares'
+          }}
+          open
+          liveRegion={() => null}
+          onStartUpload={() => {}}
+          onComplete={() => {}}
+          onDismiss={() => {}}
+          tabs={{record: false, upload: false}}
+          uploadMediaTranslations={uploadMediaTranslations}
+        />
+      )
+
+      // rerender, setting the record tab to true
+      const container = rerender(
+        <UploadMedia
+          rcsConfig={{
+            contextType: 'course',
+            contextId: '17',
+            origin: 'http://host:port',
+            jwt: 'whocares'
+          }}
+          open
+          liveRegion={() => null}
+          onStartUpload={() => {}}
+          onComplete={() => {}}
+          onDismiss={() => {}}
+          tabs={{record: false, upload: true}}
+          uploadMediaTranslations={uploadMediaTranslations}
+        />
+      )
+
+      expect(setStateSpy).toHaveBeenCalledWith({selectedPanel: 0})
+
+      setStateSpy.mockRestore()
     })
   })
 
