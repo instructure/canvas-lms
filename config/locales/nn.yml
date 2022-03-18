@@ -1841,6 +1841,7 @@ nn:
           has_one: "Kan ikkje slette oppføringa fordi ei avhengig %{record} eksisterer"
           many: "Kan ikkje slette oppføringa fordi det eksisterer ei avhengig %{record} "
           one: "Kan ikkje slette oppføringa fordi ei avhengig %{record} eksisterer"
+  activity_13915493: Aktivitet
   activity_by_category_9c2033d1: "Aktivitet etter kategori"
   activity_by_date_878c5b49: "Aktivitet etter dato"
   activity_compared_to_class_8133cb0: "Aktivitet samanlikna med seksjon"
@@ -2878,6 +2879,7 @@ nn:
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Er du sikker på at du vil slette din kopi av samtalen? Du kan ikkje angre handlinga."
     other: "Er du sikker på at du vil slette din kopi av meldingane? Du kan ikkje angre handlinga."
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Er du sikker på at du vil slette din kopi av meldinga? Du kan ikkje angre handlinga."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Er du sikker på at du vil slette reservasjonen av denne hendinga?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Er du sikker på at du vil deaktivere Sync til %{sisName}for alle oppgåver?"
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane?"
@@ -6980,6 +6982,8 @@ nn:
         everyone_tab: Alle
         groups: Grupper
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "Brukaren har enno ikkje godkjent invitasjonen til emnet"
         links: 
           edit_sections: "Rediger seksjonar"
           link_to_students: "Lenker til studentar"
@@ -8128,6 +8132,10 @@ nn:
       new_quiz: "Ny prøve"
     edit_crumb: Rediger
     edit_view: 
+      ? " saving"
+      : Lagrar...
+      ? " topic_title"
+      : Emnetittel
       allow_liking: "Tillat å like"
       allow_threaded_replies: "Tillat tråda svar"
       attachment: Vedlegg
@@ -9268,6 +9276,7 @@ nn:
   event_fe9ba3fe: Hending
   event_start_time_441b491f: "Starttidspunkt for hending"
   event_title_57a50568: "Tittel på hending:"
+  event_title_7f1051a6: "Tittel på hending"
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} endra til"
   everthing_updated_after_start_date_f3be8ba: "Alt oppdatert etter startdato"
   every_665d821e: Kvar
@@ -9411,6 +9420,7 @@ nn:
   fail_62dbb06a: feil
   failed_276786d: Mislukka
   failed_307449e1: "Mislukkast:"
+  failed_at_f471dfd3: "Mislukkast med"
   failed_creating_user_b706a1c5: "Kan ikkje opprette brukar"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Kan ikkje laste Associations-komponenten. Er internettkoplinga OK?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Kan ikkje laste emneklassar. Last sida på nytt og prøv igjen."
@@ -11174,6 +11184,7 @@ nn:
   handlebars_helpers: 
     time: 
       event: "%{date} %{time}"
+  handler_7912052f: Behandlar
   has_similarity_score_d5f332b4: "Har likskapsresultat"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
@@ -12049,6 +12060,7 @@ nn:
     titles: 
       job_handler: Jobbehandlar
       last_error: "Siste feil"
+  jobs_ec5d59d8: Jobbar
   join_6cafecca: "Ta del"
   join_course_511e6cb3: "Delta i %{course}"
   join_group_group_name_871a5e3f: "Bli med i gruppa %{group_name}"
@@ -12117,6 +12129,7 @@ nn:
   last_edit_ascending_6a18dba4: "Siste endring: Aukande"
   last_edit_descending_6b7ee755: "Siste endring: Synkande"
   last_enrollment_activity_10fe15ba: "Siste påmeldingsaktivitet"
+  last_error_a3832668: "Siste feil"
   last_export_899a04c5: "Siste eksport: "
   last_first_name_95a078f5: "Etter-, fornamn"
   last_item_79583712: "Siste element: "
@@ -12492,6 +12505,8 @@ nn:
   lock_this_setting_for_sub_accounts_2ae5af17: "Lås innstillinga for underkontoar"
   locked_762f138b: Låst
   locked_796957c7: "Låst:"
+  locked_at_cda02889: Låst
+  locked_by_983c07f7: "Låst av"
   locked_click_to_unlock_50747e11: "Låst. Klikk for å opne."
   locked_content_f4ef2968: "Låst innhald"
   locked_image_24f37a16: "Låst bilde"
@@ -12778,6 +12793,7 @@ nn:
       miscellaneous: Diverse
       operators: Operatør
       relationships: Relasjon
+  max_attempts_ae7b90bc: "Maksimalt tal på forsøk"
   max_dd02d615: maks
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Talet (maks)på brukarar/grupper per avtale"
@@ -13689,6 +13705,10 @@ nn:
         course_starts_next_week: "Emnet ditt startar neste veke"
     dialog: 
       title: "Send eit svar"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "Klikk her for å delta i samtalen"
     email: 
       footer: |-
           Du får denne e-postmeldinga fordi du deltek i ein eller fleire seksjonar som brukar Canvas.  Dersom du vil endre eller slå av e-postvarsla, kan du gå til :
@@ -14796,6 +14816,7 @@ nn:
   move_this_module_4a262aaf: "Flytt denne modulen"
   move_this_page_4a05c813: "Flytt denne sida"
   move_this_section_890bee38: "Flytt denne klassa"
+  move_to_1c208ae5: "Flytt til..."
   move_to_25d7ef11: "Flytt til"
   move_to_9b91c6e0: "Flytt til…"
   move_to_bottom_d0f71bf0: "Flytt nedst"
@@ -15735,6 +15756,7 @@ nn:
   organize_course_content_11de8958: "Organiser emneinnhaldet"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser EPUB etter innhaldstype (standard er etter modul)."
   organize_your_course_content_c3c7ed03: "Organiser emneinnhaldet"
+  original_job_id_d81afbb3: "Opphavleg jobb-ID"
   originality_report_5d461681: Originalitetsrapport
   originality_reports_1e36b935: Originalitetsrapport
   other_1c6d9c79: Anna
@@ -16798,6 +16820,7 @@ nn:
   primary_color_button_b75db628: Primærfargeknapp
   primary_color_button_disabled_9081ddff: "Dekativert primærfargeknapp"
   print_grades_9d5dd50f: "Skriv ut vurderingsresultat"
+  priority_dd4381ee: Prioritet
   privacy_290109ea: Personvern
   privacy_level_f0ec09a3: Personvernnivå
   private_3883d133: Privat
@@ -21404,6 +21427,7 @@ nn:
   tabs_5605547e: Faner
   tag_7bb005ff: Merke
   tagalog_74906db7: Tagalog
+  tags_2b72a03b: Merke
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
   take_a_picture_d582acf1: "Ta eit bilde"
   take_a_snapshot_now_5b622d85: "Ta eit augneblinksbilde no"
