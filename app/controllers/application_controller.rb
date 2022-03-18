@@ -1959,7 +1959,7 @@ class ApplicationController < ActionController::Base
                       return_url: @return_url,
                       expander: variable_expander,
                       opts: opts.merge(
-                        resource_link_for_custom_params: @tag.associated_asset_lti_resource_link
+                        resource_link: @tag.associated_asset_lti_resource_link
                       )
                     )
                   else

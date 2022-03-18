@@ -527,7 +527,7 @@ class ExternalToolsController < ApplicationController
 
   # Get resource link from `resource_link_lookup_id` or `resource_link_lookup_uuid`
   # query param, and ensure the tool matches the resource link.
-  # Used for link-level custom params, but may in the future be used to
+  # Used for link-level custom params, and to
   # determine resource_link_id to send to tool.
   def lookup_resource_link(tool)
     return nil unless resource_link_lookup_uuid
@@ -583,7 +583,7 @@ class ExternalToolsController < ApplicationController
                   return_url: @return_url,
                   expander: expander,
                   opts: opts.merge(
-                    resource_link_for_custom_params: lookup_resource_link(tool)
+                    resource_link: lookup_resource_link(tool)
                   )
                 )
 
