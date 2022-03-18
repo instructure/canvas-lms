@@ -827,11 +827,19 @@ class Group < ActiveRecord::Base
     content_exports.where(user_id: user)
   end
 
-  def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(account_id)
-    result = @account_chain.dup
-    Account.add_site_admin_to_chain!(result) if include_site_admin
-    result
+  def account_chain(include_site_admin: false, include_federated_parent: false)
+    @account_chain ||= Account.account_chain(account_id).freeze
+
+    # This implicitly includes add_federated_parent_to_chain
+    if include_site_admin
+      return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+
+    if include_federated_parent
+      return @account_chain_with_federated_parent ||= Account.add_federated_parent_to_chain!(@account_chain.dup).freeze
+    end
+
+    @account_chain
   end
 
   def sortable_name
