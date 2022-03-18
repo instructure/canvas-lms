@@ -21,6 +21,10 @@ import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
 import AddPeopleApp from '@canvas/add-people'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {TextInput} from '@instructure/ui-text-input'
+import {IconSearchLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('RosterView')
 
@@ -53,6 +57,25 @@ export default class RosterView extends Backbone.View {
   }
 
   afterRender() {
+    ReactDOM.render(
+      <TextInput
+        onChange={e => {
+          // Sends events to hidden input to utilize backbone
+          const hiddenInput = $('[data-view=inputFilter]')
+          hiddenInput[0].value = e.target?.value
+          hiddenInput.keyup()
+        }}
+        display="inline-block"
+        type="text"
+        placeholder={I18n.t('Search people')}
+        aria-label={I18n.t(
+          'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.'
+        )}
+        renderBeforeInput={() => <IconSearchLine />}
+      />,
+      this.$el.find('#search_input_container')[0]
+    )
+
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
 
     const canReadSIS = 'permissions' in ENV ? !!ENV.permissions.read_sis : true
