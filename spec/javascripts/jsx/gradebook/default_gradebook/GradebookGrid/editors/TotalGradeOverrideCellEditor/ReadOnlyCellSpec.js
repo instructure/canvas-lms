@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
-import ReadOnlyCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/ReadOnlyCell'
+import ReadOnlyCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/ReadOnlyCell.js'
 
 QUnit.module('GradebookGrid TotalGradeOverrideCellEditor ReadOnlyCell', suiteHooks => {
   let $container

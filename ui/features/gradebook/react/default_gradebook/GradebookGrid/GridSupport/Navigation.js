@@ -68,12 +68,6 @@ function isLastCellInRow(location, grid) {
 }
 
 export default class Navigation {
-  grid: any
-
-  gridSupport: any
-
-  helper: GridHelper
-
   constructor(grid, gridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport
@@ -319,7 +313,7 @@ export default class Navigation {
     return undefined
   }
 
-  getEventLocation(event, obj: {row?: number; cell?: number} = {}) {
+  getEventLocation(event, obj = {}) {
     const columns = this.grid.getColumns()
 
     if (typeof obj.row === 'number' && typeof obj.cell === 'number') {
@@ -328,7 +322,7 @@ export default class Navigation {
 
     const index = columns.findIndex(column => {
       const $headerNode = this.helper.getColumnHeaderNode(column.id)
-      return $headerNode === event.target || $headerNode?.contains(event.target)
+      return $headerNode === event.target || $headerNode.contains(event.target)
     })
 
     if (index !== -1) {

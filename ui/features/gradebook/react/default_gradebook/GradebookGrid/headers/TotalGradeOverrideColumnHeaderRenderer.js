@@ -28,8 +28,6 @@ function getProps(options) {
 }
 
 export default class TotalGradeOverrideColumnHeaderRenderer {
-  gradebook: any
-
   constructor(gradebook) {
     this.gradebook = gradebook
   }

@@ -18,7 +18,7 @@
 
 import '@canvas/keycodes' // used by some SlickGrid editors
 import slickgrid from 'slickgrid'
-import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index'
+import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index.js'
 
 const {Grid, Editors} = slickgrid
 
