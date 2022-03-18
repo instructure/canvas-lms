@@ -1605,6 +1605,7 @@ uk:
         restrict_dependent_destroy: 
           has_many: "Неможливо видалити запис через залежність на %{record}"
           has_one: "Неможливо видалити запис через наявну залежність на %{record}"
+  activity_13915493: Активність
   activity_by_category_9c2033d1: "Діяльність за категорією"
   activity_by_date_878c5b49: "Діяльність за датою"
   activity_compared_to_class_8133cb0: "Активність в порівнянні з Класом"
@@ -2087,6 +2088,7 @@ uk:
     many: "Ви впевнені, що хочете видалити вашу копію цих розмов? Цю дію неможливо буде скасувати."
     one: "Ви впевнені, що хочете видалити вашу копію цієї розмови? Цю дію неможливо буде скасувати."
     other: "Ви впевнені, що хочете видалити вашу копію цих розмов? Цю дію неможливо буде скасувати."
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Ви впевнені, що хочете видалити Вашу копію цьго повідомлення? Ця дія не може бути скасована."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Ви впевнені, що хочете видалити Ваше резервування для цієї події?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Ви впевнені, що хочете вимкнути синхронізацію %{sisName} для усіх завдань?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Ви впевнені, що хочете це зробити? Це не може бути скасоване і перевизначить існуючі оцінки в заліковій книжці."
@@ -5348,6 +5350,8 @@ uk:
         everyone_tab: Кожен
         groups: Групи
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "Цей користувач ще не прийняв запрошення до курсу"
         links: 
           edit_sections: "Редагувати розділи"
           link_to_students: "Посилання на студентів"
@@ -6261,6 +6265,10 @@ uk:
       student_settings: "Налаштування студента"
     edit_crumb: Редагувати
     edit_view: 
+      ? " saving"
+      : Збереження...
+      ? " topic_title"
+      : "Назва теми"
       allow_liking: "Дозволити ставити Like"
       allow_threaded_replies: "Дозволити зв'язані відповіді"
       attachment: Вкладення
@@ -7157,6 +7165,7 @@ uk:
   event_fe9ba3fe: Подія
   event_start_time_441b491f: "Час початку події"
   event_title_57a50568: "Назва події:"
+  event_title_7f1051a6: "Заголовок події"
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} змінено на"
   every_665d821e: Кожен
   everyone_854554dd: Кожен
@@ -7275,6 +7284,7 @@ uk:
   fail_62dbb06a: відмова
   failed_276786d: "Не вдалося"
   failed_307449e1: "Не вдалося:"
+  failed_at_f471dfd3: "Помилка у"
   failed_creating_user_b706a1c5: "Не вдалося створити користувача"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Не вдалося завантажити компоненти Асоціацій. Чи все гаразд з вашим мережним з'єднанням?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Не вдалося завантажити розділи курсу. Перезавантажте сторінку, щоб повторити спробу."
@@ -8313,6 +8323,7 @@ uk:
   handlebars_helpers: 
     time: 
       event: "%{date} о %{time}"
+  handler_7912052f: Обробник
   has_similarity_score_d5f332b4: "Має оцінку схожості"
   haven_t_been_graded_d7dee5bb: "Не було оцінено"
   haven_t_submitted_yet_e63834db: "Не було відправлено ще"
@@ -8814,6 +8825,7 @@ uk:
     titles: 
       job_handler: "Обробник завдань"
       last_error: "Остання помилка"
+  jobs_ec5d59d8: "Перелік робіт"
   join_6cafecca: Приєднатися
   join_course_511e6cb3: "Приєднуйтесь до  %{course}"
   join_group_group_name_871a5e3f: "Приєднуйтесь до групи %{group_name}"
@@ -8856,6 +8868,7 @@ uk:
     lock_module_until: "Заблоковано до"
   language_6b3e2c7c: Мова
   last_enrollment_activity_10fe15ba: "Остання активність реєстрації"
+  last_error_a3832668: "Остання помилка"
   last_export_899a04c5: "Останній експорт:"
   last_first_name_95a078f5: "Прізвище, Ім'я"
   last_item_79583712: "Останній елемент:"
@@ -9120,6 +9133,8 @@ uk:
   lock_this_setting_for_sub_accounts_2ae5af17: "Блокувати ці налаштування для підпорядкованих облікових записів"
   locked_762f138b: Заблоковано
   locked_796957c7: "Заблоковано:"
+  locked_at_cda02889: "Заблоковано в"
+  locked_by_983c07f7: Заблоковано
   locked_click_to_unlock_50747e11: "Заблоковано. Клацніть, щоб розблокувати."
   locked_content_f4ef2968: "Заблокований вміст"
   locked_object_configuration_d1fb1b82: "Налаштування заблокованого об'єкта:"
@@ -9325,6 +9340,7 @@ uk:
       miscellaneous: Різне
       operators: Оператори
       relationships: Відносини
+  max_attempts_ae7b90bc: "Максимальна кількість спроб"
   max_dd02d615: "максимальне значення"
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Максимальна кількість користувачів / груп за призначенням"
@@ -10208,6 +10224,10 @@ uk:
         course_starts_next_week: "Ваш курс почнеться наступного тижня"
     dialog: 
       title: "Відправити повідомлення у відповідь"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "Натисніть тут для приєднання до бесіди"
     email: 
       footer: |-
           Ви отримали це повідомлення, тому що ви є учасником одного чи декількох класів у системі Canvas.  Аби змінити чи вимкнути сповіщення через електронну пошту відвідайте:
@@ -11248,6 +11268,7 @@ uk:
   move_this_module_4a262aaf: "Перемістити цей модуль"
   move_this_page_4a05c813: "Перемістити цю сторінку"
   move_this_section_890bee38: "Перемістити цей розділ"
+  move_to_1c208ae5: "Перемістити в..."
   move_to_25d7ef11: "Перемістити до"
   move_to_9b91c6e0: "Перемістити в..."
   move_to_dde1a5e1: "Перемістити в..."
@@ -11899,6 +11920,7 @@ uk:
       передумови.
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Організувати epub по типу контента (за замовчуванням є модулем)"
   organize_your_course_content_c3c7ed03: "Організуйте вміст свого курсу"
+  original_job_id_d81afbb3: "Оригінальний ідентифікатор завдання"
   originality_report_5d461681: "Оригінальний звіт"
   other_1c6d9c79: Інше
   other_carrier_45531207: "Інший носій"
@@ -12695,6 +12717,7 @@ uk:
   primary_button_text_1f55d27b: "Основний текст кнопки"
   primary_color_button_b75db628: "Основний колір кнопки"
   primary_color_button_disabled_9081ddff: "Основний колір кнопки вимкнено"
+  priority_dd4381ee: Пріоритет
   privacy_290109ea: Приватність
   proceed_f3d33864: Продовжувати
   processing_2fcc9739: Обробка
@@ -16511,6 +16534,7 @@ uk:
     tab_location_error: "Положення цієї вкладки недійсне "
     tab_unmanagable_error: "%{css_class} не керований"
   tag_7bb005ff: Тег
+  tags_2b72a03b: Теги
   taiwan_886_9a5b6bbf: "Тайва́нь (+886)"
   take_a_picture_d582acf1: "Вибрати зображення"
   take_a_snapshot_now_5b622d85: "Зробити зараз знімок"
