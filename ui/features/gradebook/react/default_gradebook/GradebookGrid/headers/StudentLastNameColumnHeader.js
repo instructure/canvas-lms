@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,29 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default class GridEvent {
-  handlers: any[] = []
+import { useScope as useI18nScope } from '@canvas/i18n';
+import StudentColumnHeader from './StudentColumnHeader'
 
-  subscribe(handler) {
-    if (!this.handlers.includes(handler)) {
-      this.handlers.push(handler)
-    }
+const I18n = useI18nScope('gradebook');
+
+export default class StudentLastNameColumnHeader extends StudentColumnHeader {
+  getColumnHeaderName() {
+    return I18n.t('Student Last Name')
   }
 
-  unsubscribe(handler) {
-    const index = this.handlers.indexOf(handler)
-    if (index !== -1) {
-      this.handlers.splice(index, 1)
-    }
+  getColumnHeaderOptions() {
+    return I18n.t('Student Last Name Options')
   }
 
-  trigger(event, data) {
-    for (let i = 0; i < this.handlers.length; i++) {
-      if (this.handlers[i](event, data) === false) {
-        return false // prevent additional handlers from continuing
-      }
-    }
-
-    return true // continue handling
+  showDisplayAsViewOption() {
+    return false
   }
 }

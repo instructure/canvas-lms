@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import LatePolicyGrade from 'ui/features/gradebook/react/default_gradebook/components/LatePolicyGrade'
+import LatePolicyGrade from 'ui/features/gradebook/react/default_gradebook/components/LatePolicyGrade.js'
 
 QUnit.module('LatePolicyGrade', suiteHooks => {
   let wrapper
@@ -38,11 +38,7 @@ QUnit.module('LatePolicyGrade', suiteHooks => {
         pointsDeducted: 3
       },
       enterGradesAs: 'percent',
-      gradingScheme: [
-        ['A', 90],
-        ['B', 80],
-        ['C', 70]
-      ]
+      gradingScheme: [['A', 90], ['B', 80], ['C', 70]]
     }
     wrapper = mount(<LatePolicyGrade {...defaultProps} {...props} />)
   }

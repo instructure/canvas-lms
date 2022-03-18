@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import ModuleFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/ModuleFilter'
+import ModuleFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/ModuleFilter.js'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {
@@ -34,10 +34,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
       props = {
         disabled: false,
-        modules: [
-          {id: '2002', name: 'Module 2'},
-          {id: '2001', name: 'Module 1'}
-        ],
+        modules: [{id: '2002', name: 'Module 2'}, {id: '2001', name: 'Module 1'}],
         onSelect: sinon.stub(),
         selectedModuleId: '0'
       }

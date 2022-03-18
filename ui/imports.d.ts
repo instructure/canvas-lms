@@ -33,7 +33,6 @@ interface MissingInputProps {
   onClick?: MouseEventHandler<HTMLElement>
   onKeyDown?: KeyboardEventHandler<HTMLElement>
   role?: string
-  disabled?: boolean
 }
 
 interface MissingElementProps {
