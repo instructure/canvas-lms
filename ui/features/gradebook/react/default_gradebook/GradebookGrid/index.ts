@@ -24,6 +24,18 @@ import Events from './Events'
 import GridSupport from './GridSupport/index'
 
 export default class GradebookGrid {
+  columns: Columns
+
+  events: Events
+
+  gridData: any
+
+  options: any
+
+  grid: slickgrid.Grid
+
+  gridSupport?: GridSupport
+
   constructor(options) {
     this.gridData = options.data
     this.options = options
@@ -64,7 +76,7 @@ export default class GradebookGrid {
 
   destroy() {
     if (this.grid) {
-      this.gridSupport.destroy()
+      this.gridSupport?.destroy()
       this.grid.destroy()
       this.grid = null
     }

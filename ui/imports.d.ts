@@ -77,3 +77,21 @@ declare module '@instructure/ui-buttons' {
     id?: string
   }
 }
+
+declare module '@instructure/ui-menu' {
+  export interface Menu {
+    contentRef?: any
+  }
+}
+
+declare module '@instructure/ui-link' {
+  export interface Link {
+    size?: string
+  }
+}
+
+declare module '@instructure/ui-text' {
+  export interface Text {
+    tag?: string
+  }
+}

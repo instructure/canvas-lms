@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import StudentFirstNameColumnHeader from './StudentFirstNameColumnHeader'
+import type Gradebook from '../../Gradebook'
 
 function getProps(gradebook, options) {
   const columnId = 'student_firstname'
@@ -35,6 +36,8 @@ function getProps(gradebook, options) {
 }
 
 export default class StudentFirstNameColumnHeaderRenderer {
+  gradebook: Gradebook
+
   constructor(gradebook) {
     this.gradebook = gradebook
   }

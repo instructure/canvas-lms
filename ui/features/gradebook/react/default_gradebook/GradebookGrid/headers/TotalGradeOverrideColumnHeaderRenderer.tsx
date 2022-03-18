@@ -34,7 +34,7 @@ export default class TotalGradeOverrideColumnHeaderRenderer {
     this.gradebook = gradebook
   }
 
-  render(column, $container, _gridSupport, options) {
+  render(_column, $container, _gridSupport, options) {
     const props = getProps(options)
     ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
   }
