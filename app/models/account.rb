@@ -1059,12 +1059,13 @@ class Account < ActiveRecord::Base
       chain.each_with_index { |a, idx| a.parent_account = chain[idx + 1] if a.parent_account_id == chain[idx + 1]&.id }
     end.freeze
 
-    if include_federated_parent
-      return @account_chain_with_federated_parent ||= Account.add_federated_parent_to_chain!(@account_chain.dup).freeze
-    end
-
+    # This implicitly includes add_federated_parent_to_chain
     if include_site_admin
       return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+
+    if include_federated_parent
+      return @account_chain_with_federated_parent ||= Account.add_federated_parent_to_chain!(@account_chain.dup).freeze
     end
 
     @account_chain
@@ -1188,7 +1189,11 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_roles(include_inactive = false)
-    scope = Role.where(account_id: account_chain_ids)
+    scope = if root_account.primary_settings_root_account?
+              Role.where(account_id: account_chain_ids)
+            else
+              Role.shard(account_chain(include_federated_parent: true).map(&:shard).uniq).where(account: account_chain(include_federated_parent: true))
+            end
     include_inactive ? scope.not_deleted : scope.active
   end
 
@@ -1237,7 +1242,8 @@ class Account < ActiveRecord::Base
   end
 
   def valid_role?(role)
-    role && (role.built_in? || (id == role.account_id) || account_chain_ids.include?(role.account_id))
+    allowed_ids = root_account.primary_settings_root_account? ? account_chain_ids : account_chain(include_federated_parent: true).map(&:id)
+    role && (role.built_in? || (id == role.account_id) || allowed_ids.include?(role.account_id))
   end
 
   def login_handle_name_is_customized?

@@ -1819,13 +1819,29 @@ class RoleOverride < ActiveRecord::Base
     account.shard.activate do
       result = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = {} } }
 
-      Shard.partition_by_shard(account.account_chain(include_site_admin: true)) do |shard_accounts|
-        # skip loading from site admin if the role is not from site admin
-        next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
+      account_root_id = account.root_account_id&.nonzero? ? account.root_account_id : account.id
 
-        RoleOverride.where(role: roles, account: shard_accounts).each do |ro|
+      # skip loading from site admin if the role is not from site admin
+      Shard.partition_by_shard(account.account_chain(include_federated_parent: !account.root_account.primary_settings_root_account?, include_site_admin: role_context == Account.site_admin)) do |shard_accounts|
+        uniq_root_account_ids = shard_accounts.map { |sa| sa.root_account_id&.nonzero? ? sa.root_account_id : sa.id }.uniq
+        uniq_root_account_ids -= [account_root_id] if Shard.current == account.shard
+        all_roles = roles + Role.where(
+          workflow_state: "built_in",
+          root_account_id: uniq_root_account_ids,
+          base_role_type: roles.select(&:built_in?).map(&:base_role_type)
+        )
+        id_map = all_roles.map do |r|
+          if !r.built_in? || r.root_account_id == account_root_id
+            [r.global_id, r.global_id]
+          else
+            # These will all be built-in role copies
+            [r.global_id, roles.detect { |local| local.built_in? && local.base_role_type == r.base_role_type }.global_id]
+          end
+        end.to_h
+
+        RoleOverride.where(role: all_roles, account: shard_accounts).find_each do |ro|
           permission_hash = result[ro.permission]
-          permission_hash[ro.global_context_id][ro.global_role_id] = ro
+          permission_hash[ro.global_context_id][id_map[ro.global_role_id]] = ro
         end
         nil
       end
