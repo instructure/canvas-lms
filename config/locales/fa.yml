@@ -2651,6 +2651,7 @@ fa:
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "آیا مطمئن هستید که می خواهید کپی خود از این گفتگوها را حذف کنید؟ این عمل قابل لغو نیست."
     other: "آیا مطمئن هستید که می خواهید کپی خود از این گفتگوها را حذف کنید؟ این عمل قابل لغو نیست."
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "مطمئنید که می خواهید نسخه این پیام حذف شود؟ این اقدام را نمی توان لغو کرد."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "مطمئنید که می خواهید رزرو شما برای این رویداد حذف شود؟"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "آیا مطمئن هستید که می خواهید همگام سازی به %{sisName} را برای همه تکالیف غیرفعال کنید؟"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "مطمئنید که می خواهید این کار را انجام دهید؟ این عمل لغو نمی شود و جایگزین نمره های موجود در دفتر نمره خواهد شد."
@@ -6684,6 +6685,8 @@ fa:
         everyone_tab: همه
         groups: "گروه ها"
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "این کاربر هنوز دعوت نامه درس را نپذیرفته است"
         links: 
           edit_sections: "ویرایش بخش ها"
           link_to_students: "پیوند دادن به دانشجویان"
@@ -7763,6 +7766,10 @@ fa:
       new_quiz: "آزمون جدید"
     edit_crumb: ویرایش
     edit_view: 
+      ? " saving"
+      : "در حال ذخیره سازی..."
+      ? " topic_title"
+      : "عنوان موضوع"
       allow_liking: "اجازه دادن برای لایک کردن"
       allow_threaded_replies: "اجازه دادن به پاسخ های نخ کشی شده"
       attachment: پیوست
@@ -8830,6 +8837,7 @@ fa:
   event_fe9ba3fe: رویداد
   event_start_time_441b491f: "زمان شروع رویداد"
   event_title_57a50568: "عنوان رویداد:"
+  event_title_7f1051a6: "عنوان رویداد"
   event_title_course_name_changed_to_37510fbb: "%{event_title}، %{course_name} تغییر یافت به"
   every_665d821e: هر
   everyone_854554dd: همه
@@ -9051,6 +9059,7 @@ fa:
   fail_62dbb06a: "نا موفق"
   failed_276786d: "انجام نشد"
   failed_307449e1: "انجام نشد"
+  failed_at_f471dfd3: "انجام نشد در"
   failed_creating_user_b706a1c5: "ایجاد کاربر انجام نشد"
   failed_loading_associations_component_is_your_netw_fa49fb32: "بارگذاری مؤلفه ارتباط ها انجام نشد. آیا اتصال به شبکه درست است؟"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "بخش های درس بارگیری نشد، صفحه را از نو باز و  دوباره امتحان کنید."
@@ -10762,6 +10771,7 @@ fa:
   handlebars_helpers: 
     time: 
       event: "%{date} در %{time}"
+  handler_7912052f: گرداننده
   has_similarity_score_d5f332b4: "دارای امتیاز تشابه"
   haven_t_been_graded_d7dee5bb: "نمره گذاری نشده است"
   haven_t_submitted_yet_e63834db: "هنوز ارسال نشده است"
@@ -11438,6 +11448,7 @@ fa:
     titles: 
       job_handler: "گرداننده کار"
       last_error: "آخرین خطا"
+  jobs_ec5d59d8: کارها
   join_6cafecca: پیوستن
   join_course_511e6cb3: "ملحق شدن به %{course}"
   join_group_group_name_871a5e3f: "پیوستن به گروه %{group_name}"
@@ -11496,6 +11507,7 @@ fa:
   last_day_attended_b72d623c: "روز گذشته بازدید کرد"
   last_e159dbd: آخرین
   last_enrollment_activity_10fe15ba: "آخرین فعالیت ثبت نام"
+  last_error_a3832668: "آخرین خطا"
   last_export_899a04c5: "آخرین صدور:"
   last_first_name_95a078f5: "نام خانوادگی، نام"
   last_item_79583712: "آخرین مورد:"
@@ -11845,6 +11857,8 @@ fa:
   lock_this_setting_for_sub_accounts_2ae5af17: "قفل کردن این تنظیم برای زیر حساب ها"
   locked_762f138b: "قفل شده"
   locked_796957c7: "قفل شده:"
+  locked_at_cda02889: "قفل شده در"
+  locked_by_983c07f7: "قفل شده توسط"
   locked_click_to_unlock_50747e11: "قفل شده. برای قفل گشایی کلیک کنید."
   locked_content_f4ef2968: "محتوای قفل شده"
   locked_image_24f37a16: "تصویر قفل شده"
@@ -12108,6 +12122,7 @@ fa:
       miscellaneous: متفرقه
       operators: عملگرها
       relationships: روابط
+  max_attempts_ae7b90bc: "حداکثر تلاش ها"
   max_dd02d615: بیشینه
   max_membership_bd0ddc68: حداکثر_عضویت
   max_users_groups_per_appointment_867c505b: "حداکثر تعداد کاربر/گروه در هر قرار ملاقات"
@@ -13036,6 +13051,10 @@ fa:
         course_starts_next_week: "درس شما در هفته آینده آغاز می شود"
     dialog: 
       title: "ارسال پیام پاسخ"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "برای پیوستن به گفتگو، اینجا کلیک کنید"
     email: 
       footer: |-
           به این دلیل این نامه الکترونیکی را دریافت کرده اید که با استفاده از کانواس در یک یا چند کلاس شرکت دارید. برای تغییر دادن یا غیر فعال کردن اطلاعیه های پست الکترونیکی، از نشانی زیر بازدید نمایید:
@@ -14340,6 +14359,7 @@ fa:
   move_this_module_4a262aaf: "انتقال این ماژول"
   move_this_page_4a05c813: "انتقال این صفحه"
   move_this_section_890bee38: "انتقال این بخش"
+  move_to_1c208ae5: "انتقال به..."
   move_to_25d7ef11: "انتقال به "
   move_to_9b91c6e0: "انتقال به ..."
   move_to_dde1a5e1: "انتقال به ... "
@@ -15177,6 +15197,7 @@ fa:
       مرتب کنید.
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "epub را بر اساس نوع محتوا سازماندهی کنید (پیش فرض بر اساس ماژول است)."
   organize_your_course_content_c3c7ed03: "سازماندهی محتوای درس خود"
+  original_job_id_d81afbb3: "شناسه کار اصلی"
   originality_report_5d461681: "گزارش اصالت"
   originality_reports_1e36b935: "گزارش‌های اصالت"
   other_1c6d9c79: سایر
@@ -16142,6 +16163,7 @@ fa:
   primary_color_button_b75db628: "دکمه رنگ اولیه"
   primary_color_button_disabled_9081ddff: "دکمه رنگ اولیه غیر فعال شد"
   print_grades_9d5dd50f: "چاپ نمره‌ها"
+  priority_dd4381ee: اولویت
   privacy_290109ea: "حریم خصوصی"
   privacy_level_f0ec09a3: "سطح حریم خصوصی"
   private_3883d133: خصوصی
@@ -20812,6 +20834,7 @@ fa:
   tabs_5605547e: زبانه‌ها
   tag_7bb005ff: برچسب
   tagalog_74906db7: تاگالوگ
+  tags_2b72a03b: "برچسب ها"
   taiwan_886_9a5b6bbf: "تایوان (+886)"
   take_a_picture_d582acf1: "گرفتن عکس"
   take_a_snapshot_now_5b622d85: "اکنون تصویر لحظه ای بگیرید"
