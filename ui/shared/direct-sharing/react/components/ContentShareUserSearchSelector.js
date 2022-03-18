@@ -21,7 +21,7 @@ import React, {useState} from 'react'
 import {arrayOf, func, string} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
+import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'
 import {basicUser} from '@canvas/users/react/proptypes/user'

@@ -18,13 +18,13 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
-import {func, string, object, shape, instanceOf} from 'prop-types'
+import {func, string, object, number, shape, instanceOf} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
-import {MINIMUM_SEARCH_LENGTH, isSearchableTerm} from '../effects/useManagedCourseSearchApi'
+import useDebouncedSearchTerm from './hooks/useDebouncedSearchTerm'
 
 const I18n = useI18nScope('managed_course_selector')
+const MINIMUM_SEARCH_LENGTH = 2
 
 SearchItemSelector.propTypes = {
   onItemSelected: func, // expects each item to have the 'name' property
@@ -33,6 +33,9 @@ SearchItemSelector.propTypes = {
   contextId: string,
   renderOption: func,
   additionalParams: object,
+  minimumSearchLength: number,
+  isSearchableTerm: func,
+  placeholder: string,
   mountNodeRef: shape({
     current: instanceOf(Element)
   })
@@ -42,6 +45,8 @@ SearchItemSelector.defaultProps = {
   onItemSelected: () => {},
   itemSearchFunction: () => {},
   renderLabel: '',
+  minimumSearchLength: MINIMUM_SEARCH_LENGTH,
+  isSearchableTerm: () => true,
   additionalParams: {}
 }
 
@@ -52,7 +57,10 @@ export default function SearchItemSelector({
   contextId = '',
   renderOption,
   additionalParams,
-  mountNodeRef
+  mountNodeRef,
+  minimumSearchLength,
+  isSearchableTerm,
+  placeholder
 }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
@@ -100,7 +108,7 @@ export default function SearchItemSelector({
   const searchableInput = isSearchableTerm(inputValue)
   const noOptionsLabel = searchableInput
     ? I18n.t('No Results')
-    : I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
+    : I18n.t('Enter at least %{count} characters', {count: minimumSearchLength})
   const itemOptions =
     items === null
       ? null
@@ -115,9 +123,9 @@ export default function SearchItemSelector({
     isLoading: isLoading || searchTermIsPending,
     inputValue,
     selectedOptionId: selectedItem ? selectedItem.id : null,
-    assistiveText: I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH}),
+    assistiveText: I18n.t('Enter at least %{count} characters', {count: minimumSearchLength}),
     renderLabel,
-    placeholder: I18n.t('Begin typing to search'),
+    placeholder: placeholder || I18n.t('Begin typing to search'),
     noOptionsLabel,
     onInputChange: handleInputChanged,
     onOptionSelected: handleItemSelected,

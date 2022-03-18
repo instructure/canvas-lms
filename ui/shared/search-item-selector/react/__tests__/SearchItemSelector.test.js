@@ -18,10 +18,9 @@
 
 import React from 'react'
 import SearchItemSelector from '../SearchItemSelector'
-import useManagedCourseSearchApi, {isSearchableTerm} from '../../effects/useManagedCourseSearchApi'
 import {render, fireEvent, act} from '@testing-library/react'
 
-jest.mock('../../effects/useManagedCourseSearchApi')
+const testSearchFunction = jest.fn()
 
 describe('SearchItemSelector', () => {
   beforeAll(() => {
@@ -37,19 +36,18 @@ describe('SearchItemSelector', () => {
   })
 
   beforeEach(() => {
-    isSearchableTerm.mockImplementation(() => true)
     jest.useFakeTimers()
   })
 
-  it('initially searches for all managed courses', () => {
+  it('initially sends no search term', () => {
     render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
       />
     )
-    expect(useManagedCourseSearchApi).toHaveBeenCalledWith(
+    expect(testSearchFunction).toHaveBeenCalledWith(
       expect.objectContaining({
         params: {}
       })
@@ -57,10 +55,10 @@ describe('SearchItemSelector', () => {
   })
 
   it('renders a loading spinner in the combo box while searching', () => {
-    useManagedCourseSearchApi.mockImplementationOnce(({loading}) => loading(true))
+    testSearchFunction.mockImplementationOnce(({loading}) => loading(true))
     const {getByText, getByLabelText} = render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
       />
@@ -72,7 +70,7 @@ describe('SearchItemSelector', () => {
   it('renders a loading spinner and searches with a specific search term when typed', () => {
     const {getAllByText, getByLabelText} = render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
       />
@@ -80,26 +78,24 @@ describe('SearchItemSelector', () => {
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.click(selectInput)
     fireEvent.change(selectInput, {target: {value: 'abc'}})
-    useManagedCourseSearchApi.mockImplementationOnce(({loading}) => loading(true))
+    testSearchFunction.mockImplementationOnce(({loading}) => loading(true))
     act(() => jest.runAllTimers()) // let the debounce happen
     const loadingTexts = getAllByText(/loading/i)
     const loadingTextForSpinner = loadingTexts.find(loading => loading.closest('svg'))
     expect(loadingTextForSpinner).toBeInTheDocument()
-    expect(useManagedCourseSearchApi).toHaveBeenCalledWith(
+    expect(testSearchFunction).toHaveBeenCalledWith(
       expect.objectContaining({
         params: {term: 'abc', search_term: 'abc'}
       })
     )
   })
 
-  it('updates select and invokes onItemSelected when a course is chosen', () => {
-    useManagedCourseSearchApi.mockImplementationOnce(({success}) =>
-      success([{id: 'foo', name: 'bar'}])
-    )
+  it('updates select and invokes onItemSelected when an item is chosen', () => {
+    testSearchFunction.mockImplementationOnce(({success}) => success([{id: 'foo', name: 'bar'}]))
     const handleCourseSelected = jest.fn()
     const {getByText, getByLabelText} = render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
       />
@@ -111,14 +107,12 @@ describe('SearchItemSelector', () => {
     expect(handleCourseSelected).toHaveBeenCalledWith({id: 'foo', name: 'bar'})
   })
 
-  it('invokes onItemSelected with null when the user searches after a course has already been selected', () => {
-    useManagedCourseSearchApi.mockImplementationOnce(({success}) =>
-      success([{id: 'foo', name: 'bar'}])
-    )
+  it('invokes onItemSelected with null when the user searches after an item has already been selected', () => {
+    testSearchFunction.mockImplementationOnce(({success}) => success([{id: 'foo', name: 'bar'}]))
     const handleCourseSelected = jest.fn()
     const {getByText, getByLabelText} = render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
       />
@@ -132,10 +126,10 @@ describe('SearchItemSelector', () => {
   })
 
   it('renders no results if search comes back empty', async () => {
-    useManagedCourseSearchApi.mockImplementationOnce(({success}) => success([]))
+    testSearchFunction.mockImplementationOnce(({success}) => success([]))
     const {getByLabelText, findByText} = render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
       />
@@ -146,13 +140,11 @@ describe('SearchItemSelector', () => {
   })
 
   it('removes the existing input if the contextId changes', () => {
-    useManagedCourseSearchApi.mockImplementationOnce(({success}) =>
-      success([{id: 'foo', name: 'bar'}])
-    )
+    testSearchFunction.mockImplementationOnce(({success}) => success([{id: 'foo', name: 'bar'}]))
     const handleCourseSelected = jest.fn()
     const {getByText, getByLabelText, rerender} = render(
       <SearchItemSelector
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
       />
@@ -164,7 +156,7 @@ describe('SearchItemSelector', () => {
     rerender(
       <SearchItemSelector
         contextId="1"
-        itemSearchFunction={useManagedCourseSearchApi}
+        itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
       />
@@ -175,11 +167,11 @@ describe('SearchItemSelector', () => {
   // not sure how to suppress the error output this creates. oh well.
   it('throws errors for handling by an ErrorBoundary', () => {
     const testError = new Error('test error')
-    useManagedCourseSearchApi.mockImplementationOnce(({error}) => error(testError))
+    testSearchFunction.mockImplementationOnce(({error}) => error(testError))
     expect(() =>
       render(
         <SearchItemSelector
-          itemSearchFunction={useManagedCourseSearchApi}
+          itemSearchFunction={testSearchFunction}
           onItemSelected={() => {}}
           renderLabel="Select a course"
         />
