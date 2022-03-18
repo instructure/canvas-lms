@@ -56,6 +56,20 @@ module Api
         end
       end
 
+      describe "#process_incoming" do
+        context "when the incoming html is too long to parse" do
+          before do
+            stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
+          end
+
+          it "raises 'UnparsableContentError'" do
+            expect do
+              Content.process_incoming("<div><p>too long</p></div>")
+            end.to raise_error Api::Html::UnparsableContentError
+          end
+        end
+      end
+
       describe "#modified_html" do
         it "scrubs links" do
           string = "<body><a href='http://somelink.com'>link</a></body>"
