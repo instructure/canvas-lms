@@ -1775,6 +1775,7 @@ hy:
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս գրառումը:"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս սխեման:"
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս հաղորդակցության Ձեր օրինակը: Այս գործողությունը հնարավոր չէ չեղյալ համարել:"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Դուք իսկապե՞ս ցանկանում եք կատարել այս գործողությունը: Այն հնարավոր չէ չեղարկել եւ արդյունքում կջնջվեն գնահատականների մատյանում տեղ գտած գնահատականները:  "
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Դուք իսկապե՞ս ցանկանում եք ապաակտիվացնել այս օգտատիրոջը: Ապաակտիվացման դեպքում նա չի կարող մասնակցել դասընթացին:"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
@@ -4896,6 +4897,8 @@ hy:
         everyone_tab: Յուրաքանչյուրին
         groups: Խմբեր
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "Այս օգտատերը դեռևս չի ընդունել դասընթացի հրավերը"
         links: 
           edit_sections: "Խմբագրել բաժինները"
           link_to_students: "Կապել ունկնդիրների հետ"
@@ -5728,6 +5731,10 @@ hy:
       new_quiz: "Նոր թեստ"
     edit_crumb: Խմբագրել
     edit_view: 
+      ? " saving"
+      : "Պահպանվում է..."
+      ? " topic_title"
+      : "Թեմայի վերնագիր"
       allow_liking: "Ակտիվացնել \"Հավանել\" կոճակը"
       allow_threaded_replies: "Թույլ տալ շղթայական պատասխաններ"
       attachment: Ներդիր
@@ -6520,6 +6527,7 @@ hy:
   event_date_f05219e7: "Միջոցառման ամսաթիվ՝"
   event_end_time_ef830e66: "Միջոցառման ավարտման ամսաթիվ"
   event_start_time_441b491f: "Միջոցառման մեկնարկի ամսաթիվ"
+  event_title_7f1051a6: "Միջոցառման անվանում"
   every_665d821e: Յուրաքանչյուր
   everyone_854554dd: Յուրաքանչյուրին
   everyone_else_6c6dc7b6: "Մնացած բոլորը"
@@ -6701,6 +6709,7 @@ hy:
   external_tools_6e77821: "Արտաքին գործիքներ"
   external_url_e9b87215: "Արտաքին url"
   failed_307449e1: "Չհաջողված փորձ."
+  failed_at_f471dfd3: Խափանում
   failed_please_report_the_following_error_code_to_y_42248d60: "Ձախողվել է, խնդրում ենք զեկուցել Ձեր համակարգի ադմինիստրատորին սխալի հետևյալ կոդը՝   ErrorReport:%{error};"
   failed_to_create_webhook_b766cf5c: "Չի հաջողվել ստեղծել webhook"
   failed_to_create_zip_file_1a943d06: "Չհաջողվեց ստեղծել zip ֆայլ"
@@ -7941,6 +7950,7 @@ hy:
       Խմբերը գերազանց տեղ են համատեղ նախագծերի վրա աշխատելու կամ ուսումնական պարապմունքների ժամանակացույցը իմանալու և այլնի համար: Ամեն խումբ ստանում է օրացույց, վիկի, քննարկումներ և ֆայլեր պահելու համար մի փոքր տեղ:
       Խմբերը կարող են համատեղ աշխատել փաստաթղթերի կամ նույնիսկ վեբ-կոնֆերանսների ժամանակացույցի վրա:
       Սա իսկապես նման է մինի դասընթացի, որտեղ դու կարող ես աշխատել ուսանողների ավելի փոքր խմբով ավելի նեղ նախագծի վրա:
+  handler_7912052f: Մշակող
   helpDialog: 
     Back: Վերադառնալ
     Help: Օգնություն
@@ -8342,6 +8352,7 @@ hy:
     titles: 
       job_handler: "Հանձնարարության մշակող"
       last_error: "Վերջին սխալ"
+  jobs_ec5d59d8: Առաջադրանքներ
   join_6cafecca: Միանալ
   join_group_group_name_871a5e3f: "Միանալ %{group_name} խմբին"
   joined_group_group_name_e3802c04: "Միացել է %{group_name} խմբին"
@@ -8371,6 +8382,7 @@ hy:
     lock_module_until: "Արգելափակել մինչև"
   language_6b3e2c7c: Լեզուն
   last_enrollment_activity_10fe15ba: "Վերջին գրանցման հետ կապված գործողություն"
+  last_error_a3832668: "Վերջին սխալ"
   last_item_79583712: "Վերջին տարրը՝"
   last_login_54565109: "Վերջին մուտք"
   last_modified_by_ca4bb5e1: "Ում կողմից է փոփոխվել վերջին անգամ"
@@ -8556,6 +8568,8 @@ hy:
   lock_date_cannot_be_before_due_date_ac30f54: "Արգելափակման ամսաթիվը չի կարող նախորդել կատարման վերջնաժամկետին"
   lock_icon_a9916601: "արգելափակել պատկերը"
   locked_762f138b: "Արգելափակված է"
+  locked_at_cda02889: "Արգելափակված է ___________ին"
+  locked_by_983c07f7: "Արգելափակված է ______________կողմից"
   locked_until_unlock_date_498ead5f: "Արգելափակված է մինչև %{unlock_date}"
   log_in_5c66644d: Մուտք
   log_in_c9e240ef: "Մուտք համակարգ"
@@ -8732,6 +8746,7 @@ hy:
       miscellaneous: Այլ
       operators: Օպերատորներ
       relationships: Հարաբերություններ
+  max_attempts_ae7b90bc: "Փորձերի առավելագույն քանակ"
   max_users_groups_per_appointment_867c505b: "Մեկ հանդիպման համար օգտատերերի/խմբերի առավելագույն թիվը"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Մեկ մասնակցի կողմից հանդիպումներին մասնակցության առավելագույն  թիվը:"
   media_af190855: Մուլտիմեդիա
@@ -9569,6 +9584,10 @@ hy:
         course_starts_next_week: "Ձեր դասընթացը սկսվում է հաջորդ շաբաթ"
     dialog: 
       title: "Ուղարկել պատասխան հաղորդագրություն"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "Սեղմեք այստեղ՝ խոսակցությանը միանալու համար"
     email: 
       footer: |-
           Դուք ստացել եք այս էլեկտրոնային հաղորդագրությունը, քանի որ դուք մասնակցում եք Canvas-ի միջոցով անցկացվող մեկ կամ մի քանի դասընթացների: Էլեկտրոնային ծանուցումները փոխելու կամ անջատելու համար այցելեք՝
@@ -10765,6 +10784,7 @@ hy:
   move_module_item_77754119: "Տեղափոխել Մոդուլ/Տարր"
   move_outcome_ce497e6c: "Տեղափոխել արդյունքը"
   move_outcome_group_cfa1a505: "Տեղափոխել արդյունքների խումբը"
+  move_to_1c208ae5: "Անցնել ..."
   move_to_end_fef2fa15: "Տեղափոխել վերջ"
   move_to_front_7eae2e90: "Տեղափոխել սկիզբ"
   move_to_front_bf6f0194: "Տեղափոխել սկիզբ"
@@ -11253,6 +11273,7 @@ hy:
   order_301c3ac1: Կարգ
   ordered_by_recent_activity_112d33d5: "Դասավորվել է ըստ վերջին գործողությունների"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Կազմակերպել epub ըստ բովանդակության տեսակի (լռելյայն ընդունված է ըստ մոդուլների)"
+  original_job_id_d81afbb3: "Աշխատանքի  նույնականացուցչի բնօրինակ"
   outcome_groups: 
     invalid_file: "Արդյունքների խմբի սխալ ֆայլ"
   outcome_groups_api: 
@@ -11918,6 +11939,7 @@ hy:
   previous_timestamp_19343a58: "Նախորդը (%{timestamp})"
   primary_color_button_b75db628: "Առաջնային գույնի կոճակը"
   primary_color_button_disabled_9081ddff: "Առաջնային գույնի կոճակը անջատվել է"
+  priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
   product_name: Canvas
   profile: 
@@ -15756,6 +15778,7 @@ hy:
     tab_location_error: "Ներդիրի տեղը սխալ է նշված"
     tab_unmanagable_error: "%{css_class} կառավարման ենթակա չէ "
   tag_7bb005ff: Պիտակ
+  tags_2b72a03b: Պիտակներ
   take_a_picture_d582acf1: "Օգտագործել պատկերը"
   take_the_quiz_87214d7e: "Կատարել թեստը"
   take_the_quiz_again_8ea51a6c: "Նորից կատարել թեստը"
