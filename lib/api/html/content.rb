@@ -22,11 +22,16 @@ require "nokogiri"
 
 module Api
   module Html
+    class UnparsableContentError < StandardError; end
+
     class Content
       def self.process_incoming(html, host: nil, port: nil)
         return html unless html.present?
 
         content = new(html, host: host, port: port)
+
+        content.validate_is_parsable!
+
         # shortcut html documents that definitely don't have anything we're interested in
         return html unless content.might_need_modification?
 
@@ -141,6 +146,14 @@ module Api
         parsed_html
       end
 
+      def validate_is_parsable!
+        # Make Nokogiri attempt to parse the HTML.
+        # A failure to parse will result in a raised error
+        parsed_html
+      rescue ArgumentError => e
+        raise UnparsableContentError, e.message
+      end
+
       def self.add_overrides_to_html(parsed_html, overrides)
         if (mobile_css_overrides = overrides[:mobile_css_overrides])
           mobile_css_overrides.reverse_each do |url|
@@ -173,7 +186,7 @@ module Api
       end
 
       def parsed_html
-        @_parsed_html ||= Nokogiri::HTML5.fragment(html)
+        @parsed_html ||= Nokogiri::HTML5.fragment(html, nil, CanvasSanitize::SANITIZE[:parser_options])
       end
 
       def apply_user_content_attributes(node, user_content)
