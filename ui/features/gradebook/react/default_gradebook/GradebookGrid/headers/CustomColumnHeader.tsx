@@ -17,11 +17,9 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import {string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import ColumnHeader from './ColumnHeader'
-
-const {string} = PropTypes
 
 export default class CustomColumnHeader extends ColumnHeader {
   static propTypes = {
